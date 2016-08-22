@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -31,7 +30,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
@@ -59,6 +57,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
   private static final String EVENT_MODEL_CHANGED = "modelChanged";
 
   private CalendarListener m_calendarListener;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonCalendar(CALENDAR model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -94,7 +93,14 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     super.attachChildAdapters();
     attachAdapter(getModel().getSelectedComponent());
     attachAdapters(getModel().getComponents());
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    m_jsonContextMenu.dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -329,14 +335,10 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
-  // FIXME awe: (calendar) discuss with C.GU: this is copy&paste. See other impl. if IJsonContextMenuOwner
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
-    }
+    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
     return json;
   }
 

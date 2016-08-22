@@ -16,7 +16,6 @@ import java.util.Date;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
@@ -134,7 +133,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedFormField;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.table.JsonAlphanumericSortingStringColumn;
@@ -270,9 +268,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     // --- other model objects ---
     if (model instanceof IDesktop) {
       return new JsonDesktop<IDesktop>((IDesktop) model, session, id, parent);
-    }
-    if (model instanceof IContextMenu) {
-      return new JsonContextMenu<IContextMenu>((IContextMenu) model, session, id, parent);
     }
     if (model instanceof IFormMenu<?>) {
       return new JsonFormMenu((IFormMenu<?>) model, session, id, parent);

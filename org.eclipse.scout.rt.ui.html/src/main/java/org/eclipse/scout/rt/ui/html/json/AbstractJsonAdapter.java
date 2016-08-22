@@ -187,11 +187,13 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_uiSession.getOrCreateJsonAdapter(model, this);
   }
 
-  protected final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models) {
+  @Override
+  public final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models) {
     return attachAdapters(models, null);
   }
 
-  protected final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models, IFilter<M> filter) {
+  @Override
+  public final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models, IFilter<M> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
     for (M model : models) {
       IJsonAdapter<?> adapter = attachAdapter(model, filter);

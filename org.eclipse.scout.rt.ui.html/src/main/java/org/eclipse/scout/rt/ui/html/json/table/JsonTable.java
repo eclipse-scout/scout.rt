@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -132,6 +131,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   private final TableEventFilter m_tableEventFilter;
   private final Map<IColumn, JsonColumn> m_jsonColumns;
   private final AbstractEventBuffer<TableEvent> m_eventBuffer;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -146,6 +146,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   public String getObjectType() {
     return "Table";
+  }
+
+  public JsonContextMenu<IContextMenu> getJsonContextMenu() {
+    return m_jsonContextMenu;
   }
 
   @Override
@@ -296,8 +300,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
     attachColumns();
+    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
   }
 
   protected void attachColumns() {
@@ -363,9 +368,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   @Override
   protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
     disposeAllColumns();
     disposeAllRows();
+    getJsonContextMenu().dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -394,10 +400,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     json.put(PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     json.put(PROP_COLUMN_ADDABLE, getModel().getTableOrganizer().isColumnAddable());
     json.put(PROP_ROWS, tableRowsToJson(getModel().getRows()));
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
-    }
+    json.put(PROP_MENUS, getJsonContextMenu().childActionsToJson());
     json.put(PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
     if (getModel().getUserFilterManager() != null) {
       json.put(PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));

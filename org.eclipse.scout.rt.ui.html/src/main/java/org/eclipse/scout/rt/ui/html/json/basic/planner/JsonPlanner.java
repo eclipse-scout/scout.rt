@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.DisplayModeOptions;
@@ -39,7 +38,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
-import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
@@ -68,6 +66,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   private final Map<Resource<?>, String> m_resourceIds;
   private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
   private final PlannerEventFilter m_plannerEventFilter;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonPlanner(PLANNER model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -107,7 +106,14 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    m_jsonContextMenu.dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -225,10 +231,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       jsonResources.put(jsonResource);
     }
     json.put("resources", jsonResources);
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
-    }
+    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
     putProperty(json, "selectedResources", resourceIdsToJson(getModel().getSelectedResources(), new P_ResourceIdProvider()));
     return json;
   }

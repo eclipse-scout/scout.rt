@@ -106,16 +106,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
-  protected void attachContextMenuAdapters() {
-    attachAdapter(getModel().getContextMenu(), new OutlineContextMenuFilter<IMenu>());
-  }
-
-  @Override
-  protected void putContextMenu(JSONObject json) {
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson(new OutlineMenuFilter<IMenu>()));
-    }
+  protected JsonContextMenu<IContextMenu> createJsonContextMenu() {
+    return new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this, new OutlineMenuFilter<IMenu>());
   }
 
   @Override

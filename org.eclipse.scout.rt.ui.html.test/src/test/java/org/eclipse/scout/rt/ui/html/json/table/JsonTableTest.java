@@ -26,7 +26,6 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -48,12 +47,11 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.FormTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.ListBoxTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.FormTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu.DisplayableMenu;
@@ -425,9 +423,8 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
-    JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class));
-    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.NonDisplayableMenu.class));
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonTable.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonTable.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.NonDisplayableMenu.class));
 
     // Adapter for NonDisplayableMenu must not exist
     assertNull(jsonNonDisplayableMenu);
@@ -448,15 +445,13 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
-
     Menu menu1 = new Menu();
     table.getContextMenu().addChildAction(menu1);
-    assertNotNull(jsonContextMenu.getAdapter(menu1));
-    assertTrue(jsonContextMenu.getAdapter(menu1).isInitialized());
+    assertNotNull(jsonTable.getAdapter(menu1));
+    assertTrue(jsonTable.getAdapter(menu1).isInitialized());
 
     table.getContextMenu().removeChildAction(menu1);
-    assertNull(jsonContextMenu.getAdapter(menu1));
+    assertNull(jsonTable.getAdapter(menu1));
   }
 
   /**
@@ -472,19 +467,17 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
-
     DisplayableMenu displayableMenu = table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class);
     NonDisplayableMenu NonDisplayableMenu = table.getMenuByClass(TableWithNonDisplayableMenu.NonDisplayableMenu.class);
-    assertNull(jsonContextMenu.getAdapter(NonDisplayableMenu));
-    assertNotNull(jsonContextMenu.getAdapter(displayableMenu));
-    assertTrue(jsonContextMenu.getAdapter(displayableMenu).isInitialized());
+    assertNull(jsonTable.getAdapter(NonDisplayableMenu));
+    assertNotNull(jsonTable.getAdapter(displayableMenu));
+    assertTrue(jsonTable.getAdapter(displayableMenu).isInitialized());
 
     table.getContextMenu().removeChildAction(NonDisplayableMenu);
     table.getContextMenu().removeChildAction(displayableMenu);
 
-    assertNull(jsonContextMenu.getAdapter(NonDisplayableMenu));
-    assertNull(jsonContextMenu.getAdapter(displayableMenu));
+    assertNull(jsonTable.getAdapter(NonDisplayableMenu));
+    assertNull(jsonTable.getAdapter(displayableMenu));
   }
 
   @Test

@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -88,6 +87,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   private final Map<ITreeNode, String> m_treeNodeIds;
   private final TreeEventFilter m_treeEventFilter;
   private final AbstractEventBuffer<TreeEvent> m_eventBuffer;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonTree(TREE model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -100,6 +100,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   @Override
   public String getObjectType() {
     return "Tree";
+  }
+
+  public JsonContextMenu<IContextMenu> getJsonContextMenu() {
+    return m_jsonContextMenu;
   }
 
   @Override
@@ -198,18 +202,20 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachContextMenuAdapters();
+    m_jsonContextMenu = createJsonContextMenu();
+    m_jsonContextMenu.init();
     attachNodes(getTopLevelNodes(), true);
   }
 
-  protected void attachContextMenuAdapters() {
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+  protected JsonContextMenu<IContextMenu> createJsonContextMenu() {
+    return new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
   }
 
   @Override
   protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
     disposeAllNodes();
+    m_jsonContextMenu.dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -279,15 +285,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     }
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODES, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
-    putContextMenu(json);
+    putProperty(json, PROP_MENUS, getJsonContextMenu().childActionsToJson());
     return json;
-  }
-
-  protected void putContextMenu(JSONObject json) {
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson(null));
-    }
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {

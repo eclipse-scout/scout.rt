@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -42,6 +41,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   public static final String PROP_IMAGE_URL = "imageUrl";
 
   private PropertyChangeListener m_contextMenuListener;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonImageField(IMAGE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -84,7 +84,14 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    m_jsonContextMenu.dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -118,11 +125,8 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put(PROP_IMAGE_URL, getImageUrl());
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
-      json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
-    }
+    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
+    json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
     return json;
   }
 

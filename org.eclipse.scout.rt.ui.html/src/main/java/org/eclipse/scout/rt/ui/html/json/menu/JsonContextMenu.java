@@ -20,32 +20,65 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-// FIXME awe: (menu) diese klasse soll kein JsonAdapter mehr sein. Parent der menus ist dann die Table
-public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends AbstractJsonPropertyObserver<CONTEXT_MENU> {
+/**
+ * Helper to handle {@link IContextMenu}. The context menu is never sent to client, only the actual menu items. That is
+ * the reason why this is not an adapter.
+ */
+public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
 
   private ContextMenuListener m_contextMenuListener;
   private Set<IJsonAdapter<?>> m_jsonMenuAdapters = new HashSet<IJsonAdapter<?>>();
 
-  public JsonContextMenu(CONTEXT_MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
-    super(model, uiSession, id, parent);
+  private final IUiSession m_uiSession;
+  private final CONTEXT_MENU m_model;
+  private IJsonAdapter<?> m_parent;
+  private IFilter<IMenu> m_filter;
+
+  public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent) {
+    this(model, parent, new DisplayableActionFilter<IMenu>());
   }
 
-  @Override
-  public String getObjectType() {
-    // ContextMenu is just a wrapper, not a real adapter meant to be sent to client
-    return null;
+  public JsonContextMenu(CONTEXT_MENU model, IJsonAdapter<?> parent, IFilter<IMenu> filter) {
+    if (model == null) {
+      throw new IllegalArgumentException("model must not be null");
+    }
+    m_model = model;
+    m_parent = parent;
+    m_uiSession = parent.getUiSession();
+    m_filter = filter;
   }
 
-  @Override
+  public CONTEXT_MENU getModel() {
+    return m_model;
+  }
+
+  public IUiSession getUiSession() {
+    return m_uiSession;
+  }
+
+  public IJsonAdapter<?> getParent() {
+    return m_parent;
+  }
+
+  public IFilter<IMenu> getFilter() {
+    return m_filter;
+  }
+
+  public void init() {
+    attachModel();
+    attachChildAdapters();
+  }
+
+  public void dispose() {
+    detachModel();
+  }
+
   protected void attachModel() {
-    super.attachModel();
     if (m_contextMenuListener != null) {
       throw new IllegalStateException();
     }
@@ -53,9 +86,7 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends Abstract
     getModel().addContextMenuListener(m_contextMenuListener);
   }
 
-  @Override
   protected void detachModel() {
-    super.detachModel();
     if (m_contextMenuListener == null) {
       throw new IllegalStateException();
     }
@@ -63,27 +94,12 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends Abstract
     m_contextMenuListener = null;
   }
 
-  @Override
-  public JSONObject toJson() {
-    // ContextMenu is just a wrapper, not a real adapter meant to be sent to client
-    return null;
-  }
-
-  public JSONArray childActionsToJson(IFilter<IMenu> menuFilter) {
-    if (menuFilter == null) {
-      menuFilter = new DisplayableActionFilter<IMenu>();
-    }
-    return JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), getModel().getChildActions(), this, menuFilter);
-  }
-
   public JSONArray childActionsToJson() {
-    return childActionsToJson(new DisplayableActionFilter<IMenu>());
+    return JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), getModel().getChildActions(), getParent(), getFilter());
   }
 
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    m_jsonMenuAdapters.addAll(attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>()));
+  public void attachChildAdapters() {
+    m_jsonMenuAdapters.addAll(getParent().attachAdapters(getModel().getChildActions(), getFilter()));
   }
 
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
@@ -101,7 +117,7 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends Abstract
         m_jsonMenuAdapters.remove(adapter);
       }
     }
-    List<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
+    List<IJsonAdapter<?>> menuAdapters = getParent().attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
     m_jsonMenuAdapters.addAll(menuAdapters);
 
     IJsonAdapter<?> parent = getParent();

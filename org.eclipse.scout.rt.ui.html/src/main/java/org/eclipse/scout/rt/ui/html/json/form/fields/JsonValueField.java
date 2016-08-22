@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
@@ -52,6 +51,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
 
   private PropertyChangeListener m_contextMenuListener;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonValueField(VALUE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -76,7 +76,14 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+    m_jsonContextMenu = new JsonContextMenu<IContextMenu>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    m_jsonContextMenu.dispose();
+    super.disposeChildAdapters();
   }
 
   @Override
@@ -114,13 +121,9 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
-
-    if (jsonContextMenu != null) {
-      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
-      json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
-      json.put(PROP_CURRENT_MENU_TYPES, menuTypesToJson(getModel().getContextMenu().getCurrentMenuTypes()));
-    }
+    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
+    json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
+    json.put(PROP_CURRENT_MENU_TYPES, menuTypesToJson(getModel().getContextMenu().getCurrentMenuTypes()));
     return json;
   }
 

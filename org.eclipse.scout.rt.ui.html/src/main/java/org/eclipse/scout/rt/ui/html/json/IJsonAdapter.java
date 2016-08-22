@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -65,9 +66,13 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
   // attachAdapter -> attachChildAdapter
   // getAdapter -> getChildAdapter
   // getAdapters -> getChildAdapters
-  // getParent -> getParentAdapter (owner would be better to have consistent naming with the js part)
+  // getParent -> getParentAdapter
 
   <A extends IJsonAdapter<?>, MODEL> A attachAdapter(MODEL model, IFilter<MODEL> filter);
+
+  <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models);
+
+  <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models, IFilter<MODEL> filter);
 
   <A extends IJsonAdapter<?>> A getAdapter(Object model);
 

@@ -18,14 +18,20 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -38,6 +44,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest;
@@ -211,6 +218,38 @@ public class JsonOutlineTest {
     assertEquals(JsonTree.EVENT_NODES_INSERTED, responseEvents.get(0).getType());
   }
 
+  /**
+   * Tests whether only header menus are sent.
+   * <p>
+   * Other menus are never displayed, no need to send them.
+   */
+  @Test
+  public void testDontSendNonDisplayableMenus() throws Exception {
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    IOutline outline = new Outline(pages);
+    IMenu headerMenu = new HeaderMenu();
+    headerMenu.initAction();
+    IMenu nonHeaderMenu = new NonHeaderMenu();
+    nonHeaderMenu.initAction();
+    outline.getContextMenu().addChildAction(headerMenu);
+    outline.getContextMenu().addChildAction(nonHeaderMenu);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+
+    // ----------
+
+    JsonMenu<IMenu> jsonHeaderMenu = jsonOutline.getAdapter(headerMenu);
+    JsonMenu<IMenu> jsonNonHeaderMenu = jsonOutline.getAdapter(nonHeaderMenu);
+
+    // Adapter for NonHeaderMenu must not exist
+    assertNull(jsonNonHeaderMenu);
+
+    // Json response must not contain NonHeaderMenu
+    JSONObject json = jsonOutline.toJson();
+    JSONArray jsonMenus = json.getJSONArray("menus");
+    assertEquals(1, jsonMenus.length());
+    assertEquals(jsonHeaderMenu.getId(), jsonMenus.get(0));
+  }
+
   protected JsonEvent createNodeSelectionEvent(JsonOutline<IOutline> jsonOutline, IPage page) throws JSONException {
     JSONObject eventData = new JSONObject();
     JSONArray nodeIds = new JSONArray();
@@ -218,5 +257,22 @@ public class JsonOutlineTest {
     eventData.put("nodeIds", nodeIds);
     JsonEvent event = new JsonEvent(jsonOutline.getId(), JsonTree.EVENT_NODES_SELECTED, eventData);
     return event;
+  }
+
+  private static class HeaderMenu extends AbstractMenu {
+
+    @Override
+    protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+      return CollectionUtility.<IMenuType> hashSet(
+          TreeMenuType.Header);
+    }
+  }
+
+  private class NonHeaderMenu extends AbstractMenu {
+    @Override
+    protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+      return CollectionUtility.<IMenuType> hashSet(
+          TreeMenuType.SingleSelection);
+    }
   }
 }
