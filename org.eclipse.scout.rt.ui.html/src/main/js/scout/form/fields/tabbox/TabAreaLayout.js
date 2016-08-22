@@ -17,9 +17,9 @@ scout.TabAreaLayout = function(tabBox) {
 scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
 
 scout.TabAreaLayout.prototype.layout = function($container) {
-  if(!this._ellipsisBounds) {
+  if (!this._ellipsisBounds) {
     this._createAndRenderEllipsis($container);
-    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis,true,true);
+    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis, true, true);
   }
 
   this._destroyEllipsis();
@@ -57,7 +57,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
       tabs = [], // tabs that are visible by model
       tabBounds = [], // bounds of visible tabs
       visibleTabs = [], // tabs that are visible by model and visible in the UI (= not in overflow)
-      selectedTab = 0; // points to index of selected tab (in array of UI visible tabs)
+      selectedTab = -1; // points to index of selected tab (in array of UI visible tabs)
 
     // reduce list to tab-items that are visible by model
     for (i = 0; i < this._tabBox.tabItems.length; i++) {
@@ -75,52 +75,54 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     }
     numTabs = tabs.length;
 
-    // if we have too few space to even display the selected tab, only render the selected tab
-    visibleTabs.push(selectedTab);
-    bounds = tabBounds[selectedTab];
+    if (selectedTab >= 0) {
+      // if we have too few space to even display the selected tab, only render the selected tab
+      visibleTabs.push(selectedTab);
+      bounds = tabBounds[selectedTab];
 
-    if (clientWidth > bounds.width) {
-      // in case of overflow, place selected tab at the left-most position...
-      var horizontalInsets = scout.graphics.getInsets($container).horizontal();
+      if (clientWidth > bounds.width) {
+        // in case of overflow, place selected tab at the left-most position...
+        var horizontalInsets = scout.graphics.getInsets($container).horizontal();
 
-      var viewWidth = bounds.width,
-        delta = bounds.x - horizontalInsets, // delta used to start from x=0
-        leftMostTab = selectedTab,
-        rightMostTab = selectedTab,
-        overflow = false;
+        var viewWidth = bounds.width,
+          delta = bounds.x - horizontalInsets, // delta used to start from x=0
+          leftMostTab = selectedTab,
+          rightMostTab = selectedTab,
+          overflow = false;
 
-      // when viewWidth doesn't fit into clientWidth anymore, abort always
-      // expand to the right until the last tab is reached...
-      if (selectedTab < numTabs - 1) {
-        for (i = selectedTab + 1; i < numTabs; i++) {
-          bounds = tabBounds[i];
-          viewWidth = bounds.x - delta + bounds.width + this._ellipsisBounds.width;
-          if (viewWidth < clientWidth) {
-            visibleTabs.push(i);
-          } else {
-            overflow = true;
+        // when viewWidth doesn't fit into clientWidth anymore, abort always
+        // expand to the right until the last tab is reached...
+        if (selectedTab < numTabs - 1) {
+          for (i = selectedTab + 1; i < numTabs; i++) {
+            bounds = tabBounds[i];
+            viewWidth = bounds.x - delta + bounds.width + this._ellipsisBounds.width;
+            if (viewWidth < clientWidth) {
+              visibleTabs.push(i);
+            } else {
+              overflow = true;
+            }
+          }
+        }
+
+        // than expand to the left until the first tab is reached
+        if (!overflow && selectedTab > 0) {
+          for (i = selectedTab - 1; i >= 0; i--) {
+            bounds = tabBounds[i];
+            if (viewWidth + delta - bounds.x < clientWidth) {
+              visibleTabs.push(i);
+            }
           }
         }
       }
 
-      // than expand to the left until the first tab is reached
-      if (!overflow && selectedTab > 0) {
-        for (i = selectedTab - 1; i >= 0; i--) {
-          bounds = tabBounds[i];
-          if (viewWidth + delta - bounds.x < clientWidth) {
-            visibleTabs.push(i);
-          }
+      // remove all tabs which aren't visible
+      for (i = 0; i < numTabs; i++) {
+        tab = tabs[i];
+        if (visibleTabs.indexOf(i) === -1) {
+          $.log.debug('Overflow tab=' + tab);
+          this._overflowTabs.push(tab);
+          tab.removeTab();
         }
-      }
-    }
-
-    // remove all tabs which aren't visible
-    for (i = 0; i < numTabs; i++) {
-      tab = tabs[i];
-      if (visibleTabs.indexOf(i) === -1) {
-        $.log.debug('Overflow tab=' + tab);
-        this._overflowTabs.push(tab);
-        tab.removeTab();
       }
     }
   }
@@ -157,7 +159,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     menu.on('doAction', function(event) {
       $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
       tabBox._selectTab(tabItem);
-      popup.one('remove', function(event){
+        popup.one('remove', function(event){
           tabItem.session.focusManager.requestFocus(tabItem.$tabContainer);
       });
     });

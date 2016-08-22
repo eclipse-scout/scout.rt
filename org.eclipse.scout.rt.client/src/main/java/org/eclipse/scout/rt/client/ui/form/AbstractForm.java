@@ -850,28 +850,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         m_closeType = IButton.SYSTEM_TYPE_NONE;
         m_blockingCondition.setBlocking(true);
         try {
-          // check if form was made invisible ( = access control denied access)
-          if (!getRootGroupBox().isVisible()) {
-            disposeFormInternal();
-            return;
-          }
           initForm();
-          // check if form was made invisible ( = access control denied access)
-          if (!getRootGroupBox().isVisible()) {
-            // make sure the form is storing since it is not showing
-            disposeFormInternal();
-            return;
-          }
           loadStateInternal();
-          // check if form was made invisible ( = access control denied access)
+
+          // if form was disposed during initForm() or loadStateInternal()
           if (!isBlockingInternal()) {
-            disposeFormInternal();
             return;
           }
-          if (!getRootGroupBox().isVisible()) {
-            disposeFormInternal();
-            return;
-          }
+
           if (getHandler().isGuiLess()) {
             // make sure the form is storing since it is not showing
             storeStateInternal();
