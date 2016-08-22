@@ -158,36 +158,40 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   protected void handleFieldVisibilityChanged() {
     super.handleFieldVisibilityChanged();
+
     if (isInitialized()) {
       rebuildFieldGrid();
     }
-    IGroupBox selectedBox = getSelectedTab();
-    if (selectedBox == null) {
-      for (IGroupBox box : getGroupBoxes()) {
-        if (box.isVisible()) {
-          setSelectedTab(box);
-          break;
+
+    if (getVisibleFieldCount() > 0) {
+      final IGroupBox selectedBox = getSelectedTab();
+      if (selectedBox == null) {
+        for (IGroupBox box : getGroupBoxes()) {
+          if (box.isVisible()) {
+            setSelectedTab(box);
+            break;
+          }
         }
       }
-    }
-    else if (!selectedBox.isVisible()) {
-      int index = getFieldIndex(selectedBox);
-      List<IGroupBox> boxes = getGroupBoxes();
-      // next to right side
-      for (int i = index + 1; i < getFieldCount(); i++) {
-        IGroupBox box = boxes.get(i);
-        if (box.isVisible()) {
-          setSelectedTab(box);
-          break;
-        }
-      }
-      if (getSelectedTab() == selectedBox) {
-        // next to left side
-        for (int i = index - 1; i >= 0; i--) {
+      else if (!selectedBox.isVisible()) {
+        int index = getFieldIndex(selectedBox);
+        List<IGroupBox> boxes = getGroupBoxes();
+        // next to right side
+        for (int i = index + 1; i < getFieldCount(); i++) {
           IGroupBox box = boxes.get(i);
           if (box.isVisible()) {
             setSelectedTab(box);
             break;
+          }
+        }
+        if (getSelectedTab() == selectedBox) {
+          // next to left side
+          for (int i = index - 1; i >= 0; i--) {
+            IGroupBox box = boxes.get(i);
+            if (box.isVisible()) {
+              setSelectedTab(box);
+              break;
+            }
           }
         }
       }

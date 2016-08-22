@@ -25,7 +25,7 @@ scout.TabBox = function() {
         // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
         return;
       }
-      this.htmlComp.invalidateLayoutTree();
+      scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
     }
   }.bind(this);
 };
@@ -36,7 +36,9 @@ scout.inherits(scout.TabBox, scout.CompositeField);
  */
 scout.TabBox.prototype._init = function(model) {
   scout.TabBox.parent.prototype._init.call(this, model);
-  this.tabItems[this.selectedTab].setTabActive(true);
+  if (this.selectedTab >= 0) {
+    this.tabItems[this.selectedTab].setTabActive(true);
+  }
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -50,8 +52,8 @@ scout.TabBox.prototype._render = function($parent) {
     .appendDiv('tab-area')
     .on('keydown', this._onKeyDown.bind(this));
   this.addStatus();
-  this.htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
-  this.htmlComp.setLayout(new scout.TabAreaLayout(this));
+  var htmlAreaComp = new scout.HtmlComponent(this._$tabArea, this.session);
+  htmlAreaComp.setLayout(new scout.TabAreaLayout(this));
 
   this.menuBar.render(this._$tabArea);
 
@@ -147,10 +149,12 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
       });
     }
 
-    var oldSelectedTabItem = this.tabItems[oldSelectedTab],
-      selectedTabItem = this.tabItems[this.selectedTab];
+    var oldSelectedTabItem = this.tabItems[oldSelectedTab];
+    if (oldSelectedTabItem) {
+      oldSelectedTabItem.setTabActive(false);
+    }
 
-    oldSelectedTabItem.setTabActive(false);
+    var selectedTabItem = this.tabItems[this.selectedTab];
     selectedTabItem.setTabActive(true);
 
     if (this.rendered) {
@@ -159,7 +163,11 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
         scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
       }
       selectedTabItem.focusTab();
-      oldSelectedTabItem.detach();
+
+      if (oldSelectedTabItem) {
+        oldSelectedTabItem.detach();
+      }
+
       this._renderTabContent();
     }
   }
@@ -208,16 +216,18 @@ scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualInde
 
 scout.TabBox.prototype._renderTabContent = function() {
   // add new tab-content (use from cache or render)
-  var selectedTabItem = this.tabItems[this.selectedTab];
-  if (selectedTabItem.rendered && !selectedTabItem.attached) {
-    selectedTabItem.attach();
-  } else {
-    // in Swing there's some complicated logic dealing with borders and labels
-    // that determines whether the first group-box in a tab-box has a title or not.
-    // I decided to simplify this and always set the title of the first group-box
-    // to invisible.
-    selectedTabItem.render(this._$tabContent);
-    selectedTabItem._renderLabelVisible(false);
+  if (this.selectedTab >= 0) {
+    var selectedTabItem = this.tabItems[this.selectedTab];
+    if (selectedTabItem.rendered && !selectedTabItem.attached) {
+      selectedTabItem.attach();
+    } else {
+      // in Swing there's some complicated logic dealing with borders and labels
+      // that determines whether the first group-box in a tab-box has a title or not.
+      // I decided to simplify this and always set the title of the first group-box
+      // to invisible.
+      selectedTabItem.render(this._$tabContent);
+      selectedTabItem._renderLabelVisible(false);
+    }
   }
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();

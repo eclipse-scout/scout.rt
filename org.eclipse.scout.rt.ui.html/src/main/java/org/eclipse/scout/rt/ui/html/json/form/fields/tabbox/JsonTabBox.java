@@ -140,6 +140,6 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
       }
       i++;
     }
-    throw new IllegalStateException("selected tab not found in group-boxes list");
+    return -1;
   }
 }

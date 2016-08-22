@@ -98,6 +98,11 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return getClass().getSimpleName();
       }
+
+      @Override
+      protected boolean execCalculateVisible() {
+        return true;
+      }
     }
 
     @Order(30)
@@ -118,6 +123,10 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
         return getClass().getSimpleName();
       }
 
+      @Override
+      protected boolean execCalculateVisible() {
+        return true;
+      }
     }
 
     @Order(40)
@@ -137,6 +146,11 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
       protected String getConfiguredLabel() {
         return getClass().getSimpleName();
       }
+
+      @Override
+      protected boolean execCalculateVisible() {
+        return true;
+      }
     }
 
     @Order(50)
@@ -152,6 +166,10 @@ public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
         return 2;
       }
 
+      @Override
+      protected boolean execCalculateVisible() {
+        return true;
+      }
     }
 
     @Order(60)

@@ -68,12 +68,14 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * Full override: disable
+   * A CompositeField is visible when it has visible child fields (note that menus aren't taken into account).
+   * <p>
+   * Overwrite this method to do further logic or return true to display an empty field
+   * </p>
    */
-
   @Override
   protected boolean execCalculateVisible() {
-    return true;
+    return getVisibleFieldCount() > 0;
   }
 
   @Override
@@ -494,7 +496,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   public void rebuildFieldGrid() {
   }
 
-  private void setVisibleFieldCount(int n) {
+  protected void setVisibleFieldCount(int n) {
     propertySupport.setPropertyInt(PROP_VISIBLE_FIELD_COUNT, n);
   }
 
