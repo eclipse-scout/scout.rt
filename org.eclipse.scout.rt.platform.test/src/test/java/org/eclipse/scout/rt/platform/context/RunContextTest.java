@@ -17,6 +17,10 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 import java.security.PrivilegedAction;
 import java.util.HashSet;
@@ -27,6 +31,8 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -34,6 +40,8 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 @RunWith(PlatformTestRunner.class)
 public class RunContextTest {
@@ -264,6 +272,74 @@ public class RunContextTest {
   @Test
   public void testCurrentTransactionScope() {
     assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope());
+  }
+
+  @Test
+  public void testTransactionMember_TxRequiresNew() {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+    when(txMember.getMemberId()).thenReturn("abc");
+    when(txMember.needsCommit()).thenReturn(true);
+    when(txMember.commitPhase1()).thenReturn(true);
+
+    RunContexts.empty()
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .withTransactionMember(txMember)
+        .run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+          }
+        });
+
+    InOrder inOrder = Mockito.inOrder(txMember);
+    inOrder.verify(txMember, times(1)).commitPhase1();
+    inOrder.verify(txMember, times(1)).commitPhase2();
+    inOrder.verify(txMember, never()).rollback();
+    inOrder.verify(txMember, times(1)).release();
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTransactionMember_TxRequired_TxPresent() {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+
+    RunContexts.empty()
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            RunContexts.copyCurrent()
+                .withTransactionScope(TransactionScope.REQUIRED)
+                .withTransactionMember(txMember)
+                .run(mock(IRunnable.class));
+          }
+        });
+  }
+
+  @Test
+  public void testTransactionMember_TxRequired_TxNotPresent() {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+    when(txMember.getMemberId()).thenReturn("abc");
+    when(txMember.needsCommit()).thenReturn(true);
+    when(txMember.commitPhase1()).thenReturn(true);
+
+    RunContexts.empty()
+        .withTransactionScope(TransactionScope.REQUIRED)
+        .withTransactionMember(txMember)
+        .run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+          }
+        });
+
+    InOrder inOrder = Mockito.inOrder(txMember);
+    inOrder.verify(txMember, times(1)).commitPhase1();
+    inOrder.verify(txMember, times(1)).commitPhase2();
+    inOrder.verify(txMember, never()).rollback();
+    inOrder.verify(txMember, times(1)).release();
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

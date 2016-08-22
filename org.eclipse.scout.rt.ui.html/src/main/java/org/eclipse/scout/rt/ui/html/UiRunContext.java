@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
@@ -87,6 +88,18 @@ public class UiRunContext extends RunContext {
   @Override
   public UiRunContext withTransactionScope(TransactionScope transactionScope) {
     super.withTransactionScope(transactionScope);
+    return this;
+  }
+
+  @Override
+  public UiRunContext withTransactionMember(ITransactionMember transactionMember) {
+    super.withTransactionMember(transactionMember);
+    return this;
+  }
+
+  @Override
+  public UiRunContext withoutTransactionMembers() {
+    super.withoutTransactionMembers();
     return this;
   }
 

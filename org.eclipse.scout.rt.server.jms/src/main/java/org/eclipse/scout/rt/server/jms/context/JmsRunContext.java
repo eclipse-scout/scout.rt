@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
@@ -85,6 +86,18 @@ public class JmsRunContext extends RunContext {
   @Override
   public JmsRunContext withTransaction(final ITransaction transaction) {
     super.withTransaction(transaction);
+    return this;
+  }
+
+  @Override
+  public JmsRunContext withTransactionMember(final ITransactionMember transactionMember) {
+    super.withTransactionMember(transactionMember);
+    return this;
+  }
+
+  @Override
+  public JmsRunContext withoutTransactionMembers() {
+    super.withoutTransactionMembers();
     return this;
   }
 

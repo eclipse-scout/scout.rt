@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.platform.context;
 
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +33,7 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
@@ -67,6 +70,7 @@ public class RunContext implements IAdaptable {
 
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
   protected ITransaction m_transaction;
+  protected List<ITransactionMember> m_transactionMembers = new ArrayList<>();
 
   /**
    * Runs the given {@link IRunnable} on behalf of this {@link RunContext}. Use this method if you run code that does
@@ -147,6 +151,12 @@ public class RunContext implements IAdaptable {
     final CallableChain<RESULT> contributions = new CallableChain<RESULT>();
     interceptCallableChain(contributions);
 
+    @SuppressWarnings("unchecked")
+    final TransactionProcessor<RESULT> transactionProcessor = BEANS.get(TransactionProcessor.class)
+        .withCallerTransaction(m_transaction)
+        .withTransactionScope(m_transactionScope)
+        .withTransactionMembers(m_transactionMembers);
+
     return new CallableChain<RESULT>()
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
@@ -157,7 +167,7 @@ public class RunContext implements IAdaptable {
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
         .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers))
         .addAll(contributions.asList())
-        .add(new TransactionProcessor<RESULT>(getTransaction(), m_transactionScope));
+        .add(transactionProcessor);
   }
 
   /**
@@ -281,6 +291,26 @@ public class RunContext implements IAdaptable {
   }
 
   /**
+   * Associates this context with the given {@link ITransactionMember}. A transaction member participates in this
+   * context's transaction to take action upon commit or rollback.
+   * <p>
+   * The registration of a transaction member is only allowed, if this context demarcates a new transaction boundary,
+   * which always applies for transaction scope {@link TransactionScope#REQUIRES_NEW}.
+   */
+  public RunContext withTransactionMember(final ITransactionMember transactionMember) {
+    m_transactionMembers.add(transactionMember);
+    return this;
+  }
+
+  /**
+   * Removes all transaction members associated with this context.
+   */
+  public RunContext withoutTransactionMembers() {
+    m_transactionMembers.clear();
+    return this;
+  }
+
+  /**
    * Returns the {@link PropertyMap} associated with this context.
    *
    * @see #withProperty(Object, Object)
@@ -373,6 +403,7 @@ public class RunContext implements IAdaptable {
     builder.attr("identifiers", CollectionUtility.format(getIdentifiers()));
     builder.ref("transaction", getTransaction());
     builder.attr("transactionScope", getTransactionScope());
+    builder.ref("transactionMembers", m_transactionMembers);
     return builder.toString();
   }
 
@@ -388,6 +419,7 @@ public class RunContext implements IAdaptable {
     m_identifiers = new LinkedList<>(origin.m_identifiers);
     m_transactionScope = origin.m_transactionScope;
     m_transaction = origin.m_transaction;
+    m_transactionMembers = new ArrayList<>(origin.m_transactionMembers);
   }
 
   /**
@@ -420,6 +452,7 @@ public class RunContext implements IAdaptable {
 
     m_transactionScope = TransactionScope.REQUIRED;
     m_transaction = ITransaction.CURRENT.get();
+    m_transactionMembers = new ArrayList<>();
   }
 
   /**
@@ -438,6 +471,7 @@ public class RunContext implements IAdaptable {
     m_identifiers = new LinkedList<>();
     m_transactionScope = TransactionScope.REQUIRED;
     m_transaction = null;
+    m_transactionMembers = new ArrayList<>();
   }
 
   /**

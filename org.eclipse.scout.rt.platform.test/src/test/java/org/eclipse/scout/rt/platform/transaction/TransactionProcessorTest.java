@@ -20,8 +20,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -32,6 +34,7 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -77,7 +80,9 @@ public class TransactionProcessorTest {
   @Test
   public void testMandatoryWithoutExistingTransaction() throws Exception {
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.MANDATORY));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.MANDATORY));
 
     try {
       chain.call(new Callable<Object>() {
@@ -100,7 +105,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.MANDATORY));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -124,7 +131,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.MANDATORY));
     try {
       chain.call(new Callable<Object>() {
 
@@ -154,7 +163,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -184,7 +195,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -219,7 +232,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -251,7 +266,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -283,7 +300,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -317,7 +336,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRED));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRED));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -347,7 +368,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -384,7 +407,9 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -420,7 +445,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRED));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -447,7 +474,9 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRED));
     try {
       chain.call(new Callable<Object>() {
 
@@ -470,6 +499,127 @@ public class TransactionProcessorTest {
       verify(callingTransaction, never()).rollback();
       verify(callingTransaction, times(1)).addFailure(any(Throwable.class));
     }
+  }
+
+  @Test
+  public void testTransactionMemberSuccess() throws Exception {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+    when(txMember.getMemberId()).thenReturn("abc");
+    when(txMember.needsCommit()).thenReturn(true);
+    when(txMember.commitPhase1()).thenReturn(true);
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .withTransactionMembers(Arrays.asList(txMember)));
+
+    chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+        return null;
+      }
+    });
+
+    InOrder inOrder = Mockito.inOrder(txMember);
+    inOrder.verify(txMember, times(1)).commitPhase1();
+    inOrder.verify(txMember, times(1)).commitPhase2();
+    inOrder.verify(txMember, never()).rollback();
+    inOrder.verify(txMember, times(1)).release();
+  }
+
+  @Test
+  public void testTransactionMemberFailed() throws Exception {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+    when(txMember.getMemberId()).thenReturn("abc");
+    when(txMember.needsCommit()).thenReturn(true);
+    when(txMember.commitPhase1()).thenReturn(true);
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .withTransactionMembers(Arrays.asList(txMember)));
+
+    try {
+      chain.call(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+          throw new RuntimeException("JUnit exception");
+        }
+      });
+      fail("exception expected");
+    }
+    catch (RuntimeException e) {
+      // NOOP
+    }
+
+    InOrder inOrder = Mockito.inOrder(txMember);
+    inOrder.verify(txMember, never()).commitPhase1();
+    inOrder.verify(txMember, never()).commitPhase2();
+    inOrder.verify(txMember, times(1)).rollback();
+    inOrder.verify(txMember, times(1)).release();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test(expected = AssertionException.class)
+  public void testTransactionMember_REQUIRED_TxPresent() throws Exception {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(mock(ITransaction.class))
+        .withTransactionScope(TransactionScope.REQUIRED)
+        .withTransactionMembers(Arrays.asList(txMember)));
+
+    chain.call(mock(Callable.class));
+  }
+
+  @Test
+  public void testTransactionMember_REQUIRED_TxNotPresent() throws Exception {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+    when(txMember.getMemberId()).thenReturn("abc");
+    when(txMember.needsCommit()).thenReturn(true);
+    when(txMember.commitPhase1()).thenReturn(true);
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRED)
+        .withTransactionMembers(Arrays.asList(txMember)));
+
+    chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+        return null;
+      }
+    });
+
+    InOrder inOrder = Mockito.inOrder(txMember);
+    inOrder.verify(txMember, times(1)).commitPhase1();
+    inOrder.verify(txMember, times(1)).commitPhase2();
+    inOrder.verify(txMember, never()).rollback();
+    inOrder.verify(txMember, times(1)).release();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test(expected = AssertionException.class)
+  public void testTransactionMember_MANDATORY() throws Exception {
+    final ITransactionMember txMember = mock(ITransactionMember.class);
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(mock(ITransaction.class))
+        .withTransactionScope(TransactionScope.MANDATORY)
+        .withTransactionMembers(Arrays.asList(txMember)));
+
+    chain.call(mock(Callable.class));
   }
 
   public static class TestTransactionMember implements ITransactionMember {

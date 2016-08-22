@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
@@ -107,6 +108,18 @@ public class ClientRunContext extends RunContext {
   @Override
   public ClientRunContext withTransaction(final ITransaction transaction) {
     super.withTransaction(transaction);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withTransactionMember(final ITransactionMember transactionMember) {
+    super.withTransactionMember(transactionMember);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withoutTransactionMembers() {
+    super.withoutTransactionMembers();
     return this;
   }
 

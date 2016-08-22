@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.transaction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator.IUndecorator;
@@ -35,18 +38,32 @@ import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
  *
  * @since 5.1
  */
+@Bean
 public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT> {
 
-  protected final TransactionScope m_transactionScope;
-  protected final ITransaction m_callerTransaction;
+  protected TransactionScope m_transactionScope = TransactionScope.REQUIRES_NEW;
+  protected ITransaction m_callerTransaction;
+  protected List<ITransactionMember> m_transactionMembers = new ArrayList<>();
 
-  public TransactionProcessor(final ITransaction callerTransaction, final TransactionScope transactionScope) {
-    m_transactionScope = (transactionScope != null ? transactionScope : TransactionScope.REQUIRES_NEW);
+  public TransactionProcessor<RESULT> withTransactionScope(final TransactionScope transactionScope) {
+    m_transactionScope = Assertions.assertNotNull(transactionScope, "transactionScope must not be null");
+    return this;
+  }
+
+  public TransactionProcessor<RESULT> withCallerTransaction(final ITransaction callerTransaction) {
     m_callerTransaction = callerTransaction;
+    return this;
+  }
+
+  public TransactionProcessor<RESULT> withTransactionMembers(final List<ITransactionMember> transactionMembers) {
+    m_transactionMembers.addAll(transactionMembers);
+    return this;
   }
 
   @Override
   public RESULT intercept(final Chain<RESULT> chain) throws Exception {
+    assertTransactionMemberRegistration();
+
     switch (m_transactionScope) {
       case REQUIRES_NEW:
         return runTxRequiresNew(chain);
@@ -70,6 +87,12 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
   protected RESULT runTxRequiresNew(final Chain<RESULT> chain) throws Exception {
     // Create and register the new transaction.
     final ITransaction newTransaction = BEANS.get(ITransaction.class);
+
+    // Register the transaction members.
+    for (final ITransactionMember transactionMember : m_transactionMembers) {
+      newTransaction.registerMember(transactionMember);
+    }
+
     final IRegistrationHandle currentTransactionRegistration = registerAsCurrentTransaction(newTransaction);
     final IRegistrationHandle cancellationRegistration = registerTransactionForCancellation(newTransaction);
     try {
@@ -87,6 +110,10 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
     finally {
       currentTransactionRegistration.dispose();
       cancellationRegistration.dispose();
+
+      for (final ITransactionMember transactionMember : m_transactionMembers) {
+        newTransaction.unregisterMember(transactionMember);
+      }
     }
   }
 
@@ -158,5 +185,15 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
         decoration.undecorate();
       }
     };
+  }
+
+  protected void assertTransactionMemberRegistration() {
+    if (m_transactionMembers.isEmpty()) {
+      return; // no members to be registered
+    }
+    if (m_transactionScope == TransactionScope.REQUIRES_NEW || m_callerTransaction == null) {
+      return; // members to be registered within a new transaction
+    }
+    Assertions.fail("Registration of transaction members only allowed if starting a new transaction");
   }
 }
