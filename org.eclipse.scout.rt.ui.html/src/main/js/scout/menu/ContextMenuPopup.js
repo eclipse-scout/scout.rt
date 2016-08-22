@@ -305,9 +305,6 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     }
     var menuRemoveHandler = function(event) {
       var removedMenu = event.eventOn;
-      if (removedMenu.cloneOf) {
-        this.session.unregisterAllAdapterClones(removedMenu.cloneOf);
-      }
       removedMenu.setParent(oldParent);
     }.bind(this);
     menu.on('remove', menuRemoveHandler);
@@ -355,17 +352,24 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
  * @override Widget.js
  */
 scout.ContextMenuPopup.prototype._remove = function() {
-  this._getMenuItems().forEach(function(menu) {
-    if (this.options.cloneMenuItems) {
-      if (this.session.hasClones(menu)) {
-        this.session.unregisterAllAdapterClones(menu);
-      }
-    } else {
+  if (this.options.cloneMenuItems) {
+    this._getMenuItems().forEach(unregisterAllAdapterClonesRec, this);
+  } else {
+    this._getMenuItems().forEach(function(menu) {
       menu.remove();
-    }
-  }, this);
+    }, this);
+  }
   scout.scrollbars.uninstall(this.$body, this.session);
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
+
+  // ----- Helper functions -----
+
+  function unregisterAllAdapterClonesRec(menu) {
+    menu.children.slice().reverse().forEach(unregisterAllAdapterClonesRec, this);
+    if (this.session.hasClones(menu)) {
+      this.session.unregisterAllAdapterClones(menu);
+    }
+  }
 };
 
 scout.ContextMenuPopup.prototype.close = function(event) {
