@@ -101,7 +101,9 @@ scout.PopupWindow.prototype._onResize = function() {
   $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
 
   // store window bounds by class ID
-  scout.PopupWindow.storeWindowBounds(this.form, new scout.Rectangle(left, top, width, height));
+  if (this.form.cacheBounds) {
+    scout.PopupWindow.storeWindowBounds(this.form, new scout.Rectangle(left, top, width, height));
+  }
 
   var windowSize = new scout.Dimension($myWindow.width(), $myWindow.height());
   this.htmlComp.setSize(windowSize);
@@ -109,12 +111,18 @@ scout.PopupWindow.prototype._onResize = function() {
 
 scout.PopupWindow.storeWindowBounds = function(form, bounds) {
   var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
-  window.localStorage[storageKey] = JSON.stringify(bounds);
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(bounds));
+  }
+  catch (err) {
+    // ignore errors (e.g. this can happen in "private mode" on Safari)
+    $.log.error('Error while storing "' + storageKey + '" in localStorage: ' + err);
+  }
 };
 
 scout.PopupWindow.readWindowBounds = function(form) {
-  var storageKey = 'scout:formBounds:' + form.cacheBoundsKey,
-    bounds = window.localStorage[storageKey];
+  var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
+  var bounds = localStorage.getItem(storageKey);
   if (!bounds) {
     return null;
   }

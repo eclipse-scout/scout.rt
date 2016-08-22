@@ -143,6 +143,7 @@ scout.TabItem.prototype.setMarked = function(marked) {
   if (this._tabRendered) {
     this._renderMarked();
   }
+  return false;
 };
 
 scout.TabItem.prototype._renderMarked = function(marked) {
@@ -161,6 +162,7 @@ scout.TabItem.prototype.setVisible = function(visible) {
   if (this._tabRendered) {
     this._renderVisible();
   }
+  return false;
 };
 
 /**
@@ -207,7 +209,8 @@ scout.TabItem.prototype.addStatus = function() {
   }
   this.$status = this.$tabContainer
     .appendSpan('status')
-    .on('mousedown', this._onStatusMousedown.bind(this));
+    .on('mousedown', this._onStatusMousedown.bind(this))
+    .cssWidth(scout.HtmlEnvironment.fieldStatusWidth);
 };
 
 scout.TabItem.prototype._syncStatusVisible = function() {
