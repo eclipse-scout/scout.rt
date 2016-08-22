@@ -14,7 +14,7 @@ scout.TabItemLayout = function(tabItem) {
 scout.inherits(scout.TabItemLayout, scout.GroupBoxLayout);
 
 scout.TabItemLayout.prototype._layoutStatus = function() {
-  this._groupBox.$status.cssWidth(this._statusWidth);
+  // NOP: $status width is set in TabItem.addStatus()
 };
 
 scout.TabItemLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {

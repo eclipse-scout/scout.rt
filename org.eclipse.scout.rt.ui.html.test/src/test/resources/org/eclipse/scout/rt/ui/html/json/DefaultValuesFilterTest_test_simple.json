@@ -133,6 +133,17 @@
           }
         ]
       }
+    },
+    {
+      "id": "13",
+      "objectType": "Button",
+      "statusVisible": true,
+      "gridData": {
+        "x": -1,
+        "y": -1,
+        "h": 2,
+        "w": 2
+      }
     }
   ]
 }

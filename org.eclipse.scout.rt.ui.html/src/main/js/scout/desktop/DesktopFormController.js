@@ -65,9 +65,9 @@ scout.DesktopFormController.prototype._findActiveSelectablePart = function(form)
  */
 scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
   var windowSpecs,
-    resizeToPrefSize, // flag used to resize browser-window later (see PopupWindow.js)
-    bounds = scout.PopupWindow.readWindowBounds(form);
+    resizeToPrefSize; // flag used to resize browser-window later (see PopupWindow.js)
 
+  var bounds = (form.cacheBounds ? scout.PopupWindow.readWindowBounds(form) : null);
   if (bounds) {
     windowSpecs = 'left=' + bounds.x + ',top=' + bounds.y + ',width=' + bounds.width + ',height=' + bounds.height;
     resizeToPrefSize = false;

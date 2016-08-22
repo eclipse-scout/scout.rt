@@ -826,7 +826,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
 
   // Store size
   if (this.cacheSplitterPosition) {
-    sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+    storeSplitterPosition(this.splitter.position);
   }
 
   // Check if splitter is smaller than min size
@@ -847,13 +847,24 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
         this.resizing = true;
         this.splitter.setPosition();
         // Store size
-        sessionStorage.setItem('scout:desktopSplitterPosition', this.splitter.position);
+        storeSplitterPosition(this.splitter.position);
         this.revalidateLayout();
         this.resizing = false;
       }.bind(this)
     });
   } else {
     this.resizing = false;
+  }
+  
+  // ----- Helper functions -----
+
+  function storeSplitterPosition(splitterPosition) {
+    try {
+      sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+    } catch (err) {
+      // ignore errors (e.g. this can happen in "private mode" on Safari)
+      $.log.error('Error while storing "scout:desktopSplitterPosition" in sessionStorage: ' + err);
+    }
   }
 };
 

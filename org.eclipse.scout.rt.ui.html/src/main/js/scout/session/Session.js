@@ -275,7 +275,12 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }
 
   // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
-  sessionStorage.setItem('scout:clientSessionId', data.startupData.clientSessionId);
+  try {
+    sessionStorage.setItem('scout:clientSessionId', data.startupData.clientSessionId);
+  } catch (err) {
+    // ignore errors (e.g. this can happen in "private mode" on Safari)
+    $.log.error('Error while storing "scout:clientSessionId" in sessionStorage: ' + err);
+  }
 
   // Assign server generated uiSessionId. It must be sent along with all further requests.
   this.uiSessionId = data.startupData.uiSessionId;
@@ -326,6 +331,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
     this._resumeBackgroundJobPolling();
 
     this.ready = true;
+
     $.log.info('Session initialized. Detected ' + scout.device);
     if ($.log.isDebugEnabled()) {
       $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countOwnProperties(this._adapterDataCache));
@@ -1207,7 +1213,12 @@ scout.Session.prototype.logout = function(logoutUrl) {
     this.desktop.$container.window(true).close();
   } else {
     // remember current url to not lose query parameters
+  try {
     sessionStorage.setItem('scout:loginUrl', window.location.href);
+  } catch (err) {
+    // ignore errors (e.g. this can happen in "private mode" on Safari)
+    $.log.error('Error while storing "scout:loginUrl" in sessionStorage: ' + err);
+  }
     // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
     setTimeout(function() {
       scout.reloadPage({

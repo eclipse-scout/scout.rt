@@ -129,11 +129,11 @@ scout.TabItem.prototype.removeTab = function() {
 
 scout.TabItem.prototype._syncMarked = function(marked) {
   this.marked = marked;
-  // Marked affects the tab item -> it needs to be rendered even if groupox is not
+  // Marked affects the tab item -> it needs to be rendered even if group box is not
   if (this._tabRendered) {
     this._renderMarked();
-    return false;
   }
+  return false;
 };
 
 scout.TabItem.prototype._renderMarked = function(marked) {
@@ -142,11 +142,11 @@ scout.TabItem.prototype._renderMarked = function(marked) {
 
 scout.TabItem.prototype._syncVisible = function(visible) {
   this.visible = visible;
-  // Visible affects the tab item -> it needs to be rendered even if groupox is not
+  // Visible affects the tab item -> it needs to be rendered even if group box is not
   if (this._tabRendered) {
     this._renderVisible();
-    return false;
   }
+  return false;
 };
 
 scout.TabItem.prototype._renderVisible = function(visible) {
@@ -159,11 +159,11 @@ scout.TabItem.prototype._renderVisible = function(visible) {
 
 scout.TabItem.prototype._syncLabel = function(label) {
   this.label = label;
-  // Label affects the tab item -> it needs to be rendered even if groupox is not
+  // Label affects the tab item -> it needs to be rendered even if group box is not
   if (this._tabRendered) {
     this._renderLabel();
-    return false;
   }
+  return false;
 };
 
 scout.TabItem.prototype._renderLabel = function() {
@@ -188,7 +188,8 @@ scout.TabItem.prototype.addStatus = function() {
   }
   this.$status = this.$tabContainer
     .appendSpan('status')
-    .on('mousedown', this._onStatusMousedown.bind(this));
+    .on('mousedown', this._onStatusMousedown.bind(this))
+    .cssWidth(scout.HtmlEnvironment.fieldStatusWidth);
 };
 
 scout.TabItem.prototype._syncStatusVisible = function() {

@@ -18,6 +18,16 @@ scout.TabBox = function() {
   this.selectedTab;
   this._$tabArea;
   this._$tabContent;
+
+  this._tabItemPropertyChangeListener = function(event) {
+    if (event.changedProperties.length > 0) {
+      if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
+        // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
+        return;
+      }
+      this.htmlComp.invalidateLayoutTree();
+    }
+  }.bind(this);
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
@@ -41,14 +51,14 @@ scout.TabBox.prototype._render = function($parent) {
     .appendDiv('tab-area')
     .on('keydown', this._onKeyDown.bind(this));
   this.addStatus();
-  var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
-  htmlComp.setLayout(new scout.TabAreaLayout(this));
+  this.htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
+  this.htmlComp.setLayout(new scout.TabAreaLayout(this));
 
   this.menuBar.render(this._$tabArea);
 
   this._$tabContent = this.$container.appendDiv('tab-content');
-  htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
-  htmlComp.setLayout(new scout.SingleLayout());
+  var htmlCompContent = new scout.HtmlComponent(this._$tabContent, this.session);
+  htmlCompContent.setLayout(new scout.SingleLayout());
 };
 
 /**
@@ -87,12 +97,14 @@ scout.TabBox.prototype._renderSelectedTab = function() {
 scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
+    tabItem.on('propertyChange', this._tabItemPropertyChangeListener);
   }, this);
 };
 
 scout.TabBox.prototype._removeTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.removeTab();
+    tabItem.off('propertyChange', this._tabItemPropertyChangeListener);
   }, this);
 };
 
