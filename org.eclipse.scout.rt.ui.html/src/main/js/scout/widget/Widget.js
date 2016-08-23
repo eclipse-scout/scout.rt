@@ -45,7 +45,9 @@ scout.Widget = function() {
   // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
   this._adapterProperties = [];
   this._cloneProperties = ['parent', 'session']; // FIXME [awe, cgu] discuss: when not cloned automatically we need to pass 'parent' in clone method
-  this._propertyConfig = {};
+  this._preserveOnPropertyChangeProperties = []; // FIXME [awe, cgu] 6.1 - migrieren zu propertyConfig und
+  // dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
+
 
   // FIXME [awe, cgu] 6.1 discuss: wenn alle widgets events und keyStrokeContext haben sollen braucht es die add methoden nicht mehr
   this._addKeyStrokeContextSupport();
@@ -97,10 +99,6 @@ scout.Widget.prototype.createFromProperty = function(propertyName, value) {
   }
   value.parent = this;
   return scout.create(value);
-};
-
-scout.Widget.prototype._isPropertyRemotable = function(propertyName) {
-  return true; // FIXME [awe] 6.1 - hier propertyConfig lesen, diese Funktion würde für tableStatus / Status false zurückgeben weil es keinen Adapter gibt
 };
 
 scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -706,33 +704,33 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * 3. Model update: If there is a custom sync function (e.g. _syncXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
  * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called.
  */
-scout.Widget.prototype.setProperty = function(name, value) {
-  if (scout.objects.equals(this[name], value)) {
+scout.Widget.prototype.setProperty = function(propertyName, value) {
+  if (scout.objects.equals(this[propertyName], value)) {
     return;
   }
 
-  value = this._prepareProperty(name, value);
+  value = this._prepareProperty(propertyName, value);
   if (this.rendered) {
-    this._callRemoveProperty(name);
+    this._callRemoveProperty(propertyName);
   }
-  this._callSetProperty(name, value);
+  this._callSetProperty(propertyName, value);
   if (this.rendered) {
-    this._callRenderProperty(name);
+    this._callRenderProperty(propertyName);
   }
 };
 
-scout.Widget.prototype._prepareProperty = function(name, value) {
-  if (!this._isAdapterProperty(name)) {
+scout.Widget.prototype._prepareProperty = function(propertyName, value) {
+  if (!this._isAdapterProperty(propertyName)) {
     return value;
   }
-  return this._prepareWidgetProperty(name, value);
+  return this._prepareWidgetProperty(propertyName, value);
 };
 
-scout.Widget.prototype._prepareWidgetProperty = function(name, widgets) {
+scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) {
   // Create new child widget(s)
-  widgets = this._ensureType(name, widgets);
+  widgets = this._ensureType(propertyName, widgets);
 
-  var oldWidgets = this[name];
+  var oldWidgets = this[propertyName];
   if (oldWidgets && Array.isArray(widgets)) {
     // if new value is an array, old value has to be one as well
     // copy to prevent modification of original
@@ -743,7 +741,9 @@ scout.Widget.prototype._prepareWidgetProperty = function(name, widgets) {
   }
 
   // Destroy old child widget(s)
-  this._destroyWidgets(oldWidgets);
+  if (!this._isPreserveOnPropertyChangeProperty(propertyName)) {
+    this._destroyWidgets(oldWidgets);
+  }
 
   // Link to new parent
   this.link(widgets);
@@ -751,12 +751,12 @@ scout.Widget.prototype._prepareWidgetProperty = function(name, widgets) {
   return widgets;
 };
 
-scout.Widget.prototype._callRemoveProperty = function(name) {
-  var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(name);
+scout.Widget.prototype._callRemoveProperty = function(propertyName) {
+  var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(propertyName);
   if (this[removeFuncName]) {
     this[removeFuncName]();
   } else {
-    this._removeProperty(name);
+    this._removeProperty(propertyName);
   }
 };
 
@@ -764,12 +764,15 @@ scout.Widget.prototype._callRemoveProperty = function(name) {
  * Does nothing if the property is not a widget property.<p>
  * If it is a widget property, it removes the existing widgets. Render has to be implemented by the widget itself.
  */
-scout.Widget.prototype._removeProperty = function(name) {
-  var widgets = this[name];
+scout.Widget.prototype._removeProperty = function(propertyName) {
+  var widgets = this[propertyName];
   if (!widgets) {
     return;
   }
-  if (!this._isAdapterProperty(name)) {
+  if (!this._isAdapterProperty(propertyName)) {
+    return;
+  }
+  if (this._isPreserveOnPropertyChangeProperty(propertyName)) {
     return;
   }
 
@@ -780,17 +783,17 @@ scout.Widget.prototype._removeProperty = function(name) {
   });
 };
 
-scout.Widget.prototype._callSetProperty = function(name, value) {
-  var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
+scout.Widget.prototype._callSetProperty = function(propertyName, value) {
+  var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName);
   if (this[syncFuncName]) {
     this[syncFuncName](value); // FIXME [6.1] CGU rename to _setFuncName
   } else {
-    this._setProperty(name, value);
+    this._setProperty(propertyName, value);
   }
 };
 
-scout.Widget.prototype._callRenderProperty = function(name) {
-  var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
+scout.Widget.prototype._callRenderProperty = function(propertyName) {
+  var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(propertyName);
   if (!this[renderFuncName]) { // FIXME [6.1] cgu remove this error and remove every empty render function
     throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
   }
@@ -894,6 +897,14 @@ scout.Widget.prototype._addCloneProperties = function(properties) {
 
 scout.Widget.prototype._isCloneProperty = function(propertyName) {
   return this._cloneProperties.indexOf(propertyName) > -1;
+};
+
+scout.Widget.prototype._addPreserveOnPropertyChangeProperties = function(properties) {
+  this._addProperties('_preserveOnPropertyChangeProperties', properties);
+};
+
+scout.Widget.prototype._isPreserveOnPropertyChangeProperty = function(propertyName) {
+  return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
 };
 
 scout.Widget.prototype._addProperties = function(propertyName, properties) {

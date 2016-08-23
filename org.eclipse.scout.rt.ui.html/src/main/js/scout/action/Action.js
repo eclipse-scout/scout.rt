@@ -234,7 +234,7 @@ scout.Action.prototype.afterSendDoAction = function() {
   // NOP
 };
 
-scout.Action.prototype.setSelected = function(selected, notifyServer) {
+scout.Action.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
 };
 

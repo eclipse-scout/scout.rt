@@ -83,7 +83,7 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
     this._preventTabActivation = false;
     return;
   }
-  this.parent._selectTab(this);
+  this.parent.setSelectedTab(this);
   // Focus tab on mouse down, normally done when the tab get selected, but not if focus manger is deactivated.
   // -> If user explicitly clicks a tab it needs to get the focus otherwise keystrokes to switch tabs would not work.
   if (!this.session.focusManager.active) {

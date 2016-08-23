@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.TabBoxAdapter = function() {
   scout.TabBoxAdapter.parent.call(this);
-  this._addAdapterProperties(['tabItems']);
+  this._addAdapterProperties(['tabItems', 'selectedTab']);
+  this._addRemoteProperties(['selectedTab']);
 };
 scout.inherits(scout.TabBoxAdapter, scout.CompositeFieldAdapter);
+

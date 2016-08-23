@@ -14,7 +14,8 @@
  */
 scout.TabBox = function() {
   scout.TabBox.parent.call(this);
-  this._addAdapterProperties(['tabItems']);
+  this._addAdapterProperties(['tabItems', 'selectedTab']);
+  this._addPreserveOnPropertyChangeProperties(['selectedTab']); // FIXME [awe] 6.1 - do this in Calendar too, for selectedComponent
   this.selectedTab;
   this._$tabArea;
   this._$tabContent;
@@ -36,7 +37,8 @@ scout.inherits(scout.TabBox, scout.CompositeField);
  */
 scout.TabBox.prototype._init = function(model) {
   scout.TabBox.parent.prototype._init.call(this, model);
-  this.tabItems[this.selectedTab].setTabActive(true);
+  // FIXME [awe] 6.1 - check commit on 5.2 branch from michael schmucki, should not cause errors when no tab is selected initially
+  this.selectedTab.setTabActive(true);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -77,14 +79,6 @@ scout.TabBox.prototype._remove = function() {
   scout.TabBox.parent.prototype._remove.call(this);
   this._removeTabs();
   this._removeTabContent();
-};
-
-/**
- * Must call _selectTab(), the method sets the this.selectedTab property
- * and renders the new tab/content.
- */
-scout.TabBox.prototype._syncSelectedTab = function(selectedTab) {
-  this._selectTab(this.tabItems[selectedTab], false);
 };
 
 scout.TabBox.prototype._renderSelectedTab = function() {
@@ -132,38 +126,35 @@ scout.TabBox.prototype.rebuildTabs = function() {
   }
 };
 
-scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
-  var tabIndex = this.tabItems.indexOf(tabItem);
-  if (tabIndex !== this.selectedTab) {
-    $.log.debug('(TabBox#_selectTab) tabItem=' + tabItem + ' tabIndex=' + tabIndex);
-    var oldSelectedTab = this.selectedTab;
-    this.selectedTab = tabIndex;
-    if (scout.nvl(notifyServer, true)) {
-      this._send('selected', {
-        tabIndex: tabIndex
-      });
+scout.TabBox.prototype.setSelectedTab = function(selectedTab) {
+  this.setProperty('selectedTab', selectedTab);
+};
+
+scout.TabBox.prototype._syncSelectedTab = function(tab, notifyServer) {
+  if (this.selectedTab === tab) {
+    return;
+  }
+
+  $.log.debug('(TabBox#_selectTab) tab=' + tab);
+  var oldSelectedTab = this.selectedTab;
+  var selectedTab = tab;
+  oldSelectedTab.setTabActive(false);
+  selectedTab.setTabActive(true);
+  this._setProperty('selectedTab', selectedTab);
+
+  if (this.rendered) {
+    // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
+    if (!this.selectedTab._tabRendered) {
+      scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
     }
-
-    var oldSelectedTabItem = this.tabItems[oldSelectedTab],
-      selectedTabItem = this.tabItems[this.selectedTab];
-
-    oldSelectedTabItem.setTabActive(false);
-    selectedTabItem.setTabActive(true);
-
-    if (this.rendered) {
-      // revalidateLayoutTree layout when tab-area has changed, because overflow tabs must be re-arranged
-      if (!selectedTabItem._tabRendered) {
-        scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
-      }
-      selectedTabItem.focusTab();
-      oldSelectedTabItem.detach();
-      this._renderTabContent();
-    }
+    this.selectedTab.focusTab();
+    oldSelectedTab.detach();
+    this._renderTabContent();
   }
 };
 
 // keyboard navigation in tab-box button area
-// FIXME awe: (tab-box) overflow menu must be accessible by keyboard navigation
+// TODO awe: (tab-box) overflow menu should be accessible by keyboard navigation
 scout.TabBox.prototype._onKeyDown = function(event) {
   var tabIndex, navigationKey =
     event.which === scout.keys.LEFT ||
@@ -205,15 +196,15 @@ scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualInde
 
 scout.TabBox.prototype._renderTabContent = function() {
   // add new tab-content (use from cache or render)
-  var selectedTabItem = this.tabItems[this.selectedTab];
-  if (selectedTabItem.rendered && !selectedTabItem.attached) {
-    selectedTabItem.attach();
+  var selectedTab = this.selectedTab;
+  if (selectedTab.rendered && !selectedTab.attached) {
+    selectedTab.attach();
   } else {
     // in Swing there's some complicated logic dealing with borders and labels
     // that determines whether the first group-box in a tab-box has a title or not.
     // I decided to simplify this and always set the title of the first group-box
     // to invisible.
-    selectedTabItem.render(this._$tabContent);
+    selectedTab.render(this._$tabContent);
   }
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();

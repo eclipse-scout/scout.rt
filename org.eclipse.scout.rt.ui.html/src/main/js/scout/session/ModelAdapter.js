@@ -306,9 +306,9 @@ scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
 /**
  * Sends the current state of the given property to the server.
  */
-scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
+scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   var data = {};
-  data[propertyName] = this.widget[propertyName];
+  data[propertyName] = value;
   this._send('property', data);
 };
 
@@ -340,7 +340,7 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
 
     if (this._isRemoteProperty(propertyName)) {
       if (value && this._isAdapterProperty(propertyName)) {
-        value = value.remoteAdapter;
+        value = value.remoteAdapter.id;
       }
       this._callSendProperty(propertyName, value);
     }

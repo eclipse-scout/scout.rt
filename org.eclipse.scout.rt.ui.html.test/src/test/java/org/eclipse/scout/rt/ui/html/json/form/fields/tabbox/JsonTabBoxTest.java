@@ -13,8 +13,11 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
@@ -23,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBoxUIFacade;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
@@ -48,28 +52,35 @@ public class JsonTabBoxTest {
     UiSessionMock uiSession = new UiSessionMock();
     m_tabBoxModel = Mockito.mock(ITabBox.class);
     m_groupBox1 = Mockito.mock(IGroupBox.class);
+    Mockito.when(m_groupBox1.getContextMenu()).thenReturn(Mockito.mock(IFormFieldContextMenu.class));
     Mockito.when(m_groupBox1.isVisibleGranted()).thenReturn(true);
     m_groupBox2 = Mockito.mock(IGroupBox.class);
+    Mockito.when(m_groupBox2.getContextMenu()).thenReturn(Mockito.mock(IFormFieldContextMenu.class));
     Mockito.when(m_groupBox2.isVisibleGranted()).thenReturn(true);
     m_uiFacade = Mockito.mock(ITabBoxUIFacade.class);
     Mockito.when(m_tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
     Mockito.when(m_tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);
     m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, uiSession, "123", null);
+    m_tabBox.attachAdapters(m_tabBoxModel.getGroupBoxes());
     m_uiSession = new UiSessionMock();
   }
 
   @Test
   public void testHandleUiTabSelected() {
-    handleUiTabSelected(0);
+    // find adapter IDs of group-boxes / tab-items
+    List<IJsonAdapter<?>> tabItemAdapters = new ArrayList<>(m_tabBox.getAdapters(m_tabBoxModel.getGroupBoxes()));
+    String tabItemAdapterId = tabItemAdapters.get(0).getId(); // 1st tab
+    handleUiTabSelected(tabItemAdapterId);
     Mockito.verify(m_uiFacade).setSelectedTabFromUI(m_groupBox1);
-    handleUiTabSelected(1);
+    tabItemAdapterId = tabItemAdapters.get(1).getId(); // 2nd tab
+    handleUiTabSelected(tabItemAdapterId);
     Mockito.verify(m_uiFacade).setSelectedTabFromUI(m_groupBox2);
   }
 
-  private void handleUiTabSelected(int tabIndex) {
+  private void handleUiTabSelected(String selectedTabId) {
     JSONObject data = new JSONObject();
-    data.put("tabIndex", tabIndex);
-    m_tabBox.handleUiTabSelected(new JsonEvent("?", "?", data));
+    data.put("selectedTab", selectedTabId);
+    m_tabBox.handleUiPropertyChange("selectedTab", new JsonEvent("?", "?", data).toJson());
   }
 
   /**

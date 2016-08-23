@@ -13,16 +13,14 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.form.fields.DisplayableFormFieldFilter;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -39,17 +37,15 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
   protected void initJsonProperties(TAB_BOX model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model) {
+    putJsonProperty(new JsonAdapterProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model, getUiSession()) {
       @Override
       protected IGroupBox modelValue() {
         return getModel().getSelectedTab();
       }
 
       @Override
-      public Integer prepareValueForToJson(Object value) {
-        // instead of returning a whole adapter here, we simply return the index of the group-box (=tab)
-        IGroupBox selectedTab = (IGroupBox) value;
-        return getIndexForGroupBox(selectedTab);
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
       }
     });
   }
@@ -95,54 +91,27 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (JsonEventType.SELECTED.matches(event)) {
-      handleUiTabSelected(event);
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (ITabBox.PROP_SELECTED_TAB.equals(propertyName)) {
+      String tabId = data.optString("selectedTab");
+      IGroupBox selectedTab = getGroupBoxForId(tabId);
+      addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, selectedTab);
+      getModel().getUIFacade().setSelectedTabFromUI(selectedTab);
     }
     else {
-      super.handleUiEvent(event);
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 
-  protected void handleUiTabSelected(JsonEvent event) {
-    int tabIndex = event.getData().optInt("tabIndex");
-    IGroupBox selectedTabBox = getGroupBoxForIndex(tabIndex);
-    if (selectedTabBox != null) {
-      addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, selectedTabBox);
-      getModel().getUIFacade().setSelectedTabFromUI(selectedTabBox);
-    }
-  }
-
-  protected IGroupBox getGroupBoxForIndex(int index) {
-    DisplayableFormFieldFilter<IFormField> filter = new DisplayableFormFieldFilter<>();
-    int i = 0;
+  protected IGroupBox getGroupBoxForId(String tabId) {
     for (IGroupBox gb : getModel().getGroupBoxes()) {
-      // Don't count invisible group boxes (they are not sent to the UI, see JsonCompositeField)
-      if (!filter.accept(gb)) {
-        continue;
+      // in case group-box is visibleGranted=false getAdapter will return null
+      IJsonAdapter<?> adapter = getAdapter(gb);
+      if (adapter != null && adapter.getId().equals(tabId)) {
+        return (IGroupBox) adapter.getModel();
       }
-      if (i == index) {
-        return gb;
-      }
-      i++;
     }
     return null;
   }
 
-  protected int getIndexForGroupBox(IGroupBox groupBox) {
-    List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
-    DisplayableFormFieldFilter<IFormField> filter = new DisplayableFormFieldFilter<>();
-    int i = 0;
-    for (IGroupBox gb : groupBoxes) {
-      // Don't count invisible group boxes (they are not sent to the UI, see JsonCompositeField)
-      if (!filter.accept(gb)) {
-        continue;
-      }
-      if (gb == groupBox) {
-        return i;
-      }
-      i++;
-    }
-    throw new IllegalStateException("selected tab not found in group-boxes list");
-  }
 }

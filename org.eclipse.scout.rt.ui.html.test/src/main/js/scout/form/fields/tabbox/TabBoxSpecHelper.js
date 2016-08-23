@@ -18,7 +18,7 @@ scout.TabBoxSpecHelper.prototype.createTabBox = function(tabItems) {
   // Form is necessary to make keystrokes work
   var form = this.formHelper.createFormWithOneField(this.session.desktop);
   var tabBox = this.formHelper.createField('TabBox', form, {
-    selectedTab: 0,
+    selectedTab: tabItems[0],
     tabItems: tabItems
   });
   form.render(this.session.$entryPoint);

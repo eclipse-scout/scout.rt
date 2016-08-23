@@ -36,18 +36,17 @@ scout.RemoteApp.prototype._init = function(options) {
  */
 scout.RemoteApp.modifyWidgetPrototype = function() {
   scout.Widget.prototype.createFromProperty = function(propertyName, value) {
-    if (value instanceof scout.Widget) { // FIXME [awe] 6.1: check if this code is still required. In some cases (menu) we already have a Widget instance
+    if (value instanceof scout.Widget) {
       return value;
     }
 
-    // Remote Case
+    // Remote case
     var remoteAdapter = findRemoteAdapter(this);
-    if (remoteAdapter &&                                  // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
-        this._isPropertyRemotable(propertyName)) {        // True, if it's a 'managed' property of this remote-adapter
-      return this.session.getOrCreateWidget(value, this); // value is a StringString, contains (remote) object ID
+    if (remoteAdapter) {                                  // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
+      return this.session.getOrCreateWidget(value, this); // value is a String, contains (remote) object ID
     }
 
-    // Default: Local-Fall
+    // Local case (default)
     value.parent = this;
     return scout.create(value);
 
