@@ -14,18 +14,19 @@ scout.ContextMenuPopup = function() {
   // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
   this._headVisible = false;
   this.menuItems = [];
-  this._addAdapterProperties('menuItems');
+  this.cloneMenuItems = true;
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
 scout.ContextMenuPopup.prototype._init = function(options) {
   options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
-  scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
-  this.menuFilter = options.menuFilter;
-  this.options = $.extend({
-    cloneMenuItems: true
-  }, options);
+  // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
+  if (options.cloneMenuItems === false) {
+    this._addAdapterProperties('menuItems');
+  }
+
+  scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 };
 
 /**
@@ -294,7 +295,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
 
     // prevent loosing original parent
     var parentMenu = menu.parent;
-    if (this.options.cloneMenuItems && !menu.cloneOf) {
+    if (this.cloneMenuItems && !menu.cloneOf) {
       menu = menu.cloneAndMirror({
         parent: this
       });
@@ -359,7 +360,8 @@ scout.ContextMenuPopup.prototype._onCloneMenuDoAction = function(event) {
 scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
   if (event.changedProperties.indexOf('selected') !== -1) {
     var menu = event.source;
-    menu.cloneOf.setSelected(event.newProperties.selected);
+    // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
+    menu.cloneOf.triggerPropertyChange('selected', event.oldProperties.selected, event.newProperties.selected);
   }
 };
 

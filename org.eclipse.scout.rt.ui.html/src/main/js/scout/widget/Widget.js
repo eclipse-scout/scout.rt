@@ -651,7 +651,7 @@ scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
   }, this);
 };
 
-scout.Widget.prototype._fireBulkPropertyChange = function(oldProperties, newProperties) {
+scout.Widget.prototype.triggerBulkPropertyChange = function(oldProperties, newProperties) {
   var propertyChangeEvent = {
     newProperties: newProperties,
     oldProperties: oldProperties,
@@ -672,7 +672,7 @@ scout.Widget.prototype._fireBulkPropertyChange = function(oldProperties, newProp
 /**
  * Fires a property change for a single property.
  */
-scout.Widget.prototype._firePropertyChange = function(propertyName, oldValue, newValue) {
+scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, newValue) {
   if (!propertyName) {
     return;
   }
@@ -680,7 +680,7 @@ scout.Widget.prototype._firePropertyChange = function(propertyName, oldValue, ne
     newProperties = {};
   oldProperties[propertyName] = oldValue;
   newProperties[propertyName] = newValue;
-  this._fireBulkPropertyChange(oldProperties, newProperties);
+  this.triggerBulkPropertyChange(oldProperties, newProperties);
 };
 
 /**
@@ -692,7 +692,7 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
   }
   var oldValue = this[propertyName];
   this[propertyName] = newValue;
-  this._firePropertyChange(propertyName, oldValue, newValue);
+  this.triggerPropertyChange(propertyName, oldValue, newValue);
 };
 
 /**

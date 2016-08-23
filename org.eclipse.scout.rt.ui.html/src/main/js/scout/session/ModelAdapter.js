@@ -304,7 +304,7 @@ scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
 };
 
 /**
- * Sends the current state of the given property to the server.
+ * Sends the given value as property event to the server.
  */
 scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   var data = {};

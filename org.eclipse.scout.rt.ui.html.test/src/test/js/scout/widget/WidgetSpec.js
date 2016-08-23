@@ -91,7 +91,7 @@ describe('Widget', function() {
 
   });
 
-  describe('_firePropertyChange', function() {
+  describe('triggerPropertyChange', function() {
 
     var propertyChangeEvent, widget;
 
@@ -103,7 +103,7 @@ describe('Widget', function() {
       widget.on('propertyChange', function(event) {
         propertyChangeEvent = event;
       });
-      widget._firePropertyChange('selected', oldValue, newValue);
+      widget.triggerPropertyChange('selected', oldValue, newValue);
     }
 
     it('fires the expected event object', function() {
