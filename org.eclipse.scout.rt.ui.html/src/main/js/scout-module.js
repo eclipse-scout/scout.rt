@@ -81,7 +81,6 @@
   __include("scout/keystroke/KeyStroke.js");
   __include("scout/keystroke/RangeKeyStroke.js");
   __include("scout/keystroke/ContextMenuKeyStroke.js");
-  __include("scout/keystroke/MnemonicKeyStroke.js");
   __include("scout/keystroke/ClickActiveElementKeyStroke.js");
   __include("scout/keystroke/FocusAdjacentElementKeyStroke.js");
   __include("scout/keystroke/CloseKeyStroke.js");
@@ -335,7 +334,6 @@
   __include("scout/form/fields/button/Button.js");
   __include("scout/form/fields/button/ButtonAdapter.js");
   __include("scout/form/fields/button/ButtonLayout.js");
-  __include("scout/form/fields/button/ButtonMnemonicKeyStroke.js");
   __include("scout/form/fields/button/ButtonKeyStroke.js");
   __include("scout/form/fields/calendarfield/CalendarField.js");
   __include("scout/form/fields/calendarfield/CalendarFieldAdapter.js");
@@ -405,7 +403,6 @@
   __include("scout/form/fields/tabbox/TabAreaLayout.js");
   __include("scout/form/fields/tabbox/TabBox.js");
   __include("scout/form/fields/tabbox/TabBoxAdapter.js");
-  __include("scout/form/fields/tabbox/TabItemMnemonicKeyStroke.js");
   __include("scout/form/fields/tabbox/TabBoxLayout.js");
   __include("scout/form/fields/tabbox/TabItem.js");
   __include("scout/form/fields/tabbox/TabItemAdapter.js");

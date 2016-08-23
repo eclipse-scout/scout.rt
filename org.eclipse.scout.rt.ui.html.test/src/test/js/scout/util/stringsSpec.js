@@ -31,51 +31,6 @@ describe("scout.strings", function() {
 
   });
 
-  describe("removeAmpersand", function() {
-
-    it("can remove ampersands", function() {
-      expect(scout.strings.removeAmpersand()).toBe(undefined);
-      expect(scout.strings.removeAmpersand(null)).toBe(null);
-      expect(scout.strings.removeAmpersand('')).toBe('');
-      expect(scout.strings.removeAmpersand(' ')).toBe(' ');
-      expect(scout.strings.removeAmpersand('Hello')).toBe('Hello');
-      expect(scout.strings.removeAmpersand('Hello & Co')).toBe('Hello  Co');
-      expect(scout.strings.removeAmpersand('&Menu')).toBe('Menu');
-      expect(scout.strings.removeAmpersand('&')).toBe('');
-      expect(scout.strings.removeAmpersand('&One &Two &Three&')).toBe('One Two Three');
-      expect(scout.strings.removeAmpersand('You&&Me')).toBe('You&Me');
-      expect(scout.strings.removeAmpersand('You&&&Me')).toBe('You&Me');
-      expect(scout.strings.removeAmpersand('You&&&&Me')).toBe('You&&Me');
-      expect(scout.strings.removeAmpersand('You&&&&&Me')).toBe('You&&Me');
-      expect(scout.strings.removeAmpersand(123)).toBe('123');
-    });
-
-  });
-
-  describe("getMnemonic", function() {
-
-    it("can extract mnemonics", function() {
-      expect(scout.strings.getMnemonic()).toBe(null);
-      expect(scout.strings.getMnemonic(null)).toBe(null);
-      expect(scout.strings.getMnemonic('')).toBe(null);
-      expect(scout.strings.getMnemonic(' ')).toBe(null);
-      expect(scout.strings.getMnemonic('Hello')).toBe(null);
-      expect(scout.strings.getMnemonic('Hello & Co')).toBe(null);
-      expect(scout.strings.getMnemonic('&Menu')).toBe('M');
-      expect(scout.strings.getMnemonic('Ne&xt...')).toBe('x');
-      expect(scout.strings.getMnemonic('N&ächster Eintrag')).toBe(null); // ä is not defined in scout.keys
-      expect(scout.strings.getMnemonic('Next&...')).toBe(null);
-      expect(scout.strings.getMnemonic('&')).toBe(null);
-      expect(scout.strings.getMnemonic('&One &Two &Three&')).toBe('O');
-      expect(scout.strings.getMnemonic('You&&Me')).toBe(null);
-      expect(scout.strings.getMnemonic('You&&&Me')).toBe('M');
-      expect(scout.strings.getMnemonic('You&&&&Me')).toBe(null);
-      expect(scout.strings.getMnemonic('You&&&&&Me')).toBe('M');
-      expect(scout.strings.getMnemonic(123)).toBe(null);
-    });
-
-  });
-
   describe("hasText", function() {
 
     it("can check if string has text", function() {

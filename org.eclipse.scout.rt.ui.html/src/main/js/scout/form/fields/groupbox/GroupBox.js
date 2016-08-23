@@ -195,14 +195,6 @@ scout.GroupBox.prototype._prepareFields = function() {
         this.controls.push(field);
         this._registerButtonKeyStrokes(field);
       }
-    } else if (field instanceof scout.TabBox) {
-      this.controls.push(field);
-      for (var k = 0; k < field.tabItems.length; k++) {
-        var tabMnemonic = this._getMnemonic(field.tabItems[k]);
-        if (tabMnemonic) {
-          this.keyStrokeContext.registerKeyStroke(new scout.TabItemMnemonicKeyStroke(tabMnemonic, field.tabItems[k]));
-        }
-      }
     } else {
       this.controls.push(field);
     }
@@ -221,19 +213,11 @@ scout.GroupBox.prototype._prepareFields = function() {
 };
 
 scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
-  var mnemonic = this._getMnemonic(button);
-  if (mnemonic) {
-    this.keyStrokeContext.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(mnemonic, button));
-  }
   if (button.keyStrokes) {
     button.keyStrokes.forEach(function(keyStroke) {
       this.keyStrokeContext.registerKeyStroke(keyStroke);
     }, this);
   }
-};
-
-scout.GroupBox.prototype._getMnemonic = function(field) {
-  return scout.strings.getMnemonic(field.label);
 };
 
 /**

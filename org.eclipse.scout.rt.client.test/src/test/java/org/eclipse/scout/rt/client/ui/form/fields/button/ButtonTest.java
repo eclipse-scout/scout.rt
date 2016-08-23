@@ -76,7 +76,7 @@ public class ButtonTest {
         public class TestMenu1 extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return "&TestMenu1";
+            return "TestMenu1";
           }
 
           @Override
@@ -94,7 +94,7 @@ public class ButtonTest {
         public class TestMenu2 extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return "T&estMenu2";
+            return "TestMenu2";
           }
 
           @Override
@@ -124,11 +124,9 @@ public class ButtonTest {
     List<IMenu> pushButton1Menus = m_form.getPushButton1().getMenus();
     Assert.assertEquals("PushButton1 should have 2 menus", 2, pushButton1Menus.size());
     Assert.assertEquals("TestMenu1", pushButton1Menus.get(0).getText());
-    Assert.assertEquals("&TestMenu1", pushButton1Menus.get(0).getTextWithMnemonic());
     Assert.assertEquals("alternate-2", pushButton1Menus.get(0).getKeyStroke());
 
     Assert.assertEquals("TestMenu2", pushButton1Menus.get(1).getText());
-    Assert.assertEquals("T&estMenu2", pushButton1Menus.get(1).getTextWithMnemonic());
     Assert.assertEquals("control-alternate-f11", pushButton1Menus.get(1).getKeyStroke());
 
   }

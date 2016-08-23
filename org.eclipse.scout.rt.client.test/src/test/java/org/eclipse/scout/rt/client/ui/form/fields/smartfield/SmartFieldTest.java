@@ -155,7 +155,7 @@ public class SmartFieldTest {
         public class TestMenu1 extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return "&TestMenu1";
+            return "TestMenu1";
           }
 
           @Override
@@ -168,7 +168,7 @@ public class SmartFieldTest {
         public class TestMenu2 extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return "T&estMenu2";
+            return "TestMenu2";
           }
 
           @Override
@@ -491,11 +491,9 @@ public class SmartFieldTest {
     List<IMenu> smartfieldMenus = m_styleField.getMenus();
     assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.size());
     assertEquals("TestMenu1", smartfieldMenus.get(0).getText());
-    assertEquals("&TestMenu1", smartfieldMenus.get(0).getTextWithMnemonic());
     assertEquals("alternate-2", smartfieldMenus.get(0).getKeyStroke());
 
     assertEquals("TestMenu2", smartfieldMenus.get(1).getText());
-    assertEquals("T&estMenu2", smartfieldMenus.get(1).getTextWithMnemonic());
     assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
   }
 

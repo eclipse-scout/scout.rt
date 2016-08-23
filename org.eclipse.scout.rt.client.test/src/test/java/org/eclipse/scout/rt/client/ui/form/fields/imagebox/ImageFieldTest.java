@@ -78,7 +78,7 @@ public class ImageFieldTest {
 
           @Override
           protected String getConfiguredText() {
-            return "&ImageFieldMenu";
+            return "ImageFieldMenu";
           }
         }
       }
@@ -98,7 +98,6 @@ public class ImageFieldTest {
     List<IMenu> imageFieldMenus = m_form.getImageField().getMenus();
     Assert.assertEquals("ImageField should have 1 menu", 1, imageFieldMenus.size());
     Assert.assertEquals("ImageFieldMenu", imageFieldMenus.get(0).getText());
-    Assert.assertEquals("&ImageFieldMenu", imageFieldMenus.get(0).getTextWithMnemonic());
     Assert.assertEquals("control-a", imageFieldMenus.get(0).getKeyStroke());
 
   }

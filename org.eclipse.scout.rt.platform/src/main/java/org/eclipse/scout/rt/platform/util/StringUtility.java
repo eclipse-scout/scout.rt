@@ -341,6 +341,12 @@ public final class StringUtility {
     return s;
   }
 
+  /**
+   * @deprecated Will be removed in 16.0
+   * @param text
+   * @return
+   */
+  @Deprecated
   public static String removeMnemonic(String text) {
     if (text == null) {
       return null;
@@ -613,6 +619,12 @@ public final class StringUtility {
 
   public static final Pattern MNEMONIC_PATTERN = Pattern.compile("&([\\S])");
 
+  /**
+   * @deprecated Will be removed in 16.0
+   * @param text
+   * @return
+   */
+  @Deprecated
   public static char getMnemonic(String text) {
     if (text == null) {
       return 0x0;

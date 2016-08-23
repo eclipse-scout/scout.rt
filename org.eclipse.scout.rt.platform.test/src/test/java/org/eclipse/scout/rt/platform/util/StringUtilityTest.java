@@ -158,36 +158,6 @@ public class StringUtilityTest {
     assertArrayEquals(new String[]{"boo", "and", "foo"}, StringUtility.split("boo:and:foo", ":"));
   }
 
-  @Test
-  public void testMnemonics() {
-    String s = "Button &Test";
-    assertEquals('T', StringUtility.getMnemonic(s));
-    assertEquals("Button Test", StringUtility.removeMnemonic(s));
-    s = "Button & Test";
-    assertEquals(0x00, StringUtility.getMnemonic(s));
-    assertEquals(s, StringUtility.removeMnemonic(s));
-    s = "&test";
-    assertEquals('t', StringUtility.getMnemonic(s));
-    assertEquals("test", StringUtility.removeMnemonic(s));
-    s = "test &";
-    assertEquals(0x00, StringUtility.getMnemonic(s));
-    assertEquals(s, StringUtility.removeMnemonic(s));
-
-    assertEquals('a', StringUtility.getMnemonic("&a"));
-    assertEquals('a', StringUtility.getMnemonic("&abc"));
-    assertEquals(0x00, StringUtility.getMnemonic(null));
-    assertEquals(0x00, StringUtility.getMnemonic("sometext"));
-    assertEquals('1', StringUtility.getMnemonic("&1"));
-    assertEquals('1', StringUtility.getMnemonic("\\&1"));
-    assertEquals('á', StringUtility.getMnemonic("&á"));
-    assertEquals("á", StringUtility.removeMnemonic("&á"));
-    assertEquals('&', StringUtility.getMnemonic("&&"));
-    assertEquals(null, StringUtility.removeMnemonic(null));
-    s = "A & B T&Êxt";
-    assertEquals('Ê', StringUtility.getMnemonic(s));
-    assertEquals("A & B TÊxt", StringUtility.removeMnemonic(s));
-  }
-
   // UTF-8 length is 13 to avoid accidental buffer size matches
   static final String CHARACTERS = "aouäöüàé";
 

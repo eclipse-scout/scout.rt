@@ -95,7 +95,7 @@ scout.RadioButton.prototype._renderProperties = function() {
  * @override
  */
 scout.RadioButton.prototype._renderLabel = function() {
-  this.$field.textOrNbsp(scout.strings.removeAmpersand(this.label));
+  this.$field.textOrNbsp(this.label);
 };
 
 scout.RadioButton.prototype._renderSelected = function() {

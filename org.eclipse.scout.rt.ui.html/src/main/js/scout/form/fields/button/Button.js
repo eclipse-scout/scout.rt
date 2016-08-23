@@ -217,12 +217,11 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function() {
-  var label = scout.strings.removeAmpersand(this.label);
   if (this.iconId) {
     // If there is an icon, we don't need to ensure &nbsp; for empty strings
-    this.$buttonLabel.text(label);
+    this.$buttonLabel.text(this.label);
   } else {
-    this.$buttonLabel.textOrNbsp(label);
+    this.$buttonLabel.textOrNbsp(this.label);
   }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();

@@ -110,7 +110,7 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
   });
 
   // Properties requiring special handling (non-trivial mapping)
-  menuProperties.text = scout.strings.removeAmpersand(buttonProperties.label);
+  menuProperties.text = buttonProperties.label;
   menuProperties.horizontalAlignment = (buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined);
   menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
   menuProperties.toggleAction = buttonProperties.displayStyle === scout.Button.DisplayStyle.TOGGLE;

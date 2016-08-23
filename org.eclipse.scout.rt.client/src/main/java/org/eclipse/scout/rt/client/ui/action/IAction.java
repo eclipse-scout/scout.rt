@@ -31,12 +31,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";
   String PROP_TEXT = "text";
-  String PROP_TEXT_WITH_MNEMONIC = "&text";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_ENABLED = "enabled";
   String PROP_SELECTED = "selected";
   String PROP_VISIBLE = "visible";
-  String PROP_MNEMONIC = "mnemonic";
   String PROP_KEY_STROKE = "keyStroke";
   String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
@@ -74,12 +72,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   String getText();
 
   void setText(String text);
-
-  /**
-   * @return returns the text with mnemonic, e.g. "&File";
-   * @since 3.10.0-M3
-   */
-  String getTextWithMnemonic();
 
   /**
    * Key stroke with format lowercase [shift-] [control-] [alternate-] key
@@ -181,8 +173,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   boolean isToggleAction();
 
   void setToggleAction(boolean b);
-
-  char getMnemonic();
 
   /**
    * UI processes

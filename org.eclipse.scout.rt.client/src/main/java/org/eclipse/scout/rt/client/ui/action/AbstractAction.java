@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -413,22 +412,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public String getTextWithMnemonic() {
-    return propertySupport.getPropertyString(PROP_TEXT_WITH_MNEMONIC);
-  }
-
-  @Override
   public void setText(String text) {
-    if (text != null) {
-      propertySupport.setPropertyString(PROP_TEXT, StringUtility.removeMnemonic(text));
-      propertySupport.setPropertyString(PROP_TEXT_WITH_MNEMONIC, text);
-      propertySupport.setProperty(PROP_MNEMONIC, StringUtility.getMnemonic(text));
-    }
-    else {
-      propertySupport.setPropertyString(PROP_TEXT, null);
-      propertySupport.setPropertyString(PROP_TEXT_WITH_MNEMONIC, null);
-      propertySupport.setProperty(PROP_MNEMONIC, (char) 0x0);
-    }
+    propertySupport.setPropertyString(PROP_TEXT, text);
   }
 
   @Override
@@ -668,12 +653,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       return simpleClassId + ID_CONCAT_SYMBOL + ((ITypeWithClassId) getContainer()).classId();
     }
     return simpleClassId;
-  }
-
-  @Override
-  public char getMnemonic() {
-    Character c = (Character) propertySupport.getProperty(PROP_MNEMONIC);
-    return c != null ? c.charValue() : 0x00;
   }
 
   /**

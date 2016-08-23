@@ -291,11 +291,6 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
-  public String getTextWithMnemonic() {
-    return m_wrappedMenu.getTextWithMnemonic();
-  }
-
-  @Override
   public String getKeyStroke() {
     return m_wrappedMenu.getKeyStroke();
   }
@@ -423,11 +418,6 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   @Override
   public void setToggleAction(boolean b) {
     unsupported();
-  }
-
-  @Override
-  public char getMnemonic() {
-    return m_wrappedMenu.getMnemonic();
   }
 
   @Override

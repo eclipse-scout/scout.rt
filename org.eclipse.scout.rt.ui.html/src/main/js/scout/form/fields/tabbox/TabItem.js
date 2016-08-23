@@ -188,7 +188,7 @@ scout.TabItem.prototype.setLabel = function(label) {
 };
 
 scout.TabItem.prototype._renderLabel = function() {
-  this.$label.textOrNbsp(scout.strings.removeAmpersand(this.label));
+  this.$label.textOrNbsp(this.label);
 };
 
 scout.TabItem.prototype._renderLabelVisible = function() {

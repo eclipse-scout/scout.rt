@@ -139,7 +139,7 @@ scout.Tooltip.prototype._renderText = function() {
     this.$content.html(text);
   } else {
     // use nl2br to allow tooltips with line breaks
-    this.$content.html(scout.strings.nl2br(scout.strings.removeAmpersand(text)));
+    this.$content.html(scout.strings.nl2br(text));
   }
 };
 

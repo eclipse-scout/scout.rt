@@ -150,7 +150,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
   this._overflowTabs.forEach(function(tabItem) {
     menu = scout.create('Menu', {
       parent: tabBox,
-      text: scout.strings.removeAmpersand(tabItem.label),
+      text: tabItem.label,
       tabItem: tabItem,
       visible: tabItem.visible
     });

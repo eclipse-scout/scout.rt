@@ -27,18 +27,6 @@ scout.strings = {
     return text.replace(/\n/g, '<br>').replace(/\r/g, '');
   },
 
-  removeAmpersand: function(text) {
-    if (!text) {
-      return text;
-    }
-    text = this.asString(text);
-    // Remove single & that are not surrounded by & or &&
-    text = text.replace(/(^|[^&]|&&)&($|[^&]|&&)/g, '$1$2');
-    // Replace remaining && by a single &
-    text = text.replace(/&&/g, '&');
-    return text;
-  },
-
   insertAt: function(text, insertText, position) {
     if (!text) {
       return text;
@@ -49,28 +37,6 @@ scout.strings = {
       return text.substr(0, position) + insertText + text.substr(position);
     }
     return text;
-  },
-
-  getMnemonic: function(text, resolveKey) {
-    if (!text) {
-      return null;
-    }
-    text = this.asString(text);
-    // Remove escaped & (they are not of concern)
-    text = text.replace(/&&/g, '');
-    var m = text.match(/&(.)/);
-    if (m !== null) {
-      // Potential mnemonic found
-      var mnemonic = m[1];
-      if (mnemonic) {
-        // Unless disabled explicitly, check if mnemonic matches with a known key
-        if (scout.nvl(resolveKey, true) && !scout.keys[mnemonic.toUpperCase()]) {
-          mnemonic = null;
-        }
-        return mnemonic;
-      }
-    }
-    return null;
   },
 
   /**

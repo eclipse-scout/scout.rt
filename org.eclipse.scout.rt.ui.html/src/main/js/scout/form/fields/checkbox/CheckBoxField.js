@@ -100,7 +100,7 @@ scout.CheckBoxField.prototype._renderValue = function(value) {
  * @override
  */
 scout.CheckBoxField.prototype._renderLabel = function() {
-  this.$checkBoxLabel.textOrNbsp(scout.strings.removeAmpersand(this.label), 'empty');
+  this.$checkBoxLabel.textOrNbsp(this.label, 'empty');
   // Make sure the empty label is as height as the other labels, especially important for top labels
   this.$label.html('&nbsp;');
 };

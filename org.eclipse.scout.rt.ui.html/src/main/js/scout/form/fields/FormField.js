@@ -189,7 +189,7 @@ scout.FormField.prototype._renderLabel = function() {
   } else if (this.$label) {
     this._removePlaceholder();
     // Make sure an empty label is as height as the other labels, especially important for top labels
-    this.$label.textOrNbsp(scout.strings.removeAmpersand(label), 'empty');
+    this.$label.textOrNbsp(label, 'empty');
 
     // Invalidate layout if label width depends on its content
     if (this.labelUseUiWidth) {

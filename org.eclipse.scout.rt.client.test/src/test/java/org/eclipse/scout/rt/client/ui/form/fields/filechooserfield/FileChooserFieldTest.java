@@ -78,7 +78,7 @@ public class FileChooserFieldTest {
 
           @Override
           protected String getConfiguredText() {
-            return "&Menu1";
+            return "Menu1";
           }
 
         }
@@ -93,7 +93,7 @@ public class FileChooserFieldTest {
 
           @Override
           protected String getConfiguredText() {
-            return "Menu&2";
+            return "Menu2";
           }
         }
 
@@ -145,11 +145,9 @@ public class FileChooserFieldTest {
     Assert.assertEquals("fileChooserField should have 2 menus", 2, fileChooserFieldMenus.size());
 
     Assert.assertEquals("Menu1", fileChooserFieldMenus.get(0).getText());
-    Assert.assertEquals("&Menu1", fileChooserFieldMenus.get(0).getTextWithMnemonic());
     Assert.assertEquals("alternate-1", fileChooserFieldMenus.get(0).getKeyStroke());
 
     Assert.assertEquals("Menu2", fileChooserFieldMenus.get(1).getText());
-    Assert.assertEquals("Menu&2", fileChooserFieldMenus.get(1).getTextWithMnemonic());
     Assert.assertEquals("alternate-2", fileChooserFieldMenus.get(1).getKeyStroke());
 
   }

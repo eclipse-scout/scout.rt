@@ -166,7 +166,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return TEXTS.get("CheckAllWithMnemonic");
+              return TEXTS.get("CheckAll");
             }
 
             @Override
@@ -186,7 +186,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return TEXTS.get("UncheckAllWithMnemonic");
+              return TEXTS.get("UncheckAll");
             }
 
             @Override
