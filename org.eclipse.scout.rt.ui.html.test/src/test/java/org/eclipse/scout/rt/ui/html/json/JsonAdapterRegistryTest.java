@@ -43,14 +43,14 @@ public class JsonAdapterRegistryTest {
     };
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
 
-    // Note: Additionally, registry contains the "root adapter" and a context-menu
-    assertEquals(3, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
-    assertEquals(2, session.currentJsonResponse().adapterMap().size());
+    // Note: Additionally, registry contains the "root adapter"
+    assertEquals(2, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
+    assertEquals(1, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());
 
     model.setDisplayText("Test");
-    assertEquals(3, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
-    assertEquals(2, session.currentJsonResponse().adapterMap().size());
+    assertEquals(2, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
+    assertEquals(1, session.currentJsonResponse().adapterMap().size());
     assertEquals(1, session.currentJsonResponse().eventList().size());
 
     adapter.dispose();

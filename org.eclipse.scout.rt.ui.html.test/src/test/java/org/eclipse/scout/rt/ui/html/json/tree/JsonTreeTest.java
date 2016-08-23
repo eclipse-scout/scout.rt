@@ -187,15 +187,14 @@ public class JsonTreeTest {
     assertFalse(node.isSelectedNode());
 
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
-    IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
 
     Menu menu1 = new Menu();
     tree.getContextMenu().addChildAction(menu1);
-    assertNotNull(contextMenu.getAdapter(menu1));
-    assertTrue(contextMenu.getAdapter(menu1).isInitialized());
+    assertNotNull(jsonTree.getAdapter(menu1));
+    assertTrue(jsonTree.getAdapter(menu1).isInitialized());
 
     tree.getContextMenu().removeChildAction(menu1);
-    assertNull(contextMenu.getAdapter(menu1));
+    assertNull(jsonTree.getAdapter(menu1));
   }
 
   @Test
@@ -205,21 +204,20 @@ public class JsonTreeTest {
     assertFalse(node.isSelectedNode());
 
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
-    IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
 
     Menu menu1 = new Menu();
     Menu menu2 = new Menu();
     tree.getContextMenu().addChildAction(menu1);
     tree.getContextMenu().addChildAction(menu2);
-    assertNotNull(contextMenu.getAdapter(menu1));
-    assertTrue(contextMenu.getAdapter(menu1).isInitialized());
-    assertNotNull(contextMenu.getAdapter(menu2));
-    assertTrue(contextMenu.getAdapter(menu2).isInitialized());
+    assertNotNull(jsonTree.getAdapter(menu1));
+    assertTrue(jsonTree.getAdapter(menu1).isInitialized());
+    assertNotNull(jsonTree.getAdapter(menu2));
+    assertTrue(jsonTree.getAdapter(menu2).isInitialized());
 
     tree.getContextMenu().removeChildAction(menu1);
-    assertNull(contextMenu.getAdapter(menu1));
-    assertNotNull(contextMenu.getAdapter(menu2));
-    assertTrue(contextMenu.getAdapter(menu2).isInitialized());
+    assertNull(jsonTree.getAdapter(menu1));
+    assertNotNull(jsonTree.getAdapter(menu2));
+    assertTrue(jsonTree.getAdapter(menu2).isInitialized());
   }
 
   /**
@@ -232,11 +230,10 @@ public class JsonTreeTest {
     assertFalse(node.isSelectedNode());
 
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
-    IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
 
     Menu menu1 = new Menu();
     tree.getContextMenu().addChildAction(menu1);
-    IJsonAdapter<?> jsonMenu1 = contextMenu.getAdapter(menu1);
+    IJsonAdapter<?> jsonMenu1 = jsonTree.getAdapter(menu1);
     assertNotNull(jsonMenu1);
     assertTrue(jsonMenu1.isInitialized());
 
