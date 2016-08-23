@@ -17,17 +17,15 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,11 +50,6 @@ public class ServerRunContextFutureFilterTest {
 
     when(m_serverJobFuture.getJobInput()).thenReturn(Jobs.newInput().withRunContext(ServerRunContexts.empty().withSession(m_serverSession1)));
     when(m_jobFuture.getJobInput()).thenReturn(Jobs.newInput().withRunContext(RunContexts.empty()));
-  }
-
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
   }
 
   @Test
@@ -97,38 +90,32 @@ public class ServerRunContextFutureFilterTest {
 
   @Test
   public void testCurrentSession() {
-    ISession.CURRENT.set(m_serverSession1);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatch(new SessionFutureFilter(m_serverSession1))
         .toFilter()
         .accept(m_serverJobFuture));
 
-    ISession.CURRENT.set(m_serverSession2);
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatch(new SessionFutureFilter(m_serverSession2))
         .toFilter()
         .accept(m_serverJobFuture));
-    ISession.CURRENT.remove();
   }
 
   @Test
   public void testNotCurrentSession() {
-    ISession.CURRENT.set(m_serverSession1);
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchNot(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchNot(new SessionFutureFilter(m_serverSession1))
         .toFilter()
         .accept(m_serverJobFuture));
 
-    ISession.CURRENT.set(m_serverSession2);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchNot(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchNot(new SessionFutureFilter(m_serverSession2))
         .toFilter()
         .accept(m_serverJobFuture));
-    ISession.CURRENT.remove();
   }
 
   @Test

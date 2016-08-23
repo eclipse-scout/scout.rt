@@ -22,12 +22,15 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link ClientNotificationNodeQueue}
  */
+@RunWith(PlatformTestRunner.class)
 public class ClientNotificationNodeQueueTest {
   private ClientNotificationNodeQueue m_queue;
   private int MAX_TEST_CAPACITY = 10;

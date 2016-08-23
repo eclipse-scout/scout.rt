@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.ISession;
@@ -159,8 +158,8 @@ public class ClientRunContext extends RunContext {
    * context has that {@link ISession} set in {@link ISession#CURRENT} thread-local.
    *
    * @param applySessionProperties
-   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}
-   *          directly onto this context.
+   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject}, {@link UserAgent} and
+   *          {@link IDesktop} to this context.
    */
   public ClientRunContext withSession(final IClientSession session, final boolean applySessionProperties) {
     m_session = session;
@@ -169,6 +168,7 @@ public class ClientRunContext extends RunContext {
       m_locale = (session != null ? session.getLocale() : null);
       m_userAgent = (session != null ? session.getUserAgent() : null);
       m_subject = (session != null ? session.getSubject() : null);
+      m_desktop = (session != null ? session.getDesktopElseVirtualDesktop() : null);
     }
     return this;
   }
@@ -228,9 +228,9 @@ public class ClientRunContext extends RunContext {
    * Typically, that information is set by the UI facade when dispatching a request from UI, or when constructing UI
    * model elements.
    * <p>
-   * If unsetForm is true the form on this runContext is set to null
+   * If <i>unsetForm</i> is <code>true</code> the form on this {@link RunContext} is set to <code>null</code>.
    */
-  public ClientRunContext withOutline(final IOutline outline, boolean unsetForm) {
+  public ClientRunContext withOutline(final IOutline outline, final boolean unsetForm) {
     if (unsetForm) {
       m_form = null;
     }
@@ -261,54 +261,36 @@ public class ClientRunContext extends RunContext {
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", getRunMonitor());
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
-    builder.ref("session", getSession());
-    builder.attr("userAgent", getUserAgent());
-    builder.ref("desktop", getDesktop());
-    builder.ref("outline", getOutline());
-    builder.ref("form", getForm());
-    return builder.toString();
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    super.interceptToStringBuilder(builder
+        .ref("session", getSession())
+        .attr("userAgent", getUserAgent())
+        .ref("form", getForm())
+        .ref("outline", getOutline())
+        .ref("desktop", getDesktop()));
   }
 
-  // === fill methods ===
-
   @Override
-  protected void copyValues(final RunContext origin) {
-    final ClientRunContext originRunContext = (ClientRunContext) origin;
+  protected void copyValues(final RunContext runContext) {
+    super.copyValues(runContext);
 
-    super.copyValues(originRunContext);
-    m_userAgent = originRunContext.m_userAgent;
-    m_session = originRunContext.m_session;
-    m_desktop = originRunContext.m_desktop;
-    m_outline = originRunContext.m_outline;
-    m_form = originRunContext.m_form;
+    final ClientRunContext origin = (ClientRunContext) runContext;
+    m_userAgent = origin.m_userAgent;
+    m_session = origin.m_session;
+    m_desktop = origin.m_desktop;
+    m_outline = origin.m_outline;
+    m_form = origin.m_form;
   }
 
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_identifiers.push(CLIENT_RUN_CONTEXT_IDENTIFIER);
+
     m_userAgent = UserAgent.CURRENT.get();
     m_session = ClientSessionProvider.currentSession();
-    m_desktop = resolveCurrentDesktop();
+    m_desktop = IDesktop.CURRENT.get();
     m_outline = IOutline.CURRENT.get();
     m_form = IForm.CURRENT.get();
-  }
-
-  @Override
-  protected void fillEmptyValues() {
-    super.fillEmptyValues();
-    m_identifiers.push(CLIENT_RUN_CONTEXT_IDENTIFIER);
-    m_userAgent = null;
-    m_session = null;
-    m_desktop = null;
-    m_outline = null;
-    m_form = null;
   }
 
   @Override
@@ -318,30 +300,12 @@ public class ClientRunContext extends RunContext {
     return copy;
   }
 
-  /**
-   * Resolves the {@link IDesktop} form current calling context.
-   */
-  protected IDesktop resolveCurrentDesktop() {
-    final IDesktop desktop = IDesktop.CURRENT.get();
-    if (desktop != null) {
-      return desktop;
-    }
-
-    final ISession currentSession = ISession.CURRENT.get();
-    if (currentSession instanceof IClientSession) {
-      return ((IClientSession) currentSession).getDesktopElseVirtualDesktop();
-    }
-    return null;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getAdapter(final Class<T> type) {
     if (ISession.class.isAssignableFrom(type)) {
       return (T) m_session;
     }
-    else {
-      return null;
-    }
+    return null;
   }
 }

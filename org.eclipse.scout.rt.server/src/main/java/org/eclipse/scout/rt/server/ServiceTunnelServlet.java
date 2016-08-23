@@ -70,7 +70,8 @@ public class ServiceTunnelServlet extends HttpServlet {
   protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
 
-    return ServletRunContexts.copyCurrent()
+    return ServletRunContexts.copyCurrent(true)
+        .withSubject(Subject.getSubject(AccessController.getContext()))
         .withServletRequest(req)
         .withServletResponse(resp)
         .withLocale(Locale.getDefault())

@@ -8,30 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.server.runner.statement;
+package org.eclipse.scout.rt.testing.platform.runner.statement;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to ensure to work on an empty <code>ServerRunContext</code>.
+ * Statement to run on the given {@link RunContext}.
  *
- * @since 5.1
+ * @since 6.1
  */
-public class ClearServerRunContextStatement extends Statement {
+public class RunContextStatement extends Statement {
 
   protected final Statement m_next;
+  private final RunContext m_runContext;
 
-  public ClearServerRunContextStatement(final Statement next) {
+  public RunContextStatement(final Statement next, final RunContext runContext) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
+    m_runContext = runContext;
   }
 
   @Override
   public void evaluate() throws Throwable {
     final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
-    ServerRunContexts.empty().run(invoker);
+    m_runContext.run(invoker);
     invoker.throwOnError();
   }
 }

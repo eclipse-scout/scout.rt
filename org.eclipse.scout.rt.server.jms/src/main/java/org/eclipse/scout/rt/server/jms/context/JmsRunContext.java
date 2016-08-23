@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
@@ -135,35 +134,18 @@ public class JmsRunContext extends RunContext {
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
-    builder.ref("message", getJmsMessage());
-    return builder.toString();
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    super.interceptToStringBuilder(builder
+        .ref("message", getJmsMessage()));
   }
-
-  // === fill methods ===
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final JmsRunContext originRunContext = (JmsRunContext) origin;
+    super.copyValues(origin);
 
-    super.copyValues(originRunContext);
-    m_jmsMessage = originRunContext.m_jmsMessage;
-  }
-
-  @Override
-  protected void fillCurrentValues() {
-    super.fillCurrentValues();
-    m_jmsMessage = JmsRunContext.CURRENT_JMS_MESSAGE.get();
-  }
-
-  @Override
-  protected void fillEmptyValues() {
-    super.fillEmptyValues();
-    m_jmsMessage = null;
+    if (origin instanceof JmsRunContext) {
+      m_jmsMessage = ((JmsRunContext) origin).m_jmsMessage;
+    }
   }
 
   @Override

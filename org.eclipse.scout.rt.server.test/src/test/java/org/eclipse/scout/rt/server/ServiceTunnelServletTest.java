@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.security.auth.Subject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,7 +112,8 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ServletException {
-    ServletRunContexts.copyCurrent()
+    ServletRunContexts.copyCurrent(true)
+        .withSubject(Subject.getSubject(AccessController.getContext()))
         .withServletRequest(m_requestMock)
         .withServletResponse(m_responseMock)
         .run(new IRunnable() {
@@ -133,13 +136,15 @@ public class ServiceTunnelServletTest {
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
 
-    ServletRunContexts.copyCurrent().withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
+    ServletRunContexts.copyCurrent(true)
+        .withSubject(Subject.getSubject(AccessController.getContext()))
+        .withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
+          }
+        });
   }
 
   /**
@@ -261,13 +266,17 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return ServletRunContexts.copyCurrent().withServletRequest(m_request).withServletResponse(m_response).call(new Callable<IServerSession>() {
+      return ServletRunContexts.copyCurrent(true)
+          .withSubject(Subject.getSubject(AccessController.getContext()))
+          .withServletRequest(m_request)
+          .withServletResponse(m_response)
+          .call(new Callable<IServerSession>() {
 
-        @Override
-        public IServerSession call() throws Exception {
-          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
-        }
-      });
+            @Override
+            public IServerSession call() throws Exception {
+              return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
+            }
+          });
     }
   }
 }

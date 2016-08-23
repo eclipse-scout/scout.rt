@@ -12,19 +12,18 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClientNotificationsStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
-import org.eclipse.scout.rt.testing.server.runner.statement.TimeoutServerRunContextStatement;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Test.None;
-import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
@@ -73,10 +72,9 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
-    final Statement s3 = new ClientNotificationsStatement(s4, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
-    final Statement s2 = super.interceptClassLevelStatement(s3, testClass);
-    final Statement s1 = new ClearServerRunContextStatement(s2);
+    final Statement s3 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
+    final Statement s2 = new ClientNotificationsStatement(s3, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
+    final Statement s1 = super.interceptClassLevelStatement(s2, testClass);
 
     return s1;
   }
@@ -87,38 +85,15 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
-    final Statement s3 = new ClientNotificationsStatement(s4, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
-    final Statement s2 = super.interceptMethodLevelStatement(s3, testClass, testMethod);
-    final Statement s1 = new ClearServerRunContextStatement(s2);
+    final Statement s3 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
+    final Statement s2 = new ClientNotificationsStatement(s3, ReflectionUtility.getAnnotation(RunWithClientNotifications.class, testClass));
+    final Statement s1 = super.interceptMethodLevelStatement(s2, testClass, testMethod);
+
     return s1;
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  protected Statement withPotentialTimeout(FrameworkMethod method, Object test, Statement next) {
-    long timeoutMillis = getTimeoutMillis(method.getMethod());
-    if (timeoutMillis <= 0) {
-      return next;
-    }
-    return new TimeoutServerRunContextStatement(next, timeoutMillis);
-  }
-
-  @Override
-  protected Statement interceptBeforeStatement(Statement next, Class<?> testClass, Method testMethod) {
-    Statement interceptedBeforeStatement = super.interceptBeforeStatement(next, testClass, testMethod);
-    if (hasNoTimeout(testMethod)) {
-      return interceptedBeforeStatement;
-    }
-    return new TimeoutServerRunContextStatement(interceptedBeforeStatement, 0);
-  }
-
-  @Override
-  protected Statement interceptAfterStatement(Statement next, Class<?> testClass, Method testMethod) {
-    Statement interceptedAfterStatement = super.interceptAfterStatement(next, testClass, testMethod);
-    if (hasNoTimeout(testMethod)) {
-      return interceptedAfterStatement;
-    }
-    return new TimeoutServerRunContextStatement(interceptedAfterStatement, 0);
+  protected RunContext createJUnitRunContext() {
+    return ServerRunContexts.empty();
   }
 }

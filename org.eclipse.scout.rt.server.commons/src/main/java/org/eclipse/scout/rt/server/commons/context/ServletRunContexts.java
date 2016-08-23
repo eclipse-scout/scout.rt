@@ -14,9 +14,14 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * Factory methods to create new {@link ServletRunContext} objects to propagate {@link Servlet} state like
@@ -43,16 +48,55 @@ public final class ServletRunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling context.<br/>
+   * Creates a "snapshot" of the current calling context for values managed by {@link ServletRunContext} class.
+   * <p>
+   * {@link RunMonitor}<br>
+   * Uses a new {@link RunMonitor} which is registered as child monitor of {@link RunMonitor#CURRENT}, meaning that the
+   * context is cancelled upon cancellation of the current (parent) monitor. Cancellation works top-down, so
+   * cancellation of the context's monitor has no effect to the current (parent) monitor.
+   * <p>
+   * {@link TransactionScope}<br>
+   * Uses the transaction scope {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in
+   * a transaction yet.
+   * <p>
+   * {@link ITransactionMember}<br>
+   * If the current context has some transaction members registered, those are not registered with the new context.
+   * <p>
+   * {@link ThreadLocal}<br>
+   * Thread-Locals associated with the current context via {@link RunContext#withThreadLocal(ThreadLocal, Object)} are
+   * copied as well.
    *
-   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
-   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
-   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * @param orElseEmpty
+   *          indicates whether to return an empty {@link RunContext} if not running in a context yet.
+   * @throws AssertionException
+   *           if not running in a {@link RunContext}, and <i>orElseEmpty</i> is set to <code>false</code>.
    */
-  public static ServletRunContext copyCurrent() {
-    final ServletRunContext runContext = BEANS.get(ServletRunContext.class);
-    runContext.fillCurrentValues();
-    return runContext;
+  public static ServletRunContext copyCurrent(final boolean orElseEmpty) {
+    if (RunContext.CURRENT.get() == null && orElseEmpty) {
+      return BEANS.get(ServletRunContextFactory.class).empty();
+    }
+    return BEANS.get(ServletRunContextFactory.class).copyCurrent();
+  }
+
+  /**
+   * Factory to create initialized {@link ServletRunContext} objects.
+   */
+  @ApplicationScoped
+  public static class ServletRunContextFactory extends RunContextFactory {
+
+    @Override
+    public ServletRunContext copyCurrent() {
+      return (ServletRunContext) super.copyCurrent();
+    }
+
+    @Override
+    public ServletRunContext empty() {
+      return (ServletRunContext) super.empty();
+    }
+
+    @Override
+    protected ServletRunContext newInstance() {
+      return BEANS.get(ServletRunContext.class);
+    }
   }
 }

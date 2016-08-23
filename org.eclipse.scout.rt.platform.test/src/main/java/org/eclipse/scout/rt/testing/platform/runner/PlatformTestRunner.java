@@ -16,14 +16,18 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.statement.AssertNoRunningJobsStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.RunContextStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.TimeoutRunContextStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -38,7 +42,8 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Use this Runner to run tests which require the Scout {@link IPlatform}
+ * Use this Runner to run tests which require the Scout {@link IPlatform}, and to have a current {@link RunContext} set
+ * for test execution.
  * <p>
  * Use {@link RunWithNewPlatform} to run the test with a new platform.
  * <p>
@@ -66,7 +71,8 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    final Statement s3 = super.classBlock(notifier);
+    final Statement s4 = super.classBlock(notifier);
+    final Statement s3 = new RunContextStatement(s4, createJUnitRunContext());
     final Statement s2 = new AssertNoRunningJobsStatement(s3, "Test class");
     final Statement s1 = new PlatformStatement(s2, ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
 
@@ -261,6 +267,26 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   protected boolean hasNoTimeout(Method method) {
     return getTimeoutMillis(method) <= 0;
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  protected Statement withPotentialTimeout(FrameworkMethod method, Object test, Statement next) {
+    long timeoutMillis = getTimeoutMillis(method.getMethod());
+    if (timeoutMillis <= 0) {
+      return next;
+    }
+
+    // JUnit runs tests with a timeout in a separate thread.
+    // This statement replaces 'FailOnTimeout', and additionally provides the current 'RunContext' to the executing thread.
+    return new TimeoutRunContextStatement(next, timeoutMillis);
+  }
+
+  /**
+   * Method invoked to create the {@link RunContext} to run tests.
+   */
+  protected RunContext createJUnitRunContext() {
+    return RunContexts.empty();
   }
 
   protected static class RunAftersStatement extends Statement {

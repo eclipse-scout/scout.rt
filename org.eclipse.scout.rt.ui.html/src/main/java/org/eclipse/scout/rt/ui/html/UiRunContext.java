@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDia
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
@@ -160,38 +159,21 @@ public class UiRunContext extends RunContext {
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", getRunMonitor());
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
-    builder.ref("session", getSession());
-    builder.ref("jsonRequest", getJsonRequest());
-    return builder.toString();
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    super.interceptToStringBuilder(builder
+        .ref("session", getSession())
+        .ref("jsonRequest", getJsonRequest()));
   }
-
-  // === fill methods ===
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final UiRunContext originRunContext = (UiRunContext) origin;
+    super.copyValues(origin);
 
-    super.copyValues(originRunContext);
-    m_session = originRunContext.m_session;
-    m_jsonRequest = originRunContext.m_jsonRequest;
-  }
-
-  @Override
-  protected void fillCurrentValues() {
-    super.fillCurrentValues();
-    m_session = IUiSession.CURRENT.get();
-    m_jsonRequest = JsonRequest.CURRENT.get();
-  }
-
-  @Override
-  protected void fillEmptyValues() {
-    throw new UnsupportedOperationException(); // not supported to not loose context information accidentally (e.g. the authenticated subject)
+    if (origin instanceof UiRunContext) {
+      final UiRunContext source = (UiRunContext) origin;
+      m_session = source.m_session;
+      m_jsonRequest = source.m_jsonRequest;
+    }
   }
 
   @Override

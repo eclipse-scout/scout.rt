@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.server.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashSet;
@@ -22,34 +24,19 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ServerRunContextTest {
-
-  @Before
-  public void before() {
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.remove();
-    ScoutTexts.CURRENT.remove();
-    UserAgent.CURRENT.remove();
-  }
-
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
-  }
 
   @Test
   public void testEmpty() {
@@ -82,7 +69,48 @@ public class ServerRunContextTest {
 
   @Test
   public void testCurrentTransactionScope() {
-    assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope());
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope());
+      }
+    });
+    RunContexts.empty().withTransactionScope(TransactionScope.REQUIRED).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope());
+      }
+    });
+  }
+
+  @Test
+  public void testCopyCurrentOrElseEmpty() {
+    Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        try {
+          ServerRunContexts.copyCurrent();
+          fail("AssertionException expected because not running in a RunContext");
+        }
+        catch (AssertionException e) {
+          // expected
+        }
+
+        try {
+          ServerRunContexts.copyCurrent(false);
+          fail("AssertionException expected because not running in a RunContext");
+        }
+        catch (AssertionException e) {
+          // expected
+        }
+
+        assertNotNull(ServerRunContexts.copyCurrent(true));
+      }
+    }, Jobs.newInput())
+        .awaitDoneAndGet();
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

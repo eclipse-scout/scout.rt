@@ -315,7 +315,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
             public void run() throws Exception {
               forceClientSessionShutdown(clientSession);
             }
-          }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
+          }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true))
               .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()));
 
           int timeout = CONFIG.getPropertyValue(SessionStoreHousekeepingMaxWaitShutdownProperty.class).intValue();
@@ -446,7 +446,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
                 forceClientSessionShutdown(clientSession);
                 removeClientSession(clientSession);
               }
-            }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
+            }, ModelJobs.newInput(ClientRunContexts.empty()
+                .withSession(clientSession, true))
                 .withName("Closing desktop due to HTTP session invalidation")));
           }
         }

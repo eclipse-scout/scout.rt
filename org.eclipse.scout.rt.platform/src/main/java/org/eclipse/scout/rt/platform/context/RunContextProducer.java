@@ -28,6 +28,6 @@ public class RunContextProducer {
    * Produces a {@link RunContext} for the given {@link Subject}.
    */
   public RunContext produce(final Subject subject) {
-    return RunContexts.copyCurrent().withSubject(subject);
+    return RunContexts.copyCurrent(true).withSubject(subject);
   }
 }

@@ -27,9 +27,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,11 +41,6 @@ public class ModelJobsTest {
   public void before() {
     m_clientSession = mock(IClientSession.class);
     when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
-  }
-
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
   }
 
   @Test
@@ -137,37 +130,46 @@ public class ModelJobsTest {
 
   @Test
   public void testScheduleWithoutInput() {
-    ISession.CURRENT.set(m_clientSession);
-
-    // Test schedule
-    IFuture<?> actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
+    ClientRunContexts.copyCurrent().withSession(m_clientSession, false).run(new IRunnable() {
 
       @Override
-      public IFuture<?> call() throws Exception {
-        return IFuture.CURRENT.get();
+      public void run() throws Exception {
+        // Test schedule
+        IFuture<?> actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
+
+          @Override
+          public IFuture<?> call() throws Exception {
+            return IFuture.CURRENT.get();
+          }
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+            .awaitDoneAndGet();
+
+        assertTrue(ModelJobs.isModelJob(actualFuture));
+
+        // Test schedule with delay
+        actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
+
+          @Override
+          public IFuture<?> call() throws Exception {
+            return IFuture.CURRENT.get();
+          }
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDoneAndGet();
+
+        assertTrue(ModelJobs.isModelJob(actualFuture));
+        assertTrue(actualFuture.getJobInput().getRunContext() instanceof ClientRunContext);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
-        .awaitDoneAndGet();
-
-    assertTrue(ModelJobs.isModelJob(actualFuture));
-
-    // Test schedule with delay
-    actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
-
-      @Override
-      public IFuture<?> call() throws Exception {
-        return IFuture.CURRENT.get();
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDoneAndGet();
-
-    assertTrue(ModelJobs.isModelJob(actualFuture));
-    assertTrue(actualFuture.getJobInput().getRunContext() instanceof ClientRunContext);
+    });
   }
 
   @Test(expected = AssertionException.class)
   public void testScheduleWithoutInputWithoutSession() {
-    ISession.CURRENT.set(null);
-    ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    ClientRunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+      }
+    });
   }
 
   @Test

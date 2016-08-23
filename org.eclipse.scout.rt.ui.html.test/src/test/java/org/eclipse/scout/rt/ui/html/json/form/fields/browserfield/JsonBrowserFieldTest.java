@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.json.JSONException;
@@ -12,10 +13,12 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Testing: {@link AbstractBrowserField}
  */
+@RunWith(PlatformTestRunner.class)
 public class JsonBrowserFieldTest extends BaseFormFieldTest {
   /**
    * <ul>

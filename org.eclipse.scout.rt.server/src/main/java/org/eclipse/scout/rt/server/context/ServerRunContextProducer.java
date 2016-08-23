@@ -34,7 +34,7 @@ public class ServerRunContextProducer extends RunContextProducer {
    */
   @Override
   public ServerRunContext produce(final Subject subject) {
-    final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+    final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent(true)
         .withSubject(subject)
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
 

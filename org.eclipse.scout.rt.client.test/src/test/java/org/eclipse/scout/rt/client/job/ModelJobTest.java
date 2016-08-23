@@ -29,10 +29,8 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,20 +50,15 @@ public class ModelJobTest {
     when(m_clientSession2.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
   }
 
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
-  }
-
   @Test(expected = AssertionException.class)
   public void testNoSession() {
-    ISession.CURRENT.remove();
-    ModelJobs.schedule(new IRunnable() {
+    ClientRunContexts.empty().run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
+        ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    });
   }
 
   @Test

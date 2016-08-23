@@ -22,11 +22,14 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link ClientNotificationRegistry}
  */
+@RunWith(PlatformTestRunner.class)
 public class ClientNotificationRegistryTest {
   private static final String TEST_NODE = "Node1";
   private static final String TEST_NOTIFICATION = "testNotification";

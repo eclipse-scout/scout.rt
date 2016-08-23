@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -152,37 +151,21 @@ public class ServletRunContext extends RunContext {
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
-    builder.ref("servletRequest", getServletRequest());
-    builder.ref("servletResponse", getServletResponse());
-    return builder.toString();
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    super.interceptToStringBuilder(builder
+        .ref("servletRequest", getServletRequest())
+        .ref("servletResponse", getServletResponse()));
   }
-
-  // === fill methods ===
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final ServletRunContext originRunContext = (ServletRunContext) origin;
+    super.copyValues(origin);
 
-    super.copyValues(originRunContext);
-    m_servletRequest = originRunContext.m_servletRequest;
-    m_servletResponse = originRunContext.m_servletResponse;
-  }
-
-  @Override
-  protected void fillCurrentValues() {
-    super.fillCurrentValues();
-    m_servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    m_servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-  }
-
-  @Override
-  protected void fillEmptyValues() {
-    throw new UnsupportedOperationException(); // not supported to not loose context information accidentally (e.g. the authenticated subject)
+    if (origin instanceof ServletRunContext) {
+      final ServletRunContext source = (ServletRunContext) origin;
+      m_servletRequest = source.m_servletRequest;
+      m_servletResponse = source.m_servletResponse;
+    }
   }
 
   @Override

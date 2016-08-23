@@ -36,7 +36,7 @@ public class RunContextExceptionTranslationTest {
 
     // Test with DefaultRuntimeExceptionTranslator
     try {
-      RunContexts.copyCurrent().run(runnableWithError);
+      RunContexts.empty().run(runnableWithError);
       fail();
     }
     catch (PlatformException e) {
@@ -45,7 +45,7 @@ public class RunContextExceptionTranslationTest {
 
     // Test with DefaultRuntimeExceptionTranslator
     try {
-      RunContexts.copyCurrent().run(runnableWithError, DefaultRuntimeExceptionTranslator.class);
+      RunContexts.empty().run(runnableWithError, DefaultRuntimeExceptionTranslator.class);
       fail();
     }
     catch (PlatformException e) {
@@ -54,7 +54,7 @@ public class RunContextExceptionTranslationTest {
 
     // Test with DefaultExceptionTranslator
     try {
-      RunContexts.copyCurrent().run(runnableWithError, DefaultExceptionTranslator.class);
+      RunContexts.empty().run(runnableWithError, DefaultExceptionTranslator.class);
       fail();
     }
     catch (RuntimeException e) {
@@ -66,7 +66,7 @@ public class RunContextExceptionTranslationTest {
 
     // Test with PlatformExceptionTranslator
     try {
-      RunContexts.copyCurrent().run(runnableWithError, PlatformExceptionTranslator.class);
+      RunContexts.empty().run(runnableWithError, PlatformExceptionTranslator.class);
       fail();
     }
     catch (PlatformException e) {

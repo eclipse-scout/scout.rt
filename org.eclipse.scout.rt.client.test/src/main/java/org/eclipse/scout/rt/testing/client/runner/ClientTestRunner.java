@@ -14,14 +14,15 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.testing.client.runner.statement.ClearClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.TimeoutClientRunContextStatement;
@@ -80,40 +81,36 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement classBlock(RunNotifier notifier) {
-    Statement s2 = super.classBlock(notifier);
-    //make sure that the test cleans up the desktop; no leftover forms, messageboxes or filechoosers
-    final Statement s1 = new CheckDesktopCleanupStatement(s2);
+    final Statement s2 = super.classBlock(notifier);
+    final Statement s1 = new CheckDesktopCleanupStatement(s2); //make sure that the test cleans up the desktop; no leftover forms, messageboxes or filechoosers
     return s1;
   }
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s4 = new RunInModelJobStatement(next);
-    final Statement s3 = new ClientRunContextStatement(s4, ReflectionUtility.getAnnotation(RunWithClientSession.class, testClass));
-    final Statement s2 = super.interceptClassLevelStatement(s3, testClass);
-    final Statement s1 = new ClearClientRunContextStatement(s2);
+    final Statement s3 = new RunInModelJobStatement(next);
+    final Statement s2 = new ClientRunContextStatement(s3, ReflectionUtility.getAnnotation(RunWithClientSession.class, testClass));
+    final Statement s1 = super.interceptClassLevelStatement(s2, testClass);
     return s1;
   }
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s5;
+    final Statement s4;
     if (hasNoTimeout(testMethod)) {
-      s5 = new RunInModelJobStatement(next);
+      s4 = new RunInModelJobStatement(next);
     }
     else {
       // Three different model jobs are scheduled for all @Before methods, the @Test-annotated method and all @After methods.
-      s5 = next;
+      s4 = next;
     }
-    final Statement s4 = new AddBlockingConditionTimeoutStatement(s5);
-    final Statement s3 = new ClientRunContextStatement(s4, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
-    final Statement s2 = super.interceptMethodLevelStatement(s3, testClass, testMethod);
-    final Statement s1 = new ClearClientRunContextStatement(s2);
+    final Statement s3 = new AddBlockingConditionTimeoutStatement(s4);
+    final Statement s2 = new ClientRunContextStatement(s3, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
+    final Statement s1 = super.interceptMethodLevelStatement(s2, testClass, testMethod);
     return s1;
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   protected Statement withPotentialTimeout(FrameworkMethod method, Object test, Statement next) {
     long timeoutMillis = getTimeoutMillis(method.getMethod());
     if (timeoutMillis <= 0) {
@@ -141,6 +138,11 @@ public class ClientTestRunner extends PlatformTestRunner {
       return interceptedAfterStatement;
     }
     return new TimeoutClientRunContextStatement(interceptedAfterStatement, 0);
+  }
+
+  @Override
+  protected RunContext createJUnitRunContext() {
+    return ClientRunContexts.empty();
   }
 
   protected static class AddBlockingConditionTimeoutStatement extends Statement {

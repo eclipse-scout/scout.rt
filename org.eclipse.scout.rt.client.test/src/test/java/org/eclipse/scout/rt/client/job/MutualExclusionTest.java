@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -56,6 +57,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
@@ -69,6 +71,9 @@ import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+/**
+ * Do not use {@link ClientTestRunner} to not have the model mutex acquired yet.
+ */
 @RunWith(PlatformTestRunner.class)
 public class MutualExclusionTest {
 
@@ -76,6 +81,8 @@ public class MutualExclusionTest {
 
   private static ExecutorService s_executor;
 
+  private RunContext m_oldRunContext;
+  private ISession m_oldSession;
   private IClientSession m_clientSession;
 
   @BeforeClass
@@ -90,15 +97,19 @@ public class MutualExclusionTest {
 
   @Before
   public void before() {
+    m_oldRunContext = RunContext.CURRENT.get();
+    m_oldSession = ISession.CURRENT.get();
+
     m_clientSession = mock(IClientSession.class);
     when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
-
+    RunContext.CURRENT.set(ClientRunContexts.empty().withSession(m_clientSession, false));
     ISession.CURRENT.set(m_clientSession);
   }
 
   @After
   public void after() {
-    ISession.CURRENT.remove();
+    RunContext.CURRENT.set(m_oldRunContext);
+    ISession.CURRENT.set(m_oldSession);
   }
 
   /**

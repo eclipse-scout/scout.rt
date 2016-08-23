@@ -11,12 +11,13 @@
 package org.eclipse.scout.rt.client.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -25,33 +26,22 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class ClientRunContextTest {
-
-  @Before
-  public void before() {
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.remove();
-    ScoutTexts.CURRENT.remove();
-    UserAgent.CURRENT.remove();
-  }
-
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
-  }
 
   @Test
   public void testEmpty() {
@@ -82,215 +72,150 @@ public class ClientRunContextTest {
   }
 
   @Test
-  public void testCurrentSubject() {
-    Subject subject = new Subject();
-    ClientRunContext runContext = Subject.doAs(subject, new PrivilegedAction<ClientRunContext>() {
+  public void testCurrentSessionAndDerivedValues() {
+    final IClientSession session = mock(IClientSession.class);
+    final UserAgent sessionUserAgent = UserAgents.create().build();
+    final Locale sessionLocale = Locale.CANADA_FRENCH;
+    final Subject sessionSubject = new Subject();
+    final IDesktop sessionDesktop = mock(IDesktop.class);
+
+    when(session.getUserAgent()).thenReturn(sessionUserAgent);
+    when(session.getLocale()).thenReturn(sessionLocale);
+    when(session.getSubject()).thenReturn(sessionSubject);
+    when(session.getDesktopElseVirtualDesktop()).thenReturn(sessionDesktop);
+
+    ClientRunContexts.empty().withSession(null, false).run(new IRunnable() {
 
       @Override
-      public ClientRunContext run() {
-        return ClientRunContexts.copyCurrent();
+      public void run() throws Exception {
+        assertNull(ISession.CURRENT.get());
+        assertNull(NlsLocale.CURRENT.get());
+        assertNull(UserAgent.CURRENT.get());
+        assertNull(IDesktop.CURRENT.get());
+
+        assertNull(ClientRunContexts.copyCurrent().getSession());
+        assertNull(ClientRunContexts.copyCurrent().getLocale());
+        assertNull(ClientRunContexts.copyCurrent().getUserAgent());
+        assertNull(ClientRunContexts.copyCurrent().getDesktop());
       }
     });
-    assertSame(subject, runContext.getSubject());
 
-    runContext = Subject.doAs(null, new PrivilegedAction<ClientRunContext>() {
+    ClientRunContexts.empty().withSession(session, false).run(new IRunnable() {
 
       @Override
-      public ClientRunContext run() {
-        return ClientRunContexts.copyCurrent();
+      public void run() throws Exception {
+        assertSame(session, ISession.CURRENT.get());
+        assertNull(NlsLocale.CURRENT.get());
+        assertNull(UserAgent.CURRENT.get());
+        assertNull(IDesktop.CURRENT.get());
+
+        assertSame(session, ClientRunContexts.copyCurrent().getSession());
+        assertNull(ClientRunContexts.copyCurrent().getLocale());
+        assertNull(ClientRunContexts.copyCurrent().getUserAgent());
+        assertNull(ClientRunContexts.copyCurrent().getDesktop());
+
+        final UserAgent customUserAgent = UserAgents.create().build();
+        assertSame(customUserAgent, ClientRunContexts.copyCurrent().withUserAgent(customUserAgent).getUserAgent());
+        final Locale customLocale = Locale.ITALIAN;
+        assertSame(customLocale, ClientRunContexts.copyCurrent().withLocale(customLocale).getLocale());
       }
     });
-    assertNull(runContext.getSubject());
-  }
 
-  @Test
-  public void testCurrentSession() {
-    // No session on ThreadLocal
-    ISession.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().getSession());
+    ClientRunContexts.empty().withSession(session, true).run(new IRunnable() {
 
-    // Session on ThreadLocal
-    IClientSession sessionThreadLocal = mock(IClientSession.class);
-    ISession.CURRENT.set(sessionThreadLocal);
-    assertSame(sessionThreadLocal, ClientRunContexts.copyCurrent().getSession());
+      @Override
+      public void run() throws Exception {
+        assertSame(session, ISession.CURRENT.get());
+        assertSame(sessionLocale, NlsLocale.CURRENT.get());
+        assertSame(sessionUserAgent, UserAgent.CURRENT.get());
+        assertSame(sessionDesktop, IDesktop.CURRENT.get());
 
-    // Session on ThreadLocal, but set explicitly
-    ISession.CURRENT.set(sessionThreadLocal);
-    IClientSession explicitSession = mock(IClientSession.class);
-    assertSame(explicitSession, ClientRunContexts.copyCurrent().withSession(explicitSession, true).getSession());
+        assertSame(session, ClientRunContexts.copyCurrent().getSession());
+        assertSame(sessionLocale, ClientRunContexts.copyCurrent().getLocale());
+        assertSame(sessionUserAgent, ClientRunContexts.copyCurrent().getUserAgent());
+        assertSame(sessionDesktop, ClientRunContexts.copyCurrent().getDesktop());
 
-    // Session on ThreadLocal, but set explicitly to null
-    ISession.CURRENT.set(sessionThreadLocal);
-    assertNull(ClientRunContexts.copyCurrent().withSession(null, true).getSession());
-  }
+        final UserAgent customUserAgent = UserAgents.create().build();
+        assertSame(customUserAgent, ClientRunContexts.copyCurrent().withUserAgent(customUserAgent).getUserAgent());
 
-  @Test
-  public void testCurrentLocale() {
-    IClientSession session = mock(IClientSession.class);
+        final Locale customLocale = Locale.ITALIAN;
+        assertSame(customLocale, ClientRunContexts.copyCurrent().withLocale(customLocale).getLocale());
 
-    // ThreadLocal set, Session set with Locale
-    ISession.CURRENT.set(session);
-    when(session.getLocale()).thenReturn(Locale.ITALY);
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ClientRunContexts.copyCurrent().getLocale());
-
-    // ThreadLocal not set, Session set with Locale
-    ISession.CURRENT.set(session);
-    when(session.getLocale()).thenReturn(Locale.ITALY);
-    NlsLocale.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().getLocale());
-  }
-
-  @Test
-  public void testCurrentLocaleAndSetNullLocale() {
-    IClientSession session = mock(IClientSession.class);
-
-    // ThreadLocal set, Session set with Locale
-    ISession.CURRENT.set(session);
-    when(session.getLocale()).thenReturn(Locale.ITALY);
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertSame(Locale.ITALY, ClientRunContexts.copyCurrent().withLocale(null).withSession(session, true).getLocale());
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, false).getLocale());
-
-    // ThreadLocal set, Session set with null Locale
-    ISession.CURRENT.set(session);
-    when(session.getLocale()).thenReturn(null);
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, true).getLocale());
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, false).getLocale());
-
-    // ThreadLocal set, Session not set
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, true).getLocale());
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, false).getLocale());
-
-    // ThreadLocal not set, Session not set
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, true).getLocale());
-    assertNull(ClientRunContexts.copyCurrent().withLocale(null).withSession(session, false).getLocale());
-  }
-
-  @Test
-  public void testCurrentLocaleAndSetNotNullLocale() {
-    IClientSession session = mock(IClientSession.class);
-
-    // ThreadLocal set, Session set with Locale
-    ISession.CURRENT.set(session);
-    when(session.getLocale()).thenReturn(Locale.ITALY);
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.ITALY, ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, true).getLocale());
-    assertEquals(Locale.JAPAN, ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, false).getLocale());
-
-    // ThreadLocal set, Session set with null Locale
-    ISession.CURRENT.set(session);
-    when(session.getLocale()).thenReturn(null);
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, true).getLocale());
-    assertEquals(Locale.JAPAN, ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, false).getLocale());
-
-    // ThreadLocal set, Session not set
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, true).getLocale());
-    assertEquals(Locale.JAPAN, ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, false).getLocale());
-
-    // ThreadLocal not set, Session not set
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, true).getLocale());
-    assertEquals(Locale.JAPAN, ClientRunContexts.copyCurrent().withLocale(Locale.JAPAN).withSession(session, false).getLocale());
+        final IDesktop customDesktop = mock(IDesktop.class);
+        assertSame(customDesktop, ClientRunContexts.copyCurrent().withDesktop(customDesktop).getDesktop());
+      }
+    });
   }
 
   @Test
   public void testCurrentUserAgent() {
-    IClientSession session = mock(IClientSession.class);
-    UserAgent userAgent1 = UserAgents.create().build();
-    UserAgent userAgent2 = UserAgents.create().build();
+    final UserAgent userAgent = UserAgents.create().build();
+    ClientRunContexts.empty().withUserAgent(null).run(new IRunnable() {
 
-    // ThreadLocal set, Session set with UserAgent
-    ISession.CURRENT.set(session);
-    when(session.getUserAgent()).thenReturn(userAgent1);
-    UserAgent.CURRENT.set(userAgent2);
-    assertSame(userAgent2, ClientRunContexts.copyCurrent().getUserAgent());
+      @Override
+      public void run() throws Exception {
+        assertNull(UserAgent.CURRENT.get());
+        assertNull(RunContexts.copyCurrent().getLocale());
+      }
+    });
 
-    // ThreadLocal not set, Session set with Locale
-    ISession.CURRENT.set(session);
-    when(session.getUserAgent()).thenReturn(userAgent1);
-    UserAgent.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().getUserAgent());
-  }
+    ClientRunContexts.empty().withUserAgent(userAgent).run(new IRunnable() {
 
-  @Test
-  public void testCurrentUserAgentAndSetNullUserAgent() {
-    IClientSession session = mock(IClientSession.class);
-    UserAgent userAgent1 = UserAgents.create().build();
-    UserAgent userAgent2 = UserAgents.create().build();
+      @Override
+      public void run() throws Exception {
+        assertSame(userAgent, UserAgent.CURRENT.get());
+        assertEquals(userAgent, ClientRunContexts.copyCurrent().getUserAgent());
 
-    // ThreadLocal set, Session set with UserAgent
-    ISession.CURRENT.set(session);
-    when(session.getUserAgent()).thenReturn(userAgent1);
-    UserAgent.CURRENT.set(userAgent2);
-    assertSame(userAgent1, ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, true).getUserAgent());
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, false).getUserAgent());
-
-    // ThreadLocal set, Session set with null UserAgent
-    ISession.CURRENT.set(session);
-    when(session.getUserAgent()).thenReturn(null);
-    UserAgent.CURRENT.set(userAgent2);
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, true).getUserAgent());
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, false).getUserAgent());
-
-    // ThreadLocal set, Session not set
-    ISession.CURRENT.remove();
-    UserAgent.CURRENT.set(userAgent2);
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, true).getUserAgent());
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, false).getUserAgent());
-
-    // ThreadLocal not set, Session not set
-    ISession.CURRENT.remove();
-    UserAgent.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, true).getUserAgent());
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(null).withSession(session, false).getUserAgent());
-  }
-
-  @Test
-  public void testCurrentUserAgentAndSetNotNullUserAgent() {
-    IClientSession session = mock(IClientSession.class);
-    UserAgent userAgent1 = UserAgents.create().build();
-    UserAgent userAgent2 = UserAgents.create().build();
-    UserAgent userAgent3 = UserAgents.create().build();
-
-    // ThreadLocal set, Session set with UserAgent
-    ISession.CURRENT.set(session);
-    when(session.getUserAgent()).thenReturn(userAgent1);
-    UserAgent.CURRENT.set(userAgent2);
-    assertEquals(userAgent3, ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, true).getUserAgent());
-
-    // ThreadLocal set, Session set with null UserAgent
-    ISession.CURRENT.set(session);
-    when(session.getUserAgent()).thenReturn(null);
-    UserAgent.CURRENT.set(userAgent1);
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, true).getUserAgent());
-    assertEquals(userAgent3, ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, false).getUserAgent());
-
-    // ThreadLocal set, Session not set
-    ISession.CURRENT.remove();
-    UserAgent.CURRENT.set(userAgent1);
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, true).getUserAgent());
-    assertEquals(userAgent3, ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, false).getUserAgent());
-
-    // ThreadLocal not set, Session not set
-    ISession.CURRENT.remove();
-    UserAgent.CURRENT.remove();
-    assertNull(ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, true).getUserAgent());
-    assertEquals(userAgent3, ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, false).getUserAgent());
+        final UserAgent customUserAgent = UserAgents.create().build();
+        assertEquals(customUserAgent, ClientRunContexts.copyCurrent().withUserAgent(customUserAgent).getUserAgent());
+      }
+    });
   }
 
   @Test
   public void testCurrentTransactionScope() {
-    assertEquals(TransactionScope.REQUIRED, ClientRunContexts.copyCurrent().getTransactionScope());
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertEquals(TransactionScope.REQUIRED, ClientRunContexts.copyCurrent().getTransactionScope());
+      }
+    });
+    RunContexts.empty().withTransactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertEquals(TransactionScope.REQUIRED, ClientRunContexts.copyCurrent().getTransactionScope());
+      }
+    });
+  }
+
+  @Test
+  public void testCopyCurrentOrElseEmpty() {
+    Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        try {
+          ClientRunContexts.copyCurrent();
+          fail("AssertionException expected because not running in a RunContext");
+        }
+        catch (AssertionException e) {
+          // expected
+        }
+
+        try {
+          ClientRunContexts.copyCurrent(false);
+          fail("AssertionException expected because not running in a RunContext");
+        }
+        catch (AssertionException e) {
+          // expected
+        }
+
+        assertNotNull(ClientRunContexts.copyCurrent(true));
+      }
+    }, Jobs.newInput())
+        .awaitDoneAndGet();
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

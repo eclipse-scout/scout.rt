@@ -12,9 +12,12 @@ package org.eclipse.scout.rt.server.jms.context;
 
 import javax.jms.Message;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 
 /**
  * Factory methods to create new {@link JmsRunContext} objects to propagate <i>JMS Java Message Service</i> state like
@@ -41,26 +44,40 @@ public final class JmsRunContexts {
   }
 
   /**
-   * Creates an empty <code>JmsRunContext</code>.
+   * Creates an empty {@link JmsRunContext} with all values managed by {@link JmsRunContext} class set to their default
+   * value. This method does not require to already run in a {@link RunContext}.
+   * <p>
+   * {@link RunMonitor}<br>
+   * Uses a new {@link RunMonitor} which is not registered as child monitor of {@link RunMonitor#CURRENT}, meaning that
+   * the context is not cancelled upon cancellation of the current monitor.
+   * <p>
+   * {@link TransactionScope}<br>
+   * Uses the transaction scope {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in
+   * a transaction yet.
    */
   public static JmsRunContext empty() {
-    final JmsRunContext runContext = BEANS.get(JmsRunContext.class);
-    runContext.fillEmptyValues();
-    return runContext;
+    return BEANS.get(JmsRunContextFactory.class).empty();
   }
 
   /**
-   * Creates a "snapshot" of the current calling <code>JmsRunContext</code>.
-   * <p>
-   * <strong>RunMonitor</strong><br>
-   * a new {@link RunMonitor} is created and registered within the {@link RunMonitor} of the current calling context.
-   * That makes the <i>returned</i> {@link RunContext} to be cancelled as well once the current calling
-   * {@link RunContext} is cancelled, but DOES NOT cancel the current calling {@link RunContext} if the <i>returned</i>
-   * {@link RunContext} is cancelled.
+   * Factory to create initialized {@link JmsRunContext} objects.
    */
-  public static JmsRunContext copyCurrent() {
-    final JmsRunContext runContext = BEANS.get(JmsRunContext.class);
-    runContext.fillCurrentValues();
-    return runContext;
+  @ApplicationScoped
+  public static class JmsRunContextFactory extends RunContextFactory {
+
+    @Override
+    public JmsRunContext copyCurrent() {
+      return (JmsRunContext) super.copyCurrent();
+    }
+
+    @Override
+    public JmsRunContext empty() {
+      return (JmsRunContext) super.empty();
+    }
+
+    @Override
+    protected JmsRunContext newInstance() {
+      return BEANS.get(JmsRunContext.class);
+    }
   }
 }

@@ -10,26 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.context;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
- * Factory methods to create new {@link ClientRunContext} objects to propagate client-side context.
+ * Factory methods to create a new {@link ClientRunContext} objects to propagate client-side state. See
+ * {@link RunContexts} for more information.
  * <p>
- * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
- * client state among different threads, or allows temporary state changes to be done for the time of executing some
- * code.
- * </p>
  * Usage:
  *
  * <pre>
- * ClientRunContexts.copyCurrent().withLocale(Locale.US).withSubject(...).withSession(...).run(new IRunnable() {
+ * ClientRunContexts.copyCurrent()
+ *   .withLocale(Locale.US)
+ *   .withSubject(...)
+ *   .withSession(...)
+ *   .withTransactionScope(TransactionScope.REQUIRES_NEW)
+ *   .run(new IRunnable() {
  *
- *   &#064;Override
- *   public void run() throws Exception {
- *      // run code on behalf of the new context
- *   }
+ *    &#064;Override
+ *    public void run() {
+ *      // run code on behalf of the context
+ *    }
  * });
  * </pre>
  *
@@ -42,30 +52,89 @@ public final class ClientRunContexts {
   }
 
   /**
-   * Creates an empty {@link ClientRunContext}.
+   * Creates an empty {@link ClientRunContext} with all values managed by {@link ClientRunContext} class set to their
+   * default value. This method does not require to already run in a {@link RunContext}.
    * <p>
-   * <strong>RunMonitor</strong><br>
-   * a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT registered
-   * as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor} is cancelled.
+   * {@link RunMonitor}<br>
+   * Uses a new {@link RunMonitor} which is not registered as child monitor of {@link RunMonitor#CURRENT}, meaning that
+   * the context is not cancelled upon cancellation of the current monitor.
+   * <p>
+   * {@link TransactionScope}<br>
+   * Uses the transaction scope {@link TransactionScope#REQUIRED}. Because 'empty' constructs a {@link RunContext}
+   * without a transaction associated, it starts a new transaction if not specifying a transaction via
+   * {@link RunContext#withTransaction(ITransaction)}.
    */
   public static ClientRunContext empty() {
-    final ClientRunContext runContext = BEANS.get(ClientRunContext.class);
-    runContext.fillEmptyValues();
-    return runContext;
+    return BEANS.get(ClientRunContextFactory.class).empty();
   }
 
   /**
-   * Creates a "snapshot" of the current calling client context.
+   * Creates a "snapshot" of the current calling context for values managed by {@link ClientRunContext} class. This
+   * method requires to run in a {@link RunContext}, meaning that {@link RunContext#CURRENT} is set, or this method
+   * throws an {@link AssertionException} otherwise.
    * <p>
-   * <strong>RunMonitor</strong><br>
-   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
-   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
-   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
-   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * {@link RunMonitor}<br>
+   * Uses a new {@link RunMonitor} which is registered as child monitor of {@link RunMonitor#CURRENT}, meaning that the
+   * context is cancelled upon cancellation of the current (parent) monitor. Cancellation works top-down, so
+   * cancellation of the context's monitor has no effect to the current (parent) monitor.
+   * <p>
+   * {@link TransactionScope}<br>
+   * Uses the transaction scope {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in
+   * a transaction yet.
+   * <p>
+   * {@link ITransactionMember}<br>
+   * If the current context has some transaction members registered, those are not registered with the new context.
+   * <p>
+   * {@link ThreadLocal}<br>
+   * Thread-Locals associated with the current context via {@link RunContext#withThreadLocal(ThreadLocal, Object)} are
+   * copied as well.
+   *
+   * @throws AssertionException
+   *           if not running in a {@link RunContext}
    */
   public static ClientRunContext copyCurrent() {
-    final ClientRunContext runContext = BEANS.get(ClientRunContext.class);
-    runContext.fillCurrentValues();
-    return runContext;
+    return copyCurrent(false);
+  }
+
+  /**
+   * Same as {@link ClientRunContexts#copyCurrent()}, but less strict if not running in a {@link RunContext}.
+   *
+   * @param orElseEmpty
+   *          indicates whether to return an empty {@link RunContext} if not running in a context yet.
+   * @throws AssertionException
+   *           if not running in a {@link RunContext}, and <i>orElseEmpty</i> is set to <code>false</code>.
+   */
+  public static ClientRunContext copyCurrent(final boolean orElseEmpty) {
+    if (RunContext.CURRENT.get() != null) {
+      return BEANS.get(ClientRunContextFactory.class).copyCurrent();
+    }
+    if (orElseEmpty) {
+      return BEANS.get(ClientRunContextFactory.class).empty();
+    }
+    return Assertions.fail("Not running in a RunContext. Use '{}.empty()' or {}.copyCurrent(true) instead.", ClientRunContexts.class.getSimpleName(), ClientRunContexts.class.getSimpleName());
+  }
+
+  /**
+   * Factory to create initialized {@link ClientRunContext} objects.
+   */
+  @ApplicationScoped
+  public static class ClientRunContextFactory extends RunContextFactory {
+
+    @Override
+    public ClientRunContext empty() {
+      return (ClientRunContext) super.empty()
+          .withIdentifier(ClientRunContext.CLIENT_RUN_CONTEXT_IDENTIFIER);
+    }
+
+    @Override
+    public ClientRunContext copyCurrent() {
+      return (ClientRunContext) super.copyCurrent()
+          .withIdentifier(ClientRunContext.CLIENT_RUN_CONTEXT_IDENTIFIER);
+    }
+
+    @Override
+    protected ClientRunContext newInstance() {
+      return BEANS.get(ClientRunContext.class);
+    }
   }
 }

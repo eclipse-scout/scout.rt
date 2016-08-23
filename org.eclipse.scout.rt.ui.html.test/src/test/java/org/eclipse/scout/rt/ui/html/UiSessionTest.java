@@ -35,6 +35,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -61,9 +63,13 @@ import org.junit.Test;
 public class UiSessionTest {
 
   private List<IBean<?>> m_beans;
+  private RunContext m_oldRunContext;
 
   @Before
   public void before() {
+    m_oldRunContext = RunContext.CURRENT.get();
+    RunContext.CURRENT.set(RunContexts.empty()); // Because this test must be executed by a bare JUnit runner (see JavaDoc of test class).
+
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
           @Override
@@ -111,6 +117,7 @@ public class UiSessionTest {
   @After
   public void after() {
     TestingUtility.unregisterBeans(m_beans);
+    RunContext.CURRENT.set(m_oldRunContext);
   }
 
   @Test

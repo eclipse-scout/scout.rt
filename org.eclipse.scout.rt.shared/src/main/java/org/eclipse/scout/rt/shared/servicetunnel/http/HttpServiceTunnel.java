@@ -23,7 +23,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
@@ -212,7 +211,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
     final IFuture<ServiceTunnelResponse> future = Jobs
         .schedule(remoteInvocationCallable,
-            Jobs.newInput().withRunContext(createRunContext())
+            Jobs.newInput().withRunContext(RunContext.CURRENT.get().copy())
                 .withName(createServiceRequestName(requestSequence))
                 .withExceptionHandling(null, false)) // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
         .whenDone(new IDoneHandler<ServiceTunnelResponse>() {
@@ -223,7 +222,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
               remoteInvocationCallable.cancel();
             }
           }
-        }, createRunContext()
+        }, RunContext.CURRENT.get().copy()
             .withRunMonitor(BEANS.get(RunMonitor.class))); // separate monitor to not cancel this cancellation action.
 
     try {
@@ -254,9 +253,4 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     final String submitter = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
     return String.format("Tunneling service request [seq=%s, submitter=%s]", requestSequence, submitter);
   }
-
-  public RunContext createRunContext() {
-    return RunContexts.copyCurrent();
-  }
-
 }

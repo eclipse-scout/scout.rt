@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -38,21 +37,14 @@ import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
- * The <code>ServerRunContext</code> controls propagation of server-side state and sets the transaction boundaries. To
- * control transaction scope, configure the <code>ServerRunContext</code> with the respective {@link TransactionScope}.
+ * The <code>ServerRunContext</code> controls propagation of server-side state.
  * <p>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * server state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
  * <p>
- * A transaction scope controls in which transaction to run executables. By default, a new transaction is started, and
- * committed or rolled back upon completion.
- * <ul>
- * <li>Use {@link TransactionScope#REQUIRES_NEW} to run executables in a new transaction.</li>
- * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if not running in a transaction yet.</li>
- * <li>Use {@link TransactionScope#MANDATORY} to enforce that the caller is already running in a transaction. Otherwise,
- * a {@link TransactionRequiredException} is thrown.</li>
- * </ul>
+ * By default, {@link ServerRunContext} is configured with {@link TransactionScope#REQUIRES_NEW}, so that code is always
+ * executed in a new transaction.
  *
  * @since 5.1
  * @see RunContext
@@ -67,7 +59,7 @@ public class ServerRunContext extends RunContext {
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected String m_clientNodeId;
-  protected ClientNotificationCollector m_clientNotificationCollector;
+  protected ClientNotificationCollector m_clientNotificationCollector = new ClientNotificationCollector();
 
   @Override
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
@@ -234,52 +226,33 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", getRunMonitor());
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
-    builder.ref("session", getSession());
-    builder.attr("userAgent", getUserAgent());
-    builder.attr("clientNodeId", getClientNodeId());
-    builder.ref("transactionalClientNotificationCollector", getClientNotificationCollector());
-    return builder.toString();
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    super.interceptToStringBuilder(builder
+        .ref("session", getSession())
+        .attr("userAgent", getUserAgent())
+        .attr("clientNodeId", getClientNodeId())
+        .ref("transactionalClientNotificationCollector", getClientNotificationCollector()));
   }
 
-  // === fill methods ===
-
   @Override
-  protected void copyValues(final RunContext origin) {
-    final ServerRunContext originRunContext = (ServerRunContext) origin;
+  protected void copyValues(final RunContext runContext) {
+    super.copyValues(runContext);
 
-    super.copyValues(originRunContext);
-    m_session = originRunContext.m_session;
-    m_userAgent = originRunContext.m_userAgent;
-    m_clientNotificationCollector = originRunContext.m_clientNotificationCollector;
-    m_clientNodeId = originRunContext.m_clientNodeId;
+    final ServerRunContext origin = (ServerRunContext) runContext;
+    m_session = origin.m_session;
+    m_userAgent = origin.m_userAgent;
+    m_clientNotificationCollector = origin.m_clientNotificationCollector;
+    m_clientNodeId = origin.m_clientNodeId;
   }
 
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
+
     m_userAgent = UserAgent.CURRENT.get();
+    m_session = ServerSessionProvider.currentSession();
     m_clientNotificationCollector = ClientNotificationCollector.CURRENT.get();
     m_clientNodeId = IClientNodeId.CURRENT.get();
-    m_session = ServerSessionProvider.currentSession();
-    m_transactionScope = TransactionScope.REQUIRES_NEW;
-  }
-
-  @Override
-  protected void fillEmptyValues() {
-    super.fillEmptyValues();
-    m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
-    m_userAgent = null;
-    m_clientNotificationCollector = new ClientNotificationCollector();
-    m_clientNodeId = null;
-    m_session = null;
-    m_transactionScope = TransactionScope.REQUIRES_NEW;
   }
 
   @Override
@@ -295,8 +268,6 @@ public class ServerRunContext extends RunContext {
     if (ISession.class.isAssignableFrom(type)) {
       return (T) m_session;
     }
-    else {
-      return null;
-    }
+    return null;
   }
 }

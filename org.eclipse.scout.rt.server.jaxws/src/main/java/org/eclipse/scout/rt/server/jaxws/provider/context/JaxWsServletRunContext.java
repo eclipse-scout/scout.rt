@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
@@ -161,36 +160,18 @@ public class JaxWsServletRunContext extends ServletRunContext {
   }
 
   @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", getRunMonitor());
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("ids", CollectionUtility.format(getIdentifiers()));
-    builder.ref("servletRequest", getServletRequest());
-    builder.ref("servletResponse", getServletResponse());
-    builder.ref("webServiceContext", getWebServiceContext());
-    return builder.toString();
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    super.interceptToStringBuilder(builder
+        .ref("webServiceContext", getWebServiceContext()));
   }
-
-  // === fill methods ===
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final JaxWsServletRunContext originRunContext = (JaxWsServletRunContext) origin;
-    super.copyValues(originRunContext);
-    m_webServiceContext = originRunContext.m_webServiceContext;
-  }
+    super.copyValues(origin);
 
-  @Override
-  protected void fillCurrentValues() {
-    super.fillCurrentValues();
-    m_webServiceContext = IWebServiceContext.CURRENT.get();
-  }
-
-  @Override
-  protected void fillEmptyValues() {
-    throw new UnsupportedOperationException(); // not supported to not loose context information accidentally (e.g. the authenticated subject)
+    if (origin instanceof JaxWsServletRunContext) {
+      m_webServiceContext = ((JaxWsServletRunContext) origin).m_webServiceContext;
+    }
   }
 
   @Override

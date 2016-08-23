@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.AccessController;
 import java.util.List;
 import java.util.Locale;
 
+import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -76,7 +78,8 @@ public class UiServlet extends HttpServlet {
   protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
 
-    return ServletRunContexts.copyCurrent()
+    return ServletRunContexts.copyCurrent(true)
+        .withSubject(Subject.getSubject(AccessController.getContext()))
         .withServletRequest(req)
         .withServletResponse(resp)
         .withLocale(getPreferredLocale(req))

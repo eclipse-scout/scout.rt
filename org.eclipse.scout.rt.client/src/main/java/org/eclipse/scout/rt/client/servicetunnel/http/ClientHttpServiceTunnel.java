@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -116,10 +115,4 @@ public class ClientHttpServiceTunnel extends HttpServiceTunnel implements IClien
         }, null);
     cond.waitFor();
   }
-
-  @Override
-  public ClientRunContext createRunContext() {
-    return ClientRunContexts.copyCurrent();
-  }
-
 }

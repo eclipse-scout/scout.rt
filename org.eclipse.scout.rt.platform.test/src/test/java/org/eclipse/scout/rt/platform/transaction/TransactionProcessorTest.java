@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -64,13 +63,10 @@ public class TransactionProcessorTest {
             return m_transaction;
           }
         })));
-
-    RunMonitor.CURRENT.set(new RunMonitor());
   }
 
   @After
   public void after() {
-    RunMonitor.CURRENT.remove();
     for (IBean<?> bean : m_beans) {
       BEANS.getBeanManager().unregisterBean(bean);
     }

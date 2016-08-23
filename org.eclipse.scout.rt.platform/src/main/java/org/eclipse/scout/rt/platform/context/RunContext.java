@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
@@ -62,12 +63,19 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class RunContext implements IAdaptable {
 
+  /**
+   * The {@link RunContext} which is currently associated with the current thread.
+   */
+  public static final ThreadLocal<RunContext> CURRENT = new ThreadLocal<>();
+
   protected RunMonitor m_runMonitor = BEANS.get(RunMonitor.class);
+
   protected Subject m_subject;
   protected Locale m_locale;
-  protected PropertyMap m_propertyMap = new PropertyMap();
   protected String m_correlationId;
+  protected PropertyMap m_propertyMap = new PropertyMap();
   protected Deque<String> m_identifiers = new LinkedList<>();
+
   protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
 
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
@@ -160,6 +168,7 @@ public class RunContext implements IAdaptable {
         .withTransactionMembers(m_transactionMembers);
 
     return new CallableChain<RESULT>()
+        .add(new ThreadLocalProcessor<>(RunContext.CURRENT, this))
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<RESULT>(m_subject))
@@ -262,8 +271,7 @@ public class RunContext implements IAdaptable {
   }
 
   /**
-   * Sets the transaction scope to demarcate the transaction boundary of this context. The default scope is
-   * {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in a transaction yet.
+   * Sets the transaction scope to demarcate the transaction boundary of this context.
    * <ul>
    * <li>Use {@link TransactionScope#REQUIRES_NEW} to start a new transaction.</li>
    * <li>Use {@link TransactionScope#REQUIRED} to start a new transaction only if not running in a transaction yet.</li>
@@ -420,20 +428,28 @@ public class RunContext implements IAdaptable {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("runMonitor", getRunMonitor());
-    builder.ref("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.attr("cid", getCorrelationId());
-    builder.attr("identifiers", CollectionUtility.format(getIdentifiers()));
-    builder.ref("transaction", getTransaction());
-    builder.attr("transactionScope", getTransactionScope());
-    builder.ref("transactionMembers", m_transactionMembers);
-    builder.ref("threadLocalProcessors", m_threadLocalProcessors);
+    interceptToStringBuilder(builder);
     return builder.toString();
   }
 
   /**
-   * Method invoked to fill this {@link RunContext} with values from the given {@link RunContext}.
+   * Allows the contribution of <code>toString</code> tokens.
+   */
+  protected void interceptToStringBuilder(final ToStringBuilder builder) {
+    builder
+        .attr("subject", getSubject())
+        .attr("locale", getLocale())
+        .attr("cid", getCorrelationId())
+        .attr("transactionScope", getTransactionScope())
+        .ref("transaction", getTransaction())
+        .ref("runMonitor", getRunMonitor())
+        .ref("transactionMembers", m_transactionMembers)
+        .ref("threadLocalProcessors", m_threadLocalProcessors)
+        .attr("identifiers", CollectionUtility.format(getIdentifiers()));
+  }
+
+  /**
+   * Copies the values of the specified {@link RunContext} to <code>this</code> context.
    */
   protected void copyValues(final RunContext origin) {
     m_runMonitor = origin.m_runMonitor;
@@ -449,63 +465,34 @@ public class RunContext implements IAdaptable {
   }
 
   /**
-   * Method invoked to fill this {@link RunContext} with values from the current calling {@link RunContext}.
-   * <p>
-   * <strong>RunMonitor</strong><br>
-   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
-   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
-   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
-   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * Takes a "snapshot" of the calling context, and applies it to <code>this</code> context, or throws
+   * {@link AssertionException} if not running in a {@link RunContext}.
    */
   protected void fillCurrentValues() {
+    final RunContext currentRunContext = Assertions.assertNotNull(RunContext.CURRENT.get());
+
+    m_runMonitor = RunMonitor.CURRENT.get();
     m_subject = Subject.getSubject(AccessController.getContext());
     m_locale = NlsLocale.CURRENT.get();
     m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
-
-    // RunMonitor
-    m_runMonitor = BEANS.get(RunMonitor.class);
-    if (RunMonitor.CURRENT.get() != null) {
-      RunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
-    }
-
-    // RunContextIdentifiers
-    m_identifiers = new LinkedList<>();
-    final Deque<String> callingRunContextIdentifiers = RunContextIdentifiers.CURRENT.get();
-    if (callingRunContextIdentifiers != null) {
-      m_identifiers.addAll(callingRunContextIdentifiers);
-    }
-
-    m_transactionScope = TransactionScope.REQUIRED;
+    m_identifiers = new LinkedList<>(RunContextIdentifiers.CURRENT.get());
+    m_transactionScope = currentRunContext.m_transactionScope;
     m_transaction = ITransaction.CURRENT.get();
-    m_transactionMembers = new ArrayList<>();
+    m_transactionMembers = new ArrayList<>(currentRunContext.m_transactionMembers);
+    m_diagnosticProcessors = new HashMap<>(currentRunContext.m_diagnosticProcessors);
 
-    m_threadLocalProcessors = new HashMap<>();
+    // Create a copy of the current 'thread-local' processors, and update their values to their current value.
+    m_threadLocalProcessors = new HashMap<>(currentRunContext.m_threadLocalProcessors.size());
+    for (final ThreadLocalProcessor<?> threadLocalProcessor : currentRunContext.m_threadLocalProcessors.values()) {
+      @SuppressWarnings("unchecked")
+      final ThreadLocal<Object> threadLocal = (ThreadLocal<Object>) threadLocalProcessor.getThreadLocal();
+      m_threadLocalProcessors.put(threadLocal, new ThreadLocalProcessor<>(threadLocal, threadLocal.get()));
+    }
   }
 
   /**
-   * Method invoked to fill this {@link RunContext} with empty values.
-   * <p>
-   * <strong>RunMonitor</strong><br>
-   * a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT registered
-   * as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor} is cancelled.
-   */
-  protected void fillEmptyValues() {
-    m_subject = null;
-    m_locale = null;
-    m_correlationId = null;
-    m_runMonitor = BEANS.get(RunMonitor.class);
-    m_propertyMap = new PropertyMap();
-    m_identifiers = new LinkedList<>();
-    m_transactionScope = TransactionScope.REQUIRED;
-    m_transaction = null;
-    m_transactionMembers = new ArrayList<>();
-
-    m_threadLocalProcessors = new HashMap<>();
-  }
-
-  /**
-   * Creates a copy of <code>this RunContext</code>.
+   * Creates a copy of <code>this</code> context.
    */
   public RunContext copy() {
     final RunContext copy = BEANS.get(RunContext.class);

@@ -48,7 +48,7 @@ public class ClientNotificationPoller {
     Assertions.assertNull(m_pollerFuture);
     if (BEANS.get(IServiceTunnel.class).isActive()) {
       m_pollerFuture = Jobs.schedule(new P_NotificationPoller(), Jobs.newInput()
-          .withRunContext(ClientRunContexts.copyCurrent()
+          .withRunContext(ClientRunContexts.empty()
               .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
               .withUserAgent(UserAgents.createDefault())
               .withSession(null, false))
