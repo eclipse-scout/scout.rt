@@ -707,7 +707,7 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called.
  */
 scout.Widget.prototype.setProperty = function(name, value) {
-  if (this[name] === value) {
+  if (scout.objects.equals(this[name], value)) {
     return;
   }
 

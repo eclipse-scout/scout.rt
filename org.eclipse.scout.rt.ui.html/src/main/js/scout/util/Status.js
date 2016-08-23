@@ -29,6 +29,29 @@ scout.Status.prototype.isError = function() {
   return this.severity === scout.Status.Severity.ERROR;
 };
 
+/**
+ * @return a clone of this Status instance.
+ */
+scout.Status.prototype.clone = function() {
+  var modelClone = $.extend({}, this);
+  return new scout.Status(modelClone);
+};
+
+scout.Status.prototype.equals = function(o) {
+  if (!(o instanceof scout.Status)) {
+    return false;
+  }
+  return scout.objects.propertiesEquals(this, o,
+      ['severity', 'message', 'invalidDate', 'invalidTime']);
+};
+
+/**
+ * Null-safe static clone method.
+ */
+scout.Status.clone = function(original) {
+  return original ? original.clone() : null;
+};
+
 scout.Status.cssClassForSeverity = function(severity) {
   var isInfo = (severity > scout.Status.Severity.OK);
   var isWarning = (severity > scout.Status.Severity.INFO);

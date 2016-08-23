@@ -13,3 +13,26 @@ scout.DateFieldAdapter = function() {
   this.enabledWhenOffline = true;
 };
 scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);
+
+scout.ModelAdapter.prototype._initProperties = function(model) {
+  if (model.errorStatus) {
+    model._modelErrorStatus = new scout.Status(model.errorStatus);
+  } else {
+    model._modelErrorStatus = null;
+  }
+};
+
+scout.ModelAdapter.prototype._syncErrorStatus = function(errorStatus) {
+  var invalidTime, invalidDate,
+    widgetErrorStatus = this.widget.errorStatus;
+
+  // copy UI only properties to error status from server
+  if (widgetErrorStatus) {
+    errorStatus.invalidTime = widgetErrorStatus.invalidTime;
+    errorStatus.invalidDate = widgetErrorStatus.invalidDate;
+  }
+
+  // set error status and additional model error status on widget (stores error status from server)
+  this.widget.setErrorStatus(errorStatus);
+  this.widget._modelErrorStatus = scout.Status.clone(this.widget.errorStatus);
+};

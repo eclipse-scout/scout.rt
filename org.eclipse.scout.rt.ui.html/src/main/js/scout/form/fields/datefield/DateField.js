@@ -71,20 +71,6 @@ scout.DateField.prototype.createPopup = function() {
   });
 };
 
-scout.DateField.prototype._syncErrorStatus = function(errorStatus) {
-  var invalidTime, invalidDate;
-  if (this.errorStatus) {
-    invalidTime = this.errorStatus.invalidTime;
-    invalidDate = this.errorStatus.invalidDate;
-  }
-  scout.DateField.parent.prototype._syncErrorStatus.call(this, errorStatus);
-  this._modelErrorStatus = this.errorStatus;
-  if (this.errorStatus) {
-    this.errorStatus.invalidTime = invalidTime;
-    this.errorStatus.invalidDate = invalidDate;
-  }
-};
-
 scout.DateField.prototype._render = function($parent) {
   this.addContainer($parent, 'date-field');
   this.addLabel();
@@ -1056,6 +1042,9 @@ scout.DateField.prototype._predictTime = function(inputText) {
   };
 };
 
+/**
+ * @returns {scout.Status} error status from UI or error status set by model.
+ */
 scout.DateField.prototype._errorStatus = function(valid) {
   var errorStatus = this.errorStatus;
   if (valid) {
@@ -1090,7 +1079,8 @@ scout.DateField.prototype._setErrorStatusPart = function(property, valid) {
       errorStatus = this._modelErrorStatus;
     }
   }
-  this.setErrorStatus(errorStatus);
+  // clone error status, to prevent errorStatus and _modelErrorStatus pointing to the same instance
+  this.setErrorStatus(scout.Status.clone(errorStatus));
 };
 
 scout.DateField.prototype._setDateValid = function(valid) {

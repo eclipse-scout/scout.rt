@@ -185,6 +185,37 @@ scout.objects = {
   },
 
   /**
+   * Java-like equals method. Compares the given objects by checking with ===, if that fails, the function
+   * checks if both objects have an equals function and use the equals function to compare the two objects
+   * by value.
+   * @returns True if both objects are equals by reference or by value
+   */
+  equals: function(objA, objB) {
+    if (objA === objB) {
+      return true;
+    }
+    // both objects have an equals() method
+    if ((objA && objB) && (objA.equals && objB.equals)) {
+      return objA.equals(objB.equals);
+    }
+    return false;
+  },
+
+  /**
+   * Compares a list of properties of two objects by using the equals method for each property.
+   */
+  propertiesEquals: function(objA, objB, properties) {
+    var i, property;
+    for (i = 0; i < properties.length; i++) {
+      property = properties[i];
+      if (!scout.objects.equals(objA[property], objB[property])) {
+        return false;
+      }
+    }
+    return true;
+  },
+
+  /**
    * TODO [5.2] bsh: Document
    *
    * How to use:

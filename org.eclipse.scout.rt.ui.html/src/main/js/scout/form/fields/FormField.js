@@ -373,9 +373,11 @@ scout.FormField.prototype._syncMenus = function(menus) {
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
-  // FIXME [6.1] cgu ensure type ?
-  this._setProperty('errorStatus',
-      errorStatus ? new scout.Status(errorStatus) : null);
+  // FIXME [6.1] cgu ensure type?
+  if (errorStatus && !(errorStatus instanceof scout.Status)) {
+    errorStatus = new scout.Status(errorStatus);
+  }
+  this._setProperty('errorStatus', errorStatus);
 };
 
 scout.FormField.prototype.setCssClass = function(cssClass) {

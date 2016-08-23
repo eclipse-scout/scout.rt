@@ -62,13 +62,13 @@ scout.ModelAdapter.prototype.destroy = function() {
 };
 
 scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
-  var model = this._prepareModel(adapterData, parent);
+  var model = this._initModel(adapterData, parent);
   this.widget = this._createWidget(model);
   this._attachWidget();
   return this.widget;
 };
 
-scout.ModelAdapter.prototype._prepareModel = function(model, parent) {
+scout.ModelAdapter.prototype._initModel = function(model, parent) {
   // Make a copy to prevent a modification of the given model
   model = $.extend({}, model);
 
@@ -85,7 +85,17 @@ scout.ModelAdapter.prototype._prepareModel = function(model, parent) {
       throw new Error('owner not found.');
     }
   }
+
+  this._initProperties(model);
+
   return model;
+};
+
+/**
+ * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
+ */
+scout.ModelAdapter.prototype._initProperties = function() {
+  // NOP
 };
 
 /**
@@ -382,8 +392,15 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
   for (var propertyName in newProperties) {
     var value = newProperties[propertyName];
 
-    // Call the setter of the widget
-    this.widget.callSetter(propertyName, value);
+    // FIXME [awe] 6.1 - review with C.GU
+    // Call the _sync* function on the adapter or setter on the widget, the _sync impl.
+    // should call the setProperty method on the widget
+    var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
+    if (this[syncFuncName]) {
+      this[syncFuncName](value);
+    } else {
+      this.widget.callSetter(propertyName, value);
+    }
   }
 };
 
