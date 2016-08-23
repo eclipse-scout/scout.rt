@@ -30,12 +30,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
 import org.slf4j.Logger;
@@ -75,13 +77,14 @@ public class UiServlet extends HttpServlet {
     return new P_RequestHandlerPost();
   }
 
-  protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
+  protected RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
 
-    return ServletRunContexts.copyCurrent(true)
+    return RunContexts.copyCurrent(true)
         .withSubject(Subject.getSubject(AccessController.getContext()))
-        .withServletRequest(req)
-        .withServletResponse(resp)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
+        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
         .withLocale(getPreferredLocale(req))
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
   }

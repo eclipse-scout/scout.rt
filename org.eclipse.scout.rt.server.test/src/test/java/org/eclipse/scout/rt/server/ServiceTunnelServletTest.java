@@ -43,6 +43,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -50,7 +51,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
+import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -112,19 +114,15 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ServletException {
-    ServletRunContexts.copyCurrent(true)
-        .withSubject(Subject.getSubject(AccessController.getContext()))
-        .withServletRequest(m_requestMock)
-        .withServletResponse(m_responseMock)
-        .run(new IRunnable() {
+    createServletRunContext(m_requestMock, m_responseMock).run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
-            IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("testid", runcontext);
-            assertNotNull(session);
-          }
-        });
+      @Override
+      public void run() throws Exception {
+        final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
+        IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("testid", runcontext);
+        assertNotNull(session);
+      }
+    });
   }
 
   @Test
@@ -136,15 +134,13 @@ public class ServiceTunnelServletTest {
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
 
-    ServletRunContexts.copyCurrent(true)
-        .withSubject(Subject.getSubject(AccessController.getContext()))
-        .withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
+    createServletRunContext(m_requestMock, m_responseMock).run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
-          }
-        });
+      @Override
+      public void run() throws Exception {
+        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
+      }
+    });
   }
 
   /**
@@ -266,17 +262,22 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return ServletRunContexts.copyCurrent(true)
-          .withSubject(Subject.getSubject(AccessController.getContext()))
-          .withServletRequest(m_request)
-          .withServletResponse(m_response)
-          .call(new Callable<IServerSession>() {
+      return createServletRunContext(m_request, m_response).call(new Callable<IServerSession>() {
 
-            @Override
-            public IServerSession call() throws Exception {
-              return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
-            }
-          });
+        @Override
+        public IServerSession call() throws Exception {
+          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
+        }
+      });
     }
   }
+
+  private static RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
+    return RunContexts.copyCurrent(true)
+        .withSubject(Subject.getSubject(AccessController.getContext()))
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
+        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class));
+  }
+
 }

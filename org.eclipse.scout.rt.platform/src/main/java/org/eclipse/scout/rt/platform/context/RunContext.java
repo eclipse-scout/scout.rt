@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.context;
 
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -47,6 +49,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.slf4j.MDC;
 
 /**
  * A {@link RunContext} represents a "snapshot" of the current calling state and is always associated with a
@@ -77,6 +80,7 @@ public class RunContext implements IAdaptable {
   protected Deque<String> m_identifiers = new LinkedList<>();
 
   protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
+  protected Map<String, DiagnosticContextValueProcessor> m_diagnosticProcessors = new HashMap<>();
 
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
   protected ITransaction m_transaction;
@@ -179,6 +183,7 @@ public class RunContext implements IAdaptable {
         .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers))
         .addAll(m_threadLocalProcessors.values())
         .addAll(contributions.asList())
+        .addAll(m_diagnosticProcessors.values())
         .add(transactionProcessor);
   }
 
@@ -343,6 +348,28 @@ public class RunContext implements IAdaptable {
   }
 
   /**
+   * Associates this context with the given diagnostic data to be used by the underlying logging system.
+   *
+   * @see MDC
+   */
+  public RunContext withDiagnostic(final IDiagnosticContextValueProvider provider) {
+    m_diagnosticProcessors.put(provider.key(), new DiagnosticContextValueProcessor(provider));
+    return this;
+  }
+
+  /**
+   * Associates this context with the given diagnostic data to be used by the underlying logging system.
+   *
+   * @see MDC
+   */
+  public RunContext withDiagnostics(final Collection<? extends IDiagnosticContextValueProvider> diagnosticContextValueProviders) {
+    for (final IDiagnosticContextValueProvider provider : diagnosticContextValueProviders) {
+      withDiagnostic(provider);
+    }
+    return this;
+  }
+
+  /**
    * Returns the {@link PropertyMap} associated with this context.
    *
    * @see #withProperty(Object, Object)
@@ -462,6 +489,7 @@ public class RunContext implements IAdaptable {
     m_transaction = origin.m_transaction;
     m_transactionMembers = new ArrayList<>(origin.m_transactionMembers);
     m_threadLocalProcessors = new HashMap<>(origin.m_threadLocalProcessors);
+    m_diagnosticProcessors = new HashMap<>(origin.m_diagnosticProcessors);
   }
 
   /**

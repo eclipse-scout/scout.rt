@@ -28,6 +28,8 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
@@ -35,12 +37,11 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestore
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistrationHandle;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -67,13 +68,14 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   private transient IServiceTunnelContentHandler m_contentHandler;
 
-  protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
+  protected RunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
 
-    return ServletRunContexts.copyCurrent(true)
+    return RunContexts.copyCurrent(true)
         .withSubject(Subject.getSubject(AccessController.getContext()))
-        .withServletRequest(req)
-        .withServletResponse(resp)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
+        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
         .withLocale(Locale.getDefault())
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
   }

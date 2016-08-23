@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -43,9 +44,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
+import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -99,8 +100,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       uiSession.touch();
 
       // Associate subsequent processing with the uiSession.
-      UiRunContexts.copyCurrent()
-          .withSession(uiSession)
+      RunContexts.copyCurrent()
+          .withThreadLocal(IUiSession.CURRENT, uiSession)
+          .withDiagnostics(BEANS.all(IUiRunContextDiagnostics.class))
           .run(new IRunnable() {
             @Override
             public void run() throws Exception {

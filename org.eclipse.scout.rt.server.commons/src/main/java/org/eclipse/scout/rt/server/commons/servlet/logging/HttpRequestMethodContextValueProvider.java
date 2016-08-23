@@ -28,7 +28,7 @@ import org.slf4j.MDC;
  * @since 5.1
  */
 @ApplicationScoped
-public class HttpRequestMethodContextValueProvider implements IDiagnosticContextValueProvider {
+public class HttpRequestMethodContextValueProvider implements IDiagnosticContextValueProvider, IServletRunContextDiagnostics {
 
   public static final String KEY = "http.request.method";
 

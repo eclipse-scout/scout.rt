@@ -28,7 +28,7 @@ import org.slf4j.MDC;
  * @since 5.1
  */
 @ApplicationScoped
-public class HttpSessionIdContextValueProvider implements IDiagnosticContextValueProvider {
+public class HttpSessionIdContextValueProvider implements IDiagnosticContextValueProvider, IServletRunContextDiagnostics {
 
   public static final String KEY = "http.session.id";
 

@@ -40,10 +40,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.http.HTTPException;
 
 import org.eclipse.scout.jaxws.apt.internal.EntryPointDefinition;
 import org.eclipse.scout.jaxws.apt.internal.EntryPointDefinition.HandlerDefinition;
@@ -57,14 +55,13 @@ import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint;
-import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsServletRunContexts;
+import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsRunContextLookup;
+import org.eclipse.scout.rt.server.jaxws.provider.context.JaxWsUndeclaredExceptionTranslator;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
@@ -98,6 +95,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected static final String LOGGER_FIELD_NAME = "LOG";
   protected static final String WEBSERVICE_CONTEXT_FIELD_NAME = "m_webServiceContext";
   protected static final String HANDLE_UNDECLARED_FAULT_METHOD_NAME = "handleUndeclaredFault";
+  protected static final String LOOKUP_RUN_CONTEXT_METHOD_NAME = "lookupRunContext";
   protected static final String SERVLET_RUN_CONTEXT_FIELD_NAME = "servletRunContext";
   protected static final String RUN_CONTEXT_FIELD_NAME = "requestRunContext";
 
@@ -233,8 +231,6 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     // Add JavaDoc to the EntryPoint.
     AptUtil.addJavaDoc(entryPoint, createJavaDocForEntryPoint(entryPointDefinition));
 
-    // Create the logger field.
-    final JFieldVar logger = entryPoint.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, org.slf4j.Logger.class, LOGGER_FIELD_NAME, model.ref(org.slf4j.LoggerFactory.class).staticInvoke("getLogger").arg(entryPoint.dotclass()));
     // Inject WebServiceContext
     final JFieldVar webServiceContext = entryPoint.field(JMod.PROTECTED, WebServiceContext.class, WEBSERVICE_CONTEXT_FIELD_NAME);
     webServiceContext.annotate(Resource.class);
@@ -271,7 +267,10 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     }
 
     // Create the method to handle undeclared errors.
-    addHandleUndeclaredFaultMethod(model, entryPoint, logger);
+    addHandleUndeclaredFaultMethod(model, entryPoint);
+
+    // Create the method to lookup the RunContext.
+    addLookupRunContextMethod(model, entryPoint, webServiceContext);
 
     // Build and persist this compilation unit.
     AptUtil.buildAndPersist(model, processingEnv.getFiler());
@@ -287,37 +286,11 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected void addEntryPointMethodImplementation(final JCodeModel model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String endpointInterfaceName) {
     final JBlock methodBody = method.body();
 
-    // Declare correlationId variable
-    final JVar cid = methodBody
-        .decl(model.ref(String.class), "cid", model.ref(MessageContexts.class)
-            .staticInvoke("getCorrelationId")
-            .arg(webServiceContext.invoke("getMessageContext")));
-    methodBody
-        ._if(cid.eq(JExpr._null()))
-        ._then()
-        .assign(cid, model
-            .ref(BEANS.class)
-            .staticInvoke("get")
-            .arg(model.ref(CorrelationId.class).dotclass())
-            .invoke("newCorrelationId"));
-
-    // Declare RunContext variables.
-    final JVar servletRunContext = methodBody
-        .decl(JMod.FINAL, model.ref(RunContext.class), SERVLET_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsServletRunContexts.class)
-            .staticInvoke("copyCurrent")
-            .invoke("withWebServiceContext")
-            .arg(webServiceContext)
-            .invoke("withCorrelationId")
-            .arg(cid));
-    final JVar runContext = methodBody
-        .decl(JMod.FINAL, model.ref(RunContext.class), RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class)
-            .staticInvoke("getRunContext")
-            .arg(webServiceContext.invoke("getMessageContext")));
-
+    final JInvocation runContext = JExpr.invoke(LOOKUP_RUN_CONTEXT_METHOD_NAME);
     final JTryBlock tryBlock = methodBody._try();
 
     // Invoke port type on behalf of RunContext.
-    final JInvocation runContextInvocation = createRunContextInvocation(model, servletRunContext, runContext, voidMethod, method, endpointInterfaceName);
+    final JInvocation runContextInvocation = createRunContextInvocation(model, runContext, voidMethod, method, endpointInterfaceName);
     if (voidMethod) {
       tryBlock.body().add(runContextInvocation);
     }
@@ -348,23 +321,24 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
    * Creates code to invoke the port type on behalf of the RunContext.
    */
   @Internal
-  protected JInvocation createRunContextInvocation(final JCodeModel model, final JVar servletRunContext, final JVar runContext, final boolean voidMethod, final JMethod portTypeMethod, final String endpointInterfaceName) {
+  protected JInvocation createRunContextInvocation(final JCodeModel model, final JExpression runContext, final boolean voidMethod, final JMethod portTypeMethod, final String endpointInterfaceName) {
     final JType returnType;
-    final JDefinedClass servletRunContextCallable;
     final JDefinedClass runContextCallable;
     final String runMethodName;
     if (voidMethod) {
       returnType = model.ref(Void.class).unboxify();
-      servletRunContextCallable = model.anonymousClass(IRunnable.class);
       runContextCallable = model.anonymousClass(IRunnable.class);
       runMethodName = "run";
     }
     else {
       returnType = portTypeMethod.type().boxify();
-      servletRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(returnType));
       runContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(returnType));
       runMethodName = "call";
     }
+
+    // Implement RunContext callable.
+    final JMethod runContextRunMethod = runContextCallable.method(JMod.PUBLIC | JMod.FINAL, returnType, runMethodName)._throws(Exception.class);
+    runContextRunMethod.annotate(Override.class);
 
     // Invoke the bean method.
     final JInvocation beanInvocation = model.ref(BEANS.class).staticInvoke("get").arg(model.ref(endpointInterfaceName).dotclass()).invoke(portTypeMethod.name());
@@ -372,9 +346,6 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
       beanInvocation.arg(parameter);
     }
 
-    // Implement RunContext callable.
-    final JMethod runContextRunMethod = runContextCallable.method(JMod.PUBLIC | JMod.FINAL, returnType, runMethodName)._throws(Exception.class);
-    runContextRunMethod.annotate(Override.class);
     if (voidMethod) {
       runContextRunMethod.body().add(beanInvocation);
     }
@@ -384,51 +355,37 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
     // Create RunContext invocations.
     final JExpression exceptionTranslator = model.ref(DefaultExceptionTranslator.class).dotclass();
-
-    final JInvocation servletRunContextInvocation = servletRunContext.invoke(runMethodName).arg(JExpr._new(servletRunContextCallable)).arg(exceptionTranslator);
-    final JInvocation runContextInvocation = runContext
-        .invoke("withCorrelationId").arg(model.ref(CorrelationId.class).staticRef("CURRENT").invoke("get"))
-        .invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);
-
-    // Implement ServletRunContext callable.
-    final JMethod servletRunContextRunMethod = servletRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, returnType, runMethodName)._throws(Exception.class);
-    servletRunContextRunMethod.annotate(Override.class);
-
-    final JConditionalEx servletRunContextCondition = new JConditionalEx(servletRunContextRunMethod.body());
-
-    // Assemble the methods.
-    if (voidMethod) {
-      servletRunContextCondition._if(runContext.eq(JExpr._null())).add(beanInvocation); // directly invoke Bean method.
-      servletRunContextCondition._else().add(runContextInvocation); // call RunContext to invoke Bean method.
-    }
-    else {
-      servletRunContextCondition._if(runContext.eq(JExpr._null()))._return(beanInvocation); // directly invoke Bean method.
-      servletRunContextCondition._else()._return(runContextInvocation); // call RunContext to invoke Bean method.
-    }
-    return servletRunContextInvocation;
+    return runContext.invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);
   }
 
   /**
    * Adds the method to handle undeclared exceptions which are not declared in the WSDL.
    */
   @Internal
-  protected void addHandleUndeclaredFaultMethod(final JCodeModel model, final JDefinedClass entryPoint, final JFieldVar logger) {
+  protected void addHandleUndeclaredFaultMethod(final JCodeModel model, final JDefinedClass entryPoint) {
     // Create the method to handle undeclared faults.
     final JMethod method = entryPoint.method(JMod.PROTECTED, RuntimeException.class, HANDLE_UNDECLARED_FAULT_METHOD_NAME);
     method.annotate(Internal.class);
 
     final JVar exceptionParam = method.param(JMod.FINAL, Exception.class, "e");
+    method.body()._throw(model.ref(BEANS.class)
+        .staticInvoke("get")
+        .arg(model.ref(JaxWsUndeclaredExceptionTranslator.class).dotclass())
+        .invoke("translate").arg(exceptionParam));
+  }
 
-    final JConditionalEx condition = new JConditionalEx(method.body());
+  /**
+   * Adds the method to lookup the {@link RunContext}.
+   */
+  @Internal
+  protected void addLookupRunContextMethod(final JCodeModel model, final JDefinedClass entryPoint, final JFieldVar webServiceContext) {
+    final JMethod method = entryPoint.method(JMod.PROTECTED, RunContext.class, LOOKUP_RUN_CONTEXT_METHOD_NAME);
+    method.annotate(Internal.class);
 
-    // Handle RuntimeException
-    final JType runtimeException = model._ref(RuntimeException.class);
-    condition._if(exceptionParam._instanceof(runtimeException))._throw(JExprEx.cast(runtimeException, exceptionParam));
-
-    // Handle other exception
-    final JBlock otherExceptionBlock = condition._else();
-    otherExceptionBlock.invoke(logger, "error").arg(JExpr.lit("Undeclared exception while processing webservice request")).arg(exceptionParam);
-    otherExceptionBlock._throw(JExpr._new(model.ref(HTTPException.class)).arg(model.ref(HttpServletResponse.class).staticRef("SC_INTERNAL_SERVER_ERROR")));
+    method.body()._return(model.ref(BEANS.class)
+        .staticInvoke("get")
+        .arg(model.ref(JaxWsRunContextLookup.class).dotclass())
+        .invoke("lookup").arg(webServiceContext));
   }
 
   /**

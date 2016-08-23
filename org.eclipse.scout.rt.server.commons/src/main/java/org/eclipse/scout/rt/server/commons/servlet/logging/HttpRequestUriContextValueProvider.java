@@ -28,7 +28,7 @@ import org.slf4j.MDC;
  * @since 5.1
  */
 @ApplicationScoped
-public class HttpRequestUriContextValueProvider implements IDiagnosticContextValueProvider {
+public class HttpRequestUriContextValueProvider implements IDiagnosticContextValueProvider, IServletRunContextDiagnostics {
 
   public static final String KEY = "http.request.uri";
 

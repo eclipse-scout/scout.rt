@@ -22,12 +22,12 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,10 +198,12 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
         @Override
         public void onMessage(final Message jmsMessage) {
           try {
-            JmsRunContexts.empty()
-                .withJmsMessage(jmsMessage)
+            RunContexts.empty()
+                .withThreadLocal(IJmsMessage.CURRENT, jmsMessage)
+                .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
                 .withCorrelationId(jmsMessage.getJMSCorrelationID())
                 .run(new IRunnable() {
+
               @Override
               public void run() throws Exception {
                 final T message = getMessageSerializer().extractMessage(jmsMessage);

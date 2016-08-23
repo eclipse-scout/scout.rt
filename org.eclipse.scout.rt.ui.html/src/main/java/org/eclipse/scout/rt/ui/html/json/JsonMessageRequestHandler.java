@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
@@ -35,10 +36,10 @@ import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.MaxUserIdleTimeProperty;
-import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
+import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,9 +117,10 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
 
       // Associate subsequent processing with the uiSession and jsonRequest.
-      UiRunContexts.copyCurrent()
-          .withSession(uiSession)
-          .withJsonRequest(jsonRequest)
+      RunContexts.copyCurrent()
+          .withThreadLocal(IUiSession.CURRENT, uiSession)
+          .withThreadLocal(JsonRequest.CURRENT, jsonRequest)
+          .withDiagnostics(BEANS.all(IUiRunContextDiagnostics.class))
           .run(new IRunnable() {
 
             @Override
