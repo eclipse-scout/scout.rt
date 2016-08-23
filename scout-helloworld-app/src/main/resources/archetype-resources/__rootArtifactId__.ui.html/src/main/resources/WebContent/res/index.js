@@ -1,5 +1,6 @@
 $(document).ready(function() {
-  scout.init({
+  var app = new scout.RemoteApp();
+  app.init({
     bootstrap: {
       fonts: ['scoutIcons']
     }
