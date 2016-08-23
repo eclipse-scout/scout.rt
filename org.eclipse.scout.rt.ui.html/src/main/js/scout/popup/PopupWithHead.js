@@ -42,13 +42,17 @@ scout.PopupWithHead.prototype._render = function($parent) {
 };
 
 scout.PopupWithHead.prototype.onResize = function() {
+  if (!this.rendered) {
+    // may already be removed if a parent popup is closed during the resize event
+    return;
+  }
   this.$parent.window().off('resize', this.resizeHandler);
   this.close();
 };
 
 scout.PopupWithHead.prototype._remove = function() {
-  scout.PopupWithHead.parent.prototype._remove.call(this);
   this.$parent.window().off('resize', this.resizeHandler);
+  scout.PopupWithHead.parent.prototype._remove.call(this);
 };
 
 scout.PopupWithHead.prototype._$createNewBody = function() {
