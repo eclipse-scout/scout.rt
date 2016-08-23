@@ -35,9 +35,5 @@
       <artifactId>jms-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-    </dependency>
   </dependencies>
 </project>

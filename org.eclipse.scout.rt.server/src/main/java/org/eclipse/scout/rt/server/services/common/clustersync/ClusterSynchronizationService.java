@@ -11,13 +11,10 @@
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -30,16 +27,14 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncNodeIdProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -78,46 +73,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   protected String createNodeId() {
-    // system property defined node id
-    String nodeId = CONFIG.getPropertyValue(ClusterSyncNodeIdProperty.class);
-
-    // weblogic name as node id
-    if (!StringUtility.hasText(nodeId)) {
-      nodeId = System.getProperty("weblogic.Name");
-    }
-
-    // jboss node name as node id
-    if (!StringUtility.hasText(nodeId)) {
-      nodeId = System.getProperty("jboss.node.name");
-    }
-
-    // use host name
-    if (!StringUtility.hasText(nodeId)) {
-      String hostname;
-      try {
-        hostname = InetAddress.getLocalHost().getHostName();
-      }
-      catch (UnknownHostException e) { // NOSONAR
-        hostname = null;
-      }
-      // might result in a hostname 'localhost'
-      if (StringUtility.isNullOrEmpty(hostname) || "localhost".equalsIgnoreCase(hostname)) {
-        // use random number
-        nodeId = UUID.randomUUID().toString();
-      }
-      else {
-        // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
-        // therefore we use in this case the jetty port too
-        String port = ConfigUtility.getProperty("scout.jetty.port"); // see org.eclipse.scout.dev.jetty.JettyServer.SERVER_PORT_KEY
-        if (StringUtility.hasText(port)) {
-          nodeId = StringUtility.join(":", hostname, port);
-        }
-        else {
-          nodeId = StringUtility.join(":", hostname, 8080);
-        }
-      }
-    }
-    return nodeId;
+    return BEANS.get(NodeIdentifier.class).get();
   }
 
   protected EventListenerList getListenerList() {

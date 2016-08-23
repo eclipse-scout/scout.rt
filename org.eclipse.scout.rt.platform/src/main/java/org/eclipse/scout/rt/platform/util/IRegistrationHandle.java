@@ -5,11 +5,12 @@ package org.eclipse.scout.rt.platform.util;
  *
  * @since 5.2
  */
-public interface IRegistrationHandle {
+public interface IRegistrationHandle extends IDisposable {
 
   /**
    * Unregisters the registration represented by this handle. This call has no effect if already disposed.
    */
+  @Override
   void dispose();
 
   /**

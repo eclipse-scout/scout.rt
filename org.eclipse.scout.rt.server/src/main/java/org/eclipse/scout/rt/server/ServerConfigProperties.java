@@ -35,14 +35,6 @@ public final class ServerConfigProperties {
     }
   }
 
-  public static class ClusterSyncNodeIdProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "org.eclipse.scout.rt.server.clusterNodeId";
-    }
-  }
-
   /**
    * expiration for {@link ServerSessionProviderWithCache} in milliseconds. Default is one day.
    */
