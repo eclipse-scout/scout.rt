@@ -138,8 +138,6 @@ scout.Widget.prototype.destroy = function() {
   this.parent = null;
 
   this.destroyed = true;
-
-  // Inform listeners
   this.trigger('destroy');
 };
 
@@ -168,6 +166,7 @@ scout.Widget.prototype.render = function($parent) {
   this.rendering = false;
   this.rendered = true;
   this.attached = true;
+  this.trigger('render');
   this._postRender();
 };
 

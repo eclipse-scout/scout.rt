@@ -160,12 +160,6 @@ scout.Outline.prototype._renderTitleMenuBar = function() {
   }
 };
 
-scout.Outline.prototype._postRender = function() {
-  // used to render glasspane
-  this.trigger('rendered');
-  scout.Outline.parent.prototype._postRender.call(this);
-};
-
 /**
  * @override
  */

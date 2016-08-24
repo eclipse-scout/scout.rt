@@ -57,9 +57,9 @@ scout.DeferredGlassPaneTarget.createFor = function(widget, findGlassPaneTargets)
     deferred.ready(elements);
   };
 
-  widget.one('rendered', renderedHandler);
+  widget.one('render', renderedHandler);
   widget.one('destroy', function() {
-    widget.off('rendered', renderedHandler);
+    widget.off('render', renderedHandler);
   }.bind(widget));
   return [deferred];
 };
