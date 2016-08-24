@@ -114,14 +114,14 @@ scout.ModelAdapter.prototype._attachWidget = function() {
   this._widgetListener = {
     func: this._onWidgetEventInternal.bind(this)
   };
-  this.widget.events.addListener(this._widgetListener);
+  this.widget.addListener(this._widgetListener);
 };
 
 scout.ModelAdapter.prototype._detachWidget = function() {
   if (!this._widgetListener) {
     return;
   }
-  this.widget.events.removeListener(this._widgetListener);
+  this.widget.removeListener(this._widgetListener);
   this._widgetListener = null;
 };
 

@@ -213,7 +213,7 @@ scout.Outline.prototype._initDetailTable = function(node) {
       that._onDetailTableEvent(event);
     }
   };
-  node.detailTable.events.addListener(this._detailTableListener);
+  node.detailTable.addListener(this._detailTableListener);
 };
 
 scout.Outline.prototype._initDetailForm = function(node) {
@@ -315,7 +315,7 @@ scout.Outline.prototype.handleInitialExpanded = function() {
 scout.Outline.prototype._onNodeDeleted = function(node) {
   // Destroy table, which is attached at the root adapter. Form gets destroyed by form close event
   if (node.detailTable) {
-    node.detailTable.events.removeListener(this._detailTableListener);
+    node.detailTable.removeListener(this._detailTableListener);
     node.detailTable.destroy();
     node.detailTable = null;
   }
@@ -589,11 +589,11 @@ scout.Outline.prototype.setDetailContent = function(content) {
   if (this.rendered) {
     this._removeDetailContent();
   }
-  if (this.detailContent && this.detailContent.events) {
+  if (this.detailContent) {
     this.detailContent.off('destroy', this._detailContentDestroyHandler);
   }
   this._setProperty('detailContent', content);
-  if (content && content.events) {
+  if (content) {
     content.on('destroy', this._detailContentDestroyHandler);
   }
   if (this.rendered) {

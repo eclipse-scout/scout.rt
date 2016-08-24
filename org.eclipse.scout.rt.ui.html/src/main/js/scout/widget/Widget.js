@@ -494,10 +494,6 @@ scout.Widget.prototype._createEventSupport = function() {
 };
 
 scout.Widget.prototype.trigger = function(type, event) {
-  if (!this.events) {
-    return;
-  }
-
   event = event || {};
   event.source = this;
   this.events.trigger(type, event);
@@ -513,6 +509,14 @@ scout.Widget.prototype.on = function(type, func) {
 
 scout.Widget.prototype.off = function(type, func) {
   this.events.off(type, func);
+};
+
+scout.Widget.prototype.addListener = function(listener) {
+  this.events.addListener(listener);
+};
+
+scout.Widget.prototype.removeListener = function(listener) {
+  this.events.removeListener(listener);
 };
 
 /**

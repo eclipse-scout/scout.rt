@@ -32,10 +32,10 @@ scout.TableTooltip.prototype._render = function($parent) {
       this.position();
     }
   }.bind(this);
-  this.table.events.on('rowOrderChanged', this._rowOrderChangedFunc);
+  this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
 };
 
 scout.TableTooltip.prototype._remove = function() {
   scout.TableTooltip.parent.prototype._remove.call(this);
-  this.table.events.off('rowOrderChanged', this._rowOrderChangedFunc);
+  this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
 };

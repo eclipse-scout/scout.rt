@@ -84,7 +84,7 @@ scout.CellEditorPopup.prototype._render = function($parent) {
       this.position();
     }
   }.bind(this);
-  this.table.events.on('rowOrderChanged', this._rowOrderChangedFunc);
+  this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
   // Set table style to focused, so that it looks as it still has the focus.
   // This prevents flickering if the cell editor gets opened, especially when tabbing to the next cell editor.
   if (this.table.enabled) {
@@ -107,7 +107,7 @@ scout.CellEditorPopup.prototype._postRender = function() {
 scout.CellEditorPopup.prototype._remove = function() {
   scout.CellEditorPopup.parent.prototype._remove.call(this); // uninstalls the focus context for this popup
 
-  this.table.events.off('rowOrderChanged', this._rowOrderChangedFunc);
+  this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
   // table may have been removed in the meantime
   if (this.table.rendered) {
     this.table.$container.removeClass('focused');

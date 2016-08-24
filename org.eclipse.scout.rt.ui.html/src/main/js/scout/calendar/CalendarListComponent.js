@@ -19,10 +19,10 @@ scout.CalendarListComponent = function(partDay, source) {
   this.partDay = partDay;
   this.source = source;
   this.$container;
-  this._selectedListener = source.events.on('selected', function(event) {
+  this._selectedListener = source.on('selected', function(event) {
     this.$container.toggleClass('comp-selected', event.selected);
   }.bind(this));
-  this._removeListener = source.events.on('remove', this.remove.bind(this));
+  this._removeListener = source.on('remove', this.remove.bind(this));
 };
 
 scout.CalendarListComponent.prototype.render = function($parent) {
@@ -38,7 +38,7 @@ scout.CalendarListComponent.prototype.render = function($parent) {
 };
 
 scout.CalendarListComponent.prototype.remove = function() {
-  this.source.events.removeListener(this._selectedListener);
-  this.source.events.removeListener(this._removeListener);
+  this.source.removeListener(this._selectedListener);
+  this.source.removeListener(this._removeListener);
   this.$container.remove();
 };
