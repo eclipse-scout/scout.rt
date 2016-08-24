@@ -35,10 +35,10 @@ scout.CellEditorPopup.prototype._createLayout = function() {
 /**
  * @override
  */
-scout.CellEditorPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.CellEditorPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.CellEditorPopup.prototype._initKeyStrokeContext = function() {
+  scout.CellEditorPopup.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke([
+  this.keyStrokeContext.registerKeyStroke([
     new scout.CellEditorCompleteEditKeyStroke(this),
     new scout.CellEditorCancelEditKeyStroke(this),
     new scout.CellEditorTabKeyStroke(this)

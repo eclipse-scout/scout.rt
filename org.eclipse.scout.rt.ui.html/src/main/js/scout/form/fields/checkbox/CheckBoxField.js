@@ -16,12 +16,12 @@ scout.CheckBoxField = function() {
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
 /**
- * @override ModelAdapter
+ * @override
  */
-scout.CheckBoxField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.CheckBoxField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
+  scout.CheckBoxField.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
 };
 
 scout.CheckBoxField.prototype._render = function($parent) {

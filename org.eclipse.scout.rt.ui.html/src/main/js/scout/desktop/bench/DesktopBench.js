@@ -28,8 +28,6 @@ scout.DesktopBench = function() {
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
 
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
-
-  this._addEventSupport();
 };
 scout.inherits(scout.DesktopBench, scout.Widget);
 
@@ -72,8 +70,8 @@ scout.DesktopBench.prototype._createColumns = function() {
   }
 };
 
-scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.DesktopBench.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.DesktopBench.prototype._initKeyStrokeContext = function() {
+  scout.DesktopBench.parent.prototype._initKeyStrokeContext.call(this);
 
   // Bound to desktop
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();

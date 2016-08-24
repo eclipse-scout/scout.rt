@@ -61,6 +61,13 @@ scout.Planner.SelectionMode = {
   MULTI_RANGE: 2
 };
 
+/**
+ * @override
+ */
+scout.Planner.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
 scout.Planner.prototype._init = function(model) {
   scout.Planner.parent.prototype._init.call(this, model);
   this._yearPanel = scout.create('YearPanel', {

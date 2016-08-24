@@ -47,12 +47,12 @@ scout.Button.prototype._init = function(model) {
 };
 
 /**
- * @override ModelAdapter.js
+ * @override
  */
-scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Button.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.Button.prototype._initKeyStrokeContext = function() {
+  scout.Button.parent.prototype._initKeyStrokeContext.call(this);
 
-  this._initDefaultKeyStrokes(keyStrokeContext);
+  this._initDefaultKeyStrokes();
 
   this.formKeyStrokeContext = new scout.KeyStrokeContext();
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
@@ -70,8 +70,8 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   }.bind(this);
 };
 
-scout.Button.prototype._initDefaultKeyStrokes = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke([
+scout.Button.prototype._initDefaultKeyStrokes = function() {
+  this.keyStrokeContext.registerKeyStroke([
     new scout.ButtonKeyStroke(this, 'ENTER'),
     new scout.ButtonKeyStroke(this, 'SPACE')
   ]);

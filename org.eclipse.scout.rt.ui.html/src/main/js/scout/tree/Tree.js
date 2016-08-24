@@ -120,18 +120,25 @@ scout.Tree.prototype._createTreeNode = function(nodeModel) {
 };
 
 /**
- * @override ModelAdapter.js
+ * @override
  */
-scout.Tree.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Tree.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
-  this._initTreeKeyStrokeContext(keyStrokeContext);
+scout.Tree.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
 };
 
-scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
+/**
+ * @override
+ */
+scout.Tree.prototype._initKeyStrokeContext = function() {
+  scout.Tree.parent.prototype._initKeyStrokeContext.call(this);
+
+  this._initTreeKeyStrokeContext();
+};
+
+scout.Tree.prototype._initTreeKeyStrokeContext = function() {
   var modifierBitMask = scout.keyStrokeModifier.NONE;
 
-  keyStrokeContext.registerKeyStroke([
+  this.keyStrokeContext.registerKeyStroke([
     new scout.TreeSpaceKeyStroke(this),
     new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
     new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
@@ -145,7 +152,7 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   // Otherwise, an '↑-event' on the first node, or an '↓-event' on the last row will bubble up (because not consumed by tree navigation keystrokes) and cause a superior tree to move its selection;
   // Use case: - outline tree with a detail form that contains a tree;
   //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
-  keyStrokeContext.registerStopPropagationInterceptor(function(event) {
+  this.keyStrokeContext.registerStopPropagationInterceptor(function(event) {
     if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
       event.stopPropagation();
       event.preventDefault();

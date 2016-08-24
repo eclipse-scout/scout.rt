@@ -44,6 +44,13 @@ scout.Action.ActionStyle = {
   BUTTON: 1
 };
 
+/**
+ * @override
+ */
+scout.Action.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
   this.actionKeyStroke = this._createActionKeyStroke();

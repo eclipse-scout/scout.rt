@@ -43,24 +43,20 @@ scout.Widget = function() {
   this.animateRemoval;
 
   // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
+  // ev. dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
   this._adapterProperties = [];
   this._cloneProperties = ['parent', 'session']; // FIXME [awe, cgu] discuss: when not cloned automatically we need to pass 'parent' in clone method
-  this._preserveOnPropertyChangeProperties = []; // FIXME [awe, cgu] 6.1 - migrieren zu propertyConfig und
-  // dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
-
-
-  // FIXME [awe, cgu] 6.1 discuss: wenn alle widgets events und keyStrokeContext haben sollen braucht es die add methoden nicht mehr
-  this._addKeyStrokeContextSupport();
-  this._addEventSupport();
-
-  this._parentDestroyHandler = this._onParentDestroy.bind(this);
-  this._postRenderActions = [];
   this._addCloneProperties(['visible', 'enabled']);
+  this._preserveOnPropertyChangeProperties = []; // FIXME [awe, cgu] 6.1 - migrieren zu propertyConfig und
+  this._postRenderActions = [];
+  this._parentDestroyHandler = this._onParentDestroy.bind(this);
+  this.events = this._createEventSupport();
+  this.keyStrokeContext = this._createKeyStrokeContext();
 };
 
 scout.Widget.prototype.init = function(model) {
   this._init(model);
-  this._initKeyStrokeContext(this.keyStrokeContext);
+  this._initKeyStrokeContext();
   this.initialized = true;
   this.trigger('initialized');
 };
@@ -101,8 +97,16 @@ scout.Widget.prototype.createFromProperty = function(propertyName, value) {
   return scout.create(value);
 };
 
-scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  // NOP
+scout.Widget.prototype._initKeyStrokeContext = function() {
+  if (!this.keyStrokeContext) {
+    return;
+  }
+  this.keyStrokeContext.$scopeTarget = function() {
+    return this.$container;
+  }.bind(this);
+  this.keyStrokeContext.$bindTarget = function() {
+    return this.$container;
+  }.bind(this);
 };
 
 scout.Widget.prototype.destroy = function() {
@@ -381,7 +385,6 @@ scout.Widget.prototype.has = function(widget) {
   return false;
 };
 
-
 scout.Widget.prototype.setEnabled = function(enabled) {
   this.setProperty('enabled', enabled);
 };
@@ -410,7 +413,9 @@ scout.Widget.prototype._renderVisible = function() {
  * method if you want to hide something else for a special field.
  */
 scout.Widget.prototype.addLoadingSupport = function() {
-  this.loadingSupport = new scout.LoadingSupport({widget: this});
+  this.loadingSupport = new scout.LoadingSupport({
+    widget: this
+  });
 };
 
 //--- Layouting / HtmlComponent methods ---
@@ -486,12 +491,8 @@ scout.Widget.prototype.revalidateLayoutTree = function() {
 };
 
 //--- Event handling methods ---
-
-/**
- * Call this function in the constructor of your widget if you need event support.
- **/
-scout.Widget.prototype._addEventSupport = function() {
-  this.events = new scout.EventSupport();
+scout.Widget.prototype._createEventSupport = function() {
+  return new scout.EventSupport();
 };
 
 scout.Widget.prototype.trigger = function(type, event) {
@@ -610,26 +611,10 @@ scout.Widget.prototype._beforeDetach = function(parent) {
 };
 
 /**
- * Call this function in the constructor of your widget if you need keystroke context support.
- **/
-scout.Widget.prototype._addKeyStrokeContextSupport = function() {
-  this.keyStrokeContext = this._createKeyStrokeContext();
-  if (this.keyStrokeContext) {
-    this.keyStrokeContext.$scopeTarget = function() {
-      return this.$container;
-    }.bind(this);
-    this.keyStrokeContext.$bindTarget = function() {
-      return this.$container;
-    }.bind(this);
-  }
-};
-
-/**
- * Creates a new keystroke context.
- * This method is intended to be overwritten by subclasses to provide another keystroke context.
+ * Does nothing by default. If a widget needs keystroke support override this method and return a keystroke context, e.g. the default scout.KeyStrokeContext.
  */
 scout.Widget.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
+  return null;
 };
 
 scout.Widget.prototype.updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {

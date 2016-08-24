@@ -15,8 +15,6 @@ scout.Scrollbar = function() {
   this._thumbRange;
   this._scrollSize;
   this._offsetSize;
-  this._addEventSupport();
-
   this._onScrollWheelHandler = this._onScrollWheel.bind(this);
   this._onScrollHandler = this._onScroll.bind(this);
   this._onScrollbarMousedownHandler = this._onScrollbarMousedown.bind(this);

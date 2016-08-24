@@ -10,8 +10,6 @@
  ******************************************************************************/
 scout.BusyIndicator = function() {
   scout.BusyIndicator.parent.call(this);
-  this._addKeyStrokeContextSupport();
-  this._addEventSupport();
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
 
@@ -21,8 +19,20 @@ scout.BusyIndicator.prototype._init = function(options) {
   this._cancellable = (options.cancellable === undefined ? true : !!options.cancellable);
 };
 
-scout.BusyIndicator.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke([
+/**
+ * @override
+ */
+scout.BusyIndicator.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
+/**
+ * @override
+ */
+scout.BusyIndicator.prototype._initKeyStrokeContext = function() {
+  scout.BusyIndicator.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke([
     new scout.ClickActiveElementKeyStroke(this, [
       scout.keys.SPACE, scout.keys.ENTER
     ]),

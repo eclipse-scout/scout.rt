@@ -23,7 +23,6 @@ scout.DatePicker = function() {
   this.$currentBox;
   this.$scrollable;
   this._scrollableLeft;
-  this._addEventSupport();
 };
 scout.inherits(scout.DatePicker, scout.Widget);
 

@@ -18,8 +18,8 @@ scout.inherits(scout.RadioButton, scout.Button);
 /**
  * @override Button.js
  */
-scout.RadioButton.prototype._initDefaultKeyStrokes = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke([
+scout.RadioButton.prototype._initDefaultKeyStrokes = function() {
+  this.keyStrokeContext.registerKeyStroke([
     new scout.RadioButtonKeyStroke(this, 'ENTER'),
     new scout.RadioButtonKeyStroke(this, 'SPACE')
   ]);

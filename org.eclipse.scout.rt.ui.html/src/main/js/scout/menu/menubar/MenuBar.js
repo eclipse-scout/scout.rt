@@ -11,8 +11,6 @@
 scout.MenuBar = function() {
   scout.MenuBar.parent.call(this);
 
-  this._addKeyStrokeContextSupport();
-  this._addEventSupport();
   this.menuSorter;
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'
@@ -60,8 +58,20 @@ scout.MenuBar.prototype._init = function(options) {
   this.updateVisibility();
 };
 
-scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke([
+/**
+ * @override
+ */
+scout.MenuBar.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
+/**
+ * @override
+ */
+scout.MenuBar.prototype._initKeyStrokeContext = function() {
+  scout.MenuBar.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke([
     new scout.MenuBarLeftKeyStroke(this),
     new scout.MenuBarRightKeyStroke(this)
   ]);

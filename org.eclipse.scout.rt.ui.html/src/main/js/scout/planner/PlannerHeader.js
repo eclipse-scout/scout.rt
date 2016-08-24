@@ -12,7 +12,6 @@ scout.PlannerHeader = function() {
   scout.PlannerHeader.parent.call(this);
 
   this.availableDisplayModes = [];
-  this._addEventSupport();
 };
 scout.inherits(scout.PlannerHeader, scout.Widget);
 

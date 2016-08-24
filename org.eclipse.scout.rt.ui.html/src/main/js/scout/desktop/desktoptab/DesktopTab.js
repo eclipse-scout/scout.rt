@@ -30,8 +30,6 @@ scout.DesktopTab = function() {
   // im bench mode ist der DesktopTab nicht gerendet, _remove wird
   // darum nicht aufgerufen und das 'remove event vom tab nie getriggert
   this._removeListener = this._onViewRemoved.bind(this);
-
-  this._addEventSupport();
 };
 
 scout.inherits(scout.DesktopTab, scout.SimpleTab);

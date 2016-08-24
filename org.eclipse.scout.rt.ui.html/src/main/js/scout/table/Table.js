@@ -148,16 +148,23 @@ scout.Table.prototype._initColumns = function() {
 };
 
 /**
- * @override ModelAdapter.js
+ * @override
  */
-scout.Table.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Table.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
-  this._initTableKeyStrokeContext(keyStrokeContext);
+scout.Table.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
 };
 
-scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke([
+/**
+ * @override
+ */
+scout.Table.prototype._initKeyStrokeContext = function() {
+  scout.Table.parent.prototype._initKeyStrokeContext.call(this);
+
+  this._initTableKeyStrokeContext();
+};
+
+scout.Table.prototype._initTableKeyStrokeContext = function() {
+  this.keyStrokeContext.registerKeyStroke([
     new scout.TableNavigationUpKeyStroke(this),
     new scout.TableNavigationDownKeyStroke(this),
     new scout.TableNavigationPageUpKeyStroke(this),
@@ -180,7 +187,7 @@ scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
   // Use case: - outline page table with search form that contains a table field;
   //           - shift + '↑-event'/'↓-event' are not consumed by a single selection table, and would propagate otherwise;
   //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
-  keyStrokeContext.registerStopPropagationInterceptor(function(event) {
+  this.keyStrokeContext.registerStopPropagationInterceptor(function(event) {
     if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
       event.stopPropagation();
       event.preventDefault();

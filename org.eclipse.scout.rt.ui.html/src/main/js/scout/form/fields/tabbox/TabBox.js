@@ -166,6 +166,7 @@ scout.TabBox.prototype._onKeyDown = function(event) {
 
   event.preventDefault();
   event.stopPropagation();
+  // FIXME [6.1] awe this does not work anymore, the method returns an TabItem instead of an index
   tabIndex = this._getNextVisibleTabIndexForKeyStroke(this.selectedTab, event.which);
 
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {

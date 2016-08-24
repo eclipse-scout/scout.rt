@@ -16,7 +16,6 @@ scout.Splitter = function() {
   this.ratio;
   this.position; // current splitter position in pixels, updated by updatePosition()
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
-  this._addEventSupport();
 };
 scout.inherits(scout.Splitter, scout.Widget);
 

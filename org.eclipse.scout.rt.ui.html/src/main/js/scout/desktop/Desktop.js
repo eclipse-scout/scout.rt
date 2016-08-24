@@ -60,12 +60,22 @@ scout.Desktop.prototype._init = function(model) {
   this._syncMenus(this.menus);
 };
 
-scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Desktop.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+/**
+ * @override
+ */
+scout.Desktop.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
+/**
+ * @override
+ */
+scout.Desktop.prototype._initKeyStrokeContext = function() {
+  scout.Desktop.parent.prototype._initKeyStrokeContext.call(this);
 
   // Keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active
-  keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
-  keyStrokeContext.registerKeyStroke(new scout.DisableBrowserTabSwitchingKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
+  this.keyStrokeContext.registerKeyStroke(new scout.DisableBrowserTabSwitchingKeyStroke(this));
 };
 
 scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
@@ -825,7 +835,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   } else {
     this.resizing = false;
   }
-  
+
   // ----- Helper functions -----
 
   function storeSplitterPosition(splitterPosition) {

@@ -11,8 +11,6 @@
 scout.Popup = function() {
   scout.Popup.parent.call(this);
 
-  this._addKeyStrokeContextSupport();
-  this._addEventSupport();
   this._mouseDownHandler;
   this._scrollHandler;
   this._popupOpenHandler;
@@ -67,8 +65,20 @@ scout.Popup.prototype._init = function(options) {
   this.closeOnAnchorMousedown = scout.nvl(options.closeOnAnchorMousedown, true);
 };
 
-scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke(new scout.CloseKeyStroke(this));
+/**
+ * @override
+ */
+scout.Popup.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
+/**
+ * @override
+ */
+scout.Popup.prototype._initKeyStrokeContext = function() {
+  scout.Popup.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke(new scout.CloseKeyStroke(this));
 };
 
 scout.Popup.prototype._createLayout = function() {

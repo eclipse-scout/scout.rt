@@ -32,10 +32,10 @@ scout.ContextMenuPopup.prototype._init = function(options) {
 /**
  * @override Popup.js
  */
-scout.ContextMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.ContextMenuPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.ContextMenuPopup.prototype._initKeyStrokeContext = function() {
+  scout.ContextMenuPopup.parent.prototype._initKeyStrokeContext.call(this);
 
-  scout.menuNavigationKeyStrokes.registerKeyStrokes(keyStrokeContext, this, 'menu-item');
+  scout.menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
 };
 
 scout.ContextMenuPopup.prototype._render = function($parent) {

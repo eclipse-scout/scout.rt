@@ -31,10 +31,10 @@ scout.BeanField.prototype._renderProperties = function() {
 /**
  * @override FormField.js
  */
-scout.BeanField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.BeanField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.BeanField.prototype._initKeyStrokeContext = function() {
+  scout.BeanField.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
+  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
 };
 
 /**

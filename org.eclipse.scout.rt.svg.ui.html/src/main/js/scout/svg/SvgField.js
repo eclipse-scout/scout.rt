@@ -30,9 +30,9 @@ scout.SvgField.prototype._renderProperties = function() {
 /**
  * @override FormField.js
  */
-scout.SvgField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.SvgField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-  keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
+scout.SvgField.prototype._initKeyStrokeContext = function() {
+  scout.SvgField.parent.prototype._initKeyStrokeContext.call(this);
+  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
 }
 
 scout.SvgField.prototype._renderSvgDocument = function() {

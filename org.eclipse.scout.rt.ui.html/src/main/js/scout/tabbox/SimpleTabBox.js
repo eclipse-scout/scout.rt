@@ -15,8 +15,6 @@ scout.SimpleTabBox = function() {
   this.tabArea;
   this.viewStack = [];
   this.currentView;
-
-  this._addEventSupport();
 };
 scout.inherits(scout.SimpleTabBox, scout.Widget);
 

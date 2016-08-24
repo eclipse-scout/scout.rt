@@ -32,12 +32,19 @@ scout.MessageBox.SEVERITY = {
 };
 
 /**
- * @override ModelAdapter
+ * @override
  */
-scout.MessageBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.MessageBox.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.MessageBox.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
 
-  keyStrokeContext.registerKeyStroke([
+/**
+ * @override
+ */
+scout.MessageBox.prototype._initKeyStrokeContext = function() {
+  scout.MessageBox.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke([
     new scout.FocusAdjacentElementKeyStroke(this.session, this),
     new scout.ClickActiveElementKeyStroke(this, [
       scout.keys.SPACE, scout.keys.ENTER

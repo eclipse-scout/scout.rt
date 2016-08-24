@@ -15,8 +15,6 @@ scout.Slider = function() {
   this.minValue;
   this.maxValue;
   this.step;
-
-  this._addEventSupport();
 };
 scout.inherits(scout.Slider, scout.Widget);
 

@@ -40,10 +40,10 @@ scout.ViewMenuPopup.prototype._createLayout = function() {
 /**
  * @override Popup.js
  */
-scout.ViewMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.ViewMenuPopup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.ViewMenuPopup.prototype._initKeyStrokeContext = function() {
+  scout.ViewMenuPopup.parent.prototype._initKeyStrokeContext.call(this);
 
-  scout.menuNavigationKeyStrokes.registerKeyStrokes(keyStrokeContext, this, 'view-menu-item');
+  scout.menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'view-menu-item');
 };
 
 scout.ViewMenuPopup.prototype._render = function($parent) {

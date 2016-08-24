@@ -21,12 +21,19 @@ scout.FileChooser.prototype._init = function(model) {
 };
 
 /**
- * @override ModelAdapter
+ * @override
  */
-scout.FileChooser.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.FileChooser.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.FileChooser.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
 
-  keyStrokeContext.registerKeyStroke([
+/**
+ * @override
+ */
+scout.FileChooser.prototype._initKeyStrokeContext = function() {
+  scout.FileChooser.parent.prototype._initKeyStrokeContext.call(this);
+
+  this.keyStrokeContext.registerKeyStroke([
     new scout.FocusAdjacentElementKeyStroke(this.session, this),
     new scout.ClickActiveElementKeyStroke(this, [
       scout.keys.SPACE, scout.keys.ENTER

@@ -16,18 +16,8 @@ scout.CalendarComponent = function() {
    */
   this._selected = false;
   this._$parts = [];
-  this.events = new scout.EventSupport();
 };
 scout.inherits(scout.CalendarComponent, scout.Widget);
-
-/**
- * Since we cannot configure any key-strokes on a calendar-component we must
- * return null here, so no key-stroke will be installed in Widget.js.
- * @override Widget.js
- */
-scout.CalendarComponent.prototype._createKeyStrokeContext = function() {
-  return null;
-};
 
 /**
  * @override ModelAdapter.js

@@ -87,6 +87,13 @@ scout.Calendar.prototype._isWorkWeek = function() {
   return this.displayMode === scout.Calendar.DisplayMode.WORK_WEEK;
 };
 
+/**
+ * @override
+ */
+scout.Calendar.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
 scout.Calendar.prototype._init = function(model) {
   scout.Calendar.parent.prototype._init.call(this, model);
   this._yearPanel = scout.create('YearPanel', {

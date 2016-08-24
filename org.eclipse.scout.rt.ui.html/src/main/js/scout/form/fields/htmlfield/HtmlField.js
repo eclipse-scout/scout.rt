@@ -17,10 +17,10 @@ scout.inherits(scout.HtmlField, scout.ValueField);
 /**
  * @override FormField.js
  */
-scout.HtmlField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.HtmlField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.HtmlField.prototype._initKeyStrokeContext = function() {
+  scout.HtmlField.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
+  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
 };
 
 scout.HtmlField.prototype._render = function($parent) {

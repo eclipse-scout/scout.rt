@@ -21,7 +21,7 @@ scout.Tooltip = function() {
   this.windowPaddingX = 10;
   this.windowPaddingY = 5;
   this.origin;
-  
+
   /**
    * When the origin point is calculated using $element.offset(),
    * the result is absolute to the window. When positioning the tooltip, the $parent's offset must
@@ -36,7 +36,6 @@ scout.Tooltip = function() {
   this.scrollType = 'position';
   this.htmlEnabled = false;
   this.$content;
-  this._addEventSupport();
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 

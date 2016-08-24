@@ -37,12 +37,12 @@ scout.Menu = function() {
 scout.inherits(scout.Menu, scout.Action);
 
 /**
- * @override Widget
+ * @override
  */
-scout.Menu.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.Menu.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.Menu.prototype._initKeyStrokeContext = function() {
+  scout.Menu.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke(new scout.MenuExecKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(new scout.MenuExecKeyStroke(this));
 };
 
 scout.Menu.prototype._render = function($parent) {

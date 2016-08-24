@@ -52,10 +52,10 @@ scout.GroupBox.prototype._syncFields = function(fields) {
 };
 
 /**
- * @override ModelAdapter.js
+ * @override
  */
-scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.GroupBox.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
+scout.GroupBox.prototype._initKeyStrokeContext = function() {
+  scout.GroupBox.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.keyStrokeContext.$bindTarget = this._keyStrokeBindTarget.bind(this);
 };

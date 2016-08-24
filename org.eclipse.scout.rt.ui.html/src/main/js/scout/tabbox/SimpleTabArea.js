@@ -19,8 +19,6 @@ scout.SimpleTabArea.prototype._init = function(model) {
   this._selectedViewTab;
 
   this._viewTabSelectionHandler = this._onTabSelection.bind(this);
-
-  this._addEventSupport();
 };
 
 scout.SimpleTabArea.prototype._render = function($parent) {

@@ -26,7 +26,6 @@ scout.ViewMenuTab = function() {
   this.visible = true;
 
   this.defaultIconId = scout.icons.OUTLINE;
-  this._addEventSupport();
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
   this._addAdapterProperties('viewMenus');
 };
@@ -41,8 +40,8 @@ scout.ViewMenuTab.prototype._init = function(model) {
   this.updateVisibility();
 };
 
-scout.ViewMenuTab.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.ViewMenuTab.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.ViewMenuTab.prototype._initKeyStrokeContext = function() {
+  scout.ViewMenuTab.parent.prototype._initKeyStrokeContext.call(this);
 
   // Bound to desktop
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();

@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.CollapseHandle = function() {
   scout.CollapseHandle.parent.call(this);
-  this._addEventSupport();
   this.leftVisible = false;
   this.rightVisible = false;
 };
@@ -32,12 +31,6 @@ scout.CollapseHandle.prototype._render = function($parent) {
 
   this.$left = this.$container.appendDiv('collapse-handle-body left');
   this.$right = this.$container.appendDiv('collapse-handle-body right');
-  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
-};
-
-scout.CollapseHandle.prototype._remove = function() {
-  scout.CollapseHandle.parent.prototype._remove.call(this);
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 
 scout.CollapseHandle.prototype._renderProperties = function() {

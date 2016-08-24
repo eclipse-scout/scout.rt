@@ -77,6 +77,13 @@ scout.FormField.MODE_DEFAULT = 'default';
  */
 scout.FormField.MODE_CELLEDITOR = 'celleditor';
 
+/**
+ * @override
+ */
+scout.FormField.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
 //  this.refFieldId = this.uniqueId('ref'); // FIXME [6.1] CGU move to widget or form field adapter? still needed?

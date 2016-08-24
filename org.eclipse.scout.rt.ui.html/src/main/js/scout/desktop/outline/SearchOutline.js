@@ -19,8 +19,8 @@ scout.inherits(scout.SearchOutline, scout.Outline);
 /**
  * @override Tree.js
  */
-scout.SearchOutline.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.SearchOutline.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.SearchOutline.prototype._initKeyStrokeContext = function() {
+  scout.SearchOutline.parent.prototype._initKeyStrokeContext.call(this);
 
   this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
 };

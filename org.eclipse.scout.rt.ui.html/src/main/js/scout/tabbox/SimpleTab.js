@@ -20,8 +20,6 @@ scout.SimpleTab = function() {
 
   // Container for the _Tab_ (not for the view).
   this.$container;
-
-  this._addEventSupport();
 };
 scout.inherits(scout.SimpleTab, scout.Widget);
 

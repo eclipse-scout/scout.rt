@@ -22,10 +22,10 @@ scout.inherits(scout.RadioButtonGroup, scout.ValueField);
 /**
  * @override ModelAdapter.js
  */
-scout.RadioButtonGroup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.RadioButtonGroup.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
+  scout.RadioButtonGroup.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke([
+  this.keyStrokeContext.registerKeyStroke([
     new scout.RadioButtonGroupLeftKeyStroke(this),
     new scout.RadioButtonGroupRightKeyStroke(this)
   ]);

@@ -17,7 +17,6 @@ scout.YearPanel = function() {
   this.selectedDate;
   this.displayMode;
   this.alwaysSelectFirstDay;
-  this._addEventSupport();
 };
 scout.inherits(scout.YearPanel, scout.Widget);
 

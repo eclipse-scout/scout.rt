@@ -8,8 +8,8 @@ scout.inherits(scout.CompactTree, scout.Tree);
 /**
  * @override Tree.js
  */
-scout.CompactTree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
-  keyStrokeContext.registerKeyStroke([
+scout.CompactTree.prototype._initTreeKeyStrokeContext = function() {
+  this.keyStrokeContext.registerKeyStroke([
     new scout.CompactTreeUpKeyStroke(this),
     new scout.CompactTreeDownKeyStroke(this),
     new scout.CompactTreeLeftKeyStroke(this),

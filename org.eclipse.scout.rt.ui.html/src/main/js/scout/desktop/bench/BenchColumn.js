@@ -20,8 +20,6 @@ scout.BenchColumn = function() {
   this._viewRemovedHandler = this._onViewRemoved.bind(this);
   this._viewActivatedHandler = this._onViewActivated.bind(this);
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
-
-  this._addEventSupport();
 };
 scout.inherits(scout.BenchColumn, scout.Widget);
 
@@ -34,15 +32,6 @@ scout.BenchColumn.TAB_BOX_INDEX = {
 scout.BenchColumn.prototype._init = function(model) {
   scout.BenchColumn.parent.prototype._init.call(this, model);
   this._createTabBoxes();
-};
-
-/**
- * @override ModelAdapter.js
- */
-scout.BenchColumn.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.BenchColumn.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
-  this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  this.keyStrokeContext.$bindTarget = this._keyStrokeBindTarget.bind(this);
 };
 
 /**

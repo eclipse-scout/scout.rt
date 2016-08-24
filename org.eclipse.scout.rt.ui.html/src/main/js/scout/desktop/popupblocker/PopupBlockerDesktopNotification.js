@@ -1,6 +1,5 @@
 scout.PopupBlockerDesktopNotification = function() {
   scout.PopupBlockerDesktopNotification.parent.call(this);
-  this._addEventSupport();
 };
 scout.inherits(scout.PopupBlockerDesktopNotification, scout.DesktopNotification);
 

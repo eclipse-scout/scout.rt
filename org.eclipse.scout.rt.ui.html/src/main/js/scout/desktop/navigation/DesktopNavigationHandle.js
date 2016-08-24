@@ -13,8 +13,8 @@ scout.DesktopNavigationHandle = function() {
 };
 scout.inherits(scout.DesktopNavigationHandle, scout.CollapseHandle);
 
-scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.DesktopNavigationHandle.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function() {
+  scout.DesktopNavigationHandle.parent.prototype._initKeyStrokeContext.call(this);
 
   // Bound to desktop
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
@@ -30,4 +30,10 @@ scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function(keyStro
 scout.DesktopNavigationHandle.prototype._render = function($parent) {
   scout.DesktopNavigationHandle.parent.prototype._render.call(this, $parent);
   this.$container.addClass('desktop-navigation-handle');
+  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+};
+
+scout.DesktopNavigationHandle.prototype._remove = function() {
+  scout.DesktopNavigationHandle.parent.prototype._remove.call(this);
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
 };

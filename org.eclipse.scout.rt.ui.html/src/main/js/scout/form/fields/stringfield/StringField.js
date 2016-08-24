@@ -30,10 +30,10 @@ scout.StringField.TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
 /**
  * @override ModelAdapter.js
  */
-scout.StringField.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.StringField.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.StringField.prototype._initKeyStrokeContext = function() {
+  scout.StringField.parent.prototype._initKeyStrokeContext.call(this);
 
-  keyStrokeContext.registerKeyStroke([
+  this.keyStrokeContext.registerKeyStroke([
     new scout.StringFieldEnterKeyStroke(this),
     new scout.StringFieldCtrlEnterKeyStroke(this)
   ]);

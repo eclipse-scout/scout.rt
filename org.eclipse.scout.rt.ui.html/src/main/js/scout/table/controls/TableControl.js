@@ -28,10 +28,10 @@ scout.TableControl.prototype._init = function(model) {
 };
 
 /**
- * @override ModelAdapter.js
+ * @override
  */
-scout.TableControl.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.TableControl.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.TableControl.prototype._initKeyStrokeContext = function() {
+  scout.TableControl.parent.prototype._initKeyStrokeContext.call(this);
 
   this.tableControlKeyStrokeContext = this._createKeyStrokeContextForTableControl();
 };
