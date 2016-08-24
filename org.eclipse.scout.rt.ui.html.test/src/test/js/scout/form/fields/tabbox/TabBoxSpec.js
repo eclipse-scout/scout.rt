@@ -40,4 +40,31 @@ describe('TabBox', function() {
 
   });
 
+  describe('key handling', function() {
+
+    it('supports left/right keys to select a tab-item', function() {
+      var tabItemA = helper.createTabItem();
+      var tabItemB = helper.createTabItem();
+      var tabBox = helper.createTabBox([tabItemA, tabItemB]);
+      tabBox.render(session.$entryPoint);
+
+      // check right/left keys
+      expect(tabBox.selectedTab).toBe(tabItemA);
+      tabBox._$tabArea.triggerKeyDown(scout.keys.RIGHT);
+      expect(tabBox.selectedTab).toBe(tabItemB);
+      tabBox._$tabArea.triggerKeyDown(scout.keys.LEFT);
+      expect(tabBox.selectedTab).toBe(tabItemA);
+
+      // make sure that nothing happens when first or last tab is selected and left/right is pressed
+      tabBox.setSelectedTab(tabItemA);
+      tabBox._$tabArea.triggerKeyDown(scout.keys.LEFT);
+      expect(tabBox.selectedTab).toBe(tabItemA); // still A
+
+      tabBox.setSelectedTab(tabItemB);
+      tabBox._$tabArea.triggerKeyDown(scout.keys.RIGHT);
+      expect(tabBox.selectedTab).toBe(tabItemB); // still B
+    });
+
+  });
+
 });

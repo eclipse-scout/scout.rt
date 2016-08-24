@@ -156,10 +156,9 @@ scout.TabBox.prototype._syncSelectedTab = function(tab, notifyServer) {
 // keyboard navigation in tab-box button area
 // TODO awe: (tab-box) overflow menu should be accessible by keyboard navigation
 scout.TabBox.prototype._onKeyDown = function(event) {
-  var tabIndex, navigationKey =
+  var navigationKey =
     event.which === scout.keys.LEFT ||
     event.which === scout.keys.RIGHT;
-
   if (!navigationKey) {
     return true;
   }
@@ -167,32 +166,26 @@ scout.TabBox.prototype._onKeyDown = function(event) {
   event.preventDefault();
   event.stopPropagation();
   // FIXME [6.1] awe this does not work anymore, the method returns an TabItem instead of an index
-  tabIndex = this._getNextVisibleTabIndexForKeyStroke(this.selectedTab, event.which);
 
-  if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
-    var tabItem = this.tabItems[tabIndex];
-    if (tabItem._tabRendered) {
-      this._selectTab(tabItem);
-    }
+  var nextTab = this._getNextVisibleTabForKeyStroke(event.which);
+  if (nextTab && nextTab._tabRendered) {
+    this.setSelectedTab(nextTab);
   }
 };
 
-scout.TabBox.prototype._getNextVisibleTabIndexForKeyStroke = function(actualIndex, keyStroke) {
-  var i, tabItem,
-    modifier = keyStroke === scout.keys.LEFT ? -1 : 1,
-    endFunc = function(i) {
-      if (keyStroke === scout.keys.LEFT) {
-        return i >= 0;
-      }
-      return i < this.tabItems.length;
-    }.bind(this);
-  for (i = actualIndex + modifier; endFunc(i); i = i + modifier) {
-    tabItem = this.tabItems[i];
-    if (tabItem.visible) {
-      return i;
+scout.TabBox.prototype._getNextVisibleTabForKeyStroke = function(keyStroke) {
+  var nextTab,
+    dir = (keyStroke === scout.keys.LEFT) ? -1 : 1,
+    i = this.tabItems.indexOf(this.selectedTab) + dir;
+
+  while (i >= 0 && i < this.tabItems.length) {
+    nextTab = this.tabItems[i];
+    if (nextTab.visible) {
+      return nextTab;
     }
+    i += dir;
   }
-  return actualIndex;
+  return null;
 };
 
 scout.TabBox.prototype._renderTabContent = function() {
