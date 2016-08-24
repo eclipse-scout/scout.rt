@@ -45,8 +45,7 @@ scout.Widget = function() {
   // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
   // ev. dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
   this._adapterProperties = [];
-  this._cloneProperties = ['parent', 'session']; // FIXME [awe, cgu] discuss: when not cloned automatically we need to pass 'parent' in clone method
-  this._addCloneProperties(['visible', 'enabled']);
+  this._cloneProperties = ['visible', 'enabled'];
   this._preserveOnPropertyChangeProperties = []; // FIXME [awe, cgu] 6.1 - migrieren zu propertyConfig und
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
@@ -58,7 +57,7 @@ scout.Widget.prototype.init = function(model) {
   this._init(model);
   this._initKeyStrokeContext();
   this.initialized = true;
-  this.trigger('initialized');
+  this.trigger('initialized'); // FIXME [6.1] CGU rename to ('init') or ('initialize') to conform with render, remove, destroy?
 };
 
 /**
@@ -938,6 +937,9 @@ scout.Widget.prototype._send = function(type, data) {
   this.trigger(type, data);
 };
 
+/**
+ * Clones the widget and mirrors the events, see this.clone() and this.mirror() for details.
+ */
 scout.Widget.prototype.cloneAndMirror = function(model) {
   var clone = this.clone(model);
   clone.mirror();
@@ -955,6 +957,12 @@ scout.Widget.prototype.original = function() {
   return original;
 };
 
+/**
+ * Clones the widget and returns the clone. Only the properties defined in this._cloneProperties are copied to the clone.
+ * The parameter model has to contain at least the property 'parent'.
+ * @param model The model used to create the clone is a combination of the clone properties and this model.
+ * Therefore this model may be used to override the cloned properties or to add additional properties.
+ */
 scout.Widget.prototype.clone = function(model) {
   var clone, cloneModel;
   model = model || {};
@@ -966,7 +974,14 @@ scout.Widget.prototype.clone = function(model) {
   return clone;
 };
 
+/**
+ * Delegates every property change event from the original widget to this cloned widget by calling the appropriate setter.
+ * Works only if this widget is a clone.
+ */
 scout.Widget.prototype.mirror = function() {
+  if (!this.cloneOf) {
+    throw new Error('Widget is not a clone.');
+  }
   this._mirror(this.cloneOf);
   this.children.forEach(function(childClone) {
     if (childClone.cloneOf) {

@@ -142,7 +142,9 @@ describe('Widget', function() {
     });
 
     it('clones only properties marked as clone property', function() {
-      var widgetClone = widget.clone();
+      var widgetClone = widget.clone({
+        parent: widget.parent
+      });
       // should contain the following properties:
       expectedProperties.forEach(function(propertyName) {
         expect(widgetClone[propertyName]).not.toBe(undefined);
@@ -158,6 +160,7 @@ describe('Widget', function() {
 
     it('prefers properties passed as modelOverride', function() {
       var widgetClone = widget.clone({
+        parent: widget.parent,
         text: 'foo'
       });
       expect(widgetClone.text).toBe('foo');
