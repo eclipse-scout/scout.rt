@@ -250,8 +250,11 @@ scout.Widget.prototype._removeInternal = function() {
 
   // remove children in reverse order.
   this.children.slice().reverse().forEach(function(child) {
-    child.remove();
-  });
+    // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
+    if (child.parent === this) {
+      child.remove();
+    }
+  }, this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   this._cleanup();
   this._remove();

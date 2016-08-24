@@ -12,13 +12,21 @@ describe('Widget', function() {
 
   var session, widget, parent;
 
+  var TestWidget = function() {
+    TestWidget.parent.call(this);
+  };
+  scout.inherits(TestWidget, scout.NullWidget);
+  TestWidget.prototype._render = function($parent) {
+    this.$container = $parent.appendDiv();
+  };
+
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     session.init();
 
-    widget = new scout.NullWidget(),
-      parent = new scout.NullWidget();
+    widget = new TestWidget();
+    parent = new TestWidget();
   });
 
   function createWidget(model) {
@@ -27,7 +35,9 @@ describe('Widget', function() {
     };
     model = model || {};
     $.extend(model, defaults);
-    return scout.create('NullWidget', model);
+    var widget = new TestWidget();
+    widget.init(model);
+    return widget;
   }
 
   describe('rendering', function() {
@@ -96,7 +106,7 @@ describe('Widget', function() {
     var propertyChangeEvent, widget;
 
     beforeEach(function() {
-      widget = new scout.NullWidget();
+      widget = new TestWidget();
     });
 
     function firePropertyChange(oldValue, newValue) {
@@ -282,7 +292,7 @@ describe('Widget', function() {
         parent: parent
       });
       var owner = createWidget({
-        parent: new scout.NullWidget()
+        parent: new TestWidget()
       });
       var another = createWidget({
         parent: parent,
@@ -343,6 +353,82 @@ describe('Widget', function() {
       // Ensure parent destroy listener is removed on destroy
       another.destroy();
       expect(parent.events._eventListeners.length).toBe(parentListenerCount - 1);
+    });
+  });
+
+  describe('remove', function() {
+    it('removes the widget', function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      expect(widget.rendered).toBe(true);
+      expect(widget.$container).toBeDefined();
+
+      widget.remove();
+      expect(widget.rendered).toBe(false);
+      expect(widget.$container).toBe(null);
+    });
+
+    it('removes the children', function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      var child0 = createWidget({
+        parent: widget
+      });
+      var child0_0 = createWidget({
+        parent: child0
+      });
+      widget.render(session.$entryPoint);
+      child0.render(widget.$container);
+      child0_0.render(child0.$container);
+      expect(widget.rendered).toBe(true);
+      expect(child0.rendered).toBe(true);
+      expect(child0_0.rendered).toBe(true);
+
+      widget.remove();
+      expect(widget.rendered).toBe(false);
+      expect(child0.rendered).toBe(false);
+      expect(child0_0.rendered).toBe(false);
+    });
+
+    it('does not remove the children if owner is removed but parent is still rendered', function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      var child0 = createWidget({
+        parent: widget
+      });
+      var owner = createWidget({
+        parent: new TestWidget()
+      });
+      var anotherChild = createWidget({
+        parent: widget,
+        owner: owner
+      });
+      widget.render(session.$entryPoint);
+      owner.render(session.$entryPoint);
+      child0.render(widget.$container);
+      anotherChild.render(widget.$container);
+      expect(anotherChild.parent).toBe(widget);
+      expect(anotherChild.owner).toBe(owner);
+
+      owner.remove();
+      expect(owner.rendered).toBe(false);
+      expect(anotherChild.rendered).toBe(true);
+      expect(widget.rendered).toBe(true);
+      expect(child0.rendered).toBe(true);
+
+      // If the owner is destroyed, the widget has to be removed even if another widget is currently the parent
+      // Otherwise the widget would be in a inconsistent state (destroyed, but still rendered)
+      owner.destroy();
+      expect(owner.rendered).toBe(false);
+      expect(owner.destroyed).toBe(true);
+      expect(anotherChild.rendered).toBe(false);
+      expect(anotherChild.destroyed).toBe(true);
+      expect(widget.rendered).toBe(true);
+      expect(child0.rendered).toBe(true);
     });
   });
 
