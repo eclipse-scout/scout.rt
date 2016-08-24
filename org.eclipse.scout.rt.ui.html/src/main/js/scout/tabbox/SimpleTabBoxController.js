@@ -14,7 +14,7 @@
  * The {@link {@link scout.SimpleTabBoxController}} is used to link a {@link {@link scout.SimpleTabBox}} with a {@link {@link scout.SimpleTabArea}}.
  * There are {@link {@link scout.SimpleTabBox}} with more than one {@link {@link scout.SimpleTabArea}} to actualized.
  * Therefore the linking is separated in a controller.
- * The controller basically listens to 'viewAdded', 'viewReplaced', 'viewRemoved', 'viewActivated', 'viewDeactivated' on the {@link {@link scout.SimpleTabBox}} and
+ * The controller basically listens to 'viewAdded', 'viewRemoved', 'viewActivated', 'viewDeactivated' on the {@link {@link scout.SimpleTabBox}} and
  * updates the {@link {@link scout.SimpleTabArea}}.
  */
 scout.SimpleTabBoxController = function(tabBox, tabArea) {
@@ -22,7 +22,6 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
   this.tabArea = tabArea;
 
   this._viewAddedHandler = this._onViewAdded.bind(this);
-  this._viewReplacedHandler = this._onViewReplaced.bind(this);
   this._viewRemovedHandler = this._onViewRemoved.bind(this);
   this._viewActivatedHandler = this._onViewActivated.bind(this);
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
