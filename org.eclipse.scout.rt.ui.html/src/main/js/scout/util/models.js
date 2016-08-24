@@ -12,13 +12,14 @@ scout.models = {
 
   modelMap: {},
 
-  // FIXME [awe] 6.1 als zwischenlösung hier alle einzelnen .json files auflisten und laden
-  // in der finalen lösungen haben wir einen builder analog defaultValues
-  bootstrap: function() {
+  /**
+   * @param modelsUrl relative URL points to the *-models.json file. Example: 'myproject-models.json'.
+   */
+  bootstrap: function(modelsUrl) {
+    scout.objects.mandatoryParameter('modelsUrl', modelsUrl);
     var that = this;
-
     return $.ajax({
-      url: 'res/models.json',
+      url: modelsUrl,
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8'
     }).done(that._onModelDone.bind(that))

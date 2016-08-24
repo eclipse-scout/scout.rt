@@ -40,6 +40,9 @@ public class ResourceLoaders {
     if (resourcePath.matches("^/defaultValues$")) {
       return new DefaultValuesLoader();
     }
+    if (JsonModelsLoader.matchesFile(resourcePath)) {
+      return new JsonModelsLoader();
+    }
     if (resourcePath.endsWith(".json")) {
       return new JsonFileLoader();
     }
