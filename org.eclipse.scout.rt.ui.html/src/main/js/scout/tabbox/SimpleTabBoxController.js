@@ -34,7 +34,6 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
 
 scout.SimpleTabBoxController.prototype._installListeners = function() {
   this.tabBox.on('viewAdded', this._viewAddedHandler);
-  this.tabBox.on('viewReplaced', this._viewReplacedHandler);
   this.tabBox.on('viewRemoved', this._viewRemovedHandler);
   this.tabBox.on('viewActivated', this._viewActivatedHandler);
   this.tabBox.on('viewDeactivated', this._viewDeactivatedHandler);
@@ -60,17 +59,6 @@ scout.SimpleTabBoxController.prototype._onViewAdded = function(event) {
       view: view
     });
     this.tabArea.addTab(viewTab, siblingViewTab);
-  }
-};
-
-scout.SimpleTabBoxController.prototype._onViewReplaced = function(event) {
-  var view = event.view;
-  if (!view) {
-    return;
-  }
-  var viewTab = this._getTab(view);
-  if (viewTab) {
-    viewTab._titlesUpdated();
   }
 };
 
