@@ -18,7 +18,6 @@ describe('Widget', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.init();
   });
 
   describe('attach/detach', function() {

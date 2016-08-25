@@ -316,8 +316,8 @@ describe('Session', function() {
 
     it('sends startup parameter', function() {
       var session = createSession();
+      session.start();
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
@@ -334,8 +334,8 @@ describe('Session', function() {
 
     it('sends user agent on startup if not desktop', function() {
       var session = createSession(new scout.UserAgent(scout.Device.Type.MOBILE));
+      session.start();
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
@@ -352,7 +352,6 @@ describe('Session', function() {
       //device type desktop is the default, so don't send it
       session = createSession(new scout.UserAgent(scout.Device.Type.DESKTOP));
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 

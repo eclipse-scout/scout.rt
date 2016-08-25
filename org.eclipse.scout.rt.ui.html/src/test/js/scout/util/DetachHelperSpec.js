@@ -16,7 +16,6 @@ describe("DetachHelper", function() {
     $sandbox = $('#sandbox');
     jasmine.Ajax.install();
     session = sandboxSession();
-    session.init();
   });
 
   afterEach(function(){

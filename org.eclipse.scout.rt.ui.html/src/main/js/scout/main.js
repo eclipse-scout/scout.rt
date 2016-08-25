@@ -74,8 +74,9 @@ scout._init = function(options) {
   $('.scout').each(function() {
     var $entryPoint = $(this);
     options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
-    var session = new scout.Session($entryPoint, options);
-    session.init();
+    options.$entryPoint = $entryPoint;
+    var session = scout.create('Session', options);
+    session.start();
     scout.sessions.push(session);
   });
 };
