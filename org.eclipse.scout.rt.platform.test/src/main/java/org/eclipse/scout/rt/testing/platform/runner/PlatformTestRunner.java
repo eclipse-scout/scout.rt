@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.statement.AssertNoRunningJobsStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsCleanupStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.BeanAnnotationsInitStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ClearThreadInterruptionStatusStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RunContextStatement;
@@ -246,7 +247,8 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s4 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+    final Statement s5 = new ClearThreadInterruptionStatusStatement(next);
+    final Statement s4 = new SubjectStatement(s5, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
     final Statement s3 = new RegisterBeanStatement(s4, new BeanMetaData(JUnitExceptionHandler.class).withReplace(true).withOrder(-1000)); // exception handler to not silently swallow handled exceptions.
     final Statement s2 = new AssertNoRunningJobsStatement(s3, "Test method");
     final Statement s1 = new TimesStatement(s2, ReflectionUtility.getAnnotation(Times.class, testMethod, testClass));
