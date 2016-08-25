@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 
 /**
  * Represents a transaction which multiple transaction members can participate for consistent commit or rollback.
@@ -38,6 +39,14 @@ public interface ITransaction extends ICancellable {
    *           if the transaction is cancelled.
    */
   void registerMember(ITransactionMember member);
+
+  /**
+   * Produces and registers the given transaction member using the given mapping function, but only if not registered
+   * yet. This allows the member to participate in the <code>2-phase-commit-protocol (2PC)</code>.
+   *
+   * @return transaction member registered, or which was produced by the given mapping function.
+   */
+  <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(String memberId, IFunction<String, TRANSACTION_MEMBER> producer);
 
   /**
    * Returns the transaction member of the given member id, or <code>null</code> if not registered.

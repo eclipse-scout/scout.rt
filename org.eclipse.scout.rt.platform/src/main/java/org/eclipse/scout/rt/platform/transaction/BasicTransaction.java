@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,22 @@ public class BasicTransaction implements ITransaction {
   }
 
   @Override
+  public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer) {
+    synchronized (m_memberMapLock) {
+      @SuppressWarnings("unchecked")
+      TRANSACTION_MEMBER member = (TRANSACTION_MEMBER) getMember(memberId);
+      if (member == null) {
+        member = producer.apply(memberId);
+        registerMember(member);
+      }
+      return member;
+    }
+  }
+
+  @Override
   public ITransactionMember getMember(String memberId) {
     synchronized (m_memberMapLock) {
-      ITransactionMember res = (ITransactionMember) m_memberMap.get(memberId);
+      ITransactionMember res = m_memberMap.get(memberId);
       if (LOG.isDebugEnabled()) {
         LOG.debug("get transaction member '{}' -> '{}'.", memberId, res);
       }

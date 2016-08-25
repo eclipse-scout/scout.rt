@@ -4,7 +4,8 @@ package org.eclipse.scout.rt.platform.util.concurrent;
  * Represents a function that accepts two arguments and produces a result. This is the two-arity specialization of
  * <code>Function</code>.
  * <p>
- * This is a surrogate for <code>BiConsumer</code> contained in Java 8, and is to comply with Java 7.
+ * This is a surrogate for <code>BiConsumer</code> contained in Java 8, and is to comply with Java 7. This interface
+ * will be removed once compiler compliance level is changed to 1.8.
  *
  * @param <T>
  *          the type of the first argument to the function
