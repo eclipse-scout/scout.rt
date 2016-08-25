@@ -33,20 +33,20 @@ scout.LogicalGridData = function(vararg) {
   if (vararg instanceof scout.LogicalGridData) {
     // copy properties from LGD template
     scout.objects.copyProperties(vararg, this);
-  } else if (vararg instanceof scout.FormField) {
-    // work with model / validate
-    this.model = vararg;
+  } else if (vararg instanceof scout.Widget) {
+    // work with widget / validate
+    this.widget = vararg;
   } else {
     // NOP - default CTOR
   }
 };
 
 scout.LogicalGridData.prototype.validate = function() {
-  if (!this.model) {
+  if (!this.widget) {
     return;
   }
 
-  var data = this.model.gridData;
+  var data = this.widget.gridData;
   // setup constraints
   this.gridx = data.x;
   this.gridy = data.y;
@@ -72,15 +72,15 @@ scout.LogicalGridData.prototype.validate = function() {
   this.heightHint = data.heightInPixel;
 
   // when having the label on top, the row height has to be increased
-  if (this.model.labelVisible && this.model.$label && this.model.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+  if (this.widget.labelVisible && this.widget.$label && this.widget.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
     this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
   }
 };
 
 scout.LogicalGridData.prototype._inheritWeightY = function() {
-  var d = this._inheritWeightYRec(this.model);
+  var d = this._inheritWeightYRec(this.widget);
   if (d === null) {
-    var data = this.model.gridData;
+    var data = this.widget.gridData;
     if (data.weightY >= 0) {
       d = data.weightY;
     } else {
