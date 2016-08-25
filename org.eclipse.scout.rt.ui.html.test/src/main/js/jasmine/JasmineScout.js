@@ -18,8 +18,7 @@ function mostRecentJsonRequest() {
 }
 
 function sandboxSession(options) {
-  var session,
-    $sandbox = $('#sandbox');
+  var $sandbox = $('#sandbox').addClass('scout');
 
   $sandbox.addClass('scout');
   options = options || {};
@@ -27,8 +26,10 @@ function sandboxSession(options) {
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
+  options.$entryPoint = $sandbox;
 
-  session = new scout.Session($sandbox, options);
+  var session = new scout.Session();
+  session.init(options);
 
   // Install non-filtering requestToJson() function. This is required to test
   // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
@@ -103,7 +104,7 @@ function receiveResponseForAjaxCall(request, response) {
 }
 
 /**
- * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.init()
+ * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.start()
  */
 function uninstallUnloadHandlers(session) {
   $(window)

@@ -15,7 +15,6 @@ describe('Widget', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.init();
 
     widget = new scout.Widget(),
     parent = new scout.Widget();

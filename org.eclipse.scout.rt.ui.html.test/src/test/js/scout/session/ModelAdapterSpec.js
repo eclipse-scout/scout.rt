@@ -20,7 +20,6 @@ describe('ModelAdapter', function() {
     jasmine.clock().install();
 
     session = sandboxSession();
-    session.init();
     uninstallUnloadHandlers(session);
 
     // Create a private object factory used for these tests

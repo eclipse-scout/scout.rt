@@ -17,7 +17,6 @@ describe('scout.FocusManager', function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     session = sandboxSession();
-    session.init();
     formHelper = new scout.FormSpecHelper(session);
     focusHelper = new FocusManagerSpecHelper();
     jasmine.clock().install();

@@ -80,7 +80,10 @@ describe('ObjectFactory', function() {
 
   it('creates objects which are registered in scout.objectFactories', function() {
     setFixtures(sandbox());
-    var session = new scout.Session($('#sandbox'), '1.1');
+    var session = new scout.Session();
+    session.init({
+      $entryPoint: $('#sandbox')
+    });
     session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
 
     // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'

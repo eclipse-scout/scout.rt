@@ -317,8 +317,8 @@ describe('Session', function() {
 
     it('sends startup parameter', function() {
       var session = createSession();
+      session.start();
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
@@ -335,8 +335,8 @@ describe('Session', function() {
 
     it('sends user agent on startup', function() {
       var session = createSession(new scout.UserAgent(scout.Device.Type.MOBILE));
+      session.start();
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 

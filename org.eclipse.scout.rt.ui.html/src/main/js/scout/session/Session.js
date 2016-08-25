@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+scout.Session = function() {
+};
+
 /**
  * $entryPoint is required to create a new session.
  *
@@ -36,8 +39,8 @@
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
  */
-scout.Session = function($entryPoint, options) {
-  options = options || {};
+scout.Session.prototype.init = function(model) {
+  var options = model || {};
 
   // Prepare clientSessionId
   var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
@@ -49,7 +52,7 @@ scout.Session = function($entryPoint, options) {
   }
 
   // Set members
-  this.$entryPoint = $entryPoint;
+  this.$entryPoint = options.$entryPoint;
   this.uiSessionId; // assigned by server on session init (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.partId = scout.nvl(options.portletPartId, 0);
   this.clientSessionId = clientSessionId;
@@ -1163,8 +1166,8 @@ scout.Session.prototype._processEvents = function(events) {
   this.currentEvent = null;
 };
 
-scout.Session.prototype.init = function() {
-  $.log.info('Session initializing...');
+scout.Session.prototype.start = function() {
+  $.log.info('Session starting...');
 
   // After a short time, display a loading animation (will be removed again in _renderDesktop)
   this._setApplicationLoading(true);
