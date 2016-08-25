@@ -210,8 +210,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       //
       setChildrenLoaded(false);
       //
-      getTree().removeAllChildNodes(this);
-      getTree().addChildNodes(this, pageList);
+      if (tree != null) {
+        tree.removeAllChildNodes(this);
+        tree.addChildNodes(this, pageList);
+      }
       //
       setChildrenLoaded(true);
       setChildrenDirty(false);
