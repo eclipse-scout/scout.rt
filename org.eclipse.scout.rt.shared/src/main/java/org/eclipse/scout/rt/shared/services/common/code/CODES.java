@@ -42,17 +42,8 @@ public final class CODES {
     return BEANS.get(ICodeService.class).findCodeTypeById(id);
   }
 
-  @SuppressWarnings("unchecked")
   public static List<ICodeType<?, ?>> getCodeTypes(Class<?>... types) {
-    if (types == null) {
-      return CollectionUtility.emptyArrayList();
-    }
-    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<Class<? extends ICodeType<?, ?>>>(types.length);
-    for (Class<?> t : types) {
-      if (ICodeType.class.isAssignableFrom(t)) {
-        typeList.add((Class<? extends ICodeType<?, ?>>) t);
-      }
-    }
+    List<Class<? extends ICodeType<?, ?>>> typeList = varargToList(types);
     return BEANS.get(ICodeService.class).getCodeTypes(typeList);
   }
 
@@ -68,22 +59,43 @@ public final class CODES {
     return BEANS.get(ICodeService.class).reloadCodeType(type);
   }
 
-  @SuppressWarnings("unchecked")
   public static List<ICodeType<?, ?>> reloadCodeTypes(Class<?>... types) {
-    if (types == null) {
-      return CollectionUtility.emptyArrayList();
-    }
-    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<Class<? extends ICodeType<?, ?>>>(types.length);
-    for (Class<?> t : types) {
-      if (ICodeType.class.isAssignableFrom(t)) {
-        typeList.add((Class<? extends ICodeType<?, ?>>) t);
-      }
-    }
+    List<Class<? extends ICodeType<?, ?>>> typeList = varargToList(types);
     return BEANS.get(ICodeService.class).reloadCodeTypes(typeList);
   }
 
   public static List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
     return BEANS.get(ICodeService.class).reloadCodeTypes(types);
+  }
+
+  public static void invalidateCodeType(Class<? extends ICodeType> type) {
+    BEANS.get(ICodeService.class).invalidateCodeType(type);
+  }
+
+  public static void invalidateCodeTypes(Class<?>... types) {
+    List<Class<? extends ICodeType<?, ?>>> typeList = varargToList(types);
+    BEANS.get(ICodeService.class).invalidateCodeTypes(typeList);
+  }
+
+  public static void invalidateCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
+    BEANS.get(ICodeService.class).invalidateCodeTypes(types);
+  }
+
+  /**
+   * Converts the given classes vararg into a {@link List}.
+   */
+  @SuppressWarnings("unchecked")
+  private static List<Class<? extends ICodeType<?, ?>>> varargToList(Class<?>... types) {
+    if (types == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    List<Class<? extends ICodeType<?, ?>>> typeList = new ArrayList<>(types.length);
+    for (Class<?> t : types) {
+      if (ICodeType.class.isAssignableFrom(t)) {
+        typeList.add((Class<? extends ICodeType<?, ?>>) t);
+      }
+    }
+    return typeList;
   }
 
   @SuppressWarnings("deprecation")
