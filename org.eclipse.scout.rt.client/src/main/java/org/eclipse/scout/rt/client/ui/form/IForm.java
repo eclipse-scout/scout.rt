@@ -305,9 +305,13 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter);
 
   /**
+   * this feature isn't supported in html ui<br>
+   * 
    * @return the {@link IFormField} that owns the focus AND is inside this form.<br>
    *         In order to get the global focus owner, use {@link IDesktop#getFocusOwner()}.
+   * @deprecated will be removed in o-release
    */
+  @Deprecated
   IFormField getFocusOwner();
 
   /**

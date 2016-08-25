@@ -806,7 +806,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     propertySupport.setPropertyString(PROP_LOGO_ID, id);
   }
 
+  /**
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
+   */
   @Override
+  @Deprecated
   public IFormField getFocusOwner() {
     return fireFindFocusOwner();
   }

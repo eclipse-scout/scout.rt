@@ -1295,9 +1295,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return m_wizardStep;
   }
 
+  /**
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
+   */
   @Override
-  public IFormField getFocusOwner() { // FIXME dwi: make this work with Html UI (blocking-condition, browser must send focused element in a separate request).
-    IFormField field = getDesktop().getFocusOwner();
+  @Deprecated
+  public IFormField getFocusOwner() {
+    IDesktop desktop = getDesktop();
+    if (desktop == null) {
+      return null;
+    }
+    IFormField field = desktop.getFocusOwner();
     if (field == null) {
       return null;
     }

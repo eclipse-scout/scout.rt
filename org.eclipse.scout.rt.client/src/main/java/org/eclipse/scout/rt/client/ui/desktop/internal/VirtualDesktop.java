@@ -438,7 +438,13 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  /**
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
+   */
   @Override
+  @Deprecated
   public IFormField getFocusOwner() {
     throw createUnsupportedOperationException();
   }
