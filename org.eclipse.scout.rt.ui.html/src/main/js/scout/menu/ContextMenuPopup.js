@@ -385,6 +385,15 @@ scout.ContextMenuPopup.prototype._remove = function() {
       this.session.unregisterAllAdapterClones(menu);
     }
   }
+
+  // ----- Helper functions -----
+
+  function unregisterAllAdapterClonesRec(menu) {
+    menu.children.slice().reverse().forEach(unregisterAllAdapterClonesRec, this);
+    if (this.session.hasClones(menu)) {
+      this.session.unregisterAllAdapterClones(menu);
+    }
+  }
 };
 
 /**
