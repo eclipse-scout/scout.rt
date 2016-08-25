@@ -188,7 +188,7 @@ scout.Action.prototype.doAction = function() {
   if (this.isToggleAction()) {
     this.setSelected(!this.selected);
   } else {
-    this.sendDoAction();
+    this._doAction();
   }
   return true;
 };
@@ -214,26 +214,8 @@ scout.Action.prototype.prepareDoAction = function() {
   return true;
 };
 
-scout.Action.prototype.sendDoAction = function() {
-  this.beforeSendDoAction();
-  this._send('doAction');
-  this.afterSendDoAction();
-};
-
-/**
- * Override this method to do something before 'doAction' is sent to the server.
- * The default impl. does nothing.
- */
-scout.Action.prototype.beforeSendDoAction = function() {
-  // NOP
-};
-
-/**
- * Override this method to do something after 'doAction' has been sent to the server.
- * The default impl. does nothing.
- */
-scout.Action.prototype.afterSendDoAction = function() {
-  // NOP
+scout.Action.prototype._doAction = function() {
+  this.trigger('doAction');
 };
 
 scout.Action.prototype.setSelected = function(selected) {

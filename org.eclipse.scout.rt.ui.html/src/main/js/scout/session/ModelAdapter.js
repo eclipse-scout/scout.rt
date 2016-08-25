@@ -253,17 +253,6 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
 };
 
 /**
- * This method is used to directly send an event triggered by a Widget to the server.
- * Use this method in your _onWidgetEvent code when it makes no sense to implement an
- * own _sendXxx method.
- *
- * @param widgetEvent
- */
-scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
-  this._send(widgetEvent.type, widgetEvent);
-};
-
-/**
  * Sends the given value as property event to the server.
  */
 scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
@@ -336,9 +325,7 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'propertyChange') {
     this._onWidgetPropertyChange(event);
   } else {
-    // FIXME CGU [6.1] temporary, until model adapter separation - anmerkung von AWE: eigentlich ist das kein schlechter
-    // default. Häufig gibt es events vom Widget, die man 1:1 an den server leiten will, ohne eine eigene _sendXxx Methode
-    // zu implementieren. Siehe: _sendWidgetEvent
+    // FIXME CGU [6.1] temporary, until model adapter separation
     if (event.sendToServer) {
       event = $.extend({}, event); // copy
       delete event.source;

@@ -14,11 +14,23 @@ scout.ActionAdapter = function() {
 };
 scout.inherits(scout.ActionAdapter, scout.ModelAdapter);
 
-scout.Action.prototype._goOffline = function() {
+scout.ActionAdapter.prototype._goOffline = function() {
   this._enabledBeforeOffline = this.widget.enabled;
   this.widget.setEnabled(false);
 };
 
-scout.Action.prototype._goOnline = function() {
+scout.ActionAdapter.prototype._goOnline = function() {
   this.widget.setEnabled(this._enabledBeforeOffline);
+};
+
+scout.ActionAdapter.prototype._onWidgetDoAction = function(event) {
+  this._send('doAction');
+};
+
+scout.ActionAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'doAction') {
+    this._onWidgetDoAction(event);
+  } else {
+    scout.ActionAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
 };

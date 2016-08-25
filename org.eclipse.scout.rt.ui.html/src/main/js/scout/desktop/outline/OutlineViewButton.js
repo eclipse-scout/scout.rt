@@ -15,10 +15,10 @@ scout.OutlineViewButton = function() {
 scout.inherits(scout.OutlineViewButton, scout.ViewButton);
 
 /**
- * Don't await server response to make it more responsive and offline capable.
- * @override Action.js
+ * @override
  */
-scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
+scout.OutlineViewButton.prototype._doAction = function() {
+  scout.OutlineViewButton.parent.prototype._doAction.call(this);
   if (this.outline) {
     this.session.desktop.bringOutlineToFront(this.outline);
   }

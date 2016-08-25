@@ -307,8 +307,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
       menu.parentMenu = parentMenu;
     }
     menu.render(this.$body);
-    menu.afterSendDoAction = this.close.bind(this);
-    menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
+    this._attachMenuListeners(menu);
     iconOffset = this._updateIconAndText(menu, iconOffset);
   }, this);
 
@@ -344,6 +343,17 @@ scout.ContextMenuPopup.prototype._updateIconAndText = function(menu, iconOffset)
     menu.$container.find('.text').css('padding-left', iconOffset - menu.$container.data('$icon').cssWidth());
   }
   return iconOffset;
+};
+
+scout.ContextMenuPopup.prototype._attachMenuListeners = function(menu) {
+  var menuItemDoActionHandler = this._onMenuItemDoAction.bind(this);
+  var menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
+  menu.on('doAction', menuItemDoActionHandler);
+  menu.on('propertyChange', menuItemPropertyChange);
+  this.one('remove', function() {
+    menu.off('doAction', menuItemDoActionHandler);
+    menu.off('propertyChange', menuItemPropertyChange);
+  });
 };
 
 scout.ContextMenuPopup.prototype._attachCloneMenuListeners = function(menu) {
@@ -415,6 +425,10 @@ scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, 
   if ($selectedItem.hasClass('selected')) {
     $selectedItem.nextAll(':visible').first().toggleClass('next-to-selected', true);
   }
+};
+
+scout.ContextMenuPopup.prototype._onMenuItemDoAction = function(event) {
+  this.close();
 };
 
 scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
