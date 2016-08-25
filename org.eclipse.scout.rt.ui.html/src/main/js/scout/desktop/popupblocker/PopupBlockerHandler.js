@@ -43,7 +43,7 @@ scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
     linkUrl = vararg;
   }
 
-  notification = scout.create('DesktopNotification.PopupBlocker', {
+  notification = scout.create('DesktopNotification:PopupBlocker', {
     parent: desktop,
     linkUrl: linkUrl
   });

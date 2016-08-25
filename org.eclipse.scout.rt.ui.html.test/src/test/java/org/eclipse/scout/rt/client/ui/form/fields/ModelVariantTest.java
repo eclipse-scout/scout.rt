@@ -10,19 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.junit.Test;
 
 public class ModelVariantTest {
 
   @ModelVariant("foo")
   static class A {
-
   }
 
   static class B extends A {
+  }
 
+  static class C {
   }
 
   /**
@@ -36,4 +39,16 @@ public class ModelVariantTest {
     assertTrue(b.getClass().isAnnotationPresent(ModelVariant.class));
   }
 
+  @Test
+  public void testObjectType() {
+    A a = new A();
+    B b = new B();
+    C c = new C();
+    String objectTypeA = JsonAdapterUtility.getObjectType("Test", a);
+    String objectTypeB = JsonAdapterUtility.getObjectType("Test", b);
+    String objectTypeC = JsonAdapterUtility.getObjectType("Test", c);
+    assertEquals("Test:foo", objectTypeA);
+    assertEquals("Test:foo", objectTypeB);
+    assertEquals("Test", objectTypeC);
+  }
 }

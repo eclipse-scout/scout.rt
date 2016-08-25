@@ -108,7 +108,7 @@ scout.defaultValues = {
     var objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     if (!objectTypeHierarchy) {
       // Remove model variant and try again
-      objectType = objectType.replace(/\..*/, '');
+      objectType = objectType.replace(new RegExp(scout.strings.quote(scout.ObjectFactory.MODEL_VARIANT_SEPARATOR) + '.*'), '');
       objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     }
     // FIXME [awe] 6.1 --> hier auf den parent gehen (rekursiv) bis wir einen objectType finden.

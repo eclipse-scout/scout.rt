@@ -3,7 +3,7 @@
     "FormField": {
       "enabled": true
     },
-    "TableField.Custom": {
+    "TableField:Custom": {
       "enabled": false,
       "borderDecoration": "auto"
     }

@@ -180,7 +180,7 @@ describe("scout.defaultValues", function() {
           "FormField": {
             "enabled": true
           },
-          "TableField.Custom": {
+          "TableField:Custom": {
             "enabled": false,
             "borderDecoration": "auto"
           }
@@ -205,12 +205,12 @@ describe("scout.defaultValues", function() {
         "borderDecoration": "auto"
       }, { // [2]
         "id": "3",
-        "objectType": "FormField.Custom",
+        "objectType": "FormField:Custom",
         "visible": true,
         "borderDecoration": "auto"
       }, { // [3]
         "id": "4",
-        "objectType": "TableField.Custom",
+        "objectType": "TableField:Custom",
         "enabled": true,
         "visible": true
       }];

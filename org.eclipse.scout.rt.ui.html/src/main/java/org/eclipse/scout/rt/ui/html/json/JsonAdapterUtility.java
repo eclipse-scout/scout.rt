@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONArray;
 
@@ -66,11 +67,11 @@ public final class JsonAdapterUtility {
   public static String getObjectType(String objectType, Object model) {
     if (model.getClass().isAnnotationPresent(ModelVariant.class)) {
       ModelVariant modelVariant = model.getClass().getAnnotation(ModelVariant.class);
-      return objectType + "." + modelVariant.value();
+      if (StringUtility.hasText(modelVariant.value())) {
+        return objectType + ModelVariant.SEPARATOR + modelVariant.value();
+      }
     }
-    else {
-      return objectType;
-    }
+    return objectType;
   }
 
   /**

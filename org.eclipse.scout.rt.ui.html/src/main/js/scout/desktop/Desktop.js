@@ -523,7 +523,7 @@ scout.Desktop.prototype.goOffline = function() {
     return;
   }
   this.offline = true;
-  this._offlineNotification = scout.create('DesktopNotification.Offline', {
+  this._offlineNotification = scout.create('DesktopNotification:Offline', {
     parent: this,
     closable: false,
     duration: scout.DesktopNotification.INFINITE,

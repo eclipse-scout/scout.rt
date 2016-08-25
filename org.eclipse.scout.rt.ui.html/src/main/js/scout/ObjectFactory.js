@@ -21,118 +21,177 @@ scout.ObjectFactory = function() {
   this._registry = {};
 };
 
+scout.ObjectFactory.NAMESPACE_SEPARATOR = ".";
+scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ":";
+
 /**
- * Creates the object using the given type, or if undefined the objectType of the model. Only the constructor is called, but not the init() method.<p>
+ * Creates an object from the given objectType. Only the constructor is called.
+ *
+ * OBJECT TYPE:
+ *
+ * An object type may consist of three parts: [name.space.]Class[:Variant]
+ * 1. Name spaces (optional)
+ *    All name space parts have to end with a dot ('.') character. If this part is omitted, the default
+ *    name space "scout." is assumed.
+ *    Examples: "scout.", "my.custom.namespace."
+ * 2. Scout class name (mandatory)
+ *    Examples: "Desktop", "Session", "StringField"
+ * 3. Model variant (optional)
+ *    Custom variants of a class can be created by adding the custom class prefix after
+ *    the Scout class name and a colon character (':'). This prefix is then combined with
+ *    the class name.
+ *    Examples: ":Offline", ":Horizontal"
+ *
+ * Full examples:
+ *   Object type: Outline                        -> Constructor: scout.Outline
+ *   Object type: myNamespace.Outline            -> Constructor: myNamespace.Outline
+ *   Object type: Outline:MyVariant              -> Constructor: scout.MyVariantOutline
+ *   Object type: myNamespace.Outline:MyVariant  -> Constructor: myNamespace.MyVariantOutline
+ *
+ * RESOLVING THE CONSTRUCTOR:
+ *
  * When scout.objectFactories contains a create function for the given objectType, this function is called.
- * Otherwise it tries to find the constructor function by the following logic:<br>
- * If the objectType provides a namespace, it is used. Otherwise it takes the default 'scout' namespace.
- * If the object type provides a variant, the variant is moved before the actual object type.
  *
- * Examples:
- * Object type is Outline -> constructor scout.Outline is called
- * Object type is myNamespace.Outline -> constructor myNamespace.Outline is called
- * Object type is Outline.MyVariant -> constructor scout.MyVariantOutline is called
- * Object type is myNamespace.Outline.MyVariant -> constructor myNamespace.MyVariantOutline is called
+ * Otherwise it tries to find the constructor function by the following logic:
+ * If the objectType provides a name space, it is used. Otherwise it takes the default "scout" name space.
+ * If the object type provides a variant ("Type:Variant"), the final object type is built by prepending
+ * the variant to the type ("VariantType"). If no such type can be found and the option "variantLenient"
+ * is set to true, a second attempt is made without the variant.
  *
- * @param model with property objectType
- * @param type optional, if defined will be used instead of model.objectType
+ * @param objectType (mandatory) String describing the type of the object to be created.
+ * @param options    (optional)  Options object, currently supporting the following two options:
+ *                               - model = Model object to be passed to the constructor or create function
+ *                               - variantLenient = Flag to allow a second attempt to resolve the class
+ *                                 without variant (see description above).
  */
-scout.ObjectFactory.prototype._createObjectByType = function(model, type) {
-  // check if requested objectType / variant is registered
-  var objectTypeParts, scoutClass, scoutObject,
-    variant = '',
-    namespaceName = '',
-    objectType = type || model.objectType,
-    createFunc = this._registry[objectType];
+scout.ObjectFactory.prototype._createObjectByType = function(objectType, options) {
+  if (typeof objectType !== 'string') {
+    throw new Error('missing or invalid object type');
+  }
+  options = options || {};
 
+  var scoutObject,
+    failMsgPrefix = 'Failed to create object for objectType "' + objectType + '": ';
+
+  var createFunc = this._registry[objectType];
   if (createFunc) {
-    // When a factory is registered for the given objectType
-    scoutObject = createFunc(model);
+    // 1.
+    // Use factory function registered for the given objectType
+    scoutObject = createFunc(options.model);
+    if (!scoutObject) {
+      throw new Error(failMsgPrefix + 'Factory function did not return a valid object');
+    }
   } else {
-    // When no factory is registered for the given objectType
-    objectTypeParts = objectType.split('.');
+    // 2.
+    // Resolve class by name
+    var namespaceParts = objectType.split(scout.ObjectFactory.NAMESPACE_SEPARATOR);
+    var namespaces = namespaceParts.slice(0, namespaceParts.length - 1);
+    var objectTypeParts = namespaceParts[namespaceParts.length - 1]
+      .split(scout.ObjectFactory.MODEL_VARIANT_SEPARATOR)
+      // Ensure max. two objectType parts (ignore multiple separators)
+      .slice(0, 2);
+    // Change "Type:Custom" to "CustomType"
+    var scoutClass = objectTypeParts.slice().reverse().join('');
 
-    var namespace = scout;
-
-    // Extract namespace
-    if (objectTypeParts.length >= 2 && window.hasOwnProperty(objectTypeParts[0])) {
-      // FIXME CGU [6.1] maybe it would be better to define the namespace in scout.App to avoid name clashes in the window object (if objectType is named after a var in window)
-      namespaceName = objectTypeParts[0];
-      namespace = window[namespaceName];
-      objectTypeParts = objectTypeParts.slice(1);
+    // Find name space
+    var namespace = scout; // <-- default
+    if (namespaces.length) {
+      namespace = window;
+      for (var i = 0; i < namespaces.length; i++) {
+        namespace = namespace[namespaces[i]];
+        if (!namespace) {
+          throw new Error(failMsgPrefix + 'Could not resolve namespace "' + namespaces[i] + '"');
+        }
+      }
     }
-
-    // Extract variant
-    variant = '';
-    if (objectTypeParts.length >= 2) {
-      variant = objectTypeParts[1]; // ignore the rest
+    if (!namespace[scoutClass]) {
+      if (options.variantLenient && objectTypeParts.length === 2) {
+        // Try without variant if variantLenient is true
+        return this._createObjectByType(namespaces.concat(objectTypeParts[0]).join(scout.ObjectFactory.NAMESPACE_SEPARATOR), options);
+      }
+      throw new Error(failMsgPrefix + 'Could not find "' + scoutClass + '" in namespace "' + namespaces.join('.') + '"');
     }
-
-    scoutClass = variant + objectTypeParts[0];
-    if (!namespace[scoutClass] && model.variantLenient && variant) {
-      delete model.variantLenient;
-
-      // Try without variant if variantLenient is true
-      return this._createObjectByType(model, namespaceName + '.' + objectTypeParts[0]);
-    }
-    try {
-      scoutObject = new namespace[scoutClass]();
-    } catch (e) {
-      // NOP - error handling below
-    }
+    scoutObject = new namespace[scoutClass](options.model);
   }
-
-  if (!scoutObject) {
-    throw new Error('Failed to create Scout object for objectType:' + objectType + '. Either file/class \'scout.' + objectType +
-      '\' does not exist, or no factory is registered to create an instance for the given objectType');
-  }
-
-  // Put object type used to create the object
-  scoutObject.objectType = objectType;
 
   return scoutObject;
 };
 
 /**
- * Creates and initializes a new Scout object. Depending on the type of the vararg parameter the method does this:
+ * Creates and initializes a new Scout object.
  *
- * <ul>
- * <li><code>string</code> objectType. The second parameter must provide the model. A lookup is performed to
- *     find the constructor function.</li>
- * <li><code>object</code> model object. The object must have a property 'objectType'. The second parameter is not
- *     required. A lookup is performed to find the constructor function.</li>
- * </ul>
+ * @param objectType A string with the requested objectType. This argument is optional, but if it
+ *                   is omitted, the argument "model" becomes mandatory and MUST contain a
+ *                   property named "objectType".
+ * @param model      The model object passed to the constructor function and to the init() method.
+ *                   This argument is mandatory.
+ * @param options    Options object, see table below. This argument is optional.
  *
- * When the provided model does not contain the property 'id', the property is set to a random, unqiue value
- * having the prefix 'ui'.
+ * An error is thrown if the argument list does not match this definition.
  *
- * The returned Scout object is initialized, by calling the init() function.
+ * List of options:
  *
- * Note: support to pass a constructor-function as vararg has been removed because we cannot determine the name of the
- * function at runtime (ECMA 6 Function.name is not supported by all browsers currently). Thus the objectType would be
- * missing and it makes no sense to pass an additional objectType when we already have the constructor.
+ * OPTION                   DEFAULT VALUE   DESCRIPTION
+ * ------------------------------------------------------------------------------------------------------
+ * variantLenient           false           Controls if the object factory may try to resolve the
+ *                                          scoutClass without the model variant part if the initial
+ *                                          objectType could not be resolved.
  *
- *  @param vararg string or object
- *  @param model (optional) must be set when vararg is a string
+ * initObject               true            If true, the init() method is called on the newly created
+ *                                          scoutObject (with the model as argument).
+ *
+ * ensureUniqueId           true            Controls if the resulting object should be assigned the
+ *                                          attribute "id" if it is not defined. If "initObject" is
+ *                                          true, this also happens on the given model object, to
+ *                                          allow the init() method to copy the attribute from the
+ *                                          model to the scoutObject.
+ *
+ * ensureObjectType         true            Controls if the resulting object should be assigned the
+ *                                          attribute "objectType" if it is not defined. If "initObject"
+ *                                          is true, this also happens on the given model object, to
+ *                                          allow the init() method to copy the attribute from the
+ *                                          model to the scoutObject.
  */
-scout.ObjectFactory.prototype.create = function(vararg, model) {
-  var scoutObject, objectType;
-  model = model || {};
-  if (typeof vararg === 'string') {
-    objectType = vararg;
-    scoutObject = this._createObjectByType(model, objectType);
-  } else if (typeof vararg === 'object') {
-    model = vararg;
-    scoutObject = this._createObjectByType(model);
+scout.ObjectFactory.prototype.create = function(objectType, model, options) {
+  // Normalize arguments
+  if (typeof objectType === 'string') {
+    options = options || {};
+    if (!model) {
+      throw new Error('Missing mandatory argument "model"');
+    }
+  } else if (scout.objects.isPlainObject(objectType)) {
+    options = model || {};
+    model = objectType;
+    if (!model.objectType) {
+      throw new Error('Missing mandatory property "objectType" on model');
+    }
+    objectType = model.objectType;
   } else {
-    throw new Error('parameter vararg must be an objectType string or an object having an objectType property');
+    throw new Error('Invalid arguments');
+  }
+  options.model = model;
+
+  // Create object
+  var scoutObject = this._createObjectByType(objectType, options);
+
+  // Initialize object
+  if (scout.nvl(options.initObject, true)) {
+    if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+      model.id = this.createUniqueId();
+    }
+    if (model.objectType === undefined && scout.nvl(options.ensureObjectType, true)) {
+      model.objectType = objectType;
+    }
+    scoutObject.init(model);
   }
 
-  if (model.id === undefined) {
-    model.id = this.createUniqueId();
+  if (scoutObject.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+    scoutObject.id = this.createUniqueId();
+  }
+  if (scoutObject.objectType === undefined && scout.nvl(options.ensureObjectType, true)) {
+    scoutObject.objectType = objectType;
   }
 
-  scoutObject.init(model);
   return scoutObject;
 };
 
@@ -165,7 +224,9 @@ scout.ObjectFactory.prototype.get = function(objectType) {
  */
 scout.ObjectFactory.prototype.init = function() {
   for (var objectType in scout.objectFactories) {
-    this.register(objectType, scout.objectFactories[objectType]);
+    if (scout.objectFactories.hasOwnProperty(objectType)) {
+      this.register(objectType, scout.objectFactories[objectType]);
+    }
   }
 };
 

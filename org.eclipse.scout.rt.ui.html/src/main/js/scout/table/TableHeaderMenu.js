@@ -672,7 +672,7 @@ scout.TableHeaderMenu.prototype._updateFilterTableActions = function() {
 };
 
 scout.TableHeaderMenu.prototype._renderFilterFields = function() {
-  this.filterFieldsGroupBox = scout.create('GroupBox.FilterFields', {
+  this.filterFieldsGroupBox = scout.create('GroupBox:FilterFields', {
     parent: this,
     column: this.column,
     filter: this.filter

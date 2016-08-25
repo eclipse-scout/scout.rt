@@ -16,14 +16,14 @@
     },
     {
       "id": "3",
-      "objectType": "FormField.Custom",
+      "objectType": "FormField:Custom",
       "enabled": true,
       "visible": true,
       "borderDecoration": "auto"
     },
     {
       "id": "4",
-      "objectType": "TableField.Custom",
+      "objectType": "TableField:Custom",
       "enabled": true,
       "visible": true,
       "borderDecoration": "auto"

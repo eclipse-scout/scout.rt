@@ -21,7 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
@@ -160,7 +162,7 @@ public class DefaultValuesFilter {
     List<String> objectTypeHierarchy = m_objectTypeHierarchyFlat.get(objectType);
     if (objectTypeHierarchy == null) {
       // Remove model variant and try again
-      objectType = objectType.replaceAll("\\..*", "");
+      objectType = objectType.replaceAll(Pattern.quote(ModelVariant.SEPARATOR) + ".*", "");
       objectTypeHierarchy = m_objectTypeHierarchyFlat.get(objectType);
     }
     if (objectTypeHierarchy == null) {
