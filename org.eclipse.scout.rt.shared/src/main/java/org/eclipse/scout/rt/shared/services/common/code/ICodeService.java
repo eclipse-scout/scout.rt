@@ -53,6 +53,20 @@ public interface ICodeService extends IService {
   List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types);
 
   /**
+   * Invalidates the given code type without reloading it immediately.
+   *
+   * @param type
+   */
+  <T extends ICodeType<?, ?>> void invalidateCodeType(Class<T> type);
+
+  /**
+   * Invalidates the given list of code types without reloading them immediately.
+   *
+   * @param type
+   */
+  void invalidateCodeTypes(List<Class<? extends ICodeType<?, ?>>> types);
+
+  /**
    * @return all code type classes
    */
   Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses();

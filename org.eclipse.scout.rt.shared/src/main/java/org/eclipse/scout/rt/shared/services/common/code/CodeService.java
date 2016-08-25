@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -142,8 +141,11 @@ public class CodeService implements ICodeService {
 
   @Override
   public List<ICodeType<?, ?>> getCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> codeTypeMap = getCodeTypeMap(types);
     List<ICodeType<?, ?>> result = new ArrayList<>();
+    if (CollectionUtility.isEmpty(types)) {
+      return result;
+    }
+    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> codeTypeMap = getCodeTypeMap(types);
     for (Class<? extends ICodeType<?, ?>> type : types) {
       result.add(codeTypeMap.get(type));
     }
@@ -234,21 +236,31 @@ public class CodeService implements ICodeService {
 
   @Override
   public <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type) {
-    if (type == null) {
-      return null;
-    }
-    getCache().invalidate(new CodeTypeCacheEntryFilter(resolveCodeTypeClass(type)), true);
+    invalidateCodeType(type);
     return getCodeType(type);
   }
 
   @Override
   public List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
+    invalidateCodeTypes(types);
+    return getCodeTypes(types);
+  }
+
+  @Override
+  public <T extends ICodeType<?, ?>> void invalidateCodeType(Class<T> type) {
+    if (type == null) {
+      return;
+    }
+    getCache().invalidate(new CodeTypeCacheEntryFilter(resolveCodeTypeClass(type)), true);
+  }
+
+  @Override
+  public void invalidateCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
     CodeTypeCacheEntryFilter filter = new CodeTypeCacheEntryFilter(resolveCodeTypeClasses(types));
     if (filter.getCodeTypeClasses().isEmpty()) {
-      return Collections.emptyList();
+      return;
     }
     getCache().invalidate(filter, true);
-    return getCodeTypes(types);
   }
 
   @Override
