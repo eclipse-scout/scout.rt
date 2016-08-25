@@ -108,9 +108,6 @@ scout.GroupBox.prototype._render = function($parent) {
     env = scout.HtmlEnvironment;
 
   this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
-  if (this.mainBox) {
-    this.htmlComp.layoutData = null;
-  }
 
   this.$title = this.$container.appendDiv('group-box-title');
   this.addLabel();
@@ -127,6 +124,9 @@ scout.GroupBox.prototype._render = function($parent) {
 
   this.controls.forEach(function(control) {
     control.render(this.$body);
+
+    // set each children layout data to logical grid data
+    control.setLayoutData(new scout.LogicalGridData(control));
   }, this);
 };
 

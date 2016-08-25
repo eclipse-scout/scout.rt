@@ -493,6 +493,16 @@ scout.Widget.prototype.revalidateLayoutTree = function() {
   this.htmlComp.revalidateLayoutTree();
 };
 
+scout.Widget.prototype.setLayoutData = function(layoutData) {
+  if (!this.rendered) {
+    return;
+  }
+  if (!this.htmlComp) {
+    throw new Error('Function expects a htmlComp property');
+  }
+  this.htmlComp.layoutData = layoutData;
+};
+
 //--- Event handling methods ---
 scout.Widget.prototype._createEventSupport = function() {
   return new scout.EventSupport();

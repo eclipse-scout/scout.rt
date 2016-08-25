@@ -56,6 +56,9 @@ scout.RadioButtonGroup.prototype._render = function($parent) {
 
   this.formFields.forEach(function(formField) {
     formField.render(this.$body);
+
+    // set each children layout data to logical grid data
+    formField.setLayoutData(new scout.LogicalGridData(formField));
   }, this);
 
   this.addLabel();

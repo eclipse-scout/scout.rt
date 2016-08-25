@@ -31,6 +31,9 @@ scout.SequenceBox.prototype._render = function($parent) {
     field.on('propertyChange', this._onFieldPropertyChange.bind(this));
     field.render(this.$field);
     this._modifyLabel(field);
+
+    // set each children layout data to logical grid data
+    field.setLayoutData(new scout.LogicalGridData(field));
   }
 };
 

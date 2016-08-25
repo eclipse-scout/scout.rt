@@ -40,15 +40,6 @@ scout.TabItem.prototype._renderCssClass = function() {
   this.$tabContainer.addClass(this.cssClass);
 };
 
-scout.TabItem.prototype._render = function($parent) {
-  scout.TabItem.parent.prototype._render.call(this, $parent);
-  // LogicalGridData.isValidateRoot would always return true which is wrong if the data has not been validated yet.
-  // Since the tabbox does not use the logical grid layout, noone validates the griddata -> isValidateRoot is never correct.
-  // Because there is no logical grid layout, there is no use for the logical grid data.
-  // TODO CGU [6.0] we should consider removing new scout.LogicalGridData(this) from addContainer and set it explicitly in the composites which use a logical grid layout
-  this.htmlComp.layoutData = null;
-};
-
 scout.TabItem.prototype._createLayout = function() {
   return new scout.TabItemLayout(this);
 };

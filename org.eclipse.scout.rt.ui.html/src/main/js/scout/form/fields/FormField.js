@@ -644,7 +644,7 @@ scout.FormField.prototype._onIconClick = function(event) {
 
 /**
  * Appends a DIV element as form-field container to $parent and sets the this.$container property.
- * Applies (logical) grid-data and FormFieldLayout to this.$container.
+ * Applies FormFieldLayout to this.$container (if container does not define another layout).
  * Sets this.htmlComp to the HtmlComponent created for this.$container.
  *
  * @param $parent to which container is appended
@@ -658,7 +658,6 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
     this.$container.addClass(cssClass);
   }
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   this.htmlComp = htmlComp;
 };
