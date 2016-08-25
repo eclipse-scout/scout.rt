@@ -29,10 +29,6 @@ scout.OutlineOverview.prototype._render = function($parent) {
   this.$content.appendDiv('outline-overview-title').text(this.outline.title);
 };
 
-scout.OutlineOverview.prototype.destroy = function() {
-  // nop
-};
-
 /**
  * @override Widget.js
  */

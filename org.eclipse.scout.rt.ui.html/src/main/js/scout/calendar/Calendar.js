@@ -122,7 +122,7 @@ scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
 };
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
-  this._setProperty('viewRange', new scout.DateRange(// FIXME [6.1] cgu ensure type
+  this._setProperty('viewRange', new scout.DateRange( // FIXME [6.1] cgu ensure type
     scout.dates.parseJsonDate(viewRange.from),
     scout.dates.parseJsonDate(viewRange.to)));
 };
@@ -204,7 +204,6 @@ scout.Calendar.prototype._renderProperties = function() {
   this._renderComponents();
   this._renderSelectedComponent();
   this._renderLoadInProgress();
-  this._renderMenus();
   this._renderDisplayMode();
   this._renderSelectedDate();
   this._renderViewRange();
@@ -242,10 +241,6 @@ scout.Calendar.prototype._renderDisplayMode = function() {
 
 scout.Calendar.prototype._renderSelectedDate = function() {
   $.log.debug('(Calendar#_renderSelectedDate) impl.');
-};
-
-scout.Calendar.prototype._renderMenus = function() {
-  // NOP
 };
 
 scout.Calendar.prototype._removeMenus = function() {

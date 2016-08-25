@@ -499,6 +499,23 @@ describe('Widget', function() {
       });
     });
 
+    it('calls the _render* method if there is one for this property', function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+
+      // Must not fail, render is optional
+      widget.setProperty('foo', 'xyz');
+
+      // Add render method and set property again
+      widget._renderFoo = function() {
+        this.$container.text(this.foo);
+      };
+      widget.setProperty('foo', 'bar');
+      expect(widget.$container.text()).toBe('bar');
+    });
+
   });
 
 });

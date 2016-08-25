@@ -27,10 +27,6 @@ scout.ValueField.prototype._renderDisplayText = function() {
   this.$field.val(this.displayText);
 };
 
-scout.ValueField.prototype._renderCurrentMenuTypes = function() {
-  // nop
-};
-
 scout.ValueField.prototype._readDisplayText = function() {
   return this.$field.val();
 };

@@ -349,10 +349,6 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
   this.updateDetailContent();
 };
 
-scout.Outline.prototype._renderDefaultDetailForm = function() {
-  // nop
-};
-
 scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
   if (this.defaultDetailForm) {
@@ -427,10 +423,6 @@ scout.Outline.prototype._removeNavigateButtonsForDetailTable = function(node) {
     }
   });
   node.detailTable.setStaticMenus(staticMenus);
-};
-
-scout.Outline.prototype._renderNavigateButtonsVisible = function() {
-  // nop
 };
 
 /**

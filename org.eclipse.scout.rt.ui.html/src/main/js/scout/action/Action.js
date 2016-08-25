@@ -159,11 +159,6 @@ scout.Action.prototype._renderCssClass = function() {
   this.$container.addClass(this.cssClass);
 };
 
-
-scout.Action.prototype._renderToggleAction = function() {
-  // nop
-};
-
 scout.Action.prototype._renderCompact = function() {
   this.$container.toggleClass('compact', this.compact);
   this.invalidateLayoutTree();

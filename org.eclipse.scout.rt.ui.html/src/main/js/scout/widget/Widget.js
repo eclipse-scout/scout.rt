@@ -694,7 +694,7 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
  * 2. DOM removal: If the widget is rendered and there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called. Otherwise the default remove function _removeProperty is called.
  * 3. Model update: If there is a custom sync function (e.g. _syncXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
- * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called.
+ * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
  */
 scout.Widget.prototype.setProperty = function(propertyName, value) {
   if (scout.objects.equals(this[propertyName], value)) {
@@ -786,8 +786,8 @@ scout.Widget.prototype._callSetProperty = function(propertyName, value) {
 
 scout.Widget.prototype._callRenderProperty = function(propertyName) {
   var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(propertyName);
-  if (!this[renderFuncName]) { // FIXME [6.1] cgu remove this error and remove every empty render function
-    throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
+  if (!this[renderFuncName]) {
+    return;
   }
   this[renderFuncName]();
 };

@@ -81,10 +81,6 @@ scout.TabBox.prototype._remove = function() {
   this._removeTabContent();
 };
 
-scout.TabBox.prototype._renderSelectedTab = function() {
-  // NOP - already handled by _syncSelectedTab
-};
-
 scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
@@ -210,10 +206,6 @@ scout.TabBox.prototype._syncMenus = function(menus) {
     // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
     this._updateMenuBar(menus);
   }
-};
-
-scout.TabBox.prototype._renderMenus = function() {
-  // NOP
 };
 
 scout.TabBox.prototype._removeMenus = function() {

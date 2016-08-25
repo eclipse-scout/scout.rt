@@ -352,9 +352,6 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
   for (var propertyName in newProperties) {
     var value = newProperties[propertyName];
 
-    // FIXME [awe] 6.1 - review with C.GU
-    // Call the _sync* function on the adapter or setter on the widget, the _sync impl.
-    // should call the setProperty method on the widget
     var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
     if (this[syncFuncName]) {
       this[syncFuncName](value);

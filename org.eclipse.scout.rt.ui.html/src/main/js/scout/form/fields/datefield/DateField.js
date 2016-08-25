@@ -88,9 +88,6 @@ scout.DateField.prototype._renderProperties = function() {
   this._renderHasDate();
   this._renderHasTime();
   this._renderDateFormatPattern();
-  this._renderTimeFormatPattern();
-  this._renderTimestamp();
-  this._renderAutoTimestamp();
 
   // Has to be the last call, otherwise _renderErrorStatus() would operate on the wrong state.
   scout.DateField.parent.prototype._renderProperties.call(this);
@@ -209,10 +206,6 @@ scout.DateField.prototype._syncTimeFormatPattern = function(timeFormatPattern) {
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
 };
 
-scout.DateField.prototype._renderTimeFormatPattern = function() {
-  // nop
-};
-
 /**
  * @override BasicField.js
  */
@@ -284,14 +277,6 @@ scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
   } else {
     this._setProperty('allowedDates', null);
   }
-};
-
-scout.DateField.prototype._renderTimestamp = function() {
-  // nop
-};
-
-scout.DateField.prototype._renderAutoTimestamp = function() {
-  // nop
 };
 
 scout.DateField.prototype._renderAllowedDates = function() {

@@ -14,10 +14,6 @@ scout.OutlineViewButton = function() {
 };
 scout.inherits(scout.OutlineViewButton, scout.ViewButton);
 
-scout.OutlineViewButton.prototype._renderOutline = function(outline) {
-  // NOP
-};
-
 /**
  * Don't await server response to make it more responsive and offline capable.
  * @override Action.js

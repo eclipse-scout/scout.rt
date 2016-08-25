@@ -1077,10 +1077,6 @@ scout.Planner.prototype._updateMenuBar = function() {
   this.menuBar.setMenuItems(menuItems);
 };
 
-scout.Planner.prototype._renderMenus = function() {
-  // NOP
-};
-
 scout.Planner.prototype._removeMenus = function() {
   // menubar takes care about removal
 };

@@ -121,7 +121,7 @@ describe('ModelAdapter', function() {
     expect(widget.o2.id).toBe('4');
   });
 
-  it('_syncPropertiesOnPropertyChange calls set* methods or _setProperty method', function() {
+  it('_syncPropertiesOnPropertyChange calls set* methods or setProperty method', function() {
     var widget = createWidget({
       foo: 1,
       bar: 2});
@@ -140,32 +140,6 @@ describe('ModelAdapter', function() {
     expect(widget.bar).toBe(7);
     expect(widget.setFoo).toHaveBeenCalled(); // for property 'foo'
     expect(widget.setProperty).toHaveBeenCalled(); // for property 'bar'
-  });
-
-  describe('_renderPropertiesOnPropertyChange', function() {
-
-    it('for non-adapter property -> expects a _render* method', function() {
-      var widget = createWidget();
-      var $div = $('<div>');
-      widget.render($sandbox);
-      widget._renderFoo = function() {
-        $div.text(this.foo);
-      };
-      widget.remoteAdapter._syncPropertiesOnPropertyChange({
-        foo: 'bar'
-      });
-      expect($div.text()).toBe('bar');
-    });
-
-    it('for non-adapter property -> throw when _render* method does not exist', function() {
-      var widget = createWidget();
-      var adapter = widget.remoteAdapter;
-      widget.render($sandbox);
-      expect(adapter._syncPropertiesOnPropertyChange.bind(adapter, {
-        foo: 'bar'
-      })).toThrow();
-    });
-
   });
 
   describe('init', function() {

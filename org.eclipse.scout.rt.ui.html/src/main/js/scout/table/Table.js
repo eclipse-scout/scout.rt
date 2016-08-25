@@ -292,7 +292,6 @@ scout.Table.prototype._renderProperties = function() {
   scout.Table.parent.prototype._renderProperties.call(this);
   this._renderTableHeader();
   this._renderFooterVisible();
-  this._renderMenus();
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderLoading();
@@ -322,18 +321,6 @@ scout.Table.prototype._renderTableControls = function() {
   if (this.footer) {
     this.footer._renderControls();
   }
-};
-
-scout.Table.prototype._renderSortEnabled = function() {
-  // nop
-};
-
-scout.Table.prototype._renderUiSortPossible = function() {
-  // nop
-};
-
-scout.Table.prototype._renderColumnAddable = function() {
-  // nop
 };
 
 scout.Table.prototype._syncTableControls = function(controls) {
@@ -471,10 +458,6 @@ scout.Table.prototype._onDataScroll = function() {
   }
   this._renderViewport();
   this.scrollTop = scrollTop;
-};
-
-scout.Table.prototype._renderTableStatusVisible = function() {
-  // nop
 };
 
 scout.Table.prototype._renderTableStatus = function() {
@@ -1444,10 +1427,6 @@ scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, e
 scout.Table.prototype.setStaticMenus = function(staticMenus) {
   this._setProperty('staticMenus', staticMenus);
   this._updateMenuBar();
-};
-
-scout.Table.prototype._renderMenus = function() {
-  // NOP
 };
 
 scout.Table.prototype._removeMenus = function() {
@@ -3201,18 +3180,6 @@ scout.Table.prototype._renderEnabled = function() {
       $row.find('input').setEnabled(enabled && row.enabled);
     });
   }
-};
-
-scout.Table.prototype._renderMultiSelect = function() {
-  // nop
-};
-
-scout.Table.prototype._renderMultiCheck = function() {
-  // nop
-};
-
-scout.Table.prototype._renderMultilineText = function() {
-  // nop
 };
 
 scout.Table.prototype._renderAutoResizeColumns = function() {

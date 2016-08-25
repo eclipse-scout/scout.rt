@@ -168,10 +168,6 @@ scout.MessageBox.prototype._renderHiddenText = function(text) {
   }
 };
 
-scout.MessageBox.prototype._renderCopyPasteText = function(text) {
-  // nop
-};
-
 scout.MessageBox.prototype._onButtonClick = function(event, option) {
   this._send('action', {
     option: option

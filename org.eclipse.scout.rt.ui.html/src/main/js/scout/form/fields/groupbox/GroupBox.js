@@ -381,10 +381,6 @@ scout.GroupBox.prototype._updateMenuBar = function() {
   this.menuBar.setMenuItems(menus);
 };
 
-scout.GroupBox.prototype._renderMenus = function() {
-  // NOP
-};
-
 scout.GroupBox.prototype._removeMenus = function() {
   // menubar takes care about removal
 };

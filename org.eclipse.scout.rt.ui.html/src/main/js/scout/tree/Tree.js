@@ -343,7 +343,6 @@ scout.Tree.prototype._remove = function() {
 
 scout.Tree.prototype._renderProperties = function() {
   scout.Tree.parent.prototype._renderProperties.call(this);
-  this._renderMenus();
   this._renderDropType();
 };
 
@@ -905,10 +904,6 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
     .toggleClass('checked', node.checked);
 };
 
-scout.Tree.prototype._renderMenus = function() {
-  // NOP
-};
-
 scout.Tree.prototype._removeMenus = function() {
   // menubar takes care about removal
 };
@@ -936,14 +931,6 @@ scout.Tree.prototype._renderEnabled = function() {
         .toggleClass('disabled', !(enabled && node.enabled));
     });
   }
-};
-
-scout.Tree.prototype._renderTitle = function() {
-  // NOP
-};
-
-scout.Tree.prototype._renderAutoCheckChildren = function() {
-  // NOP
 };
 
 scout.Tree.prototype._renderCheckable = function() {
@@ -976,10 +963,6 @@ scout.Tree.prototype._renderCheckable = function() {
 
   // Start recursion
   this.nodes.filter(isNodeRendered).forEach(updateCheckableStateRec);
-};
-
-scout.Tree.prototype._renderMultiCheck = function() {
-  // NOP
 };
 
 scout.Tree.prototype._renderDisplayStyle = function() {
