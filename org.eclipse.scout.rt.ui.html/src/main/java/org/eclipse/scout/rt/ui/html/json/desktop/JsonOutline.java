@@ -79,7 +79,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
+        return JsonAdapterPropertyConfigBuilder.globalConfig();
       }
     });
   }
