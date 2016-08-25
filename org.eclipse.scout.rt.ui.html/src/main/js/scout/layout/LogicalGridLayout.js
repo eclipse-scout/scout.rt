@@ -40,19 +40,18 @@ scout.LogicalGridLayout.prototype.invalidate = function() {
 };
 
 scout.LogicalGridLayout.prototype.validateLayout = function($container) {
-  var visibleComps = [], visibleCons = [], i, cons,
-    $children = $container.children('.form-field');
+  var visibleComps = [], visibleCons = [], cons;
 
-  for (i = 0; i < $children.length; i++) {
-    var $comp = $children.eq(i);
-    var htmlComp = scout.HtmlComponent.get($comp);
-    if ($comp.isVisible()) {
+  $container.children().each(function (idx, elem) {
+    var $comp = $(elem);
+    var htmlComp = scout.HtmlComponent.optGet($comp);
+    if (htmlComp && $comp.isVisible()) {
       visibleComps.push($comp);
       cons = htmlComp.layoutData;
       cons.validate();
       visibleCons.push(cons);
     }
-  }
+  });
   this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap);
   $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
