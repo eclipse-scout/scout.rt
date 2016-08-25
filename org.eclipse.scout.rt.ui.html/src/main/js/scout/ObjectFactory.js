@@ -124,7 +124,8 @@ scout.ObjectFactory.prototype._createObjectByType = function(objectType, options
  *                   is omitted, the argument "model" becomes mandatory and MUST contain a
  *                   property named "objectType".
  * @param model      The model object passed to the constructor function and to the init() method.
- *                   This argument is mandatory.
+ *                   This argument is mandatory if it is the first argument, otherwise it is
+ *                   optional (see above).
  * @param options    Options object, see table below. This argument is optional.
  *
  * An error is thrown if the argument list does not match this definition.
@@ -156,9 +157,6 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
   // Normalize arguments
   if (typeof objectType === 'string') {
     options = options || {};
-    if (!model) {
-      throw new Error('Missing mandatory argument "model"');
-    }
   } else if (scout.objects.isPlainObject(objectType)) {
     options = model || {};
     model = objectType;
@@ -174,14 +172,16 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
   // Create object
   var scoutObject = this._createObjectByType(objectType, options);
 
-  // Initialize object
   if (scout.nvl(options.initObject, true)) {
-    if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
-      model.id = this.createUniqueId();
+    if (model) {
+      if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+        model.id = this.createUniqueId();
+      }
+      if (model.objectType === undefined && scout.nvl(options.ensureObjectType, true)) {
+        model.objectType = objectType;
+      }
     }
-    if (model.objectType === undefined && scout.nvl(options.ensureObjectType, true)) {
-      model.objectType = objectType;
-    }
+    // Initialize object
     scoutObject.init(model);
   }
 

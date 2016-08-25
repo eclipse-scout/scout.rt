@@ -1,5 +1,4 @@
-scout.App = function() {
-
+scout.App = function() { //
 };
 
 /**
@@ -77,10 +76,13 @@ scout.App.prototype._init = function(options) {
 };
 
 scout.App.prototype._createSession = function($entryPoint, options) {
-  options.locale = options.locale || new scout.Locale(scout.locales.get('de-CH'));  //FIXME CGU wo soll die locale definiert werden? Initial vom browser auslesen?
-  var session = new scout.Session($entryPoint, options);
+  options.locale = options.locale || new scout.Locale(scout.locales.get('de-CH')); //FIXME CGU wo soll die locale definiert werden? Initial vom browser auslesen?
+  options.$entryPoint = $entryPoint;
+  var session = scout.create('Session', options, {
+    ensureUniqueId: false
+  });
 
-  // FIXME improve this, init must not be executed because it currently does a server request
+  // FIXME improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
   parent.session = session;
   session.desktop = scout.create('Desktop', {

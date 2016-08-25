@@ -439,9 +439,9 @@ describe("TableAdapter", function() {
       adapter._sendRowsFiltered(['1','2']); // should create a remove event, because number of rows is equals to the length of rowIds
       adapter._sendRowsFiltered(['1']); // should create an 'add' event
       adapter._sendRowsFiltered(['2']); // should be coalesced with previous add event
-      expect(session._asyncEvents.length).toBe(2);
-      expect(session._asyncEvents[0].remove).toBe(true);
-      expect(session._asyncEvents[1].remove).toBe(undefined);
+      expect(session.asyncEvents.length).toBe(2);
+      expect(session.asyncEvents[0].remove).toBe(true);
+      expect(session.asyncEvents[1].remove).toBe(undefined);
     });
 
   });

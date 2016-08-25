@@ -8,6 +8,64 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+scout.Session = function() {
+  this.$entryPoint;
+  this.partId = 0;
+
+  this.url = new scout.URL();
+  this.userAgent = new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
+  this.locale;
+  this.textMap = new scout.TextMap();
+
+  this.ready = false; // true after desktop has been completely rendered
+  this.unloading = false; // true when 'beforeOnload' event has been triggered
+  this.unloaded = false; // true after unload event has been received from the window
+  this.loggedOut = false;
+  this.inspector = false;
+  this.desktop;
+  this.layoutValidator = new scout.LayoutValidator();
+  this.detachHelper = new scout.DetachHelper(this);
+  this.focusManager;
+  this.keyStrokeManager;
+
+  // TODO [6.1] BSH/CGU/AWE: Split in "RemoteSession" and "???" (maybe move to App)
+  this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
+  this.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+  this.forceNewClientSession = false;
+  this.remote = false;
+  this.remoteUrl = 'json';
+  this.modelAdapterRegistry = {};
+  this.ajaxRequests = [];
+  this.asyncEvents = [];
+  this.responseQueue = new scout.ResponseQueue(this);
+  this.requestsPendingCounter = 0;
+  this.suppressErrors = false;
+  this.requestTimeoutCancel = 5000; // ms
+  this.requestTimeoutPoll = 75000; // ms
+  this.requestTimeoutPing = 5000; // ms
+  this.backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(true);
+
+  this._adapterDataCache = {};
+  this._busyCounter = 0; // >0 = busy
+  this._busyIndicator;
+  this._busyIndicatorTimeoutId;
+  this._deferred;
+  this._fatalMessagesOnScreen = {};
+
+  // FIXME [awe] 6.1 - rename in RootAdapter, should also have a widget, see FIXME in Session#_processEvents
+  this.rootAdapter = new scout.ModelAdapter();
+  this.rootAdapter.init({
+    session: this,
+    id: '1',
+    objectType: 'GlobalAdapter'
+  });
+  this.rootAdapter.createWidget({
+    session: this,
+    id: '1',
+    objectType: 'NullWidget'
+  }, new scout.NullWidget());
+};
+
 /**
  * $entryPoint is required to create a new session.
  *
@@ -36,71 +94,33 @@
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
  */
-scout.Session = function($entryPoint, options) {
-  options = options || {};
+scout.Session.prototype.init = function(model) {
+  var options = model || {};
 
-  // Prepare clientSessionId
-  var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
-
-  this.scoutUrl = new scout.URL();
-  if (this.scoutUrl.getParameter('forceNewClientSession') || options.forceNewClientSession) {
-    clientSessionId = null;
-    this._forceNewClientSession = true;
+  if (!options.$entryPoint) {
+    throw new Error('$entryPoint is not defined');
   }
-
-  // Set members
-  this.$entryPoint = $entryPoint;
-  this.uiSessionId; // assigned by server on session init (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
-  this.partId = scout.nvl(options.portletPartId, 0);
-  this.clientSessionId = clientSessionId;
-  this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
-  this.suppressErrors = scout.nvl(options.suppressErrors, false);
-  this.modelAdapterRegistry = {};
-  this.locale = options.locale;
-  if (this.locale) {
-    this._texts = scout.texts.get(this.locale.languageTag);
+  this.$entryPoint = options.$entryPoint;
+  this.partId = scout.nvl(options.portletPartId, this.partId);
+  this.forceNewClientSession = (this.url.getParameter('forceNewClientSession') || options.forceNewClientSession);
+  if (this.forceNewClientSession) {
+    this.clientSessionId = null;
   } else {
-    this._texts = new scout.TextMap();
+    this.clientSessionId = scout.nvl(options.clientSessionId, this.clientSessionId);
   }
-  this.ajaxRequests = [];
-  this._asyncEvents = [];
-  this.responseQueue = new scout.ResponseQueue(this);
-  this._deferred;
-  this.requestTimeoutCancel = 5000; // ms
-  this.requestTimeoutPoll = 75000; // ms
-  this.requestTimeoutPing = 5000; // ms
-  this.ready = false; // true after desktop has been completely rendered
-  this.unloading = false; // true when 'beforeOnload' event has been triggered
-  this.unloaded = false; // true after unload event has been received from the window
-  this.desktop;
-  this.url = 'json';
-  this._adapterDataCache = {};
-  this._requestsPendingCounter = 0;
-  this._busyCounter = 0; // >0 = busy
-  this.layoutValidator = new scout.LayoutValidator();
-  this.detachHelper = new scout.DetachHelper(this);
-  this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.nvl(options.backgroundJobPollingEnabled, true));
-  this._fatalMessagesOnScreen = {};
-  this._loggedOut = false;
-  this.inspector = false;
-
+  this.userAgent = scout.nvl(options.userAgent, this.userAgent);
+  this.suppressErrors = scout.nvl(options.suppressErrors, this.suppressErrors);
+  if (options.locale) {
+    this.locale = options.locale;
+    this.textMap = scout.texts.get(this.locale.languageTag);
+  }
   // FIXME CGU [6.1] flag necessary for modeladapter, remove it
-  this.remote = options.remote;
+  this.remote = scout.nvl(options.remote, this.remote);
+  if (options.backgroundJobPollingEnabled === false) {
+    this.backgroundJobPollingSupport.enabled = false;
+  }
 
-  // FIXME [awe] 6.1 - rename in RootAdapter, should also have a widget, see FIXME in Session#_processEvents
-  this.rootAdapter = new scout.ModelAdapter();
-  this.rootAdapter.init({
-    session: this,
-    id: '1',
-    objectType: 'GlobalAdapter'
-  });
-  this.rootAdapter.createWidget({
-    session: this,
-    id: '1',
-    objectType: 'NullWidget'
-  }, new scout.NullWidget());
-
-  // Install focus management for this session.
+  // Install focus management for this session (cannot be created in constructor, because this.$entryPoint is required)
   this.focusManager = new scout.FocusManager({
     session: this,
     active: options.focusManagerActive
@@ -183,8 +203,8 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
 scout.Session.prototype.sendEvent = function(event, delay) {
   delay = delay || 0;
 
-  this._asyncEvents = this._coalesceEvents(this._asyncEvents, event);
-  this._asyncEvents.push(event);
+  this.asyncEvents = this._coalesceEvents(this.asyncEvents, event);
+  this.asyncEvents.push(event);
   // Use the specified delay, except another event is already scheduled. In that case, use the minimal delay.
   // This ensures that an event with a long delay doesn't hold back another event with a short delay.
   this._asyncDelay = Math.min(delay, scout.nvl(this._asyncDelay, delay));
@@ -238,14 +258,13 @@ scout.Session.prototype._sendStartupRequest = function() {
  * Extracts session startup parameters from URL: query string parameters and the URL itself with key 'url'
  */
 scout.Session.prototype._createSessionStartupParams = function() {
-  var params = {};
-  params.url = this.scoutUrl.baseUrlRaw;
-
-  var urlParameterMap = this.scoutUrl.parameterMap;
+  var params = {
+    url: this.url.baseUrlRaw
+  };
+  var urlParameterMap = this.url.parameterMap;
   for (var prop in urlParameterMap) {
     params[prop] = urlParameterMap[prop];
   }
-
   return params;
 };
 
@@ -352,13 +371,13 @@ scout.Session.prototype._sendUnloadRequest = function() {
 };
 
 scout.Session.prototype._sendNow = function() {
-  if (this._asyncEvents.length === 0) {
+  if (this.asyncEvents.length === 0) {
     // Nothing to send -> return
     return;
   }
   var request = {
     uiSessionId: this.uiSessionId,
-    events: this._asyncEvents
+    events: this.asyncEvents
   };
   // Busy indicator required when at least one event requests it
   request.showBusyIndicator = request.events.some(function(event) {
@@ -367,7 +386,7 @@ scout.Session.prototype._sendNow = function() {
   this.responseQueue.prepareRequest(request);
   // Send request
   this._sendRequest(request);
-  this._asyncEvents = [];
+  this.asyncEvents = [];
 };
 
 scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
@@ -401,7 +420,7 @@ scout.Session.prototype._sendRequest = function(request) {
     var msg = new Blob([this._requestToJson(request)], {
       type: 'application/json; charset=UTF-8'
     });
-    navigator.sendBeacon(this._decorateUrl(this.url, request), msg);
+    navigator.sendBeacon(this._decorateUrl(this.remoteUrl, request), msg);
     return;
   }
 
@@ -442,7 +461,7 @@ scout.Session.prototype._handleSendWhenOffline = function(request) {
 
 scout.Session.prototype.defaultAjaxOptions = function(request) {
   request = request || {};
-  var url = this._decorateUrl(this.url, request);
+  var url = this._decorateUrl(this.remoteUrl, request);
 
   var ajaxOptions = {
     async: true,
@@ -506,7 +525,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   if (busyHandling) {
     this.setBusy(true);
   }
-  this._requestsPendingCounter++;
+  this.requestsPendingCounter++;
 
   var jsError = null,
     success = false;
@@ -545,7 +564,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.unregisterAjaxRequest(xhr);
-    this._requestsPendingCounter--;
+    this.requestsPendingCounter--;
     this.layoutValidator.validate();
 
     // "success" is false when either
@@ -590,19 +609,12 @@ scout.Session.prototype.unregisterAjaxRequest = function(xhr) {
 };
 
 /**
- * Enable / disable background job polling.
- */
-scout.Session.prototype.enableBackgroundJobPolling = function(enabled) {
-  this._backgroundJobPollingSupport.enabled(enabled);
-};
-
-/**
  * (Re-)starts background job polling when not started yet or when an error occurred while polling.
  * In the latter case, polling is resumed when a user-initiated request has been successful.
  */
 scout.Session.prototype._resumeBackgroundJobPolling = function() {
-  if (this._backgroundJobPollingSupport.enabled() && this._backgroundJobPollingSupport.status() !== scout.BackgroundJobPollingStatus.RUNNING) {
-    $.log.info('Resume background jobs polling request, status was=' + this._backgroundJobPollingSupport.status());
+  if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== scout.BackgroundJobPollingStatus.RUNNING) {
+    $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
     this._pollForBackgroundJobs();
   }
 };
@@ -620,7 +632,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
   };
   this.responseQueue.prepareRequest(request);
 
-  this._backgroundJobPollingSupport.setRunning();
+  this.backgroundJobPollingSupport.setRunning();
 
   var ajaxOptions = this.defaultAjaxOptions(request);
 
@@ -638,7 +650,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       // when the next user-initiated request succeeds, we re-enable polling
       // otherwise the polling would ping the server to death in case of an error
       $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
-      this._backgroundJobPollingSupport.setFailed();
+      this.backgroundJobPollingSupport.setFailed();
       if (this.areRequestsPending()) {
         // Add response to queue, handle later by _performUserAjaxRequest()
         this.responseQueue.add(data);
@@ -650,7 +662,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       $.log.warn('Session terminated, stopped polling for background jobs');
       // If were are not yet logged out, redirect to the logout URL (the session that initiated the
       // session invalidation will receive a dedicated logout event, redirect is handled there).
-      if (!this._loggedOut && data.redirectUrl) {
+      if (!this.loggedOut && data.redirectUrl) {
         this.logout(data.redirectUrl);
       }
     } else {
@@ -667,7 +679,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
   }
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
-    this._backgroundJobPollingSupport.setFailed();
+    this.backgroundJobPollingSupport.setFailed();
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
 
@@ -807,7 +819,7 @@ scout.Session.prototype._fireRequestFinished = function(message) {
       this._deferredEventTypes.push(message.events[i].type);
     }
   }
-  if (this._requestsPendingCounter === 0) {
+  if (this.requestsPendingCounter === 0) {
     this._deferred.resolve(this._deferredEventTypes);
     this._deferred = null;
     this._deferredEventTypes = null;
@@ -887,8 +899,8 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
   if (totalSize > maxTotalSize) {
     var boxOptions = {
-      header: this._texts.get('ui.FileSizeLimitTitle'),
-      body: this._texts.get('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),
+      header: this.text('ui.FileSizeLimitTitle'),
+      body: this.text('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),
       yesButtonText: this.optText('Ok', 'Ok')
     };
 
@@ -986,11 +998,11 @@ scout.Session.prototype.listen = function() {
 };
 
 scout.Session.prototype.areEventsQueued = function() {
-  return this._asyncEvents.length > 0;
+  return this.asyncEvents.length > 0;
 };
 
 scout.Session.prototype.areBusyIndicatedEventsQueued = function() {
-  return this._asyncEvents.some(function(event) {
+  return this.asyncEvents.some(function(event) {
     return scout.nvl(event.showBusyIndicator, true);
   });
 };
@@ -1000,7 +1012,7 @@ scout.Session.prototype.areResponsesQueued = function() {
 };
 
 scout.Session.prototype.areRequestsPending = function() {
-  return this._requestsPendingCounter > 0;
+  return this.requestsPendingCounter > 0;
 };
 
 scout.Session.prototype.setBusy = function(busy) {
@@ -1145,8 +1157,8 @@ scout.Session.prototype._processEvents = function(events) {
   this.currentEvent = null;
 };
 
-scout.Session.prototype.init = function() {
-  $.log.info('Session initializing...');
+scout.Session.prototype.start = function() {
+  $.log.info('Session starting...');
 
   // After a short time, display a loading animation (will be removed again in _renderDesktop)
   this._setApplicationLoading(true);
@@ -1182,7 +1194,7 @@ scout.Session.prototype._onLocaleChanged = function(event) {
 
 scout.Session.prototype._putLocaleData = function(locale, textMap) {
   this.locale = new scout.Locale(locale);
-  this._texts = new scout.TextMap(textMap);
+  this.textMap = new scout.TextMap(textMap);
   // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 };
 
@@ -1197,17 +1209,18 @@ scout.Session.prototype._onLogout = function(event) {
 };
 
 scout.Session.prototype.logout = function(logoutUrl) {
-  this._loggedOut = true;
-  if (this._forceNewClientSession) {
+  this.loggedOut = true;
+  // TODO [6.1] BSH Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
+  if (this.forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
     // remember current url to not lose query parameters
-  try {
-    sessionStorage.setItem('scout:loginUrl', window.location.href);
-  } catch (err) {
-    // ignore errors (e.g. this can happen in "private mode" on Safari)
-    $.log.error('Error while storing "scout:loginUrl" in sessionStorage: ' + err);
-  }
+    try {
+      sessionStorage.setItem('scout:loginUrl', window.location.href);
+    } catch (err) {
+      // ignore errors (e.g. this can happen in "private mode" on Safari)
+      $.log.error('Error while storing "scout:loginUrl" in sessionStorage: ' + err);
+    }
     // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
     setTimeout(function() {
       scout.reloadPage({
@@ -1257,8 +1270,8 @@ scout.Session.prototype._onWindowUnload = function() {
   }
 
   // Destroy UI session on server (only when the server did not not initiate the logout,
-  // otherwise the UI session would already be dispoed)
-  if (!this._loggedOut) {
+  // otherwise the UI session would already be disposed)
+  if (!this.loggedOut) {
     this._sendUnloadRequest();
   }
 };
@@ -1280,13 +1293,13 @@ scout.Session.prototype.getAdapterData = function(id) {
 };
 
 scout.Session.prototype.text = function(textKey) {
-  return scout.TextMap.prototype.get.apply(this._texts, arguments);
+  return scout.TextMap.prototype.get.apply(this.textMap, arguments);
 };
 
 scout.Session.prototype.optText = function(textKey, defaultValue) {
-  return scout.TextMap.prototype.optGet.apply(this._texts, arguments);
+  return scout.TextMap.prototype.optGet.apply(this.textMap, arguments);
 };
 
 scout.Session.prototype.textExists = function(textKey) {
-  return this._texts.exists(textKey);
+  return this.textMap.exists(textKey);
 };

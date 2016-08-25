@@ -23,7 +23,6 @@ describe('Widget', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.init();
 
     widget = new TestWidget();
     parent = new TestWidget();

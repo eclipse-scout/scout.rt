@@ -1,5 +1,4 @@
-scout.RemoteApp = function() {
-
+scout.RemoteApp = function() { //
 };
 scout.inherits(scout.RemoteApp, scout.App);
 
@@ -18,8 +17,11 @@ scout.RemoteApp.prototype._doBootstrap = function(options) {
 scout.RemoteApp.prototype._createSession = function($entryPoint, options) {
   options = options || {};
   options.remote = true;
-  var session = new scout.Session($entryPoint, options);
-  session.init();
+  options.$entryPoint = $entryPoint;
+  var session = scout.create('Session', options, {
+    ensureUniqueId: false
+  });
+  session.start();
   return session;
 };
 
@@ -42,7 +44,7 @@ scout.RemoteApp.modifyWidgetPrototype = function() {
 
     // Remote case
     var remoteAdapter = findRemoteAdapter(this);
-    if (remoteAdapter) {                                  // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
+    if (remoteAdapter) { // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
       return this.session.getOrCreateWidget(value, this); // value is a String, contains (remote) object ID
     }
 

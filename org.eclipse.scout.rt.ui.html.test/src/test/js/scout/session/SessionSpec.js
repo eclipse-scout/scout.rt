@@ -210,7 +210,7 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(true);
-      expect(session._asyncEvents[0].type).toBe('nodeClicked');
+      expect(session.asyncEvents[0].type).toBe('nodeClicked');
 
       // receive response for nodeSelected -> request for nodeClicked gets sent
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
@@ -249,14 +249,14 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(true);
-      expect(session._asyncEvents[0].type).toBe('nodeClicked');
+      expect(session.asyncEvents[0].type).toBe('nodeClicked');
 
       // receive response for nodeSelected -> request for nodeClicked does not get sent because it should be sent delayed
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(true);
-      expect(session._asyncEvents[0].type).toBe('nodeClicked');
+      expect(session.asyncEvents[0].type).toBe('nodeClicked');
 
       // trigger sending of second request
       jasmine.clock().tick(300);
@@ -274,14 +274,14 @@ describe('Session', function() {
 
     it('queues ?poll results when user requests are pending', function() {
       var session = createSession();
-      session.enableBackgroundJobPolling(true);
+      session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
 
       // Start ?poll request
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -290,7 +290,7 @@ describe('Session', function() {
       send(session, 1, 'nodeSelected');
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(2);
-      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true); // <--
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -298,7 +298,7 @@ describe('Session', function() {
       // Send response for ?poll request (response must be queued)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
       jasmine.clock().tick(0);
-      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(true); // <--
@@ -307,7 +307,7 @@ describe('Session', function() {
       // Send response for user request (must be executed, including the queued response)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
       jasmine.clock().tick(0);
-      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false); // <--
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false); // <--
@@ -319,8 +319,8 @@ describe('Session', function() {
 
     it('sends startup parameter', function() {
       var session = createSession();
+      session.start();
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
@@ -337,8 +337,8 @@ describe('Session', function() {
 
     it('sends user agent on startup', function() {
       var session = createSession(new scout.UserAgent(scout.Device.Type.MOBILE));
+      session.start();
 
-      session.init();
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
@@ -362,7 +362,7 @@ describe('Session', function() {
 
     beforeEach(function() {
       session = createSession();
-      session._texts = new scout.TextMap({
+      session.textMap = new scout.TextMap({
         NoOptions: 'Keine Übereinstimmung',
         NumOptions: '{0} Optionen',
         Greeting: 'Hello {0}, my name is {2}, {1}.',

@@ -18,22 +18,23 @@ function mostRecentJsonRequest() {
 }
 
 function sandboxSession(options) {
-  var session,
-    $sandbox = $('#sandbox');
+  var $sandbox = $('#sandbox').addClass('scout');
 
-  $sandbox.addClass('scout');
   options = options || {};
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
   options.remote = true; // required so adapters will be registered in the adapter registry
+  options.$entryPoint = $sandbox;
 
   // Since most of the tests are written to simulate RemoteApp behavior we must run
   // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
   scout.RemoteApp.modifyWidgetPrototype();
 
-  session = new scout.Session($sandbox, options);
+  var session = scout.create('scout.Session', options, {
+    ensureUniqueId: false
+  });
 
   // Install non-filtering requestToJson() function. This is required to test
   // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
@@ -112,7 +113,7 @@ function receiveResponseForAjaxCall(request, response) {
 }
 
 /**
- * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.init()
+ * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.start()
  */
 function uninstallUnloadHandlers(session) {
   $(window)

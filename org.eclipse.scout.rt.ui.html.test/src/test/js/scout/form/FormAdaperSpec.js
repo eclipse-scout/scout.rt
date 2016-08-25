@@ -17,7 +17,6 @@ describe('FormAdapter', function() {
     jasmine.Ajax.install();
     jasmine.clock().install();
     session = sandboxSession();
-    session.init();
     helper = new scout.FormSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
