@@ -82,6 +82,7 @@ scout.Session = function($entryPoint, options) {
   this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.nvl(options.backgroundJobPollingEnabled, true));
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
+  this.inspector = false;
 
   // FIXME CGU [6.1] flag necessary for modeladapter, remove it
   this.remote = options.remote;
@@ -276,6 +277,11 @@ scout.Session.prototype._processStartupResponse = function(data) {
   if (data.startupData.reloadPage) {
     scout.reloadPage();
     return;
+  }
+
+  // Enable inspector mode if required
+  if (data.startupData.inspector) {
+    this.inspector = true;
   }
 
   // Register UI session

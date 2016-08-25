@@ -125,23 +125,6 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   this._widgetListener = null;
 };
 
-// FIXME [6.1] cgu move to widget? still needed?
-scout.ModelAdapter.prototype._renderInternal = function($parent) {
-  scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
-  this._renderUniqueId();
-};
-
-scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
-  if (typeof qualifier !== 'string' && $target === undefined) {
-    $target = qualifier;
-    qualifier = undefined;
-  }
-  $target = $target || this.$container;
-  if ($target && !$target.attr('id')) { // don't overwrite
-    $target.attr('id', this.uniqueId(qualifier));
-  }
-};
-
 scout.ModelAdapter.prototype.goOffline = function() {
   this.widget.children.forEach(function(child) {
     if (!child.rendered) {
@@ -176,29 +159,6 @@ scout.ModelAdapter.prototype.goOnline = function() {
 
 scout.ModelAdapter.prototype._goOnline = function() {
   // NOP may be implemented by subclasses
-};
-
-/**
- * Returns a unique identifier for the modelAdapter, consisting of the object type,
- * the session's partId and the adapter ID. An optional qualifier argument allows
- * generation of multiple unique IDs per adapter.
- *
- * The return value is suitable for use in the HTML 'id' attribute.
- *
- * @see http://www.w3.org/TR/html5/dom.html#the-id-attribute
- */
-scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
-  var s = 'scout.';
-  if (!this.objectType && qualifier) {
-    s += qualifier;
-  } else {
-    s += scout.nvl(this.objectType, 'NO_TYPE');
-    if (qualifier) {
-      s += '@' + qualifier;
-    }
-  }
-  s += '[' + this.session.partId + '-' + scout.nvl(this.id, 'NO_ID') + ']';
-  return s.replace(/\s/g, '');
 };
 
 scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {

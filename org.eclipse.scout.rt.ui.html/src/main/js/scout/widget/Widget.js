@@ -159,7 +159,10 @@ scout.Widget.prototype.render = function($parent) {
     throw new Error('Widget is destroyed: ' + this);
   }
   this.rendering = true;
-  this._renderInternal($parent);
+  this.$parent = $parent;
+  this._render($parent);
+  this._renderProperties();
+  this._renderInspectorInfo();
   this._linkWithDOM();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendering = false;
@@ -167,14 +170,6 @@ scout.Widget.prototype.render = function($parent) {
   this.attached = true;
   this.trigger('render');
   this._postRender();
-};
-
-// Currently only necessary for ModelAdapter
-scout.Widget.prototype._renderInternal = function($parent) {
-  this.$parent = $parent;
-  this._render($parent);
-  this._renderProperties();
-  scout.inspector.applyInfo(this);
 };
 
 /**
@@ -288,6 +283,13 @@ scout.Widget.prototype._removeAnimated = function() {
       this._removeInternal();
     }.bind(this));
   }.bind(this));
+};
+
+scout.Widget.prototype._renderInspectorInfo = function() {
+  if (!this.session.inspector) {
+    return;
+  }
+  scout.inspector.applyInfo(this);
 };
 
 /**

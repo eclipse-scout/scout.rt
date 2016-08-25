@@ -86,7 +86,6 @@ scout.FormField.prototype._createKeyStrokeContext = function() {
 
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
-//  this.refFieldId = this.uniqueId('ref'); // FIXME [6.1] CGU move to widget or form field adapter? still needed?
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);

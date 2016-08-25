@@ -46,17 +46,10 @@ scout.BrowserField.prototype._render = function($parent) {
 
   this._postMessageListener = this._onPostMessage.bind(this);
   this.myWindow.addEventListener('message', this._postMessageListener);
-};
-
-/**
- * @override Widget.js
- */
-scout.BrowserField.prototype._renderInternal = function(parent) {
-  scout.BrowserField.parent.prototype._renderInternal.call(this, parent);
 
   if (this.enabled) {
     // use setTimeout to call method, because _openPopupWindow must be called after layouting
-    window.setTimeout(this._openPopupWindow.bind(this, true), 20);
+    setTimeout(this._openPopupWindow.bind(this, true), 20);
   }
 };
 

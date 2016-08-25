@@ -111,7 +111,9 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
       .on('mousedown', this._onHeaderItemMousedown.bind(this));
   }
 
-  scout.inspector.applyInfo(column, $header);
+  if (this.session.inspector) {
+    scout.inspector.applyInfo(column, $header);
+  }
 
   if (isFirstColumn) {
     $header.addClass('first');

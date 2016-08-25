@@ -23,6 +23,7 @@ scout.inspector = {
     if (!$container) {
       return;
     }
+    $container.toggleAttr('data-id', !!model.id, model.id);
     $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
     $container.toggleAttr('data-classid', !!model.classId, model.classId);
   }

@@ -255,7 +255,9 @@ scout.Outline.prototype._linkNodeWithRow = function(row) {
  */
 scout.Outline.prototype._decorateNode = function(node) {
   scout.Outline.parent.prototype._decorateNode.call(this, node);
-  scout.inspector.applyInfo(node, node.$node);
+  if (this.session.inspector) {
+    scout.inspector.applyInfo(node, node.$node);
+  }
 };
 
 scout.Outline.prototype._createNavigateButtons = function(node, staticMenus) {

@@ -94,7 +94,6 @@ scout.Desktop.prototype._render = function($parent) {
   this.$container.addClass('desktop');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-  scout.inspector.applyInfo(this, this.$container);
 
   // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
   this.$overlaySeparator = this.$container.appendDiv('overlay-separator').setVisible(false);

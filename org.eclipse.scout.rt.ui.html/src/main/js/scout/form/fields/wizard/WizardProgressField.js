@@ -85,8 +85,8 @@ scout.WizardProgressField.prototype._renderSteps = function() {
     this._updateStepClasses(step);
 
     // Inspector info
-    scout.inspector.applyInfo(step, $step);
-    if (step.classId) { // true if inspector hints are enabled
+    if (this.session.inspector) {
+      scout.inspector.applyInfo(step, $step);
       $step.attr('data-step-index', step.index);
     }
 

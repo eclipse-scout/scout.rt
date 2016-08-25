@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -240,6 +241,8 @@ public class UiSession implements IUiSession {
       // Fill startupData with everything that is needed to start the session on the UI
       putInitializationStartupData(jsonClientSessionAdapter.getId());
 
+      putUrlHintsStartupData();
+
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
     finally {
@@ -420,6 +423,13 @@ public class UiSession implements IUiSession {
     startupData.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
     startupData.put("clientSession", clientSessionAdapterId);
     putLocaleData(startupData, BEANS.get(UiJobs.class).awaitAndGet(future));
+  }
+
+  protected void putUrlHintsStartupData() {
+    final JSONObject startupData = m_currentJsonResponse.getStartupData();
+    if (UrlHints.isInspectorHint(currentHttpRequest())) {
+      startupData.put("inspector", true);
+    }
   }
 
   @Override
