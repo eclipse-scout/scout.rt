@@ -21,7 +21,6 @@ scout.scrollbars = {
    */
 
   _$scrollables: {},
-  _scrollableOptions: {},
 
   getScrollables: function(session) {
     // return scrollables for given session
@@ -47,26 +46,7 @@ scout.scrollbars = {
     } else {
       this._$scrollables[session] = [$container];
     }
-    this.removeScrollableOptions($container);
     $.log.debug('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
-  },
-
-  pushScrollableOptions: function($container, options) {
-    if (this._scrollableOptions[$container]) {
-      this._scrollableOptions[$container].push(options);
-    } else {
-      this._scrollableOptions[$container] = [options];
-    }
-  },
-
-  getScrollableOptions: function($container) {
-    return this._scrollableOptions[$container];
-  },
-
-  removeScrollableOptions: function($container) {
-    if (this._scrollableOptions[$container]) {
-      delete this._scrollableOptions[$container];
-    }
   },
 
   removeScrollable: function(session, $container) {
@@ -112,7 +92,6 @@ scout.scrollbars = {
     }
     $container.data('scrollable', true);
     this.pushScrollable(session, $container);
-    this.pushScrollableOptions($container, options);
     return $container;
 
     function installNativeScrollbars() {
