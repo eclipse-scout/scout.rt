@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
@@ -21,15 +22,17 @@ import org.json.JSONObject;
 public class JsonCell implements IJsonObject {
   private final ICell m_cell;
   private final String m_cellText;
+  private final IJsonAdapter<?> m_parentAdapter;
   private Object m_cellValue;
 
-  public JsonCell(ICell cell) {
-    this(cell, null);
+  public JsonCell(ICell cell, IJsonAdapter<?> parentAdapter) {
+    this(cell, parentAdapter, null);
   }
 
-  public JsonCell(ICell cell, ICellValueReader cellValueReader) {
+  public JsonCell(ICell cell, IJsonAdapter<?> parentAdapter, ICellValueReader cellValueReader) {
     m_cell = cell;
     m_cellText = cell.getText();
+    m_parentAdapter = parentAdapter;
     if (cellValueReader != null) {
       m_cellValue = cellValueReader.read();
     }
@@ -54,7 +57,14 @@ public class JsonCell implements IJsonObject {
     }
     JSONObject json = new JSONObject();
     json.put("value", m_cellValue);
-    json.put("text", m_cellText);
+    if (getCell().isHtmlEnabled()) {
+      String cellText = BinaryResourceUrlUtility.replaceIconIdHandlerWithUrl(m_cellText);
+      cellText = BinaryResourceUrlUtility.replaceBinaryResourceHandlerWithUrl(m_parentAdapter, cellText);
+      json.put("text", cellText);
+    }
+    else {
+      json.put("text", m_cellText);
+    }
     json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     json.put("tooltipText", m_cell.getTooltipText());
     if (m_cell.getErrorStatus() != null && m_cell.getErrorStatus().getSeverity() == IStatus.ERROR) {

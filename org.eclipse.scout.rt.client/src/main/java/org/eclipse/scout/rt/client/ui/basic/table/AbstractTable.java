@@ -98,6 +98,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -154,6 +155,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
   private ITableUIFacade m_uiFacade;
   private final List<ITableRowFilter> m_rowFilters;
+  private final Map<String, BinaryResource> m_attachments;
   private String m_userPreferenceContext;
   // batch mutation
   private boolean m_autoDiscardOnDelete;
@@ -200,6 +202,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_deletedRows = new HashMap<CompositeObject, ITableRow>();
     m_keyStrokeBuffer = new KeyStrokeBuffer(500L);
     m_rowFilters = new ArrayList<ITableRowFilter>(1);
+    m_attachments = new HashMap<>(0);
     m_initLock = new OptimisticLock();
     m_actionRunning = false;
     m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this);
@@ -1173,6 +1176,30 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       finally {
         m_actionRunning = false;
       }
+    }
+  }
+
+  @Override
+  public void addAttachment(BinaryResource attachment) {
+    if (attachment != null) {
+      m_attachments.put(attachment.getFilename(), attachment);
+    }
+  }
+
+  @Override
+  public Set<BinaryResource> getAttachments() {
+    return CollectionUtility.hashSet(m_attachments.values());
+  }
+
+  @Override
+  public BinaryResource getAttachment(String filename) {
+    return m_attachments.get(filename);
+  }
+
+  @Override
+  public void removeAttachment(BinaryResource attachment) {
+    if (attachment != null) {
+      m_attachments.remove(attachment);
     }
   }
 

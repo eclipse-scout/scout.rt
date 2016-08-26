@@ -15,7 +15,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -40,7 +42,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
 
   private IHtmlFieldUIFacade m_uiFacade;
-  private Set<BinaryResource> m_attachments;
+  private Map<String, BinaryResource> m_attachments;
 
   public AbstractHtmlField() {
     this(true);
@@ -135,12 +137,28 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   @Override
   public Set<BinaryResource> getAttachments() {
-    return CollectionUtility.hashSet(m_attachments);
+    return CollectionUtility.hashSet(m_attachments.values());
+  }
+
+  @Override
+  public BinaryResource getAttachment(String filename) {
+    return m_attachments.get(filename);
   }
 
   @Override
   public void setAttachments(Collection<? extends BinaryResource> attachments) {
-    m_attachments = CollectionUtility.<BinaryResource> hashSetWithoutNullElements(attachments);
+    if (attachments == null) {
+      m_attachments = new HashMap<>(0);
+    }
+    else {
+      HashMap<String, BinaryResource> newMap = new HashMap<>(attachments.size());
+      for (BinaryResource attachment : attachments) {
+        if (attachment != null) {
+          newMap.put(attachment.getFilename(), attachment);
+        }
+      }
+      m_attachments = newMap;
+    }
   }
 
   @Override

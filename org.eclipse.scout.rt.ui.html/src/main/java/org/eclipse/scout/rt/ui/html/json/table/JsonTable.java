@@ -67,14 +67,16 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBu
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableUserFilter;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
+public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner, IBinaryResourceConsumer, IBinaryResourceProvider {
   private static final Logger LOG = LoggerFactory.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
@@ -818,7 +820,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     ICell cell = row.getCell(column);
     JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
     ICellValueReader reader = new TableCellValueReader(jsonColumn, cell);
-    return new JsonCell(cell, reader).toJsonOrString();
+    return new JsonCell(cell, this, reader).toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {
@@ -830,6 +832,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       jsonColumns.put(json);
     }
     return jsonColumns;
+  }
+
+  @Override
+  public BinaryResourceHolder provideBinaryResource(String filename) {
+    BinaryResource att = getModel().getAttachment(filename);
+    if (att != null) {
+      return new BinaryResourceHolder(att);
+    }
+    return null;
   }
 
   /**

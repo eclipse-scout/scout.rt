@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.planner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
@@ -23,9 +24,11 @@ public class JsonResource implements IJsonObject {
   private Resource<?> m_resource;
   private final IIdProvider<Resource<?>> m_resourceIdProvider;
   private final IIdProvider<Activity<?, ?>> m_cellIdProvider;
+  private final IJsonAdapter<?> m_parentAdapter;
 
-  public JsonResource(Resource resource, IIdProvider<Resource<?>> resourceIdProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
+  public JsonResource(Resource resource, IJsonAdapter<?> parentAdapter, IIdProvider<Resource<?>> resourceIdProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
     m_resource = resource;
+    m_parentAdapter = parentAdapter;
     m_resourceIdProvider = resourceIdProvider;
     m_cellIdProvider = cellIdProvider;
   }
@@ -34,7 +37,7 @@ public class JsonResource implements IJsonObject {
   public Object toJson() {
     JSONObject jsonRow = new JSONObject();
     jsonRow.put("id", m_resourceIdProvider.getId(m_resource));
-    jsonRow.put("resourceCell", new JsonCell(m_resource.getCell()).toJson());
+    jsonRow.put("resourceCell", new JsonCell(m_resource.getCell(), m_parentAdapter).toJson());
     jsonRow.put("activities", cellsToJson());
     JsonObjectUtility.filterDefaultValues(jsonRow, "Resource");
     return jsonRow;

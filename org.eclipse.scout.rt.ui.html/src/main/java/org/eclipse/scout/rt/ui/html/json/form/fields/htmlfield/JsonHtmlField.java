@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
-import java.util.Set;
-
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -97,11 +94,9 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    Set<BinaryResource> attachments = getModel().getAttachments();
-    for (BinaryResource att : attachments) {
-      if (CompareUtility.equals(filename, att.getFilename())) {
-        return new BinaryResourceHolder(att);
-      }
+    BinaryResource att = getModel().getAttachment(filename);
+    if (att != null) {
+      return new BinaryResourceHolder(att);
     }
     return null;
   }

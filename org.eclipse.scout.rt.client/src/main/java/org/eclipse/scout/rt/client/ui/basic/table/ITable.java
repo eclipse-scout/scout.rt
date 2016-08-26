@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
@@ -33,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -209,6 +211,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * filters to the table.
    */
   void applyRowFilters();
+
+  Set<BinaryResource> getAttachments();
+
+  BinaryResource getAttachment(String filename);
+
+  void addAttachment(BinaryResource attachment);
+
+  void removeAttachment(BinaryResource attachment);
 
   String getTitle();
 

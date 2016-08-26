@@ -355,7 +355,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   protected void handleModelResourcesInserted(List<? extends Resource> resources) {
     JSONArray jsonResources = new JSONArray();
     for (Resource resource : resources) {
-      Object jsonResource = new JsonResource(resource, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
+      Object jsonResource = new JsonResource(resource, this, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
       jsonResources.put(jsonResource);
     }
     if (jsonResources.length() == 0) {
@@ -516,11 +516,11 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   protected Object resourceToJson(Resource resource) {
-    return new JsonResource(resource, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
+    return new JsonResource(resource, this, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
   }
 
   protected Object resourceToJson(Resource resource, IIdProvider<Resource<?>> idProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
-    return new JsonResource(resource, idProvider, cellIdProvider).toJson();
+    return new JsonResource(resource, this, idProvider, cellIdProvider).toJson();
   }
 
   protected JSONArray resourceIdsToJson(List<? extends Resource> resources, IIdProvider<Resource<?>> idProvider) {
