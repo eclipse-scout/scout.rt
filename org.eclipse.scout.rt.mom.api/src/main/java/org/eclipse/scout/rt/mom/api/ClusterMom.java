@@ -54,7 +54,7 @@ public class ClusterMom extends AbstractMomDelegate implements IMom {
    * Example to work with a JMS based implementor.
    *
    * <pre>
-   * scout.clustermom.implementor = org.eclipse.scout.rt.mom.api.jms.JmsMom
+   * scout.mom.cluster.implementor = org.eclipse.scout.rt.mom.api.jms.JmsMom
    * </pre>
    */
   public static class ClusterMomImplementorProperty extends AbstractClassConfigProperty<IMom> {
@@ -71,8 +71,8 @@ public class ClusterMom extends AbstractMomDelegate implements IMom {
    * Example to connect to ActiveMQ broker via <code>JmsMom</code>.
    *
    * <pre>
-   * scout.clustermom.implementor = org.eclipse.scout.rt.mom.api.jms.JmsMom
-   * scout.clustermom.environment=(java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
+   * scout.mom.cluster.implementor = org.eclipse.scout.rt.mom.api.jms.JmsMom
+   * scout.mom.cluster.environment=(java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
    *                              (java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\
    *                              (connectionFactoryNames)->ClusterMom\
    *                              (x-scout.naming.mom.factory.connection)->ClusterMom
