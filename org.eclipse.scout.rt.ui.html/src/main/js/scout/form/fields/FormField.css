@@ -10,7 +10,6 @@
  ******************************************************************************/
 .form-field {
   border-spacing: 0;
-  position: absolute;
 
   & > label {
     position: absolute;

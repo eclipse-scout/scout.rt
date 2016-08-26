@@ -174,6 +174,9 @@ scout.HtmlComponent.prototype.isValidateRoot = function() {
  */
 scout.HtmlComponent.prototype.setLayout = function(layout) {
   this.layout = layout;
+  if (layout.cssClass) {
+    this.$comp.addClass(layout.cssClass);
+  }
 };
 
 /**

@@ -13,6 +13,7 @@
  */
 scout.LogicalGridLayout = function(hgap, vgap) {
   scout.LogicalGridLayout.parent.call(this);
+  this.cssClass = 'logical-grid-layout';
   this.validityBasedOnContainerSize = new scout.Dimension();
   this.valid = false;
   this.m_info;
