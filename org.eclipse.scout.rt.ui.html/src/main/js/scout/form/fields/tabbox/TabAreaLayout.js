@@ -158,7 +158,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
     });
     menu.on('doAction', function(event) {
       $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
-      tabBox._selectTab(tabItem);
+      tabBox._syncSelectedTab(tabItem);
         popup.one('remove', function(event){
           tabItem.session.focusManager.requestFocus(tabItem.$tabContainer);
       });

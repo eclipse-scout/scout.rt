@@ -68,6 +68,11 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String PROP_CONTEXT_MENU = "contextMenu";
 
+  /**
+   * Only implemented for groupboxes inside a tabbox.
+   */
+  String PROP_SELECTION_KEYSTROKE = "selectionKeystroke";
+
   /*
    * Runtime
    */
@@ -176,6 +181,10 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   boolean isExpanded();
 
   void setExpanded(boolean b);
+
+  String getSelectionKeyStroke();
+
+  void setSelectionKeyStroke(String keystroke);
 
   IGroupBoxUIFacade getUIFacade();
 

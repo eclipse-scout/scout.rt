@@ -109,7 +109,7 @@ public class FileChooserFieldTest {
 
         @Override
         protected String getConfiguredLabel() {
-          return "&choose an image";
+          return "choose an image";
         }
       }
     }
@@ -125,7 +125,7 @@ public class FileChooserFieldTest {
 
   @Test
   public void testLabel() {
-    Assert.assertEquals("&choose an image", m_form.getFileChooserField().getLabel());
+    Assert.assertEquals("choose an image", m_form.getFileChooserField().getLabel());
   }
 
   @Test

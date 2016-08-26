@@ -195,6 +195,13 @@ scout.GroupBox.prototype._prepareFields = function() {
         this.controls.push(field);
         this._registerButtonKeyStrokes(field);
       }
+    } else if (field instanceof scout.TabBox) {
+      this.controls.push(field);
+      for (var k = 0; k < field.tabItems.length; k++) {
+        if (field.tabItems[k].selectionKeystroke) {
+          this.keyStrokeContext.registerKeyStroke(new scout.TabItemKeyStroke(field.tabItems[k].selectionKeystroke, field.tabItems[k]));
+        }
+      }
     } else {
       this.controls.push(field);
     }

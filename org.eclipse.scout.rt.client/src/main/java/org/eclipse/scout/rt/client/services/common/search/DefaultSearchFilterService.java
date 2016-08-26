@@ -100,7 +100,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
       AbstractRadioButtonGroup<?> valueField = (AbstractRadioButtonGroup<?>) field;
       if (valueField.getValue() != null) {
         IButton selectedButton = valueField.getSelectedButton();
-        search.addDisplayText(label + "=" + (selectedButton != null ? ("" + selectedButton.getLabel()).replace("&", "") : ""));
+        search.addDisplayText(label + "=" + (selectedButton != null ? selectedButton.getLabel() : ""));
       }
       return;
     }
