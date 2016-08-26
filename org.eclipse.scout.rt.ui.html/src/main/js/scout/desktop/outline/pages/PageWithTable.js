@@ -24,6 +24,10 @@ scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
   return childPage;
 };
 
+/**
+ * Override this method to return a specific Page instance for the given table-row.
+ * The default impl. returns null, which means a AutoLeaftPageWithNodes instance will be created for the table-row.
+ */
 scout.PageWithTable.prototype.createChildPage = function(tableRow) {
   return null;
 };
@@ -40,15 +44,14 @@ scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
  */
 scout.PageWithTable.prototype.loadChildren = function() {
   return this.loadTableData()
-  .done(function() {
-    var childPage, childNodes = [];
-    this.detailTable.rows.forEach(function(row) {
-      childPage = this._createChildPageInternal(row);
-      if (childPage !== null) {
-        childNodes.push(childPage);
-      }
-    }, this);
-    this.childNodes = childNodes;
-
-  }.bind(this));
+    .done(function() {
+      var childPage, childNodes = [];
+      this.detailTable.rows.forEach(function(row) {
+        childPage = this._createChildPageInternal(row);
+        if (childPage !== null) {
+          childNodes.push(childPage);
+        }
+      }, this);
+      this.getOutline().insertNodes(childNodes, this);
+    }.bind(this));
 };

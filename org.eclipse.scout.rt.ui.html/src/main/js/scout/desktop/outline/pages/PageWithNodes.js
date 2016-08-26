@@ -44,7 +44,7 @@ scout.PageWithNodes.prototype._onDetailTableRowAction = function(event) {
  */
 scout.PageWithNodes.prototype._loadTableData = function() {
   var i = 0, row, rows = [],
-    deferred = $.Deferred();
+    deferred = $.Deferred(); // FIXME [awe] 6.1 - use $.resolvedDeferred here (it's a sync OP)
   this.childNodes.forEach(function(node) {
     // we add an additional property 'node' to the table-row. This way, we
     // don't need an additional map to link the table-row with the tree-node
@@ -64,5 +64,17 @@ scout.PageWithNodes.prototype._loadTableData = function() {
  * @override TreeNode.js
  */
 scout.PageWithNodes.prototype.loadChildren = function() {
+  var childPages = this._createChildPages();
+  if (childPages.length > 0) {
+    scout.arrays.pushAll(this.childNodes, childPages); // FIXME [awe] 6.1 - shouldn't we call insertNodes() here?
+  }
   return this.loadTableData();
+};
+
+/**
+ * Override this method to create child pages for this page. The default impl. returns an empty array.
+ * @returns Array of child pages
+ */
+scout.PageWithNodes.prototype._createChildPages = function() {
+  return [];
 };

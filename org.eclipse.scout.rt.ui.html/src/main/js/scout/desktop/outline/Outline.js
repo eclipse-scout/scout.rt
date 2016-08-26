@@ -946,13 +946,8 @@ scout.Outline.prototype._nodesSelectedInternal = function() {
   // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
   var activePage = this.selectedNodes[0];
   if (activePage) {
-    if (activePage.childrenLoaded) {
-      return;
-    }
-    var promise = activePage.loadChildren();
-    if (promise) {
-      promise.done(this._onLoadChildrenDone.bind(this, activePage));
-    }
+    activePage.ensureLoadChildren().done(
+      this._onLoadChildrenDone.bind(this, activePage));
   }
 };
 

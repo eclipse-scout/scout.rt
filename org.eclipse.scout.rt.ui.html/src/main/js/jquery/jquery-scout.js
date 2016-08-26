@@ -239,12 +239,19 @@ $.pxToNumber = function(pixel) {
 };
 
 /**
- * @return a promise for an already resolved jQuery.Deferred object.
+ * @return a deferred for an already resolved jQuery.Deferred object.
  */
 $.resolvedDeferred = function() {
   var deferred = $.Deferred();
   deferred.resolve();
-  return deferred.promise();
+  return deferred;
+};
+
+/**
+ * @return a promise for an already resolved jQuery.Deferred object.
+ */
+$.resolvedPromise = function() {
+  return $.resolvedDeferred().promise();
 };
 
 // === $.prototype extensions ===

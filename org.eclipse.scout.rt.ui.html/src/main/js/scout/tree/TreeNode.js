@@ -27,6 +27,11 @@ scout.TreeNode = function() {
   this.parentNode;
   this.rendered = false;
   this.text;
+
+  /**
+   * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
+   */
+  this._loadChildrenPromise = false;
 };
 
 scout.TreeNode.prototype.init = function(model) {
@@ -99,6 +104,34 @@ scout.TreeNode.prototype.isFilterAccepted = function(forceFilter) {
  *     TreeNodes in the remote case). The default impl. return null.
  */
 scout.TreeNode.prototype.loadChildren = function() {
-  return null;
+  return $.resolvedDeferred();
 };
 
+/**
+ * This method calls loadChildren() but does nothing when children are already loaded or when loadChildren()
+ * is already in progress.
+ */
+scout.TreeNode.prototype.ensureLoadChildren = function() {
+  // when children are already loaded we return an already resolved promise so the caller can continue immediately
+  if (this.childrenLoaded) {
+    return $.resolvedPromise();
+  }
+  // when load children is already in progress, we return the same promise
+  if (this._loadChildrenPromise) {
+    return this._loadChildrenPromise;
+  }
+  var deferred = this.loadChildren();
+  var promise = deferred.promise();
+  if (deferred.state() === 'resolved') { // FIXME [awe] 6.1 - better solution as this deferred mess -> create own deferred here?
+    this._loadChildrenPromise = null;
+    return promise;
+  }
+
+  this._loadChildrenPromise = promise;
+  promise.done(this._onLoadChildrenDone.bind(this));
+  return promise; // we must always return a promise, never null - otherwise caller would throw an error
+};
+
+scout.TreeNode.prototype._onLoadChildrenDone = function() {
+  this._loadChildrenPromise = null;
+};

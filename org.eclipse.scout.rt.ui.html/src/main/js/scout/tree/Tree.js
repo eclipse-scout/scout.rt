@@ -116,7 +116,7 @@ scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
 };
 
 scout.Tree.prototype._createTreeNode = function(nodeModel) {
-  return new scout.TreeNode(); // FIXME [awe] 6.1 ausprobieren ob das auch mit scout.create klappt
+  return scout.create('TreeNode', nodeModel);
 };
 
 /**
@@ -1375,8 +1375,8 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
 
     if (node.expanded) {
-      node.loadChildren();
-      this._addChildrenToFlatList(node, null, renderAnimated, null, true);
+      node.ensureLoadChildren().done(
+        this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true));
     } else {
       this._removeChildrenFromFlatList(node, renderAnimated);
     }
@@ -2706,8 +2706,8 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   }
   //because we suppress handling by browser we have to set focus manually.
   this._onNodeControlMouseDownDoFocus();
-  this.selectNodes(node);
-  this.setNodeExpanded(node, expanded, expansionOpts);
+  this.selectNodes(node);                              // <---- ### 1
+  this.setNodeExpanded(node, expanded, expansionOpts); // <---- ### 2
   // prevent bubbling to _onNodeMouseDown()
   $.suppressEvent(event);
 
