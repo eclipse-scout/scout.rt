@@ -448,6 +448,7 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
     return;
   }
   this.open = false;
+  this.opening = false;
   this.table.invalidateLayoutTree();
 
   this.$controlContainer.stop(true).show().animate({
