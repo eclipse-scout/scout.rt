@@ -29,6 +29,16 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
    */
   public static final ThreadLocal<PropertyMap> CURRENT = new ThreadLocal<>();
 
+  /**
+   * The property ID to indicate whether running in server scope.
+   */
+  public static final String PROP_SERVER_SCOPE = "scout.scope.server";
+
+  /**
+   * The property ID to indicate whether running in client scope.
+   */
+  public static final String PROP_CLIENT_SCOPE = "scout.scope.client";
+
   private final Map<Object, Object> m_properties;
 
   public PropertyMap() {
@@ -97,5 +107,21 @@ public class PropertyMap implements Iterable<Entry<Object, Object>> {
   @Override
   public Iterator<Entry<Object, Object>> iterator() {
     return m_properties.entrySet().iterator();
+  }
+
+  /**
+   * Checks whether the given property is contained in the current {@link PropertyMap}, and is convenience for
+   * {@link PropertyMap#CURRENT#get(...)}.
+   *
+   * @return <code>true</code> if set in current property map, or else <code>false</code>.
+   */
+  public static boolean isSet(final String property) {
+    final PropertyMap propertyMap = PropertyMap.CURRENT.get();
+    if (propertyMap == null) {
+      return false;
+    }
+
+    return propertyMap.contains(property);
+
   }
 }

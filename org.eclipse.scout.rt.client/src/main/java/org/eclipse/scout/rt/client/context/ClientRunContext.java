@@ -50,11 +50,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class ClientRunContext extends RunContext {
 
-  /**
-   * Identifier used in {@link RunContext#withIdentifier(String)} to mark a run context as client run context
-   */
-  public static final String CLIENT_RUN_CONTEXT_IDENTIFIER = "Client";
-
   protected IClientSession m_session;
   protected UserAgent m_userAgent;
   protected IForm m_form;
@@ -125,12 +120,6 @@ public class ClientRunContext extends RunContext {
   @Override
   public <THREAD_LOCAL> ClientRunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
     super.withThreadLocal(threadLocal, value);
-    return this;
-  }
-
-  @Override
-  public ClientRunContext withIdentifier(final String id) {
-    super.withIdentifier(id);
     return this;
   }
 

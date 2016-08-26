@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -94,52 +93,47 @@ public class ClientRunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 9. ThreadLocalProcessor for RunContextIdentifiers.CURRENT
-    c = chainIterator.next();
-    assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(RunContextIdentifiers.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
-
-    // 10. ThreadLocalProcessor for ISession.CURRENT
+    // 9. ThreadLocalProcessor for ISession.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(ISession.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 11. DiagnosticContextValueProcessor
+    // 10. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("scout.user.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 12. DiagnosticContextValueProcessor
+    // 11. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("scout.session.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 13. ThreadLocalProcessor for UserAgent.CURRENT
+    // 12. ThreadLocalProcessor for UserAgent.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(UserAgent.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 14. ThreadLocalProcessor for ScoutTexts.CURRENT
+    // 13. ThreadLocalProcessor for ScoutTexts.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(ScoutTexts.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 15. ThreadLocalProcessor for IDesktop.CURRENT
+    // 14. ThreadLocalProcessor for IDesktop.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IDesktop.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 16. ThreadLocalProcessor for IOutline.CURRENT
+    // 15. ThreadLocalProcessor for IOutline.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IOutline.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 17. ThreadLocalProcessor for IForm.CURRENT
+    // 16. ThreadLocalProcessor for IForm.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IForm.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 18. TransactionProcessor
+    // 17. TransactionProcessor
     c = chainIterator.next();
     assertEquals(TransactionProcessor.class, c.getClass());
     assertFalse(chainIterator.hasNext());

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.context;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
@@ -119,14 +120,14 @@ public final class ServerRunContexts {
     @Override
     public ServerRunContext empty() {
       return (ServerRunContext) super.empty()
-          .withIdentifier(ServerRunContext.SERVER_RUN_CONTEXT_IDENTIFIER)
+          .withProperty(PropertyMap.PROP_SERVER_SCOPE, true)
           .withTransactionScope(TransactionScope.REQUIRES_NEW);
     }
 
     @Override
     public ServerRunContext copyCurrent() {
       return (ServerRunContext) super.copyCurrent()
-          .withIdentifier(ServerRunContext.SERVER_RUN_CONTEXT_IDENTIFIER)
+          .withProperty(PropertyMap.PROP_SERVER_SCOPE, true)
           .withTransactionScope(TransactionScope.REQUIRES_NEW);
     }
 

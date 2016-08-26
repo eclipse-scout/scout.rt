@@ -15,7 +15,7 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -62,7 +62,7 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
   }
 
   protected Object ensureRunInServerContext(final IBeanInvocationContext<T> context) {
-    if (RunContextIdentifiers.isCurrent(ServerRunContext.SERVER_RUN_CONTEXT_IDENTIFIER)) {
+    if (PropertyMap.isSet(PropertyMap.PROP_SERVER_SCOPE)) {
       // already in a server scope
       return continueCall(context);
     }

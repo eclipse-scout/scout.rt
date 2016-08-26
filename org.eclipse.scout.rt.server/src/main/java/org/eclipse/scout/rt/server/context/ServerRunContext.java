@@ -51,11 +51,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class ServerRunContext extends RunContext {
 
-  /**
-   * Identifier used in {@link RunContext#withIdentifier(String)} to mark a run context as server run context
-   */
-  public static final String SERVER_RUN_CONTEXT_IDENTIFIER = "Server";
-
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected String m_clientNodeId;
@@ -136,12 +131,6 @@ public class ServerRunContext extends RunContext {
   @Override
   public ServerRunContext withProperties(final Map<?, ?> properties) {
     super.withProperties(properties);
-    return this;
-  }
-
-  @Override
-  public ServerRunContext withIdentifier(final String id) {
-    super.withIdentifier(id);
     return this;
   }
 

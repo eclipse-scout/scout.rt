@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.context;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
@@ -123,13 +124,13 @@ public final class ClientRunContexts {
     @Override
     public ClientRunContext empty() {
       return (ClientRunContext) super.empty()
-          .withIdentifier(ClientRunContext.CLIENT_RUN_CONTEXT_IDENTIFIER);
+          .withProperty(PropertyMap.PROP_CLIENT_SCOPE, true);
     }
 
     @Override
     public ClientRunContext copyCurrent() {
       return (ClientRunContext) super.copyCurrent()
-          .withIdentifier(ClientRunContext.CLIENT_RUN_CONTEXT_IDENTIFIER);
+          .withProperty(PropertyMap.PROP_CLIENT_SCOPE, true);
     }
 
     @Override

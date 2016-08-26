@@ -13,9 +13,7 @@ package org.eclipse.scout.rt.platform.context;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,7 +40,6 @@ import org.eclipse.scout.rt.platform.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -77,7 +74,6 @@ public class RunContext implements IAdaptable {
   protected Locale m_locale;
   protected String m_correlationId;
   protected PropertyMap m_propertyMap = new PropertyMap();
-  protected Deque<String> m_identifiers = new LinkedList<>();
 
   protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
   protected Map<String, DiagnosticContextValueProcessor> m_diagnosticProcessors = new HashMap<>();
@@ -180,7 +176,6 @@ public class RunContext implements IAdaptable {
         .add(new DiagnosticContextValueProcessor(BEANS.get(CorrelationIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
-        .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers))
         .addAll(m_threadLocalProcessors.values())
         .addAll(contributions.asList())
         .addAll(m_diagnosticProcessors.values())
@@ -429,29 +424,6 @@ public class RunContext implements IAdaptable {
     return this;
   }
 
-  /**
-   * Gets a live reference to the identifiers of this run context.
-   *
-   * @return A {@link Deque} with all identifiers of this context having the current identifier on top of the deque.
-   * @see RunContextIdentifiers#isCurrent(String)
-   */
-  public Deque<String> getIdentifiers() {
-    return m_identifiers;
-  }
-
-  /**
-   * Pushes a new identifier on top of the identifiers {@link Deque}.
-   *
-   * @param id
-   *          The new top identifier.
-   * @return this
-   * @see RunContextIdentifiers#isCurrent(String)
-   */
-  public RunContext withIdentifier(final String id) {
-    m_identifiers.push(id);
-    return this;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -471,8 +443,7 @@ public class RunContext implements IAdaptable {
         .ref("transaction", getTransaction())
         .ref("runMonitor", getRunMonitor())
         .ref("transactionMembers", m_transactionMembers)
-        .ref("threadLocalProcessors", m_threadLocalProcessors)
-        .attr("identifiers", CollectionUtility.format(getIdentifiers()));
+        .ref("threadLocalProcessors", m_threadLocalProcessors);
   }
 
   /**
@@ -484,7 +455,6 @@ public class RunContext implements IAdaptable {
     m_locale = origin.m_locale;
     m_correlationId = origin.m_correlationId;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
-    m_identifiers = new LinkedList<>(origin.m_identifiers);
     m_transactionScope = origin.m_transactionScope;
     m_transaction = origin.m_transaction;
     m_transactionMembers = new ArrayList<>(origin.m_transactionMembers);
@@ -504,7 +474,6 @@ public class RunContext implements IAdaptable {
     m_locale = NlsLocale.CURRENT.get();
     m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
-    m_identifiers = new LinkedList<>(RunContextIdentifiers.CURRENT.get());
     m_transactionScope = currentRunContext.m_transactionScope;
     m_transaction = ITransaction.CURRENT.get();
     m_transactionMembers = new ArrayList<>(currentRunContext.m_transactionMembers);
