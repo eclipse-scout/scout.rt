@@ -13,6 +13,7 @@ scout.TabItem = function() {
   this.$tabContainer;
   this._tabRendered = false;
   this._tabActive = false;
+  this.selectionKeystroke;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 

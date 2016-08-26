@@ -50,6 +50,12 @@ public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP
         return m_marked;
       }
     });
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_SELECTION_KEYSTROKE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getSelectionKeyStroke();
+      }
+    });
   }
 
   @Override

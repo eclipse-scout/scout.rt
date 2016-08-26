@@ -150,7 +150,7 @@ public class ColorFieldTest {
         public class TestMenu1 extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return "&TestMenu1";
+            return "TestMenu1";
           }
 
           @Override

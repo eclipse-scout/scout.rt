@@ -230,6 +230,20 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
+   * Configures the keystroke to select this group box.<br>
+   * If the groupbox is not inside a tabbox, this configured selection keyStroke will be ignored.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return the keyStroke to select this groupbox (inside a tabbox)
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(280)
+  protected String getConfiguredSelectionKeyStroke() {
+    return null;
+  }
+
+  /**
    * Configures the column span of this group box.<br>
    * The value defined by this property refers to the number of columns defined by the container of this group box. <br>
    * The column count of the container, which actually is the parent group box, can be configured by
@@ -276,6 +290,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setBackgroundImageHorizontalAlignment(getConfiguredBackgroundImageHorizontalAlignment());
     setBackgroundImageVerticalAlignment(getConfiguredBackgroundImageVerticalAlignment());
     setScrollable(getConfiguredScrollable());
+    setSelectionKeyStroke(getConfiguredSelectionKeyStroke());
     initMenus();
   }
 
@@ -572,6 +587,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setExpanded(boolean b) {
     propertySupport.setPropertyBool(PROP_EXPANDED, b);
+  }
+
+  @Override
+  public String getSelectionKeyStroke() {
+    return propertySupport.getPropertyString(PROP_SELECTION_KEYSTROKE);
+  }
+
+  @Override
+  public void setSelectionKeyStroke(String keystroke) {
+    propertySupport.setPropertyString(PROP_SELECTION_KEYSTROKE, keystroke);
   }
 
   @Override
