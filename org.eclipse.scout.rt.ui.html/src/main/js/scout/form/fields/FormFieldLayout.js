@@ -162,11 +162,20 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
     var padding = scout.graphics.getInsets($field, {
         includePadding: true
       });
+
+    // subtract scrollbars sizes from width and height so overlay does not block scrollbars
+    // we read the size from the scrollbar from our device, because we already determined
+    // it on startup
+    var elem = $field[0];
+    var scrollHorizontal = (elem.scrollWidth - elem.clientWidth) > 0;
+    var scrollVertical = (elem.scrollHeight - elem.clientHeight) > 0;
+    var scrollbarSize = scout.device.scrollbarWidth;
+
     $overlay
       .css('top', pos.top)
       .css('left', pos.left)
-      .width($field.width() + padding.horizontal())
-      .height($field.height() + padding.vertical());
+      .width($field.width() + padding.horizontal() - (scrollVertical ? scrollbarSize : 0))
+      .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
   }
 };
 

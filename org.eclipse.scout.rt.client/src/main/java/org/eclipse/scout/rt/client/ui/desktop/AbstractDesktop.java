@@ -169,7 +169,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_fileChooserStore = BEANS.get(FileChooserStore.class);
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
     m_addOns = new ArrayList<>();
-    m_objectExtensions = new ObjectExtensions<>(this);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     if (callInitializer) {
       callInitializer();
     }
@@ -813,7 +813,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     propertySupport.setPropertyString(PROP_LOGO_ID, id);
   }
 
+  /**
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
+   */
   @Override
+  @Deprecated
   public IFormField getFocusOwner() {
     return fireFindFocusOwner();
   }

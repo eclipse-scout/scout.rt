@@ -128,7 +128,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_enabledSlave = true;
     m_enabledProcessingButton = true;
     m_visibleGranted = true;
-    m_objectExtensions = new ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>>(this, false);
     if (callInitializer) {
       callInitializer();
     }

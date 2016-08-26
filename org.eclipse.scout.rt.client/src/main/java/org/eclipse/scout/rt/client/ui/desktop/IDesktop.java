@@ -194,8 +194,12 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   List<IForm> getSimilarViewForms(IForm form);
 
   /**
+   * this feature isn't supported in html ui
+   * 
    * @return the {@link IFormField} that owns the focus
+   * @deprecated will be removed in o-release
    */
+  @Deprecated
   IFormField getFocusOwner();
 
   /**

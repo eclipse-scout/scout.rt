@@ -1,19 +1,28 @@
 package org.eclipse.scout.rt.client.extension.ui.outline.pages;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AbstractInitializableMenu;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AbstractPersonTablePage;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AbstractPersonTablePage.Table.EditMenu;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AllPersonTablePage;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AllPersonTablePageExtension;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktopExtension;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.EveryPersonTablePageExtension;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.OtherPersonTablePage;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktop;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktop.PersonPageTestOutline;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonSearchForm;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonSearchFormExtension;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonSearchFormExtension.TopBoxExtension.TopBoxStringField;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -64,6 +73,29 @@ public class TablePageExtensionTest extends AbstractLocalExtensionTestCase {
     assertOriginalTablePage(new OtherPersonTablePage());
   }
 
+  @Test
+  public void testAllPersonTablePageAlongWithDesktopOutlineAndExtendedSearchForm() {
+    BEANS.get(IExtensionRegistry.class).register(PersonPageTestDesktopExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(PersonSearchFormExtension.class);
+
+    PersonPageTestDesktop desktop = new PersonPageTestDesktop();
+
+    PersonPageTestOutline outline = desktop.findOutline(PersonPageTestOutline.class);
+    IPage<?> page = outline.getRootPage().getChildPage(0);
+    assertTrue(page instanceof AllPersonTablePage);
+
+    PersonSearchForm personSearchForm = (PersonSearchForm) ((AllPersonTablePage) page).getSearchFormInternal();
+    PersonSearchFormExtension personSearchFormExtension = personSearchForm.getExtension(PersonSearchFormExtension.class);
+
+    assertNotNull(personSearchForm);
+    assertNotNull(personSearchFormExtension);
+
+    TopBoxStringField topBoxStringField = personSearchFormExtension.getTopBoxStringField();
+    assertNotNull(topBoxStringField);
+    assertTrue(topBoxStringField.isGetConfiguredLabelCalled());
+    assertTrue(topBoxStringField.isInitialized());
+  }
+
   protected void assertOriginalTablePage(AbstractPersonTablePage<?> page) {
     AbstractPersonTablePage<?>.Table table = page.getTable();
     assertEquals(2, table.getColumnCount());
@@ -77,7 +109,7 @@ public class TablePageExtensionTest extends AbstractLocalExtensionTestCase {
     assertEquals(1, table.getMenuByClass(EditMenu.class).getAllExtensions().size());
   }
 
-  protected void assertExtendedTablePage(AbstractPersonTablePage<?> page, Class<? extends IMenu> expectedTestMenuClass, Class<? extends IMenuExtension> expectedMenuExtensionClass) {
+  protected void assertExtendedTablePage(AbstractPersonTablePage<?> page, Class<? extends AbstractInitializableMenu> expectedTestMenuClass, Class<? extends IMenuExtension> expectedMenuExtensionClass) {
     AbstractPersonTablePage<?>.Table table = page.getTable();
     assertEquals(2, table.getColumnCount());
     assertSame(table.getNameColumn(), table.getColumnSet().getColumn(0));
@@ -86,7 +118,11 @@ public class TablePageExtensionTest extends AbstractLocalExtensionTestCase {
     assertEquals(3, table.getMenus().size());
     EditMenu editMenu = table.getMenuByClass(EditMenu.class);
     assertSame(editMenu, table.getMenus().get(0));
-    assertSame(table.getMenuByClass(expectedTestMenuClass), table.getMenus().get(1));
+
+    AbstractInitializableMenu expectedEditMenu = table.getMenuByClass(expectedTestMenuClass);
+    assertSame(expectedEditMenu, table.getMenus().get(1));
+    assertTrue(expectedEditMenu.isInitialized());
+
     assertSame(table.getMenuByClass(OrganizeColumnsMenu.class), table.getMenus().get(2));
 
     assertEquals(2, editMenu.getAllExtensions().size());

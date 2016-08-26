@@ -122,7 +122,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_deletedNodes = new HashMap<Object, ITreeNode>();
     m_nodeFilters = new ArrayList<ITreeNodeFilter>(1);
     m_actionRunning = false;
-    m_objectExtensions = new ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>>(this, false);
     if (callInitialzier) {
       callInitializer();
     }

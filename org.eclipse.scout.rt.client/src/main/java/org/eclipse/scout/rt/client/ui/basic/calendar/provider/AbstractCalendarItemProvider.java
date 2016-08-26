@@ -70,7 +70,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   public AbstractCalendarItemProvider(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractCalendarItemProvider, ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractCalendarItemProvider, ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>>(this, false);
     if (callInitializer) {
       callInitializer();
     }

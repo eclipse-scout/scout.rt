@@ -83,7 +83,7 @@ scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
     return;
   }
   var view = event.view;
-  if (this.bench.outlineContent !== view && !view.detailForm) {
+  if (view instanceof scout.Form && this.bench.outlineContent !== view && !view.detailForm) {
     // Notify model that this form is active (only for regular views, not detail forms)
     this._setFormActivated(view);
   }

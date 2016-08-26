@@ -82,7 +82,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    *          {@link #callInitializer()} itself
    */
   public AbstractDataModelAttribute(boolean callInitConfig) {
-    m_objectExtensions = new ObjectExtensions<AbstractDataModelAttribute, IDataModelAttributeExtension<? extends AbstractDataModelAttribute>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractDataModelAttribute, IDataModelAttributeExtension<? extends AbstractDataModelAttribute>>(this, false);
     if (callInitConfig) {
       callInitializer();
     }

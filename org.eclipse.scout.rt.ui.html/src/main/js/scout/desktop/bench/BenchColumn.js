@@ -194,11 +194,11 @@ scout.BenchColumn.prototype._onSplitterPositionChanged = function() {
   this.revalidateLayout();
 };
 
-scout.BenchColumn.prototype.addView = function(view, activate) {
+scout.BenchColumn.prototype.addView = function(view, bringToFront) {
   var tabBox = this.getTabBox(view.displayViewId);
   this._widgetToTabBox[view.id] = tabBox;
 
-  tabBox.addView(view, activate);
+  tabBox.addView(view, bringToFront);
 
   if (this.rendered && tabBox.viewCount() === 1) {
     if (!tabBox.rendered) {

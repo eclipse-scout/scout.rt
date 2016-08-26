@@ -131,7 +131,6 @@ scout.TabBox.prototype._syncSelectedTab = function(tab, notifyServer) {
   if (this.selectedTab === tab) {
     return;
   }
-
   $.log.debug('(TabBox#_selectTab) tab=' + tab);
   var oldSelectedTab = this.selectedTab;
   var selectedTab = tab;
@@ -150,6 +149,9 @@ scout.TabBox.prototype._syncSelectedTab = function(tab, notifyServer) {
     }
     if (this.selectedTab) {
       this.selectedTab.focusTab();
+      if (oldSelectedTabItem) {
+      }
+
     }
     if (oldSelectedTab) {
       oldSelectedTab.detach();

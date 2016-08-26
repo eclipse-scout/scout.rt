@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 
 import static org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.EXEC_VALIDATE_VALUE_OPERATION_NAME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.Bottom
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.BottomDetailBox.BottomDetailBoxField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.CountryField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm.SalutationFieldEx;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedFormExtendedGroupWithField;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedFormExtendedGroupWithField.TopBoxExtension.TopBoxStringField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox.SalutationField;
@@ -208,6 +211,17 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
     form.getOperations();
     assertOperations(form.getOperations(),
         OrigForm.formatOperationLogEntry(OrigFormStringFieldContribution.class, EXEC_VALIDATE_VALUE_OPERATION_NAME));
+  }
+
+  /**
+   * extend an original group in a form extension (registration on original form).
+   */
+  @Test
+  public void testExtendedFormExtendedGroupWithField() throws Exception {
+    BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtendedGroupWithField.class);
+
+    OrigForm form = new OrigForm();
+    assertTrue(form.getFieldByClass(TopBoxStringField.class).isInitialized());
   }
 
   public static void assertOperations(List<String> actual, String... expected) {

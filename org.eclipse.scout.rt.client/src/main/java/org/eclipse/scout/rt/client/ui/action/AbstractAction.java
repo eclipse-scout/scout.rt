@@ -74,7 +74,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_enabledProcessingAction = true;
     m_enabledInheritAccessibility = true;
     m_visibleGranted = true;
-    m_objectExtensions = new ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>>(this, false);
     if (callInitializer) {
       callInitializer();
     }

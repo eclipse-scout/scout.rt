@@ -130,11 +130,17 @@ scout.DesktopBench.prototype._remove = function() {
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {
-  if (!this.outlineContent || this.desktop.inBackground) {
+  if (!this.outlineContent) {
     return;
   }
 
-  this.addView(this.outlineContent);
+  // Reset view tab relevant properties to make sure no tab is visible for the outline content
+  delete this.outlineContent.title;
+  delete this.outlineContent.subTitle;
+  delete this.outlineContent.iconId;
+
+  // bring the view to top if the desktop is not in background.
+  this.addView(this.outlineContent, !this.desktop.inBackground);
 
   if (this.desktop.rendered) {
     // Request focus on first element in outline content
@@ -229,32 +235,15 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   if (content) {
     content.one('destroy', this._onOutlineContentDestroyedHandler);
   }
+
   this._setProperty('outlineContent', content);
+
   // Inform header that outline content has changed
   // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
   if (this.desktop.header) {
     this.desktop.header.onBenchOutlineContentChange(content, oldContent);
   }
-  this._showOutlineContent();
-};
-
-scout.DesktopBench.prototype._showOutlineContent = function() {
-  if (this.outlineContent) {
-    // Reset view tab relevant properties to make sure no tab is visible for the outline content
-    delete this.outlineContent.title;
-    delete this.outlineContent.subTitle;
-    delete this.outlineContent.iconId;
-
-    this.addView(this.outlineContent);
-
-    if (this.desktop.rendered) {
-      // Request focus on first element in outline content
-      this.session.focusManager.validateFocus();
-    }
-    if (this.outlineContent instanceof scout.Table) {
-      this.outlineContent.restoreScrollPosition();
-    }
-  }
+  this._renderOutlineContent();
 };
 
 scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
@@ -269,7 +258,7 @@ scout.DesktopBench.prototype.bringToFront = function() {
   if (!this.outlineContent) {
     return;
   }
-  this._showOutlineContent();
+  this._renderOutlineContent();
 };
 
 scout.DesktopBench.prototype.sendToBack = function() {

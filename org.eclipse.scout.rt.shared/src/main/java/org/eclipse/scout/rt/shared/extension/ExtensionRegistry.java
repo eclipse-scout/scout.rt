@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
+import org.eclipse.scout.rt.platform.extension.InheritOuterExtensionScope;
 import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -129,7 +130,13 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
 
       if (isExtension) {
         // 1. try type parameter of extension
-        ownerClassIdentifier = new ClassIdentifier(ownerClassIdentifierFromDeclaring, extensionGeneric);
+        InheritOuterExtensionScope inheritOuterExtensionScope = extensionClass.getAnnotation(InheritOuterExtensionScope.class);
+        if (inheritOuterExtensionScope == null || inheritOuterExtensionScope.value()) {
+          ownerClassIdentifier = new ClassIdentifier(ownerClassIdentifierFromDeclaring, extensionGeneric);
+        }
+        else {
+          ownerClassIdentifier = new ClassIdentifier(extensionGeneric);
+        }
       }
 
       if (ownerClassIdentifier == null) {
@@ -725,14 +732,19 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
 
   @Override
   public void runInContext(ExtensionContext ctx, Runnable runnable) {
-    Assertions.assertNotNull(ctx, "Extension context must not be null");
     Assertions.assertNotNull(runnable, "Runnable must not be null");
     // backup current extension context
     final ScopeStack scopeStack = m_scopeStack.get();
     final ExtensionStack extensionStack = m_extensionStack.get();
     try {
-      m_scopeStack.set(ctx.getScopeStack());
-      m_extensionStack.set(ctx.getExtensionStack());
+      if (ctx == null) {
+        m_scopeStack.remove();
+        m_extensionStack.remove();
+      }
+      else {
+        m_scopeStack.set(ctx.getScopeStack());
+        m_extensionStack.set(ctx.getExtensionStack());
+      }
       runnable.run();
     }
     finally {

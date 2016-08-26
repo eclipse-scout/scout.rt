@@ -109,7 +109,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   public AbstractColumn(boolean callInitializer) {
     m_headerCell = new HeaderCell();
-    m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this, false);
     if (callInitializer) {
       callInitializer();
     }

@@ -42,16 +42,16 @@ scout.SimpleTabBoxController.prototype._installListeners = function() {
 
 scout.SimpleTabBoxController.prototype._onViewAdded = function(event) {
   var view = event.view,
-  siblingView = event.siblingView,
-  viewTab,
-  // the sibling to insert the tab after.
-  siblingViewTab;
+    siblingView = event.siblingView,
+    viewTab,
+    // the sibling to insert the tab after.
+    siblingViewTab;
 
   if (!scout.SimpleTabBoxController.hasViewTab(view)) {
     return;
   }
   viewTab = this._getTab(view);
-  if(!viewTab){
+  if (!viewTab) {
     siblingViewTab = this._getTab(siblingView);
     viewTab = scout.create('DesktopTab', {
       parent: this.tabArea,
@@ -59,7 +59,6 @@ scout.SimpleTabBoxController.prototype._onViewAdded = function(event) {
     });
     this.tabArea.addTab(viewTab, siblingViewTab);
   }
-
 };
 
 scout.SimpleTabBoxController.prototype._onViewRemoved = function(event) {

@@ -72,7 +72,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_eventListeners = new EventListenerList();
     m_sessionData = new SessionData();
     m_sharedVariableMap = new SharedVariableMap();
-    m_objectExtensions = new ObjectExtensions<>(this);
+    m_objectExtensions = new ObjectExtensions<>(this, true);
     m_scoutTexts = new ScoutTexts();
     if (autoInitConfig) {
       interceptInitConfig();

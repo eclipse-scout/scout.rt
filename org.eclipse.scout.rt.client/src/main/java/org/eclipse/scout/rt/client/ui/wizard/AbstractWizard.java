@@ -97,7 +97,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     m_availableStepList = new ArrayList<IWizardStep<? extends IForm>>(0);
     m_stepList = new ArrayList<IWizardStep<? extends IForm>>(0);
     m_blockingCondition = Jobs.newBlockingCondition(false);
-    m_objectExtensions = new ObjectExtensions<AbstractWizard, IWizardExtension<? extends AbstractWizard>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractWizard, IWizardExtension<? extends AbstractWizard>>(this, true);
     if (callInitializer) {
       callInitializer();
     }

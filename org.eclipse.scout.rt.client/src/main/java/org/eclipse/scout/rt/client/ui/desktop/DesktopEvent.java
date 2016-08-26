@@ -60,8 +60,14 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus The listener can store the result using
    * {@link #setFocusedField()} The event waits some time to give asynchronous jobs a chance to complete (default is
-   * 2000 ms)
+   * 2000 ms)<br>
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
    */
+  /**
+   */
+  @Deprecated
   public static final int TYPE_FIND_FOCUS_OWNER = 1000;
 
   /**
@@ -174,10 +180,22 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     return m_outline;
   }
 
+  /**
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
+   */
+  @Deprecated
   public IFormField getFocusedField() {
     return m_focusedField;
   }
 
+  /**
+   * this feature isn't supported in html ui
+   *
+   * @deprecated will be removed in o-release
+   */
+  @Deprecated
   public void setFocusedField(IFormField f) {
     m_focusedField = f;
   }

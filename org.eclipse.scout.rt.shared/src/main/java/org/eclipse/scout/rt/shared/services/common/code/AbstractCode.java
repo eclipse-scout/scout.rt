@@ -83,7 +83,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
    */
   public AbstractCode(ICodeRow<T> row, boolean callInitializer) {
     m_row = row;
-    m_objectExtensions = new ObjectExtensions<AbstractCode<T>, ICodeExtension<T, ? extends AbstractCode<T>>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractCode<T>, ICodeExtension<T, ? extends AbstractCode<T>>>(this, false);
     if (callInitializer) {
       callInitializer();
     }

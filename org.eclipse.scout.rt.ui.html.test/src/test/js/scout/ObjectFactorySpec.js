@@ -81,6 +81,9 @@ describe('ObjectFactory', function() {
   }
 
   it('creates objects which are registered in scout.objectFactories', function() {
+    session.init({
+      $entryPoint: $('#sandbox')
+    });
     // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
     // you should check if the required .js File is registered in SpecRunnerMaven.html.
     var i, model, factory, object, modelAdapter, objectType;

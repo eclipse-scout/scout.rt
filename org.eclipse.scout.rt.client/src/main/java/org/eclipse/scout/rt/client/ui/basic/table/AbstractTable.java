@@ -205,7 +205,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_attachments = new HashMap<>(0);
     m_initLock = new OptimisticLock();
     m_actionRunning = false;
-    m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this, false);
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {
