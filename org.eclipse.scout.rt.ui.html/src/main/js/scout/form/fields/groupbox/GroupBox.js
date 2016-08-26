@@ -21,6 +21,7 @@ scout.GroupBox = function() {
   this.scrollable = false;
   this.expandable = false;
   this.expanded = true;
+  this.gridColumnCountHint = 2;
   this.controls = [];
   this.systemButtons = [];
   this.customButtons = [];

@@ -17,3 +17,11 @@ scout.GridData = function(model) {
 
   $.extend(this, model);
 };
+
+scout.GridData.createFromHints = function(field, gridColumnCount) {
+  var data = new scout.GridData(field.gridDataHints);
+  if (data.w === scout.FormField.FULL_WIDTH) {
+    data.w = gridColumnCount;
+  }
+  return data;
+};

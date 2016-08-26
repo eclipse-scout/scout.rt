@@ -73,6 +73,11 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String PROP_SELECTION_KEYSTROKE = "selectionKeystroke";
 
+  /**
+   * {@link Integer}
+   */
+  String PROP_GRID_COLUMN_COUNT_HINT = "gridColumnCountHint";
+
   /*
    * Runtime
    */

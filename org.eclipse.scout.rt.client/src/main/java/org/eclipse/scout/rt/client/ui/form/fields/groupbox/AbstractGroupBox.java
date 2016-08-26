@@ -46,7 +46,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   private IGroupBoxUIFacade m_uiFacade;
   private boolean m_mainBoxFlag = false;
-  private int m_gridColumnCountHint;
   private TriState m_scrollable;
   private List<IFormField> m_controlFields;
   private List<IGroupBox> m_groupBoxes;
@@ -500,7 +499,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public void setGridColumnCountHint(int c) {
-    m_gridColumnCountHint = c;
+    propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT_HINT, c);
     if (isInitialized()) {
       rebuildFieldGrid();
     }
@@ -508,7 +507,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public int getGridColumnCountHint() {
-    return m_gridColumnCountHint;
+    return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT_HINT);
   }
 
   @Override

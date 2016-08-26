@@ -68,6 +68,9 @@ scout.FormField.LABEL_POSITION_TOP = 4;
 scout.FormField.STATUS_POSITION_DEFAULT = 'default';
 scout.FormField.STATUS_POSITION_TOP = 'top';
 
+// see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
+scout.FormField.FULL_WIDTH = 0;
+
 /**
  * Indicates the field to be used in default mode, e.g. in a Form.
  */
@@ -519,6 +522,18 @@ scout.FormField.prototype.getForm = function() {
     parent = parent.parent;
   }
   return parent;
+};
+
+scout.FormField.prototype.getParentGroupBox = function() {
+  var parent = this.parent;
+  while (parent && !(parent instanceof scout.GroupBox)) {
+    parent = parent.parent;
+  }
+  return parent;
+};
+
+scout.FormField.prototype.getParentField = function() {
+  return this.parent;
 };
 
 /**

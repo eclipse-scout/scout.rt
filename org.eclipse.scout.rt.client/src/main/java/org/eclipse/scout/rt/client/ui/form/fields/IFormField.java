@@ -88,6 +88,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_STATUS_VISIBLE = "statusVisible";
   String PROP_STATUS_POSITION = "statusPosition";
   String PROP_GRID_DATA = "gridData";
+  String PROP_GRID_DATA_HINTS = "gridDataHints";
 
   /**
    * if the field is focusable or not, value is of type {@link Boolean}

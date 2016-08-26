@@ -1,11 +1,11 @@
 /*!
-* Eclipse Scout
-* https://eclipse.org/scout/
-*
-* Copyright (c) BSI Business Systems Integration AG. All rights reserved.
-* Released under the Eclipse Public License v1.0
-* http://www.eclipse.org/legal/epl-v10.html
-*/
+ * Eclipse Scout
+ * https://eclipse.org/scout/
+ *
+ * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+ * Released under the Eclipse Public License v1.0
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
   // FIXME CGU [6.1] maybe extract remote/modeladapter files into remotescout-module.js
@@ -354,6 +354,11 @@
   __include("scout/form/fields/groupbox/GroupBoxAdapter.js");
   __include("scout/form/fields/groupbox/GroupBoxLayout.js");
   __include("scout/form/fields/groupbox/GroupBoxMenuItemsOrder.js");
+  __include("scout/form/fields/groupbox/grid/AbstractGroupBoxBodyGrid.js");
+  __include("scout/form/fields/groupbox/grid/HorizontalGroupBoxBodyGrid.js");
+  __include("scout/form/fields/groupbox/grid/matrix/GroupBoxGridCell.js");
+  __include("scout/form/fields/groupbox/grid/matrix/HorizontalGridMatrixGroupBox.js");
+  __include("scout/form/fields/groupbox/grid/matrix/GroupBoxGridMatrixCursor.js");
   __include("scout/form/fields/htmlfield/HtmlField.js");
   __include("scout/form/fields/htmlfield/HtmlFieldAdapter.js");
   __include("scout/form/fields/imagefield/ImageField.js");
