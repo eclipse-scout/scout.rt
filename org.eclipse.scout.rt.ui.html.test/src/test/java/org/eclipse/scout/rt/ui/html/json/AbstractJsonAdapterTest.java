@@ -43,7 +43,7 @@ public class AbstractJsonAdapterTest {
   public void testToJson_WithVariant() {
     JSONObject json = newAdapter(new P_ModelVariant()).toJson();
     assertEquals("x", json.getString("id"));
-    assertEquals("Foo.Bar", json.getString("objectType"));
+    assertEquals("Foo:Bar", json.getString("objectType"));
   }
 
   @Test
