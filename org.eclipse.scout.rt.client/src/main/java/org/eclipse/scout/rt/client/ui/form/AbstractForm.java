@@ -426,6 +426,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return null;
   }
 
+  /**
+   * Configures the css class(es) of this form.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(160)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(170)
   protected int/* seconds */ getConfiguredCloseTimer() {
@@ -681,6 +694,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     setCacheBounds(getConfiguredCacheBounds());
     setAskIfNeedSave(getConfiguredAskIfNeedSave());
     setIconId(getConfiguredIconId());
+    setCssClass((getConfiguredCssClass()));
 
     // Set 'modality' as preferred value if not 'auto'.
     int modalityHint = getConfiguredModalityHint();
@@ -778,6 +792,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
+  }
+
+  @Override
+  public String getCssClass() {
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   /**

@@ -72,4 +72,24 @@ describe("Form", function() {
 
   });
 
+  describe("onModelPropertyChange", function() {
+    var form;
+
+    beforeEach(function() {
+      form = helper.createFormWithOneField();
+    });
+
+    it("considers custom css class", function() {
+      form.render(session.$entryPoint);
+
+      var event = createPropertyChangeEvent(form, {cssClass: 'custom-class'});
+      form.onModelPropertyChange(event);
+      expect(form.$container).toHaveClass('custom-class');
+
+      event = createPropertyChangeEvent(form, {cssClass: ''});
+      form.onModelPropertyChange(event);
+      expect(form.$container).not.toHaveClass('custom-class');
+    });
+  });
+
 });

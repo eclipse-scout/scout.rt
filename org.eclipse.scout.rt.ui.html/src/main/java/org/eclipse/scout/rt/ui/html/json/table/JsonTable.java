@@ -291,6 +291,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getKeyStrokes();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
+      }
+    });
   }
 
   @Override

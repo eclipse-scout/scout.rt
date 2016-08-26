@@ -36,6 +36,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_TITLE = IForm.PROP_TITLE;
   public static final String PROP_SUB_TITLE = IForm.PROP_SUB_TITLE;
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
+  public static final String PROP_CSS_CLASS = IForm.PROP_CSS_CLASS;
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
@@ -86,6 +87,12 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
       @Override
       public Object prepareValueForToJson(Object value) {
         return BinaryResourceUrlUtility.createIconUrl((String) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<IForm>(PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
       }
     });
   }

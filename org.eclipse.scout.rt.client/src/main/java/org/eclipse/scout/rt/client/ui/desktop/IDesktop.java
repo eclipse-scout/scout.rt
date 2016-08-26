@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -58,7 +59,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * </ul>
  */
 @SuppressWarnings("deprecation")
-public interface IDesktop extends IPropertyObserver, IDisplayParent {
+public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable {
 
   /**
    * The {@link IDesktop} which is currently associated with the current thread.
@@ -179,7 +180,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * this feature isn't supported in html ui
-   * 
+   *
    * @return the {@link IFormField} that owns the focus
    * @deprecated will be removed in o-release
    */

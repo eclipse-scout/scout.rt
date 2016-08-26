@@ -272,6 +272,7 @@ scout.Table.prototype._render = function($parent) {
 
 scout.Table.prototype._renderProperties = function() {
   scout.Table.parent.prototype._renderProperties.call(this);
+  this._renderCssClass();
   this._renderTableHeader();
   this._renderFooterVisible();
   this._renderMenus();
@@ -2993,6 +2994,12 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
 
 scout.Table.prototype._triggerGroupingChanged = function() {
   this.trigger('groupingChanged');
+};
+
+scout.Table.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  cssClass = cssClass || this.cssClass;
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {

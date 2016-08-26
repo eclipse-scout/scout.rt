@@ -2702,4 +2702,26 @@ describe("Tree", function() {
       });
     });
   });
+
+  describe("onModelPropertyChange", function() {
+    var model, tree;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(4, 4);
+      tree = helper.createTree(model);
+    });
+
+    it("considers custom css class", function() {
+      tree.render(session.$entryPoint);
+
+      var event = createPropertyChangeEvent(tree, {cssClass: 'custom-class'});
+      tree.onModelPropertyChange(event);
+      expect(tree.$container).toHaveClass('custom-class');
+
+      event = createPropertyChangeEvent(tree, {cssClass: ''});
+      tree.onModelPropertyChange(event);
+      expect(tree.$container).not.toHaveClass('custom-class');
+    });
+  });
+
 });

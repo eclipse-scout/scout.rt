@@ -331,6 +331,7 @@ scout.Tree.prototype._remove = function() {
 scout.Tree.prototype._renderProperties = function() {
   scout.Tree.parent.prototype._renderProperties.call(this);
   this._renderEnabled();
+  this._renderCssClass();
   this._renderMenus();
   this._renderDropType();
 };
@@ -924,6 +925,13 @@ scout.Tree.prototype._renderEnabled = function() {
         .toggleClass('disabled', !(enabled && node.enabled));
     });
   }
+};
+
+
+scout.Tree.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  cssClass = cssClass || this.cssClass;
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
 };
 
 scout.Tree.prototype._renderTitle = function() {

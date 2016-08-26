@@ -89,6 +89,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderHeaderVisible();
   this._renderBenchVisible();
   this._renderTitle();
+  this._renderCssClass();
   this._renderLogoUrl();
   this._renderSplitterVisible();
   this._renderInBackground();
@@ -178,10 +179,16 @@ scout.Desktop.prototype._renderTitle = function() {
   if (title === undefined || title === null) {
     return;
   }
-  var $scoutDivs = $('div.scout');
+  var $scoutDivs = $('.scout');
   if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
     $scoutDivs.document(true).title = title;
   }
+};
+
+scout.Desktop.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  cssClass = cssClass || this.cssClass;
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
 };
 
 scout.Desktop.prototype._renderActiveForm = function() {
@@ -855,7 +862,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   } else {
     this.resizing = false;
   }
-  
+
   // ----- Helper functions -----
 
   function storeSplitterPosition(splitterPosition) {
