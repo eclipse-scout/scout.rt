@@ -431,9 +431,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * {@link IForm#TOOLBAR_VIEW_PART}. In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
+   * Configures the css class(es) of this form.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
    *
-   * @return {@link IForm#TOOLBAR_FORM_HEADER} | {@link IForm#TOOLBAR_VIEW_PART}
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(160)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
+  /**
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
    */
   @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
   @Order(160)
@@ -703,6 +715,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     setCacheBounds(getConfiguredCacheBounds());
     setAskIfNeedSave(getConfiguredAskIfNeedSave());
     setIconId(getConfiguredIconId());
+    setCssClass((getConfiguredCssClass()));
 
     // Set 'modality' as preferred value if not 'auto'.
     int modalityHint = getConfiguredModalityHint();
@@ -800,6 +813,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
+  }
+
+  @Override
+  public String getCssClass() {
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

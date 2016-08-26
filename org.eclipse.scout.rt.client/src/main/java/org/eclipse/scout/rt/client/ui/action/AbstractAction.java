@@ -703,12 +703,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public String getCssClass() {
-    return (String) propertySupport.getProperty(PROP_CSS_CLASS);
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
   }
 
   @Override
   public void setCssClass(String cssClass) {
-    propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

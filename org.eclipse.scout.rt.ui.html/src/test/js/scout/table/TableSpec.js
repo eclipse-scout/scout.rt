@@ -2820,6 +2820,20 @@ describe("Table", function() {
 
     });
 
+    it("considers custom css class", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var event = createPropertyChangeEvent(table, {cssClass: 'custom-class'});
+      table.onModelPropertyChange(event);
+      expect(table.$container).toHaveClass('custom-class');
+
+      event = createPropertyChangeEvent(table, {cssClass: ''});
+      table.onModelPropertyChange(event);
+      expect(table.$container).not.toHaveClass('custom-class');
+    });
+
   });
 
   describe("_sendRowsFiltered", function() {

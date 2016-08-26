@@ -673,6 +673,16 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public String getCssClass() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public boolean doBeforeClosingInternal() {
     throw createUnsupportedOperationException();
   }

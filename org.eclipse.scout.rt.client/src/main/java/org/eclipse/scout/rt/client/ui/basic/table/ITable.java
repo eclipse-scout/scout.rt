@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -46,7 +47,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  * </p>
  * For every inner column class there is a generated getXYColumn method directly on the table.
  */
-public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IAppLinkCapable, IContextMenuOwner {
+public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IStyleable, IAppLinkCapable, IContextMenuOwner {
 
   /**
    * String

@@ -123,6 +123,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
+      }
+    });
     putJsonProperty(new JsonProperty<TREE>(ITree.PROP_CHECKABLE, model) {
       @Override
       protected Boolean modelValue() {

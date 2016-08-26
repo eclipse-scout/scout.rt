@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
-public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, IContextMenuOwner {
+public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppLinkCapable, IContextMenuOwner {
 
   String PROP_TITLE = "title";
   String PROP_ENABLED = "enabled";

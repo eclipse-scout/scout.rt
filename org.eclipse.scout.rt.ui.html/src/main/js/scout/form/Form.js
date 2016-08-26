@@ -61,6 +61,7 @@ scout.Form.prototype._init = function(model) {
 scout.Form.prototype._renderProperties = function() {
   scout.Form.parent.prototype._renderProperties.call(this);
   this._updateTitle();
+  this._renderCssClass();
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -143,6 +144,12 @@ scout.Form.prototype._updateTitle = function() {
   } else if (this.isDialog()) {
     this._updateTitleForDom();
   }
+};
+
+scout.Form.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  cssClass = cssClass || this.cssClass;
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
 };
 
 scout.Form.prototype._updateTitleForWindow = function() {

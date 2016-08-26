@@ -477,12 +477,12 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   @Override
   public String getCssClass() {
-    return (String) propertySupport.getProperty(PROP_CSS_CLASS);
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
   }
 
   @Override
   public void setCssClass(String cssClass) {
-    propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override
