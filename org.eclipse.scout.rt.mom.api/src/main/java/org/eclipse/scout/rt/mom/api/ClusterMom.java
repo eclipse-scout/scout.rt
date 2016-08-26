@@ -16,11 +16,11 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * Example <i>config.properties</i> of {@link ClusterMom} based on JMS with ActiveMQ as implementor.
  *
  * <pre>
- * scout.clustermom.implementor=org.eclipse.scout.rt.mom.jms.JmsMom
- * scout.clustermom.environment=(java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
- *                              (java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\
- *                              (connectionFactoryNames)->ClusterMom\
- *                              (scout.naming.mom.factory.connection)->ClusterMom
+ * scout.mom.cluster.implementor=org.eclipse.scout.rt.mom.jms.JmsMom
+ * scout.mom.cluster.environment=(java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
+ *                               (java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\
+ *                               (connectionFactoryNames)->ClusterMom\
+ *                               (scout.naming.mom.factory.connection)->ClusterMom
  * </pre>
  *
  * @see IMom
