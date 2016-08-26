@@ -83,23 +83,6 @@ scout.Popup.prototype.open = function($parent, event) {
 
 };
 
-scout.Popup.prototype._uninstallAllChildScrollbars = function() {
-  var $scrollables = scout.scrollbars.getScrollables(this.session),
-    handledScrollables = [];
-  $scrollables.forEach(function($scrollable) {
-    if (this.$container.has($scrollable).length > 0) {
-      var options = scout.scrollbars.getScrollableOptions($scrollable);
-      handledScrollables.push({
-        $scrollable: $scrollable,
-        options: options
-      });
-      scout.scrollbars.uninstall($scrollable, this.session);
-    }
-
-  }.bind(this));
-  return handledScrollables;
-};
-
 scout.Popup.prototype._open = function($parent, event) {
   this.render($parent, event);
   this.revalidateLayout();
