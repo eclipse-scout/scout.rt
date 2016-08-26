@@ -20,7 +20,6 @@ function mostRecentJsonRequest() {
 function sandboxSession(options) {
   var $sandbox = $('#sandbox').addClass('scout');
 
-  $sandbox.addClass('scout');
   options = options || {};
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
