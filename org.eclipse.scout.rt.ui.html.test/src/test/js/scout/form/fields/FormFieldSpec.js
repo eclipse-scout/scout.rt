@@ -145,22 +145,4 @@ describe("FormField", function() {
 
   });
 
-  describe("property css class", function() {
-    var formField, model;
-
-    beforeEach(function() {
-      model = helper.createFieldModel();
-      formField = createFormField(model);
-    });
-
-    it("adds or removes custom css class", function() {
-      formField.render(session.$entryPoint);
-
-      formField.setCssClass('custom-class');
-      expect(formField.$container).toHaveClass('custom-class');
-
-      formField.setCssClass('');
-      expect(formField.$container).not.toHaveClass('custom-class');
-    });
-  });
 });

@@ -69,7 +69,6 @@ scout.Action.prototype._renderProperties = function() {
   this._renderSelected();
   this._renderTabbable();
   this._renderCompact();
-  this._renderCssClass();
 };
 
 scout.Action.prototype._remove = function() {
@@ -149,14 +148,6 @@ scout.Action.prototype._renderTabbable = function() {
 
 scout.Action.prototype._renderHorizontalAlignment = function() {
   // nothing to render, property is only considered by the menubar
-};
-
-scout.Action.prototype._removeCssClass = function() {
-  this.$container.removeClass(this.cssClass);
-};
-
-scout.Action.prototype._renderCssClass = function() {
-  this.$container.addClass(this.cssClass);
 };
 
 scout.Action.prototype._renderCompact = function() {

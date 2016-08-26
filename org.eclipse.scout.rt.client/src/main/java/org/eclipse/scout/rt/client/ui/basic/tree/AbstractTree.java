@@ -188,6 +188,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return null;
   }
 
+  /**
+   * Configures the css class(es) of this tree.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(15)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
   protected boolean getConfiguredAutoTitle() {
@@ -571,6 +584,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setTitle(getConfiguredTitle());
     setIconId(getConfiguredIconId());
     setDefaultIconId(getConfiguredDefaultIconId());
+    setCssClass(getConfiguredCssClass());
     setAutoTitle(getConfiguredAutoTitle());
     setCheckable(getConfiguredCheckable());
     setNodeHeightHint(getConfiguredNodeHeightHint());
@@ -933,6 +947,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void setDefaultIconId(String defaultIconId) {
     propertySupport.setPropertyString(PROP_DEFAULT_ICON_ID, defaultIconId);
+  }
+
+  @Override
+  public String getCssClass() {
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

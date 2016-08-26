@@ -188,6 +188,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         return getModel().getTitle();
       }
     });
+    putJsonProperty(new JsonProperty<IDesktop>(IDesktop.PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
+      }
+    });
     putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_SELECT_VIEW_TABS_KEY_STROKES_ENABLED, model) {
       @Override
       protected Object modelValue() {

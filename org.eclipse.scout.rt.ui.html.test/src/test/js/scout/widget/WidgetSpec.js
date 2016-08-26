@@ -518,4 +518,21 @@ describe('Widget', function() {
 
   });
 
+  describe("property css class", function() {
+
+    it("adds or removes custom css class", function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+
+      widget.setCssClass('custom-class');
+      expect(widget.$container).toHaveClass('custom-class');
+
+      widget.setCssClass('');
+      expect(widget.$container).not.toHaveClass('custom-class');
+    });
+
+  });
+
 });

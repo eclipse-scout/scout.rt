@@ -217,6 +217,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
+   * Configures the css class(es) of this tree.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(15)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
+  /**
    * Configures the outlines associated with this desktop. If multiple outlines are configured, there is typically a
    * need to provide some means of switching between different outlines, such as a {@link AbstractOutlineViewButton}.
    * <p>
@@ -547,6 +560,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     BEANS.get(IDeviceTransformationService.class).install(this);
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
+    setCssClass(getConfiguredCssClass());
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setLogoId(getConfiguredLogoId());
@@ -1397,6 +1411,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
+  }
+
+  @Override
+  public String getCssClass() {
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

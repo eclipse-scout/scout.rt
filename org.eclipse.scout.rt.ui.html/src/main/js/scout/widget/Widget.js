@@ -189,6 +189,7 @@ scout.Widget.prototype._render = function($parent) {
 scout.Widget.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderVisible();
+  this._renderCssClass();
 };
 
 /**
@@ -408,6 +409,24 @@ scout.Widget.prototype._renderVisible = function() {
     return;
   }
   this.$container.setVisible(this.visible);
+};
+
+scout.Widget.prototype._removeCssClass = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.removeClass(this.cssClass);
+};
+
+scout.Widget.prototype._renderCssClass = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.addClass(this.cssClass);
+};
+
+scout.Widget.prototype.setCssClass = function(cssClass) {
+  this.setProperty('cssClass', cssClass);
 };
 
 /**

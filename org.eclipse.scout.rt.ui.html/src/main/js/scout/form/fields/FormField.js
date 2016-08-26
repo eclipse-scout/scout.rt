@@ -119,7 +119,6 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelVisible();
   this._renderStatusVisible();
   this._renderStatusPosition();
-  this._renderCssClass();
   this._renderFont();
   this._renderForegroundColor();
   this._renderBackgroundColor();
@@ -292,14 +291,6 @@ scout.FormField.prototype._renderEnabled = function() {
   this._updateDisabledCopyOverlay();
 };
 
-scout.FormField.prototype._removeCssClass = function() {
-  this.$container.removeClass(this.cssClass);
-};
-
-scout.FormField.prototype._renderCssClass = function() {
-  this.$container.addClass(this.cssClass);
-};
-
 scout.FormField.prototype._renderFont = function() {
   scout.styles.legacyStyle(this, this.$field);
 };
@@ -384,10 +375,6 @@ scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
     errorStatus = new scout.Status(errorStatus);
   }
   this._setProperty('errorStatus', errorStatus);
-};
-
-scout.FormField.prototype.setCssClass = function(cssClass) {
-  this.setProperty('cssClass', cssClass);
 };
 
 scout.FormField.prototype.setLabel = function(label) {
