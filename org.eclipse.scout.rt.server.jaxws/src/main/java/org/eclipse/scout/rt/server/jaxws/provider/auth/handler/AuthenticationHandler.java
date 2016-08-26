@@ -40,8 +40,8 @@ import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.method.ContainerBasedAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
+import org.eclipse.scout.rt.server.jaxws.provider.auth.method.PreAuthenticationMethod;
 
 /**
  * <code>SOAPHandler</code> used to authenticate webservice requests based on the configured <i>Authentication
@@ -108,10 +108,10 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
     try {
       final HttpServletRequest servletRequest = Assertions.assertNotNull(m_implementorSpecifics.getServletRequest(messageContext), "ServletRequest must not be null");
 
-      // Get Subject if already authenticated, e.g. by application server or Servlet filter.
-      final Subject requestSubject = BEANS.get(ContainerBasedAuthenticationMethod.class).getRequestSubject(servletRequest, m_principalProducer);
-      if (requestSubject != null) {
-        MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(requestSubject));
+      // Check whether the request was pre-authenticated, e.g. by application server or Servlet filter.
+      final Subject preAuthSubject = BEANS.get(PreAuthenticationMethod.class).getRequestSubject(servletRequest, m_principalProducer);
+      if (preAuthSubject != null) {
+        MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(preAuthSubject));
         return true;
       }
 

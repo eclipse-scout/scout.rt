@@ -16,12 +16,24 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Lookup for JAX-WS {@link RunContext} in WS-EntryPoints.
+ *
+ * @since 6.1
  */
 @ApplicationScoped
 public class JaxWsRunContextLookup {
+
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsRunContextLookup.class);
+
+  private static final String RUNCONTEXT_MISSING_WARNING = ""
+      + "No RunContext found in calling context: using empty RunContext. "
+      + "Specify the RunContext in JAX-WS handler via 'MessageContexts.putRunContext(...)', "
+      + "or use built-in authentication mechanism, "
+      + "or provide it in Servlet filter via 'RunContext.CURRENT.set(...)'";
 
   /**
    * Looks up the {@link RunContext} from the given {@link WebServiceContext}.
@@ -46,18 +58,24 @@ public class JaxWsRunContextLookup {
   }
 
   /**
-   * Method invoked to look up the {@link RunContext}.
+   * Method invoked to look up the {@link RunContext}, and must not return <code>null</code>.
    */
   protected RunContext lookupRunContext(final WebServiceContext webServiceContext) {
     final RunContext runContext = MessageContexts.getRunContext(webServiceContext.getMessageContext());
     if (runContext != null) {
       return runContext;
     }
-    return RunContexts.copyCurrent(true); // use 'copyCurrent(true)' in case the context is provided by a Servlet Filter
+
+    if (RunContext.CURRENT.get() != null) {
+      return RunContext.CURRENT.get().copy();
+    }
+
+    LOG.warn(RUNCONTEXT_MISSING_WARNING);
+    return RunContexts.empty();
   }
 
   /**
-   * Method invoked to look up the {@link Subject}.
+   * Method invoked to look up the {@link Subject}, and may be <code>null</code>.
    */
   protected Subject lookupSubject(final WebServiceContext webServiceContext, final RunContext runContext) {
     final Subject subject = runContext.getSubject();
