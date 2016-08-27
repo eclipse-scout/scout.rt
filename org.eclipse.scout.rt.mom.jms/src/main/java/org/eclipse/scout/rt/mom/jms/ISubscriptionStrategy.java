@@ -24,5 +24,5 @@ public interface ISubscriptionStrategy {
    * @param runContext
    *          specifies the context in which to receive and process the messages; must not be <code>null</code>.
    */
-  <TRANSFER_OBJECT> ISubscription subscribe(IDestination destination, IMessageListener<TRANSFER_OBJECT> listener, RunContext runContext) throws JMSException;
+  <TYPE> ISubscription subscribe(IDestination<TYPE> destination, IMessageListener<TYPE> listener, RunContext runContext) throws JMSException;
 }

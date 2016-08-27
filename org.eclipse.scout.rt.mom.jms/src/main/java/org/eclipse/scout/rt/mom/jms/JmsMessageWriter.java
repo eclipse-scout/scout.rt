@@ -6,6 +6,7 @@ import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_MARSHALLER_CON
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_NULL_OBJECT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REQUEST_REPLY_SUCCESS;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Allows to write a JMS message.
@@ -44,9 +44,9 @@ public class JmsMessageWriter {
    * Initializes this writer.
    */
   protected JmsMessageWriter init(final Session session, final IMarshaller marshaller) throws JMSException {
-    Assertions.assertNotNull(session, "Session not specified");
+    assertNotNull(session, "Session not specified");
     m_message = createMessage(marshaller.getMessageType(), session);
-    m_marshaller = Assertions.assertNotNull(marshaller, "Marshaller not specified");
+    m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
     m_marshallerContext = new HashMap<>();
     return this;
   }

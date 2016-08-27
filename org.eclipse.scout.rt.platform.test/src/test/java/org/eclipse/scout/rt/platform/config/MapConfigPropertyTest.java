@@ -23,8 +23,9 @@ public class MapConfigPropertyTest {
   private static final String PROP_VALUE = ""
       + PROP_NAME + " = (key1)->value1\\\n"
       + "               (key2)->value2\\\n"
-      + "               (key3)->failover:(tcp://local1:61616,tcp://local2:61616,tcp://remote:61616)?randomize=false&priorityBackup=true&priorityURIs=tcp://local1:61616,tcp://local2:61616\\\n"
-      + "               (key4)->value4";
+      + "               (key3)->vm:(broker:(tcp://localhost:8229)?persistent=false)?jms.prefetchPolicy.queuePrefetch=1\\\n"
+      + "               (key4)->failover:(tcp://local1:61616,tcp://local2:61616,tcp://remote:61616)?randomize=false&priorityBackup=true&priorityURIs=tcp://local1:61616,tcp://local2:61616\\\n"
+      + "               (key5)->value4";
 
   private static PropertiesHelper PROPERTIES_HELPER;
 
@@ -43,8 +44,9 @@ public class MapConfigPropertyTest {
     Map<String, String> expected = new HashMap<>();
     expected.put("key1", "value1");
     expected.put("key2", "value2");
-    expected.put("key3", "failover:(tcp://local1:61616,tcp://local2:61616,tcp://remote:61616)?randomize=false&priorityBackup=true&priorityURIs=tcp://local1:61616,tcp://local2:61616");
-    expected.put("key4", "value4");
+    expected.put("key3", "vm:(broker:(tcp://localhost:8229)?persistent=false)?jms.prefetchPolicy.queuePrefetch=1");
+    expected.put("key4", "failover:(tcp://local1:61616,tcp://local2:61616,tcp://remote:61616)?randomize=false&priorityBackup=true&priorityURIs=tcp://local1:61616,tcp://local2:61616");
+    expected.put("key5", "value4");
     assertEquals(expected, testee.getValue());
   }
 

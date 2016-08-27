@@ -1,5 +1,11 @@
 package org.eclipse.scout.rt.mom.api.encrypter;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertGreater;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.fail;
+
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
@@ -18,7 +24,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 
 /**
@@ -55,7 +60,7 @@ public class AesEncrypter implements IEncrypter {
 
   public AesEncrypter init() {
     if (!m_initialized.compareAndSet(false, true)) {
-      Assertions.fail("{} already initialized", AesEncrypter.class);
+      fail("{} already initialized", AesEncrypter.class);
     }
     assertConfiguration();
 
@@ -132,24 +137,24 @@ public class AesEncrypter implements IEncrypter {
   // === Configuration methods === //
 
   protected void assertConfiguration() {
-    Assertions.assertNotNull(m_algorithmProvider, "'AES algorithm provider' not defined");
-    Assertions.assertNotNull(m_pbeSalt, "'PBE salt' not defined");
-    Assertions.assertNotNull(m_pbePassword, "'PBE password' not defined");
-    Assertions.assertTrue(m_pbeKeyLength == 128 || m_pbeKeyLength == 192 || m_pbeKeyLength == 256, "'PBE key length' must be 128, 192 or 256 bits");
-    Assertions.assertNotNull(m_pbeAlgorithm, "'PBE algorithm' not defined");
-    Assertions.assertNotNull(m_pbeAlgorithmProvider, "'PBE algorithm provider' not defined");
-    Assertions.assertGreater(m_pbeIterationCount, 0, "'PBE iteration count' not defined");
-    Assertions.assertGreater(m_gcmInitializationVectorByteLength, 0, "GCM initialization vector' not defined");
-    Assertions.assertGreater(m_gcmAuthTagBitLength, 0, "GCM auth tag length' not defined");
-    Assertions.assertNotNull(m_padding, "'Padding' not defined");
+    assertNotNull(m_algorithmProvider, "'AES algorithm provider' not defined");
+    assertNotNull(m_pbeSalt, "'PBE salt' not defined");
+    assertNotNull(m_pbePassword, "'PBE password' not defined");
+    assertTrue(m_pbeKeyLength == 128 || m_pbeKeyLength == 192 || m_pbeKeyLength == 256, "'PBE key length' must be 128, 192 or 256 bits");
+    assertNotNull(m_pbeAlgorithm, "'PBE algorithm' not defined");
+    assertNotNull(m_pbeAlgorithmProvider, "'PBE algorithm provider' not defined");
+    assertGreater(m_pbeIterationCount, 0, "'PBE iteration count' not defined");
+    assertGreater(m_gcmInitializationVectorByteLength, 0, "GCM initialization vector' not defined");
+    assertGreater(m_gcmAuthTagBitLength, 0, "GCM auth tag length' not defined");
+    assertNotNull(m_padding, "'Padding' not defined");
   }
 
   protected void assertInitialized() {
-    Assertions.assertTrue(m_initialized.get(), "{} not initialized", AesEncrypter.class);
+    assertTrue(m_initialized.get(), "{} not initialized", AesEncrypter.class);
   }
 
   protected void assertNotInitialized() {
-    Assertions.assertFalse(m_initialized.get(), "{} already initialized", AesEncrypter.class);
+    assertFalse(m_initialized.get(), "{} already initialized", AesEncrypter.class);
   }
 
   /**

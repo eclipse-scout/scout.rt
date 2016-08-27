@@ -81,7 +81,7 @@ public interface IMom {
    * @see #newTopic(String)
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
-  void publish(IDestination destination, Object transferObject);
+  <TYPE> void publish(IDestination<TYPE> destination, TYPE transferObject);
 
   /**
    * Publishes the given message to the given destination.
@@ -99,7 +99,7 @@ public interface IMom {
    * @see #newTopic(String)
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
-  void publish(IDestination destination, Object transferObject, PublishInput input);
+  <TYPE> void publish(IDestination<TYPE> destination, TYPE transferObject, PublishInput input);
 
   /**
    * Subscribes the given listener to receive messages sent to the given destination. Messages are acknowledged
@@ -116,7 +116,7 @@ public interface IMom {
    * @return subscription handle to unsubscribe from the destination.
    * @see #publish(IDestination, Object)
    */
-  <TRANSFER_OBJECT> ISubscription subscribe(IDestination destination, IMessageListener<TRANSFER_OBJECT> listener, RunContext runContext);
+  <TYPE> ISubscription subscribe(IDestination<TYPE> destination, IMessageListener<TYPE> listener, RunContext runContext);
 
   /**
    * Subscribes the given listener to receive messages sent to the given destination.
@@ -136,7 +136,7 @@ public interface IMom {
    * @return subscription handle to unsubscribe from the destination.
    * @see #publish(IDestination, Object)
    */
-  <TRANSFER_OBJECT> ISubscription subscribe(IDestination destination, IMessageListener<TRANSFER_OBJECT> listener, RunContext runContext, int acknowledgementMode);
+  <TYPE> ISubscription subscribe(IDestination<TYPE> destination, IMessageListener<TYPE> listener, RunContext runContext, int acknowledgementMode);
 
   /**
    * Initiates a 'request-reply' communication with a replier, and blocks until the reply is received (synchronous).
@@ -156,7 +156,7 @@ public interface IMom {
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
    *          documentation for more information about the difference between topic and queue based messaging.
-   * @param transferObject
+   * @param requestObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
    *          that destination. By default, {@link JsonMarshaller} is used.
@@ -165,7 +165,7 @@ public interface IMom {
    *           if interrupted while waiting for the reply to receive.
    * @see {@link #reply(IDestination, IRequestListener, RunContext)}
    */
-  <REPLY_OBJECT, REQUEST_OBJECT> REPLY_OBJECT request(IDestination destination, REQUEST_OBJECT transferObject);
+  <REQUEST, REPLY> REPLY request(IBiDestination<REQUEST, REPLY> destination, REQUEST requestObject);
 
   /**
    * Initiates a 'request-reply' communication with a replier, and blocks until the reply is received. This type of
@@ -199,7 +199,7 @@ public interface IMom {
    * @see #reply(IDestination, IRequestListener, RunContext)
    */
 
-  <REPLY_OBJECT> REPLY_OBJECT request(IDestination destination, Object transferObject, PublishInput input);
+  <REQUEST, REPLY> REPLY request(IBiDestination<REQUEST, REPLY> destination, REQUEST requestObject, PublishInput input);
 
   /**
    * Subscribes the given listener to receive messages from 'request-reply' communication sent to the given destination.
@@ -215,22 +215,26 @@ public interface IMom {
    * @return subscription handle to unsubscribe from the destination.
    * @see #request(IDestination, Object)
    */
-  <REQUEST_TRANSFER_OBJECT, REPLY_TRANSFER_OBJECT> ISubscription reply(IDestination destination, IRequestListener<REQUEST_TRANSFER_OBJECT, REPLY_TRANSFER_OBJECT> listener, RunContext runContext);
+  <REQUEST, REPLY> ISubscription reply(IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, RunContext runContext);
 
   /**
-   * Creates a new topic for publish/subscribe messaging.
+   * Creates a destination for asynchronous 'publish/subscribe' messaging.
+   *
+   * @see IDestination#TOPIC
+   * @see IDestination#QUEUE
+   * @see IDestination#JNDI
    */
-  IDestination newTopic(String topic);
+  <TYPE> IDestination<TYPE> newDestination(String name, int destinationType);
 
   /**
-   * Creates a new queue for point-to-point messaging.
+   * Creates a destination for synchronous 'request-reply' messaging, where the requester sends a request for some data
+   * and the replier responds to the request.
+   *
+   * @see IDestination#TOPIC
+   * @see IDestination#QUEUE
+   * @see IDestination#JNDI
    */
-  IDestination newQueue(String queue);
-
-  /**
-   * Looks up the given destination using JNDI.
-   */
-  IDestination lookupDestination(String destination);
+  <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(String name, int destinationType);
 
   /**
    * Creates a input to control how to publish a message. The input returned specifies normal delivery priority,
@@ -252,7 +256,7 @@ public interface IMom {
    * @see JsonMarshaller
    * @see ObjectMarshaller
    */
-  IRegistrationHandle registerMarshaller(IDestination destination, IMarshaller marshaller);
+  IRegistrationHandle registerMarshaller(IDestination<?> destination, IMarshaller marshaller);
 
   /**
    * Allows end-to-end encryption for transfer objects sent to the given destination. By default, no encryption is used.
@@ -260,7 +264,7 @@ public interface IMom {
    * @return registration handle to unregister the encrypter from the destination.
    * @see ClusterEncrypter
    */
-  IRegistrationHandle registerEncrypter(IDestination destination, IEncrypter encrypter);
+  IRegistrationHandle registerEncrypter(IDestination<?> destination, IEncrypter encrypter);
 
   /**
    * Destroys this MOM and releases all associated resources.

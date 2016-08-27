@@ -40,18 +40,18 @@ public class TransactedStrategy implements ISubscriptionStrategy {
   }
 
   @Override
-  public <TRANSFER_OBJECT> ISubscription subscribe(final IDestination destination, final IMessageListener<TRANSFER_OBJECT> listener, final RunContext runContext) throws JMSException {
+  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
 
     final Session transactedSession = m_mom.getConnection().createSession(true, Session.SESSION_TRANSACTED);
-    final MessageConsumer consumer = transactedSession.createConsumer(m_mom.toJmsDestination(destination));
+    final MessageConsumer consumer = transactedSession.createConsumer(m_mom.lookupJmsDestination(destination, transactedSession));
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
       public void onJmsMessage(final Message jmsMessage) throws JMSException, GeneralSecurityException {
-        final JmsMessageReader<TRANSFER_OBJECT> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
-        final IMessage<TRANSFER_OBJECT> message = messageReader.readMessage();
+        final JmsMessageReader<TYPE> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
+        final IMessage<TYPE> message = messageReader.readMessage();
 
         runContext
             .withCorrelationId(messageReader.readCorrelationId())

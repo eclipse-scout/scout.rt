@@ -30,12 +30,13 @@ import javax.jms.Message;
 import javax.naming.Context;
 
 import org.apache.activemq.jndi.ActiveMQInitialContextFactory;
+import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMom.EncrypterProperty;
-import org.eclipse.scout.rt.mom.api.IMomInitializer;
+import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter.PbePasswordProperty;
@@ -93,7 +94,8 @@ public class JmsMomTest {
     env.put(Context.INITIAL_CONTEXT_FACTORY, ActiveMQInitialContextFactory.class.getName());
     env.put(Context.PROVIDER_URL, "vm://junitBroker?broker.persistent=false");
     env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
-    env.put(IMomInitializer.CONNECTION_FACTORY, "JUnitConnectionFactory");
+    env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
+    env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
 
     s_mom = BEANS.get(JmsMom.class);
     s_mom.init(env);
@@ -155,7 +157,7 @@ public class JmsMomTest {
     person.setLastname("smith");
     person.setFirstname("anna");
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
 
     s_mom.publish(queue, person);
@@ -177,7 +179,7 @@ public class JmsMomTest {
   public void testPublishBytes() throws InterruptedException {
     final Capturer<byte[]> capturer = new Capturer<>();
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<byte[]> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(BytesMarshaller.class)));
 
     s_mom.publish(queue, "hello world".getBytes(StandardCharsets.UTF_8));
@@ -198,7 +200,7 @@ public class JmsMomTest {
   public void testPublishText() throws InterruptedException {
     final Capturer<String> capturer = new Capturer<>();
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(TextMarshaller.class)));
 
     s_mom.publish(queue, "hello world");
@@ -297,7 +299,7 @@ public class JmsMomTest {
   public void testPublishJsonData() throws InterruptedException {
     final Capturer<Person> capturer = new Capturer<>();
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();
@@ -321,7 +323,7 @@ public class JmsMomTest {
 
   @Test
   public void testTopicPublishSubscribe() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
 
     final Capturer<String> capturer = new Capturer<>();
 
@@ -343,7 +345,7 @@ public class JmsMomTest {
 
   @Test
   public void testTopicPublishSubscribeMultipleSubscriptions() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
 
     final CountDownLatch latch = new CountDownLatch(2);
 
@@ -375,7 +377,7 @@ public class JmsMomTest {
   @Test
   @Times(10) // regression
   public void testTopicPublishFirst() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
 
     // Publish a message
     s_mom.publish(topic, "hello world");
@@ -396,7 +398,7 @@ public class JmsMomTest {
 
   @Test
   public void testQueuePublishSubscribe() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
 
     final Capturer<String> capturer = new Capturer<>();
 
@@ -419,7 +421,7 @@ public class JmsMomTest {
   @Test
   @Times(10) // regression
   public void testQueuePublishSubscribeMultipleSubscriptions() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
 
     final AtomicInteger msgCounter = new AtomicInteger();
     final CountDownLatch latch = new CountDownLatch(1);
@@ -456,7 +458,7 @@ public class JmsMomTest {
   @Test
   @Times(10) // regression
   public void testQueuePublishFirst() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
 
     // Publish a message
     s_mom.publish(queue, "hello world");
@@ -477,19 +479,19 @@ public class JmsMomTest {
 
   @Test
   public void testQueuePublishSubscribeCorrelationId() throws InterruptedException {
-    final IDestination queue = s_mom.newQueue("test/mom");
+    final IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     testPublishSubscribeCorrelationIdInternal(queue);
   }
 
   @Test
   public void testTopicPublishSubscribeCorrelationId() throws InterruptedException {
-    final IDestination topic = s_mom.newTopic("test/mom");
+    final IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
     testPublishSubscribeCorrelationIdInternal(topic);
   }
 
   @Test(timeout = 15_000)
   public void testQueueRequestReply() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
 
     // Subscribe for the destination
     m_disposables.add(s_mom.reply(queue, new IRequestListener<String, String>() {
@@ -509,13 +511,13 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyCorrelationId() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyCorrelationIdInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyCorrelationId() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyCorrelationIdInternal(topic);
   }
 
@@ -526,7 +528,7 @@ public class JmsMomTest {
   }
 
   private void testProperties(IEncrypter encrypter) throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
 
     List<IDisposable> disposables = new ArrayList<>();
     if (encrypter != null) {
@@ -557,7 +559,7 @@ public class JmsMomTest {
   @Test
   @Times(10)
   public void testTimeToLive() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
 
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -580,7 +582,7 @@ public class JmsMomTest {
     assertFalse(latch.await(50, TimeUnit.MILLISECONDS)); // expect the message not to be received
   }
 
-  private void testRequestReplyCorrelationIdInternal(final IDestination destination) throws InterruptedException {
+  private void testRequestReplyCorrelationIdInternal(final IBiDestination<String, String> destination) throws InterruptedException {
     m_disposables.add(s_mom.reply(destination, new IRequestListener<String, String>() {
 
       @Override
@@ -606,7 +608,7 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testTopicRequestReply() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
 
     // Subscribe for the destination
     m_disposables.add(s_mom.reply(topic, new IRequestListener<String, String>() {
@@ -627,7 +629,7 @@ public class JmsMomTest {
   @Test(timeout = 15_000)
   @Times(10) // regression
   public void testQueueRequestReplyMultipleSubscriptions() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
 
     final CountDownLatch msgLatch = new CountDownLatch(2);
 
@@ -661,7 +663,7 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyMultipleSubscriptions() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
 
     final CountDownLatch msgLatch = new CountDownLatch(2);
 
@@ -695,7 +697,7 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyRequestFirst() throws InterruptedException {
-    final IDestination queue = s_mom.newQueue("test/mom");
+    final IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
 
     // Test setup: simulate to initiate 'request-reply' before subscription
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
@@ -738,7 +740,7 @@ public class JmsMomTest {
   @Test(timeout = 15_000)
   @Times(10) // regression
   public void testTopicRequestReplyRequestFirst() throws InterruptedException {
-    final IDestination topic = s_mom.newTopic("test/mom");
+    final IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
 
     // Test setup: simulate to initiate 'request-reply' before subscription
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
@@ -786,17 +788,17 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyCancellation() throws InterruptedException {
-    final IDestination queue = s_mom.newQueue("test/mom");
+    final IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyCancellationInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyCancellation() throws InterruptedException {
-    final IDestination queue = s_mom.newTopic("test/mom");
-    testRequestReplyCancellationInternal(queue);
+    final IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    testRequestReplyCancellationInternal(topic);
   }
 
-  private void testRequestReplyCancellationInternal(final IDestination destination) throws InterruptedException {
+  private void testRequestReplyCancellationInternal(final IBiDestination<String, String> destination) throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(2);
 
@@ -887,17 +889,17 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyTimeout() throws InterruptedException {
-    final IDestination queue = s_mom.newTopic("test/mom");
+    final IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyTimeoutInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyTimeout() throws InterruptedException {
-    final IDestination topic = s_mom.newTopic("test/mom");
+    final IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyTimeoutInternal(topic);
   }
 
-  private void testRequestReplyTimeoutInternal(final IDestination destination) throws InterruptedException {
+  private void testRequestReplyTimeoutInternal(final IBiDestination<String, String> destination) throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(2);
 
@@ -941,7 +943,7 @@ public class JmsMomTest {
     assertTrue(replierInterrupted.get());
   }
 
-  private void testPublishSubscribeCorrelationIdInternal(final IDestination destination) throws InterruptedException {
+  private void testPublishSubscribeCorrelationIdInternal(final IDestination<String> destination) throws InterruptedException {
     final Capturer<String> cid = new Capturer<>();
 
     m_disposables.add(s_mom.subscribe(destination, new IMessageListener<String>() {
@@ -968,17 +970,17 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyJsonObjectMarshaller() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IBiDestination<Person, Person> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyJsonObjectMarshallerInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyJsonObjectMarshaller() throws InterruptedException {
-    IDestination topic = s_mom.newTopic("test/mom");
+    IBiDestination<Person, Person> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyJsonObjectMarshallerInternal(topic);
   }
 
-  private void testRequestReplyJsonObjectMarshallerInternal(IDestination destination) throws InterruptedException {
+  private void testRequestReplyJsonObjectMarshallerInternal(IBiDestination<Person, Person> destination) throws InterruptedException {
     m_disposables.add(s_mom.registerMarshaller(destination, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();
@@ -1010,7 +1012,7 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IDestination destination = s_mom.newQueue("test/mom");
+    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
 
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
@@ -1038,7 +1040,7 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IDestination destination = s_mom.newQueue("test/mom");
+    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     s_mom.registerMarshaller(destination, BEANS.get(JsonMarshaller.class));
 
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
@@ -1067,7 +1069,7 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IDestination destination = s_mom.newQueue("test/mom");
+    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     s_mom.registerMarshaller(destination, BEANS.get(JsonMarshaller.class));
 
     final RuntimeException runtimeException = new VetoException();
@@ -1096,7 +1098,7 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IDestination destination = s_mom.newQueue("test/mom");
+    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
     s_mom.registerMarshaller(destination, BEANS.get(TextMarshaller.class));
 
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
@@ -1181,7 +1183,7 @@ public class JmsMomTest {
   public void testPublishJsonDataSecure() throws InterruptedException {
     final Capturer<Person> capturer = new Capturer<>();
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();
@@ -1214,7 +1216,7 @@ public class JmsMomTest {
       person.setLastname("smith");
       person.setFirstname("anna");
 
-      IDestination queue = s_mom.newQueue("test/mom");
+      IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
       m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
 
       s_mom.publish(queue, person);
@@ -1250,7 +1252,7 @@ public class JmsMomTest {
       person.setLastname("smith");
       person.setFirstname("anna");
 
-      IDestination queue = s_mom.newQueue("test/mom");
+      IBiDestination<Person, Void> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
       m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
 
       m_disposables.add(s_mom.reply(queue, new IRequestListener<Person, Void>() {
@@ -1287,7 +1289,7 @@ public class JmsMomTest {
     ITransaction tx = BEANS.get(ITransaction.class);
     ITransaction.CURRENT.set(tx);
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
 
     s_mom.publish(queue, person, s_mom.newPublishInput().withTransactional(true));
@@ -1326,9 +1328,9 @@ public class JmsMomTest {
     assertEquals("anna", testee.getFirstname());
   }
 
-  // TODO dwi
+  @Test
   public void testSubscribeTransactional() throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
     m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
 
     s_mom.publish(queue, "message-1", s_mom.newPublishInput());
@@ -1382,7 +1384,7 @@ public class JmsMomTest {
   private Object testPublishAndConsumeInternal(Object transferObject, IMarshaller marshaller, IEncrypter encrypter) throws InterruptedException {
     final Capturer<Object> capturer = new Capturer<>();
 
-    IDestination queue = s_mom.newQueue("test/mom");
+    IDestination<Object> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
 
     List<IDisposable> disposables = new ArrayList<>();
     if (encrypter != null) {
@@ -1411,7 +1413,7 @@ public class JmsMomTest {
   }
 
   private Object testRequestReplyInternal(Object request, IMarshaller marshaller, IEncrypter encrypter) throws InterruptedException {
-    IDestination queue = s_mom.newQueue("test/mom");
+    IBiDestination<Object, Object> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
 
     List<IDisposable> disposables = new ArrayList<>();
     if (encrypter != null) {

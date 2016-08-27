@@ -6,6 +6,7 @@ import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_MARSHALLER_CON
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_NULL_OBJECT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REQUEST_REPLY_SUCCESS;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.security.GeneralSecurityException;
 import java.util.Collections;
@@ -27,7 +28,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +52,8 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
    * Initializes this reader.
    */
   protected JmsMessageReader init(final Message message, final IMarshaller marshaller) throws JMSException, GeneralSecurityException {
-    m_message = Assertions.assertNotNull(message, "Message not specified");
-    m_marshaller = Assertions.assertNotNull(marshaller, "Marshaller not specified");
+    m_message = assertNotNull(message, "Message not specified");
+    m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
     initContext();
     return this;
   }
@@ -120,7 +120,7 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
    */
   public Destination readReplyTo() throws JMSException {
     final Destination replyTo = m_message.getJMSReplyTo();
-    return Assertions.assertNotNull(replyTo, "missing 'replyTo' [msg={}]", m_message);
+    return assertNotNull(replyTo, "missing 'replyTo' [msg={}]", m_message);
   }
 
   /**
@@ -131,7 +131,7 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
    */
   public String readReplyId() throws JMSException, GeneralSecurityException {
     final String replyId = readProperty(PROP_REPLY_ID, false);
-    return Assertions.assertNotNull(replyId, "missing 'replyId' [msg={}]", m_message);
+    return assertNotNull(replyId, "missing 'replyId' [msg={}]", m_message);
   }
 
   /**

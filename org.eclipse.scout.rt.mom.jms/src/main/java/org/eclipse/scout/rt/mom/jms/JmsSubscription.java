@@ -22,22 +22,22 @@ public class JmsSubscription implements ISubscription {
 
   private final Session m_session;
   private final MessageConsumer m_consumer;
-  private final IDestination m_destination;
+  private final IDestination<?> m_destination;
 
-  public JmsSubscription(final MessageConsumer consumer, final IDestination destination) {
+  public JmsSubscription(final MessageConsumer consumer, final IDestination<?> destination) {
     m_consumer = consumer;
     m_destination = destination;
     m_session = null;
   }
 
-  public JmsSubscription(final Session session, final IDestination destination) {
+  public JmsSubscription(final Session session, final IDestination<?> destination) {
     m_session = session;
     m_destination = destination;
     m_consumer = null;
   }
 
   @Override
-  public IDestination getDestination() {
+  public IDestination<?> getDestination() {
     return m_destination;
   }
 

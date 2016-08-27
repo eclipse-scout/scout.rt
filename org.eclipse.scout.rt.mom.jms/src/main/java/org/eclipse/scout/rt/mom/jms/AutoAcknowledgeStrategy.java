@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.Session;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
@@ -39,17 +40,18 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
   }
 
   @Override
-  public <TRANSFER_OBJECT> ISubscription subscribe(final IDestination destination, final IMessageListener<TRANSFER_OBJECT> listener, final RunContext runContext) throws JMSException {
+  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
 
-    final MessageConsumer consumer = m_mom.getDefaultSession().createConsumer(m_mom.toJmsDestination(destination));
+    final Session defaultSession = m_mom.getDefaultSession();
+    final MessageConsumer consumer = defaultSession.createConsumer(m_mom.lookupJmsDestination(destination, defaultSession));
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
       public void onJmsMessage(final Message jmsMessage) throws JMSException, GeneralSecurityException {
-        final JmsMessageReader<TRANSFER_OBJECT> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
-        final IMessage<TRANSFER_OBJECT> message = messageReader.readMessage();
+        final JmsMessageReader<TYPE> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
+        final IMessage<TYPE> message = messageReader.readMessage();
 
         Jobs.schedule(new IRunnable() {
 

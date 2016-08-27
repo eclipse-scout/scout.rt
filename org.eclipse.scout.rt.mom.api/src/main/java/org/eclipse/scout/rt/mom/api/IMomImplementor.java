@@ -9,20 +9,25 @@ import java.util.Map;
 import javax.naming.InitialContext;
 
 /**
- * Allows the initialization of a MOM implementor.
+ * Represents a implementor for {@link IMom}.
  *
  * @see IMom
  * @since 6.1
  */
-public interface IMomInitializer {
+public interface IMomImplementor extends IMom {
 
   /**
    * Use this property to specify the JNDI name to lookup the connection factory.
    */
-  String CONNECTION_FACTORY = "scout.naming.mom.factory.connection";
+  String CONNECTION_FACTORY = "scout.mom.connectionfactory.name";
 
   /**
-   * Initializes this {@link IMom} to connect to the environment as specified by the given properties.
+   * Use this property to optionally specify the symbolic name of a MOM.
+   */
+  String SYMBOLIC_NAME = "scout.mom.name";
+
+  /**
+   * Initializes this implementor, e.g. to connect to the environment as specified by the given properties.
    *
    * @param properties
    *          used to connect to the network or broker, and is implementor-specific. To connect to a JMS broker, you

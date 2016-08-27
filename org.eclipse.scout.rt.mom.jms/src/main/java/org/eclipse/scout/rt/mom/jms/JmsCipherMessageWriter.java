@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_ENCRYPTER_CONTEXT;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -14,7 +15,6 @@ import javax.jms.TextMessage;
 
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 
 /**
@@ -32,7 +32,7 @@ public class JmsCipherMessageWriter extends JmsMessageWriter {
    * Initializes this writer.
    */
   protected JmsMessageWriter init(final Session session, final IMarshaller marshaller, final IEncrypter encrypter) throws JMSException {
-    m_encrypter = Assertions.assertNotNull(encrypter, "Encrypter not specified");
+    m_encrypter = assertNotNull(encrypter, "Encrypter not specified");
     m_encrypterContext = encrypter.newContext();
     return super.init(session, marshaller);
   }

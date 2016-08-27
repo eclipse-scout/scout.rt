@@ -15,5 +15,5 @@ public interface ISubscription extends IDisposable {
   /**
    * Returns the destination this subscription belongs to.
    */
-  IDestination getDestination();
+  IDestination<?> getDestination();
 }

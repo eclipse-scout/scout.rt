@@ -1,9 +1,10 @@
 package org.eclipse.scout.rt.mom.api.marshaller;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
+
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * This marshaller allows to transport a series of bytes across the network.
@@ -22,8 +23,7 @@ public class BytesMarshaller implements IMarshaller {
       return null;
     }
 
-    Assertions.assertInstance(transferObject, byte[].class, "bytes array expected [actual={}]", transferObject.getClass().getSimpleName());
-    return (byte[]) transferObject;
+    return (byte[]) assertInstance(transferObject, byte[].class, "bytes array expected [actual={}]", transferObject.getClass().getSimpleName());
   }
 
   @Override

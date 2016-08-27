@@ -1,6 +1,8 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.security.GeneralSecurityException;
 import java.util.Hashtable;
@@ -19,7 +21,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.Topic;
@@ -27,11 +28,12 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
-import org.eclipse.scout.rt.mom.api.IMomInitializer;
+import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.PublishInput;
@@ -42,6 +44,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
@@ -58,8 +61,8 @@ import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -77,19 +80,19 @@ import org.slf4j.LoggerFactory;
  * @since 6.1
  */
 @Bean
-public class JmsMom implements IMom, IMomInitializer {
+public class JmsMom implements IMomImplementor {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsMom.class);
 
   protected final String m_momUid = UUID.randomUUID().toString();
-  protected volatile Context m_context;
-  protected volatile Connection m_connection;
+  protected Context m_context;
+  protected Connection m_connection;
 
-  protected volatile Session m_defaultSession; // single-threaded
-  protected volatile MessageProducer m_defaultProducer;
+  protected Session m_defaultSession; // single-threaded
+  protected MessageProducer m_defaultProducer;
 
-  protected volatile TemporaryQueue m_replyQueue;
-  protected volatile Topic m_requestReplyCancellationTopic;
+  protected TemporaryQueue m_replyQueue;
+  protected Topic m_requestReplyCancellationTopic;
   protected final Map<String, ReplyFuture> m_replyFutureMap = new ConcurrentHashMap<>();
 
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
@@ -99,6 +102,11 @@ public class JmsMom implements IMom, IMomInitializer {
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
+    final String symbolicName = StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM");
+    if (Platform.get().inDevelopmentMode()) {
+      LOG.info("{} configuration: {}", symbolicName, properties);
+    }
+
     m_context = createContext(properties);
     m_connection = createConnection(m_context, properties);
     m_defaultSession = m_connection.createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
@@ -138,17 +146,18 @@ public class JmsMom implements IMom, IMomInitializer {
         });
 
     m_connection.start();
+    LOG.info("{} initialized: {}", symbolicName, m_connection);
   }
 
   @Override
-  public void publish(final IDestination destination, final Object transferObject) {
+  public <TYPE> void publish(final IDestination<TYPE> destination, final TYPE transferObject) {
     publish(destination, transferObject, newPublishInput());
   }
 
   @Override
-  public void publish(final IDestination destination, final Object transferObject, final PublishInput input) {
-    Assertions.assertNotNull(destination, "destination not specified");
-    Assertions.assertNotNull(input, "publishInput not specified");
+  public <TYPE> void publish(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) {
+    assertNotNull(destination, "destination not specified");
+    assertNotNull(input, "publishInput not specified");
 
     try {
       if (input.isTransactional()) {
@@ -163,7 +172,7 @@ public class JmsMom implements IMom, IMomInitializer {
     }
   }
 
-  protected void publishNonTransactional(final IDestination destination, final Object transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
+  protected <TYPE> void publishNonTransactional(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
     final IMarshaller marshaller = lookupMarshaller(destination);
     final IEncrypter encrypter = lookupEncrypter(destination);
 
@@ -172,11 +181,11 @@ public class JmsMom implements IMom, IMomInitializer {
         .writeProperties(input.getProperties(), true)
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
-    send(m_defaultProducer, toJmsDestination(destination), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+    send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
-  protected void publishTransactional(final IDestination destination, final Object transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
-    final ITransaction currentTransaction = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
+  protected <TYPE> void publishTransactional(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
+    final ITransaction currentTransaction = assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
     final IMarshaller marshaller = lookupMarshaller(destination);
     final IEncrypter encrypter = lookupEncrypter(destination);
 
@@ -200,26 +209,29 @@ public class JmsMom implements IMom, IMomInitializer {
     });
 
     // Publish the message
-    final Message message = JmsMessageWriter.newInstance(txMember.getTransactedSession(), marshaller, encrypter)
+    final Session transactedSession = txMember.getTransactedSession();
+    final MessageProducer transactedProducer = txMember.getTransactedProducer();
+
+    final Message message = JmsMessageWriter.newInstance(transactedSession, marshaller, encrypter)
         .writeTransferObject(transferObject)
         .writeProperties(input.getProperties(), true)
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
-    send(txMember.getTransactedProducer(), toJmsDestination(destination), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+    send(transactedProducer, lookupJmsDestination(destination, transactedSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
   @Override
-  public <TRANSFER_OBJECT> ISubscription subscribe(final IDestination destination, final IMessageListener<TRANSFER_OBJECT> listener, final RunContext runContext) {
+  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext) {
     return subscribe(destination, listener, runContext, ACKNOWLEDGE_AUTO);
   }
 
   @Override
-  public <TRANSFER_OBJECT> ISubscription subscribe(final IDestination destination, final IMessageListener<TRANSFER_OBJECT> listener, final RunContext runContext, final int acknowledgementMode) {
-    Assertions.assertNotNull(destination, "destination not specified");
-    Assertions.assertNotNull(listener, "messageListener not specified");
+  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext, final int acknowledgementMode) {
+    assertNotNull(destination, "destination not specified");
+    assertNotNull(listener, "messageListener not specified");
 
     try {
-      final ISubscriptionStrategy strategy = Assertions.assertNotNull(m_subscriptionStrategies.get(acknowledgementMode), "Acknowledgement mode not supported [mode={}]", acknowledgementMode);
+      final ISubscriptionStrategy strategy = assertNotNull(m_subscriptionStrategies.get(acknowledgementMode), "Acknowledgement mode not supported [mode={}]", acknowledgementMode);
       return strategy.subscribe(destination, listener, runContext != null ? runContext.copy() : RunContexts.empty());
     }
     catch (final JMSException e) {
@@ -228,21 +240,21 @@ public class JmsMom implements IMom, IMomInitializer {
   }
 
   @Override
-  public <REPLY_OBJECT, REQUEST_OBJECT> REPLY_OBJECT request(final IDestination destination, final REQUEST_OBJECT transferObject) {
-    return request(destination, transferObject, newPublishInput());
+  public <REQUEST, REPLY> REPLY request(final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject) {
+    return request(destination, requestObject, newPublishInput());
   }
 
   @Override
-  public <REPLY_OBJECT> REPLY_OBJECT request(final IDestination destination, final Object transferObject, final PublishInput input) {
-    Assertions.assertNotNull(destination, "destination not specified");
-    Assertions.assertNotNull(input, "publishInput not specified");
-    Assertions.assertFalse(input.isTransactional(), "transactional mode not supported for 'request-reply' communication");
+  public <REQUEST, REPLY> REPLY request(final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject, final PublishInput input) {
+    assertNotNull(destination, "destination not specified");
+    assertNotNull(input, "publishInput not specified");
+    assertFalse(input.isTransactional(), "transactional mode not supported for 'request-reply' communication");
 
     final IMarshaller marshaller = lookupMarshaller(destination);
     final IEncrypter encrypter = lookupEncrypter(destination);
 
     // Prepare to receive the reply message
-    final ReplyFuture<REPLY_OBJECT> replyFuture = new ReplyFuture<>(marshaller, encrypter);
+    final ReplyFuture<REPLY> replyFuture = new ReplyFuture<>(marshaller, encrypter);
     final String replyId = String.format("scout.mom.requestreply.uid-%s", UUID.randomUUID()); // JMS message ID not applicable because unknown until sent
 
     m_replyFutureMap.put(replyId, replyFuture);
@@ -253,9 +265,9 @@ public class JmsMom implements IMom, IMomInitializer {
           .writeReplyId(replyId)
           .writeProperties(input.getProperties(), true)
           .writeCorrelationId(CorrelationId.CURRENT.get())
-          .writeTransferObject(transferObject)
+          .writeTransferObject(requestObject)
           .build();
-      send(m_defaultProducer, toJmsDestination(destination), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+      send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
 
       // Wait until the reply is received
       try {
@@ -282,20 +294,20 @@ public class JmsMom implements IMom, IMomInitializer {
   }
 
   @Override
-  public <REQUEST_OBJECT, REPLY_OBJECT> ISubscription reply(final IDestination destination, final IRequestListener<REQUEST_OBJECT, REPLY_OBJECT> listener, final RunContext runContext) {
-    Assertions.assertNotNull(destination, "Destination not specified");
-    Assertions.assertNotNull(listener, "MessageListener not specified");
+  public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext) {
+    assertNotNull(destination, "Destination not specified");
+    assertNotNull(listener, "MessageListener not specified");
 
     final IMarshaller marshaller = lookupMarshaller(destination);
     final IEncrypter encrypter = lookupEncrypter(destination);
     try {
-      final MessageConsumer consumer = m_defaultSession.createConsumer(toJmsDestination(destination));
+      final MessageConsumer consumer = m_defaultSession.createConsumer(lookupJmsDestination(destination, m_defaultSession));
       consumer.setMessageListener(new JmsMessageListener() {
 
         @Override
         public void onJmsMessage(final Message jmsRequest) throws JMSException, GeneralSecurityException {
-          final JmsMessageReader<REQUEST_OBJECT> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller, encrypter);
-          final IMessage<REQUEST_OBJECT> request = requestReader.readMessage();
+          final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller, encrypter);
+          final IMessage<REQUEST> request = requestReader.readMessage();
           final String replyId = requestReader.readReplyId();
           final Destination replyTopic = requestReader.readReplyTo();
 
@@ -305,7 +317,7 @@ public class JmsMom implements IMom, IMomInitializer {
             public void run() throws Exception {
               Message replyMessage;
               try {
-                final REPLY_OBJECT reply = listener.onRequest(request);
+                final REPLY reply = listener.onRequest(request);
                 replyMessage = JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
                     .writeTransferObject(reply)
                     .writeRequestReplySuccess(true)
@@ -343,42 +355,13 @@ public class JmsMom implements IMom, IMomInitializer {
   }
 
   @Override
-  public IDestination newTopic(final String topic) {
-    try {
-      return BEANS.get(JmsTopicDestination.class).init(m_defaultSession.createTopic(topic));
-    }
-    catch (final JMSException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
+  public <TYPE> IDestination<TYPE> newDestination(final String name, final int destinationType) {
+    return new org.eclipse.scout.rt.mom.api.Destination<TYPE, Void>(name, destinationType);
   }
 
   @Override
-  public IDestination newQueue(final String queue) {
-    try {
-      return BEANS.get(JmsQueueDestination.class).init(m_defaultSession.createQueue(queue));
-    }
-    catch (final JMSException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
-  }
-
-  @Override
-  public IDestination lookupDestination(final String name) {
-    try {
-      final Destination destination = (Destination) m_context.lookup(name);
-      if (destination instanceof Queue) {
-        return BEANS.get(JmsQueueDestination.class).init((Queue) destination);
-      }
-      else if (destination instanceof Topic) {
-        return BEANS.get(JmsTopicDestination.class).init((Topic) destination);
-      }
-      else {
-        throw new PlatformException("Destination lookup failed: must be a topic or queue [name={}, destination={}]", name, destination);
-      }
-    }
-    catch (final NamingException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
+  public <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final int destinationType) {
+    return new org.eclipse.scout.rt.mom.api.Destination<REQUEST, REPLY>(name, destinationType);
   }
 
   @Override
@@ -397,7 +380,7 @@ public class JmsMom implements IMom, IMomInitializer {
   }
 
   @Override
-  public IRegistrationHandle registerMarshaller(final IDestination destination, final IMarshaller marshaller) {
+  public IRegistrationHandle registerMarshaller(final IDestination<?> destination, final IMarshaller marshaller) {
     m_marshallers.put(destination, marshaller);
     return new IRegistrationHandle() {
 
@@ -409,7 +392,7 @@ public class JmsMom implements IMom, IMomInitializer {
   }
 
   @Override
-  public IRegistrationHandle registerEncrypter(final IDestination destination, final IEncrypter encrypter) {
+  public IRegistrationHandle registerEncrypter(final IDestination<?> destination, final IEncrypter encrypter) {
     m_encrypters.put(destination, encrypter);
     return new IRegistrationHandle() {
 
@@ -433,7 +416,7 @@ public class JmsMom implements IMom, IMomInitializer {
   /**
    * Returns the {@link IMarshaller} registered for the given destination, and is never <code>null</code>.
    */
-  public IMarshaller lookupMarshaller(final IDestination destination) {
+  public IMarshaller lookupMarshaller(final IDestination<?> destination) {
     final IMarshaller marshaller = m_marshallers.get(destination);
     if (marshaller != null) {
       return marshaller;
@@ -444,7 +427,7 @@ public class JmsMom implements IMom, IMomInitializer {
   /**
    * Returns the {@link IEncrypter} registered for the given destination, or <code>null</code> if not set.
    */
-  public IEncrypter lookupEncrypter(final IDestination destination) {
+  public IEncrypter lookupEncrypter(final IDestination<?> destination) {
     final IEncrypter encrypter = m_encrypters.get(destination);
     if (encrypter != null) {
       return encrypter;
@@ -499,10 +482,10 @@ public class JmsMom implements IMom, IMomInitializer {
   }
 
   protected Connection createConnection(final Context context, final Map<Object, Object> properties) throws NamingException, JMSException {
-    final String connectionFactoryName = (String) Assertions.assertNotNull(properties.get(CONNECTION_FACTORY), "Property {} not specified to lookup connection factory", CONNECTION_FACTORY);
+    final String connectionFactoryName = (String) assertNotNull(properties.get(CONNECTION_FACTORY), "Property {} not specified to lookup connection factory", CONNECTION_FACTORY);
     final ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(connectionFactoryName);
     final Connection connection = connectionFactory.createConnection();
-    connection.setClientID(computeConnectionIdentifier());
+    connection.setClientID(computeClientId(properties));
     connection.setExceptionListener(new ExceptionListener() {
 
       @Override
@@ -513,8 +496,22 @@ public class JmsMom implements IMom, IMomInitializer {
     return connection;
   }
 
-  public Destination toJmsDestination(final IDestination destination) {
-    return Assertions.assertNotNull(destination.getAdapter(Destination.class), "JMS destination cannot be resolved");
+  public Destination lookupJmsDestination(final IDestination<?> destination, final Session session) {
+    try {
+      switch (destination.getType()) {
+        case IDestination.TOPIC:
+          return session.createTopic(destination.getName());
+        case IDestination.QUEUE:
+          return session.createQueue(destination.getName());
+        case IDestination.JNDI_LOOKUP:
+          return (Destination) m_context.lookup(destination.getName());
+        default:
+          throw new PlatformException("Not supported destination [type={}]", destination.getType());
+      }
+    }
+    catch (final JMSException | NamingException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
   }
 
   public int toJmsPriority(final PublishInput publishInput) {
@@ -547,17 +544,17 @@ public class JmsMom implements IMom, IMomInitializer {
   /**
    * Returns the identifier to name the {@link Connection}.
    */
-  protected String computeConnectionIdentifier() {
+  protected String computeClientId(final Map<Object, Object> properties) {
     final String applicationName = CONFIG.getPropertyValue(ApplicationNameProperty.class);
     final String applicationVersion = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
-    return String.format("%s:%s [mom=%s nodeId=%s]", applicationName, applicationVersion, getClass().getSimpleName(), nodeId);
+    return String.format("%s [application='%s:%s' nodeId='%s']", StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId);
   }
 
   /**
    * Future to wait for a reply to receive.
    */
-  protected static class ReplyFuture<TYPE> {
+  protected static class ReplyFuture<REPLY> {
 
     protected final IBlockingCondition m_condition = Jobs.newBlockingCondition(true);
     private final IMarshaller m_marshaller;
@@ -589,7 +586,7 @@ public class JmsMom implements IMom, IMomInitializer {
      *           if the wait timed out.
      */
     @SuppressWarnings("unchecked")
-    public TYPE awaitDoneAndGet(final long timeoutMillis) throws JMSException, GeneralSecurityException, ExecutionException {
+    public REPLY awaitDoneAndGet(final long timeoutMillis) throws JMSException, GeneralSecurityException, ExecutionException {
       // Wait until the reply is received
       if (timeoutMillis == PublishInput.INFINITELY) {
         m_condition.waitFor();
@@ -602,7 +599,7 @@ public class JmsMom implements IMom, IMomInitializer {
       final JmsMessageReader reader = JmsMessageReader.newInstance(m_reply, m_marshaller, m_encrypter);
       final Object reply = reader.readMessage().getTransferObject();
       if (reader.readRequestReplySuccess()) {
-        return (TYPE) reply;
+        return (REPLY) reply;
       }
       final Throwable cause = reply instanceof Throwable ? (Throwable) reply : new ProcessingException("Request-Reply failed");
       throw new ExecutionException(cause);

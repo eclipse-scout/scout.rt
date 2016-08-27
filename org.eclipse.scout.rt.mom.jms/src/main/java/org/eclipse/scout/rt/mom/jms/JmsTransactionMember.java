@@ -1,12 +1,13 @@
 package org.eclipse.scout.rt.mom.jms;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class JmsTransactionMember implements ITransactionMember {
   }
 
   public JmsTransactionMember withTransactedSession(final Session transactedSession) throws JMSException {
-    Assertions.assertTrue(transactedSession.getTransacted(), "session must be transacted");
+    assertTrue(transactedSession.getTransacted(), "session must be transacted");
     m_transactedSession = transactedSession;
     return this;
   }
