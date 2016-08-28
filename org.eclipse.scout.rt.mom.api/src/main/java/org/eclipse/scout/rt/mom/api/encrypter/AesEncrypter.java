@@ -93,7 +93,7 @@ public class AesEncrypter implements IEncrypter {
 
     // Security depends on a unique initialization vector (IV) for every encryption performed.
     // The IV does not need to be secret. Decryption requires both the key and IV.
-    final byte iv[] = new byte[m_gcmInitializationVectorByteLength];
+    final byte[] iv = new byte[m_gcmInitializationVectorByteLength];
     m_random.nextBytes(iv); // generate random IV
 
     context.put(PROP_GCM_IV, Base64Utility.encode(iv));

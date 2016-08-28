@@ -40,7 +40,7 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
   }
 
   @Override
-  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext) throws JMSException {
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
 
@@ -50,14 +50,14 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
 
       @Override
       public void onJmsMessage(final Message jmsMessage) throws JMSException, GeneralSecurityException {
-        final JmsMessageReader<TYPE> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
-        final IMessage<TYPE> message = messageReader.readMessage();
+        final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
+        final IMessage<DTO> message = messageReader.readMessage();
 
         Jobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            listener.onMessage(message);
+            handleMessage(listener, message);
           }
         }, Jobs.newInput()
             .withName("Receiving JMS message [msg={}]", jmsMessage)
@@ -68,5 +68,12 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
       }
     });
     return new JmsSubscription(consumer, destination);
+  }
+
+  /**
+   * Method invoked upon the receipt of a message.
+   */
+  protected <DTO> void handleMessage(final IMessageListener<DTO> listener, final IMessage<DTO> message) {
+    listener.onMessage(message);
   }
 }

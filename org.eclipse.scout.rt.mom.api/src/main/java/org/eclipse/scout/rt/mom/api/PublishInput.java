@@ -89,6 +89,9 @@ public class PublishInput {
     return this;
   }
 
+  /**
+   * Returns the timeout in milliseconds.
+   */
   public long getRequestReplyTimeout() {
     return m_requestReplyTimeout;
   }

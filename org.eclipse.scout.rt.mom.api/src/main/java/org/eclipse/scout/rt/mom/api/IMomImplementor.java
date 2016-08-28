@@ -34,5 +34,5 @@ public interface IMomImplementor extends IMom {
    *          typically provide a {@link InitialContext} with the JNDI name of the connection factory specified with the
    *          property {@link #CONNECTION_FACTORY}.
    */
-  void init(Map<Object, Object> properties) throws Exception;
+  void init(Map<Object, Object> properties) throws Exception; // NOSONAR
 }

@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.PublishInput;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
+import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IPlatform.State;
@@ -239,8 +240,8 @@ public class JmsMom implements IMomImplementor {
     final IEncrypter encrypter = lookupEncrypter(destination);
 
     // Prepare to receive the reply message
-    final ReplyFuture<REPLY> replyFuture = new ReplyFuture<>(marshaller, encrypter);
     final String replyId = String.format("scout.mom.requestreply.uid-%s", UUID.randomUUID()); // JMS message ID not applicable because unknown until sent
+    final ReplyFuture<REPLY> replyFuture = new ReplyFuture<>(marshaller, encrypter, replyId);
 
     m_replyFutureMap.put(replyId, replyFuture);
     try {
@@ -255,26 +256,33 @@ public class JmsMom implements IMomImplementor {
       send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
 
       // Wait until the reply is received
-      try {
-        return replyFuture.awaitDoneAndGet(input.getRequestReplyTimeout());
-      }
-      catch (final ExecutionException e) {
-        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-      }
-      catch (ThreadInterruptedException | TimedOutException e) {
-        final Message cancellationMessage = JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
-            .writeReplyId(replyId)
-            .writeCorrelationId(CorrelationId.CURRENT.get())
-            .build();
-        send(m_defaultProducer, m_requestReplyCancellationTopic, cancellationMessage, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
-        throw e;
-      }
+      return waitForReply(replyFuture, input.getRequestReplyTimeout());
     }
     catch (final JMSException | GeneralSecurityException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
     finally {
       m_replyFutureMap.remove(replyId);
+    }
+  }
+
+  /**
+   * Waits until received the reply. If interrupted or the timeout elapses, the request is cancelled.
+   */
+  protected <REPLY> REPLY waitForReply(final ReplyFuture<REPLY> replyFuture, final long timeout) throws JMSException, GeneralSecurityException {
+    try {
+      return replyFuture.awaitDoneAndGet(timeout);
+    }
+    catch (final ExecutionException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e); // exception thrown by the replier
+    }
+    catch (ThreadInterruptedException | TimedOutException e) {
+      final Message cancellationMessage = JmsMessageWriter.newInstance(m_defaultSession, BEANS.get(TextMarshaller.class), null)
+          .writeReplyId(replyFuture.getReplyId())
+          .writeCorrelationId(CorrelationId.CURRENT.get())
+          .build();
+      send(m_defaultProducer, m_requestReplyCancellationTopic, cancellationMessage, Message.DEFAULT_DELIVERY_MODE, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
+      throw e;
     }
   }
 
@@ -300,25 +308,7 @@ public class JmsMom implements IMomImplementor {
 
             @Override
             public void run() throws Exception {
-              Message replyMessage;
-              try {
-                final REPLY reply = listener.onRequest(request);
-                replyMessage = JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
-                    .writeTransferObject(reply)
-                    .writeRequestReplySuccess(true)
-                    .writeReplyId(replyId)
-                    .writeCorrelationId(CorrelationId.CURRENT.get())
-                    .build();
-              }
-              catch (final Exception e) { // NOSONAR
-                BEANS.get(ExceptionHandler.class).handle(e);
-                replyMessage = JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
-                    .writeTransferObject(interceptRequestReplyException(e))
-                    .writeRequestReplySuccess(false)
-                    .writeReplyId(replyId)
-                    .writeCorrelationId(CorrelationId.CURRENT.get())
-                    .build();
-              }
+              final Message replyMessage = handleRequest(listener, marshaller, encrypter, request, replyId);
               send(m_defaultProducer, replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
             }
           }, Jobs.newInput()
@@ -328,7 +318,6 @@ public class JmsMom implements IMomImplementor {
               .withRunContext((runContext != null ? runContext.copy() : RunContexts.empty())
                   .withThreadLocal(IMessage.CURRENT, request)
                   .withCorrelationId(requestReader.readCorrelationId())));
-
         }
       });
 
@@ -336,6 +325,31 @@ public class JmsMom implements IMomImplementor {
     }
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
+  }
+
+  /**
+   * Delegates the request to the listener, and returns the message to be replied.
+   */
+  protected <REPLY, REQUEST> Message handleRequest(final IRequestListener<REQUEST, REPLY> listener, final IMarshaller marshaller, final IEncrypter encrypter, final IMessage<REQUEST> request, final String replyId)
+      throws JMSException, GeneralSecurityException {
+    try {
+      final REPLY reply = listener.onRequest(request);
+      return JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
+          .writeTransferObject(reply)
+          .writeRequestReplySuccess(true)
+          .writeReplyId(replyId)
+          .writeCorrelationId(CorrelationId.CURRENT.get())
+          .build();
+    }
+    catch (final Exception e) { // NOSONAR
+      BEANS.get(ExceptionHandler.class).handle(e);
+      return JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
+          .writeTransferObject(interceptRequestReplyException(e))
+          .writeRequestReplySuccess(false)
+          .writeReplyId(replyId)
+          .writeCorrelationId(CorrelationId.CURRENT.get())
+          .build();
     }
   }
 
@@ -527,14 +541,16 @@ public class JmsMom implements IMomImplementor {
   protected static class ReplyFuture<REPLY> {
 
     protected final IBlockingCondition m_condition = Jobs.newBlockingCondition(true);
+    private final String m_replyId;
     private final IMarshaller m_marshaller;
     private final IEncrypter m_encrypter;
 
     protected volatile Message m_reply;
 
-    public ReplyFuture(final IMarshaller marshaller, final IEncrypter encrypter) {
+    public ReplyFuture(final IMarshaller marshaller, final IEncrypter encrypter, final String replyId) {
       m_marshaller = marshaller;
       m_encrypter = encrypter;
+      m_replyId = replyId;
     }
 
     /**
@@ -573,6 +589,10 @@ public class JmsMom implements IMomImplementor {
       }
       final Throwable cause = reply instanceof Throwable ? (Throwable) reply : new ProcessingException("Request-Reply failed");
       throw new ExecutionException(cause);
+    }
+
+    public String getReplyId() {
+      return m_replyId;
     }
   }
 

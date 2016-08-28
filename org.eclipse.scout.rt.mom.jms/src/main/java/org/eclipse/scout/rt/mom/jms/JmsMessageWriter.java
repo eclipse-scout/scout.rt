@@ -11,6 +11,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
@@ -107,8 +108,8 @@ public class JmsMessageWriter {
    * Convenience method for {@link #writeProperty(String, String, boolean)} to write multiple properties.
    */
   public JmsMessageWriter writeProperties(final Map<String, String> properties, final boolean encrypt) throws JMSException, GeneralSecurityException {
-    for (final String key : properties.keySet()) {
-      writeProperty(key, properties.get(key), encrypt);
+    for (final Entry<String, String> property : properties.entrySet()) {
+      writeProperty(property.getKey(), property.getValue(), encrypt);
     }
     return this;
   }

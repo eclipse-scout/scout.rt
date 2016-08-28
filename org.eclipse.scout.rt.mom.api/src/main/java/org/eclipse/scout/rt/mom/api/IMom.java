@@ -135,6 +135,9 @@ public interface IMom {
    * @throws TimedOutException
    *           if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
    *           elapsed, an interruption request is sent to the consumer(s).
+   * @throws RuntimeException
+   *           if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
+   *           that exception which is thrown.
    * @param <REQUEST>
    *          the type of the request object
    * @param <REPLY>

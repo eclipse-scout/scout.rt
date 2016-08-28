@@ -14,8 +14,6 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class JsonAsBytesMarshaller extends JsonMarshaller {
 
-  protected static final String PROP_OBJECT_TYPE = "x-scout.mom.json.objecttype";
-
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {
     final String jsonText = (String) super.marshall(transferObject, context);

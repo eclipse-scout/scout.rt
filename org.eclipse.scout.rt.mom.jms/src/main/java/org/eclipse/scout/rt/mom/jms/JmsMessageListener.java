@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 6.1
  */
-public abstract class JmsMessageListener implements MessageListener {
+public abstract class JmsMessageListener implements MessageListener { // NOSONAR
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsMessageListener.class);
 
@@ -32,5 +32,5 @@ public abstract class JmsMessageListener implements MessageListener {
    * Invoked upon the receipt of a message. If this method throws an exception, the exception is given to
    * {@link MomExceptionHandler}.
    */
-  protected abstract void onJmsMessage(Message message) throws Exception;
+  protected abstract void onJmsMessage(Message message) throws Exception; // NOSONAR
 }

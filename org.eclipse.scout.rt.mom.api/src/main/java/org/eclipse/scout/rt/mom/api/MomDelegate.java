@@ -60,5 +60,5 @@ public abstract class MomDelegate implements IMom {
   /**
    * Initializes this {@link IMom} delegate.
    */
-  protected abstract IMom initDelegate() throws Exception;
+  protected abstract IMom initDelegate() throws Exception; // NOSONAR
 }
