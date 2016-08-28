@@ -12,11 +12,11 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * @see IMom#subscribe(IDestination, IMessageListener, RunContext)
  * @since 6.1
  */
-public interface IMessageListener<TRANSFER_OBJECT> {
+public interface IMessageListener<DTO> {
 
   /**
    * Method invoked upon the receive of a message, and is invoked in the {@link RunContext} as specified at
    * registration.
    */
-  void onMessage(IMessage<TRANSFER_OBJECT> message);
+  void onMessage(IMessage<DTO> message);
 }

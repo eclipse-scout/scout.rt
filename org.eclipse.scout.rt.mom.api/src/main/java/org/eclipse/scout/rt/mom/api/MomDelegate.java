@@ -23,28 +23,13 @@ public abstract class MomDelegate implements IMom {
   }
 
   @Override
-  public <TYPE> void publish(final IDestination<TYPE> destination, final TYPE transferObject) {
-    m_delegate.publish(destination, transferObject);
-  }
-
-  @Override
-  public <TYPE> void publish(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) {
+  public <DTO> void publish(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     m_delegate.publish(destination, transferObject, input);
   }
 
   @Override
-  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext) {
-    return m_delegate.subscribe(destination, listener, runContext);
-  }
-
-  @Override
-  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext, final int acknowledgementMode) {
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final int acknowledgementMode) {
     return m_delegate.subscribe(destination, listener, runContext, acknowledgementMode);
-  }
-
-  @Override
-  public <REQUEST, REPLY> REPLY request(final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject) {
-    return m_delegate.request(destination, requestObject);
   }
 
   @Override
@@ -55,21 +40,6 @@ public abstract class MomDelegate implements IMom {
   @Override
   public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext) {
     return m_delegate.reply(destination, listener, runContext);
-  }
-
-  @Override
-  public <TYPE> IDestination<TYPE> newDestination(final String name, final int destinationType) {
-    return m_delegate.newDestination(name, destinationType);
-  }
-
-  @Override
-  public <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final int destinationType) {
-    return m_delegate.newBiDestination(name, destinationType);
-  }
-
-  @Override
-  public PublishInput newPublishInput() {
-    return m_delegate.newPublishInput();
   }
 
   @Override

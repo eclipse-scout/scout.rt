@@ -14,7 +14,7 @@ package org.eclipse.scout.rt.mom.api;
  * @see IMom
  * @since 6.1
  */
-public interface IDestination<TRANSFER_OBJECT> {
+public interface IDestination<DTO> {
 
   /**
    * Represents a topic for <i>publish/subscribe messaging</i>.

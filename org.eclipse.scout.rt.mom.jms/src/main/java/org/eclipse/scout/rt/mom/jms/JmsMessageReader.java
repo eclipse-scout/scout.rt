@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @see JmsMom
  */
 @Bean
-public class JmsMessageReader<TRANSFER_OBJECT> {
+public class JmsMessageReader<DTO> {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsMessageReader.class);
 
@@ -68,7 +68,7 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
    * @see JmsMessageWriter#writeTransferObject(Object)
    */
   @SuppressWarnings("unchecked")
-  public TRANSFER_OBJECT readTransferObject() throws JMSException, GeneralSecurityException {
+  public DTO readTransferObject() throws JMSException, GeneralSecurityException {
     if (Boolean.valueOf(m_marshallerContext.get(PROP_NULL_OBJECT))) {
       return null;
     }
@@ -85,7 +85,7 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
         throw new PlatformException("Unsupported message type '{}'", m_marshaller.getMessageType());
     }
 
-    return (TRANSFER_OBJECT) m_marshaller.unmarshall(transferData, m_marshallerContext);
+    return (DTO) m_marshaller.unmarshall(transferData, m_marshallerContext);
   }
 
   /**
@@ -143,12 +143,12 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
     return Boolean.valueOf(m_marshallerContext.get(PROP_REQUEST_REPLY_SUCCESS));
   }
 
-  public IMessage<TRANSFER_OBJECT> readMessage() throws JMSException, GeneralSecurityException {
-    final TRANSFER_OBJECT transferObject = readTransferObject();
-    return new IMessage<TRANSFER_OBJECT>() {
+  public IMessage<DTO> readMessage() throws JMSException, GeneralSecurityException {
+    final DTO transferObject = readTransferObject();
+    return new IMessage<DTO>() {
 
       @Override
-      public TRANSFER_OBJECT getTransferObject() {
+      public DTO getTransferObject() {
         return transferObject;
       }
 
@@ -204,7 +204,7 @@ public class JmsMessageReader<TRANSFER_OBJECT> {
    * Creates a new reader instance.
    */
   @SuppressWarnings("unchecked")
-  public static <TRANSFER_OBJECT> JmsMessageReader<TRANSFER_OBJECT> newInstance(final Message message, final IMarshaller marshaller, final IEncrypter encrypter) throws JMSException, GeneralSecurityException {
+  public static <DTO> JmsMessageReader<DTO> newInstance(final Message message, final IMarshaller marshaller, final IEncrypter encrypter) throws JMSException, GeneralSecurityException {
     if (encrypter == null) {
       return BEANS.get(JmsMessageReader.class).init(message, marshaller);
     }

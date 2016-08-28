@@ -150,12 +150,7 @@ public class JmsMom implements IMomImplementor {
   }
 
   @Override
-  public <TYPE> void publish(final IDestination<TYPE> destination, final TYPE transferObject) {
-    publish(destination, transferObject, newPublishInput());
-  }
-
-  @Override
-  public <TYPE> void publish(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) {
+  public <DTO> void publish(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     assertNotNull(destination, "destination not specified");
     assertNotNull(input, "publishInput not specified");
 
@@ -172,7 +167,7 @@ public class JmsMom implements IMomImplementor {
     }
   }
 
-  protected <TYPE> void publishNonTransactional(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
+  protected <DTO> void publishNonTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
     final IMarshaller marshaller = lookupMarshaller(destination);
     final IEncrypter encrypter = lookupEncrypter(destination);
 
@@ -184,7 +179,7 @@ public class JmsMom implements IMomImplementor {
     send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
-  protected <TYPE> void publishTransactional(final IDestination<TYPE> destination, final TYPE transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
+  protected <DTO> void publishTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
     final ITransaction currentTransaction = assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
     final IMarshaller marshaller = lookupMarshaller(destination);
     final IEncrypter encrypter = lookupEncrypter(destination);
@@ -221,12 +216,7 @@ public class JmsMom implements IMomImplementor {
   }
 
   @Override
-  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext) {
-    return subscribe(destination, listener, runContext, ACKNOWLEDGE_AUTO);
-  }
-
-  @Override
-  public <TYPE> ISubscription subscribe(final IDestination<TYPE> destination, final IMessageListener<TYPE> listener, final RunContext runContext, final int acknowledgementMode) {
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final int acknowledgementMode) {
     assertNotNull(destination, "destination not specified");
     assertNotNull(listener, "messageListener not specified");
 
@@ -237,11 +227,6 @@ public class JmsMom implements IMomImplementor {
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
-  }
-
-  @Override
-  public <REQUEST, REPLY> REPLY request(final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject) {
-    return request(destination, requestObject, newPublishInput());
   }
 
   @Override
@@ -352,21 +337,6 @@ public class JmsMom implements IMomImplementor {
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
-  }
-
-  @Override
-  public <TYPE> IDestination<TYPE> newDestination(final String name, final int destinationType) {
-    return new org.eclipse.scout.rt.mom.api.Destination<TYPE, Void>(name, destinationType);
-  }
-
-  @Override
-  public <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final int destinationType) {
-    return new org.eclipse.scout.rt.mom.api.Destination<REQUEST, REPLY>(name, destinationType);
-  }
-
-  @Override
-  public PublishInput newPublishInput() {
-    return BEANS.get(PublishInput.class);
   }
 
   @Override
@@ -533,7 +503,7 @@ public class JmsMom implements IMomImplementor {
     }
     t.setStackTrace(new StackTraceElement[0]);
 
-    // Break recursion
+    // Unset cause in status to break recursion
     if (t instanceof ProcessingException) {
       ((ProcessingStatus) ((ProcessingException) t).getStatus()).setException(null);
     }

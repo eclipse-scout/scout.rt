@@ -5,39 +5,27 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
 
 /**
- * Message oriented middleware (MOM) for sending and receiving messages in the cluster. See {@link IMom} for more
- * information.
+ * Message oriented middleware (MOM) for sending and receiving messages in the cluster.
  * <p>
- * Example <i>config.properties</i> of {@link ClusterMom} based on JMS with ActiveMQ as implementor.
- *
- * <pre>
- * scout.mom.cluster.implementor=org.eclipse.scout.rt.mom.jms.JmsMom
- * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
- *                               (scout.mom.connectionfactory.name)->ClusterMom\
- *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
- *                               (java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\
- *                               (connectionFactoryNames)->ClusterMom
- * </pre>
+ * See {@link IMom} for more information.
  *
  * @see IMom
  * @since 6.1
  */
-@ApplicationScoped
-public class ClusterMom extends MomDelegate {
+public class ClusterMom extends MomDelegate implements IMomTransport {
 
   @Override
   protected IMom initDelegate() throws Exception {
     final ClusterMomImplementorProperty implementorProperty = BEANS.get(ClusterMomImplementorProperty.class);
     final Class<? extends IMomImplementor> implementorClazz = assertNotNull(implementorProperty.getValue(), "Missing configuration for {}: MOM implementor not specified [config={}]", ClusterMom.class.getSimpleName(), implementorProperty.getKey());
-    final IMomImplementor momImplementor = BEANS.get(implementorClazz);
-    momImplementor.init(lookupEnvironment());
-    return momImplementor;
+    final IMomImplementor implementor = BEANS.get(implementorClazz);
+    implementor.init(lookupEnvironment());
+    return implementor;
   }
 
   /**
@@ -55,7 +43,7 @@ public class ClusterMom extends MomDelegate {
    * Example to work with a JMS based implementor.
    *
    * <pre>
-   * scout.mom.cluster.implementor = org.eclipse.scout.rt.mom.api.jms.JmsMom
+   * scout.mom.cluster.implementor = org.eclipse.scout.rt.mom.jms.JmsMom
    * </pre>
    */
   public static class ClusterMomImplementorProperty extends AbstractClassConfigProperty<IMomImplementor> {
@@ -67,15 +55,38 @@ public class ClusterMom extends MomDelegate {
   }
 
   /**
-   * Configures the MOM connector and is specific to {@link ClusterMomImplementorProperty}.
+   * Contains the configuration to connect to the network or broker. This configuration is specific to the MOM
+   * implementor as specified in {@link ClusterMomImplementorProperty}.
    * <p>
-   * Example to connect to ActiveMQ broker via <code>JmsMom</code>.
+   * <strong>In the following there are some examples specific to ActiveMQ broker.</strong>
+   * <p>
+   * Example to connect to a peer based cluster, which is useful in development mode because there is no central broker:
    *
    * <pre>
    * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
    *                               (scout.mom.connectionfactory.name)->ClusterMom\
    *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
-   *                               (java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\
+   *                               <strong>(java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\</strong>
+   *                               (connectionFactoryNames)->ClusterMom
+   * </pre>
+   *
+   * Example to start an embedded broker which accepts remote connections from other hosts:
+   *
+   * <pre>
+   * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
+   *                               (scout.mom.connectionfactory.name)->ClusterMom\
+   *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
+   *                               <strong>(java.naming.provider.url)->vm:(broker:(tcp://0.0.0.0:5050)?persistent=false\</strong>
+   *                               (connectionFactoryNames)->ClusterMom
+   * </pre>
+   *
+   * Example to connect to a remote broker:
+   *
+   * <pre>
+   * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
+   *                               (scout.mom.connectionfactory.name)->ClusterMom\
+   *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
+   *                               <strong>(java.naming.provider.url)->tcp://ip_of_broker:5050\</strong>
    *                               (connectionFactoryNames)->ClusterMom
    * </pre>
    */

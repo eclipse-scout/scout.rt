@@ -8,7 +8,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
  * @see IMom
  * @since 6.1
  */
-public class Destination<REQUEST, REPLY> implements IBiDestination<REQUEST, REPLY> {
+class Destination<REQUEST, REPLY> implements IBiDestination<REQUEST, REPLY> {
 
   private final int m_type;
   private final String m_name;

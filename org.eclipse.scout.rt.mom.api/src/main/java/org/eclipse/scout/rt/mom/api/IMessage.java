@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  *
  * @since 6.1
  */
-public interface IMessage<TRANSFER_OBJECT> extends IAdaptable {
+public interface IMessage<DTO> extends IAdaptable {
 
   /**
    * The {@link IMessage} which is currently associated with the current thread.
@@ -17,7 +17,7 @@ public interface IMessage<TRANSFER_OBJECT> extends IAdaptable {
   /**
    * Returns the transfer object sent with this message.
    */
-  TRANSFER_OBJECT getTransferObject();
+  DTO getTransferObject();
 
   /**
    * Returns the property associated with this message.

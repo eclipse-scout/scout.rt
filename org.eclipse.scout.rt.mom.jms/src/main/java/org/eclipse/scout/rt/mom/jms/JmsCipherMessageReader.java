@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
  * @since 6.1
  * @see JmsMom
  */
-public class JmsCipherMessageReader<TRANSFER_OBJECT> extends JmsMessageReader<TRANSFER_OBJECT> {
+public class JmsCipherMessageReader<DTO> extends JmsMessageReader<DTO> {
 
   protected IEncrypter m_encrypter;
   protected Map<String, String> m_encrypterContext;

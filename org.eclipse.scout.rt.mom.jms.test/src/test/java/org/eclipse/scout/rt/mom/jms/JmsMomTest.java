@@ -37,7 +37,10 @@ import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMom.EncrypterProperty;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
+import org.eclipse.scout.rt.mom.api.IMomTransport;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
+import org.eclipse.scout.rt.mom.api.MOM;
+import org.eclipse.scout.rt.mom.api.MomDelegate;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter.PbePasswordProperty;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter.PbeSaltProperty;
@@ -47,6 +50,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -78,8 +82,6 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class JmsMomTest {
 
-  private static JmsMom s_mom;
-
   private List<IDisposable> m_disposables;
 
   private String m_testJobExecutionHint;
@@ -88,22 +90,17 @@ public class JmsMomTest {
   private IBean<ClusterEncrypter.PbeSaltProperty> m_junitPbeSaltProperty;
   private IBean<ClusterEncrypter.PbePasswordProperty> m_junitPbePasswordProperty;
 
+  private static IBean<JmsTestMom> s_momBean;
+
   @BeforeClass
   public static void beforeClass() throws Exception {
-    final Map<Object, Object> env = new HashMap<>();
-    env.put(Context.INITIAL_CONTEXT_FACTORY, ActiveMQInitialContextFactory.class.getName());
-    env.put(Context.PROVIDER_URL, "vm://junitBroker?broker.persistent=false");
-    env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
-    env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
-    env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
-
-    s_mom = BEANS.get(JmsMom.class);
-    s_mom.init(env);
+    s_momBean = BEANS.getBeanManager().registerClass(JmsTestMom.class);
   }
 
   @AfterClass
   public static void afterClass() {
-    s_mom.destroy();
+    BEANS.get(JmsTestMom.class).destroy();
+    BEANS.getBeanManager().unregisterBean(s_momBean);
   }
 
   @Before
@@ -157,11 +154,11 @@ public class JmsMomTest {
     person.setLastname("smith");
     person.setFirstname("anna");
 
-    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
+    IDestination<Person> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
-    s_mom.publish(queue, person);
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<Person>() {
+    MOM.publish(JmsTestMom.class, queue, person);
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
       public void onMessage(IMessage<Person> message) {
@@ -179,11 +176,11 @@ public class JmsMomTest {
   public void testPublishBytes() throws InterruptedException {
     final Capturer<byte[]> capturer = new Capturer<>();
 
-    IDestination<byte[]> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(BytesMarshaller.class)));
+    IDestination<byte[]> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(BytesMarshaller.class)));
 
-    s_mom.publish(queue, "hello world".getBytes(StandardCharsets.UTF_8));
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<byte[]>() {
+    MOM.publish(JmsTestMom.class, queue, "hello world".getBytes(StandardCharsets.UTF_8));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<byte[]>() {
 
       @Override
       public void onMessage(IMessage<byte[]> message) {
@@ -200,11 +197,11 @@ public class JmsMomTest {
   public void testPublishText() throws InterruptedException {
     final Capturer<String> capturer = new Capturer<>();
 
-    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(TextMarshaller.class)));
+    IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(TextMarshaller.class)));
 
-    s_mom.publish(queue, "hello world");
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<String>() {
+    MOM.publish(JmsTestMom.class, queue, "hello world");
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -299,15 +296,15 @@ public class JmsMomTest {
   public void testPublishJsonData() throws InterruptedException {
     final Capturer<Person> capturer = new Capturer<>();
 
-    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(JsonMarshaller.class)));
+    IDestination<Person> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();
     person.setFirstname("anna");
     person.setLastname("smith");
 
-    s_mom.publish(queue, person);
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<Person>() {
+    MOM.publish(JmsTestMom.class, queue, person);
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
       public void onMessage(IMessage<Person> message) {
@@ -323,12 +320,12 @@ public class JmsMomTest {
 
   @Test
   public void testTopicPublishSubscribe() throws InterruptedException {
-    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
+    IDestination<String> topic = MOM.newDestination("test/mom", IDestination.TOPIC);
 
     final Capturer<String> capturer = new Capturer<>();
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(topic, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -337,7 +334,7 @@ public class JmsMomTest {
     }, null));
 
     // Publish a message
-    s_mom.publish(topic, "hello world");
+    MOM.publish(JmsTestMom.class, topic, "hello world");
 
     // Verify
     assertEquals("hello world", capturer.get());
@@ -345,12 +342,12 @@ public class JmsMomTest {
 
   @Test
   public void testTopicPublishSubscribeMultipleSubscriptions() throws InterruptedException {
-    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
+    IDestination<String> topic = MOM.newDestination("test/mom", IDestination.TOPIC);
 
     final CountDownLatch latch = new CountDownLatch(2);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(topic, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -359,7 +356,7 @@ public class JmsMomTest {
     }, null));
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(topic, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -368,7 +365,7 @@ public class JmsMomTest {
     }, null));
 
     // Publish a message
-    s_mom.publish(topic, "hello world");
+    MOM.publish(JmsTestMom.class, topic, "hello world");
 
     // Verify
     assertTrue(latch.await(5, TimeUnit.SECONDS));
@@ -377,14 +374,14 @@ public class JmsMomTest {
   @Test
   @Times(10) // regression
   public void testTopicPublishFirst() throws InterruptedException {
-    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
+    IDestination<String> topic = MOM.newDestination("test/mom", IDestination.TOPIC);
 
     // Publish a message
-    s_mom.publish(topic, "hello world");
+    MOM.publish(JmsTestMom.class, topic, "hello world");
 
     // Subscribe for the destination
     final CountDownLatch latch = new CountDownLatch(1);
-    m_disposables.add(s_mom.subscribe(topic, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -398,12 +395,12 @@ public class JmsMomTest {
 
   @Test
   public void testQueuePublishSubscribe() throws InterruptedException {
-    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
+    IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
 
     final Capturer<String> capturer = new Capturer<>();
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -412,7 +409,7 @@ public class JmsMomTest {
     }, null));
 
     // Publish a message
-    s_mom.publish(queue, "hello world");
+    MOM.publish(JmsTestMom.class, queue, "hello world");
 
     // Verify
     assertEquals("hello world", capturer.get());
@@ -421,13 +418,13 @@ public class JmsMomTest {
   @Test
   @Times(10) // regression
   public void testQueuePublishSubscribeMultipleSubscriptions() throws InterruptedException {
-    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
+    IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
 
     final AtomicInteger msgCounter = new AtomicInteger();
     final CountDownLatch latch = new CountDownLatch(1);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -437,7 +434,7 @@ public class JmsMomTest {
     }, null));
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -447,7 +444,7 @@ public class JmsMomTest {
     }, null));
 
     // Publish a message
-    s_mom.publish(queue, "hello world");
+    MOM.publish(JmsTestMom.class, queue, "hello world");
 
     // Verify
     latch.await(5, TimeUnit.SECONDS);
@@ -458,14 +455,14 @@ public class JmsMomTest {
   @Test
   @Times(10) // regression
   public void testQueuePublishFirst() throws InterruptedException {
-    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
+    IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
 
     // Publish a message
-    s_mom.publish(queue, "hello world");
+    MOM.publish(JmsTestMom.class, queue, "hello world");
 
     // Subscribe for the destination
     final CountDownLatch latch = new CountDownLatch(1);
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -479,22 +476,22 @@ public class JmsMomTest {
 
   @Test
   public void testQueuePublishSubscribeCorrelationId() throws InterruptedException {
-    final IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
+    final IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
     testPublishSubscribeCorrelationIdInternal(queue);
   }
 
   @Test
   public void testTopicPublishSubscribeCorrelationId() throws InterruptedException {
-    final IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
+    final IDestination<String> topic = MOM.newDestination("test/mom", IDestination.TOPIC);
     testPublishSubscribeCorrelationIdInternal(topic);
   }
 
   @Test(timeout = 15_000)
   public void testQueueRequestReply() throws InterruptedException {
-    IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    IBiDestination<String, String> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(queue, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -503,7 +500,7 @@ public class JmsMomTest {
     }, null));
 
     // Initiate 'request-reply' communication
-    String testee = s_mom.request(queue, "hello world");
+    String testee = MOM.request(JmsTestMom.class, queue, "hello world");
 
     // Verify
     assertEquals("HELLO WORLD", testee);
@@ -511,13 +508,13 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyCorrelationId() throws InterruptedException {
-    IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    IBiDestination<String, String> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyCorrelationIdInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyCorrelationId() throws InterruptedException {
-    IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    IBiDestination<String, String> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyCorrelationIdInternal(topic);
   }
 
@@ -528,17 +525,17 @@ public class JmsMomTest {
   }
 
   private void testProperties(IEncrypter encrypter) throws InterruptedException {
-    IDestination<String> topic = s_mom.newDestination("test/mom", IDestination.TOPIC);
+    IDestination<String> topic = MOM.newDestination("test/mom", IDestination.TOPIC);
 
     List<IDisposable> disposables = new ArrayList<>();
     if (encrypter != null) {
-      disposables.add(s_mom.registerEncrypter(topic, encrypter));
+      disposables.add(MOM.registerEncrypter(JmsTestMom.class, topic, encrypter));
     }
 
     final Capturer<String> capturer1 = new Capturer<>();
 
     // Subscribe for the destination
-    disposables.add(s_mom.subscribe(topic, new IMessageListener<String>() {
+    disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -547,7 +544,7 @@ public class JmsMomTest {
     }, null));
 
     // Publish a message
-    s_mom.publish(topic, "hello world", s_mom.newPublishInput()
+    MOM.publish(JmsTestMom.class, topic, "hello world", MOM.newPublishInput()
         .withProperty("prop", "propValue"));
 
     // Verify
@@ -559,18 +556,18 @@ public class JmsMomTest {
   @Test
   @Times(10)
   public void testTimeToLive() throws InterruptedException {
-    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
+    IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
 
     final CountDownLatch latch = new CountDownLatch(1);
 
     // Publish a message
-    s_mom.publish(queue, "hello world", s_mom.newPublishInput()
+    MOM.publish(JmsTestMom.class, queue, "hello world", MOM.newPublishInput()
         .withTimeToLive(1, TimeUnit.MILLISECONDS));
 
     Thread.sleep(100);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -583,7 +580,7 @@ public class JmsMomTest {
   }
 
   private void testRequestReplyCorrelationIdInternal(final IBiDestination<String, String> destination) throws InterruptedException {
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -599,7 +596,7 @@ public class JmsMomTest {
 
           @Override
           public void run() throws Exception {
-            String testee = s_mom.request(destination, "hello world");
+            String testee = MOM.request(JmsTestMom.class, destination, "hello world");
             // Verify
             assertEquals("cid:abc", testee);
           }
@@ -608,10 +605,10 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testTopicRequestReply() throws InterruptedException {
-    IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    IBiDestination<String, String> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(topic, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, topic, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -620,7 +617,7 @@ public class JmsMomTest {
     }, null));
 
     // Initiate 'request-reply' communication
-    String testee = s_mom.request(topic, "hello world");
+    String testee = MOM.request(JmsTestMom.class, topic, "hello world");
 
     // Verify
     assertEquals("HELLO WORLD", testee);
@@ -629,12 +626,12 @@ public class JmsMomTest {
   @Test(timeout = 15_000)
   @Times(10) // regression
   public void testQueueRequestReplyMultipleSubscriptions() throws InterruptedException {
-    IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    IBiDestination<String, String> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
 
     final CountDownLatch msgLatch = new CountDownLatch(2);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(queue, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -644,7 +641,7 @@ public class JmsMomTest {
     }, null));
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(queue, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -654,7 +651,7 @@ public class JmsMomTest {
     }, null));
 
     // Initiate 'request-reply' communication
-    String testee = s_mom.request(queue, "hello world");
+    String testee = MOM.request(JmsTestMom.class, queue, "hello world");
 
     // Verify
     assertEquals("HELLO WORLD", testee);
@@ -663,12 +660,12 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyMultipleSubscriptions() throws InterruptedException {
-    IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    IBiDestination<String, String> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
 
     final CountDownLatch msgLatch = new CountDownLatch(2);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(topic, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, topic, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -678,7 +675,7 @@ public class JmsMomTest {
     }, null));
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(topic, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, topic, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -688,7 +685,7 @@ public class JmsMomTest {
     }, null));
 
     // Initiate 'request-reply' communication
-    String testee = s_mom.request(topic, "hello world");
+    String testee = MOM.request(JmsTestMom.class, topic, "hello world");
 
     // Verify
     assertEquals("HELLO WORLD", testee);
@@ -697,7 +694,7 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyRequestFirst() throws InterruptedException {
-    final IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
 
     // Test setup: simulate to initiate 'request-reply' before subscription
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
@@ -707,7 +704,7 @@ public class JmsMomTest {
 
       @Override
       public String call() throws Exception {
-        return s_mom.request(queue, "hello world");
+        return MOM.request(JmsTestMom.class, queue, "hello world");
       }
     }, Jobs.newInput()
         .withExecutionHint(m_testJobExecutionHint)
@@ -719,7 +716,7 @@ public class JmsMomTest {
       @Override
       public void run() throws Exception {
         // Subscribe replier
-        m_disposables.add(s_mom.reply(queue, new IRequestListener<String, String>() {
+        m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<String, String>() {
 
           @Override
           public String onRequest(IMessage<String> request) {
@@ -740,7 +737,7 @@ public class JmsMomTest {
   @Test(timeout = 15_000)
   @Times(10) // regression
   public void testTopicRequestReplyRequestFirst() throws InterruptedException {
-    final IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
 
     // Test setup: simulate to initiate 'request-reply' before subscription
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
@@ -750,7 +747,7 @@ public class JmsMomTest {
 
       @Override
       public String call() throws Exception {
-        return s_mom.request(topic, "hello world");
+        return MOM.request(JmsTestMom.class, topic, "hello world");
       }
     }, Jobs.newInput()
         .withExecutionHint(m_testJobExecutionHint)
@@ -763,7 +760,7 @@ public class JmsMomTest {
       @Override
       public void run() throws Exception {
         // Subscribe replier
-        m_disposables.add(s_mom.reply(topic, new IRequestListener<String, String>() {
+        m_disposables.add(MOM.reply(JmsTestMom.class, topic, new IRequestListener<String, String>() {
 
           @Override
           public String onRequest(IMessage<String> request) {
@@ -788,13 +785,13 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyCancellation() throws InterruptedException {
-    final IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyCancellationInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyCancellation() throws InterruptedException {
-    final IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyCancellationInternal(topic);
   }
 
@@ -808,7 +805,7 @@ public class JmsMomTest {
     final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -860,7 +857,7 @@ public class JmsMomTest {
       @Override
       public void run() throws Exception {
         try {
-          String result = s_mom.request(destination, "hello world");
+          String result = MOM.request(JmsTestMom.class, destination, "hello world");
           testee.set(result);
         }
         catch (ThreadInterruptedException e) {
@@ -889,13 +886,13 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyTimeout() throws InterruptedException {
-    final IBiDestination<String, String> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyTimeoutInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyTimeout() throws InterruptedException {
-    final IBiDestination<String, String> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyTimeoutInternal(topic);
   }
 
@@ -907,7 +904,7 @@ public class JmsMomTest {
     final AtomicBoolean replierInterrupted = new AtomicBoolean();
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<String, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<String, String>() {
 
       @Override
       public String onRequest(IMessage<String> request) {
@@ -926,7 +923,7 @@ public class JmsMomTest {
 
     // Initiate 'request-reply' communication
     try {
-      s_mom.request(destination, "hello world", s_mom.newPublishInput()
+      MOM.request(JmsTestMom.class, destination, "hello world", MOM.newPublishInput()
           .withRequestReplyTimeout(1, TimeUnit.MILLISECONDS));
     }
     catch (TimedOutException e) {
@@ -946,7 +943,7 @@ public class JmsMomTest {
   private void testPublishSubscribeCorrelationIdInternal(final IDestination<String> destination) throws InterruptedException {
     final Capturer<String> cid = new Capturer<>();
 
-    m_disposables.add(s_mom.subscribe(destination, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, destination, new IMessageListener<String>() {
 
       @Override
       public void onMessage(IMessage<String> message) {
@@ -961,7 +958,7 @@ public class JmsMomTest {
 
           @Override
           public void run() throws Exception {
-            s_mom.publish(destination, "hello world");
+            MOM.publish(JmsTestMom.class, destination, "hello world");
           }
         });
 
@@ -970,25 +967,25 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testTopicRequestReplyJsonObjectMarshaller() throws InterruptedException {
-    IBiDestination<Person, Person> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    IBiDestination<Person, Person> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
     testRequestReplyJsonObjectMarshallerInternal(queue);
   }
 
   @Test(timeout = 15_000)
   public void testQueueRequestReplyJsonObjectMarshaller() throws InterruptedException {
-    IBiDestination<Person, Person> topic = s_mom.newBiDestination("test/mom", IDestination.TOPIC);
+    IBiDestination<Person, Person> topic = MOM.newBiDestination("test/mom", IDestination.TOPIC);
     testRequestReplyJsonObjectMarshallerInternal(topic);
   }
 
   private void testRequestReplyJsonObjectMarshallerInternal(IBiDestination<Person, Person> destination) throws InterruptedException {
-    m_disposables.add(s_mom.registerMarshaller(destination, BEANS.get(JsonMarshaller.class)));
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, destination, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();
     person.setLastname("smith");
     person.setFirstname("anna");
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<Person, Person>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<Person, Person>() {
 
       @Override
       public Person onRequest(IMessage<Person> request) {
@@ -1000,7 +997,7 @@ public class JmsMomTest {
     }, null));
 
     // Initiate 'request-reply' communication
-    Person testee = s_mom.request(destination, person);
+    Person testee = MOM.request(JmsTestMom.class, destination, person);
 
     // Verify
     assertEquals("ANNA", testee.getFirstname());
@@ -1012,12 +1009,12 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    IBiDestination<Void, String> destination = MOM.newBiDestination("test/mom", IDestination.QUEUE);
 
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<Void, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<Void, String>() {
 
       @Override
       public String onRequest(IMessage<Void> request) {
@@ -1027,7 +1024,7 @@ public class JmsMomTest {
 
     // Initiate 'request-reply' communication
     try {
-      s_mom.request(destination, null);
+      MOM.request(JmsTestMom.class, destination, null);
       fail("SomethingWrongException expected");
     }
     catch (SomethingWrongException e) {
@@ -1040,13 +1037,13 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
-    s_mom.registerMarshaller(destination, BEANS.get(JsonMarshaller.class));
+    IBiDestination<Void, String> destination = MOM.newBiDestination("test/mom", IDestination.QUEUE);
+    MOM.registerMarshaller(JmsTestMom.class, destination, BEANS.get(JsonMarshaller.class));
 
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<Void, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<Void, String>() {
 
       @Override
       public String onRequest(IMessage<Void> request) {
@@ -1056,7 +1053,7 @@ public class JmsMomTest {
 
     // Initiate 'request-reply' communication
     try {
-      s_mom.request(destination, null);
+      MOM.request(JmsTestMom.class, destination, null);
       fail("SomethingWrongException expected");
     }
     catch (SomethingWrongException e) {
@@ -1069,13 +1066,13 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
-    s_mom.registerMarshaller(destination, BEANS.get(JsonMarshaller.class));
+    IBiDestination<Void, String> destination = MOM.newBiDestination("test/mom", IDestination.QUEUE);
+    MOM.registerMarshaller(JmsTestMom.class, destination, BEANS.get(JsonMarshaller.class));
 
     final RuntimeException runtimeException = new VetoException();
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<Void, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<Void, String>() {
 
       @Override
       public String onRequest(IMessage<Void> request) {
@@ -1085,7 +1082,7 @@ public class JmsMomTest {
 
     // Initiate 'request-reply' communication
     try {
-      s_mom.request(destination, null);
+      MOM.request(JmsTestMom.class, destination, null);
       fail("VetoException expected");
     }
     catch (VetoException e) {
@@ -1098,13 +1095,13 @@ public class JmsMomTest {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
-    IBiDestination<Void, String> destination = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
-    s_mom.registerMarshaller(destination, BEANS.get(TextMarshaller.class));
+    IBiDestination<Void, String> destination = MOM.newBiDestination("test/mom", IDestination.QUEUE);
+    MOM.registerMarshaller(JmsTestMom.class, destination, BEANS.get(TextMarshaller.class));
 
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
     // Subscribe for the destination
-    m_disposables.add(s_mom.reply(destination, new IRequestListener<Void, String>() {
+    m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<Void, String>() {
 
       @Override
       public String onRequest(IMessage<Void> request) {
@@ -1114,7 +1111,7 @@ public class JmsMomTest {
 
     // Initiate 'request-reply' communication
     try {
-      s_mom.request(destination, null);
+      MOM.request(JmsTestMom.class, destination, null);
       fail("ProcessingException expected");
     }
     catch (ProcessingException e) {
@@ -1183,15 +1180,15 @@ public class JmsMomTest {
   public void testPublishJsonDataSecure() throws InterruptedException {
     final Capturer<Person> capturer = new Capturer<>();
 
-    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(JsonMarshaller.class)));
+    IDestination<Person> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();
     person.setFirstname("anna");
     person.setLastname("smith");
 
-    s_mom.publish(queue, person);
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<Person>() {
+    MOM.publish(JmsTestMom.class, queue, person);
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
       public void onMessage(IMessage<Person> message) {
@@ -1216,11 +1213,11 @@ public class JmsMomTest {
       person.setLastname("smith");
       person.setFirstname("anna");
 
-      IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-      m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
+      IDestination<Person> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+      m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
-      s_mom.publish(queue, person);
-      m_disposables.add(s_mom.subscribe(queue, new IMessageListener<Person>() {
+      MOM.publish(JmsTestMom.class, queue, person);
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
         @Override
         public void onMessage(IMessage<Person> message) {
@@ -1252,10 +1249,10 @@ public class JmsMomTest {
       person.setLastname("smith");
       person.setFirstname("anna");
 
-      IBiDestination<Person, Void> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
-      m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
+      IBiDestination<Person, Void> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
+      m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
-      m_disposables.add(s_mom.reply(queue, new IRequestListener<Person, Void>() {
+      m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<Person, Void>() {
 
         @Override
         public Void onRequest(IMessage<Person> request) {
@@ -1263,7 +1260,7 @@ public class JmsMomTest {
           return null;
         }
       }, null));
-      s_mom.request(queue, person);
+      MOM.request(JmsTestMom.class, queue, person);
 
       // Verify
       IMessage<Person> testee = (IMessage<Person>) capturer.get();
@@ -1289,11 +1286,11 @@ public class JmsMomTest {
     ITransaction tx = BEANS.get(ITransaction.class);
     ITransaction.CURRENT.set(tx);
 
-    IDestination<Person> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
+    IDestination<Person> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
-    s_mom.publish(queue, person, s_mom.newPublishInput().withTransactional(true));
-    m_disposables.add(s_mom.subscribe(queue, new IMessageListener<Person>() {
+    MOM.publish(JmsTestMom.class, queue, person, MOM.newPublishInput().withTransactional(true));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Person>() {
 
       @Override
       public void onMessage(IMessage<Person> message) {
@@ -1330,10 +1327,10 @@ public class JmsMomTest {
 
   @Test
   public void testSubscribeTransactional() throws InterruptedException {
-    IDestination<String> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
-    m_disposables.add(s_mom.registerMarshaller(queue, BEANS.get(ObjectMarshaller.class)));
+    IDestination<String> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
-    s_mom.publish(queue, "message-1", s_mom.newPublishInput());
+    MOM.publish(JmsTestMom.class, queue, "message-1", MOM.newPublishInput());
 
     final AtomicInteger messageCounter = new AtomicInteger();
 
@@ -1368,11 +1365,11 @@ public class JmsMomTest {
     };
 
     // Register transactional subscriber
-    m_disposables.add(s_mom.subscribe(queue, listener, null, IMom.ACKNOWLEDGE_TRANSACTED));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, listener, null, IMom.ACKNOWLEDGE_TRANSACTED));
     assertTrue("message expected to be rejected 3 times", message1Latch.await());
 
     // Publish a next message
-    s_mom.publish(queue, "message-2", s_mom.newPublishInput());
+    MOM.publish(JmsTestMom.class, queue, "message-2", MOM.newPublishInput());
 
     // Check that the message was received
     assertTrue("message expected to be received", message2Latch.await());
@@ -1384,18 +1381,18 @@ public class JmsMomTest {
   private Object testPublishAndConsumeInternal(Object transferObject, IMarshaller marshaller, IEncrypter encrypter) throws InterruptedException {
     final Capturer<Object> capturer = new Capturer<>();
 
-    IDestination<Object> queue = s_mom.newDestination("test/mom", IDestination.QUEUE);
+    IDestination<Object> queue = MOM.newDestination("test/mom", IDestination.QUEUE);
 
     List<IDisposable> disposables = new ArrayList<>();
     if (encrypter != null) {
-      disposables.add(s_mom.registerEncrypter(queue, encrypter));
+      disposables.add(MOM.registerEncrypter(JmsTestMom.class, queue, encrypter));
     }
     if (marshaller != null) {
-      disposables.add(s_mom.registerMarshaller(queue, marshaller));
+      disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
     }
 
-    s_mom.publish(queue, transferObject);
-    disposables.add(s_mom.subscribe(queue, new IMessageListener<Object>() {
+    MOM.publish(JmsTestMom.class, queue, transferObject);
+    disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<Object>() {
 
       @Override
       public void onMessage(IMessage<Object> msg) {
@@ -1413,18 +1410,18 @@ public class JmsMomTest {
   }
 
   private Object testRequestReplyInternal(Object request, IMarshaller marshaller, IEncrypter encrypter) throws InterruptedException {
-    IBiDestination<Object, Object> queue = s_mom.newBiDestination("test/mom", IDestination.QUEUE);
+    IBiDestination<Object, Object> queue = MOM.newBiDestination("test/mom", IDestination.QUEUE);
 
     List<IDisposable> disposables = new ArrayList<>();
     if (encrypter != null) {
-      disposables.add(s_mom.registerEncrypter(queue, encrypter));
+      disposables.add(MOM.registerEncrypter(JmsTestMom.class, queue, encrypter));
     }
     if (marshaller != null) {
-      disposables.add(s_mom.registerMarshaller(queue, marshaller));
+      disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, marshaller));
     }
 
     try {
-      disposables.add(s_mom.reply(queue, new IRequestListener<Object, Object>() {
+      disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<Object, Object>() {
 
         @Override
         public Object onRequest(IMessage<Object> req) {
@@ -1432,7 +1429,7 @@ public class JmsMomTest {
         }
       }, null));
 
-      return s_mom.request(queue, request);
+      return MOM.request(JmsTestMom.class, queue, request);
     }
     finally {
       dispose(disposables);
@@ -1482,6 +1479,28 @@ public class JmsMomTest {
 
     public SomethingWrongException(String message) {
       super(message);
+    }
+  }
+
+  /**
+   * Encapsulates {@link JmsMom} for testing purpose.
+   */
+  @Ignore
+  @ApplicationScoped
+  public static class JmsTestMom extends MomDelegate implements IMomTransport {
+
+    @Override
+    protected IMom initDelegate() throws Exception {
+      final Map<Object, Object> env = new HashMap<>();
+      env.put(Context.INITIAL_CONTEXT_FACTORY, ActiveMQInitialContextFactory.class.getName());
+      env.put(Context.PROVIDER_URL, "vm://junitBroker?broker.persistent=false");
+      env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
+      env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
+      env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
+
+      JmsMom testee = new JmsMom();
+      testee.init(env);
+      return testee;
     }
   }
 }

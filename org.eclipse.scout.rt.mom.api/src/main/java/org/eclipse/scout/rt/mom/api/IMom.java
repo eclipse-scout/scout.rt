@@ -66,25 +66,6 @@ public interface IMom {
 
   /**
    * Publishes the given message to the given destination.
-   * <p>
-   * The message is published with default messaging settings, meaning with normal priority, with persistent delivery
-   * mode and without expiration.
-   *
-   * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
-   * @param transferObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
-   * @see #newQueue(String)
-   * @see #newTopic(String)
-   * @see #subscribe(IDestination, IMessageListener, RunContext)
-   */
-  <TYPE> void publish(IDestination<TYPE> destination, TYPE transferObject);
-
-  /**
-   * Publishes the given message to the given destination.
    *
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
@@ -95,28 +76,13 @@ public interface IMom {
    *          that destination. By default, {@link JsonMarshaller} is used.
    * @param input
    *          specifies how to publish the message.
+   * @param <DTO>
+   *          the type of the transfer object to be published.
    * @see #newQueue(String)
    * @see #newTopic(String)
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
-  <TYPE> void publish(IDestination<TYPE> destination, TYPE transferObject, PublishInput input);
-
-  /**
-   * Subscribes the given listener to receive messages sent to the given destination. Messages are acknowledged
-   * automatically, and which complies with the mode {@link #ACKNOWLEDGE_AUTO}.
-   *
-   * @param destination
-   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
-   *          {@link IMom} documentation for more information about the difference between topic and queue based
-   *          messaging.
-   * @param listener
-   *          specifies the listener to receive messages.
-   * @param runContext
-   *          specifies the context in which to receive and process the messages.
-   * @return subscription handle to unsubscribe from the destination.
-   * @see #publish(IDestination, Object)
-   */
-  <TYPE> ISubscription subscribe(IDestination<TYPE> destination, IMessageListener<TYPE> listener, RunContext runContext);
+  <DTO> void publish(IDestination<DTO> destination, DTO transferObject, PublishInput input);
 
   /**
    * Subscribes the given listener to receive messages sent to the given destination.
@@ -134,38 +100,11 @@ public interface IMom {
    *          specifies the mode how to acknowledge messages. Supported modes are {@link IMom#ACKNOWLEDGE_AUTO} and
    *          {@link IMom#ACKNOWLEDGE_TRANSACTED}.
    * @return subscription handle to unsubscribe from the destination.
+   * @param <DTO>
+   *          the type of the transfer object a subscription is created for.
    * @see #publish(IDestination, Object)
    */
-  <TYPE> ISubscription subscribe(IDestination<TYPE> destination, IMessageListener<TYPE> listener, RunContext runContext, int acknowledgementMode);
-
-  /**
-   * Initiates a 'request-reply' communication with a replier, and blocks until the reply is received (synchronous).
-   * <p>
-   * This method is for convenience to facilitate synchronous communication between a publisher and a subscriber, and is
-   * still based on P2P or pub/sub messaging, meaning that there is no open connection for the time of blocking.
-   * <p>
-   * Typically, request-reply is used with a queue destination. If using a topic, it is the first reply which is
-   * returned.
-   * <p>
-   * If the current thread is interrupted while waiting for the reply to receive, this method returns with a
-   * {@link ThreadInterruptedException} and the interruption is propagated to the consumer(s) as well.
-   * <p>
-   * The message is published with default messaging settings, meaning with normal priority, with persistent delivery
-   * mode and without expiration.
-   *
-   * @param destination
-   *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
-   *          documentation for more information about the difference between topic and queue based messaging.
-   * @param requestObject
-   *          specifies the transfer object to be sent to the destination.<br>
-   *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
-   * @return the reply of the consumer.
-   * @throws ThreadInterruptedException
-   *           if interrupted while waiting for the reply to receive.
-   * @see {@link #reply(IDestination, IRequestListener, RunContext)}
-   */
-  <REQUEST, REPLY> REPLY request(IBiDestination<REQUEST, REPLY> destination, REQUEST requestObject);
+  <DTO> ISubscription subscribe(IDestination<DTO> destination, IMessageListener<DTO> listener, RunContext runContext, int acknowledgementMode);
 
   /**
    * Initiates a 'request-reply' communication with a replier, and blocks until the reply is received. This type of
@@ -196,9 +135,12 @@ public interface IMom {
    * @throws TimedOutException
    *           if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
    *           elapsed, an interruption request is sent to the consumer(s).
+   * @param <REQUEST>
+   *          the type of the request object
+   * @param <REPLY>
+   *          the type of the reply object
    * @see #reply(IDestination, IRequestListener, RunContext)
    */
-
   <REQUEST, REPLY> REPLY request(IBiDestination<REQUEST, REPLY> destination, REQUEST requestObject, PublishInput input);
 
   /**
@@ -213,34 +155,13 @@ public interface IMom {
    * @param runContext
    *          specifies the context in which to receive and process the messages.
    * @return subscription handle to unsubscribe from the destination.
+   * @param <REQUEST>
+   *          the type of the request object
+   * @param <REPLY>
+   *          the type of the reply object
    * @see #request(IDestination, Object)
    */
   <REQUEST, REPLY> ISubscription reply(IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, RunContext runContext);
-
-  /**
-   * Creates a destination for asynchronous 'publish/subscribe' messaging.
-   *
-   * @see IDestination#TOPIC
-   * @see IDestination#QUEUE
-   * @see IDestination#JNDI
-   */
-  <TYPE> IDestination<TYPE> newDestination(String name, int destinationType);
-
-  /**
-   * Creates a destination for synchronous 'request-reply' messaging, where the requester sends a request for some data
-   * and the replier responds to the request.
-   *
-   * @see IDestination#TOPIC
-   * @see IDestination#QUEUE
-   * @see IDestination#JNDI
-   */
-  <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(String name, int destinationType);
-
-  /**
-   * Creates a input to control how to publish a message. The input returned specifies normal delivery priority,
-   * persistent delivery mode, and without expiration.
-   */
-  PublishInput newPublishInput();
 
   /**
    * Registers a marshaller for transfer objects sent to the given destination, or which are received from the given
