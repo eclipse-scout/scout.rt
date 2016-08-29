@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class JarLocator {
@@ -33,33 +31,10 @@ public class JarLocator {
     if (url != null) {
       return url;
     }
+    url = m_loaderClass.getResource("/target/classes/" + resourceName);
+    if (url != null) {
+      return url;
+    }
     return null;
-  }
-
-  public URL getJarContaining(Class<?> clazz) {
-    URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
-    if (url == null) {
-      return url;
-    }
-    if (url.getPath().endsWith(".jar")) {
-      return url;
-    }
-    //workspace
-    try {
-      URL fileUrl = new URL(url, "target/classes/");
-      File f = new File(fileUrl.getPath());
-      if (f.exists()) {
-        return fileUrl;
-      }
-      fileUrl = url;
-      f = new File(fileUrl.getPath());
-      if (f.exists()) {
-        return fileUrl;
-      }
-    }
-    catch (MalformedURLException e) {
-      //nop
-    }
-    return url;
   }
 }
