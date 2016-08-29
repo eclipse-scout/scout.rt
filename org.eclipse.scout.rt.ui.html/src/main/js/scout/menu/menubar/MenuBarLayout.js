@@ -140,7 +140,9 @@ scout.MenuBarLayout.prototype._destroyEllipsis = function() {
 scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options) {
   // Menubar has an absolute css height set -> useCssSize = true
   var prefSize = scout.graphics.prefSize($container, {
-    useCssSize: true
+    //useCssSize: true
+    //heightHint: 'css'
+    useCssHeight: true
   });
   if (options.widthHint) {
     prefSize.width = Math.min(prefSize.width, options.widthHint);

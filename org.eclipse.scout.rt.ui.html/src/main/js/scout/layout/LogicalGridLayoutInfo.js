@@ -96,6 +96,7 @@ scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap, options) {
   this.rows = usedRows.size();
 
   this.logicalColumnWidth = scout.HtmlEnvironment.formColumnWidth;
+  this.lastLogicalColumnWidthDiff = 0;
   if (this.options.widthHint) {
     this.logicalColumnWidth = Math.floor((this.options.widthHint - (this.m_hgap * Math.max(0, this.cols - 1))) / this.cols);
     this.lastLogicalColumnWidthDiff = options.widthHint - (this.logicalColumnWidth * this.cols) - (this.m_hgap * Math.max(0, this.cols - 1));
@@ -107,7 +108,7 @@ scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap, options) {
   this.weightY = [];
   $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + $components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
   this._initializeInfo(hgap, vgap);
-  console.log('--- LogicalGridLayoutInfo initialized [widthHint=' + options.widthHint + ', heightHint=' + options.heightHint);
+  console.log('--- LogicalGridLayoutInfo initialized [widthHint=' + options.widthHint + ', heightHint=' + options.heightHint + ']');
 };
 
 scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
@@ -129,15 +130,29 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
         // Don't propagate hints if both dimensions should use uiSize
       } else {
         innerMargins = scout.graphics.getMargins($comp);
-        if (useUiHeight && this.options.widthHint) {
-          var fWidth = Math.floor((this.options.widthHint - Math.max(0, this.cols - 1) * hgap) / this.cols);
-          var deltaX = this.options.widthHint - (this.cols * fWidth) - (Math.max(0, this.cols - 1) * hgap);
+        if (useUiHeight) {
+          var wh = this.options.widthHint;
+          if (!wh) {
+            wh = Math.max(cons.widthHint, 0);
+          }
+          if (!wh) {
+            wh = this.logicalWidthInPixel(cons);
+          }
+          var fWidth = Math.floor((wh - Math.max(0, this.cols - 1) * hgap) / this.cols);
+          var deltaX = wh - (this.cols * fWidth) - (Math.max(0, this.cols - 1) * hgap);
           var isLastCol = (cons.gridx + cons.gridw === this.cols);
           innerOptions.widthHint = (cons.gridw * fWidth) + (Math.max(0, cons.gridw - 1) * hgap) + (isLastCol ? deltaX : 0) - innerMargins.horizontal();
         }
-        if (useUiWidth && this.options.heightHint) {
-          var fHeight = Math.floor((this.options.heightHint - Math.max(0, this.rows - 1) * vgap) / this.rows);
-          var deltaY = this.options.heightHint - (this.rows * fHeight) - (Math.max(0, this.rows - 1) * vgap);
+        if (useUiWidth) {
+          var hh = this.options.heightHint;
+          if (!hh) {
+            hh = Math.max(cons.heightHint, 0);
+          }
+          if (!hh) {
+            hh = this.logicalHeightInPixel(cons);
+          }
+          var fHeight = Math.floor((hh - Math.max(0, this.rows - 1) * vgap) / this.rows);
+          var deltaY = hh - (this.rows * fHeight) - (Math.max(0, this.rows - 1) * vgap);
           var isLastRow = (cons.gridy + cons.gridh === this.rows);
           innerOptions.heightHint = (cons.gridh * fHeight) + (Math.max(0, cons.gridh - 1) * vgap) + (isLastRow ? deltaY : 0) - innerMargins.vertical();
         }
@@ -226,7 +241,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
       }
       if (cons.widthHint > 0) {
         distWidth = cons.widthHint - spanWidth - (hSpan - 1) * hgap;
-      } else if (cons.useUiWidth || cons.useUiHeight) {
+      } else if (cons.useUiWidth){//} || cons.useUiHeight) {
         distWidth = compSize[i].width - spanWidth - (hSpan - 1) * hgap;
       } else {
         distWidth = this.logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * hgap;
@@ -302,7 +317,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
     if (cons.gridh === 1 && false) { // XXX
       if (cons.heightHint > 0) {
         prefh = cons.heightHint;
-      } else if (cons.useUiHeight || cons.useUiWidth) {
+      } else if (cons.useUiHeight) {//} || cons.useUiWidth) {
         prefh = compSize[i].height;
       } else {
         prefh = this.logicalHeightInPixel(cons);

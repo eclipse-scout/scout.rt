@@ -58,7 +58,11 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
       visibleCons.push(cons);
     }
   });
+  $container.removeClass(this.cssClass);
   this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap, options);
+  if (this.cssClass) {
+    $container.addClass(this.cssClass);
+  }
   $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
 

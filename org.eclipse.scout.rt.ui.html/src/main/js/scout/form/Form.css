@@ -24,7 +24,7 @@
 }
 
 .dialog {
-  position: absolute !important; /* ignore positioning of 'ui-resizable' */
+  position: absolute;
   background-color: @background-color;
   border: solid 1px @border-color;
   border-top: 5px solid @active-color;
@@ -34,6 +34,14 @@
   margin: 10px; /* minimum padding to desktop */
   margin-bottom: 15px;
   top: 0px; /* must be specified otherwise dialogs will be positioned at end of document and increase document size */
+
+  &.layout-in-progress {
+    position: static !important;
+  }
+
+  &.ui-resizable {
+    position: absolute; /* override positioning of '.ui-resizable' */
+  }
 
   &.shown {
     #scout.animation(fadeIn ease-in 1);

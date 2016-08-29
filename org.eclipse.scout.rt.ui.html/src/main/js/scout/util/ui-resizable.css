@@ -11,7 +11,7 @@
 /* Resizable
 ----------------------------------*/
 .ui-resizable {
-  position: relative;
+  //position: relative;
 }
 .ui-resizable-handle {
   position: absolute;

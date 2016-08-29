@@ -19,6 +19,7 @@ scout.DialogLayout.prototype.layout = function($container) {
     scout.DialogLayout.parent.prototype.layout.call(this, $container);
     return;
   }
+  $container.addClass('layout-in-progress');
 
   var htmlComp = this._form.htmlComp,
     $window = this._form.$container.window(),
@@ -27,6 +28,7 @@ scout.DialogLayout.prototype.layout = function($container) {
     dialogSize = new scout.Dimension(),
     currentBounds = htmlComp.getBounds(),
     prefSize = this.preferredLayoutSize($container);
+  $container.removeClass('layout-in-progress');
 
   // class .dialog may specify a margin
   // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0

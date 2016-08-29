@@ -54,11 +54,23 @@ scout.graphics = {
     var defaults = {
       includeMargin: false,
       useCssSize: false,
+      useCssWidth: false,
+      useCssHeight: false,
       widthHint: undefined,
       heightHint: undefined,
       restoreScrollPositions: true
     };
     options = $.extend({}, defaults, options);
+
+    if (options.useCssSize) {
+      options.useCssWidth = true;
+      options.useCssHeight = true;
+    } else if (options.widthHint === 'css') {
+      options.useCssWidth = true;
+    } else if (options.heightHint === 'css') {
+      options.useCssHeight = true;
+    }
+
 
     var oldStyle = $elem.attr('style');
     var oldScrollLeft = $elem.scrollLeft();
@@ -70,8 +82,8 @@ scout.graphics = {
 
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
-    var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
-    var newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
+    var newWidth = (options.useCssWidth ? '' : scout.nvl(options.widthHint, 'auto'));
+    var newHeight = (options.useCssHeight ? '' : scout.nvl(options.heightHint, 'auto'));
 
     // modify properties which prevent reading the preferred size
     $elem.css({

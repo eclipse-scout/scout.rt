@@ -285,21 +285,23 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
 
   // Field
   if (formField.$fieldContainer) {
+    var innerMargins = scout.graphics.getMargins(formField.$fieldContainer);
+    if (innerOptions.widthHint) {
+      innerOptions.widthHint -= innerMargins.horizontal();
+    }
+    if (innerOptions.heightHint) {
+      innerOptions.heightHint -= innerMargins.vertical();
+    }
+
     var htmlInnerComp = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlInnerComp) {
       if (htmlInnerComp.isVisible()) {
-        var innerMargins = htmlInnerComp.getMargins();
-        if (innerOptions.widthHint) {
-          innerOptions.widthHint -= innerMargins.horizontal();
-        }
-        if (innerOptions.heightHint) {
-          innerOptions.heightHint -= innerMargins.vertical();
-        }
         prefSizeField = htmlInnerComp.getPreferredSize(innerOptions)
           .add(innerMargins);
       }
     } else {
-      prefSizeField = this.naturalSize(formField, innerOptions);
+      prefSizeField = this.naturalSize(formField, innerOptions)
+        .add(innerMargins);
       if ($container.attr('id') === 'scout.BeanField.Needs[1-53]') {
         console.log('@nat: io={' + innerOptions.widthHint + '} ps=' + prefSizeField);
       }
@@ -420,7 +422,5 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
  * another size (which is required when the field-content is scrollable).
  */
 scout.FormFieldLayout.prototype.naturalSize = function(formField, options) {
-  return scout.graphics.prefSize(formField.$fieldContainer, $.extend({
-    includeMargin: true
-  }, options));
+  return scout.graphics.prefSize(formField.$fieldContainer, options);
 };

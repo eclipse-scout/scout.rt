@@ -120,10 +120,22 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
     includeMargin: true
   });
 
-  if (this._groupBox.expanded) {
-    var widthInPixel = this._groupBox.gridData.widthInPixel;//(this._groupBox.gridData && this._groupBox.gridData.widthInPixel);
-    var heightInPixel = this._groupBox.gridData.heightInPixel;//XXX (this._groupBox.gridData && this._groupBox.gridData.heightInPixel);
+  var outerOptions = {
+      widthHint: options.widthHint,
+      heightHint: options.heightHint
+  };
 
+  var widthInPixel = this._groupBox.gridData.widthInPixel;//(this._groupBox.gridData && this._groupBox.gridData.widthInPixel);
+  var heightInPixel = this._groupBox.gridData.heightInPixel;//XXX (this._groupBox.gridData && this._groupBox.gridData.heightInPixel);
+  options = {};
+  if (outerOptions.widthHint || widthInPixel) {
+    options.widthHint = (widthInPixel ? Math.min(widthInPixel, scout.nvl(outerOptions.widthHint, widthInPixel)) : outerOptions.widthHint);
+  }
+  if (outerOptions.heightHint || heightInPixel) {
+    options.heightHint = (heightInPixel ? Math.min(heightInPixel, scout.nvl(outerOptions.heightHint, heightInPixel)) : outerOptions.heightHint);
+  }
+
+  if (this._groupBox.expanded) {
     if (widthInPixel && heightInPixel) {
       prefSize.width = widthInPixel;
       prefSize.height = heightInPixel;
