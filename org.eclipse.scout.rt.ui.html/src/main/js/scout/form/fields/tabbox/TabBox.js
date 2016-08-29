@@ -149,14 +149,10 @@ scout.TabBox.prototype._syncSelectedTab = function(tab, notifyServer) {
     }
     if (this.selectedTab) {
       this.selectedTab.focusTab();
-      if (oldSelectedTabItem) {
-      }
-
     }
     if (oldSelectedTab) {
       oldSelectedTab.detach();
     }
-
     this._renderTabContent();
   }
 };
