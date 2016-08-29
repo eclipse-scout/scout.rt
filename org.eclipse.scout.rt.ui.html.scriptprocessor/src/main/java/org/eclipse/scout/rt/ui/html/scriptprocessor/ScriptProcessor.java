@@ -37,7 +37,8 @@ public class ScriptProcessor implements AutoCloseable {
         .addLocalJar("private-libs/yuicompressor.jar")
         .addClasses("yui-calls.jar",
             "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyCssWithYui",
-            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui")
+            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui",
+            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui$1")
         .build(null);
     m_lessLoader = new SandboxClassLoaderBuilder()
         .addLocalJar("private-libs/slf4j-api.jar")
