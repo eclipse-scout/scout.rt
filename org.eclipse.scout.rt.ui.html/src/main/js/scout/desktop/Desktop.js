@@ -463,12 +463,12 @@ scout.Desktop.prototype.setNavigationVisible = function(visible) {
   this.updateSplitterVisibility();
 };
 
-scout.Desktop.prototype.setBenchVisible = function(visible, notifyServer) {
+scout.Desktop.prototype.setBenchVisible = function(visible) {
   this.setProperty('benchVisible', visible);
   this.updateSplitterVisibility();
 };
 
-scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
+scout.Desktop.prototype.setHeaderVisible = function(visible) {
   this.setProperty('headerVisible', visible);
 };
 
@@ -592,6 +592,33 @@ scout.Desktop.prototype.destroyPopupsFor = function(widget) {
   });
 };
 
+scout.Desktop.prototype.openUri = function(uri, action) {
+  action = action || 'open';
+  $.log.debug('(Desktop#openUri) uri=' + uri + ' action=' + action);
+  if (action === 'download') {
+    if (scout.device.isIos()) {
+      // The iframe trick does not work for ios
+      // Since the file cannot be stored on the file system it will be shown in the browser if possible
+      // -> create a new window to not replace the existing content.
+      // Drawback: Popup-Blocker will show up
+      this._openUriAsNewWindow(uri);
+    } else {
+      this._openUriInIFrame(uri);
+    }
+  } else if (action === 'open') {
+    // Open in same window.
+    // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
+    // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
+    this._openUriInSameWindow(uri);
+  } else if (action === 'newWindow') {
+    this._openUriAsNewWindow(uri);
+  }
+};
+
+scout.Desktop.prototype._openUriInSameWindow = function(uri) {
+  window.location.href = uri;
+};
+
 scout.Desktop.prototype._openUriInIFrame = function(uri) {
   // Create a hidden iframe and set the URI as src attribute value
   var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
@@ -701,8 +728,10 @@ scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTar
   }, this);
 };
 
-scout.Desktop.prototype.showForm = function(form, displayParent, position, notifyServer) {
-  this._setFormActivated(form, notifyServer);
+scout.Desktop.prototype.showForm = function(form, displayParent, position) {
+  displayParent = displayParent || this;
+
+  this._setFormActivated(form);
   // register listener to recover active form when child dialog is removed
   displayParent.formController.registerAndRender(form, position, true);
 };
@@ -719,39 +748,32 @@ scout.Desktop.prototype.hideForm = function(form) {
   form.displayParent.formController.unregisterAndRemove(form);
 };
 
-scout.Desktop.prototype.activateForm = function(form, notifyServer) {
+scout.Desktop.prototype.activateForm = function(form) {
   form.displayParent.formController.activateForm(form);
-  this._setFormActivated(form, notifyServer);
+  this._setFormActivated(form);
 };
 
 scout.Desktop.prototype._setOutlineActivated = function() {
   this._setFormActivated();
 };
 
-scout.Desktop.prototype._setFormActivated = function(form, notifyServer) {
+scout.Desktop.prototype._setFormActivated = function(form) {
   // If desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
   if (!this.rendered || this.initialFormRendering) {
     return;
   }
 
-  if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
-    this.activeForm = form ? form.id : null;
-    notifyServer = scout.nvl(notifyServer, true);
-    if (notifyServer) {
-      this._sendFormActivated(form);
-    }
+  if (this.activeForm === form) {
+    return;
   }
+
+  this.activeForm = form;
+  this.triggerFormActivated(form);
 };
 
-scout.Desktop.prototype._sendFormActivated = function(form) {
-  var eventData = {
-    formId: form ? form.id : null
-  };
-
-  this._send('formActivated', eventData, {
-    coalesce: function(previous) {
-      return this.type === previous.type;
-    }
+scout.Desktop.prototype.triggerFormActivated = function(form) {
+  this.trigger('formActivated', {
+    form: form
   });
 };
 
@@ -779,7 +801,7 @@ scout.Desktop.prototype.onResize = function(event) {
 scout.Desktop.prototype.onPopstate = function(event) {
   var historyState = event.originalEvent.state;
   if (historyState && historyState.deepLinkPath) {
-    this._send('historyEntryActivated', historyState);
+    this.trigger('historyEntryActivated', historyState);
   }
 };
 

@@ -123,7 +123,7 @@ describe('Desktop', function() {
       var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
       form.displayHint = scout.Form.DisplayHint.VIEW;
-      desktop.showForm(form, desktop);
+      desktop.showForm(form);
 
       expect(form.rendered).toBe(true);
       expect(form.parent).toBe(tabBox);
@@ -229,11 +229,25 @@ describe('Desktop', function() {
       session._renderDesktop();
     });
 
+    it('shows and activates the form', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var form = formHelper.createFormWithOneField();
+      desktop.showForm(form);
+      expect(form.rendered).toBe(true);
+      expect(desktop.activeForm).toBe(form);
+
+      var anotherForm = formHelper.createFormWithOneField();
+      desktop.showForm(anotherForm);
+      expect(form.rendered).toBe(true);
+      expect(desktop.activeForm).toBe(anotherForm);
+    });
+
     it('adds a view to the bench if displayHint is View', function() {
       var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
       form.displayHint = scout.Form.DisplayHint.VIEW;
-      desktop.showForm(form, desktop);
+      desktop.showForm(form);
 
       expect(form.rendered).toBe(true);
       expect(form.parent).toBe(tabBox);
@@ -262,7 +276,7 @@ describe('Desktop', function() {
         expect(desktop.benchVisible).toBe(false);
         expect(desktop.headerVisible).toBe(false);
 
-        desktop.showForm(form, desktop);
+        desktop.showForm(form);
         expect(form.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
         expect(desktop.benchVisible).toBe(true);
@@ -279,7 +293,7 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(false);
 
         // open first form, bench is shown
-        desktop.showForm(form1, desktop);
+        desktop.showForm(form1);
         expect(form1.rendered).toBe(true);
         expect(form2.rendered).toBe(false);
         expect(desktop.navigationVisible).toBe(false);
@@ -287,7 +301,7 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(true);
 
         // open second form, bench is still shown
-        desktop.showForm(form2, desktop);
+        desktop.showForm(form2);
         expect(form1.rendered).toBe(true);
         expect(form2.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
@@ -295,7 +309,7 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(true);
 
         // close first form, bench is still shown
-        desktop.hideForm(form1, desktop);
+        desktop.hideForm(form1);
         expect(form1.rendered).toBe(false);
         expect(form2.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
@@ -306,7 +320,7 @@ describe('Desktop', function() {
         desktop.bench.animateRemoval = false;
 
         // close second form, bench is not shown anymore
-        desktop.hideForm(form2, desktop);
+        desktop.hideForm(form2);
         expect(form1.rendered).toBe(false);
         expect(form2.rendered).toBe(false);
         expect(desktop.navigationVisible).toBe(true);

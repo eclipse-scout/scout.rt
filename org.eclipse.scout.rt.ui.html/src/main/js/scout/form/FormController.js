@@ -89,7 +89,7 @@ scout.FormController.prototype.remove = function() {
  * Activates the given view or dialog.
  */
 scout.FormController.prototype.activateForm = function(form) {
-  // if form is not rendered it could not be activated.
+  // if form is not rendered it can not be activated.
   if (!form.rendered) {
     return;
   }

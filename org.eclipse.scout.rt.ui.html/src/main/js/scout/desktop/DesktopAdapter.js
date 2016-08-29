@@ -23,13 +23,46 @@ scout.DesktopAdapter.prototype._goOnline = function() {
   this.widget.goOnline();
 };
 
+scout.DesktopAdapter.prototype._onWidgetHistoryEntryActivated = function(event) {
+  this._send('historyEntryActivated', {
+    deepLinkPath: event.deepLinkPath
+  });
+};
+
+scout.DesktopAdapter.prototype._onWidgetFormActivated = function(event) {
+  this._sendFormActivated(event.form);
+};
+
+scout.DesktopAdapter.prototype._sendFormActivated = function(form) {
+  var eventData = {
+    formId: form ? form.remoteAdapter.id : null
+  };
+
+  this._send('formActivated', eventData, {
+    coalesce: function(previous) {
+      return this.type === previous.type;
+    }
+  });
+};
+
+scout.DesktopAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'formActivated') {
+    this._onWidgetFormActivated(event);
+  } else if (event.type === 'historyEntryActivated') {
+    this._onWidgetHistoryEntryActivated(event);
+  } else {
+    scout.DesktopAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};
+
 scout.DesktopAdapter.prototype._onFormShow = function(event) {
   var form,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
     form = this.session.getOrCreateWidget(event.form, this.widget);
-    this.widget.showForm(form, displayParent.widget, event.position, false);
+    this.addFilterForWidgetEventType('formActivated');
+    this.widget.showForm(form, displayParent.widget, event.position);
   }
 };
 
@@ -42,7 +75,6 @@ scout.DesktopAdapter.prototype._onFormHide = function(event) {
     this.widget.hideForm(form.widget);
   }
 };
-
 
 scout.DesktopAdapter.prototype._onFormActivate = function(event) {
   var form,
@@ -95,29 +127,10 @@ scout.DesktopAdapter.prototype._onFileChooserHide = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onOpenUri = function(event) {
-  $.log.debug('(Desktop#_onOpenUri) uri=' + event.uri + ' action=' + event.action);
   if (!event.uri) {
     return;
   }
-
-  if (event.action === 'download') {
-    if (scout.device.isIos()) {
-      // The iframe trick does not work for ios
-      // Since the file cannot be stored on the file system it will be shown in the browser if possible
-      // -> create a new window to not replace the existing content.
-      // Drawback: Popup-Blocker will show up
-      this.widget._openUriAsNewWindow(event.uri); // FIXME [awe] 6.1 - handle this in Widget? Make public?
-    } else {
-      this.widget._openUriInIFrame(event.uri);
-    }
-  } else if (event.action === 'open') {
-    // Open in same window.
-    // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
-    // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
-    window.location.href = event.uri;
-  } else if (event.action === 'newWindow') {
-    this.widget._openUriAsNewWindow(event.uri);
-  }
+  this.widget.openUri(event.uri, event.action);
 };
 
 scout.DesktopAdapter.prototype._onOutlineChanged = function(event) {
