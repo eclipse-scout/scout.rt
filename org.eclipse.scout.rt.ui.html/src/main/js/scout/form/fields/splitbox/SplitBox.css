@@ -19,6 +19,7 @@
     & > .first-field,
     & > .second-field {
       overflow: hidden;
+      position: absolute;
 
       &.collapsed {
         display: none;
