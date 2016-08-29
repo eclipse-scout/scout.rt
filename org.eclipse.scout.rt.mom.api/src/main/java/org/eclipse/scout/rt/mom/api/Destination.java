@@ -2,6 +2,8 @@ package org.eclipse.scout.rt.mom.api;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+
 /**
  * Lightweight object which describes a messaging destination with no physical resources allocated.
  *
@@ -56,5 +58,19 @@ class Destination<REQUEST, REPLY> implements IBiDestination<REQUEST, REPLY> {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public String toString() {
+    switch (m_type) {
+      case QUEUE:
+        return new ToStringBuilder(this).attr("queue", m_name).toString();
+      case TOPIC:
+        return new ToStringBuilder(this).attr("topic", m_name).toString();
+      case JNDI_LOOKUP:
+        return new ToStringBuilder(this).attr("jndi", m_name).toString();
+      default:
+        return m_name;
+    }
   }
 }

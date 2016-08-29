@@ -19,12 +19,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Messages are acknowledged automatically upon their receipt. This strategy has less footprint than
  * {@link TransactedStrategy}, and allows concurrent message processing.
- * <p>
  *
  * @see IMom#ACKNOWLEDGE_AUTO
  * @since 6.1
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
 
-  private volatile JmsMom m_mom;
+  protected JmsMom m_mom;
 
   public ISubscriptionStrategy init(final JmsMom mom) {
     m_mom = mom;
@@ -50,21 +50,29 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
 
       @Override
       public void onJmsMessage(final Message jmsMessage) throws JMSException, GeneralSecurityException {
-        final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
-        final IMessage<DTO> message = messageReader.readMessage();
-
+        // Read and process the message asynchronously because JMS session is single-threaded. This allows concurrent message processing.
         Jobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            handleMessage(listener, message);
+            final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
+            final IMessage<DTO> message = messageReader.readMessage();
+
+            runContext.copy()
+                .withCorrelationId(messageReader.readCorrelationId())
+                .withThreadLocal(IMessage.CURRENT, message)
+                .withTransactionScope(TransactionScope.REQUIRES_NEW)
+                .run(new IRunnable() {
+
+              @Override
+              public void run() throws Exception {
+                handleMessage(listener, message);
+              }
+            });
           }
         }, Jobs.newInput()
             .withName("Receiving JMS message [msg={}]", jmsMessage)
-            .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)
-            .withRunContext(runContext
-                .withCorrelationId(messageReader.readCorrelationId())
-                .withThreadLocal(IMessage.CURRENT, message)));
+            .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true));
       }
     });
     return new JmsSubscription(consumer, destination);

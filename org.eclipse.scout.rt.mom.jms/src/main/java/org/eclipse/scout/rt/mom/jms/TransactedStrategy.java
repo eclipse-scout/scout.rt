@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 /**
  * Messages are acknowledged upon successful commit of the receiving transaction. While processing a message, this
  * subscription cannot process another message sent to its destination.
- * <p>
  *
  * @see IMom#ACKNOWLEDGE_TRANSACTED
  * @since 6.1
@@ -32,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class TransactedStrategy implements ISubscriptionStrategy {
 
-  private volatile JmsMom m_mom;
+  protected JmsMom m_mom;
 
   public ISubscriptionStrategy init(final JmsMom mom) {
     m_mom = mom;
@@ -50,10 +49,13 @@ public class TransactedStrategy implements ISubscriptionStrategy {
 
       @Override
       public void onJmsMessage(final Message jmsMessage) throws JMSException, GeneralSecurityException {
+        // Do not process asynchronously due to transacted acknowledgment.
+        // This guarantees that messages do not arrive concurrently, which is required to commit or rollback a single message.
+
         final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
         final IMessage<DTO> message = messageReader.readMessage();
 
-        runContext
+        runContext.copy()
             .withCorrelationId(messageReader.readCorrelationId())
             .withThreadLocal(IMessage.CURRENT, message)
             .withTransactionScope(TransactionScope.REQUIRES_NEW)

@@ -19,7 +19,6 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
@@ -30,7 +29,6 @@ import javax.naming.NamingException;
 
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
-import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
@@ -58,14 +56,12 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
@@ -95,6 +91,7 @@ public class JmsMom implements IMomImplementor {
   protected TemporaryQueue m_replyQueue;
   protected Topic m_requestReplyCancellationTopic;
   protected final Map<String, ReplyFuture> m_replyFutureMap = new ConcurrentHashMap<>();
+  protected final Replier m_replier = BEANS.get(Replier.class).init(this);
 
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
   protected final Map<IDestination, IEncrypter> m_encrypters = new ConcurrentHashMap<>();
@@ -223,7 +220,7 @@ public class JmsMom implements IMomImplementor {
 
     try {
       final ISubscriptionStrategy strategy = assertNotNull(m_subscriptionStrategies.get(acknowledgementMode), "Acknowledgement mode not supported [mode={}]", acknowledgementMode);
-      return strategy.subscribe(destination, listener, runContext != null ? runContext.copy() : RunContexts.empty());
+      return strategy.subscribe(destination, listener, runContext != null ? runContext : RunContexts.empty());
     }
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
@@ -291,65 +288,11 @@ public class JmsMom implements IMomImplementor {
     assertNotNull(destination, "Destination not specified");
     assertNotNull(listener, "MessageListener not specified");
 
-    final IMarshaller marshaller = lookupMarshaller(destination);
-    final IEncrypter encrypter = lookupEncrypter(destination);
     try {
-      final MessageConsumer consumer = m_defaultSession.createConsumer(lookupJmsDestination(destination, m_defaultSession));
-      consumer.setMessageListener(new JmsMessageListener() {
-
-        @Override
-        public void onJmsMessage(final Message jmsRequest) throws JMSException, GeneralSecurityException {
-          final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller, encrypter);
-          final IMessage<REQUEST> request = requestReader.readMessage();
-          final String replyId = requestReader.readReplyId();
-          final Destination replyTopic = requestReader.readReplyTo();
-
-          Jobs.schedule(new IRunnable() {
-
-            @Override
-            public void run() throws Exception {
-              final Message replyMessage = handleRequest(listener, marshaller, encrypter, request, replyId);
-              send(m_defaultProducer, replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
-            }
-          }, Jobs.newInput()
-              .withName("Receiving JMS request [msg={}]", jmsRequest)
-              .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)
-              .withExecutionHint(replyId) // Register for cancellation
-              .withRunContext((runContext != null ? runContext.copy() : RunContexts.empty())
-                  .withThreadLocal(IMessage.CURRENT, request)
-                  .withCorrelationId(requestReader.readCorrelationId())));
-        }
-      });
-
-      return new JmsSubscription(consumer, destination);
+      return m_replier.subscribe(destination, listener, runContext != null ? runContext : RunContexts.empty());
     }
     catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
-  }
-
-  /**
-   * Delegates the request to the listener, and returns the message to be replied.
-   */
-  protected <REPLY, REQUEST> Message handleRequest(final IRequestListener<REQUEST, REPLY> listener, final IMarshaller marshaller, final IEncrypter encrypter, final IMessage<REQUEST> request, final String replyId)
-      throws JMSException, GeneralSecurityException {
-    try {
-      final REPLY reply = listener.onRequest(request);
-      return JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
-          .writeTransferObject(reply)
-          .writeRequestReplySuccess(true)
-          .writeReplyId(replyId)
-          .writeCorrelationId(CorrelationId.CURRENT.get())
-          .build();
-    }
-    catch (final Exception e) { // NOSONAR
-      BEANS.get(ExceptionHandler.class).handle(e);
-      return JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
-          .writeTransferObject(interceptRequestReplyException(e))
-          .writeRequestReplySuccess(false)
-          .writeReplyId(replyId)
-          .writeCorrelationId(CorrelationId.CURRENT.get())
-          .build();
     }
   }
 
@@ -450,7 +393,7 @@ public class JmsMom implements IMomImplementor {
   /**
    * Sends the message to the given destination.
    */
-  protected void send(final MessageProducer producer, final Destination destination, final Message message, final int deliveryMode, final int priority, final long timeToLive) throws JMSException {
+  public void send(final MessageProducer producer, final Destination destination, final Message message, final int deliveryMode, final int priority, final long timeToLive) throws JMSException {
     final IRestorer interruption = ThreadInterruption.clear(); // Temporarily clear the thread's interrupted status while sending a message.
     try {
       LOG.debug("Sending JMS message [destination={}, message={}]", destination, message);
@@ -508,21 +451,6 @@ public class JmsMom implements IMomImplementor {
 
   public int toJmsDeliveryMode(final PublishInput publishInput) {
     return publishInput.getDeliveryMode() == PublishInput.DELIVERY_MODE_PERSISTENT ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
-  }
-
-  protected Throwable interceptRequestReplyException(final Throwable t) {
-    // Unset cause and stracktrace (security)
-    if (t.getCause() == t) {
-      t.initCause(null);
-    }
-    t.setStackTrace(new StackTraceElement[0]);
-
-    // Unset cause in status to break recursion
-    if (t instanceof ProcessingException) {
-      ((ProcessingStatus) ((ProcessingException) t).getStatus()).setException(null);
-    }
-
-    return t;
   }
 
   /**

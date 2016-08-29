@@ -4,7 +4,6 @@ import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_B
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_TEXT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_MARSHALLER_CONTEXT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_NULL_OBJECT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REQUEST_REPLY_SUCCESS;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
@@ -121,17 +120,6 @@ public class JmsMessageReader<DTO> {
   public Destination readReplyTo() throws JMSException {
     final Destination replyTo = m_message.getJMSReplyTo();
     return assertNotNull(replyTo, "missing 'replyTo' [msg={}]", m_message);
-  }
-
-  /**
-   * Reads the unique reply id used to follow a 'request-reply' communication, or throws {@link AssertionException} if
-   * not set.
-   *
-   * @see JmsMessageWriter#writeReplyId(String)
-   */
-  public String readReplyId() throws JMSException, GeneralSecurityException {
-    final String replyId = readProperty(PROP_REPLY_ID, false);
-    return assertNotNull(replyId, "missing 'replyId' [msg={}]", m_message);
   }
 
   /**

@@ -135,8 +135,6 @@ public class JmsMessageWriter {
   /**
    * Writes the reply id used to follow a 'request-reply' communication, and must be unique for every communication
    * initiated.
-   *
-   * @see JmsMessageReader#readReplyId()
    */
   public JmsMessageWriter writeReplyId(final String replyId) throws JMSException, GeneralSecurityException {
     return writeProperty(PROP_REPLY_ID, replyId, false);
