@@ -66,7 +66,7 @@ scout.PageWithNodes.prototype._loadTableData = function() {
 scout.PageWithNodes.prototype.loadChildren = function() {
   var childPages = this._createChildPages();
   if (childPages.length > 0) {
-    scout.arrays.pushAll(this.childNodes, childPages); // FIXME [awe] 6.1 - shouldn't we call insertNodes() here?
+    this.getOutline().insertNodes(childPages, this);
   }
   return this.loadTableData();
 };

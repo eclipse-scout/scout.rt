@@ -36,6 +36,7 @@ scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
   return new scout.AutoLeafPageWithNodes(tableRow);
 };
 
+// FIXME [awe] 6.1 - check P_TableListener usage:
 // AbstractPageWithTable#P_TableListener hat einen listener auf der table, über die listener wird
 // der baum mit der tabelle synchronisiert
 
@@ -43,6 +44,11 @@ scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
  * @override TreeNode.js
  */
 scout.PageWithTable.prototype.loadChildren = function() {
+  // It's allowed to have no table - but we don't have to load data in that case
+  if (!this.detailTable) {
+    return $.resolvedDeferred();
+  }
+
   return this.loadTableData()
     .done(function() {
       var childPage, childNodes = [];

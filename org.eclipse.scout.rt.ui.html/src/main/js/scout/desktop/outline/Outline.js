@@ -951,6 +951,9 @@ scout.Outline.prototype._nodesSelectedInternal = function() {
   }
 };
 
+// FIXME [awe] 6.1 - DesktopBenchSpec anschauen. 2 Tests failen weil updateOutlineContent zu oft aufgerufen wird.
+// prüfen, ob es richtig ist hier pageChanged zu triggern, oder ob hier ein eigenes event nötig ist, das evtl.
+// weniger macht (auch mit Java code vergleichen)
 scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
   this._triggerPageChanged(activePage);
 };
