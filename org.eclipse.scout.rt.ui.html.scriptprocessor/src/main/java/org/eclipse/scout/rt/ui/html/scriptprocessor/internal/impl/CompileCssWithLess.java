@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl;
 
 import java.io.IOException;
 
-import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.ScoutClasspathResourceLoader;
-
 import com.asual.lesscss.LessEngine;
 import com.asual.lesscss.LessException;
 import com.asual.lesscss.LessOptions;
