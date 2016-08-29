@@ -89,7 +89,7 @@ describe("DesktopBench", function() {
       var form = formHelper.createFormWithOneField();
       form.displayHint = scout.Form.DisplayHint.VIEW;
       form.displayViewId = 'C';
-      desktop._showForm(form, desktop);
+      desktop.showForm(form, desktop);
 
       expect(desktop.inBackground).toBeTruthy();
 
@@ -119,7 +119,7 @@ describe("DesktopBench", function() {
       var form = formHelper.createFormWithOneField();
       form.displayHint = scout.Form.DisplayHint.VIEW;
       form.displayViewId = 'C';
-      desktop._showForm(form, desktop);
+      desktop.showForm(form, desktop);
 
       expect(desktop.inBackground).toBeTruthy();
 
