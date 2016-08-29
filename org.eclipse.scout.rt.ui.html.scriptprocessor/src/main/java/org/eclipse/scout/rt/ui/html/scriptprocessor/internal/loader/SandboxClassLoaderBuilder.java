@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,11 +23,17 @@ import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,32 +55,66 @@ public final class SandboxClassLoaderBuilder {
     m_jarLocator = (jarLocator != null ? jarLocator : new JarLocator(SandboxClassLoaderBuilder.class));
   }
 
-  public SandboxClassLoaderBuilder addJar(URL url) {
-    if (url == null) {
-      throw new IllegalArgumentException("Argument 'url' must not be null");
-    }
-    m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
-    return this;
-  }
-
   public SandboxClassLoaderBuilder addLocalJar(String path) {
     URL url = m_jarLocator.getResource(path);
     if (url == null) {
-      throw new IllegalStateException("Could not resolve URL for path '" + path + "'");
+      throw new PlatformException("Could not resolve URL for path '{}'", path);
     }
-    m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
+    ByteArrayOutputStream jarData = new ByteArrayOutputStream();
+    try {
+      try (InputStream in = url.openStream()) {
+        byte[] buf = new byte[ANY_SIZE];
+        int n;
+        while ((n = in.read(buf)) > 0) {
+          jarData.write(buf, 0, n);
+        }
+      }
+      URL jarUrl = createTemporaryJar(path, jarData.toByteArray());
+      m_urls.put(jarUrl.toExternalForm(), jarUrl);
+    }
+    catch (Exception e) {
+      throw new PlatformException("Cannot read content of {}", path, e);
+    }
     return this;
   }
 
-  public SandboxClassLoaderBuilder addJarContaining(Class<?> clazz) {
-    if (clazz == null) {
-      throw new IllegalStateException("Argument 'clazz' must not be null");
+  public SandboxClassLoaderBuilder addClasses(String newJarFileName, String... classNames) {
+    if (classNames == null || classNames.length == 0) {
+      return this;
     }
-    URL url = m_jarLocator.getJarContaining(clazz);
-    if (url == null) {
-      throw new IllegalStateException("Could not resolve URL for class " + clazz.getName());
+    ByteArrayOutputStream jarData = new ByteArrayOutputStream();
+    try {
+      //create jar
+      Manifest manifest = new Manifest();
+      manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+      try (JarOutputStream jar = new JarOutputStream(jarData, manifest)) {
+        for (String className : classNames) {
+          String classPath = (className.replace(".", "/")) + ".class";
+          URL url = m_jarLocator.getResource(classPath);
+          if (url == null) {
+            throw new PlatformException("Could not resolve URL for class {}", className);
+          }
+          //add entry
+          JarEntry entry = new JarEntry(classPath);
+          entry.setTime(0L);
+          jar.putNextEntry(entry);
+          try (InputStream in = url.openStream()) {
+            byte[] buf = new byte[ANY_SIZE];
+            int n;
+            while ((n = in.read(buf)) > 0) {
+              jar.write(buf, 0, n);
+            }
+          }
+          jar.closeEntry();
+        }
+        jar.finish();
+      }
     }
-    m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
+    catch (Exception e) {
+      throw new PlatformException("Cannot create jar for {}", Arrays.toString(classNames), e);
+    }
+    URL jarUrl = createTemporaryJar(newJarFileName, jarData.toByteArray());
+    m_urls.put(jarUrl.toExternalForm(), jarUrl);
     return this;
   }
 
@@ -85,95 +127,69 @@ public final class SandboxClassLoaderBuilder {
     });
   }
 
-  static URL unwrapNestedJar(URL url) {
-    if (!url.getPath().endsWith(".jar")) {
-      return url;
-    }
-
+  static URL createTemporaryJar(String jarFilePath, byte[] data) {
+    String jarFileName = new File(jarFilePath).getName();
     String tempDir = System.getProperty("java.io.tmpdir");
     if (!(tempDir.endsWith("/") || tempDir.endsWith("\\"))) {
       tempDir += System.getProperty("file.separator");
     }
-
     try {
-      String name = url.getPath();
-      int i = name.lastIndexOf('/');
-      if (i >= 0) {
-        name = name.substring(i + 1);
-      }
-
       String sha1;
-      try (InputStream inputStream = url.openStream()) {
-        sha1 = getSha1(inputStream);
+      try (InputStream inputStream = new ByteArrayInputStream(data)) {
+        sha1 = readSha1(inputStream);
       }
-
-      String filenameWithoutExtension = name.substring(0, name.lastIndexOf('.'));
-      String targetFilename = filenameWithoutExtension + "-" + sha1 + ".jar";
-      File targetFile = new File(tempDir, targetFilename);
+      File targetFile = new File(tempDir, sha1 + "-" + jarFileName);
       if (targetFile.exists()) {
         String targetFileSha1;
         try (InputStream inputStream = new FileInputStream(targetFile)) {
-          targetFileSha1 = getSha1(inputStream);
+          targetFileSha1 = readSha1(inputStream);
         }
-
-        if (!targetFileSha1.equals(sha1)) {
-          // sha1 hash of existing file doesn't match
-          // use newly created temporary file as fallback
-          File f = File.createTempFile("jar-sandbox-", name);
-          LOG.error("Target file '{}' already exists but has wrong sha1 hash [{}]. Using new temporary file instead '{}' [{}].", targetFile.getAbsolutePath(), targetFileSha1, f.getAbsolutePath(), sha1);
-          targetFile = f;
-          targetFile.deleteOnExit();
-          writeContent(url, targetFile);
+        if (targetFileSha1.equals(sha1)) {
+          return targetFile.toURI().toURL();
         }
+        // sha1 hash of existing file doesn't match
+        // use newly created temporary file as fallback
+        File f = File.createTempFile("jar-sandbox-", jarFileName);
+        LOG.error("Target file '{}' already exists but has wrong sha1 hash [{}]. Using new temporary file instead '{}' [{}].", targetFile.getAbsolutePath(), targetFileSha1, f.getAbsolutePath(), sha1);
+        targetFile = f;
       }
-      else {
-        // existing file doesn't exist
-        // write content to file
-        targetFile.deleteOnExit();
-        writeContent(url, targetFile);
-      }
-
+      targetFile.deleteOnExit();
+      writeContent(targetFile, data);
       return targetFile.toURI().toURL();
     }
     catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("SHA-1 algorithm is missing but required to verify jar for classloader", e);
+      throw new PlatformException("SHA-1 algorithm is missing but required to verify jar for classloader", e);
     }
     catch (IOException e) {
-      throw new IllegalArgumentException("JAR " + url + " could not be extracted to temp directory", e);
+      throw new PlatformException("JAR {} could not be extracted to temp directory", jarFilePath, e);
     }
   }
 
   /**
    * Determines the sha1 hash (hex representation) of the data provided by the input stream.
    */
-  static String getSha1(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
+  static String readSha1(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
     MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
     byte[] buf = new byte[ANY_SIZE];
     int n;
     while ((n = inputStream.read(buf)) > 0) {
       sha1Digest.update(buf, 0, n);
     }
-
     return new HexBinaryAdapter().marshal(sha1Digest.digest());
   }
 
   /**
    * Writes the content from the url output stream to the provided file.
    */
-  static void writeContent(URL url, File f) throws IOException {
+  static void writeContent(File f, byte[] content) throws IOException {
     // ensure folder exists
     File folder = f.getParentFile();
     if (!folder.exists() && !folder.mkdirs()) {
-      throw new IOException("unable to create folder '" + folder.getAbsolutePath() + "'.");
+      throw new PlatformException("unable to create folder '{}'", folder.getAbsolutePath());
     }
-
     // write content
-    try (InputStream in = url.openStream(); FileOutputStream out = new FileOutputStream(f)) {
-      byte[] buf = new byte[ANY_SIZE];
-      int n;
-      while ((n = in.read(buf)) > 0) {
-        out.write(buf, 0, n);
-      }
+    try (FileOutputStream out = new FileOutputStream(f)) {
+      out.write(content);
     }
   }
 

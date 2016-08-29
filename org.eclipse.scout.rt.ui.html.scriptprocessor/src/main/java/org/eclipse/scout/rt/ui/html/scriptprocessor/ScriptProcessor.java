@@ -35,14 +35,18 @@ public class ScriptProcessor {
     //set up an external private class loader
     m_yuiLoader = new SandboxClassLoaderBuilder()
         .addLocalJar("private-libs/yuicompressor.jar")
-        .addJarContaining(ScriptProcessor.class)
+        .addClasses("yui-calls.jar",
+            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyCssWithYui",
+            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui")
         .build(null);
     m_lessLoader = new SandboxClassLoaderBuilder()
         .addLocalJar("private-libs/slf4j-api.jar")
         .addLocalJar("private-libs/jcl-over-slf4j.jar")
         .addLocalJar("private-libs/rhino.jar")
         .addLocalJar("private-libs/lesscss-engine.jar")
-        .addJarContaining(ScriptProcessor.class)
+        .addClasses("less-calls.jar",
+            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.CompileCssWithLess",
+            "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.ScoutClasspathResourceLoader")
         .build(null);
   }
 
