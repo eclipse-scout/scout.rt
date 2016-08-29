@@ -270,11 +270,11 @@ scout.Menu.prototype.isButton = function() {
   return scout.Action.ActionStyle.BUTTON === this.actionStyle;
 };
 
-scout.Menu.prototype.setSelected = function(selected, notifyServer) {
+scout.Menu.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
   }
-  scout.Menu.parent.prototype.setSelected.call(this, selected, notifyServer);
+  scout.Menu.parent.prototype.setSelected.call(this, selected);
   if (!this._doActionTogglesSubMenu() && !this._doActionTogglesPopup()) {
     return;
   }

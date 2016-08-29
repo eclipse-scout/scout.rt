@@ -162,7 +162,7 @@ scout.TableControl.prototype.toggle = function() {
   }
 };
 
-scout.TableControl.prototype.setSelected = function(selected, notifyServer, closeWhenUnselected) {
+scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
   if (selected && !this.visible) {
     return;
   }
@@ -171,7 +171,7 @@ scout.TableControl.prototype.setSelected = function(selected, notifyServer, clos
   }
 
   if (this.tableFooter && this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
-    this.tableFooter.selectedControl.setSelected(false, true, false);
+    this.tableFooter.selectedControl.setSelected(false, false);
   }
 
   // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise

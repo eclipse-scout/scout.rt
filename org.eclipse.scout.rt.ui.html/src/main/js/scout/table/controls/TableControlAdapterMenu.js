@@ -72,8 +72,8 @@ scout.TableControlAdapterMenu.prototype.doAction = function() {
 /**
  * @override Action.js
  */
-scout.TableControlAdapterMenu.prototype.setSelected = function(selected, notifyServer) {
-  this.tableControl.setSelected(selected, notifyServer);
+scout.TableControlAdapterMenu.prototype.setSelected = function(selected) {
+  this.tableControl.setSelected(selected);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
