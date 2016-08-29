@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -193,15 +192,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
    * Detail Form.
    */
   List<IForm> getSimilarViewForms(IForm form);
-
-  /**
-   * this feature isn't supported in html ui
-   * 
-   * @return the {@link IFormField} that owns the focus
-   * @deprecated will be removed in o-release
-   */
-  @Deprecated
-  IFormField getFocusOwner();
 
   /**
    * fires a ensure visible event for every form in viewStack

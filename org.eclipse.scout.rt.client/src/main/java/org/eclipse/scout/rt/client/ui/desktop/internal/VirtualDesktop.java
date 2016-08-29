@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
@@ -386,17 +385,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public List<IForm> getDialogs(IDisplayParent displayParent, boolean includeChildDialogs) {
-    throw createUnsupportedOperationException();
-  }
-
-  /**
-   * this feature isn't supported in html ui
-   *
-   * @deprecated will be removed in o-release
-   */
-  @Override
-  @Deprecated
-  public IFormField getFocusOwner() {
     throw createUnsupportedOperationException();
   }
 

@@ -1304,34 +1304,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return m_wizardStep;
   }
 
-  /**
-   * this feature isn't supported in html ui
-   *
-   * @deprecated will be removed in o-release
-   */
-  @Override
-  @Deprecated
-  public IFormField getFocusOwner() {
-    IDesktop desktop = getDesktop();
-    if (desktop == null) {
-      return null;
-    }
-    IFormField field = desktop.getFocusOwner();
-    if (field == null) {
-      return null;
-    }
-
-    IForm form = field.getForm();
-    while (form != null) {
-      if (form == this) {
-        return field;
-      }
-      // next
-      form = form.getOuterForm();
-    }
-    return null;
-  }
-
   @Override
   public List<IFormField> getAllFields() {
     P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {

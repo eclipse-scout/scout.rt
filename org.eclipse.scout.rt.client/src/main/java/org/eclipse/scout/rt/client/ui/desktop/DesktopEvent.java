@@ -57,18 +57,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    * @see IDesktop#openUri(String, IOpenUriAction)
    */
   public static final int TYPE_OPEN_URI = 920;
-  /**
-   * Send a broadcast event to find the {@link IFormField} that owns the focus The listener can store the result using
-   * {@link #setFocusedField()} The event waits some time to give asynchronous jobs a chance to complete (default is
-   * 2000 ms)<br>
-   * this feature isn't supported in html ui
-   *
-   * @deprecated will be removed in o-release
-   */
-  /**
-   */
-  @Deprecated
-  public static final int TYPE_FIND_FOCUS_OWNER = 1000;
 
   /**
    * Event type indicates that a notification has been added to the desktop.

@@ -70,7 +70,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
@@ -825,17 +824,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setLogoId(String id) {
     propertySupport.setPropertyString(PROP_LOGO_ID, id);
-  }
-
-  /**
-   * this feature isn't supported in html ui
-   *
-   * @deprecated will be removed in o-release
-   */
-  @Override
-  @Deprecated
-  public IFormField getFocusOwner() {
-    return fireFindFocusOwner();
   }
 
   @Override
@@ -1762,12 +1750,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private void fireOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, res, openUriAction);
     fireDesktopEvent(e);
-  }
-
-  private IFormField fireFindFocusOwner() {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FIND_FOCUS_OWNER);
-    fireDesktopEvent(e);
-    return e.getFocusedField();
   }
 
   private void fireNotification(int eventType, IDesktopNotification notification) {
