@@ -214,7 +214,7 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     return "";
   }
 
-  private DateFormat getDateFormat() {
+  protected DateFormat getDateFormat() {
     DateFormat df = null;
     if (getFormat() != null) {
       df = new SimpleDateFormat(getFormat(), NlsLocale.get());
