@@ -198,7 +198,7 @@ public interface IMom {
    * Allows end-to-end encryption for transfer objects sent to the given destination. By default, no encryption is used.
    *
    * @return registration handle to unregister the encrypter from the destination.
-   * @see ClusterEncrypter
+   * @see ClusterAesEncrypter
    */
   IRegistrationHandle registerEncrypter(IDestination<?> destination, IEncrypter encrypter);
 

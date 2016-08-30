@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
  * @since 6.1
  */
 @ApplicationScoped
-public class ClusterEncrypter implements IEncrypter {
+public class ClusterAesEncrypter implements IEncrypter {
 
   protected AesEncrypter m_aesEncrypter;
 

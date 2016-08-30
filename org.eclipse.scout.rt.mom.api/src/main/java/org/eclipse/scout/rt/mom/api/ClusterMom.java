@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
  * @see IMom
  * @since 6.1
  */
-public class ClusterMom extends MomDelegate implements IMomTransport {
+public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
 
   @Override
   protected IMom initDelegate() throws Exception {

@@ -40,10 +40,10 @@ import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IMomTransport;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.MOM;
-import org.eclipse.scout.rt.mom.api.MomDelegate;
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter;
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter.PbePasswordProperty;
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter.PbeSaltProperty;
+import org.eclipse.scout.rt.mom.api.AbstractMomDelegate;
+import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
+import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter.PbePasswordProperty;
+import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter.PbeSaltProperty;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -88,8 +88,8 @@ public class JmsMomTest {
   private String m_testJobExecutionHint;
 
   private IBean<EncrypterProperty> m_nullEncrypterProperty;
-  private IBean<ClusterEncrypter.PbeSaltProperty> m_junitPbeSaltProperty;
-  private IBean<ClusterEncrypter.PbePasswordProperty> m_junitPbePasswordProperty;
+  private IBean<ClusterAesEncrypter.PbeSaltProperty> m_junitPbeSaltProperty;
+  private IBean<ClusterAesEncrypter.PbePasswordProperty> m_junitPbePasswordProperty;
 
   private static IBean<JmsTestMom> s_momBean;
 
@@ -217,10 +217,10 @@ public class JmsMomTest {
 
   @Test
   public void testPublishSubscribe() throws InterruptedException {
-    assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(TextMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
 
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(TextMarshaller.class), null));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class), null));
@@ -230,10 +230,10 @@ public class JmsMomTest {
 
   @Test(timeout = 15_000)
   public void testRequestReply() throws InterruptedException {
-    assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testRequestReplyInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testRequestReplyInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
 
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class), null));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class), null));
@@ -243,10 +243,10 @@ public class JmsMomTest {
 
   @Test
   public void testPublishEmpty() throws InterruptedException {
-    assertEquals("", testPublishAndConsumeInternal("", BEANS.get(TextMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("", testPublishAndConsumeInternal("", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("", testPublishAndConsumeInternal("", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertArrayEquals(new byte[0], (byte[]) testPublishAndConsumeInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertEquals("", testPublishAndConsumeInternal("", BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("", testPublishAndConsumeInternal("", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("", testPublishAndConsumeInternal("", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertArrayEquals(new byte[0], (byte[]) testPublishAndConsumeInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
 
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(TextMarshaller.class), null));
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(ObjectMarshaller.class), null));
@@ -256,10 +256,10 @@ public class JmsMomTest {
 
   @Test
   public void testPublishNull() throws InterruptedException {
-    assertNull(testPublishAndConsumeInternal(null, BEANS.get(TextMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertNull(testPublishAndConsumeInternal(null, BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertNull(testPublishAndConsumeInternal(null, BEANS.get(JsonMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertNull(testPublishAndConsumeInternal(null, BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertNull(testPublishAndConsumeInternal(null, BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertNull(testPublishAndConsumeInternal(null, BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertNull(testPublishAndConsumeInternal(null, BEANS.get(JsonMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertNull(testPublishAndConsumeInternal(null, BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
 
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(TextMarshaller.class), null));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(ObjectMarshaller.class), null));
@@ -272,20 +272,20 @@ public class JmsMomTest {
     assertEquals("", testRequestReplyInternal("", BEANS.get(TextMarshaller.class), null));
     assertEquals("", testRequestReplyInternal("", BEANS.get(ObjectMarshaller.class), null));
     assertEquals("", testRequestReplyInternal("", BEANS.get(JsonMarshaller.class), null));
-    assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
 
-    assertEquals("", testRequestReplyInternal("", BEANS.get(TextMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("", testRequestReplyInternal("", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertEquals("", testRequestReplyInternal("", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertEquals("", testRequestReplyInternal("", BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("", testRequestReplyInternal("", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertEquals("", testRequestReplyInternal("", BEANS.get(JsonMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
   }
 
   @Test(timeout = 15_000)
   public void testRequestReplyNull() throws InterruptedException {
-    assertNull(testRequestReplyInternal(null, BEANS.get(TextMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertNull(testRequestReplyInternal(null, BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertNull(testRequestReplyInternal(null, BEANS.get(JsonMarshaller.class), BEANS.get(ClusterEncrypter.class)));
-    assertNull(testRequestReplyInternal(null, BEANS.get(BytesMarshaller.class), BEANS.get(ClusterEncrypter.class)));
+    assertNull(testRequestReplyInternal(null, BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertNull(testRequestReplyInternal(null, BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertNull(testRequestReplyInternal(null, BEANS.get(JsonMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
+    assertNull(testRequestReplyInternal(null, BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
 
     assertNull(testRequestReplyInternal(null, BEANS.get(TextMarshaller.class), null));
     assertNull(testRequestReplyInternal(null, BEANS.get(ObjectMarshaller.class), null));
@@ -522,7 +522,7 @@ public class JmsMomTest {
   @Test
   public void testProperties() throws InterruptedException {
     testProperties(null);
-    testProperties(BEANS.get(ClusterEncrypter.class));
+    testProperties(BEANS.get(ClusterAesEncrypter.class));
   }
 
   private void testProperties(IEncrypter encrypter) throws InterruptedException {
@@ -1550,7 +1550,7 @@ public class JmsMomTest {
    */
   @Ignore
   @ApplicationScoped
-  public static class JmsTestMom extends MomDelegate implements IMomTransport {
+  public static class JmsTestMom extends AbstractMomDelegate implements IMomTransport {
 
     @Override
     protected IMom initDelegate() throws Exception {

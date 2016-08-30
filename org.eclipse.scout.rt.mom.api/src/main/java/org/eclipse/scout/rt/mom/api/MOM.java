@@ -2,7 +2,7 @@ package org.eclipse.scout.rt.mom.api;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter;
+import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -329,7 +329,7 @@ public final class MOM {
    * Allows end-to-end encryption for transfer objects sent to the given destination. By default, no encryption is used.
    *
    * @return registration handle to unregister the encrypter from the destination.
-   * @see ClusterEncrypter
+   * @see ClusterAesEncrypter
    */
   public static <TRANSPORT extends IMom & IMomTransport> IRegistrationHandle registerEncrypter(final Class<? extends TRANSPORT> transport, final IDestination<?> destination, final IEncrypter encrypter) {
     return BEANS.get(transport).registerEncrypter(destination, encrypter);

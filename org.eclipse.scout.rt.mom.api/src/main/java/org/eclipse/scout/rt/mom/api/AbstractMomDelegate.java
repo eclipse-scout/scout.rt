@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
  * @see IMom
  * @since 6.1
  */
-public abstract class MomDelegate implements IMom {
+public abstract class AbstractMomDelegate implements IMom {
 
   protected IMom m_delegate;
 

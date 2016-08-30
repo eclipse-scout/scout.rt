@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
 /**
  * Provides an 'instance-scoped' AES (Advanced Encryption Standard) cipher for message encryption.
  * <p>
- * Initialize this bean before usage, or use {@link ClusterEncrypter} with default values from <i>config.properties</i>.
+ * Initialize this bean before usage, or use {@link ClusterAesEncrypter} with default values from <i>config.properties</i>.
  *
  * @since 6.1
  */
