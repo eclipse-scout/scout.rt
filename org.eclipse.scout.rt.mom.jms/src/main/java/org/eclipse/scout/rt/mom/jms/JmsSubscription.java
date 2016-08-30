@@ -21,19 +21,11 @@ public class JmsSubscription implements ISubscription {
   private static final Logger LOG = LoggerFactory.getLogger(JmsSubscription.class);
 
   private final Session m_session;
-  private final MessageConsumer m_consumer;
   private final IDestination<?> m_destination;
-
-  public JmsSubscription(final MessageConsumer consumer, final IDestination<?> destination) {
-    m_consumer = consumer;
-    m_destination = destination;
-    m_session = null;
-  }
 
   public JmsSubscription(final Session session, final IDestination<?> destination) {
     m_session = session;
     m_destination = destination;
-    m_consumer = null;
   }
 
   @Override
@@ -43,22 +35,11 @@ public class JmsSubscription implements ISubscription {
 
   @Override
   public void dispose() {
-    if (m_consumer != null) {
-      try {
-        m_consumer.close();
-      }
-      catch (final JMSException e) {
-        LOG.warn("Failed to close consumer", m_consumer, e);
-      }
+    try {
+      m_session.close();
     }
-
-    if (m_session != null) {
-      try {
-        m_session.close();
-      }
-      catch (final JMSException e) {
-        LOG.warn("Failed to close session", m_consumer, e);
-      }
+    catch (final JMSException e) {
+      LOG.warn("Failed to close session", m_session, e);
     }
   }
 }

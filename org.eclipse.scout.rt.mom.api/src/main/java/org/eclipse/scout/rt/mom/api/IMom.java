@@ -6,7 +6,6 @@ package org.eclipse.scout.rt.mom.api;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -48,14 +47,26 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 public interface IMom {
 
   /**
-   * Subscription mode to acknowledge a message automatically upon its receipt.
+   * Subscription mode to acknowledge a message automatically upon its receipt. This mode dispatches message processing
+   * to a separate thread to allow concurrent message consumption.
+   * <p>
+   * This is the default acknowledgment mode.
    */
   int ACKNOWLEDGE_AUTO = 1;
 
   /**
-   * Subscription mode to acknowledge a message upon successful commit of the receiving transaction.
+   * Subscription mode to acknowledge a message automatically upon its receipt. This mode uses the <i>message receiving
+   * thread</i> to process the message, meaning the subscription does not receive any other messages for the time of
+   * processing a message.
    */
-  int ACKNOWLEDGE_TRANSACTED = 2;
+  int ACKNOWLEDGE_AUTO_SINGLE_THREADED = 2;
+
+  /**
+   * Subscription mode to acknowledge a message upon successful commit of the receiving transaction. This mode uses the
+   * <i>message receiving thread</i> to process the message, meaning the subscription does not receive any other
+   * messages for the time of processing a message.
+   */
+  int ACKNOWLEDGE_TRANSACTED = 3;
 
   /**
    * Indicates the order of the MOM's {@link IPlatformListener} to shutdown itself upon entering platform state
@@ -94,11 +105,11 @@ public interface IMom {
    * @param listener
    *          specifies the listener to receive messages.
    * @param runContext
-   *          specifies the optional context in which to receive and process the messages. If using transacted
-   *          acknowledgment, MOM sets the transaction boundary to {@link TransactionScope#REQUIRES_NEW}.
+   *          specifies the optional context in which to receive messages. If not specified, an empty context is
+   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
    * @param acknowledgementMode
-   *          specifies the mode how to acknowledge messages. Supported modes are {@link IMom#ACKNOWLEDGE_AUTO} and
-   *          {@link IMom#ACKNOWLEDGE_TRANSACTED}.
+   *          specifies the mode how to acknowledge messages. Supported modes are {@link IMom#ACKNOWLEDGE_AUTO},
+   *          {@link IMom#ACKNOWLEDGE_AUTO_SINGLE_THREADED} and {@link IMom#ACKNOWLEDGE_TRANSACTED}.
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
@@ -156,7 +167,8 @@ public interface IMom {
    * @param listener
    *          specifies the listener to receive messages.
    * @param runContext
-   *          specifies the context in which to receive and process the messages.
+   *          specifies the optional context in which to receive messages. If not specified, an empty context is
+   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
    * @return subscription handle to unsubscribe from the destination.
    * @param <REQUEST>
    *          the type of the request object

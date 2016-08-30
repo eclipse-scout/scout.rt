@@ -40,10 +40,21 @@ public class TransactedStrategy implements ISubscriptionStrategy {
 
   @Override
   public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext) throws JMSException {
+    final Session transactedSession = m_mom.getConnection().createSession(true, Session.SESSION_TRANSACTED);
+    try {
+      installMessageListener(destination, listener, runContext, transactedSession);
+      return new JmsSubscription(transactedSession, destination);
+    }
+    catch (JMSException | RuntimeException e) {
+      transactedSession.close();
+      throw e;
+    }
+  }
+
+  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final Session transactedSession) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
 
-    final Session transactedSession = m_mom.getConnection().createSession(true, Session.SESSION_TRANSACTED);
     final MessageConsumer consumer = transactedSession.createConsumer(m_mom.lookupJmsDestination(destination, transactedSession));
     consumer.setMessageListener(new JmsMessageListener() {
 
@@ -72,7 +83,6 @@ public class TransactedStrategy implements ISubscriptionStrategy {
         });
       }
     });
-    return new JmsSubscription(transactedSession, destination);
   }
 
   /**

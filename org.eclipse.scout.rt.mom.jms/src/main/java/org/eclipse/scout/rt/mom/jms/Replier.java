@@ -48,11 +48,22 @@ public class Replier {
    * Registers a replier to respond to requests sent to the specified 'request-reply' destination.
    */
   public <REQUEST, REPLY> ISubscription subscribe(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext) throws JMSException {
+    final Session session = m_mom.getConnection().createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
+    try {
+      installMessageListener(destination, listener, runContext, session);
+      return new JmsSubscription(session, destination);
+    }
+    catch (JMSException | RuntimeException e) {
+      session.close();
+      throw e;
+    }
+  }
+
+  protected <REQUEST, REPLY> void installMessageListener(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext, final Session session) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
 
-    final Session defaultSession = m_mom.getDefaultSession();
-    final MessageConsumer consumer = defaultSession.createConsumer(m_mom.lookupJmsDestination(destination, defaultSession));
+    final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session));
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
@@ -87,8 +98,6 @@ public class Replier {
             .withExecutionHint(replyId)); // Register for cancellation
       }
     });
-
-    return new JmsSubscription(consumer, destination);
   }
 
   /**

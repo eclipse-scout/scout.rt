@@ -142,8 +142,10 @@ public final class MOM {
   }
 
   /**
-   * Subscribes the given listener to receive messages sent to the given destination. Messages are acknowledged
-   * automatically, and which complies with the mode {@link #ACKNOWLEDGE_AUTO}.
+   * Subscribes the given listener to receive messages sent to the given destination.
+   * <p>
+   * This method complies with {@link IMom#ACKNOWLEDGE_AUTO}, where message are received concurrently and acknowledged
+   * automatically.
    *
    * @param transport
    *          specifies the 'transport or network' to subscribe for messages, e.g. {@link ClusterMom}.
@@ -154,7 +156,8 @@ public final class MOM {
    * @param listener
    *          specifies the listener to receive messages.
    * @param runContext
-   *          specifies the context in which to receive and process the messages.
+   *          specifies the optional context in which to receive messages. If not specified, an empty context is
+   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
@@ -176,11 +179,11 @@ public final class MOM {
    * @param listener
    *          specifies the listener to receive messages.
    * @param runContext
-   *          specifies the optional context in which to receive and process the messages. If using transacted
-   *          acknowledgment, MOM sets the transaction boundary to {@link TransactionScope#REQUIRES_NEW}.
+   *          specifies the optional context in which to receive messages. If not specified, an empty context is
+   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
    * @param acknowledgementMode
-   *          specifies the mode how to acknowledge messages. Supported modes are {@link IMom#ACKNOWLEDGE_AUTO} and
-   *          {@link IMom#ACKNOWLEDGE_TRANSACTED}.
+   *          specifies the mode how to acknowledge messages. Supported modes are {@link IMom#ACKNOWLEDGE_AUTO},
+   *          {@link IMom#ACKNOWLEDGE_AUTO_SINGLE_THREADED} and {@link IMom#ACKNOWLEDGE_TRANSACTED}.
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
@@ -290,7 +293,8 @@ public final class MOM {
    * @param listener
    *          specifies the listener to receive messages.
    * @param runContext
-   *          specifies the context in which to receive and process the messages.
+   *          specifies the optional context in which to receive messages. If not specified, an empty context is
+   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
    * @return subscription handle to unsubscribe from the destination.
    * @param <REQUEST>
    *          the type of the request object

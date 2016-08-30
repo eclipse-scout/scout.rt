@@ -30,7 +30,7 @@ public final class BlockingCountDownLatch {
   private final Condition m_zeroCountCondition;
 
   private boolean m_blocking;
-  private int m_count;
+  private volatile int m_count;
 
   /**
    * Creates a {@link BlockingCountDownLatch} with default timeouts of 30 seconds.
@@ -164,6 +164,13 @@ public final class BlockingCountDownLatch {
    */
   public boolean countDownAndBlock() throws InterruptedException {
     return countDownAndBlock(m_defaultAwaitTime, m_defaultAwaitUnit);
+  }
+
+  /**
+   * Returns the current count.
+   */
+  public int getCount() {
+    return m_count;
   }
 
   /**

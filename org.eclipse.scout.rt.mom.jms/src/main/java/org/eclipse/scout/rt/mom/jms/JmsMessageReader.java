@@ -183,7 +183,17 @@ public class JmsMessageReader<DTO> {
    * @see JmsMessageWriter#writeBytesMessage(BytesMessage, byte[])
    */
   protected byte[] readBytesMessage(final BytesMessage message) throws JMSException, GeneralSecurityException {
-    final byte[] bytes = new byte[(int) message.getBodyLength()];
+    long length = message.getBodyLength();
+    if (length == Integer.MAX_VALUE) {
+      LOG.warn("BytesMessage received is empty");
+      return null;
+    }
+    else if (length > Integer.MAX_VALUE) {
+      LOG.warn("BytesMessage received is too large [length={}]", length);
+      return null;
+    }
+
+    final byte[] bytes = new byte[(int) length];
     message.readBytes(bytes);
     return bytes;
   }

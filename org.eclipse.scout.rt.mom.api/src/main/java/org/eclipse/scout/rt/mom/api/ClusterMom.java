@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.mom.api;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +22,12 @@ public class ClusterMom extends MomDelegate implements IMomTransport {
 
   @Override
   protected IMom initDelegate() throws Exception {
-    final ClusterMomImplementorProperty implementorProperty = BEANS.get(ClusterMomImplementorProperty.class);
-    final Class<? extends IMomImplementor> implementorClazz = assertNotNull(implementorProperty.getValue(), "Missing configuration for {}: MOM implementor not specified [config={}]", ClusterMom.class.getSimpleName(), implementorProperty.getKey());
-    final IMomImplementor implementor = BEANS.get(implementorClazz);
+    final Class<? extends IMomImplementor> implementorClass = BEANS.get(ClusterMomImplementorProperty.class).getValue();
+    if (implementorClass == null) {
+      fail("Missing configuration for {}: MOM implementor not specified [config={}]", ClusterMom.class.getSimpleName(), BEANS.get(ClusterMomImplementorProperty.class).getKey());
+    }
+
+    final IMomImplementor implementor = BEANS.get(implementorClass);
     implementor.init(lookupEnvironment());
     return implementor;
   }

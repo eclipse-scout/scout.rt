@@ -5,6 +5,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
@@ -66,6 +67,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +112,8 @@ public class JmsMom implements IMomImplementor {
     m_defaultSession = m_connection.createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
     m_defaultProducer = m_defaultSession.createProducer(null /* all destinations */);
 
-    m_subscriptionStrategies.put(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeStrategy.class).init(this));
+    m_subscriptionStrategies.put(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeStrategy.class).init(this, false));
+    m_subscriptionStrategies.put(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeStrategy.class).init(this, true));
     m_subscriptionStrategies.put(ACKNOWLEDGE_TRANSACTED, BEANS.get(TransactedStrategy.class).init(this));
 
     // Register consumer to dispatch replies of 'request-reply' messaging to the requester.
@@ -460,7 +463,8 @@ public class JmsMom implements IMomImplementor {
     final String applicationName = CONFIG.getPropertyValue(ApplicationNameProperty.class);
     final String applicationVersion = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
-    return String.format("%s [application='%s:%s' nodeId='%s']", StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId);
+    final String now = DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS");
+    return String.format("%s [application='%s:%s', nodeId='%s', created on=%s]", StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId, now);
   }
 
   /**
