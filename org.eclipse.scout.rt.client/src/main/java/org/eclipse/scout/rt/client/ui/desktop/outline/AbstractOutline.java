@@ -167,6 +167,17 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
+   * Configures if the outline overview is visible or not. The outline overview is rendered if no default detail form is
+   * set (see {@link AbstractOutline#getConfiguredDefaultDetailForm()}. An overview of the outline is rendered in the JS
+   * part.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   */
+  protected boolean getConfiguredOutlineOverviewVisible() {
+    return true;
+  }
+
+  /**
    * Configures whether the outline should automatically switch to the bread crumb style when getting smaller and back
    * when getting bigger. The threshold is determined by the GUI.
    * <p>
@@ -282,6 +293,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
     setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
+    setOutlineOverviewVisible(getConfiguredOutlineOverviewVisible());
     ensureDefaultDetailFormCreated();
     ensureDefaultDetailFormStarted();
   }
@@ -500,6 +512,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void setDetailForm(IForm form) {
     propertySupport.setProperty(PROP_DETAIL_FORM, form);
+  }
+
+  @Override
+  public void setOutlineOverviewVisible(boolean visible) {
+    propertySupport.setPropertyBool(PROP_OUTLINE_OVERVIEW_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isOutlineOverviewVisible() {
+    return propertySupport.getPropertyBool(PROP_OUTLINE_OVERVIEW_VISIBLE);
   }
 
   @Override
@@ -922,5 +944,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
+
   }
 }
