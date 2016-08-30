@@ -152,3 +152,16 @@ scout.Page.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThr
 scout.Page.prototype.getOutline = function() {
   return this.parent;
 };
+
+/**
+ * @returns a page parameter object used to pass to newly created child pages. Sets the parent
+ *     to our outline instance and adds optional other properties. Typically you'll pass an
+ *     object (entity-key or arbitrary data) to a child page.
+ */
+scout.Page.prototype._pageParam = function(paramProperties) {
+  var param = {
+    parent: this.getOutline()
+  };
+  $.extend(param, paramProperties);
+  return param;
+};

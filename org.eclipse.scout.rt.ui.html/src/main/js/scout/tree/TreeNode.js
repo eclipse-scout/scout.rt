@@ -44,9 +44,9 @@ scout.TreeNode.prototype.getTree = function() {
 };
 
 scout.TreeNode.prototype._init = function(model) {
-  if (!model.parent) {
-    throw new Error('missing property \'parent\'');
-  }
+  scout.objects.mandatoryParameter('parent', model.parent, scout.Tree);
+  this.session = model.parent.session; // FIXME [awe] 6.1 - discuss with C.GU: how about function session() { return this.parent.session; } ?
+
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
   // make sure all nodes are TreeNodes
