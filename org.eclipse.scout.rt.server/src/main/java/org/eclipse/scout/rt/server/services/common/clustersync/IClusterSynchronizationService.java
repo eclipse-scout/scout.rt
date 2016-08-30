@@ -40,7 +40,9 @@ public interface IClusterSynchronizationService extends IService {
 
   /**
    * @return the node of the currently connected cluster
+   * @deprecated will be removed in 7.1.x; use BEANS.get(NodeIdentifier.class).get();
    */
+  @Deprecated
   String getNodeId();
 
   /**

@@ -25,12 +25,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +123,7 @@ public abstract class AbstractJmsService<T> implements IService {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append(" ");
     sb.append(serverVersion).append(" ");
-    sb.append("nodeId=").append(BEANS.get(IClusterSynchronizationService.class).getNodeId()).append(" ");
+    sb.append("nodeId=").append(BEANS.get(NodeIdentifier.class).get()).append(" ");
     sb.append("registered at ");
     sb.append(DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS"));
     return sb.toString();
