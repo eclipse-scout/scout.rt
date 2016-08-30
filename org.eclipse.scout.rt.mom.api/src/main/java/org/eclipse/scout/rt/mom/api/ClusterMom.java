@@ -6,12 +6,15 @@ import static org.eclipse.scout.rt.platform.util.Assertions.fail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
 
 /**
  * Message oriented middleware (MOM) for sending and receiving messages in the cluster.
+ * <p>
+ * By default, {@link ClusterMom} uses {@link ObjectMarshaller} to transport objects across the network.
  * <p>
  * See {@link IMom} for more information.
  *
@@ -29,6 +32,8 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
 
     final IMomImplementor implementor = BEANS.get(implementorClass);
     implementor.init(lookupEnvironment());
+    implementor.setDefaultMarshaller(BEANS.get(ObjectMarshaller.class));
+
     return implementor;
   }
 

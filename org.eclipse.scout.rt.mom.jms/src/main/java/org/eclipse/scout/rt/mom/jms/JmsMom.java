@@ -100,6 +100,9 @@ public class JmsMom implements IMomImplementor {
 
   protected final Map<Integer, ISubscriptionStrategy> m_subscriptionStrategies = new ConcurrentHashMap<>();
 
+  protected IMarshaller m_defaultMarshaller;
+  protected IEncrypter m_defaultEncrypter;
+
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
     final String symbolicName = StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM");
@@ -146,6 +149,14 @@ public class JmsMom implements IMomImplementor {
           }
         });
 
+    // Set default marshaller
+    m_defaultMarshaller = BEANS.get(CONFIG.getPropertyValue(MarshallerProperty.class));
+
+    // Set default encrypter
+    final Class<? extends IEncrypter> encrypterClazz = CONFIG.getPropertyValue(EncrypterProperty.class);
+    m_defaultEncrypter = (encrypterClazz != null ? BEANS.get(encrypterClazz) : null);
+
+    // Start the connection
     m_connection.start();
     LOG.info("{} initialized: {}", symbolicName, m_connection);
   }
@@ -351,7 +362,7 @@ public class JmsMom implements IMomImplementor {
     if (marshaller != null) {
       return marshaller;
     }
-    return BEANS.get(CONFIG.getPropertyValue(MarshallerProperty.class));
+    return m_defaultMarshaller;
   }
 
   /**
@@ -363,8 +374,7 @@ public class JmsMom implements IMomImplementor {
       return encrypter;
     }
 
-    final Class<? extends IEncrypter> clazz = CONFIG.getPropertyValue(EncrypterProperty.class);
-    return (clazz != null ? BEANS.get(clazz) : null);
+    return m_defaultEncrypter;
   }
 
   /**
@@ -553,5 +563,15 @@ public class JmsMom implements IMomImplementor {
         BEANS.get(JmsMom.class).destroy();
       }
     }
+  }
+
+  @Override
+  public void setDefaultMarshaller(final IMarshaller marshaller) {
+    m_defaultMarshaller = marshaller;
+  }
+
+  @Override
+  public void setDefaultEncrypter(final IEncrypter encrypter) {
+    m_defaultEncrypter = encrypter;
   }
 }

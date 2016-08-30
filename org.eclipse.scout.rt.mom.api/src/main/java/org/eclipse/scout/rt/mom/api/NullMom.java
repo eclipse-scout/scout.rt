@@ -58,6 +58,16 @@ public class NullMom implements IMomImplementor {
   }
 
   @Override
+  public void setDefaultMarshaller(final IMarshaller marshaller) {
+    // NOOP
+  }
+
+  @Override
+  public void setDefaultEncrypter(final IEncrypter encrypter) {
+    // NOOP
+  }
+
+  @Override
   public void destroy() {
     // NOOP
   }
