@@ -533,6 +533,23 @@ describe('Widget', function() {
       expect(widget.$container).not.toHaveClass('custom-class');
     });
 
+    it("does not accidentally remove other css classes on a property change", function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      widget.$container.addClass('xy');
+      expect(widget.$container).toHaveClass('xy');
+
+      widget.setCssClass('custom-class');
+      expect(widget.$container).toHaveClass('custom-class');
+      expect(widget.$container).toHaveClass('xy');
+
+      widget.setCssClass('');
+      expect(widget.$container).not.toHaveClass('custom-class');
+      expect(widget.$container).toHaveClass('xy');
+    });
+
   });
 
 });

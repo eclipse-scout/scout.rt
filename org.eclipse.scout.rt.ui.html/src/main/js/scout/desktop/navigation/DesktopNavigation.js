@@ -103,6 +103,9 @@ scout.DesktopNavigation.prototype._syncOutline = function(outline) {
   if (this.outline) {
     currentDisplayStyle = this.outline.displayStyle;
   }
+  if (this.rendered) {
+    this._removeOutline();
+  }
   this.outline = outline;
   if (this.outline) {
     this.outline.setParent(this);

@@ -45,7 +45,7 @@ scout.Widget = function() {
   // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
   // ev. dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
   this._adapterProperties = [];
-  this._cloneProperties = ['visible', 'enabled'];
+  this._cloneProperties = ['visible', 'enabled', 'cssClass'];
   this._preserveOnPropertyChangeProperties = []; // FIXME [awe, cgu] 6.1 - migrieren zu propertyConfig und
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
@@ -411,6 +411,13 @@ scout.Widget.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
 };
 
+scout.Widget.prototype._syncCssClass = function(cssClass) {
+  if (this.rendered) {
+    this._removeCssClass();
+  }
+  this._setProperty('cssClass', cssClass);
+};
+
 scout.Widget.prototype._removeCssClass = function() {
   if (!this.$container) {
     return;
@@ -721,7 +728,8 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * Otherwise the following phases are executed:
  * <p>
  * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
- * 2. DOM removal: If the widget is rendered and there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called. Otherwise the default remove function _removeProperty is called.
+ * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see _preserveOnPropertyChangeProperties).
+ *    If there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called instead of removing the widgets directly.
  * 3. Model update: If there is a custom sync function (e.g. _syncXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
  * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
  */
@@ -772,32 +780,33 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
   return widgets;
 };
 
-scout.Widget.prototype._callRemoveProperty = function(propertyName) {
-  var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(propertyName);
-  if (this[removeFuncName]) {
-    this[removeFuncName]();
-  } else {
-    this._removeProperty(propertyName);
-  }
-};
-
 /**
  * Does nothing if the property is not a widget property.<p>
  * If it is a widget property, it removes the existing widgets. Render has to be implemented by the widget itself.
  */
-scout.Widget.prototype._removeProperty = function(propertyName) {
-  var widgets = this[propertyName];
-  if (!widgets) {
-    return;
-  }
+scout.Widget.prototype._callRemoveProperty = function(propertyName) {
   if (!this._isAdapterProperty(propertyName)) {
     return;
   }
   if (this._isPreserveOnPropertyChangeProperty(propertyName)) {
     return;
   }
+  var widgets = this[propertyName];
+  if (!widgets) {
+    return;
+  }
+  var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  if (this[removeFuncName]) {
+    this[removeFuncName]();
+  } else {
+    this._removeWidgets(widgets);
+  }
+};
 
-  // Remove existing widgets on property change. Render should be implemented by the widget itself
+/**
+ * Removes the given widgets
+ */
+scout.Widget.prototype._removeWidgets = function(widgets) {
   widgets = scout.arrays.ensure(widgets);
   widgets.forEach(function(widget) {
     widget.remove();
