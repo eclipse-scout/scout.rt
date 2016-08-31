@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.form;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -511,6 +512,30 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     // check setup
     assertEquals(0, form.getSubBox().getFieldCount());
     assertSame(form.getBottomBox(), form.getStringField().getParentField());
+
+    assertFalse(form.getStringField().isSaveNeeded());
+    form.getStringField().touch();
+    assertTrue(form.getStringField().isSaveNeeded());
+
+    // check empty subBox
+    assertFalse(form.getSubBox().isVisible());
+    assertTrue(form.getSubBox().isEmpty());
+    assertFalse(form.getSubBox().isSaveNeeded());
+
+    // check topBox containing only subBox
+    assertFalse(form.getTopBox().isVisible());
+    assertTrue(form.getTopBox().isEmpty());
+    assertFalse(form.getTopBox().isSaveNeeded());
+
+    // check  bottomBox where the string field has been moved to
+    assertTrue(form.getBottomBox().isVisible());
+    assertTrue(form.getBottomBox().isEmpty());
+    assertTrue(form.getBottomBox().isSaveNeeded());
+
+    // untouch string field
+    form.getStringField().markSaved();
+    assertFalse(form.getStringField().isSaveNeeded());
+
     return form;
   }
 

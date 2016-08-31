@@ -38,9 +38,6 @@ public final class CompositeFieldUtility {
     Collections.sort(fields, new OrderedComparator());
     f.setParentFieldInternal(compositeField);
     f.setFormInternal(compositeField.getForm());
-    if (compositeField instanceof AbstractCompositeField) {
-      f.addPropertyChangeListener(((AbstractCompositeField) compositeField).new P_FieldPropertyChangeListener());
-    }
   }
 
   public static void removeField(IFormField f, ICompositeField compositeField, List<IFormField> fields) {

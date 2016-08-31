@@ -69,6 +69,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   private Class<? extends ICodeType<?, T>> m_codeTypeClass;
   private ICompositeFieldGrid<ICompositeField> m_grid;
   private List<IFormField> m_fields;
+  private P_FieldPropertyChangeListenerEx m_fieldPropertyChangeListener;
   private List<IRadioButton<T>> m_radioButtons;
   private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
 
@@ -135,6 +136,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   protected void initConfig() {
     m_fields = CollectionUtility.emptyArrayList();
     m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
+    m_fieldPropertyChangeListener = new P_FieldPropertyChangeListenerEx();
     m_grid = createGrid();
     super.initConfig();
     // Configured CodeType
@@ -162,7 +164,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     m_fields = fields.getOrderedList();
     //attach a proxy controller to each child field in the group for: visible, saveNeeded
     for (IFormField f : m_fields) {
-      f.addPropertyChangeListener(new P_FieldPropertyChangeListenerEx());
+      f.addPropertyChangeListener(m_fieldPropertyChangeListener);
     }
     //extract buttons from field subtree
     List<IRadioButton<T>> buttonList = new ArrayList<IRadioButton<T>>();
@@ -245,11 +247,15 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   public void addField(IFormField f) {
     CompositeFieldUtility.addField(f, this, m_fields);
+    f.addPropertyChangeListener(m_fieldPropertyChangeListener);
+    handleFildsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
     CompositeFieldUtility.removeField(f, this, m_fields);
+    f.removePropertyChangeListener(m_fieldPropertyChangeListener);
+    handleFildsChanged();
   }
 
   @Override
@@ -260,6 +266,15 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   public Map<Class<? extends IFormField>, IFormField> getMovedFields() {
     return Collections.unmodifiableMap(m_movedFormFieldsByClass);
+  }
+
+  /**
+   * Updates this composite field's state after a child field has been added or removed.
+   */
+  protected void handleFildsChanged() {
+    handleFieldVisibilityChanged();
+    checkSaveNeeded();
+    checkEmpty();
   }
 
   public ILookupCall<T> getLookupCall() {

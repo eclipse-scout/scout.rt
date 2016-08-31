@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.beans.PropertyChangeListener;
@@ -273,8 +272,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
     int count = 0;
     for (PropertyChangeListener listener : propertyChangeListeners) {
       if (listener instanceof AbstractCompositeField.P_FieldPropertyChangeListener) {
-        ++count;
-        assertTrue(((AbstractCompositeField.P_FieldPropertyChangeListener) listener).isDirectChildOfComposite(field));
+        count++;
       }
     }
     assertEquals(1, count);

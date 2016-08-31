@@ -44,6 +44,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   private List<IFormField> m_fields;
   private Map<Class<?>, Class<? extends IFormField>> m_formFieldReplacements;
   private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
+  private P_FieldPropertyChangeListener m_fieldPropertyChangeListener;
 
   public AbstractCompositeField() {
     this(true);
@@ -87,6 +88,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      */
     m_fields = CollectionUtility.emptyArrayList();
     m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
+    m_fieldPropertyChangeListener = new P_FieldPropertyChangeListener();
     super.initConfig();
     // prepare injected fields
     DefaultFormFieldInjection injectedFields = null;
@@ -133,7 +135,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
       // attach a proxy controller to each child field in the group for: visible, saveNeeded
       for (IFormField f : m_fields) {
-        f.addPropertyChangeListener(new P_FieldPropertyChangeListener());
+        f.addPropertyChangeListener(m_fieldPropertyChangeListener);
       }
     }
     finally {
@@ -149,11 +151,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public void addField(IFormField f) {
     CompositeFieldUtility.addField(f, this, m_fields);
+    f.addPropertyChangeListener(m_fieldPropertyChangeListener);
+    handleFildsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
     CompositeFieldUtility.removeField(f, this, m_fields);
+    f.removePropertyChangeListener(m_fieldPropertyChangeListener);
+    handleFildsChanged();
   }
 
   @Override
@@ -164,6 +170,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public Map<Class<? extends IFormField>, IFormField> getMovedFields() {
     return Collections.unmodifiableMap(m_movedFormFieldsByClass);
+  }
+
+  /**
+   * Updates this composite field's state after a child field has been added or removed.
+   */
+  protected void handleFildsChanged() {
+    handleFieldVisibilityChanged();
+    checkSaveNeeded();
+    checkEmpty();
   }
 
   /**
@@ -527,23 +542,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       else if (e.getPropertyName().equals(IFormField.PROP_EMPTY)) {
         checkEmpty();
       }
-      // if a field is moved to another parent this listener unregisters itself
-      else if (e.getPropertyName().equals(IFormField.PROP_PARENT_FIELD)) {
-        IFormField field = (IFormField) e.getSource();
-        if (!isDirectChildOfComposite(field)) {
-          field.removePropertyChangeListener(this);
-        }
-      }
     }
-
-    /**
-     * @return <code>true</code>, if the field is a direct child inside this listener's composite field instance,
-     *         <code>false</code> otherwise.
-     */
-    protected boolean isDirectChildOfComposite(IFormField field) {
-      return field.getParentField() == AbstractCompositeField.this;
-    }
-
   }
 
   protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER> implements ICompositeFieldExtension<OWNER> {

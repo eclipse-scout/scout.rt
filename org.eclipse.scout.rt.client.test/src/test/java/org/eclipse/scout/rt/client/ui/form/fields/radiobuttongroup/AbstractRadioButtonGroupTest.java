@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
@@ -35,6 +38,7 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -204,6 +208,37 @@ public class AbstractRadioButtonGroupTest {
     for (IRadioButton<Long> radioButton : m_group.getButtons()) {
       assertEquals(formMock, radioButton.getForm());
     }
+  }
+
+  @Test
+  public void testAddField() {
+    DynamicStringField field = new DynamicStringField("id", "test-field");
+    assertNull(getFieldPropertyChangeListener(field));
+    m_group.addField(field);
+    assertNotNull(getFieldPropertyChangeListener(field));
+  }
+
+  @Test
+  public void testRemoveField() {
+    P_StandardRadioButtonGroup.LabelField labelField = m_group.getFieldByClass(P_StandardRadioButtonGroup.LabelField.class);
+    assertNotNull(labelField);
+    assertSame(m_group, labelField.getParentField());
+    assertNotNull(getFieldPropertyChangeListener(labelField));
+
+    m_group.removeField(labelField);
+    assertNull(labelField.getParentField());
+    assertNull(getFieldPropertyChangeListener(labelField));
+    assertNull(m_group.getFieldByClass(P_StandardRadioButtonGroup.LabelField.class));
+  }
+
+  private PropertyChangeListener getFieldPropertyChangeListener(AbstractPropertyObserver observer) {
+    ArrayList<PropertyChangeListener> listeners = observer.getPropertyChangeListeners();
+    for (PropertyChangeListener listener : listeners) {
+      if (listener.getClass().getEnclosingClass() == AbstractRadioButtonGroup.class) {
+        return listener;
+      }
+    }
+    return null;
   }
 
   private void assertAllButtonsEnabled(boolean enabled, IRadioButtonGroup<?> group) {
