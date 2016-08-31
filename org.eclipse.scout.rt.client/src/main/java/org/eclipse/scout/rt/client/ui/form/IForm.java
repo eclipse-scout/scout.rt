@@ -539,7 +539,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, ISty
    * @return the display hint to control visualization of this {@link IForm}.
    * @see #DISPLAY_HINT_VIEW
    * @see #DISPLAY_HINT_POPUP_DIALOG
-   * @see #DISPLAY_HINT_POPUP_DIALOG
    * @see #DISPLAY_HINT_POPUP_WINDOW
    */
   int getDisplayHint();
@@ -548,7 +547,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, ISty
    * Set the given hint to control visualization of this {@link IForm}.
    * <ul>
    * <li>{@link #DISPLAY_HINT_VIEW}</li>
-   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link #DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
