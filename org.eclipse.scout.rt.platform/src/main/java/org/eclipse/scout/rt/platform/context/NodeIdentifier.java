@@ -93,7 +93,7 @@ public class NodeIdentifier {
     }
 
     @Override
-    @Deprecated // Remove fallback in Scout 6.2.x
+    @Deprecated // Remove fallback in Scout 7.1.x
     protected String getDefaultValue() {
       return ConfigUtility.getProperty("org.eclipse.scout.rt.server.clusterNodeId");
     }

@@ -18,9 +18,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.PostConstruct;
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.mom.api.ClusterMom;
+import org.eclipse.scout.rt.mom.api.ClusterMom.ClusterMomImplementorProperty;
+import org.eclipse.scout.rt.mom.api.IMessage;
+import org.eclipse.scout.rt.mom.api.IMessageListener;
+import org.eclipse.scout.rt.mom.api.ISubscription;
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -38,6 +43,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.mom.IMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
@@ -46,7 +52,7 @@ import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClusterSynchronizationService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
+public class ClusterSynchronizationService implements IClusterSynchronizationService, IMessageListener<IClusterNotificationMessage> {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterSynchronizationService.class);
 
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
@@ -55,25 +61,17 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
   private final ConcurrentMap<Class<? extends Serializable>, ClusterNodeStatusInfo> m_messageStatusMap = new ConcurrentHashMap<>();
 
-  private volatile String m_nodeId;
   private final Subject m_subject;
 
-  private volatile boolean m_enabled;
-  private volatile IPublishSubscribeMessageService m_messageService;
+  private volatile ISubscription m_subscription;
+  private final Object m_subscriptionLock = new Object();
+
+  private final String m_nodeId = BEANS.get(NodeIdentifier.class).get();
 
   public ClusterSynchronizationService() {
     m_subject = new Subject();
     m_subject.getPrincipals().add(new SimplePrincipal(CONFIG.getPropertyValue(ClusterSyncUserProperty.class)));
     m_subject.setReadOnly();
-  }
-
-  @PostConstruct
-  public void initializeService() {
-    m_nodeId = createNodeId();
-  }
-
-  protected String createNodeId() {
-    return BEANS.get(NodeIdentifier.class).get();
   }
 
   protected EventListenerList getListenerList() {
@@ -100,21 +98,9 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     return m_nodeId;
   }
 
-  protected IPublishSubscribeMessageService getMessageService() {
-    return m_messageService;
-  }
-
-  protected void setMessageService(IPublishSubscribeMessageService messageService) {
-    m_messageService = messageService;
-  }
-
-  protected void setEnabled(boolean enabled) {
-    m_enabled = enabled;
-  }
-
   @Override
   public boolean isEnabled() {
-    return m_enabled;
+    return m_subscription != null;
   }
 
   @Override
@@ -122,25 +108,25 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     if (isEnabled()) {
       return true;
     }
-    if (getNodeId() == null) {
-      LOG.error("Clustersync could not be enabled. No cluster nodeId could be determined.");
-      return false;
+
+    if (ClusterMomImplementorProperty.isNullImplementor()) {
+      LOG.info("Cluster synchronization is not enabled.");
     }
-    IPublishSubscribeMessageService messageService = BEANS.get(IPublishSubscribeMessageService.class);
-    if (messageService == null) {
-      LOG.error("Clustersync could not be enabled. No MessageService found.");
-      return false;
+
+    synchronized (m_subscriptionLock) {
+      if (isEnabled()) {
+        return true;
+      }
+
+      try {
+        m_subscription = MOM.subscribe(ClusterMom.class, IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, this, null);
+      }
+      catch (RuntimeException e) {
+        LOG.error("Failed to subscribe to {}", IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, e);
+        return false;
+      }
     }
-    try {
-      messageService.setListener(this);
-      messageService.subscribe();
-      setMessageService(messageService);
-    }
-    catch (Exception e) {
-      LOG.error("Could not subscribe message listener", e);
-      return false;
-    }
-    setEnabled(true);
+
     return true;
   }
 
@@ -149,16 +135,20 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     if (!isEnabled()) {
       return true;
     }
-    setEnabled(false);
-    IPublishSubscribeMessageService messageService = getMessageService();
-    if (messageService != null) {
-      try {
-        messageService.unsubsribe();
+
+    final ISubscription subscription;
+    synchronized (m_subscriptionLock) {
+      subscription = m_subscription;
+      m_subscription = null;
+    }
+
+    try {
+      if (subscription != null) {
+        subscription.dispose();
       }
-      catch (Exception e) {
-        LOG.error("Could not unsubscribe message listener", e);
-        return false;
-      }
+    }
+    catch (RuntimeException e) {
+      LOG.error("Failed to unsubscribe from {}", IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, e);
     }
     return true;
   }
@@ -189,7 +179,9 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
    * Publish and update status.
    */
   private void publishInternal(List<IClusterNotificationMessage> messages) {
-    m_messageService.publishNotifications(messages);
+    for (IClusterNotificationMessage message : messages) {
+      MOM.publish(ClusterMom.class, IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, message);
+    }
     for (IClusterNotificationMessage im : messages) {
       getStatusInfoInternal().updateSentStatus(im);
       getStatusInfoInternal(im.getNotification().getClass()).updateReceiveStatus(im);
@@ -200,20 +192,22 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   public IClusterNotificationProperties getNotificationProperties() {
     ISession curentSession = ISession.CURRENT.get();
     String userid = curentSession != null ? curentSession.getUserId() : "";
-    return new ClusterNotificationProperties(getNodeId(), userid);
+    return new ClusterNotificationProperties(m_nodeId, userid);
   }
 
   @Override
-  public void onMessage(final IClusterNotificationMessage message) {
+  public void onMessage(IMessage<IClusterNotificationMessage> message) {
+    final IClusterNotificationMessage notificationMessage = message.getTransferObject();
     if (isEnabled()) {
       //Do not progress notifications sent by node itself
-      String originNode = message.getProperties().getOriginNode();
-      if (getNodeId().equals(originNode)) {
+      String originNode = notificationMessage.getProperties().getOriginNode();
+
+      if (m_nodeId.equals(originNode)) {
         return;
       }
 
-      getStatusInfoInternal().updateReceiveStatus(message);
-      getStatusInfoInternal(message.getNotification().getClass()).updateReceiveStatus(message);
+      getStatusInfoInternal().updateReceiveStatus(notificationMessage);
+      getStatusInfoInternal(notificationMessage.getNotification().getClass()).updateReceiveStatus(notificationMessage);
 
       ServerRunContext serverRunContext = ServerRunContexts.empty();
       serverRunContext.withSubject(m_subject);
@@ -223,7 +217,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
         @Override
         public void run() throws Exception {
           NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-          reg.notifyHandlers(message.getNotification());
+          reg.notifyHandlers(notificationMessage.getNotification());
         }
       });
     }

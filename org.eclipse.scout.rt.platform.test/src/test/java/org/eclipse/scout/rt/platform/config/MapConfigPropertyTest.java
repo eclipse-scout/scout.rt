@@ -26,7 +26,7 @@ public class MapConfigPropertyTest {
       + "               (key3)->vm:(broker:(tcp://localhost:8229)?persistent=false)?jms.prefetchPolicy.queuePrefetch=1\\\n"
       + "               (key4)->failover:(tcp://local1:61616,tcp://local2:61616,tcp://remote:61616)?randomize=false&priorityBackup=true&priorityURIs=tcp://local1:61616,tcp://local2:61616\\\n"
       + "               (key5)->vm://localBroker?broker.persistent=false&jms.prefetchPolicy.queuePrefetch=1\\\n"
-      + "               (key6)->value4";
+      + "               (key6)->value6(key7)->value7(key8)->value8";
 
   private static PropertiesHelper PROPERTIES_HELPER;
 
@@ -48,7 +48,9 @@ public class MapConfigPropertyTest {
     expected.put("key3", "vm:(broker:(tcp://localhost:8229)?persistent=false)?jms.prefetchPolicy.queuePrefetch=1");
     expected.put("key4", "failover:(tcp://local1:61616,tcp://local2:61616,tcp://remote:61616)?randomize=false&priorityBackup=true&priorityURIs=tcp://local1:61616,tcp://local2:61616");
     expected.put("key5", "vm://localBroker?broker.persistent=false&jms.prefetchPolicy.queuePrefetch=1");
-    expected.put("key6", "value4");
+    expected.put("key6", "value6");
+    expected.put("key7", "value7");
+    expected.put("key8", "value8");
     assertEquals(expected, testee.getValue());
   }
 
