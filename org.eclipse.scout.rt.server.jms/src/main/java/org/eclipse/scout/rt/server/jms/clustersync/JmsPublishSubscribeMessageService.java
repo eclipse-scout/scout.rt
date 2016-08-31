@@ -21,6 +21,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -43,9 +44,13 @@ import org.slf4j.LoggerFactory;
  * This publish subscribe message service uses a JMS topic to deliver messages.
  * <p>
  * This services must not be registered with a session based service factory.
+ *
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
 @Bean
 @ApplicationScoped
+@Deprecated
+@SuppressWarnings("deprecation")
 public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<IClusterNotificationMessage> implements IPublishSubscribeMessageService {
   private static Logger LOG = LoggerFactory.getLogger(JmsPublishSubscribeMessageService.class);
 

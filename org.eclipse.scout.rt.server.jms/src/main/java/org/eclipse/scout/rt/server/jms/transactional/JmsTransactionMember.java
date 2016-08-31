@@ -18,6 +18,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -31,7 +32,10 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T>
  *          the type of message that should be sent and received
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class JmsTransactionMember<T> extends AbstractTransactionMember {
   private static final Logger LOG = LoggerFactory.getLogger(JmsTransactionMember.class);
 

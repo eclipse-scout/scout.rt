@@ -12,12 +12,16 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Note: Implementing services must not be registered with a session based service factory.
+ * 
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
+@Deprecated
 public interface IPublishSubscribeMessageService extends IService {
 
   void setListener(IPublishSubscribeMessageListener listener);

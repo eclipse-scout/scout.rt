@@ -21,6 +21,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
@@ -53,7 +54,10 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T>
  *          the type of message that should be sent and received
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractJmsService<T> implements IService {
   private static Logger LOG = LoggerFactory.getLogger(AbstractJmsService.class);
 

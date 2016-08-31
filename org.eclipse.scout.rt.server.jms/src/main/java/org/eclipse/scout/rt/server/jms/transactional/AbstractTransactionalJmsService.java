@@ -14,6 +14,7 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -26,7 +27,11 @@ import org.eclipse.scout.rt.server.jms.AbstractJmsService;
  * A services extending this class <strong>must be registered</strong> with a session based service factory.
  * <p>
  * Before you can use any of the send or receive methods you must call {@link #setupConnection()}.
+ *
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsService<T> {
 
   protected AbstractTransactionalJmsService() {

@@ -21,6 +21,7 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
@@ -42,7 +43,11 @@ import org.slf4j.LoggerFactory;
  * Before one can send messages or start the message consumer you must call {@link #setupConnection()}. After that one
  * can start receiving messages by calling {@link #startMessageConsumer()} and stopping by calling
  * {@link #stopMessageConsumer()}.
+ *
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
   private static Logger LOG = LoggerFactory.getLogger(AbstractSimpleJmsService.class);
 
@@ -200,7 +205,6 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
           try {
             RunContexts.empty()
                 .withThreadLocal(IJmsMessage.CURRENT, jmsMessage)
-                .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
                 .withCorrelationId(jmsMessage.getJMSCorrelationID())
                 .run(new IRunnable() {
 

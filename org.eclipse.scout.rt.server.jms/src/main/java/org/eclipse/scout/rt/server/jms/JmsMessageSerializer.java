@@ -17,6 +17,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
@@ -24,6 +25,11 @@ import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
   private static Logger LOG = LoggerFactory.getLogger(JmsMessageSerializer.class);
   // Property name to save the message content on a JMS message - only used for logging/debug reasons.

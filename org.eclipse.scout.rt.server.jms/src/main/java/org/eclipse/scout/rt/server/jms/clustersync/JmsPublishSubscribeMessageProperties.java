@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jms.clustersync;
 
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 
 /**
  * Config properties for JMS
+ *
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
  */
+@Deprecated
 public final class JmsPublishSubscribeMessageProperties {
   private JmsPublishSubscribeMessageProperties() {
   }

@@ -13,6 +13,12 @@ package org.eclipse.scout.rt.server.jms;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.mom.api.MOM;
+
+/**
+ * @deprecated will be removed in 7.1.x; use {@link MOM} instead.
+ */
+@Deprecated
 public interface IJmsMessageSerializer<T> {
 
   Message createMessage(T message, Session session);
