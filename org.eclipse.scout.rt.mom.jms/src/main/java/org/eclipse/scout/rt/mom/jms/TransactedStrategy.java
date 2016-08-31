@@ -74,6 +74,7 @@ public class TransactedStrategy implements ISubscriptionStrategy {
                 .withMemberId(UUID.randomUUID().toString())
                 .withTransactedSession(transactedSession)
                 .withAutoClose(false))
+            .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
             .run(new IRunnable() {
 
           @Override

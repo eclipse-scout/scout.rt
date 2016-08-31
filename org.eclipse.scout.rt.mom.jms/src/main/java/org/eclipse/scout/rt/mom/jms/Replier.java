@@ -83,6 +83,7 @@ public class Replier {
                 .withCorrelationId(requestReader.readCorrelationId())
                 .withThreadLocal(IMessage.CURRENT, request)
                 .withTransactionScope(TransactionScope.REQUIRES_NEW)
+                .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
                 .run(new IRunnable() {
 
               @Override

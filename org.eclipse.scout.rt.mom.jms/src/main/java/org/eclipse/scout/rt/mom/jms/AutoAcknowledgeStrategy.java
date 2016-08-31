@@ -73,6 +73,7 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
                 .withCorrelationId(messageReader.readCorrelationId())
                 .withThreadLocal(IMessage.CURRENT, message)
                 .withTransactionScope(TransactionScope.REQUIRES_NEW)
+                .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
                 .run(new IRunnable() {
 
               @Override
