@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.mom.api;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +9,9 @@ import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Message oriented middleware (MOM) for sending and receiving messages in the cluster.
@@ -23,17 +25,21 @@ import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
  */
 public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
 
+  private static final Logger LOG = LoggerFactory.getLogger(ClusterMom.class);
+
   @Override
   protected IMom initDelegate() throws Exception {
-    final Class<? extends IMomImplementor> implementorClass = BEANS.get(ClusterMomImplementorProperty.class).getValue();
-    if (implementorClass == null) {
-      fail("Missing configuration for {}: MOM implementor not specified [config={}]", ClusterMom.class.getSimpleName(), BEANS.get(ClusterMomImplementorProperty.class).getKey());
+    if (ClusterMomImplementorProperty.isNullImplementor()) {
+      LOG.info("+++ Using '{}' for transport '{}'. No messages are published and received. To enable this transport, configure a MOM implementor with property '{}'.",
+          NullMom.class.getSimpleName(),
+          ClusterMom.class.getSimpleName(),
+          BEANS.get(ClusterMomImplementorProperty.class).getKey());
+      return BEANS.get(NullMom.class);
     }
 
-    final IMomImplementor implementor = BEANS.get(implementorClass);
+    final IMomImplementor implementor = BEANS.get(CONFIG.getPropertyValue(ClusterMomImplementorProperty.class));
     implementor.init(lookupEnvironment());
     implementor.setDefaultMarshaller(BEANS.get(ObjectMarshaller.class));
-
     return implementor;
   }
 
@@ -60,6 +66,14 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
     @Override
     public String getKey() {
       return "scout.mom.cluster.implementor";
+    }
+
+    /**
+     * Returns <code>true</code> if no {@link IMomImplementor} is configured for {@link ClusterMom}.
+     */
+    public static boolean isNullImplementor() {
+      final Class<? extends IMomImplementor> implementorClass = CONFIG.getPropertyValue(ClusterMomImplementorProperty.class);
+      return implementorClass == null || implementorClass == NullMom.class;
     }
   }
 

@@ -4,27 +4,21 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * MOM which does nothing, and which is useful if running in development mode with no access to the network.
  *
  * @since 6.1
  */
-@Bean
+@ApplicationScoped
 public class NullMom implements IMomImplementor {
-
-  private static final Logger LOG = LoggerFactory.getLogger(NullMom.class);
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
-    final String symbolicName = StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM");
-    LOG.info("+++ Using {} for transport '{}': no messages are published and received", NullMom.class.getSimpleName(), symbolicName);
+    // NOOP
   }
 
   @Override
