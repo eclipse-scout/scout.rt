@@ -68,6 +68,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableUserFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceMediator;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
@@ -134,6 +135,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   private final Map<IColumn, JsonColumn> m_jsonColumns;
   private final AbstractEventBuffer<TableEvent> m_eventBuffer;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
+  private final BinaryResourceMediator m_binaryResourceMediator;
 
   public JsonTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -143,6 +145,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     m_tableEventFilter = new TableEventFilter(this);
     m_jsonColumns = new HashMap<IColumn, JsonColumn>();
     m_eventBuffer = model.createEventBuffer();
+    m_binaryResourceMediator = new BinaryResourceMediator(this);
   }
 
   @Override
@@ -152,6 +155,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   public JsonContextMenu<IContextMenu> getJsonContextMenu() {
     return m_jsonContextMenu;
+  }
+
+  public BinaryResourceMediator getBinaryResourceMediator() {
+    return m_binaryResourceMediator;
   }
 
   @Override
@@ -322,10 +329,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         continue;
       }
       String id = getUiSession().createUniqueId();
-      JsonColumn jsonColumn = (JsonColumn) MainJsonObjectFactory.get().createJsonObject(column);
-      jsonColumn.setUiSession(getUiSession());
+      JsonColumn<?> jsonColumn = (JsonColumn) MainJsonObjectFactory.get().createJsonObject(column);
       jsonColumn.setId(id);
       jsonColumn.setColumnIndexOffset(offset);
+      jsonColumn.setJsonTable(this);
       m_jsonColumns.put(column, jsonColumn);
       m_columns.put(id, column);
     }
@@ -846,7 +853,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (att != null) {
       return new BinaryResourceHolder(att);
     }
-    return null;
+    return getBinaryResourceMediator().getBinaryResourceHolder(filename);
   }
 
   /**

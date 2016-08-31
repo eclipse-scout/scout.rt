@@ -58,5 +58,9 @@ public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlC
 
   void setAttachments(Collection<? extends BinaryResource> attachments);
 
+  void addAttachment(BinaryResource attachment);
+
+  void removeAttachment(BinaryResource attachment);
+
   String getPlainText();
 }

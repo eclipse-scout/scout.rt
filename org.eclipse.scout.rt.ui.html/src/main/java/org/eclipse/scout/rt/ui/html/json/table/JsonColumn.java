@@ -25,8 +25,8 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   public static final String OBJECT_TYPE = "Column";
 
   private String m_id;
-  private IUiSession m_uiSession;
   private T m_column;
+  private JsonTable<?> m_jsonTable;
   private int m_indexOffset;
 
   private final static String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
@@ -115,11 +115,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   }
 
   public IUiSession getUiSession() {
-    return m_uiSession;
-  }
-
-  public void setUiSession(IUiSession uiSession) {
-    m_uiSession = uiSession;
+    return getJsonTable().getUiSession();
   }
 
   public String getId() {
@@ -128,5 +124,13 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   public void setId(String id) {
     m_id = id;
+  }
+
+  public void setJsonTable(JsonTable<?> jsonTable) {
+    m_jsonTable = jsonTable;
+  }
+
+  public JsonTable<?> getJsonTable() {
+    return m_jsonTable;
   }
 }

@@ -162,6 +162,20 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
+  public void addAttachment(BinaryResource attachment) {
+    if (attachment != null) {
+      m_attachments.put(attachment.getFilename(), attachment);
+    }
+  }
+
+  @Override
+  public void removeAttachment(BinaryResource attachment) {
+    if (attachment != null) {
+      m_attachments.remove(attachment);
+    }
+  }
+
+  @Override
   public void setScrollBarEnabled(boolean scrollBarEnabled) {
     propertySupport.setPropertyBool(PROP_SCROLL_BAR_ENABLED, scrollBarEnabled);
   }

@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty.Context;
 import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
 import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceMediator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -40,12 +42,18 @@ import org.json.JSONObject;
  * @return {@link JSONObject}, {@link JSONArray} or a basic type
  */
 public class JsonBean implements IJsonObject {
+
   private Object m_bean;
   private IJsonObjectFactory m_objectFactory;
+  private BinaryResourceMediator m_binaryResourceMediator;
 
   public JsonBean(Object bean, IJsonObjectFactory objectFactory) {
     m_bean = bean;
     m_objectFactory = objectFactory;
+  }
+
+  public void setBinaryResourceMediator(BinaryResourceMediator binaryResourceMediator) {
+    m_binaryResourceMediator = binaryResourceMediator;
   }
 
   @Override
@@ -60,12 +68,19 @@ public class JsonBean implements IJsonObject {
       return m_bean;
     }
 
+    // binary resource
+    if (BinaryResource.class.isAssignableFrom(type)) {
+      BinaryResource binaryResource = (BinaryResource) m_bean;
+      m_binaryResourceMediator.addBinaryResource(binaryResource);
+      return m_binaryResourceMediator.createUrl(binaryResource);
+    }
+
     // array
     if (type.isArray()) {
       JSONArray jsonArray = new JSONArray();
       int n = Array.getLength(m_bean);
       for (int i = 0; i < n; i++) {
-        IJsonObject jsonObject = m_objectFactory.createJsonObject(Array.get(m_bean, i));
+        IJsonObject jsonObject = createJsonObject(Array.get(m_bean, i));
         jsonArray.put(jsonObject.toJson());
       }
       return jsonArray;
@@ -76,7 +91,7 @@ public class JsonBean implements IJsonObject {
       JSONArray jsonArray = new JSONArray();
       Collection collection = (Collection) m_bean;
       for (Object object : collection) {
-        IJsonObject jsonObject = m_objectFactory.createJsonObject(object);
+        IJsonObject jsonObject = createJsonObject(object);
         jsonArray.put(jsonObject.toJson());
       }
       return jsonArray;
@@ -109,7 +124,7 @@ public class JsonBean implements IJsonObject {
         }
         String key = f.getName();
         Object val = f.get(m_bean);
-        IJsonObject jsonObject = m_objectFactory.createJsonObject(val);
+        IJsonObject jsonObject = createJsonObject(val);
         properties.put(key, jsonObject.toJson());
       }
       FastBeanInfo beanInfo = new FastBeanInfo(type, Object.class);
@@ -125,7 +140,7 @@ public class JsonBean implements IJsonObject {
         }
         String key = desc.getName();
         Object val = m.invoke(m_bean);
-        IJsonObject jsonObject = m_objectFactory.createJsonObject(val);
+        IJsonObject jsonObject = createJsonObject(val);
         properties.put(key, jsonObject.toJson());
       }
       JSONObject jbean = new JSONObject();
@@ -138,4 +153,13 @@ public class JsonBean implements IJsonObject {
       throw new IllegalArgumentException(type + " to json", e);
     }
   }
+
+  protected IJsonObject createJsonObject(Object object) {
+    IJsonObject jsonObject = m_objectFactory.createJsonObject(object);
+    if (jsonObject instanceof JsonBean) {
+      ((JsonBean) jsonObject).setBinaryResourceMediator(m_binaryResourceMediator);
+    }
+    return jsonObject;
+  }
+
 }

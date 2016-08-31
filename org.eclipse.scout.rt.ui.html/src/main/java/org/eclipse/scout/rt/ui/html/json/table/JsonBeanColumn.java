@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
+import org.eclipse.scout.rt.ui.html.json.JsonBean;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 
 public class JsonBeanColumn<T extends IColumn<?>> extends JsonColumn<T> {
@@ -26,6 +28,9 @@ public class JsonBeanColumn<T extends IColumn<?>> extends JsonColumn<T> {
 
   @Override
   public Object cellValueToJson(Object value) {
-    return MainJsonObjectFactory.get().createJsonObject(value).toJson();
+    IJsonObject jsonObject = MainJsonObjectFactory.get().createJsonObject(value);
+    JsonBean jsonBean = (JsonBean) jsonObject;
+    jsonBean.setBinaryResourceMediator(getJsonTable().getBinaryResourceMediator());
+    return jsonObject.toJson();
   }
 }
