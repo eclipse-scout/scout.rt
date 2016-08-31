@@ -65,7 +65,17 @@ scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
   var model = this._initModel(adapterData, parent);
   this.widget = this._createWidget(model);
   this._attachWidget();
+  this._postCreateWidget();
   return this.widget;
+};
+
+
+/**
+ * Override this method to do something right after the widget has been created and has been
+ * attached to the remote adapter. The default impl. does nothing.
+ */
+scout.ModelAdapter.prototype._postCreateWidget = function() {
+  // NOP
 };
 
 scout.ModelAdapter.prototype._initModel = function(model, parent) {

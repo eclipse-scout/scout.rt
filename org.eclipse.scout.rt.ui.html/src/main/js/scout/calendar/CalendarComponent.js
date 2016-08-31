@@ -172,14 +172,7 @@ scout.CalendarComponent.prototype._renderSelected = function() {
 };
 
 scout.CalendarComponent.prototype.setSelected = function(selected) {
-  var oldSelected = this._selected; // FIXME CGU [6.1] use proper property pattern and use property event
-  this._selected = selected;
-  if (oldSelected !== selected) {
-    this.trigger('selected', {
-      selected: selected
-    });
-    this._renderSelected();
-  }
+  this.setProperty('selected', selected);
 };
 
 scout.CalendarComponent.prototype._onMousedown = function(event) {

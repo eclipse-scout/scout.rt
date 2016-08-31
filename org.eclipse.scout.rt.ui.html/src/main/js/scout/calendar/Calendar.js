@@ -105,10 +105,6 @@ scout.Calendar.prototype._init = function(model) {
   this._exactRange = this._calcExactRange();
   this._yearPanel.setViewRange(this._exactRange);
   this.viewRange = this._calcViewRange();
-  // We must send the view-range to the client-model on the server.
-  // The view-range is determined by the UI. Thus the calendar cannot
-  // be completely initialized without the view-range from the UI.
-  this._sendViewRangeChanged();
 };
 
 scout.Calendar.prototype._syncSelectedDate = function(dateString) {
@@ -294,7 +290,7 @@ scout.Calendar.prototype._updateModel = function(animate) {
   this._exactRange = this._calcExactRange();
   this._yearPanel.setViewRange(this._exactRange);
   this.viewRange = this._calcViewRange();
-  this._sendModelChanged();
+  this.trigger('modelChanged');
   this._updateScreen(animate);
 };
 
@@ -438,7 +434,7 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
   }
 
   if (changed) {
-    this._sendSelectionChanged();
+    this.trigger('selectionChanged');
     this._updateListPanel();
   }
 
@@ -448,33 +444,6 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
 };
 
 /* --  set display mode and range ------------------------------------- */
-
-scout.Calendar.prototype._sendModelChanged = function() {
-  var data = {
-    viewRange: this._jsonViewRange(),
-    selectedDate: scout.dates.toJsonDate(this.selectedDate),
-    displayMode: this.displayMode
-  };
-  this._send('modelChanged', data);
-};
-
-scout.Calendar.prototype._sendViewRangeChanged = function() {
-  this._send('viewRangeChanged', {
-    viewRange: this._jsonViewRange()
-  });
-};
-
-scout.Calendar.prototype._sendSelectionChanged = function() {
-  var selectedComponentId = this.selectedComponent ? this.selectedComponent.id : null;
-  this._send('selectionChanged', {
-    date: scout.dates.toJsonDate(this.selectedDate),
-    componentId: selectedComponentId
-  });
-};
-
-scout.Calendar.prototype._jsonViewRange = function() {
-  return scout.dates.toJsonDateRange(this.viewRange);
-};
 
 scout.Calendar.prototype._updateScreen = function(animate) {
   $.log.info('(Calendar#_updateScreen)');
