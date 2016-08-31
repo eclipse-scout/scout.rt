@@ -31,9 +31,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class TransactedStrategy implements ISubscriptionStrategy {
 
-  protected JmsMom m_mom;
+  protected JmsMomImplementor m_mom;
 
-  public ISubscriptionStrategy init(final JmsMom mom) {
+  public ISubscriptionStrategy init(final JmsMomImplementor mom) {
     m_mom = mom;
     return this;
   }

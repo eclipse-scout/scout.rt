@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
  * Allows to read a JMS message, and to decrypt its payload and properties.
  *
  * @since 6.1
- * @see JmsMom
+ * @see JmsMomImplementor
  */
 public class JmsCipherMessageReader<DTO> extends JmsMessageReader<DTO> {
 

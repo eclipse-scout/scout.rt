@@ -1,7 +1,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 /**
- * Properties used in {@link JmsMom} implementation.
+ * Properties used in {@link JmsMomImplementor} implementation.
  */
 public interface IJmsMomProperties {
 

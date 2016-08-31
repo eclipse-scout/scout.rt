@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
  * Allows to write a JMS message, and to encrypt its payload and properties.
  *
  * @since 6.1
- * @see JmsMom
+ * @see JmsMomImplementor
  */
 public class JmsCipherMessageWriter extends JmsMessageWriter {
 

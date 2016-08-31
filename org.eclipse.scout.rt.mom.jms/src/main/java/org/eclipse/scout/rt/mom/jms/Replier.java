@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.mom.jms.JmsMom.MomExceptionHandler;
+import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
@@ -37,9 +37,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class Replier {
 
-  protected JmsMom m_mom;
+  protected JmsMomImplementor m_mom;
 
-  public Replier init(final JmsMom mom) {
+  public Replier init(final JmsMomImplementor mom) {
     m_mom = mom;
     return this;
   }

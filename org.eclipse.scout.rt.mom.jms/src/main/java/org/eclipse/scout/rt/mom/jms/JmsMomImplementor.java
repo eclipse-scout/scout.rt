@@ -79,9 +79,9 @@ import org.slf4j.LoggerFactory;
  * @since 6.1
  */
 @Bean
-public class JmsMom implements IMomImplementor {
+public class JmsMomImplementor implements IMomImplementor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JmsMom.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JmsMomImplementor.class);
 
   protected final String m_momUid = UUID.randomUUID().toString();
   protected Context m_context;
@@ -560,7 +560,7 @@ public class JmsMom implements IMomImplementor {
     @Override
     public void stateChanged(final PlatformEvent event) {
       if (State.PlatformStopping.equals(event.getState())) {
-        BEANS.get(JmsMom.class).destroy();
+        BEANS.get(JmsMomImplementor.class).destroy();
       }
     }
   }

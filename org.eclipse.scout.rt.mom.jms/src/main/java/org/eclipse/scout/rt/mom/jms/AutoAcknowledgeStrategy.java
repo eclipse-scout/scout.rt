@@ -12,7 +12,7 @@ import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.mom.jms.JmsMom.MomExceptionHandler;
+import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -31,10 +31,10 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
 
-  protected JmsMom m_mom;
+  protected JmsMomImplementor m_mom;
   protected boolean m_singleThreaded;
 
-  public ISubscriptionStrategy init(final JmsMom mom, final boolean singleThreaded) {
+  public ISubscriptionStrategy init(final JmsMomImplementor mom, final boolean singleThreaded) {
     m_mom = mom;
     m_singleThreaded = singleThreaded;
     return this;

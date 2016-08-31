@@ -81,7 +81,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class JmsMomTest {
+public class JmsMomImplementorTest {
 
   private List<IDisposable> m_disposables;
 
@@ -142,8 +142,8 @@ public class JmsMomTest {
 
   @Test
   public void testInstanceScoped() {
-    JmsMom mom1 = BEANS.get(JmsMom.class);
-    JmsMom mom2 = BEANS.get(JmsMom.class);
+    JmsMomImplementor mom1 = BEANS.get(JmsMomImplementor.class);
+    JmsMomImplementor mom2 = BEANS.get(JmsMomImplementor.class);
     assertNotSame(mom1, mom2);
   }
 
@@ -1546,7 +1546,7 @@ public class JmsMomTest {
   }
 
   /**
-   * Encapsulates {@link JmsMom} for testing purpose.
+   * Encapsulates {@link JmsMomImplementor} for testing purpose.
    */
   @Ignore
   @ApplicationScoped
@@ -1561,7 +1561,7 @@ public class JmsMomTest {
       env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
       env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
 
-      JmsMom testee = new JmsMom();
+      JmsMomImplementor testee = new JmsMomImplementor();
       testee.init(env);
       return testee;
     }

@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.mom.jms;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.eclipse.scout.rt.mom.jms.JmsMom.MomExceptionHandler;
+import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

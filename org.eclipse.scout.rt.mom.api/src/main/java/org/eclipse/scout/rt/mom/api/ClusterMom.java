@@ -31,10 +31,10 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
   protected IMom initDelegate() throws Exception {
     if (ClusterMomImplementorProperty.isNullImplementor()) {
       LOG.info("+++ Using '{}' for transport '{}'. No messages are published and received. To enable this transport, configure a MOM implementor with property '{}'.",
-          NullMom.class.getSimpleName(),
+          NullMomImplementor.class.getSimpleName(),
           ClusterMom.class.getSimpleName(),
           BEANS.get(ClusterMomImplementorProperty.class).getKey());
-      return BEANS.get(NullMom.class);
+      return BEANS.get(NullMomImplementor.class);
     }
 
     final IMomImplementor implementor = BEANS.get(CONFIG.getPropertyValue(ClusterMomImplementorProperty.class));
@@ -58,7 +58,7 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
    * Example to work with a JMS based implementor.
    *
    * <pre>
-   * scout.mom.cluster.implementor = org.eclipse.scout.rt.mom.jms.JmsMom
+   * scout.mom.cluster.implementor = org.eclipse.scout.rt.mom.jms.JmsMomImplementor
    * </pre>
    */
   public static class ClusterMomImplementorProperty extends AbstractClassConfigProperty<IMomImplementor> {
@@ -73,7 +73,7 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
      */
     public static boolean isNullImplementor() {
       final Class<? extends IMomImplementor> implementorClass = CONFIG.getPropertyValue(ClusterMomImplementorProperty.class);
-      return implementorClass == null || implementorClass == NullMom.class;
+      return implementorClass == null || implementorClass == NullMomImplementor.class;
     }
   }
 

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * Allows to read a JMS message.
  *
  * @since 6.1
- * @see JmsMom
+ * @see JmsMomImplementor
  */
 @Bean
 public class JmsMessageReader<DTO> {
