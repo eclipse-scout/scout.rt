@@ -53,6 +53,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    */
   String PROP_DEFAULT_DETAIL_FORM = "defaultDetailForm";
 
+  String PROP_OUTLINE_OVERVIEW_VISIBLE = "outlineOverviewVisible";
+
   /**
    * {@link ITable}
    */
@@ -134,6 +136,10 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   IForm getDetailForm();
 
   void setDetailForm(IForm form);
+
+  void setOutlineOverviewVisible(boolean visible);
+
+  boolean isOutlineOverviewVisible();
 
   /**
    * @return the detail table of the active (selected) page {@link IPage#getTable()}

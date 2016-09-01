@@ -82,6 +82,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return JsonAdapterPropertyConfigBuilder.globalConfig();
       }
     });
+    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_OUTLINE_OVERVIEW_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isOutlineOverviewVisible();
+      }
+    });
   }
 
   @Override

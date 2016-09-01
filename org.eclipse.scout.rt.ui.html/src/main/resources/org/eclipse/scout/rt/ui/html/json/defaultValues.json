@@ -159,6 +159,7 @@
     "Outline": {
       "autoToggleBreadcrumbStyle": true,
       "navigateButtonsVisible": true,
+      "outlineOverviewVisible":true,
       "dialogs": [],
       "views": [],
       "messageBoxes": [],

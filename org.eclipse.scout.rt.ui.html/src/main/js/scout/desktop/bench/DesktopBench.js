@@ -355,7 +355,7 @@ scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
 };
 
 scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
-  if (event.changedProperties.indexOf('defaultDetailForm') !== -1) {
+  if(scout.arrays.containsAny(event.changedProperties, ['defaultDetailForm', 'outlineOverview'])){
     this.updateOutlineContent();
   }
 };

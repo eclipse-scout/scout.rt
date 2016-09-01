@@ -64,6 +64,7 @@ scout.Outline.prototype._init = function(model) {
   this.detailMenuBar.bottom();
 
   this._syncDefaultDetailForm(this.defaultDetailForm);
+  this._syncOutlineOverviewVisible(this.outlineOverviewVisible);
   this._syncMenus(this.menus);
   this.updateDetailContent();
 };
@@ -351,19 +352,38 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
 
 scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
+  this._updateDetailForm();
+};
+
+
+
+scout.Outline.prototype._syncOutlineOverviewVisible = function(outlineOverviewVisible) {
+  this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
+  this._updateDetailForm();
+};
+
+scout.Outline.prototype._updateDetailForm = function() {
   if (this.defaultDetailForm) {
     if (this.outlineOverview) {
       this.outlineOverview.destroy();
-      this.outlineOverview = null;
+      this._setProperty('outlineOverview', null);
     }
   } else {
-    if (!this.outlineOverview) {
-      // Create outlineOverview if no defaultDetailForm is available
-      this.outlineOverview = scout.create('OutlineOverview', {
-        parent: this,
-        outline: this
-      });
+    if (this.outlineOverviewVisible) {
+      if (!this.outlineOverview) {
+        // Create outlineOverview if no defaultDetailForm is available
+        this._setProperty('outlineOverview', scout.create('OutlineOverview', {
+          parent: this,
+          outline: this
+        }));
+      }
+    } else {
+      if (this.outlineOverview) {
+        this.outlineOverview.destroy();
+        this._setProperty('outlineOverview', null);
+      }
     }
+
   }
 };
 
