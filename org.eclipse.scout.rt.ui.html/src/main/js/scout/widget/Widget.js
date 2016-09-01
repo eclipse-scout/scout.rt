@@ -87,6 +87,25 @@ scout.Widget.prototype._init = function(model) {
   }.bind(this));
 };
 
+/**
+ * Loads a JSON model from *-module.json. The ID of the model to load must be equals 
+ * to the model.objectType property. Optional additional model properties are added
+ * to the JSON model. You should call this function in your Widget#_init function.
+ *
+ * @param parent
+ * @param (optional) additional model properties to be merged into the loaded JSON model
+ */
+scout.Widget.prototype._loadJsonModel = function(model) {
+  var jsonModel = scout.models.get(model.objectType, model.parent);
+  if (!jsonModel) {
+    jsonModel = {};
+  }
+  if (model) {
+    $.extend(jsonModel, model);
+  }
+  return jsonModel;
+};
+
 scout.Widget.prototype.createFromProperty = function(propertyName, value) {
   // FIXME [6.1] awe Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
   if (value instanceof scout.Widget) {

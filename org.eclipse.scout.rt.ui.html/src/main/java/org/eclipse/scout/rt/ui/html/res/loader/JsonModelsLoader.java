@@ -18,6 +18,7 @@ import java.util.Iterator;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.WebContentService;
 import org.json.JSONArray;
@@ -103,7 +104,12 @@ public class JsonModelsLoader extends AbstractResourceLoader {
         }
       }
       else {
-        output.put(toPropertyName(file), jsonFragment);
+        String modelId = jsonFragment.optString("id");
+        if (StringUtility.isNullOrEmpty(modelId)) {
+          modelId = toPropertyName(file);
+          LOG.error("JSON model file '{}' is missing mandatory property 'id'. Using file location as id: {}", file, modelId);
+        }
+        output.put(modelId, jsonFragment);
       }
     }
     return output;
