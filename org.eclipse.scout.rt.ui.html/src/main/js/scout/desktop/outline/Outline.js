@@ -989,7 +989,7 @@ scout.Outline.prototype._nodesSelectedInternal = function() {
 // prüfen, ob es richtig ist hier pageChanged zu triggern, oder ob hier ein eigenes event nötig ist, das evtl.
 // weniger macht (auch mit Java code vergleichen)
 scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
-  this._triggerPageChanged(activePage);
+  this.pageChanged(activePage);
 };
 
 scout.Outline.prototype.pageChanged = function(page) {
