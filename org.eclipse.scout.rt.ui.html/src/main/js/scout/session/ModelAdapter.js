@@ -349,7 +349,7 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
   for (var propertyName in newProperties) {
     var value = newProperties[propertyName];
 
-    var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
+    var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName);
     if (this[syncFuncName]) {
       this[syncFuncName](value);
     } else {

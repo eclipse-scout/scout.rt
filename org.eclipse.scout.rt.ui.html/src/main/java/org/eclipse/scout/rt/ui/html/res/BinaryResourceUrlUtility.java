@@ -19,8 +19,10 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -92,23 +94,64 @@ public class BinaryResourceUrlUtility {
     return ret.toString();
   }
 
+  public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, BinaryResource binaryResource) {
+    if (!checkCreateDynamicAdapterResourceUrlArguments(jsonAdapter, binaryResource)) {
+      return null;
+    }
+    return new DynamicResourceInfo(jsonAdapter, getFilenameWithFingerprint(binaryResource)).toPath();
+  }
+
   /**
    * @return a relative URL for a resource handled by an adapter, see {@link DynamicResourceLoader}.
    *         <p>
    *         The calling adapter must implement {@link IBinaryResourceProvider}.
    */
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {
-    if (jsonAdapter == null) {
-      return null;
-    }
-    if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
-      LOG.warn("adapter {} is not implementing {}", jsonAdapter, IBinaryResourceProvider.class.getName());
-      return null;
-    }
-    if (filename == null) {
+    if (!checkCreateDynamicAdapterResourceUrlArguments(jsonAdapter, filename)) {
       return null;
     }
     return new DynamicResourceInfo(jsonAdapter, filename).toPath();
+  }
+
+  public static String getFilenameWithFingerprint(BinaryResource binaryResource) {
+    if (!binaryResource.hasFilename()) {
+      return null;
+    }
+    if (binaryResource.getFingerprint() <= 0) {
+      return binaryResource.getFilename();
+    }
+    return binaryResource.getFingerprint() + "/" + binaryResource.getFilename();
+  }
+
+  public static Pair<String, Long> extractFilenameWithFingerprint(String filenameWithFingerprint) {
+    String REGEX_FINGERPRINT_PATTERN = "^([0-9]*)/?(.*)$";
+    Pattern p = Pattern.compile(REGEX_FINGERPRINT_PATTERN);
+    Matcher m = p.matcher(filenameWithFingerprint);
+    m.find();
+
+    String fingerprintString = m.group(1);
+    String filename = m.group(2);
+
+    Long fingerprint = 0L;
+    if (StringUtility.hasText(fingerprintString)) {
+      fingerprint = Long.valueOf(fingerprintString);
+    }
+
+    return new Pair<>(filename, fingerprint);
+  }
+
+  protected static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
+    if (jsonAdapter == null) {
+      return false;
+    }
+    if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
+      LOG.warn("adapter {} is not implementing {}", jsonAdapter, IBinaryResourceProvider.class.getName());
+      return false;
+    }
+    if (arg == null) {
+      return false;
+    }
+    return true;
   }
 
   /**

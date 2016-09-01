@@ -70,7 +70,6 @@ scout.BrowserField.prototype._renderIframeProperties = function() {
   this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
 };
 
-
 scout.BrowserField.prototype._renderLocation = function() {
   if (!this.showInExternalWindow) {
     // <iframe>
