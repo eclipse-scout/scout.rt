@@ -59,5 +59,5 @@ scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
   }
 
   table.selectionHandler.lastActionRow = viewport.lastRow;
-  table.selectRows(newSelectedRows, true, true);
+  table.selectRows(newSelectedRows, true);
 };

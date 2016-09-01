@@ -157,11 +157,14 @@ scout.arrays = {
   equalsIgnoreOrder: function(arr, arr2) {
     if (arr === arr2) {
       return true;
-    } else if ((!arr || arr.length === 0) && (!arr2 || arr2.length === 0)) {
+    }
+    if ((!arr || arr.length === 0) && (!arr2 || arr2.length === 0)) {
       return true;
-    } else if (!arr || !arr2) {
+    }
+    if (!arr || !arr2) {
       return false;
-    } else if (arr.length !== arr2.length) {
+    }
+    if (arr.length !== arr2.length) {
       return false;
     }
     return scout.arrays.containsAll(arr, arr2);
@@ -170,11 +173,14 @@ scout.arrays = {
   equals: function(arr, arr2) {
     if (arr === arr2) {
       return true;
-    } else if ((!arr || arr.length === 0) && (!arr2 || arr2.length === 0)) {
+    }
+    if ((!arr || arr.length === 0) && (!arr2 || arr2.length === 0)) {
       return true;
-    } else if (!arr || !arr2) {
+    }
+    if (!arr || !arr2) {
       return false;
-    } else if (arr.length !== arr2.length) {
+    }
+    if (arr.length !== arr2.length) {
       return false;
     }
 

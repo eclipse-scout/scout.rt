@@ -70,6 +70,6 @@ scout.TableNavigationDownKeyStroke.prototype.handle = function(event) {
   }
 
   table.selectionHandler.lastActionRow = newActionRow;
-  table.selectRows(newSelectedRows, true, true);
+  table.selectRows(newSelectedRows, true);
   table.scrollTo(newActionRow);
 };

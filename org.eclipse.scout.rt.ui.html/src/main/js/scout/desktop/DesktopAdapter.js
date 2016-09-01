@@ -61,7 +61,10 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
 
   if (displayParent) {
     form = this.session.getOrCreateWidget(event.form, this.widget);
-    this.addFilterForWidgetEventType('formActivated');
+    this.addFilterForWidgetEvent(function(widgetEvent) {
+      return (widgetEvent.type === 'formActivated' &&
+          widgetEvent.form === form);
+    });
     this.widget.showForm(form, displayParent.widget, event.position);
   }
 };

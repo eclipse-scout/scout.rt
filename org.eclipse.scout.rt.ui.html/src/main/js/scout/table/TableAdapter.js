@@ -287,10 +287,12 @@ scout.TableAdapter.prototype._onRowsInserted = function(rows) {
 
 scout.TableAdapter.prototype._onRowsDeleted = function(rowIds) {
   var rows = this.widget._rowsByIds(rowIds);
+  this.addFilterForWidgetEventType('rowsSelected');
   this.widget.deleteRows(rows);
 };
 
 scout.TableAdapter.prototype._onAllRowsDeleted = function() {
+  this.addFilterForWidgetEventType('rowsSelected');
   this.widget.deleteAllRows();
 };
 
@@ -300,6 +302,7 @@ scout.TableAdapter.prototype._onRowsUpdated = function(rows) {
 
 scout.TableAdapter.prototype._onRowsSelected = function(rowIds) {
   var rows = this.widget._rowsByIds(rowIds);
+  this.addFilterForWidgetEventType('rowsSelected');
   this.widget.selectRows(rows);
   // FIXME [6.1] CGU what is this for? seems wrong here
   this.widget.selectionHandler.clearLastSelectedRowMarker();
@@ -318,13 +321,12 @@ scout.TableAdapter.prototype._onRowsChecked = function(rows) {
     }
   }, this);
 
+  this.addFilterForWidgetEventType('rowsChecked');
   this.widget.checkRows(checkedRows, {
     checked: true,
-    notifyServer: false,
     checkOnlyEnabled: false
   });
   this.widget.uncheckRows(uncheckedRows, {
-    notifyServer: false,
     checkOnlyEnabled: false
   });
 };
@@ -358,7 +360,6 @@ scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldI
 scout.TableAdapter.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
   this.widget.endCellEdit(field.widget);
-  // FIXME [6.1] CGU field must be destroyed, listener or do it here?
 };
 
 scout.TableAdapter.prototype._onRequestFocus = function() {
@@ -370,11 +371,17 @@ scout.TableAdapter.prototype._onScrollToSelection = function() {
 };
 
 scout.TableAdapter.prototype._onColumnBackgroundEffectChanged = function(event) {
-  var columnId, column;
   event.eventParts.forEach(function(eventPart) {
-    columnId = eventPart.columnId;
-    column = this.widget._columnById(columnId);
-    column.setBackgroundEffect(eventPart.backgroundEffect, false);
+    var column = this.widget._columnById(eventPart.columnId),
+      backgroundEffect = eventPart.backgroundEffect;
+
+    this.addFilterForWidgetEvent(function(widgetEvent) {
+      return (widgetEvent.type === 'columnBackgroundEffectChanged' &&
+        widgetEvent.column.id === column.id &&
+        widgetEvent.column.backgroundEffect === backgroundEffect);
+    });
+
+    column.setBackgroundEffect(backgroundEffect);
   }, this);
 };
 
@@ -392,6 +399,13 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
   event.eventParts.forEach(function(eventPart) {
     var func = eventPart.aggregationFunction,
       column = this.widget._columnById(eventPart.columnId);
+
+    this.addFilterForWidgetEvent(function(widgetEvent) {
+      return (widgetEvent.type === 'aggregationFunctionChanged' &&
+        widgetEvent.column.id === column.id &&
+        widgetEvent.column.aggregationFunction === func);
+    });
+
     columns.push(column);
     functions.push(func);
   }, this);
@@ -400,16 +414,14 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
 };
 
 scout.TableAdapter.prototype._onFiltersChanged = function(filters) {
+  this.addFilterForWidgetEventType('addFilter');
+  this.addFilterForWidgetEventType('removeFilter');
+
   this.widget.setFilters(filters);
   // do not refilter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)
-  if (!this.widget._rebuildingTable) {//FIXME CGU [6.1] gehört das nicht direkt in filter rein?
-    this.filter();
+  if (!this.widget._rebuildingTable) { //FIXME CGU [6.1] gehört das nicht direkt in filter rein?
+    this.widget.filter();
   }
-};
-
-scout.TableAdapter.prototype._onColumnActionsChanged = function(event) {
-  // FIXME [6.1] cgu still needed? Never called
-  this.widget.header.onColumnActionsChanged(event);
 };
 
 scout.TableAdapter.prototype.onModelAction = function(event) {
@@ -449,8 +461,6 @@ scout.TableAdapter.prototype.onModelAction = function(event) {
     this._onColumnBackgroundEffectChanged(event);
   } else if (event.type === 'requestFocusInCell') {
     this._onRequestFocusInCell(event);
-  } else if (event.type === 'columnActionsChanged') {
-    this._onColumnActionsChanged(event);
   } else {
     scout.TableAdapter.parent.prototype.onModelAction.call(this, event);
   }

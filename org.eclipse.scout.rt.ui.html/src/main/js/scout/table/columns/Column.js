@@ -362,7 +362,7 @@ scout.Column.prototype.createAggrEmptyCell = function() {
   };
 };
 
-scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
+scout.Column.prototype.setBackgroundEffect = function(effect) {
   if (this.backgroundEffect === effect) {
     return;
   }

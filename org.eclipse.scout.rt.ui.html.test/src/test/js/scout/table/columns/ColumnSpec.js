@@ -492,6 +492,30 @@ describe('Column', function() {
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
       });
+
+      it('does not send columnBackgroundEffectChanged if server triggered it', function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        var table = helper.createTable(model);
+        var column0 = table.columns[0];
+        table.render(session.$entryPoint);
+
+        linkWidgetAndAdapter(table, 'TableAdapter');
+        table.remoteAdapter._onColumnBackgroundEffectChanged({
+          eventParts: [{
+            columnId: column0.id,
+            backgroundEffect: 'barChart'
+          }]
+        });
+        expect(column0.backgroundEffect).toBe('barChart');
+
+        sendQueuedAjaxCalls();
+        expect(jasmine.Ajax.requests.count()).toBe(0);
+
+        // It has to be sent if effect differs from what the server sent
+        table.setColumnBackgroundEffect(column0, 'colorGradient1');
+        sendQueuedAjaxCalls();
+        expect(jasmine.Ajax.requests.count()).toBe(1);
+      });
     });
   });
 

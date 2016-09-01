@@ -622,23 +622,19 @@ describe("Table", function() {
       expect(table.$selectedRows().length).toBe(1);
     });
 
-    it("sends selection event containing rowIds", function() {
+    it("triggers rowsSelected", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
       var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var rows = [table.rows[0], table.rows[4]];
-      table.selectRows(rows, true);
-
-      sendQueuedAjaxCalls();
-
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: helper.getRowIds(rows)
+      var eventTriggered = false;
+      table.on('rowsSelected', function() {
+        eventTriggered = true;
       });
-      expect(mostRecentJsonRequest()).toContainEvents(event);
+      table.selectRows(rows);
+      expect(eventTriggered).toBe(true);
     });
 
   });

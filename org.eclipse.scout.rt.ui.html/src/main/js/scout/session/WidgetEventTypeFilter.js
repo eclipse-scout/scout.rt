@@ -1,19 +1,23 @@
 scout.WidgetEventTypeFilter = function() {
-  this._filterEventTypes = [];
+  this.filters = [];
+};
+
+scout.WidgetEventTypeFilter.prototype.addFilter = function(filterFunc) {
+  this.filters.push(filterFunc);
 };
 
 scout.WidgetEventTypeFilter.prototype.addFilterForEventType = function(eventType) {
-  if (this._filterEventTypes.indexOf(eventType) === -1) {
-    this._filterEventTypes.push(eventType);
-  }
+  this.filters.push(function(event) {
+    return event.type === eventType;
+  });
 };
 
 scout.WidgetEventTypeFilter.prototype.filter = function(event) {
-  return this._filterEventTypes.some(function(filterEventType) {
-    return filterEventType === event.type;
+  return this.filters.some(function(filterFunc) {
+    return filterFunc(event);
   });
 };
 
 scout.WidgetEventTypeFilter.prototype.reset = function() {
-  this._filterEventTypes = [];
+  this.filters = [];
 };

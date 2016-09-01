@@ -29,6 +29,77 @@ describe("TableAdapter", function() {
     helper.resetIntlCollator();
   });
 
+  describe("selectRows", function() {
+
+    it("sends rowsSelected event containing rowIds", function() {
+      var model = helper.createModelFixture(2, 5);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+
+      var rows = [table.rows[0], table.rows[4]];
+      table.selectRows(rows);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var event = new scout.Event(table.id, 'rowsSelected', {
+        rowIds: helper.getRowIds(rows)
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("does not send selection event if triggered by server", function() {
+      var model = helper.createModelFixture(2, 5);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+
+      var rows = [table.rows[0], table.rows[4]];
+      adapter._onRowsSelected([rows[0].id, rows[1].id]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+  });
+
+  describe("checkRows", function() {
+
+    it("sends rowsChecked event containing rowIds", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+
+      var rows = [table.rows[0]];
+      table.checkRows(rows);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var event = new scout.Event(table.id, 'rowsChecked', {
+        rows: [{
+          rowId: rows[0].id,
+          checked: true
+        }]
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("does not send rowsChecked event if triggered by server", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+
+      var rows = [table.rows[0]];
+      adapter._onRowsChecked([{
+        id: rows[0].id,
+        checked: true
+      }]);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+  });
 
   describe("onModelAction", function() {
 
@@ -95,6 +166,15 @@ describe("TableAdapter", function() {
         expect(table.deleteRows).toHaveBeenCalledWith([rows[0], rows[2]]);
       });
 
+      it("does not send rowsSelected event for the deleted rows", function() {
+        var row = table.rows[0];
+        table.selectedRows = [row];
+
+        adapter._onRowsDeleted([row.id]);
+        sendQueuedAjaxCalls();
+        expect(jasmine.Ajax.requests.count()).toBe(0);
+      });
+
     });
 
     describe("allRowsDeleted event", function() {
@@ -121,6 +201,14 @@ describe("TableAdapter", function() {
         expect(table.deleteAllRows).toHaveBeenCalled();
       });
 
+      it("does not send rowsSelected event", function() {
+        var row = table.rows[0];
+        table.selectedRows = [row];
+
+        adapter._onAllRowsDeleted();
+        sendQueuedAjaxCalls();
+        expect(jasmine.Ajax.requests.count()).toBe(0);
+      });
     });
 
     describe("rowsInserted event", function() {
@@ -436,7 +524,7 @@ describe("TableAdapter", function() {
       var model = helper.createModelFixture(1, 2);
       var adapter = helper.createTableAdapter(model);
       var table = adapter.createWidget(model, session.desktop);
-      adapter._sendRowsFiltered(['1','2']); // should create a remove event, because number of rows is equals to the length of rowIds
+      adapter._sendRowsFiltered(['1', '2']); // should create a remove event, because number of rows is equals to the length of rowIds
       adapter._sendRowsFiltered(['1']); // should create an 'add' event
       adapter._sendRowsFiltered(['2']); // should be coalesced with previous add event
       expect(session.asyncEvents.length).toBe(2);

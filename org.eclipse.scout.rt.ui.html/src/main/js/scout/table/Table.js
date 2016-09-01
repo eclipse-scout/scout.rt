@@ -563,12 +563,12 @@ scout.Table.prototype.toggleSelection = function() {
   }
 };
 
-scout.Table.prototype.selectAll = function(notifyServer) {
-  this.selectRows(this.filteredRows(), notifyServer);
+scout.Table.prototype.selectAll = function() {
+  this.selectRows(this.filteredRows());
 };
 
-scout.Table.prototype.deselectAll = function(notifyServer) {
-  this.selectRows([], notifyServer);
+scout.Table.prototype.deselectAll = function() {
+  this.selectRows([]);
 };
 
 scout.Table.prototype.checkAll = function(checked) {
@@ -1853,7 +1853,6 @@ scout.Table.prototype.checkRow = function(row, checked) {
 scout.Table.prototype.checkRows = function(rows, options) {
   var opts = {
     checked: true,
-    notifyServer: true,
     checkOnlyEnabled: true
   };
   $.extend(opts, options);
@@ -1886,10 +1885,8 @@ scout.Table.prototype.checkRows = function(rows, options) {
   this._triggerRowsChecked(updatedRows);
 };
 
-scout.Table.prototype.uncheckRow = function(row, notifyServer) {
-  this.uncheckRows([row], {
-    notifyServer: notifyServer
-  });
+scout.Table.prototype.uncheckRow = function(row) {
+  this.uncheckRows([row]);
 };
 
 scout.Table.prototype.uncheckRows = function(rows, options) {
@@ -1986,7 +1983,7 @@ scout.Table.prototype.deleteRows = function(rows) {
 
     // Update model
     scout.arrays.remove(this.rows, row);
-    if (scout.arrays.remove(this._filteredRows, row)) {
+    if (this._filterCount() > 0 && scout.arrays.remove(this._filteredRows, row)) {
       filterChanged = true;
     }
     delete this.rowsMap[row.id];
@@ -1996,7 +1993,7 @@ scout.Table.prototype.deleteRows = function(rows) {
     }
   }.bind(this));
 
-  this.deselectRows(rows, false);
+  this.deselectRows(rows);
   if (filterChanged) {
     this._rowsFiltered();
   }
@@ -2014,7 +2011,7 @@ scout.Table.prototype.deleteRows = function(rows) {
 };
 
 scout.Table.prototype.deleteAllRows = function() {
-  var filterChanged = this._filteredRows.length > 0;
+  var filterChanged = this._filterCount() > 0 && this._filteredRows.length > 0;
 
   // Update HTML
   if (this.rendered) {
@@ -2030,7 +2027,7 @@ scout.Table.prototype.deleteAllRows = function() {
   // Update model
   this.rows = [];
   this.rowsMap = {};
-  this.deselectAll(false);
+  this.deselectAll();
   this._filteredRows = [];
 
   if (filterChanged) {
@@ -2327,7 +2324,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   }
 };
 
-scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
+scout.Table.prototype.selectRows = function(rows, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
   // TODO CGU maybe make sure selectedRows are in correct order, this would make logic in AbstractTableNavigationKeyStroke or renderSelection easier
@@ -2357,12 +2354,11 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   }
 };
 
-scout.Table.prototype.deselectRows = function(rows, notifyServer) {
+scout.Table.prototype.deselectRows = function(rows) {
   rows = scout.arrays.ensure(rows);
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
   var selectedRows = this.selectedRows.slice(); // copy
   if (scout.arrays.removeAll(selectedRows, rows)) {
-    this.selectRows(selectedRows, notifyServer);
+    this.selectRows(selectedRows);
   }
 };
 
@@ -2633,8 +2629,7 @@ scout.Table.prototype.resizeToFit = function(column) {
 /**
  * @param filter object with createKey() and accept()
  */
-scout.Table.prototype.addFilter = function(filter, notifyServer) {
-  notifyServer = scout.nvl(notifyServer, true);
+scout.Table.prototype.addFilter = function(filter) {
   var key = filter.createKey();
   if (!key) {
     throw new Error('key has to be defined');
@@ -2645,12 +2640,11 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
   });
 };
 
-scout.Table.prototype.removeFilter = function(filter, notifyServer) {
-  this.removeFilterByKey(filter.createKey(), notifyServer);
+scout.Table.prototype.removeFilter = function(filter) {
+  this.removeFilterByKey(filter.createKey());
 };
 
-scout.Table.prototype.removeFilterByKey = function(key, notifyServer) {
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
+scout.Table.prototype.removeFilterByKey = function(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
@@ -2978,12 +2972,12 @@ scout.Table.prototype._syncKeyStrokes = function(keyStrokes) {
 
 scout.Table.prototype.setFilters = function(filters) {
   for (var key in this._filterMap) {
-    this.removeFilterByKey(key, false);
+    this.removeFilterByKey(key);
   }
   if (filters) {
     filters.forEach(function(filter) {
       filter = this._ensureFilter(filter);
-      this.addFilter(filter, false);
+      this.addFilter(filter);
     }, this);
   }
 };

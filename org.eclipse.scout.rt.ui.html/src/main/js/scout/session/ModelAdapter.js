@@ -34,7 +34,6 @@ scout.ModelAdapter = function() {
 
   this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
   this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
-  this.eventFilters = [this._propertyChangeEventFilter, this._widgetEventTypeFilter];
 };
 
 // FIXME CGU [6.1] ev. renamen to RemoteAdapter
@@ -271,6 +270,10 @@ scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   this._send('property', data);
 };
 
+scout.ModelAdapter.prototype.addFilterForWidgetEvent = function(eventType) {
+  this._widgetEventTypeFilter.addFilter(eventType);
+};
+
 scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
   this._widgetEventTypeFilter.addFilterForEventType(eventType);
 };
@@ -284,9 +287,8 @@ scout.ModelAdapter.prototype._isWidgetEventFiltered = function(event) {
 };
 
 scout.ModelAdapter.prototype.resetEventFilters = function() {
-  this.eventFilters.forEach(function(filter) {
-    filter.reset();
-  });
+  this._propertyChangeEventFilter.reset();
+  this._widgetEventTypeFilter.reset();
 };
 
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
