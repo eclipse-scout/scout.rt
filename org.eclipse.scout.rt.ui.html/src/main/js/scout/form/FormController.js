@@ -81,7 +81,7 @@ scout.FormController.prototype.remove = function() {
     this._removeDialog(dialog, false);
   }.bind(this));
   this.displayParent.views.forEach(function(view, position) {
-    this._removeView(view, false, position);
+    this._removeView(view, false);
   }.bind(this));
 };
 
