@@ -49,23 +49,15 @@ scout.TreeNode.prototype._init = function(model) {
 
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
-  // make sure all nodes are TreeNodes
-  for (var i = 0; i < this.childNodes.length; i++) {
-    this._ensureTreeNode(i);
+
+  // make sure all child nodes are TreeNodes too
+  if (this.hasChildNodes()) {
+    this.getTree()._ensureTreeNodes(this.childNodes);
   }
 };
 
-scout.TreeNode.prototype._ensureTreeNode = function(nodeIndex) {
-  var node = this.childNodes[nodeIndex];
-  if (node instanceof scout.TreeNode) {
-    return;
-  }
-  if (!node.objectType) {
-    node.objectType = 'TreeNode';
-  }
-  node.parent = this.parent;
-  scout.defaultValues.applyTo(node);
-  this.childNodes[nodeIndex] = scout.create(node);
+scout.TreeNode.prototype.hasChildNodes = function() {
+  return this.childNodes.length > 0;
 };
 
 scout.TreeNode.prototype.reset = function() {
@@ -134,10 +126,5 @@ scout.TreeNode.prototype.ensureLoadChildren = function() {
 
 scout.TreeNode.prototype._onLoadChildrenDone = function() {
   this._loadChildrenPromise = null;
-};
-
-// FIXME [awe] 6.1 - check why we have TreeNodes instead of Pages in Outline -> ensureTreeNode?
-scout.TreeNode.prototype.activate = function() {
-  // NOP
 };
 

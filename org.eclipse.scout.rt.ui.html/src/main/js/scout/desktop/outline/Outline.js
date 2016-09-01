@@ -73,7 +73,8 @@ scout.Outline.prototype._init = function(model) {
  * @override Tree.js
  */
 scout.Outline.prototype._createTreeNode = function(nodeModel) {
-  return new scout.Page(this);
+  nodeModel.parent = this;
+  return scout.create('Page', nodeModel);
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {

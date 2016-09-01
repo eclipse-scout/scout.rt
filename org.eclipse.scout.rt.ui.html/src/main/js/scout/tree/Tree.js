@@ -79,7 +79,7 @@ scout.Tree.prototype._init = function(model) {
     this.addFilter(this.breadcrumbFilter, true, true);
   }
   this.initialTraversing = true;
-  this.nodes = this._ensureTreeNodes(this.nodes);
+  this._ensureTreeNodes(this.nodes);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   this._visitNodes(this.nodes, this._updateFlatListAndSelectionPath.bind(this));
   this.initialTraversing = false;
@@ -97,25 +97,24 @@ scout.Tree.prototype._init = function(model) {
 };
 
 /**
- * Convert the node model to a TreeNode instance.
+ * Iterates through the given array and converts node-models to instances of scout.TreeNode (or a subclass).
+ * If the array element is already a TreeNode the function leaves the element untouched.
+ *
+ * @param nodes Array of node-models (plain object) or nodes (instance of scout.TreeNode)
  */
-scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
-  var i, nodeModel, treeNode, treeNodes = [];
-  for (i = 0; i < nodeModels.length; i++) {
-    nodeModel = nodeModels[i];
-    if (nodeModel instanceof scout.TreeNode) {
-      treeNode = nodeModel;
-    } else {
-      nodeModel.parent = this; // FIXME [awe] 6.1 ... braucht es das noch? Wir haben ja jetzt ensure auf der TreeNode
-      treeNode = this._createTreeNode(nodeModel);
-      treeNode.init(nodeModel);
+scout.Tree.prototype._ensureTreeNodes = function(nodes) {
+  var i, node;
+  for (i = 0; i < nodes.length; i++) {
+    node = nodes[i];
+    if (node instanceof scout.TreeNode) {
+      continue;
     }
-    treeNodes[i] = treeNode;
+    nodes[i] = this._createTreeNode(node);
   }
-  return treeNodes;
 };
 
 scout.Tree.prototype._createTreeNode = function(nodeModel) {
+  nodeModel.parent = this;
   return scout.create('TreeNode', nodeModel);
 };
 
@@ -1883,7 +1882,7 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
 };
 
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
-  nodes = this._ensureTreeNodes(nodes); // FIXME [awe] 6.1 - wir müssen schauen, wo wir überall das nodeModel in ein TreeNode oder Page konvertieren wollen
+  this._ensureTreeNodes(nodes);
   if (parentNode && !(parentNode instanceof scout.TreeNode)) {
     throw new Error('parent has to be a tree node: ' + parentNode);
   }
