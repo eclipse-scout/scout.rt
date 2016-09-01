@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.CancellationException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.ISession;
@@ -43,6 +45,11 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   }
 
   public Object invokeService(ServiceTunnelRequest request) {
+    final IFuture<?> future = IFuture.CURRENT.get();
+    if (future != null && future.isCancelled()) {
+      throw new CancellationException("Future is already cancelled");
+    }
+
     long t0 = System.nanoTime();
     beforeTunnel(request);
     ServiceTunnelResponse response = tunnel(request);
