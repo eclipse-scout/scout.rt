@@ -135,3 +135,9 @@ scout.TreeNode.prototype.ensureLoadChildren = function() {
 scout.TreeNode.prototype._onLoadChildrenDone = function() {
   this._loadChildrenPromise = null;
 };
+
+// FIXME [awe] 6.1 - check why we have TreeNodes instead of Pages in Outline -> ensureTreeNode?
+scout.TreeNode.prototype.activate = function() {
+  // NOP
+};
+
