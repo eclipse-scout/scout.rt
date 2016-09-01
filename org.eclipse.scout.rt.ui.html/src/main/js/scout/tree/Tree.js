@@ -2350,6 +2350,16 @@ scout.Tree.prototype._isGroupingEnd = function(node) {
   return false;
 };
 
+/**
+ * @returns the first selected node or null when no node is selected.
+ */
+scout.Tree.prototype.selectedNode = function() {
+  if (this.selectedNodes.length === 0) {
+    return null;
+  }
+  return this.selectedNodes[0];
+};
+
 scout.Tree.prototype.$selectedNodes = function() {
   return this.$data.find('.selected');
 };

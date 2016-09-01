@@ -892,6 +892,18 @@ scout.Outline.prototype.acceptView = function(view) {
   return this.session.desktop.outline === this;
 };
 
+// see Java: AbstractOutline#makeActivePageToContextPage
+scout.Outline.prototype.activateCurrentPage = function() {
+  var activePage = this.activePage();
+  if (activePage) {
+    activePage.activate();
+  }
+};
+
+scout.Outline.prototype.activePage = function() {
+  return this.selectedNode();
+};
+
 /**
  * @override Tree.js (don't call parent)
  */
@@ -944,8 +956,9 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
  */
 scout.Outline.prototype._nodesSelectedInternal = function() {
   // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
-  var activePage = this.selectedNodes[0];
+  var activePage = this.activePage();
   if (activePage) {
+    activePage.activate();
     activePage.ensureLoadChildren().done(
       this._onLoadChildrenDone.bind(this, activePage));
   }

@@ -755,6 +755,9 @@ scout.Desktop.prototype.activateForm = function(form) {
 
 scout.Desktop.prototype._setOutlineActivated = function() {
   this._setFormActivated();
+  if (this.outline) {
+    this.outline.activateCurrentPage();
+  }
 };
 
 scout.Desktop.prototype._setFormActivated = function(form) {

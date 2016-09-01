@@ -35,10 +35,13 @@ scout.models = {
   },
 
   get: function(modelId, parent) {
-    if (!parent) {
-      throw new Error('missing argument parent');
-    }
+    scout.objects.mandatoryParameter('parent', parent);
     var model = this.modelMap[modelId];
+    if (!model) {
+      throw new Error('No JSON model defined for modelId=\'' + modelId + '\'. ' +
+          'Check if model .json is listed in your *-module.json ' +
+          'and if modelId matches the filename of the model .json file');
+    }
     model.parent = parent;
     return model;
   }

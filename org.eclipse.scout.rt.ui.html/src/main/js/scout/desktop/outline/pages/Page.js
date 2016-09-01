@@ -115,8 +115,6 @@ scout.Page.prototype._onLoadTableDataDone = function(tableData) {
   if (rows && rows.length > 0) {
     this.detailTable.insertRows(rows);
   }
-  // FIXME [awe] 6.1 - discuss with C.GU, is this the right place?
-  this._ensureDetailForm();
 };
 
 scout.Page.prototype._onLoadTableDataAlways = function() {
@@ -143,6 +141,15 @@ scout.Page.prototype._transformTableDataToTableRows = function(tableData) {
 
 scout.Page.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThrown) {
   $.log.error('Failed to load tableData. error=' + textStatus);
+};
+
+// see Java: AbstractPage#pageActivatedNotify
+scout.Page.prototype.activate = function() {
+  this._ensureDetailForm();
+};
+
+// see Java: AbstractPage#pageDeactivatedNotify
+scout.Page.prototype.deactivate = function() {
 };
 
 /**
