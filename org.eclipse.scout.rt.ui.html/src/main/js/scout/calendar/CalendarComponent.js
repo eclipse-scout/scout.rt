@@ -14,7 +14,7 @@ scout.CalendarComponent = function() {
   /**
    * Selected is a GUI only property (the model doesn't have it)
    */
-  this._selected = false;
+  this.selected = false;
   this._$parts = [];
 };
 scout.inherits(scout.CalendarComponent, scout.Widget);
@@ -161,14 +161,9 @@ scout.CalendarComponent.prototype._renderProperties = function() {
 };
 
 scout.CalendarComponent.prototype._renderSelected = function() {
-  // the rendered check is required because the selected component may be
-  // off-screen. in that case it is not rendered.
-  if (this.rendered) {
-    var selected = this._selected;
-    this._$parts.forEach(function($part) {
-      $part.toggleClass('comp-selected', selected);
-    });
-  }
+  this._$parts.forEach(function($part) {
+    $part.toggleClass('comp-selected', this.selected);
+  }, this);
 };
 
 scout.CalendarComponent.prototype.setSelected = function(selected) {
