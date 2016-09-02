@@ -31,8 +31,14 @@ scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
     lastActionRowIndex = -1,
     newSelectedRows;
 
+  // Last row may be undefined if there is only one row visible in the viewport and this row is bigger than the viewport. In that case just scroll down.
+  // If it already is at the bottom nothing will happen
   if (!viewport.lastRow) {
-    return;
+    table.scrollPageDown();
+    viewport = this._viewportInfo();
+    if (!viewport.lastRow) {
+      return;
+    }
   }
 
   if (lastActionRow) {
@@ -49,9 +55,14 @@ scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
   if (selectedRows.length > 0 && lastActionRow === viewport.lastRow && !(selectedRows.length > 1 && !event.shiftKey)) {
     table.scrollPageDown();
     viewport = this._viewportInfo();
+    if (!viewport.lastRow) {
+      // May happen due to same reason as above -> Row will fill the whole viewport after scrolling
+      return;
+    }
   }
 
   if (event.shiftKey && selectedRows.length > 0) {
+    // Using lastActionRow instead of lastSelectedRow is essential if the user does a multi selection using ctrl and presses shift-pagedown afterwards
     newSelectedRows = rows.slice(lastActionRowIndex + 1, rows.indexOf(viewport.lastRow) + 1);
     newSelectedRows = scout.arrays.union(selectedRows, newSelectedRows);
   } else {
