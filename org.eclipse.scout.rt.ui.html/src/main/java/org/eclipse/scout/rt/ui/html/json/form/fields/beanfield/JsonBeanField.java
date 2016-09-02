@@ -30,7 +30,11 @@ public class JsonBeanField<BEAN_FIELD extends IBeanField<?>> extends JsonValueFi
 
   public JsonBeanField(BEAN_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
-    m_binaryResourceMediator = new BinaryResourceMediator(this);
+    m_binaryResourceMediator = createBinaryResourceMediator();
+  }
+
+  protected BinaryResourceMediator createBinaryResourceMediator() {
+    return new BinaryResourceMediator(this);
   }
 
   @Override

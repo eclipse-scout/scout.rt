@@ -145,7 +145,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     m_tableEventFilter = new TableEventFilter(this);
     m_jsonColumns = new HashMap<IColumn, JsonColumn>();
     m_eventBuffer = model.createEventBuffer();
-    m_binaryResourceMediator = new BinaryResourceMediator(this);
+    m_binaryResourceMediator = createBinaryResourceMediator();
+  }
+
+  protected BinaryResourceMediator createBinaryResourceMediator() {
+    return new BinaryResourceMediator(this);
   }
 
   @Override
