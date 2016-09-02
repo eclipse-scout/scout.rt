@@ -3116,6 +3116,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void resetColumnsInternal(boolean visibility, boolean order, boolean sorting, boolean widths) {
     ClientUIPreferences env = ClientUIPreferences.getInstance();
     env.removeAllTableColumnPreferences(this, visibility, order, sorting, widths);
+    //Order
+    if (order) {
+      TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
+      int index = 0;
+      for (IColumn<?> col : getColumns()) {
+        if (col.isDisplayable()) {
+          orderMap.put(new CompositeObject(col.getViewOrder(), index), col);
+          index++;
+        }
+      }
+      getColumnSet().setVisibleColumns(orderMap.values().toArray(new IColumn[orderMap.size()]));
+    }
 
     //Visibilities
     if (visibility) {
@@ -3130,18 +3142,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       getColumnSet().setVisibleColumns(list.toArray(new IColumn<?>[list.size()]));
     }
-    //Order
-    if (order) {
-      TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
-      int index = 0;
-      for (IColumn<?> col : getColumns()) {
-        if (col.isDisplayable() && col.isVisible()) {
-          orderMap.put(new CompositeObject(col.getViewOrder(), index), col);
-          index++;
-        }
-      }
-      getColumnSet().setVisibleColumns(orderMap.values().toArray(new IColumn[orderMap.size()]));
-    }
+
     //Sorting
     if (sorting) {
       TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
