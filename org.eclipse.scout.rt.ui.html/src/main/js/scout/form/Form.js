@@ -130,9 +130,10 @@ scout.Form.prototype.close = function() {
 };
 
 scout.Form.prototype._postRender = function() {
+  scout.Form.parent.prototype._postRender.call(this);
+
   this.trigger('rendered');
   this._installFocusContext();
-
   if (this.renderInitialFocusEnabled) {
     this.renderInitialFocus();
   }

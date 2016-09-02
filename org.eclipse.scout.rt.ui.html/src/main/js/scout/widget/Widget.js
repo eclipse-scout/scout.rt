@@ -31,6 +31,8 @@ scout.Widget = function() {
   // This expects a css animation which may be triggered by the class 'removed'
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval;
+
+  this._postRenderActions = [];
 };
 
 scout.Widget.prototype.init = function(options) {
@@ -115,9 +117,14 @@ scout.Widget.prototype._renderProperties = function() {
 
 /**
  * Method invoked once rendering completed and 'rendered' flag is set to 'true'.
+ * By default executes every action of this._postRenderActions
  */
 scout.Widget.prototype._postRender = function() {
-  // NOP
+  var actions = this._postRenderActions;
+  this._postRenderActions = [];
+  actions.forEach(function(action) {
+    action();
+  });
 };
 
 scout.Widget.prototype.remove = function() {
@@ -442,6 +449,10 @@ scout.Widget.prototype._attach = function(event) {
  * widgets, because when a DOM element is detached - child elements are not notified
  */
 scout.Widget.prototype.detach = function() {
+  if (this.rendering) {
+    // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
+    this._postRenderActions.push(this.detach.bind(this));
+  }
   if (!this.attached || !this.rendered || this._isRemovalPending()) {
     return;
   }

@@ -119,6 +119,8 @@ scout.Desktop.prototype._remove = function() {
 };
 
 scout.Desktop.prototype._postRender = function() {
+  scout.Desktop.parent.prototype._postRender.call(this);
+
   // Render attached forms, message boxes and file choosers.
   this.initialFormRendering = true;
   this.formController.render();

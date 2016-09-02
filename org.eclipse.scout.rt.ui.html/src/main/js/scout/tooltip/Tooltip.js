@@ -105,6 +105,7 @@ scout.Tooltip.prototype._render = function($parent) {
 };
 
 scout.Tooltip.prototype._postRender = function() {
+  scout.Tooltip.parent.prototype._postRender.call(this);
   this.position();
 };
 

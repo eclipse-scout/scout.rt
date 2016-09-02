@@ -113,6 +113,7 @@ scout.MessageBox.prototype._render = function($parent) {
 };
 
 scout.MessageBox.prototype._postRender = function() {
+  scout.MessageBox.parent.prototype._postRender.call(this);
   this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 

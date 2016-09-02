@@ -86,6 +86,7 @@ scout.BusyIndicator.prototype._onClickCancel = function(event) {
 };
 
 scout.BusyIndicator.prototype._postRender = function() {
+  scout.BusyIndicator.parent.prototype._postRender.call(this);
   this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 
