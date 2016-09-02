@@ -225,11 +225,22 @@ describe('Desktop', function() {
 
   describe('geolocation', function() {
 
-    var browserImpl = navigator.geolocation.getCurrentPosition;
+    var browserImpl;
+    if (!navigator.geolocation) {
+      navigator.geolocation = {
+        getCurrentPosition: function() {}
+      };
+    }
+    browserImpl = navigator.geolocation.getCurrentPosition;
 
     beforeEach(function() {
       navigator.geolocation.getCurrentPosition = function(success, error) {
-        success({coords:{latitude:1,longitude:1}});
+        success({
+          coords: {
+            latitude: 1,
+            longitude: 1
+          }
+        });
       };
       jasmine.Ajax.install();
     });
@@ -237,11 +248,11 @@ describe('Desktop', function() {
     it('asks the browser for its geographic location', function() {
       expect(scout.device.supportsGeolocation()).toBe(true);
       var message = {
-          events: [{
-            target: session.desktop.id,
-            type: 'requestGeolocation'
-          }]
-        };
+        events: [{
+          target: session.desktop.id,
+          type: 'requestGeolocation'
+        }]
+      };
       linkWidgetAndAdapter(session.desktop, 'DesktopAdapter');
       session._processSuccessResponse(message);
       sendQueuedAjaxCalls();
