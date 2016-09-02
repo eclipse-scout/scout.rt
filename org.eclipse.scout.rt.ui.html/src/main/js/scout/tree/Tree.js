@@ -1061,8 +1061,7 @@ scout.Tree.prototype._renderSelection = function() {
   }, this);
 
   if (this.scrollToSelection) {
-    // Execute delayed because tree may be not layouted yet
-    setTimeout(this.revealSelection.bind(this));
+    this.revealSelection();
   }
   // TODO [6.1] CGU remove this, it does way too much and renderNodeText prevents that tree can get focus when a node is clicked. It seems that it is only necessary to update the group css class
   this._redecorateViewRange();
@@ -1763,6 +1762,12 @@ scout.Tree.prototype.scrollTo = function(node) {
 };
 
 scout.Tree.prototype.revealSelection = function() {
+  if (!this.rendered) {
+    // Execute delayed because table may be not layouted yet
+    this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
+    return;
+  }
+
   if (this.selectedNodes.length > 0) {
     if (!this.visibleNodesMap[this.selectedNodes[0].id]) {
       this._expandAllParentNodes(this.selectedNodes[0]);
@@ -2764,6 +2769,11 @@ scout.Tree.prototype._onContextMenu = function(event) {
 };
 
 scout.Tree.prototype._onRequestFocus = function() {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onRequestFocus.bind(this));
+    return;
+  }
+
   this.session.focusManager.requestFocus(this.$container);
 };
 

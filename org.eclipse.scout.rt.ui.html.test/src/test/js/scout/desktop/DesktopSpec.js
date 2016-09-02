@@ -55,6 +55,28 @@ describe('Desktop', function() {
       expect(desktop.$notification).not.toBe(null);
     });
 
+    it('schedules addNotification when desktop is not rendered', function() {
+      desktop.remove();
+      desktop._onAddNotification({
+        target: desktop.id,
+        type: 'addNotification',
+        duration: 3000,
+        status: {
+          severity: scout.Status.Severity.OK,
+          message: 'Test'
+        },
+        closable: true
+      });
+      expect(desktop.notifications.length).toBe(0);
+      expect(desktop.session.$entryPoint.find('.notifications').length).toBe(0);
+      expect(desktop._postRenderActions.length).toBe(1);
+
+      desktop.render(desktop.session.$entryPoint);
+      expect(desktop.notifications.length).toBe(1);
+      expect(desktop.$container.find('.notifications').length).toBe(1);
+      expect(desktop._postRenderActions.length).toBe(0);
+    });
+
     it('removeNotification with object', function() {
       spyOn(ntfc, 'fadeOut');
       desktop.addNotification(ntfc); // first add -> create $notifications DIV

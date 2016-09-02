@@ -36,8 +36,6 @@ scout.Table = function(model) {
   this._animationRowLimit = 25;
   this._blockLoadThreshold = 25;
   this.menuBar;
-  this._renderRowsInProgress = false;
-  this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
@@ -265,8 +263,7 @@ scout.Table.prototype._render = function($parent) {
   this._updateRowHeight();
   this._renderViewport();
   if (this.scrollToSelection) {
-    // Execute delayed because table may be not layouted yet
-    setTimeout(this.revealSelection.bind(this));
+    this.revealSelection();
   }
 };
 
@@ -2272,6 +2269,12 @@ scout.Table.prototype.setScrollTop = function(scrollTop) {
 };
 
 scout.Table.prototype.revealSelection = function() {
+  if (!this.rendered) {
+    // Execute delayed because table may be not layouted yet
+    this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
+    return;
+  }
+
   if (this.selectedRows.length > 0) {
     this.scrollTo(this.selectedRows[0]);
   }
@@ -3738,12 +3741,22 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onStartCellEdit.bind(this, columnId, rowId, fieldId));
+    return;
+  }
+
   var column = this._columnById(columnId),
     row = this._rowById(rowId);
   this._startCellEdit(column, row, fieldId);
 };
 
 scout.Table.prototype._onEndCellEdit = function(fieldId) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onEndCellEdit.bind(this, fieldId));
+    return;
+  }
+
   var field = this.session.getModelAdapter(fieldId);
   //the cellEditorPopup could already be removed by scrolling(out of view range) or be removed by update rows
   if (this.cellEditorPopup) {
@@ -3756,6 +3769,11 @@ scout.Table.prototype._onEndCellEdit = function(fieldId) {
 };
 
 scout.Table.prototype._onRequestFocus = function() {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onRequestFocus.bind(this));
+    return;
+  }
+
   this.session.focusManager.requestFocus(this.$container);
 };
 
@@ -3773,6 +3791,11 @@ scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
 };
 
 scout.Table.prototype._onRequestFocusInCell = function(event) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onRequestFocusInCell.bind(this, event));
+    return;
+  }
+
   var row = this._rowById(event.rowId),
     column = this._columnById(event.columnId),
     cell = this.cell(column, row);
@@ -3809,16 +3832,6 @@ scout.Table.prototype._onColumnActionsChanged = function(event) {
 };
 
 scout.Table.prototype.onModelAction = function(event) {
-  // _renderRows() might not have drawn all rows yet, therefore postpone the
-  // execution of this method to prevent conflicts on the row objects.
-  if (this._renderRowsInProgress) {
-    var that = this;
-    setTimeout(function() {
-      that.onModelAction(event);
-    }, 0);
-    return;
-  }
-
   if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
   } else if (event.type === 'rowsDeleted') {

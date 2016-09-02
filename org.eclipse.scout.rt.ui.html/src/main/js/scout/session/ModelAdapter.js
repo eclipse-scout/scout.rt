@@ -339,6 +339,20 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
 };
 
 /**
+ * Called by Session.js for every event from the model
+ */
+scout.ModelAdapter.prototype.onModelEvent = function(event) {
+  if (!event) {
+    return;
+  }
+  if (event.type === 'property') { // Special handling for 'property' type
+    this.onModelPropertyChange(event);
+  } else {
+    this.onModelAction(event);
+  }
+};
+
+/**
  * Processes the JSON event from the server and sets dynamically properties on the adapter (-model)
  * and calls the right function to update the UI. For each property a corresponding function-name
  * must exist (property-name 'myValue', function-name 'setMyValue').

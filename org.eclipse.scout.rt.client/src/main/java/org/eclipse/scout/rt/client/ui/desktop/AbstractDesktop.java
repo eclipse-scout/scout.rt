@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.deeplink.OutlineDeepLinkHandler;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DefaultDesktopEventHistory;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopDefaultViewChain;
@@ -50,6 +51,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -127,6 +129,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktop.class);
 
+  private IEventHistory<DesktopEvent> m_eventHistory;
   private final IDesktopExtension m_localDesktopExtension;
   private List<IDesktopExtension> m_desktopExtensions;
   private final EventListenerList m_listenerList;
@@ -185,6 +188,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         interceptInitConfig();
       }
     });
+  }
+
+  protected IEventHistory<DesktopEvent> createEventHistory() {
+    return new DefaultDesktopEventHistory(5000L);
+  }
+
+  @Override
+  public IEventHistory<DesktopEvent> getEventHistory() {
+    return m_eventHistory;
   }
 
   @Override
@@ -542,6 +554,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void initConfig() {
+    m_eventHistory = createEventHistory();
+    // add convenience observer for event history
+    addDesktopListener(new DesktopListener() {
+      @Override
+      public void desktopChanged(DesktopEvent e) {
+        IEventHistory<DesktopEvent> h = getEventHistory();
+        if (h != null) {
+          h.notifyEvent(e);
+        }
+      }
+    });
+
     BEANS.get(IDeviceTransformationService.class).install(this);
     initDesktopExtensions();
     setTitle(getConfiguredTitle());

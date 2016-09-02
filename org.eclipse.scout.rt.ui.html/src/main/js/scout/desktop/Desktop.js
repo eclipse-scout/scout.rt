@@ -941,6 +941,11 @@ scout.Desktop.prototype._onFileChooserHide = function(event) {
 };
 
 scout.Desktop.prototype._onOpenUri = function(event) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onOpenUri.bind(this, event));
+    return;
+  }
+
   $.log.debug('(Desktop#_onOpenUri) uri=' + event.uri + ' action=' + event.action);
   if (!event.uri) {
     return;
@@ -971,10 +976,19 @@ scout.Desktop.prototype._onOutlineChanged = function(event) {
 };
 
 scout.Desktop.prototype._onOutlineContentActivate = function(event) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onOutlineContentActivate.bind(this, event));
+    return;
+  }
   this.bringOutlineToFront();
 };
 
 scout.Desktop.prototype._onAddNotification = function(event) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onAddNotification.bind(this, event));
+    return;
+  }
+
   scout.create('DesktopNotification', {
     parent: this,
     id: event.id,
@@ -985,6 +999,11 @@ scout.Desktop.prototype._onAddNotification = function(event) {
 };
 
 scout.Desktop.prototype._onRemoveNotification = function(event) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this._onRemoveNotification.bind(this, event));
+    return;
+  }
+
   this.removeNotification(event.id);
 };
 

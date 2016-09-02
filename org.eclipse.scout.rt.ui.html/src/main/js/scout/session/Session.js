@@ -1155,12 +1155,7 @@ scout.Session.prototype._processEvents = function(events) {
     eventTargets = [adapter];
     scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
     for (j = 0; j < eventTargets.length; j++) {
-      var target = eventTargets[j];
-      if (event.type === 'property') { // Special handling for 'property' type
-        target.onModelPropertyChange(event);
-      } else {
-        target.onModelAction(event);
-      }
+      eventTargets[j].onModelEvent(event);
     }
   }
   this.currentEvent = null;
@@ -1176,7 +1171,7 @@ scout.Session.prototype.start = function() {
   this._sendStartupRequest();
 };
 
-scout.Session.prototype.onModelAction = function(event) {
+scout.Session.prototype.onModelEvent = function(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);
   } else if (event.type === 'logout') {

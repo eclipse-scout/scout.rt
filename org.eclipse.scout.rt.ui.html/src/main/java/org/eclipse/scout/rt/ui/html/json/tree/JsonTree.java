@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -100,6 +101,23 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   @Override
   public String getObjectType() {
     return "Tree";
+  }
+
+  @Override
+  public void init() {
+    super.init();
+
+    // Replay missed events
+    IEventHistory<TreeEvent> eventHistory = getModel().getEventHistory();
+    if (eventHistory != null) {
+      for (TreeEvent event : eventHistory.getRecentEvents()) {
+        // Immediately execute events (no buffering), because this method is not called
+        // from the model but from the JSON layer. If Response.toJson() is in progress,
+        // adding this adapter to the list of buffered event providers would cause
+        // an exception.
+        processBufferedEvent(event);
+      }
+    }
   }
 
   @Override
@@ -610,11 +628,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleModelRequestFocus(TreeEvent event) {
-    addActionEvent(EVENT_REQUEST_FOCUS);
+    addActionEvent(EVENT_REQUEST_FOCUS).protect();
   }
 
   protected void handleModelScrollToSelection(TreeEvent event) {
-    addActionEvent(EVENT_SCROLL_TO_SELECTION);
+    addActionEvent(EVENT_SCROLL_TO_SELECTION).protect();
   }
 
   @Override

@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -49,6 +52,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
   private static final String EVENT_FORM_ACTIVATED = "formActivated";
   private static final String EVENT_HISTORY_ENTRY_ACTIVATED = "historyEntryActivated";
+  private static final String EVENT_ADD_NOTIFICATION = "addNotification";
+  private static final String EVENT_REMOVE_NOTIFICATION = "removeNotification";
+  private static final String EVENT_OPEN_URI = "openUri";
+  private static final String EVENT_FORM_ACTIVATE = "formActivate";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -176,6 +183,19 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
     getModel().removeDesktopListener(m_desktopListener);
     m_desktopListener = null;
+  }
+
+  @Override
+  public void init() {
+    super.init();
+
+    // Replay missed events
+    IEventHistory<DesktopEvent> eventHistory = getModel().getEventHistory();
+    if (eventHistory != null) {
+      for (DesktopEvent event : eventHistory.getRecentEvents()) {
+        handleModelDesktopEvent(event);
+      }
+    }
   }
 
   @Override
@@ -338,12 +358,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   protected void handleModelNotificationAdded(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
-    addActionEvent("addNotification", JsonDesktopNotification.toJson(notification));
+    addActionEvent(EVENT_ADD_NOTIFICATION, JsonDesktopNotification.toJson(notification)).protect();
   }
 
   protected void handleModelNotificationRemoved(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
-    addActionEvent("removeNotification", JsonDesktopNotification.toNotificationIdJson(notification));
+    addActionEvent(EVENT_REMOVE_NOTIFICATION, JsonDesktopNotification.toNotificationIdJson(notification)).protect();
   }
 
   @Override
@@ -357,7 +377,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     JSONObject json = new JSONObject();
     putProperty(json, "uri", uri);
     putProperty(json, "action", openUriAction.getIdentifier());
-    addActionEvent("openUri", json);
+    addActionEvent(EVENT_OPEN_URI, json).protect();
   }
 
   protected void handleModelOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
@@ -393,12 +413,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelOutlineContentActivate() {
-    addActionEvent(EVENT_OUTLINE_CONTENT_ACTIVATE);
+    addActionEvent(EVENT_OUTLINE_CONTENT_ACTIVATE).protect();
   }
 
   protected void handleModelFormShow(IForm form) {
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
-    //if form is dialog form.getViews(getDisplayParent()).indexOf(form) retunrs -1 -> position is not sent to UI
+    // if form is dialog form.getViews(getDisplayParent()).indexOf(form) returns -1 -> position is not sent to UI
     addActionEventForEachDisplayParentAdapter("formShow", PROP_FORM, jsonAdapter, form.getDisplayParent(), getModel().getViews(form.getDisplayParent()).indexOf(form));
   }
 
@@ -412,7 +432,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   protected void handleModelFormActivate(IForm form) {
     IJsonAdapter<?> jsonAdapter = getGlobalAdapter(form);
     if (jsonAdapter != null) {
-      addActionEventForEachDisplayParentAdapter("formActivate", PROP_FORM, jsonAdapter, form.getDisplayParent(), -1);
+      List<JsonEvent> events = addActionEventForEachDisplayParentAdapter(EVENT_FORM_ACTIVATE, PROP_FORM, jsonAdapter, form.getDisplayParent(), -1);
+      for (JsonEvent event : events) {
+        event.protect();
+      }
     }
   }
 
@@ -445,7 +468,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     // when the JsonClientSession is disposed.
   }
 
-  protected void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent, int position) {
+  protected List<JsonEvent> addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent, int position) {
+    List<JsonEvent> events = new ArrayList<>();
     for (IJsonAdapter<IDisplayParent> displayParentAdapter : getUiSession().getJsonAdapters(displayParent)) {
       JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(propModelAdapterId, modelAdapter.getId());
@@ -455,8 +479,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       }
       // Add modelAdapter as "referenced adapter" to event (to remove event when
       // modelAdapter is disposed but desktop is not)
-      addActionEvent(eventName, modelAdapter, jsonEvent);
+      events.add(addActionEvent(eventName, modelAdapter, jsonEvent));
     }
+    return events;
   }
 
   protected class P_DesktopListener implements DesktopListener {

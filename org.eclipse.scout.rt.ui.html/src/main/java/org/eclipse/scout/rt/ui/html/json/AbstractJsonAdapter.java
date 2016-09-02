@@ -316,23 +316,25 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return json.put(key, value);
   }
 
-  protected final void addActionEvent(String eventName) {
-    addActionEvent(eventName, null);
+  protected final JsonEvent addActionEvent(String eventName) {
+    return addActionEvent(eventName, null);
   }
 
-  protected final void addActionEvent(String eventName, JSONObject eventData) {
-    addActionEvent(eventName, null, eventData);
+  protected final JsonEvent addActionEvent(String eventName, JSONObject eventData) {
+    return addActionEvent(eventName, null, eventData);
   }
 
-  protected final void addActionEvent(String eventName, IJsonAdapter referenceAdapter, JSONObject eventData) {
+  protected final JsonEvent addActionEvent(String eventName, IJsonAdapter referenceAdapter, JSONObject eventData) {
+    JsonEvent event = null;
     if (referenceAdapter == null) {
-      getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
+      event = getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
       LOG.debug("Added action event '{}' for {} with id {}. Model: {}", eventName, getObjectType(), getId(), getModel());
     }
     else {
-      getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, referenceAdapter.getId(), eventData);
+      event = getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, referenceAdapter.getId(), eventData);
       LOG.debug("Added action event '{}' for {} with id {} and reference {}. Model: {}", eventName, getObjectType(), getId(), referenceAdapter.getId(), getModel());
     }
+    return event;
   }
 
   protected final void registerAsBufferedEventsAdapter() {
@@ -347,15 +349,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * Like {@link #addActionEvent(String, JSONObject)} but if there are already action events for the same event in the
    * current response, all existing events are removed before adding the new event.
    */
-  protected final void replaceActionEvent(String eventName, JSONObject eventData) {
-    getUiSession().currentJsonResponse().replaceActionEvent(getId(), eventName, eventData);
+  protected final JsonEvent replaceActionEvent(String eventName, JSONObject eventData) {
+    return getUiSession().currentJsonResponse().replaceActionEvent(getId(), eventName, eventData);
   }
 
-  protected void addPropertyChangeEvent(String propertyName, Object newValue) {
+  protected JsonEvent addPropertyChangeEvent(String propertyName, Object newValue) {
     if (newValue instanceof IJsonAdapter<?>) {
       throw new IllegalArgumentException("Cannot pass an adapter instance to a JSON response");
     }
-    getUiSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, newValue);
+    return getUiSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, newValue);
   }
 
   @Override

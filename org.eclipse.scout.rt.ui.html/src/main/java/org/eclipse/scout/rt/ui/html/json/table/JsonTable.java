@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -146,6 +147,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   public String getObjectType() {
     return "Table";
+  }
+
+  @Override
+  public void init() {
+    super.init();
+
+    // Replay missed events
+    IEventHistory<TableEvent> eventHistory = getModel().getEventHistory();
+    if (eventHistory != null) {
+      for (TableEvent event : eventHistory.getRecentEvents()) {
+        // Immediately execute events (no buffering), because this method is not called
+        // from the model but from the JSON layer. If Response.toJson() is in progress,
+        // adding this adapter to the list of buffered event providers would cause
+        // an exception.
+        processEvent(event, false);
+      }
+    }
   }
 
   @Override
@@ -696,7 +714,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     json.put("columnId", event.getData().getString(PROP_COLUMN_ID));
     json.put("rowId", event.getData().getString(PROP_ROW_ID));
     json.put("fieldId", jsonField.getId());
-    addActionEvent(EVENT_START_CELL_EDIT, json);
+    addActionEvent(EVENT_START_CELL_EDIT, json).protect();
   }
 
   protected void handleUiCompleteCellEdit(JsonEvent event) {
@@ -723,7 +741,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     // TODO [5.2] cgu: maybe optimize by adding a filter for disposed adapters
     JSONObject json = new JSONObject();
     json.put("fieldId", jsonField.getId());
-    addActionEvent(EVENT_END_CELL_EDIT, json);
+    addActionEvent(EVENT_END_CELL_EDIT, json).protect();
 
     //FIXME cgu: feld merken, revert bei toJson für page reload
     jsonField.dispose();
@@ -1281,11 +1299,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelRequestFocus(TableEvent event) {
-    addActionEvent(EVENT_REQUEST_FOCUS);
+    addActionEvent(EVENT_REQUEST_FOCUS).protect();
   }
 
   protected void handleModelScrollToSelection(TableEvent event) {
-    addActionEvent(EVENT_SCROLL_TO_SELECTION);
+    addActionEvent(EVENT_SCROLL_TO_SELECTION).protect();
   }
 
   protected void handleModelUserFilterChanged(TableEvent event) {
@@ -1327,7 +1345,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROW_ID, getOrCreatedRowId(event.getRows().iterator().next()));
     putProperty(jsonEvent, PROP_COLUMN_ID, getColumnId(event.getColumns().iterator().next()));
-    addActionEvent(EVENT_REQUEST_FOCUS_IN_CELL, jsonEvent);
+    addActionEvent(EVENT_REQUEST_FOCUS_IN_CELL, jsonEvent).protect();
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
