@@ -352,7 +352,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
       return null;
     }
     BinaryResource binaryResource = getBinaryResource();
-    if (binaryResource != null && binaryResource.getFilename().equals(filename)) {
+    if (binaryResource != null && CompareUtility.equals(binaryResource.getFilename(), filename)) {
       return binaryResource;
     }
     Set<BinaryResource> attachments = getAttachments();
