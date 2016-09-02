@@ -289,6 +289,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   }.bind(this);
 
   // upload content function, if content can not be read from event
+  // (e.g. "Allow programmatic clipboard access" is disabled in IE)
   var uploadContentFunction = function() {
     // store old inner html (will be replaced)
     scout.scrollbars.uninstall(this.$field, this.session);
@@ -300,8 +301,8 @@ scout.ClipboardField.prototype._onPaste = function(event) {
         parent: this
       });
     }.bind(this);
-
     setTimeout(function() {
+      var imgElementsFound = false;
       this.$field.children().each(function(idx, elem) {
         if (elem.nodeName === 'IMG') {
           var srcAttr = $(elem).attr('src');
@@ -319,10 +320,24 @@ scout.ClipboardField.prototype._onPaste = function(event) {
             });
             f.name = '';
             filesArgument.push(f);
+            imgElementsFound = true;
           }
         }
       });
-      restoreOldHtmlContent();
+      if (imgElementsFound) {
+        restoreOldHtmlContent();
+      } else {
+        // try to read nativly pasted text from field
+        var nativePasteContent = this.$field.text();
+        if (scout.strings.hasText(nativePasteContent)) {
+          this._renderDisplayText(nativePasteContent);
+          filesArgument.push(new Blob([nativePasteContent], {
+            type: scout.mimeTypes.TEXT_PLAIN
+          }));
+        } else {
+          restoreOldHtmlContent();
+        }
+      }
       uploadFunction();
     }.bind(this), 0);
   }.bind(this);
