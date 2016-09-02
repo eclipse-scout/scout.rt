@@ -12,3 +12,7 @@ scout.GroupBoxGridCell = function(field, data) {
   this.field = field;
   this.data = data;
 };
+
+scout.GroupBoxGridCell.prototype.isEmpty = function() {
+  return !this.field;
+};

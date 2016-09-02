@@ -70,6 +70,28 @@ describe("GroupBoxBodyGrid01", function() {
       // field04
       scout.GroupBoxSpecHelper.assertGridData(1, 2, 1, 1, this.fields[3].gridData);
     });
+
+
+    it('test vertical smart layout', function() {
+      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      grid.validate(this.groupBox);
+
+      // group box
+      expect(grid.getGridRowCount()).toEqual(3);
+      expect(grid.getGridColumnCount()).toEqual(2);
+
+      // field01
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 1, 1, this.fields[0].gridData);
+
+      // field02
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 1, 2, this.fields[1].gridData);
+
+      // field03
+      scout.GroupBoxSpecHelper.assertGridData(1, 0, 1, 2, this.fields[2].gridData);
+
+      // field04
+      scout.GroupBoxSpecHelper.assertGridData(1, 2, 1, 1, this.fields[3].gridData);
+    });
   });
 
 });

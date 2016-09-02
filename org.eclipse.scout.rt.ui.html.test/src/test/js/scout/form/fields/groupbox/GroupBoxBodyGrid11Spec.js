@@ -8,6 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/**
+ * Reference implementation javadoc:
+ *
+ * <h4>Vertical</h4>
+ *
+ * <pre>
+ * ---------------------------
+ *    Group01   |   Group01
+ * ---------------------------
+ *    Group02   |   Group03
+ * ---------------------------
+ *    Group04   |   Group04
+ * ---------------------------
+ * </pre>
+ *
+ * <h4>Horizontal</h4>
+ *
+ * <pre>
+ * ---------------------------
+ *    Group01   |   Group01
+ * ---------------------------
+ *    Group02   |   Group03
+ * ---------------------------
+ *    Group04   |   Group04
+ * ---------------------------
+ * </pre>
+ *
+ * @author Andreas Hoegger
+ * @since 4.0.0 M6 13.03.2014
+ */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout11Test
 describe("GroupBoxBodyGrid11", function() {
   var session;
@@ -69,6 +99,27 @@ describe("GroupBoxBodyGrid11", function() {
   describe('group box layout 11', function() {
     it('test horizontal layout', function() {
       var grid = new scout.HorizontalGroupBoxBodyGrid();
+      grid.validate(this.groupBox);
+
+      // group box
+      expect(grid.getGridRowCount()).toEqual(3);
+      expect(grid.getGridColumnCount()).toEqual(2);
+
+      // field01
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
+
+      // field02
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 1, 1, this.fields[1].gridData);
+
+      // field03
+      scout.GroupBoxSpecHelper.assertGridData(1, 1, 1, 1, this.fields[2].gridData);
+
+      // field04
+      scout.GroupBoxSpecHelper.assertGridData(0, 2, 2, 1, this.fields[3].gridData);
+    });
+
+    it('test vertical smart layout', function() {
+      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
       grid.validate(this.groupBox);
 
       // group box

@@ -8,6 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/**
+ * Javadoc:
+ *
+ * Field01 has a width of 3 columns in a group box of only 2 columns. <br>
+ * <h4>Vertical</h4>
+ *
+ * <pre>
+ * ---------------------------
+ *    Field01   |   Field01       Field01
+ * ---------------------------
+ *    Field02   |   Field03
+ * ---------------------------
+ * </pre>
+ *
+ * <h4>Horizontal</h4>
+ *
+ * <pre>
+ * ---------------------------
+ *    Field01   |   Field01       Field01
+ * ---------------------------
+ *    Field02   |   Field03
+ * ---------------------------
+ * </pre>
+ *
+ * @author Andreas Hoegger
+ * @since 4.0.0 M6 25.02.2014
+ */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout0100Test
 describe("GroupBoxBodyGrid03", function() {
   var session;
@@ -49,6 +76,24 @@ describe("GroupBoxBodyGrid03", function() {
   describe('group box layout 0100', function() {
     it('test horizontal layout', function() {
       var grid = new scout.HorizontalGroupBoxBodyGrid();
+      grid.validate(this.groupBox);
+
+      // group box
+      expect(grid.getGridRowCount()).toEqual(2);
+      expect(grid.getGridColumnCount()).toEqual(2);
+
+      // field01
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
+
+      // field02
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 1, 1, this.fields[1].gridData);
+
+      // field03
+      scout.GroupBoxSpecHelper.assertGridData(1, 1, 1, 1, this.fields[2].gridData);
+    });
+
+    it('test vertical smart layout', function() {
+      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
       grid.validate(this.groupBox);
 
       // group box

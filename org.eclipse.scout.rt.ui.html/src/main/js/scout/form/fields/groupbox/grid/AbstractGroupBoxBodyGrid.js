@@ -85,3 +85,12 @@ scout.AbstractGroupBoxBodyGrid.prototype._computeGridColumnCount = function(grou
   } while (gridColumns < 0 && (tmp = tmp.getParentGroupBox()));
   return gridColumns < 0 ? 2 : gridColumns;
 };
+
+/**
+ * if grid w greater than group box column count. Grid w will be set to group box column count.
+ */
+scout.AbstractGroupBoxBodyGrid.getGridDataFromHints = function(field, groupBoxColumnCount) {
+  var data = scout.GridData.createFromHints(field, groupBoxColumnCount);
+  data.w = Math.min(groupBoxColumnCount, data.w);
+  return data;
+};

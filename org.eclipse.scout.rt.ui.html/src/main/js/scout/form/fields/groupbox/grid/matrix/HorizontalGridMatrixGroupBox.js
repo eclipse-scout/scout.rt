@@ -9,37 +9,28 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.HorizontalGridMatrixGroupBox = function(columnCount) {
-  this.columnCount = columnCount;
-  this.rowCount = 0;
+  scout.HorizontalGridMatrixGroupBox.parent.call(this, new scout.GroupBoxGridMatrixCursor(0, 0, columnCount, Number.MAX_SAFE_INTEGER, scout.GroupBoxGridMatrixCursor.HORIZONTAL));
 
-  // helper
-  this._cursor = new scout.GroupBoxGridMatrixCursor(0, 0, columnCount, Number.MAX_SAFE_INTEGER, scout.GroupBoxGridMatrixCursor.HORIZONTAL);
-  this._assignedCells = [];
+  this.rowCount = 0;
 };
+scout.inherits(scout.HorizontalGridMatrixGroupBox, scout.AbstractGridMatrixGroupBox);
 
 scout.HorizontalGridMatrixGroupBox.prototype.computeGridData = function(fields) {
   fields.forEach(function(field) {
-    var hints = scout.GridData.createFromHints(field, this.columnCount);
+    var hints = scout.GridData.createFromHints(field, this.getColumnCount());
     var gridData = new scout.GridData(hints);
-    gridData.w = Math.min(hints.w, this.columnCount);
+    gridData.w = Math.min(hints.w, this.getColumnCount());
     this._add(field, hints, gridData);
     field.gridData = gridData;
   }.bind(this));
+  this._cursor.rowCount = this.rowCount;
   return true;
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype.getRowCount = function() {
-  return this.rowCount;
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype.getColumnCount = function() {
-  return this.columnCount;
 };
 
 scout.HorizontalGridMatrixGroupBox.prototype._add = function(field, hints, data) {
   this._nextFree(data.w, data.h);
   var currentIndex = this._cursor.currentIndex();
-  if (data.w <= (this.columnCount - currentIndex.x)) {
+  if (data.w <= (this.getColumnCount() - currentIndex.x)) {
     data.x = currentIndex.x;
     data.y = currentIndex.y;
     // add field
@@ -57,58 +48,4 @@ scout.HorizontalGridMatrixGroupBox.prototype._add = function(field, hints, data)
     this._setAssignedCell(this._cursor.currentIndex(), new scout.GroupBoxGridCell());
     this._add(field, hints, data);
   }
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype._nextFree = function(w, h) {
-  this._cursor.increment();
-  var currentIndex = this._cursor.currentIndex();
-  if (!this._isAllCellFree(currentIndex.x, currentIndex.y, w, h)) {
-    if (!this._getAssignedCell(currentIndex)) {
-      this._setAssignedCell(currentIndex, new scout.GroupBoxGridCell());
-    }
-    this._nextFree(w, h);
-  }
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype._setAssignedCell = function(index, val) {
-  if (!this._assignedCells[index.x]) {
-    this._assignedCells[index.x] = [];
-  }
-  this._assignedCells[index.x][index.y] = val;
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype._getAssignedCell = function(index) {
-  if (!this._assignedCells[index.x]) {
-    return null;
-  }
-  return this._assignedCells[index.x][index.y];
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype._isAllCellFree = function(x, y, w, h) {
-  if (x + w > this.getColumnCount()) {
-    return false;
-  }
-  return this._assignedCells.slice(x, x + w).every(function(valX) {
-    return (valX || []).slice(y, y + h).every(function(valY) {
-      return !valY;
-    }.bind(this));
-  }.bind(this));
-};
-
-scout.HorizontalGridMatrixGroupBox.prototype.toString = function() {
-  var ret = "----Horizontal Grid Matrix [columnCount=" + this.getColumnCount() + ",rowCount=" + this.getRowCount() + "]--------------\n";
-  var tempCursor = new scout.GroupBoxGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), scout.GroupBoxGridMatrixCursor.HORIZONTAL);
-  while (tempCursor.increment()) {
-    var cell = this._getAssignedCell(tempCursor.currentIndex());
-    ret += "cell[" + tempCursor.currentIndex().x + ", " + tempCursor.currentIndex().y + "] ";
-    if (!cell) {
-      ret += "NULL";
-    } else if (!cell.field) {
-      ret += "Placeholder";
-    } else {
-      ret += cell.field;
-    }
-    ret += "\n";
-  }
-  return ret;
 };

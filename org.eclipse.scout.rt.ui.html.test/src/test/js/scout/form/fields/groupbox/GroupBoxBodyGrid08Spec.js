@@ -8,6 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/**
+ * Reference implementation javadoc:
+ *
+ * <h4>Vertical</h4>
+ *
+ * <pre>
+ * -------------------------------------------------------
+ *    Group01   |   Group01   |   Group05   |   Group05
+ * -------------------------------------------------------
+ *    Group02   |   Group02   |   Group06   |
+ * -------------------------------------------------------
+ *    Group03   |   Group03   |   Group07   |   Group07
+ * -------------------------------------------------------
+ *    Group04   |   Group04   |             |
+ * -------------------------------------------------------
+ * </pre>
+ *
+ * <h4>Horizontal</h4>
+ *
+ * <pre>
+ * -------------------------------------------------------
+ *    Group01   |   Group01   |   Group02   |   Group02
+ * -------------------------------------------------------
+ *    Group03   |   Group03   |   Group04   |   Group04
+ * -------------------------------------------------------
+ *    Group06   |   Group05   |   Group06   |
+ * -------------------------------------------------------
+ *    Group07   |   Group07   |             |
+ * -------------------------------------------------------
+ * </pre>
+ *
+ * @author Andreas Hoegger
+ * @since 4.0.0 M6 25.02.2014
+ */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout08Test
 describe("GroupBoxBodyGrid08", function() {
   var session;
@@ -130,6 +164,36 @@ describe("GroupBoxBodyGrid08", function() {
 
       // field07
       scout.GroupBoxSpecHelper.assertGridData(0, 3, 2, 1, this.fields[6].gridData);
+    });
+
+    it('test vertical smart layout', function() {
+      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      grid.validate(this.groupBox);
+
+      // group box
+      expect(grid.getGridRowCount()).toEqual(4);
+      expect(grid.getGridColumnCount()).toEqual(4);
+
+      // field01
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
+
+      // field02
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 2, 1, this.fields[1].gridData);
+
+      // field03
+      scout.GroupBoxSpecHelper.assertGridData(0, 2, 2, 1, this.fields[2].gridData);
+
+      // field04
+      scout.GroupBoxSpecHelper.assertGridData(0, 3, 2, 1, this.fields[3].gridData);
+
+      // field05
+      scout.GroupBoxSpecHelper.assertGridData(2, 0, 2, 1, this.fields[4].gridData);
+
+      // field06
+      scout.GroupBoxSpecHelper.assertGridData(2, 1, 1, 1, this.fields[5].gridData);
+
+      // field07
+      scout.GroupBoxSpecHelper.assertGridData(2, 2, 2, 1, this.fields[6].gridData);
     });
   });
 

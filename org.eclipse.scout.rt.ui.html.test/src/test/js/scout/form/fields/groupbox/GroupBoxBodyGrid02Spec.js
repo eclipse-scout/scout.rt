@@ -9,6 +9,36 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test
+/**
+ * Javadoc:
+ *
+ * <h4>Vertical</h4>
+ *
+ * <pre>
+ * -----------------------------------------
+ *    Field01   |   Field02   |   Field05
+ * -----------------------------------------
+ *    Field03   |   Field03   |
+ * -----------------------------------------
+ *    Field04   |   Field06   |   Field06
+ * -----------------------------------------
+ * </pre>
+ *
+ * <h4>Horizontal</h4>
+ *
+ * <pre>
+ * -----------------------------------------
+ *    Field01   |   Field02   |
+ * -----------------------------------------
+ *    Field03   |   Field03   |   Field04
+ * -----------------------------------------
+ *    Field05   |   Field06   |   Field06
+ * -----------------------------------------
+ * </pre>
+ *
+ * @author Andreas Hoegger
+ * @since 4.0.0 M6 25.02.2014
+ */
 describe("GroupBoxBodyGrid02", function() {
   var session;
 
@@ -86,6 +116,33 @@ describe("GroupBoxBodyGrid02", function() {
 
       // field05
       scout.GroupBoxSpecHelper.assertGridData(0, 2, 1, 1, this.fields[4].gridData);
+
+      // field06
+      scout.GroupBoxSpecHelper.assertGridData(1, 2, 2, 1, this.fields[5].gridData);
+    });
+
+    it('test vertical smart layout', function() {
+      var grid = new scout.VerticalSmartGroupBoxBodyGrid();
+      grid.validate(this.groupBox);
+
+      // group box
+      expect(grid.getGridRowCount()).toEqual(3);
+      expect(grid.getGridColumnCount()).toEqual(3);
+
+      // field01
+      scout.GroupBoxSpecHelper.assertGridData(0, 0, 1, 1, this.fields[0].gridData);
+
+      // field02
+      scout.GroupBoxSpecHelper.assertGridData(1, 0, 1, 1, this.fields[1].gridData);
+
+      // field03
+      scout.GroupBoxSpecHelper.assertGridData(0, 1, 2, 1, this.fields[2].gridData);
+
+      // field04
+      scout.GroupBoxSpecHelper.assertGridData(0, 2, 1, 1, this.fields[3].gridData);
+
+      // field05
+      scout.GroupBoxSpecHelper.assertGridData(2, 0, 1, 1, this.fields[4].gridData);
 
       // field06
       scout.GroupBoxSpecHelper.assertGridData(1, 2, 2, 1, this.fields[5].gridData);

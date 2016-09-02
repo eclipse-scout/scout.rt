@@ -362,9 +362,12 @@
   __include("scout/form/fields/groupbox/GroupBoxMenuItemsOrder.js");
   __include("scout/form/fields/groupbox/grid/AbstractGroupBoxBodyGrid.js");
   __include("scout/form/fields/groupbox/grid/HorizontalGroupBoxBodyGrid.js");
+  __include("scout/form/fields/groupbox/grid/VerticalSmartGroupBoxBodyGrid.js");
+  __include("scout/form/fields/groupbox/grid/matrix/AbstractGridMatrixGroupBox.js");
   __include("scout/form/fields/groupbox/grid/matrix/GroupBoxGridCell.js");
-  __include("scout/form/fields/groupbox/grid/matrix/HorizontalGridMatrixGroupBox.js");
   __include("scout/form/fields/groupbox/grid/matrix/GroupBoxGridMatrixCursor.js");
+  __include("scout/form/fields/groupbox/grid/matrix/HorizontalGridMatrixGroupBox.js");
+  __include("scout/form/fields/groupbox/grid/matrix/VerticalGridMatrixGroupBox.js");
   __include("scout/form/fields/htmlfield/HtmlField.js");
   __include("scout/form/fields/htmlfield/HtmlFieldAdapter.js");
   __include("scout/form/fields/imagefield/ImageField.js");
