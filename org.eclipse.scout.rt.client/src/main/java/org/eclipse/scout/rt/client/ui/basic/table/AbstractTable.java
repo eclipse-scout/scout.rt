@@ -3490,6 +3490,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void resetColumnsInternal(Set<String> options) {
 
+    if (options.contains(IResetColumnsOption.ORDER)) {
+      TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
+      int index = 0;
+      for (IColumn<?> col : getColumns()) {
+        if (col.isDisplayable()) {
+          orderMap.put(new CompositeObject(col.getOrder(), index), col);
+          index++;
+        }
+      }
+      getColumnSet().setVisibleColumns(orderMap.values());
+    }
+
     if (options.contains(IResetColumnsOption.VISIBILITY)) {
       ArrayList<IColumn<?>> list = new ArrayList<IColumn<?>>();
       for (IColumn<?> col : getColumnSet().getAllColumnsInUserOrder()) {
@@ -3501,18 +3513,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
       getColumnSet().setVisibleColumns(list);
-    }
-
-    if (options.contains(IResetColumnsOption.ORDER)) {
-      TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
-      int index = 0;
-      for (IColumn<?> col : getColumns()) {
-        if (col.isDisplayable() && col.isVisible()) {
-          orderMap.put(new CompositeObject(col.getOrder(), index), col);
-          index++;
-        }
-      }
-      getColumnSet().setVisibleColumns(orderMap.values());
     }
 
     if (options.contains(IResetColumnsOption.SORTING)) {
