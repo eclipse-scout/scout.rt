@@ -31,8 +31,14 @@ scout.TableNavigationPageUpKeyStroke.prototype.handle = function(event) {
     lastActionRowIndex = -1,
     newSelectedRows;
 
+  // First row may be undefined if there is only one row visible in the viewport and this row is bigger than the viewport. In that case just scroll up.
+  // If it already is at the top nothing will happen
   if (!viewport.firstRow) {
-    return;
+    table.scrollPageUp();
+    viewport = this._viewportInfo();
+    if (!viewport.firstRow) {
+      return;
+    }
   }
 
   if (lastActionRow) {
@@ -49,6 +55,10 @@ scout.TableNavigationPageUpKeyStroke.prototype.handle = function(event) {
   if (selectedRows.length > 0 && lastActionRow === viewport.firstRow && !(selectedRows.length > 1 && !event.shiftKey)) {
     table.scrollPageUp();
     viewport = this._viewportInfo();
+    if (!viewport.firstRow) {
+      // May happen due to same reason as above -> Row will fill the whole viewport after scrolling
+      return;
+    }
   }
 
   if (event.shiftKey && selectedRows.length > 0) {
