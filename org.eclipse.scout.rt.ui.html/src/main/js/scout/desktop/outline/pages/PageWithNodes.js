@@ -64,17 +64,19 @@ scout.PageWithNodes.prototype._loadTableData = function() {
  * @override TreeNode.js
  */
 scout.PageWithNodes.prototype.loadChildren = function() {
-  var childPages = this._createChildPages();
-  if (childPages.length > 0) {
-    this.getOutline().insertNodes(childPages, this);
-  }
-  return this.loadTableData();
+  return this._createChildPages().done(function(childPages) {
+    if (childPages.length > 0) {
+      this.getOutline().insertNodes(childPages, this);
+    }
+    this.loadTableData();
+  }.bind(this));
 };
 
 /**
  * Override this method to create child pages for this page. The default impl. returns an empty array.
- * @returns Array of child pages
+ * @return jQuery.Deferred
  */
 scout.PageWithNodes.prototype._createChildPages = function() {
-  return [];
+  return $.resolvedDeferred();
 };
+
