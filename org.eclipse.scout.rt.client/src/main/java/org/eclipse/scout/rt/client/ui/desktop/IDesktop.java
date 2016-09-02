@@ -18,9 +18,11 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DefaultDesktopEventHistory;
 import org.eclipse.scout.rt.client.ui.Coordinates;
+import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
+import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -787,6 +789,17 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
   boolean isHeaderVisible();
 
   /**
+   * @return the {@link IEventHistory} associated with this desktop (may be <code>null</code>).
+   *         <p>
+   *         The default implementation is a {@link DefaultDesktopEventHistory} and created by
+   *         {@link AbstractDesktop#createEventHistory()}
+   *         <p>
+   *         This method is thread safe.
+   * @since 6.0
+   */
+  IEventHistory<DesktopEvent> getEventHistory();
+
+  /**
    * @since 6.1
    */
   boolean isGeolocationServiceAvailable();
@@ -800,5 +813,4 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
    * @since 6.1
    */
   Future<Coordinates> requestGeolocation();
-
 }

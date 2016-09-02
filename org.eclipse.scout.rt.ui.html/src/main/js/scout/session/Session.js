@@ -711,6 +711,8 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     this._copyAdapterData(message.adapterData);
   }
 
+
+
   if (message.events) {
     this.processingEvents = true;
     try {
@@ -1137,24 +1139,38 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
 };
 
 scout.Session.prototype._processEvents = function(events) {
-  var i, j, event, adapter, eventTargets;
-  for (i = 0; i < events.length; i++) {
-    event = events[i];
+  var i = 0;
+  while (i < events.length) {
+    var event = events[i];
     this.currentEvent = event;
 
-    $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
-    adapter = this.getModelAdapter(event.target);
+    var adapter = this.getModelAdapter(event.target);
     if (!adapter) {
-      throw new Error('No adapter registered for ID ' + event.target);
+      // Sometimes events seem to happen "too early", e.g. when a "requestFocus" event for a field is
+      // encountered before the "showForm" event has been processed. If the target adapter cannot be
+      // resolved, we try the other events first, expecting them to trigger the creation of the event
+      // adapter. As soon as a event could be processed successfully, we try our postponed event again.
+      $.log.debug("Postponing '" + event.type + "' for adapter with ID " + event.target);
+      i++;
+      continue;
     }
-    if (event.type === 'property') { // Special handling for 'property' type
-      adapter.onModelPropertyChange(event);
-    } else {
-      adapter.onModelAction(event);
-    }
+    // Remove the successful event and reset the pointer to the start of the remaining events (to
+    // retry previously postponed events).
+    events.splice(i, 1);
+    i = 0;
+
+    $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
+    adapter.onModelEvent(event);
     adapter.resetEventFilters();
   }
   this.currentEvent = null;
+
+  // If there are still events whose target could not be resolved, throw an error
+  if (events.length) {
+    throw new Error('Could not resolve event targets: [' + events.map(function(el) {
+      return '"' + el.target + '"';
+    }).join(', ') + ']');
+  }
 };
 
 scout.Session.prototype.start = function() {
@@ -1170,7 +1186,7 @@ scout.Session.prototype.start = function() {
 // FIXME [awe] 6.1 : discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
 // guess we need a SessionAdapter.js - I noticed this in a jasmine test where _processEvents is called an the adapter is the Session
 // (event.type=disposeAdapter), also see resetEventFilters method
-scout.Session.prototype.onModelAction = function(event) {
+scout.Session.prototype.onModelEvent = function(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);
   } else if (event.type === 'logout') {

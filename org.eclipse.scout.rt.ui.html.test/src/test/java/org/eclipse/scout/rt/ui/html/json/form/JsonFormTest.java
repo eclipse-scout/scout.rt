@@ -90,8 +90,9 @@ public class JsonFormTest {
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
     assertFalse(JsonResponseTest.getAdapterData(m_uiSession.currentJsonResponse()).isEmpty());
-    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
-    assertEquals("formShow", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
+    assertEquals(2, m_uiSession.currentJsonResponse().getEventList().size());
+    assertEquals("requestFocus", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
+    assertEquals("formShow", m_uiSession.currentJsonResponse().getEventList().get(1).getType());
 
     JsonTestUtility.endRequest(m_uiSession);
 

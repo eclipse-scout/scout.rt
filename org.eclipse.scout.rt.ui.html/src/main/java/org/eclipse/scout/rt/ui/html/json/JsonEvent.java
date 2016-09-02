@@ -24,6 +24,7 @@ public class JsonEvent implements IJsonObject {
   private final String m_type;
   private final String m_reference;
   private final JSONObject m_data;
+  private volatile boolean m_protected;
 
   /**
    * @param target
@@ -82,6 +83,20 @@ public class JsonEvent implements IJsonObject {
 
   public JSONObject getData() {
     return m_data;
+  }
+
+  /**
+   * @return true if the event is "protected", i.e. it will not be removed by {@link JsonResponse#toJson()}.
+   */
+  public boolean isProtected() {
+    return m_protected;
+  }
+
+  /**
+   * Marks the event as "protected", i.e. it will not be removed by {@link JsonResponse#toJson()}.
+   */
+  public void protect() {
+    m_protected = true;
   }
 
   public static JsonEvent fromJson(JSONObject json) {

@@ -1149,6 +1149,11 @@ scout.Widget.prototype.getWidgetById = function(widgetId) {
 };
 
 scout.Widget.prototype.requestFocus = function() {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.requestFocus.bind(this));
+    return;
+  }
+
   this.session.focusManager.requestFocus(this.$container);
 };
 

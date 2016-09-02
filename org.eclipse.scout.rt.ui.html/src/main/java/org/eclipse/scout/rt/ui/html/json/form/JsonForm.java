@@ -64,6 +64,19 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   }
 
   @Override
+  public void init() {
+    super.init();
+
+    // Replay missed events
+    IEventHistory<FormEvent> eventHistory = getModel().getEventHistory();
+    if (eventHistory != null) {
+      for (FormEvent event : eventHistory.getRecentEvents()) {
+        handleModelFormChanged(event);
+      }
+    }
+  }
+
+  @Override
   protected void initJsonProperties(FORM model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IForm>(PROP_TITLE, model) {
@@ -232,6 +245,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_FORM_FIELD, formFieldAdapter.getId());
+    // TODO [6.0] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
     addActionEvent(EVENT_REQUEST_FOCUS, jsonEvent);
   }
 

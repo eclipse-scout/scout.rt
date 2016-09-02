@@ -555,6 +555,11 @@ scout.Desktop.prototype.hideOfflineMessage = function() {
 };
 
 scout.Desktop.prototype.addNotification = function(notification) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.addNotification.bind(this, notification));
+    return;
+  }
+
   if (!notification) {
     return;
   }
@@ -573,6 +578,11 @@ scout.Desktop.prototype.addNotification = function(notification) {
  * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
  */
 scout.Desktop.prototype.removeNotification = function(notification) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.removeNotification.bind(this, notification));
+    return;
+  }
+
   if (typeof notification === 'string') {
     var notificationId = notification;
     notification = scout.arrays.find(this.notifications, function(n) {
@@ -604,8 +614,17 @@ scout.Desktop.prototype.destroyPopupsFor = function(widget) {
 };
 
 scout.Desktop.prototype.openUri = function(uri, action) {
-  action = action || 'open';
+  if (!this.rendered) {
+    this._postRenderActions.push(this.openUri.bind(this, uri, action));
+    return;
+  }
+
   $.log.debug('(Desktop#openUri) uri=' + uri + ' action=' + action);
+  if (!uri) {
+    return;
+  }
+  action = action || 'open';
+
   if (action === 'download') {
     if (scout.device.isIos()) {
       // The iframe trick does not work for ios
@@ -652,6 +671,11 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function() {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.bringOutlineToFront.bind(this));
+    return;
+  }
+
   if (!this.inBackground || this.displayStyle === scout.Desktop.DisplayStyle.BENCH) {
     return;
   }

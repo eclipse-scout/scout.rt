@@ -102,6 +102,19 @@ public class JsonResponseTest {
     resp.addAdapter(mockAdapter);
     json = resp.toJson();
     assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
+
+    // protected action events must be preserved, event when the corresponding adapter is in m_adapterMap
+    resp.addActionEvent(mockAdapter.getId(), "normalEvent");
+    resp.addActionEvent(mockAdapter.getId(), "protectedEvent").protect();
+    json = resp.toJson();
+    assertNotNull(json.optJSONArray(JsonResponse.PROP_EVENTS));
+    assertEquals(1, json.optJSONArray(JsonResponse.PROP_EVENTS).length());
+    assertEquals("protectedEvent", json.optJSONArray(JsonResponse.PROP_EVENTS).getJSONObject(0).getString("type"));
+
+    // protected events must be removed when the adapter is removed
+    resp.removeJsonAdapter(mockAdapter.getId());
+    json = resp.toJson();
+    assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
   }
 
   public static Map<String, IJsonAdapter<?>> getAdapterData(JsonResponse jsonResponse) {

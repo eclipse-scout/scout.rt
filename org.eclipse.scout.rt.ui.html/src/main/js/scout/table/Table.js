@@ -50,8 +50,6 @@ scout.Table = function() {
   this._animationRowLimit = 25;
   this._blockLoadThreshold = 25;
   this.menuBar;
-  this._renderRowsInProgress = false;
-  this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this.$container;
@@ -283,8 +281,7 @@ scout.Table.prototype._render = function($parent) {
   this._updateRowHeight();
   this._renderViewport();
   if (this.scrollToSelection) {
-    // Execute delayed because table may be not layouted yet
-    setTimeout(this.revealSelection.bind(this));
+    this.revealSelection();
   }
 };
 
@@ -2140,6 +2137,11 @@ scout.Table.prototype._removeCellEditorForRow = function(row) {
 };
 
 scout.Table.prototype.startCellEdit = function(column, row, field) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.startCellEdit.bind(this, column, row, field));
+    return;
+  }
+
   this.ensureRowRendered(row);
   var popup = column.startCellEdit(row, field);
   this.cellEditorPopup = popup;
@@ -2147,6 +2149,11 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
 };
 
 scout.Table.prototype.endCellEdit = function(field) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.endCellEdit.bind(this, field));
+    return;
+  }
+
   // the cellEditorPopup could already be removed by scrolling(out of view range) or be removed by update rows
   if (this.cellEditorPopup) {
     // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
@@ -2185,6 +2192,12 @@ scout.Table.prototype.setScrollTop = function(scrollTop) {
 };
 
 scout.Table.prototype.revealSelection = function() {
+  if (!this.rendered) {
+    // Execute delayed because table may be not layouted yet
+    this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
+    return;
+  }
+
   if (this.selectedRows.length > 0) {
     this.scrollTo(this.selectedRows[0]);
   }
@@ -3565,6 +3578,11 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
 };
 
 scout.Table.prototype.requestFocusInCell = function(column, row) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.requestFocusInCell.bind(this, column, row));
+    return;
+  }
+
   var cell = this.cell(column, row);
   if (this.enabled && row.enabled && cell.editable) {
     this.prepareCellEdit(column, row, true);

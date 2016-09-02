@@ -361,6 +361,20 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
 };
 
 /**
+ * Called by Session.js for every event from the model
+ */
+scout.ModelAdapter.prototype.onModelEvent = function(event) {
+  if (!event) {
+    return;
+  }
+  if (event.type === 'property') { // Special handling for 'property' type
+    this.onModelPropertyChange(event);
+  } else {
+    this.onModelAction(event);
+  }
+};
+
+/**
  * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {

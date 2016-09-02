@@ -130,9 +130,6 @@ scout.DesktopAdapter.prototype._onFileChooserHide = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onOpenUri = function(event) {
-  if (!event.uri) {
-    return;
-  }
   this.widget.openUri(event.uri, event.action);
 };
 

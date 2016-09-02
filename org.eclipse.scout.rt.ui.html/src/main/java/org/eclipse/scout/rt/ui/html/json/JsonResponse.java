@@ -100,7 +100,7 @@ public class JsonResponse {
    * @param newValue
    *          property value
    */
-  public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
+  public JsonEvent addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     // coalesce
     JsonEvent event = m_idToPropertyChangeEventMap.get(id);
     if (event == null) {
@@ -116,18 +116,21 @@ public class JsonResponse {
     }
     // Add special NULL object for null values to preserve them in the resulting JSON string
     props.put(propertyName, (newValue == null ? JSONObject.NULL : newValue));
+    return event;
   }
 
-  public void addActionEvent(String eventTarget, String eventType) {
-    addActionEvent(eventTarget, eventType, null);
+  public JsonEvent addActionEvent(String eventTarget, String eventType) {
+    return addActionEvent(eventTarget, eventType, null);
   }
 
   /**
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
-  public void addActionEvent(String eventTarget, String eventType, JSONObject eventData) {
-    m_eventList.add(new JsonEvent(eventTarget, eventType, eventData));
+  public JsonEvent addActionEvent(String eventTarget, String eventType, JSONObject eventData) {
+    JsonEvent event = new JsonEvent(eventTarget, eventType, eventData);
+    m_eventList.add(event);
+    return event;
   }
 
   /**
@@ -138,15 +141,17 @@ public class JsonResponse {
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
-  public void addActionEvent(String eventTarget, String eventType, String eventReference, JSONObject eventData) {
-    m_eventList.add(new JsonEvent(eventTarget, eventType, eventReference, eventData));
+  public JsonEvent addActionEvent(String eventTarget, String eventType, String eventReference, JSONObject eventData) {
+    JsonEvent event = new JsonEvent(eventTarget, eventType, eventReference, eventData);
+    m_eventList.add(event);
+    return event;
   }
 
   /**
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
-  public void replaceActionEvent(String eventTarget, String eventType, JSONObject eventData) {
+  public JsonEvent replaceActionEvent(String eventTarget, String eventType, JSONObject eventData) {
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
       // Same target and same type --> remove existing event
@@ -155,7 +160,7 @@ public class JsonResponse {
         it.remove();
       }
     }
-    addActionEvent(eventTarget, eventType, eventData);
+    return addActionEvent(eventTarget, eventType, eventData);
   }
 
   /**
@@ -326,7 +331,7 @@ public class JsonResponse {
    * Example: NodesInserted event on tree must not be sent since the same nodes are already sent by Tree.toJson.
    */
   protected boolean doAddEvent(JsonEvent event) {
-    if (m_adapterMap.containsKey(event.getTarget())) {
+    if (m_adapterMap.containsKey(event.getTarget()) && !event.isProtected()) {
       return false;
     }
     return true;
