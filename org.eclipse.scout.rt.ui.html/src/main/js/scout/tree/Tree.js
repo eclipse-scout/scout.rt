@@ -318,6 +318,7 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype._postRender = function() {
+  scout.Tree.parent.prototype._postRender.call(this);
   this._renderSelection();
 };
 

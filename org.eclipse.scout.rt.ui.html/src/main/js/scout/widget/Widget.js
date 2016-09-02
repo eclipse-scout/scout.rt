@@ -88,7 +88,7 @@ scout.Widget.prototype._init = function(model) {
 };
 
 /**
- * Loads a JSON model from *-module.json. The ID of the model to load must be equals 
+ * Loads a JSON model from *-module.json. The ID of the model to load must be equals
  * to the model.objectType property. Optional additional model properties are added
  * to the JSON model. You should call this function in your Widget#_init function.
  *
@@ -216,10 +216,11 @@ scout.Widget.prototype._renderProperties = function() {
  * By default executes every action of this._postRenderActions
  */
 scout.Widget.prototype._postRender = function() {
-  this._postRenderActions.forEach(function(action) {
+  var actions = this._postRenderActions;
+  this._postRenderActions = [];
+  actions.forEach(function(action) {
     action();
   });
-  this._postRenderActions = [];
 };
 
 scout.Widget.prototype.remove = function() {

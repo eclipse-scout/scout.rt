@@ -151,6 +151,7 @@ scout.FileChooser.prototype._render = function($parent) {
 };
 
 scout.FileChooser.prototype._postRender = function() {
+  scout.FileChooser.parent.prototype._postRender.call(this);
   this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 

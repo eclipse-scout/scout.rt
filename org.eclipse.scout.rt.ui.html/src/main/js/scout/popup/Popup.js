@@ -124,6 +124,8 @@ scout.Popup.prototype._render = function($parent) {
 };
 
 scout.Popup.prototype._postRender = function() {
+  scout.Popup.parent.prototype._postRender.call(this);
+
   this.size();
   this._attachCloseHandler();
   scout.scrollbars.update(this.$body);
