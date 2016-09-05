@@ -313,7 +313,9 @@ public class JmsMomImplementor implements IMomImplementor {
   @Override
   public void destroy() {
     try {
-      m_connection.close();
+      if (m_connection != null) {
+        m_connection.close();
+      }
     }
     catch (final JMSException e) {
       LOG.error("Failed to destory MOM", e);
