@@ -38,7 +38,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
   private List<T> m_buffer = new LinkedList<>();
   private T m_lastAddedEvent = null;
 
-  protected List<T> getBufferInternal() {
+  public List<T> getBufferInternal() {
     return m_buffer;
   }
 

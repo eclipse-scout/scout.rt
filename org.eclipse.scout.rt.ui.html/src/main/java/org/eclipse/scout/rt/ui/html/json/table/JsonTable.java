@@ -161,7 +161,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         // from the model but from the JSON layer. If Response.toJson() is in progress,
         // adding this adapter to the list of buffered event providers would cause
         // an exception.
-        processEvent(event, false);
+        processEvent(event);
       }
     }
   }
@@ -1013,45 +1013,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void bufferModelEvent(TableEvent event) {
     switch (event.getType()) {
-      case TableEvent.TYPE_ROW_FILTER_CHANGED: {
-        // Convert the "filter changed" event to a ROWS_DELETED and a ROWS_INSERTED event. This prevents sending unnecessary
-        // data to the UI. We convert the event before adding it to the event buffer to allow coalescing on UI-level.
-        // NOTE: This may lead to a temporary inconsistent situation, where row events exist in the buffer after the
-        // row itself is deleted. This is because the row is not really deleted from the model. However, when processing
-        // the buffered events, the "wrong" events will be ignored and everything is fixed again.
-        List<ITableRow> rowsToInsert = new ArrayList<>();
-        List<ITableRow> rowsToDelete = new ArrayList<>();
-        for (ITableRow row : getModel().getRows()) {
-          String existingRowId = getTableRowId(row);
-          if (row.isFilterAccepted()) {
-            if (existingRowId == null) {
-              // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
-              rowsToInsert.add(row);
-            }
-          }
-          else if (!row.isRejectedByUser()) {
-            if (existingRowId != null) {
-              // Row is filtered, but JsonTable has it in its list --> handle as deletion event
-              rowsToDelete.add(row);
-            }
-          }
-        }
-        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_DELETED, rowsToDelete));
-        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, rowsToInsert));
-        break;
-      }
       case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
-        m_eventBuffer.add(event);
-
-        // Resend filters because a column with a filter may got invisible (since the gui does not know invisible columns, the filter would fail).
-        // Also necessary because column ids have changed.
-        if (getModel().getUserFilterManager() != null && getModel().getUserFilterManager().getFilters().size() > 0) {
-          m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_USER_FILTER_ADDED));
-        }
-
-        // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
-        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
-        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, getModel().getRows()));
+        bufferColumnStructureChanged(event);
         break;
       }
       default: {
@@ -1060,32 +1023,78 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
+  protected void bufferColumnStructureChanged(TableEvent event) {
+    m_eventBuffer.add(event);
+
+    // Resend filters because a column with a filter may got invisible (since the gui does not know invisible columns, the filter would fail).
+    // Also necessary because column ids have changed.
+    if (getModel().getUserFilterManager() != null && getModel().getUserFilterManager().getFilters().size() > 0) {
+      m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_USER_FILTER_ADDED));
+    }
+
+    // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
+    m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
+    m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, getModel().getRows()));
+  }
+
+  protected void preprocessBufferedEvents() {
+    List<TableEvent> bufferInternal = m_eventBuffer.getBufferInternal();
+    for (int i = 0; i < bufferInternal.size(); i++) {
+      TableEvent event = bufferInternal.get(i);
+      if (event.getType() != TableEvent.TYPE_ROW_FILTER_CHANGED) {
+        continue;
+      }
+
+      // Convert the "filter changed" event to a ROWS_DELETED and a ROWS_INSERTED event. This prevents sending unnecessary
+      // data to the UI. We convert the event before adding it to the event buffer to allow coalescing on UI-level.
+      // NOTE: This may lead to a temporary inconsistent situation, where row events exist in the buffer after the
+      // row itself is deleted. This is because the row is not really deleted from the model. However, when processing
+      // the buffered events, the "wrong" events will be ignored and everything is fixed again.
+      List<ITableRow> rowsToInsert = new ArrayList<>();
+      List<ITableRow> rowsToDelete = new ArrayList<>();
+      for (ITableRow row : getModel().getRows()) {
+        String existingRowId = getTableRowId(row);
+        if (row.isFilterAccepted()) {
+          if (existingRowId == null) {
+            // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
+            rowsToInsert.add(row);
+          }
+        }
+        else if (!row.isRejectedByUser()) {
+          if (existingRowId != null) {
+            // Row is filtered, but JsonTable has it in its list --> handle as deletion event
+            rowsToDelete.add(row);
+          }
+        }
+      }
+
+      // Put at the same position as the row_filter_changed event (replace it) to keep the order of multiple insert events
+      bufferInternal.set(i, new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, rowsToInsert));
+
+      // Make sure no previous event contains the newly inserted rows
+      for (int j = i - 1; j >= 0; j--) {
+        bufferInternal.get(j).removeRows(rowsToInsert);
+      }
+
+      // Put at the beginning to make sure no subsequent event contains the deleted row
+      bufferInternal.add(0, new TableEvent(getModel(), TableEvent.TYPE_ROWS_DELETED, rowsToDelete));
+      i++;
+    }
+  }
+
   @Override
   public void processBufferedEvents() {
     if (m_eventBuffer.isEmpty()) {
       return;
     }
+    preprocessBufferedEvents();
     List<TableEvent> coalescedEvents = m_eventBuffer.consumeAndCoalesceEvents();
-    boolean ignoreAccepted = containsInsertOrDelete(coalescedEvents);
     for (TableEvent event : coalescedEvents) {
-      processEvent(event, ignoreAccepted);
+      processEvent(event);
     }
   }
 
-  protected boolean containsInsertOrDelete(List<TableEvent> events) {
-    boolean rowOrderChangedFound = false;
-    for (TableEvent event : events) {
-      if (TableEvent.TYPE_ROW_ORDER_CHANGED == event.getType()) {
-        rowOrderChangedFound = true;
-      }
-      else if (rowOrderChangedFound && (TableEvent.TYPE_ROWS_INSERTED == event.getType() || TableEvent.TYPE_ROWS_DELETED == event.getType())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  protected void processEvent(TableEvent event, boolean ignoreAccepted) {
+  protected void processEvent(TableEvent event) {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED:
         handleModelRowsInserted(event.getRows());
@@ -1103,7 +1112,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         handleModelRowsSelected(event.getRows());
         break;
       case TableEvent.TYPE_ROW_ORDER_CHANGED:
-        handleModelRowOrderChanged(event.getRows(), ignoreAccepted);
+        handleModelRowOrderChanged(event.getRows());
         break;
       case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
         handleModelColumnStructureChanged();
@@ -1239,15 +1248,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
   }
 
-  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows, boolean ignoreAccepted) {
-    // Note: when a insert or delete event is in the event-buffer, we must preserve the chronological
-    // order of the events. That's why we can not always check isRowAccepted() since this only looks
-    // at the current (final) state of the row and not on the state the JavaScript UI has. Without this
-    // flag, Table.js would throw an error because the number of rows in the event differs from the
-    // number of rows in the (JS-) model.
+  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (ignoreAccepted || isRowAccepted(row)) {
+      if (isRowAccepted(row)) {
         jsonRowIds.put(getTableRowId(row));
       }
     }
