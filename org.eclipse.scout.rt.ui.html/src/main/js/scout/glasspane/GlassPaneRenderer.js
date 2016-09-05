@@ -87,7 +87,7 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
   }
 
   var parent = this._element.displayParent || this.session.desktop; // use Desktop if no parent set.
-  if (!parent) {
+  if (!parent || !parent.rendered) {
     return []; // No parent, e.g. during startup to display fatal errors.
   }
 
