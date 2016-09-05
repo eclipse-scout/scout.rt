@@ -89,14 +89,16 @@ scout.Widget.prototype._init = function(model) {
 
 /**
  * Loads a JSON model from *-module.json. The ID of the model to load must be equals
- * to the model.objectType property. Optional additional model properties are added
+ * to the given modelId. Optional additional model properties are added
  * to the JSON model. You should call this function in your Widget#_init function.
  *
- * @param parent
- * @param (optional) additional model properties to be merged into the loaded JSON model
+ * @param modelId ID to lookup the model definition in the models.json. You should use
+ *    the class name of the class that uses this function as model ID
+ * @param model additional model properties to be merged into the loaded JSON model,
+ *     must have a property 'parent'
  */
-scout.Widget.prototype._loadJsonModel = function(model) {
-  var jsonModel = scout.models.get(model.objectType, model.parent);
+scout.Widget.prototype._loadJsonModel = function(modelId, model) {
+  var jsonModel = scout.models.get(modelId, model.parent);
   if (!jsonModel) {
     jsonModel = {};
   }
