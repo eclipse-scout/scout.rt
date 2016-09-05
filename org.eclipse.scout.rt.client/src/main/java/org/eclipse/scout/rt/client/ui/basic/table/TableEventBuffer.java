@@ -69,7 +69,6 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     // previous events may be deleted from the list
     final Set<Integer> typesToDelete = new HashSet<>();
     final Set<Integer> typesToClear = new HashSet<>();
-    final Set<ITableRow> rowsToRemove = new HashSet<>();
     final Set<Integer> rowRelatedEventTypes = getRowRelatedEvents();
     final List<DeletedRowsRemover> deletedRowsRemoverList = new LinkedList<>();
 
@@ -99,9 +98,6 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       if (typesToClear.contains(type)) {
         event.clearRows();
       }
-      else if (rowRelatedEventTypes.contains(type)) {
-        event.removeRows(rowsToRemove, null);
-      }
 
       if (type == TableEvent.TYPE_ALL_ROWS_DELETED) {
         // remove all row related events from the given event list if the event type requires rows. If the event type is row
@@ -126,9 +122,6 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       else if (isIgnorePrevious(type)) {
         // remove all previous events of the same type
         typesToDelete.add(type);
-      }
-      else if (type == TableEvent.TYPE_ROWS_INSERTED) {
-        rowsToRemove.addAll(event.getRows());
       }
       else if (type == TableEvent.TYPE_ROWS_DELETED && event.hasRows()) {
         deletedRowsRemoverList.add(new DeletedRowsRemover(event));
@@ -675,8 +668,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     }
 
     public void removeDeletedRows(TableEvent event) {
-      // never remove rows from a previous row order changed / checked event. Even when the row is deleted later,
-      // the UI expects the row to be still available at the point where the row order / checked state is changed.
+      // never remove rows from a previous row order changed event. Even when the row is deleted later,
+      // the UI expects the row to be still available at the point where the row order state is changed.
       if (TableEvent.TYPE_ROW_ORDER_CHANGED != event.getType()) {
         ensureInitialized();
         event.removeRows(m_rowsToRemove, event.getType() == TableEvent.TYPE_ROWS_INSERTED ? m_removedRowsCollector : null);

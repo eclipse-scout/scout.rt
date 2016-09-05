@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -222,16 +221,14 @@ public class TableEventBufferTest {
    */
   @Test
   public void testCombineOnlyConsecutiveUpdates() {
-    final TableEvent e1 = createTestUpdateEvent();
-    m_testBuffer.add(e1);
-    m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_INSERTED, 1));
-    final TableEvent e2 = createTestUpdateEvent();
-    m_testBuffer.add(e2);
+    m_testBuffer.add(new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1)));
+    m_testBuffer.add(new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(2)));
+    m_testBuffer.add(new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 2)));
     final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, events.size());
-    assertEquals(1, events.get(0).getRowCount()); // row 1 is removed from update because of the consecutive insert event for row 1
+    assertEquals(2, events.get(0).getRowCount());
     assertEquals(1, events.get(1).getRowCount());
-    assertEquals(1, events.get(2).getRowCount()); // row 1 was merged to insert
+    assertEquals(1, events.get(2).getRowCount()); // row 2 was merged to insert
   }
 
   ////// REPLACE
@@ -513,49 +510,6 @@ public class TableEventBufferTest {
     TableEvent bgEffectEvent = events.get(1);
     assertEquals(2, bgEffectEvent.getColumns().size());
     assertTrue(bgEffectEvent.getColumns().containsAll(CollectionUtility.arrayList(c1, c2)));
-  }
-
-  @Test
-  public void testRemoveRowsFromPreviousEventsWhenInserted() throws Exception {
-    ITable table = mock(ITable.class);
-    ITableRow rowDummy = mockRow(0);
-    ITableRow rowPrivat = mockRow(1);
-    ITableRow rowFerien = mockRow(2);
-
-    TableEvent event0 = new TableEvent(table, TableEvent.TYPE_ROWS_CHECKED);
-    event0.setRows(Arrays.asList(rowFerien, rowPrivat));
-    TableEvent event1 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED);
-    event1.setRows(Arrays.asList(rowDummy, rowFerien, rowPrivat));
-    TableEvent event2 = new TableEvent(table, TableEvent.TYPE_ROW_ORDER_CHANGED);
-    event2.setRows(Arrays.asList(rowDummy, rowFerien, rowPrivat));
-    TableEvent event3 = new TableEvent(table, TableEvent.TYPE_ROWS_DELETED);
-    // no rows!
-    TableEvent event4 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED);
-    event4.setRows(Arrays.asList(rowPrivat));
-    TableEvent event5 = new TableEvent(table, TableEvent.TYPE_ROWS_CHECKED);
-    event5.setRows(Arrays.asList(rowPrivat));
-
-    m_testBuffer.add(event0);
-    m_testBuffer.add(event1);
-    m_testBuffer.add(event2);
-    m_testBuffer.add(event3);
-    m_testBuffer.add(event4);
-    m_testBuffer.add(event5);
-
-    List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
-    assertEquals(5, events.size());
-    // assert that the row "rowPrivat" is removed from the first ROWS_CHECKED event
-    // because it is INSERTED later (which means the UI cannot check the row at that
-    // point in time, because for the UI the rows does not exist until the insert
-    // event occurs.
-    assertEquals(TableEvent.TYPE_ROWS_CHECKED, events.get(0).getType());
-    assertTableEventDoesNotContainRow(events.get(0), rowPrivat);
-
-    assertEquals(TableEvent.TYPE_ROWS_UPDATED, events.get(1).getType());
-    assertTableEventDoesNotContainRow(events.get(1), rowPrivat);
-
-    assertEquals(TableEvent.TYPE_ROW_ORDER_CHANGED, events.get(2).getType());
-    assertTableEventDoesNotContainRow(events.get(2), rowPrivat);
   }
 
   @Test
@@ -973,19 +927,15 @@ public class TableEventBufferTest {
     eventMerger.merge(e1);
   }
 
-  private void assertTableEventDoesNotContainRow(TableEvent tableEvent, ITableRow tableRow) {
-    Assert.assertFalse("Table event must not contain table-row " + tableRow, tableEvent.getRows().contains(tableRow));
-  }
-
-  private TableEvent createTestUpdateEvent() {
-    return new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1));
-  }
-
   private TableEvent mockEvent(int type) {
     return mockEvent(type, 0);
   }
 
   private TableEvent mockEvent(int type, int rowCount) {
+    return mockEvent(type, rowCount, 0);
+  }
+
+  private TableEvent mockEvent(int type, int rowCount, int startRowIndex) {
     List<ITableRow> rows = null;
     if (rowCount > 0) {
       rows = new ArrayList<>();

@@ -187,11 +187,11 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return CollectionUtility.arrayList(m_rows);
   }
 
-  protected void setRows(List<? extends ITableRow> rows) {
+  public void setRows(List<? extends ITableRow> rows) {
     m_rows = CollectionUtility.arrayList(rows);
   }
 
-  protected Set<ITableRow> getRowsSet() {
+  public Set<ITableRow> getRowsSet() {
     return CollectionUtility.hashSet(m_rows);
   }
 
@@ -200,7 +200,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
    *
    * @return Returns <code>true</code> if the given row has been deleted. Otherwise <code>false</code>.
    */
-  protected boolean removeRow(ITableRow row) {
+  public boolean removeRow(ITableRow row) {
     if (row == null || m_rows.isEmpty()) {
       return false;
     }
@@ -208,12 +208,16 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return removeRows(Collections.singleton(row), null);
   }
 
+  public boolean removeRows(Collection<ITableRow> rowsToRemove) {
+    return removeRows(rowsToRemove, null);
+  }
+
   /**
    * Removes all occurrences of the given rows. Removed rows are added to the optional row collector.
    *
    * @return Returns <code>true</code> if any of the given rows has been deleted. Otherwise <code>false</code>.
    */
-  protected boolean removeRows(Set<ITableRow> rowsToRemove, Set<ITableRow> removedRowsCollector) {
+  public boolean removeRows(Collection<ITableRow> rowsToRemove, Set<ITableRow> removedRowsCollector) {
     if (CollectionUtility.isEmpty(rowsToRemove) || m_rows.isEmpty()) {
       return false;
     }
@@ -231,7 +235,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return removed;
   }
 
-  protected void clearRows() {
+  public void clearRows() {
     m_rows.clear();
   }
 
@@ -324,7 +328,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return m_dropObject;
   }
 
-  protected void setDropObject(TransferObject t) {
+  public void setDropObject(TransferObject t) {
     m_dropObject = t;
   }
 
@@ -335,7 +339,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return m_copyObject;
   }
 
-  protected void setCopyObject(TransferObject t) {
+  public void setCopyObject(TransferObject t) {
     m_copyObject = t;
   }
 
@@ -350,14 +354,14 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return CollectionUtility.firstElement(m_columns);
   }
 
-  protected void setColumns(Collection<? extends IColumn<?>> columns) {
+  public void setColumns(Collection<? extends IColumn<?>> columns) {
     m_columns = columns;
   }
 
   /**
    * Used by {@link #TYPE_ROWS_UPDATED}
    */
-  protected void setUpdatedColumns(ITableRow row, Set<IColumn<?>> updateColumns) {
+  public void setUpdatedColumns(ITableRow row, Set<IColumn<?>> updateColumns) {
     if (m_updatedColumns == null) {
       m_updatedColumns = new HashMap<>();
     }
@@ -396,7 +400,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     return m_sortInMemoryAllowed;
   }
 
-  protected void setSortInMemoryAllowed(boolean b) {
+  public void setSortInMemoryAllowed(boolean b) {
     m_sortInMemoryAllowed = b;
   }
 
@@ -429,7 +433,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
   /**
    * decode type
    */
-  private String getTypeName() {
+  protected String getTypeName() {
     try {
       Field[] f = getClass().getDeclaredFields();
       for (int i = 0; i < f.length; i++) {

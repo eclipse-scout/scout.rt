@@ -626,8 +626,52 @@ public class JsonTableTest {
     }
   }
 
+  /**
+   * Usecase:
+   * <p>
+   * 1. Add filter to table<br>
+   * 2. Remove same filter so that no rows are removed<br>
+   * Assert that no events are generated, especially no rowsDeleted event
+   */
   @Test
-  public void testRowFilterWithUpdates() throws Exception {
+  public void testRowFilter_nop() throws JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+    ITableRow row1 = table.getRow(1);
+    ITableRow row2 = table.getRow(2);
+
+    jsonTable.toJson();
+    assertNotNull(jsonTable.tableRowIdsMap().get(row0));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row1));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row2));
+
+    ITableRowFilter filter = new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() > 0; // hide first row
+      }
+    };
+    table.addRowFilter(filter);
+    assertEquals(2, table.getFilteredRowCount());
+
+    // Remove the just added filter -> Must not create any request
+    table.removeRowFilter(filter);
+    assertEquals(3, table.getFilteredRowCount());
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    assertNotNull(jsonTable.tableRowIdsMap().get(row1));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row1));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row2));
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+  }
+
+  @Test
+  public void testAddRowFilterAfterUpdates() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(3);
     table.initTable();
@@ -658,12 +702,56 @@ public class JsonTableTest {
     assertEquals(3, table.getRowCount());
     assertEquals(2, table.getFilteredRowCount());
     assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
-    assertEquals(3, jsonTable.eventBuffer().size()); // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED = TYPE_ROWS_DELETED + TYPE_ROWS_INSERTED + TYPE_ROWS_UPDATED
+    assertEquals(2, jsonTable.eventBuffer().size()); // contains row_filter_changed and rows_updated
 
     // Filtering is implemented by Only one deletion event should be emitted (no update event!)
-    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.processBufferedEvents(m_uiSession); // Conversion of rowFilterChanged event happens here -> // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED = TYPE_ROWS_DELETED
     assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
     assertEquals("rowsDeleted", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
+  }
+
+  @Test
+  public void testRemoveRowFilterAfterUpdates() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    // Filter the first row
+    ITableRowFilter filter = new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() > 0; // hide first row
+      }
+    };
+    table.addRowFilter(filter);
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
+
+    // Simulate that the full table is sent to the UI
+    jsonTable.toJson();
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // Hidden row must not be sent to ui -> no row id
+    ITableRow row = table.getRow(0);
+    assertNull(jsonTable.getTableRowId(row));
+
+    // Update the hidden row
+    row.getCellForUpdate(0).setValue("Updated text");
+
+    // Remove filter -> Insert event is generated, inserted row is removed from update event in JsonTable.preprocessBufferedEvents
+    table.removeRowFilter(filter);
+    assertEquals(3, table.getFilteredRowCount());
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    // Filtering is implemented by Only one deletion event should be emitted (no update event!)
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
+    List<JsonEvent> eventList = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals("rowsInserted", eventList.get(0).getType());
+    JsonEvent jsonEvent = eventList.get(0);
+    assertEquals(1, jsonEvent.getData().getJSONArray("rows").length());
+    assertEquals(jsonTable.getTableRowId(row), jsonEvent.getData().getJSONArray("rows").getJSONObject(0).get("id"));
   }
 
   /**
