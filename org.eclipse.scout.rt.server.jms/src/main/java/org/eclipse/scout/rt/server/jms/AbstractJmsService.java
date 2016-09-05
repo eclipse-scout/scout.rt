@@ -140,6 +140,7 @@ public abstract class AbstractJmsService<T> implements IService {
    *
    * @return Returns <code>true</code> if the value has been added. Otherwise <code>false</code>.
    */
+  @SuppressWarnings("squid:S1149")
   protected boolean addConfigPropertyToEnvironment(Hashtable<Object, Object> env, Class<? extends IConfigProperty<String>> configPropertyClass, String envPropertyName) {
     Assertions.assertNotNull(envPropertyName, "envPropertyName must not be null");
     String value = CONFIG.getPropertyValue(configPropertyClass);

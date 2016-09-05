@@ -52,12 +52,9 @@ public class FormDataStatementBuilderCheck {
     return m_body;
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (m_imports.size() > 0) {
       for (String s : m_imports) {
         buf.append(s);

@@ -73,6 +73,7 @@ public class ScriptProcessor {
     // 1. Protect whitespace inside calc() expressions
     Pattern p = Pattern.compile("calc\\s*\\(\\s*(.*?)\\s*\\)");
     Matcher m = p.matcher(content);
+    @SuppressWarnings("squid:S1149")
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String s = "calc(" + m.group(1).replaceAll("\\s+", "___YUICSSMIN_SPACE_IN_CALC___") + ")";

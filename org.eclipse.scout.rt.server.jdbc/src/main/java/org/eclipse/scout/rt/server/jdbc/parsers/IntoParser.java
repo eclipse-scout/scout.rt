@@ -53,7 +53,7 @@ public class IntoParser {
   private ParsePosition m_pos;
   //
   private ArrayList<ValueOutputToken> m_intoList = new ArrayList<ValueOutputToken>();
-  private StringBuffer m_filteredText = new StringBuffer();
+  private StringBuilder m_filteredText = new StringBuilder();
   private int m_lastTextIndex;
 
   public IntoParser(String sqlStatement) {

@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 public class KeyStrokeBuffer {
-  private StringBuffer m_buf;
+  private StringBuilder m_buf;
   private long m_lastActivity;
   private long m_resetTimeoutMillis;
 
   public KeyStrokeBuffer(long resetTimeoutMillis) {
-    m_buf = new StringBuffer();
+    m_buf = new StringBuilder();
     m_resetTimeoutMillis = resetTimeoutMillis;
     m_lastActivity = System.currentTimeMillis();
   }

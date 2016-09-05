@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -61,13 +62,13 @@ public final class TuningUtility {
   }
 
   // current timer
-  private static final Stack<Long> TIMER_STACK;
+  private static final Deque<Long> TIMER_STACK;
   // analysis
   private static final Object ANALYSIS_MAP_LOCK;
   private static final TreeMap<String, TreeSet<CompositeObject>> ANALYSIS_MAP;
 
   static {
-    TIMER_STACK = new Stack<Long>();
+    TIMER_STACK = new LinkedList<>();
     // analysis
     ANALYSIS_MAP_LOCK = new Object();
     ANALYSIS_MAP = new TreeMap<String, TreeSet<CompositeObject>>();

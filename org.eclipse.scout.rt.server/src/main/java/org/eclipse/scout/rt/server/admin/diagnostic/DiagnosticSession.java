@@ -216,7 +216,7 @@ public class DiagnosticSession {
   }
 
   private String getDiagnosticItemsXML(List<List<String>> result) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (List<String> status : result) {
       if (!CompareUtility.equals(DiagnosticFactory.STATUS_TITLE, status.get(2))) {
         buf.append("<status name='" + status.get(0) + "' status='" + status.get(2) + "'>");
@@ -228,7 +228,7 @@ public class DiagnosticSession {
   }
 
   private String getDiagnosticItemsHTML(List<List<String>> diagnosticItems) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("<table>");
     for (int i = 0; i < diagnosticItems.size(); i++) {
       List<String> item = diagnosticItems.get(i);

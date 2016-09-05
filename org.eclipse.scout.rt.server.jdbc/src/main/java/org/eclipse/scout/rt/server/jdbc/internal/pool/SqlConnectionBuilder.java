@@ -77,6 +77,7 @@ public class SqlConnectionBuilder {
       String jndiProviderUrl = sqlService.getJndiProviderUrl();
       String jndiUrlPkgPrefixes = sqlService.getJndiUrlPkgPrefixes();
       LOG.info("Opening rmi connection. jndiName: '{}', user: '{}', initialContextFactory: '{}', providerUrl: '{}'", jndiName, user, jndiInitialContextFactory, jndiProviderUrl);
+      @SuppressWarnings("squid:S1149")
       Hashtable<String, String> ht = new Hashtable<String, String>();
       if (jndiInitialContextFactory != null) {
         ht.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialContextFactory);

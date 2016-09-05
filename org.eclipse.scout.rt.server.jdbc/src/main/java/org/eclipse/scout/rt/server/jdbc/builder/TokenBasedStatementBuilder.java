@@ -48,7 +48,7 @@ public class TokenBasedStatementBuilder {
   private final HashMap<Integer, String> m_tokenMappings = new HashMap<Integer, String>();
   private final AtomicLong m_bindSeq = new AtomicLong();
   private final HashMap<String, Object> m_binds = new HashMap<String, Object>();
-  private final StringBuffer m_where = new StringBuffer("");
+  private final StringBuilder m_where = new StringBuilder();
   /**
    * speed-up due to static caching of default mappings
    */
@@ -198,7 +198,7 @@ public class TokenBasedStatementBuilder {
   /**
    * Just adds the (localized) bind value for :S, replaces :S by the new bind name inside the statement and returns the
    * localized s
-   * 
+   *
    * @param sql
    * @param sValue
    *          is the value for the :S bind

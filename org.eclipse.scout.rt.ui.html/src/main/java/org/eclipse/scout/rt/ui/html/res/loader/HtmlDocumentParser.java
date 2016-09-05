@@ -67,6 +67,7 @@ public class HtmlDocumentParser {
     return m_workingContent.getBytes(StandardCharsets.UTF_8);
   }
 
+  @SuppressWarnings("squid:S1149")
   protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) throws IOException {
     Matcher m = pattern.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
@@ -200,6 +201,7 @@ public class HtmlDocumentParser {
     m_workingContent = m_workingContent.replaceAll(PATTERN_BASE_TAG, baseTag);
   }
 
+  @SuppressWarnings("squid:S1149")
   protected void replaceIncludeTags() throws IOException {
     // <scout:include template="no-script.html" />
     Matcher m = PATTERN_INCLUDE_TAG.matcher(m_workingContent);
@@ -223,6 +225,7 @@ public class HtmlDocumentParser {
     m_workingContent = sb.toString();
   }
 
+  @SuppressWarnings("squid:S1149")
   protected void replaceMessageTags() {
     // <scout:message key="ui.JavaScriptDisabledTitle" />
     Matcher m = PATTERN_MESSAGE_TAG.matcher(m_workingContent);

@@ -178,10 +178,10 @@ public class ServletFilterHelper {
   }
 
   public String createBasicAuthRequest(String username, char[] password) {
-    StringBuffer cred = new StringBuffer(username).append(":").append(password);
+    StringBuilder cred = new StringBuilder(username).append(":").append(password);
     String encodedCred;
     encodedCred = Base64Utility.encode(cred.toString().getBytes(HTTP_BASIC_AUTH_CHARSET));
-    return new StringBuffer(HTTP_BASIC_AUTH_NAME).append(" ").append(encodedCred).toString();
+    return new StringBuilder(HTTP_BASIC_AUTH_NAME).append(' ').append(encodedCred).toString();
   }
 
   public String[] parseBasicAuthRequest(HttpServletRequest req) {

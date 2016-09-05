@@ -22,7 +22,7 @@ public class LegacyStatementBuilder {
   private ISqlStyle m_sqlStyle;
   private Map<String, Object> m_bindMap;
   private long m_bindSeqNo = 0;
-  private StringBuffer m_where;
+  private StringBuilder m_where;
 
   /**
    * @param sqlStyle

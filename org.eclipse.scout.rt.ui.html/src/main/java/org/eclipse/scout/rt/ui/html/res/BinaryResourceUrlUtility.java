@@ -86,7 +86,8 @@ public class BinaryResourceUrlUtility {
       return null;
     }
     Matcher m = BinaryResourceUrlUtility.ICON_REGEX_PATTERN.matcher(String.valueOf(str));
-    StringBuffer ret = new StringBuffer(); // StringBuffer must be used, Java API does not accept a StringBuilder
+    @SuppressWarnings("squid:S1149")
+    StringBuffer ret = new StringBuffer();
     while (m.find()) {
       m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createIconUrl(m.group(2)) + m.group(1));
     }
@@ -162,7 +163,8 @@ public class BinaryResourceUrlUtility {
       return null;
     }
     Matcher m = BinaryResourceUrlUtility.BINARY_RESOURCE_REGEX_PATTERN.matcher(str);
-    StringBuffer ret = new StringBuffer(); // StringBuffer must be used, Java API does not accept a StringBuilder
+    @SuppressWarnings("squid:S1149")
+    StringBuffer ret = new StringBuffer();
     while (m.find()) {
       m.appendReplacement(ret, m.group(1) + BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(jsonAdapter, m.group(2)) + m.group(1));
     }

@@ -212,7 +212,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   private List<BasicPartDefinition> m_basicDefs;
   private Map<String, Object> m_bindMap;
   private AtomicInteger m_sequenceProvider;
-  private StringBuffer m_where;
+  private StringBuilder m_where;
   private List<IFormDataStatementBuilderInjection> m_formDataStatementBuilderInjections;
 
   /**
@@ -480,7 +480,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   @SuppressWarnings("cast")
   public String build(AbstractFormData formData) {
-    m_where = new StringBuffer();
+    m_where = new StringBuilder();
     // get all formData fields and properties defined directly and indirectly by extending template fields, respectively
     //build constraints for fields
     for (BasicPartDefinition def : m_basicDefs) {
@@ -1376,7 +1376,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
         }
         break;
       }
-        //where / having
+      //where / having
       case BuildConstraintOfAttribute: {
         if (attPart != null) {
           String sql = createSqlPart(aggregationType, attPart, positiveOperation, bindNames, bindValues, plainBind, parentAliasMap);

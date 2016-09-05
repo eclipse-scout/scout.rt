@@ -61,6 +61,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   @PostConstruct
   protected void initializeService() {
     try {
+      @SuppressWarnings("squid:S1149")
       Hashtable<Object, Object> env = new Hashtable<>();
       setupInitialContextEnvironment(env);
       InitialContext context = new InitialContext(env.isEmpty() ? null : env);
@@ -76,6 +77,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   /**
    * Sets-up the environment used for creating an {@link InitialContext}.
    */
+  @SuppressWarnings("squid:S1149")
   protected void setupInitialContextEnvironment(Hashtable<Object, Object> env) {
     addConfigPropertyToEnvironment(env, JndiInitialContextFactory.class, Context.INITIAL_CONTEXT_FACTORY);
     addConfigPropertyToEnvironment(env, JndiProviderUrl.class, Context.PROVIDER_URL);
