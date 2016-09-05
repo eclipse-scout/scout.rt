@@ -34,6 +34,7 @@ scout.Desktop = function() {
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
+  this.geolocationServiceAvailable = false;
   this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
@@ -58,7 +59,7 @@ scout.Desktop.prototype._init = function(model) {
   this.resolveTextKeys(['title']);
   this._syncViewButtons(this.viewButtons);
   this._syncMenus(this.menus);
-  this._initGeolocationService();
+  this.geolocationServiceAvailable = scout.device.supportsGeolocation();
 };
 
 /**
@@ -459,14 +460,6 @@ scout.Desktop.prototype.setMenus = function(menus) {
   if (this.header) {
     this.header.setMenus(menus);
   }
-};
-
-scout.Desktop.prototype._initGeolocationService = function() {
-  //  setTimeout: DesktopAdapter, which propagates property to backend, is not initialized while
-  //  Desktop is being initialized. Thus, setTimeout is used to defer invocation after initialization.
-  setTimeout(function(){
-    this.setProperty('geolocationServiceAvailable', scout.device.supportsGeolocation());
-  }.bind(this));
 };
 
 scout.Desktop.prototype.setNavigationVisible = function(visible) {

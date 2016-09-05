@@ -19,8 +19,7 @@ scout.inherits(scout.CalendarAdapter, scout.ModelAdapter);
  * @override ModelAdapter.js
  */
 scout.CalendarAdapter.prototype._postCreateWidget = function() {
-  this._sendViewRangeChanged(); // FIXME [awe] 6.1 Geolocation auf Desktop wird aktuell mit setTimeout gemacht
-  // auf _postCreateWidget umbiegen -> nur schicken wenn != defaultValues
+  this._sendViewRangeChanged();
 };
 
 /**
