@@ -19,7 +19,7 @@ describe("GroupBoxBodyGrid11", function() {
     this.fields = [];
     this.groupBox = scout.create('GroupBox', {
       parent: session.desktop,
-      gridColumnCountHint: 2,
+      gridColumnCount: 2,
       mainBox: false
     });
     this.fields.push(scout.create('GroupBox', {
@@ -32,7 +32,7 @@ describe("GroupBoxBodyGrid11", function() {
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,
       label: "Field 02",
-      gridColumnCountHint: 1,
+      gridColumnCount: 1,
       gridDataHints: new scout.GridData({
         w: 1
       })
@@ -40,7 +40,7 @@ describe("GroupBoxBodyGrid11", function() {
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,
       label: "Field 03",
-      gridColumnCountHint: 1,
+      gridColumnCount: 1,
       gridDataHints: new scout.GridData({
         w: 1
       })
