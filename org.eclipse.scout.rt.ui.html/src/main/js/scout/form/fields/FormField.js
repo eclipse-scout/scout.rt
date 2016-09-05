@@ -89,6 +89,7 @@ scout.FormField.prototype._createKeyStrokeContext = function() {
 
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
+  this.resolveTextKeys(['label']);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);

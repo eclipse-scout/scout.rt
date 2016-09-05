@@ -81,7 +81,7 @@ scout.AbstractGroupBoxBodyGrid.prototype._computeGridColumnCount = function(grou
   var gridColumns = -1,
     tmp = groupBox;
   do {
-    gridColumns = tmp.gridColumnCountHint;
+    gridColumns = tmp.gridColumnCount;
   } while (gridColumns < 0 && (tmp = tmp.getParentGroupBox()));
   return gridColumns < 0 ? 2 : gridColumns;
 };
