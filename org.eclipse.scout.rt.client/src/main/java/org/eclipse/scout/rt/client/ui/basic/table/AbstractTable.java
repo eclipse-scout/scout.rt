@@ -1242,11 +1242,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  public void removeRowFilters() {
-    removeRowFilters(true);
+  public void removeUserRowFilters() {
+    removeUserRowFilters(true);
   }
 
-  public void removeRowFilters(boolean applyRowFilters) {
+  public void removeUserRowFilters(boolean applyRowFilters) {
     for (ITableRowFilter filter : getRowFilters()) {
       if (filter instanceof UserTableRowFilter) {
         m_rowFilters.remove(filter);
@@ -3536,7 +3536,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     if (options.contains(IResetColumnsOption.FILTERS)) {
-      removeRowFilters();
+      removeUserRowFilters();
     }
   }
 
@@ -4625,7 +4625,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         pushUIProcessor();
         // Remove existing filter first, so that only one UserTableRowFilter is active
-        removeRowFilters(false);
+        removeUserRowFilters(false);
 
         // Create and add a new filter
         UserTableRowFilter filter = new UserTableRowFilter(rows);
@@ -4643,7 +4643,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public void removeFilteredRowsFromUI() {
       try {
         pushUIProcessor();
-        removeRowFilters();
+        removeUserRowFilters();
       }
       finally {
         popUIProcessor();
