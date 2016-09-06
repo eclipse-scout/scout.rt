@@ -276,9 +276,9 @@ public class HtmlDocumentParser {
 
   protected String toJavaScriptString(String text) {
     // escape single quotes
-    text = text.replaceAll("'", "\\'");
+    text = text.replaceAll("'", "\\\\'");
     // escape new-lines
-    text = text.replaceAll("\r\n", "\\\\n");
+    text = text.replaceAll("(\r\n|\n)", "\\\\n");
     return "'" + text + "'";
   }
 
