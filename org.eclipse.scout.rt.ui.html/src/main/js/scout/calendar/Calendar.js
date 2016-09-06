@@ -282,7 +282,7 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
   } else if (this._isWeek() || this._isWorkWeek()) {
     return new Date(p.year, p.month, p.date + weekOperand);
   } else if (this._isMonth()) {
-    return new Date(p.year, p.month + monthOperand, p.date);
+    return scout.dates.shift(this.selectedDate, 0, monthOperand, 0);
   }
 };
 

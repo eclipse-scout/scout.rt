@@ -241,4 +241,77 @@ describe("Calendar", function() {
     });
   });
 
+  describe("navigation", function() {
+
+    it("navigate forward and back (with first day of month selected)", function() {
+      // empty parent div
+      var $div = $('<div/>');
+
+      // init model
+      var model = helper.createSimpleModel();
+      model.selectedDate = "2016-01-01 12:00:00.000";
+      model.displayMode = scout.Calendar.DisplayMode.MONTH;
+
+      // init and render calendar
+      var cal = helper.createCalendar(model);
+      cal._render($div);
+
+      var viewRange = cal.viewRange;
+      var selectedDate = cal.selectedDate;
+
+      // go two months forward, four month back and two  month forward
+      // (navigate over JAN/FEB (31. vs. 27. days) month-boundary and 2015/2016 year-boundary)
+      for (var f1 = 0; f1 < 2; f1++) {
+        cal._onClickNext();
+      }
+      for (var b1 = 0; b1 < 4; b1++) {
+        cal._onClickPrevious();
+      }
+      for (var f2 = 0; f2 < 2; f2++) {
+        cal._onClickNext();
+      }
+
+      // expect viewRange is the same as before navigation
+      expect(cal.viewRange).toEqual(viewRange);
+      // expect selectedDate is the same as before navigation
+      expect(cal.selectedDate).toEqual(selectedDate);
+    });
+
+    it("navigate forward and back (with last day of month selected)", function() {
+      // empty parent div
+      var $div = $('<div/>');
+
+      // init model
+      var model = helper.createSimpleModel();
+      model.selectedDate = "2016-01-31 12:00:00.000";
+      model.displayMode = scout.Calendar.DisplayMode.MONTH;
+
+      // init and render calendar
+      var cal = helper.createCalendar(model);
+      cal._render($div);
+
+      var viewRange = cal.viewRange;
+
+      // go two months forward, four month back and two  month forward
+      // (navigate over JAN/FEB (31. vs. 27. days) month-boundary and 2015/2016 year-boundary)
+      for (var f1 = 0; f1 < 2; f1++) {
+        cal._onClickNext();
+      }
+      for (var b1 = 0; b1 < 4; b1++) {
+        cal._onClickPrevious();
+      }
+      for (var f2 = 0; f2 < 2; f2++) {
+        cal._onClickNext();
+      }
+
+      // expect viewRange is the same as before navigation
+      expect(cal.viewRange).toEqual(viewRange);
+
+      // expect selectedDate is the same as 2016-01-29,
+      // because the day was shifted to 29 while navigating over Feb. 2016
+      expect(cal.selectedDate).toEqual(scout.dates.parseJsonDate("2016-01-29 12:00:00.000"));
+    });
+
+  });
+
 });
