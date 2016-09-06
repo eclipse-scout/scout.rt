@@ -362,10 +362,8 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             for (ITreeNode source : elements) {
               if (source != dropNode && source.getTree() == getTree()) {
                 ITreeNode target = dropNode;
-                if (isFolderNode(source)) {
-                  if (isBookmarkNode(target)) {
-                    target = target.getParentNode();
-                  }
+                if (isFolderNode(source) && isBookmarkNode(target)) {
+                  target = target.getParentNode();
                 }
                 //
                 if (isBookmarkNode(source) && isFolderNode(target)) {

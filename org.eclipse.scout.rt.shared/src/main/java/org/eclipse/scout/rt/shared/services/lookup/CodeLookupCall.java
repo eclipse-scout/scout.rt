@@ -249,7 +249,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
         }
         ICode parentCode = code.getParentCode();
         if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
-          if (((parentCode == null && key == null) || (parentCode != null && parentCode.getId() != null && parentCode.getId().equals(key)))) {
+          if (((parentCode == null && key == null) || (parentCode != null && parentCode.getId() != null && parentCode.getId().equals(key)))) { // NOSONAR
             ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
             if (row != null) {
               add(row);

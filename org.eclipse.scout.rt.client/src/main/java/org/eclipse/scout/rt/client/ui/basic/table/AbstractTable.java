@@ -1220,21 +1220,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void addRowFilter(ITableRowFilter filter) {
-    if (filter != null) {
-      //avoid duplicate add
-      if (!m_rowFilters.contains(filter)) {
-        m_rowFilters.add(filter);
-        applyRowFilters();
-      }
+    if (filter != null && !m_rowFilters.contains(filter)) {
+      m_rowFilters.add(filter);
+      applyRowFilters();
     }
   }
 
   @Override
   public void removeRowFilter(ITableRowFilter filter) {
-    if (filter != null) {
-      if (m_rowFilters.remove(filter)) {
-        applyRowFilters();
-      }
+    if (filter != null && m_rowFilters.remove(filter)) {
+      applyRowFilters();
     }
   }
 
@@ -3558,14 +3553,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (m_rowFilters.size() > 0) {
       boolean filterChanged = false;
       for (ITableRow row : set) {
-        if (row.getTable() == AbstractTable.this) {
-          if (row instanceof InternalTableRow) {
-            InternalTableRow irow = (InternalTableRow) row;
-            boolean oldFlag = irow.isFilterAccepted();
-            applyRowFiltersInternal(irow);
-            boolean newFlag = irow.isFilterAccepted();
-            filterChanged = filterChanged || (oldFlag != newFlag);
-          }
+        if (row.getTable() == AbstractTable.this && row instanceof InternalTableRow) {
+          InternalTableRow irow = (InternalTableRow) row;
+          boolean oldFlag = irow.isFilterAccepted();
+          applyRowFiltersInternal(irow);
+          boolean newFlag = irow.isFilterAccepted();
+          filterChanged = filterChanged || (oldFlag != newFlag);
         }
       }
       if (filterChanged) {

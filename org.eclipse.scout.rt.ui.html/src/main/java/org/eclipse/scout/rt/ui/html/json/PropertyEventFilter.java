@@ -20,13 +20,10 @@ public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent
   @Override
   public PropertyChangeEvent filter(PropertyChangeEvent event) {
     for (IPropertyChangeEventFilterCondition condition : getConditions()) {
-      if (condition.getPropertyName().equals(event.getPropertyName())) {
-        if (!condition.accept(event)) {
-          return null;
-        }
+      if (condition.getPropertyName().equals(event.getPropertyName()) && !condition.accept(event)) {
+        return null;
       }
     }
     return event;
   }
-
 }

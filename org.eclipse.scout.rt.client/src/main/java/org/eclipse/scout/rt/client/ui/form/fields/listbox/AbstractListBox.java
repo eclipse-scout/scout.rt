@@ -621,14 +621,11 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       return rawValue;
     }
     ITable table = getTable();
-    if (table != null) {
-      if ((table.isCheckable() && !table.isMultiCheck()) || (!table.isCheckable() && !table.isMultiSelect())) {
-        //only single value
-        if (rawValue.size() > 1) {
-          LOG.warn("{} only accepts a single value. Got {}. Using only first value.", getClass().getName(), rawValue);
-          return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
-        }
-      }
+    if (table != null
+        && ((table.isCheckable() && !table.isMultiCheck()) || (!table.isCheckable() && !table.isMultiSelect()))
+        && rawValue.size() > 1) {
+      LOG.warn("{} only accepts a single value. Got {}. Using only first value.", getClass().getName(), rawValue);
+      return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
     }
     return rawValue;
   }

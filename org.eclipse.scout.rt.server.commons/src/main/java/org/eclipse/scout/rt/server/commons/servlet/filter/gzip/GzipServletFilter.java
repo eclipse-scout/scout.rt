@@ -85,14 +85,12 @@ public class GzipServletFilter implements Filter {
     if (resp instanceof GzipServletResponseWrapper) {
       GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
       boolean compressed = gzipResp.finish(minimumLengthToCompress(req));
-      if (compressed) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("GZIP response[size {}%, uncompressed: {}, compressed: {}]: {}",
-              gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength(),
-              gzipResp.getUncompressedLength(),
-              gzipResp.getCompressedLength(),
-              req.getPathInfo());
-        }
+      if (compressed && LOG.isDebugEnabled()) {
+        LOG.debug("GZIP response[size {}%, uncompressed: {}, compressed: {}]: {}",
+            gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength(),
+            gzipResp.getUncompressedLength(),
+            gzipResp.getCompressedLength(),
+            req.getPathInfo());
       }
     }
   }

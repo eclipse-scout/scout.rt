@@ -54,19 +54,16 @@ class BeanPropertyInput implements IBindInput {
       throw new ProcessingException("property " + m_propertyName, e);
     }
     // initialize target
-    if (isBatch()) {
-    }
-    else if (m_beans.length >= 2) {
-      if (m_target.isPlainValue() || m_target.isPlainSql()) {
-        // if the op is = or <> change it to IN or NOT IN
-        if (m_target.getParsedOp() != null) {
-          if ("=".equals(m_target.getParsedOp())) {
-            m_target.setParsedOp("IN");
-          }
-          else if ("!=".equals(m_target.getParsedOp()) || "<>".equals(m_target.getParsedOp())) {
-            m_target.setParsedOp("NOT IN");
-          }
-        }
+    if (!isBatch()
+        && m_beans.length >= 2
+        && m_target.getParsedOp() != null
+        && (m_target.isPlainValue() || m_target.isPlainSql())) {
+
+      if ("=".equals(m_target.getParsedOp())) {
+        m_target.setParsedOp("IN");
+      }
+      else if ("!=".equals(m_target.getParsedOp()) || "<>".equals(m_target.getParsedOp())) {
+        m_target.setParsedOp("NOT IN");
       }
     }
   }

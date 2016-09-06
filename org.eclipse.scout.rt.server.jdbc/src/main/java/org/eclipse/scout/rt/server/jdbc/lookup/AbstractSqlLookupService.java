@@ -166,12 +166,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
 
   protected static boolean containsRefusingAllTag(String sqlSelect) {
     Matcher m = REFUSING_ALL_TAGS_REGEX.matcher(sqlSelect.toLowerCase());
-    if (m.find()) {
-      if (!m.group(1).equals(m.group(2))) {
-        return true;
-      }
-    }
-    return false;
+    return m.find() && !m.group(1).equals(m.group(2));
   }
 
   /**

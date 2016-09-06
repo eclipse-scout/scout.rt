@@ -1438,15 +1438,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Refresh all column values to trigger re-validate and re-format
    */
   public void refreshValues() {
-    if (isInitialized()) {
-      if (getTable() != null) {
-        List<ITableRow> rows = getTable().getRows();
-        for (ITableRow row : rows) {
-          setValue(row, getValue(row));
-        }
-        updateDisplayTexts();
-        decorateCells();
+    if (isInitialized() && getTable() != null) {
+      List<ITableRow> rows = getTable().getRows();
+      for (ITableRow row : rows) {
+        setValue(row, getValue(row));
       }
+      updateDisplayTexts();
+      decorateCells();
     }
   }
 

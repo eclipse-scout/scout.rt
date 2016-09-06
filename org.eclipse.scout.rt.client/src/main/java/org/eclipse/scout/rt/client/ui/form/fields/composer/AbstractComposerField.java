@@ -397,19 +397,17 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     Assertions.assertNotNull(source);
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) source;
-    if (treeFieldData.isValueSet()) {
-      if (m_tree != null) {
-        try {
-          if (!valueChangeTriggersEnabled) {
-            setValueChangeTriggerEnabled(false);
-          }
-          //
-          m_tree.importTreeData(treeFieldData);
+    if (treeFieldData.isValueSet() && m_tree != null) {
+      try {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(false);
         }
-        finally {
-          if (!valueChangeTriggersEnabled) {
-            setValueChangeTriggerEnabled(true);
-          }
+        //
+        m_tree.importTreeData(treeFieldData);
+      }
+      finally {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(true);
         }
       }
     }

@@ -137,10 +137,8 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
       if (e.getType() == TreeEvent.TYPE_NODES_SELECTED) {
         handleOwnerValueChanged();
       }
-      else if (e.getType() == TreeEvent.TYPE_NODES_UPDATED) {
-        if (CollectionUtility.containsAny(e.getNodes(), m_currentSelection)) {
-          handleOwnerValueChanged();
-        }
+      else if (e.getType() == TreeEvent.TYPE_NODES_UPDATED && CollectionUtility.containsAny(e.getNodes(), m_currentSelection)) {
+        handleOwnerValueChanged();
       }
     }
   }

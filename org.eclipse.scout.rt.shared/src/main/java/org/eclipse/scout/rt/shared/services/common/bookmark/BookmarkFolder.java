@@ -206,25 +206,46 @@ public class BookmarkFolder implements Serializable, Cloneable {
 
   @Override
   public int hashCode() {
-    return 0;
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
+    result = prime * result + (int) (m_id ^ (m_id >>> 32));
+    result = prime * result + ((m_title == null) ? 0 : m_title.hashCode());
+    return result;
   }
 
-  /**
-   * Equality is only calculated with regard to the folder. The contained folders and bookmarks are not considered.
-   */
   @Override
-  public boolean equals(Object o) {
-    if (o instanceof BookmarkFolder) {
-      BookmarkFolder other = (BookmarkFolder) o;
-      if (this.m_id == other.m_id) {
-        if (CompareUtility.equals(this.m_title, other.m_title)) {
-          if (CompareUtility.equals(this.m_iconId, other.m_iconId)) {
-            return true;
-          }
-        }
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    BookmarkFolder other = (BookmarkFolder) obj;
+    if (m_iconId == null) {
+      if (other.m_iconId != null) {
+        return false;
       }
     }
-    return false;
+    else if (!m_iconId.equals(other.m_iconId)) {
+      return false;
+    }
+    if (m_id != other.m_id) {
+      return false;
+    }
+    if (m_title == null) {
+      if (other.m_title != null) {
+        return false;
+      }
+    }
+    else if (!m_title.equals(other.m_title)) {
+      return false;
+    }
+    return true;
   }
 
   @Override

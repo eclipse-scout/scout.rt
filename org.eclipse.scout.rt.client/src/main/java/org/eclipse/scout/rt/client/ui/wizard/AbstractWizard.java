@@ -656,13 +656,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
         // in-between targets
         List<IWizardStep<? extends IForm>> intermediateSteps = getStepSpan(m_activeStep, false, step, false);
-        if (intermediateSteps.size() > 0) {
-          if ((kind == IWizardStep.STEP_NEXT && !jumpForward) || (kind == IWizardStep.STEP_PREVIOUS && !jumpBackward)) {
-            for (IWizardStep<? extends IForm> intermediateStep : intermediateSteps) {
-              // these calls may veto
-              intermediateStep.activate(kind);
-              intermediateStep.deactivate(kind);
-            }
+        if (!intermediateSteps.isEmpty()
+            && ((kind == IWizardStep.STEP_NEXT && !jumpForward) || (kind == IWizardStep.STEP_PREVIOUS && !jumpBackward))) {
+          for (IWizardStep<? extends IForm> intermediateStep : intermediateSteps) {
+            // these calls may veto
+            intermediateStep.activate(kind);
+            intermediateStep.deactivate(kind);
           }
         }
         // new target

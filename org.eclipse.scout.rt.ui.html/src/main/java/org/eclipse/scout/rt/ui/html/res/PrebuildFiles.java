@@ -35,10 +35,8 @@ public class PrebuildFiles implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) {
-    if (event.getState() == State.PlatformStarted) {
-      if (CONFIG.getPropertyValue(UiPrebuildProperty.class)) {
-        buildScripts();
-      }
+    if (event.getState() == State.PlatformStarted && CONFIG.getPropertyValue(UiPrebuildProperty.class)) {
+      buildScripts();
     }
   }
 

@@ -398,10 +398,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void rebuildFieldGrid() {
     m_bodyGrid.validate(this);
-    if (isInitialized()) {
-      if (getForm() != null) {
-        getForm().structureChanged(this);
-      }
+    if (isInitialized() && getForm() != null) {
+      getForm().structureChanged(this);
     }
   }
 

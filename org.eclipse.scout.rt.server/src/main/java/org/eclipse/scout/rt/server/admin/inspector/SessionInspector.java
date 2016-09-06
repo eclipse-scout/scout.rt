@@ -79,12 +79,10 @@ public class SessionInspector {
 
   public CallInspector requestCallInspector(ServiceTunnelRequest call) {
     synchronized (m_callListLock) {
-      if (getProcessInspector().isEnabled()) {
-        if (getProcessInspector().acceptCall(call.getServiceInterfaceClassName(), call.getOperation())) {
-          CallInspector callInspector = new CallInspector(this, call);
-          m_callList.add(callInspector);
-          return callInspector;
-        }
+      if (getProcessInspector().isEnabled() && getProcessInspector().acceptCall(call.getServiceInterfaceClassName(), call.getOperation())) {
+        CallInspector callInspector = new CallInspector(this, call);
+        m_callList.add(callInspector);
+        return callInspector;
       }
     }
     return null;

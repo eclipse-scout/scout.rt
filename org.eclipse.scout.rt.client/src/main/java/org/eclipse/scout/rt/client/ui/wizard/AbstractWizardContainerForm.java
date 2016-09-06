@@ -71,11 +71,9 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   @Override
   protected void execDisposeForm() {
     // detach from wizard
-    if (m_wizard != null) {
-      if (m_propertyChangeListener != null) {
-        m_wizard.removePropertyChangeListener(m_propertyChangeListener);
-        m_propertyChangeListener = null;
-      }
+    if (m_wizard != null && m_propertyChangeListener != null) {
+      m_wizard.removePropertyChangeListener(m_propertyChangeListener);
+      m_propertyChangeListener = null;
     }
     super.doFinally();
   }

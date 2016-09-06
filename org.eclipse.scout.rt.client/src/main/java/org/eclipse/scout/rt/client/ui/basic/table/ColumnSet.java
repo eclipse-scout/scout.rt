@@ -997,7 +997,7 @@ public class ColumnSet {
       }
     }
     else {
-      //remove from user cols and set grouped to false;
+      //remove from user cols and set grouped to false
       HeaderCell cell = (HeaderCell) col.getHeaderCell();
       cell.setGroupingActive(false);
       removeSortColumn(col);
@@ -1437,18 +1437,18 @@ public class ColumnSet {
   }
 
   private void checkMultiline() {
-    if (m_table != null) {
-      if (!m_table.isInitialMultilineText() && !ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "getConfiguredMultilineText", null, m_table.getClass())) {
-        //do automatic check for wrapping columns
-        boolean m = false;
-        for (IColumn col : getVisibleColumns()) {
-          if (col instanceof IStringColumn && ((IStringColumn) col).isTextWrap()) {
-            m = true;
-            break;
-          }
+    if (m_table != null
+        && !m_table.isInitialMultilineText()
+        && !ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "getConfiguredMultilineText", null, m_table.getClass())) {
+      //do automatic check for wrapping columns
+      boolean m = false;
+      for (IColumn col : getVisibleColumns()) {
+        if (col instanceof IStringColumn && ((IStringColumn) col).isTextWrap()) {
+          m = true;
+          break;
         }
-        m_table.setMultilineText(m);
       }
+      m_table.setMultilineText(m);
     }
   }
 

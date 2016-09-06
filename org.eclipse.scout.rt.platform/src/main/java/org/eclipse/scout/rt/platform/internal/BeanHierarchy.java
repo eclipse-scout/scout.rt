@@ -147,11 +147,9 @@ public class BeanHierarchy<T> {
                 }
               }
             }
-            if (superClazz != null) {
+            if (superClazz != null && !extendsMap.containsKey(superClazz)) {
               //only add if first to override, respects @Order annotation
-              if (!extendsMap.containsKey(superClazz)) {
-                extendsMap.put(superClazz, bean.getBeanClazz());
-              }
+              extendsMap.put(superClazz, bean.getBeanClazz());
             }
           }
         }

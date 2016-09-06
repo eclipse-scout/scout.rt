@@ -222,10 +222,8 @@ public final class DataModelUtility {
   public static IDataModelEntity findEntity(List<? extends IDataModelEntity> entities, String simpleName, Map<String, String> metaData) {
     if (entities != null) {
       for (IDataModelEntity e : entities) {
-        if (e.getClass().getSimpleName().equals(simpleName)) {
-          if (CompareUtility.equals(e.getMetaDataOfEntity(), metaData)) {
-            return e;
-          }
+        if (e.getClass().getSimpleName().equals(simpleName) && CompareUtility.equals(e.getMetaDataOfEntity(), metaData)) {
+          return e;
         }
       }
     }
@@ -239,10 +237,8 @@ public final class DataModelUtility {
   public static IDataModelAttribute findAttribute(List<? extends IDataModelAttribute> attributes, String simpleName, Map<String, String> metaData) {
     if (attributes != null) {
       for (IDataModelAttribute a : attributes) {
-        if (a.getClass().getSimpleName().equals(simpleName)) {
-          if (CompareUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
-            return a;
-          }
+        if (a.getClass().getSimpleName().equals(simpleName) && CompareUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
+          return a;
         }
       }
     }

@@ -215,10 +215,8 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @Order(60)
   @ConfigOperation
   protected void execFormClosed(boolean activation) {
-    if (!activation) {
-      if (getForm().isFormStored() && getForm().getCloseSystemType() != IButton.SYSTEM_TYPE_CANCEL) {
-        getWizard().doNextStep();
-      }
+    if (!activation && getForm().isFormStored() && getForm().getCloseSystemType() != IButton.SYSTEM_TYPE_CANCEL) {
+      getWizard().doNextStep();
     }
   }
 
@@ -303,10 +301,8 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @Override
   public void setForm(FORM f) {
     // remove old
-    if (m_form != null) {
-      if (m_formListener != null) {
-        m_form.removeFormListener(m_formListener);
-      }
+    if (m_form != null && m_formListener != null) {
+      m_form.removeFormListener(m_formListener);
     }
     m_form = f;
     // add old

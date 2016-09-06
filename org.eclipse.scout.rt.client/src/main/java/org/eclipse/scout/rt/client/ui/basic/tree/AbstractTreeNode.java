@@ -429,28 +429,24 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public ITreeNode resolveVirtualChildNode(ITreeNode node) {
-    if (m_tree != null) {
-      if (node instanceof IVirtualTreeNode) {
-        if (node.getTree() == m_tree && node.getParentNode() == this) {
-          try {
-            m_tree.setTreeChanging(true);
-            //
-            ITreeNode resolvedNode = interceptResolveVirtualChildNode((IVirtualTreeNode) node);
-            if (node != resolvedNode) {
-              if (resolvedNode == null) {
-                m_tree.removeChildNode(this, node);
-              }
-              else {
-                replaceChildNodeInternal(node.getChildNodeIndex(), resolvedNode);
-                onVirtualChildNodeResolved(resolvedNode);
-              }
-              return resolvedNode;
-            }
+    if (m_tree != null && node instanceof IVirtualTreeNode && node.getTree() == m_tree && node.getParentNode() == this) {
+      try {
+        m_tree.setTreeChanging(true);
+        //
+        ITreeNode resolvedNode = interceptResolveVirtualChildNode((IVirtualTreeNode) node);
+        if (node != resolvedNode) {
+          if (resolvedNode == null) {
+            m_tree.removeChildNode(this, node);
           }
-          finally {
-            m_tree.setTreeChanging(false);
+          else {
+            replaceChildNodeInternal(node.getChildNodeIndex(), resolvedNode);
+            onVirtualChildNodeResolved(resolvedNode);
           }
+          return resolvedNode;
         }
+      }
+      finally {
+        m_tree.setTreeChanging(false);
       }
     }
     return node;

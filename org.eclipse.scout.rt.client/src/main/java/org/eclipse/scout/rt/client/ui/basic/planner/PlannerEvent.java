@@ -118,11 +118,12 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
     try {
       Field[] f = getClass().getDeclaredFields();
       for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")) {
-          if (((Number) f[i].get(null)).intValue() == m_type) {
-            buf.append(f[i].getName());
-            break;
-          }
+        if (Modifier.isPublic(f[i].getModifiers())
+            && Modifier.isStatic(f[i].getModifiers())
+            && f[i].getName().startsWith("TYPE_")
+            && ((Number) f[i].get(null)).intValue() == m_type) {
+          buf.append(f[i].getName());
+          break;
         }
       }
     }

@@ -715,8 +715,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (field instanceof IButton) {
-          if (((IButton) field).getSystemType() != IButton.SYSTEM_TYPE_NONE) {
-            ((IButton) field).addButtonListener(m_systemButtonListener);
+          final IButton button = (IButton) field;
+          if (button.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
+            button.addButtonListener(m_systemButtonListener);
           }
         }
         return true;
@@ -838,11 +839,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       throw new ProcessingException("The form " + getFormId() + " has already been started");
     }
     for (IForm simCandidate : getDesktop().getSimilarViewForms(this)) {
-      if (handler != null && simCandidate.getHandler() != null && handler.getClass().getName() == simCandidate.getHandler().getClass().getName()) {
-        if (simCandidate.getHandler().isOpenExclusive() && handler.isOpenExclusive()) {
-          getDesktop().activateForm(simCandidate);
-          return simCandidate;
-        }
+      if (handler != null
+          && simCandidate.getHandler() != null
+          && handler.getClass().getName() == simCandidate.getHandler().getClass().getName()
+          && simCandidate.getHandler().isOpenExclusive()
+          && handler.isOpenExclusive()) {
+        getDesktop().activateForm(simCandidate);
+        return simCandidate;
       }
     }
     return startInternal(handler);
@@ -1440,10 +1443,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (formDataClass == null) {
       return null;
     }
-    if (AbstractFormData.class.isAssignableFrom(formDataClass)) {
-      if (!Modifier.isAbstract(formDataClass.getModifiers())) {
-        return formDataClass;
-      }
+    if (AbstractFormData.class.isAssignableFrom(formDataClass) && !Modifier.isAbstract(formDataClass.getModifiers())) {
+      return formDataClass;
     }
     return null;
   }
@@ -2771,46 +2772,44 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       case ButtonEvent.TYPE_CLICKED: {
         // disable close timer
         setCloseTimerArmed(false);
-        if (isButtonsArmed()) {
-          if (checkForVerifyingFields()) {
-            try {
-              IButton src = (IButton) e.getSource();
-              switch (src.getSystemType()) {
-                case IButton.SYSTEM_TYPE_CANCEL: {
-                  doCancel();
-                  break;
-                }
-                case IButton.SYSTEM_TYPE_CLOSE: {
-                  doClose();
-                  break;
-                }
-                case IButton.SYSTEM_TYPE_OK: {
-                  doOk();
-                  break;
-                }
-                case IButton.SYSTEM_TYPE_RESET: {
-                  doReset();
-                  break;
-                }
-                case IButton.SYSTEM_TYPE_SAVE: {
-                  doSave();
-                  break;
-                }
-                case IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE: {
-                  doSaveWithoutMarkerChange();
-                  break;
-                }
+        if (isButtonsArmed() && checkForVerifyingFields()) {
+          try {
+            IButton src = (IButton) e.getSource();
+            switch (src.getSystemType()) {
+              case IButton.SYSTEM_TYPE_CANCEL: {
+                doCancel();
+                break;
+              }
+              case IButton.SYSTEM_TYPE_CLOSE: {
+                doClose();
+                break;
+              }
+              case IButton.SYSTEM_TYPE_OK: {
+                doOk();
+                break;
+              }
+              case IButton.SYSTEM_TYPE_RESET: {
+                doReset();
+                break;
+              }
+              case IButton.SYSTEM_TYPE_SAVE: {
+                doSave();
+                break;
+              }
+              case IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE: {
+                doSaveWithoutMarkerChange();
+                break;
               }
             }
-            catch (RuntimeException ex) {
-              BEANS.get(ExceptionHandler.class).handle(BEANS.get(PlatformExceptionTranslator.class).translate(ex)
-                  .withContextInfo("button", e.getButton().getClass().getName()));
-            }
-            if (m_currentValidateContentDescriptor != null) {
-              m_currentValidateContentDescriptor.activateProblemLocation();
-              m_currentValidateContentDescriptor = null;
-            }
-          }// end
+          }
+          catch (RuntimeException ex) {
+            BEANS.get(ExceptionHandler.class).handle(BEANS.get(PlatformExceptionTranslator.class).translate(ex)
+                .withContextInfo("button", e.getButton().getClass().getName()));
+          }
+          if (m_currentValidateContentDescriptor != null) {
+            m_currentValidateContentDescriptor.activateProblemLocation();
+            m_currentValidateContentDescriptor = null;
+          }
         }
         break;
       }

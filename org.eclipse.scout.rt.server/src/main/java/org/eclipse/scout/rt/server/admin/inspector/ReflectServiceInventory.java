@@ -59,10 +59,8 @@ public class ReflectServiceInventory {
     // operations
     Method[] methods = service.getClass().getMethods();
     for (Method m : methods) {
-      if (Object.class.isAssignableFrom(m.getDeclaringClass())) {
-        if (!propertyMethods.contains(m)) {
-          addOperation(m);
-        }
+      if (Object.class.isAssignableFrom(m.getDeclaringClass()) && !propertyMethods.contains(m)) {
+        addOperation(m);
       }
     }
   }

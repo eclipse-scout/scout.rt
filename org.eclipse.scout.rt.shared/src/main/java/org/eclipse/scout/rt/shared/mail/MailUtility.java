@@ -602,8 +602,9 @@ public class MailUtility {
     else {
       final String chartsetEquals = "charset=";
       if (part.getContentType().contains(chartsetEquals)) {
-        if (part.getContentType().split(chartsetEquals).length == 2) {
-          characterEncoding = part.getContentType().split(chartsetEquals)[1];
+        String[] contentTypeParts = part.getContentType().split(chartsetEquals);
+        if (contentTypeParts.length == 2) {
+          characterEncoding = contentTypeParts[1];
         }
       }
     }

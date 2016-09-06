@@ -505,11 +505,9 @@ public final class BookmarkUtility {
         for (IColumn<?> headSortColumn : columnSet.getPermanentHeadSortColumns()) {
           if (!headSortColumn.isVisible() || !headSortColumn.isGroupingActive()) {
             TableColumnState state = sortColToColumnState.get(headSortColumn);
-            if (state != null) {
-              if (!state.isGroupingActive()) {
-                groupingPossible = false;
-                break;
-              }
+            if (state != null && !state.isGroupingActive()) {
+              groupingPossible = false;
+              break;
             }
           }
         }
@@ -759,11 +757,9 @@ public final class BookmarkUtility {
         for (ITableRow row : table.getRows()) {
           CompositeObject testPkLegacy = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), true));
           CompositeObject testPk = new CompositeObject(BookmarkUtility.makeSerializableKeys(row.getKeyValues(), false));
-          if (selectionSet.contains(testPk) || selectionSet.contains(testPkLegacy)) {
-            //row must not be filtered out
-            if (row.isFilterAccepted()) {
-              rowList.add(row);
-            }
+          if ((selectionSet.contains(testPk) || selectionSet.contains(testPkLegacy))
+              && row.isFilterAccepted()) {
+            rowList.add(row);
           }
         }
         if (rowList.size() > 0) {
@@ -776,7 +772,8 @@ public final class BookmarkUtility {
 
     // check, whether table column filter must be reset
     if (resetViewAndWarnOnFail) {
-      if (childPage == null || (!childPage.isFilterAccepted() && table.getUserFilterManager() != null)) {
+      final boolean childPageHidden = childPage == null || (!childPage.isFilterAccepted() && table.getUserFilterManager() != null);
+      if (childPageHidden) {
         table.getUserFilterManager().reset();
         tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResetColumnFilters"), IStatus.WARNING));
       }

@@ -97,17 +97,15 @@ public class SqlConnectionPool {
             break;
           }
         }
-        if (candidate == null) {
-          if (m_idleEntries.size() + m_busyEntries.size() < m_poolSize) {
-            // create new connection
-            PoolEntry test = new PoolEntry();
-            test.conn = new SqlConnectionBuilder().createJdbcConnection(service);
-            LOG.info("created jdbc connection {}", test.conn);
-            service.callbackAfterConnectionCreated(test.conn);
-            test.createTime = System.currentTimeMillis();
-            m_idleEntries.add(test);
-            candidate = test;
-          }
+        if (candidate == null && m_idleEntries.size() + m_busyEntries.size() < m_poolSize) {
+          // create new connection
+          PoolEntry test = new PoolEntry();
+          test.conn = new SqlConnectionBuilder().createJdbcConnection(service);
+          LOG.info("created jdbc connection {}", test.conn);
+          service.callbackAfterConnectionCreated(test.conn);
+          test.createTime = System.currentTimeMillis();
+          m_idleEntries.add(test);
+          candidate = test;
         }
         if (candidate == null) {
           // wait

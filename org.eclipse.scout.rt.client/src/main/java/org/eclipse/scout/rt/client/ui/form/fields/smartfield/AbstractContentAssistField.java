@@ -674,10 +674,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       CodeLookupCall<LOOKUP_KEY> codeLookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
       m_lookupCall = codeLookupCall;
       ICodeType t = BEANS.opt(m_codeTypeClass);
-      if (t != null) {
-        if (!ConfigurationUtility.isMethodOverwrite(AbstractContentAssistField.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
-          setBrowseHierarchy(t.isHierarchy());
-        }
+      if (t != null && !ConfigurationUtility.isMethodOverwrite(AbstractContentAssistField.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
+        setBrowseHierarchy(t.isHierarchy());
       }
     }
   }
@@ -1009,10 +1007,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     // set currentLookupRow to null, when new value doesn't match lookupRow
     // we must do this every time setValue() is called.
     ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
-    if (currentLookupRow != null) {
-      if (!lookupRowMatchesValue(currentLookupRow, validatedValue)) {
-        setCurrentLookupRow(null);
-      }
+    if (currentLookupRow != null && !lookupRowMatchesValue(currentLookupRow, validatedValue)) {
+      setCurrentLookupRow(null);
     }
 
     return validatedValue;

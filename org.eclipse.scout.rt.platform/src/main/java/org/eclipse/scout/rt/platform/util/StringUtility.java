@@ -1488,10 +1488,8 @@ public final class StringUtility {
    */
   public static String removeSuffixes(String s, String... suffixes) {
     for (int i = suffixes.length - 1; i >= 0; i--) {
-      if (suffixes[i] != null) {
-        if (s.toLowerCase().endsWith(suffixes[i].toLowerCase())) {
-          s = s.substring(0, s.length() - suffixes[i].length());
-        }
+      if (suffixes[i] != null && s.toLowerCase().endsWith(suffixes[i].toLowerCase())) {
+        s = s.substring(0, s.length() - suffixes[i].length());
       }
     }
     return s;

@@ -103,10 +103,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       else if (type == TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE || type == TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE) {
         typesToDelete.addAll(getExpansionRelatedEvents());
       }
-      else if (type == TreeEvent.TYPE_NODES_DELETED || type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED) {
-        if (event.hasNodes()) {
-          deletedNodesRemoverList.add(new DeletedNodesRemover(event));
-        }
+      else if ((type == TreeEvent.TYPE_NODES_DELETED || type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED) && event.hasNodes()) {
+        deletedNodesRemoverList.add(new DeletedNodesRemover(event));
       }
     }
 

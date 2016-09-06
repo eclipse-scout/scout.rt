@@ -41,20 +41,17 @@ public final class JandexFolderIndexer {
           scanDirectory(f, indexer);
         }
       }
-      else if (f.isFile()) {
-        if (f.getName().endsWith(CLASS_EXT)) {
-          try {
-            URL url = f.toURI().toURL();
-            try (InputStream in = url.openStream()) {
-              indexer.index(in);
-            }
+      else if (f.isFile() && f.getName().endsWith(CLASS_EXT)) {
+        try {
+          URL url = f.toURI().toURL();
+          try (InputStream in = url.openStream()) {
+            indexer.index(in);
           }
-          catch (IOException ex) {
-            LOG.error("indexing class: {}", f, ex);
-          }
+        }
+        catch (IOException ex) {
+          LOG.error("indexing class: {}", f, ex);
         }
       }
     }
   }
-
 }

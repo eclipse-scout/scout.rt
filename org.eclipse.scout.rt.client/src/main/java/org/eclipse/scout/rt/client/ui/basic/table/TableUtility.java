@@ -267,18 +267,14 @@ public final class TableUtility {
           //special intercept for boolean
           if (type == Boolean.class) {
             Boolean b = TypeCastUtility.castValue(columns.get(c).getValue(rows.get(r)), Boolean.class);
-            if (b != null && b.booleanValue()) {
+            if (b != null && b.booleanValue() && !StringUtility.hasText(text)) {
               // only use X if no display text is set
-              if (!StringUtility.hasText(text)) {
-                text = "X";
-              }
+              text = "X";
             }
           }
           //special intercept for html
-          if (type == String.class) {
-            if (text != null && columns.get(c).isHtmlEnabled()) {
-              text = BEANS.get(HtmlHelper.class).toPlainText(text);
-            }
+          if (type == String.class && text != null && columns.get(c).isHtmlEnabled()) {
+            text = BEANS.get(HtmlHelper.class).toPlainText(text);
           }
           a[csvRowIndex][c] = text;
         }

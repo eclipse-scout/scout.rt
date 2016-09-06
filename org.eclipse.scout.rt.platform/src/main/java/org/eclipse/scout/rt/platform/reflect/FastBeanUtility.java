@@ -50,13 +50,7 @@ public final class FastBeanUtility {
     if ((a == null) != (b == null)) {
       return false;
     }
-
-    if (a != null && b != null) {
-      if (!a.equals(b)) {
-        return false;
-      }
-    }
-    return true;
+    return a == null || a.equals(b);
   }
 
   public static Class findPropertyType(Method readMethod, Method writeMethod) {

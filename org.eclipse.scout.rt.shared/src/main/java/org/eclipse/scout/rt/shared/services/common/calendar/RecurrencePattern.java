@@ -379,12 +379,8 @@ public class RecurrencePattern implements java.io.Serializable {
            * @rn sle, 05.07.2006,
            * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
            */
-          if (m_noEndDate == false) {
-            if (m_lastDate == null) {
-              if (count >= m_occurrences) {
-                break;
-              }
-            }
+          if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+            break;
           }
         }
         // next weekday
@@ -397,12 +393,8 @@ public class RecurrencePattern implements java.io.Serializable {
        * @rn sle, 05.07.2006,
        * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
-      if (m_noEndDate == false) {
-        if (m_lastDate == null) {
-          if (count >= m_occurrences) {
-            break;
-          }
-        }
+      if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+        break;
       }
     }
   }
@@ -442,12 +434,8 @@ public class RecurrencePattern implements java.io.Serializable {
        * @rn sle, 05.07.2006,
        * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
-      if (m_noEndDate == false) {
-        if (m_lastDate == null) {
-          if (count >= m_occurrences) {
-            break;
-          }
-        }
+      if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+        break;
       }
     }
   }
@@ -507,12 +495,8 @@ public class RecurrencePattern implements java.io.Serializable {
        * @rn sle, 05.07.2006,
        * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
-      if (m_noEndDate == false) {
-        if (m_lastDate == null) {
-          if (count >= m_occurrences) {
-            break;
-          }
-        }
+      if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+        break;
       }
     }
   }
@@ -545,12 +529,8 @@ public class RecurrencePattern implements java.io.Serializable {
        * @rn sle, 05.07.2006,
        * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
-      if (m_noEndDate == false) {
-        if (m_lastDate == null) {
-          if (count >= m_occurrences) {
-            break;
-          }
-        }
+      if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+        break;
       }
     }
   }
@@ -612,12 +592,8 @@ public class RecurrencePattern implements java.io.Serializable {
        * @rn sle, 05.07.2006,
        * @since Build 204 Bugfix to ensure value 'occurrences' is realy true reported by MBR, ORS / SSC, BAP PK
        */
-      if (m_noEndDate == false) {
-        if (m_lastDate == null) {
-          if (count >= m_occurrences) {
-            break;
-          }
-        }
+      if (!m_noEndDate && m_lastDate == null && count >= m_occurrences) {
+        break;
       }
     }
   }

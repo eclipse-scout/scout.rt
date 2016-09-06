@@ -203,19 +203,17 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     Assertions.assertNotNull(source);
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) source;
-    if (treeFieldData.isValueSet()) {
-      if (m_tree != null) {
-        try {
-          if (!valueChangeTriggersEnabled) {
-            setValueChangeTriggerEnabled(false);
-          }
-          //
-          m_tree.importTreeData(treeFieldData);
+    if (treeFieldData.isValueSet() && m_tree != null) {
+      try {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(false);
         }
-        finally {
-          if (!valueChangeTriggersEnabled) {
-            setValueChangeTriggerEnabled(true);
-          }
+        //
+        m_tree.importTreeData(treeFieldData);
+      }
+      finally {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(true);
         }
       }
     }
@@ -239,11 +237,9 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     if (m_tree instanceof AbstractTree) {
       ((AbstractTree) m_tree).setContainerInternal(null);
     }
-    if (m_tree != null && !m_treeExternallyManaged) {
-      if (m_treeListener != null) {
-        m_tree.removeTreeListener(m_treeListener);
-        m_treeListener = null;
-      }
+    if (m_tree != null && !m_treeExternallyManaged && m_treeListener != null) {
+      m_tree.removeTreeListener(m_treeListener);
+      m_treeListener = null;
     }
     m_tree = tree;
     if (m_tree instanceof AbstractTree) {
@@ -258,10 +254,8 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       m_tree.setEnabled(isEnabled());
     }
     boolean changed = propertySupport.setProperty(PROP_TREE, m_tree);
-    if (changed) {
-      if (getForm() != null) {
-        getForm().structureChanged(this);
-      }
+    if (changed && getForm() != null) {
+      getForm().structureChanged(this);
     }
   }
 
@@ -276,11 +270,10 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   @Override
   public boolean isContentValid() {
     boolean b = super.isContentValid();
-    if (b) {
-      if (isMandatory()) {
-        if (getTree() == null || getTree().getRootNode() == null) {
-          return false;
-        }
+    if (b && isMandatory()) {
+      final ITree tree = getTree();
+      if (tree == null || tree.getRootNode() == null) {
+        return false;
       }
     }
     return b;

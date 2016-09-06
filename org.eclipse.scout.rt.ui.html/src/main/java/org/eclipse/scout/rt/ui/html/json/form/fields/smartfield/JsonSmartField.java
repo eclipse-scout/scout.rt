@@ -107,10 +107,8 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   protected void handleUiOpenProposal(JsonEvent event) {
     boolean browseAll = event.getData().optBoolean("browseAll");
     String displayText = event.getData().optString("displayText", null);
-    if (browseAll) {
-      if (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && !checkStatusContainsCode(getModel().getErrorStatus(), AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE))) {
-        displayText = "*";
-      }
+    if (browseAll && (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && !checkStatusContainsCode(getModel().getErrorStatus(), AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE)))) {
+      displayText = "*";
     }
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");

@@ -175,10 +175,8 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     m_timeToLive = timeToLiveDurationMillis;
     m_touchOnGet = touchOnGet;
     m_touchOnIterate = touchOnIterate;
-    if (overflowSize > 0) {
-      if (targetSize <= 0 || targetSize >= overflowSize) {
-        throw new IllegalArgumentException("overflowSize is set but targetSize has no valid value");
-      }
+    if (overflowSize > 0 && (targetSize <= 0 || targetSize >= overflowSize)) {
+      throw new IllegalArgumentException("overflowSize is set but targetSize has no valid value");
     }
     m_targetSize = targetSize;
     m_overflowSize = overflowSize;
@@ -415,7 +413,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     // note: in JRE 1.8 the performance of ConcurrentHashMap#size() is increased
     if (m_overflowSize > 0 && m_elementMap.size() >= m_overflowSize) {
       // maximum one thread at the time should shrink the map
-      if (m_validateSizeLock.tryLock()) {
+      if (m_validateSizeLock.tryLock()) { // NOSONAR
         try {
           // recheck size
           if (m_elementMap.size() >= m_overflowSize) {

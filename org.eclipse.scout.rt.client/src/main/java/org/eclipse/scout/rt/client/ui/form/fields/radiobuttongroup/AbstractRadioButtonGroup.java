@@ -668,8 +668,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (e.getPropertyName().equals(IButton.PROP_SELECTED)) {
-        if (((IRadioButton) e.getSource()).isSelected()) {
-          syncButtonsToValue((IRadioButton<T>) e.getSource());
+        final IRadioButton<T> radioButton = (IRadioButton<T>) e.getSource();
+        if (radioButton.isSelected()) {
+          syncButtonsToValue(radioButton);
         }
       }
     }

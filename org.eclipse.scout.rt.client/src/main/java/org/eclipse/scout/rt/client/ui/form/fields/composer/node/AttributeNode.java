@@ -45,10 +45,8 @@ public class AttributeNode extends AbstractComposerNode {
     if (m_op != null) {
       dataType = m_op.getType();
     }
-    if (dataType == DataModelConstants.TYPE_INHERITED) {
-      if (m_attribute != null) {
-        dataType = m_attribute.getType();
-      }
+    if (dataType == DataModelConstants.TYPE_INHERITED && m_attribute != null) {
+      dataType = m_attribute.getType();
     }
     String prefix = "";
     if (getSiblingBefore() != null) {

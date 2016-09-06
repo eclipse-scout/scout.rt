@@ -181,10 +181,8 @@ public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   @Override
   protected boolean setValueInternal(int bitPos, Object o) {
     boolean b = super.setValueInternal(bitPos, o);
-    if (getObserver() != null) {
-      if (bitPos != OBSERVER_BIT) {
-        getObserver().activityChanged(this, bitPos);
-      }
+    if (getObserver() != null && bitPos != OBSERVER_BIT) {
+      getObserver().activityChanged(this, bitPos);
     }
     return b;
   }

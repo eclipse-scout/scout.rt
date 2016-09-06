@@ -139,12 +139,9 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
       if (e.getType() == TableEvent.TYPE_ROWS_SELECTED) {
         handleOwnerValueChanged();
       }
-      else if (e.getType() == TableEvent.TYPE_ROWS_UPDATED) {
-        if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
-          handleOwnerValueChanged();
-        }
+      else if (e.getType() == TableEvent.TYPE_ROWS_UPDATED && CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
+        handleOwnerValueChanged();
       }
     }
-
   }
 }

@@ -709,10 +709,8 @@ public class SqlParser {
     //eliminate all empty Raw
     for (Iterator<IToken> it = list.iterator(); it.hasNext();) {
       IToken item = it.next();
-      if (item instanceof Raw) {
-        if (!StringUtility.hasText(item.getText())) {
-          it.remove();
-        }
+      if (item instanceof Raw && !StringUtility.hasText(item.getText())) {
+        it.remove();
       }
     }
     //check the rest, no more Raw, convert to comment with warning

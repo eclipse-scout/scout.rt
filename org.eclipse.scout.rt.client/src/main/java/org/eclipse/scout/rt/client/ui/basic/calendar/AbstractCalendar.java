@@ -585,13 +585,10 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T extends ICalendarItem> T getSelectedItem(Class<T> c) {
     CalendarComponent comp = getSelectedComponent();
-    if (comp != null && comp.getItem() != null) {
-      if (c.isAssignableFrom(comp.getItem().getClass())) {
-        return (T) comp.getItem();
-      }
+    if (comp != null && comp.getItem() != null && c.isAssignableFrom(comp.getItem().getClass())) {
+      return c.cast(comp.getItem());
     }
     return null;
   }

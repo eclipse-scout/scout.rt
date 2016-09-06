@@ -1244,10 +1244,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     node = resolveNode(node);
-    if (node != null) {
-      if (node.isExpanded() != b || node.isExpandedLazy() != lazy) {
-        setNodeExpandedInternal(node, b, lazy);
-      }
+    if (node != null && (node.isExpanded() != b || node.isExpandedLazy() != lazy)) {
+      setNodeExpandedInternal(node, b, lazy);
     }
   }
 
@@ -1408,11 +1406,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void setNodeLeaf(ITreeNode node, boolean b) {
     node = resolveNode(node);
-    if (node != null) {
-      if (node.isLeaf() != b) {
-        node.setLeafInternal(b);
-        fireNodesUpdated(node.getParentNode(), CollectionUtility.arrayList(node));
-      }
+    if (node != null && node.isLeaf() != b) {
+      node.setLeafInternal(b);
+      fireNodesUpdated(node.getParentNode(), CollectionUtility.arrayList(node));
     }
   }
 
@@ -1443,27 +1439,25 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     List<ITreeNode> changedNodes = new ArrayList<ITreeNode>();
     for (ITreeNode node : nodes) {
       node = resolveNode(node);
-      if (node != null) {
-        if (node.isChecked() != b && (!onlyCheckEnabledNodes || node.isEnabled())) {
-          if (b) {
-            m_checkedNodes.add(node);
-          }
-          else {
-            m_checkedNodes.remove(node);
-          }
-          changedNodes.add(node);
+      if (node != null && node.isChecked() != b && (!onlyCheckEnabledNodes || node.isEnabled())) {
+        if (b) {
+          m_checkedNodes.add(node);
+        }
+        else {
+          m_checkedNodes.remove(node);
+        }
+        changedNodes.add(node);
 
-          //uncheck others in single-check mode
-          if (b && !isMultiCheck()) {
-            List<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
-            for (ITreeNode cn : getCheckedNodes()) {
-              if (cn != node) {
-                m_checkedNodes.remove(cn);
-                uncheckedNodes.add(cn);
-              }
+        //uncheck others in single-check mode
+        if (b && !isMultiCheck()) {
+          List<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
+          for (ITreeNode cn : getCheckedNodes()) {
+            if (cn != node) {
+              m_checkedNodes.remove(cn);
+              uncheckedNodes.add(cn);
             }
-            break;
           }
+          break;
         }
       }
     }
@@ -1506,11 +1500,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void setNodeStatus(ITreeNode node, int status) {
     node = resolveNode(node);
-    if (node != null) {
-      if (node.getStatus() != status) {
-        node.setStatusInternal(status);
-        fireNodesUpdated(node.getParentNode(), CollectionUtility.arrayList(node));
-      }
+    if (node != null && node.getStatus() != status) {
+      node.setStatusInternal(status);
+      fireNodesUpdated(node.getParentNode(), CollectionUtility.arrayList(node));
     }
   }
 
@@ -2214,11 +2206,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (n != null) {
       ITreeNode parent = n.getParentNode();
       while (parent != null) {
-        if (parent != getRootNode() || isRootNodeVisible()) {
-          if (parent.isFilterAccepted()) {
-            selectNode(parent);
-            return;
-          }
+        if ((parent != getRootNode() || isRootNodeVisible()) && parent.isFilterAccepted()) {
+          selectNode(parent);
+          return;
         }
         //
         parent = parent.getParentNode();
@@ -2559,14 +2549,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;
-        if (node != null && !node.isInitializing()) {
-          if (node.isLeaf()) {
-            try {
-              interceptNodeAction(node);
-            }
-            catch (Exception ex) {
-              BEANS.get(ExceptionHandler.class).handle(ex);
-            }
+        if (node != null && !node.isInitializing() && node.isLeaf()) {
+          try {
+            interceptNodeAction(node);
+          }
+          catch (Exception ex) {
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }
       }
@@ -2968,15 +2956,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           //
           node = resolveNode(node);
           node = resolveVirtualNode(node);
-          if (node != null) {
-            if (node.isExpanded() != on || node.isExpandedLazy() != lazy) {
-              if (on) {
-                if (node.isChildrenDirty() || node.isChildrenVolatile()) {
-                  node.loadChildren();
-                }
-              }
-              setNodeExpanded(node, on, lazy);
+          if (node != null && (node.isExpanded() != on || node.isExpandedLazy() != lazy)) {
+            if (on && (node.isChildrenDirty() || node.isChildrenVolatile())) {
+              node.loadChildren();
             }
+            setNodeExpanded(node, on, lazy);
           }
         }
         finally {
@@ -3050,10 +3034,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
           // load children for selection
           for (ITreeNode node : validNodes) {
-            if (node.isChildrenLoaded()) {
-              if (node.isChildrenDirty() || node.isChildrenVolatile()) {
-                node.loadChildren();
-              }
+            if (node.isChildrenLoaded() && (node.isChildrenDirty() || node.isChildrenVolatile())) {
+              node.loadChildren();
             }
           }
 

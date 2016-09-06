@@ -1592,10 +1592,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     else {
       changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleProperty && interceptCalculateVisible());
     }
-    if (changed) {
-      if (getForm() != null) {
-        getForm().structureChanged(this);
-      }
+    if (changed && getForm() != null) {
+      getForm().structureChanged(this);
     }
   }
 
@@ -1841,11 +1839,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   public void setMasterField(IValueField field) {
     IValueField oldMasterField = getMasterField();
     // remove old listener
-    if (oldMasterField != null) {
-      if (m_currentMasterListener != null) {
-        oldMasterField.removeMasterListener(m_currentMasterListener);
-        m_currentMasterListener = null;
-      }
+    if (oldMasterField != null && m_currentMasterListener != null) {
+      oldMasterField.removeMasterListener(m_currentMasterListener);
+      m_currentMasterListener = null;
     }
     // add new listener and set enabling
     if (field != null) {

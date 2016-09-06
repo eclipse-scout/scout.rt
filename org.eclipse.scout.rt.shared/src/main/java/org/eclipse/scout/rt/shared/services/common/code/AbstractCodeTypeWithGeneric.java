@@ -526,12 +526,9 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     visit(new ICodeVisitor<ICode<CODE_ID>>() {
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (code.getParentCode() != null) {
-          if (!code.getParentCode().isActive() && code.isActive()) {
-            if (code instanceof AbstractCode<?>) {
-              ((AbstractCode<?>) code).setActiveInternal(false);
-            }
-          }
+        final ICode<CODE_ID> parentCode = code.getParentCode();
+        if (parentCode != null && !parentCode.isActive() && code.isActive() && code instanceof AbstractCode<?>) {
+          ((AbstractCode<?>) code).setActiveInternal(false);
         }
         return true;
       }

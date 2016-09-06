@@ -644,14 +644,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       return rawValue;
     }
     ITree tree = getTree();
-    if (tree != null) {
-      if ((tree.isCheckable() && !tree.isMultiCheck()) || (!tree.isCheckable() && !tree.isMultiSelect())) {
-        //only single value
-        if (rawValue.size() > 1) {
-          LOG.warn("{} only accepts a single value. Got {}. Using only first value.", getClass().getName(), rawValue);
-          return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
-        }
-      }
+    if (tree != null
+        && ((tree.isCheckable() && !tree.isMultiCheck()) || (!tree.isCheckable() && !tree.isMultiSelect()))
+        && rawValue.size() > 1) {
+      LOG.warn("{} only accepts a single value. Got {}. Using only first value.", getClass().getName(), rawValue);
+      return CollectionUtility.hashSet(CollectionUtility.firstElement(rawValue));
     }
     return rawValue;
   }

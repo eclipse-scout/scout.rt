@@ -499,10 +499,8 @@ public class CsvHelper {
     if (strings != null) {
       for (Iterator<String> it = strings.iterator(); it.hasNext();) {
         buf.append(encodeText(it.next()));
-        if (it.hasNext()) {
-          if (getSeparatorChar() != 0x00) {
-            buf.append(getSeparatorChar());
-          }
+        if (it.hasNext() && getSeparatorChar() != 0x00) {
+          buf.append(getSeparatorChar());
         }
       }
     }
@@ -536,25 +534,21 @@ public class CsvHelper {
   }
 
   protected String encodeText(String text) {
-    if (getTextDelimiterChar() != 0x00) {
-      if (text != null) {
-        text = stringReplace(text, "" + getTextDelimiterChar(), "" + getTextDelimiterChar() + getTextDelimiterChar());
-        if (text.indexOf(getSeparatorChar()) >= 0 || text.indexOf(getTextDelimiterChar()) >= 0 || (isEncodeLineSeparator() && text.indexOf(getLineSeparator()) >= 0)) {
-          text = getTextDelimiterChar() + text + getTextDelimiterChar();
-        }
+    if (getTextDelimiterChar() != 0x00 && text != null) {
+      text = stringReplace(text, "" + getTextDelimiterChar(), "" + getTextDelimiterChar() + getTextDelimiterChar());
+      if (text.indexOf(getSeparatorChar()) >= 0 || text.indexOf(getTextDelimiterChar()) >= 0 || (isEncodeLineSeparator() && text.indexOf(getLineSeparator()) >= 0)) {
+        text = getTextDelimiterChar() + text + getTextDelimiterChar();
       }
     }
     return text;
   }
 
   protected String decodeText(String text) {
-    if (text != null && text.length() > 0) {
-      if (getTextDelimiterChar() != 0x00) {
-        if (text.charAt(0) == getTextDelimiterChar() && text.charAt(text.length() - 1) == getTextDelimiterChar()) {
-          text = text.substring(1, text.length() - 1);
-        }
-        text = stringReplace(text, "" + getTextDelimiterChar() + getTextDelimiterChar(), "" + getTextDelimiterChar());
+    if (text != null && text.length() > 0 && getTextDelimiterChar() != 0x00) {
+      if (text.charAt(0) == getTextDelimiterChar() && text.charAt(text.length() - 1) == getTextDelimiterChar()) {
+        text = text.substring(1, text.length() - 1);
       }
+      text = stringReplace(text, "" + getTextDelimiterChar() + getTextDelimiterChar(), "" + getTextDelimiterChar());
     }
     return text;
   }

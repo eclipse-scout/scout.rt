@@ -62,10 +62,8 @@ public class BatchSplit {
     List<ILookupCall<?>> localResult = new ArrayList<ILookupCall<?>>();
     for (int i = 0; i < m_calls.size(); i++) {
       ILookupCall<?> call = m_calls.get(i);
-      if (call != null) {
-        if (m_local[i]) {
-          localResult.add(call);
-        }
+      if (call != null && m_local[i]) {
+        localResult.add(call);
       }
     }
     return localResult;
@@ -79,10 +77,8 @@ public class BatchSplit {
     List<ILookupCall<?>> remoteResult = new ArrayList<ILookupCall<?>>();
     for (int i = 0; i < m_calls.size(); i++) {
       ILookupCall<?> call = m_calls.get(i);
-      if (call != null) {
-        if (!m_local[i]) {
-          remoteResult.add(call);
-        }
+      if (call != null && !m_local[i]) {
+        remoteResult.add(call);
       }
     }
     return remoteResult;
@@ -92,11 +88,9 @@ public class BatchSplit {
     int k = 0;
     for (int i = 0; i < m_calls.size(); i++) {
       ILookupCall<?> call = m_calls.get(i);
-      if (call != null) {
-        if (m_local[i]) {
-          m_results.put(call, data.get(k));
-          k++;
-        }
+      if (call != null && m_local[i]) {
+        m_results.put(call, data.get(k));
+        k++;
       }
     }
   }
@@ -105,11 +99,9 @@ public class BatchSplit {
     int k = 0;
     for (int i = 0; i < m_calls.size(); i++) {
       ILookupCall<?> call = m_calls.get(i);
-      if (call != null) {
-        if (!m_local[i]) {
-          m_results.put(call, data.get(k));
-          k++;
-        }
+      if (call != null && !m_local[i]) {
+        m_results.put(call, data.get(k));
+        k++;
       }
     }
   }
@@ -121,5 +113,4 @@ public class BatchSplit {
     }
     return result;
   }
-
 }

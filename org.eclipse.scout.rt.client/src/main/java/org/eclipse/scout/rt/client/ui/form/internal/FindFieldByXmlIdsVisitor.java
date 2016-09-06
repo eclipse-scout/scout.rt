@@ -128,10 +128,8 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
       return null;
     }
     Entry<CompositeObject, IFormField> candidate = m_prioMap.lastEntry();
-    if (m_ambiguousFieldKeys.contains(candidate.getKey())) {
-      if (Platform.get().inDevelopmentMode()) {
-        LOG.warn("ambiguous fieldId: {} returning first candidate [{}]", m_xmlFieldIds, candidate.getValue());
-      }
+    if (m_ambiguousFieldKeys.contains(candidate.getKey()) && Platform.get().inDevelopmentMode()) {
+      LOG.warn("ambiguous fieldId: {} returning first candidate [{}]", m_xmlFieldIds, candidate.getValue());
     }
     return candidate.getValue();
   }

@@ -134,10 +134,8 @@ public final class ConfigurationUtility {
   public static <T> List<Class<T>> filterClassesIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
     List<Class<T>> list = new ArrayList<Class<T>>(classes.length);
     for (Class c : classes) {
-      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
-        if (!isInjectFieldAnnotationPresent(c)) {
-          list.add(c);
-        }
+      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()) && !isInjectFieldAnnotationPresent(c)) {
+        list.add(c);
       }
     }
     return list;
@@ -153,10 +151,8 @@ public final class ConfigurationUtility {
   public static <T> List<Class<T>> filterClassesWithInjectFieldAnnotation(Class[] classes, Class<T> filter) {
     List<Class<T>> list = new ArrayList<Class<T>>(classes.length);
     for (Class c : classes) {
-      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
-        if (isInjectFieldAnnotationPresent(c)) {
-          list.add(c);
-        }
+      if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers()) && isInjectFieldAnnotationPresent(c)) {
+        list.add(c);
       }
     }
     return list;

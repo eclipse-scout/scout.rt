@@ -1085,11 +1085,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
             rowsToInsert.add(row);
           }
         }
-        else if (!row.isRejectedByUser()) {
-          if (existingRowId != null) {
-            // Row is filtered, but JsonTable has it in its list --> handle as deletion event
-            rowsToDelete.add(row);
-          }
+        else if (!row.isRejectedByUser() && existingRowId != null) {
+          // Row is filtered, but JsonTable has it in its list --> handle as deletion event
+          rowsToDelete.add(row);
         }
       }
 

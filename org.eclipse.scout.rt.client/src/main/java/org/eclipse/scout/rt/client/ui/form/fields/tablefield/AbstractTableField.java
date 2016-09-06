@@ -216,11 +216,9 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       ((AbstractTable) m_table).setContainerInternal(null);
     }
     if (m_table != null) {
-      if (!m_tableExternallyManaged) {
-        if (m_managedTableListener != null) {
-          m_table.removeTableListener(m_managedTableListener);
-          m_managedTableListener = null;
-        }
+      if (!m_tableExternallyManaged && m_managedTableListener != null) {
+        m_table.removeTableListener(m_managedTableListener);
+        m_managedTableListener = null;
       }
       if (isInitialized()) {
         for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
@@ -257,38 +255,34 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   public void exportFormFieldData(AbstractFormFieldData target) {
-    if (m_table != null) {
-      if (target instanceof AbstractTableFieldBeanData) {
-        AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) target;
-        m_table.exportToTableBeanData(tableBeanData);
-        target.setValueSet(true);
-      }
+    if (m_table != null && target instanceof AbstractTableFieldBeanData) {
+      AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) target;
+      m_table.exportToTableBeanData(tableBeanData);
+      target.setValueSet(true);
     }
   }
 
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     Assertions.assertNotNull(source);
-    if (source.isValueSet()) {
-      if (m_table != null) {
-        try {
-          if (!valueChangeTriggersEnabled) {
-            setValueChangeTriggerEnabled(false);
-          }
-          if (source instanceof AbstractTableFieldBeanData) {
-            AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) source;
-            m_table.importFromTableBeanData(tableBeanData);
-          }
-          if (m_table.isCheckable() && m_table.getCheckableColumn() != null) {
-            for (ITableRow row : m_table.getRows()) {
-              row.setChecked(BooleanUtility.nvl(m_table.getCheckableColumn().getValue(row)));
-            }
+    if (source.isValueSet() && m_table != null) {
+      try {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(false);
+        }
+        if (source instanceof AbstractTableFieldBeanData) {
+          AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) source;
+          m_table.importFromTableBeanData(tableBeanData);
+        }
+        if (m_table.isCheckable() && m_table.getCheckableColumn() != null) {
+          for (ITableRow row : m_table.getRows()) {
+            row.setChecked(BooleanUtility.nvl(m_table.getCheckableColumn().getValue(row)));
           }
         }
-        finally {
-          if (!valueChangeTriggersEnabled) {
-            setValueChangeTriggerEnabled(true);
-          }
+      }
+      finally {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(true);
         }
       }
     }

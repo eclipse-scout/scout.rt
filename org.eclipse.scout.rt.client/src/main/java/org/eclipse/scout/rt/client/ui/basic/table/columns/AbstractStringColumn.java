@@ -206,10 +206,8 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   protected String/* validValue */ validateValueInternal(ITableRow row, String rawValue) {
     String value = super.validateValueInternal(row, rawValue);
-    if (value != null) {
-      if (value.length() > getMaxLength()) {
-        value = value.substring(0, getMaxLength());
-      }
+    if (value != null && value.length() > getMaxLength()) {
+      value = value.substring(0, getMaxLength());
     }
     return StringUtility.nullIfEmpty(value);
   }

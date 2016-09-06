@@ -497,14 +497,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
     Map<Integer, Map<String, AbstractFormFieldData>> fieldsBreathFirstMap = formData.getAllFieldsRec();
     for (Map<String, AbstractFormFieldData> map : fieldsBreathFirstMap.values()) {
       for (AbstractFormFieldData f : map.values()) {
-        if (f.isValueSet()) {
-          if (f instanceof AbstractTreeFieldData) {
-            // composer tree with entity, attribute
-            EntityContribution contrib = buildTreeNodes(((AbstractTreeFieldData) f).getRoots(), EntityStrategy.BuildConstraints, AttributeStrategy.BuildConstraintOfAttributeWithContext);
-            String cons = createWhereConstraint(contrib);
-            if (cons != null) {
-              addWhere(" AND " + cons);
-            }
+        if (f.isValueSet() && f instanceof AbstractTreeFieldData) {
+          // composer tree with entity, attribute
+          EntityContribution contrib = buildTreeNodes(((AbstractTreeFieldData) f).getRoots(), EntityStrategy.BuildConstraints, AttributeStrategy.BuildConstraintOfAttributeWithContext);
+          String cons = createWhereConstraint(contrib);
+          if (cons != null) {
+            addWhere(" AND " + cons);
           }
         }
       }

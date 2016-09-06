@@ -70,13 +70,11 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
   @Override
   public void releasePreparedStatement(PreparedStatement ps) {
     // close statement when it is not cached
-    if (ps != null) {
-      if (!m_statementCache.containsValue(ps)) {
-        try {
-          ps.close();
-        }
-        catch (Throwable t) {
-        }
+    if (ps != null && !m_statementCache.containsValue(ps)) {
+      try {
+        ps.close();
+      }
+      catch (Throwable t) {
       }
     }
   }
@@ -103,13 +101,11 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
   @Override
   public void releaseCallableStatement(CallableStatement cs) {
     // close statement when it is not cached
-    if (cs != null) {
-      if (!m_statementCache.containsValue(cs)) {
-        try {
-          cs.close();
-        }
-        catch (Throwable t) {
-        }
+    if (cs != null && !m_statementCache.containsValue(cs)) {
+      try {
+        cs.close();
+      }
+      catch (Throwable t) {
       }
     }
   }
