@@ -54,7 +54,6 @@ import org.eclipse.scout.jaxws.apt.internal.util.AptLogger;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -282,7 +281,6 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Creates the implementation of a entry point method.
    */
-  @Internal
   protected void addEntryPointMethodImplementation(final JCodeModel model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String endpointInterfaceName) {
     final JBlock methodBody = method.body();
 
@@ -320,7 +318,6 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Creates code to invoke the port type on behalf of the RunContext.
    */
-  @Internal
   protected JInvocation createRunContextInvocation(final JCodeModel model, final JExpression runContext, final boolean voidMethod, final JMethod portTypeMethod, final String endpointInterfaceName) {
     final JType returnType;
     final JDefinedClass runContextCallable;
@@ -361,11 +358,9 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Adds the method to handle undeclared exceptions which are not declared in the WSDL.
    */
-  @Internal
   protected void addHandleUndeclaredFaultMethod(final JCodeModel model, final JDefinedClass entryPoint) {
     // Create the method to handle undeclared faults.
     final JMethod method = entryPoint.method(JMod.PROTECTED, RuntimeException.class, HANDLE_UNDECLARED_FAULT_METHOD_NAME);
-    method.annotate(Internal.class);
 
     final JVar exceptionParam = method.param(JMod.FINAL, Exception.class, "e");
     method.body()._throw(model.ref(BEANS.class)
@@ -377,10 +372,8 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Adds the method to lookup the {@link RunContext}.
    */
-  @Internal
   protected void addLookupRunContextMethod(final JCodeModel model, final JDefinedClass entryPoint, final JFieldVar webServiceContext) {
     final JMethod method = entryPoint.method(JMod.PROTECTED, RunContext.class, LOOKUP_RUN_CONTEXT_METHOD_NAME);
-    method.annotate(Internal.class);
 
     method.body()._return(model.ref(BEANS.class)
         .staticInvoke("get")
@@ -453,7 +446,6 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Returns {@link WebService} for the given service name, else <code>null</code>.
    */
-  @Internal
   protected WebServiceClient findWebServiceClientAnnotation(final RoundEnvironment roundEnv, final String serviceName) {
     for (final Element _annotatedElement : roundEnv.getElementsAnnotatedWith(WebServiceClient.class)) {
       final WebServiceClient candidate = _annotatedElement.getAnnotation(WebServiceClient.class);

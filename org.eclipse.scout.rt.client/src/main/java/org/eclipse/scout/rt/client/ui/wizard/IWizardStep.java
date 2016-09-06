@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 
@@ -44,7 +43,6 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
   /**
    * Do not call this internal method.
    */
-  @Internal
   void setWizardInternal(IWizard w);
 
   String getTitle();

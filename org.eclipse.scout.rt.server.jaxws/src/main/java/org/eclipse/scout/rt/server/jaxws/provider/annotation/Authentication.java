@@ -17,7 +17,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
@@ -51,8 +50,7 @@ public @interface Authentication {
    *
    * @see IAuthenticationMethod
    */
-  Clazz method() default @Clazz(value = NullAuthenticationMethod.class)
-  ;
+  Clazz method() default @Clazz(value = NullAuthenticationMethod.class);
 
   /**
    * Indicates against which data source credentials are to be verified. By default, {@link ForbiddenCredentialVerifier}
@@ -60,8 +58,7 @@ public @interface Authentication {
    *
    * @see ICredentialVerifier
    */
-  Clazz verifier() default @Clazz(value = ForbiddenCredentialVerifier.class)
-  ;
+  Clazz verifier() default @Clazz(value = ForbiddenCredentialVerifier.class);
 
   /**
    * Specifies the position where to register the authentication handler in the handler chain. By default, it is
@@ -73,28 +70,24 @@ public @interface Authentication {
    * Indicates the principal producer to use to create principals to represent authenticated users. By default,
    * {@link SimplePrincipalProducer} is used.
    */
-  Clazz principalProducer() default @Clazz(value = SimplePrincipalProducer.class)
-  ;
+  Clazz principalProducer() default @Clazz(value = SimplePrincipalProducer.class);
 
   /**
    * Indicates which {@link RunContext} to use to run authenticated webservice requests. By default,
    * {@link ServerRunContextProducer} is used, which is based on a {@link ServerSessionProviderWithCache session cache},
    * and enforces to run in a new transaction.
    */
-  Clazz runContextProducer() default @Clazz(value = ServerRunContextProducer.class)
-  ;
+  Clazz runContextProducer() default @Clazz(value = ServerRunContextProducer.class);
 
   /**
    * Represents no authentication handler to be installed.
    */
-  @Internal
   public interface NullAuthenticationMethod extends IAuthenticationMethod {
   }
 
   /**
    * Credential verifier which always returns <code>forbidden</code>.
    */
-  @Internal
   public static final class ForbiddenCredentialVerifier implements ICredentialVerifier {
 
     @Override

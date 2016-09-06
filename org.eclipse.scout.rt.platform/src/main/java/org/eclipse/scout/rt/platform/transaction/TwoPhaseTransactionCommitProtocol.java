@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.transaction;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +72,6 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
    *           if an error occurs during commit phase 1.
    * @see ITransaction#commitPhase1()
    */
-  @Internal
   protected boolean commitPhase1(final ITransaction tx) {
     return tx.commitPhase1();
   }
@@ -83,7 +81,6 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
    * @throws RuntimeException
    *           if an error occurs during commit phase 2.
    */
-  @Internal
   protected void commitPhase2(final ITransaction tx) {
     tx.commitPhase2();
   }
@@ -91,7 +88,6 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
   /**
    * @see ITransaction#rollback()
    */
-  @Internal
   protected void rollback(final ITransaction tx) {
     tx.rollback();
   }
@@ -99,7 +95,6 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
   /**
    * @see ITransaction#release()
    */
-  @Internal
   protected void release(final ITransaction tx) {
     tx.release();
   }

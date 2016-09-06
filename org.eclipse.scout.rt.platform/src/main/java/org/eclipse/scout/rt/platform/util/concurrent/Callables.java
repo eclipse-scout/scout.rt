@@ -12,14 +12,11 @@ package org.eclipse.scout.rt.platform.util.concurrent;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
-
 /**
  * Factory to create callable objects.
  *
  * @since 5.1
  */
-@Internal
 public final class Callables {
 
   private Callables() {

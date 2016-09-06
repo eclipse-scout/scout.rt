@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -626,7 +625,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     return m_modelJobSemaphore;
   }
 
-  @Internal
   protected void fireSessionChangedEvent(final SessionEvent event) {
     List<ISessionListener> listeners = new ArrayList<>();
     listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners

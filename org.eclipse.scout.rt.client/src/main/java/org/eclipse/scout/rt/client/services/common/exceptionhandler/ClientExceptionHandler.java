@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -126,7 +125,6 @@ public class ClientExceptionHandler extends ExceptionHandler {
     BEANS.get(ErrorPopup.class).showMessageBox(t);
   }
 
-  @Internal
   protected Semaphore getLoopDetectionSemaphore(final IClientSession session) {
     Semaphore semaphore = (Semaphore) session.getData(SESSION_DATA_KEY);
     if (semaphore == null) {

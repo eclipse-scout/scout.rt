@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerAllowCoreThreadTimeoutProperty;
@@ -241,7 +240,6 @@ public class JobManager implements IJobManager {
     return m_listeners.add(filter, listener);
   }
 
-  @Internal
   protected void fireEvent(final JobEvent eventToFire) {
     m_listeners.notifyListeners(eventToFire);
   }
@@ -254,7 +252,6 @@ public class JobManager implements IJobManager {
    * @param input
    *          input that describes the job to be executed.
    */
-  @Internal
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input) {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
 
@@ -303,7 +300,6 @@ public class JobManager implements IJobManager {
   /**
    * Returns the internal Executor Service.
    */
-  @Internal
   protected ExecutorService getExecutor() {
     return m_executor;
   }
@@ -311,7 +307,6 @@ public class JobManager implements IJobManager {
   /**
    * Returns the internal delayed Executor Service.
    */
-  @Internal
   protected DelayedExecutor getDelayedExecutor() {
     return m_delayedExecutor;
   }
@@ -375,7 +370,6 @@ public class JobManager implements IJobManager {
    * @throws AssertionException
    *           if the job manager is shut donw.
    */
-  @Internal
   protected void registerFuture(final JobFutureTask<?> future) {
     m_shutdownLock.readLock().lock();
     try {
@@ -387,7 +381,6 @@ public class JobManager implements IJobManager {
     }
   }
 
-  @Internal
   protected void unregisterFuture(final JobFutureTask<?> future) {
     m_futures.remove(future);
   }
@@ -396,7 +389,6 @@ public class JobManager implements IJobManager {
    * Ensures that the given job input has a name set. If already set, the input is returned, or otherwise, a copy of the
    * input is returned with the given <code>defaultName</code> set as name.
    */
-  @Internal
   protected JobInput ensureJobInputName(final JobInput input, final String defaultName) {
     if (input != null && input.getName() == null) {
       return input.copy().withName(defaultName);

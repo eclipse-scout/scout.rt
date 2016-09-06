@@ -25,7 +25,6 @@ import javax.xml.ws.http.HTTPException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
@@ -105,7 +104,6 @@ public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<
   /**
    * Method invoked to optionally run the given {@link Callable} on behalf of a {@link RunContext}.
    */
-  @Internal
   protected <T> T handle(final MessageContext messageContext, final String method, final Callable<T> callable) {
     try {
       if (m_handlerRunContextProducer == null) {
@@ -137,7 +135,6 @@ public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<
   /**
    * Injects the given 'init-params' into the given handler.
    */
-  @Internal
   protected void injectInitParams(final Handler<CONTEXT> handler, final Map<String, String> initParams) {
     for (final Field field : handler.getClass().getDeclaredFields()) {
       if (field.getAnnotation(Resource.class) != null && field.getType().isAssignableFrom(initParams.getClass())) {
@@ -158,7 +155,6 @@ public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<
     }
   }
 
-  @Internal
   protected Map<String, String> toInitParamMap(final InitParam[] initParams) {
     final Map<String, String> map = new HashMap<>(initParams.length);
     for (final InitParam initParam : initParams) {

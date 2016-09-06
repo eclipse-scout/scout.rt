@@ -23,7 +23,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerCorePoolSizeProperty;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
@@ -285,7 +284,6 @@ public class FutureSet {
     return Collections.singleton(Boolean.TRUE).equals(success);
   }
 
-  @Internal
   protected List<JobFutureTask<?>> copyFutures() {
     m_readLock.lock();
     try {

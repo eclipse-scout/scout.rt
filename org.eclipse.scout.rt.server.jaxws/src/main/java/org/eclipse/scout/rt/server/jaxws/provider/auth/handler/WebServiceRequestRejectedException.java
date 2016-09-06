@@ -3,8 +3,6 @@ package org.eclipse.scout.rt.server.jaxws.provider.auth.handler;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.http.HTTPException;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
-
 /**
  * Exception to be thrown, if the call chain should be exit with a {@link HTTPException}.
  * <p>
@@ -14,7 +12,6 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
  *
  * @since 5.2
  */
-@Internal
 public class WebServiceRequestRejectedException extends Exception {
 
   private static final long serialVersionUID = 1L;

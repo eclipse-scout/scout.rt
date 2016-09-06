@@ -54,7 +54,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -1593,14 +1592,12 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   /**
    * Decorate all cells.
    */
-  @Internal
   protected void decorateCells() {
     if (getTable() != null) {
       decorateCells(getTable().getRows());
     }
   }
 
-  @Internal
   @Override
   public void decorateCells(List<ITableRow> rows) {
     for (ITableRow row : rows) {

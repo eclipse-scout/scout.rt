@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
@@ -11,7 +10,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 /**
  * Job helper methods to be included later in the job framework.
  */
-@Internal
 public class LookupJobHelper {
 
   /**

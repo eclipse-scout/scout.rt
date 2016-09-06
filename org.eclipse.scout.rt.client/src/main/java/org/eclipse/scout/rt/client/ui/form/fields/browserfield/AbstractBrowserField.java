@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -252,7 +251,6 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     fireContentChanged();
   }
 
-  @Internal
   protected void setLocationInternal(String location) {
     validateLocation(location);
     propertySupport.setProperty(PROP_LOCATION, location);
@@ -312,7 +310,6 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     fireContentChanged();
   }
 
-  @Internal
   protected void setBinaryResourceInternal(BinaryResource binaryResource) {
     propertySupport.setProperty(PROP_BINARY_RESOURCE, binaryResource);
   }
@@ -327,7 +324,6 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     setAttachmentsInternal(attachments);
   }
 
-  @Internal
   protected void setAttachmentsInternal(Set<BinaryResource> attachments) {
     propertySupport.setProperty(PROP_ATTACHMENTS, attachments);
   }

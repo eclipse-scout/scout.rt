@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -235,7 +234,6 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Method invoked by 'HTTP-GET' and 'HTTP-POST' to identify the session-class and to initialize the content handler
    * for serialization/deserialization.
    */
-  @Internal
   protected void lazyInit(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException {
     m_contentHandler = createContentHandler();
   }
@@ -253,7 +251,6 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   // === SESSION LOOKUP ===
 
-  @Internal
   protected IServerSession lookupServerSessionOnHttpSession(final String sessionId, final ServerRunContext serverRunContext) throws ServletException {
     final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
@@ -317,7 +314,6 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   // === Helper methods ===
 
-  @Internal
   protected boolean isConnectionError(Exception e) {
     Throwable cause = e;
     while (cause != null) {

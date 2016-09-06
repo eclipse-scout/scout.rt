@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.InitializationException;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
@@ -53,7 +52,6 @@ public class BeanManagerImplementor implements IBeanManager {
     return m_lock;
   }
 
-  @Internal
   protected <T> List<IBean<T>> querySingle(Class<T> beanClazz) {
     m_lock.readLock().lock();
     try {
@@ -72,7 +70,6 @@ public class BeanManagerImplementor implements IBeanManager {
     }
   }
 
-  @Internal
   protected <T> List<IBean<T>> queryAll(Class<T> beanClazz) {
     m_lock.readLock().lock();
     try {
@@ -228,12 +225,10 @@ public class BeanManagerImplementor implements IBeanManager {
     return queryAll(beanClazz);
   }
 
-  @Internal
   protected void setBeanDecorationFactory(IBeanDecorationFactory f) {
     m_beanDecorationFactory = f;
   }
 
-  @Internal
   protected IBeanDecorationFactory getBeanDecorationFactory() {
     return m_beanDecorationFactory;
   }

@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -92,7 +91,6 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   /**
    * Sets the row status without firing any events.
    */
-  @Internal
   public void setStatusInternal(int status) {
     super.setStatus(status);
   }

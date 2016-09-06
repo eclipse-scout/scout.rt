@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 
 /**
@@ -19,7 +18,6 @@ import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
  *
  * @since 5.1
  */
-@Internal
 public interface IRejectableRunnable extends Runnable {
 
   /**

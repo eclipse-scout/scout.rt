@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -290,7 +289,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_eventListeners.remove(ISessionListener.class, sessionListener);
   }
 
-  @Internal
   protected void fireSessionChangedEvent(final SessionEvent event) {
     List<ISessionListener> listeners = new ArrayList<>();
     listeners.addAll(Arrays.asList(m_eventListeners.getListeners(ISessionListener.class))); // session specific listeners

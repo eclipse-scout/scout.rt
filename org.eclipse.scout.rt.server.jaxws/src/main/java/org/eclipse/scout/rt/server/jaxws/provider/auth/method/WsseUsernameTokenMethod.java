@@ -26,7 +26,6 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
@@ -86,7 +85,6 @@ public class WsseUsernameTokenMethod implements IAuthenticationMethod {
    *
    * @return {@link Entry} with username as key and password as value, or <code>null</code> if not found.
    */
-  @Internal
   protected Entry<String, String> readWsseCredentials(final SOAPMessageContext messageContext) {
     SOAPHeader header;
     try {

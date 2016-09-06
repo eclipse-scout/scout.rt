@@ -16,7 +16,6 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler;
 
 /**
@@ -25,7 +24,6 @@ import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler;
  * @see HandlerDelegate
  * @since 5.1
  */
-@Internal
 public class SOAPHandlerDelegate extends HandlerDelegate<SOAPMessageContext> implements SOAPHandler<SOAPMessageContext> {
 
   public SOAPHandlerDelegate(final Handler handlerAnnotation) {

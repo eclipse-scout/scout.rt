@@ -25,7 +25,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
@@ -156,7 +155,6 @@ public class RunContext implements IAdaptable {
    * This method is not intended to be overwritten. To contribute behavior, overwrite
    * {@link #interceptCallableChain(CallableChain)}. Contributions are added before setting the transaction boundary.
    */
-  @Internal
   protected <RESULT> CallableChain<RESULT> createCallableChain() {
     final CallableChain<RESULT> contributions = new CallableChain<RESULT>();
     interceptCallableChain(contributions);

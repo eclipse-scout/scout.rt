@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.Date;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.quartz.Calendar;
 import org.quartz.Trigger;
@@ -29,7 +28,6 @@ import org.quartz.spi.OperableTrigger;
  *
  * @since 5.2
  */
-@Internal
 public class FutureRunner<RESULT> implements IRejectableRunnable {
 
   private final JobFutureTask<RESULT> m_futureTask;

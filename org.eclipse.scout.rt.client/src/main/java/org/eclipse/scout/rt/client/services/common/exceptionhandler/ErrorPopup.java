@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
@@ -61,7 +60,6 @@ public class ErrorPopup {
         .show();
   }
 
-  @Internal
   protected void ensureErrorParsed(Throwable exception) {
     if (!m_parsed.compareAndSet(false, true)) {
       return;

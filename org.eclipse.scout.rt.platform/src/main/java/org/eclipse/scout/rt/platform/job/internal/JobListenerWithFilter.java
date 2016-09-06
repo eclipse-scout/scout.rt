@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Internal
 class JobListenerWithFilter implements IJobListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(JobListenerWithFilter.class);
