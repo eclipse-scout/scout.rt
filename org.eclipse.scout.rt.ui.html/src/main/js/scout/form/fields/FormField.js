@@ -401,6 +401,10 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   this.setProperty('menusVisible', menusVisible);
 };
 
+scout.FormField.prototype.setMandatory = function(mandatory) {
+  this.setProperty('mandatory', mandatory);
+};
+
 /**
  * Sets the focus on this field if the field is rendered.
  */
