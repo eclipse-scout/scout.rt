@@ -14,7 +14,7 @@ scout.DateFieldAdapter = function() {
 };
 scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);
 
-scout.ModelAdapter.prototype._initProperties = function(model) {
+scout.DateFieldAdapter.prototype._initProperties = function(model) {
   if (model.errorStatus) {
     model._modelErrorStatus = new scout.Status(model.errorStatus);
   } else {
@@ -22,7 +22,7 @@ scout.ModelAdapter.prototype._initProperties = function(model) {
   }
 };
 
-scout.ModelAdapter.prototype._syncErrorStatus = function(errorStatus) {
+scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
   var invalidTime, invalidDate,
     widgetErrorStatus = this.widget.errorStatus;
 
