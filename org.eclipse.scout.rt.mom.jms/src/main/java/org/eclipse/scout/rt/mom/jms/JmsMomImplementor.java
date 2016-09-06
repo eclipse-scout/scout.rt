@@ -41,11 +41,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.IPlatform.State;
-import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
@@ -313,9 +309,7 @@ public class JmsMomImplementor implements IMomImplementor {
   @Override
   public void destroy() {
     try {
-      if (m_connection != null) {
-        m_connection.close();
-      }
+      m_connection.close();
     }
     catch (final JMSException e) {
       LOG.error("Failed to destory MOM", e);
@@ -549,20 +543,6 @@ public class JmsMomImplementor implements IMomImplementor {
       }
       else {
         super.handle(t);
-      }
-    }
-  }
-
-  /**
-   * {@link IPlatformListener} to shutdown this MOM upon platform shutdown.
-   */
-  @Order(IMom.DESTROY_ORDER)
-  public static class MomPlatformListener implements IPlatformListener {
-
-    @Override
-    public void stateChanged(final PlatformEvent event) {
-      if (State.PlatformStopping.equals(event.getState())) {
-        BEANS.get(JmsMomImplementor.class).destroy();
       }
     }
   }

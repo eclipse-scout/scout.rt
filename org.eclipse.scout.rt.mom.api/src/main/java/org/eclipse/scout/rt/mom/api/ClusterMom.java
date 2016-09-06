@@ -7,6 +7,10 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -118,6 +122,20 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
     @Override
     public String getKey() {
       return "scout.mom.cluster.environment";
+    }
+  }
+
+  /**
+   * {@link IPlatformListener} to shutdown this MOM upon platform shutdown.
+   */
+  @Order(IMom.DESTROY_ORDER)
+  public static class MomPlatformListener implements IPlatformListener {
+
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (State.PlatformStopping.equals(event.getState())) {
+        BEANS.get(ClusterMom.class).destroy();
+      }
     }
   }
 }
