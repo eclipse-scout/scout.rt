@@ -54,7 +54,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -116,9 +115,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   public AbstractTree(boolean callInitialzier) {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerTree(this);
-    }
     m_deletedNodes = new HashMap<Object, ITreeNode>();
     m_nodeFilters = new ArrayList<ITreeNodeFilter>(1);
     m_actionRunning = false;

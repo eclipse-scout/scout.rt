@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -95,9 +94,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   public AbstractTreeNode(boolean callInitializer) {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerTreeNode(this);
-    }
     m_filterAccepted = true;
     m_visibleGranted = true;
     m_visibleProperty = true;

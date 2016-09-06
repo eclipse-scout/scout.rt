@@ -86,7 +86,6 @@ import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
@@ -193,9 +192,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public AbstractTable(boolean callInitializer) {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerTable(this);
-    }
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));

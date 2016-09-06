@@ -196,9 +196,6 @@ public interface ITableRow {
 
   boolean isRowChanging();
 
-  /**
-   * if this is the top level caller calling with b=false, then calls {@link ITable#updateRow(ITableRow)}
-   */
   void setRowChanging(boolean b);
 
   /**

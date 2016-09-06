@@ -88,7 +88,6 @@ import org.eclipse.scout.rt.client.ui.form.internal.FindFieldByXmlIdsVisitor;
 import org.eclipse.scout.rt.client.ui.form.internal.FormDataPropertyFilter;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -200,9 +199,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   public AbstractForm(boolean callInitializer) {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerForm(this);
-    }
     m_eventHistory = createEventHistory();
     setHandler(new NullFormHandler());
     m_enabledGranted = true;

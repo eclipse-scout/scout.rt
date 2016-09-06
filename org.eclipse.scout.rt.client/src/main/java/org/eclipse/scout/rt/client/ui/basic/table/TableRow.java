@@ -20,7 +20,6 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -46,7 +45,6 @@ public class TableRow implements ITableRow {
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
     addCells(colCount);
-    addDesktopProfiler();
   }
 
   public TableRow(ColumnSet columnSet, ITableRow row) {
@@ -56,7 +54,6 @@ public class TableRow implements ITableRow {
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
     copyCells(row);
-    addDesktopProfiler();
   }
 
   public TableRow(ColumnSet columnSet, List<? extends Object> values) {
@@ -66,12 +63,6 @@ public class TableRow implements ITableRow {
         Cell cell = getCellForUpdate(i);
         cell.setValue(values.get(i));
       }
-    }
-  }
-
-  private void addDesktopProfiler() {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerTableRow(this);
     }
   }
 
@@ -272,10 +263,7 @@ public class TableRow implements ITableRow {
 
   @Override
   public void setRowChanging(boolean b) {
-    if (b) {
-    }
-    else {
-    }
+    //nop
   }
 
   @Override

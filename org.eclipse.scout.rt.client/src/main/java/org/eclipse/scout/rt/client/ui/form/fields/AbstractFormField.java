@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
@@ -119,9 +118,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   public AbstractFormField(boolean callInitializer) {
-    if (DesktopProfiler.getInstance().isEnabled()) {
-      DesktopProfiler.getInstance().registerFormField(this);
-    }
     m_enabledGranted = true;
     m_enabledSlave = true;
     m_enabledProcessingButton = true;
