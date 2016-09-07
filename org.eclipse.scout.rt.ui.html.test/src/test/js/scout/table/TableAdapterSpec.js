@@ -446,8 +446,8 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].remoteAdapter);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].remoteAdapter);
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].modelAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].modelAdapter);
       });
 
       it("destroys the old menus", function() {
@@ -464,8 +464,8 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].remoteAdapter);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].remoteAdapter);
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].modelAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].modelAdapter);
 
         var menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
@@ -475,7 +475,7 @@ describe("TableAdapter", function() {
         };
         session._processSuccessResponse(message);
         expect(table.menus.length).toBe(1);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0].remoteAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0].modelAdapter);
         expect(session.getModelAdapter(menu1.id)).toBeFalsy();
         expect(menu1Widget.destroyed).toBe(true);
       });
@@ -495,8 +495,8 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].remoteAdapter);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].remoteAdapter);
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].modelAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].modelAdapter);
 
         var menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
@@ -507,8 +507,8 @@ describe("TableAdapter", function() {
         };
         session._processSuccessResponse(message);
         expect(table.menus.length).toBe(2);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0].remoteAdapter);
-        expect(session.getModelAdapter(menu3.id)).toBe(table.menus[1].remoteAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0].modelAdapter);
+        expect(session.getModelAdapter(menu3.id)).toBe(table.menus[1].modelAdapter);
         expect(session.getModelAdapter(menu1.id)).toBeFalsy();
         expect(menu1Widget.destroyed).toBe(true);
       });

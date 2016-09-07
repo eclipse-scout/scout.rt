@@ -500,7 +500,7 @@ describe('Column', function() {
         table.render(session.$entryPoint);
 
         linkWidgetAndAdapter(table, 'TableAdapter');
-        table.remoteAdapter._onColumnBackgroundEffectChanged({
+        table.modelAdapter._onColumnBackgroundEffectChanged({
           eventParts: [{
             columnId: column0.id,
             backgroundEffect: 'barChart'

@@ -19,7 +19,7 @@ scout.ButtonAdapter.prototype._postCreateWidget = function() {
     return;
   }
 
-  var formAdapter = this.widget.getForm().remoteAdapter;
+  var formAdapter = this.widget.getForm().modelAdapter;
   if (formAdapter.attached) {
     this.resolveKeyStrokeScope();
     return;

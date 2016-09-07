@@ -41,7 +41,6 @@ scout.ModelAdapter = function() {
   this.events = new scout.EventSupport();
 };
 
-// FIXME CGU [6.1] ev. renamen to RemoteAdapter
 scout.ModelAdapter.prototype.init = function(model) {
   this._init(model);
   this.initialized = true;
@@ -89,7 +88,7 @@ scout.ModelAdapter.prototype._initModel = function(model, parent) {
   scout.defaultValues.applyTo(model);
 
   model.parent = parent;
-  model.remoteAdapter = this;
+  model.modelAdapter = this;
 
   if (model.owner !== undefined) {
     // Prefer the owner sent by the server
@@ -148,10 +147,10 @@ scout.ModelAdapter.prototype.goOffline = function() {
       // going offline must not modify model state -> only necessary to inform rendered objects
       return;
     }
-    if (!child.remoteAdapter) {
+    if (!child.modelAdapter) {
       return;
     }
-    child.remoteAdapter.goOffline();
+    child.modelAdapter.goOffline();
   }, this);
   this._goOffline();
 };
@@ -166,10 +165,10 @@ scout.ModelAdapter.prototype.goOnline = function() {
       // going online must not modify model state -> only necessary to inform rendered objects
       return;
     }
-    if (!child.remoteAdapter) {
+    if (!child.modelAdapter) {
       return;
     }
-    child.remoteAdapter.goOnline();
+    child.modelAdapter.goOnline();
   }, this);
   this._goOnline();
 };
@@ -309,7 +308,7 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
 
     if (this._isRemoteProperty(propertyName)) {
       if (value && this._isAdapterProperty(propertyName)) {
-        value = value.remoteAdapter.id;
+        value = value.modelAdapter.id;
       }
       this._callSendProperty(propertyName, value);
     }

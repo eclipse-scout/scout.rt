@@ -43,8 +43,8 @@ scout.RemoteApp.modifyWidgetPrototype = function() {
     }
 
     // Remote case
-    var remoteAdapter = findRemoteAdapter(this);
-    if (remoteAdapter) { // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
+    var modelAdapter = findModelAdapter(this);
+    if (modelAdapter) { // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
       return this.session.getOrCreateWidget(value, this); // value is a String, contains (remote) object ID
     }
 
@@ -52,10 +52,10 @@ scout.RemoteApp.modifyWidgetPrototype = function() {
     value.parent = this;
     return scout.create(value);
 
-    function findRemoteAdapter(widget) {
+    function findModelAdapter(widget) {
       while (widget) {
-        if (widget.remoteAdapter) {
-          return widget.remoteAdapter;
+        if (widget.modelAdapter) {
+          return widget.modelAdapter;
         }
         widget = widget.parent;
       }

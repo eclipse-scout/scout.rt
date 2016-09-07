@@ -46,7 +46,7 @@ scout.DesktopAdapter.prototype._onWidgetFormActivated = function(event) {
 
 scout.DesktopAdapter.prototype._sendFormActivated = function(form) {
   var eventData = {
-    formId: form ? form.remoteAdapter.id : null
+    formId: form ? form.modelAdapter.id : null
   };
 
   this._send('formActivated', eventData, {

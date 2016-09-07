@@ -187,7 +187,7 @@ describe('SmartField', function() {
       smartField.touch = true;
       smartField.render(session.$entryPoint);
       smartField.$field.click();
-      smartField.remoteAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+      smartField.modelAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
       }));
       expect(smartField.popup.rendered).toBe(true);
@@ -196,7 +196,7 @@ describe('SmartField', function() {
       expect($('.smart-field-popup').length).toBe(0);
 
       smartField.popup.close();
-      smartField.remoteAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+      smartField.modelAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: null
       }));
       expect(smartField.popup).toBe(null);
@@ -205,7 +205,7 @@ describe('SmartField', function() {
 
       // Expect same behavior after a second click
       smartField.$field.click();
-      smartField.remoteAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+      smartField.modelAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
       }));
       expect(smartField.popup.rendered).toBe(true);

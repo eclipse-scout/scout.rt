@@ -135,7 +135,7 @@ describe('ModelAdapter', function() {
     spyOn(widget, 'setFoo').and.callThrough();
     spyOn(widget, 'setProperty').and.callThrough();
 
-    widget.remoteAdapter._syncPropertiesOnPropertyChange(newValues);
+    widget.modelAdapter._syncPropertiesOnPropertyChange(newValues);
     expect(widget.foo).toBe(6);
     expect(widget.bar).toBe(7);
     expect(widget.setFoo).toHaveBeenCalled(); // for property 'foo'
@@ -171,7 +171,7 @@ describe('ModelAdapter', function() {
 
     beforeEach(function() {
       widget = createWidget();
-      adapter = widget.remoteAdapter;
+      adapter = widget.modelAdapter;
       childModel = createModel();
     });
 
@@ -186,7 +186,7 @@ describe('ModelAdapter', function() {
 
       expect(session.getModelAdapter(adapter.id)).toBe(adapter);
       expect(widget.childWidget).toBeTruthy();
-      expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
+      expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.modelAdapter);
 
       adapter.destroy();
 
@@ -207,7 +207,7 @@ describe('ModelAdapter', function() {
 
       expect(session.getModelAdapter(adapter.id)).toBe(adapter);
       expect(widget.childWidget).toBeTruthy();
-      expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
+      expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.modelAdapter);
 
       adapter.destroy();
 
@@ -224,7 +224,7 @@ describe('ModelAdapter', function() {
 
     beforeEach(function() {
       widget = createWidget();
-      adapter = widget.remoteAdapter;
+      adapter = widget.modelAdapter;
       childModel = createModel();
       childModel2 = createModel();
     });
@@ -241,7 +241,7 @@ describe('ModelAdapter', function() {
         session._processSuccessResponse(message);
 
         expect(widget.childWidget).toBeTruthy();
-        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.modelAdapter);
       });
 
       it('destroys the old adapter', function() {
@@ -254,7 +254,7 @@ describe('ModelAdapter', function() {
         session._processSuccessResponse(message);
 
         expect(widget.childWidget).toBeTruthy();
-        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.modelAdapter);
 
         message = {
           adapterData: mapAdapterData(childModel2),
@@ -264,7 +264,7 @@ describe('ModelAdapter', function() {
         };
         session._processSuccessResponse(message);
 
-        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget.remoteAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget.modelAdapter);
         expect(session.getModelAdapter(childModel.id)).toBeFalsy();
       });
 
@@ -277,7 +277,7 @@ describe('ModelAdapter', function() {
       beforeEach(function() {
         jasmine.Ajax.requests.reset();
         widget = createWidget();
-        adapter = widget.remoteAdapter;
+        adapter = widget.modelAdapter;
         adapter._addRemoteProperties(['foo']);
       });
 
@@ -348,8 +348,8 @@ describe('ModelAdapter', function() {
 
         expect(widget.childWidget[0]).toBeTruthy();
         expect(widget.childWidget[1]).toBeTruthy();
-        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
-        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].modelAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].modelAdapter);
       });
 
       it('destroys the old adapters', function() {
@@ -362,8 +362,8 @@ describe('ModelAdapter', function() {
         session._processSuccessResponse(message);
         expect(widget.childWidget[0]).toBeTruthy();
         expect(widget.childWidget[1]).toBeTruthy();
-        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
-        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].modelAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].modelAdapter);
 
         var childWidget = widget.childWidget[0];
         var childWidget2 = widget.childWidget[1];
@@ -377,7 +377,7 @@ describe('ModelAdapter', function() {
         expect(widget.childWidget[0]).toBeTruthy();
         expect(session.getModelAdapter(childModel.id)).toBeFalsy();
         expect(childWidget.destroyed).toBe(true);
-        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].modelAdapter);
         expect(childWidget2.destroyed).toBe(false);
       });
 
@@ -393,8 +393,8 @@ describe('ModelAdapter', function() {
 
         expect(widget.childWidget[0]).toBeTruthy();
         expect(widget.childWidget[1]).toBeTruthy();
-        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
-        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].modelAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].modelAdapter);
 
         message = {
           adapterData: mapAdapterData(childModel3),
@@ -407,8 +407,8 @@ describe('ModelAdapter', function() {
         expect(widget.childWidget.length).toBe(2);
         expect(widget.childWidget[0]).toBeTruthy();
         expect(widget.childWidget[1]).toBeTruthy();
-        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].remoteAdapter);
-        expect(session.getModelAdapter(childModel3.id)).toBe(widget.childWidget[1].remoteAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].modelAdapter);
+        expect(session.getModelAdapter(childModel3.id)).toBe(widget.childWidget[1].modelAdapter);
         expect(session.getModelAdapter(childModel.id)).toBeFalsy();
       });
 

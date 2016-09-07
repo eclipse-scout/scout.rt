@@ -25,7 +25,7 @@ describe('DesktopAdapter', function() {
     formHelper = new scout.FormSpecHelper(session);
     desktop = session.desktop;
     linkWidgetAndAdapter(desktop, 'DesktopAdapter');
-    desktopAdapter = desktop.remoteAdapter;
+    desktopAdapter = desktop.modelAdapter;
   });
 
   afterEach(function() {
@@ -59,7 +59,7 @@ describe('DesktopAdapter', function() {
 
       sendQueuedAjaxCalls();
       var event = new scout.Event(desktopAdapter.id, 'formActivated', {
-        formId: form.remoteAdapter.id
+        formId: form.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
@@ -68,7 +68,7 @@ describe('DesktopAdapter', function() {
 
       sendQueuedAjaxCalls();
       event = new scout.Event(desktopAdapter.id, 'formActivated', {
-        formId: form2.remoteAdapter.id
+        formId: form2.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });

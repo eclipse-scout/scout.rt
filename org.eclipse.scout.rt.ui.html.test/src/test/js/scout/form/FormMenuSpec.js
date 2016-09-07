@@ -108,7 +108,7 @@ describe('FormMenu', function() {
         var event = createPropertyChangeEvent(menu, {
           'selected': true
         });
-        menu.remoteAdapter.onModelPropertyChange(event);
+        menu.modelAdapter.onModelPropertyChange(event);
         expect(menu.setSelected).toHaveBeenCalled();
       });
 

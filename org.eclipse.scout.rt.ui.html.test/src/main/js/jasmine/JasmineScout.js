@@ -176,7 +176,7 @@ function linkWidgetAndAdapter(widget, adapterClass) {
     session: session
   });
   adapter.widget = widget;
-  widget.remoteAdapter = adapter;
+  widget.modelAdapter = adapter;
   adapter._attachWidget();
 }
 
