@@ -74,7 +74,7 @@ public class JsonBrowserFieldTest extends BaseFormFieldTest {
     boolean windowState = true;
     Map<String, String> map = new HashMap<>();
     map.put("windowState", Boolean.toString(windowState));
-    m_browserField.handleUiEvent(new JsonEvent("xyz", "externalWindowState", new JSONObject(map)));
+    m_browserField.handleUiEvent(new JsonEvent("xyz", "externalWindowStateChange", new JSONObject(map)));
     Assert.assertNotNull(m_lastExternalWindowState);
     Assert.assertEquals(true, m_lastExternalWindowState);
   }
