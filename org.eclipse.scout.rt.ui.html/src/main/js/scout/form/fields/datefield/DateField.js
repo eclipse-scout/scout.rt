@@ -260,11 +260,13 @@ scout.DateField.prototype._syncDisplayText = function(displayText) {
 
 scout.DateField.prototype._syncTimestamp = function(timestamp) {
   // TODO CGU [6.1] no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
-  this.timestampAsDate = scout.dates.parseJsonDate(timestamp); // FIXME [6.1] cgu ensure type
+  timestamp = scout.dates.ensure(timestamp);
+  this.timestampAsDate = timestamp;
 };
 
 scout.DateField.prototype._syncAutoTimestamp = function(autoTimestamp) {
-  this.autoTimestampAsDate = scout.dates.parseJsonDate(autoTimestamp);// FIXME [6.1] cgu ensure type
+  autoTimestamp = scout.dates.ensure(autoTimestamp);
+  this.autoTimestampAsDate = autoTimestamp;
 };
 
 scout.DateField.prototype._syncAllowedDates = function(allowedDates) {

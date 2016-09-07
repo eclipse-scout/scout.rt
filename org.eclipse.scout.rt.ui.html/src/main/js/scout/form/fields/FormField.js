@@ -374,10 +374,7 @@ scout.FormField.prototype._syncMenus = function(menus) {
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
-  // FIXME [6.1] cgu ensure type?
-  if (errorStatus && !(errorStatus instanceof scout.Status)) {
-    errorStatus = new scout.Status(errorStatus);
-  }
+  errorStatus = scout.Status.ensure(errorStatus);
   this._setProperty('errorStatus', errorStatus);
 };
 

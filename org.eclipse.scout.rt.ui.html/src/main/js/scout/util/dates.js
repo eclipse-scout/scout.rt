@@ -84,6 +84,24 @@ scout.dates = {
     return scout.dates.shiftToNextOrPrevDayOfType(date, 1, direction);
   },
 
+  /**
+   * Ensures that the given date is really a date.
+   * <p>
+   * If it already is a date, the date will be returned.
+   * Otherwise parseJsonDate is used to create a Date.
+   *
+   * @param date may be of type date or string.
+   */
+  ensure: function(date) {
+    if (!date) {
+      return date;
+    }
+    if (date instanceof Date) {
+      return date;
+    }
+    return scout.dates.parseJsonDate(date);
+  },
+
   ensureMonday: function(date, direction) {
     if (date.getDay() === 1) {
       return date;

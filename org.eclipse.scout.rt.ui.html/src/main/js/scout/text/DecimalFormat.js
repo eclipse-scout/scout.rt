@@ -207,3 +207,13 @@ scout.DecimalFormat.PATTERN_SYMBOLS = {
   minusSign: '-',
   patternSeparator: ';'
 };
+
+scout.DecimalFormat.ensure = function(locale, format) {
+  if (!format) {
+    return format;
+  }
+  if (format instanceof scout.DecimalFormat) {
+    return format;
+  }
+  return new scout.DecimalFormat(locale, format);
+};

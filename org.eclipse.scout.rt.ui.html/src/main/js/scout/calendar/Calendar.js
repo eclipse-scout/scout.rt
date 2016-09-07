@@ -107,8 +107,9 @@ scout.Calendar.prototype._init = function(model) {
   this.viewRange = this._calcViewRange();
 };
 
-scout.Calendar.prototype._syncSelectedDate = function(dateString) {
-  this._setProperty('selectedDate', scout.dates.parseJsonDate(dateString)); // FIXME [6.1] cgu ensure type
+scout.Calendar.prototype._syncSelectedDate = function(date) {
+  date = scout.dates.ensure(date);
+  this._setProperty('selectedDate', date);
   this._yearPanel.selectDate(this.selectedDate);
 };
 
@@ -118,9 +119,8 @@ scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
 };
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
-  this._setProperty('viewRange', new scout.DateRange( // FIXME [6.1] cgu ensure type
-    scout.dates.parseJsonDate(viewRange.from),
-    scout.dates.parseJsonDate(viewRange.to)));
+  viewRange = scout.DateRange.ensure(viewRange);
+  this._setProperty('viewRange', viewRange);
 };
 
 scout.Calendar.prototype._syncMenus = function(menus) {

@@ -81,3 +81,13 @@ scout.Status.animateStatusMessage = function($status, message) {
     $status.text(message);
   }
 };
+
+scout.Status.ensure = function(status) {
+  if (!status) {
+    return status;
+  }
+  if (status instanceof scout.Status) {
+    return status;
+  }
+  return new scout.Status(status);
+};

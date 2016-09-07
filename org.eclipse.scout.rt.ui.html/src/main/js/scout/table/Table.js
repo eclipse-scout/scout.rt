@@ -3007,12 +3007,9 @@ scout.Table.prototype._ensureFilter = function(filter) {
   return scout.create(filter);
 };
 
-scout.Table.prototype._syncTableStatus = function(tableStatus) {
-  if (tableStatus) {
-    this._setProperty('tableStatus', new scout.Status(tableStatus)); // FIXME [6.1] cgu ensure type
-  } else {
-    this._setProperty('tableStatus', null);
-  }
+scout.Table.prototype._syncTableStatus = function(status) {
+  status = scout.Status.ensure(status);
+  this._setProperty('tableStatus', status);
 };
 
 scout.Table.prototype.setTableStatusVisible = function(visible) {

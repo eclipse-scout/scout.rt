@@ -45,11 +45,8 @@ scout.NumberField.prototype._renderGridData = function() {
 };
 
 scout.NumberField.prototype._syncDecimalFormat = function(decimalFormat) {
-  if (decimalFormat instanceof scout.DecimalFormat) {
-    this._setProperty('decimalFormat', decimalFormat);
-  } else { // FIXME [6.1] cgu ensure type ?
-    this._setProperty('decimalFormat', new scout.DecimalFormat(this.session.locale, decimalFormat));
-  }
+  decimalFormat = scout.DecimalFormat.ensure(this.session.locale, decimalFormat);
+  this._setProperty('decimalFormat', decimalFormat);
 };
 
 scout.NumberField.prototype._renderDecimalFormat = function() {

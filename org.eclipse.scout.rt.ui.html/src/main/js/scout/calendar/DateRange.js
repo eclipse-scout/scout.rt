@@ -27,3 +27,15 @@ scout.DateRange.prototype.toString = function() {
   'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
   ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
 };
+
+scout.DateRange.ensure = function(dateRange) {
+  if (!dateRange) {
+    return dateRange;
+  }
+  if (dateRange instanceof scout.DateRange) {
+    return dateRange;
+  }
+  return new scout.DateRange(
+      scout.dates.ensure(dateRange.from),
+      scout.dates.ensure(dateRange.to));
+};
