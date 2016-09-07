@@ -177,11 +177,11 @@ scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
-    node.detailTable = this.createFromProperty('detailTable', node.detailTable);
+    node.detailTable = this._createChild(node.detailTable);
     this._initDetailTable(node);
   }
   if (node.detailForm) {
-    node.detailForm = this.createFromProperty('detailForm', node.detailForm);
+    node.detailForm = this._createChild(node.detailForm);
     this._initDetailForm(node);
   }
 

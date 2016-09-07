@@ -108,13 +108,33 @@ scout.Widget.prototype._loadJsonModel = function(modelId, model) {
   return jsonModel;
 };
 
-scout.Widget.prototype.createFromProperty = function(propertyName, value) {
-  // FIXME [6.1] awe Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
-  if (value instanceof scout.Widget) {
-    return value;
+/**
+ * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
+ * @returns an array of created widgets if models was an array. Or the created widget if models is not an array.
+ */
+scout.Widget.prototype._createChildren = function(models) {
+  if (!models) {
+    return null;
   }
-  value.parent = this;
-  return scout.create(value);
+
+  if (!Array.isArray(models)) {
+    return this._createChild(models);
+  }
+
+  var widgets = [];
+  models.forEach(function(model, i) {
+    widgets[i] = this._createChildren(model);
+  }, this);
+  return widgets;
+};
+
+scout.Widget.prototype._createChild = function(model) {
+  // FIXME [6.1] awe Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
+  if (model instanceof scout.Widget) {
+    return model;
+  }
+  model.parent = this;
+  return scout.create(model);
 };
 
 scout.Widget.prototype._initKeyStrokeContext = function() {
@@ -144,9 +164,7 @@ scout.Widget.prototype.destroy = function() {
   }
 
   // Destroy children in reverse order
-  this.children.slice().reverse().forEach(function(child) {
-    this._destroyChild(child);
-  }, this);
+  this._destroyChildren(this.children.slice().reverse());
 
   this.remove();
 
@@ -159,6 +177,20 @@ scout.Widget.prototype.destroy = function() {
 
   this.destroyed = true;
   this.trigger('destroy');
+};
+
+/**
+ * @param widgets may be an object or array of objects
+ */
+scout.Widget.prototype._destroyChildren = function(widgets) {
+  if (!widgets) {
+    return;
+  }
+
+  widgets = scout.arrays.ensure(widgets);
+  widgets.forEach(function(widget, i) {
+    this._destroyChild(widget);
+  }, this);
 };
 
 scout.Widget.prototype._destroyChild = function(child) {
@@ -779,7 +811,7 @@ scout.Widget.prototype._prepareProperty = function(propertyName, value) {
 
 scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) {
   // Create new child widget(s)
-  widgets = this._ensureType(propertyName, widgets);
+  widgets = this._createChildren(widgets);
 
   var oldWidgets = this[propertyName];
   if (oldWidgets && Array.isArray(widgets)) {
@@ -793,7 +825,7 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
 
   // Destroy old child widget(s)
   if (!this._isPreserveOnPropertyChangeProperty(propertyName)) {
-    this._destroyWidgets(oldWidgets);
+    this._destroyChildren(oldWidgets);
   }
 
   // Link to new parent
@@ -853,20 +885,6 @@ scout.Widget.prototype._callRenderProperty = function(propertyName) {
 };
 
 /**
- * @param widgets may be an object or array of objects
- */
-scout.Widget.prototype._destroyWidgets = function(widgets) {
-  if (!widgets) {
-    return;
-  }
-
-  widgets = scout.arrays.ensure(widgets);
-  widgets.forEach(function(widget, i) {
-    this._destroyChild(widget);
-  }, this);
-};
-
-/**
  * Sets this widget as parent of the given widget(s).
  *
  * @param widgets may be a widget or array of widgets
@@ -880,22 +898,6 @@ scout.Widget.prototype.link = function(widgets) {
   widgets.forEach(function(child, i) {
     child.setParent(this);
   }, this);
-};
-
-scout.Widget.prototype._ensureType = function(propertyName, value) {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  if (Array.isArray(value)) {
-    var returnValues = [];
-    value.forEach(function(elementValue, i) {
-      returnValues[i] = this._ensureType(propertyName, elementValue);
-    }, this);
-    return returnValues;
-  }
-  // FIXME [6.1] cgu rename to createChild? remove propertyName
-  return this.createFromProperty(propertyName, value);
 };
 
 /**
@@ -934,7 +936,7 @@ scout.Widget.prototype.resolveIconIds = function(properties) {
   }, this);
 };
 
-// FIXME CGU [6.1] temporary, rename, extract to Composite.js?
+// FIXME CGU [6.1] temporary, rename
 scout.Widget.prototype._addAdapterProperties = function(properties) {
   this._addProperties('_adapterProperties', properties);
 };

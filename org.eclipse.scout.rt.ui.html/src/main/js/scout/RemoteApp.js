@@ -37,20 +37,20 @@ scout.RemoteApp.prototype._init = function(options) {
  * Static method to modify the prototype of scout.Widget.
  */
 scout.RemoteApp.modifyWidgetPrototype = function() {
-  scout.Widget.prototype.createFromProperty = function(propertyName, value) {
-    if (value instanceof scout.Widget) {
-      return value;
+  scout.Widget.prototype._createChild = function(model) {
+    if (model instanceof scout.Widget) {
+      return model;
     }
 
     // Remote case
     var modelAdapter = findModelAdapter(this);
     if (modelAdapter) { // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
-      return this.session.getOrCreateWidget(value, this); // value is a String, contains (remote) object ID
+      return this.session.getOrCreateWidget(model, this); // model is a String, contains (remote) object ID
     }
 
     // Local case (default)
-    value.parent = this;
-    return scout.create(value);
+    model.parent = this;
+    return scout.create(model);
 
     function findModelAdapter(widget) {
       while (widget) {
