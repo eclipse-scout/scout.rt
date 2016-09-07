@@ -58,14 +58,10 @@ scout.Button.prototype._initKeyStrokeContext = function() {
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
   this.formKeyStrokeContext.$bindTarget = function() {
-    // FIXME CGU [6.1] wieso nicht einfach ein adapter property?
-//    if (this.keyStrokeScope) {
-//      var adapter = this.session.getModelAdapter(this.keyStrokeScope);
-//      if (adapter) {
-//        return adapter.$container;
-//      }
-//    }
-    //failsave if scope is not set use form
+    if (this.keyStrokeScope) {
+      return this.keyStrokeScope.$container;
+    }
+    // use form as default scope
     return this.getForm().$container;
   }.bind(this);
 };

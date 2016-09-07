@@ -13,3 +13,25 @@ scout.ButtonAdapter = function() {
   this._addRemoteProperties(['selected']);
 };
 scout.inherits(scout.ButtonAdapter, scout.FormFieldAdapter);
+
+scout.ButtonAdapter.prototype._postCreateWidget = function() {
+  if (!this.widget.keyStrokeScope) {
+    return;
+  }
+
+  var formAdapter = this.widget.getForm().remoteAdapter;
+  if (formAdapter.attached) {
+    this.resolveKeyStrokeScope();
+    return;
+  }
+  // KeyStrokeScope is another widget (form or formfield) which may not be initialized and attached to the adapter yet.
+  // The widget must be on the same form as the button, so once that form is attached the keyStrokeScope has to be available
+  formAdapter.events.one('attach', this._resolveKeyStrokeScope.bind(this));
+};
+
+scout.ButtonAdapter.prototype._resolveKeyStrokeScope = function() {
+  this.widget.keyStrokeScope = this.session.getWidget(this.widget.keyStrokeScope);
+  if (!this.widget.keyStrokeScope) {
+    throw new Error('Could not resolve keyStrokeScope: ' + this.widget.keyStrokeScope);
+  }
+};

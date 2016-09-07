@@ -25,6 +25,10 @@
  */
 scout.ModelAdapter = function() {
   this._adapterProperties = []; // FIXME [awe, cgu] 6.1 - hier löschen (nur noch auf Widget.js)
+  this.initialized = false;
+  this.attached = false;
+  this.destroyed = false;
+  this.widget;
 
   /**
    * Widget properties which should be sent to server on property change.
@@ -34,6 +38,7 @@ scout.ModelAdapter = function() {
 
   this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
   this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
+  this.events = new scout.EventSupport();
 };
 
 // FIXME CGU [6.1] ev. renamen to RemoteAdapter
@@ -67,7 +72,6 @@ scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
   this._postCreateWidget();
   return this.widget;
 };
-
 
 /**
  * Override this method to do something right after the widget has been created and has been
@@ -124,6 +128,8 @@ scout.ModelAdapter.prototype._attachWidget = function() {
     func: this._onWidgetEventInternal.bind(this)
   };
   this.widget.addListener(this._widgetListener);
+  this.attached = true;
+  this.events.trigger('attach');
 };
 
 scout.ModelAdapter.prototype._detachWidget = function() {
@@ -132,6 +138,8 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   }
   this.widget.removeListener(this._widgetListener);
   this._widgetListener = null;
+  this.attached = false;
+  this.events.trigger('detach');
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {

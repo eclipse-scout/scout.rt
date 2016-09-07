@@ -149,7 +149,7 @@ scout.Session.prototype.getModelAdapter = function(id) {
   return this.modelAdapterRegistry[id];
 };
 
-scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
+scout.Session.prototype.getWidget = function(adapterId) {
   if (!adapterId) {
     return null;
   }
@@ -157,16 +157,29 @@ scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
     throw new Error('typeof adapterId must be string');
   }
   var adapter = this.getModelAdapter(adapterId);
-  if (adapter) {
-    var widget = adapter.widget;
-    widget.setParent(parent);
+  if (!adapter) {
+    return null;
+  }
+  var widget = adapter.widget;
+  return widget;
+};
+
+scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
+  if (!adapterId) {
+    return null;
+  }
+  if (typeof adapterId !== 'string') {
+    throw new Error('typeof adapterId must be string');
+  }
+  var widget = this.getWidget(adapterId);
+  if (widget) {
     return widget;
   }
   var adapterData = this._getAdapterData(adapterId);
   if (!adapterData) {
     throw new Error('no adapterData found for adapterId=' + adapterId);
   }
-  adapter = this.createModelAdapter(adapterData);
+  var adapter = this.createModelAdapter(adapterData);
   return adapter.createWidget(adapterData, parent);
 };
 
