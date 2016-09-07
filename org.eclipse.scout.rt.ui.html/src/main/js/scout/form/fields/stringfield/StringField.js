@@ -97,11 +97,11 @@ scout.StringField.prototype._onFieldBlur = function() {
 scout.StringField.prototype._renderProperties = function() {
   scout.StringField.parent.prototype._renderProperties.call(this);
 
-  this._renderInputMasked(this.inputMasked);
-  this._renderWrapText(this.wrapText);
-  this._renderFormat(this.format);
-  this._renderSpellCheckEnabled(this.spellCheckEnabled);
-  this._renderHasAction(this.hasAction);
+  this._renderInputMasked();
+  this._renderWrapText();
+  this._renderFormat();
+  this._renderSpellCheckEnabled();
+  this._renderHasAction();
   this._renderMaxLength();
   this._renderSelectionTrackingEnabled();
   // Do not render selectionStart and selectionEnd here, because that would cause the focus to
@@ -157,11 +157,11 @@ scout.StringField.prototype._renderInputMasked = function(inputMasked) {
   if (this.multilineText) {
     return;
   }
-  this.$field.attr('type', (inputMasked ? 'password' : 'text'));
+  this.$field.attr('type', (this.inputMasked ? 'password' : 'text'));
 };
 
-scout.StringField.prototype._renderHasAction = function(decorationLink) {
-  if (decorationLink) {
+scout.StringField.prototype._renderHasAction = function() {
+  if (this.hasAction) {
     this.$container.addClass("has-action");
     this.addIcon();
     this.invalidateLayoutTree(false);
@@ -173,10 +173,10 @@ scout.StringField.prototype._renderHasAction = function(decorationLink) {
   }
 };
 
-scout.StringField.prototype._renderFormat = function(fmt) {
-  if (fmt === scout.StringField.FORMAT.LOWER) {
+scout.StringField.prototype._renderFormat = function() {
+  if (this.format === scout.StringField.FORMAT.LOWER) {
     this.$field.css('text-transform', 'lowercase');
-  } else if (fmt === scout.StringField.FORMAT.UPPER) {
+  } else if (this.format === scout.StringField.FORMAT.UPPER) {
     this.$field.css('text-transform', 'uppercase');
   }
 };
@@ -260,7 +260,7 @@ scout.StringField.prototype._renderGridData = function() {
 scout.StringField.prototype._onIconClick = function(event) {
   this.acceptInput();
   scout.StringField.parent.prototype._onIconClick.call(this, event);
-  this._send('callAction');
+  this.trigger('action');
 };
 
 scout.StringField.prototype._onSelectionChangingAction = function(event) {
@@ -313,24 +313,15 @@ scout.StringField.prototype._updateSelection = function() {
   if (this.selectionTrackingEnabled) {
     var selectionChanged = (this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd);
     if (selectionChanged) {
-      this._sendSelectionChanged();
+      this.triggerSelectionChange();
     }
   }
 };
 
-scout.StringField.prototype._sendSelectionChanged = function() {
-  var eventData = {
+scout.StringField.prototype.triggerSelectionChange = function() {
+  this.trigger('selectionChange', {
     selectionStart: this.selectionStart,
     selectionEnd: this.selectionEnd
-  };
-
-  // send delayed to avoid a lot of requests while selecting
-  // coalesce: only send the latest selection changed event for a field
-  this._send('selectionChanged', eventData, {
-    delay: 500,
-    coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type;
-    }
   });
 };
 

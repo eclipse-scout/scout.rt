@@ -12,3 +12,15 @@ scout.FileChooserAdapter = function() {
   scout.FileChooserAdapter.parent.call(this);
 };
 scout.inherits(scout.FileChooserAdapter, scout.ModelAdapter);
+
+scout.FileChooserAdapter.prototype._onWidgetCancel = function(event) {
+  this._send('cancel');
+};
+
+scout.FileChooserAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'cancel') {
+    this._onWidgetCancel(event);
+  } else {
+    scout.FileChooserAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

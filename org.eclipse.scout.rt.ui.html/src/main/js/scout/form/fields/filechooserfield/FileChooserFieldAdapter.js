@@ -12,3 +12,15 @@ scout.FileChooserFieldAdapter = function() {
   scout.FileChooserFieldAdapter.parent.call(this);
 };
 scout.inherits(scout.FileChooserFieldAdapter, scout.ValueFieldAdapter);
+
+scout.FileChooserFieldAdapter.prototype._onWidgetChooseFile = function(event) {
+  this._send('chooseFile');
+};
+
+scout.FileChooserFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'chooseFile') {
+    this._onWidgetChooseFile(event);
+  } else {
+    scout.FileChooserFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

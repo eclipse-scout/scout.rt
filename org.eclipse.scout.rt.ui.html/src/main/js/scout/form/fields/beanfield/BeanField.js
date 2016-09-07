@@ -48,8 +48,8 @@ scout.BeanField.prototype._renderValue = function() {
   // to be implemented by the subclass
 };
 
-scout.BeanField.prototype._sendAppLinkAction = function(ref) {
-  this._send('appLinkAction', {
+scout.BeanField.prototype.triggerAppLinkAction = function(ref) {
+  this.trigger('appLinkAction', {
     ref: ref
   });
 };
@@ -57,5 +57,5 @@ scout.BeanField.prototype._sendAppLinkAction = function(ref) {
 scout.BeanField.prototype._onAppLinkAction = function(event) {
   var $target = $(event.target);
   var ref = $target.data('ref');
-  this._sendAppLinkAction(ref);
+  this.triggerAppLinkAction(ref);
 };

@@ -19,15 +19,14 @@ describe('BrowserFieldAdapter', function() {
     jasmine.clock().install();
   });
 
-  it('sends postMessage on post message', function() {
+  it('sends postMessage on message', function() {
     var model = createSimpleModel('BrowserField', session, 'foo');
     var adapter = scout.create('BrowserFieldAdapter', model);
     var browserField = adapter.createWidget(model, session.desktop);
     browserField.render(session.$entryPoint);
 
-    // TODO [6.1] awe: discuss with C.GU: postMessage is an async call - how to test this with Jasmine?
-    // window.postMessage('hello world', '*');
-    browserField._onPostMessage({
+    // postMessage is an async call -> hard to test -> simulate it (window.postMessage('hello world', '*');)
+    browserField._onMessage({
       data: 'hello world',
       origin: 'foo'});
 

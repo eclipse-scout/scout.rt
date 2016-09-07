@@ -170,7 +170,7 @@ scout.MessageBox.prototype._renderHiddenText = function(text) {
 };
 
 scout.MessageBox.prototype._onButtonClick = function(event, option) {
-  this._send('action', {
+  this.trigger('action', {
     option: option
   });
 };

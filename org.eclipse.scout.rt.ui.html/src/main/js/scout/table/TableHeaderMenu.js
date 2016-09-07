@@ -264,9 +264,9 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
 
   function onClick(action) {
     menuPopup.close();
-    this.table._send('columnOrganizeAction', {
+    this.table.trigger('columnOrganizeAction', {
       action: action,
-      columnId: column.id
+      column: column
     });
   }
 };

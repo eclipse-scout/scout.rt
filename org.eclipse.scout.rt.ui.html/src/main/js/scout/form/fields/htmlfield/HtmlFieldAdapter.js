@@ -12,3 +12,17 @@ scout.HtmlFieldAdapter = function() {
   scout.HtmlFieldAdapter.parent.call(this);
 };
 scout.inherits(scout.HtmlFieldAdapter, scout.ValueFieldAdapter);
+
+scout.HtmlFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {
+  this._send('appLinkAction', {
+    ref: event.ref
+  });
+};
+
+scout.HtmlFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'appLinkAction') {
+    this._onWidgetAppLinkAction(event);
+  } else {
+    scout.HtmlFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

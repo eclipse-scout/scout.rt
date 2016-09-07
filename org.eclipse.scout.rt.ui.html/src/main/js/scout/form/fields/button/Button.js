@@ -144,7 +144,7 @@ scout.Button.prototype.doAction = function() {
   } else if (this.menus.length > 0) {
     this.togglePopup();
   } else {
-    this._send('clicked');
+    this.trigger('click');
   }
   return true;
 };

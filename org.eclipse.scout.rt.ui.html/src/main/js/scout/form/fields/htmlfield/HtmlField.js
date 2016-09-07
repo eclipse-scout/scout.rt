@@ -101,11 +101,11 @@ scout.HtmlField.prototype._renderScrollToAnchor = function(anchor) {
 scout.HtmlField.prototype._onAppLinkAction = function(event) {
   var $target = $(event.target);
   var ref = $target.data('ref');
-  this._sendAppLinkAction(ref);
+  this.triggerAppLinkAction(ref);
 };
 
-scout.HtmlField.prototype._sendAppLinkAction = function(ref) {
-  this._send('appLinkAction', {
+scout.HtmlField.prototype.triggerAppLinkAction = function(ref) {
+  this.trigger('appLinkAction', {
     ref: ref
   });
 };

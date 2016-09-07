@@ -35,3 +35,15 @@ scout.ButtonAdapter.prototype._resolveKeyStrokeScope = function() {
     throw new Error('Could not resolve keyStrokeScope: ' + this.widget.keyStrokeScope);
   }
 };
+
+scout.ButtonAdapter.prototype._onWidgetClick = function(event) {
+  this._send('clicked');
+};
+
+scout.ButtonAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'click') {
+    this._onWidgetClick(event);
+  } else {
+    scout.ButtonAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

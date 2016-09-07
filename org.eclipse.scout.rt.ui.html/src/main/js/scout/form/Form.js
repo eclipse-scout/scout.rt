@@ -145,6 +145,8 @@ scout.Form.prototype._renderForm = function($parent) {
 };
 
 scout.Form.prototype.close = function() {
+  // FIXME [6.1] cgu/awe: this is confusing, close sends a formClosing? May it be rejected? I would expect the form to be closed in offline mode too.
+  // Is it only used for popup windows? Suggestion: Rename close to kill, destroy the form and send a kill event (trigger('kill')).
   this._send('formClosing');
 };
 
@@ -258,9 +260,6 @@ scout.Form.prototype._remove = function() {
   this.formController.remove();
   this.messageBoxController.remove();
   this.fileChooserController.remove();
-
-  // FIXME awe: call acceptInput() when form is removed
-  // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._glassPaneRenderer.removeGlassPanes();
   this._uninstallFocusContext();
   scout.Form.parent.prototype._remove.call(this);

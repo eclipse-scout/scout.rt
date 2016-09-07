@@ -12,3 +12,26 @@ scout.BrowserFieldAdapter = function() {
   scout.BrowserFieldAdapter.parent.call(this);
 };
 scout.inherits(scout.BrowserFieldAdapter, scout.ValueFieldAdapter);
+
+scout.BrowserFieldAdapter.prototype._onWidgetMessage = function(event) {
+  this._send('postMessage', {
+    data: event.data,
+    origin: event.origin
+  });
+};
+
+scout.BrowserFieldAdapter.prototype._onWidgetExternalWindowStateChange = function(event) {
+  this._send('externalWindowStateChange', {
+    windowState: event.windowState
+  });
+};
+
+scout.BrowserFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'message') {
+    this._onWidgetMessage(event);
+  } else if (event.type === 'externalWindowStateChange') {
+    this._onWidgetExternalWindowStateChange(event);
+  } else {
+    scout.BrowserFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

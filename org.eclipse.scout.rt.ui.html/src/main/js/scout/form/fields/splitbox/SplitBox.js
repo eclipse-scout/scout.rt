@@ -373,8 +373,8 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
   var positionChanged = (this.splitterPosition !== newSplitterPosition);
   this.splitterPosition = newSplitterPosition;
   if (positionChanged) {
-    this._send('setSplitterPosition', {
-      splitterPosition: newSplitterPosition
+    this.trigger('positionChange', {
+      position: newSplitterPosition
     });
   }
 

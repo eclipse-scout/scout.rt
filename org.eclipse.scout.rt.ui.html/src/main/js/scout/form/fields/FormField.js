@@ -805,7 +805,8 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
   });
   menu.on('doAction', function(event) {
     if (field instanceof scout.ValueField) {
-      field._send('exportToClipboard');
+      // FIXME CGU [6.1] offline?
+      field.trigger('exportToClipboard');
     }
   });
 

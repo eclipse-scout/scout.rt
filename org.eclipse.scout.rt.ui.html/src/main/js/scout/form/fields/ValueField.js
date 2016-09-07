@@ -59,7 +59,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
   whileTyping = !!whileTyping; // cast to boolean
   var displayText = scout.nvl(this._readDisplayText(), '');
 
-  // send only if displayText has really changed
+  // trigger only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
     var validatedDisplayText = this._validateDisplayText(displayText, whileTyping);
     this.displayText = validatedDisplayText;

@@ -12,3 +12,17 @@ scout.WizardProgressFieldAdapter = function() {
   scout.WizardProgressFieldAdapter.parent.call(this);
 };
 scout.inherits(scout.WizardProgressFieldAdapter, scout.FormFieldAdapter);
+
+scout.WizardProgressFieldAdapter.prototype._onWidgetStepAction = function(event) {
+  this._send('doStepAction', {
+    stepIndex: event.stepIndex
+  });
+};
+
+scout.WizardProgressFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'stepAction') {
+    this._onWidgetStepAction(event);
+  } else {
+    scout.WizardProgressFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

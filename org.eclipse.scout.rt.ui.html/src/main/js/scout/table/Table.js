@@ -2837,13 +2837,13 @@ scout.Table.prototype._triggerPrepareCellEdit = function(row, column) {
 };
 
 scout.Table.prototype._triggerCompleteCellEdit = function(field) {
-  this._send('completeCellEdit', {
+  this.trigger('completeCellEdit', {
     field: field
   });
 };
 
 scout.Table.prototype._triggerCancelCellEdit = function(field) {
-  this._send('cancelCellEdit', {
+  this.trigger('cancelCellEdit', {
     field: field
   });
 };

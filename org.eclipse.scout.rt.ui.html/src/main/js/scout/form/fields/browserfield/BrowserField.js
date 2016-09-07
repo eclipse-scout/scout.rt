@@ -11,18 +11,20 @@
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
 
-  this._postMessageListener;
+  this._messageListener;
   this._popupWindow;
   this._externalWindowTextField;
   this._externalWindowButton;
-  this.loadingSupport = new scout.LoadingSupport({widget: this});
+  this.loadingSupport = new scout.LoadingSupport({
+    widget: this
+  });
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
 scout.BrowserField.windowStates = {
-    WINDOW_OPEN: "true",
-    WINDOW_CLOSED: "false"
-  };
+  WINDOW_OPEN: "true",
+  WINDOW_CLOSED: "false"
+};
 
 scout.BrowserField.prototype._render = function($parent) {
   this.addContainer($parent, 'browser-field');
@@ -44,8 +46,8 @@ scout.BrowserField.prototype._render = function($parent) {
 
   this.myWindow = $parent.window(true);
 
-  this._postMessageListener = this._onPostMessage.bind(this);
-  this.myWindow.addEventListener('message', this._postMessageListener);
+  this._messageListener = this._onMessage.bind(this);
+  this.myWindow.addEventListener('message', this._messageListener);
 
   if (this.enabled) {
     // use setTimeout to call method, because _openPopupWindow must be called after layouting
@@ -125,7 +127,7 @@ scout.BrowserField.prototype._renderExternalWindowButtonText = function() {
 
 scout.BrowserField.prototype._renderExternalWindowFieldText = function() {
   if (this.showInExternalWindow) {
-    this._externalWindowTextField .text(this.externalWindowFieldText);
+    this._externalWindowTextField.text(this.externalWindowFieldText);
   }
 };
 
@@ -148,54 +150,57 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
     var windowHeight = ((this.$field.height() + windowTop) > window.screen.availHeight) ? (window.screen.availHeight - windowTop) : this.$field.height();
     // (b) window specifications
     var windowSpecs = scout.strings.join(',',
-        'directories=no',
-        'location=no',
-        'menubar=no',
-        'resizable=yes,',
-        'status=no',
-        'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
-        'toolbar=no',
-        'dependent=yes',
-        'left=' + windowLeft,
-        'top=' + windowTop,
-        'width=' + windowWidth,
-        'height=' + windowHeight
-        );
+      'directories=no',
+      'location=no',
+      'menubar=no',
+      'resizable=yes,',
+      'status=no',
+      'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
+      'toolbar=no',
+      'dependent=yes',
+      'left=' + windowLeft,
+      'top=' + windowTop,
+      'width=' + windowWidth,
+      'height=' + windowHeight
+    );
     this._popupWindow = popupBlockerHandler.openWindow(this.location,
-        undefined,
-        windowSpecs);
+      undefined,
+      windowSpecs);
     if (this._popupWindow) {
       this._popupWindowOpen();
     } else {
       $.log.warn('Popup-blocker detected! Show link to open window manually');
       popupBlockerHandler.showNotification(function() {
         this._popupWindow = window.open(this.location,
-            undefined,
-            windowSpecs);
+          undefined,
+          windowSpecs);
         this._popupWindowOpen();
       }.bind(this));
     }
-  }
-  else if (reopenIfClosed) {
+  } else if (reopenIfClosed) {
     this._popupWindow.focus();
   }
 };
 
 scout.BrowserField.prototype._popupWindowOpen = function() {
   if (this._popupWindow && !this._popupWindow.closed) {
-    this._send('externalWindowState', { 'windowState': scout.BrowserField.windowStates.WINDOW_OPEN });
+    this.trigger('externalWindowStateChange', {
+      windowState: scout.BrowserField.windowStates.WINDOW_OPEN
+    });
     var popupInterval = window.setInterval(function() {
       if (this._popupWindow === null || this._popupWindow.closed) {
         window.clearInterval(popupInterval);
-        this._send('externalWindowState', { 'windowState': scout.BrowserField.windowStates.WINDOW_CLOSED });
+        this.trigger('externalWindowStateChange', {
+          windowState: scout.BrowserField.windowStates.WINDOW_CLOSED
+        });
       }
     }.bind(this), 500);
   }
 };
 
-scout.BrowserField.prototype._onPostMessage = function(event) {
+scout.BrowserField.prototype._onMessage = function(event) {
   $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
-  this._send('postMessage', {
+  this.trigger('message', {
     data: event.data,
     origin: event.origin
   });
@@ -206,13 +211,13 @@ scout.BrowserField.prototype._onPostMessage = function(event) {
  */
 scout.BrowserField.prototype._remove = function() {
   scout.BrowserField.parent.prototype._remove.call(this);
-  this.myWindow.removeEventListener('message', this._postMessageListener);
-  this._postMessageListener = null;
+  this.myWindow.removeEventListener('message', this._messageListener);
+  this._messageListener = null;
 };
 
 /**
-* @override Widget.js
-*/
+ * @override Widget.js
+ */
 scout.BrowserField.prototype._afterAttach = function(parent) {
   // the security=restricted attribute prevents browsers (IE 9 and below) from
   // sending any cookies a second time
@@ -225,4 +230,3 @@ scout.BrowserField.prototype._afterAttach = function(parent) {
     this.htmlComp.revalidateLayout();
   }
 };
-

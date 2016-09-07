@@ -115,6 +115,13 @@ scout.TableAdapter.prototype._sendColumnBackgroundEffectChanged = function(colum
   this._send('columnBackgroundEffectChanged', data);
 };
 
+scout.TableAdapter.prototype._onWidgetColumnOrganizeAction = function(event) {
+  this._send('columnOrganizeAction', {
+    action: event.action,
+    columnId: event.column.id
+  });
+};
+
 scout.TableAdapter.prototype._onWidgetColumnMoved = function(event) {
   var index = event.newPos;
   this.widget.columns.forEach(function(iteratingColumn, i) {
@@ -274,6 +281,8 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetColumnMoved(event);
   } else if (event.type === 'columnBackgroundEffectChanged') {
     this._onWidgetColumnBackgroundEffectChanged(event);
+  } else if (event.type === 'columnOrganizeAction') {
+    this._onWidgetColumnOrganizeAction(event);
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
   } else {

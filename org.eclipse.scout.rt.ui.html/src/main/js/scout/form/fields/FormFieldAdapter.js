@@ -35,3 +35,15 @@ scout.FormFieldAdapter.prototype._goOnline = function() {
   }
   this.widget.setEnabled(this._enabledBeforeOffline);
 };
+
+scout.FormFieldAdapter.prototype._onWidgetExportToClipboard = function(event) {
+  this._send('exportToClipboard');
+};
+
+scout.FormFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'exportToClipboard') {
+    this._onWidgetExportToClipboard(event);
+  } else {
+    scout.FormFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

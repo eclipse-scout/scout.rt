@@ -14,3 +14,17 @@ scout.SplitBoxAdapter = function() {
   this._addRemoteProperties(['collapsibleField', 'fieldCollapsed']);
 };
 scout.inherits(scout.SplitBoxAdapter, scout.CompositeFieldAdapter);
+
+scout.SplitBoxAdapter.prototype._onWidgetPositionChange = function(event) {
+  this._send('setSplitterPosition', {
+    splitterPosition: event.position
+  });
+};
+
+scout.SplitBoxAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'positionChange') {
+    this._onWidgetPositionChange(event);
+  } else {
+    scout.SplitBoxAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

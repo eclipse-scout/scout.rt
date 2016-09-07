@@ -180,7 +180,8 @@ scout.FileChooser.prototype._doUpload = function() {
 };
 
 scout.FileChooser.prototype._doCancel = function() {
-  this._send('cancel');
+  // FIXME CGU [6.1] offline case?
+  this.trigger('cancel');
 };
 
 scout.FileChooser.prototype._doAddFile = function() {

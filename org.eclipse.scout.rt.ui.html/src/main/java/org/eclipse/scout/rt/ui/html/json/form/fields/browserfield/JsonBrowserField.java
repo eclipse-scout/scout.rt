@@ -33,7 +33,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   private BrowserFieldListener m_browserFieldListener;
 
   public static final String EVENT_POST_MESSAGE = "postMessage";
-  public static final String EVENT_EXTERNAL_WINDOW_STATE = "externalWindowState";
+  public static final String EVENT_EXTERNAL_WINDOW_STATE_CHANGE = "externalWindowStateChange";
 
   public JsonBrowserField(BROWSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -147,8 +147,8 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     if (EVENT_POST_MESSAGE.equals(event.getType())) {
       handleUiPostMessage(event);
     }
-    else if (EVENT_EXTERNAL_WINDOW_STATE.equals(event.getType())) {
-      handleUiWindowState(event);
+    else if (EVENT_EXTERNAL_WINDOW_STATE_CHANGE.equals(event.getType())) {
+      handleUiExternalWindowStateChange(event);
     }
     else {
       super.handleUiEvent(event);
@@ -161,7 +161,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     getModel().getUIFacade().firePostMessageFromUI(data, origin);
   }
 
-  protected void handleUiWindowState(JsonEvent event) {
+  protected void handleUiExternalWindowStateChange(JsonEvent event) {
     getModel().getUIFacade().firePostExternalWindowStateFromUI(event.getData().optBoolean("windowState"));
   }
 
