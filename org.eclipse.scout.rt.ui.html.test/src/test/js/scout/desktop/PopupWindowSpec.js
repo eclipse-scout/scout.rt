@@ -48,7 +48,7 @@ describe('PopupWindow', function() {
     var popupWindow = new scout.PopupWindow(myWindow, myForm),
       called = false;
 
-    popupWindow.one('initialized', function() {
+    popupWindow.one('init', function() {
       called = true;
     });
     expect(popupWindow.initialized).toBe(false);

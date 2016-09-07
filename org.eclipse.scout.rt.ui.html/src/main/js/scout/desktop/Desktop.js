@@ -743,7 +743,7 @@ scout.Desktop.prototype.glassPaneTargets = function() {
  */
 scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
   var deferred = new scout.DeferredGlassPaneTarget();
-  popupWindow.one('initialized', function() {
+  popupWindow.one('init', function() {
     deferred.ready([popupWindow.$container]);
   });
   return deferred;

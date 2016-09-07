@@ -57,7 +57,7 @@ scout.Widget.prototype.init = function(model) {
   this._init(model);
   this._initKeyStrokeContext();
   this.initialized = true;
-  this.trigger('initialized'); // FIXME [6.1] CGU rename to ('init') or ('initialize') to conform with render, remove, destroy?
+  this.trigger('init');
 };
 
 /**

@@ -86,7 +86,7 @@ scout.PopupWindow.prototype._onReady = function() {
 
   // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
   this.initialized = true;
-  this.events.trigger('initialized');
+  this.events.trigger('init');
 };
 
 // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
