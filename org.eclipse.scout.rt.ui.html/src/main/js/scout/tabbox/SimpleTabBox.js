@@ -207,17 +207,19 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
   }
   showSiblingView = scout.nvl(showSiblingView, true);
   var index = this.viewStack.indexOf(view);
+  var viewToActivate;
   // if current view is the view to remove reset current view
   if (this.currentView === view) {
     this.currentView = null;
   }
+
   if (index > -1) {
     // activate previous
     if (showSiblingView) {
       if (index - 1 >= 0) {
-        this.activateView(this.viewStack[index - 1]);
+        viewToActivate = this.viewStack[index - 1];
       } else if (index + 1 < this.viewStack.length) {
-        this.activateView(this.viewStack[index + 1]);
+        viewToActivate = this.viewStack[index + 1];
       }
     }
 
@@ -230,6 +232,9 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
       view: view
     });
 
+    if(viewToActivate){
+      this.activateView(viewToActivate);
+    }
     if (this.rendered) {
       this.viewContent.invalidateLayoutTree();
       this.viewContent.validateLayoutTree();
