@@ -169,8 +169,7 @@ scout.Tree.prototype._syncMenus = function(menus) {
 scout.Tree.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
   this.menuBar.setMenuItems(menuItems);
-  var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
-    $part = $(event.currentTarget);
+  var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
   if (this.contextMenu) {
     this.contextMenu.updateMenuItems(contextMenuItems);
   }
