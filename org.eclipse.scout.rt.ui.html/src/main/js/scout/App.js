@@ -85,9 +85,7 @@ scout.App.prototype._createSession = function($entryPoint, options) {
   // FIXME improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
   parent.session = session;
-  session.desktop = scout.create('Desktop', {
-    parent: parent
-  });
+  session.desktop = this._createDesktop(parent);
   session.render(function() {
     this.onSessionReady(session);
     session._renderDesktop();
@@ -102,6 +100,14 @@ scout.App.prototype._createSession = function($entryPoint, options) {
   return session;
 };
 
+scout.App.prototype._createDesktop = function(parent) {
+  return scout.create('Desktop', {
+    parent: parent
+  });
+};
+
 scout.App.prototype.onSessionReady = function(session) {
   // NOP
 };
+
+

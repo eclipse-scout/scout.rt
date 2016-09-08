@@ -43,6 +43,12 @@ public class ResourceLoaders {
     if (JsonModelsLoader.matchesFile(resourcePath)) {
       return new JsonModelsLoader();
     }
+    if (resourcePath.endsWith("/locales.json")) {
+      return new LocalesLoader();
+    }
+    if (resourcePath.endsWith("/texts.json")) {
+      return new TextsLoader();
+    }
     if (resourcePath.endsWith(".json")) {
       return new JsonFileLoader();
     }
