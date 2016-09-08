@@ -30,6 +30,7 @@ import javax.jms.Message;
 import javax.naming.Context;
 
 import org.apache.activemq.jndi.ActiveMQInitialContextFactory;
+import org.eclipse.scout.rt.mom.api.AbstractMomDelegate;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
@@ -40,7 +41,6 @@ import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IMomTransport;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.MOM;
-import org.eclipse.scout.rt.mom.api.AbstractMomDelegate;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter.PbePasswordProperty;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter.PbeSaltProperty;
@@ -228,7 +228,7 @@ public class JmsMomImplementorTest {
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class), null));
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReply() throws InterruptedException {
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
@@ -267,7 +267,7 @@ public class JmsMomImplementorTest {
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(BytesMarshaller.class), null));
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReplyEmpty() throws InterruptedException {
     assertEquals("", testRequestReplyInternal("", BEANS.get(TextMarshaller.class), null));
     assertEquals("", testRequestReplyInternal("", BEANS.get(ObjectMarshaller.class), null));
@@ -280,7 +280,7 @@ public class JmsMomImplementorTest {
     assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReplyNull() throws InterruptedException {
     assertNull(testRequestReplyInternal(null, BEANS.get(TextMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(ObjectMarshaller.class), BEANS.get(ClusterAesEncrypter.class)));
@@ -487,7 +487,7 @@ public class JmsMomImplementorTest {
     testPublishSubscribeCorrelationIdInternal(topic);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testQueueRequestReply() throws InterruptedException {
     IBiDestination<String, String> queue = MOM.newBiDestination("test/momtestQueueRequestReply", IDestination.QUEUE);
 
@@ -507,13 +507,13 @@ public class JmsMomImplementorTest {
     assertEquals("HELLO WORLD", testee);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testQueueRequestReplyCorrelationId() throws InterruptedException {
     IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCorrelationId", IDestination.QUEUE);
     testRequestReplyCorrelationIdInternal(queue);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testTopicRequestReplyCorrelationId() throws InterruptedException {
     IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyCorrelationId", IDestination.TOPIC);
     testRequestReplyCorrelationIdInternal(topic);
@@ -604,7 +604,7 @@ public class JmsMomImplementorTest {
         });
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testTopicRequestReply() throws InterruptedException {
     IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReply", IDestination.TOPIC);
 
@@ -624,7 +624,7 @@ public class JmsMomImplementorTest {
     assertEquals("HELLO WORLD", testee);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   @Times(10) // regression
   public void testQueueRequestReplyMultipleSubscriptions() throws InterruptedException {
     IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyMultipleSubscriptions", IDestination.QUEUE);
@@ -659,7 +659,7 @@ public class JmsMomImplementorTest {
     assertFalse(msgLatch.await(50, TimeUnit.MILLISECONDS));
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testTopicRequestReplyMultipleSubscriptions() throws InterruptedException {
     IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyMultipleSubscriptions", IDestination.TOPIC);
 
@@ -693,7 +693,7 @@ public class JmsMomImplementorTest {
     assertTrue(msgLatch.await(5, TimeUnit.SECONDS));
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testQueueRequestReplyRequestFirst() throws InterruptedException {
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyRequestFirst", IDestination.QUEUE);
 
@@ -735,7 +735,7 @@ public class JmsMomImplementorTest {
     assertEquals("HELLO WORLD", testee);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   @Times(10) // regression
   public void testTopicRequestReplyRequestFirst() throws InterruptedException {
     final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyRequestFirst", IDestination.TOPIC);
@@ -784,13 +784,13 @@ public class JmsMomImplementorTest {
     }
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testQueueRequestReplyCancellation() throws InterruptedException {
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", IDestination.QUEUE);
     testRequestReplyCancellationInternal(queue);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testTopicRequestReplyCancellation() throws InterruptedException {
     final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyCancellation", IDestination.TOPIC);
     testRequestReplyCancellationInternal(topic);
@@ -885,13 +885,13 @@ public class JmsMomImplementorTest {
     assertFalse(testee.isSet());
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testQueueRequestReplyTimeout() throws InterruptedException {
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyTimeout", IDestination.QUEUE);
     testRequestReplyTimeoutInternal(queue);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testTopicRequestReplyTimeout() throws InterruptedException {
     final IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyTimeout", IDestination.TOPIC);
     testRequestReplyTimeoutInternal(topic);
@@ -966,13 +966,13 @@ public class JmsMomImplementorTest {
     assertEquals("cid:abc", cid.get());
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testTopicRequestReplyJsonObjectMarshaller() throws InterruptedException {
     IBiDestination<Person, Person> queue = MOM.newBiDestination("test/mom/testTopicRequestReplyJsonObjectMarshaller", IDestination.QUEUE);
     testRequestReplyJsonObjectMarshallerInternal(queue);
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testQueueRequestReplyJsonObjectMarshaller() throws InterruptedException {
     IBiDestination<Person, Person> topic = MOM.newBiDestination("test/mom/testQueueRequestReplyJsonObjectMarshaller", IDestination.TOPIC);
     testRequestReplyJsonObjectMarshallerInternal(topic);
@@ -1005,7 +1005,7 @@ public class JmsMomImplementorTest {
     assertEquals("SMITH", testee.getLastname());
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReply_ObjectMarshaller_Exception() {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
@@ -1033,7 +1033,7 @@ public class JmsMomImplementorTest {
     }
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReply_JsonMarshaller_Exception1() {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
@@ -1062,7 +1062,7 @@ public class JmsMomImplementorTest {
     }
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReply_JsonMarshaller_Exception2() {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
@@ -1091,7 +1091,7 @@ public class JmsMomImplementorTest {
     }
   }
 
-  @Test(timeout = 15_000)
+  @Test(timeout = 200_000)
   public void testRequestReply_StringMarshaller_Exception() {
     // Unregister JUnit exception handler
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
