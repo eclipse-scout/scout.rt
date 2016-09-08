@@ -21,6 +21,7 @@ scout.Tree = function() {
   this._treeItemCheckBoxPaddingLeft = 29;
   this._treeItemPaddingLevel = 15;
   this.menus = [];
+  this.contextMenu;
   this.menuBar;
   this.checkedNodes = [];
   this._filters = [];
@@ -129,6 +130,11 @@ scout.Tree.prototype._syncMenus = function(menus, oldMenus) {
 scout.Tree.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
   this.menuBar.setMenuItems(menuItems);
+  var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
+    $part = $(event.currentTarget);
+  if (this.contextMenu) {
+    this.contextMenu.updateMenuItems(contextMenuItems);
+  }
 };
 
 scout.Tree.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
@@ -927,7 +933,6 @@ scout.Tree.prototype._renderEnabled = function() {
     });
   }
 };
-
 
 scout.Tree.prototype._renderCssClass = function(cssClass, oldCssClass) {
   cssClass = cssClass || this.cssClass;
@@ -2236,7 +2241,7 @@ scout.Tree.prototype._showContextMenu = function(event) {
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
-    var popup = scout.create('ContextMenuPopup', {
+    this.contextMenu = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: filteredMenus,
       location: {
@@ -2246,15 +2251,16 @@ scout.Tree.prototype._showContextMenu = function(event) {
       $anchor: $part,
       menuFilter: this._filterMenusHandler
     });
-    popup.open();
+    this.contextMenu.open();
 
     // Set table style to focused, so that it looks as it still has the focus.
     // Must be called after open(), because opening the popup might cause another
     // popup to close first (which will remove the 'focused' class).
     if (this.enabled) {
       this.$container.addClass('focused');
-      popup.on('close', function(event) {
+      this.contextMenu.on('close', function(event) {
         this.$container.removeClass('focused');
+        this.contextMenu = null;
       }.bind(this));
     }
   };
@@ -2574,7 +2580,7 @@ scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
 
   // append after index
   var nodeBefore = this.visibleNodesFlat[index - 1];
-  this._ensureNodeInDOM(nodeBefore, false, index-1);
+  this._ensureNodeInDOM(nodeBefore, false, index - 1);
   if (nodeBefore.attached) {
     $node.insertAfter(nodeBefore.$node);
     return;
