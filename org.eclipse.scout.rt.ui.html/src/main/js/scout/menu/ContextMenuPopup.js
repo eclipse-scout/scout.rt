@@ -386,8 +386,7 @@ scout.ContextMenuPopup.prototype.updateMenuItems = function(menuItems){
   menuItems = scout.arrays.ensure(menuItems);
   // Only update if list of menus changed. Don't compare this.menuItems, because that list
   // may contain additional UI separators, and may not be in the same order
-  var someMenus = scout.arrays.equals(this.menuItems, menuItems);
-  if(!someMenus){
+  if(!scout.arrays.equals(this.menuItems, menuItems)){
     this.close();
   }
 };

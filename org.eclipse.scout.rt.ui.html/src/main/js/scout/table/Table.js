@@ -19,7 +19,7 @@ scout.Table = function() {
   this.keyStrokes = [];
   this.keyboardNavigation = true;
   this.menus = [];
-  this.popupMenu;
+  this.contextMenu;
   this.multiCheck = true;
   this.multiSelect = true;
   this.multilineText = false;
@@ -421,7 +421,7 @@ scout.Table.prototype.onContextMenu = function(event) {
         event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
       }
       if (menuItems.length > 0) {
-        this.popupMenu = scout.create('ContextMenuPopup', {
+        this.contextMenu = scout.create('ContextMenuPopup', {
           parent: this,
           menuItems: menuItems,
           location: {
@@ -431,16 +431,16 @@ scout.Table.prototype.onContextMenu = function(event) {
           $anchor: this.$data,
           menuFilter: this._filterMenusHandler
         });
-        this.popupMenu.open();
+        this.contextMenu.open();
 
         // Set table style to focused, so that it looks as it still has the focus.
         // Must be called after open(), because opening the popup might cause another
         // popup to close first (which will remove the 'focused' class).
         if (this.enabled) {
           this.$container.addClass('focused');
-          this.popupMenu.on('close', function(event) {
+          this.contextMenu.on('close', function(event) {
             this.$container.removeClass('focused');
-            this.popupMenu = null;
+            this.contextMenu = null;
           }.bind(this));
         }
       }
@@ -2978,9 +2978,9 @@ scout.Table.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.setMenuItems(menuItems);
-  if(this.popupMenu){
-    var popupMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
-    this.popupMenu.updateMenuItems(popupMenuItems);
+  if (this.contextMenu) {
+    var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+    this.contextMenu.updateMenuItems(contextMenuItems);
   }
 };
 
