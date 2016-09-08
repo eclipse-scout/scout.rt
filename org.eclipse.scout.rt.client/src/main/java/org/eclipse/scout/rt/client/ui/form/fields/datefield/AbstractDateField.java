@@ -147,6 +147,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    * date cannot be parsed again.
    */
   @Override
+  @SuppressWarnings("squid:S1185")
   protected String execFormatValue(Date value) {
     return super.execFormatValue(value);
   }

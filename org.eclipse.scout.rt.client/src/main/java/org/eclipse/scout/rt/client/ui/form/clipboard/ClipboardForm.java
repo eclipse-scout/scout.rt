@@ -128,11 +128,6 @@ public class ClipboardForm extends AbstractForm {
       }
 
       @Override
-      protected void execInitField() {
-        super.execInitField();
-      }
-
-      @Override
       protected boolean getConfiguredLabelVisible() {
         return false;
       }

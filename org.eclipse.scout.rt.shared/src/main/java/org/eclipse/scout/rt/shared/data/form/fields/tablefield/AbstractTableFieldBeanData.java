@@ -45,11 +45,6 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
   public AbstractTableFieldBeanData() {
   }
 
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-  }
-
   /**
    * @return Returns the number of available table row data.
    */

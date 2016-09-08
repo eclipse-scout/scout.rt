@@ -24,11 +24,6 @@ public abstract class AbstractPlaceholderField extends AbstractFormField impleme
     super(callInitializer);
   }
 
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-  }
-
   protected static class LocalPlaceholderFieldExtension<OWNER extends AbstractPlaceholderField> extends LocalFormFieldExtension<OWNER> implements IPlaceholderFieldExtension<OWNER> {
 
     public LocalPlaceholderFieldExtension(OWNER owner) {
@@ -40,5 +35,4 @@ public abstract class AbstractPlaceholderField extends AbstractFormField impleme
   protected IPlaceholderFieldExtension<? extends AbstractPlaceholderField> createLocalExtension() {
     return new LocalPlaceholderFieldExtension<AbstractPlaceholderField>(this);
   }
-
 }

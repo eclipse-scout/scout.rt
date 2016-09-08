@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
-import java.util.Date;
-
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IUTCDateFieldExtension;
@@ -32,11 +30,6 @@ public abstract class AbstractUTCDateField extends AbstractDateField implements 
 
   public AbstractUTCDateField(boolean callInitializer) {
     super(callInitializer);
-  }
-
-  @Override
-  public Class<Date> getHolderType() {
-    return super.getHolderType();
   }
 
   protected static class LocalUTCDateFieldExtension<OWNER extends AbstractUTCDateField> extends LocalDateFieldExtension<OWNER> implements IUTCDateFieldExtension<OWNER> {

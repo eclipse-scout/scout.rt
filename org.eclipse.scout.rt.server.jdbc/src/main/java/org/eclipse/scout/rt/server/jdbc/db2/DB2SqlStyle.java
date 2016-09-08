@@ -11,12 +11,10 @@
 package org.eclipse.scout.rt.server.jdbc.db2;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
 
 public class DB2SqlStyle extends AbstractSqlStyle {
@@ -58,11 +56,6 @@ public class DB2SqlStyle extends AbstractSqlStyle {
     try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM SYSIBM.SYSTABLES")) {
       rs.next();
     }
-  }
-
-  @Override
-  public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
-    super.writeBind(ps, jdbcBindIndex, bind);
   }
 
   @Override

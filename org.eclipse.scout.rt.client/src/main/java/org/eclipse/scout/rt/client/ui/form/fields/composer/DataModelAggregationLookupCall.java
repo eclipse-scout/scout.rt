@@ -126,15 +126,32 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
 
   @Override
   public int hashCode() {
-    return super.hashCode();
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_attribute == null) ? 0 : m_attribute.hashCode());
+    return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (super.equals(obj)) {
-      DataModelAggregationLookupCall other = (DataModelAggregationLookupCall) obj;
-      return this.m_attribute == other.m_attribute;
+    if (this == obj) {
+      return true;
     }
-    return false;
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DataModelAggregationLookupCall other = (DataModelAggregationLookupCall) obj;
+    if (m_attribute == null) {
+      if (other.m_attribute != null) {
+        return false;
+      }
+    }
+    else if (!m_attribute.equals(other.m_attribute)) {
+      return false;
+    }
+    return true;
   }
 }

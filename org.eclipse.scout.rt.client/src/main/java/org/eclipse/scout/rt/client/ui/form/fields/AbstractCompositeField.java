@@ -64,6 +64,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * have to use {@link #setStatusVisible(boolean)} in {@link #execInitField()}.
    */
   @Override
+  @SuppressWarnings("squid:S1185")
   protected boolean getConfiguredStatusVisible() {
     return super.getConfiguredStatusVisible();
   }
@@ -462,6 +463,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * permission set
    */
   @Override
+  @SuppressWarnings("squid:S1185") // method is final
   public void setVisibleGranted(boolean b) {
     super.setVisibleGranted(b);
   }

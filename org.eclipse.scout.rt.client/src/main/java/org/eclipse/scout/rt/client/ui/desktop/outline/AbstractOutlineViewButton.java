@@ -108,6 +108,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
    * affect.
    */
   @Override
+  @SuppressWarnings("squid:S1185") // method is final
   protected final boolean getConfiguredEnabled() {
     return super.getConfiguredEnabled();
   }
@@ -117,6 +118,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
    * affect.
    */
   @Override
+  @SuppressWarnings("squid:S1185") // method is final
   protected final String getConfiguredText() {
     return super.getConfiguredText();
   }
@@ -126,6 +128,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
    * affect.
    */
   @Override
+  @SuppressWarnings("squid:S1185") // method is final
   protected final boolean getConfiguredVisible() {
     return super.getConfiguredVisible();
   }

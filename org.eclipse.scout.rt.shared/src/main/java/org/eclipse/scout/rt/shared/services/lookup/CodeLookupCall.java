@@ -58,19 +58,39 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
 
   @Override
   public int hashCode() {
-    return super.hashCode();
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_codeTypeClass == null) ? 0 : m_codeTypeClass.hashCode());
+    result = prime * result + ((m_filter == null) ? 0 : m_filter.hashCode());
+    return result;
   }
 
   @Override
   public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
     if (!super.equals(obj)) {
       return false;
     }
-    CodeLookupCall other = (CodeLookupCall) obj;
-    if (this.m_codeTypeClass != other.m_codeTypeClass) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
-    if (this.m_filter != other.m_filter) {
+    CodeLookupCall other = (CodeLookupCall) obj;
+    if (m_codeTypeClass == null) {
+      if (other.m_codeTypeClass != null) {
+        return false;
+      }
+    }
+    else if (!m_codeTypeClass.equals(other.m_codeTypeClass)) {
+      return false;
+    }
+    if (m_filter == null) {
+      if (other.m_filter != null) {
+        return false;
+      }
+    }
+    else if (!m_filter.equals(other.m_filter)) {
       return false;
     }
     return true;

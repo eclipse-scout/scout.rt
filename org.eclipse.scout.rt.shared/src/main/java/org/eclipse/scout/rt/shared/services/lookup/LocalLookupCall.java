@@ -33,11 +33,13 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 
   @Override
+  @SuppressWarnings("squid:S1185") // method is required to satisfy LookupCall quality checks that require equals to be overridden
   public boolean equals(Object obj) {
     return super.equals(obj);
   }
 
   @Override
+  @SuppressWarnings("squid:S1185") // method is expected because equals is implemented
   public int hashCode() {
     return super.hashCode();
   }

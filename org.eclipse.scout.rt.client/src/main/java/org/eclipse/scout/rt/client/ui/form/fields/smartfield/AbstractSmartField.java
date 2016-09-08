@@ -35,6 +35,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractMixedSmartField<
    * avoid from further overriding
    */
   @Override
+  @SuppressWarnings("squid:S1185") // method is final
   protected final VALUE execConvertKeyToValue(VALUE key) {
     return super.execConvertKeyToValue(key);
   }
@@ -43,6 +44,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractMixedSmartField<
    * avoid from further overriding
    */
   @Override
+  @SuppressWarnings("squid:S1185") // method is final
   protected final VALUE execConvertValueToKey(VALUE value) {
     return super.execConvertValueToKey(value);
   }

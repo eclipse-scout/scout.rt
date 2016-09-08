@@ -88,11 +88,6 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
   }
 
   @Override
-  public void addChildActions(Collection<? extends IMenu> actionList) {
-    super.addChildActions(actionList);
-  }
-
-  @Override
   protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     super.afterChildMenusAdd(newChildMenus);
     addScoutMenuVisibilityListenerRec(newChildMenus);
