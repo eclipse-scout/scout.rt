@@ -19,6 +19,7 @@ scout.Table = function(model) {
   this.columns = [];
   this.tableControls = [];
   this.menus = [];
+  this.popupMenu;
   this.rows = [];
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
@@ -27,7 +28,9 @@ scout.Table = function(model) {
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
-  this.loadingSupport = new scout.LoadingSupport({widget: this});
+  this.loadingSupport = new scout.LoadingSupport({
+    widget: this
+  });
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -145,22 +148,22 @@ scout.Table.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
   keyStrokeContext.registerKeyStroke([
-      new scout.TableNavigationUpKeyStroke(this),
-      new scout.TableNavigationDownKeyStroke(this),
-      new scout.TableNavigationPageUpKeyStroke(this),
-      new scout.TableNavigationPageDownKeyStroke(this),
-      new scout.TableNavigationHomeKeyStroke(this),
-      new scout.TableNavigationEndKeyStroke(this),
+    new scout.TableNavigationUpKeyStroke(this),
+    new scout.TableNavigationDownKeyStroke(this),
+    new scout.TableNavigationPageUpKeyStroke(this),
+    new scout.TableNavigationPageDownKeyStroke(this),
+    new scout.TableNavigationHomeKeyStroke(this),
+    new scout.TableNavigationEndKeyStroke(this),
 
-      new scout.TableFocusFilterFieldKeyStroke(this),
-      new scout.TableStartCellEditKeyStroke(this),
-      new scout.TableSelectAllKeyStroke(this),
-      new scout.TableRefreshKeyStroke(this),
-      new scout.TableToggleRowKeyStroke(this),
-      new scout.TableCopyKeyStroke(this),
-      new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
-      new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
-    ]);
+    new scout.TableFocusFilterFieldKeyStroke(this),
+    new scout.TableStartCellEditKeyStroke(this),
+    new scout.TableSelectAllKeyStroke(this),
+    new scout.TableRefreshKeyStroke(this),
+    new scout.TableToggleRowKeyStroke(this),
+    new scout.TableCopyKeyStroke(this),
+    new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
+    new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
+  ]);
 
   // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
   // Otherwise, an '↑-event' on the first row, or an '↓-event' on the last row will bubble up (because not consumed by table navigation keystrokes) and cause a superior table to move its selection.
@@ -405,7 +408,7 @@ scout.Table.prototype.onContextMenu = function(event) {
   var func = function(event) {
     event.preventDefault();
 
-    var menuItems, popup;
+    var menuItems;
     if (this.selectedRows.length > 0) {
       menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
       if (!event.pageX && !event.pageY) {
@@ -415,7 +418,7 @@ scout.Table.prototype.onContextMenu = function(event) {
         event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
       }
       if (menuItems.length > 0) {
-        popup = scout.create('ContextMenuPopup', {
+        this.popupMenu = scout.create('ContextMenuPopup', {
           parent: this,
           menuItems: menuItems,
           location: {
@@ -425,15 +428,16 @@ scout.Table.prototype.onContextMenu = function(event) {
           $anchor: this.$data,
           menuFilter: this._filterMenusHandler
         });
-        popup.open();
+        this.popupMenu.open();
 
         // Set table style to focused, so that it looks as it still has the focus.
         // Must be called after open(), because opening the popup might cause another
         // popup to close first (which will remove the 'focused' class).
         if (this.enabled) {
           this.$container.addClass('focused');
-          popup.on('close', function(event) {
+          this.popupMenu.on('close', function(event) {
             this.$container.removeClass('focused');
+            this.popupMenu = null;
           }.bind(this));
         }
       }
@@ -3092,6 +3096,11 @@ scout.Table.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.setMenuItems(menuItems);
+  if (this.popupMenu) {
+    var popupMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+    this.popupMenu.updateMenuItems(popupMenuItems);
+  }
+
 };
 
 scout.Table.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
