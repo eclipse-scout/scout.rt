@@ -27,7 +27,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
   var bounds,
     tabArea = $container[0],
-    clientWidth = tabArea.clientWidth,
+    clientWidth = tabArea.clientWidth - scout.graphics.getInsets($container).horizontal(),
     scrollWidth = tabArea.scrollWidth,
     menuBar = this._tabBox.menuBar,
     $status = this._tabBox.$status,
