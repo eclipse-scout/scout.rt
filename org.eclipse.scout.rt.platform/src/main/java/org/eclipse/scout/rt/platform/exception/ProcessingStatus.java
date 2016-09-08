@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 public class ProcessingStatus extends Status implements IProcessingStatus, Serializable {
   private static final long serialVersionUID = 1L;
 
+  @SuppressWarnings("squid:S2387")
   public static final ProcessingStatus OK_STATUS = new ProcessingStatus(Status.OK_STATUS) {
     private static final long serialVersionUID = 1L;
 

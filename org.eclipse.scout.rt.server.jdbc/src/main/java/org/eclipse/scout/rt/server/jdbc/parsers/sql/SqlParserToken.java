@@ -33,7 +33,7 @@ final class SqlParserToken {
     List<Comment> getComments();
   }
 
-  public static abstract class AbstractToken implements IToken {
+  public abstract static class AbstractToken implements IToken {
     private String m_text;
     private List<IToken> m_children;
     private List<Comment> m_comments;

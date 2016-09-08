@@ -152,7 +152,7 @@ public class PortCache<PORT> {
   /**
    * Represents a Port with its associated TTL.
    */
-  protected static class PortCacheEntry<PORT> {
+  protected static final class PortCacheEntry<PORT> {
 
     private final PORT m_port;
     private long m_expiration;

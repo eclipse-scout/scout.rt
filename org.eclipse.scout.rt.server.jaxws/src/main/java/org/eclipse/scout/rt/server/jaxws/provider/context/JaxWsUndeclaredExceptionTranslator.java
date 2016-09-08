@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JaxWsUndeclaredExceptionTranslator implements IExceptionTranslator<WebServiceException> {
 
-  private final static Logger LOG = LoggerFactory.getLogger(JaxWsUndeclaredExceptionTranslator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsUndeclaredExceptionTranslator.class);
 
   @Override
   public WebServiceException translate(final Throwable throwable) {

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUtility;
 
-public class DeepLinkUriBuilder {
+public final class DeepLinkUriBuilder {
 
   private final UriBuilder m_builder;
 

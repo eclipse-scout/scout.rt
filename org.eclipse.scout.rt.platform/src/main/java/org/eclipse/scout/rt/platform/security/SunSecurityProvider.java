@@ -83,6 +83,7 @@ public class SunSecurityProvider implements ISecurityProvider {
      * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP
      * 800-38D</a> ).
      */
+    @SuppressWarnings("squid:S00117")
     final int GCM_INITIALIZATION_VECTOR_LEN = 16;
 
     /**
@@ -90,6 +91,7 @@ public class SunSecurityProvider implements ISecurityProvider {
      * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP
      * 800-38D</a> ).
      */
+    @SuppressWarnings("squid:S00117")
     final int GCM_AUTH_TAG_BIT_LEN = 128;
 
     try {

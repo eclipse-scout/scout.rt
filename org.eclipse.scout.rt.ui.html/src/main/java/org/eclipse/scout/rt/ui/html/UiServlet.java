@@ -171,7 +171,7 @@ public class UiServlet extends HttpServlet {
   /**
    * Template pattern.
    */
-  protected static abstract class P_AbstractRequestHandler implements Serializable {
+  protected abstract static class P_AbstractRequestHandler implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected P_AbstractRequestHandler() {

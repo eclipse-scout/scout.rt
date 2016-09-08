@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  * @see ModelJobs
  * @since 5.2
  */
-public class ModelJobEventFilter implements IFilter<JobEvent>, IAdaptable {
+public final class ModelJobEventFilter implements IFilter<JobEvent>, IAdaptable {
 
   public static final IFilter<JobEvent> INSTANCE = new ModelJobEventFilter();
 

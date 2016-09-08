@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * This class represents the <code>NLS-Locale</code> currently associated with the current thread.
  */
-public class NlsLocale {
+public final class NlsLocale {
 
   /**
    * The {@link Locale} which is currently associated with the current thread.

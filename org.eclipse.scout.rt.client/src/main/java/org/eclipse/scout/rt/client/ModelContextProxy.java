@@ -55,16 +55,16 @@ public class ModelContextProxy {
             .withForm(modelContext.getForm())
             .call(new Callable<Object>() {
 
-          @Override
-          public Object call() throws Exception {
-            return method.invoke(object, args);
-          }
-        }, DefaultExceptionTranslator.class);
+              @Override
+              public Object call() throws Exception {
+                return method.invoke(object, args);
+              }
+            }, DefaultExceptionTranslator.class);
       }
     });
   }
 
-  public static class ModelContext {
+  public static final class ModelContext {
     private IDesktop m_desktop;
     private IOutline m_outline;
     private IForm m_form;

@@ -21,7 +21,7 @@ import com.sun.codemodel.JType;
  *
  * @since 5.1
  */
-public class JTypeParser {
+public final class JTypeParser {
 
   private JTypeParser() {
   }
@@ -38,8 +38,8 @@ public class JTypeParser {
    * This method is similar to {@link JCodeModel#parseType(String)}, but fixes an issue that JCodeModel does not support
    * '&lt;?&gt;' generic declaration (short for '&lt;? extends Object&gt;').
    */
+  @SuppressWarnings("squid:S00117")
   public static JType parseType(final JCodeModel model, final TypeMirror _typeMirror) throws ClassNotFoundException {
     return model.parseType(_typeMirror.toString().replaceAll("<\\?>", "<? extends Object>")); // bug in JCode model that it does not accept
   }
-
 }

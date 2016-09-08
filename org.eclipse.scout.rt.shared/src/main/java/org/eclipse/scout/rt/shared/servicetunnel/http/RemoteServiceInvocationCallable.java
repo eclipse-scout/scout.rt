@@ -70,16 +70,16 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       nBytes = requestData.length;
 
       // Send the request to the server.
-      final URLConnection m_urlConnection = m_tunnel.createURLConnection(m_serviceRequest, requestData);
+      final URLConnection urlConnection = m_tunnel.createURLConnection(m_serviceRequest, requestData);
 
       // Receive the response.
-      final int httpStatusCode = (m_urlConnection instanceof HttpURLConnection ? ((HttpURLConnection) m_urlConnection).getResponseCode() : 200);
-      m_tunnel.interceptHttpResponse(m_urlConnection, m_serviceRequest, httpStatusCode);
+      final int httpStatusCode = (urlConnection instanceof HttpURLConnection ? ((HttpURLConnection) urlConnection).getResponseCode() : 200);
+      m_tunnel.interceptHttpResponse(urlConnection, m_serviceRequest, httpStatusCode);
       if (httpStatusCode != 0 && (httpStatusCode < 200 || httpStatusCode > 299)) {
         return new ServiceTunnelResponse(new HttpException(httpStatusCode)); // request failed
       }
 
-      try (InputStream in = m_urlConnection.getInputStream()) {
+      try (InputStream in = urlConnection.getInputStream()) {
         return m_tunnel.getContentHandler().readResponse(in);
       }
     }

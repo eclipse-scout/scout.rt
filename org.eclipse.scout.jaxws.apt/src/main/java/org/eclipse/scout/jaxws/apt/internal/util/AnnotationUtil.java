@@ -45,6 +45,7 @@ import com.sun.codemodel.JFormatter;
  *
  * @since 5.1
  */
+@SuppressWarnings("squid:S00117")
 public final class AnnotationUtil {
 
   private AnnotationUtil() {

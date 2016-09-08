@@ -15,10 +15,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 /**
  * @since 3.9.0
  */
-public class DeviceTransformationUtility {
+public final class DeviceTransformationUtility {
 
   private DeviceTransformationUtility() {
-
   }
 
   /**

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  *
  * @since 5.2
  */
-public class ModelJobFutureFilter implements IFilter<IFuture<?>> {
+public final class ModelJobFutureFilter implements IFilter<IFuture<?>> {
 
   public static final IFilter<IFuture<?>> INSTANCE = new ModelJobFutureFilter();
 

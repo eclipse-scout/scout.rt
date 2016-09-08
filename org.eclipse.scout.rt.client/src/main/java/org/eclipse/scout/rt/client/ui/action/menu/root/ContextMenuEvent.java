@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 public class ContextMenuEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 
-  public final static int TYPE_STRUCTURE_CHANGED = 1;
+  public static final int TYPE_STRUCTURE_CHANGED = 1;
 
   private final int m_eventType;
 

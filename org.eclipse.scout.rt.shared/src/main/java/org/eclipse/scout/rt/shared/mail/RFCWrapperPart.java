@@ -43,8 +43,8 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public void addHeader(String header_name, String header_value) throws MessagingException {
-    m_rfcPart.addHeader(header_name, header_value);
+  public void addHeader(String headerName, String headerValue) throws MessagingException {
+    m_rfcPart.addHeader(headerName, headerValue);
   }
 
   @Override
@@ -78,8 +78,8 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public String[] getHeader(String header_name) throws MessagingException {
-    return m_rfcPart.getHeader(header_name);
+  public String[] getHeader(String headerName) throws MessagingException {
+    return m_rfcPart.getHeader(headerName);
   }
 
   @Override
@@ -93,13 +93,13 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public Enumeration getMatchingHeaders(String[] header_names) throws MessagingException {
-    return m_rfcPart.getMatchingHeaders(header_names);
+  public Enumeration getMatchingHeaders(String[] headerNames) throws MessagingException {
+    return m_rfcPart.getMatchingHeaders(headerNames);
   }
 
   @Override
-  public Enumeration getNonMatchingHeaders(String[] header_names) throws MessagingException {
-    return m_rfcPart.getNonMatchingHeaders(header_names);
+  public Enumeration getNonMatchingHeaders(String[] headerNames) throws MessagingException {
+    return m_rfcPart.getNonMatchingHeaders(headerNames);
   }
 
   @Override
@@ -113,8 +113,8 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public void removeHeader(String header_name) throws MessagingException {
-    m_rfcPart.removeHeader(header_name);
+  public void removeHeader(String headerName) throws MessagingException {
+    m_rfcPart.removeHeader(headerName);
   }
 
   @Override
@@ -148,8 +148,8 @@ public class RFCWrapperPart implements Part {
   }
 
   @Override
-  public void setHeader(String header_name, String header_value) throws MessagingException {
-    m_rfcPart.setHeader(header_name, header_value);
+  public void setHeader(String headerName, String headerValue) throws MessagingException {
+    m_rfcPart.setHeader(headerName, headerValue);
   }
 
   @Override

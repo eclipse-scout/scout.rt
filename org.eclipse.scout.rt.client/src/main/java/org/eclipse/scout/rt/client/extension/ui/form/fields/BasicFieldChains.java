@@ -43,7 +43,7 @@ public final class BasicFieldChains {
     }
   }
 
-  public static abstract class AbstractBasicFieldChain<VALUE> extends AbstractExtensionChain<IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>>> {
+  public abstract static class AbstractBasicFieldChain<VALUE> extends AbstractExtensionChain<IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>>> {
 
     /**
      * @param executers
@@ -51,6 +51,5 @@ public final class BasicFieldChains {
     public AbstractBasicFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> executers) {
       super(executers, IBasicFieldExtension.class);
     }
-
   }
 }

@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiThemeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UiThemeUtility {
+public final class UiThemeUtility {
 
   private static final Logger LOG = LoggerFactory.getLogger(UiThemeUtility.class);
   private static final String THEME_SESSION_ATTRIBUTE = UiThemeUtility.class.getName() + "#theme";

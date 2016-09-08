@@ -48,7 +48,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   private PropertyChangeListener m_wrappedMenuPropertyChangeListener;
   private Set<IMenuType> m_menuTypes;
 
-  public final static IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
+  public static final IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {
       return menuType;

@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  *
  * @since 5.1
  */
+@SuppressWarnings("squid:S00117")
 public class EntryPointDefinition {
 
   public static final String ENTRY_POINT_SUFFIX = "EntryPoint";

@@ -60,13 +60,13 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
    * Used to create the 'model' of the proposal chooser. In this method you shouldn't call methods that access the
    * m_model variable since it isn't set until this method has completed. Use the {@link #init()} method instead.
    */
-  abstract protected T createModel();
+  protected abstract T createModel();
 
   /**
    * Called when smart-field doesn't provide a inner class for a proposal model (tree or table). Returns the default
    * proposal model.
    */
-  abstract protected T createDefaultModel();
+  protected abstract T createDefaultModel();
 
   /**
    * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set. The

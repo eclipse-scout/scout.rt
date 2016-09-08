@@ -24,7 +24,7 @@ import org.junit.runners.model.TestClass;
  * This class contains the logic which is shared among {@link ParameterizedServerTestRunner} and
  * {@link ParameterizedClientTestRunner}
  */
-public class ParameterizedTestRunnerExtension {
+public final class ParameterizedTestRunnerExtension {
 
   private ParameterizedTestRunnerExtension() {
   }

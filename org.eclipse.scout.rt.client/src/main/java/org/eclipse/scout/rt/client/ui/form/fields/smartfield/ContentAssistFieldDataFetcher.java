@@ -59,7 +59,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     }
   }
 
-  private class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
+  private final class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
     private final IContentAssistSearchParam<LOOKUP_KEY> m_param;
 
     private P_LookupCallDataCallback(IContentAssistSearchParam<LOOKUP_KEY> param) {
@@ -77,5 +77,4 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
       setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_param));
     }
   }
-
 }

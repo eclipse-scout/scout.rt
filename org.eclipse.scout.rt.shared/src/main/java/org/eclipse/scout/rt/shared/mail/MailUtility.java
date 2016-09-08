@@ -54,7 +54,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MailUtility {
+public final class MailUtility {
 
   private static final Logger LOG = LoggerFactory.getLogger(MailUtility.class);
 

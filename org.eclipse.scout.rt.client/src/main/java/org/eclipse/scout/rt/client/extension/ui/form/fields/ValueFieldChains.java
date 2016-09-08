@@ -21,7 +21,7 @@ public final class ValueFieldChains {
   private ValueFieldChains() {
   }
 
-  public static abstract class AbstractValueFieldChain<VALUE> extends AbstractExtensionChain<IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> {
+  public abstract static class AbstractValueFieldChain<VALUE> extends AbstractExtensionChain<IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> {
 
     public AbstractValueFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions, IValueFieldExtension.class);
