@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Allows the subscription of a replier to respond to requests sent to a 'request-reply' destination.
@@ -36,6 +38,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  */
 @Bean
 public class Replier {
+  private static final Logger LOG = LoggerFactory.getLogger(Replier.class);
 
   protected JmsMomImplementor m_mom;
 
@@ -75,6 +78,7 @@ public class Replier {
 
           @Override
           public void run() throws Exception {
+            LOG.debug("JMS request received [msg={}]", jmsRequest);
             final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller, encrypter);
             final IMessage<REQUEST> request = requestReader.readMessage();
             final Destination replyTopic = requestReader.readReplyTo();
@@ -86,15 +90,15 @@ public class Replier {
                 .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
                 .run(new IRunnable() {
 
-              @Override
-              public void run() throws Exception {
-                final Message replyMessage = handleRequest(listener, marshaller, encrypter, request, replyId);
-                m_mom.send(m_mom.getDefaultProducer(), replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
-              }
-            });
+                  @Override
+                  public void run() throws Exception {
+                    final Message replyMessage = handleRequest(listener, marshaller, encrypter, request, replyId);
+                    m_mom.send(m_mom.getDefaultProducer(), replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
+                  }
+                });
           }
         }, Jobs.newInput()
-            .withName("Receiving JMS request [msg={}]", jmsRequest)
+            .withName("Receiving JMS request [dest={}]", jmsRequest.getJMSDestination())
             .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)
             .withExecutionHint(replyId)); // Register for cancellation
       }
