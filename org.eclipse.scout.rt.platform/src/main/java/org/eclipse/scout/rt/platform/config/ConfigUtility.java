@@ -42,7 +42,10 @@ public final class ConfigUtility {
    */
   public static final String CONFIG_FILE_NAME = "config.properties";
 
-  private final static PropertiesHelper INSTANCE = new PropertiesHelper(CONFIG_FILE_NAME);
+  private ConfigUtility() {
+  }
+
+  private static final PropertiesHelper INSTANCE = new PropertiesHelper(CONFIG_FILE_NAME);
 
   /**
    * Gets the property with given key. If there is no property with given key, <code>null</code> is returned.<br>

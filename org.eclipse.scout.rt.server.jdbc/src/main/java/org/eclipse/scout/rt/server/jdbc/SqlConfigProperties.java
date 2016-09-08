@@ -18,7 +18,11 @@ import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 /**
  * Config properties for org.eclipse.scout.rt.server.jdbc
  */
-public class SqlConfigProperties {
+public final class SqlConfigProperties {
+
+  private SqlConfigProperties() {
+  }
+
   public static class SqlTransactionMemberIdProperty extends AbstractStringConfigProperty {
 
     @Override

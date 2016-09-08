@@ -29,6 +29,9 @@ import org.slf4j.LoggerFactory;
 public final class EntityContributionUtility {
   private static final Logger LOG = LoggerFactory.getLogger(EntityContributionUtility.class);
 
+  private EntityContributionUtility() {
+  }
+
   public static EntityContribution constraintTextToContribution(String wherePart) {
     EntityContribution contrib = new EntityContribution();
     if (wherePart != null) {

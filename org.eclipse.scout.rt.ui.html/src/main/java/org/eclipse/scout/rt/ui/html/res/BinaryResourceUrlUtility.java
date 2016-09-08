@@ -31,8 +31,11 @@ import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BinaryResourceUrlUtility {
+public final class BinaryResourceUrlUtility {
   private static final Logger LOG = LoggerFactory.getLogger(BinaryResourceUrlUtility.class);
+
+  private BinaryResourceUrlUtility() {
+  }
 
   /**
    * Regular expression pattern to find icons, e.g. to find &lt;img src="iconid:some_icon"&gt;.
@@ -141,7 +144,7 @@ public class BinaryResourceUrlUtility {
     return new Pair<>(filename, fingerprint);
   }
 
-  protected static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
+  static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
     if (jsonAdapter == null) {
       return false;
     }

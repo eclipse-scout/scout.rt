@@ -27,7 +27,10 @@ import org.eclipse.scout.rt.platform.job.internal.JobManager;
 /**
  * Helper class for Job API in JUnit tests.
  */
-public class JobTestUtil {
+public final class JobTestUtil {
+
+  private JobTestUtil() {
+  }
 
   /**
    * Replaces the current {@link JobManager} with the given job manager instance.

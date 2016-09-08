@@ -14,7 +14,10 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 /**
  * This class provides all properties configured in the config.properties file that affect the HTML UI module.
  */
-public class UiHtmlConfigProperties {
+public final class UiHtmlConfigProperties {
+
+  private UiHtmlConfigProperties() {
+  }
 
   /**
    * Returns the name of the UI theme which is activated when the application starts. When the default theme is active

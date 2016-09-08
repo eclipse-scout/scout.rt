@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 /**
  * <h4>AbstractLookupService</h4>
  */
+@SuppressWarnings("squid:S1118")
 public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILookupService<LOOKUP_ROW_KEY_TYPE> {
 
   /**

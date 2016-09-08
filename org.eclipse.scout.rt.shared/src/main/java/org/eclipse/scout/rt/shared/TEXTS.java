@@ -14,7 +14,10 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.nls.NlsUtility;
 
-public class TEXTS {
+public final class TEXTS {
+
+  private TEXTS() {
+  }
 
   /**
    * Gets the translation for the given key and the default locale.<br>
@@ -69,8 +72,8 @@ public class TEXTS {
    * <ul>
    * <li>TEXTS.get(locale, "MissingFile1"); with MissingFile1="The File could not be found."</li>
    * <li>TEXTS.get(locale, "MissingFile2", fileName); with MissingFile2="The File {0} could not be found."</li>
-   * <li>TEXTS.get(locale, "MissingFile3", fileName, dir); with MissingFile3=
-   * "The File {0} in Folder {1} could not be found."</li>
+   * <li>TEXTS.get(locale, "MissingFile3", fileName, dir); with MissingFile3= "The File {0} in Folder {1} could not be
+   * found."</li>
    * </ul>
    *
    * @param locale

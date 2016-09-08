@@ -10,7 +10,10 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 /**
  * Job helper methods to be included later in the job framework.
  */
-public class LookupJobHelper {
+public final class LookupJobHelper {
+
+  private LookupJobHelper() {
+  }
 
   /**
    * await result while freeing model thread

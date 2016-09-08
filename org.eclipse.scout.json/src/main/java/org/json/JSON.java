@@ -28,7 +28,11 @@ package org.json;
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
 
-class JSON {
+final class JSON {
+
+  private JSON() {
+  }
+
   /**
    * Returns the input if it is a JSON-permissible value; throws otherwise.
    */
