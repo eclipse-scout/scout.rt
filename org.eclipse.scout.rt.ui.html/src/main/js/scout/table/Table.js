@@ -411,7 +411,7 @@ scout.Table.prototype.onContextMenu = function(event) {
   var func = function(event) {
     event.preventDefault();
 
-    var menuItems, popup;
+    var menuItems;
     if (this.selectedRows.length > 0) {
       menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
       if (!event.pageX && !event.pageY) {

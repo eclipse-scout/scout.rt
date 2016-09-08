@@ -115,12 +115,12 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
           this._updateFirstLastClass();
           this.updateNextToSelected('menu-item', parentMenu.$container);
 
-        parentMenu.$subMenuBody.detach();
-        scout.scrollbars.install(this.$body, {
-          parent: this
-        });
-        this.$body.css('box-shadow', "");
-        this.bodyAnimating = false;
+          parentMenu.$subMenuBody.detach();
+          scout.scrollbars.install(this.$body, {
+            parent: this
+          });
+          this.$body.css('box-shadow', "");
+          this.bodyAnimating = false;
         }
       }.bind(this)
     });
@@ -317,7 +317,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
 
 scout.ContextMenuPopup.prototype._handleInitialSubMenus = function(initialSubMenuRendering) {
   var menusObj;
-  while(this.initialSubMenusToRender && !initialSubMenuRendering) {
+  while (this.initialSubMenusToRender && !initialSubMenuRendering) {
     menusObj = this.initialSubMenusToRender;
     this.initialSubMenusToRender = undefined;
     this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);
@@ -382,11 +382,11 @@ scout.ContextMenuPopup.prototype._modifyBody = function() {
   this.$body.addClass('context-menu');
 };
 
-scout.ContextMenuPopup.prototype.updateMenuItems = function(menuItems){
+scout.ContextMenuPopup.prototype.updateMenuItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
   // Only update if list of menus changed. Don't compare this.menuItems, because that list
   // may contain additional UI separators, and may not be in the same order
-  if(!scout.arrays.equals(this.menuItems, menuItems)){
+  if (!scout.arrays.equals(this.menuItems, menuItems)) {
     this.close();
   }
 };

@@ -18,6 +18,7 @@ scout.Tree = function() {
   this.filterEnabled = false;
   this.lazyExpandingEnabled = true;
   this.menus = [];
+  this.contextMenu;
   this.menuBar;
   this.keyStrokes = [];
   this.multiCheck = true;
@@ -168,6 +169,11 @@ scout.Tree.prototype._syncMenus = function(menus) {
 scout.Tree.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
   this.menuBar.setMenuItems(menuItems);
+  var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
+    $part = $(event.currentTarget);
+  if (this.contextMenu) {
+    this.contextMenu.updateMenuItems(contextMenuItems);
+  }
 };
 
 scout.Tree.prototype._syncKeyStrokes = function(keyStrokes) {
@@ -2207,7 +2213,7 @@ scout.Tree.prototype._showContextMenu = function(event) {
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
-    var popup = scout.create('ContextMenuPopup', {
+    this.contextMenu = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: filteredMenus,
       location: {
@@ -2217,15 +2223,16 @@ scout.Tree.prototype._showContextMenu = function(event) {
       $anchor: $part,
       menuFilter: this._filterMenusHandler
     });
-    popup.open();
+    this.contextMenu.open();
 
     // Set table style to focused, so that it looks as it still has the focus.
     // Must be called after open(), because opening the popup might cause another
     // popup to close first (which will remove the 'focused' class).
     if (this.enabled) {
       this.$container.addClass('focused');
-      popup.on('close', function(event) {
+      this.contextMenu.on('close', function(event) {
         this.$container.removeClass('focused');
+        this.contextMenu = null;
       }.bind(this));
     }
   };
@@ -2555,7 +2562,7 @@ scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
 
   // append after index
   var nodeBefore = this.visibleNodesFlat[index - 1];
-  this._ensureNodeInDOM(nodeBefore, false, index-1);
+  this._ensureNodeInDOM(nodeBefore, false, index - 1);
   if (nodeBefore.attached) {
     $node.insertAfter(nodeBefore.$node);
     return;
@@ -2721,7 +2728,7 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
   }
   //because we suppress handling by browser we have to set focus manually.
   this._onNodeControlMouseDownDoFocus();
-  this.selectNodes(node);                              // <---- ### 1
+  this.selectNodes(node); // <---- ### 1
   this.setNodeExpanded(node, expanded, expansionOpts); // <---- ### 2
   // prevent bubbling to _onNodeMouseDown()
   $.suppressEvent(event);
