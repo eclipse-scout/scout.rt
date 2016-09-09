@@ -1070,21 +1070,20 @@ scout.Tree.prototype._renderSelection = function() {
     }
   }, this);
 
+
+  // Update 'group' markers for all rendered nodes
+  for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+    if (i >= this.visibleNodesFlat.length) {
+      break;
+    }
+    var node = this.visibleNodesFlat[i];
+    if (node && node.rendered) {
+      node.$node.toggleClass('group', !!this.groupedNodes[node.id]);
+    }
+  }
+
   if (this.scrollToSelection) {
     this.revealSelection();
-  }
-  // TODO [6.1] CGU remove this, it does way too much and renderNodeText prevents that tree can get focus when a node is clicked. It seems that it is only necessary to update the group css class
-  this._redecorateViewRange();
-};
-
-scout.Tree.prototype._redecorateViewRange = function() {
-  if (this.rendered) {
-    for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
-      if (i >= this.visibleNodesFlat.length) {
-        break;
-      }
-      this._decorateNode(this.visibleNodesFlat[i]);
-    }
   }
 };
 
