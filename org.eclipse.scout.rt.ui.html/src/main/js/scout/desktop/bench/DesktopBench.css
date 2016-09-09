@@ -73,8 +73,8 @@
   }
 
   & .table-aggregate {
-    margin-left: @bench-padding-x;
-    margin-right: @bench-padding-x;
+    /* Desktop table has a 2px (left) border. */
+    margin-left: @detail-table-data-padding-x + 2px;
 
     & > .table-cell {
       padding-top: @detail-table-row-padding-y;

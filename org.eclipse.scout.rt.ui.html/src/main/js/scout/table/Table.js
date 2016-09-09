@@ -2742,13 +2742,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
 
   // move aggregated rows
   this._aggregateRows.forEach(function(aggregateRow) {
-    var val = aggregateRow.contents[oldPos];
-    aggregateRow.contents.splice(oldPos, 1);
-    if (aggregateRow.contents.length > newPos) {
-      aggregateRow.contents.splice(newPos, 0, val);
-    } else {
-      aggregateRow.contents[newPos] = val;
-    }
+    scout.arrays.move(aggregateRow.contents, oldPos, newPos);
   });
 
   // move cells
