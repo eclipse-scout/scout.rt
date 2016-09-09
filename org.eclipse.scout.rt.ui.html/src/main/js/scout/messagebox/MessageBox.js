@@ -23,7 +23,7 @@ scout.MessageBox = function() {
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
-// represents severity codes from IStatus
+// represents severity codes from IStatus // FIXME [awe] 6.1 - same as scout.Status.Severity!? merge
 scout.MessageBox.SEVERITY = {
   OK: 1,
   INFO: 256,

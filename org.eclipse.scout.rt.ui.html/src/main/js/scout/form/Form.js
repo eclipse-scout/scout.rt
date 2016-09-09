@@ -381,3 +381,7 @@ scout.Form.prototype.requestFocus = function(formField) {
   }
   formField.focus();
 };
+
+scout.Form.prototype.visitFields = function(visitor) {
+  this.rootGroupBox.visit(visitor);
+};

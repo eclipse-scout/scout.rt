@@ -160,6 +160,7 @@
   __include("scout/form/Form.js");
   __include("scout/form/FormAdapter.js");
   __include("scout/form/FormLayout.js");
+  __include("scout/form/FormLifecycle.js");
   __include("scout/form/FormMenu.js");
   __include("scout/form/FormMenuAdapter.js");
   __include("scout/form/FormMenuPopup.js");

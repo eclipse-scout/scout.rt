@@ -48,6 +48,8 @@ scout.FormField = function() {
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
+  this.touched = false;
+  this.empty = true;
 
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
@@ -94,6 +96,7 @@ scout.FormField.prototype._init = function(model) {
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);
   this._syncGridData(this.gridData);
+  this._updateEmpty();
 };
 
 /**
@@ -818,4 +821,29 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
     $anchor: this._$disabledOverlay
   });
   popup.open();
+};
+
+scout.FormField.prototype.visit = function(visitor) {
+  visitor(this);
+};
+
+scout.FormField.prototype.markAsSaved = function() {
+  this.touched = false;
+};
+
+scout.FormField.prototype.validate = function() {
+  // !hasError() && isMandatoryFulfilled();
+  // !isMandatory() || !isEmpty();
+  var validByErrorStatus = !this.errorStatus;
+  var validByMandatory = !this.mandatory || !this.empty;
+  var valid = validByErrorStatus && validByMandatory;
+  return {
+    valid: valid,
+    validByErrorStatus: validByErrorStatus,
+    validByMandatory: validByMandatory
+  };
+};
+
+scout.FormField.prototype._updateEmpty = function() {
+  // NOP
 };

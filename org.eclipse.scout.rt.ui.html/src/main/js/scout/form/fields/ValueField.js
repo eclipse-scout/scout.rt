@@ -14,6 +14,7 @@
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
+  this._initialValue = null;
   this.displayText = '';
 };
 scout.inherits(scout.ValueField, scout.FormField);
@@ -61,13 +62,23 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
 
   // trigger only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
-    var validatedDisplayText = this._validateDisplayText(displayText, whileTyping);
-    this.displayText = validatedDisplayText;
-    if (displayText !== validatedDisplayText) {
-      this._renderDisplayText(this.displayText);
-    }
-    this._triggerDisplayTextChanged(validatedDisplayText, whileTyping);
+    this._parseAndSetValue(displayText, whileTyping);
   }
+};
+
+scout.ValueField.prototype._parseAndSetValue = function(displayText, whileTyping) {
+  var validatedDisplayText = this._validateDisplayText(displayText, whileTyping);
+  this.displayText = validatedDisplayText;
+  if (displayText !== validatedDisplayText) {
+    this._renderDisplayText(this.displayText);
+  }
+  this._triggerDisplayTextChanged(validatedDisplayText, whileTyping);
+  this.setValue(this._parseValue(validatedDisplayText));
+};
+
+scout.ValueField.prototype._parseValue = function(displayText) {
+  // FIXME [awe] 6.1 - this impl. is wrong and far too simple. Check how it is done in Java Scout first, also discuss with J.GU
+  return displayText;
 };
 
 scout.ValueField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
@@ -106,6 +117,29 @@ scout.ValueField.prototype._triggerDisplayTextChanged = function(displayText, wh
  */
 scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
+};
+
+// FIXME [awe] 6.1 - check fields like DateField where setTimestamp is used instead of setValue
+scout.ValueField.prototype.setValue = function(value) {
+  this.setProperty('value', value);
+};
+
+scout.ValueField.prototype._syncValue = function(newValue) {
+  var oldValue = this.value;
+  this.value = newValue;
+  if (this._valueChanged(newValue, oldValue)) {
+    this._updateTouched();
+    this._updateEmpty();
+  }
+  this.triggerPropertyChange('value', oldValue, newValue);
+};
+
+scout.ValueField.prototype._updateTouched = function() {
+  this.touched = this._valueChanged(this.value, this._initialValue);
+};
+
+scout.ValueField.prototype._valueChanged = function(newValue, oldValue) {
+  return newValue !== oldValue;
 };
 
 scout.ValueField.prototype.addField = function($field) {
@@ -158,4 +192,16 @@ scout.ValueField._getActiveValueField = function(target) {
   var $activeElement = $(target.ownerDocument.activeElement),
     valueField = $activeElement.data('valuefield') || $activeElement.parent().data('valuefield');
   return valueField && !(valueField.$field && valueField.$field.hasClass('disabled')) ? valueField : null;
+};
+
+scout.ValueField.prototype.markAsSaved = function() {
+  scout.ValueField.parent.prototype.markAsSaved.call(this);
+  this._initialValue = this.value;
+};
+
+/**
+ * @override FormField.js
+ */
+scout.ValueField.prototype._updateEmpty = function() {
+  this.empty = !!this.value;
 };

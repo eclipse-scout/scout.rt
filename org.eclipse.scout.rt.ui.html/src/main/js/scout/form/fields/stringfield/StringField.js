@@ -331,3 +331,10 @@ scout.StringField.prototype._validateDisplayText = function(displayText, whileTy
   }
   return scout.StringField.parent.prototype._validateDisplayText(displayText, whileTyping);
 };
+
+/**
+ * @override ValueField.js
+ */
+scout.StringField.prototype._updateEmpty = function() {
+  this.empty = scout.strings.empty(this.value);
+};

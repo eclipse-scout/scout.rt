@@ -19,3 +19,10 @@ scout.inherits(scout.CompositeField, scout.FormField);
 scout.CompositeField.prototype.getFields = function() {
   throw new Error('Not implemented');
 };
+
+scout.CompositeField.prototype.visit = function(visitor) {
+  this.getFields().forEach(function(field) {
+    field.visit(visitor);
+  });
+  scout.CompositeField.parent.prototype.visit(visitor);
+};

@@ -25,6 +25,14 @@ scout.Status.prototype.cssClass = function() {
   return scout.Status.cssClassForSeverity(this.severity);
 };
 
+/**
+ * @returns true if severity is OK or INFO, false if severity is WARNING or ERROR.
+ */
+scout.Status.prototype.isValid = function() {
+  return this.severity === scout.Status.Severity.OK ||
+         this.severity === scout.Status.Severity.INFO;
+};
+
 scout.Status.prototype.isError = function() {
   return this.severity === scout.Status.Severity.ERROR;
 };
