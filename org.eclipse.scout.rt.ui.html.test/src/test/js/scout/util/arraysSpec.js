@@ -114,6 +114,46 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("insert", function() {
+
+    it("insert element at index", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.insert(arr, 'e', 0);
+      expect(arr).toEqual(['e', 'a', 'b', 'c', 'd']);
+
+      arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.insert(arr, 'e', 1);
+      expect(arr).toEqual(['a', 'e', 'b', 'c', 'd']);
+
+      arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.insert(arr, 'e', 10);
+      expect(arr).toEqual(['a', 'b', 'c', 'd', 'e']);
+    });
+
+  });
+
+  describe("move", function() {
+
+    it("replaces elements", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.move(arr, 0, 1);
+      expect(arr).toEqual(['b', 'a', 'c', 'd']);
+
+      arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.move(arr, 1, 0);
+      expect(arr).toEqual(['b', 'a', 'c', 'd']);
+
+      arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.move(arr, 0, 100);
+      expect(arr).toEqual(['b', 'c', 'd', 'a']);
+
+      arr = ['a', 'b', 'c', 'd'];
+      scout.arrays.move(arr, 10, 0);
+      expect(arr).toEqual([undefined, 'a', 'b', 'c', 'd']);
+    });
+
+  });
+
   describe("union", function() {
 
     it("merges two arrays", function() {
