@@ -17,6 +17,7 @@ scout.AggregateTableControl = function() {
   this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
+  this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
   this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
   this._tableAggregationFunctionHandler = this._onTableAggregationFunctionChanged.bind(this);
   this._tableGroupingHandler = this._onTableGroupingChanged.bind(this);
@@ -63,6 +64,7 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
+  this.table.on('columnMoved', this._tableColumnMovedHandler);
   this.table.on('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
   this.table.on('groupingChanged', this._tableGroupingHandler);
 };
@@ -77,6 +79,7 @@ scout.AggregateTableControl.prototype._removeContent = function() {
   this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
+  this.table.off('columnMoved', this._tableColumnMovedHandler);
   this.table.off('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
   this.table.off('groupingChanged', this._tableGroupingHandler);
 };
@@ -185,6 +188,12 @@ scout.AggregateTableControl.prototype._onTableRowsSelected = function(event) {
 };
 
 scout.AggregateTableControl.prototype._onTableColumnResized = function(event) {
+  this._rerenderAggregate();
+};
+
+scout.AggregateTableControl.prototype._onTableColumnMoved = function(event) {
+  // move aggregated value in aggregateRow
+  scout.arrays.move(this.aggregateRow, event.oldPos, event.newPos);
   this._rerenderAggregate();
 };
 
