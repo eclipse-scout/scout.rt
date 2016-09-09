@@ -778,7 +778,7 @@ public final class DateUtility {
     c.setTime(time);
     double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
     Double d = new Double(t / DAY_MILLIS);
-    // range check;
+    // range check
     if (d.doubleValue() < 0) {
       d = new Double(0);
     }

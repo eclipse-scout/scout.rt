@@ -68,7 +68,6 @@ public class DataModelAttributeInjector implements DataModelConstants {
         opList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_GE_HOURS));
         opList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_GE_MINUTES));
         opList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_HOURS));
-        // opList.add(DataModelAttributeOp.create(OPERATOR_Time_Is_In_Minutes,AGGREGATION_NONE));
         opList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_LE_HOURS));
         opList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_LE_MINUTES));
         opList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_NOW));
@@ -139,7 +138,6 @@ public class DataModelAttributeInjector implements DataModelConstants {
         opList.add(DataModelAttributeOp.create(OPERATOR_DATE_IS_IN_GE_DAYS));
         opList.add(DataModelAttributeOp.create(OPERATOR_DATE_IS_IN_GE_MONTHS));
         if (attribute.isNotOperatorEnabled()) {
-          // opList.add(DataModelAttributeOp.create(OPERATOR_Date_TimeIs_NotNow,AGGREGATION_NONE));
           opList.add(DataModelAttributeOp.create(OPERATOR_DATE_IS_NOT_TODAY));
         }
         break;

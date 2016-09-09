@@ -232,8 +232,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     }
     if (m_table != null) {
       if (!m_tableExternallyManaged) {
-        // ticket 84893
-        // m_table.setAutoDiscardOnDelete(false);
         m_managedTableListener = new P_ManagedTableListener();
         m_table.addTableListener(m_managedTableListener);
       }

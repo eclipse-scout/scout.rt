@@ -24,7 +24,7 @@ public interface IFileChooserField extends IValueField<BinaryResource> {
   /**
    * default maximum upload size
    */
-  long DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // default: 50 MB;
+  long DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // default: 50 MB
 
   void setShowFileExtension(boolean b);
 

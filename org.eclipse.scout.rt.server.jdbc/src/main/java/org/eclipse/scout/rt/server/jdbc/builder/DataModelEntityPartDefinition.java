@@ -87,22 +87,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    * Called by the constructor after calling {@link #autoCompleteTags(String)} and setting its member fields
    */
   protected void check() {
-    /*
-    if (m_whereClause != null) {
-      for (String tag : new String[]{"whereParts", "groupBy", "groupByParts", "havingParts"}) {
-        if (StringUtility.getTag(m_whereClause, tag) == null) {
-          throw new IllegalArgumentException("whereClause must contain a " + tag + " tag");
-        }
-      }
-    }
-    if (m_selectClause != null) {
-      for (String tag : new String[]{"selectParts", "fromParts", "whereParts", "groupBy", "groupByParts", "havingParts"}) {
-        if (StringUtility.getTag(m_selectClause, tag) == null) {
-          throw new IllegalArgumentException("selectClause must contain a " + tag + " tag");
-        }
-      }
-    }
-     */
+    // default implementation does nothing
   }
 
   public String getSelectClause() {

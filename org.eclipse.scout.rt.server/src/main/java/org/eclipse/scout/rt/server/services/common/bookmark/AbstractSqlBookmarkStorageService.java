@@ -149,7 +149,6 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
       return SerializationUtility.createObjectSerializer().deserialize(bytesResolved, BookmarkFolder.class);
     }
     catch (Exception e) {
-      //delete is also an option: execStoreBookmarkFolder(id, kind, null);
       throw new ProcessingException("loading object" + id, e);
     }
   }

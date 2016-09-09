@@ -51,7 +51,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private boolean m_initialized;
   private final IActionUIFacade m_uiFacade;
   private boolean m_inheritAccessibility;
-  // enabled is defined as: enabledGranted && enabledProperty && enabledProcessing && enabledInheritAccessibility
+  // enabled is defined as: enabledGranted AND enabledProperty AND enabledProcessing AND enabledInheritAccessibility
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   private boolean m_enabledProcessingAction;

@@ -240,7 +240,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
    */
   protected boolean isConsumeChildContributions(EntityPath ePath) {
     return true;
-    //return ePath.lastElement().isOneToMany();
   }
 
   /**

@@ -44,9 +44,6 @@ public class AptLogger {
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public void info(final String msg, final Object... args) {
-    // TODO [6.1] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
-    //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
-    //                 Correct solution: final String message = MessageFormatter.arrayFormat(msg, args).getMessage();
     final String message = SLF4JMessageFormatter.format(msg, args).getMessage();
     final String logMsg = String.format("Annotation processing: %s [processor=%s]", message, JaxWsAnnotationProcessor.class.getSimpleName());
 
@@ -65,9 +62,6 @@ public class AptLogger {
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public void warn(final String msg, final Object... args) {
-    // TODO [6.1] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
-    //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
-    //                 Correct solution: final String message = MessageFormatter.arrayFormat(msg, args).getMessage();
     final String message = SLF4JMessageFormatter.format(msg, args).getMessage();
     final String logMsg = String.format("Annotation processing: %s [processor=%s]", message, JaxWsAnnotationProcessor.class.getSimpleName());
 
@@ -87,10 +81,6 @@ public class AptLogger {
    *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
    */
   public void error(final String msg, final Object... args) {
-    // TODO [6.1] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
-    //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
-    //                 Correct solution: final String message = MessageFormatter.arrayFormat(msg, args).getMessage();
-    //                                   final Throwable throwable = MessageFormatter.arrayFormat(msg, args).getThrowable();
     final FormattingTuple format = SLF4JMessageFormatter.format(msg, args);
 
     final StringWriter writer = new StringWriter();

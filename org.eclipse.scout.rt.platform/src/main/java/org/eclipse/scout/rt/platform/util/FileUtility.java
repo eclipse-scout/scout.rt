@@ -377,7 +377,9 @@ public final class FileUtility {
     if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
       return false;
     }
-    try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+    try (
+        @SuppressWarnings("squid:S2095")
+        DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
       int test = in.readInt();
       return test == 0x504b0304; // magic number of a zip file
     }

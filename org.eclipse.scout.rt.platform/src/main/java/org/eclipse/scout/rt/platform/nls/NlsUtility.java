@@ -35,12 +35,7 @@ public final class NlsUtility {
 
   public static void dynamicBindFields(Class<?> clazz) {
     final Field[] fieldArray = clazz.getDeclaredFields();
-
     boolean isAccessible = (clazz.getModifiers() & Modifier.PUBLIC) != 0;
-
-    // build a map of field names to Field objects
-    // final int len = fieldArray.length;
-
     for (Field field : fieldArray) {
       // can only set value of public static non-final fields
       if ((field.getModifiers() & MOD_MASK) != MOD_EXPECTED) {

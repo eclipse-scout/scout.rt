@@ -75,11 +75,11 @@ public final class AptUtil {
   private static String interceptContent(String content) {
     // replace new lines before '{'
     content = content.replaceAll("\\s*\\{", " \\{");
-    // replace new lines before 'throws;
+    // replace new lines before 'throws'
     content = content.replaceAll("\\s*throws", " throws");
-    // replace new lines before 'implements;
+    // replace new lines before 'implements'
     content = content.replaceAll("\\s*implements", " implements");
-    // replace new lines before 'extends;
+    // replace new lines before 'extends'
     content = content.replaceAll("\\s*extends", " extends");
     // change indent space two 2 spaces
     content = content.replaceAll("    ", "  ");

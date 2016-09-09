@@ -37,7 +37,7 @@ public interface IDNDSupport {
   /**
    * default maximum upload size
    */
-  long DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // default: 50 MB;
+  long DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // default: 50 MB
 
   /**
    * @param dragType

@@ -36,6 +36,7 @@ public class TableOrganizer implements ITableOrganizer {
   }
 
   @Override
+  @SuppressWarnings("squid:CommentedOutCodeLine")
   public boolean isColumnRemovable(IColumn column) {
     // We could write column.isVisible() || isCustomizable() && hasRemovePermission() && isCustom(column)
     // here but the outcome would be the same as 'true', because the given column is always visible here.

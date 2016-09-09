@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class RowIndexComparator implements Comparator<ITableRow> {
+public class RowIndexComparator implements Comparator<ITableRow>, Serializable {
+  private static final long serialVersionUID = 1L;
 
   @Override
   public int compare(ITableRow row1, ITableRow row2) {
@@ -28,5 +30,4 @@ public class RowIndexComparator implements Comparator<ITableRow> {
       return 0;
     }
   }
-
 }

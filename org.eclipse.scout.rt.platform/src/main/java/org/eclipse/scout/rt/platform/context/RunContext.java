@@ -187,6 +187,7 @@ public class RunContext implements IAdaptable {
    *          The chain used to construct the context.
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
+    // intercept method for sub classes
   }
 
   /**

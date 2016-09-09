@@ -396,7 +396,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 try {
                   getTable().setTableChanging(true);
                   newRow = getTable().addRow(newRow);
-//                  newRow.getCellForUpdate(getTable().getConfigNameColumn()).setEditable(false);
                   getTable().selectRow(newRow);
                   getMenuByClass(RenameMenu.class).doAction();
                 }

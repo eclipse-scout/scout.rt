@@ -4477,7 +4477,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         row = resolveRow(row);
         if (row != null && col != null) {
           // ensure the editable row to be selected.
-          // This is crucial if the cell's value is changed right away in @{link IColumn#prepareEdit(ITableRow)}, e.g. in @{link AbstractBooleanColumn}
+          // This is crucial if the cell's value is changed right away in IColumn#prepareEdit(ITableRow), e.g. in AbstractBooleanColumn
           row.getTable().selectRow(row);
           IFormField f = col.prepareEdit(row);
           if (f != null) {

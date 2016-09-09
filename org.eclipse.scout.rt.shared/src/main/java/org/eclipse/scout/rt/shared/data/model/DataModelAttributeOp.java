@@ -172,11 +172,6 @@ public final class DataModelAttributeOp implements DataModelConstants {
       return m_operator;
     }
 
-//    @Override
-//    public abstract String getShortText() {
-//      return getText();
-//    }
-
     @Override
     public boolean equals(Object obj) {
       if (obj == null) {

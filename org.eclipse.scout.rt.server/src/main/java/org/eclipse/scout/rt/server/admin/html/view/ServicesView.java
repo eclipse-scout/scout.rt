@@ -174,13 +174,6 @@ public class ServicesView extends DefaultView {
       }, selected);
     }
     p.endListBox();
-
-    /*
-     * p.startTable(0,0,3,"100%"); p.startTableRow();
-     * p.tableHeaderCell(sectionName); p.endTableRow(); for(ServiceInspector
-     * serviceInspector: sortMap.values()){
-     * renderServiceRow(p,serviceInspector); } p.endTable();
-     */
   }
 
   private void renderServiceDetail(HtmlComponent p, ServiceInspector service) {

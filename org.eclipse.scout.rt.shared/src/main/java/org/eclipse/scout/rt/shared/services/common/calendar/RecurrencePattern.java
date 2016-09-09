@@ -481,7 +481,6 @@ public class RecurrencePattern implements java.io.Serializable {
       }
       if (lastValid != null && lastValid.compareTo(m_firstDate) >= 0) {
         // valid
-        // Date dMonth=monthCal.getTime();
         count++;
         // add, if in requested interval
         if (lastValid.compareTo(startDate) >= 0) {

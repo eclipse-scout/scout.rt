@@ -191,7 +191,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
         tmpClass = tmpClass.getSuperclass();
       }
 
-      // insert field if (1) annotated inject-to class is this container OR (2) annotated inject-to class was a container which was replaced by this container
+      // insert field if 1) annotated inject-to class is this container OR 2) annotated inject-to class was a container which was replaced by this container
       Class<?> injectTo = tmpClass.getAnnotation(InjectFieldTo.class).value();
       if (injectTo == container.getClass() || m_replacementMapping.get(injectTo) == container.getClass()) {
         createAndInsertField(container, fields, injectedField);

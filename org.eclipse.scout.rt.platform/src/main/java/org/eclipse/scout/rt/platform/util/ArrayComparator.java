@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.util;
 import java.util.Comparator;
 import java.util.Locale;
 
+@SuppressWarnings("squid:S2063")
 public class ArrayComparator implements Comparator<Object[]> {
   private final ColumnComparator[] m_comparators;
 
@@ -103,6 +104,7 @@ public class ArrayComparator implements Comparator<Object[]> {
    * {@link StringUtility#compareIgnoreCase(Locale, String, String)}.
    * </ol>
    */
+  @SuppressWarnings("squid:S2063")
   public static class DefaultObjectComparator implements Comparator<Object> {
 
     private Locale m_locale;

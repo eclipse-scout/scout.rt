@@ -1933,16 +1933,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
       @Override
       public boolean visitField(IFormField f, int level, int fieldIndex) {
-        boolean filteredB = b;
-        /*
-         * @since 3.0 all items are enabled/disabled. a dialog can still be
-         * closed using the X in the window header if(f instanceof IButton){
-         * IButton b=(IButton)f; if(b.isProcessButton()){
-         * switch(b.getSystemType()){ case IButton.SYSTEM_TYPE_CLOSE: case
-         * IButton.SYSTEM_TYPE_CANCEL:{ filteredB=true; break; } } } }
-         */
-        //
-        f.setEnabled(filteredB);
+        f.setEnabled(b);
         return true;
       }
     };

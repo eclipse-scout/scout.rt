@@ -82,13 +82,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private IForm m_form;
   private boolean m_initialized;
   // special property/members
-  // enabled is defined as: enabledGranted && enabledProperty && enabledSlave && enabledProcessing
+  // enabled is defined as: enabledGranted AND enabledProperty AND enabledSlave AND enabledProcessing
   private Permission m_enabledPermission;
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   private boolean m_enabledSlave;
   private boolean m_enabledProcessingButton;
-  // visible is defined as: visibleGranted && visibleProperty
+  // visible is defined as: visibleGranted AND visibleProperty
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;

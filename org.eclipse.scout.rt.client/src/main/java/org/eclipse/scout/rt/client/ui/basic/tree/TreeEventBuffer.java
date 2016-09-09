@@ -46,7 +46,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected List<TreeEvent> coalesce(List<TreeEvent> events) {
     removeObsolete(events);
     removeNodesContainedInPreviousInsertEvents(events, CollectionUtility.hashSet(
-        //why these types? This information is included on each inserted node;
+        //why these types? This information is included on each inserted node.
         //once the event buffer is flushed, the individual inserted tree nodes will be
         //sent with their current (=latest) state.
         TreeEvent.TYPE_NODE_EXPANDED,

@@ -180,7 +180,6 @@ public class SqlConnectionPool {
              * Since oracle is not supporting warnings, the subsequent call has no effect!
              */
             candidate.conn.clearWarnings();
-            // candidate=null;
           }
         }
         catch (Throwable e) {

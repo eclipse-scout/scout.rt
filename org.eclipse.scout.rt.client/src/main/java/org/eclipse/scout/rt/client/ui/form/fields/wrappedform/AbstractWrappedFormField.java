@@ -248,17 +248,6 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     }
   }
 
-  /*
-   * Do not make wrapped form field auto-invisible when no form is hosted. For
-   * example in wizard forms this leads to (correct) but unexpected layout flow.
-   * The following line might be added by developers in their own subclass to
-   * have auto-invisible behavior.
-   *
-   * @Override protected boolean execCalculateVisible() {
-   *   return getInnerForm() != null;
-   * }
-   */
-
   // group box is only visible when it has at least one visible item
   protected void handleFieldVisibilityChanged() {
     calculateVisibleInternal();

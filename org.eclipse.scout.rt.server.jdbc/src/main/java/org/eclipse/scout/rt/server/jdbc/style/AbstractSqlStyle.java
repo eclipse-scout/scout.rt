@@ -452,8 +452,6 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       }
       // Date
       case Types.DATE: {
-        // Build 154: changed from getDate to getTimestamp()
-        // o=result.getDate(i+1);
         o = rs.getTimestamp(jdbcBindIndex);
         break;
       }

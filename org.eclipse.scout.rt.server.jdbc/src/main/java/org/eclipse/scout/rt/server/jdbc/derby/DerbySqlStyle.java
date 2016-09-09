@@ -205,49 +205,4 @@ public class DerbySqlStyle extends AbstractSqlStyle {
   public String createTimeIsInGEHours(String attribute, String bindName) {
     return attribute + ">=(HOUR(CURRENT_TIMESTAMP)*60 + MINUTE(CURRENT_TIMESTAMP)+(:" + bindName + "/24.0))/24.0/60";
   }
-
-  /*
-   * Time is currently modeled as a double value. The methods below can be used, if time is modeled as SQL Standard (1999) TIME datatype.
-   * The code below is fine for SQL Standard (1999) and JDBC (not just for derby)
-   *
-  @Override
-  public String createTimeIsNow(String attribute){
-    return attribute + ">= CURRENT_TIME AND " + attribute + " < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  
-  @Override
-  public String createTimeIsNotNow(String attribute){
-    return "(" + attribute + " < CURRENT_TIME OR " + attribute + " > " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, 1, CURRENT_TIMESTAMP)} AS TIME))";
-  }
-  
-  @Override
-  public String createTimeIsInMinutes(String attribute, String bindName){
-    return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME) AND " + attribute + " < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  
-  @Override
-  public String createTimeIsInHours(String attribute, String bindName){
-    return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME) AND " + attribute + " < " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  
-  @Override
-  public String createTimeIsInLEMinutes(String attribute, String bindName){
-    return attribute + "< " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  
-  @Override
-  public String createTimeIsInLEHours(String attribute, String bindName){
-    return attribute + "< " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+"+1, CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  
-  @Override
-  public String createTimeIsInGEMinutes(String attribute, String bindName){
-    return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_MINUTE, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  
-  @Override
-  public String createTimeIsInGEHours(String attribute, String bindName){
-    return attribute + ">= " + CAST_SQL_METHOD + "{FN TIMESTAMPADD(SQL_TSI_HOUR, :"+bindName+", CURRENT_TIMESTAMP)} AS TIME)";
-  }
-  */
 }

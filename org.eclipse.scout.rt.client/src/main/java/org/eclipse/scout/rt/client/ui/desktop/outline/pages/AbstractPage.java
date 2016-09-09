@@ -763,9 +763,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (tree != null) {
       try {
         tree.setTreeChanging(true);
-        //
-        // do NOT unload page, because this will clear the selection
-        // //getOutline().unloadNode(this);
         loadChildren();
       }
       finally {

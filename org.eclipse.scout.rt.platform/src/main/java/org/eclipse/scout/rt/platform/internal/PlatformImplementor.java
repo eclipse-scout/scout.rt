@@ -129,7 +129,6 @@ public class PlatformImplementor implements IPlatform {
           //now all IPlatformListener are registered and can receive platform events
           changeState(State.BeanManagerPrepared, true);
 
-          //validateBeanManager();
           validateConfiguration();
           initBeanDecorationFactory();
 

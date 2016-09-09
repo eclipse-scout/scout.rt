@@ -67,13 +67,4 @@ public interface ITableHolder {
    * @throws IllegalArgumentException
    */
   void setValueAt(int row, int column, Object value);
-
-  /**
-   * Sample of column property of type String
-   */
-  /*
-   * String getCityColumn(int rowIndex){ ... } setCityColumn(int rowIndex,String
-   * value){ ... }
-   */
-
 }

@@ -23,9 +23,4 @@ public interface IHolidayCalendarService extends ICalendarService {
    * default value: calendar/holidays.xml
    */
   Set<? extends ICalendarItem> getItems(RemoteFile f, Date minDate, Date maxDate);
-
-  /*
-   * Not needed void storeItems(ICalendarItem[] items, boolean delta) throws
-   * ProcessingException;
-   */
 }

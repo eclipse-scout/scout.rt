@@ -166,7 +166,6 @@ public class GridCell {
     out.println(pref + "field: " + getField());
     if (m_up != null) {
       out.println(pref + "-up: " + m_up.getField());
-//      m_up.printCell(out, pref + "  ");
     }
     if (m_right != null) {
       out.println(pref + "-right: " + m_right.getField());

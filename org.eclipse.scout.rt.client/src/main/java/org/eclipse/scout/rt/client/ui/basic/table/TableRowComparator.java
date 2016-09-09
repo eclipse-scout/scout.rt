@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 /**
  * compares two TableRow objects based on 1 ore more columns
  */
+@SuppressWarnings("squid:S2063")
 public class TableRowComparator implements Comparator<ITableRow> {
   private final List<IColumn<?>> m_columns;
 

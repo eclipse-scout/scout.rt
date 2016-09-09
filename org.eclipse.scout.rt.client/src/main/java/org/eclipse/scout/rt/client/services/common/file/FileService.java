@@ -193,22 +193,22 @@ public class FileService implements IFileService {
             // put together
             counter = 0;
             f = getFileLocation(fileDirectory, spec.getName(), false);
-            OutputStream out = new FileOutputStream(f);
-            part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
-            while (part.exists()) {
-              InputStream in = new FileInputStream(part);
-              byte[] buf = new byte[102400];
-              int len;
-              while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-              }
-              out.flush();
-              in.close();
-              part.delete();
-              counter++;
+            try (OutputStream out = new FileOutputStream(f)) {
               part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
+              while (part.exists()) {
+                try (InputStream in = new FileInputStream(part)) {
+                  byte[] buf = new byte[102400];
+                  int len;
+                  while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                  }
+                  out.flush();
+                }
+                part.delete();
+                counter++;
+                part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
+              }
             }
-            out.close();
             f.setLastModified(fileDate);
           }
           else {

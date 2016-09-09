@@ -299,26 +299,19 @@ public class RemoteFileService implements IRemoteFileService {
     if (!file.exists()) {
       throw new ProcessingException("remote file does not exist: " + spec.getPath());
     }
-    try {
-      int len = (int) file.length();
-      byte[] buf = new byte[Math.min(102400, len)];
-      int written = 0;
-      int delta = 0;
-      BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-      try {
-        while (written < len) {
-          delta = in.read(buf);
-          out.write(buf, 0, delta);
-          written += delta;
-        }
-      }
-      finally {
-        in.close();
+    int len = (int) file.length();
+    byte[] buf = new byte[Math.min(102400, len)];
+    int written = 0;
+    int delta = 0;
+    try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
+      while (written < len) {
+        delta = in.read(buf);
+        out.write(buf, 0, delta);
+        written += delta;
       }
     }
     catch (IOException e) {
       throw new ProcessingException("error streaming file: " + file.getAbsolutePath(), e);
     }
   }
-
 }

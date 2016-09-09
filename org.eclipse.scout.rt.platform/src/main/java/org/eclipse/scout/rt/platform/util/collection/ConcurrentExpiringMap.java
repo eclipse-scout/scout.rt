@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.collection;
 
+import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -449,7 +450,8 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     }
   }
 
-  private class StableTimestampComparator implements Comparator<Entry<K, ExpiringElement<V>>> {
+  private class StableTimestampComparator implements Comparator<Entry<K, ExpiringElement<V>>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int compare(Entry<K, ExpiringElement<V>> o1, Entry<K, ExpiringElement<V>> o2) {
