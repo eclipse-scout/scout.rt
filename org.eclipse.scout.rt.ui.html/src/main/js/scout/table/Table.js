@@ -3108,6 +3108,12 @@ scout.Table.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
   this.keyStrokes = keyStrokes;
 };
 
+scout.Table.prototype._renderKeyStrokes = function() {
+  // Do nothing! If this method was not overridden, the default logic would call
+  // render() on the new key stroke adapters. This would cause an error, as Action.js
+  // is not intended to be rendered (KeyStroke.js is not a model adapter).
+};
+
 scout.Table.prototype._syncFilters = function(filters) {
   for (var key in this._filterMap) {
     this.removeFilterByKey(key, false);

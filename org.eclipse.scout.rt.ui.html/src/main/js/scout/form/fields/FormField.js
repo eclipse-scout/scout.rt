@@ -348,6 +348,12 @@ scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) 
   this.keyStrokes = keyStrokes;
 };
 
+scout.FormField.prototype._renderKeyStrokes = function() {
+  // Do nothing! If this method was not overridden, the default logic would call
+  // render() on the new key stroke adapters. This would cause an error, as Action.js
+  // is not intended to be rendered (KeyStroke.js is not a model adapter).
+};
+
 scout.FormField.prototype._syncMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this.menus = menus;

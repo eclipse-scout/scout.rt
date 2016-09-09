@@ -141,6 +141,12 @@ scout.Tree.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
   this.keyStrokes = keyStrokes;
 };
 
+scout.Tree.prototype._renderKeyStrokes = function() {
+  // Do nothing! If this method was not overridden, the default logic would call
+  // render() on the new key stroke adapters. This would cause an error, as Action.js
+  // is not intended to be rendered (KeyStroke.js is not a model adapter).
+};
+
 scout.Tree.prototype._syncDisplayStyle = function(newValue) {
   this.setDisplayStyle(newValue, false);
 };

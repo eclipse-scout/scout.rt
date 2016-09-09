@@ -454,6 +454,12 @@ scout.Desktop.prototype._syncMenus = function(menus, oldMenus) {
   this.menus = menus;
 };
 
+scout.Desktop.prototype._renderKeyStrokes = function() {
+  // Do nothing! If this method was not overridden, the default logic would call
+  // render() on the new key stroke adapters. This would cause an error, as Action.js
+  // is not intended to be rendered (KeyStroke.js is not a model adapter).
+};
+
 scout.Desktop.prototype._syncNavigationVisible = function(visible) {
   this.setNavigationVisible(visible, false);
   return false;
