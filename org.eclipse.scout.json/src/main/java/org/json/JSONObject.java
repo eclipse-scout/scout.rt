@@ -96,7 +96,7 @@ public class JSONObject {
    */
   public static final Object NULL = new Object() {
     @Override
-    @SuppressWarnings("squid:S1206") // hashCode() cannot be implemented for value <code>null</code>.
+    @SuppressWarnings({"squid:S1206", "findbugs:EQ_UNUSUAL"}) // hashCode() cannot be implemented for value <code>null</code>.
     public boolean equals(Object o) {
       return o == this || o == null; // API specifies this broken equals implementation
     }
@@ -665,13 +665,14 @@ public class JSONObject {
    * </pre>
    */
   @Override
+  @SuppressWarnings({"squid:S1166", "squid:S2225"})
   public String toString() {
     try {
       JSONStringer stringer = new JSONStringer();
       writeTo(stringer);
       return stringer.toString();
     }
-    catch (JSONException e) { // NOSONAR
+    catch (JSONException e) {
       return null;
     }
   }

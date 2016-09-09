@@ -60,6 +60,7 @@ public final class CompareUtility {
    *          the second Object to be compared.
    * @return <code>true</code> if a is the same as b, <code>false</code> otherwise.
    */
+  @SuppressWarnings("squid:S1201")
   public static <T> boolean equals(T a, T b) {
     // object level check
     if (a == null && b == null) {

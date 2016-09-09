@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.notification.TypeParameterBeanRegistry;
 
 /**
@@ -37,18 +38,18 @@ public class NotificationCoalescer {
     m_registry.registerBeans(BEANS.all(ICoalescer.class));
   }
 
-  @SuppressWarnings("unchecked")
-  public List<? extends Serializable> coalesce(List<? extends Serializable> notificationsIn) {
+  public <T extends Serializable> List<T> coalesce(List<T> notificationsIn) {
     if (notificationsIn.size() < 2) {
       return notificationsIn;
     }
     else {
       int i = 0;
-      List<? extends Serializable> res = notificationsIn;
+      List<T> res = notificationsIn;
       while (i < res.size()) {
         final List<ICoalescer> coalescers = m_registry.getBeans(res.get(i).getClass());
-        if (coalescers.size() > 0) {
-          ICoalescer c = coalescers.get(0);
+        @SuppressWarnings("unchecked")
+        ICoalescer<T> c = CollectionUtility.firstElement(coalescers);
+        if (c != null) {
           int j = getCoalesceCount(c, res.subList(i, res.size()));
           res = coalesce(i, i + j, c, res);
         }
@@ -58,7 +59,7 @@ public class NotificationCoalescer {
     }
   }
 
-  private <T extends Serializable> List<? extends Serializable> coalesce(int from, int to, ICoalescer<T> c, List<T> notifications) {
+  private <T extends Serializable> List<T> coalesce(int from, int to, ICoalescer<T> c, List<T> notifications) {
     List<T> res = new ArrayList<>();
     res.addAll(notifications.subList(0, from));
     res.addAll(c.coalesce(notifications.subList(from, to)));
@@ -81,5 +82,4 @@ public class NotificationCoalescer {
     Serializable n = notifications.get(i);
     return m_registry.getBeans(n.getClass()).contains(c);
   }
-
 }

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
-import org.eclipse.scout.rt.testing.platform.util.date.FixedDateProvider;
 import org.junit.Test;
 
 /**
@@ -28,5 +27,4 @@ public class FixedDateProviderTest {
     FixedDateProvider dateProvider = new FixedDateProvider(now);
     assertEquals(now, dateProvider.currentMillis());
   }
-
 }

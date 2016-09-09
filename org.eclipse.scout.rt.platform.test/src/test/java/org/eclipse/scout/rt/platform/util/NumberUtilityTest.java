@@ -161,4 +161,19 @@ public class NumberUtilityTest {
     assertFalse(NumberUtility.isValidDouble("+-123", ",", "."));
     assertFalse(NumberUtility.isValidDouble("1A2B", ",", "."));
   }
+
+  @Test
+  public void testLongToInt() {
+    assertEquals(0, NumberUtility.longToInt(null));
+    assertEquals(0, NumberUtility.longToInt(0L));
+    assertEquals(42, NumberUtility.longToInt(42L));
+    assertEquals(Integer.MIN_VALUE, NumberUtility.longToInt((long) Integer.MIN_VALUE));
+    assertEquals(Integer.MAX_VALUE, NumberUtility.longToInt((long) Integer.MAX_VALUE));
+    assertEquals(Integer.MIN_VALUE + 1, NumberUtility.longToInt((long) Integer.MIN_VALUE + 1L));
+    assertEquals(Integer.MAX_VALUE - 1, NumberUtility.longToInt((long) Integer.MAX_VALUE - 1L));
+    assertEquals(Integer.MIN_VALUE, NumberUtility.longToInt((long) Integer.MIN_VALUE - 1L));
+    assertEquals(Integer.MAX_VALUE, NumberUtility.longToInt((long) Integer.MAX_VALUE + 1L));
+    assertEquals(Integer.MIN_VALUE, NumberUtility.longToInt(Long.MIN_VALUE));
+    assertEquals(Integer.MAX_VALUE, NumberUtility.longToInt(Long.MAX_VALUE));
+  }
 }

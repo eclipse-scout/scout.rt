@@ -581,6 +581,7 @@ public final class DateUtility {
     return min;
   }
 
+  @SuppressWarnings("squid:S1201")
   public static boolean equals(Date a, Date b) {
     return a == b || (a != null && b != null && a.compareTo(b) == 0);
   }

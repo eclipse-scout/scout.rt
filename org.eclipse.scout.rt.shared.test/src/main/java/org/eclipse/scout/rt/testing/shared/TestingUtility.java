@@ -238,6 +238,7 @@ public final class TestingUtility {
   /**
    * Invokes the GC several times and verifies that the object referenced by the weak reference was garbage collected.
    */
+  @SuppressWarnings("squid:S1215")
   public static void assertGC(WeakReference<?> ref) {
     int maxRuns = 50;
     for (int i = 0; i < maxRuns; i++) {

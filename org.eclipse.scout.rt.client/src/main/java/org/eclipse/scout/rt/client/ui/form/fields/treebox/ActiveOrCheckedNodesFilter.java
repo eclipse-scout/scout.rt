@@ -29,7 +29,7 @@ class ActiveOrCheckedNodesFilter extends CheckedNodesFilter {
   public boolean accept(ITreeNode node, int level) {
     Boolean nodeValue = m_box.isNodeActive(node);
     Boolean filterValue = m_filterValue.getBooleanValue();
-    if (nodeValue == null || filterValue == null || nodeValue == filterValue) {
+    if (nodeValue == null || filterValue == null || nodeValue.booleanValue() == filterValue.booleanValue()) {
       return true;
     }
     else {

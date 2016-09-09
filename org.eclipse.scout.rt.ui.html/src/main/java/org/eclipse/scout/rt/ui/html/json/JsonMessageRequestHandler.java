@@ -192,7 +192,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
     }
     else {
-      uiSession.uiSessionLock().lock();
+      uiSession.uiSessionLock().lock(); // NOSONAR
     }
     try {
       if (uiSession.isDisposed()) {

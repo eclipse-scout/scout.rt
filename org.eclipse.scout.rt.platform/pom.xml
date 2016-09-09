@@ -31,7 +31,7 @@
       <groupId>org.jboss</groupId>
       <artifactId>jandex</artifactId>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>javax.mail</artifactId>
     </dependency>

@@ -52,7 +52,7 @@ public class ClassIdentifier implements Serializable {
     this(null, segments);
   }
 
-  public ClassIdentifier(ClassIdentifier context, Class<?>... segments) throws IllegalArgumentException {
+  public ClassIdentifier(ClassIdentifier context, Class<?>... segments) {
     if (context == null && (segments == null || segments.length == 0)) {
       throw new IllegalArgumentException("The given context and classes array must not be null or empty");
     }

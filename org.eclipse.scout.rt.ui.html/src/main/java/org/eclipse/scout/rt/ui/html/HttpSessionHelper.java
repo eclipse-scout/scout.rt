@@ -26,6 +26,7 @@ public class HttpSessionHelper {
    * @throws IllegalStateException
    *           if the given HTTP session is invalid.
    */
+  @SuppressWarnings("findbugs:J2EE_STORE_OF_NON_SERIALIZABLE_OBJECT_INTO_SESSION")
   public void prepareHttpSession(HttpSession httpSession) {
     Assertions.assertNotNull(httpSession);
 

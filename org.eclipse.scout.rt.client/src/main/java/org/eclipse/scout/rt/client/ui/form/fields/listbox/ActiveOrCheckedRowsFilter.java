@@ -32,7 +32,7 @@ class ActiveOrCheckedRowsFilter extends CheckedRowsFilter {
     // active
     if (active != null) {
       Boolean b = m_filterValue.getBooleanValue();
-      if (b != null && b != active) {
+      if (b != null && b.booleanValue() != active.booleanValue()) {
         // active mismatch, check checked
         return super.accept(row);
       }

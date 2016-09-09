@@ -24,11 +24,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DynamicGVTBuilder;
+import org.apache.batik.bridge.GVTBuilder;
 import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGOMRect;
-import org.apache.batik.swing.svg.GVTTreeBuilder;
 import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -140,9 +141,8 @@ public final class SVGUtility {
     //add a gvt tree for text and alignment calculations
     BridgeContext bc = new BridgeContext(new UserAgentAdapter());
     bc.setDynamic(true);
-    GVTTreeBuilder treeBuilder = new GVTTreeBuilder(doc, bc);
-    treeBuilder.setPriority(Thread.MAX_PRIORITY);
-    treeBuilder.run();
+    GVTBuilder builder = new DynamicGVTBuilder();
+    builder.build(bc, doc);
     return bc;
   }
 

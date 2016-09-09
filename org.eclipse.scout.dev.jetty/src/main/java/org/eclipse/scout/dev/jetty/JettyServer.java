@@ -107,7 +107,7 @@ public class JettyServer {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
           while (true) {
-            String command = br.readLine().trim();
+            String command = StringUtility.trim(br.readLine());
             if ("shutdown".equalsIgnoreCase(command)) {
               try {
                 LOG.warn("Shutting down...");

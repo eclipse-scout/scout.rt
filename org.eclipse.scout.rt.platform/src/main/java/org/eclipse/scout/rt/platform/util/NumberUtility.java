@@ -460,10 +460,10 @@ public final class NumberUtility {
    */
   public static int longToInt(Long l) {
     if (l != null) {
-      if (new Long(Integer.MAX_VALUE).compareTo(l) == -1) {
+      if (l.longValue() > Integer.MAX_VALUE) {
         return Integer.MAX_VALUE;
       }
-      else if (new Long(Integer.MIN_VALUE).compareTo(l) == 1) {
+      else if (l.longValue() < Integer.MIN_VALUE) {
         return Integer.MIN_VALUE;
       }
       return l.intValue();

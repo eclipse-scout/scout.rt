@@ -89,7 +89,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   private final String m_defaultUser;
   private final String m_defaultPass;
   private final int m_queryCacheSize;
-  private final int m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
+  private final int m_maxFetchMemorySize;
   private final Class<? extends ScoutTexts> m_nlsProvider;
   private final ISqlStyle m_sqlStyle;
 
@@ -119,6 +119,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     m_jdbcPoolSize = getPropertyValue(SqlJdbcPoolSizeProperty.class, getConfiguredJdbcPoolSize());
     m_jdbcPoolConnectionBusyTimeout = getPropertyValue(SqlJdbcPoolConnectionBusyTimeoutProperty.class, getConfiguredJdbcPoolConnectionBusyTimeout());
     m_jdbcPoolConnectionLifetime = getPropertyValue(SqlJdbcPoolConnectionLifetimeProperty.class, getConfiguredJdbcPoolConnectionLifetime());
+    m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
     m_nlsProvider = getConfiguredNlsProvider();
 
     // load sql style

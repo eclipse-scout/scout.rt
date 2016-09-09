@@ -244,7 +244,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
         return value.toLowerCase();
       }
       else if (FORMAT_UPPER.equals(format)) {
-        value.toUpperCase();
+        return value.toUpperCase();
       }
     }
     return value;

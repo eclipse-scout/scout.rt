@@ -574,13 +574,14 @@ public class JSONArray {
    * </pre>
    */
   @Override
+  @SuppressWarnings({"squid:S1166", "squid:S2225"})
   public String toString() {
     try {
       JSONStringer stringer = new JSONStringer();
       writeTo(stringer);
       return stringer.toString();
     }
-    catch (JSONException e) { // NOSONAR
+    catch (JSONException e) {
       return null;
     }
   }

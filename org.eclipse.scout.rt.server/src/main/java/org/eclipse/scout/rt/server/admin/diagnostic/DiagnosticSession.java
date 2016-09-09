@@ -77,6 +77,7 @@ public class DiagnosticSession {
     out.println("</diagnosticsStatus>");
   }
 
+  @SuppressWarnings("squid:S1215")
   private void doHtmlResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     boolean hasReadDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new ReadDiagnosticServletPermission());
     boolean hasUpdateDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());

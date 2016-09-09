@@ -38,6 +38,8 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * file path with / as delimiter
@@ -45,6 +47,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 // content encoded in utf-8 and then compressed!!!
 
 public class RemoteFile implements Serializable {
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteFile.class);
+
   private static final int ONE_HUNDRED_KILO_BYTE = 102400;
   public static final long DEFAULT_MAX_BLOCK_SIZE = 20000000; // 20MB
   private static final String DEFAULT_CHARSETNAME = StandardCharsets.UTF_8.name();
@@ -429,7 +433,10 @@ public class RemoteFile implements Serializable {
     setPartStartPosition((int) startPosition);
     long readSize = 0;
     try {
-      is.skip(startPosition);
+      long skippedBytes = is.skip(startPosition);
+      if (skippedBytes != startPosition) {
+        LOG.warn("Skipped less bytes than requested [requested={}, skipped={}]", startPosition, skippedBytes);
+      }
       in = new BufferedInputStream(is);
       out = getCompressedOutputStream();
       int bufferSize = ONE_HUNDRED_KILO_BYTE;

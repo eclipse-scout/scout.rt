@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
@@ -53,7 +54,7 @@ public class InteractiveTestSuite extends Runner {
           return;
         }
         String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
-        if (line.isEmpty()) {
+        if (StringUtility.isNullOrEmpty(line)) {
           if (!lastLine.isEmpty()) {
             line = lastLine;
           }

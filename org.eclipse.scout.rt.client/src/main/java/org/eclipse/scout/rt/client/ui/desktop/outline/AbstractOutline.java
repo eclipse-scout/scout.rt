@@ -828,7 +828,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       }
     }
 
-    private void handlePageWithTableTreeEvent(TreeEvent e, IPageWithTable<? extends ITable> pageWithTable) {
+    private void handlePageWithTableTreeEvent(TreeEvent e, IPageWithTable<?> pageWithTable) {
       OutlineMediator outlineMediator = getOutlineMediator();
       if (outlineMediator == null) {
         return;

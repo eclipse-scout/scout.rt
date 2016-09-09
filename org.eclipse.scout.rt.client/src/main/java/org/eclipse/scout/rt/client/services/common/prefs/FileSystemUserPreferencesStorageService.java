@@ -118,11 +118,8 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
       }
     }
 
-    try (FileOutputStream fos = new FileOutputStream(prefsLocation, false)) {
-      OutputStream out = new BufferedOutputStream(fos);
+    try (OutputStream out = new BufferedOutputStream(new FileOutputStream(prefsLocation, false))) {
       props.store(out, null);
-      out.flush();
-      fos.getFD().sync();
     }
     catch (IOException e) {
       throw new ProcessingException("Error writing preferences to file '" + prefsLocation.getAbsolutePath() + "'.", e);

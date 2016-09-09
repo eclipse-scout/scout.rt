@@ -197,7 +197,7 @@ public class FormDataStatementBuilderCheck {
         //default aggregate count attribute
         return;
       }
-      String parentName = null;
+      String parentName = "";
       EntityPath parentPath = aPath.getEntityPath();
       if (!parentPath.isEmpty()) {
         parentName = entityToName(parentPath);
