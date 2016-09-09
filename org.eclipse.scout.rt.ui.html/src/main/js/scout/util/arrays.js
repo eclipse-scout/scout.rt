@@ -87,6 +87,10 @@ scout.arrays = {
     arr.splice(index, 0, element);
   },
 
+  move: function(arr, fromIndex, toIndex) {
+    arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
+  },
+
   containsAny: function(haystack, needles) {
     haystack = this.ensure(haystack);
     needles = this.ensure(needles);
