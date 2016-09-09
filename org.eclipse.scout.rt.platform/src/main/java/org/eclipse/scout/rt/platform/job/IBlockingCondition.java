@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
  * run while waiting. A typical use case would be to wait for a MessageBox to be closed.
  *
  * @since 5.1
+ * @see Jobs#newBlockingCondition(boolean)
  */
 public interface IBlockingCondition {
 

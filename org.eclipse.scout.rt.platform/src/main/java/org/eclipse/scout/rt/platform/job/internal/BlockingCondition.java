@@ -22,6 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -33,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link IBlockingCondition}.
+ *
+ * @see Jobs#newBlockingCondition(boolean)
  */
 public class BlockingCondition implements IBlockingCondition {
 
