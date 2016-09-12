@@ -16,7 +16,7 @@ scout.models = {
    * @param modelsUrl relative URL points to the *-models.json file. Example: 'myproject-models.json'.
    */
   bootstrap: function(modelsUrl) {
-    scout.objects.mandatoryParameter('modelsUrl', modelsUrl);
+    scout.assertParameter('modelsUrl', modelsUrl);
     var that = this;
     return $.ajax({
       url: modelsUrl,
@@ -35,7 +35,7 @@ scout.models = {
   },
 
   get: function(modelId, parent) {
-    scout.objects.mandatoryParameter('parent', parent);
+    scout.assertParameter('parent', parent);
     var model = this.modelMap[modelId];
     if (!model) {
       throw new Error('No JSON model defined for modelId=\'' + modelId + '\'. ' +

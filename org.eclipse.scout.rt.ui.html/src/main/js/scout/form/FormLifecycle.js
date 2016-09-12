@@ -10,7 +10,7 @@ scout.FormLifecycle = function() {
 // Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI
 
 scout.FormLifecycle.prototype.init = function(form) {
-  scout.objects.mandatoryParameter('form', form, scout.Form);
+  scout.assertParameter('form', form, scout.Form);
   this.form = form;
   this.askSaveChangesText = this.session().text('FormSaveChangesQuestion');
   this.markAsSaved();

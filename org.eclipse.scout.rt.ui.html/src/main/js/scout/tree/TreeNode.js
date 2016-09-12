@@ -44,7 +44,7 @@ scout.TreeNode.prototype.getTree = function() {
 };
 
 scout.TreeNode.prototype._init = function(model) {
-  scout.objects.mandatoryParameter('parent', model.parent, scout.Tree);
+  scout.assertParameter('parent', model.parent, scout.Tree);
   this.session = model.session || model.parent.session;
 
   $.extend(this, model);

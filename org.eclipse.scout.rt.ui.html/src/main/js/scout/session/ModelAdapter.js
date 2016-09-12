@@ -50,8 +50,8 @@ scout.ModelAdapter.prototype.init = function(model) {
  * @param model expects a plain-object with properties: id, session
  */
 scout.ModelAdapter.prototype._init = function(model) {
-  scout.objects.mandatoryParameter('id', model.id);
-  scout.objects.mandatoryParameter('session', model.session);
+  scout.assertParameter('id', model.id);
+  scout.assertParameter('session', model.session);
   $.extend(this, model);
   this.session.registerModelAdapter(this);
 };

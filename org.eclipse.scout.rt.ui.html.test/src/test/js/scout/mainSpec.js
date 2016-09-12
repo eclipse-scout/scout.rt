@@ -16,9 +16,9 @@ describe('main', function() {
     session = sandboxSession();
   });
 
-  describe("nvl", function() {
+  describe('nvl', function() {
 
-    it("can return alternative value", function() {
+    it('can return alternative value', function() {
       expect(scout.nvl()).toBe(undefined);
       expect(scout.nvl('X')).toBe('X');
       expect(scout.nvl('X', 'Y')).toBe('X');
@@ -45,9 +45,31 @@ describe('main', function() {
 
   });
 
-  describe("isOneOf", function() {
+  describe('assertParameter', function() {
 
-    it("can check if value is one of multiple values", function() {
+    it('throws Error when value is not set', function() {
+      var foo = null;
+      var func = scout.assertParameter.bind(scout, 'foo', foo);
+      expect(func).toThrowError();
+      foo = 'bar';
+      func = scout.assertParameter.bind(scout, 'foo', foo);
+      expect(func).not.toThrowError();
+    });
+
+    it('throws Error when value has wrong type', function() {
+      var foo = {};
+      var func = scout.assertParameter.bind(scout, 'foo', foo, scout.Status);
+      expect(func).toThrowError();
+      foo = new scout.Status();
+      func = scout.assertParameter.bind(scout, 'foo', foo, scout.Status);
+      expect(func).not.toThrowError();
+    });
+
+  });
+
+  describe('isOneOf', function() {
+
+    it('can check if value is one of multiple values', function() {
       expect(scout.isOneOf()).toBe(false);
       expect(scout.isOneOf('test')).toBe(false);
       expect(scout.isOneOf('test', 'bla')).toBe(false);

@@ -39,6 +39,21 @@ scout.nvl = function() {
   return result;
 };
 
+/**
+ * Use this method in your functions to assert that a mandatory parameter is passed
+ * to the function. Throws an Error when value is not set.
+ *
+ * @param type (optional) if this parameter is set, the given value must be of this type (instanceof check)
+ */
+scout.assertParameter = function(parameterName, value, type) {
+  if (!value) {
+    throw new Error('Missing required parameter \'' + parameterName + '\'');
+  }
+  if (type && !(value instanceof type)) {
+    throw new Error('Parameter \'' + parameterName + '\' has wrong type');
+  }
+};
+
 scout.isOneOf = function() {
   if (arguments && arguments.length >= 2) {
     var value = arguments[0];

@@ -374,7 +374,7 @@ scout.Widget.prototype._remove = function() {
 };
 
 scout.Widget.prototype.setOwner = function(owner) {
-  scout.objects.mandatoryParameter('owner', owner);
+  scout.assertParameter('owner', owner);
   if (owner === this.owner) {
     return;
   }
@@ -388,7 +388,7 @@ scout.Widget.prototype.setOwner = function(owner) {
 };
 
 scout.Widget.prototype.setParent = function(parent) {
-  scout.objects.mandatoryParameter('parent', parent);
+  scout.assertParameter('parent', parent);
   if (parent === this.parent) {
     return;
   }
