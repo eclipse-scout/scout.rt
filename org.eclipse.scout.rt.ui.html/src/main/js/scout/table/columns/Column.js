@@ -53,7 +53,7 @@ scout.Column.prototype.init = function(model) {
 };
 
 /**
- * Converts the cell if it is of type string to an object with
+ * Converts the vararg if it is of type string to an object with
  * a property 'text' with the original value.
  *
  * Example:
@@ -61,30 +61,40 @@ scout.Column.prototype.init = function(model) {
  *
  * @see JsonCell.java
  */
-scout.Column.prototype.initCell = function(cell) {
-  if (typeof cell !== 'object') {
-    cell = {
-      text: cell
-    };
+scout.Column.prototype.initCell = function(vararg) {
+  if (vararg instanceof scout.Cell) {
+    return vararg;
   }
-  if (!(cell instanceof scout.Cell)) {
-    this._initCell(cell);
-    // when cell doesn't define horiz. alignment - use value from column
-    if (cell.horizontalAlignment === undefined) {
-      cell.horizontalAlignment = this.horizontalAlignment;
-    }
-    cell.parent = this;
-    cell = scout.create('Cell', cell);
+
+  var cellModel;
+  if (scout.objects.isPlainObject(vararg)) {
+    cellModel = vararg;
+  } else {
+    // in this case 'vararg' is only a scalar value, typically a string
+    cellModel = this._createCellModel(vararg);
   }
-  return cell;
+  this._initCell(cellModel);
+  return scout.create('Cell', cellModel);
+};
+
+/**
+ * Override this method to create a cell model object based on the given scalar value.
+ */
+scout.Column.prototype._createCellModel = function(text) {
+  return {
+    text: text
+  };
 };
 
 /**
  * Override this method to impl. type specific init cell behavior.
- * The default impl. does nothing.
  */
-scout.Column.prototype._initCell = function(cell) {
-  // NOP
+scout.Column.prototype._initCell = function(cellModel) {
+  // when cell doesn't define horiz. alignment - use value from column
+  if (cellModel.horizontalAlignment === undefined) {
+    cellModel.horizontalAlignment = this.horizontalAlignment;
+  }
+  cellModel.parent = this;
 };
 
 scout.Column.prototype.buildCellForRow = function(row) {

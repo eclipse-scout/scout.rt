@@ -30,6 +30,7 @@ scout.NumberColumn.prototype.init = function(model) {
  * @override Column.js
  */
 scout.NumberColumn.prototype._initCell = function(cell) {
+  scout.NumberColumn.parent.prototype._initCell.call(this, cell);
   // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
   // Cell.value may be undefined for other column types -> use table.cellValue to access the value.
   // The only reason is to save some memory (may get obsolete in the future)
