@@ -1199,3 +1199,8 @@ scout.DateField.prototype.formatTimestamp = function(timestamp) {
   this.timeDisplayText = timeText;
   this._updateDisplayTextProperty();
 };
+
+scout.DateField.prototype._renderDisabledStyle = function() {
+  this._renderDisabledStyleInternal(this.$dateField);
+  this._renderDisabledStyleInternal(this.$timeField);
+};

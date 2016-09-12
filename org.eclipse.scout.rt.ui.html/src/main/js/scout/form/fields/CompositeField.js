@@ -24,5 +24,15 @@ scout.CompositeField.prototype.visit = function(visitor) {
   this.getFields().forEach(function(field) {
     field.visit(visitor);
   });
-  scout.CompositeField.parent.prototype.visit(visitor);
+  scout.CompositeField.parent.prototype.visit.call(this, visitor);
+};
+
+/**
+ * @override FormField.js
+ */
+scout.CompositeField.prototype.setDisabledStyle = function(disabledStyle) {
+  this.getFields().forEach(function(field) {
+    field.setDisabledStyle(disabledStyle);
+  });
+  scout.CompositeField.parent.prototype.setDisabledStyle.call(this, disabledStyle);
 };

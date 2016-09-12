@@ -93,3 +93,7 @@ scout.BasicField.prototype._checkDisplayTextChanged = function(displayText, whil
   }
   return false;
 };
+
+scout.BasicField.prototype._renderDisabledStyle = function() {
+  this._renderDisabledStyleInternal(this.$field);
+};

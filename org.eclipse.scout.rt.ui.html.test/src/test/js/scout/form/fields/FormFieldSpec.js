@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("FormField", function() {
+describe('FormField', function() {
   var session;
   var helper;
 
@@ -28,7 +28,7 @@ describe("FormField", function() {
     return formField;
   }
 
-  describe("inheritance", function() {
+  describe('inheritance', function() {
     var formField, model;
 
     beforeEach(function() {
@@ -37,13 +37,13 @@ describe("FormField", function() {
       formField.init(model);
     });
 
-    it("inherits from Widget", function() {
+    it('inherits from Widget', function() {
       expect(scout.Widget.prototype.isPrototypeOf(formField)).toBe(true);
     });
 
   });
 
-  describe("property label position", function() {
+  describe('property label position', function() {
     var formField, model;
 
     beforeEach(function() {
@@ -52,20 +52,20 @@ describe("FormField", function() {
       formField.init(model);
     });
 
-    describe("position on_field", function() {
+    describe('position on_field', function() {
 
       beforeEach(function() {
         formField.label = 'labelName';
         formField.labelPosition = scout.FormField.LABEL_POSITION_ON_FIELD;
       });
 
-      it("sets the label as placeholder", function() {
+      it('sets the label as placeholder', function() {
         formField.render(session.$entryPoint);
         expect(formField.$label.html()).toBeFalsy();
         expect(formField.$field.attr('placeholder')).toBe(formField.label);
       });
 
-      it("does not call field._renderLabelPosition initially", function() {
+      it('does not call field._renderLabelPosition initially', function() {
         formField.render(session.$entryPoint);
         expect(formField.$label.html()).toBeFalsy();
         expect(formField.$field.attr('placeholder')).toBe(formField.label);
@@ -76,14 +76,14 @@ describe("FormField", function() {
 
     });
 
-    describe("position top", function() {
+    describe('position top', function() {
 
       beforeEach(function() {
         formField.label = 'labelName';
         formField.labelPosition = scout.FormField.LABEL_POSITION_TOP;
       });
 
-      it("guarantees a minimum height if label is empty", function() {
+      it('guarantees a minimum height if label is empty', function() {
         formField.label = '';
         formField.render(session.$entryPoint);
         expect(formField.$label.html()).toBe('&nbsp;');
@@ -92,7 +92,7 @@ describe("FormField", function() {
 
     });
 
-    it("does not display a status if status visible = false", function() {
+    it('does not display a status if status visible = false', function() {
       formField.statusVisible = false;
       formField.render(session.$entryPoint);
 
@@ -101,7 +101,26 @@ describe("FormField", function() {
 
   });
 
-  describe("property status visible", function() {
+  describe('disabled style read-only', function() {
+
+    var formField;
+
+    beforeEach(function() {
+      formField = helper.createField('StringField', session.desktop);
+    });
+
+    it('sets css class \'read-only\' when field is disabled and setDisabledStyle has been called ', function() {
+      formField.render(session.$entryPoint);
+      formField.setDisabledStyle(scout.FormField.DisabledStyle.READ_ONLY);
+      formField.setEnabled(false);
+      expect(formField.$field.attr('class')).toContain('read-only');
+      formField.setEnabled(true);
+      expect(formField.$field.attr('class')).not.toContain('read-only');
+    });
+
+  });
+
+  describe('property status visible', function() {
     var formField, model;
 
     beforeEach(function() {
@@ -109,21 +128,21 @@ describe("FormField", function() {
       formField = createFormField(model);
     });
 
-    it("shows a status if status visible = true", function() {
+    it('shows a status if status visible = true', function() {
       formField.statusVisible = true;
       formField.render(session.$entryPoint);
 
       expect(formField.$status.isVisible()).toBe(true);
     });
 
-    it("does not show a status if status visible = false", function() {
+    it('does not show a status if status visible = false', function() {
       formField.statusVisible = false;
       formField.render(session.$entryPoint);
 
       expect(formField.$status.isVisible()).toBe(false);
     });
 
-    it("shows a status even though status visible is false but tooltipText is set", function() {
+    it('shows a status even though status visible is false but tooltipText is set', function() {
       formField.statusVisible = false;
       formField.tooltipText = 'hello';
       formField.render(session.$entryPoint);
@@ -133,7 +152,7 @@ describe("FormField", function() {
       expect(formField.$status.isVisible()).toBe(false);
     });
 
-    it("shows a status even though status visible is false but errorStatus is set", function() {
+    it('shows a status even though status visible is false but errorStatus is set', function() {
       formField.statusVisible = false;
       formField.errorStatus = new scout.Status({message: 'error', severity: scout.Status.Severity.ERROR});
       formField.render(session.$entryPoint);

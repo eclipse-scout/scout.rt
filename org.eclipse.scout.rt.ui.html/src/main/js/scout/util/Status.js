@@ -99,3 +99,12 @@ scout.Status.ensure = function(status) {
   }
   return new scout.Status(status);
 };
+
+/**
+ * @returns a Status object with severity OK.
+ */
+scout.Status.ok = function() {
+  return new scout.Status({
+    severity: scout.Status.Severity.OK
+  });
+};

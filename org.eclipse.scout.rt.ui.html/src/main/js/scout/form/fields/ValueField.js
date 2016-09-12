@@ -78,6 +78,9 @@ scout.ValueField.prototype._parseAndSetValue = function(displayText, whileTyping
 
 scout.ValueField.prototype._parseValue = function(displayText) {
   // FIXME [awe] 6.1 - this impl. is wrong and far too simple. Check how it is done in Java Scout first, also discuss with J.GU
+  // FIXME [awe] 6.1 - durchdenken: was passiert, wenn der server ein execFormatValue macht? abc -> ABC
+  // wahrscheinlich kann es keinen cycle geben, wegen unseren filters und weil der remote adapter den value nicht kennt
+  // kann es endlos-cycles geben? beispiel von beat: collator AE - Ä oder so
   return displayText;
 };
 
@@ -127,11 +130,21 @@ scout.ValueField.prototype.setValue = function(value) {
 scout.ValueField.prototype._syncValue = function(newValue) {
   var oldValue = this.value;
   this.value = newValue;
+  this._updateDisplayText(newValue);
   if (this._valueChanged(newValue, oldValue)) {
     this._updateTouched();
     this._updateEmpty();
   }
   this.triggerPropertyChange('value', oldValue, newValue);
+};
+
+scout.ValueField.prototype._updateDisplayText = function() {
+  var displayText = this._formatValue(this.value);
+  this.setDisplayText(displayText);
+};
+
+scout.ValueField.prototype._formatValue = function(value) {
+  return scout.nvl(value, ''); // FIXME [awe] 6.1 - check impl. for fields other than StringField
 };
 
 scout.ValueField.prototype._updateTouched = function() {

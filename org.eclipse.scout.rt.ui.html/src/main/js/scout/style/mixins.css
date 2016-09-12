@@ -99,6 +99,14 @@
     height: calc(~'100% +' @diffH);
   }
 
+  /* Use dashed line instead of solid to avoid visual conflict with editable fields */
+  .read-only() {
+    background-color: @background-color;
+    border-color: transparent;
+    border-bottom: dashed 1px @border-color;
+    color: @text-color;
+  }
+
   /* Expects a sibling html element with class 'icon' **/
   .text-field-with-icon(@icon; @className: ~'') {
     padding-right: @text-field-padding-x + 15px;

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global removePopups */
-describe("ValueField", function() {
+describe('ValueField', function() {
   var session, helper, menuHelper;
 
   beforeEach(function() {
@@ -26,7 +26,7 @@ describe("ValueField", function() {
     jasmine.Ajax.uninstall();
   });
 
-  describe("property status visible", function() {
+  describe('property status visible', function() {
     var formField, model;
 
     beforeEach(function() {
@@ -40,7 +40,7 @@ describe("ValueField", function() {
       formField.init(model);
     });
 
-    it("shows a status even though status visible is false but there are visible menus", function() {
+    it('shows a status even though status visible is false but there are visible menus', function() {
       formField.statusVisible = false;
       var menu0 = menuHelper.createMenu(menuHelper.createModel());
       formField.menus = [menu0];
@@ -54,7 +54,89 @@ describe("ValueField", function() {
 
   });
 
-  describe("menu visibility", function() {
+  describe('value and display-text', function() {
+
+    var field;
+
+    beforeEach(function() {
+      field = helper.createField('StringField', session.desktop);
+    });
+
+    it('sets display-text when value is set', function() {
+      field.setValue('Foo');
+      expect(field.displayText).toBe('Foo');
+      field.setValue(null);
+      expect(field.displayText).toBe('');
+    });
+
+    it('sets value when _parseAndSetValue is called', function() {
+      field._parseAndSetValue('Foo');
+      expect(field.displayText).toBe('Foo');
+      expect(field.value).toBe('Foo');
+    });
+
+  });
+
+  describe('validation: initialValue, touched, empty and mandatory', function() {
+
+    var field;
+
+    beforeEach(function() {
+      field = helper.createField('StringField', session.desktop);
+    });
+
+    it('sets _initialValue when markAsSaved is called', function() {
+      field.setValue('Foo');
+      expect(field._initialValue).toBeFalsy();
+      field.markAsSaved();
+      expect(field._initialValue).toBe('Foo');
+      expect(field.touched).toBe(false);
+    });
+
+    it('sets touched to true when value is different from initial value', function() {
+      field.setValue('Foo');
+      field.markAsSaved();
+      expect(field.touched).toBe(false);
+      field.setValue('Bar');
+      expect(field.touched).toBe(true);
+      field.setValue('Foo');
+      expect(field.touched).toBe(false);
+    });
+
+    it('sets empty to true when value is an empty string (for StringField)', function() {
+      field.setValue(null);
+      expect(field.empty).toBe(true);
+      field.setValue('Foo');
+      expect(field.empty).toBe(false);
+      field.setValue(null);
+      expect(field.empty).toBe(true);
+    });
+
+    it('validate returns valid when errorStatus is not set and field is not mandatory', function() {
+      field.setValue(null);
+      field.setErrorStatus(null);
+      field.setMandatory(false);
+      var status = field.validate();
+      expect(status.valid).toBe(true);
+    });
+
+    it('validate returns not valid when errorStatus is set or field is mandatory and empty', function() {
+      var errorStatus = new scout.Status({severity: scout.Status.Severity.ERROR});
+      field.setErrorStatus(errorStatus);
+      var status = field.validate();
+      expect(status.valid).toBe(false);
+      expect(status.validByErrorStatus).toBe(false);
+
+      field.setErrorStatus(null);
+      field.setMandatory(true);
+      status = field.validate();
+      expect(status.valid).toBe(false);
+      expect(status.validByMandatory).toBe(false);
+    });
+
+  });
+
+  describe('menu visibility', function() {
     var formField, model;
 
     beforeEach(function() {
@@ -75,7 +157,7 @@ describe("ValueField", function() {
       removePopups(session);
     });
 
-    it("context menu only shows visible menus", function() {
+    it('context menu only shows visible menus', function() {
       var menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1),
         menuModel2 = menuHelper.createModel('menu'),
@@ -92,7 +174,7 @@ describe("ValueField", function() {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
-    it("context menu only shows only menus of specific type", function() {
+    it('context menu only shows only menus of specific type', function() {
       var menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1),
         menuModel2 = menuHelper.createModel('menu'),
@@ -124,7 +206,7 @@ describe("ValueField", function() {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
-    it("context menu triggers a display text changed event", function() {
+    it('context menu triggers a display text changed event', function() {
       linkWidgetAndAdapter(formField, 'ValueFieldAdapter');
 
       var menuModel1 = menuHelper.createModel('menu'),
