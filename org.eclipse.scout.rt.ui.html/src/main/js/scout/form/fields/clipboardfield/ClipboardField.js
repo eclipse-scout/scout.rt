@@ -126,7 +126,7 @@ scout.ClipboardField.prototype._getSelection = function() {
 // The 'keydown' event is used in this cases.
 scout.ClipboardField.prototype._onInput = function(event) {
   if (event.type === 'input') {
-    this._renderDisplayText(this.displayText);
+    this._renderDisplayText();
     return false;
   } else if (!event['char'] || event['char'] === '') {
     return;
@@ -137,7 +137,7 @@ scout.ClipboardField.prototype._onInput = function(event) {
   } else if (event.keyCode === scout.keys.ESC || event.keyCode === scout.keys.ENTER) {
     return;
   } else {
-    this._renderDisplayText(this.displayText);
+    this._renderDisplayText();
     return false;
   }
 };
@@ -188,7 +188,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
 
 scout.ClipboardField.prototype._onPaste = function(event) {
   if (this.readOnly) {
-    this._renderDisplayText(this.displayText);
+    this._renderDisplayText();
     return;
   }
   var dataTransfer, myWindow = this.$container.window(true);
@@ -330,7 +330,8 @@ scout.ClipboardField.prototype._onPaste = function(event) {
         // try to read nativly pasted text from field
         var nativePasteContent = this.$field.text();
         if (scout.strings.hasText(nativePasteContent)) {
-          this._renderDisplayText(nativePasteContent);
+          //TODO [15.3] osc from imo: I saaw this when ckecking code consistency: the function _renderDisplayText takes no args since 15.3. What is the documented semantics here? a call to this.setDisplayText(nativePasteContent) would do the same
+          this.setDisplayText(nativePasteContent);
           filesArgument.push(new Blob([nativePasteContent], {
             type: scout.mimeTypes.TEXT_PLAIN
           }));

@@ -25,7 +25,7 @@ scout.BeanField.prototype._render = function($parent) {
 
 scout.BeanField.prototype._renderProperties = function() {
   scout.BeanField.parent.prototype._renderProperties.call(this);
-  this._renderValue(this.value);
+  this._renderValue();
 };
 
 /**

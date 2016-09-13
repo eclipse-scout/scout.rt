@@ -70,7 +70,7 @@ scout.ValueField.prototype._parseAndSetValue = function(displayText, whileTyping
   var validatedDisplayText = this._validateDisplayText(displayText, whileTyping);
   this.displayText = validatedDisplayText;
   if (displayText !== validatedDisplayText) {
-    this._renderDisplayText(this.displayText);
+    this._renderDisplayText();
   }
   this._triggerDisplayTextChanged(validatedDisplayText, whileTyping);
   this.setValue(this._parseValue(validatedDisplayText));

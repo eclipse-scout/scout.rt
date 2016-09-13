@@ -89,11 +89,11 @@ scout.CheckBoxField.prototype._renderEnabled = function() {
 
 scout.CheckBoxField.prototype._renderProperties = function() {
   scout.CheckBoxField.parent.prototype._renderProperties.call(this);
-  this._renderValue(this.value);
+  this._renderValue();
 };
 
-scout.CheckBoxField.prototype._renderValue = function(value) {
-  this.$checkBox.toggleClass('checked', value);
+scout.CheckBoxField.prototype._renderValue = function() {
+  this.$checkBox.toggleClass('checked', this.value);
 };
 
 /**
