@@ -92,15 +92,15 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
     return;
   }
 
-  // other fixes (NBU)
-  if ($element.not(selectableElements).length === 0) {
-    return;
-  }
-
   var userSelect = $element.css('user-select'),
     selectableElements =
       'div:not(.desktop),[tabindex]:not([tabindex=-1]),radio,a[href],area[href],input:not([disabled]),' +
       'select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
+
+  // other fixes (NBU)
+  if ($element.not(selectableElements).length === 0) {
+    return;
+  }
 
   if ($element.closest('[contenteditable="true"]').length === 0 &&
     ((userSelect && userSelect === 'none') ||
