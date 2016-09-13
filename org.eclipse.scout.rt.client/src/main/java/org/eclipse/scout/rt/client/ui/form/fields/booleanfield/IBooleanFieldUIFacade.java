@@ -12,5 +12,5 @@ package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
 public interface IBooleanFieldUIFacade {
 
-  void setCheckedFromUI(boolean checked);
+  void setValueFromUI(Boolean value);
 }

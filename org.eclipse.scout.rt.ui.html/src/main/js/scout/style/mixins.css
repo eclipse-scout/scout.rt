@@ -288,6 +288,13 @@
     font-size: 11px;
   }
 
+  .checkbox-before-tristate() {
+    #scout.font-icon();
+    content: @icon-tristate;
+    color: @palette-blue-6;
+    font-size: 11px;
+  }
+
   .checkbox-before-disabled() {
     color: @checkbox-disabled-color;
   }

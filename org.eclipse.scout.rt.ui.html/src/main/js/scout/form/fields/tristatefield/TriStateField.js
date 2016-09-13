@@ -8,25 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.CheckBoxField = function() {
-  scout.CheckBoxField.parent.call(this);
-  this.tristateEnabled = false;
+scout.TriStateField = function() {
+  scout.TriStateField.parent.call(this);
   this.$checkBox;
   this.$checkBoxLabel;
 };
-scout.inherits(scout.CheckBoxField, scout.ValueField);
+scout.inherits(scout.TriStateField, scout.ValueField);
 
 /**
- * The value of the CheckBoxField widget is: false, true, (and '' if it is in tristate mode with value undefined)
+ * The value of the TriStateField widget is a string: 'false', 'true', 'undefined'
  * @override
  */
-scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
-  scout.CheckBoxField.parent.prototype._initKeyStrokeContext.call(this);
+scout.TriStateField.prototype._initKeyStrokeContext = function() {
+  scout.TriStateField.parent.prototype._initKeyStrokeContext.call(this);
 
-  this.keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(new scout.TriStateFieldToggleKeyStroke(this));
 };
 
-scout.CheckBoxField.prototype._render = function($parent) {
+scout.TriStateField.prototype._render = function($parent) {
   this.addContainer($parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
@@ -48,82 +47,75 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.CheckBoxField.prototype._remove = function() {
+scout.TriStateField.prototype._remove = function() {
   scout.tooltips.uninstall(this.$checkBoxLabel);
-  scout.CheckBoxField.parent.prototype._remove.call(this);
+  scout.TriStateField.parent.prototype._remove.call(this);
 };
 
-scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
+scout.TriStateField.prototype.acceptInput = function(whileTyping, forceSend) {
   //nop
 };
 
-scout.CheckBoxField.prototype._renderDisplayText = function() {
+scout.TriStateField.prototype._renderDisplayText = function() {
   //nop
 };
 
-scout.CheckBoxField.prototype._onMouseDown = function(event) {
-  this.toggleChecked();
+scout.TriStateField.prototype._onMouseDown = function(event) {
+  this.toggleValue();
   if (event.currentTarget === this.$checkBoxLabel[0]) {
     this.session.focusManager.requestFocus(this.$checkBox);
   }
 };
 
-scout.CheckBoxField.prototype.toggleChecked = function() {
+scout.TriStateField.prototype.toggleValue = function() {
   if (!this.enabled) {
     return;
   }
-  if (this.tristateEnabled) {
-    if (this.value === false) {
-      this.setValue(true);
-    }
-    else if (this.value === true) {
-      this.setValue('');
-    }
-    else {
-      this.setValue(false);
-    }
+  if(this.value===false){
+    this.setValue(true);
   }
-  else {
-    this.setValue(!this.value);
+  else if(this.value===true){
+    this.setValue('');
+  }
+  else{
+    this.setValue(false);
   }
 };
 
-scout.CheckBoxField.prototype.setValue = function(value) {
+scout.TriStateField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderEnabled = function() {
-  scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
+scout.TriStateField.prototype._renderEnabled = function() {
+  scout.TriStateField.parent.prototype._renderEnabled.call(this);
   this.$checkBox
     .setTabbable(this.enabled && !scout.device.supportsTouch())
     .setEnabled(this.enabled);
 };
 
-scout.CheckBoxField.prototype._renderProperties = function() {
-  scout.CheckBoxField.parent.prototype._renderProperties.call(this);
-  this._renderValue();
+scout.TriStateField.prototype._renderProperties = function() {
+  scout.TriStateField.parent.prototype._renderProperties.call(this);
+  this._renderValue(this.value);
 };
 
-scout.CheckBoxField.prototype._renderValue = function() {
+scout.TriStateField.prototype._renderValue = function() {
   this.$checkBox.toggleClass('checked', this.value===true);
-  if (this.tristateEnabled) {
-    this.$checkBox.toggleClass('tristate', this.value !== true && this.value !== false);
-  }
+  this.$checkBox.toggleClass('tristate', this.value!==true && this.value!==false);
 };
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderLabel = function() {
+scout.TriStateField.prototype._renderLabel = function() {
   this.$checkBoxLabel.textOrNbsp(this.label, 'empty');
   // Make sure the empty label is as height as the other labels, especially important for top labels
   this.$label.html('&nbsp;');
 };
 
-scout.CheckBoxField.prototype._renderGridData = function() {
+scout.TriStateField.prototype._renderGridData = function() {
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });

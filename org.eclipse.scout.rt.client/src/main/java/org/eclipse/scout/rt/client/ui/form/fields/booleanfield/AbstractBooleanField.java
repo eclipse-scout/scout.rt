@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("3f14b55f-b49b-428a-92c4-05745d6d48c4")
@@ -37,6 +36,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
+    setTristateEnabled(getConfiguredTristateEnabled());
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554
     propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue()));
@@ -47,6 +47,34 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredAutoAddDefaultMenus() {
     return false;
+  }
+
+  /**
+   * true: the checkbox can have a {@link #getValue()} of true, false and also null. null is the tristate and is
+   * typically displayed using a filled rectangluar area.
+   * <p>
+   * false: the checkbox can have a {@link #getValue()} of true, false. The value is never null.
+   * <p>
+   * default is false
+   *
+   * @since 6.1
+   * @return true if this checkbox supports the so-called tristate and can be {@link #setValue(Boolean)} to null in
+   *         order to represent the tristate value
+   */
+  @Order(220)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredTristateEnabled() {
+    return false;
+  }
+
+  @Override
+  public void setTristateEnabled(boolean b) {
+    propertySupport.setPropertyBool(PROP_TRISTATE_ENABLED, b);
+  }
+
+  @Override
+  public boolean isTristateEnabled() {
+    return propertySupport.getPropertyBool(PROP_TRISTATE_ENABLED);
   }
 
   @Override
@@ -71,7 +99,11 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
 
   @Override
   protected Boolean validateValueInternal(Boolean rawValue) {
-    return BooleanUtility.nvl(super.validateValueInternal(rawValue));
+    rawValue = super.validateValueInternal(rawValue);
+    if (!isTristateEnabled() && rawValue == null) {
+      rawValue = Boolean.FALSE;
+    }
+    return rawValue;
   }
 
   // convert string to a boolean
@@ -109,11 +141,10 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   }
 
   protected class P_UIFacade implements IBooleanFieldUIFacade {
-
     @Override
-    public void setCheckedFromUI(boolean checked) {
+    public void setValueFromUI(Boolean value) {
       if (isEnabled() && isVisible()) {
-        setChecked(checked);
+        setValue(value);
       }
     }
   }

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface IBooleanField extends IValueField<Boolean> {
+  String PROP_TRISTATE_ENABLED = "tristateEnabled";
 
   /**
    * Configuration
@@ -20,6 +21,28 @@ public interface IBooleanField extends IValueField<Boolean> {
   void setChecked(boolean b);
 
   boolean isChecked();
+
+  /**
+   * see {@link #isTristateEnabled()}
+   *
+   * @since 6.1
+   * @param b
+   */
+  void setTristateEnabled(boolean b);
+
+  /**
+   * true: the checkbox can have a {@link #getValue()} of true, false and also null. null is the tristate and is
+   * typically displayed using a filled rectangluar area.
+   * <p>
+   * false: the checkbox can have a {@link #getValue()} of true, false. The value is never null.
+   * <p>
+   * default is false
+   *
+   * @since 6.1
+   * @return true if this checkbox supports the so-called tristate and can be {@link #setValue(Boolean)} to null in
+   *         order to represent the tristate value
+   */
+  boolean isTristateEnabled();
 
   IBooleanFieldUIFacade getUIFacade();
 }

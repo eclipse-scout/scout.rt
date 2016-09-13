@@ -41,6 +41,12 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
         return getModel().getValue();
       }
     });
+    putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_TRISTATE_ENABLED, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isTristateEnabled();
+      }
+    });
     // No need to send display text for check box
     removeJsonProperty(IBooleanField.PROP_DISPLAY_TEXT);
   }
@@ -48,16 +54,26 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IBooleanField.PROP_VALUE.equals(propertyName)) {
-      boolean uiChecked = data.getBoolean(IBooleanField.PROP_VALUE);
-      addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiChecked);
-      getModel().getUIFacade().setCheckedFromUI(uiChecked);
+      String s = data.optString(IBooleanField.PROP_VALUE);
+      Boolean uiValue;
+      if ("true".equals(s)) {
+        uiValue = true;
+      }
+      else if ("false".equals(s)) {
+        uiValue = false;
+      }
+      else {
+        uiValue = null;
+      }
+      addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiValue);
+      getModel().getUIFacade().setValueFromUI(uiValue);
 
       // In some cases the widget in the UI is clicked, which causes the check-box to be de-/selected, but the model rejects the value-change.
       // in that case we must "revert" the click in the UI, so that UI and model are in-sync again. This may happen, when the model-field throws
       // a VetoExeception in its execValidateValue() method.
-      boolean modelChecked = getModel().isChecked();
-      if (uiChecked != modelChecked) {
-        addPropertyChangeEvent(IValueField.PROP_VALUE, modelChecked);
+      Boolean modelValue = getModel().getValue();
+      if (uiValue != modelValue) {
+        addPropertyChangeEvent(IValueField.PROP_VALUE, modelValue);
       }
     }
   }
