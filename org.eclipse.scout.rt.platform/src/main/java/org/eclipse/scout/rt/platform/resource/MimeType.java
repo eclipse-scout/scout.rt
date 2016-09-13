@@ -19,6 +19,7 @@ import java.util.Collection;
 public enum MimeType {
   //by file extension
   APPCACHE("text/cache-manifest", "appcache"),
+  AVI("video/avi", "avi"),
   BMP("image/bmp", "bmp"),
   CSS("text/css", "css"),
   CSV("text/csv", "csv"),
@@ -40,7 +41,11 @@ public enum MimeType {
   JSON("application/json", "json"),
   JSONML("application/jsonml+json", "jsonml"),
   LOG("text/x-log", "log"),
+  M2V("video/mpeg", "m2v"),
   MIME("message/rfc822", "mime"),
+  MOV("video/quicktime", "mov"),
+  MP4("video/mp4", "mp4"),
+  MPG("video/mpeg", "mpg"),
   MSG("application/vnd.ms-outlook", "msg"),
   ONEPKG("application/onenote", "onepkg"),
   ONETMP("application/onenote", "onetmp"),
@@ -119,6 +124,20 @@ public enum MimeType {
    */
   public static MimeType[] getCommonImageTypesAsArray() {
     return new MimeType[]{BMP, GIF, JPG, JPE, JPEG, PNG, SVG, TIF, TIFF};
+  }
+
+  /**
+   * Common video mime types.
+   */
+  public static Collection<MimeType> getCommonVideoTypes() {
+    return Arrays.asList(getCommonVideoTypesAsArray());
+  }
+
+  /**
+   * Common image mime types.
+   */
+  public static MimeType[] getCommonVideoTypesAsArray() {
+    return new MimeType[]{AVI, M2V, MOV, MP4, MPG};
   }
 
   public static boolean isOneOf(Collection<MimeType> mimeTypes, String input) {
