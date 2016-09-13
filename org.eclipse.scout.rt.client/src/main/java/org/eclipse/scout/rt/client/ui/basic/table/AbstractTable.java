@@ -3897,7 +3897,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         IFormField field = ctxCol.prepareEdit(row);
         if (field instanceof IBooleanField) {
           IBooleanField bfield = (IBooleanField) field;
-          bfield.setChecked(!bfield.isChecked());
+          bfield.toggleValue();
           ctxCol.completeEdit(row, field);
         }
       }

@@ -44,5 +44,16 @@ public interface IBooleanField extends IValueField<Boolean> {
    */
   boolean isTristateEnabled();
 
+  /**
+   * Toggle the value.
+   * <p>
+   * If the checkbox is not {@link #isTristateEnabled()} then toggles between: true, false
+   * <p>
+   * If the checkbox is {@link #isTristateEnabled()} then toggles between: true, false, null
+   * 
+   * @since 6.1
+   */
+  void toggleValue();
+
   IBooleanFieldUIFacade getUIFacade();
 }

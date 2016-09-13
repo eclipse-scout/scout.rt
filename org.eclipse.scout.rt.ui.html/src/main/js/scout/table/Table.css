@@ -231,6 +231,9 @@
     &.checked::before {
       #scout.checkbox-before-checked();
     }
+    &.tristate::before {
+      #scout.checkbox-before-tristate();
+    }
   }
 
   &.halign-right {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
+import org.json.JSONObject;
 
 public class JsonBooleanColumn<T extends IBooleanColumn> extends JsonColumn<T> {
 
@@ -26,6 +27,13 @@ public class JsonBooleanColumn<T extends IBooleanColumn> extends JsonColumn<T> {
   @Override
   public Object cellValueToJson(Object value) {
     return value;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put(IBooleanColumn.PROP_TRISTATE_ENABLED, getColumn().isTristateEnabled());
+    return json;
   }
 
 }

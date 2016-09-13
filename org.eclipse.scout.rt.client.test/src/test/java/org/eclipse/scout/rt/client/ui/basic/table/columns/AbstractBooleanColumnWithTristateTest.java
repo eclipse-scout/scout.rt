@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -23,9 +24,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * Tests for {@link AbstractBooleanColumn}
+ * Tests for {@link AbstractBooleanColumn} with {@link AbstractBooleanColumn#isTristateEnabled()} set to true
  */
-public class AbstractBooleanColumnTest {
+public class AbstractBooleanColumnWithTristateTest {
 
   @Test
   public void testPrepareEditInternal() {
@@ -42,8 +43,7 @@ public class AbstractBooleanColumnTest {
     TestTable table = new TestTable();
     table.addRowByArray(new Object[]{null});
     Boolean value = table.getTestBooleanColumn().getValue(0);
-    assertNotNull(value);
-    assertFalse(value);
+    assertNull(value);
   }
 
   @Test
@@ -70,8 +70,7 @@ public class AbstractBooleanColumnTest {
     TestTable.TestBooleanColumn column = table.getTestBooleanColumn();
     ITableRow row = table.addRowByArray(new Object[]{null});
     Boolean value = column.getValue(0);
-    assertNotNull(value);
-    assertFalse(value);
+    assertNull(value);
     column.setEditable(true);
     //toggle
     IBooleanField checkbox = (IBooleanField) table.getTestBooleanColumn().prepareEdit(row);
@@ -79,14 +78,14 @@ public class AbstractBooleanColumnTest {
     table.getTestBooleanColumn().completeEdit(row, checkbox);
     value = table.getTestBooleanColumn().getValue(0);
     assertNotNull(value);
-    assertTrue(value);
+    assertFalse(value);
     //toggle
     checkbox = (IBooleanField) table.getTestBooleanColumn().prepareEdit(row);
     checkbox.toggleValue();
     table.getTestBooleanColumn().completeEdit(row, checkbox);
     value = table.getTestBooleanColumn().getValue(0);
     assertNotNull(value);
-    assertFalse(value);
+    assertTrue(value);
   }
 
   public class TestTable extends AbstractTable {
@@ -97,6 +96,10 @@ public class AbstractBooleanColumnTest {
 
     @Order(10)
     public class TestBooleanColumn extends AbstractBooleanColumn {
+      @Override
+      protected boolean getConfiguredTristateEnabled() {
+        return true;
+      }
     }
 
   }

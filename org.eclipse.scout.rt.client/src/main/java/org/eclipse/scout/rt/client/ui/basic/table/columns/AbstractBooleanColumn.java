@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBooleanColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -37,6 +39,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   protected void initConfig() {
     super.initConfig();
     setVerticalAlignment(getConfiguredVerticalAlignment());
+    setTristateEnabled(getConfiguredTristateEnabled());
   }
 
   @Override
@@ -50,6 +53,16 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
+  public void setTristateEnabled(boolean b) {
+    propertySupport.setPropertyBool(PROP_TRISTATE_ENABLED, b);
+  }
+
+  @Override
+  public boolean isTristateEnabled() {
+    return propertySupport.getPropertyBool(PROP_TRISTATE_ENABLED);
+  }
+
+  @Override
   protected void decorateCellInternal(Cell cell, ITableRow row) {
     super.decorateCellInternal(cell, row);
     updateDisplayText(row, cell);
@@ -57,6 +70,9 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected String formatValueInternal(ITableRow row, Boolean value) {
+    if (isTristateEnabled() && value == null) {
+      return TRISTATE_TEXT;
+    }
     return (BooleanUtility.nvl(value)) ? TRUE_TEXT : "";
   }
 
@@ -80,13 +96,25 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected Boolean validateValueInternal(ITableRow row, Boolean rawValue) {
-    return BooleanUtility.nvl(super.validateValueInternal(row, rawValue));
+    rawValue = super.validateValueInternal(row, rawValue);
+    if (!isTristateEnabled() && rawValue == null) {
+      rawValue = Boolean.FALSE;
+    }
+    return rawValue;
   }
 
   @Override
   protected IValueField<Boolean> createDefaultEditor() {
     return new AbstractBooleanField() {
     };
+  }
+
+  @Override
+  protected void mapEditorFieldProperties(IFormField f) {
+    super.mapEditorFieldProperties(f);
+    if (f instanceof IBooleanField) {
+      ((IBooleanField) f).setTristateEnabled(isTristateEnabled());
+    }
   }
 
   /**
@@ -112,6 +140,24 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   @Order(200)
   protected int getConfiguredVerticalAlignment() {
     return -1; // top position
+  }
+
+  /**
+   * true: the checkbox can have a {@link #getValue()} of true, false and also null. null is the tristate and is
+   * typically displayed using a filled rectangluar area.
+   * <p>
+   * false: the checkbox can have a {@link #getValue()} of true, false. The value is never null.
+   * <p>
+   * default is false
+   *
+   * @since 6.1
+   * @return true if this checkbox supports the so-called tristate and can be {@link #setValue(Boolean)} to null in
+   *         order to represent the tristate value
+   */
+  @Order(220)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredTristateEnabled() {
+    return false;
   }
 
   protected static class LocalBooleanColumnExtension<OWNER extends AbstractBooleanColumn> extends LocalColumnExtension<Boolean, OWNER> implements IBooleanColumnExtension<OWNER> {

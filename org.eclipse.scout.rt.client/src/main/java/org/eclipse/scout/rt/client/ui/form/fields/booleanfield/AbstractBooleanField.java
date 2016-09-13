@@ -87,6 +87,29 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     return getValue() != null && getValue().booleanValue();
   }
 
+  @Override
+  public void toggleValue() {
+    if (isTristateEnabled()) {
+      if (getValue() == Boolean.FALSE) {
+        setValue(true);
+      }
+      else if (getValue() == Boolean.TRUE) {
+        setValue(null);
+      }
+      else {
+        setValue(false);
+      }
+    }
+    else {
+      if (getValue() == Boolean.FALSE) {
+        setValue(true);
+      }
+      else {
+        setValue(false);
+      }
+    }
+  }
+
   // format value for display
   @Override
   protected String formatValueInternal(Boolean validValue) {

@@ -17,6 +17,7 @@ scout.BooleanColumn = function() {
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
   this.filterType = 'ColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
+  this.tristateEnabled = false;
 };
 scout.inherits(scout.BooleanColumn, scout.Column);
 
@@ -24,14 +25,13 @@ scout.inherits(scout.BooleanColumn, scout.Column);
  * @override
  */
 scout.BooleanColumn.prototype.buildCell = function(cell, row) {
-  var style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
+  var style, content, tooltipText, tooltip, cssClass, checkBoxCssClass;
   var enabled = row.enabled;
   if (cell.empty) {
     // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
     return scout.BooleanColumn.parent.prototype.buildCell.call(this, cell, row);
   }
 
-  checked = cell.value;
   enabled = enabled && cell.editable;
   cssClass = this._cellCssClass(cell);
   style = this._cellStyle(cell);
@@ -42,8 +42,11 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   tooltip = (scout.strings.empty(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
   checkBoxCssClass = 'check-box';
-  if (checked) {
+  if (cell.value===true) {
     checkBoxCssClass += ' checked';
+  }
+  if (this.tristateEnabled && cell.value!==true && cell.value!==false) {
+    checkBoxCssClass += ' tristate';
   }
   if (!enabled) {
     checkBoxCssClass += ' disabled';
