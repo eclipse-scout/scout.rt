@@ -15,22 +15,8 @@ scout.texts = {
   textsByLocale: {},
 
   bootstrap: function() {
-    var that = this;
-
-    return $.ajax({
-      url: 'res/texts.json',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8'
-    }).done(that._onLoadDone.bind(that))
-    .fail(that._onLoadFail.bind(that));
-  },
-
-  _onLoadDone: function(data) {
-    this.init(data);
-  },
-
-  _onLoadFail: function(jqXHR, textStatus, errorThrown) {
-    throw new Error('Error while loading texts: ' + errorThrown);
+    return $.ajaxJson('res/texts.json')
+      .done(this.init.bind(this));
   },
 
   init: function(model) {

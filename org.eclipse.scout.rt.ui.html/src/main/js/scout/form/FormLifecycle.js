@@ -44,6 +44,9 @@ scout.FormLifecycle.prototype.doReset = function() {
  */
 scout.FormLifecycle.prototype._whenInvalid = function(func) {
   var status = func.call(this);
+  if (!(status instanceof scout.Status)) {
+    throw new Error('Expected function to return a scout.Status object');
+  }
   if (status.isValid()) {
     return false;
   }

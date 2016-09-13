@@ -477,7 +477,6 @@ scout.Session.prototype.defaultAjaxOptions = function(request) {
   var url = this._decorateUrl(this.remoteUrl, request);
 
   var ajaxOptions = {
-    async: true,
     type: 'POST',
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8',

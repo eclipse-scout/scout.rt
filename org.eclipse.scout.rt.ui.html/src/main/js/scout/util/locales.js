@@ -13,24 +13,14 @@ scout.locales = {
   localesMap: {},
 
   bootstrap: function() {
-    var that = this;
-
-    return $.ajax({
-        url: 'res/locales.json',
-        dataType: 'json',
-        contentType: 'application/json; charset=UTF-8'
-      }).done(that._onLoadDone.bind(that))
-      .fail(that._onLoadFail.bind(that));
+    return $.ajaxJson('res/locales.json')
+      .done(this.init.bind(this));
   },
 
-  _onLoadDone: function(data) {
+  init: function(data) {
     data.forEach(function(locale) {
       this.localesMap[locale.languageTag] = locale;
     }, this);
-  },
-
-  _onLoadFail: function(jqXHR, textStatus, errorThrown) {
-    throw new Error('Error while loading locales: ' + errorThrown);
   },
 
   get: function(languageTag) {

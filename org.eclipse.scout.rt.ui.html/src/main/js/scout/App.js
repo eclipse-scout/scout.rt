@@ -47,7 +47,8 @@ scout.App.prototype._doBootstrap = function(options) {
     scout.fonts.bootstrap(options.fonts),
     scout.models.bootstrap(options.modelsUrl),
     scout.locales.bootstrap(),
-    scout.texts.bootstrap()
+    scout.texts.bootstrap(),
+    scout.codes.bootstrap()
   ];
 };
 

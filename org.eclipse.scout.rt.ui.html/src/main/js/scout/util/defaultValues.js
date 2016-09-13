@@ -26,24 +26,12 @@ scout.defaultValues = {
       url: 'defaultValues'
     };
     options = $.extend({}, defaultOptions, options);
-    var that = this;
     // Load default value configuration from server (and cache it)
-    return $.ajax({
-        async: true,
-        type: 'GET',
-        dataType: 'json',
-        contentType: 'application/json; charset=UTF-8',
-        cache: true,
-        url: options.url,
-        data: ''
-      }).done(function(data) {
-        that._loadDefaultsConfiguration(data);
-      }).fail(function(jqXHR, textStatus, errorThrown) {
-        throw new Error('Error while loading default values: ' + errorThrown);
-      });
+    return $.ajaxJson(options.url)
+      .done(this.init.bind(this));
   },
 
-  _loadDefaultsConfiguration: function(data) {
+  init: function(data) {
     // Store defaults
     this._objectTypeHierarchyFlat = {};
     this._defaults = data.defaults || {};

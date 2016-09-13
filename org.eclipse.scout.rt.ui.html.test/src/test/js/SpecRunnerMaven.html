@@ -73,7 +73,7 @@
         data: ''
       }).done(function(data) {
         var dataWithoutComments = stripCommentsFromJson(data), dataObj = JSON.parse(dataWithoutComments);
-        scout.defaultValues._loadDefaultsConfiguration(dataObj);
+        scout.defaultValues.init(dataObj);
       }).fail(function(jqXHR, textStatus, errorThrown) {
         throw new Error('Error while loading default values: ' + errorThrown);
       });

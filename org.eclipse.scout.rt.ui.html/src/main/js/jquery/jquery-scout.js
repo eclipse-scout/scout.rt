@@ -254,6 +254,22 @@ $.resolvedPromise = function() {
   return $.resolvedDeferred().promise();
 };
 
+/**
+ * Shorthand for an AJAX request for a JSON file with UTF8 encoding
+ * and a default fail handler which simply throws an Error.
+ *
+ * @returns a promise form JQuery function $.ajax
+ */
+$.ajaxJson = function(url) {
+  return $.ajax({
+    url: url,
+    dataType: 'json',
+    contentType: 'application/json; charset=UTF-8'
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    throw new Error('Error while loading URL \'' + url + '\'. Error=' + errorThrown);
+  });
+};
+
 // === $.prototype extensions ===
 
 $.fn.nvl = function($element) {
