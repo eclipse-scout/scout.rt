@@ -23,6 +23,9 @@
   __include("scout/widget/NullWidgetAdapter.js");
   // Basic utilities
   __include("scout/util/arrays.js");
+  __include("scout/util/Code.js");
+  __include("scout/util/CodeType.js");
+  __include("scout/util/codes.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
   __include("scout/util/DetachHelper.js");
@@ -191,6 +194,7 @@
   __include("scout/table/columns/AlphanumericSortingStringColumn.js"); // requires Column.js
   __include("scout/table/columns/BeanColumn.js"); // requires Column.js
   __include("scout/table/columns/BooleanColumn.js"); // requires Column.js
+  __include("scout/table/columns/CodeColumn.js"); // requires Column.js
   __include("scout/table/columns/DateColumn.js"); // requires Column.js
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
