@@ -225,6 +225,7 @@ public final class SVGUtility {
    * @param rowGap
    *          in px
    */
+  @SuppressWarnings("squid:S2583")
   public static void setTextContent(Element e, String value, final Float rowGap) {
     if (e == null) {
       return;

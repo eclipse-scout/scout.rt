@@ -192,6 +192,7 @@ public class SqlParser {
     return stm;
   }
 
+  @SuppressWarnings("squid:S2583")
   private Statement parseStatement(List<IToken> list, ParseContext ctx) {
     //SingleStatement (UnionToken SingleStatement)*
     ParseStep lock = ctx.checkAndAdd("Statement", list);

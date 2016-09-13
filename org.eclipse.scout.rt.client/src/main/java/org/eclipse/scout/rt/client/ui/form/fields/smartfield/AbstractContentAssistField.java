@@ -1617,7 +1617,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           dataProvider.afterProvide(lookupCall, result);
           callback.onSuccess(result);
         }
-        catch (FutureCancelledException | ThreadInterruptedException e) {
+        catch (FutureCancelledException | ThreadInterruptedException e) { // NOSONAR
           callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
         }
         catch (final RuntimeException e) { // NOSONAR

@@ -125,6 +125,7 @@ public class JSONObject {
    *           if any of the map's keys are null.
    */
   /* (accept a raw type for API compatibility) */
+  @SuppressWarnings("squid:S1695")
   public JSONObject(Map copyFrom) {
     this();
     Map<?, ?> contentsTyped = (Map<?, ?>) copyFrom;

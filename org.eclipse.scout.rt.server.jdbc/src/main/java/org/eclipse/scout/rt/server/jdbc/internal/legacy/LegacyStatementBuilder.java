@@ -30,6 +30,7 @@ public class LegacyStatementBuilder {
   public LegacyStatementBuilder(ISqlStyle sqlStyle) {
     m_sqlStyle = sqlStyle;
     m_bindMap = new HashMap<String, Object>();
+    m_where = new StringBuilder();
   }
 
   public String resolveComposerAttribute(int op, String attribute, String bindName, Object value) {

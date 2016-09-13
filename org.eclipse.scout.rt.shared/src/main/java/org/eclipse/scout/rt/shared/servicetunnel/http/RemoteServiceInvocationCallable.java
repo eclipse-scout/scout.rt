@@ -104,7 +104,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       request.setUserAgent(m_serviceRequest.getUserAgent());
       m_tunnel.invokeService(request);
     }
-    catch (final FutureCancelledException | ThreadInterruptedException e) {
+    catch (final FutureCancelledException | ThreadInterruptedException e) { // NOSONAR
       // NOOP: Do not cancel 'cancel-request' to prevent loop.
     }
     catch (RuntimeException | NoSuchMethodException e) {

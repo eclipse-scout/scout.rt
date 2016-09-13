@@ -87,7 +87,8 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
   private final ElementIndex<ELEMENT> m_elementIndex;
 
   public IndexedStore() {
-    m_indices.add(m_elementIndex = new ElementIndex<ELEMENT>());
+    m_elementIndex = new ElementIndex<ELEMENT>();
+    m_indices.add(m_elementIndex);
   }
 
   /**

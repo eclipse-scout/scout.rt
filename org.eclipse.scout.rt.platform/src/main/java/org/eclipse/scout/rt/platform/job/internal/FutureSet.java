@@ -306,7 +306,7 @@ public class FutureSet {
           case JOB_EXECUTION_HINT_ADDED:
           case JOB_EXECUTION_HINT_REMOVED:
             return true; // manual signaling required
-          case JOB_STATE_CHANGED:
+          case JOB_STATE_CHANGED: // NOSONAR
             switch (event.getData().getState()) {
               case PENDING:
               case RUNNING:

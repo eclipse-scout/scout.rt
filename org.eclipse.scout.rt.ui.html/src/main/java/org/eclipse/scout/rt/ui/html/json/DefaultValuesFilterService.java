@@ -35,7 +35,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
   private static final long FILE_UPDATE_CHECK_INTERVAL = 1234; // in milliseconds (only used in dev mode)
 
   private DefaultValuesFilter m_filter;
-  private long m_lastModified = -1;
+  private volatile long m_lastModified = -1;
   private long m_lastCheckForFileUpdate = -1; // timestamp in milliseconds (only used in dev mode)
   private String m_combinedDefaultValuesConfiguration = null;
 

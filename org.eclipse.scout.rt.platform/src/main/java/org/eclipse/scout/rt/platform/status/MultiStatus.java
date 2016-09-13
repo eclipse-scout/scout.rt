@@ -158,6 +158,7 @@ public class MultiStatus extends Status implements IMultiStatus {
   }
 
   @Override
+  @SuppressWarnings("squid:S2583")
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
@@ -166,6 +167,7 @@ public class MultiStatus extends Status implements IMultiStatus {
   }
 
   @Override
+  @SuppressWarnings("squid:S2583")
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -188,5 +190,4 @@ public class MultiStatus extends Status implements IMultiStatus {
 
     return true;
   }
-
 }

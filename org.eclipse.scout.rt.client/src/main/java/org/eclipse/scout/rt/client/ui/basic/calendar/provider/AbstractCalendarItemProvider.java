@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCalendarItemProvider extends AbstractPropertyObserver implements ICalendarItemProvider, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCalendarItemProvider.class);
 
-  private IFuture<Void> m_reloadJob;
+  private volatile IFuture<Void> m_reloadJob;
   private boolean m_initialized;
   private List<IMenu> m_menus;
   private Date m_minDateLoaded;
@@ -404,7 +404,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         try {
           interceptLoadItemsInBackground(ClientSessionProvider.currentSession(), m_loadingMinDate, m_loadingMaxDate, m_result);
         }
-        catch (ThreadInterruptedException | FutureCancelledException e) {
+        catch (ThreadInterruptedException | FutureCancelledException e) { // NOSONAR
           // NOOP
         }
         catch (RuntimeException e) {

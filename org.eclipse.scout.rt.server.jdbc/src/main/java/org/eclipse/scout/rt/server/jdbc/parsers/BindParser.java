@@ -332,6 +332,7 @@ public class BindParser {
     return null;
   }
 
+  @SuppressWarnings("squid:AssignmentInSubExpressionCheck")
   private IToken parseFunctionBind() {
     if (LOG.isTraceEnabled()) {
       trace("parseFunctionBind");

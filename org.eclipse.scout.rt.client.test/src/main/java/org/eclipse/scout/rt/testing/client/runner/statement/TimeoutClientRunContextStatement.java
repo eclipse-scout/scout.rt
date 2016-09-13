@@ -55,7 +55,7 @@ public class TimeoutClientRunContextStatement extends Statement {
         future.awaitDone(m_timeoutMillis, TimeUnit.MILLISECONDS);
       }
     }
-    catch (ThreadInterruptedException | TimedOutException e) {
+    catch (ThreadInterruptedException | TimedOutException e) { // NOSONAR
       future.cancel(true);
       throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS); // JUnit timeout exception
     }

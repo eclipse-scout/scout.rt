@@ -20,21 +20,15 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class RFCWrapperPart implements Part {
   private final Part m_rfcPart;
   private final String m_fileName;
 
   public RFCWrapperPart(Part part, String fileName) {
-    super();
-    if (part != null && fileName != null && StringUtility.hasText(fileName)) {
-      m_rfcPart = part;
-      m_fileName = fileName;
-    }
-    else {
-      throw new NullPointerException("RFC-Part and fileName should not be null or empty.");
-    }
+    m_rfcPart = Assertions.assertNotNull(part);
+    m_fileName = Assertions.assertNotNullOrEmpty(fileName);
   }
 
   @Override

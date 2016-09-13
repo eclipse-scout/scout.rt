@@ -190,7 +190,7 @@ public class BlockingCondition implements IBlockingCondition {
     waitForHints.dispose(); // if released via 'setBlocking(false)', the 'wait-for' hints are already disposed, but not if interrupted or timed out.
     futureTask.changeState(JobState.RUNNING);
 
-    if (errorWhileWaiting != null) {
+    if (errorWhileWaiting != null) { // NOSONAR
       throw errorWhileWaiting;
     }
     if (exceptionWhileWaiting != null) {

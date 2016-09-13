@@ -138,6 +138,7 @@ public class JSONTokener {
     }
   }
 
+  @SuppressWarnings("squid:S128")
   private int nextCleanInternal() {
     while (m_pos < m_in.length()) {
       int c = m_in.charAt(m_pos++);
@@ -230,7 +231,7 @@ public class JSONTokener {
       if (c == quote) {
         if (builder == null) {
           // a new string avoids leaking memory
-          return new String(m_in.substring(start, m_pos - 1));
+          return new String(m_in.substring(start, m_pos - 1)); // NOSONAR
         }
         else {
           builder.append(m_in, start, m_pos - 1);
@@ -359,7 +360,7 @@ public class JSONTokener {
     }
 
     /* ... finally give up. We have an unquoted string */
-    return new String(literal); // a new string avoids leaking memory
+    return new String(literal); // a new string avoids leaking memory (NOSONAR)
   }
 
   /**
@@ -424,7 +425,7 @@ public class JSONTokener {
         case '}':
           return result;
         case ';':
-        case ',':
+        case ',': // NOSONAR
           continue;
         default:
           throw syntaxError("Unterminated object");
@@ -453,7 +454,7 @@ public class JSONTokener {
           }
           return result;
         case ',':
-        case ';':
+        case ';': // NOSONAR
           /* A separator without a value first means "null". */
           result.put(null);
           hasTrailingSeparator = true;
@@ -468,7 +469,7 @@ public class JSONTokener {
         case ']':
           return result;
         case ',':
-        case ';':
+        case ';': // NOSONAR
           hasTrailingSeparator = true;
           continue;
         default:
@@ -570,6 +571,7 @@ public class JSONTokener {
    *
    * @return a possibly-empty string
    */
+  @SuppressWarnings("squid:S1695")
   public String nextTo(String excluded) {
     if (excluded == null) {
       throw new NullPointerException("excluded == null");

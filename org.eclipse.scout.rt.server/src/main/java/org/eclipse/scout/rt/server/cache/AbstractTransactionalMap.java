@@ -279,7 +279,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     public V put(K key, V value) {
       if (key == null || value == null) {
         // fast fail
-        throw new NullPointerException("Null key or value is not allowed in this map implementation");
+        throw new NullPointerException("Null key or value is not allowed in this map implementation"); // NOSONAR (Map API)
       }
       V sharedValue = getReadSharedMap().get(key);
       boolean hasRemoveEntry = m_removedMap.containsKey(key);

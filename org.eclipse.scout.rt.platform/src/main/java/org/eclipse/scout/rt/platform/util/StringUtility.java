@@ -462,6 +462,7 @@ public final class StringUtility {
     return getTag(text, tagName, false);
   }
 
+  @SuppressWarnings("squid:AssignmentInSubExpressionCheck")
   public static String getTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;

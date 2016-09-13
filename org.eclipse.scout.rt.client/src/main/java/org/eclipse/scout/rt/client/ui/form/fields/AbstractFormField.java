@@ -1845,7 +1845,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
     // add new listener and set enabling
     if (field != null) {
-      field.addMasterListener(m_currentMasterListener = new P_MasterListener());
+      m_currentMasterListener = new P_MasterListener();
+      field.addMasterListener(m_currentMasterListener);
       m_enabledSlave = (field.getValue() != null || !isMasterRequired());
       setEnabledGranted(m_enabledGranted);
     }

@@ -826,7 +826,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         loadTableDataImpl();
       }
-      catch (ThreadInterruptedException | FutureCancelledException e) {
+      catch (ThreadInterruptedException | FutureCancelledException e) { // NOSONAR
         // NOOP
       }
       finally {

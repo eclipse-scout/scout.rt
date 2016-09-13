@@ -215,6 +215,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
           break;
         case SessionEvent.TYPE_STOPPED:
           sessionStopped((IClientSession) source);
+          break;
         default:
           break;
       }

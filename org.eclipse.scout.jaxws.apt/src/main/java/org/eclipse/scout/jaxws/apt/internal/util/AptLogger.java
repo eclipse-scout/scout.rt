@@ -98,7 +98,7 @@ public class AptLogger {
 
     m_message.printMessage(Kind.ERROR, writer.toString()); // fails the build
     if (m_consoleLog) {
-      System.err.printf("[ERROR] %s\n", writer.toString());
+      System.err.printf("[ERROR] %s%n", writer.toString());
     }
   }
 }

@@ -15,6 +15,8 @@ import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
+
 public class BufferedServletOutputStream extends ServletOutputStream {
 
   private final ByteArrayOutputStream m_buf;
@@ -31,10 +33,7 @@ public class BufferedServletOutputStream extends ServletOutputStream {
 
   @Override
   public void setWriteListener(javax.servlet.WriteListener writeListener) {
-    if (writeListener == null) {
-      throw new NullPointerException("writeListener may not be null."); // as per ServletInputStream spec
-    }
-    m_writeListener = writeListener;
+    m_writeListener = Assertions.assertNotNull(writeListener);
     try {
       writeListener.onWritePossible();
     }

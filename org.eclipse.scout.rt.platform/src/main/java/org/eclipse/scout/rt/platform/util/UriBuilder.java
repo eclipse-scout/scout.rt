@@ -190,7 +190,7 @@ public class UriBuilder {
 
   private String getQueryString(String encoding) {
     Assertions.assertNotNull(encoding);
-    if (m_parameters == null || m_parameters.isEmpty()) {
+    if (m_parameters.isEmpty()) {
       return null;
     }
 
