@@ -48,7 +48,7 @@ scout.URL.prototype.setParameter = function(param, value) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
-  if (param === null || param === '') { // ignore empty keys
+  if (param === '') { // ignore empty keys
     return;
   }
   this.parameterMap[param] = value;
@@ -59,7 +59,7 @@ scout.URL.prototype.addParameter = function(param, value) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
-  if (param === null || param === '') { // ignore empty keys
+  if (param === '') { // ignore empty keys
     return;
   }
   scout.URL._addToMap(this.parameterMap, param, value);

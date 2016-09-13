@@ -33,7 +33,7 @@ scout.SvgField.prototype._renderProperties = function() {
 scout.SvgField.prototype._initKeyStrokeContext = function() {
   scout.SvgField.parent.prototype._initKeyStrokeContext.call(this);
   this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
-}
+};
 
 scout.SvgField.prototype._renderSvgDocument = function() {
   if (!this.svgDocument) {

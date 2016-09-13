@@ -23,7 +23,7 @@ scout.FocusAdjacentElementKeyStroke.prototype.handle = function(event) {
   var activeElement = this.field.$container.activeElement(true),
     $focusableElements = this.field.$container.find(':focusable');
 
-  switch (event.which) {
+  switch (event.which) { // NOSONAR
     case scout.keys.RIGHT:
       if (activeElement === $focusableElements.last()[0]) {
         this.session.focusManager.requestFocus($focusableElements.first());

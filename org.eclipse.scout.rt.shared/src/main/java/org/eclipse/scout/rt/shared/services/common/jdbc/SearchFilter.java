@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 /**
  * Search model that contains a form data, verbose search texts and a valid status
  */
-public class SearchFilter implements Serializable, Cloneable {
+public class SearchFilter implements Serializable {
   private static final long serialVersionUID = 0L;
 
   private boolean m_completed;
@@ -28,7 +28,15 @@ public class SearchFilter implements Serializable, Cloneable {
   private List<String> m_displayTexts;
 
   public SearchFilter() {
-    m_displayTexts = new ArrayList<String>();
+    m_displayTexts = new ArrayList<>();
+  }
+
+  protected SearchFilter(SearchFilter other) {
+    m_completed = other.m_completed;
+    if (other.m_formData != null) {
+      m_formData = other.m_formData.deepCopy();
+    }
+    m_displayTexts = new ArrayList<>(other.m_displayTexts);
   }
 
   /**
@@ -86,21 +94,11 @@ public class SearchFilter implements Serializable, Cloneable {
     m_completed = b;
   }
 
-  @Override
-  public Object clone() {
-    SearchFilter f;
-    try {
-      f = (SearchFilter) super.clone();
-    }
-    catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
-    }
-    f.m_completed = m_completed;
-    if (m_formData != null) {
-      f.m_formData = (AbstractFormData) m_formData.clone();
-    }
-    f.m_displayTexts = new ArrayList<String>(m_displayTexts);
-    return f;
+  /**
+   * Creates a copy of this instance. The copy is basically a deep copy, but immutable objects are shallow copied.
+   */
+  public SearchFilter copy() {
+    return new SearchFilter(this);
   }
 
   @Override

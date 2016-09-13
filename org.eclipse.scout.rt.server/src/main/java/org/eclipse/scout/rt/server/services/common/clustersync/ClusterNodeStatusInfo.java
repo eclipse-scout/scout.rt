@@ -29,7 +29,7 @@ public class ClusterNodeStatusInfo {
    */
   public IClusterNodeStatusInfo getStatus() {
     synchronized (m_lock) {
-      return m_info.clone();
+      return m_info.copy();
     }
   }
 
@@ -72,7 +72,7 @@ public class ClusterNodeStatusInfo {
     updateLastChanged(message.getProperties().getOriginUser(), message.getProperties().getOriginNode());
   }
 
-  private static class ClusterNodeStatusBean implements IClusterNodeStatusInfo, Cloneable {
+  private static class ClusterNodeStatusBean implements IClusterNodeStatusInfo {
 
     private long m_sentMessageCount;
 
@@ -81,6 +81,18 @@ public class ClusterNodeStatusInfo {
     private Date m_lastChangedDate;
     private String m_lastChangedUserId;
     private String m_lastChangedOriginNodeId;
+
+    public ClusterNodeStatusBean() {
+      super();
+    }
+
+    protected ClusterNodeStatusBean(ClusterNodeStatusBean other) {
+      m_sentMessageCount = other.m_sentMessageCount;
+      m_receivedMessageCount = other.m_receivedMessageCount;
+      m_lastChangedDate = other.m_lastChangedDate;
+      m_lastChangedUserId = other.m_lastChangedUserId;
+      m_lastChangedOriginNodeId = other.m_lastChangedOriginNodeId;
+    }
 
     @Override
     public long getSentMessageCount() {
@@ -127,14 +139,11 @@ public class ClusterNodeStatusInfo {
       m_lastChangedOriginNodeId = lastChangedOriginNodeId;
     }
 
-    @Override
-    protected ClusterNodeStatusBean clone() {
-      try {
-        return (ClusterNodeStatusBean) super.clone();
-      }
-      catch (CloneNotSupportedException e) {
-        throw new UnsupportedOperationException(e);
-      }
+    /**
+     * Creates a shallow copy of this instance.
+     */
+    public ClusterNodeStatusBean copy() {
+      return new ClusterNodeStatusBean(this);
     }
 
     @Override
@@ -142,7 +151,5 @@ public class ClusterNodeStatusInfo {
       return "ClusterNodeStatusBean [sentMessageCount=" + m_sentMessageCount + ", receivedMessageCount=" + m_receivedMessageCount + ", lastChangedDate=" + m_lastChangedDate + ", lastChangedUserId=" + m_lastChangedUserId
           + ", lastChangedOriginNodeId=" + m_lastChangedOriginNodeId + "]";
     }
-
   }
-
 }

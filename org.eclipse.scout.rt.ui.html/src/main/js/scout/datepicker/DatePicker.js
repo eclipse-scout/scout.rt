@@ -76,10 +76,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     this.preselectedDate = null;
   }
 
-  if (!viewDate) {
-    viewDate = this.selectedDate || new Date();
-  }
-  if (this.viewDate && viewDate) {
+  viewDate = viewDate || this.selectedDate || new Date();
+  if (this.viewDate) {
     viewDateDiff = scout.dates.compareMonths(viewDate, this.viewDate);
   }
   this.viewDate = viewDate;

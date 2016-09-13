@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 
 @Bean
-public abstract class AbstractFormData extends AbstractContributionComposite implements Serializable, Cloneable, IPropertyHolder {
+public abstract class AbstractFormData extends AbstractContributionComposite implements Serializable, IPropertyHolder {
   public static final char FIELD_PATH_DELIM = '/';
   private static final long serialVersionUID = 1L;
 
@@ -360,13 +360,12 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
     return candidate;
   }
 
-  @Override
-  public Object clone() {
+  public AbstractFormData deepCopy() {
     try {
       return CloneUtility.createDeepCopyBySerializing(this);
     }
     catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException("Could not create deep copy", e);
     }
   }
 

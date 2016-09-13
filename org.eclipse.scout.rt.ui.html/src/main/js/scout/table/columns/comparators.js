@@ -108,9 +108,7 @@ scout.comparators = {
       if (!found1) {
         return -1;
       }
-      if (!found2) {
-        return 1;
-      }
+      return 1;
     }
   }
 

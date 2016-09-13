@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 /**
  * Use the {@link TokenBasedSearchFilterService} on the client side to use this class
  */
-public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
+public class TokenBasedSearchFilter extends SearchFilter {
   private static final long serialVersionUID = 0L;
 
   private ArrayList<ValueToken> m_valueTokens;
@@ -27,9 +27,16 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
   private ArrayList<AndNodeToken> m_treeTokens;
 
   public TokenBasedSearchFilter() {
-    m_valueTokens = new ArrayList<ValueToken>(1);
-    m_wildcardStringTokens = new ArrayList<WildcardStringToken>(1);
-    m_treeTokens = new ArrayList<AndNodeToken>(1);
+    m_valueTokens = new ArrayList<>(1);
+    m_wildcardStringTokens = new ArrayList<>(1);
+    m_treeTokens = new ArrayList<>(1);
+  }
+
+  protected TokenBasedSearchFilter(TokenBasedSearchFilter other) {
+    super(other);
+    m_valueTokens = new ArrayList<>(other.m_valueTokens);
+    m_wildcardStringTokens = new ArrayList<>(other.m_wildcardStringTokens);
+    m_treeTokens = new ArrayList<>(other.m_treeTokens);
   }
 
   public void addToken(Integer tokenId, Object... values) {
@@ -74,12 +81,8 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
   }
 
   @Override
-  public Object clone() {
-    TokenBasedSearchFilter f = (TokenBasedSearchFilter) super.clone();
-    f.m_valueTokens = new ArrayList<ValueToken>(this.m_valueTokens);
-    f.m_wildcardStringTokens = new ArrayList<WildcardStringToken>(this.m_wildcardStringTokens);
-    f.m_treeTokens = new ArrayList<AndNodeToken>(this.m_treeTokens);
-    return f;
+  public TokenBasedSearchFilter copy() {
+    return new TokenBasedSearchFilter(this);
   }
 
   public static class ValueToken implements Serializable {
@@ -194,5 +197,4 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
       return m_tokenId;
     }
   }
-
 }

@@ -543,7 +543,7 @@ $.fn.setVisible = function(visible) {
   var i, elem;
   for (i = 0; i < this.length; i++) {
     elem = this[i];
-    if (elemVisible(elem) != visible) {
+    if (elemVisible(elem) !== visible) {
       if (visible) {
         this.show();
       } else {
@@ -1228,12 +1228,12 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
   return this.each(function() {
     var that = this,
       numClicks = 0,
-      timeout = timeout || 300;
+      timeout = scout.nvl(timeout, 300);
     $(this).on('click', function(event) {
       numClicks++;
-      if (numClicks == 1) {
+      if (numClicks === 1) {
         setTimeout(function() {
-          if (numClicks == 1) {
+          if (numClicks === 1) {
             singleClickFunc.call(that, event);
           } else {
             doubleClickFunc.call(that, event);

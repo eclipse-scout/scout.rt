@@ -86,8 +86,6 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
         var viewWidth = bounds.width,
           delta = bounds.x - horizontalInsets, // delta used to start from x=0
-          leftMostTab = selectedTab,
-          rightMostTab = selectedTab,
           overflow = false;
 
         // when viewWidth doesn't fit into clientWidth anymore, abort always
@@ -146,7 +144,7 @@ scout.TabAreaLayout.prototype._destroyEllipsis = function() {
 };
 
 scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
-  var menu, popup, localSession,
+  var menu, popup,
     overflowMenus = [],
     tabBox = this._tabBox;
   this._overflowTabs.forEach(function(tabItem) {

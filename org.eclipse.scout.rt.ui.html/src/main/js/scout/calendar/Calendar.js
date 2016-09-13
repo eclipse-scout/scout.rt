@@ -326,11 +326,11 @@ scout.Calendar.prototype._calcExactRange = function() {
  * as it contains also dates from the previous and next month.
  */
 scout.Calendar.prototype._calcViewRange = function() {
-  var viewFrom = _calcViewFromDate(this._exactRange.from),
-    viewTo = _calcViewToDate(viewFrom);
+  var viewFrom = calcViewFromDate(this._exactRange.from),
+    viewTo = calcViewToDate(viewFrom);
   return new scout.DateRange(viewFrom, viewTo);
 
-  function _calcViewFromDate(fromDate) {
+  function calcViewFromDate(fromDate) {
     var i, tmpDate = new Date(fromDate.valueOf());
     for (i = 0; i < 42; i++) {
       tmpDate.setDate(tmpDate.getDate() - 1);
@@ -341,7 +341,7 @@ scout.Calendar.prototype._calcViewRange = function() {
     throw new Error('failed to calc viewFrom date');
   }
 
-  function _calcViewToDate(fromDate) {
+  function calcViewToDate(fromDate) {
     var i, tmpDate = new Date(fromDate.valueOf());
     for (i = 0; i < 42; i++) {
       tmpDate.setDate(tmpDate.getDate() + 1);
@@ -578,7 +578,6 @@ scout.Calendar.prototype.layoutYearPanel = function() {
 
 scout.Calendar.prototype.layoutLabel = function() {
   var text, $dates,
-    $selected = $('.selected', this.$grid),
     exFrom = this._exactRange.from,
     exTo = this._exactRange.to;
 
@@ -656,7 +655,6 @@ scout.Calendar.prototype.layoutAxis = function() {
 
   // day schedule
   if (!this._isMonth()) {
-    //$('.calendar-week-name', this.$container).text('');
     var $parent = $selected.parent();
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8) + '%');
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');

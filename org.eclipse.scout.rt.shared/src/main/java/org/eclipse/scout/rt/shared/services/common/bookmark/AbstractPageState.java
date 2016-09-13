@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.Serializable;
 
-public abstract class AbstractPageState implements Serializable, Cloneable {
+public abstract class AbstractPageState implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String m_bookmarkIdentifier;
@@ -62,7 +62,9 @@ public abstract class AbstractPageState implements Serializable, Cloneable {
     m_expanded = b;
   }
 
-  @Override
-  public abstract Object clone();
-
+  /**
+   * Creates a copy of this instance. The copy is basically a deep copy, but resource intensive references like byte
+   * arrays containing serialized data as well as immutable objects are shallow copied.
+   */
+  public abstract AbstractPageState copy();
 }

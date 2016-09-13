@@ -99,7 +99,6 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
 };
 
 scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
-  var $glassPane = $(event.target);
   var $animationTarget = null;
 
   if (this._element instanceof scout.Form && this._element.isView()) {

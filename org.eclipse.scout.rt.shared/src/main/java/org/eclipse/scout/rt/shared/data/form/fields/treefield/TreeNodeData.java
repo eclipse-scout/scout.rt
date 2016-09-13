@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
@@ -32,7 +33,8 @@ public class TreeNodeData implements Serializable, Cloneable {
   }
 
   @Override
-  public Object clone() {
+  @SuppressWarnings("squid:S2975")
+  public TreeNodeData clone() {
     try {
       TreeNodeData copy = (TreeNodeData) super.clone();
       if (this.m_childNodes != null) {
@@ -44,7 +46,7 @@ public class TreeNodeData implements Serializable, Cloneable {
       return copy;
     }
     catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
+      throw new ProcessingException("Could not clone object", e);
     }
   }
 

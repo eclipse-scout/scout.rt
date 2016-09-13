@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.Serializable;
 
-public class TableColumnState implements Serializable, Cloneable {
+public class TableColumnState implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String m_className;
@@ -91,8 +91,11 @@ public class TableColumnState implements Serializable, Cloneable {
     m_visible = visible;
   }
 
-  @Override
-  public Object clone() {
+  /**
+   * Creates a copy of this instance. The copy is basically a deep copy, but resource intensive references like byte
+   * arrays containing serialized data as well as immutable objects are shallow copied.
+   */
+  public TableColumnState copy() {
     return new TableColumnState(this);
   }
 
@@ -127,5 +130,4 @@ public class TableColumnState implements Serializable, Cloneable {
   public void setBackgroundEffect(String backgroundEffect) {
     m_backgroundEffect = backgroundEffect;
   }
-
 }

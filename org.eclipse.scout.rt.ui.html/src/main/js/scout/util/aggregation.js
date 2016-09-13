@@ -35,7 +35,6 @@ scout.aggregation = {
   },
 
   avgStep: function(currentState, newVal) {
-    var val = newVal || 0;
     if (typeof newVal === 'number') {
       currentState.sum += newVal;
       currentState.count += 1;

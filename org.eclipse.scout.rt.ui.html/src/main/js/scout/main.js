@@ -55,7 +55,7 @@ scout.assertParameter = function(parameterName, value, type) {
 };
 
 scout.isOneOf = function() {
-  if (arguments && arguments.length >= 2) {
+  if (arguments.length >= 2) {
     var value = arguments[0];
     var argsToCheck;
     if (arguments.length === 2 && Array.isArray(arguments[1])) {
@@ -242,7 +242,7 @@ scout.adapter = function(adapterId, sessionIndex) {
   } else {
     sessionIndex = sessionIndex || 0;
     for (var i = 0; i < scout.sessions.length; i++) {
-      if (scout.sessions[i].partId == sessionIndex) { // <-- compare with '==' is intentional!
+      if (scout.sessions[i].partId == sessionIndex) { // <-- compare with '==' is intentional! (NOSONAR)
         sessionIndex = i;
         break;
       }

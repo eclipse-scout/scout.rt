@@ -11,10 +11,10 @@
 scout.dragAndDrop = {
 
   SCOUT_TYPES: {
-    FILE_TRANSFER: 1 << 0 /* IDNDSupport.TYPE_FILE_TRANSFER */ ,
-    JAVA_ELEMENT_TRANSFER: 1 << 1 /* IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER */ ,
-    TEXT_TRANSFER: 1 << 2 /* IDNDSupport.TYPE_TEXT_TRANSFER */ ,
-    IMAGE_TRANSFER: 1 << 3 /* IDNDSupport.TYPE_IMAGE_TRANSFER */
+    FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
+    JAVA_ELEMENT_TRANSFER: 1 << 1, // IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER (NOSONAR)
+    TEXT_TRANSFER: 1 << 2, // IDNDSupport.TYPE_TEXT_TRANSFER (NOSONAR)
+    IMAGE_TRANSFER: 1 << 3 // IDNDSupport.TYPE_IMAGE_TRANSFER (NOSONAR)
   },
 
   /**
@@ -42,14 +42,11 @@ scout.dragAndDrop = {
   verifyDataTransferTypesScoutTypes: function(event, scoutTypeArray, fieldAllowedTypes) {
     scoutTypeArray = scout.arrays.ensure(scoutTypeArray);
     var dragTypeArray = [];
-    var dataTransfer = event.originalEvent.dataTransfer;
 
     // check if any scout type is allowed for field allowed types (or no field allowed types defined)
     if (fieldAllowedTypes !== undefined) {
-      var allowed = false;
-
       scoutTypeArray.forEach(function fieldAllowedTypesContainsElement(scoutType) {
-        if (fieldAllowedTypes & scoutType === scoutType) {
+        if (fieldAllowedTypes & scoutType === scoutType) { // NOSONAR
           scout.arrays.pushAll(dragTypeArray, this.scoutTypeToDragTypeMapping(scoutTypeArray));
         }
       }.bind(this));
@@ -167,7 +164,7 @@ scout.DragAndDropHandler.prototype._onDragEnterOrOver = function(event) {
 
 scout.DragAndDropHandler.prototype._onDrop = function(event) {
   if (this.supportedScoutTypes.indexOf(scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
-    this.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
+    this.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
     scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
     event.stopPropagation();
     event.preventDefault();

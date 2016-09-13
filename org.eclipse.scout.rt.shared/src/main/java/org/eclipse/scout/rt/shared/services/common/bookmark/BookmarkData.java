@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public class BookmarkData implements Serializable, Cloneable {
+public class BookmarkData implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private BookmarkFolder m_globalBookmarks;
@@ -25,6 +25,11 @@ public class BookmarkData implements Serializable, Cloneable {
     m_globalBookmarks.setTitle(ScoutTexts.get("GlobalBookmarks"));
     m_userBookmarks = new BookmarkFolder();
     m_userBookmarks.setTitle(ScoutTexts.get("Bookmarks"));
+  }
+
+  protected BookmarkData(BookmarkData other) {
+    m_globalBookmarks = other.m_globalBookmarks.copy();
+    m_userBookmarks = other.m_userBookmarks.copy();
   }
 
   /**
@@ -55,17 +60,11 @@ public class BookmarkData implements Serializable, Cloneable {
     }
   }
 
-  @Override
-  public Object clone() {
-    try {
-      BookmarkData f = (BookmarkData) super.clone();
-      //make deep copy of folders
-      f.m_globalBookmarks = (BookmarkFolder) m_globalBookmarks.clone();
-      f.m_userBookmarks = (BookmarkFolder) m_userBookmarks.clone();
-      return f;
-    }
-    catch (CloneNotSupportedException e) {
-      throw new UnsupportedOperationException(e);
-    }
+  /**
+   * Creates a copy of this instance. The copy is basically a deep copy, but resource intensive references like byte
+   * arrays containing serialized data as well as immutable objects are shallow copied.
+   */
+  public BookmarkData copy() {
+    return new BookmarkData(this);
   }
 }

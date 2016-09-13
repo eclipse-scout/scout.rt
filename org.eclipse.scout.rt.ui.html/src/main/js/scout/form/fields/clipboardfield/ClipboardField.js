@@ -310,7 +310,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           var mimeType = srcDataMatch && srcDataMatch[1];
           if (scout.isOneOf(mimeType, scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF)) {
             var encData = window.atob(srcDataMatch[2]); // base64 decode
-            var byteNumbers = new Array(encData.length);
+            var byteNumbers = [];
             for (var i = 0; i < encData.length; i++) {
               byteNumbers[i] = encData.charCodeAt(i);
             }

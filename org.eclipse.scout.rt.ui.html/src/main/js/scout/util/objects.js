@@ -52,7 +52,6 @@ scout.objects = {
    * Properties that already exist on dest are NOT overwritten.
    */
   extractProperties: function(source, dest, properties) {
-    var destProperty;
     properties.forEach(function(propertyName) {
       if (!dest[propertyName]) {
         dest[propertyName] = source[propertyName];

@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 
-public class TablePageState extends AbstractPageState implements Serializable, Cloneable {
+public class TablePageState extends AbstractPageState implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private CompositeObject m_expandedChildPrimaryKey;
@@ -160,8 +160,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   }
 
   @Override
-  public Object clone() {
+  public TablePageState copy() {
     return new TablePageState(this);
   }
-
 }

@@ -254,7 +254,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       if (filter.isCompleted() || !isSearchRequired()) {
         // create a copy of the filter, just in case the subprocess is modifying
         // or extending the filter
-        filter = (SearchFilter) filter.clone();
+        filter = filter.copy();
         interceptLoadData(filter);
       }
     }

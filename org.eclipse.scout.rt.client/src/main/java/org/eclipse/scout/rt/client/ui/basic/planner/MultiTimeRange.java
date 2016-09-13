@@ -29,10 +29,18 @@ import org.slf4j.LoggerFactory;
  * @since 03.02.2006
  * @version 1.0
  */
-class MultiTimeRange implements Cloneable {
+class MultiTimeRange {
   private static final Logger LOG = LoggerFactory.getLogger(MultiTimeRange.class);
 
   private TreeMap<Date/* fromDate */, TimeRange> m_multipleTimeRangeMap = new TreeMap<Date, TimeRange>();
+
+  public MultiTimeRange() {
+    super();
+  }
+
+  protected MultiTimeRange(MultiTimeRange other) {
+    m_multipleTimeRangeMap = other.m_multipleTimeRangeMap;
+  }
 
   /**
    * add a time range to this timerange-collection.
@@ -237,10 +245,7 @@ class MultiTimeRange implements Cloneable {
     return (m_multipleTimeRangeMap.get(headMap.lastKey())).contains(representedDate);
   }
 
-  @Override
-  public Object clone() {
-    MultiTimeRange m = new MultiTimeRange();
-    m.m_multipleTimeRangeMap = new TreeMap<Date, TimeRange>(this.m_multipleTimeRangeMap);
-    return m;
+  public MultiTimeRange copy() {
+    return new MultiTimeRange(this);
   }
 }

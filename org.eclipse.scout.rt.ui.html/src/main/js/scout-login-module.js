@@ -26,4 +26,4 @@
 // TODO [6.1] PBZ;CGU dependencies needed by ObjectFactory, would be nice to avoid this dependency since logingbox is not a widget
   __include("scout/widget/Widget.js");
   __include("scout/session/ModelAdapter.js");
-}(window.scout = window.scout || {}, jQuery));
+}(window.scout = window.scout || {}, jQuery)); // NOSONAR

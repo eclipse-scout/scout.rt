@@ -15,4 +15,4 @@
     __include("scout/table/TableSpecHelper.js");
     __include("scout/tree/TreeSpecHelper.js");
     __include("scout/text/LocaleSpecHelper.js");
-  }(window.scout = window.scout || {}, jQuery));
+  }(window.scout = window.scout || {}, jQuery)); // NOSONAR

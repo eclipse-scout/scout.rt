@@ -1604,7 +1604,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
  * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
  */
 scout.Table.prototype._forEachColumn = function(funcName, states, row) {
-  var value, that = this;
+  var value;
   this.columns.forEach(function(column, i) {
     if (column[funcName]) {
       if (row) {
@@ -1661,7 +1661,7 @@ scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
   for (i = 0; i < groupedColumns.length; i++) {
     col = groupedColumns[i];
     hasCellTextForGroupingFunction = col && col.cellTextForGrouping && typeof col.cellTextForGrouping === 'function';
-    newRow = newRow || (hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow));
+    newRow = newRow || (hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow)); // NOSONAR
     newRow = newRow || (!hasCellTextForGroupingFunction && this.cellText(col, row) !== this.cellText(col, nextRow));
     if (newRow) {
       return true;
@@ -2279,10 +2279,10 @@ scout.Table.prototype._renderSelection = function(rows) {
       addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && !followingRowSelected, 'select-single') +
       addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && previousRowSelected && followingRowSelected, 'select-middle');
 
-    if (classChanged && previousRowSelected && rows.indexOf(filteredRows[previousIndex]) == -1) {
+    if (classChanged && previousRowSelected && rows.indexOf(filteredRows[previousIndex]) === -1) {
       rows.push(filteredRows[previousIndex]);
     }
-    if (classChanged && followingRowSelected && rows.indexOf(filteredRows[followingIndex]) == -1) {
+    if (classChanged && followingRowSelected && rows.indexOf(filteredRows[followingIndex]) === -1) {
       rows.push(filteredRows[followingIndex]);
     }
   }
@@ -2728,8 +2728,6 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
-  var index;
-
   this.columns.forEach(function(iteratingColumn, i) {
     // Don't allow moving a column before the last column with a fixed position (checkbox col, row icon col ...)
     if (iteratingColumn.fixedPosition && newPos <= i) {

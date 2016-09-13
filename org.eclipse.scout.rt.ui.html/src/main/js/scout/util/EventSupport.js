@@ -68,7 +68,7 @@ scout.EventSupport.prototype.off = function(type, func) {
       remove = (funcMatches && typeMatches);
     } else if (func) {
       remove = funcMatches;
-    } else if (type) {
+    } else { // always type. all other cases have been checked above
       remove = typeMatches;
     }
 

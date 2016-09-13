@@ -556,8 +556,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
     displayText = this.$timeField.val(),
     prediction = this._$predictTimeField && this._$predictTimeField.val(),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
-    shiftDate = true,
-    date = null;
+    shiftDate = true;
 
   // Don't propagate shift-tab to cell editor -> shift tab should focus date field
   if (this.hasDate &&

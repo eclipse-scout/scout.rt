@@ -43,7 +43,7 @@ scout.DateFormatPatternType = {
   MILLISECOND: 'millisecond'
 };
 
-scout.DateFormat = function(locale, pattern) {
+scout.DateFormat = function(locale, pattern) { // NOSONAR
   /*jshint sub:true*/
   this.locale = locale;
   if (this.locale === undefined || this.locale === null) {

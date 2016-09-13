@@ -157,7 +157,7 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
  * size of the table/tree. After that the original width and height is restored.
  */
 scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
-  var oldDisplay, prefSize, modelSize, statusSize, activeFilterSize, filterPrefSize,
+  var oldDisplay, prefSize, modelSize, statusSize, filterPrefSize,
     pcWidth, pcHeight,
     htmlComp = this._proposalChooser.htmlComp,
     $status = this._proposalChooser.$status,

@@ -558,7 +558,7 @@ scout.TableFooter.prototype._onFilterInputDebounce = function(event) {
 
     filter.text = filterText;
     this.table.addFilter(filter);
-  } else if (!filterText) {
+  } else {
     this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
   }
 

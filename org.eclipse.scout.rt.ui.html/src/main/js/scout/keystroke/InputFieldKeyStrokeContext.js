@@ -31,7 +31,7 @@ scout.InputFieldKeyStrokeContext = function() {
     scout.keys.NUMPAD_6
   ]);
 
-  this.registerStopPropagationKeys(scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT, [
+  this.registerStopPropagationKeys(scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT, [ // NOSONAR
     scout.keys.RIGHT,
     scout.keys.BACKSPACE,
     scout.keys.LEFT,

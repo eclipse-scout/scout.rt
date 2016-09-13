@@ -53,8 +53,8 @@ scout.Calculator.prototype._expr = function() {
 //a+b+...
 scout.Calculator.prototype._sum = function() {
   var v = this._prod();
-  while (this._next() == '+' || this._next() == '-') {
-    switch (this._consumeNext()) {
+  while (this._next() === '+' || this._next() === '-') {
+    switch (this._consumeNext()) { // NOSONAR
       case '+':
         v = v + this._prod();
         break;
@@ -69,8 +69,8 @@ scout.Calculator.prototype._sum = function() {
 //a*b*...
 scout.Calculator.prototype._prod = function() {
   var v = this._unary();
-  while (this._next() == '*' || this._next() == '/') {
-    switch (this._consumeNext()) {
+  while (this._next() === '*' || this._next() === '/') {
+    switch (this._consumeNext()) { // NOSONAR
       case '*':
         v = v * this._unary();
         break;
@@ -85,9 +85,9 @@ scout.Calculator.prototype._prod = function() {
 //[+-]123, [+-](a)
 scout.Calculator.prototype._unary = function() {
   var qualifier = 1;
-  if (this._next() == '+') {
+  if (this._next() === '+') {
     this._consumeNext();
-  } else if (this._next() == '-') {
+  } else if (this._next() === '-') {
     this._consumeNext();
     qualifier = -1;
   }
@@ -102,10 +102,10 @@ scout.Calculator.prototype._unary = function() {
 
 //(a)
 scout.Calculator.prototype._group = function() {
-  if (this._next() == '(') {
+  if (this._next() === '(') {
     this._consumeNext();
     var v = this._expr();
-    if (this._next() != ')') {
+    if (this._next() !== ')') {
       throw 'missing closing bracket';
     }
     this._consumeNext();

@@ -16,7 +16,7 @@ scout.PageLayout = function(outline, page) {
 scout.inherits(scout.PageLayout, scout.AbstractLayout);
 
 scout.PageLayout.prototype.layout = function($container) {
-  var containerSize, detailMenuBarSize, formTop,
+  var containerSize, detailMenuBarSize,
     htmlContainer = this.page.htmlComp,
     $text = this.page.$node.children('.text'),
     titleHeight = 0,

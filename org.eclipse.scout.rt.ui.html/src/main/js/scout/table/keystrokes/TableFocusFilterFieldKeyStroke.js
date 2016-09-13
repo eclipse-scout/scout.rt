@@ -84,8 +84,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype.renderKeyBox = function($drawingA
   var $filterInput = event._$filterInput;
 
   var filterInputPosition = $filterInput.position();
-  var top = $filterInput.css('margin-top').replace("px", "");
-  var left = filterInputPosition.left + parseInt($filterInput.css('margin-left').replace("px", ""), 0) + 4;
+  var left = filterInputPosition.left + parseInt($filterInput.css('margin-left').replace('px', ''), 0) + 4;
   $filterInput.beforeDiv('key-box char', 'a - z').css('left', left + 'px');
   return $filterInput.parent();
 };
@@ -95,7 +94,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype._isKeyStrokeInRange = function(ev
     return true; // the event has this keystroke's 'virtual which part' in case it is rendered.
   }
 
-  if (event.altKey | event.ctrlKey) {
+  if (event.altKey | event.ctrlKey) { // NOSONAR
     return false;
   }
   return (event.which >= scout.keys.a && event.which <= scout.keys.z) ||

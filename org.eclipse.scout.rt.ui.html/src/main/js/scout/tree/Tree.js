@@ -620,7 +620,7 @@ scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
     for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
       this.maxNodeWidth = Math.max(this.visibleNodesFlat[i].width, this.maxNodeWidth);
     }
-    var width = Math.max(this.maxNodeWidth, this.$data.outerWidth());
+    var width = Math.max(this.maxNodeWidth, this.$data.outerWidth()); // TODO BSH: check if widht have to be used in next statement
     this.$data.find('.tree-node').css('width', this.maxNodeWidth);
     this.nodeWidthDirty = false;
   }
@@ -1283,7 +1283,7 @@ scout.Tree.prototype._syncDisplayStyle = function(displayStyle) {
 scout.Tree.prototype.setBreadcrumbStyleActive = function(active) {
   if (active) {
     this.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
-  } else if (!active) {
+  } else {
     this.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
   }
 };
@@ -1855,7 +1855,7 @@ scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
 };
 
 scout.Tree.prototype._expandAllParentNodes = function(node) {
-  var i, $parentNode, currNode = node,
+  var i, currNode = node,
     parentNodes = [];
 
   currNode = node;

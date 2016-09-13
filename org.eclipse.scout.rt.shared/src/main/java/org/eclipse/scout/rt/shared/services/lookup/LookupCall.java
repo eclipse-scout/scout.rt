@@ -235,8 +235,9 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   }
 
   @Override
-  public Object clone() {
-    LookupCall c = null;
+  @SuppressWarnings({"unchecked", "squid:S2975"})
+  public LookupCall<KEY_TYPE> clone() {
+    LookupCall<KEY_TYPE> c = null;
     try {
       c = (LookupCall) super.clone();
     }

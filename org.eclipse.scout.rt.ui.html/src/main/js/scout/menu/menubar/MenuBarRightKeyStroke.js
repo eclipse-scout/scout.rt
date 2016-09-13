@@ -21,7 +21,7 @@ scout.inherits(scout.MenuBarRightKeyStroke, scout.KeyStroke);
 scout.MenuBarRightKeyStroke.prototype.handle = function(event) {
   var menuItems = this.field.visibleMenuItems,
     $menuItemFocused = this.field.$container.find(':focus'),
-    i, menuItem, elementToFocus, focusNext = false;
+    i, menuItem, focusNext = false;
 
   for (i = 0; i < menuItems.length; i++) {
     menuItem = menuItems[i];

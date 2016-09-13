@@ -31,7 +31,6 @@ scout.DatePickerLayout.prototype.layout = function($container) {
     $header = $container.find('.date-picker-header'),
     $scrollable = $container.find('.date-picker-scrollable'),
     $month = $container.find('.date-picker-month'),
-    $firstDay = $month.find('.date-picker-day').first(),
     // Calculate dimensions
     htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.getSize().subtract(htmlContainer.getInsets()),

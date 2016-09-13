@@ -692,7 +692,7 @@ scout.Planner.prototype._removeAllResources = function() {
 };
 
 scout.Planner.prototype._renderResources = function(resources) {
-  var i, $resource, resource,
+  var i, resource,
     resourcesHtml = '';
 
   resources = resources || this.resources;
@@ -776,7 +776,7 @@ scout.Planner.prototype._removeActivititesForResource = function(resource) {
 };
 
 scout.Planner.prototype._buildActivityHtml = function(activity) {
-  var i, level = 100 - Math.min(activity.level * 100, 100),
+  var level = 100 - Math.min(activity.level * 100, 100),
     backgroundColor = scout.styles.modelToCssColor(activity.backgroundColor),
     foregroundColor = scout.styles.modelToCssColor(activity.foregroundColor),
     levelColor = scout.styles.modelToCssColor(activity.levelColor),

@@ -46,7 +46,7 @@ public class FormDataCloneTest {
     d.getCurrency().setValue(1000654L);
     d.getCity().setValue("berne");
     d.getPersonIdProperty().setValue(1234L);
-    d = (CompanySearchFormData) d.clone();
+    d = (CompanySearchFormData) d.deepCopy();
     //
     m_outCount = 0;
     m_inCount = 0;

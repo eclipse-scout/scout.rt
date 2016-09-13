@@ -90,7 +90,7 @@ scout.Outline.prototype._filterMenus = function(menus, destination, onlyVisible,
  * @override Tree.js
  */
 scout.Outline.prototype._initTreeKeyStrokeContext = function() {
-  var modifierBitMask = scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT;
+  var modifierBitMask = scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT; // NOSONAR
 
   this.keyStrokeContext.registerKeyStroke([
     new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
@@ -434,7 +434,6 @@ scout.Outline.prototype._removeNavigateButtonsForDetailForm = function(node) {
 };
 
 scout.Outline.prototype._removeNavigateButtonsForDetailTable = function(node) {
-  var menus = [];
   var staticMenus = [];
   node.detailTable.staticMenus.forEach(function(menu) {
     if (menu instanceof scout.NavigateUpButton || menu instanceof scout.NavigateDownButton) {

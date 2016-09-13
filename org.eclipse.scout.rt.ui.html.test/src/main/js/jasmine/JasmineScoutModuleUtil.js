@@ -21,7 +21,7 @@ function loadDynamicScript(modulePath) {
     moduleText += '\n//# sourceURL=' + sourceUrl;
   }
 
-  eval(moduleText);
+  eval(moduleText); // NOSONAR
 }
 
 function loadAndResolveScriptContent(path) {

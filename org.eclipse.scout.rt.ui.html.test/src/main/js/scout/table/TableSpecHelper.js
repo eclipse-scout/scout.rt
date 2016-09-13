@@ -253,7 +253,7 @@ scout.TableSpecHelper.prototype.assertSelection = function(table, rows) {
   $selectedRows.each(function() {
     selectedRows.push($(this).data('row'));
 
-    if ($selectedRows.length == 1) {
+    if ($selectedRows.length === 1) {
       expect($(this).hasClass('select-single')).toBeTruthy();
     }
   });

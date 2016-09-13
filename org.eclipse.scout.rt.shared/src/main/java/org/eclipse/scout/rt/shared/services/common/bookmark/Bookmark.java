@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Bookmark implements Serializable, Cloneable, IOrdered {
+public class Bookmark implements Serializable, IOrdered {
   private static final Logger LOG = LoggerFactory.getLogger(Bookmark.class);
   private static final long serialVersionUID = 1L;
 
@@ -71,7 +71,7 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
     if (bm.m_path != null) {
       this.m_path = new ArrayList<AbstractPageState>();
       for (AbstractPageState state : bm.m_path) {
-        this.m_path.add((AbstractPageState) state.clone());
+        this.m_path.add(state.copy());
       }
     }
     m_serializedData = null;
@@ -202,8 +202,11 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
     m_serializedData = data;
   }
 
-  @Override
-  public Object clone() {
+  /**
+   * Creates a copy of this instance. The copy is basically a deep copy, but resource intensive references like byte
+   * arrays containing serialized data as well as immutable objects are shallow copied.
+   */
+  public Bookmark copy() {
     return new Bookmark(this);
   }
 

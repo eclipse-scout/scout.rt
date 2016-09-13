@@ -55,13 +55,14 @@ scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
 };
 
 scout.DetachHelper.prototype._storeTooltips = function($container) {
-  var tooltips = scout.tooltips.find($container);
-  var tooltipDestroyHandler = function(event) {
+  var tooltips = scout.tooltips.find($container),
+    tooltipDestroyHandler, tooltipRenderHandler;
+  tooltipDestroyHandler = function(event) {
     // If tooltip will be destroyed, remove it from the list so that restore won't try to render it
     scout.arrays.remove(tooltips, event.source);
     event.source.off('render', tooltipRenderHandler);
   };
-  var tooltipRenderHandler = function(event) {
+  tooltipRenderHandler = function(event) {
     // If tooltip will be rendered, destroy listener is obsolete
     event.source.off('destroy', tooltipDestroyHandler);
   };

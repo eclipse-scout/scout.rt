@@ -88,8 +88,8 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
 
     // Layout filter table
     filterTableHtmlComp.setSize(new scout.Dimension(
-        filterColumnSize.width - filterColumnInsets.horizontal(),
-        filterTableContainerHeight));
+      filterColumnSize.width - filterColumnInsets.horizontal(),
+      filterTableContainerHeight));
   }
 
   // fix width of actions column, so it doesn't become wider when user
@@ -181,7 +181,7 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   }
 
   if (this.popup.hasFilterFields || this.popup.hasFilterTable) {
-    filterColumnMargins = scout.graphics.getMargins(this.popup.$columnFilters),
+    filterColumnMargins = scout.graphics.getMargins(this.popup.$columnFilters);
     rightColumnHeight += filterColumnMargins.vertical();
   }
 
@@ -206,4 +206,3 @@ scout.TableHeaderMenuLayout.prototype._getMaxWidth = function() {
 scout.TableHeaderMenuLayout.prototype._setMaxWidth = function(maxWidth) {
   this.popup.$columnActions.css('max-width', maxWidth || '');
 };
-

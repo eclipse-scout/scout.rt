@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.Serializable;
 
-public class NodePageState extends AbstractPageState implements Serializable, Cloneable {
+public class NodePageState extends AbstractPageState implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public NodePageState() {
@@ -24,7 +24,7 @@ public class NodePageState extends AbstractPageState implements Serializable, Cl
   }
 
   @Override
-  public Object clone() {
+  public NodePageState copy() {
     return new NodePageState(this);
   }
 }

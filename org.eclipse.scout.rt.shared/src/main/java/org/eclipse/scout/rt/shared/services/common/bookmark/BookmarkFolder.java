@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 
-public class BookmarkFolder implements Serializable, Cloneable {
+public class BookmarkFolder implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private long m_id;
@@ -29,6 +29,23 @@ public class BookmarkFolder implements Serializable, Cloneable {
   public BookmarkFolder() {
     m_folders = new ArrayList<BookmarkFolder>();
     m_bookmarks = new ArrayList<Bookmark>();
+  }
+
+  protected BookmarkFolder(BookmarkFolder other) {
+    m_id = other.m_id;
+    m_title = other.m_title;
+    m_iconId = other.m_iconId;
+    m_folders = new ArrayList<>();
+    for (BookmarkFolder f : other.m_folders) {
+      m_folders.add(f.copy());
+    }
+    m_bookmarks = new ArrayList<>();
+    for (Bookmark b : other.m_bookmarks) {
+      m_bookmarks.add(b.copy());
+    }
+    if (other.m_startupBookmark != null) {
+      m_startupBookmark = other.m_startupBookmark.copy();
+    }
   }
 
   public long getId() {
@@ -80,7 +97,7 @@ public class BookmarkFolder implements Serializable, Cloneable {
     else {
       for (Bookmark b : folder.getBookmarks()) {
         if (!byReference) {
-          b = (Bookmark) b.clone();
+          b = b.copy();
         }
         if (replaceDuplicates) {
           Bookmark existingBm = getBookmark(b.getTitle());
@@ -98,7 +115,7 @@ public class BookmarkFolder implements Serializable, Cloneable {
             getFolders().add(existingFolder);
           }
           else {
-            existingFolder = (BookmarkFolder) subFolder.clone();
+            existingFolder = subFolder.copy();
             getFolders().add(existingFolder);
           }
         }
@@ -148,24 +165,12 @@ public class BookmarkFolder implements Serializable, Cloneable {
     return null;
   }
 
-  @Override
-  public Object clone() {
-    try {
-      BookmarkFolder f = (BookmarkFolder) super.clone();
-      //make deep copy of lists
-      f.m_folders = new ArrayList<BookmarkFolder>();
-      for (BookmarkFolder x : this.m_folders) {
-        f.m_folders.add((BookmarkFolder) x.clone());
-      }
-      f.m_bookmarks = new ArrayList<Bookmark>();
-      for (Bookmark x : this.m_bookmarks) {
-        f.m_bookmarks.add((Bookmark) x.clone());
-      }
-      return f;
-    }
-    catch (CloneNotSupportedException e) {
-      throw new UnsupportedOperationException(e);
-    }
+  /**
+   * Creates a copy of this instance. The copy is basically a deep copy, but resource intensive references like byte
+   * arrays containing serialized data as well as immutable objects are shallow copied.
+   */
+  public BookmarkFolder copy() {
+    return new BookmarkFolder(this);
   }
 
   /**

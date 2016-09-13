@@ -23,8 +23,7 @@ scout.DateFieldAdapter.prototype._initProperties = function(model) {
 };
 
 scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
-  var invalidTime, invalidDate,
-    widgetErrorStatus = this.widget.errorStatus;
+  var widgetErrorStatus = this.widget.errorStatus;
 
   // copy UI only properties to error status from server
   if (errorStatus && widgetErrorStatus) {
