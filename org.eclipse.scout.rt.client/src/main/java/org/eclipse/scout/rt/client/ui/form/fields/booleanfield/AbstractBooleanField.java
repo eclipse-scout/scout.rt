@@ -90,10 +90,10 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   @Override
   public void toggleValue() {
     if (isTristateEnabled()) {
-      if (getValue() == Boolean.FALSE) {
+      if (Boolean.FALSE.equals(getValue())) {
         setValue(true);
       }
-      else if (getValue() == Boolean.TRUE) {
+      else if (Boolean.TRUE.equals(getValue())) {
         setValue(null);
       }
       else {
@@ -101,7 +101,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
       }
     }
     else {
-      if (getValue() == Boolean.FALSE) {
+      if (Boolean.FALSE.equals(getValue())) {
         setValue(true);
       }
       else {
