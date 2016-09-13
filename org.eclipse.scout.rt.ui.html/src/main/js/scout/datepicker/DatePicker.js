@@ -241,19 +241,19 @@ scout.DatePicker.prototype._findNextAllowedDate = function(years, months, days) 
 };
 
 scout.DatePicker.prototype._build$DateBox = function() {
-  var cl, i, now = new Date();
-  var day, dayEnabled, dayInMonth, $day;
-  var weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
-  var start = new Date(this.viewDate);
+  var cl, i, day, dayEnabled, dayInMonth, $day,
+    now = new Date(),
+    start = new Date(this.viewDate),
+    weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
 
   var $box = this.$container
     .makeDiv('date-picker-month')
     .data('viewDate', this.viewDate);
 
   // Create weekday header
-  for (i in weekdays) {
-    $box.appendDiv('date-picker-weekday', weekdays[i]);
-  }
+  weekdays.forEach(function(weekday) {
+    $box.appendDiv('date-picker-weekday', weekday);
+  });
 
   // Find start date (-1)
   for (var offset = 0; offset < 42; offset++) {

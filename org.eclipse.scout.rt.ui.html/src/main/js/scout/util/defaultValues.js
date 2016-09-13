@@ -41,11 +41,11 @@ scout.defaultValues = {
     this._generateObjectTypeHierarchyRec(objectTypeHierarchy, undefined, this._objectTypeHierarchyFlat);
 
     // For all object types in the defaults that don't have a hierarchy yet, add a dummy hierarchy with one element
-    for (var objectType in this._defaults) {
+    Object.keys(this._defaults).forEach(function(objectType) {
       if (!this._objectTypeHierarchyFlat[objectType]) {
         this._objectTypeHierarchyFlat[objectType] = [objectType];
       }
-    }
+    }, this);
   },
 
   _generateObjectTypeHierarchyRec: function(json, currentParentObjectTypes, targetMap) {
@@ -55,7 +55,7 @@ scout.defaultValues = {
     if (!targetMap) {
       throw new Error('Argument \'targetMap\' must not be null');
     }
-    for (var objectType in json) {
+    Object.keys(json).forEach(function(objectType) {
       var newCurrentParentObjectTypes = [objectType];
       if (currentParentObjectTypes) {
         newCurrentParentObjectTypes = newCurrentParentObjectTypes.concat(currentParentObjectTypes);
@@ -70,7 +70,7 @@ scout.defaultValues = {
         throw new Error('Object type \'' + objectType + '\' has ambiguous parent object types.');
       }
       targetMap[objectType] = newCurrentParentObjectTypes;
-    }
+    }, this);
   },
 
   /**
@@ -114,7 +114,7 @@ scout.defaultValues = {
     if (object === undefined || defaults === undefined) {
       return;
     }
-    for (var prop in defaults) {
+    Object.keys(defaults).forEach(function(prop) {
       // Support for "pseudo" default values: If a property name in the default values definition
       // starts with a "~" character, the defined object will _not_ be applied as a default value
       // for a non-existing property, but inner properties of that object will be applied to an
@@ -142,7 +142,7 @@ scout.defaultValues = {
           }
         }
       }
-    }
+    }, this);
   }
 
 };

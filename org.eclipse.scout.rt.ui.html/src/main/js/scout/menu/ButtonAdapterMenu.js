@@ -59,7 +59,7 @@ scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
     changedProperties[prop] = event.newProperties[prop];
   });
   changedProperties = scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties);
-  for (var prop in changedProperties) {
+  for (var prop in changedProperties) { // NOSONAR
     this.setProperty(prop, changedProperties[prop]);
   }
 };

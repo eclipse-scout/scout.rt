@@ -52,7 +52,7 @@ scout.TableControlAdapterMenu.prototype._onTableControlPropertyChange = function
     changedProperties[prop] = event.newProperties[prop];
   });
   changedProperties = scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
-  for (var prop in changedProperties) {
+  for (var prop in changedProperties) { // NOSONAR
     this.setProperty(prop, changedProperties[prop]);
   }
 };

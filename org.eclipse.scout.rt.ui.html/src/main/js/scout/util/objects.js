@@ -227,10 +227,16 @@ scout.objects = {
     var result2 = ['Different argument names:'];
 
     for (var prop in scout) {
+      if (!scout.hasOwnProperty(prop)) {
+        continue;
+      }
       var o = scout[prop];
       // Only check functions that have a "parent"
       if (typeof o === 'function' && o.parent) {
         for (var name in o.prototype) {
+          if (!o.prototype.hasOwnProperty(name)) {
+            continue;
+          }
           var fn = o.prototype[name];
           // Ignore constructor, inherited properties and non-functions
           if (name === 'constructor' || !o.prototype.hasOwnProperty(name) || typeof fn !== 'function') {
@@ -308,9 +314,15 @@ scout.objects = {
 
     function getPrototypeOwner(fx) {
       for (var prop in scout) {
+        if (!scout.hasOwnProperty(prop)) {
+          continue;
+        }
         var o = scout[prop];
         if (typeof o === 'function') {
           for (var name in o.prototype) {
+            if (!o.prototype.hasOwnProperty(name)) {
+              continue;
+            }
             var fn = o.prototype[name];
             // Ignore constructor, inherited properties and non-functions
             if (name === 'constructor' || !o.prototype.hasOwnProperty(name) || typeof fn !== 'function') {

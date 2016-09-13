@@ -2545,7 +2545,7 @@ scout.Table.prototype._rowsFiltered = function(hiddenRows) {
 };
 
 scout.Table.prototype._rowAcceptedByFilters = function(row) {
-  for (var key in this._filterMap) {
+  for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
     if (!filter.accept(row)) {
       return false;
@@ -2609,7 +2609,7 @@ scout.Table.prototype._applyFilters = function(rows) {
  */
 scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
-  for (var key in this._filterMap) {
+  for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
     filteredBy.push(filter.createLabel());
   }
@@ -2618,7 +2618,7 @@ scout.Table.prototype.filteredBy = function() {
 
 scout.Table.prototype.resetFilter = function() {
   // remove filters
-  for (var key in this._filterMap) {
+  for (var key in this._filterMap) { // NOSONAR
     this.removeFilterByKey(key);
   }
   this._filterMap = {};
@@ -2988,7 +2988,7 @@ scout.Table.prototype._syncKeyStrokes = function(keyStrokes) {
 };
 
 scout.Table.prototype.setFilters = function(filters) {
-  for (var key in this._filterMap) {
+  for (var key in this._filterMap) { // NOSONAR
     this.removeFilterByKey(key);
   }
   if (filters) {

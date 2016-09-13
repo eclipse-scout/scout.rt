@@ -355,16 +355,15 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
 };
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
-  for (var propertyName in newProperties) {
+  Object.keys(newProperties).forEach(function(propertyName) {
     var value = newProperties[propertyName];
-
     var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName);
     if (this[syncFuncName]) {
       this[syncFuncName](value);
     } else {
       this.widget.callSetter(propertyName, value);
     }
-  }
+  }, this);
 };
 
 /**

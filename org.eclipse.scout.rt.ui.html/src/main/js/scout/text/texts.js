@@ -20,17 +20,16 @@ scout.texts = {
   },
 
   init: function(model) {
-    var textMap, languageTag;
-    for (languageTag in model) {
-      textMap = model[languageTag];
-      this.put(languageTag, new scout.TextMap(textMap));
-    }
-    for (languageTag in model) {
+    var languageTags = Object.keys(model);
+    languageTags.forEach(function(languageTag) {
+      this.put(languageTag, new scout.TextMap(model[languageTag]));
+    }, this);
+    languageTags.forEach(function(languageTag) {
       this.link(languageTag);
-    }
+    }, this);
   },
 
-  /**¨
+  /**
    * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default)
    */
   link: function(languageTag) {
