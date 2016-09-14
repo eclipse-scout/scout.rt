@@ -92,10 +92,10 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
     return;
   }
 
-  var userSelect = $element.css('user-select'),
-    selectableElements =
-      'div:not(.desktop),[tabindex]:not([tabindex=-1]),radio,a[href],area[href],input:not([disabled]),' +
-      'select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
+  var userSelect = $element.css('user-select');
+  var selectableElements =
+    'div:not(.desktop),[tabindex]:not([tabindex=-1]),radio,a[href],area[href],input:not([disabled]),' +
+    'select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
 
   // other fixes (NBU)
   if ($element.not(selectableElements).length === 0) {
@@ -104,7 +104,7 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
 
   if ($element.closest('[contenteditable="true"]').length === 0 &&
     ((userSelect && userSelect === 'none') ||
-    (!userSelect && $element.closest('div').not('[unselectable="on"]').length === 0)) /* IE 9 has no user-select */) {
+      (!userSelect && $element.closest('div').not('[unselectable="on"]').length === 0)) /* IE 9 has no user-select */ ) {
     $elementToFocus = $element.closest(selectableElements);
     if ($elementToFocus && $elementToFocus.not('[unselectable="on"]').length > 0) {
       this.requestFocus($elementToFocus.get(0));
