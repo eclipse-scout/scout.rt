@@ -14,6 +14,7 @@ scout.BenchColumn = function() {
   this.tabBoxs = [];
   this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
   this.components;
+  this._removeViewInProgress = 0;
 
   // event listener functions
   this._viewAddedHandler = this._onViewAdded.bind(this);
@@ -236,9 +237,11 @@ scout.BenchColumn.prototype.getTabBox = function(displayViewId) {
 scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
   var tabBox = this._widgetToTabBox[view.id];
   if (tabBox) {
+    this._removeViewInProgress++;
     tabBox.removeView(view, showSiblingView);
+    this._removeViewInProgress--;
     delete this._widgetToTabBox[view.id];
-    if (this.rendered && tabBox.viewCount() === 0) {
+    if (this.rendered && tabBox.viewCount() === 0 && this._removeViewInProgress === 0) {
       // remove view area if no view is left.
       tabBox.remove();
       this._revalidateSplitters(true);

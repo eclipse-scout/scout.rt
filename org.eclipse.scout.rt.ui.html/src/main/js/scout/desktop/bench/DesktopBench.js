@@ -14,6 +14,8 @@ scout.DesktopBench = function() {
   this.columns = [];
   this.components;
   this.tabBoxMap = {}; // [key=viewId, value=SimpleTabBox instance]
+  this._removeViewInProgress = 0;
+
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
@@ -120,13 +122,11 @@ scout.DesktopBench.prototype._renderColumn = function(column) {
 };
 
 scout.DesktopBench.prototype._remove = function() {
-
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopBench.parent.prototype._remove.call(this);
-
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {
@@ -550,10 +550,12 @@ scout.DesktopBench.prototype._getColumn = function(displayViewId) {
 scout.DesktopBench.prototype.removeView = function(view, showSiblingView) {
   var column = this.tabBoxMap[view.id];
   if (column) {
+    this._removeViewInProgress++;
     column.removeView(view, showSiblingView);
+    this._removeViewInProgress--;
     delete this.tabBoxMap[view.id];
     // remove if empty
-    if (this.rendered && column.viewCount() === 0) {
+    if (this.rendered && column.viewCount() === 0 && this._removeViewInProgress === 0) {
       column.remove();
       this._revalidateSplitters(true);
       this.htmlComp.invalidateLayoutTree();
