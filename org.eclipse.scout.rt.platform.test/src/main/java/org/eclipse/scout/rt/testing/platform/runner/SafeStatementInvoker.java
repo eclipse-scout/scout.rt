@@ -44,6 +44,7 @@ public class SafeStatementInvoker implements IRunnable {
   /**
    * Throws the {@link Throwable} if catched during execution.
    */
+  @SuppressWarnings("squid:S00112")
   public void throwOnError() throws Throwable {
     if (m_throwable != null) {
       throw m_throwable;

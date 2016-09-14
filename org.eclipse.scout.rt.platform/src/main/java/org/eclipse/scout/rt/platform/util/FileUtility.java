@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.platform.resource.MimeType;
  * @author BSI AG
  * @since 1.0
  */
+@SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public final class FileUtility {
   private static final int KILO_BYTE = 1024;
 

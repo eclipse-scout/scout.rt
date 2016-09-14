@@ -62,6 +62,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
   /**
    * Method invoked to delegate the HTTP request to the 'diagnostic service'.
    */
+  @SuppressWarnings("squid:S00112")
   protected void invokeDiagnosticService(final ServerRunContext serverRunContext) throws Exception {
     serverRunContext.run(new IRunnable() {
 

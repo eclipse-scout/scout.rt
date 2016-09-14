@@ -69,6 +69,7 @@ public final class BinaryResource implements Serializable {
    *          default 0
    */
   // explicitly package private, only called by BinaryResources and second constructor
+  @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified, boolean cachingAllowed, int cacheMaxAge) {
     m_filename = filename;
     if (contentType == null) {

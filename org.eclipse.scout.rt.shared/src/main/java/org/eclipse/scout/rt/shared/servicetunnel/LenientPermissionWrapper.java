@@ -69,6 +69,7 @@ public class LenientPermissionWrapper implements Serializable {
     out.writeFields();
   }
 
+  @SuppressWarnings("squid:S1181")
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     //no call to defaultReadObject
     try {

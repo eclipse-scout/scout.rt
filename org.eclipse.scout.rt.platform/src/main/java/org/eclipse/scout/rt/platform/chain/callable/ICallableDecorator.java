@@ -31,6 +31,7 @@ public interface ICallableDecorator extends IChainable {
    * @throws Exception
    *           throw exception to stop chain processing. The exception is propagated to the caller.
    */
+  @SuppressWarnings("squid:S00112")
   IUndecorator decorate() throws Exception;
 
   /**

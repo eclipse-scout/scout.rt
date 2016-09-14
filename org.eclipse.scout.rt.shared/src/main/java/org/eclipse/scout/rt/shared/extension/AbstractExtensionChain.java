@@ -121,17 +121,18 @@ public abstract class AbstractExtensionChain<EXTENSION> {
         methodInvocation.callMethod(nextExtension);
         methodState.setReturnValue(methodInvocation.getReturnValue());
       }
+      catch (RuntimeException e) {
+        methodInvocation.setException(e);
+        methodState.setException(e);
+        throw e;
+      }
       catch (Exception e) {
         methodInvocation.setException(e);
         methodState.setException(e);
-        if (e instanceof RuntimeException) {
-          throw (RuntimeException) e;
-        }
       }
       finally {
         previous();
       }
-
     }
     else {
       throw new IllegalStateException("No more elements in chain.");
@@ -142,7 +143,7 @@ public abstract class AbstractExtensionChain<EXTENSION> {
     private Exception m_exception;
     private RETURN_VALUE m_returnValue;
 
-    protected abstract void callMethod(EXTENSION next) throws Exception;
+    protected abstract void callMethod(EXTENSION next);
 
     public void setException(Exception exception) {
       m_exception = exception;

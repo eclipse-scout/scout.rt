@@ -22,5 +22,6 @@ public interface IRunnable {
   /**
    * Computes a result, or throws an exception if unable to do so.
    */
+  @SuppressWarnings("squid:S00112")
   void run() throws Exception;
 }

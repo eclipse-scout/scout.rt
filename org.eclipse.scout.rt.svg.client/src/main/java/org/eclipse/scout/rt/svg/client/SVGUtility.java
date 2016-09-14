@@ -74,7 +74,7 @@ public final class SVGUtility {
     /**
      * @return true to continue visiting, false to stop
      */
-    boolean visit(Node node) throws Exception;
+    boolean visit(Node node);
   }
 
   private SVGUtility() {
@@ -178,14 +178,14 @@ public final class SVGUtility {
   /**
    * @return true if whole tree was visited, false if a {@link INodeVisitor#visit(Node)} returned false
    */
-  public static boolean visitDocument(Document doc, INodeVisitor v) throws Exception {
+  public static boolean visitDocument(Document doc, INodeVisitor v) {
     return visitNode(doc.getDocumentElement(), v);
   }
 
   /**
    * @return true if whole sub-tree was visited, false if a {@link INodeVisitor#visit(Node)} returned false
    */
-  public static boolean visitNode(Node parent, INodeVisitor v) throws Exception {
+  public static boolean visitNode(Node parent, INodeVisitor v) {
     NodeList nl = parent.getChildNodes();
     boolean b;
     for (int i = 0; i < nl.getLength(); i++) {

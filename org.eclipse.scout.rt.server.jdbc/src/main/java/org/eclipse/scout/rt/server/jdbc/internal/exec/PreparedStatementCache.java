@@ -74,7 +74,7 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
       try {
         ps.close();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
       }
     }
   }
@@ -105,7 +105,7 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
       try {
         cs.close();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
       }
     }
   }

@@ -12,6 +12,7 @@ package org.eclipse.scout.jaxws.apt.internal;
 
 import static java.lang.String.format;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -25,6 +26,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.jws.HandlerChain;
 import javax.tools.StandardLocation;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
@@ -43,6 +45,7 @@ import org.w3c.dom.Node;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
+import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -83,7 +86,7 @@ public class HandlerArtifactProcessor {
         handlers.add(handlerDelegateQualifiedName);
       }
       catch (final Exception e) {
-        throw new RuntimeException(
+        throw new JaxWsProcessorException(
             format("Failed to generate handler delegate [handler=%s, portTypeDefinition=%s, endpointInterface=%s]", handlerDefinition.getHandlerQualifiedName(), portTypeEntryPointDefinition.getQualifiedName(), endpointInterface),
             e);
       }
@@ -118,7 +121,7 @@ public class HandlerArtifactProcessor {
         handlers.add(order, authHandlerQualifiedName);
       }
       catch (final Exception e) {
-        throw new RuntimeException(format("Failed to generate AuthHandler [portTypeDefinition=%s, endpointInterface=%s]", portTypeEntryPointDefinition.getQualifiedName(), endpointInterface), e);
+        throw new JaxWsProcessorException(format("Failed to generate AuthHandler [portTypeDefinition=%s, endpointInterface=%s]", portTypeEntryPointDefinition.getQualifiedName(), endpointInterface), e);
       }
     }
 
@@ -133,14 +136,14 @@ public class HandlerArtifactProcessor {
       return handlerChainFile;
     }
     catch (final Exception e) {
-      throw new RuntimeException(format("Failed to generate handler chain XML-file [portTypeDefinition=%s, endpointInterface=%s]", portTypeEntryPointDefinition.getQualifiedName(), endpointInterface), e);
+      throw new JaxWsProcessorException(format("Failed to generate handler chain XML-file [portTypeDefinition=%s, endpointInterface=%s]", portTypeEntryPointDefinition.getQualifiedName(), endpointInterface), e);
     }
   }
 
   /**
    * Generates the AuthHandler.
    */
-  public String createAndPersistAuthHandler(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final ProcessingEnvironment processingEnv) throws Exception {
+  public String createAndPersistAuthHandler(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final ProcessingEnvironment processingEnv) throws IOException, JClassAlreadyExistsException {
     final JCodeModel model = new JCodeModel();
 
     final String fullName = entryPointDefinition.getEntryPointQualifiedName() + "_" + AUTH_HANDLER_NAME;
@@ -168,7 +171,8 @@ public class HandlerArtifactProcessor {
   /**
    * Generates the entry point for a handler.
    */
-  public String createAndPersistHandlerDelegate(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final HandlerDefinition handler, final int idx, final ProcessingEnvironment env) throws Exception {
+  public String createAndPersistHandlerDelegate(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final HandlerDefinition handler, final int idx, final ProcessingEnvironment env)
+      throws IOException, JClassAlreadyExistsException {
     final JCodeModel model = new JCodeModel();
 
     final String fullName = entryPointDefinition.getEntryPointQualifiedName() + "_" + handler.getHandlerSimpleName() + HANDLER_SUFFIX;
@@ -205,7 +209,7 @@ public class HandlerArtifactProcessor {
     return handlerDelegate.fullName();
   }
 
-  protected String createAndPersistHandlerXmlFile(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final List<String> handlers, final Filer filer) throws Exception {
+  protected String createAndPersistHandlerXmlFile(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final List<String> handlers, final Filer filer) throws ParserConfigurationException, IOException {
     final DocumentBuilder builder = XmlUtility.newDocumentBuilder();
 
     // Create the comment.

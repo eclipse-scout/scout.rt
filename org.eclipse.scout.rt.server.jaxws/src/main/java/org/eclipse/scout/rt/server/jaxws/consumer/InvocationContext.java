@@ -341,6 +341,7 @@ public class InvocationContext<PORT> {
      * Invokes the webservice method in a separate, blocking job to support cancellation of the request. Thereby, the
      * job is run in the calling {@link RunContext} on behalf of the current transaction.
      */
+    @SuppressWarnings("squid:S00112")
     protected Object invokeCancellableWebMethod(final Object port, final Method method, final Object[] args) throws Throwable {
       final Holder<Object> wsResult = new Holder<>();
       final Holder<Throwable> wsError = new Holder<>();

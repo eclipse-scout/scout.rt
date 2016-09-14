@@ -27,7 +27,7 @@ public final class ReflectionUtility {
   private ReflectionUtility() {
   }
 
-  public static void removeFinalFlagOnField(Field f) throws Exception {
+  public static void removeFinalFlagOnField(Field f) throws NoSuchFieldException, IllegalAccessException {
     Field reflectedModifier = Field.class.getDeclaredField("modifiers");
     reflectedModifier.setAccessible(true);
     int modifiers = (Integer) reflectedModifier.get(f);
@@ -36,7 +36,7 @@ public final class ReflectionUtility {
     reflectedModifier.setAccessible(false);
   }
 
-  public static void setFinalFlagOnField(Field f) throws Exception {
+  public static void setFinalFlagOnField(Field f) throws NoSuchFieldException, IllegalAccessException {
     Field reflectedModifier = Field.class.getDeclaredField("modifiers");
     reflectedModifier.setAccessible(true);
     int modifiers = (Integer) reflectedModifier.get(f);

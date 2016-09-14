@@ -110,7 +110,7 @@ public final class SandboxClassLoaderBuilder {
         jar.finish();
       }
     }
-    catch (Exception e) {
+    catch (IOException e) {
       throw new PlatformException("Cannot create jar for {}", Arrays.toString(classNames), e);
     }
     URL jarUrl = createTemporaryJar(newJarFileName, jarData.toByteArray());

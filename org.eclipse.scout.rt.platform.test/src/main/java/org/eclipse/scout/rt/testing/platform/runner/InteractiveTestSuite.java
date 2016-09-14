@@ -30,7 +30,7 @@ public class InteractiveTestSuite extends Runner {
   private final Class<?> m_annotatedClass;
   private final RunnerBuilder m_builder;
 
-  public InteractiveTestSuite(Class<?> klass, RunnerBuilder builder) throws Throwable {
+  public InteractiveTestSuite(Class<?> klass, RunnerBuilder builder) {
     m_annotatedClass = klass;
     m_builder = builder;
   }
@@ -41,6 +41,7 @@ public class InteractiveTestSuite extends Runner {
   }
 
   @Override
+  @SuppressWarnings("squid:S1181")
   public void run(final RunNotifier notifier) {
     System.out.println("Started interactive test console. (Auto-closing in 30 seconds when no input is entered, assuming it is a ci-test-run)");
     String lastLine = "";
@@ -70,7 +71,7 @@ public class InteractiveTestSuite extends Runner {
         try {
           runMethod = m_annotatedClass.getMethod("run", Runner.class, RunNotifier.class);
         }
-        catch (Throwable t) { // NOSONAR
+        catch (Throwable t) {
           runMethod = InteractiveTestSuite.class.getMethod("run", Runner.class, RunNotifier.class);
         }
         Class<?> testClass = Class.forName(line, true, m_annotatedClass.getClassLoader());
@@ -88,7 +89,7 @@ public class InteractiveTestSuite extends Runner {
     }
   }
 
-  public static void run(Runner runner, RunNotifier notifier) throws Exception {
+  public static void run(Runner runner, RunNotifier notifier) {
     RunListenerImpl listener = new RunListenerImpl();
     try {
       notifier.addListener(listener);

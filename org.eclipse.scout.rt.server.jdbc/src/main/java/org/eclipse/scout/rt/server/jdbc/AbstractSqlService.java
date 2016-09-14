@@ -296,7 +296,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   @ConfigOperation
   @Order(10)
-  protected void execTestConnection(Connection conn) throws Throwable {
+  protected void execTestConnection(Connection conn) throws SQLException {
     ISqlStyle s = getSqlStyle();
     if (s != null) {
       s.testConnection(conn);
@@ -544,6 +544,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     return conn;
   }
 
+  @SuppressWarnings("squid:S1193")
   private Connection leaseConnectionInternal() {
     try {
       if (isDirectJdbcConnection()) {
@@ -579,7 +580,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     }
   }
 
-  private void releaseConnectionInternal(Connection conn) throws Throwable {
+  private void releaseConnectionInternal(Connection conn) throws SQLException {
     if (isDirectJdbcConnection()) {
       // delegate to internal pool
       getSqlConnectionPool().releaseConnection(conn);

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 5.1
  */
+@SuppressWarnings("squid:S1181")
 public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProtocol {
 
   private static final Logger LOG = LoggerFactory.getLogger(TwoPhaseTransactionCommitProtocol.class);

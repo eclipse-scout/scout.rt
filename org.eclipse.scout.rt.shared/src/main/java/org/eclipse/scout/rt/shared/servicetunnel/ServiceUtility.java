@@ -46,6 +46,7 @@ public class ServiceUtility {
    *           if the service invocation failed. Hence, runtime exceptions are propagated, any other exception is
    *           translated into {@link PlatformException}.
    */
+  @SuppressWarnings("squid:S1181")
   public Object invoke(final Object service, final Method operation, final Object[] args) {
     Assertions.assertNotNull(service, "service is null");
     Assertions.assertNotNull(operation, "operation is null");

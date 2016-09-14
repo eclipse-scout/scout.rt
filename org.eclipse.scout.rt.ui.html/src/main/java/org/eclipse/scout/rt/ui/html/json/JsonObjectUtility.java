@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -250,7 +251,7 @@ public final class JsonObjectUtility {
       }
       return o;
     }
-    catch (Exception e) {
+    catch (IllegalAccessException | InvocationTargetException | RuntimeException e) {
       throw new IllegalArgumentException(jbean + " to " + type, e);
     }
   }

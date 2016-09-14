@@ -51,6 +51,7 @@ public class ServiceOperationInvoker {
    * Invoke the service associated with the {@link ServiceTunnelRequest}. <br>
    * Must be called within a transaction.
    */
+  @SuppressWarnings("squid:S1193")
   public ServiceTunnelResponse invoke(final RunContext runContext, final ServiceTunnelRequest serviceReq) {
     final long t0 = System.nanoTime();
     ServiceTunnelResponse response;
@@ -63,19 +64,19 @@ public class ServiceOperationInvoker {
         }
       }, DefaultExceptionTranslator.class);
     }
-    catch (Throwable t) {
+    catch (Exception e) {
       // Associate the exception with context information about the service call.
-      if (t instanceof PlatformException) {
-        ((PlatformException) t)
+      if (e instanceof PlatformException) {
+        ((PlatformException) e)
             .withContextInfo("service.name", serviceReq.getServiceInterfaceClassName())
             .withContextInfo("service.operation", serviceReq.getOperation());
       }
 
       // Handle the exception.
-      handleException(t);
+      handleException(e);
 
       // Prepare ServiceTunnelResponse.
-      response = new ServiceTunnelResponse(interceptException(t));
+      response = new ServiceTunnelResponse(interceptException(e));
     }
 
     response.setProcessingDuration(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0));
@@ -83,7 +84,7 @@ public class ServiceOperationInvoker {
     return response;
   }
 
-  protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws Exception {
+  protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws ClassNotFoundException {
     IServerSession serverSession = ServerSessionProvider.currentSession();
     if (LOG.isDebugEnabled()) {
       String userId = serverSession != null ? serverSession.getUserId() : "";
@@ -113,20 +114,20 @@ public class ServiceOperationInvoker {
       try {
         callInspector.update();
       }
-      catch (Throwable t) {
-        LOG.warn("Could not update call inspector", t);
+      catch (RuntimeException e) {
+        LOG.warn("Could not update call inspector", e);
       }
       try {
         callInspector.close(serviceRes);
       }
-      catch (Throwable t) {
-        LOG.warn("Could not close service invocation on call inspector", t);
+      catch (RuntimeException e) {
+        LOG.warn("Could not close service invocation on call inspector", e);
       }
       try {
         callInspector.getSessionInspector().update();
       }
-      catch (Throwable t) {
-        LOG.warn("Could not update session inspector", t);
+      catch (RuntimeException e) {
+        LOG.warn("Could not update session inspector", e);
       }
     }
   }

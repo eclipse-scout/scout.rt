@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public final class IOUtility {
   private static final Logger LOG = LoggerFactory.getLogger(IOUtility.class);
 

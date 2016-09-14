@@ -19,6 +19,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+
 /**
  * @since 5.1
  */
@@ -69,7 +71,7 @@ public final class HexUtility {
       h.close();
     }
     catch (IOException e) {
-      throw new RuntimeException("Unexpected behaviour", e);
+      throw new ProcessingException("Unexpected behaviour", e);
     }
     return out.toString();
   }
@@ -98,7 +100,7 @@ public final class HexUtility {
       out.close();
     }
     catch (IOException e) {
-      throw new RuntimeException("Unexpected behaviour", e);
+      throw new ProcessingException("Unexpected behaviour", e);
     }
     return out.toByteArray();
   }

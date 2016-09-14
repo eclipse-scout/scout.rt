@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.security;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -228,15 +225,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
     }
 
     protected byte[] toBytes(final char[] password) {
-      try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-        final OutputStreamWriter writer = new OutputStreamWriter(os, CHARSET);
-        writer.write(password);
-        writer.flush();
-        return os.toByteArray();
-      }
-      catch (final IOException e) {
-        throw new RuntimeException(e);
-      }
+      return String.valueOf(password).getBytes(CHARSET);
     }
 
     @Override

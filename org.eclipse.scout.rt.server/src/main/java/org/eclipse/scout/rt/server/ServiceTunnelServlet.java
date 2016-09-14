@@ -178,6 +178,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Method invoked to delegate the HTTP request to the 'admin service'.
    */
+  @SuppressWarnings("squid:S00112")
   protected void invokeAdminService(final ServerRunContext serverRunContext) throws Exception {
     serverRunContext.run(new IRunnable() {
 

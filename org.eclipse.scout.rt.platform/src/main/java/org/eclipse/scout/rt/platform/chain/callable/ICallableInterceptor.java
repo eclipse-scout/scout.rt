@@ -39,6 +39,7 @@ public interface ICallableInterceptor<RESULT> extends IChainable {
    * @throws Exception
    *           the exception to pass along to the invoker.
    */
+  @SuppressWarnings("squid:S00112")
   RESULT intercept(Chain<RESULT> chain) throws Exception;
 
   /**

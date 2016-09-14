@@ -12,6 +12,7 @@ package org.eclipse.scout.jaxws.apt;
 
 import static java.lang.String.format;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -66,6 +67,7 @@ import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
+import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -205,7 +207,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Generates the entry point and associated artifacts for the given definition.
    */
-  protected void generateEntryPoint(final EntryPointDefinition entryPointDefinition, final RoundEnvironment roundEnv) throws Exception {
+  protected void generateEntryPoint(final EntryPointDefinition entryPointDefinition, final RoundEnvironment roundEnv) throws JClassAlreadyExistsException, ClassNotFoundException, IOException {
     final JCodeModel model = new JCodeModel();
 
     // Create EntryPoint class.

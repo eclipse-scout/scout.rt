@@ -113,6 +113,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
+  @SuppressWarnings("squid:S1181")
   public void start(PlatformStateLatch stateLatch) {
     try {
       m_platformLock.writeLock().lock();
@@ -303,6 +304,7 @@ public class PlatformImplementor implements IPlatform {
     return EnumSet.noneOf(State.class);
   }
 
+  @SuppressWarnings("squid:S1181")
   protected void fireStateEvent(State newState) {
     PlatformEvent event = new PlatformEvent(this, newState);
     try {

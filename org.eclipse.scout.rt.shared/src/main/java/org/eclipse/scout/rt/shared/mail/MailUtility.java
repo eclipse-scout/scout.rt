@@ -651,7 +651,7 @@ public final class MailUtility {
    * This patch uses reflection to eliminate this buggy mapping from the command map and adds the default text_plain
    * mapping (if available, e.g. sun jre)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "squid:S1181"})
   private static void fixMailcapCommandMap() {
     try {
       //set the com.sun.mail.handlers.text_plain to level 0 (programmatic) to prevent others from overriding in level 0

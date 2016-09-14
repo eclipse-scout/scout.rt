@@ -1052,6 +1052,7 @@ public class UiSession implements IUiSession {
    * thread is waiting, the token remains in the queue, and the next thread that polls the queue will get the token
    * immediately. If the queue is full (i.e. there is already a token in the queue), this method does nothing.
    */
+  @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   protected void signalPoller() {
     m_pollerQueue.offer(m_notificationToken);
   }

@@ -140,7 +140,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
   }
 
   @Override
-  public void writeRequest(OutputStream stream, ServiceTunnelRequest msg) throws Exception {
+  public void writeRequest(OutputStream stream, ServiceTunnelRequest msg) throws IOException {
     boolean debugEnabled = LOG.isDebugEnabled();
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
@@ -187,7 +187,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
   }
 
   @Override
-  public void writeResponse(OutputStream stream, ServiceTunnelResponse msg) throws Exception {
+  public void writeResponse(OutputStream stream, ServiceTunnelResponse msg) throws IOException {
     boolean debugEnabled = LOG.isDebugEnabled();
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
@@ -275,17 +275,17 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
   }
 
   @Override
-  public ServiceTunnelRequest readRequest(InputStream in) throws Exception {
+  public ServiceTunnelRequest readRequest(InputStream in) throws IOException, ClassNotFoundException {
     return (ServiceTunnelRequest) read(in);
   }
 
   @Override
-  public ServiceTunnelResponse readResponse(InputStream in) throws Exception {
+  public ServiceTunnelResponse readResponse(InputStream in) throws IOException, ClassNotFoundException {
     return (ServiceTunnelResponse) read(in);
   }
 
   @SuppressWarnings("resource")
-  protected Object/* msg */ read(InputStream in) throws Exception {
+  protected Object/* msg */ read(InputStream in) throws IOException, ClassNotFoundException {
     if (LOG.isDebugEnabled()) {
       in = new DebugInputStream(in);
     }

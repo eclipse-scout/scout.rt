@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class SqlConnectionBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(SqlConnectionBuilder.class);
 
-  public Connection createJdbcConnection(AbstractSqlService sqlService) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+  public Connection createJdbcConnection(AbstractSqlService sqlService) throws ClassNotFoundException, SQLException {
     String user = sqlService.getUsername();
     String pass = sqlService.getPassword();
     Class.forName(sqlService.getJdbcDriverName());

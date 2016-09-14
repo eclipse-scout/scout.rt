@@ -478,6 +478,7 @@ public class RemoteFile implements Serializable {
    * If the remote file is a zip archive, unpack its content to the directory see
    * {@link #readZipContentFromDirectory(File)}
    */
+  @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   public void writeZipContentToDirectory(File directory) throws IOException {
     directory.mkdirs();
     File tmp = File.createTempFile("tmp", ".zip");

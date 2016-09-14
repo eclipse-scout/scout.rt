@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -629,7 +630,7 @@ public class StatementProcessor implements IStatementProcessor {
       try {
         prepareInputStatementAndBinds();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         return t.getMessage();
       }
     }
@@ -1114,8 +1115,8 @@ public class StatementProcessor implements IStatementProcessor {
           }
         }
       }
-      catch (Exception e) {
-        // obviously there is no such property
+      catch (IllegalAccessException | InvocationTargetException e) {
+        LOG.warn("Exception while invoking bean getter", e);
       }
     }
     //
@@ -1359,8 +1360,8 @@ public class StatementProcessor implements IStatementProcessor {
           }
         }
       }
-      catch (Exception e) {
-        // obviously there is no such property
+      catch (IllegalAccessException | InvocationTargetException e) {
+        LOG.warn("Exception while invoking bean getter", e);
       }
     }
     //
@@ -1504,7 +1505,7 @@ public class StatementProcessor implements IStatementProcessor {
       try {
         rs.close();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
       }
     }
     cache.releasePreparedStatement(ps);

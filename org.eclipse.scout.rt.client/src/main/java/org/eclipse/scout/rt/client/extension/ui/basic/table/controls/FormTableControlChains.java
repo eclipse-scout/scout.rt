@@ -39,7 +39,7 @@ public final class FormTableControlChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
 
         @Override
-        protected void callMethod(IFormTableControlExtension<? extends AbstractTableControl> next) throws Exception {
+        protected void callMethod(IFormTableControlExtension<? extends AbstractTableControl> next) {
           next.execInitForm(TableControlInitFormChain.this);
         }
       };

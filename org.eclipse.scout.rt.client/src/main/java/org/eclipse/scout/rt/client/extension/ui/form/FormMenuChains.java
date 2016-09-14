@@ -39,7 +39,7 @@ public final class FormMenuChains {
     public void execInitForm(final FORM form) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
-        protected void callMethod(IFormMenuExtension<FORM, ? extends AbstractFormMenu<FORM>> next) throws Exception {
+        protected void callMethod(IFormMenuExtension<FORM, ? extends AbstractFormMenu<FORM>> next) {
           next.execInitForm(FormMenuInitFormChain.this, form);
         }
       };

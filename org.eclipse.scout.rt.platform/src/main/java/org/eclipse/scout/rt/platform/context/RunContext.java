@@ -135,6 +135,7 @@ public class RunContext implements IAdaptable {
    * @throws EXCEPTION
    *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
+  @SuppressWarnings("squid:S1181")
   public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread(), m_runMonitor);
     try {

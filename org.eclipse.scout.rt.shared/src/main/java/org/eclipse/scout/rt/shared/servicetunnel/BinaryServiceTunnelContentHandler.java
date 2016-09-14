@@ -40,22 +40,22 @@ public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelCont
   }
 
   @Override
-  public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception {
+  public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws IOException {
     writeData(out, msg);
   }
 
   @Override
-  public ServiceTunnelRequest readRequest(InputStream in) throws Exception {
+  public ServiceTunnelRequest readRequest(InputStream in) throws IOException, ClassNotFoundException {
     return readData(in, ServiceTunnelRequest.class);
   }
 
   @Override
-  public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception {
+  public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws IOException {
     writeData(out, msg);
   }
 
   @Override
-  public ServiceTunnelResponse readResponse(InputStream in) throws Exception {
+  public ServiceTunnelResponse readResponse(InputStream in) throws IOException, ClassNotFoundException {
     return readData(in, ServiceTunnelResponse.class);
   }
 

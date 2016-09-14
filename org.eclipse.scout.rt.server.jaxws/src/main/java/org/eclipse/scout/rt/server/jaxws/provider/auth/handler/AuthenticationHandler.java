@@ -100,6 +100,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
   }
 
   @Override
+  @SuppressWarnings("squid:S1181")
   public boolean handleMessage(final SOAPMessageContext messageContext) {
     if (MessageContexts.isOutboundMessage(messageContext)) {
       return true;
@@ -182,6 +183,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
    * The default implementation delegates authentication to the configured {@link IAuthenticationMethod} and
    * {@link ICredentialVerifier}. Optionally, authentication is run on the configured {@link RunContext}.
    */
+  @SuppressWarnings("squid:S00112")
   protected Principal authenticateRequest(final SOAPMessageContext context) throws Exception {
     if (m_authRunContextProducer == null) {
       return m_authenticationMethod.authenticate(context, m_credentialVerifier, m_principalProducer);

@@ -175,6 +175,7 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
    * @return the 'undo-action' to restore the thread-local value.
    * @throws Exception
    */
+  @SuppressWarnings("squid:S00112")
   protected IRegistrationHandle registerAsCurrentTransaction(final ITransaction transaction) throws Exception {
     final IUndecorator decoration = new ThreadLocalProcessor<>(ITransaction.CURRENT, transaction).decorate();
 

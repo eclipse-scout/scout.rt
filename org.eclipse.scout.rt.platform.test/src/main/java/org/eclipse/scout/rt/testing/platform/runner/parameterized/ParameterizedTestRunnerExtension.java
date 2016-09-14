@@ -29,6 +29,7 @@ public final class ParameterizedTestRunnerExtension {
   private ParameterizedTestRunnerExtension() {
   }
 
+  @SuppressWarnings("squid:S00112")
   public static Object createTest(TestClass testClass, IScoutTestParameter testParameter) throws Exception {
     try {
       return testClass.getOnlyConstructor().newInstance(testParameter);
@@ -73,7 +74,7 @@ public final class ParameterizedTestRunnerExtension {
     return result;
   }
 
-  protected static List<FrameworkMethod> createParameterizedTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
+  static List<FrameworkMethod> createParameterizedTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
     List<FrameworkMethod> result = new LinkedList<FrameworkMethod>();
 
     for (int paramsIndex = 0; paramsIndex < numberOfParameterEntries; paramsIndex++) {

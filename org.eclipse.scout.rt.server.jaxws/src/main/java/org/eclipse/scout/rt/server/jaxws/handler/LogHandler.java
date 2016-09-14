@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.handler;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -75,7 +77,7 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
     // NOOP
   }
 
-  protected void handleLogMessage(final SOAPMessageContext context) throws Exception {
+  protected void handleLogMessage(final SOAPMessageContext context) throws SOAPException, IOException {
     if (!LOG.isInfoEnabled() || m_logDebug && !LOG.isDebugEnabled()) {
       return;
     }

@@ -83,7 +83,7 @@ public class SqlConnectionPool {
             .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MINUTES))));
   }
 
-  public Connection leaseConnection(AbstractSqlService service) throws Exception {
+  public Connection leaseConnection(AbstractSqlService service) throws ClassNotFoundException, SQLException {
     managePool();
     synchronized (m_poolLock) {
       Assertions.assertFalse(isDestroyed(), "{} not available because destroyed.", getClass().getSimpleName());
@@ -129,7 +129,7 @@ public class SqlConnectionPool {
             try {
               candidate.conn.close();
             }
-            catch (Throwable fatal) {
+            catch (Exception fatal) {
             }
             candidate = null;
           }
@@ -166,7 +166,7 @@ public class SqlConnectionPool {
             candidate = null;
           }
         }
-        catch (Throwable e) {
+        catch (Exception e) {
           // ignore
           candidate = null;
         }
@@ -182,7 +182,7 @@ public class SqlConnectionPool {
             candidate.conn.clearWarnings();
           }
         }
-        catch (Throwable e) {
+        catch (Exception e) {
           // ignore
           candidate = null;
         }
@@ -261,7 +261,7 @@ public class SqlConnectionPool {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Unexpected Problem while managing SQL connection pool", t);
     }
   }

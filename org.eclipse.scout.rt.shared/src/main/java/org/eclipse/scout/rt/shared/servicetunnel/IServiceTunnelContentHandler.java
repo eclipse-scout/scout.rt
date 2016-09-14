@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -27,12 +28,11 @@ public interface IServiceTunnelContentHandler {
 
   String getContentType();
 
-  void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception;
+  void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws IOException;
 
-  ServiceTunnelRequest readRequest(InputStream in) throws Exception;
+  ServiceTunnelRequest readRequest(InputStream in) throws IOException, ClassNotFoundException;
 
-  void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception;
+  void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws IOException;
 
-  ServiceTunnelResponse readResponse(InputStream in) throws Exception;
-
+  ServiceTunnelResponse readResponse(InputStream in) throws IOException, ClassNotFoundException;
 }

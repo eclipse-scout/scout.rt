@@ -48,5 +48,6 @@ public interface IInstanceInvocationHandler<T> {
    * @see UndeclaredThrowableException
    * @see DecoratingProxy
    */
+  @SuppressWarnings("squid:S00112")
   Object invoke(T instance, Method method, Object[] args) throws Throwable;
 }

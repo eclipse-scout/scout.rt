@@ -2165,13 +2165,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       Document e = storeToXml();
       return XmlUtility.wellformDocument(e);
     }
+    catch (ProcessingException e) {
+      throw e;
+    }
     catch (Exception e) {
-      if (e instanceof ProcessingException) {
-        throw (ProcessingException) e;
-      }
-      else {
-        throw new ProcessingException("form : " + getTitle(), e);
-      }
+      throw new ProcessingException("form : {}", getTitle(), e);
     }
   }
 

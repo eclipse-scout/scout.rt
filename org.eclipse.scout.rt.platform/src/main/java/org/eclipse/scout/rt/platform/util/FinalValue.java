@@ -89,7 +89,7 @@ public class FinalValue<VALUE> {
     try {
       m_value.compareAndSet(NULL_VALUE, producer.call());
     }
-    catch (final RuntimeException | Error e) {
+    catch (final RuntimeException e) {
       throw e;
     }
     catch (final Exception e) {

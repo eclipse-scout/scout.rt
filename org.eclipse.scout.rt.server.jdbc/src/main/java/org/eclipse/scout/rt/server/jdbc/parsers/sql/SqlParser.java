@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.jdbc.parsers.BindModel;
 import org.eclipse.scout.rt.server.jdbc.parsers.BindParser;
@@ -786,7 +787,7 @@ public class SqlParser {
             t = tokenType.newInstance();
           }
           catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ProcessingException("Could not create new instance of {}", tokenType, e);
           }
           t.setText(r);
           newList.add(t);

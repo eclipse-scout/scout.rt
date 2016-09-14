@@ -40,6 +40,7 @@ public interface IAuthenticationMethod {
    *          used to produce {@link Principal} objects for authenticated users.
    * @return authenticated {@link Principal}, or <code>null</code> if forbidden.
    */
+  @SuppressWarnings("squid:S00112")
   Principal authenticate(SOAPMessageContext messageContext, ICredentialVerifier credentialVerifier, IPrincipalProducer principalProducer) throws Exception;
 
   /**

@@ -108,15 +108,15 @@ public class HttpServiceTunnelTest {
     return new IServiceTunnelContentHandler() {
 
       @Override
-      public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception {
+      public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws IOException {
       }
 
       @Override
-      public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception {
+      public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws IOException {
       }
 
       @Override
-      public ServiceTunnelResponse readResponse(InputStream in) throws Exception {
+      public ServiceTunnelResponse readResponse(InputStream in) throws IOException, ClassNotFoundException {
         ByteArrayInputStream bi = (ByteArrayInputStream) in;
         ObjectInputStream in2 = new ObjectInputStream(bi);
         Object o = in2.readObject();
@@ -124,7 +124,7 @@ public class HttpServiceTunnelTest {
       }
 
       @Override
-      public ServiceTunnelRequest readRequest(InputStream in) throws Exception {
+      public ServiceTunnelRequest readRequest(InputStream in) throws IOException, ClassNotFoundException {
         return null;
       }
 

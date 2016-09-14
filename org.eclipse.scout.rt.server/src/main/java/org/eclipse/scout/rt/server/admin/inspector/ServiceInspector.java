@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.admin.inspector;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.platform.service.IService;
@@ -39,7 +40,7 @@ public class ServiceInspector {
     return m_service;
   }
 
-  public void changeProperty(PropertyDescriptor propDesc, String propText) throws Exception {
+  public void changeProperty(PropertyDescriptor propDesc, String propText) throws IllegalAccessException, InvocationTargetException {
     if (propText != null && propText.length() == 0) {
       propText = null;
     }
@@ -49,5 +50,4 @@ public class ServiceInspector {
       setterMethod.invoke(m_service, new Object[]{value});
     }
   }
-
 }

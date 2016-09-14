@@ -214,7 +214,7 @@ public final class BeanUtility {
       try {
         return ctor.newInstance(parameters);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.info("Exception while instantiating new object [class={}, parameterTypes={}, parameters={}]", c, parameterTypes, parameters, t);
         throw new ProcessingException("Exception while instantiating new object", t);
       }

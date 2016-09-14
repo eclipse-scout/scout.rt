@@ -65,6 +65,7 @@ public class JUnitExceptionHandler extends ExceptionHandler {
    * Throws the first exception handled by this {@code ExceptionHandler} and resets this handler.<br/>
    * This method call has no effect if no exception was handled.
    */
+  @SuppressWarnings("squid:S00112")
   public void throwOnError() throws Throwable {
     if (m_errors.isEmpty()) {
       return;

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Bean
+@SuppressWarnings("squid:S1181")
 public class BasicTransaction implements ITransaction {
   private static final Logger LOG = LoggerFactory.getLogger(BasicTransaction.class);
 

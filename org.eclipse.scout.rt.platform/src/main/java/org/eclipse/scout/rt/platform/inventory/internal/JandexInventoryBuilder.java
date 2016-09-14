@@ -114,10 +114,10 @@ public class JandexInventoryBuilder {
         return;
       }
       //unknown protocol
-      throw new Exception("unknown protocol: " + urlText);
+      throw new PlatformException("unknown protocol: {}", urlText);
     }
     catch (Exception ex) {
-      throw new PlatformException("Cannot scan location '" + urlText + "' with jandex", ex);
+      throw new PlatformException("Cannot scan location '{}' with jandex", urlText, ex);
     }
   }
 

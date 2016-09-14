@@ -86,7 +86,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
         LOG.info("request sent to cancel jdbc statement");
         s.cancel();
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         LOG.error("failed to cancel jdbc statement", e);
       }
     }

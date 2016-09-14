@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +109,7 @@ class MultiTimeRange {
     }
     Object oldEntry = m_multipleTimeRangeMap.put(from, new TimeRange(from, to));
     if (oldEntry != null) {
-      throw new RuntimeException("Error: should not have an entry for key: " + from);
+      throw new ProcessingException("Error: should not have an entry for key: {}", from);
     }
   }
 

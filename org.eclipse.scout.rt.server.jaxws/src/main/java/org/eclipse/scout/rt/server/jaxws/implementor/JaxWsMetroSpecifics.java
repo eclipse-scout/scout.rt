@@ -54,7 +54,7 @@ public class JaxWsMetroSpecifics extends JaxWsImplementorSpecifics {
     try {
       ((Closeable) Proxy.getInvocationHandler(port)).close();
     }
-    catch (final Throwable e) {
+    catch (final Exception e) {
       LOG.error("Failed to close Socket for: {}", operation, e);
     }
   }

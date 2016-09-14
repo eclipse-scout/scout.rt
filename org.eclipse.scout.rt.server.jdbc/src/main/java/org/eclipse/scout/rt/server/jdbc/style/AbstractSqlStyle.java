@@ -332,6 +332,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   }
 
   @Override
+  @SuppressWarnings("squid:S1193")
   public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
     switch (bind.getSqlType()) {
       case Types.NULL: {

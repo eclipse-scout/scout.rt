@@ -210,6 +210,7 @@ public class RemoteFileService implements IRemoteFileService {
 
   @Override
   @RemoteServiceAccessDenied
+  @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   public void putRemoteFile(RemoteFile spec) {
     File file = getFileInternal(spec);
     file.getParentFile().mkdirs();
