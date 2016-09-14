@@ -117,16 +117,6 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * @deprecated use {@link #addCustomHeaders(URLConnection, String, ServiceTunnelRequest, byte[])} instead. This method
-   *             will be removed with Oxygen. See Bug 501363.
-   */
-  @Deprecated
-  protected void addCustomHeaders(URLConnection urlConn, String method, byte[] callData) throws IOException {
-    addSignatureHeader(urlConn, method, callData);
-    addCorrelationId(urlConn);
-  }
-
-  /**
    * @param urlConn
    *          connection object
    * @param method
@@ -139,7 +129,8 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    * @since 6.0
    */
   protected void addCustomHeaders(URLConnection urlConn, String method, ServiceTunnelRequest call, byte[] callData) throws IOException {
-    addCustomHeaders(urlConn, method, callData);
+    addSignatureHeader(urlConn, method, callData);
+    addCorrelationId(urlConn);
   }
 
   protected void addSignatureHeader(URLConnection urlConn, String method, byte[] callData) throws IOException {
