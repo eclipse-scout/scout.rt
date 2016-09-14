@@ -15,6 +15,7 @@ scout.SimpleTabBox = function() {
   this.tabArea;
   this.viewStack = [];
   this.currentView;
+  this._removeViewInProgress = 0;
 
   this._addEventSupport();
 };
@@ -231,18 +232,22 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
     // remove
     this.viewStack.splice(index, 1);
     if (view.rendered) {
+      this._removeViewInProgress++;
       view.remove();
+      this._removeViewInProgress--;
     }
     this.trigger('viewRemoved', {
       view: view
     });
 
-    if(viewToActivate){
-      this.activateView(viewToActivate);
-    }
-    if (this.rendered) {
-      this.viewContent.invalidateLayoutTree();
-      this.viewContent.validateLayoutTree();
+    if (this._removeViewInProgress === 0) {
+      if (viewToActivate) {
+        this.activateView(viewToActivate);
+      }
+      if (this.rendered) {
+        this.viewContent.invalidateLayoutTree();
+        this.viewContent.validateLayoutTree();
+      }
     }
   }
 };
