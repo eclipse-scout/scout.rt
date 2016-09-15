@@ -15,18 +15,20 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClientNotification;
 
 public class BookmarkClientNotificationHandler extends AbstractObservableNotificationHandler<BookmarkChangedClientNotification> {
 
   @Override
-  public void handleNotification(final BookmarkChangedClientNotification notification) {
+  public void handleNotification(BookmarkChangedClientNotification notification, IClientNotificationAddress address) {
     ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         BEANS.get(IBookmarkService.class).loadBookmarks();
-        BookmarkClientNotificationHandler.super.handleNotification(notification);
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    super.handleNotification(notification, address);
   }
+
 }

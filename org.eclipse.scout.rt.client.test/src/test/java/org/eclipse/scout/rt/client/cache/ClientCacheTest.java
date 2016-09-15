@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
-import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
 import org.eclipse.scout.rt.shared.notification.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -31,9 +31,9 @@ public class ClientCacheTest {
 
   @Test
   public void testCacheNotificationHandlerRegistration() {
-    TypeParameterBeanRegistry<INotificationHandler> registry = new TypeParameterBeanRegistry<>(INotificationHandler.class);
-    registry.registerBeans(BEANS.all(INotificationHandler.class));
-    List<INotificationHandler> handlers = registry.getBeans(InvalidateCacheNotification.class);
+    TypeParameterBeanRegistry<IDispatchingNotificationHandler> registry = new TypeParameterBeanRegistry<>(IDispatchingNotificationHandler.class);
+    registry.registerBeans(BEANS.all(IDispatchingNotificationHandler.class));
+    List<IDispatchingNotificationHandler> handlers = registry.getBeans(InvalidateCacheNotification.class);
 
     // ensure that in client exactly one cache notification handler is registered and
     // that its type is CacheClientNotificationHandler

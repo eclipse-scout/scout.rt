@@ -22,12 +22,14 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
+import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
 import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
@@ -35,12 +37,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A notification handler allowing to register {@link INotificationListener}s for specific sessions. The listeners are
- * then called within a job with the given session upon receipt of a notification. <br>
+ * A notification handler allowing to register {@link INotificationListener}s for specific sessions.
+ * <p>
+ * Listeners can be called within the context of the given session upon receipt of a notification.
  * {@link INotificationListener.#handleNotification(Serializable)} is not called within a model job (see
  * {@link ModelJobs})
+ * </p>
  */
-public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements INotificationHandler<T>, IGlobalSessionListener {
+public abstract class AbstractObservableNotificationHandler<T extends Serializable> implements IDispatchingNotificationHandler<T>, IGlobalSessionListener {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractObservableNotificationHandler.class);
 
   private final Map<IClientSession, EventListenerList> m_listeners = new WeakHashMap<>();
@@ -133,11 +137,19 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
   }
 
   @Override
-  public void handleNotification(T notification) {
-    notifyListeners(notification);
+  public void handleNotification(T notification, IClientNotificationAddress address) {
+    if (address.isNotifyAllNodes()) {
+      notifyListenersOfAllSessions(notification);
+    }
+    else {
+      notifyListenersOfCurrentSession(notification);
+    }
   }
 
-  protected void notifyListeners(final T notification) {
+  /**
+   * Notify all listeners independent of the session in the current {@link RunContext}
+   */
+  protected void notifyListenersOfAllSessions(final T notification) {
     // create copy of m_listeners (EventListenerList is thread-safe)
     Map<IClientSession, EventListenerList> listenerMap;
     synchronized (m_listeners) {
@@ -148,28 +160,43 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     for (Entry<IClientSession, EventListenerList> entry : listenerMap.entrySet()) {
       final IClientSession session = entry.getKey();
       final EventListenerList list = entry.getValue();
-
-      if (list != null && list.getListenerCount(INotificationListener.class) > 0) {
-        scheduleHandlingNotifications(notification, list, session);
-      }
+      scheduleHandlingNotifications(notification, list, session);
     }
   }
 
   /**
-   * internal
+   * Only notify listeners of the current session (e.g. if a notification is only addressed to certain users or
+   * sessions)
    */
-  private void scheduleHandlingNotifications(final T notification, final EventListenerList list, final IClientSession session) {
+  protected void notifyListenersOfCurrentSession(final T notification) {
+    ISession currentSession = IClientSession.CURRENT.get();
+    if (currentSession instanceof IClientSession) {
+      IClientSession[] sessions = {(IClientSession) currentSession};
+      for (IClientSession session : sessions) {
+        synchronized (m_listeners) {
+          EventListenerList listeners = m_listeners.get(session);
+          scheduleHandlingNotifications(notification, listeners, session);
+        }
+      }
+    }
+  }
+
+  protected void scheduleHandlingNotifications(final T notification, final EventListenerList list, final IClientSession session) {
     Jobs.schedule(new IRunnable() {
 
       @SuppressWarnings("unchecked")
       @Override
       public void run() throws Exception {
-        for (INotificationListener<T> l : list.getListeners(INotificationListener.class)) {
-          l.handleNotification(notification);
+        if (list != null && list.getListenerCount(INotificationListener.class) > 0) {
+          for (INotificationListener<T> l : list.getListeners(INotificationListener.class)) {
+            l.handleNotification(notification);
+          }
         }
-
       }
-    }, Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session, true)));
+    }, Jobs
+        .newInput()
+        .withName("Handling Client Notification")
+        .withRunContext(ClientRunContexts.empty().withSession(session, true)));
   }
 
   /**

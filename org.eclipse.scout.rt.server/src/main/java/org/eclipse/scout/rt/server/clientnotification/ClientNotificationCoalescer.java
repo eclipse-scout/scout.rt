@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.notification.NotificationCoalescer;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 
 @ApplicationScoped
 public class ClientNotificationCoalescer {
@@ -34,11 +34,11 @@ public class ClientNotificationCoalescer {
   public List<ClientNotificationMessage> coalesce(List<ClientNotificationMessage> inNotifications) {
     LinkedHashSet<ClientNotificationMessage> notificationsNoDuplicates = new LinkedHashSet<ClientNotificationMessage>(inNotifications);
     // sort by distribute & address property
-    Map<Boolean, Map<ClientNotificationAddress, List<ClientNotificationMessage>>> messagesPerDistributeAndAddress = new HashMap<>();
-    messagesPerDistributeAndAddress.put(true, new HashMap<ClientNotificationAddress, List<ClientNotificationMessage>>());
-    messagesPerDistributeAndAddress.put(false, new HashMap<ClientNotificationAddress, List<ClientNotificationMessage>>());
+    Map<Boolean, Map<IClientNotificationAddress, List<ClientNotificationMessage>>> messagesPerDistributeAndAddress = new HashMap<>();
+    messagesPerDistributeAndAddress.put(true, new HashMap<IClientNotificationAddress, List<ClientNotificationMessage>>());
+    messagesPerDistributeAndAddress.put(false, new HashMap<IClientNotificationAddress, List<ClientNotificationMessage>>());
     for (ClientNotificationMessage message : notificationsNoDuplicates) {
-      Map<ClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = messagesPerDistributeAndAddress.get(message.isDistributeOverCluster());
+      Map<IClientNotificationAddress, List<ClientNotificationMessage>> messagesPerAddress = messagesPerDistributeAndAddress.get(message.isDistributeOverCluster());
       List<ClientNotificationMessage> messages = messagesPerAddress.get(message.getAddress());
       if (messages == null) {
         messages = new ArrayList<ClientNotificationMessage>();
@@ -47,16 +47,16 @@ public class ClientNotificationCoalescer {
       messages.add(message);
     }
     List<ClientNotificationMessage> result = new ArrayList<>();
-    for (Entry<Boolean, Map<ClientNotificationAddress, List<ClientNotificationMessage>>> distributeEntry : messagesPerDistributeAndAddress.entrySet()) {
+    for (Entry<Boolean, Map<IClientNotificationAddress, List<ClientNotificationMessage>>> distributeEntry : messagesPerDistributeAndAddress.entrySet()) {
       boolean distribute = distributeEntry.getKey();
-      for (Entry<ClientNotificationAddress, List<ClientNotificationMessage>> e : distributeEntry.getValue().entrySet()) {
+      for (Entry<IClientNotificationAddress, List<ClientNotificationMessage>> e : distributeEntry.getValue().entrySet()) {
         result.addAll(coalesce(distribute, e.getKey(), e.getValue()));
       }
     }
     return result;
   }
 
-  protected List<ClientNotificationMessage> coalesce(final boolean distributeOverCluster, final ClientNotificationAddress address, final List<ClientNotificationMessage> messages) {
+  protected List<ClientNotificationMessage> coalesce(final boolean distributeOverCluster, final IClientNotificationAddress address, final List<ClientNotificationMessage> messages) {
     if (messages.isEmpty()) {
       return Collections.emptyList();
     }

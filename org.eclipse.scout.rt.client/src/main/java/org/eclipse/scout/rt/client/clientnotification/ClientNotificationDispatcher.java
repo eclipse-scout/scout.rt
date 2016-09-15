@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,20 +58,20 @@ public class ClientNotificationDispatcher {
 
             @Override
             public void run() throws Exception {
-              ClientNotificationAddress address = message.getAddress();
+              IClientNotificationAddress address = message.getAddress();
               Serializable notification = message.getNotification();
               LOG.debug("Processing client notification {}", notification);
 
               if (address.isNotifyAllNodes()) {
                 // notify all nodes
                 LOG.debug("Notify all nodes");
-                dispatch(notification);
+                dispatchForNode(notification, address);
               }
               else if (address.isNotifyAllSessions()) {
                 // notify all sessions
                 LOG.debug("Notify all sessions");
                 for (IClientSession session : notificationService.getAllClientSessions()) {
-                  dispatch(session, notification);
+                  dispatchForSession(session, notification, address);
                 }
               }
               else if (CollectionUtility.hasElements(address.getSessionIds())) {
@@ -83,7 +83,7 @@ public class ClientNotificationDispatcher {
                     LOG.warn("received notification for invalid session '{}'.", sessionId);
                   }
                   else {
-                    dispatch(session, notification);
+                    dispatchForSession(session, notification, address);
                   }
                 }
               }
@@ -91,7 +91,7 @@ public class ClientNotificationDispatcher {
                 LOG.debug("Notify sessions by user id: {}", address.getUserIds());
                 for (String userId : address.getUserIds()) {
                   for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
-                    dispatch(session, notification);
+                    dispatchForSession(session, notification, address);
                   }
                 }
               }
@@ -108,10 +108,10 @@ public class ClientNotificationDispatcher {
    *
    * @param notification
    */
-  public void dispatch(final Serializable notification) {
+  public void dispatchForNode(final Serializable notification, final IClientNotificationAddress address) {
     if (IClientSession.CURRENT.get() != null) {
       // dispatch sync for piggyback notifications
-      dispatchSync(notification);
+      dispatchSync(notification, address);
     }
     else {
       // dispatch async
@@ -119,7 +119,7 @@ public class ClientNotificationDispatcher {
 
         @Override
         public void run() throws Exception {
-          dispatchSync(notification);
+          dispatchSync(notification, address);
         }
       }, Jobs.newInput()
           .withRunContext(ClientRunContexts.copyCurrent())
@@ -140,18 +140,18 @@ public class ClientNotificationDispatcher {
    * @param notification
    *          the notification to process.
    */
-  public void dispatch(IClientSession session, final Serializable notification) {
+  public void dispatchForSession(IClientSession session, final Serializable notification, final IClientNotificationAddress address) {
     ISession currentSession = ISession.CURRENT.get();
     // sync dispatch if session is equal
     if (session == currentSession) {
-      dispatchSync(notification);
+      dispatchSync(notification, address);
     }
     else {
       IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {
-          dispatchSync(notification);
+          dispatchSync(notification, address);
         }
       }, Jobs.newInput()
           .withRunContext(ClientRunContexts.empty()
@@ -194,9 +194,9 @@ public class ClientNotificationDispatcher {
     }
   }
 
-  protected void dispatchSync(Serializable notification) {
+  protected void dispatchSync(Serializable notification, IClientNotificationAddress address) {
     NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-    reg.notifyHandlers(notification);
+    reg.notifyHandlers(notification, address);
   }
 
   private class P_NotificationFutureCallback implements IDoneHandler<Void> {

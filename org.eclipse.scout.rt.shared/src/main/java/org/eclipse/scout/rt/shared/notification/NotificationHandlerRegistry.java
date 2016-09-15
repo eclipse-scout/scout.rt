@@ -17,6 +17,8 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
+import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +28,35 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class NotificationHandlerRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(NotificationHandlerRegistry.class);
-  private final TypeParameterBeanRegistry<INotificationHandler> m_registry = new TypeParameterBeanRegistry<>(INotificationHandler.class);
+  private final TypeParameterBeanRegistry<INotificationHandler> m_notificationHandlerRegistry = new TypeParameterBeanRegistry<>(INotificationHandler.class);
+  private final TypeParameterBeanRegistry<IDispatchingNotificationHandler> m_dispatchingNotificationHandlerRegistry = new TypeParameterBeanRegistry<>(IDispatchingNotificationHandler.class);
 
   @PostConstruct
   protected void buildHandlerLinking() {
-    m_registry.registerBeans(BEANS.all(INotificationHandler.class));
+    m_notificationHandlerRegistry.registerBeans(BEANS.all(INotificationHandler.class));
+    m_dispatchingNotificationHandlerRegistry.registerBeans(BEANS.all(IDispatchingNotificationHandler.class));
+  }
+
+  public void notifyHandlers(Serializable notification, IClientNotificationAddress address) {
+    notifyNotificationHandlers(notification);
+    notifyDispatchingNotificationHandlers(notification, address);
+  }
+
+  /**
+   * @param notification
+   * @param address
+   */
+  @SuppressWarnings("unchecked")
+  public void notifyDispatchingNotificationHandlers(Serializable notification, IClientNotificationAddress address) {
+    final List<IDispatchingNotificationHandler> dispatchingHandlers = m_dispatchingNotificationHandlerRegistry.getBeans(notification.getClass());
+    for (IDispatchingNotificationHandler handler : dispatchingHandlers) {
+      try {
+        handler.handleNotification(notification, address);
+      }
+      catch (RuntimeException e) {
+        LOG.error("Handler '{}' notification with notification '{}' failed.", handler, notification, e);
+      }
+    }
   }
 
   /**
@@ -40,8 +66,8 @@ public class NotificationHandlerRegistry {
    *          notification message
    */
   @SuppressWarnings("unchecked")
-  public void notifyHandlers(Serializable notification) {
-    final List<INotificationHandler> handlers = m_registry.getBeans(notification.getClass());
+  public void notifyNotificationHandlers(Serializable notification) {
+    final List<INotificationHandler> handlers = m_notificationHandlerRegistry.getBeans(notification.getClass());
     for (INotificationHandler handler : handlers) {
       try {
         handler.handleNotification(notification);
@@ -51,4 +77,5 @@ public class NotificationHandlerRegistry {
       }
     }
   }
+
 }

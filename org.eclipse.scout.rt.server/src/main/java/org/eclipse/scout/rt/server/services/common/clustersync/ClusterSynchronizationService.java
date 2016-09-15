@@ -217,7 +217,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
         @Override
         public void run() throws Exception {
           NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-          reg.notifyHandlers(notificationMessage.getNotification());
+          reg.notifyNotificationHandlers(notificationMessage.getNotification());
         }
       });
     }

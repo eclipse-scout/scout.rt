@@ -31,8 +31,8 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,7 +199,7 @@ public class ClientNotificationNodeQueue {
     return notifications;
   }
 
-  public boolean isRelevant(ClientNotificationAddress address) {
+  public boolean isRelevant(IClientNotificationAddress address) {
     return address.isNotifyAllSessions() || address.isNotifyAllNodes() || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds()) || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
   }
 
