@@ -11,10 +11,12 @@
 package org.eclipse.scout.testing.client.form;
 
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Dynamic field to build an ad-hoc application for testing
  */
+@ClassId("1d8c91fa-2cf2-46be-bfa9-3d46fe2eb907")
 public class DynamicCancelButton extends AbstractCancelButton {
 
   public DynamicCancelButton() {

@@ -14,10 +14,12 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Dynamic form to build an ad-hoc application for testing
  */
+@ClassId("0b6b8066-b0e4-4d29-a809-c6fe615b9dc8")
 public class DynamicForm extends AbstractForm {
   private IGroupBox m_mainBox;
 
