@@ -36,7 +36,7 @@ public class AbstractObservableNotificationHandlerTest {
     AbstractObservableNotificationHandler<Serializable> testHandler = createGlobalHandler();
     final CountCondition cc = new CountCondition(1);
     testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
-    testHandler.handleNotification(m_testNotification);
+    testHandler.notifyListenersOfAllSessions(m_testNotification);
     cc.waitFor();
   }
 
@@ -47,7 +47,7 @@ public class AbstractObservableNotificationHandlerTest {
     final CountCondition cc = new CountCondition(2);
     testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
     testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
-    testHandler.handleNotification(m_testNotification);
+    testHandler.notifyListenersOfAllSessions(m_testNotification);
     cc.waitFor();
   }
 
@@ -58,7 +58,7 @@ public class AbstractObservableNotificationHandlerTest {
     final CountCondition cc = new CountCondition(2);
     testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
     testHandler.addListener(m_testSession2, createVerifyingListener(cc, m_testSession2));
-    testHandler.handleNotification(m_testNotification);
+    testHandler.notifyListenersOfAllSessions(m_testNotification);
     cc.waitFor();
   }
 
@@ -72,7 +72,7 @@ public class AbstractObservableNotificationHandlerTest {
       public void run() throws Exception {
         final CountCondition cc = new CountCondition(1);
         testHandler.addListener(createVerifyingListener(cc, m_testSession1));
-        testHandler.handleNotification(m_testNotification);
+        testHandler.notifyListenersOfAllSessions(m_testNotification);
         cc.waitFor();
       }
     }, ModelJobs
@@ -91,7 +91,7 @@ public class AbstractObservableNotificationHandlerTest {
         final CountCondition cc = new CountCondition(2);
         testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
         testHandler.addListener(m_testSession2, createVerifyingListener(cc, m_testSession2));
-        testHandler.handleNotification(m_testNotification);
+        testHandler.notifyListenersOfAllSessions(m_testNotification);
         assertEquals(m_testSession1, IClientSession.CURRENT.get());
         cc.waitFor();
       }

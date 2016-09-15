@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.cache;
 import org.eclipse.scout.rt.client.clientnotification.AbstractObservableNotificationHandler;
 import org.eclipse.scout.rt.shared.cache.CacheNotificationHandler;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 
 /**
@@ -33,10 +34,10 @@ public class CacheClientNotificationHandler extends AbstractObservableNotificati
   }
 
   @Override
-  public void handleNotification(final InvalidateCacheNotification notification) {
-    // first invalidate caches
+  public void handleNotification(InvalidateCacheNotification notification, IClientNotificationAddress address) {
+    // invalidate caches first
     m_basicHandler.handleNotification(notification);
-    // then notify any session listeners
-    notifyListeners(notification);
+    super.handleNotification(notification, address);
   }
+
 }

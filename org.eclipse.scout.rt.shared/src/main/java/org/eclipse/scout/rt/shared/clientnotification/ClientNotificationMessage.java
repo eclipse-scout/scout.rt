@@ -17,19 +17,19 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 public class ClientNotificationMessage implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final ClientNotificationAddress m_address;
+  private final IClientNotificationAddress m_address;
   private final Serializable m_notification;
   private final boolean m_distributeOverCluster;
   private final String m_correlationId;
 
-  public ClientNotificationMessage(final ClientNotificationAddress address, final Serializable notification, final boolean distributeOverCluster, final String correlationId) {
+  public ClientNotificationMessage(final IClientNotificationAddress address, final Serializable notification, final boolean distributeOverCluster, final String correlationId) {
     m_address = address;
     m_notification = notification;
     m_distributeOverCluster = distributeOverCluster;
     m_correlationId = correlationId;
   }
 
-  public ClientNotificationAddress getAddress() {
+  public IClientNotificationAddress getAddress() {
     return m_address;
   }
 

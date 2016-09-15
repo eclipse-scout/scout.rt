@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -87,7 +88,7 @@ public class NotificationDispatcherTest {
       @Override
       public void run() throws Exception {
         final ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
-        dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), stringNotification);
+        dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), stringNotification, mock(ClientNotificationAddress.class));
         waitForPendingNotifications(dispatcher);
       }
     }, Jobs.newInput()
@@ -111,9 +112,9 @@ public class NotificationDispatcherTest {
       @Override
       public void run() throws Exception {
         ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
-        dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification01());
-        dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification02());
-        dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification02());
+        dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification01(), mock(ClientNotificationAddress.class));
+        dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification02(), mock(ClientNotificationAddress.class));
+        dispatcher.dispatchForSession((IClientSession) IClientSession.CURRENT.get(), new Notification02(), mock(ClientNotificationAddress.class));
         waitForPendingNotifications(dispatcher);
       }
     }, Jobs.newInput()

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.clientnotification;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  * <li>one or more specific users</li>
  * </ul>
  */
-public class ClientNotificationAddress implements Serializable {
+public class ClientNotificationAddress implements IClientNotificationAddress {
   private static final long serialVersionUID = 1L;
 
   private final Set<String> m_sessionIds = new HashSet<>();
@@ -86,18 +85,22 @@ public class ClientNotificationAddress implements Serializable {
     return new ClientNotificationAddress().withNotifyAllNodes(true);
   }
 
+  @Override
   public Set<String> getSessionIds() {
     return m_sessionIds;
   }
 
+  @Override
   public Set<String> getUserIds() {
     return m_userIds;
   }
 
+  @Override
   public boolean isNotifyAllSessions() {
     return m_notifyAllSessions;
   }
 
+  @Override
   public boolean isNotifyAllNodes() {
     return m_notifyAllNodes;
   }

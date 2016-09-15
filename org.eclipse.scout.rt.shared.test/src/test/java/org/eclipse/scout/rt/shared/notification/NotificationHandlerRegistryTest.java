@@ -61,7 +61,7 @@ public class NotificationHandlerRegistryTest {
   @Test
   public void testStringNotification() {
     NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-    reg.notifyHandlers("A simple string notification");
+    reg.notifyNotificationHandlers("A simple string notification");
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(1)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(0)).handleNotification(Mockito.any(INotificationGroup.class));
   }
@@ -72,8 +72,8 @@ public class NotificationHandlerRegistryTest {
   @Test
   public void testNotificationGroup() {
     NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
-    reg.notifyHandlers(new Notification01());
-    reg.notifyHandlers(new Notification01());
+    reg.notifyNotificationHandlers(new Notification01());
+    reg.notifyNotificationHandlers(new Notification01());
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));
   }
