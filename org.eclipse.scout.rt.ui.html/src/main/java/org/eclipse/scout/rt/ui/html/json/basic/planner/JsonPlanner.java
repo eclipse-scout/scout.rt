@@ -287,12 +287,11 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   protected void disposeResource(Resource<?> resource) {
-    String resourceId = getResourceId(resource);
-    m_resourceIds.remove(resource);
+    String resourceId = m_resourceIds.remove(resource);
     m_resources.remove(resourceId);
     for (Activity<?, ?> activity : resource.getActivities()) {
-      m_activities.remove(activity);
-      m_activityIds.remove(activity.getId());
+      String activityId = m_activityIds.remove(activity);
+      m_activities.remove(activityId);
     }
   }
 

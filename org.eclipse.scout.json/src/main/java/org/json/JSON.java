@@ -43,6 +43,7 @@ final class JSON {
     return d;
   }
 
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   static Boolean toBoolean(Object value) {
     if (value instanceof Boolean) {
       return (Boolean) value;
@@ -71,6 +72,7 @@ final class JSON {
         return Double.valueOf((String) value);
       }
       catch (NumberFormatException ignored) {
+        // ignore exception
       }
     }
     return null;
@@ -88,6 +90,7 @@ final class JSON {
         return (int) Double.parseDouble((String) value);
       }
       catch (NumberFormatException ignored) {
+        // ignore exception
       }
     }
     return null;
@@ -105,6 +108,7 @@ final class JSON {
         return (long) Double.parseDouble((String) value);
       }
       catch (NumberFormatException ignored) {
+        // ignore exception
       }
     }
     return null;

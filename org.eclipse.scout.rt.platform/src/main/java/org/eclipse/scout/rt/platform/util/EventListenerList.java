@@ -270,13 +270,13 @@ public class EventListenerList implements IEventListenerSource {
   public String toString() {
     synchronized (m_listenerListLock) {
       Object[] lList = m_listenerList;
-      String s = "EventListenerList: ";
-      s += lList.length / 2 + " listeners: ";
+      StringBuilder sb = new StringBuilder("EventListenerList: ");
+      sb.append(lList.length / 2).append(" listeners: ");
       for (int i = 0; i <= lList.length - 2; i += 2) {
-        s += " type " + ((Class) lList[i]).getName();
-        s += " listener " + lList[i + 1];
+        sb.append(" type ").append(((Class) lList[i]).getName());
+        sb.append(" listener ").append(lList[i + 1]);
       }
-      return s;
+      return sb.toString();
     }
   }
 }

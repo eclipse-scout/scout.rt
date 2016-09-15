@@ -139,6 +139,7 @@ public abstract class AbstractExtensionChain<EXTENSION> {
     }
   }
 
+  @SuppressWarnings("squid:S00118")
   public abstract class MethodInvocation<RETURN_VALUE> {
     private Exception m_exception;
     private RETURN_VALUE m_returnValue;

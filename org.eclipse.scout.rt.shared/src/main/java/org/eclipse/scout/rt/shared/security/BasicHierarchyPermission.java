@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * With the property {@link SharedConfigProperties.PermissionLevelCheckCacheTimeToLiveProperty} a caching can be
  * configured in order to reduce the calls to {@link #execCalculateLevel(BasicHierarchyPermission)}.
  */
+@SuppressWarnings("squid:S00118")
 public abstract class BasicHierarchyPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(BasicHierarchyPermission.class);

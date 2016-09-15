@@ -429,7 +429,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
   }
 
   protected void evictOldestEntries() {
-    TreeSet<Entry<K, ExpiringElement<V>>> set = new TreeSet<Entry<K, ExpiringElement<V>>>(new StableTimestampComparator());
+    TreeSet<Entry<K, ExpiringElement<V>>> set = new TreeSet<Entry<K, ExpiringElement<V>>>(new StableTimestampComparator<K, V>());
 
     int counter = 0;
     for (Entry<K, ExpiringElement<V>> entry : m_elementMap.entrySet()) {
@@ -450,7 +450,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
     }
   }
 
-  private class StableTimestampComparator implements Comparator<Entry<K, ExpiringElement<V>>>, Serializable {
+  private static class StableTimestampComparator<K, V> implements Comparator<Entry<K, ExpiringElement<V>>>, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Override

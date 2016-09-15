@@ -21,6 +21,6 @@ public final class OfficialVersion {
 
   public static final String COPYRIGHT = "Scout " + VERSION + ", &copy; BSI Business Systems Integration AG " + 2001 + "," + Calendar.getInstance().get(Calendar.YEAR) + " EPL";
 
+  @SuppressWarnings({"squid:ClassVariableVisibilityCheck", "squid:S1444"})
   public static String customCopyrightText;
-
 }

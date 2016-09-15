@@ -176,16 +176,20 @@ public class DiagnosticSession {
       properties.add(property + "");
     }
     Collections.sort(properties);
-    String sysprops = "";
-    sysprops += "<a href=\"#\" onClick=\"javascript:toggle_visibility('sysprops'); return false;\">(show / hide)</a>";
-    sysprops += "<div id=\"sysprops\" style=\"width:600px; margin: 0px; padding: 0px; display: none; word-wrap: break-word;\">";
-    sysprops += "<dl>";
+    StringBuilder sb = new StringBuilder();
+    sb.append("<a href=\"#\" onClick=\"javascript:toggle_visibility('sysprops'); return false;\">(show / hide)</a>");
+    sb.append("<div id=\"sysprops\" style=\"width:600px; margin: 0px; padding: 0px; display: none; word-wrap: break-word;\">");
+    sb.append("<dl>");
     for (String property : properties) {
-      sysprops += "<dt>" + property + ":</b></dt><dd>" + System.getProperty(property) + "</dd>";
+      sb.append("<dt>");
+      sb.append(property);
+      sb.append(":</b></dt><dd>");
+      sb.append(System.getProperty(property));
+      sb.append("</dd>");
     }
-    sysprops += "</dl>";
-    sysprops += "</div>";
-    DiagnosticFactory.addDiagnosticItemToList(result, "System properties", sysprops, DiagnosticFactory.STATUS_INFO);
+    sb.append("</dl>");
+    sb.append("</div>");
+    DiagnosticFactory.addDiagnosticItemToList(result, "System properties", sb.toString(), DiagnosticFactory.STATUS_INFO);
 
     // environment
     List<String> envKeys = new ArrayList<String>();
@@ -193,16 +197,20 @@ public class DiagnosticSession {
       envKeys.add(envKey);
     }
     Collections.sort(envKeys);
-    String envList = "";
-    envList += "<a href=\"#\" onClick=\"javascript:toggle_visibility('env'); return false;\">(show / hide)</a>";
-    envList += "<div id=\"env\" style=\"width:600px; margin: 0px; padding: 0px; display: none; word-wrap: break-word;\">";
-    envList += "<dl>";
+    sb = new StringBuilder();
+    sb.append("<a href=\"#\" onClick=\"javascript:toggle_visibility('env'); return false;\">(show / hide)</a>");
+    sb.append("<div id=\"env\" style=\"width:600px; margin: 0px; padding: 0px; display: none; word-wrap: break-word;\">");
+    sb.append("<dl>");
     for (String envKey : envKeys) {
-      envList += "<dt>" + envKey + ":</b></dt><dd>" + System.getenv(envKey) + "</dd>";
+      sb.append("<dt>");
+      sb.append(envKey);
+      sb.append(":</b></dt><dd>");
+      sb.append(System.getenv(envKey));
+      sb.append("</dd>");
     }
-    envList += "</dl>";
-    envList += "</div>";
-    DiagnosticFactory.addDiagnosticItemToList(result, "Environment variables", envList, DiagnosticFactory.STATUS_INFO);
+    sb.append("</dl>");
+    sb.append("</div>");
+    DiagnosticFactory.addDiagnosticItemToList(result, "Environment variables", sb.toString(), DiagnosticFactory.STATUS_INFO);
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Version", "", DiagnosticFactory.STATUS_TITLE);
 

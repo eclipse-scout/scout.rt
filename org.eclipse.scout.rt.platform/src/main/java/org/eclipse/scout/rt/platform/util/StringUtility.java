@@ -822,6 +822,7 @@ public final class StringUtility {
    * Converts encoded &#92;uxxxx to unicode chars and changes special saved
    * chars to their original forms
    */
+  @SuppressWarnings("squid:ForLoopCounterChangedCheck")
   public static String convertAsciiUTF(String s) {
     if (s == null || s.length() == 0) {
       return s;
@@ -1023,6 +1024,7 @@ public final class StringUtility {
    * @return If the phone number does not match the formatting pattern the original phone number will be returned.
    *         Otherwise the formatted phone number will be returned.
    */
+  @SuppressWarnings("squid:S1643")
   public static String formatPhone(String phoneNumber, String formattingPattern, String countryCode) {
     if (phoneNumber == null) {
       return null;
@@ -1496,7 +1498,7 @@ public final class StringUtility {
     return s;
   }
 
-  @SuppressWarnings("squid:S1166")
+  @SuppressWarnings({"squid:S1166", "squid:S00108"})
   public static byte[] compress(String s) {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
@@ -1552,7 +1554,7 @@ public final class StringUtility {
     return buffer.toByteArray();
   }
 
-  @SuppressWarnings("squid:S1166")
+  @SuppressWarnings({"squid:S1166", "squid:S00108"})
   public static String decompress(byte[] compressed) {
     ByteArrayInputStream in = new ByteArrayInputStream(compressed);
     Inflater inflater = new Inflater();
@@ -1707,6 +1709,7 @@ public final class StringUtility {
     return collator.compare(a, b);
   }
 
+  @SuppressWarnings({"squid:ClassVariableVisibilityCheck", "squid:S1444", "squid:S3008"})
   public static boolean STRING_INTERN_ENABLED = true;
 
   /**

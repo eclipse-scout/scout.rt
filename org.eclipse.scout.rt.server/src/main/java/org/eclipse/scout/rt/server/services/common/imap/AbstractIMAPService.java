@@ -206,12 +206,10 @@ public abstract class AbstractIMAPService implements IIMAPService {
   }
 
   private void doTask(AbstractMailTask task) {
-    if (m_opened == false) {
+    if (!m_opened) {
       throw new ProcessingException("No connection opened");
     }
-    else {
-      task.doTask(m_folder);
-    }
+    task.doTask(m_folder);
   }
 
   private abstract class AbstractMailTask {
@@ -260,7 +258,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
     public void doTask(Folder folder) {
       try {
         Message[] m = folder.getMessages();
-        if (m_deleteAll == true) {
+        if (m_deleteAll) {
           m_toDelete = folder.getMessages();
         }
         for (int i = 0; i < Array.getLength(m_toDelete); i++) {

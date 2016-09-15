@@ -58,7 +58,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private final Object m_childNodeListLock;
   private List<ITreeNode> m_childNodeList;
   private final Object m_filteredChildNodesLock;
-  private List<ITreeNode> m_filteredChildNodes;
+  private volatile List<ITreeNode> m_filteredChildNodes;
   private int m_status;
   private final Cell m_cell;
   private List<IMenu> m_menus;

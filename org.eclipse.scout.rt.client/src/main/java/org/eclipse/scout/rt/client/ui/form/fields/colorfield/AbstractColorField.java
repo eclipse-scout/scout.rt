@@ -65,9 +65,9 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
       // try to parse any kind of RGB
       matcher = RGB_COLOR_PATTERN.matcher(text);
       if (matcher.matches()) {
-        int r = Integer.valueOf(matcher.group(1));
-        int g = Integer.valueOf(matcher.group(2));
-        int b = Integer.valueOf(matcher.group(3));
+        int r = Integer.parseInt(matcher.group(1));
+        int g = Integer.parseInt(matcher.group(2));
+        int b = Integer.parseInt(matcher.group(3));
         if (r < 0 || r > 255
             || g < 0 || g > 255
             || b < 0 || b > 255) {

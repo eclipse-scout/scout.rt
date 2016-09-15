@@ -167,6 +167,7 @@ public class BindParser {
     int index = m_pos.getIndex();
     if (matches("'")) {
       while (parseTextChar()) {
+        // nop
       }
       if (!matches("'")) {
         LOG.warn("expected ' at position {} of {}", m_pos.getIndex(), m_str);
@@ -199,15 +200,11 @@ public class BindParser {
     String attribute = null;
     String op = null;
     IToken token = null;
-    if ((attribute = parseAttribute()) != null && parseWhitespace(0) && (op = parseOp()) != null && parseWhitespace(0)) {
-    }
-    else {
+    if ((attribute = parseAttribute()) == null || !parseWhitespace(0) || (op = parseOp()) == null || !parseWhitespace(0)) {
       m_pos.setIndex(index);
       attribute = null;
       op = null;
-      if ((op = parseOp()) != null && parseWhitespace(0)) {
-      }
-      else {
+      if ((op = parseOp()) == null || !parseWhitespace(0)) {
         m_pos.setIndex(index);
       }
     }
@@ -387,6 +384,7 @@ public class BindParser {
     }
     int index = m_pos.getIndex();
     while (parseNameChar()) {
+      // nop
     }
     if (m_pos.getIndex() > index) {
       return m_str.substring(index, m_pos.getIndex());
@@ -403,6 +401,7 @@ public class BindParser {
     }
     int index = m_pos.getIndex();
     while (parseNumberChar()) {
+      // nop
     }
     if (m_pos.getIndex() > index) {
       return m_str.substring(index, m_pos.getIndex());
@@ -495,12 +494,7 @@ public class BindParser {
     }
     int index = m_pos.getIndex();
     int len = m_str.length();
-    if (index < len && NAME_MAP.indexOf(m_str.charAt(index)) >= 0) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return index < len && NAME_MAP.indexOf(m_str.charAt(index)) >= 0;
   }
 
   private boolean parseWhitespace(int nunRequired) {

@@ -550,6 +550,7 @@ public final class BookmarkUtility {
     return createBookmark(activePage);
   }
 
+  @SuppressWarnings("squid:S1643")
   public static Bookmark createBookmark(IPage<?> page) {
     if (page == null || page.getOutline() == null) {
       return null;

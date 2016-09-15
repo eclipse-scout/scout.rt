@@ -123,6 +123,7 @@ public final class VerboseUtility {
     return shortText;
   }
 
+  @SuppressWarnings("squid:S1643")
   public static String dumpType(Class cls) {
     if (cls == null) {
       return "null";

@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONObject;
 
+@SuppressWarnings("squid:S00118")
 public abstract class JsonTableUserFilter<T extends IUserFilterState> implements IJsonObject {
   private T m_filter;
   private JsonTable m_jsonTable;

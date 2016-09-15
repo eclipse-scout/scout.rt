@@ -134,7 +134,7 @@ public class CookieAccessController implements IAccessController {
    * @return the verified value extracted from the signedValue
    */
   protected String verifyValue(String signedValue) {
-    if (signedValue != null && signedValue.indexOf(':') > 0) {
+    if (signedValue != null && signedValue.indexOf(':') > -1) {
       String value = signedValue.substring(signedValue.indexOf(':') + 1);
       if (signValue(value).equals(signedValue)) {
         return value;

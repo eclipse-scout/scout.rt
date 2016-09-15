@@ -680,9 +680,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           cell.setText(bm.getTitle());
         }
         cell.setTooltipText(bm.getText());
-        if (StringUtility.isNullOrEmpty(bm.getIconId())) {
-        }
-        else {
+        if (!StringUtility.isNullOrEmpty(bm.getIconId())) {
           cell.setIconId(bm.getIconId());
         }
         if (bm.isNew()) {

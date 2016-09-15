@@ -94,6 +94,7 @@ public class NodeIdentifier {
 
     @Override
     @Deprecated // Remove fallback in Scout 7.1.x
+    @SuppressWarnings("squid:MissingDeprecatedCheck")
     protected String getDefaultValue() {
       return ConfigUtility.getProperty("org.eclipse.scout.rt.server.clusterNodeId");
     }

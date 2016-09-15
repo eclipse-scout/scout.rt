@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
+@SuppressWarnings("squid:S00118")
 public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MODEL_ELEMENT> {
   private IUiSession m_uiSession;
   private boolean m_global;

@@ -28,14 +28,14 @@ public final class ActionUtility {
   private ActionUtility() {
   }
 
-  public static IActionFilter FALSE_FILTER = new IActionFilter() {
+  public static final IActionFilter FALSE_FILTER = new IActionFilter() {
     @Override
     public boolean accept(IAction action) {
       return false;
     }
   };
 
-  public static IActionFilter TRUE_FILTER = new IActionFilter() {
+  public static final IActionFilter TRUE_FILTER = new IActionFilter() {
     @Override
     public boolean accept(IAction action) {
       return true;

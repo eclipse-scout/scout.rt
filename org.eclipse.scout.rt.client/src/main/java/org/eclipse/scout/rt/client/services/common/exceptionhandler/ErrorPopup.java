@@ -60,6 +60,7 @@ public class ErrorPopup {
         .show();
   }
 
+  @SuppressWarnings("squid:S1643")
   protected void ensureErrorParsed(Throwable exception) {
     if (!m_parsed.compareAndSet(false, true)) {
       return;

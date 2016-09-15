@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 
+@SuppressWarnings("squid:S00118")
 public abstract class JsonFormField<FORM_FIELD extends IFormField> extends AbstractJsonPropertyObserver<FORM_FIELD> {
 
   private static final String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";

@@ -759,6 +759,7 @@ public class SqlParser {
     return list;
   }
 
+  @SuppressWarnings("squid:S1643")
   private List<IToken> tokenizeRaw(List<IToken> list, Pattern p, Class<? extends IToken> tokenType, boolean transcodeDelimiters) {
     ArrayList<IToken> newList = new ArrayList<IToken>(list.size());
     for (IToken item : list) {

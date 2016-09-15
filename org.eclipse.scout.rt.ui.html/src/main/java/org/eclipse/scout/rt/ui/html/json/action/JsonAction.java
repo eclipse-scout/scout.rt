@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBu
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
+@SuppressWarnings("squid:S00118")
 public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPropertyObserver<ACTION> {
   public static final String EVENT_DO_ACTION = "doAction";
 

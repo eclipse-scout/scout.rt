@@ -1209,7 +1209,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void removeAttachment(BinaryResource attachment) {
     if (attachment != null) {
-      m_attachments.remove(attachment);
+      m_attachments.remove(attachment.getFilename());
     }
   }
 

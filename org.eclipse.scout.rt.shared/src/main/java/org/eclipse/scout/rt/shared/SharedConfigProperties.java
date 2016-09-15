@@ -143,6 +143,7 @@ public final class SharedConfigProperties {
   public static class CompressServiceTunnelRequestProperty extends AbstractBooleanConfigProperty {
 
     @Override
+    @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
     protected Boolean getDefaultValue() {
       // no default value. means the response decides
       return null;

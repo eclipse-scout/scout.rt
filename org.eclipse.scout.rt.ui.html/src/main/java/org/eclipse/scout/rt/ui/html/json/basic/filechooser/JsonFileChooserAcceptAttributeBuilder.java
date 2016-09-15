@@ -59,7 +59,7 @@ public class JsonFileChooserAcceptAttributeBuilder {
    */
   public JsonFileChooserAcceptAttributeBuilder withType(String mimeTypeOrExtension) {
     if (mimeTypeOrExtension != null) {
-      if (mimeTypeOrExtension.indexOf('/') > 0) {
+      if (mimeTypeOrExtension.indexOf('/') > -1) {
         //mime type
         m_mimeTypeToAcceptType.put(mimeTypeOrExtension, convertToAcceptType(mimeTypeOrExtension, null));
       }

@@ -28,6 +28,7 @@
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
     <sonar.sources>src/main,pom.xml</sonar.sources>
+    <sonar.exclusions>**/resources/WebContent/**,src/main/resources/org/eclipse/scout/rt/ui/html/json/defaultValues.json</sonar.exclusions>
   </properties>
 
   <dependencies>

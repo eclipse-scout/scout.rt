@@ -57,7 +57,8 @@ public class InvalidateCacheNotificationCoalescer implements ICoalescer<Invalida
 
   @SuppressWarnings("unchecked")
   protected void coalesceFilters(List<ICacheEntryFilter<?, ?>> list, ICacheEntryFilter filter) {
-    for (Iterator<ICacheEntryFilter<?, ?>> iterator = list.iterator(); iterator.hasNext();) {
+    Iterator<ICacheEntryFilter<?, ?>> iterator = list.iterator();
+    while (iterator.hasNext()) {
       ICacheEntryFilter<?, ?> otherFilter = iterator.next();
       ICacheEntryFilter<?, ?> newFilter = filter.coalesce(otherFilter);
       newFilter = newFilter != null ? newFilter : otherFilter.coalesce(filter);

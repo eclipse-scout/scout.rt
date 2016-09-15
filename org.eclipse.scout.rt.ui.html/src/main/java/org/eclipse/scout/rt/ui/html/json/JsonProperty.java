@@ -20,6 +20,7 @@ import java.util.List;
  * @param <MODEL_ELEMENT>
  *          Type of model object
  */
+@SuppressWarnings("squid:S00118")
 public abstract class JsonProperty<MODEL_ELEMENT> {
 
   private final String m_propertyName;

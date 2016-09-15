@@ -45,6 +45,7 @@ public final class JsonUtility {
    * Suppose you are using JSON to keep configuration files, which you would like to annotate. Go ahead and insert all
    * the comments you like. Then pipe it through JSMin before handing it to your JSON parser.﻿"</i> </blockquote>
    */
+  @SuppressWarnings("squid:ForLoopCounterChangedCheck")
   public static String stripCommentsFromJson(String input) {
     if (input == null) {
       return null;

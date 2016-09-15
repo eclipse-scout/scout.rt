@@ -487,7 +487,7 @@ public final class SVGUtility {
   private static float convertToPx(String valueWithUnit) {
     Matcher m = Pattern.compile("([0-9.]+)([^0-9.]*)").matcher(valueWithUnit);
     m.matches();
-    float f = Float.valueOf(m.group(1));
+    float f = Float.parseFloat(m.group(1));
     String unit = m.group(2);
     if (unit == null) {
       return f;

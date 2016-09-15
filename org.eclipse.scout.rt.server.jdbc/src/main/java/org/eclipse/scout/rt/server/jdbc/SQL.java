@@ -48,6 +48,8 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
  * @see ISqlService
  */
 public final class SQL {
+
+  @SuppressWarnings({"squid:ClassVariableVisibilityCheck", "squid:S1444"})
   public static Class<? extends ISqlService> usedServiceType = ISqlService.class;
 
   private SQL() {
@@ -181,5 +183,4 @@ public final class SQL {
     ISqlService service = BEANS.get(usedServiceType);
     return service.getSequenceNextval(sequenceName);
   }
-
 }

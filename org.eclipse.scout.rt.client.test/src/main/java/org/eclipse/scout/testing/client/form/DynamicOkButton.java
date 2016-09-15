@@ -11,10 +11,12 @@
 package org.eclipse.scout.testing.client.form;
 
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Dynamic field to build an ad-hoc application for testing
  */
+@ClassId("570af8aa-d7da-4165-b73b-a37e7d0873c2")
 public class DynamicOkButton extends AbstractOkButton {
 
   public DynamicOkButton() {

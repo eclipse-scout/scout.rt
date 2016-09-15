@@ -1101,7 +1101,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
       // Put at the beginning to make sure no subsequent event contains the deleted row
       bufferInternal.add(0, new TableEvent(getModel(), TableEvent.TYPE_ROWS_DELETED, rowsToDelete));
-      i++;
+      i++; // NOSONAR
     }
   }
 

@@ -73,12 +73,7 @@ class TableBeanHolderInput implements IBindInput {
     if (m_target.isPlainValue()) {
       return false;
     }
-    else if (m_target.isPlainSql()) {
-      return false;
-    }
-    else {
-      return true;
-    }
+    return !m_target.isPlainSql();
   }
 
   @Override

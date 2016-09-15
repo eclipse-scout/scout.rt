@@ -120,6 +120,7 @@ public class IntoParser {
     int index = m_pos.getIndex();
     if (matches("'")) {
       while (parseTextChar()) {
+        // nop
       }
       if (!matches("'")) {
         LOG.warn("expected ' at position {} of {}", m_pos.getIndex(), m_str);
@@ -226,6 +227,7 @@ public class IntoParser {
     }
     int index = m_pos.getIndex();
     while (parseNameChar()) {
+      // nop
     }
     if (m_pos.getIndex() > index) {
       return true;

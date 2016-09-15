@@ -193,6 +193,7 @@ public class ServicesView extends DefaultView {
     renderStates(p, service, inv);
   }
 
+  @SuppressWarnings("squid:S1643")
   private void renderHierarchy(HtmlComponent p, ServiceInspector service, ReflectServiceInventory inv) {
     // hierarchy
     Class serviceClass = service.getService().getClass();

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.checkbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -72,7 +73,7 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
       // in that case we must "revert" the click in the UI, so that UI and model are in-sync again. This may happen, when the model-field throws
       // a VetoExeception in its execValidateValue() method.
       Boolean modelValue = getModel().getValue();
-      if (uiValue != modelValue) {
+      if (CompareUtility.notEquals(uiValue, modelValue)) {
         addPropertyChangeEvent(IValueField.PROP_VALUE, modelValue);
       }
     }

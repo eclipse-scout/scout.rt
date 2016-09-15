@@ -40,6 +40,7 @@ import org.json.JSONObject;
  *
  * @param <VALUE_FIELD>
  */
+@SuppressWarnings("squid:S00118")
 public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends JsonFormField<VALUE_FIELD> implements IJsonContextMenuOwner {
 
   /**

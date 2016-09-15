@@ -110,7 +110,7 @@ public class Status implements IStatus, Serializable {
       return o.getSeverity() - getSeverity();
     }
     else if (o.getOrder() - getOrder() != 0) {
-      return Double.valueOf(getOrder() - o.getOrder()).intValue();
+      return (int) ((getOrder() - o.getOrder()));
     }
     else if (getMessage() != null && o.getMessage() != null) {
       return getMessage().compareTo(o.getMessage());

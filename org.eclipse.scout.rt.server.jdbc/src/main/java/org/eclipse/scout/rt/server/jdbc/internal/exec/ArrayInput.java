@@ -34,9 +34,7 @@ class ArrayInput implements IBindInput {
     m_arrayLen = m_array != null ? Array.getLength(m_array) : 0;
     m_target = target;
     // initialize target
-    if (isBatch()) {
-    }
-    else {
+    if (!isBatch()) {
       if (!sqlStyle.isCreatingInListGeneratingBind(m_array)) {
         m_target.setPlainValue(true);
       }
@@ -83,12 +81,7 @@ class ArrayInput implements IBindInput {
       if (m_target.isPlainValue()) {
         return false;
       }
-      else if (m_target.isPlainSql()) {
-        return false;
-      }
-      else {
-        return true;
-      }
+      return !m_target.isPlainSql();
     }
     else {
       return m_target.getParsedAttribute() != null && !m_target.isPlainSql() && !m_target.isPlainValue() && sqlStyle.isCreatingInListGeneratingBind(m_array);

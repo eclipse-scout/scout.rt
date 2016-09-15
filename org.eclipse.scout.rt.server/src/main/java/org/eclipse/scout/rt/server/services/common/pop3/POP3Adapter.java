@@ -132,9 +132,7 @@ public class POP3Adapter {
           Message m = folder.getMessage(i + 1);
           if (!m.isSet(Flags.Flag.SEEN)) {
             boolean ok = visitor.visit(m);
-            if (ok) {
-            }
-            else {
+            if (!ok) {
               break;
             }
           }

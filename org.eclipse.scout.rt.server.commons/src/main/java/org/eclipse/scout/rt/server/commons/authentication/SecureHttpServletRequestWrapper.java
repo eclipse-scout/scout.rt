@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class SecureHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-  private static List<String> AUTH_TYPES = CollectionUtility.arrayList(BASIC_AUTH, FORM_AUTH, CLIENT_CERT_AUTH, DIGEST_AUTH, "NTLM");
+  private static final List<String> AUTH_TYPES = CollectionUtility.arrayList(BASIC_AUTH, FORM_AUTH, CLIENT_CERT_AUTH, DIGEST_AUTH, "NTLM");
 
   private final Principal m_principal;
   private final String m_authType;

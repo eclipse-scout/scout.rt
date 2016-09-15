@@ -82,9 +82,6 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     if (m_item instanceof ICalendarAppointment) {
       m_fullDay = ((ICalendarAppointment) m_item).isFullDay();
     }
-    else if (m_item instanceof ICalendarTask) {
-      m_fullDay = true;
-    }
     else {
       m_fullDay = true;
     }

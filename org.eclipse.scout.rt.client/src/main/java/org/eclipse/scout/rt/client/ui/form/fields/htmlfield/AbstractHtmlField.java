@@ -171,7 +171,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   public void removeAttachment(BinaryResource attachment) {
     if (attachment != null) {
-      m_attachments.remove(attachment);
+      m_attachments.remove(attachment.getFilename());
     }
   }
 

@@ -41,7 +41,7 @@ public class InteractiveTestSuite extends Runner {
   }
 
   @Override
-  @SuppressWarnings("squid:S1181")
+  @SuppressWarnings({"squid:S1181", "squid:S1166"})
   public void run(final RunNotifier notifier) {
     System.out.println("Started interactive test console. (Auto-closing in 30 seconds when no input is entered, assuming it is a ci-test-run)");
     String lastLine = "";

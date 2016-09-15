@@ -211,14 +211,14 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * Method invoked to deserialize a service request to be given to the service handler.
    */
-  protected ServiceTunnelRequest deserializeServiceRequest() throws Exception {
+  protected ServiceTunnelRequest deserializeServiceRequest() throws IOException, ClassNotFoundException {
     return m_contentHandler.readRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getInputStream());
   }
 
   /**
    * Method invoked to serialize a service response to be sent back to the client.
    */
-  protected void serializeServiceResponse(ServiceTunnelResponse serviceResponse) throws Exception {
+  protected void serializeServiceResponse(ServiceTunnelResponse serviceResponse) throws IOException {
     HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 

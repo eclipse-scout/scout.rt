@@ -85,7 +85,7 @@ public final class UrlHints {
           SESSION_ATTRIBUTE_CACHE_HINT,
           UrlHints.SESSION_ATTRIBUTE_COMPRESS_HINT,
           SESSION_ATTRIBUTE_MINIFY_HINT);
-      updateHint(req, debug.booleanValue(), SESSION_ATTRIBUTE_INSPECTOR_HINT);
+      updateHint(req, debug, SESSION_ATTRIBUTE_INSPECTOR_HINT);
     }
 
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_INSPECTOR_HINT), SESSION_ATTRIBUTE_INSPECTOR_HINT);
@@ -108,6 +108,7 @@ public final class UrlHints {
     }
   }
 
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   private static Boolean getRequestParameterBoolean(HttpServletRequest req, String name) {
     String s = req.getParameter(name);
     return s != null ? ("true".equals(s)) : null;

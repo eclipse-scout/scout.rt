@@ -12,11 +12,13 @@ package org.eclipse.scout.testing.client.form;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * Dynamic group box to build an ad-hoc application for testing
  */
+@ClassId("23b1f701-f076-40a6-85cc-505b1ca27220")
 public class DynamicGroupBox extends AbstractGroupBox {
   private IFormField[] m_injectedFields;
 

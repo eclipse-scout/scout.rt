@@ -324,7 +324,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   @ConfigOperation
   @Order(35)
-  protected void execReleaseConnection(Connection conn) throws Throwable {
+  protected void execReleaseConnection(Connection conn) throws SQLException {
     releaseConnectionInternal(conn);
   }
 
@@ -445,7 +445,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     execAfterConnectionCreated(conn);
   }
 
-  public void callbackTestConnection(Connection conn) throws Throwable {
+  public void callbackTestConnection(Connection conn) throws SQLException {
     execTestConnection(conn);
   }
 
@@ -575,7 +575,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     try {
       execReleaseConnection(conn);
     }
-    catch (Throwable e) {
+    catch (SQLException | RuntimeException e) {
       LOG.error("Could not release connection", e);
     }
   }
@@ -757,6 +757,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
    *         "com.myapp.shared.core.security.ReadDataPermission" is loaded by the bundle with symbolic name
    *         "com.myapp.shared.core".
    */
+  @SuppressWarnings("squid:S1643")
   private Class loadBundleClassLenient(Map<String, List<Class<?>>> map, String name) {
     String base = name;
     String suffix = "";

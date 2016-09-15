@@ -142,8 +142,6 @@ public final class MessageBoxes {
         else if (i == 10) {
           t.append("  ...\n");
         }
-        else {
-        }
         i++;
       }
     }

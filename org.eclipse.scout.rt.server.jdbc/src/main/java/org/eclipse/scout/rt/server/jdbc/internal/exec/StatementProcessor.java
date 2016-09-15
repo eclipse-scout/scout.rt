@@ -1505,7 +1505,8 @@ public class StatementProcessor implements IStatementProcessor {
       try {
         rs.close();
       }
-      catch (Exception t) {
+      catch (Exception e) {
+        LOG.warn("could not close ResultSet", e);
       }
     }
     cache.releasePreparedStatement(ps);

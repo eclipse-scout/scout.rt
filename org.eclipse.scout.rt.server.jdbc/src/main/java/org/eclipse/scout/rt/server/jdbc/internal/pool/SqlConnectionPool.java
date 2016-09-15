@@ -122,7 +122,7 @@ public class SqlConnectionPool {
           try {
             service.callbackTestConnection(candidate.conn);
           }
-          catch (Throwable t) {
+          catch (Exception e) {
             // remove candidate from idle pool and close it
             m_idleEntries.remove(candidate);
             LOG.warn("closing dirty connection: {}", candidate.conn);
@@ -130,6 +130,7 @@ public class SqlConnectionPool {
               candidate.conn.close();
             }
             catch (Exception fatal) {
+              LOG.warn("could not close candidate connection", fatal);
             }
             candidate = null;
           }

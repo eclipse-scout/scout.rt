@@ -14,7 +14,9 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public abstract class AbstractBooleanConfigProperty extends AbstractConfigProperty<Boolean> {
+
   @Override
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean parse(String value) {
     if (!StringUtility.hasText(value)) {
       return null;

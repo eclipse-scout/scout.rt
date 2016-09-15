@@ -463,7 +463,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * permission set
    */
   @Override
-  @SuppressWarnings("squid:S1185") // method is final
+  @SuppressWarnings("squid:S1185")
   public void setVisibleGranted(boolean b) {
     super.setVisibleGranted(b);
   }
