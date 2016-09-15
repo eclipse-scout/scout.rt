@@ -25,7 +25,7 @@ import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
  * @since 5.2
  */
 @ClassId("cee88505-5685-438d-a87d-591c54efe8d7")
-public class AbstractChartField<T extends IChart> extends AbstractFormField implements IChartField<T> {
+public abstract class AbstractChartField<T extends IChart> extends AbstractFormField implements IChartField<T> {
 
   private T m_chart;
 

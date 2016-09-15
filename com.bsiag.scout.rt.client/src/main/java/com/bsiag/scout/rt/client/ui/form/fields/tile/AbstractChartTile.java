@@ -47,6 +47,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean getConfiguredAutoColor() {
     return null;
   }
@@ -56,6 +57,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean getConfiguredClickable() {
     return null;
   }
@@ -65,6 +67,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   protected Boolean getConfiguredAnimated() {
     return null;
   }
