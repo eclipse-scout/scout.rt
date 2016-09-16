@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
  *
  * @see ConcurrentExpiringMap
  */
+@SuppressWarnings("squid:S2160")
 public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
   private final EventListenerList m_listenerList = new EventListenerList();
 

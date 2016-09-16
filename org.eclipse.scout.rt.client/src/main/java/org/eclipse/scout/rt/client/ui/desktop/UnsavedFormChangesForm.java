@@ -268,5 +268,36 @@ public class UnsavedFormChangesForm extends AbstractForm {
       }
       return formRows;
     }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = super.hashCode();
+      result = prime * result + ((m_unsavedForms == null) ? 0 : m_unsavedForms.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (!super.equals(obj)) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      UnsavedFormsLookupCall other = (UnsavedFormsLookupCall) obj;
+      if (m_unsavedForms == null) {
+        if (other.m_unsavedForms != null) {
+          return false;
+        }
+      }
+      else if (!m_unsavedForms.equals(other.m_unsavedForms)) {
+        return false;
+      }
+      return true;
+    }
   }
 }

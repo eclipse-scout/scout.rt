@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@SuppressWarnings("squid:S2160")
 public final class DataModelAttributeOp implements DataModelConstants {
 
   private DataModelAttributeOp() {

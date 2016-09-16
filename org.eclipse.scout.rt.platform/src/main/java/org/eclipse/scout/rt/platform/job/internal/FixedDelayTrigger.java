@@ -16,6 +16,7 @@ import org.quartz.impl.triggers.AbstractTrigger;
  *
  * @since 5.2
  */
+@SuppressWarnings("squid:S2160")
 public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> implements IFixedDelayTrigger {
 
   private static final long serialVersionUID = 1L;

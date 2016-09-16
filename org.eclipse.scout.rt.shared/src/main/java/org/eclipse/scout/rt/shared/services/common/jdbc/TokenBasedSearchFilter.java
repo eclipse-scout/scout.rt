@@ -85,6 +85,55 @@ public class TokenBasedSearchFilter extends SearchFilter {
     return new TokenBasedSearchFilter(this);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_treeTokens == null) ? 0 : m_treeTokens.hashCode());
+    result = prime * result + ((m_valueTokens == null) ? 0 : m_valueTokens.hashCode());
+    result = prime * result + ((m_wildcardStringTokens == null) ? 0 : m_wildcardStringTokens.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    TokenBasedSearchFilter other = (TokenBasedSearchFilter) obj;
+    if (m_treeTokens == null) {
+      if (other.m_treeTokens != null) {
+        return false;
+      }
+    }
+    else if (!m_treeTokens.equals(other.m_treeTokens)) {
+      return false;
+    }
+    if (m_valueTokens == null) {
+      if (other.m_valueTokens != null) {
+        return false;
+      }
+    }
+    else if (!m_valueTokens.equals(other.m_valueTokens)) {
+      return false;
+    }
+    if (m_wildcardStringTokens == null) {
+      if (other.m_wildcardStringTokens != null) {
+        return false;
+      }
+    }
+    else if (!m_wildcardStringTokens.equals(other.m_wildcardStringTokens)) {
+      return false;
+    }
+    return true;
+  }
+
   public static class ValueToken implements Serializable {
     private static final long serialVersionUID = 1L;
 

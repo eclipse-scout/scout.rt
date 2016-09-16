@@ -82,4 +82,35 @@ public class KeyStrokeLookupCall extends LocalLookupCall<String> {
     }
     return resultList;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_currentKeyStroke == null) ? 0 : m_currentKeyStroke.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    KeyStrokeLookupCall other = (KeyStrokeLookupCall) obj;
+    if (m_currentKeyStroke == null) {
+      if (other.m_currentKeyStroke != null) {
+        return false;
+      }
+    }
+    else if (!m_currentKeyStroke.equals(other.m_currentKeyStroke)) {
+      return false;
+    }
+    return true;
+  }
 }

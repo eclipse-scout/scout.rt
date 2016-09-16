@@ -136,7 +136,7 @@ scout.DateFormat = function(locale, pattern) { // NOSONAR
    *   @return
    *            A string with the matched part of the input, or null if it did not match.
    */
-  var DateFormatPatternDefinition = function(options) {
+  var DateFormatPatternDefinition = function(options) { // NOSONAR
     options = options || {};
     this.type = options.type;
     // List of termins meaning the same thing

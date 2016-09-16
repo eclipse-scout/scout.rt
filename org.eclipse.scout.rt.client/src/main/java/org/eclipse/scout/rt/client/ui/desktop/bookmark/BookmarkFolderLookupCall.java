@@ -66,4 +66,35 @@ public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
     }
     return rows;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_rootFolder == null) ? 0 : m_rootFolder.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    BookmarkFolderLookupCall other = (BookmarkFolderLookupCall) obj;
+    if (m_rootFolder == null) {
+      if (other.m_rootFolder != null) {
+        return false;
+      }
+    }
+    else if (!m_rootFolder.equals(other.m_rootFolder)) {
+      return false;
+    }
+    return true;
+  }
 }

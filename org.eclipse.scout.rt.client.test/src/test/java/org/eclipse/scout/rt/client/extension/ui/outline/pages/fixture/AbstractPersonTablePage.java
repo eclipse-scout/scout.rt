@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.platform.Order;
 /**
  * @since 6.0
  */
-public class AbstractPersonTablePage<T extends AbstractPersonTablePage<T>.Table> extends AbstractPageWithTable<T> {
+public abstract class AbstractPersonTablePage<T extends AbstractPersonTablePage<T>.Table> extends AbstractPageWithTable<T> {
 
   @Override
   protected Class<? extends ISearchForm> getConfiguredSearchForm() {

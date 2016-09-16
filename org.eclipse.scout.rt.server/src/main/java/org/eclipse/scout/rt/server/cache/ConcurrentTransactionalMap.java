@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
  * @see AbstractTransactionalMap
  * @since 5.2
  */
+@SuppressWarnings("squid:S2160")
 public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K, V> implements ConcurrentMap<K, V> {
   private final ConcurrentMap<K, V> m_sharedMap;
 

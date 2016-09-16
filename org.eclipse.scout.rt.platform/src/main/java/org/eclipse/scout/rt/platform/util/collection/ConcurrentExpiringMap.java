@@ -60,6 +60,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *          the type of mapped values
  * @since 5.2
  */
+@SuppressWarnings("squid:S2160")
 public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> {
   private final ConcurrentMap<K, ExpiringElement<V>> m_elementMap;
   private final long m_timeToLive;

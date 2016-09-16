@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-var JasmineMavenReporter = function(options) {
+var JasmineMavenReporter = function(options) { // NOSONAR
   var noopTimer = {
     start: function() {},
     elapsed: function() {
