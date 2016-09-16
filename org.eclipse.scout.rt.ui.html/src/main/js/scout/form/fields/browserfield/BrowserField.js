@@ -73,13 +73,16 @@ scout.BrowserField.prototype._renderIframeProperties = function() {
 };
 
 scout.BrowserField.prototype._renderLocation = function() {
+  // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
+  // empty locations simply remove the src attribute but don't remove the old content.
+  var location = this.location || 'about:blank';
   if (!this.showInExternalWindow) {
     // <iframe>
-    this.$field.attr('src', this.location);
+    this.$field.attr('src', location);
   } else {
     // fallback: separate window
     if (this._popupWindow && !this._popupWindow.closed) {
-      this._popupWindow.location = this.location;
+      this._popupWindow.location = location;
     }
   }
 };
@@ -163,7 +166,8 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
       'width=' + windowWidth,
       'height=' + windowHeight
     );
-    this._popupWindow = popupBlockerHandler.openWindow(this.location,
+    var location = this.location || 'about:blank';
+    this._popupWindow = popupBlockerHandler.openWindow(location,
       undefined,
       windowSpecs);
     if (this._popupWindow) {
@@ -171,7 +175,7 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
     } else {
       $.log.warn('Popup-blocker detected! Show link to open window manually');
       popupBlockerHandler.showNotification(function() {
-        this._popupWindow = window.open(this.location,
+        this._popupWindow = window.open(location,
           undefined,
           windowSpecs);
         this._popupWindowOpen();
