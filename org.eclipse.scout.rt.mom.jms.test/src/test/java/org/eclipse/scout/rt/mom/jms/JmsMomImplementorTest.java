@@ -925,7 +925,7 @@ public class JmsMomImplementorTest {
     // Initiate 'request-reply' communication
     try {
       MOM.request(JmsTestMom.class, destination, "hello world", MOM.newPublishInput()
-          .withRequestReplyTimeout(1, TimeUnit.MILLISECONDS));
+          .withRequestReplyTimeout(1, TimeUnit.SECONDS));
     }
     catch (TimedOutException e) {
       requestorTimedOut.set(true);
