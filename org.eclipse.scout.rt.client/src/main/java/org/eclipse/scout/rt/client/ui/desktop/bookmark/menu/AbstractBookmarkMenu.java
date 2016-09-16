@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -81,7 +82,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     return BookmarkForm.class;
   }
 
-  private void createNewBookmark(int kind) {
+  protected void createNewBookmark(int kind) {
     Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
     if (b != null) {
       IBookmarkService service = BEANS.get(IBookmarkService.class);
@@ -121,7 +122,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
   }
 
-  private void handleBookmarksChanged() {
+  protected void handleBookmarksChanged() {
     IBookmarkService service = BEANS.get(IBookmarkService.class);
     List<IMenu> oldList = getChildActions();
     List<IMenu> newList = new ArrayList<IMenu>();
@@ -153,6 +154,25 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     newList.add(new MenuSeparator());
     addBookmarkTreeInternal(service.getBookmarkData().getUserBookmarks(), newList);
     setChildActions(newList);
+  }
+
+  protected void addBookmarkTreeInternal(BookmarkFolder folder, List<IMenu> actionList) {
+    for (BookmarkFolder f : folder.getFolders()) {
+      IMenu group = new MenuSeparator();
+      group.setSeparator(false);
+      group.setText(f.getTitle());
+      group.setIconId(f.getIconId());
+      List<IMenu> childActionList = new ArrayList<IMenu>();
+      addBookmarkTreeInternal(f, childActionList);
+      group.setChildActions(childActionList);
+      actionList.add(group);
+    }
+    List<IMenu> newActions = new ArrayList<>();
+    for (Bookmark b : folder.getBookmarks()) {
+      newActions.add(new ActivateBookmarkMenu(b));
+    }
+    ActionUtility.initActions(newActions);
+    actionList.addAll(newActions);
   }
 
   @Order(1)
@@ -280,28 +300,10 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
         service.storeBookmarks();
       }
     }
-
   }
 
   @Order(5)
   @ClassId("9dba06d9-a3a7-4c78-bc9a-b654ea6ee5c0")
   public class Separator1Menu extends AbstractMenuSeparator {
   }
-
-  private void addBookmarkTreeInternal(BookmarkFolder folder, List<IMenu> actionList) {
-    for (BookmarkFolder f : folder.getFolders()) {
-      IMenu group = new MenuSeparator();
-      group.setSeparator(false);
-      group.setText(f.getTitle());
-      group.setIconId(f.getIconId());
-      List<IMenu> childActionList = new ArrayList<IMenu>();
-      addBookmarkTreeInternal(f, childActionList);
-      group.setChildActions(childActionList);
-      actionList.add(group);
-    }
-    for (Bookmark b : folder.getBookmarks()) {
-      actionList.add(new ActivateBookmarkMenu(b));
-    }
-  }
-
 }

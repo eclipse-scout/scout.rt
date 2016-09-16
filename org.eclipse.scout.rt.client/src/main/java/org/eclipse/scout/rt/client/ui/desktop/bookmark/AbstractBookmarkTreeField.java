@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -221,8 +220,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
    */
   private void populateFolderContentRec(ITreeNode parent, BookmarkFolder newParent) {
     for (BookmarkFolder newFolder : newParent.getFolders()) {
-      FolderNode newNode = new FolderNode();
-      newNode.getCellForUpdate().setValue(newFolder);
+      FolderNode newNode = new FolderNode(newFolder);
       getTree().addChildNode(parent, newNode);
       populateFolderContentRec(newNode, newFolder);
     }
@@ -449,10 +447,10 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       form.startModify();
       form.waitFor();
       if (form.isFormStored()) {
-        ITreeNode newNode = new FolderNode();
         BookmarkFolder bmFolder = new BookmarkFolder();
         bmFolder.setTitle(form.getNameField().getValue());
-        newNode.getCellForUpdate().setValue(bmFolder);
+        ITreeNode newNode = new FolderNode(bmFolder);
+
         //append after last folder
         ITreeNode lastFolderNode = null;
         for (ITreeNode tmp : parentNode.getChildNodes()) {
@@ -479,7 +477,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+        return CollectionUtility.hashSet(TreeMenuType.EmptySpace);
       }
 
       @Override
@@ -525,7 +523,14 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
   }
 
-  private class FolderNode extends AbstractTreeNode {
+  protected class FolderNode extends AbstractTreeNode {
+
+    protected FolderNode(BookmarkFolder bookmarkFolder) {
+      super(false);
+      getCellForUpdate().setValue(bookmarkFolder);
+      callInitializer();
+    }
+
     @Override
     protected void execDecorateCell(Cell cell) {
       BookmarkFolder bmFolder = (BookmarkFolder) getCell().getValue();
@@ -660,7 +665,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       return Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle())
           || Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle());
     }
-
   }
 
   private class BookmarkNode extends AbstractTreeNode implements IBookmarkNode {
