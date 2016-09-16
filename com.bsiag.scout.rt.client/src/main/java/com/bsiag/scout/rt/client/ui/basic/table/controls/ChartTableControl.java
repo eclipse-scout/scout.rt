@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
 
 @ClassId("c097daeb-8105-4e11-bd02-ba37e461e033")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class ChartTableControl extends AbstractTableControl implements IChartTableControl {
 
   public ChartTableControl() {

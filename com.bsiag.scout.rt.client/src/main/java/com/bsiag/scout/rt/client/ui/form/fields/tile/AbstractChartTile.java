@@ -130,6 +130,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
     return getTileField().getChart();
   }
 
+  @Order(10)
   @ClassId("fb72a598-b9ca-44b7-b1be-0ca1a33bca6b")
   public class ChartField extends AbstractChartField<ChartField.Chart> {
 
