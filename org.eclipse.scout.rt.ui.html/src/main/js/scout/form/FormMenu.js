@@ -42,17 +42,6 @@ scout.FormMenu.prototype._renderForm = function() {
 /**
  * @override
  */
-scout.FormMenu.prototype._renderText = function() {
-  scout.FormMenu.parent.prototype._renderText.call(this);
-  if (this.rendered && this.popup && this.popup instanceof scout.FormMenuPopup) {
-    this.popup.rerenderHead();
-    this.popup.position();
-  }
-};
-
-/**
- * @override
- */
 scout.FormMenu.prototype.cloneAdapter = function(modelOverride) {
   modelOverride = modelOverride || {};
   // If the FormMenu is put into a context menu it will be cloned.
