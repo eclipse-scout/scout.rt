@@ -121,7 +121,9 @@ public class BeanManagerImplementor implements IBeanManager {
     }
 
     T proxy = new BeanProxyImplementor<T>(bean, decorator, beanClazz).getProxy();
-    return new BeanImplementor<T>(new BeanMetaData(beanClazz).withInitialInstance(proxy).withAnnotations(bean.getBeanAnnotations().values()));
+    return createBeanImplementor(new BeanMetaData(beanClazz)
+        .withInitialInstance(proxy)
+        .withAnnotations(bean.getBeanAnnotations().values()));
   }
 
   @Override
@@ -143,7 +145,7 @@ public class BeanManagerImplementor implements IBeanManager {
   public <T> IBean<T> registerBean(BeanMetaData beanData) {
     m_lock.writeLock().lock();
     try {
-      IBean<T> bean = new BeanImplementor<T>(beanData);
+      IBean<T> bean = createBeanImplementor(beanData);
       for (Class<?> type : listImplementedTypes(bean)) {
         BeanHierarchy h = m_beanHierarchies.get(type);
         if (h == null) {
@@ -161,7 +163,7 @@ public class BeanManagerImplementor implements IBeanManager {
 
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized void unregisterBean(IBean bean) {
+  public synchronized void unregisterBean(IBean<?> bean) {
     m_lock.writeLock().lock();
     try {
       Assertions.assertNotNull(bean);
@@ -231,6 +233,13 @@ public class BeanManagerImplementor implements IBeanManager {
 
   protected IBeanDecorationFactory getBeanDecorationFactory() {
     return m_beanDecorationFactory;
+  }
+
+  /**
+   * Creates the bean which represents the given {@link BeanMetaData}, and which is registered in bean manager.
+   */
+  protected <T> BeanImplementor<T> createBeanImplementor(BeanMetaData beanData) {
+    return new BeanImplementor<>(beanData);
   }
 
   public void startCreateImmediatelyBeans() {

@@ -26,8 +26,15 @@ public class BeanImplementor<T> implements IBean<T> {
   private final T m_initialInstance;
   private IBeanInstanceProducer<T> m_producer;
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Creates a {@link BeanImplementor} with {@link DefaultBeanInstanceProducer} to produce beans upon bean lookup.
+   */
   public BeanImplementor(BeanMetaData beanData) {
+    this(beanData, new DefaultBeanInstanceProducer<T>());
+  }
+
+  @SuppressWarnings("unchecked")
+  public BeanImplementor(BeanMetaData beanData, IBeanInstanceProducer<T> beanInstanceProducer) {
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
@@ -38,7 +45,7 @@ public class BeanImplementor<T> implements IBean<T> {
       m_producer = (IBeanInstanceProducer<T>) beanData.getProducer();
     }
     else if (!m_beanClazz.isInterface()) {
-      m_producer = new DefaultBeanInstanceProducer<T>();
+      m_producer = beanInstanceProducer;
     }
   }
 

@@ -47,7 +47,7 @@ public class PlatformImplementor implements IPlatform {
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
   private final Object m_platformStartedLock = new Object();
   private final AtomicReference<State> m_state; // may be read at any time by any thread
-  private BeanManagerImplementor m_beanContext;
+  private BeanManagerImplementor m_beanManager;
 
   public PlatformImplementor() {
     m_state = new AtomicReference<>(State.PlatformStopped);
@@ -66,7 +66,7 @@ public class PlatformImplementor implements IPlatform {
       if (getState() == State.PlatformInvalid) {
         throw new PlatformException("The platform is in an invalid state.");
       }
-      return m_beanContext;
+      return m_beanManager;
     }
     finally {
       m_platformLock.readLock().unlock();
@@ -126,7 +126,7 @@ public class PlatformImplementor implements IPlatform {
         }
 
         try {
-          m_beanContext = createBeanManager();
+          m_beanManager = createBeanManager();
           //now all IPlatformListener are registered and can receive platform events
           changeState(State.BeanManagerPrepared, true);
 
@@ -175,25 +175,25 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected BeanManagerImplementor createBeanManager() {
-    BeanManagerImplementor context = new BeanManagerImplementor();
+    BeanManagerImplementor beanManager = new BeanManagerImplementor();
     Set<Class> allBeans = new BeanFilter().collect(ClassInventory.get());
     for (Class<?> bean : allBeans) {
-      context.registerClass(bean);
+      beanManager.registerClass(bean);
     }
-    return context;
+    return beanManager;
   }
 
   protected void initBeanDecorationFactory() {
-    if (m_beanContext.getBeanDecorationFactory() != null) {
+    if (m_beanManager.getBeanDecorationFactory() != null) {
       return;
     }
-    IBean<IBeanDecorationFactory> bean = m_beanContext.optBean(IBeanDecorationFactory.class);
+    IBean<IBeanDecorationFactory> bean = m_beanManager.optBean(IBeanDecorationFactory.class);
     if (bean != null) {
-      m_beanContext.setBeanDecorationFactory(bean.getInstance());
+      m_beanManager.setBeanDecorationFactory(bean.getInstance());
       return;
     }
     LOG.warn("Using {}. Please verify that this application really has no client or server side {}", SimpleBeanDecorationFactory.class.getName(), IBeanDecorationFactory.class.getSimpleName());
-    m_beanContext.setBeanDecorationFactory(new SimpleBeanDecorationFactory());
+    m_beanManager.setBeanDecorationFactory(new SimpleBeanDecorationFactory());
   }
 
   protected void validateBeanManager() {
@@ -235,7 +235,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void startCreateImmediatelyBeans() {
-    ((BeanManagerImplementor) m_beanContext).startCreateImmediatelyBeans();
+    ((BeanManagerImplementor) m_beanManager).startCreateImmediatelyBeans();
   }
 
   @Override
@@ -256,7 +256,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void destroyBeanManager() {
-    m_beanContext = null;
+    m_beanManager = null;
   }
 
   protected void changeState(State newState, boolean throwOnIllegalStateChange) {
@@ -308,7 +308,7 @@ public class PlatformImplementor implements IPlatform {
   protected void fireStateEvent(State newState) {
     PlatformEvent event = new PlatformEvent(this, newState);
     try {
-      for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
+      for (IBean<IPlatformListener> bean : m_beanManager.getBeans(IPlatformListener.class)) {
         IPlatformListener listener = bean.getInstance();
         listener.stateChanged(event);
       }
