@@ -219,6 +219,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
    * Internal editor field
    */
   @ClassId("eb0895b4-c31e-4376-b97b-35aea0063c79")
+  @SuppressWarnings("bsiRulesDefinition:orderMissing")
   protected class MixedSmartEditorField extends AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> {
     private ITableRow m_row;
 

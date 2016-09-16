@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
  * flexibility in handling wizard processes.
  */
 @ClassId("f66e442b-7056-4fbd-bd72-f19a0b63c1c3")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
 
   private final IWizard m_parentWizard;

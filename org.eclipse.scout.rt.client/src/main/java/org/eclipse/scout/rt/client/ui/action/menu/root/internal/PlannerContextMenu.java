@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
  * The invisible root menu node of any activity map. (internal usage only)
  */
 @ClassId("4e3da25c-da4c-4258-aa24-e057aa9004d7")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class PlannerContextMenu extends AbstractContextMenu<IPlanner<?, ?>> implements IPlannerContextMenu {
 
   public PlannerContextMenu(IPlanner<?, ?> owner, List<? extends IMenu> initialChildMenus) {

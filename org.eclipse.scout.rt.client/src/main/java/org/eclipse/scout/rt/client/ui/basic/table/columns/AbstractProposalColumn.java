@@ -94,6 +94,7 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
    * Internal editor field
    */
   @ClassId("ceb1ae13-664c-43ce-a670-034e1f36c0b5")
+  @SuppressWarnings("bsiRulesDefinition:orderMissing")
   protected class ProposalEditorField extends AbstractProposalField<LOOKUP_TYPE> {
     private ITableRow m_row;
 
@@ -121,5 +122,4 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
       AbstractProposalColumn.this.interceptPrepareLookup(call, getRow());
     }
   }
-
 }

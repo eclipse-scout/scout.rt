@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("8af6de2d-6e4a-4008-821f-1830b6a360fd")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITreeContextMenu {
   private Set<? extends ITreeNode> m_currentSelection;
 

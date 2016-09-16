@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action.keystroke;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("e3167cec-e0d2-4f89-abc9-62696c7e250e")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class KeyStroke extends AbstractKeyStroke {
   private String m_id;
 
@@ -29,5 +30,4 @@ public class KeyStroke extends AbstractKeyStroke {
   public String getActionId() {
     return m_id;
   }
-
 }

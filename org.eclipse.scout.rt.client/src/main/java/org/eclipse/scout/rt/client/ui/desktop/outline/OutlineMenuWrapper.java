@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * using the state of the original menu.
  */
 @ClassId("28ec2113-6461-4810-9527-253d0bf68788")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu {
 
   private IMenu m_wrappedMenu;

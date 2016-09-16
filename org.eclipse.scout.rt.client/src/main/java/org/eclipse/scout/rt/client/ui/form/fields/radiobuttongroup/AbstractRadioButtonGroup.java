@@ -680,6 +680,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * A dynamic unconfigured radio button
    */
   @ClassId("7fb44a3d-b3e5-4cae-bb93-0fa435802466")
+  @SuppressWarnings("bsiRulesDefinition:orderMissing")
   private final class RadioButton extends AbstractRadioButton<T> {
   }
 

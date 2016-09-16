@@ -279,6 +279,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     }
   }
 
+  @Order(10)
   @ClassId("6be65846-72ec-49ec-aad2-42caa75709d3")
   public static class SimpleOutline extends AbstractOutline {
 

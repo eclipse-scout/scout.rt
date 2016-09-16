@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ClassId("29cd5135-9b4d-4de7-a16b-e5cea26901ef")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class ActivateBookmarkKeyStroke extends KeyStroke {
   private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkKeyStroke.class);
 

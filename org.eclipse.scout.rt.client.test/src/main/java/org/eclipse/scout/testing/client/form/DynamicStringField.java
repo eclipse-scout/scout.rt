@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  * Dynamic field to build an ad-hoc application for testing
  */
 @ClassId("73d968ca-d4f8-4012-a6b4-80aa2232e1b4")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class DynamicStringField extends AbstractStringField {
 
   public DynamicStringField(String id, String label) {

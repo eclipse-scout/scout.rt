@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ClassId("24d7ddcd-7656-487b-af5a-caf7b5d3791b")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class ActivateBookmarkMenu extends AbstractMenu {
   private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkMenu.class);
 

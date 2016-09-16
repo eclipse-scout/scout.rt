@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * Dynamic menu to add a new entity to the composer tree
  */
 @ClassId("08771479-8a4b-42de-bf8c-521215cc214e")
+@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class AddEntityMenu extends AbstractMenu {
   private final IComposerField m_field;
   private final ITreeNode m_parentNode;
