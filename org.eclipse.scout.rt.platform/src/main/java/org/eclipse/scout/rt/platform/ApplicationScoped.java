@@ -24,7 +24,8 @@ import java.lang.annotation.Target;
  * <p>
  * It does not ensure that the bean is constructed only once. For example multiple instances might be created if the
  * bean is requested at almost the same time by multiple threads. However always the same instance will be used within
- * the application (all other instances are discarded after construction and never used within the application).
+ * the application (all other instances are discarded after construction and never used within the application). <br>
+ * For initialization code that needs to be run exactly once, create a method annotated with @PostConstruct.
  * </p>
  */
 @Bean
