@@ -16,11 +16,12 @@ scout.inherits(scout.FormMenuPopup, scout.PopupWithHead);
 
 scout.FormMenuPopup.prototype._init = function(options) {
   this.formMenu = options.formMenu;
+  options.initialFocus = this.formMenu.form._initialFocusElement.bind(this.formMenu.form);
+  scout.FormMenuPopup.parent.prototype._init.call(this, options);
+
   this.$formMenu = this.formMenu.$container;
   this.$headBlueprint = this.$formMenu;
   this.form = this.formMenu.form;
-  options.initialFocus = this.form._initialFocusElement.bind(this.form);
-  scout.FormMenuPopup.parent.prototype._init.call(this, options);
 };
 
 scout.FormMenuPopup.prototype._createLayout = function() {
