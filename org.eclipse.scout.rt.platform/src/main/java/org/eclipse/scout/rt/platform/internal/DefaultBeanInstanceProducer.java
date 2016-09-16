@@ -34,7 +34,9 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
       return getApplicationScopedInstance(bean);
     }
 
-    return safeCreateInstance(bean.getBeanClazz());
+    T beanInstance = safeCreateInstance(bean.getBeanClazz());
+    initializeBean(beanInstance);
+    return beanInstance;
   }
 
   /**
@@ -54,17 +56,22 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   }
 
   private T getApplicationScopedInstance(final IBean<T> bean) {
-    return m_applicationScopedInstance.setIfAbsent(new Callable<T>() {
+    boolean created = m_applicationScopedInstance.setIfAbsent(new Callable<T>() {
       @Override
       public T call() {
         return safeCreateInstance(bean.getBeanClazz());
       }
     });
+
+    if (created) {
+      initializeBean(m_applicationScopedInstance.get());
+    }
+    return m_applicationScopedInstance.get();
   }
 
   /**
    * Creates a new instance while keeping track of the classes instantiated during this process and ensuring that there
-   * are no circular dependencies.
+   * are no circular dependencies. The bean is not initialized yet.
    *
    * @return a new instance of the bean
    */
@@ -93,12 +100,19 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   }
 
   /**
-   * Creates a new instance for a bean
+   * Creates a new instance for a bean. May be called more than once per bean class even for application scoped beans.
    *
    * @return new instance
    */
   protected T createInstance(Class<? extends T> beanClass) {
-    return BeanInstanceUtil.createAndInitializeBean(beanClass);
+    return BeanInstanceUtil.createBean(beanClass);
+  }
+
+  /**
+   * Initializes the new bean instance. Guaranteed to be called only once per instance.
+   */
+  protected void initializeBean(T beanInstance) {
+    BeanInstanceUtil.initializeBeanInstance(beanInstance);
   }
 
 }

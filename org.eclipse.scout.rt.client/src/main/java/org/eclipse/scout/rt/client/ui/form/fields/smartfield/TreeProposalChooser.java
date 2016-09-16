@@ -389,7 +389,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
     @Override
     public ILookupRow<LOOKUP_KEY> getLookupRow(LOOKUP_KEY key) {
-      m_rows.setIfAbsent(new Callable<Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>>>() {
+      m_rows.setIfAbsentAndGet(new Callable<Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>>>() {
 
         @Override
         public Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> call() throws Exception {

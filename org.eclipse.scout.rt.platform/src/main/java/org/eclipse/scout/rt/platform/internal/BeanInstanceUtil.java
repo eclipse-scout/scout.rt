@@ -34,24 +34,21 @@ public final class BeanInstanceUtil {
   }
 
   /**
-   * Crates and initializes a new bean instance.
+   * Creates a new bean instance.
    *
    * @param beanClazz
-   * @return
+   * @return the newly created instance
    */
-  public static <T> T createAndInitializeBean(Class<T> beanClazz) {
+  public static <T> T createBean(Class<T> beanClazz) {
     Assertions.assertNotNull(beanClazz);
-    T instance = null;
     try {
       Constructor<T> cons = beanClazz.getDeclaredConstructor();
       cons.setAccessible(true);
-      instance = cons.newInstance();
-      initializeBeanInstance(instance);
+      return cons.newInstance();
     }
     catch (Exception e) {
       throw translateException("Could not create bean [" + beanClazz.getName() + "]", e);
     }
-    return instance;
   }
 
   /**
@@ -69,6 +66,25 @@ public final class BeanInstanceUtil {
         throw translateException("Exception while invoking @PostConstruct method", e);
       }
     }
+  }
+
+  /**
+   * Crates and initializes a new bean instance.
+   *
+   * @param beanClazz
+   * @return
+   * @deprecated Will be removed with Scout 7.1
+   */
+  @Deprecated
+  public static <T> T createAndInitializeBean(Class<T> beanClazz) {
+    T instance = createBean(beanClazz);
+    try {
+      initializeBeanInstance(instance);
+    }
+    catch (Exception e) {
+      throw translateException("Could not create bean [" + beanClazz.getName() + "]", e);
+    }
+    return instance;
   }
 
   /**

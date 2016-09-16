@@ -262,7 +262,7 @@ public class UiSession implements IUiSession {
   }
 
   protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
-    Random random = RANDOM.setIfAbsent(new Callable<Random>() {
+    Random random = RANDOM.setIfAbsentAndGet(new Callable<Random>() {
       @Override
       public Random call() throws Exception {
         return SecurityUtility.createSecureRandom();
@@ -1120,7 +1120,7 @@ public class UiSession implements IUiSession {
   }
 
   protected static HttpSessionHelper getHttpSessionHelper() {
-    return HTTP_SESSION_HELPER.setIfAbsent(new Callable<HttpSessionHelper>() {
+    return HTTP_SESSION_HELPER.setIfAbsentAndGet(new Callable<HttpSessionHelper>() {
       @Override
       public HttpSessionHelper call() throws Exception {
         return BEANS.get(HttpSessionHelper.class);
@@ -1129,7 +1129,7 @@ public class UiSession implements IUiSession {
   }
 
   protected static JsonRequestHelper getJsonRequestHelper() {
-    return JSON_REQUEST_HELPER.setIfAbsent(new Callable<JsonRequestHelper>() {
+    return JSON_REQUEST_HELPER.setIfAbsentAndGet(new Callable<JsonRequestHelper>() {
       @Override
       public JsonRequestHelper call() throws Exception {
         return BEANS.get(JsonRequestHelper.class);

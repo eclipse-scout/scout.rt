@@ -45,33 +45,35 @@ public class BeanInstanceUtilTest {
 
   @Test
   public void testCreateAndInitializeBean() {
-    EmptyCtorBean o = BeanInstanceUtil.createAndInitializeBean(EmptyCtorBean.class);
+    EmptyCtorBean o = BeanInstanceUtil.createBean(EmptyCtorBean.class);
     assertNotNull(o);
   }
 
   @Test(expected = BeanCreationException.class)
   public void testCreateAndInitializeBeanConstructorThrowingRuntimeException() {
-    BeanInstanceUtil.createAndInitializeBean(BeanConstructorThrowingRuntimeException.class);
+    BeanInstanceUtil.createBean(BeanConstructorThrowingRuntimeException.class);
   }
 
   @Test(expected = BeanCreationException.class)
   public void testCreateAndInitializeBeanConstructorThrowingException() {
-    BeanInstanceUtil.createAndInitializeBean(BeanConstructorThrowingException.class);
+    BeanInstanceUtil.createBean(BeanConstructorThrowingException.class);
   }
 
   @Test(expected = BeanCreationException.class)
   public void testCreateAndInitializeBeanWithoutDefaultConstructor() {
-    BeanInstanceUtil.createAndInitializeBean(BeanWithoutDefaultConstructor.class);
+    BeanInstanceUtil.createBean(BeanWithoutDefaultConstructor.class);
   }
 
   @Test(expected = BeanCreationException.class)
   public void testCreateAndInitializeBeanPostConstructThrowingRuntimeException() {
-    BeanInstanceUtil.createAndInitializeBean(PostConstructThrowingRuntimeException.class);
+    PostConstructThrowingRuntimeException beanInstance = BeanInstanceUtil.createBean(PostConstructThrowingRuntimeException.class);
+    BeanInstanceUtil.initializeBeanInstance(beanInstance);
   }
 
   @Test(expected = BeanCreationException.class)
   public void testCreateAndInitializeBeanPostConstructThrowingException() {
-    BeanInstanceUtil.createAndInitializeBean(PostConstructThrowingException.class);
+    PostConstructThrowingException beanInstance = BeanInstanceUtil.createBean(PostConstructThrowingException.class);
+    BeanInstanceUtil.initializeBeanInstance(beanInstance);
   }
 
   @Test

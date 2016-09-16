@@ -59,8 +59,8 @@ public class FinalValue<VALUE> {
    *
    * @return the final value.
    */
-  public VALUE setIfAbsent(final VALUE value) {
-    return setIfAbsent(new Callable<VALUE>() {
+  public VALUE setIfAbsentAndGet(final VALUE value) {
+    return setIfAbsentAndGet(new Callable<VALUE>() {
       @Override
       public VALUE call() {
         return value;
@@ -80,14 +80,46 @@ public class FinalValue<VALUE> {
    *           if the producer throws an exception
    */
   @SuppressWarnings("unchecked")
-  public VALUE setIfAbsent(final Callable<VALUE> producer) {
+  public VALUE setIfAbsentAndGet(final Callable<VALUE> producer) {
+    setIfAbsent(producer);
+    return (VALUE) m_value.get();
+  }
+
+  /**
+   * Sets the specified value as final value, but only if not set yet.
+   *
+   * @return <code>true</code>, if the value was set with the given producer, <code>false</code>, if a value already
+   *         exited.
+   */
+  public boolean setIfAbsent(final VALUE value) {
+    return setIfAbsent(new Callable<VALUE>() {
+      @Override
+      public VALUE call() {
+        return value;
+      }
+    });
+  }
+
+  /**
+   * Computes the final value with the specified producer, but only if not set yet. It makes the same promises as other
+   * concurrent structures (e.g. like {@link ConcurrentMap}): the producer could be executed concurrently by multiple
+   * threads but only first available value is used. The producer is responsible for dealing with this fact.
+   *
+   * @param producer
+   *          to produce the final value if no final value is set yet.
+   * @return <code>true</code>, if the value was set with the given producer, <code>false</code>, if a value already
+   *         exited.
+   * @throws RuntimeException
+   *           if the producer throws an exception
+   */
+  public boolean setIfAbsent(final Callable<VALUE> producer) {
     Object value = m_value.get();
     if (value != NULL_VALUE) {
-      return (VALUE) value;
+      return false;
     }
 
     try {
-      m_value.compareAndSet(NULL_VALUE, producer.call());
+      return m_value.compareAndSet(NULL_VALUE, producer.call());
     }
     catch (final RuntimeException e) {
       throw e;
@@ -95,7 +127,6 @@ public class FinalValue<VALUE> {
     catch (final Exception e) {
       throw new PlatformException("Failed to produce final value", e);
     }
-    return (VALUE) m_value.get();
   }
 
   /**

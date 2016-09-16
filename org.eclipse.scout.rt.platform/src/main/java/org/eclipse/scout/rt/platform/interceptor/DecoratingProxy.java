@@ -71,7 +71,7 @@ public class DecoratingProxy<INSTANCE> {
   }
 
   protected INSTANCE getTargetInstance() {
-    return m_cachedTargetInstance.setIfAbsent(m_targetInstanceProvider);
+    return m_cachedTargetInstance.setIfAbsentAndGet(m_targetInstanceProvider);
   }
 
   protected boolean isInstanceEqualTo(Object other, INSTANCE myInstance) {
@@ -143,7 +143,7 @@ public class DecoratingProxy<INSTANCE> {
    * @return The proxy to be called.
    */
   public INSTANCE getProxy() {
-    return m_cachedProxyInstance.setIfAbsent(new Callable<INSTANCE>() {
+    return m_cachedProxyInstance.setIfAbsentAndGet(new Callable<INSTANCE>() {
       @Override
       @SuppressWarnings("unchecked")
       public INSTANCE call() throws Exception {

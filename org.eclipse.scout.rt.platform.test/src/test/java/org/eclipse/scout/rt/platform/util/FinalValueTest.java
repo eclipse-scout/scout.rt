@@ -62,7 +62,7 @@ public class FinalValueTest {
   @Test
   public void testLazySet() throws Exception {
     FinalValue<String> s = new FinalValue<>();
-    String value = s.setIfAbsent(TEST_VALUE);
+    String value = s.setIfAbsentAndGet(TEST_VALUE);
     assertTestValue(s);
     assertEquals(TEST_VALUE, value);
   }
@@ -102,8 +102,8 @@ public class FinalValueTest {
   @Test
   public void testLazyDuplicateSet() throws Exception {
     FinalValue<String> s = new FinalValue<>();
-    s.setIfAbsent(TEST_VALUE);
-    String value2 = s.setIfAbsent("other");
+    s.setIfAbsentAndGet(TEST_VALUE);
+    String value2 = s.setIfAbsentAndGet("other");
     assertTestValue(s);
     assertEquals(TEST_VALUE, value2);
   }
@@ -111,8 +111,8 @@ public class FinalValueTest {
   @Test
   public void testNoDoubleInitializationTry() throws Exception {
     FinalValue<String> s = new FinalValue<>();
-    s.setIfAbsent((String) null);
-    Assert.assertNull(s.setIfAbsent("should not matter"));
+    s.setIfAbsentAndGet((String) null);
+    Assert.assertNull(s.setIfAbsentAndGet("should not matter"));
   }
 
   @Test(timeout = 2000)
@@ -144,7 +144,7 @@ public class FinalValueTest {
       }
     });
 
-    String value = s.setIfAbsent(new Callable<String>() {
+    String value = s.setIfAbsentAndGet(new Callable<String>() {
       @Override
       public String call() throws Exception {
         setup.countDown();
