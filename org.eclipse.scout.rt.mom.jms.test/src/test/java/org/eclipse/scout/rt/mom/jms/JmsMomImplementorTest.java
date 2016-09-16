@@ -1396,7 +1396,7 @@ public class JmsMomImplementorTest {
       @Override
       public void onMessage(IMessage<Object> message) {
         try {
-          latch.countDownAndBlock();
+          latch.countDownAndBlock(1, TimeUnit.MINUTES); // timeout must be greater than the default latch timeout
         }
         catch (InterruptedException e) {
           throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
@@ -1404,7 +1404,12 @@ public class JmsMomImplementorTest {
       }
     }, null));
 
-    assertTrue("messages expected to be consumed concurrently", latch.await());
+    try {
+      assertTrue("messages expected to be consumed concurrently", latch.await());
+    }
+    finally {
+      latch.unblock();
+    }
   }
 
   @Test
@@ -1424,7 +1429,7 @@ public class JmsMomImplementorTest {
       @Override
       public void onMessage(IMessage<Object> message) {
         try {
-          latch.countDownAndBlock();
+          latch.countDownAndBlock(1, TimeUnit.MINUTES); // timeout must be greater than the default latch timeout
         }
         catch (InterruptedException e) {
           throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
@@ -1433,7 +1438,7 @@ public class JmsMomImplementorTest {
     }, null, IMom.ACKNOWLEDGE_AUTO_SINGLE_THREADED));
 
     try {
-      assertFalse("messages expected to be consumed concurrently", latch.await());
+      assertFalse("messages not expected to be consumed concurrently", latch.await());
       assertEquals("one message expected to be consumed", msgCount - 1, latch.getCount());
     }
     finally {
