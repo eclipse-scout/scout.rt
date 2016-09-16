@@ -11,6 +11,7 @@
 scout.FormMenuPopup = function() {
   scout.FormMenuPopup.parent.call(this);
   this.formMenu;
+  this.formMenuPropertyChangeHandler = this._onFormMenuPropertyChange.bind(this);
   this._addAdapterProperties('form');
 };
 scout.inherits(scout.FormMenuPopup, scout.PopupWithHead);
@@ -35,6 +36,19 @@ scout.FormMenuPopup.prototype._render = function($parent) {
   this.form.renderInitialFocusEnabled = false;
   this.form.render(this.$body);
   this.form.htmlComp.pixelBasedSizing = true;
+
+  // We add this here for symmetry reasons (because _removeHead is not called on remove())
+  if (this._headVisible) {
+    this.formMenu.on('propertyChange', this.formMenuPropertyChangeHandler);
+  }
+};
+
+scout.FormMenuPopup.prototype._remove = function() {
+  scout.FormMenuPopup.parent.prototype._remove.call(this);
+
+  if (this._headVisible) {
+    this.formMenu.off('propertyChange', this.formMenuPropertyChangeHandler);
+  }
 };
 
 scout.FormMenuPopup.prototype._renderHead = function() {
@@ -46,4 +60,16 @@ scout.FormMenuPopup.prototype._renderHead = function() {
     this._copyCssClassToHead(this.formMenu.cssClass);
   }
   this._copyCssClassToHead('unfocusable');
+};
+
+scout.FormMenuPopup.prototype._onFormMenuPropertyChange = function(event) {
+  this.session.layoutValidator.schedulePostValidateFunction(function() {
+    // Because this post layout validation function is executed asynchronously,
+    // we have to check again if the popup is still rendered.
+    if (!this.rendered) {
+      return;
+    }
+    this.rerenderHead();
+    this.position();
+  }.bind(this));
 };
