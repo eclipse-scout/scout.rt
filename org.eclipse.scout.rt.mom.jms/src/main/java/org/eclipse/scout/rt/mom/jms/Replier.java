@@ -28,8 +28,6 @@ import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Allows the subscription of a replier to respond to requests sent to a 'request-reply' destination.
@@ -38,7 +36,6 @@ import org.slf4j.LoggerFactory;
  */
 @Bean
 public class Replier {
-  private static final Logger LOG = LoggerFactory.getLogger(Replier.class);
 
   protected JmsMomImplementor m_mom;
 
@@ -78,7 +75,6 @@ public class Replier {
 
           @Override
           public void run() throws Exception {
-            LOG.debug("JMS request received [msg={}]", jmsRequest);
             final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller, encrypter);
             final IMessage<REQUEST> request = requestReader.readMessage();
             final Destination replyTopic = requestReader.readReplyTo();
@@ -98,7 +94,7 @@ public class Replier {
                 });
           }
         }, Jobs.newInput()
-            .withName("Receiving JMS request [dest={}]", jmsRequest.getJMSDestination())
+            .withName("Receiving JMS request [dest={}]", destination)
             .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)
             .withExecutionHint(replyId)); // Register for cancellation
       }

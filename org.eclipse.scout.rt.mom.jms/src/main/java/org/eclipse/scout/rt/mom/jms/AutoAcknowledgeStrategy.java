@@ -19,8 +19,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Messages are acknowledged automatically upon their receipt. This strategy has less footprint than
@@ -32,7 +30,6 @@ import org.slf4j.LoggerFactory;
  */
 @Bean
 public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
-  private static final Logger LOG = LoggerFactory.getLogger(AutoAcknowledgeStrategy.class);
 
   protected JmsMomImplementor m_mom;
   protected boolean m_singleThreaded;
@@ -69,8 +66,6 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
 
           @Override
           public void run() throws Exception {
-            LOG.debug("Message received [msg={}]", jmsMessage);
-
             final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
             final IMessage<DTO> message = messageReader.readMessage();
 
@@ -94,7 +89,7 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
         }
         else {
           Jobs.schedule(runnable, Jobs.newInput()
-              .withName("Receiving JMS message [dest={}]", jmsMessage.getJMSDestination())
+              .withName("Receiving JMS message [dest={}]", destination)
               .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true));
         }
       }
