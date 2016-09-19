@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
@@ -69,9 +68,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
     cache = addBeforeCustomWrappers(cache);
     cache = addCustomWrappers(cache);
     cache = addAfterCustomWrappers(cache);
-
-    // before publish cache as bean, initialize all instances
-    initializeCacheInstances();
     register(cache);
     return cache;
   }
@@ -153,12 +149,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   protected ICache<K, V> addAfterCustomWrappers(ICache<K, V> cache) {
     return cache;
-  }
-
-  protected void initializeCacheInstances() {
-    for (ICache<K, V> cache : m_cacheInstances) {
-      BeanInstanceUtil.initializeBeanInstance(cache);
-    }
   }
 
   @Override
