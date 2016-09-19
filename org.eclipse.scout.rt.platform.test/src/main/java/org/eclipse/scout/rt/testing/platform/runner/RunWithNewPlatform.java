@@ -16,6 +16,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 
 /**
@@ -28,4 +29,8 @@ import org.eclipse.scout.rt.platform.IPlatform;
 @Target(ElementType.TYPE)
 @Inherited
 public @interface RunWithNewPlatform {
+  /**
+   * @return the platform class to be used
+   */
+  Class<? extends IPlatform> platform() default DefaultPlatform.class;
 }

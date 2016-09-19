@@ -22,18 +22,22 @@ import org.junit.runners.model.Statement;
  */
 public class RunContextStatement extends Statement {
 
-  protected final Statement m_next;
-  private final RunContext m_runContext;
+  public interface IRunContextProvider {
+    RunContext create();
+  }
 
-  public RunContextStatement(final Statement next, final RunContext runContext) {
+  protected final Statement m_next;
+  private final IRunContextProvider m_runContextProvider;
+
+  public RunContextStatement(final Statement next, final IRunContextProvider runContextProvider) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_runContext = runContext;
+    m_runContextProvider = runContextProvider;
   }
 
   @Override
   public void evaluate() throws Throwable {
     final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
-    m_runContext.run(invoker);
+    m_runContextProvider.create().run(invoker);
     invoker.throwOnError();
   }
 }

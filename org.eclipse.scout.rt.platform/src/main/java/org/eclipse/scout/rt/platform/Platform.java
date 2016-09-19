@@ -30,15 +30,37 @@ import org.slf4j.LoggerFactory;
 public final class Platform {
   private static final Logger LOG = LoggerFactory.getLogger(Platform.class);
 
-  private static IPlatform platform;
+  //Note: synchronized (360ns) is 3000 times slower than volatile (0.12ns)
+  private static volatile IPlatform platform;
 
   private Platform() {
   }
 
   /**
-   * @return the active platform. It is automatically started when accessing this class (static initializer).
+   * @return the active platform, fully initialized and started
+   *         <p>
+   *         If {@link #platform} is null, then it is automatically located and started prior to returning from this
+   *         method.
    */
   public static IPlatform get() {
+    IPlatform platformAccessor = platform;
+    if (platformAccessor != null) {
+      return platformAccessor;
+    }
+    initialize();
+    return platform;
+  }
+
+  /**
+   * @return the active platform, may be null and may be not yet initialized
+   *         <p>
+   *         If {@link #platform} is null when calling this method, then the platform is <em>not</em> automatically
+   *         located and started.
+   *         <p>
+   *         Be careful when using this method. In most cases, replacing the platform should not be necessary. This
+   *         method is sometimes used in unit testing frameworks.
+   */
+  public static IPlatform peek() {
     return platform;
   }
 
@@ -46,8 +68,8 @@ public final class Platform {
    * Set the active platform using a custom implementor (not recommended).
    * <p>
    * Be careful when using this method. It should only be called by the one and only initializer. In most cases,
-   * replacing the platform should not be necessary. If needed, the use of a java service config file is recommended
-   * (see class documentation for details).
+   * replacing the platform should not be necessary. This method is sometimes used in unit testing frameworks. If
+   * otherwise needed, the use of a java service config file is recommended (see class documentation for details).
    *
    * @see Platform
    */
@@ -55,24 +77,29 @@ public final class Platform {
     platform = p;
   }
 
-  // static initializer used for platform auto-start
-  static {
+  private static synchronized void initialize() {
+    if (platform != null) {
+      return;
+    }
+    IPlatform tmpPlatform = null;
     ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
     for (IPlatform p : loader) {
-      platform = p;
+      tmpPlatform = p;
       break;
     }
-    if (platform == null) {
-      platform = new DefaultPlatform();
+    if (tmpPlatform == null) {
+      tmpPlatform = new DefaultPlatform();
     }
     PlatformStateLatch platformStateLatch = new PlatformStateLatch();
     // Start platform initialization in separate thread to let class initialization complete
-    new PlatformStarter(platform, platformStateLatch).start();
+    new PlatformStarter(tmpPlatform, platformStateLatch).start();
     try {
       platformStateLatch.await();
     }
     catch (InterruptedException e) {
       LOG.error("Interrupted while waiting for platform state latch", e);
     }
+    platform = tmpPlatform;
   }
+
 }

@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
@@ -244,9 +243,6 @@ public class PlatformImplementor implements IPlatform {
 
     m_platformLock.writeLock().lock();
     try {
-      if (Platform.get() == this) {
-        Platform.set(null);
-      }
       changeState(State.PlatformStopped, false);
       destroyBeanManager();
     }

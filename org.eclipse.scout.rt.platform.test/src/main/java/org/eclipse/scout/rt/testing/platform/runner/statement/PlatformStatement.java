@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -78,11 +77,11 @@ public class PlatformStatement extends Statement {
   }
 
   protected void evaluateWithNewPlatform() throws Throwable {
-    IPlatform old = Platform.get();
-    old.awaitPlatformStarted();
-    Platform.set(new DefaultPlatform());
+    IPlatform old = Platform.peek();
+    Platform.set(m_runWithNewPlatform.platform().newInstance());
     try {
       Platform.get().start();
+      Platform.get().awaitPlatformStarted();
       m_next.evaluate();
     }
     finally {
@@ -93,8 +92,7 @@ public class PlatformStatement extends Statement {
 
   protected void evaluateWithGlobalPlatform() throws Throwable {
     //ensure started
-    IPlatform platform = Platform.get();
-    platform.awaitPlatformStarted();
+    Platform.get().awaitPlatformStarted();
     m_next.evaluate();
   }
 }

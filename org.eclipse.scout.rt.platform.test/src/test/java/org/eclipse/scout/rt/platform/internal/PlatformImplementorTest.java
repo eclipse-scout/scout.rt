@@ -71,7 +71,7 @@ public class PlatformImplementorTest {
 
     // create platform instance and start it in another thread
     final TestingPlatformImplementor platform = new TestingPlatformImplementor(bean);
-    Future<?> platformStartFuture = startPlatformInAnohterThread(platform);
+    Future<?> platformStartFuture = startPlatformInAnotherThread(platform);
 
     // current thread is expected to be suspended
     assertAwaitPlatformStarted(platform, platformStartFailsInState == null);
@@ -158,7 +158,7 @@ public class PlatformImplementorTest {
     }
   }
 
-  protected Future<?> startPlatformInAnohterThread(final TestingPlatformImplementor platform) {
+  protected Future<?> startPlatformInAnotherThread(final TestingPlatformImplementor platform) {
     return s_executor.submit(new Runnable() {
       @Override
       public void run() {

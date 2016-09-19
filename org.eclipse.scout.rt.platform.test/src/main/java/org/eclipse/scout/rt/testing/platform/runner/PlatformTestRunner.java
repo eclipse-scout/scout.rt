@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.testing.platform.runner.statement.ClearThreadInterru
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RunContextStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.RunContextStatement.IRunContextProvider;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimeoutRunContextStatement;
@@ -73,10 +74,14 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
     final Statement s4 = super.classBlock(notifier);
-    final Statement s3 = new RunContextStatement(s4, createJUnitRunContext());
+    final Statement s3 = new RunContextStatement(s4, new IRunContextProvider() {
+      @Override
+      public RunContext create() {
+        return createJUnitRunContext();
+      }
+    });
     final Statement s2 = new AssertNoRunningJobsStatement(s3, "Test class");
     final Statement s1 = new PlatformStatement(s2, ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
-
     return s1;
   }
 

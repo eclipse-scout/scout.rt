@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.fixture.TestApplication;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,21 +18,24 @@ import org.junit.Test;
 public class ApplicationTest {
 
   @Test
-  public void testStartApplication() {
+  public void testApplicationLifecycle() {
     // backup current platform
-    IPlatform backup = Platform.get();
+    IPlatform backup = Platform.peek();
     try {
-      try {
-        Platform.set(new DefaultPlatform());
-        Platform.get().start();
-
-        Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
+      Platform.set(new DefaultPlatform());
+      for (int k = 0; k < 3; k++) {
+        try {
+          Platform.get().start();
+          Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
+          Platform.get().awaitPlatformStarted();
+          Assert.assertEquals(State.PlatformStarted, Platform.get().getState());
+        }
+        finally {
+          Platform.get().stop();
+        }
+        // Platform.get() is not null after stopping it
+        Assert.assertEquals(State.PlatformStopped, Platform.get().getState());
       }
-      finally {
-        Platform.get().stop();
-      }
-      // Platform.get() is null after stopping it
-      Assert.assertNull(Platform.get());
     }
     finally {
       // restore previous platform
