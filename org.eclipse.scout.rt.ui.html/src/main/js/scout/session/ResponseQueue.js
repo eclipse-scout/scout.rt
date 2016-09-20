@@ -143,3 +143,8 @@ scout.ResponseQueue.prototype._checkTimeout = function() {
 scout.ResponseQueue.prototype.prepareRequest = function(request) {
   request['#ACK'] = this.lastProcessedSequenceNo;
 };
+
+scout.ResponseQueue.prototype.prepareHttpRequest = function(ajaxOptions) {
+  ajaxOptions.headers = ajaxOptions.headers || {};
+  ajaxOptions.headers['X-Scout-#ACK'] = this.lastProcessedSequenceNo;
+};
