@@ -32,7 +32,7 @@ public class JsonBooleanColumn<T extends IBooleanColumn> extends JsonColumn<T> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put(IBooleanColumn.PROP_TRISTATE_ENABLED, getColumn().isTristateEnabled());
+    json.put(IBooleanColumn.PROP_TRI_STATE_ENABLED, getColumn().isTriStateEnabled());
     return json;
   }
 

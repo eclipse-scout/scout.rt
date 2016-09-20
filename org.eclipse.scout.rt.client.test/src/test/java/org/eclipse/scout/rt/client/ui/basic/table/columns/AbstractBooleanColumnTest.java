@@ -98,7 +98,5 @@ public class AbstractBooleanColumnTest {
     @Order(10)
     public class TestBooleanColumn extends AbstractBooleanColumn {
     }
-
   }
-
 }

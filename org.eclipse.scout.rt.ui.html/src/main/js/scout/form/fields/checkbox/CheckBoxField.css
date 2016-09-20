@@ -72,17 +72,21 @@
       #scout.checkbox-before-checked();
     }
 
-    &.tristate::before {
-      #scout.checkbox-before-tristate();
+    &.undefined::before {
+      /* tri-state */
+      #scout.checkbox-before-undefined();
     }
 
     &.disabled {
       #scout.checkbox-disabled();
+
       &::before {
         #scout.checkbox-before-disabled();
       }
-      :hover::before {
-        #scout.checkbox-before-disabled();
+
+      &.undefined::before {
+        /* tri-state */
+        #scout.checkbox-before-undefined-disabled();
       }
     }
   }

@@ -218,21 +218,27 @@
     .table.disabled > .table-data > .table-row > & {
       #scout.checkbox-disabled();
 
-      &::before,
-      &:hover::before,
-      .table.disabled > .table-data > .table-row > & > .check-box::before {
+      &::before {
         #scout.checkbox-before-disabled();
       }
+    }
+
+    .table.disabled > .table-data > .table-row > &.undefined::before {
+      /* tri-state */
+      #scout.checkbox-before-undefined-disabled();
     }
 
     &::before {
       #scout.checkbox-before();
     }
+
     &.checked::before {
       #scout.checkbox-before-checked();
     }
-    &.tristate::before {
-      #scout.checkbox-before-tristate();
+
+    &.undefined::before {
+      /* tri-state */
+      #scout.checkbox-before-undefined();
     }
   }
 

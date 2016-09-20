@@ -21,8 +21,8 @@ scout.StringField = function() {
 scout.inherits(scout.StringField, scout.BasicField);
 
 scout.StringField.FORMAT = {
-  LOWER: 'a' /* IStringField.FORMAT_LOWER */ ,
-  UPPER: 'A' /* IStringField.FORMAT_UPPER */
+  LOWER : 'a', /* IStringField.FORMAT_LOWER */
+  UPPER : 'A' /* IStringField.FORMAT_UPPER */
 };
 
 scout.StringField.TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
@@ -32,6 +32,9 @@ scout.StringField.TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
  */
 scout.StringField.prototype._initKeyStrokeContext = function() {
   scout.StringField.parent.prototype._initKeyStrokeContext.call(this);
+
+  x = 3;
+  var x;
 
   this.keyStrokeContext.registerKeyStroke([
     new scout.StringFieldEnterKeyStroke(this),
@@ -77,7 +80,8 @@ scout.StringField.prototype._render = function($parent) {
       .on('focusout', function() {
         this.$field.on('mousedown', mousedownHandler);
       }.bind(this));
-  } else {
+  }
+  else {
     $field = scout.fields.makeTextField($parent);
   }
   $field.on('blur', this._onFieldBlur.bind(this));
@@ -114,7 +118,8 @@ scout.StringField.prototype._renderMaxLength = function() {
   // Check if "maxLength" attribute is supported by browser
   if (this.$field[0].maxLength) {
     this.$field.attr('maxlength', this.maxLength);
-  } else {
+  }
+  else {
     // Fallback for IE9
     this.$field.on('keyup paste', function(e) {
       setTimeout(function() {
@@ -123,6 +128,7 @@ scout.StringField.prototype._renderMaxLength = function() {
           this.$field.val(text.slice(0, this.maxLength));
         }
       }.bind(this), 0);
+      this.$on('hello');
     }.bind(this));
   }
 };
@@ -165,7 +171,8 @@ scout.StringField.prototype._renderHasAction = function() {
     this.$container.addClass("has-action");
     this.addIcon();
     this.invalidateLayoutTree(false);
-  } else {
+  }
+  else {
     if (this.$icon) {
       this.$icon.remove();
       this.$container.removeClass("has-action");
@@ -176,7 +183,8 @@ scout.StringField.prototype._renderHasAction = function() {
 scout.StringField.prototype._renderFormat = function() {
   if (this.format === scout.StringField.FORMAT.LOWER) {
     this.$field.css('text-transform', 'lowercase');
-  } else if (this.format === scout.StringField.FORMAT.UPPER) {
+  }
+  else if (this.format === scout.StringField.FORMAT.UPPER) {
     this.$field.css('text-transform', 'uppercase');
   }
 };
@@ -184,7 +192,8 @@ scout.StringField.prototype._renderFormat = function() {
 scout.StringField.prototype._renderSpellCheckEnabled = function() {
   if (this.spellCheckEnabled) {
     this.$field.attr('spellcheck', 'true');
-  } else {
+  }
+  else {
     this.$field.attr('spellcheck', 'false');
   }
 };
@@ -200,8 +209,8 @@ scout.StringField.prototype._renderDisplayText = function() {
     var matches = oldDisplayText.match(scout.StringField.TRIM_REGEXP);
     if (matches && matches[2] === displayText) {
       this._setSelection({
-        start: Math.max(oldSelection.start - matches[1].length, 0),
-        end: Math.min(oldSelection.end - matches[1].length, displayText.length)
+        start : Math.max(oldSelection.start - matches[1].length, 0),
+        end : Math.min(oldSelection.end - matches[1].length, displayText.length)
       });
     }
   }
@@ -217,13 +226,13 @@ scout.StringField.prototype._renderInsertText = function() {
   // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
   if (this.insertText.length + text.length > this.maxLength) {
     scout.create('DesktopNotification', {
-      parent: this,
-      id: scout.numbers.randomId(),
-      desktop: this.session.desktop,
-      duration: 3000,
-      status: {
-        message: this.session.text('ui.CannotInsertTextTooLong'),
-        severity: scout.Status.Severity.WARNING
+      parent : this,
+      id : scout.numbers.randomId(),
+      desktop : this.session.desktop,
+      duration : 3000,
+      status : {
+        message : this.session.text('ui.CannotInsertTextTooLong'),
+        severity : scout.Status.Severity.WARNING
       }
     }).show();
     return;
@@ -253,7 +262,7 @@ scout.StringField.prototype._renderTrimText = function() {
 
 scout.StringField.prototype._renderGridData = function() {
   this.updateInnerAlignment({
-    useHorizontalAlignment: (this.multilineText ? false : true)
+    useHorizontalAlignment : (this.multilineText ? false : true)
   });
 };
 
@@ -271,10 +280,12 @@ scout.StringField.prototype._onSelectionChangingAction = function(event) {
       // after it really has been changed.
       setTimeout(this._updateSelection.bind(this));
     }.bind(this));
-  } else if (event.type === 'keydown') {
+  }
+  else if (event.type === 'keydown') {
     // Use set timeout to let the cursor move to the target position
     setTimeout(this._updateSelection.bind(this));
-  } else {
+  }
+  else {
     this._updateSelection();
   }
 };
@@ -287,8 +298,8 @@ scout.StringField.prototype._getSelection = function() {
     end = 0;
   }
   return {
-    start: start,
-    end: end
+    start : start,
+    end : end
   };
 };
 
@@ -320,8 +331,8 @@ scout.StringField.prototype._updateSelection = function() {
 
 scout.StringField.prototype.triggerSelectionChange = function() {
   this.trigger('selectionChange', {
-    selectionStart: this.selectionStart,
-    selectionEnd: this.selectionEnd
+    selectionStart : this.selectionStart,
+    selectionEnd : this.selectionEnd
   });
 };
 

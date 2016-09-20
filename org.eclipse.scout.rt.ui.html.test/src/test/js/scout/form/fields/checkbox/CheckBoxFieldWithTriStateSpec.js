@@ -20,7 +20,7 @@ describe("CheckBoxFieldWithTriState", function() {
       setFixtures(sandbox());
       session = sandboxSession();
       model = createSimpleModel('CheckBoxField', session);
-      model.tristateEnabled = true;
+      model.triStateEnabled = true;
       checkBoxField = new scout.CheckBoxField();
       checkBoxField.init(model);
     });
@@ -29,22 +29,22 @@ describe("CheckBoxFieldWithTriState", function() {
       expect(scout.ValueField.prototype.isPrototypeOf(checkBoxField)).toBe(true);
     });
 
-    it("_renderValue sets checked and tristate property", function() {
+    it("_renderValue sets checked and undefined classes", function() {
       var $div = $('<div>');
       checkBoxField.render($div);
 
       checkBoxField.setValue(false);
       expect(checkBoxField.$checkBox.hasClass('checked')).toBe(false);
-      expect(checkBoxField.$checkBox.hasClass('tristate')).toBe(false);
+      expect(checkBoxField.$checkBox.hasClass('undefined')).toBe(false);
       checkBoxField.toggleChecked();
       expect(checkBoxField.$checkBox.hasClass('checked')).toBe(true);
-      expect(checkBoxField.$checkBox.hasClass('tristate')).toBe(false);
+      expect(checkBoxField.$checkBox.hasClass('undefined')).toBe(false);
       checkBoxField.toggleChecked();
       expect(checkBoxField.$checkBox.hasClass('checked')).toBe(false);
-      expect(checkBoxField.$checkBox.hasClass('tristate')).toBe(true);
+      expect(checkBoxField.$checkBox.hasClass('undefined')).toBe(true);
       checkBoxField.toggleChecked();
       expect(checkBoxField.$checkBox.hasClass('checked')).toBe(false);
-      expect(checkBoxField.$checkBox.hasClass('tristate')).toBe(false);
+      expect(checkBoxField.$checkBox.hasClass('undefined')).toBe(false);
     });
 
     it("_renderValue sets disabled property", function() {

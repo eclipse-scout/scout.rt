@@ -10,14 +10,14 @@
  ******************************************************************************/
 scout.CheckBoxField = function() {
   scout.CheckBoxField.parent.call(this);
-  this.tristateEnabled = false;
+  this.triStateEnabled = false;
   this.$checkBox;
   this.$checkBoxLabel;
 };
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
 /**
- * The value of the CheckBoxField widget is: false, true, (and '' if it is in tristate mode with value undefined)
+ * The value of the CheckBoxField widget is: false, true (and null in tri-state mode)
  * @override
  */
 scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
@@ -72,18 +72,15 @@ scout.CheckBoxField.prototype.toggleChecked = function() {
   if (!this.enabled) {
     return;
   }
-  if (this.tristateEnabled) {
+  if (this.triStateEnabled) {
     if (this.value === false) {
       this.setValue(true);
-    }
-    else if (this.value === true) {
-      this.setValue('');
-    }
-    else {
+    } else if (this.value === true) {
+      this.setValue(null);
+    } else {
       this.setValue(false);
     }
-  }
-  else {
+  } else {
     this.setValue(!this.value);
   }
 };
@@ -108,10 +105,8 @@ scout.CheckBoxField.prototype._renderProperties = function() {
 };
 
 scout.CheckBoxField.prototype._renderValue = function() {
-  this.$checkBox.toggleClass('checked', this.value===true);
-  if (this.tristateEnabled) {
-    this.$checkBox.toggleClass('tristate', this.value !== true && this.value !== false);
-  }
+  this.$checkBox.toggleClass('checked', this.value === true);
+  this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
 };
 
 /**

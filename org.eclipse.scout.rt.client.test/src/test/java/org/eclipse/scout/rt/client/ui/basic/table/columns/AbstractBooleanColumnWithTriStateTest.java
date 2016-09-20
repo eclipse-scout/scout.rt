@@ -24,9 +24,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * Tests for {@link AbstractBooleanColumn} with {@link AbstractBooleanColumn#isTristateEnabled()} set to true
+ * Tests for {@link AbstractBooleanColumn} with {@link AbstractBooleanColumn#isTriStateEnabled()} set to true
  */
-public class AbstractBooleanColumnWithTristateTest {
+public class AbstractBooleanColumnWithTriStateTest {
 
   @Test
   public void testPrepareEditInternal() {
@@ -88,6 +88,29 @@ public class AbstractBooleanColumnWithTristateTest {
     assertTrue(value);
   }
 
+  @Test
+  public void testChangeTriStateEnabled() {
+    TestTable table = new TestTable();
+    TestTable.TestBooleanColumn column = table.getTestBooleanColumn();
+    table.addRowByArray(new Object[]{null});
+    table.addRowByArray(new Object[]{null});
+    table.addRowByArray(new Object[]{true});
+    table.addRowByArray(new Object[]{false});
+
+    assertNull(column.getValue(0));
+    assertNull(column.getValue(1));
+    assertTrue(column.getValue(2));
+    assertFalse(column.getValue(3));
+
+    column.setTriStateEnabled(false);
+    assertNotNull(column.getValue(0));
+    assertFalse(column.getValue(0));
+    assertNotNull(column.getValue(1));
+    assertFalse(column.getValue(1));
+    assertTrue(column.getValue(2));
+    assertFalse(column.getValue(3));
+  }
+
   public class TestTable extends AbstractTable {
 
     public TestBooleanColumn getTestBooleanColumn() {
@@ -96,12 +119,11 @@ public class AbstractBooleanColumnWithTristateTest {
 
     @Order(10)
     public class TestBooleanColumn extends AbstractBooleanColumn {
+
       @Override
-      protected boolean getConfiguredTristateEnabled() {
+      protected boolean getConfiguredTriStateEnabled() {
         return true;
       }
     }
-
   }
-
 }

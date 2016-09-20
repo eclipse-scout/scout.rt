@@ -36,7 +36,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
-    setTristateEnabled(getConfiguredTristateEnabled());
+    setTriStateEnabled(getConfiguredTriStateEnabled());
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554
     propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue()));
@@ -50,31 +50,38 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   }
 
   /**
-   * true: the checkbox can have a {@link #getValue()} of true, false and also null. null is the tristate and is
-   * typically displayed using a filled rectangluar area.
-   * <p>
-   * false: the checkbox can have a {@link #getValue()} of true, false. The value is never null.
-   * <p>
-   * default is false
+   * <ul>
+   * <li><b>true:</b> the check box can have a {@link #getValue()} of <code>true</code>, <code>false</code> and
+   * <code>null</code>. <code>null</code> is the third state that represents "undefined" and is typically displayed
+   * using a filled rectangular area.
+   * <li><b>false:</b> the check box can have a {@link #getValue()} of <code>true</code> and <code>false</code>. The
+   * value is never <code>null</code> (setting the value to <code>null</code> will automatically convert it to
+   * <code>false</code>).
+   * </ul>
+   * The default is <code>false</code>.
    *
    * @since 6.1
-   * @return true if this checkbox supports the so-called tristate and can be {@link #setValue(Boolean)} to null in
-   *         order to represent the tristate value
+   * @return <code>true</code> if this check box supports the so-called "tri-state" and allows setting the value to
+   *         <code>null</code> to represent the "undefined" value.
    */
   @Order(220)
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredTristateEnabled() {
+  protected boolean getConfiguredTriStateEnabled() {
     return false;
   }
 
   @Override
-  public void setTristateEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_TRISTATE_ENABLED, b);
+  public void setTriStateEnabled(boolean triStateEnabled) {
+    propertySupport.setPropertyBool(PROP_TRI_STATE_ENABLED, triStateEnabled);
+    if (!triStateEnabled) {
+      // Validate value again (converts null to false)
+      setValue(getValue());
+    }
   }
 
   @Override
-  public boolean isTristateEnabled() {
-    return propertySupport.getPropertyBool(PROP_TRISTATE_ENABLED);
+  public boolean isTriStateEnabled() {
+    return propertySupport.getPropertyBool(PROP_TRI_STATE_ENABLED);
   }
 
   @Override
@@ -89,7 +96,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
 
   @Override
   public void toggleValue() {
-    if (isTristateEnabled()) {
+    if (isTriStateEnabled()) {
       if (Boolean.FALSE.equals(getValue())) {
         setValue(true);
       }
@@ -123,7 +130,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   @Override
   protected Boolean validateValueInternal(Boolean rawValue) {
     rawValue = super.validateValueInternal(rawValue);
-    if (!isTristateEnabled() && rawValue == null) {
+    if (!isTriStateEnabled() && rawValue == null) {
       rawValue = Boolean.FALSE;
     }
     return rawValue;

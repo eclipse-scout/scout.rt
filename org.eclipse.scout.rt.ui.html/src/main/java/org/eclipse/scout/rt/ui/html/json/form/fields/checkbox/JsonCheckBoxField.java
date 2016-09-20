@@ -42,10 +42,10 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
         return getModel().getValue();
       }
     });
-    putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_TRISTATE_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_TRI_STATE_ENABLED, model) {
       @Override
       protected Object modelValue() {
-        return getModel().isTristateEnabled();
+        return getModel().isTriStateEnabled();
       }
     });
     // No need to send display text for check box
@@ -55,16 +55,10 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IBooleanField.PROP_VALUE.equals(propertyName)) {
-      String s = data.optString(IBooleanField.PROP_VALUE);
-      Boolean uiValue;
-      if ("true".equals(s)) {
-        uiValue = true;
-      }
-      else if ("false".equals(s)) {
-        uiValue = false;
-      }
-      else {
-        uiValue = null;
+      Object o = data.opt(IBooleanField.PROP_VALUE);
+      Boolean uiValue = null;
+      if (CompareUtility.isOneOf(o, Boolean.TRUE, Boolean.FALSE)) {
+        uiValue = (Boolean) o;
       }
       addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiValue);
       getModel().getUIFacade().setValueFromUI(uiValue);

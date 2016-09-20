@@ -39,7 +39,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   protected void initConfig() {
     super.initConfig();
     setVerticalAlignment(getConfiguredVerticalAlignment());
-    setTristateEnabled(getConfiguredTristateEnabled());
+    setTriStateEnabled(getConfiguredTriStateEnabled());
   }
 
   @Override
@@ -53,13 +53,19 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
-  public void setTristateEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_TRISTATE_ENABLED, b);
+  public void setTriStateEnabled(boolean triStateEnabled) {
+    propertySupport.setPropertyBool(PROP_TRI_STATE_ENABLED, triStateEnabled);
+    if (!triStateEnabled && getTable() != null) {
+      // Validate value again (converts null to false)
+      for (ITableRow row : getTable().getRows()) {
+        setValue(row, getValue(row));
+      }
+    }
   }
 
   @Override
-  public boolean isTristateEnabled() {
-    return propertySupport.getPropertyBool(PROP_TRISTATE_ENABLED);
+  public boolean isTriStateEnabled() {
+    return propertySupport.getPropertyBool(PROP_TRI_STATE_ENABLED);
   }
 
   @Override
@@ -70,8 +76,8 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected String formatValueInternal(ITableRow row, Boolean value) {
-    if (isTristateEnabled() && value == null) {
-      return TRISTATE_TEXT;
+    if (isTriStateEnabled() && value == null) {
+      return UNDEFINED_TEXT;
     }
     return (BooleanUtility.nvl(value)) ? TRUE_TEXT : "";
   }
@@ -97,7 +103,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   @Override
   protected Boolean validateValueInternal(ITableRow row, Boolean rawValue) {
     rawValue = super.validateValueInternal(row, rawValue);
-    if (!isTristateEnabled() && rawValue == null) {
+    if (!isTriStateEnabled() && rawValue == null) {
       rawValue = Boolean.FALSE;
     }
     return rawValue;
@@ -113,7 +119,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   protected void mapEditorFieldProperties(IFormField f) {
     super.mapEditorFieldProperties(f);
     if (f instanceof IBooleanField) {
-      ((IBooleanField) f).setTristateEnabled(isTristateEnabled());
+      ((IBooleanField) f).setTriStateEnabled(isTriStateEnabled());
     }
   }
 
@@ -143,20 +149,23 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   /**
-   * true: the checkbox can have a {@link #getValue()} of true, false and also null. null is the tristate and is
-   * typically displayed using a filled rectangluar area.
-   * <p>
-   * false: the checkbox can have a {@link #getValue()} of true, false. The value is never null.
-   * <p>
-   * default is false
+   * <ul>
+   * <li><b>true:</b> the check box can have a {@link #getValue()} of <code>true</code>, <code>false</code> and
+   * <code>null</code>. <code>null</code> is the third state that represents "undefined" and is typically displayed
+   * using a filled rectangular area.
+   * <li><b>false:</b> the check box can have a {@link #getValue()} of <code>true</code> and <code>false</code>. The
+   * value is never <code>null</code> (setting the value to <code>null</code> will automatically convert it to
+   * <code>false</code>).
+   * </ul>
+   * The default is <code>false</code>.
    *
    * @since 6.1
-   * @return true if this checkbox supports the so-called tristate and can be {@link #setValue(Boolean)} to null in
-   *         order to represent the tristate value
+   * @return <code>true</code> if this check box supports the so-called "tri-state" and allows setting the value to
+   *         <code>null</code> to represent the "undefined" value.
    */
   @Order(220)
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredTristateEnabled() {
+  protected boolean getConfiguredTriStateEnabled() {
     return false;
   }
 

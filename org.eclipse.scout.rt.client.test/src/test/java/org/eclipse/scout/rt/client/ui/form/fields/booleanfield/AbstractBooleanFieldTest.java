@@ -26,14 +26,11 @@ public class AbstractBooleanFieldTest extends AbstractBooleanField {
 
   @Test
   public void testExecIsEmpty() {
-
     setValue(null);
     assertEquals("Boolean field with value null is not empty.", true, execIsEmpty());
     setValue(true);
     assertEquals("Boolean field with value true is empty.", false, execIsEmpty());
     setValue(false);
     assertEquals("Boolean field with value false is not empty.", true, execIsEmpty());
-
   }
-
 }

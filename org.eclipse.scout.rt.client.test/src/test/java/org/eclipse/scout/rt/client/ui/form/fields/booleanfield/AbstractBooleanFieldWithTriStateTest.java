@@ -22,11 +22,12 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class AbstractBooleanWithTristateFieldTest extends AbstractBooleanField {
+public class AbstractBooleanFieldWithTriStateTest extends AbstractBooleanField {
 
   @Test
   public void testExecIsEmpty() {
-    setTristateEnabled(true);
+    setTriStateEnabled(true);
+
     setValue(null);
     assertEquals("Boolean field with value null is not empty.", true, execIsEmpty());
     setValue(true);
@@ -42,4 +43,44 @@ public class AbstractBooleanWithTristateFieldTest extends AbstractBooleanField {
     assertEquals("Boolean field with value false is not empty.", true, execIsEmpty());
   }
 
+  @Test
+  public void testChangeUndefinedToFalse() {
+    setValue(null);
+    assertEquals(false, getValue());
+
+    setValue(true);
+    assertEquals(true, getValue());
+
+    setTriStateEnabled(true);
+    assertEquals(true, getValue());
+
+    setValue(null);
+    assertEquals(null, getValue());
+
+    setTriStateEnabled(false);
+    assertEquals(false, getValue());
+  }
+
+  @Test
+  public void testIsChecked() {
+    setValue(null);
+    assertEquals(false, getValue());
+    assertEquals(false, isChecked());
+
+    toggleValue();
+    assertEquals(true, getValue());
+    assertEquals(true, isChecked());
+
+    setTriStateEnabled(true);
+    setValue(null);
+    assertEquals(null, getValue());
+    assertEquals(false, isChecked());
+
+    toggleValue();
+    assertEquals(false, getValue());
+    toggleValue();
+    assertEquals(true, getValue());
+    toggleValue();
+    assertEquals(null, getValue());
+  }
 }

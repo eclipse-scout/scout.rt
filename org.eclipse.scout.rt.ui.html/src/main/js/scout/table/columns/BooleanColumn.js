@@ -17,7 +17,7 @@ scout.BooleanColumn = function() {
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
   this.filterType = 'ColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
-  this.tristateEnabled = false;
+  this.triStateEnabled = false;
 };
 scout.inherits(scout.BooleanColumn, scout.Column);
 
@@ -42,11 +42,11 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   tooltip = (scout.strings.empty(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
   checkBoxCssClass = 'check-box';
-  if (cell.value===true) {
+  if (cell.value === true) {
     checkBoxCssClass += ' checked';
   }
-  if (this.tristateEnabled && cell.value!==true && cell.value!==false) {
-    checkBoxCssClass += ' tristate';
+  if (this.triStateEnabled && cell.value !== true && cell.value !== false) {
+    checkBoxCssClass += ' undefined';
   }
   if (!enabled) {
     checkBoxCssClass += ' disabled';

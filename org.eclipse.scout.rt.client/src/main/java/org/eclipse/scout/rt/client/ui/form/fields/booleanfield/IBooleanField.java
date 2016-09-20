@@ -13,7 +13,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface IBooleanField extends IValueField<Boolean> {
-  String PROP_TRISTATE_ENABLED = "tristateEnabled";
+
+  String PROP_TRI_STATE_ENABLED = "triStateEnabled";
 
   /**
    * Configuration
@@ -23,34 +24,36 @@ public interface IBooleanField extends IValueField<Boolean> {
   boolean isChecked();
 
   /**
-   * see {@link #isTristateEnabled()}
+   * see {@link #isTriStateEnabled()}
    *
    * @since 6.1
-   * @param b
    */
-  void setTristateEnabled(boolean b);
+  void setTriStateEnabled(boolean triStateEnabled);
 
   /**
-   * true: the checkbox can have a {@link #getValue()} of true, false and also null. null is the tristate and is
-   * typically displayed using a filled rectangluar area.
-   * <p>
-   * false: the checkbox can have a {@link #getValue()} of true, false. The value is never null.
-   * <p>
-   * default is false
+   * <ul>
+   * <li><b>true:</b> the check box can have a {@link #getValue()} of <code>true</code>, <code>false</code> and
+   * <code>null</code>. <code>null</code> is the third state that represents "undefined" and is typically displayed
+   * using a filled rectangular area.
+   * <li><b>false:</b> the check box can have a {@link #getValue()} of <code>true</code> and <code>false</code>. The
+   * value is never <code>null</code> (setting the value to <code>null</code> will automatically convert it to
+   * <code>false</code>).
+   * </ul>
+   * The default is <code>false</code>.
    *
    * @since 6.1
-   * @return true if this checkbox supports the so-called tristate and can be {@link #setValue(Boolean)} to null in
-   *         order to represent the tristate value
+   * @return <code>true</code> if this check box supports the so-called "tri-state" and allows setting the value to
+   *         <code>null</code> to represent the "undefined" value.
    */
-  boolean isTristateEnabled();
+  boolean isTriStateEnabled();
 
   /**
    * Toggle the value.
    * <p>
-   * If the checkbox is not {@link #isTristateEnabled()} then toggles between: true, false
+   * If the checkbox is not {@link #isTriStateEnabled()} then toggles between: true, false
    * <p>
-   * If the checkbox is {@link #isTristateEnabled()} then toggles between: true, false, null
-   * 
+   * If the checkbox is {@link #isTriStateEnabled()} then toggles between: true, false, null
+   *
    * @since 6.1
    */
   void toggleValue();
