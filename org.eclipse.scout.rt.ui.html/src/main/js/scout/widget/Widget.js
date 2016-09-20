@@ -853,14 +853,14 @@ scout.Widget.prototype._callRemoveProperty = function(propertyName) {
   if (this[removeFuncName]) {
     this[removeFuncName]();
   } else {
-    this._removeWidgets(widgets);
+    this._internalRemoveWidgets(widgets);
   }
 };
 
 /**
  * Removes the given widgets
  */
-scout.Widget.prototype._removeWidgets = function(widgets) {
+scout.Widget.prototype._internalRemoveWidgets = function(widgets) {
   widgets = scout.arrays.ensure(widgets);
   widgets.forEach(function(widget) {
     widget.remove();
