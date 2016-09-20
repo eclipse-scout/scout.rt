@@ -14,8 +14,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ISmartFie
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
- * import org.eclipse.scout.rt.platform.classid.ClassId; A content assist field allowing only values out of the lookup
- * row set.
+ * A content assist field allowing only values out of the lookup row set.
  *
  * @param <VALUE>
  *          The value type and key type of the lookup rows.
