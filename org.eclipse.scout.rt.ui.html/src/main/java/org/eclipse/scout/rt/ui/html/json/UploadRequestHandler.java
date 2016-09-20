@@ -120,6 +120,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String targetAdapterId) throws IOException, FileUploadException {
+    // If client sent ACK#, cleanup response history accordingly
+    uiSession.confirmResponseProcessed(getAckSequenceNo(httpServletRequest));
+
     IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
     if (binaryResourceConsumer == null) {
       //Request was already processed and adapter does not exist anymore;
@@ -157,6 +160,23 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     finally {
       uiSession.uiSessionLock().unlock();
     }
+  }
+
+  /**
+   * @return the value of the HTTP header <code>X-Scout-#ACK</code> as {@link Long}, or <code>null</code> if value is
+   *         not set or not a number.
+   */
+  protected Long getAckSequenceNo(HttpServletRequest req) {
+    String ackSeqNoStr = req.getHeader("X-Scout-#ACK");
+    if (ackSeqNoStr != null) {
+      try {
+        return Long.valueOf(ackSeqNoStr);
+      }
+      catch (NumberFormatException e) {
+        // nop
+      }
+    }
+    return null;
   }
 
   /**
@@ -230,9 +250,8 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   /**
-   * Checks the resource to be uploaed for malware
+   * Checks the resource to be upload for malware
    *
-   * @param res
    * @throws PlatformException
    *           when unsafe
    */
@@ -240,5 +259,4 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     //do malware scan
     BEANS.get(MalwareScanner.class).scan(res);
   }
-
 }

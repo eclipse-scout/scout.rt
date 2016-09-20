@@ -922,6 +922,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   if (formData.polyfill) {
     formData.applyToAjaxOptions(uploadAjaxOptions);
   }
+  this.responseQueue.prepareHttpRequest(uploadAjaxOptions);
 
   var busyHandling = !this.areRequestsPending();
   this._performUserAjaxRequest(uploadAjaxOptions, busyHandling);
