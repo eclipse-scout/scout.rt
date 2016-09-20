@@ -330,7 +330,6 @@ scout.ClipboardField.prototype._onPaste = function(event) {
         // try to read nativly pasted text from field
         var nativePasteContent = this.$field.text();
         if (scout.strings.hasText(nativePasteContent)) {
-          //TODO [15.3] osc from imo: I saaw this when ckecking code consistency: the function _renderDisplayText takes no args since 15.3. What is the documented semantics here? a call to this.setDisplayText(nativePasteContent) would do the same
           this.setDisplayText(nativePasteContent);
           filesArgument.push(new Blob([nativePasteContent], {
             type: scout.mimeTypes.TEXT_PLAIN
