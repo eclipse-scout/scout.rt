@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -51,19 +53,7 @@ public class JsonModelsLoader extends AbstractResourceLoader {
 
   private IWebContentService m_resourceLocator = BEANS.get(WebContentService.class);
 
-  private final String m_outputFilename;
-
-  private static final String REGEX_PATTERN = "^.*-(module|all-macro).json$";
-
-  private static final String DEFAULT_OUTPUT_FILENAME = "models.json";
-
-  public JsonModelsLoader() {
-    this(DEFAULT_OUTPUT_FILENAME);
-  }
-
-  public JsonModelsLoader(String outputFilename) {
-    this.m_outputFilename = outputFilename;
-  }
+  private static final String REGEX_PATTERN = "^(.*)(.json)$";
 
   public static boolean matchesFile(String file) {
     return file != null && file.matches(REGEX_PATTERN);
@@ -71,13 +61,23 @@ public class JsonModelsLoader extends AbstractResourceLoader {
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
-    JSONObject json = getJson(pathInfo);
-    if (json != null) {
-      JSONObject output = buildModelsJson(json);
-      LOG.info("Successfully loaded models JSON '" + m_outputFilename + "'");
-      return new BinaryResource(m_outputFilename, output.toString().getBytes());
+    Pattern pattern = Pattern.compile(REGEX_PATTERN);
+    Matcher matcher = pattern.matcher(pathInfo);
+    if (!matcher.find()) {
+      return null;
     }
-    return null;
+    String fileNameWithoutExtension = matcher.group(1);
+    String fileExtension = matcher.group(2);
+    JSONObject json = getJson(fileNameWithoutExtension + "-macro" + fileExtension);
+    if (json == null) {
+      json = getJson(fileNameWithoutExtension + "-module" + fileExtension);
+    }
+    if (json == null) {
+      return null;
+    }
+    JSONObject output = buildModelsJson(json);
+    LOG.info("Successfully loaded models JSON '" + pathInfo + "'");
+    return new BinaryResource(pathInfo, output.toString().getBytes());
   }
 
   /**
