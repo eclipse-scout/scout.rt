@@ -13,6 +13,9 @@ scout.AbstractGroupBoxBodyGrid = function() {
   this.gridColumns = 0;
 };
 
+scout.AbstractGroupBoxBodyGrid.prototype.init = function() {
+};
+
 scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox) {
   // reset old state
   this.gridRows = 0;
