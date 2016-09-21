@@ -13,10 +13,9 @@ scout.AbstractGroupBoxBodyGrid = function() {
   this.gridColumns = 0;
 };
 
-scout.AbstractGroupBoxBodyGrid.prototype.init = function() {
-};
+scout.AbstractGroupBoxBodyGrid.prototype.init = function() {};
 
-scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox) {
+scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox, recursive) {
   // reset old state
   this.gridRows = 0;
   // step 0: column count
@@ -45,6 +44,14 @@ scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox) {
     this.layoutAllStatic(fieldsExceptProcessButtons);
   } else {
     this.layoutAllDynamic(fieldsExceptProcessButtons);
+  }
+
+  if (recursive && recursive === true) {
+    groupBox.fields.filter(function(e) {
+      return e.objectType === 'GroupBox';
+    }).forEach(function(e) {
+      this.validate(e, true);
+    }.bind(this));
   }
 };
 
@@ -84,8 +91,8 @@ scout.AbstractGroupBoxBodyGrid.prototype._computeGridColumnCount = function(grou
   var gridColumns = -1,
     tmp = groupBox;
   do {
-    gridColumns = tmp.gridColumnCount;
-  } while (gridColumns < 0 && (tmp = tmp.getParentGroupBox()));
+    gridColumns = scout.nvl(tmp.gridColumnCount, gridColumns);
+  } while (gridColumns < 0 && tmp.getParentGroupBox && (tmp = tmp.getParentGroupBox()));
   return gridColumns < 0 ? 2 : gridColumns;
 };
 
