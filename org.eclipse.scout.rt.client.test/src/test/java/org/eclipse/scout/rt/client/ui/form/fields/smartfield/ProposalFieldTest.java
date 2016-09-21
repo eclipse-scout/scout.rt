@@ -48,7 +48,6 @@ import org.junit.runner.RunWith;
 public class ProposalFieldTest {
 
   private static List<IBean<?>> m_beans;
-  private ProposalField m_proposalField = new ProposalField();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -60,8 +59,11 @@ public class ProposalFieldTest {
     TestingUtility.unregisterBeans(m_beans);
   }
 
+  private ProposalField m_proposalField = new ProposalField();
+
   @Before
   public void setUp() {
+    m_proposalField = new ProposalField();
     m_proposalField.registerProposalChooserInternal();
   }
 
@@ -129,6 +131,80 @@ public class ProposalFieldTest {
     m_proposalField.setCurrentLookupRow(nullLookupRow);
     assertEquals("", m_proposalField.formatValueInternal(""));
     assertEquals(null, m_proposalField.formatValueInternal(null));
+  }
+
+  @Test
+  public void testLookupRowWithUntrimmedText() throws Exception {
+    m_proposalField.setTrimText(false);
+    m_proposalField.getUIFacade().acceptProposalFromUI(" a ", false, false);
+    assertEquals(" a ", m_proposalField.getValue());
+    m_proposalField.setTrimText(true);
+    assertEquals("a", m_proposalField.getValue());
+    m_proposalField.getUIFacade().acceptProposalFromUI(" b ", false, false);
+    assertEquals("b", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testLookupRowWithUntrimmedProposalThatCloses() throws Exception {
+    m_proposalField.setTrimText(false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" abc ", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI(" abc ", true, true);
+    assertEquals(" abc ", m_proposalField.getValue());
+    m_proposalField.setTrimText(true);
+    assertEquals("abc", m_proposalField.getValue());
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" def ", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI(" def ", true, true);
+    assertEquals("def", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testLookupRowWithUntrimmedProposalThatKeepsOpen() throws Exception {
+    m_proposalField.setTrimText(false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" abc ", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI(" abc ", true, false);
+    assertEquals(" abc ", m_proposalField.getValue());
+    m_proposalField.setTrimText(true);
+    assertEquals("abc", m_proposalField.getValue());
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" def ", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI(" def ", true, false);
+    assertEquals("def", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testLookupRowWithTooLongText() throws Exception {
+    m_proposalField.setMaxLength(32);
+    m_proposalField.getUIFacade().acceptProposalFromUI("1234567890", false, false);
+    assertEquals("1234567890", m_proposalField.getValue());
+    m_proposalField.setMaxLength(8);
+    assertEquals("12345678", m_proposalField.getValue());
+    m_proposalField.getUIFacade().acceptProposalFromUI("1234567abc", false, false);
+    assertEquals("1234567a", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testLookupRowWithTooLongProposalThatCloses() throws Exception {
+    m_proposalField.setMaxLength(32);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567890", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI("1234567890", true, true);
+    assertEquals("1234567890", m_proposalField.getValue());
+    m_proposalField.setMaxLength(8);
+    assertEquals("12345678", m_proposalField.getValue());
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567abc", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI("1234567abc", true, true);
+    assertEquals("1234567a", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testLookupRowWithTooLongProposalThatKeepsOpen() throws Exception {
+    m_proposalField.setMaxLength(32);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567890", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI("1234567890", true, false);
+    assertEquals("1234567890", m_proposalField.getValue());
+    m_proposalField.setMaxLength(8);
+    assertEquals("12345678", m_proposalField.getValue());
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567abc", true);
+    m_proposalField.getUIFacade().acceptProposalFromUI("1234567abc", true, false);
+    assertEquals("1234567a", m_proposalField.getValue());
   }
 
   /**

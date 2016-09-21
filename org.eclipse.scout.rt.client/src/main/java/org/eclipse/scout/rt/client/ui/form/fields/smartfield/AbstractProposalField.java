@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
@@ -47,6 +48,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   protected void initConfig() {
     super.initConfig();
+    setMaxLength(getConfiguredMaxLength());
+    setTrimText(getConfiguredTrimText());
     setAutoCloseChooser(getConfiguredAutoCloseChooser());
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ProposalFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   }
@@ -63,7 +66,29 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
    *
    * @since 6.0
    */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredAutoCloseChooser() {
+    return true;
+  }
+
+  /**
+   * Configures the initial value of {@link AbstractProposalField#getMaxLength() <p> Subclasses can override this
+   * method<p> Default is 4000
+   *
+   * @since 6.1
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredMaxLength() {
+    return 4000;
+  }
+
+  /**
+   * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
+   *         value. default is true.
+   * @since 6.1
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredTrimText() {
     return true;
   }
 
@@ -94,6 +119,32 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
+  public void setMaxLength(int maxLength) {
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitialized()) {
+      setValue(getValue());
+    }
+  }
+
+  @Override
+  public int getMaxLength() {
+    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
+  }
+
+  @Override
+  public void setTrimText(boolean b) {
+    boolean changed = propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, b);
+    if (b && changed && isInitialized()) {
+      setValue(getValue());
+    }
+  }
+
+  @Override
+  public boolean isTrimText() {
+    return propertySupport.getPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE);
+  }
+
+  @Override
   public void acceptProposal(ILookupRow<LOOKUP_KEY> row) {
     setCurrentLookupRow(row);
     setValue(row.getText());
@@ -106,22 +157,45 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected String formatValueInternal(String rawValue) {
+  protected String validateValueInternal(String rawValue) {
+    String validValue = super.validateValueInternal(rawValue);
+    if (validValue != null) {
+      if (isTrimText()) {
+        validValue = validValue.trim();
+      }
+      if (validValue.length() > getMaxLength()) {
+        validValue = validValue.substring(0, getMaxLength());
+      }
+    }
+    return StringUtility.nullIfEmpty(validValue);
+  }
+
+  @Override
+  protected String formatValueInternal(final String rawValue) {
+    String validValue = rawValue;
     ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
     if (currentLookupRow != null) {
       installLookupRowContext(currentLookupRow);
+      String validValueText = StringUtility.emptyIfNull(rawValue);
       String lookupRowText = StringUtility.emptyIfNull(currentLookupRow.getText());
-      String rawValueText = StringUtility.emptyIfNull(rawValue);
-      if (!lookupRowText.equals(rawValueText)) {
+      if (!lookupRowText.equals(validValueText)) {
         if (isMultilineText()) {
-          return lookupRowText;
+          validValue = lookupRowText;
         }
         else {
-          return lookupRowText.replaceAll("[\\n\\r]+", " ");
+          validValue = lookupRowText.replaceAll("[\\n\\r]+", " ");
         }
       }
+      if (validValue != null) {
+          if (isTrimText()) {
+            validValue = validValue.trim();
+          }
+          if (validValue.length() > getMaxLength()) {
+            validValue = validValue.substring(0, getMaxLength());
+          }
+        }
     }
-    return rawValue;
+    return validValue;
   }
 
   @Override

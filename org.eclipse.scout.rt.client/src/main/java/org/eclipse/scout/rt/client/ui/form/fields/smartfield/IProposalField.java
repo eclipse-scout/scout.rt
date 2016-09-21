@@ -15,6 +15,14 @@ public interface IProposalField<LOOKUP_KEY> extends IContentAssistField<String, 
    * {@link Boolean}
    */
   String PROP_AUTO_CLOSE_CHOOSER = "autoCloseChooser";
+  /**
+   * {@link Integer}
+   */
+  String PROP_MAX_LENGTH = "maxLength";
+  /**
+   * {@link Boolean}
+   */
+  String PROP_TRIM_TEXT_ON_VALIDATE = "trimText";
 
   /**
    * @since 6.0
@@ -25,4 +33,31 @@ public interface IProposalField<LOOKUP_KEY> extends IContentAssistField<String, 
    * @since 6.0
    */
   boolean isAutoCloseChooser();
+
+  /**
+   * @param maxLength
+   *          of the text in this field. Negative values are automatically converted to 0.
+   * @since 6.1
+   */
+  void setMaxLength(int maxLength);
+
+  /**
+   * @return the maximum length of text, default is 4000
+   * @since 6.1
+   */
+  int getMaxLength();
+
+  /**
+   * @param b
+   *          true if the entered text should pass through {@link String#trim()}
+   * @since 6.1
+   */
+  void setTrimText(boolean b);
+
+  /**
+   * @return true if {@link String#trim()} is applied to the text entered, default true
+   * @since 6.1
+   */
+  boolean isTrimText();
+
 }
