@@ -1587,6 +1587,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     // set all values to 'unchanged'
     markSaved();
+    rebuildSearchFilter();
     setFormLoading(false);
     getHandler().onPostLoad();
     if (!isBlockingInternal()) {
