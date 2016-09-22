@@ -107,7 +107,8 @@ public class JsonBean implements IJsonObject {
         if (!(entry.getKey() instanceof String)) {
           throw new IllegalArgumentException("Cannot convert " + type + " to json object");
         }
-        jsonMap.put((String) entry.getKey(), entry.getValue());
+        IJsonObject jsonObject = createJsonObject(entry.getValue());
+        jsonMap.put((String) entry.getKey(), jsonObject.toJson());
       }
       return jsonMap;
     }
