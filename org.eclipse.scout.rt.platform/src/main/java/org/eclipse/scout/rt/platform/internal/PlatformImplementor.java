@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.awt.GraphicsEnvironment;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +39,11 @@ import org.slf4j.LoggerFactory;
  * @since 5.1
  */
 public class PlatformImplementor implements IPlatform {
+
   private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
+
+  private static final String SCOUT_HEADLESS_PROPERTY = "scout.headless";
+  private static final String AWT_HEADLESS_PROPERTY = "java.awt.headless";
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
   private final Object m_platformStartedLock = new Object();
@@ -121,6 +127,7 @@ public class PlatformImplementor implements IPlatform {
         }
 
         try {
+          validateHeadless();
           m_beanManager = createBeanManager();
           //now all IPlatformListener are registered and can receive platform events
           changeState(State.BeanManagerPrepared, true);
@@ -146,6 +153,27 @@ public class PlatformImplementor implements IPlatform {
     }
     finally {
       notifyPlatformStarted();
+    }
+  }
+
+  protected void validateHeadless() {
+    final boolean scoutHeadless = ConfigUtility.getPropertyBoolean(SCOUT_HEADLESS_PROPERTY, true);
+    String awtHeadlessStr = System.getProperty(AWT_HEADLESS_PROPERTY);
+    final boolean awtHeadless = TypeCastUtility.castValue(awtHeadlessStr, boolean.class);
+    String autoSetMsg = "";
+    if (scoutHeadless && !awtHeadless) {
+      System.setProperty(AWT_HEADLESS_PROPERTY, "true");
+      autoSetMsg = " (automatically set by Scout)";
+      awtHeadlessStr = "true";
+    }
+    boolean graphicsEnvironmentHeadless = GraphicsEnvironment.isHeadless();
+    LOG.info("Headless mode: {}={}, {}={}{}, GraphicsEnvironment.isHeadless()={}", SCOUT_HEADLESS_PROPERTY, scoutHeadless,
+        AWT_HEADLESS_PROPERTY, awtHeadlessStr, autoSetMsg, graphicsEnvironmentHeadless);
+
+    if (scoutHeadless && !graphicsEnvironmentHeadless) {
+      LOG.warn("{} is 'true', but GraphicsEnvironment.isHeadless() reports 'false'. AWT seems to have been already initialized. "
+          + "Please try setting the system property {}=true manually when starting the VM. You can turn off this message by setting {}=false",
+          SCOUT_HEADLESS_PROPERTY, AWT_HEADLESS_PROPERTY, SCOUT_HEADLESS_PROPERTY);
     }
   }
 
