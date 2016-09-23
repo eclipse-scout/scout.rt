@@ -28,22 +28,26 @@ scout.DialogLayout.prototype.layout = function($container) {
     currentBounds = htmlComp.getBounds(),
     prefSize = this.preferredLayoutSize($container);
 
+  // Because prefSize does not include the dialog margins, we have to subtract them from the current size as well.
+  // Because currentBounds.subtract() would also alter the x/y values, we subtract the dimensions manually.
+  currentBounds.width -= dialogMargins.horizontal();
+  currentBounds.height -= dialogMargins.vertical();
+
   // class .dialog may specify a margin
   // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0
   // This guarantees the dialog size may not exceed the document size
-  var maxWidth = (windowSize.width - currentBounds.x - dialogMargins.horizontal());
-  var maxHeight = (windowSize.height - currentBounds.y - dialogMargins.vertical());
+  var maxWidth = (windowSize.width - dialogMargins.horizontal() - currentBounds.x);
+  var maxHeight = (windowSize.height - dialogMargins.vertical() - currentBounds.y);
 
-  // Ensure the dialog is not larger than viewport
+  // Calculate new dialog size:
+  // 1. Ensure the dialog is not larger than viewport
   dialogSize.width = Math.min(maxWidth, prefSize.width);
   dialogSize.height = Math.min(maxHeight, prefSize.height);
-
-  // Only resize if height changes.
-  // This makes sure the dialog won't change its size if a field changes its visibility AND if the user manually changed the width of the dialog.
-  if (currentBounds.height === dialogSize.height) {
-    scout.DialogLayout.parent.prototype.layout.call(this, $container);
-    return;
-  }
+  // 2. Ensure the dialog can only get larger, not smaller.
+  //    This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but
+  //    the user previously enlarged the dialog.
+  dialogSize.width = Math.max(dialogSize.width, currentBounds.width);
+  dialogSize.height = Math.max(dialogSize.height, currentBounds.height);
 
   scout.graphics.setSize(htmlComp.$comp, dialogSize);
   scout.DialogLayout.parent.prototype.layout.call(this, $container);
