@@ -1143,7 +1143,25 @@ $.fn.selectAllText = function() {
  * Checks if content is truncated.
  */
 $.fn.isContentTruncated = function() {
-  return this[0].scrollWidth > this[0].clientWidth;
+  var clientWidth = this[0].clientWidth;
+  var scrollWidth = this[0].scrollWidth;
+
+  // 1. Fast return if scrollWidth is larger than width
+  if (scrollWidth > clientWidth) {
+    return true;
+  }
+
+  // 2. In some cases the browser returns the same values for clientWidth and scrollWidth,
+  // but will cut off the text nevertheless. At least in FF this seems to be a bug related
+  // to sub-pixel rendering. The text is "slightly" (0.2 pixels) larger than the clientWidth,
+  // but scrollWidth returns the same value.
+  // As a workaround, we do a second measurement of the uncut width before returning false.
+  var oldStyle = this.attr('style');
+  this.css('width', 'auto');
+  scrollWidth = this[0].scrollWidth;
+  this.attrOrRemove('style', oldStyle);
+
+  return scrollWidth > clientWidth;
 };
 
 // FIXME awe: (graph) consider moving this function to DoubleClickHandler.js
