@@ -78,9 +78,12 @@ describe("GroupBox", function() {
     });
 
     it("adds group-box div when label is set", function() {
+      var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
+        .appendTo($('head'));
       session.desktop.formController._renderDialog(formAdapter);
       expect(formAdapter.rootGroupBox.$container.cssHeight()).toBe(123);
       expect(formAdapter.rootGroupBox.$container.cssWidth()).toBe(97);
+      $tmpStyle.remove();
     });
 
   });
