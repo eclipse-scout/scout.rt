@@ -483,10 +483,7 @@ scout.dates = {
     if (year === undefined || year === null) {
       return false;
     }
-    var date = new Date(0);
-    date.setFullYear(year);
-    date.setMonth(1);
-    date.setDate(29);
+    var date = new Date(year, 1, 29);
     return (date.getDate() === 29);
   },
 
