@@ -83,6 +83,9 @@ public class FormBasedAccessController implements IAccessController {
    * credentials sent via request parameters, and upon successful authentication puts the principal onto HTTP session.
    * However, the filter chain is not continued, meaning that 'login.js' is responsible to redirect the user to the
    * requested resource.
+   *
+   * @return <code>true</code> if the request was handled (caller should exit chain), or <code>false</code> if nothing
+   *         was done (caller should continue by invoking subsequent authenticators).
    */
   protected boolean handleAuthRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     // Never cache authentication requests.
@@ -138,11 +141,19 @@ public class FormBasedAccessController implements IAccessController {
       return null;
     }
 
+    // Generally, passwords should be stored as char array, because Strings are immutable and
+    // might stay in the memory forever, while char arrays _could_ be overwritten after user:
+    // http://stackoverflow.com/questions/8881291/why-is-char-preferred-over-string-for-passwords-in-java
+    // However, the password is already a String when using the servlet API, so this technique
+    // is basically useless... http://stackoverflow.com/questions/15016250/in-java-how-do-i-extract-a-password-from-a-httpservletrequest-header-without-ge
+    // We do it nevertheless to prevent accidental logging of passwords.
     final String password = request.getParameter("password");
     if (StringUtility.isNullOrEmpty(password)) {
       return null;
     }
 
+    // TODO BSH Use a dedicated "Credential" object here instead of a data structure that belongs to java.util.Map
+    //          (See also IPassword in ConfigFileCredentialVerifier. Another alternative would be the "Pair" class.)
     return new SimpleEntry<>(user, password.toCharArray());
   }
 
