@@ -53,7 +53,8 @@ public class AccessControlServiceTest {
 
   @Before
   public void setup() {
-    m_accessControlService = BeanInstanceUtil.createAndInitializeBean(TestAccessControlService.class);
+    m_accessControlService = BeanInstanceUtil.createBean(TestAccessControlService.class);
+    BeanInstanceUtil.initializeBeanInstance(m_accessControlService);
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(

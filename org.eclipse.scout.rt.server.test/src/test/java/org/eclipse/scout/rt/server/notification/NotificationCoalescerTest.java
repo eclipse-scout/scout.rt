@@ -44,10 +44,10 @@ public class NotificationCoalescerTest {
   @Before
   public void setUp() throws Exception {
     // register new test coalescer
+    P_TestNotificationCoalescer testCoalescer = BeanInstanceUtil.createBean(P_TestNotificationCoalescer.class);
+    BeanInstanceUtil.initializeBeanInstance(testCoalescer);
     m_registerServices = TestingUtility.registerBeans(
-        new BeanMetaData(ICoalescer.class).
-            withInitialInstance(BeanInstanceUtil.createAndInitializeBean(P_TestNotificationCoalescer.class)).
-            withApplicationScoped(true));
+        new BeanMetaData(ICoalescer.class).withInitialInstance(testCoalescer).withApplicationScoped(true));
 
     // now rebuild coalescer linking
     BEANS.get(NotificationCoalescer.class).buildCoalescerLinking();
