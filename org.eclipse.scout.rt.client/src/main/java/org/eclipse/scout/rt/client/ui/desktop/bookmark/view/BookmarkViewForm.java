@@ -93,7 +93,7 @@ public class BookmarkViewForm extends AbstractForm {
     return getFieldByClass(UserBookmarkSearchField.class);
   }
 
-  public AddBookmarksLinkButton getOkButton() {
+  public AddBookmarksLinkButton getAddBookmarksLinkButton() {
     return getFieldByClass(AddBookmarksLinkButton.class);
   }
 
