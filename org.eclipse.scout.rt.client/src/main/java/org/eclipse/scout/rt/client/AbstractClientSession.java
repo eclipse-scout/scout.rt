@@ -298,6 +298,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_sharedVariableMap.updateInternal(newMap);
   }
 
+  /**
+   * @deprecated use {@link #initializeSharedVariables()}, will be removed in Scout 7.1
+   */
+  @Deprecated
   protected void initializeSharedVariables(long timeout, TimeUnit unit) {
     initializeSharedVariables();
   }
