@@ -123,6 +123,7 @@ public class PreferencesTest {
     prefs.putList("l1", null);
   }
 
+  @Test
   public void testList() {
     Preferences prefs = new Preferences("X", null);
     ArrayList<String> defaultList = new ArrayList<String>();

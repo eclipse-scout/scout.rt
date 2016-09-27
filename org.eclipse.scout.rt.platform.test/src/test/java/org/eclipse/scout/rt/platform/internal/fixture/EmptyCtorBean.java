@@ -17,7 +17,7 @@ public class EmptyCtorBean {
   public EmptyCtorBean() {
   }
 
-  public boolean test() {
+  public boolean doit() {
     return true;
   }
 }

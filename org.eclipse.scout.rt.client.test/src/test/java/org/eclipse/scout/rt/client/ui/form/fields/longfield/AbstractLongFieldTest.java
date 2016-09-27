@@ -77,13 +77,14 @@ public class AbstractLongFieldTest extends AbstractLongField {
     assertEquals("expected minValue=Long.MIN_VALUE after calling setter with null-param", Long.valueOf(Long.MIN_VALUE), getMinValue());
   }
 
+  @Test
   public void testParseValueInternalAroundLongMinMaxValue() {
-    assertEquals("parsing failed", Long.valueOf(Integer.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MAX_VALUE).toPlainString()));
-    assertEquals("parsing failed", Long.valueOf(Integer.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MIN_VALUE).toPlainString()));
+    assertEquals("parsing failed", Long.valueOf(Long.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MAX_VALUE).toPlainString()));
+    assertEquals("parsing failed", Long.valueOf(Long.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Long.MIN_VALUE).toPlainString()));
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too big number.", this,
-        BigDecimal.valueOf(Integer.MAX_VALUE).add(BigDecimal.ONE).toPlainString());
+        BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.ONE).toPlainString());
     AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsRuntimeException("Expected an exception when parsing a string representing a too small number.", this,
-        BigDecimal.valueOf(Integer.MIN_VALUE).subtract(BigDecimal.ONE).toPlainString());
+        BigDecimal.valueOf(Long.MIN_VALUE).subtract(BigDecimal.ONE).toPlainString());
   }
 
   @Test

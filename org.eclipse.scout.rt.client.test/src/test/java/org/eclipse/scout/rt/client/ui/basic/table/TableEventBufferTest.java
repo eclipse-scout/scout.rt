@@ -759,6 +759,7 @@ public class TableEventBufferTest {
     assertEquals(2 * eventCount, tableEvents.size());
   }
 
+  @Test
   public void testRemoveRowsFromPreviousEventsWhenDeleted() {
     ITable table = mock(ITable.class);
     ITableRow r0 = mockRow(0);
@@ -783,13 +784,13 @@ public class TableEventBufferTest {
     m_testBuffer.removeObsolete(events);
 
     assertEquals(6, events.size());
-    assertSame(Arrays.asList(e0, e1, e2, e3, e4, e5), events.get(0));
-    assertEquals(3, e0.getRowCount());
-    assertEquals(3, e1.getRowCount());
-    assertEquals(0, e2.getRowCount());
-    assertEquals(0, e3.getRowCount());
-    assertEquals(0, e4.getRowCount());
-    assertEquals(3, e5.getRowCount());
+    assertEquals(Arrays.asList(e0, e1, e2, e3, e4, e5), events);
+    assertEquals(Arrays.asList(r0, r1, r2), e0.getRows());
+    assertEquals(Arrays.asList(r0, r1, r2), e1.getRows());
+    assertEquals(Collections.emptyList(), e2.getRows());
+    assertEquals(Collections.emptyList(), e3.getRows());
+    assertEquals(Collections.emptyList(), e4.getRows());
+    assertEquals(Arrays.asList(r0, r1, r2), e5.getRows());
   }
 
   @Test

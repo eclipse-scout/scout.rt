@@ -174,6 +174,7 @@ public class CellTest {
     verify(observer).validateValue(c, value);
   }
 
+  @Test
   public void testSetValue_validateInalidValue() throws Exception {
     ICellObserver observer = Mockito.mock(ICellObserver.class);
     Cell c = new Cell(observer);

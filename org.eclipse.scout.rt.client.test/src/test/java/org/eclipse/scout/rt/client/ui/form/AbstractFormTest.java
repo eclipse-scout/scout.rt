@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -112,6 +111,7 @@ public class AbstractFormTest {
   /**
    * Tests that validating a valid form with an ok status should not result in any error.
    */
+  @Test
   public void testValidForm_ErrorStatus() {
     String errorMessage = "";
     try {
@@ -123,8 +123,8 @@ public class AbstractFormTest {
       errorMessage = ve.getDisplayMessage();
     }
 
-    assertTrue(errorMessage.contains("MainBox: ErrorMessage"));
-
+    final String expectedTextPart = "Main Box: ErrorMessage";
+    assertTrue("expected errorMessage contains: '" + expectedTextPart + "', but was '" + errorMessage + "'", errorMessage.contains(expectedTextPart));
   }
 
   /**

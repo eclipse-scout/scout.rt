@@ -48,7 +48,7 @@ public class BomInputStreamReaderTest {
   private static final String TEXT_STRING = "Text";
 
   @Parameters(name = "{index}: {0} - {1}")
-  public static Iterable<Object[]> testData() {
+  public static Iterable<Object[]> data() {
     // unicode character sets
     List<Charset> unicodeCharsets = new ArrayList<>();
     unicodeCharsets.add(UTF_8);
