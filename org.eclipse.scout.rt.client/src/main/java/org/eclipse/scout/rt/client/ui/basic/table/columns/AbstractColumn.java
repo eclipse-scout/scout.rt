@@ -1292,30 +1292,30 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public List<ITableRow> findRows(Collection<? extends VALUE> keys) {
-    if (keys != null) {
-      List<ITableRow> values = new ArrayList<ITableRow>(keys.size());
-      for (VALUE t : keys) {
-        ITableRow row = findRow(t);
-        if (row != null) {
-          values.add(row);
+  public List<ITableRow> findRows(Collection<? extends VALUE> values) {
+    if (values != null) {
+      List<ITableRow> foundRows = new ArrayList<ITableRow>();
+      for (int i = 0; i < m_table.getRowCount(); i++) {
+        ITableRow row = m_table.getRow(i);
+        if (CompareUtility.isOneOf(getValue(row), values)) {
+          foundRows.add(row);
         }
       }
-      return values;
+      return foundRows;
     }
     return CollectionUtility.emptyArrayList();
   }
 
   @Override
   public List<ITableRow> findRows(VALUE value) {
-    List<ITableRow> values = new ArrayList<ITableRow>();
+    List<ITableRow> foundRows = new ArrayList<ITableRow>();
     for (int i = 0; i < m_table.getRowCount(); i++) {
       ITableRow row = m_table.getRow(i);
       if (CompareUtility.equals(value, getValue(row))) {
-        values.add(row);
+        foundRows.add(row);
       }
     }
-    return values;
+    return foundRows;
   }
 
   @Override

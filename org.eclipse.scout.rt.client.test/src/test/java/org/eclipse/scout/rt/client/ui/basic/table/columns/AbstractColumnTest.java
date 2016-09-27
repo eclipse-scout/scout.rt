@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -28,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -273,6 +276,28 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     ITableRow row = table.addRow();
     table.getC1Column().setValue(row, "newValue");
     assertEquals("newValue", table.getC1Column().getDisplayText(table.getRow(0)));
+  }
+
+  @Test
+  public void testFindRowsByUniqueKeys() {
+    TestTable table = new TestTable();
+    table.addRowsByArray(new String[]{"a"});
+    table.addRowsByArray(new String[]{"b"});
+    table.addRowsByArray(new String[]{"c"});
+    table.addRowsByArray(new String[]{"c"});
+    List<ITableRow> foundRows = table.getValidateTestColumn().findRows(CollectionUtility.arrayList("a", "b"));
+    assertEquals(2, foundRows.size());
+  }
+
+  @Test
+  public void testFindRowsByNonUniqueKeys() {
+    TestTable table = new TestTable();
+    table.addRowsByArray(new String[]{"a"});
+    table.addRowsByArray(new String[]{"b"});
+    table.addRowsByArray(new String[]{"c"});
+    table.addRowsByArray(new String[]{"c"});
+    List<ITableRow> foundRows = table.getValidateTestColumn().findRows(CollectionUtility.arrayList("a", "c"));
+    assertEquals(3, foundRows.size());
   }
 
   public class TestTable extends AbstractTable {
