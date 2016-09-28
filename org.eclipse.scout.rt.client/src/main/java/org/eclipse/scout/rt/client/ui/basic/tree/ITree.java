@@ -406,9 +406,13 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppL
 
   void setNodeLeaf(ITreeNode node, boolean b);
 
-  void setNodeChecked(ITreeNode node, boolean b);
+  void setNodeChecked(ITreeNode node, boolean checked);
 
-  void setNodesChecked(List<ITreeNode> nodes, boolean b);
+  void setNodeChecked(ITreeNode node, boolean checked, boolean enabledNodesOnly);
+
+  void setNodesChecked(List<ITreeNode> nodes, boolean checked);
+
+  void setNodesChecked(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly);
 
   boolean isNodeChecked(ITreeNode node);
 

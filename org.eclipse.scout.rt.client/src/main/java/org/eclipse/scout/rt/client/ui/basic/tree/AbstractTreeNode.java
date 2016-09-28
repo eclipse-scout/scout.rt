@@ -508,9 +508,16 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public void setChecked(boolean b) {
+  public void setChecked(boolean checked) {
     if (getTree() != null) {
-      getTree().setNodeChecked(this, b);
+      getTree().setNodeChecked(this, checked);
+    }
+  }
+
+  @Override
+  public void setChecked(boolean checked, boolean enabledNodesOnly) {
+    if (getTree() != null) {
+      getTree().setNodeChecked(this, checked, enabledNodesOnly);
     }
   }
 

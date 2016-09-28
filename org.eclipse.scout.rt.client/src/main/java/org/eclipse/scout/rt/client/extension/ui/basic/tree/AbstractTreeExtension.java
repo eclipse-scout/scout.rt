@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -92,4 +94,8 @@ public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends 
     return chain.execDrag(node);
   }
 
+  @Override
+  public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
+    chain.execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
+  }
 }

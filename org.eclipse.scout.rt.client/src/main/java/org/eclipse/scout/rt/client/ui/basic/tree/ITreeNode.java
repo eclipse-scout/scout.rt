@@ -144,7 +144,9 @@ public interface ITreeNode {
    */
   boolean isChecked();
 
-  void setChecked(boolean b);
+  void setChecked(boolean checked);
+
+  void setChecked(boolean checked, boolean enabledNodesOnly);
 
   /**
    * do not use this method directly use {@link ITree#setNodeStatus(ITreeNode, int)}

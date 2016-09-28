@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
@@ -42,8 +41,4 @@ public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> ex
     chain.execNodesChecked(nodes);
   }
 
-  @Override
-  public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes) {
-    chain.execAutoCheckChildNodes(nodes);
-  }
 }

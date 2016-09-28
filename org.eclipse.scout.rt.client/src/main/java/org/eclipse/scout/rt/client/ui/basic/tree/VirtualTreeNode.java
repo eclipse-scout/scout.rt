@@ -207,6 +207,11 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
+  public void setChecked(boolean checked, boolean enabledNodesOnly) {
+    // do nothing
+  }
+
+  @Override
   public boolean isExpanded() {
     return false;
   }

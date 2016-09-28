@@ -550,13 +550,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @ConfigOperation
-  protected void execAutoCheckChildNodes(List<? extends ITreeNode> nodes) {
+  protected void execAutoCheckChildNodes(List<? extends ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
     for (ITreeNode node : nodes) {
       for (ITreeNode childNode : node.getFilteredChildNodes()) {
-        if (childNode.isEnabled() && childNode.isVisible()) {
-          childNode.setChecked(node.isChecked());
-        }
-        interceptAutoCheckChildNodes(CollectionUtility.arrayList(childNode));
+        childNode.setChecked(checked, enabledNodesOnly);
+        interceptAutoCheckChildNodes(CollectionUtility.arrayList(childNode), checked, enabledNodesOnly);
       }
     }
   }
@@ -1423,24 +1421,30 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setNodeChecked(ITreeNode node, boolean b) {
-    setNodesChecked(CollectionUtility.arrayList(node), b);
+  public void setNodeChecked(ITreeNode node, boolean checked) {
+    setNodesChecked(CollectionUtility.arrayList(node), checked);
   }
 
   @Override
-  public void setNodesChecked(List<ITreeNode> nodes, boolean b) {
-    setNodesChecked(nodes, b, false);
+  public void setNodeChecked(ITreeNode node, boolean checked, boolean enabledNodesOnly) {
+    setNodesChecked(CollectionUtility.arrayList(node), checked, enabledNodesOnly);
   }
 
-  public void setNodesChecked(List<ITreeNode> nodes, boolean b, boolean onlyCheckEnabledNodes) {
+  @Override
+  public void setNodesChecked(List<ITreeNode> nodes, boolean checked) {
+    setNodesChecked(nodes, checked, false);
+  }
+
+  @Override
+  public void setNodesChecked(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
     if (!isCheckable()) {
       return;
     }
     List<ITreeNode> changedNodes = new ArrayList<ITreeNode>();
     for (ITreeNode node : nodes) {
       node = resolveNode(node);
-      if (node != null && node.isChecked() != b && (!onlyCheckEnabledNodes || node.isEnabled())) {
-        if (b) {
+      if (node != null && node.isChecked() != checked && (!enabledNodesOnly || node.isEnabled())) {
+        if (checked) {
           m_checkedNodes.add(node);
         }
         else {
@@ -1449,7 +1453,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         changedNodes.add(node);
 
         //uncheck others in single-check mode
-        if (b && !isMultiCheck()) {
+        if (checked && !isMultiCheck()) {
           List<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
           for (ITreeNode cn : getCheckedNodes()) {
             if (cn != node) {
@@ -1464,7 +1468,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (changedNodes.size() > 0) {
       if (isAutoCheckChildNodes() && isMultiCheck()) {
         try {
-          interceptAutoCheckChildNodes(nodes);
+          interceptAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
         }
         catch (RuntimeException ex) {
           BEANS.get(ExceptionHandler.class).handle(ex);
@@ -2539,10 +2543,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     chain.execNodesChecked(nodes);
   }
 
-  protected void interceptAutoCheckChildNodes(List<ITreeNode> nodes) {
+  protected void interceptAutoCheckChildNodes(List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
-    chain.execAutoCheckChildNodes(nodes);
+    chain.execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
   }
 
   private void fireNodeAction(ITreeNode node) {
@@ -3231,8 +3235,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes) {
-      getOwner().execAutoCheckChildNodes(nodes);
+    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes, boolean checked, boolean enabledNodesOnly) {
+      getOwner().execAutoCheckChildNodes(nodes, checked, enabledNodesOnly);
     }
   }
 

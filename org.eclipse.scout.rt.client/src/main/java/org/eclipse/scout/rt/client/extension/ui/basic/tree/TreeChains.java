@@ -159,11 +159,11 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execAutoCheckChildNodes(final List<ITreeNode> nodes) {
+    public void execAutoCheckChildNodes(final List<ITreeNode> nodes, final boolean checked, final boolean enabledNodesOnly) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
-          next.execAutoCheckChildNodes(TreeAutoCheckChildNodesChain.this, nodes);
+          next.execAutoCheckChildNodes(TreeAutoCheckChildNodesChain.this, nodes, checked, enabledNodesOnly);
         }
       };
       callChain(methodInvocation, nodes);
