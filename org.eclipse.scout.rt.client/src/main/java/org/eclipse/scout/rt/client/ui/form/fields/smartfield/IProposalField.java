@@ -15,12 +15,18 @@ public interface IProposalField<LOOKUP_KEY> extends IContentAssistField<String, 
    * {@link Boolean}
    */
   String PROP_AUTO_CLOSE_CHOOSER = "autoCloseChooser";
+
   /**
    * {@link Integer}
+   * 
+   * @since 6.1
    */
   String PROP_MAX_LENGTH = "maxLength";
+
   /**
    * {@link Boolean}
+   * 
+   * @since 6.1
    */
   String PROP_TRIM_TEXT_ON_VALIDATE = "trimText";
 

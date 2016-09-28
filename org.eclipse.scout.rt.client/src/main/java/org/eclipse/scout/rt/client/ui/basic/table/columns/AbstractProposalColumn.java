@@ -10,14 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IProposalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -27,6 +32,83 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
 
   public AbstractProposalColumn() {
     super();
+  }
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+    setMaxLength(getConfiguredMaxLength());
+    setTrimText(getConfiguredTrimText());
+  }
+
+  /**
+   * Configures the initial value of {@link AbstractProposalField#getMaxLength() <p> Subclasses can override this
+   * method<p> Default is 4000
+   *
+   * @since 6.1
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredMaxLength() {
+    return 4000;
+  }
+
+  /**
+   * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
+   *         value. default is true.
+   * @since 6.1
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredTrimText() {
+    return true;
+  }
+
+  @Override
+  public void setMaxLength(int maxLength) {
+    propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+  }
+
+  @Override
+  public int getMaxLength() {
+    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
+  }
+
+  @Override
+  public void setTrimText(boolean b) {
+    propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, b);
+  }
+
+  @Override
+  public boolean isTrimText() {
+    return propertySupport.getPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE);
+  }
+
+  @Override
+  protected void updateDisplayTexts() {
+    if (getTable() != null) {
+      updateDisplayTexts(getTable().getRows());
+    }
+  }
+
+  @Override
+  public void updateDisplayTexts(List<ITableRow> rows) {
+    for (ITableRow row : Assertions.assertNotNull(rows)) {
+      updateDisplayText(row, row.getCellForUpdate(this));
+    }
+  }
+
+  @Override
+  public void updateDisplayText(ITableRow row, Cell cell) {
+    updateDisplayText(row, cell, (String) cell.getValue());
+  }
+
+  @Override
+  public void updateDisplayText(ITableRow row, String value) {
+    Cell cell = row.getCellForUpdate(this);
+    updateDisplayText(row, cell, value);
+  }
+
+  private void updateDisplayText(ITableRow row, Cell cell, String value) {
+    cell.setText(formatValueInternal(row, value));
   }
 
   @Override
@@ -51,6 +133,12 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
     f.setRow(row);
     mapEditorFieldProperties(f);
     return f;
+  }
+
+  protected void mapEditorFieldProperties(IProposalField<LOOKUP_TYPE> f) {
+    super.mapEditorFieldProperties(f);
+    f.setMaxLength(getMaxLength());
+    f.setTrimText(isTrimText());
   }
 
   @Override
