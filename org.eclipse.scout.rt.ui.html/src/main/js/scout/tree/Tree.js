@@ -1297,7 +1297,7 @@ scout.Tree.prototype.isBreadcrumbStyleActive = function() {
 };
 
 scout.Tree.prototype.setBreadcrumbTogglingThreshold = function(width) {
-  this._setProperty('breadcrumbTogglingThreshold', width); // FIXME CGU [6.1]change to setProperty after making _renderXY optional
+  this.setProperty('breadcrumbTogglingThreshold', width);
 };
 
 scout.Tree.prototype.expandNode = function(node, opts) {
@@ -1326,7 +1326,6 @@ scout.Tree.prototype.collapseAll = function() {
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
   var lazy = scout.nvl(opts.lazy, node.lazyExpandingEnabled);
-  var notifyServer = scout.nvl(opts.notifyServer, true);
   var renderAnimated = scout.nvl(opts.renderAnimated, true);
 
   // Never do lazy expansion if it is disabled on the tree
@@ -1383,13 +1382,11 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     } else {
       this._removeChildrenFromFlatList(node, renderAnimated);
     }
-    if (notifyServer) {
-      this.trigger('nodeExpanded', {
-        node: node,
-        expanded: expanded,
-        expandedLazy: lazy
-      });
-    }
+    this.trigger('nodeExpanded', {
+      node: node,
+      expanded: expanded,
+      expandedLazy: lazy
+    });
     this.viewRangeDirty = true;
   }
 
@@ -1776,14 +1773,13 @@ scout.Tree.prototype.deselectAll = function() {
   this.selectNodes([]);
 };
 
-scout.Tree.prototype.selectNode = function(node, notifyServer, debounceSend) {
+scout.Tree.prototype.selectNode = function(node, debounceSend) {
   this.selectNodes(node);
 };
 
-scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
+scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
   var scrollTop;
   nodes = scout.arrays.ensure(nodes);
-  notifyServer = scout.nvl(notifyServer, true);
 
   if (scout.arrays.equalsIgnoreOrder(nodes, this.selectedNodes)) {
     return;
@@ -2115,30 +2111,28 @@ scout.Tree.prototype.updateNodeOrder = function(childNodes, parentNode) {
   });
 };
 
-scout.Tree.prototype.checkNode = function(node, checked, notifyServer) {
+scout.Tree.prototype.checkNode = function(node, checked) {
   this.checkNodes([node], {
-    checked: checked,
-    notifyServer: notifyServer
+    checked: checked
   });
 };
 
 scout.Tree.prototype.checkNodes = function(nodes, options) {
   var opts = {
     checked: true,
-    notifyServer: true,
     checkOnlyEnabled: true,
-    checkChildren: false
+    checkChildren: this.autoCheckChildren
   };
   $.extend(opts, options);
   var updatedNodes = [];
   if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
-    return updatedNodes;
+    return;
   }
   nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(node) {
     if ((!node.enabled && opts.checkOnlyEnabled) || node.checked === opts.checked) {
       if (opts.checkChildren) {
-        updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
+        this.checkNodes(node.childNodes, opts);
       }
       return;
     }
@@ -2156,25 +2150,25 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
     }
     updatedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, opts.checked, true);
-    if (opts.notifyServer) { // FIXME [6.1] CGU what is the difference to above checkChildren?
-      updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
+    if (opts.checkChildren) {
+      this.checkNodes(node.childNodes, opts);
     }
   }, this);
 
-  this.trigger('nodesChecked', {
-    nodes: updatedNodes
-  });
+  if (updatedNodes.length > 0) {
+    this.trigger('nodesChecked', {
+      nodes: updatedNodes
+    });
+  }
   if (this.rendered) {
     updatedNodes.forEach(function(node) {
       this._renderNodeChecked(node);
     }, this);
   }
-  return updatedNodes;
 };
 
-scout.Tree.prototype.uncheckNode = function(node, notifyServer) {
+scout.Tree.prototype.uncheckNode = function(node) {
   this.uncheckNodes([node], {
-    notifyServer: notifyServer,
     checkOnlyEnabled: true
   });
 };
@@ -2182,18 +2176,6 @@ scout.Tree.prototype.uncheckNode = function(node, notifyServer) {
 scout.Tree.prototype.uncheckNodes = function(nodes, options) {
   options.checked = false;
   this.checkNodes(nodes, options);
-};
-
-scout.Tree.prototype.checkChildren = function(node, checked) {
-  var updatedNodes = [];
-  if (this.autoCheckChildren && node) {
-    updatedNodes = this.checkNodes(node.childNodes, {
-      checked: checked,
-      notifyServer: false,
-      checkChildren: true
-    });
-  }
-  return updatedNodes;
 };
 
 scout.Tree.prototype._triggerNodesSelected = function(debounce) {

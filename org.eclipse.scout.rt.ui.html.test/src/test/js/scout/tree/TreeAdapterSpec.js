@@ -196,6 +196,59 @@ describe("TreeAdapter", function() {
       });
       expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);
     });
+
+    it("does not send selection event if triggered by server", function() {
+      var model = helper.createModelFixture(2, 2);
+      var adapter = helper.createTreeAdapter(model);
+      var tree = adapter.createWidget(model, session.desktop);
+
+      adapter._onNodesSelected([tree.nodes[1].id]);
+      sendQueuedAjaxCalls();
+      expect(tree.selectedNodes[0]).toBe(tree.nodes[1]);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+  });
+
+  describe("checkNodes", function() {
+
+    it("does not send checked event if triggered by server", function() {
+      var model = helper.createModelFixture(2, 2);
+      var adapter = helper.createTreeAdapter(model);
+      var tree = adapter.createWidget(model, session.desktop);
+      tree.checkable = true;
+      expect(tree.nodes[1].checked).toBe(false);
+
+      adapter._onNodesChecked([{
+        id: tree.nodes[1].id,
+        checked: true
+      }]);
+      expect(tree.nodes[1].checked).toBe(true);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+  });
+
+  describe("setNodesExpanded", function() {
+
+    it("does not send expand event if triggered by server", function() {
+      var model = helper.createModelFixture(2, 2);
+      var adapter = helper.createTreeAdapter(model);
+      var tree = adapter.createWidget(model, session.desktop);
+      var node = tree.nodes[1];
+      expect(node.expanded).toBe(false);
+
+      adapter._onNodeExpanded(node.id, {
+        nodeId: node.id,
+        expanded: true,
+        expandedLazy: false
+      });
+      sendQueuedAjaxCalls();
+      expect(node.expanded).toBe(true);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
   });
 
   describe("collapseAll", function() {
@@ -334,20 +387,9 @@ describe("TreeAdapter", function() {
 
         var event = helper.createNodesSelectedEvent(model, [node0.id]);
         adapter.onModelAction(event);
-        expect(tree.selectNodes).toHaveBeenCalledWith([node0], false);
+        expect(tree.selectNodes).toHaveBeenCalledWith([node0]);
       });
 
-      it("does not send events if called when processing response", function() {
-        tree.render(session.$entryPoint);
-
-        var message = {
-          events: [helper.createNodesSelectedEvent(model, [node0.id])]
-        };
-        session._processSuccessResponse(message);
-
-        sendQueuedAjaxCalls();
-        expect(jasmine.Ajax.requests.count()).toBe(0);
-      });
     });
 
     describe("nodeChanged event", function() {

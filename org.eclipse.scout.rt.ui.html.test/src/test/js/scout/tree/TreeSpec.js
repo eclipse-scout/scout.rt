@@ -486,7 +486,7 @@ describe("Tree", function() {
     });
 
     it("preserves group css class when nodes get updated", function() {
-      tree.selectNode(node1, false);
+      tree.selectNode(node1);
       tree.render(session.$entryPoint);
 
       tree._isGroupingEnd = function(node) {
@@ -766,7 +766,7 @@ describe("Tree", function() {
 
   });
 
-  describe("check nodes", function() {
+  describe("checkNodes", function() {
 
     it("checks a subnode -> mark upper nodes ", function() {
       var model = helper.createModelFixture(4, 4);
@@ -784,14 +784,13 @@ describe("Tree", function() {
       }
 
       if (node) {
-        tree.checkNode(node, true, false);
+        tree.checkNode(node, true);
       }
 
       while (node.parentNode) {
         node = node.parentNode;
         expect(node.childrenChecked).toEqual(true);
       }
-
     });
 
     it("checks a node -> mark upper nodes -> uncheck node and test if node keeps marked because children are checked", function() {
@@ -810,9 +809,9 @@ describe("Tree", function() {
       }
 
       if (node) {
-        tree.checkNode(node, true, false);
+        tree.checkNode(node, true);
       }
-      tree.checkNode(nodeToCheck, true, false);
+      tree.checkNode(nodeToCheck, true);
       var tmpNode = nodeToCheck;
       //upper nodes should be marked
       while (tmpNode.parentNode) {
@@ -822,7 +821,7 @@ describe("Tree", function() {
       expect(nodeToCheck.childNodes[0].checked).toEqual(true);
 
       //remove check state on second level node-> second level node should be marked because children of it are checked
-      tree.checkNode(nodeToCheck, false, false);
+      tree.checkNode(nodeToCheck, false);
       expect(nodeToCheck.checked).toEqual(false);
       expect(nodeToCheck.childrenChecked).toEqual(true);
       tmpNode = nodeToCheck;
@@ -833,7 +832,7 @@ describe("Tree", function() {
       }
     });
 
-    it("checks a subnode and its sibling->mark upper nodes -> uncheck one of the siblings", function() {
+    it("checks a subnode and its sibling -> mark upper nodes -> uncheck one of the siblings", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.render(session.$entryPoint);
@@ -848,8 +847,8 @@ describe("Tree", function() {
         }
       }
       if (nodeOne && nodeTwo) {
-        tree.checkNode(nodeOne, true, false);
-        tree.checkNode(nodeTwo, true, false);
+        tree.checkNode(nodeOne, true);
+        tree.checkNode(nodeTwo, true);
       }
       //check if all upper nodes are marked
       var tmpNode = nodeOne;
@@ -859,7 +858,7 @@ describe("Tree", function() {
       }
 
       //uncheck one of the two siblings
-      tree.checkNode(nodeTwo, false, false);
+      tree.checkNode(nodeTwo, false);
       //marks on upper should exist
       tmpNode = nodeOne;
       while (tmpNode.parentNode) {
@@ -868,7 +867,7 @@ describe("Tree", function() {
       }
 
       //uncheck second siblings
-      tree.checkNode(nodeOne, false, false);
+      tree.checkNode(nodeOne, false);
       //marks on upper should be removed
       tmpNode = nodeOne;
       while (tmpNode.parentNode) {
@@ -877,37 +876,30 @@ describe("Tree", function() {
       }
     });
 
-    it("try to check a disabled node ", function() {
+    it("does not check a disabled node", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.render(session.$entryPoint);
       tree.checkable = true;
+
       var node = tree.nodes[0];
-
-      if (node) {
-        node.enabled = false;
-        tree.checkNode(node, true, false);
-      }
+      node.enabled = false;
+      tree.checkNode(node, true);
       expect(node.checked).toEqual(false);
-
     });
 
-    it("try to check a node in disabled tree ", function() {
+    it("does not check a node in a disabled tree", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.enabled = false;
       tree.render(session.$entryPoint);
 
       var node = tree.nodes[0];
-
-      if (node) {
-        tree.checkNode(node, true, false);
-      }
+      tree.checkNode(node, true);
       expect(node.checked).toEqual(false);
-
     });
 
-    it("try to check two nodes in singlecheck tree ", function() {
+    it("never checks two nodes if multiCheck is set to false", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.multiCheck = false;
@@ -918,8 +910,8 @@ describe("Tree", function() {
         nodeTwo = tree.nodes[1];
 
       if (node && nodeTwo) {
-        tree.checkNode(node, true, false);
-        tree.checkNode(nodeTwo, true, false);
+        tree.checkNode(node, true);
+        tree.checkNode(nodeTwo, true);
       }
 
       var checkedNodes = [];
@@ -931,8 +923,8 @@ describe("Tree", function() {
       expect(checkedNodes.length).toBe(1);
     });
 
-    it("check a parent in autoCheckChildren tree ", function() {
-      var model = helper.createModelFixture(4, 4);
+    it("checks children if autoCheckChildren is set to true", function() {
+      var model = helper.createModelFixture(2, 2);
       var tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
@@ -940,20 +932,15 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var node = tree.nodes[0];
-
-      if (node) {
-        tree.checkNode(node, true);
-      }
-
-      var nodesToCheck = node.childNodes.slice();
-      for (var j = 0; j < nodesToCheck.length; j++) {
-        var tmpNode = nodesToCheck[j];
-        expect(tmpNode.checked).toEqual(true);
-        tmpNode = nodesToCheck.concat(tmpNode.childNodes.splice());
-      }
+      tree.checkNode(node, true);
+      expect(node.checked).toEqual(true);
+      // every descendant needs to be checked
+      scout.Tree.visitNodes(node.childNodes, function(node) {
+        expect(node.checked).toEqual(true);
+      });
     });
 
-    it("check a parent in autoCheckChildren = false tree ", function() {
+    it("does not check the children if autoCheckChildren is set to false", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.multiCheck = true;
@@ -962,20 +949,15 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var node = tree.nodes[0];
-
-      if (node) {
-        tree.checkNode(node, true, false);
-      }
-
-      var nodesToCheck = node.childNodes.slice();
-      for (var j = 0; j < nodesToCheck.length; j++) {
-        var tmpNode = nodesToCheck[j];
-        expect(tmpNode.checked).toEqual(false);
-        tmpNode = nodesToCheck.concat(tmpNode.childNodes.splice());
-      }
+      tree.checkNode(node, true);
+      expect(node.checked).toEqual(true);
+      // no descendant must be checked
+      scout.Tree.visitNodes(node.childNodes, function(node) {
+        expect(node.checked).toEqual(false);
+      });
     });
 
-    it("try to check nodes in uncheckable tree ", function() {
+    it("does not check nodes if checkable is set to false", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.multiCheck = false;
@@ -983,10 +965,7 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var node = tree.nodes[0];
-
-      if (node) {
-        tree.checkNode(node, true, false);
-      }
+      tree.checkNode(node, true);
 
       var checkedNodes = [];
       for (var j = 0; j < tree.nodes.length; j++) {

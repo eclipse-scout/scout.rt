@@ -153,7 +153,7 @@ scout.CompactTree.prototype._decorateNode = function(node) {
 /**
  * @override
  */
-scout.CompactTree.prototype.selectNodes = function(nodes, notifyServer) {
+scout.CompactTree.prototype.selectNodes = function(nodes) {
   var selectedSectionNodes = [];
   nodes = scout.arrays.ensure(nodes);
   // If a section is selected, automatically change selection to first section-node
@@ -161,15 +161,13 @@ scout.CompactTree.prototype.selectNodes = function(nodes, notifyServer) {
     var $node = node.$node;
     if (!$node.hasClass('section-node')) {
       node = $node.children('.section-node').first().data('node');
-      // Ensure the server model stays in sync with the UI
-      notifyServer = true;
     }
     if (node) {
       selectedSectionNodes.push(node);
     }
   }, this);
 
-  scout.CompactTree.parent.prototype.selectNodes.call(this, selectedSectionNodes, notifyServer);
+  scout.CompactTree.parent.prototype.selectNodes.call(this, selectedSectionNodes);
 };
 
 /**

@@ -277,8 +277,8 @@ scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   this._send('property', data);
 };
 
-scout.ModelAdapter.prototype.addFilterForWidgetEvent = function(eventType) {
-  this._widgetEventTypeFilter.addFilter(eventType);
+scout.ModelAdapter.prototype.addFilterForWidgetEvent = function(filter) {
+  this._widgetEventTypeFilter.addFilter(filter);
 };
 
 scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {

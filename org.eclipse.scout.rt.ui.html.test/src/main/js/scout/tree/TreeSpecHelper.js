@@ -82,6 +82,13 @@ scout.TreeSpecHelper.prototype.createCompactTree = function(model) {
   return tree;
 };
 
+scout.TreeSpecHelper.prototype.createCompactTreeAdapter = function(model) {
+  model.objectType = 'Tree:Compact';
+  var tree = new scout.TreeAdapter();
+  tree.init(model);
+  return tree;
+};
+
 scout.TreeSpecHelper.prototype.findAllNodes = function(tree) {
   return tree.$container.find('.tree-node');
 };

@@ -48,6 +48,6 @@ scout.AbstractTreeNavigationKeyStroke.prototype._computeNewSelection = function(
 };
 
 scout.AbstractTreeNavigationKeyStroke.prototype.selectNodesAndReveal = function(newSelection, debounceSend) {
-  this.field.selectNodes(newSelection, true, debounceSend);
+  this.field.selectNodes(newSelection, debounceSend);
   this.field.revealSelection();
 };

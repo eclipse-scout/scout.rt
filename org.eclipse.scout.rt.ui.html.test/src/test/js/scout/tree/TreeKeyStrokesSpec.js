@@ -326,7 +326,7 @@ describe("TreeKeyStrokes", function() {
       var tree = helper.createTree(model);
 
       var node0 = tree.nodes[0];
-      tree.checkNode(node0, true, false);
+      tree.checkNode(node0, true);
       expect(node0.checked).toBeTruthy();
       tree.render(session.$entryPoint);
       tree.$data.triggerKeyDown(scout.keys.SPACE);
@@ -368,7 +368,7 @@ describe("TreeKeyStrokes", function() {
 
       var node0 = tree.nodes[0];
       tree.render(session.$entryPoint);
-      tree.checkNode(node0, true, false);
+      tree.checkNode(node0, true);
       expect(node0.checked).toBeTruthy();
       helper.selectNodesAndAssert(tree, [node0]);
 

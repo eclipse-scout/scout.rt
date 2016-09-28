@@ -329,7 +329,7 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
   }
 };
 
-scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
+scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
   nodes = scout.arrays.ensure(nodes);
   if (nodes.length > 0 && this.isNodeSelected(nodes[0])) {
     // Already selected, do nothing
@@ -347,7 +347,7 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
       this.setDetailFormVisibleByUi(nodes[0], true);
     }
   }
-  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
+  scout.Outline.parent.prototype.selectNodes.call(this, nodes, debounceSend);
   this.updateDetailContent();
 };
 

@@ -157,17 +157,25 @@ scout.TreeAdapter.prototype._onAllChildNodesDeleted = function(parentNodeId) {
 };
 
 scout.TreeAdapter.prototype._onNodesSelected = function(nodeIds) {
-  this.addFilterForWidgetEventType('nodesSelected');
+  this.addFilterForWidgetEvent(function(widgetEvent) {
+    return widgetEvent.type === 'nodesSelected' &&
+      scout.arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
+  }.bind(this));
   var nodes = this.widget._nodesByIds(nodeIds);
-  this.widget.selectNodes(nodes, false);
+  this.widget.selectNodes(nodes);
 };
 
 scout.TreeAdapter.prototype._onNodeExpanded = function(nodeId, event) {
   var node = this.widget.nodesMap[nodeId],
     options = {
-      notifyServer: false,
       lazy: event.expandedLazy
     };
+  this.addFilterForWidgetEvent(function(widgetEvent) {
+    return widgetEvent.type === 'nodeExpanded' &&
+      nodeId === widgetEvent.node.id &&
+      event.expanded === widgetEvent.expanded &&
+      event.expandedLazy === widgetEvent.expandedLazy;
+  }.bind(this));
   this.widget.setNodeExpanded(node, event.expanded, options);
   if (event.recursive) {
     this.widget.setNodeExpandedRecursive(node.childNodes, event.expanded, options);
@@ -202,14 +210,16 @@ scout.TreeAdapter.prototype._onNodesChecked = function(nodes) {
     }
   }, this);
 
+  this.addFilterForWidgetEventType('nodesChecked');
+
   this.widget.checkNodes(checkedNodes, {
     checked: true,
-    notifyServer: false,
-    checkOnlyEnabled: false
+    checkOnlyEnabled: false,
+    checkChildren: false
   });
   this.widget.uncheckNodes(uncheckedNodes, {
-    notifyServer: false,
-    checkOnlyEnabled: false
+    checkOnlyEnabled: false,
+    checkChildren: false
   });
 };
 
