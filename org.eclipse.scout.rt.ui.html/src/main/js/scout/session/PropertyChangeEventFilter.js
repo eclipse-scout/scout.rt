@@ -11,7 +11,7 @@ scout.PropertyChangeEventFilter.prototype.filter = function(propertyName, value)
     return false;
   }
   var filterPropertyValue = this._filterProperties[propertyName];
-  return filterPropertyValue === value;
+  return scout.objects.equals(filterPropertyValue, value);
 };
 
 scout.PropertyChangeEventFilter.prototype.reset = function() {

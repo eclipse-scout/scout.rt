@@ -1141,6 +1141,9 @@ scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
   if (typeof selectedResources[0] === 'string') {
     selectedResources = this._resourcesByIds(selectedResources);
   }
+  if (this.rendered) {
+    this._removeSelectedResources();
+  }
   this._setProperty('selectedResources', selectedResources);
   this._updateMenuBar();
 };
@@ -1217,6 +1220,9 @@ scout.Planner.prototype._renderSelectionRange = function() {
 scout.Planner.prototype._syncSelectedActivity = function(selectedActivity) {
   if (typeof selectedActivity === 'string') {
     selectedActivity = this._activityById(selectedActivity);
+  }
+  if (this.rendered) {
+    this._removeSelectedActivity();
   }
   this._setProperty('selectedActivity', selectedActivity);
   this._updateMenuBar();
@@ -1299,7 +1305,7 @@ scout.Planner.prototype.setViewRange = function(viewRange) {
   }
 };
 
-scout.Planner.prototype.selectRange = function(range, notifyServer) {
+scout.Planner.prototype.selectRange = function(range) {
   if (range && range.equals(this.selectionRange)) {
     return;
   }
@@ -1312,7 +1318,7 @@ scout.Planner.prototype.selectActivity = function(activity) {
   this._updateMenuBar();
 };
 
-scout.Planner.prototype.selectResources = function(resources, notifyServer) {
+scout.Planner.prototype.selectResources = function(resources) {
   if (scout.arrays.equals(resources, this.selectedResources)) {
     return;
   }
@@ -1335,12 +1341,12 @@ scout.Planner.prototype.selectResources = function(resources, notifyServer) {
 /**
  * Returns true if a deselection happened. False if the given resources were not selected at all.
  */
-scout.Planner.prototype.deselectResources = function(resources, notifyServer) {
+scout.Planner.prototype.deselectResources = function(resources) {
   var deselected = false;
   resources = scout.arrays.ensure(resources);
   var selectedResources = this.selectedResources.slice(); // copy
   if (scout.arrays.removeAll(selectedResources, resources)) {
-    this.selectResources(selectedResources, notifyServer);
+    this.selectResources(selectedResources);
     deselected = true;
   }
   return deselected;
@@ -1362,8 +1368,8 @@ scout.Planner.prototype.insertResources = function(resources) {
 };
 
 scout.Planner.prototype.deleteResources = function(resources) {
-  if (this.deselectResources(resources, false)) {
-    this.selectRange(new scout.DateRange(), false);
+  if (this.deselectResources(resources)) {
+    this.selectRange(new scout.DateRange());
   }
   resources.forEach(function(resource) {
     // Update model
@@ -1395,8 +1401,8 @@ scout.Planner.prototype.deleteAllResources = function() {
   this.resources = [];
   this.resourceMap = {};
   this.activityMap = {};
-  this.selectResources([], false);
-  this.selectRange(new scout.DateRange(), false);
+  this.selectResources([]);
+  this.selectRange(new scout.DateRange());
 };
 
 scout.Planner.prototype._updateResources = function(resources) {

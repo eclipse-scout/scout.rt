@@ -14,18 +14,17 @@ scout.DateRange = function(from, to) {
 };
 
 scout.DateRange.prototype.equals = function(other) {
-  if (other.from === undefined || other.to === undefined) {
+  if (!other) {
     return false;
   }
-  var fromEquals = scout.dates.equals(this.from, other.from);
-  var toEquals = scout.dates.equals(this.to, other.to);
-  return fromEquals && toEquals;
+  return scout.dates.equals(this.from, other.from) &&
+    scout.dates.equals(this.to, other.to);
 };
 
 scout.DateRange.prototype.toString = function() {
   return 'scout.DateRange[' +
-  'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
-  ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
+    'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
+    ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
 };
 
 scout.DateRange.ensure = function(dateRange) {
@@ -36,6 +35,6 @@ scout.DateRange.ensure = function(dateRange) {
     return dateRange;
   }
   return new scout.DateRange(
-      scout.dates.ensure(dateRange.from),
-      scout.dates.ensure(dateRange.to));
+    scout.dates.ensure(dateRange.from),
+    scout.dates.ensure(dateRange.to));
 };

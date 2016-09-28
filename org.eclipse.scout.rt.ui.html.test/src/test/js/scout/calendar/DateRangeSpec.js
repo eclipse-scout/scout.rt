@@ -18,6 +18,9 @@ describe('DateRange', function() {
     expect(range1.equals(range2)).toBe(true);
     expect(range2.equals(range1)).toBe(true);
     expect(range1.equals(range3)).toBe(false);
+    expect(new scout.DateRange().equals(new scout.DateRange())).toBe(true);
+    expect(new scout.DateRange().equals(null)).toBe(false);
+    expect(new scout.DateRange().equals(undefined)).toBe(false);
   });
 
 });

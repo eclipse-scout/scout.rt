@@ -64,16 +64,25 @@ scout.PlannerAdapter.prototype._onResourcesInserted = function(resources) {
 
 scout.PlannerAdapter.prototype._onResourcesDeleted = function(resourceIds) {
   var resources = this.widget._resourcesByIds(resourceIds);
+  this.addFilterForWidgetEventType('resourcesSelected');
+  this.addFilterForProperties({
+    selectionRange: new scout.DateRange()
+  });
   this.widget.deleteResources(resources);
+};
+
+scout.PlannerAdapter.prototype._onAllResourcesDeleted = function() {
+  this.addFilterForWidgetEventType('resourcesSelected');
+  this.addFilterForProperties({
+    selectionRange: new scout.DateRange()
+  });
+  this.widget.deleteAllResources();
 };
 
 scout.PlannerAdapter.prototype._onResourcesSelected = function(resourceIds) {
   var resources = this.widget._resourcesByIds(resourceIds);
+  this.addFilterForWidgetEventType('resourcesSelected');
   this.widget.selectResources(resources, false);
-};
-
-scout.PlannerAdapter.prototype._onAllResourcesDeleted = function() {
-  this.widget.deleteAllResources();
 };
 
 scout.PlannerAdapter.prototype._onResourcesUpdated = function(resources) {
@@ -85,10 +94,10 @@ scout.PlannerAdapter.prototype.onModelAction = function(event) {
     this._onResourcesInserted(event.resources);
   } else if (event.type === 'resourcesDeleted') {
     this._onResourcesDeleted(event.resourceIds);
-  } else if (event.type === 'resourcesSelected') {
-    this._onResourcesSelected(event.resourceIds);
   } else if (event.type === 'allResourcesDeleted') {
     this._onAllResourcesDeleted();
+  } else if (event.type === 'resourcesSelected') {
+    this._onResourcesSelected(event.resourceIds);
   } else if (event.type === 'resourcesUpdated') {
     this._onResourcesUpdated(event.resources);
   } else {

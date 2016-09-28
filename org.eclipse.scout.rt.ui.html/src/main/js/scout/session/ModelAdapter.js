@@ -285,6 +285,10 @@ scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
   this._widgetEventTypeFilter.addFilterForEventType(eventType);
 };
 
+scout.ModelAdapter.prototype.addFilterForProperties = function(properties) {
+  this._propertyChangeEventFilter.addFilterForProperties(properties);
+};
+
 scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
   return this._propertyChangeEventFilter.filter(propertyName, value);
 };
@@ -302,6 +306,9 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   event.changedProperties.forEach(function(propertyName) {
     var value = event.newProperties[propertyName];
 
+    // FIXME CGU [6.1] This does not work if value will be converted into another object (e.g scout.DateRange.ensure(selectionRange) in Planner.js)
+    // -> either do the check in this._send() or extract ensure into separate method and move the call of addFilterForProperties.
+    // The advantage of the first one would be simpler filter functions (e.g. this.widget._nodesToIds(this.widget.selectedNodes) in Tree.js)
     if (this._isPropertyChangeEventFiltered(propertyName, value)) {
       return;
     }
@@ -384,7 +391,7 @@ scout.ModelAdapter.prototype.onModelEvent = function(event) {
  * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  this._propertyChangeEventFilter.addFilterForProperties(event.properties);
+  this.addFilterForProperties(event.properties);
   this._syncPropertiesOnPropertyChange(event.properties);
 };
 
