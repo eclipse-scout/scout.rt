@@ -41,8 +41,9 @@ public class DownloadHandlerStorageTest {
   @Test
   public void testRemove() {
     DownloadHandlerStorage storage = new DownloadHandlerStorage();
-    BinaryResourceHolder res = new BinaryResourceHolder(new BinaryResource("bar.txt", null));
-    storage.put(KEY, res, OpenUriAction.DOWNLOAD);
+    BinaryResource res = new BinaryResource("bar.txt", null);
+    BinaryResourceHolder holder = new BinaryResourceHolder(res);
+    storage.put(KEY, holder, OpenUriAction.DOWNLOAD);
     assertEquals(1, storage.futureMap().size());
     BinaryResourceHolderWithAction holderWithAction = storage.get(KEY);
     assertEquals(OpenUriAction.DOWNLOAD, holderWithAction.getOpenUriAction());
@@ -53,9 +54,15 @@ public class DownloadHandlerStorageTest {
 
   @Test
   public void testGet() {
-    DownloadHandlerStorage storage = new DownloadHandlerStorage();
-    BinaryResourceHolder res = new BinaryResourceHolder(new BinaryResource("bar.txt", null));
-    storage.put(KEY, res, OpenUriAction.NEW_WINDOW);
+    DownloadHandlerStorage storage = new DownloadHandlerStorage() {
+      @Override
+      protected long getTTLForResource(BinaryResource res) {
+        return 50L;
+      }
+    };
+    BinaryResource res = new BinaryResource("bar.txt", null);
+    BinaryResourceHolder holder = new BinaryResourceHolder(res);
+    storage.put(KEY, holder, OpenUriAction.NEW_WINDOW);
     assertEquals(1, storage.futureMap().size());
     BinaryResourceHolderWithAction holderWithAction = storage.get(KEY);
     assertEquals(OpenUriAction.NEW_WINDOW, holderWithAction.getOpenUriAction());
@@ -64,6 +71,10 @@ public class DownloadHandlerStorageTest {
     holderWithAction = storage.get(KEY);
     assertEquals(res, holderWithAction.getHolder().get());
     assertTrue("Must contain download interceptor.", containsDownloadInterceptor(holderWithAction.getHolder()));
+
+    SleepUtil.sleepElseLog(100, TimeUnit.MILLISECONDS);
+    assertNull(storage.get(KEY));
+    assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
   }
 
   private boolean containsDownloadInterceptor(BinaryResourceHolder holder) {
@@ -83,8 +94,9 @@ public class DownloadHandlerStorageTest {
         return 10L;
       }
     };
-    BinaryResourceHolder res = new BinaryResourceHolder(new BinaryResource("bar.txt", null));
-    storage.put(KEY, res, OpenUriAction.NEW_WINDOW);
+    BinaryResource res = new BinaryResource("bar.txt", null);
+    BinaryResourceHolder holder = new BinaryResourceHolder(res);
+    storage.put(KEY, holder, OpenUriAction.NEW_WINDOW);
 
     SleepUtil.sleepElseLog(100, TimeUnit.MILLISECONDS);
 
