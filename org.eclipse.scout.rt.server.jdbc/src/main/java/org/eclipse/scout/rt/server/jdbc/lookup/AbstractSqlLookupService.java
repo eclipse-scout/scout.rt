@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<T> {
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private static final Pattern REFUSING_ALL_TAGS_REGEX = Pattern.compile("<all>\\s*and\\s*([0-9]+)\\s*=\\s*([0-9]+)\\s*</all>", Pattern.DOTALL);
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlLookupService.class);

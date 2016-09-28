@@ -269,6 +269,7 @@ public class JettyServer {
 
     String absoluteJarFilePath = absoluteDirectoryPath.substring(0, absoluteDirectoryPath.indexOf('!')); // path to the JAR file.
 
+    @SuppressWarnings("bsiRulesDefinition:htmlInString")
     Pattern childResourcePattern = Pattern.compile("^META-INF/resources(?<resourcePath>" + relativeDirectorySearchPath + "[^/]+)(?<slashIfDirectory>/?)$");
     try (JarFile jarFile = new JarFile(new URL(absoluteJarFilePath).getFile())) {
       Enumeration<? extends JarEntry> jarEntries = jarFile.entries();

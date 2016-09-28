@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class GeneralView extends DefaultView {
 
   private static final long serialVersionUID = -5324529296371616980L;

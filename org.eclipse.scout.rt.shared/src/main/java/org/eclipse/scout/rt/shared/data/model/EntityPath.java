@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * creating all graph nodes once with single parent linkage. Therefore when holding a {@link IDataModelAttribute} or
  * {@link IDataModelEntity} the forward path to this object from the {@link IDataModel} root is ambiguous. This class
  * solves that problem by containing the complete path.
- * 
+ *
  * @since 3.8
  */
 public final class EntityPath implements IDataModelPath {
@@ -195,6 +195,7 @@ public final class EntityPath implements IDataModelPath {
   }
 
   @Override
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName());

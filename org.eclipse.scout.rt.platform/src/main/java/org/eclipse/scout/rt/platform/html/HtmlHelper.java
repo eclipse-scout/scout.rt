@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @ApplicationScoped
 public class HtmlHelper {
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</table>", Pattern.CASE_INSENSITIVE);
 
   /**
@@ -149,6 +150,7 @@ public class HtmlHelper {
    * Replaces all new lines with a HTML line break (&lt;br&gt; tag). In some cases used after an {@link #escape(String)}
    * operation.
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public String newLineToBr(String input) {
     String result = StringUtility.replace(input, "\r\n", "<br>");
     return StringUtility.replace(result, "\n", "<br>");

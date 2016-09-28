@@ -130,6 +130,7 @@ public class PlatformException extends RuntimeException implements Serializable 
   }
 
   @Override
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public String getMessage() {
     final String msg = extractMessageText();
     final String formattedMessage = StringUtility.hasText(msg) ? msg : "<empty>";

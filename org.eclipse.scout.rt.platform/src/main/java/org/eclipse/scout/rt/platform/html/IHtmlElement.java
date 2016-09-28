@@ -42,4 +42,14 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
    *          of the attribute
    */
   IHtmlElement addAttribute(String name, CharSequence value);
+
+  /**
+   * Add a boolean html attribute to the element.
+   *
+   * @param name
+   *          of the attribute
+   * @see <a href="https://www.w3.org/TR/html5/infrastructure.html#boolean-attributes">HTML 5 spec - Boolean
+   *      attributes<a/>
+   */
+  IHtmlElement addBooleanAttribute(String name);
 }

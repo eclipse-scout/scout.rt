@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class MessagesView extends DefaultView {
 
   private static final long serialVersionUID = -2617599437449773944L;

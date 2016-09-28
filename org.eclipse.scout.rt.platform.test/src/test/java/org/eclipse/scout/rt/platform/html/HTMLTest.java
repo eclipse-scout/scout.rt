@@ -99,6 +99,12 @@ public class HTMLTest {
     assertEquals("<span name=\"value\">text</span>", span.toHtml());
   }
 
+  @Test
+  public void testAddBooleanAttribute() {
+    IHtmlElement span = HTML.span("text").addBooleanAttribute("name");
+    assertEquals("<span name>text</span>", span.toHtml());
+  }
+
   /**
    * Test for {@link IHtmlElement#appLink(CharSequence)}
    */

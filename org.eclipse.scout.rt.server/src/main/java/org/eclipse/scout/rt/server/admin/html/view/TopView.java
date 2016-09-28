@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.IView;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class TopView extends DefaultView implements Serializable {
   private static final long serialVersionUID = -4145097068331865304L;
   private MessagesView m_messagesView;

@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class ServicesView extends DefaultView {
   private static final long serialVersionUID = -3977567784149624349L;
 

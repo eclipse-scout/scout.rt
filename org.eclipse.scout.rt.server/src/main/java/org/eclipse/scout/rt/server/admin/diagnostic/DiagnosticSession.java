@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class DiagnosticSession {
 
   public void serviceRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {

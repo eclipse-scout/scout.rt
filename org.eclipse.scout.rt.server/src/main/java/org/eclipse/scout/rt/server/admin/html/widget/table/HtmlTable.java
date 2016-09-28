@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class HtmlTable extends HtmlComponent {
   private String m_tableId;
   private SortInfo m_sortInfo;

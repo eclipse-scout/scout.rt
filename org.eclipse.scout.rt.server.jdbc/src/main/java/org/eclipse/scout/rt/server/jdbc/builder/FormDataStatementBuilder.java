@@ -114,6 +114,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final Logger LOG = LoggerFactory.getLogger(FormDataStatementBuilder.class);
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
 
   /**
@@ -1193,6 +1194,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return s;
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected String autoCompleteEntityPartTags(String s) {
     if (s == null) {
       return null;
@@ -1229,6 +1231,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind,
       Map<String, String> parentAliasMap) {
     if (stm == null) {
@@ -1450,6 +1453,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * <p>
    * To use no aggregation use {@link DataModelConstants#AGGREGATION_NONE}
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public String createSqlPart(final Integer aggregationType, String sql, final int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) {
     if (sql == null) {
       sql = "";

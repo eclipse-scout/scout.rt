@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
+import static org.eclipse.scout.rt.platform.html.HTML.imgByBinaryResource;
+import static org.eclipse.scout.rt.platform.html.HTML.td;
+
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -64,10 +68,10 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     StringBuilder listPart = new StringBuilder();
     if (w != null) {
       if (w.getSubTitle() != null) {
-        topPart = "<div class=\"infoBox\">" + w.getSubTitle() + "</div>";
+        topPart = HTML.div(w.getSubTitle()).cssClass("infoBox").toHtml();
       }
       if (w.getActiveStep() != null && (w.getActiveStep().getTooltipText() != null || w.getActiveStep().getSubTitle() != null)) {
-        bottomPart = "<div class=\"infoBox\">" + StringUtility.nvl(w.getActiveStep().getSubTitle(), w.getActiveStep().getTooltipText()) + "</div>";
+        bottomPart = HTML.div(StringUtility.nvl(w.getActiveStep().getSubTitle(), w.getActiveStep().getTooltipText())).cssClass("infoBox").toHtml();
       }
       int index = 1;
       for (IWizardStep<?> step : w.getSteps()) {
@@ -103,24 +107,28 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     StringBuilder buf = new StringBuilder();
     String spacerCssClass = "selected".equals(cssClass) ? "spacerselected" : "spacer";
     appendHtmlForSpacerLine(buf, spacerCssClass, 7, AbstractWizardStatusField.STEP_ANCHOR_IDENTIFIER + index);
-    buf.append("<tr class=\"" + cssClass + "\">\n");
-    buf.append(" <td width=\"15\"><img src=\"binaryResource:empty.png\" width=\"1\" height=\"30\"></td>\n");
-    buf.append(" <td width=\"24\" valign=\"top\" class=\"bullet\" style=\"padding:0px;padding-top:5px;\">" + index + "</td>\n");
-    buf.append(" <td width=\"17\"></td>\n");
-    buf.append(" <td style=\"padding-top:2px;\">" + step.getTitle() + "</td>\n");
-    buf.append(" <td width=\"15\"></td>\n");
-    buf.append("</tr>\n");
+
+    buf.append(HTML
+        .tr(
+            td(imgByBinaryResource("empty.png").addAttribute("width", "1").addAttribute("height", "30")).addAttribute("width", "15"),
+            td(String.valueOf(index)).addAttribute("width", "24").addAttribute("valign", "top").cssClass("bullet").style("padding:0px;padding-top:5px;"),
+            td().addAttribute("width", "17"),
+            td(step.getTitle()).style("padding-top:2px;"),
+            td().addAttribute("width", "15"))
+        .cssClass(cssClass));
+
     appendHtmlForSpacerLine(buf, spacerCssClass, 11, null);
     appendHtmlForSpacerLine(buf, "line", 1, null);
     return buf.toString();
   }
 
   protected void appendHtmlForSpacerLine(StringBuilder buf, String cssClass, int height, String anchor) {
-    buf.append("<tr class=\"" + cssClass + "\"><td colspan=\"5\">");
-    if (!StringUtility.isNullOrEmpty(anchor)) {
-      buf.append("<a name=\"" + anchor + "\"/>");
-    }
-    buf.append("<img src=\"binaryResource:empty.png\" width=\"1\" height=\"" + height + "\"></td></tr>\n");
+    buf.append(HTML
+        .tr(
+            td(
+                StringUtility.isNullOrEmpty(anchor) ? null : buf.append("<a name=\"" + anchor + "\"/>"),
+                imgByBinaryResource("empty.png").addAttribute("width", "1").addAttribute("height", String.valueOf(height))).addAttribute("colspan", "5"))
+        .cssClass(cssClass));
   }
 
   /**

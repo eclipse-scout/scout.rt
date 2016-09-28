@@ -1152,6 +1152,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private IBindOutput createOutput(IToken bindToken, Object[] bindBases) {
     IBindOutput o = null;
     if (bindToken instanceof ValueOutputToken) {

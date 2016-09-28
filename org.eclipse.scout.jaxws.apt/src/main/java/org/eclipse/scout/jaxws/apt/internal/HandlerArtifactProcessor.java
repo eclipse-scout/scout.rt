@@ -209,6 +209,7 @@ public class HandlerArtifactProcessor {
     return handlerDelegate.fullName();
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected String createAndPersistHandlerXmlFile(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final List<String> handlers, final Filer filer) throws ParserConfigurationException, IOException {
     final DocumentBuilder builder = XmlUtility.newDocumentBuilder();
 

@@ -46,6 +46,7 @@ public abstract class AbstractDerbySqlService extends AbstractSqlService {
   }
 
   @Override
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected String getConfiguredJdbcMappingName() {
     return "jdbc:derby:<path to db>";
   }

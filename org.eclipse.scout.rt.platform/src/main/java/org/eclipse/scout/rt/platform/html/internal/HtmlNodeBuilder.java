@@ -99,7 +99,14 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
     return this;
   }
 
-/// GLOBAL ATTRIBUTES
+  @Override
+  public IHtmlElement addBooleanAttribute(String name) {
+    IHtmlContent content = new HtmlPlainBuilder(escape(name));
+    m_attributes.add(content);
+    return this;
+  }
+
+  /// GLOBAL ATTRIBUTES
   @Override
   public IHtmlElement style(CharSequence value) {
     addAttribute("style", value);

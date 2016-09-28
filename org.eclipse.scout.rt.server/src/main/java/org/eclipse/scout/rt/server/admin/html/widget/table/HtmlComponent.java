@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class HtmlComponent {
   protected String m_baseURL;
   protected HttpServletRequest m_req;

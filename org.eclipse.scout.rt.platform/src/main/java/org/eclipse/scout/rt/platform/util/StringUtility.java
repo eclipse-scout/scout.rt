@@ -44,6 +44,7 @@ public final class StringUtility {
    * Special constant used by {@link #htmlEncode(String)} to preserve a tab character (<code>\t</code>) in the resulting
    * HTML. {@link #htmlDecode(String)} can convert it back to <code>\t</code>, but only if the tag was not altered.
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static final String HTML_ENCODED_TAB = "<span style=\"white-space:pre\">&#9;</span>";
 
   public static final Comparator<String> ALPHANUMERIC_COMPARATOR = new AlphanumericComparator(false);

@@ -95,6 +95,7 @@ public class UiServlet extends HttpServlet {
     checkSessionCookieConfig(config.getServletContext().getSessionCookieConfig());
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected void checkSessionCookieConfig(SessionCookieConfig sessionCookieConfig) throws ServletException {
     if (sessionCookieConfig == null) {
       LOG.warn("Cannot validate the configuration of the session cookie!");

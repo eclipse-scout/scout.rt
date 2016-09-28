@@ -91,6 +91,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    * <p>
    * Default does 99%-safe check of correct usage of wherePart on non-trivial attributes.
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected void check() {
     if (m_whereClause != null) {
       String low = m_whereClause.toLowerCase().replaceAll("\\s", " ");

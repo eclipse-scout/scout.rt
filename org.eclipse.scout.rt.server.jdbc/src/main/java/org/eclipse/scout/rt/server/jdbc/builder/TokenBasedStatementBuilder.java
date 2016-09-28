@@ -323,6 +323,7 @@ public class TokenBasedStatementBuilder {
     return buf.toString();
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected String buildEntityNode(EntityNodeToken eNode) {
     String stm = getTokenMapping(eNode.getTokenId());
     if (stm == null) {
@@ -355,6 +356,7 @@ public class TokenBasedStatementBuilder {
     }
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected String buildAttributeNode(final AttributeNodeToken aNode) {
     String baseStatement = getTokenMapping(aNode.getTokenId());
     if (baseStatement == null) {

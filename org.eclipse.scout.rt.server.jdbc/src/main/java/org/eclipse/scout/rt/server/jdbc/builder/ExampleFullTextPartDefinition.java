@@ -34,6 +34,7 @@ public class ExampleFullTextPartDefinition extends BasicPartDefinition {
   }
 
   @Override
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected String createInstanceImpl(FormDataStatementBuilder builder, List<Object> valueDatas, List<String> bindNames, List<Object> bindValues, Map<String, String> parentAliasMap) {
     String pattern = (String) bindValues.get(0);
     //generate a search patter from pattern, decorate and replace pattern
@@ -41,5 +42,4 @@ public class ExampleFullTextPartDefinition extends BasicPartDefinition {
     String sqlAttribute = "CONTAINS(<attribute>" + this.getSqlAttribute() + "</attribute>,'" + pattern + "')>0";
     return builder.createSqlPart(DataModelConstants.AGGREGATION_NONE, sqlAttribute, getOperation(), null, null, isPlainBind(), parentAliasMap);
   }
-
 }

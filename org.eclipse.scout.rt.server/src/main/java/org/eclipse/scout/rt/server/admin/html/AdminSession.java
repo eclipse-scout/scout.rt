@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class AdminSession implements Serializable {
 
   private static final long serialVersionUID = -7854819245981897318L;

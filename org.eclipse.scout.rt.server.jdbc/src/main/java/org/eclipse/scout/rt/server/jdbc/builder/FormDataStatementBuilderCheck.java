@@ -158,6 +158,7 @@ public class FormDataStatementBuilderCheck {
     }
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected void checkDataModelEntity(EntityPath ePath) {
     IDataModelEntity e = ePath.lastElement();
     DataModelEntityPartDefinition part = builder.getDataModelEntityPartDefinitions().get(e.getClass());

@@ -459,6 +459,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     return null;
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private String createJavaDocForEntryPoint(final EntryPointDefinition entryPointDefinition) {
     final StringWriter writer = new StringWriter();
     final PrintWriter out = new PrintWriter(writer);

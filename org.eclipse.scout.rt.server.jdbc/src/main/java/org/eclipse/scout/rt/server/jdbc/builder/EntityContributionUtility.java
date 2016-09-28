@@ -127,6 +127,7 @@ public final class EntityContributionUtility {
    *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
    *          its onw plus all of these child tags (proxy)
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static EntityContribution mergeContributions(EntityStrategy entityStrategy, final String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) {
     String entityPart = entityPartWithTags;
     EntityContribution parentContrib = new EntityContribution();

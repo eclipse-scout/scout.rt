@@ -182,6 +182,7 @@ public class HtmlDocumentParser {
     replaceScriptTags(PATTERN_STYLESHEET_TAG, "<link rel=\"stylesheet\" type=\"text/css\" href=\"", "\">");
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   protected void replaceScriptTags() throws IOException {
     // <scout:script src="scout-all-macro.css" />
     replaceScriptTags(PATTERN_SCRIPT_TAG, "<script src=\"", "\"></script>");

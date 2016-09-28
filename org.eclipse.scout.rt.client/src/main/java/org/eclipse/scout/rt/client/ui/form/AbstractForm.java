@@ -2487,6 +2487,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     fireFormStructureChanged(causingField);
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private void fireFormStructureChanged(IFormField causingField) {
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_STRUCTURE_CHANGED, causingField));
@@ -2518,6 +2519,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private void fireRequestFocus(IFormField f) {
     try {
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_REQUEST_FOCUS, f));

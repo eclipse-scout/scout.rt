@@ -140,6 +140,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
   }
 
   @Override
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public void writeRequest(OutputStream stream, ServiceTunnelRequest msg) throws IOException {
     boolean debugEnabled = LOG.isDebugEnabled();
     if (debugEnabled) {
@@ -187,6 +188,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
   }
 
   @Override
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public void writeResponse(OutputStream stream, ServiceTunnelResponse msg) throws IOException {
     boolean debugEnabled = LOG.isDebugEnabled();
     if (debugEnabled) {

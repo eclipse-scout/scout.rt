@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
 
+@SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class CallsView extends DefaultView {
   private static final long serialVersionUID = -6384422619943413978L;
   private CallInspector m_selectedCall;
