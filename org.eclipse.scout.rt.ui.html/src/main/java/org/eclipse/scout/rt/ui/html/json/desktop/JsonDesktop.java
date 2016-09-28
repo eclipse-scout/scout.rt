@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -39,6 +40,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.eclipse.scout.rt.ui.html.json.desktop.DownloadHandlerStorage.BinaryResourceHolderWithAction;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
@@ -419,23 +421,22 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     // with the same filename (also makes hash collisions irrelevant).
     long counter = RESOURCE_COUNTER.getAndIncrement();
     filenameHash = counter + "/" + filenameHash;
-
-    m_downloads.put(filenameHash, res);
+    BinaryResourceHolder holder = new BinaryResourceHolder(res);
+    if (openUriAction == OpenUriAction.DOWNLOAD) {
+      holder.addHttpResponseInterceptor(new DownloadHttpResponseInterceptor(res.getFilename()));
+    }
+    m_downloads.put(filenameHash, holder, openUriAction);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filenameHash);
     handleModelOpenUri(downloadUrl, openUriAction);
   }
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource res = m_downloads.remove(filename);
-    if (res != null) {
-      BinaryResourceHolder holder = new BinaryResourceHolder(res);
-      holder.addHttpResponseInterceptor(new DownloadHttpResponseInterceptor(res.getFilename()));
-      return holder;
+    BinaryResourceHolderWithAction holderWithAction = m_downloads.get(filename);
+    if (holderWithAction != null) {
+      return holderWithAction.getHolder();
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   protected void handleModelOutlineChanged(IOutline outline) {

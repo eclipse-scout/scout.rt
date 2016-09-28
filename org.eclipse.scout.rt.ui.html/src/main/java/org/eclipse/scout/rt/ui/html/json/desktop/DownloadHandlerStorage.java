@@ -14,12 +14,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResponseInterceptor;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 
 /**
  * This class manages downloadable items. Each item has a TTL, after that time the item is removed automatically. When
@@ -28,15 +33,34 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 @Bean
 public class DownloadHandlerStorage {
 
+  public static class BinaryResourceHolderWithAction {
+    private final BinaryResourceHolder m_holder;
+    private final IOpenUriAction m_openUriAction;
+
+    public BinaryResourceHolderWithAction(BinaryResourceHolder holder, IOpenUriAction openUriAction) {
+      m_holder = holder;
+      m_openUriAction = openUriAction;
+    }
+
+    public BinaryResourceHolder getHolder() {
+      return m_holder;
+    }
+
+    public IOpenUriAction getOpenUriAction() {
+      return m_openUriAction;
+    }
+
+  }
+
   /**
    * Execution hint to mark internal cleanup jobs.
    */
   public static final String RESOURCE_CLEANUP_JOB_MARKER = DownloadHandlerStorage.class.getName();
 
-  private final Map<String, BinaryResource> m_valueMap = new HashMap<>();
+  private final Map<String, BinaryResourceHolderWithAction> m_valueMap = new HashMap<>();
   private final Map<String, IFuture> m_futureMap = new HashMap<>();
 
-  protected Map<String, BinaryResource> valueMap() {
+  protected Map<String, BinaryResourceHolderWithAction> valueMap() {
     return m_valueMap;
   }
 
@@ -51,10 +75,10 @@ public class DownloadHandlerStorage {
   /**
    * Put a downloadable item in the storage, after the given TTL has passed the item is removed automatically.
    */
-  public void put(String key, BinaryResource res) {
-    long ttl = getTTLForResource(res);
+  public void put(String key, BinaryResourceHolder holder, IOpenUriAction opeUriAction) {
+    long ttl = getTTLForResource(holder.get());
     synchronized (m_valueMap) {
-      m_valueMap.put(key, res);
+      m_valueMap.put(key, new BinaryResourceHolderWithAction(holder, opeUriAction));
       scheduleRemoval(key, ttl);
     }
   }
@@ -80,15 +104,43 @@ public class DownloadHandlerStorage {
   }
 
   /**
-   * Remove a downloadable item from the storage.
+   * Remove a downloadble item from the storage.
+   * <p>
+   * In cases of OpenUriActions not of type DOWNLOAD. Ensure file can be downloaded.
    */
-  public BinaryResource remove(String key) {
-    IFuture future = m_futureMap.remove(key);
-    if (future != null) {
-      future.cancel(false);
-    }
+  public BinaryResourceHolderWithAction get(String key) {
+    BinaryResourceHolderWithAction resHolderWithAction;
     synchronized (m_valueMap) {
-      return m_valueMap.remove(key);
+      resHolderWithAction = m_valueMap.get(key);
     }
+    if (resHolderWithAction != null) {
+      if (resHolderWithAction.getOpenUriAction() == OpenUriAction.DOWNLOAD) {
+        IFuture future = m_futureMap.remove(key);
+        if (future != null) {
+          future.cancel(false);
+        }
+        synchronized (m_valueMap) {
+          resHolderWithAction = m_valueMap.remove(key);
+        }
+      }
+      else {
+        if (!containsDownloadInterceptor(resHolderWithAction.getHolder())) {
+          BinaryResourceHolder holder = new BinaryResourceHolder(resHolderWithAction.getHolder().get());
+          holder.addHttpResponseInterceptor(new DownloadHttpResponseInterceptor(holder.get().getFilename()));
+          put(key, holder, resHolderWithAction.getOpenUriAction());
+        }
+      }
+    }
+    return resHolderWithAction;
+
+  }
+
+  protected boolean containsDownloadInterceptor(BinaryResourceHolder holder) {
+    for (IHttpResponseInterceptor interceptor : holder.getHttpResponseInterceptors()) {
+      if (interceptor instanceof DownloadHttpResponseInterceptor) {
+        return true;
+      }
+    }
+    return false;
   }
 }

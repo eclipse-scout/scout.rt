@@ -68,7 +68,7 @@ public class BinaryResourceTest {
     final String filename = "document.txt";
     final Charset charset = StandardCharsets.UTF_8;
     final byte[] content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua".getBytes(charset);
-    final String contentType = MimeType.TEXT_PLAIN.getType();
+    final String contentType = MimeType.TXT.getType();
     final long lastModified = BEANS.get(IDateProvider.class).currentMillis().getTime();
 
     BinaryResource res = BinaryResources.create()

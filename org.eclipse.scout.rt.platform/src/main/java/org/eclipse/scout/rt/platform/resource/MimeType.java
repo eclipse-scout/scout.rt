@@ -17,8 +17,8 @@ import java.util.Collection;
  * Enumeration for a few well-known extensions and their mime types.
  */
 public enum MimeType {
-  //by file extension
   APPCACHE("text/cache-manifest", "appcache"),
+  APPLICATION_OCTET_STREAM("application/octet-stream", "bin"),
   AVI("video/avi", "avi"),
   BMP("image/bmp", "bmp"),
   CSS("text/css", "css"),
@@ -28,15 +28,15 @@ public enum MimeType {
   EML("message/rfc822", "eml"),
   GIF("image/gif", "gif"),
   GZ("application/gzip", "gz"),
-  HTM("text/html", "htm"),
   HTML("text/html", "html"),
+  HTM("text/html", "htm"),
   ICO("image/vnd.microsoft.icon", "ico"),
   ICS("text/calendar", "ics"),
   IFB("text/calendar", "ifb"),
   JAR("application/java-archive", "jar"),
+  JPG("image/jpeg", "jpg"),
   JPE("image/jpeg", "jpe"),
   JPEG("image/jpeg", "jpeg"),
-  JPG("image/jpeg", "jpg"),
   JS("application/javascript", "js"),
   JSON("application/json", "json"),
   JSONML("application/jsonml+json", "jsonml"),
@@ -70,13 +70,7 @@ public enum MimeType {
   XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
   XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx"),
   XML("text/xml", "xml"),
-  ZIP("application/zip", "zip"),
-  //by mime type name
-  TEXT_PLAIN("text/plain", "txt"),
-  IMAGE_PNG("image/png", "png"),
-  IMAGE_JPEG("image/jpeg", "jpg"),
-  IMAGE_GIF("image/gif", "gif"),
-  APPLICATION_OCTET_STREAM("application/octet-stream", "bin");
+  ZIP("application/zip", "zip");
 
   private final String m_type;
   private final String m_fileExtension;

@@ -50,10 +50,10 @@ public class HtmlScoutClipboardService implements IClipboardService {
   @Override
   public void setTextContents(String textContents) {
     ClipboardForm form = new ClipboardForm();
-    form.setMimeTypes(MimeType.TEXT_PLAIN);
+    form.setMimeTypes(MimeType.TXT);
     // anonymous text paste, no filename
     BinaryResource binaryResource = BinaryResources.create()
-        .withContentType(MimeType.TEXT_PLAIN.getType())
+        .withContentType(MimeType.TXT.getType())
         .withContent(StringUtility.nvl(textContents, "").getBytes(StandardCharsets.UTF_8))
         .build();
 

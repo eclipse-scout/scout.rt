@@ -64,7 +64,7 @@ public class JsonFileChooserAcceptAttributeBuilderTest {
   @Test
   public void testMime() {
     Assert.assertEquals(setOf("text/plain"), new JsonFileChooserAcceptAttributeBuilder()
-        .withType(MimeType.TEXT_PLAIN.getType())
+        .withType(MimeType.TXT.getType())
         .build());
   }
 

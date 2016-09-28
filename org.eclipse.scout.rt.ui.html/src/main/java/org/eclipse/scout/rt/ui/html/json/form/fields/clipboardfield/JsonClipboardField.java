@@ -82,7 +82,7 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
         byte[] bytes = property.getValue().getBytes(StandardCharsets.UTF_8);
         // anonymous text paste, no filename
         binaryResources.add(BinaryResources.create()
-            .withContentType(MimeType.TEXT_PLAIN.getType())
+            .withContentType(MimeType.TXT.getType())
             .withContent(bytes)
             .build());
       }

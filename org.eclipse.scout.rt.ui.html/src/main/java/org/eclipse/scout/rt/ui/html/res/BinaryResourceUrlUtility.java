@@ -144,7 +144,7 @@ public final class BinaryResourceUrlUtility {
     return new Pair<>(filename, fingerprint);
   }
 
-  static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
+  private static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
     if (jsonAdapter == null) {
       return false;
     }

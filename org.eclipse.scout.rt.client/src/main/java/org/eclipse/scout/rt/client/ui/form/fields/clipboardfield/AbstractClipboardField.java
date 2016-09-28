@@ -196,7 +196,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
   protected String formatValueAsText(Collection<BinaryResource> value) {
     if (value != null && !value.isEmpty()) {
       for (BinaryResource res : value) {
-        if (MimeType.TEXT_PLAIN.getType().equals(res.getContentType())) {
+        if (MimeType.TXT.getType().equals(res.getContentType())) {
           return res.getContentAsString();
         }
       }

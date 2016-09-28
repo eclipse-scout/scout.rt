@@ -49,7 +49,6 @@ import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -321,11 +320,4 @@ public class JsonDesktopTest {
         .toFilter(), true);
   }
 
-  @Test
-  public void testGetFilenameHash() throws Exception {
-    assertEquals("d41d8cd98f00b204e9800998ecf8427e", BinaryResourceUrlUtility.getFilenameHash(null));
-    assertEquals("d41d8cd98f00b204e9800998ecf8427e", BinaryResourceUrlUtility.getFilenameHash(""));
-    assertEquals("202cb962ac59075b964b07152d234b70", BinaryResourceUrlUtility.getFilenameHash("123"));
-    assertEquals("4fd8cc85ca9eebd2fa3c550069ce2846", BinaryResourceUrlUtility.getFilenameHash("foo.txt"));
-  }
 }
