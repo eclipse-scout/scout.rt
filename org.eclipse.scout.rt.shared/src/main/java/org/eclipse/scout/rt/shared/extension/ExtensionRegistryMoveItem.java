@@ -44,7 +44,7 @@ public class ExtensionRegistryMoveItem extends AbstractExtensionRegistryItem {
     if (!super.equals(obj)) {
       return false;
     }
-    if (!(obj instanceof ExtensionRegistryMoveItem)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     ExtensionRegistryMoveItem other = (ExtensionRegistryMoveItem) obj;

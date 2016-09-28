@@ -1363,10 +1363,16 @@ public final class StringUtility {
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof TagBounds) {
-        return ((TagBounds) o).begin == begin && ((TagBounds) o).end == end;
+      if (this == o) {
+        return true;
       }
-      return false;
+      if (o == null) {
+        return false;
+      }
+      if (getClass() != o.getClass()) {
+        return false;
+      }
+      return ((TagBounds) o).begin == begin && ((TagBounds) o).end == end;
     }
 
     @Override

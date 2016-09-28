@@ -151,7 +151,13 @@ public class SqlParser {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof ParseStep)) {
+      if (obj == this) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
         return false;
       }
       ParseStep o = (ParseStep) obj;

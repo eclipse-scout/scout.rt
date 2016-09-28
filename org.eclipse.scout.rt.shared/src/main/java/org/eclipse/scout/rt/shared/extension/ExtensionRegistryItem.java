@@ -112,7 +112,7 @@ public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
     if (!super.equals(obj)) {
       return false;
     }
-    if (!(obj instanceof ExtensionRegistryItem)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     ExtensionRegistryItem other = (ExtensionRegistryItem) obj;

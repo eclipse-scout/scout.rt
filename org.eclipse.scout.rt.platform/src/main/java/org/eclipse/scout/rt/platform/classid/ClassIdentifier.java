@@ -130,7 +130,10 @@ public class ClassIdentifier implements Serializable {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof ClassIdentifier)) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
       return false;
     }
     ClassIdentifier other = (ClassIdentifier) obj;

@@ -165,7 +165,7 @@ public class JandexClassInfo implements IClassInfo {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof JandexClassInfo)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     JandexClassInfo other = (JandexClassInfo) obj;

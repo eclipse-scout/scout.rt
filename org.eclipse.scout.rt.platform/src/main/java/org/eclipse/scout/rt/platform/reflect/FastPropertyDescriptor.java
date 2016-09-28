@@ -126,21 +126,23 @@ public class FastPropertyDescriptor implements Serializable {
     if (this == obj) {
       return true;
     }
-    if (obj instanceof FastPropertyDescriptor) {
-      FastPropertyDescriptor other = (FastPropertyDescriptor) obj;
-      Method otherReadMethod = other.getReadMethod();
-      Method otherWriteMethod = other.getWriteMethod();
-      if (!FastBeanUtility.compareMethods(getReadMethod(), otherReadMethod)) {
-        return false;
-      }
-      if (!FastBeanUtility.compareMethods(getWriteMethod(), otherWriteMethod)) {
-        return false;
-      }
-      if (getPropertyType() == other.getPropertyType()) {
-        return true;
-      }
+    if (obj == null) {
+      return false;
     }
-    return false;
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+
+    FastPropertyDescriptor other = (FastPropertyDescriptor) obj;
+    Method otherReadMethod = other.getReadMethod();
+    Method otherWriteMethod = other.getWriteMethod();
+    if (!FastBeanUtility.compareMethods(getReadMethod(), otherReadMethod)) {
+      return false;
+    }
+    if (!FastBeanUtility.compareMethods(getWriteMethod(), otherWriteMethod)) {
+      return false;
+    }
+    return getPropertyType() == other.getPropertyType();
   }
 
   @Override

@@ -142,7 +142,7 @@ public class ClientNotificationAddress implements IClientNotificationAddress {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof ClientNotificationAddress)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     final ClientNotificationAddress other = (ClientNotificationAddress) obj;

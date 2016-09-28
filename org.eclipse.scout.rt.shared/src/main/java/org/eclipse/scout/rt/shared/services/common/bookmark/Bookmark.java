@@ -232,11 +232,17 @@ public class Bookmark implements Serializable, IOrdered {
 
   @Override
   public boolean equals(Object o) {
-    if (o instanceof Bookmark) {
-      Bookmark other = (Bookmark) o;
-      return this.getCRC() == other.getCRC();
+    if (o == this) {
+      return true;
     }
-    return false;
+    if (o == null) {
+      return false;
+    }
+    if (getClass() != o.getClass()) {
+      return false;
+    }
+    Bookmark other = (Bookmark) o;
+    return this.getCRC() == other.getCRC();
   }
 
   @Override

@@ -53,7 +53,13 @@ public class RemoteServiceAccessPermission extends Permission {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof RemoteServiceAccessPermission)) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
       return false;
     }
     return ((RemoteServiceAccessPermission) obj).getName().equals(this.getName());

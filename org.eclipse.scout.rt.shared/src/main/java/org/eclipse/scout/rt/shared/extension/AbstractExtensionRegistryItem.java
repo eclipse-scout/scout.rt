@@ -45,7 +45,7 @@ public abstract class AbstractExtensionRegistryItem {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof AbstractExtensionRegistryItem)) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     AbstractExtensionRegistryItem other = (AbstractExtensionRegistryItem) obj;

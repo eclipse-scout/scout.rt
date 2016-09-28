@@ -615,7 +615,16 @@ public class JSONArray {
 
   @Override
   public boolean equals(Object o) {
-    return o instanceof JSONArray && ((JSONArray) o).m_values.equals(m_values);
+    if (o == this) {
+      return true;
+    }
+    if (o == null) {
+      return false;
+    }
+    if (getClass() != o.getClass()) {
+      return false;
+    }
+    return ((JSONArray) o).m_values.equals(m_values);
   }
 
   @Override

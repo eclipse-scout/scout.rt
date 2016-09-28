@@ -1869,7 +1869,13 @@ public final class TypeCastUtility {
 
     @Override
     public boolean equals(Object obj) {
-      if (!(obj instanceof GPCKey)) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
         return false;
       }
       GPCKey o = (GPCKey) obj;

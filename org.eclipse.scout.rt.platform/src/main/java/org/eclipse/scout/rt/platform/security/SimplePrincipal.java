@@ -40,14 +40,15 @@ public class SimplePrincipal implements Principal, Serializable {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof SimplePrincipal)) {
+    if (other == null) {
       return false;
     }
-    else {
-      String myFullName = getName();
-      String otherFullName = ((SimplePrincipal) other).getName();
-      return myFullName.equals(otherFullName);
+    if (getClass() != other.getClass()) {
+      return false;
     }
+    String myFullName = getName();
+    String otherFullName = ((SimplePrincipal) other).getName();
+    return myFullName.equals(otherFullName);
   }
 
   @Override
