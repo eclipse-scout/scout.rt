@@ -185,7 +185,7 @@ scout.objects = {
     }
     // both objects have an equals() method
     if ((objA && objB) && (objA.equals && objB.equals)) {
-      return objA.equals(objB.equals);
+      return objA.equals(objB);
     }
     return false;
   },
