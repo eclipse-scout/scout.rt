@@ -12,12 +12,29 @@ package org.eclipse.scout.rt.platform;
 
 import java.lang.annotation.Annotation;
 
+@SuppressWarnings("squid:S2162") // instanceof comparison ok here
 public final class AnnotationFactory {
 
   private static final ApplicationScoped APPLICATION_SCOPED = new ApplicationScoped() {
     @Override
     public Class<? extends Annotation> annotationType() {
       return ApplicationScoped.class;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      return obj instanceof ApplicationScoped;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
     }
   };
 
@@ -26,12 +43,44 @@ public final class AnnotationFactory {
     public Class<? extends Annotation> annotationType() {
       return CreateImmediately.class;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      return obj instanceof CreateImmediately;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
   };
 
   private static final Replace REPLACE = new Replace() {
     @Override
     public Class<? extends Annotation> annotationType() {
       return Replace.class;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      return obj instanceof Replace;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
     }
   };
 
@@ -65,7 +114,12 @@ public final class AnnotationFactory {
 
       @Override
       public int hashCode() {
-        return (int) Double.doubleToLongBits(value());
+        // hash of the double (can be replaced with Double.hashCode() as soon as JRE 1.8 is used).
+        long bits = Double.doubleToLongBits(value());
+        int hashOfValue = (int) (bits ^ (bits >>> 32));
+
+        // implementation according to java.lang.annotation.Annotation.hashCode() specification
+        return 127 * "value".hashCode() ^ hashOfValue;
       }
 
       @Override
@@ -79,11 +133,9 @@ public final class AnnotationFactory {
         if (!(obj instanceof Order)) {
           return false;
         }
+
         Order other = (Order) obj;
-        if (this.value() != other.value()) {
-          return false;
-        }
-        return true;
+        return this.value() == other.value();
       }
     };
   }

@@ -12,12 +12,29 @@ package org.eclipse.scout.rt.shared;
 
 import java.lang.annotation.Annotation;
 
+@SuppressWarnings("squid:S2162") // instanceof comparison ok here
 public final class AnnotationFactory {
-  private static final TunnelToServer TUNNEL_TO_SERVER = new TunnelToServer() {
 
+  private static final TunnelToServer TUNNEL_TO_SERVER = new TunnelToServer() {
     @Override
     public Class<? extends Annotation> annotationType() {
       return TunnelToServer.class;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      return obj instanceof TunnelToServer;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
     }
   };
 
