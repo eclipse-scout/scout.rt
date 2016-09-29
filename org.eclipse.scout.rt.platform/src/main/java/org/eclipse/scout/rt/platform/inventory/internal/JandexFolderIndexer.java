@@ -17,39 +17,36 @@ import java.net.URL;
 
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class JandexFolderIndexer {
-  private static final Logger LOG = LoggerFactory.getLogger(JandexFolderIndexer.class);
   private static final String CLASS_EXT = ".class";
 
   private JandexFolderIndexer() {
   }
 
-  public static Index createFolderIndex(File folder, Indexer indexer) {
+  public static Index createFolderIndex(File folder, Indexer indexer) throws IOException {
     if (folder.exists()) {
       scanDirectory(folder, indexer);
     }
     return indexer.complete();
   }
 
-  static void scanDirectory(File folder, Indexer indexer) {
-    for (File f : folder.listFiles()) {
+  static void scanDirectory(File folder, Indexer indexer) throws IOException {
+    File[] files = folder.listFiles();
+    if (files == null || files.length < 1) {
+      return;
+    }
+
+    for (File f : files) {
       if (f.isDirectory()) {
         if (!f.getName().startsWith(".")) {
           scanDirectory(f, indexer);
         }
       }
       else if (f.isFile() && f.getName().endsWith(CLASS_EXT)) {
-        try {
-          URL url = f.toURI().toURL();
-          try (InputStream in = url.openStream()) {
-            indexer.index(in);
-          }
-        }
-        catch (IOException ex) {
-          LOG.error("indexing class: {}", f, ex);
+        URL url = f.toURI().toURL();
+        try (InputStream in = url.openStream()) {
+          indexer.index(in);
         }
       }
     }

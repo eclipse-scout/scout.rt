@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.junit.Assert;
 
 /**
- * <h3>{@link XmlFactoriesTestSupport}</h3> Testing helper class to detect XXE vulnerabilities because of direct
- * use of the corresponding JRE factories instead of using {@link XmlUtility} which provides hardened factory methods.
+ * <h3>{@link XmlFactoriesTestSupport}</h3> Testing helper class to detect XXE vulnerabilities because of direct use of
+ * the corresponding JRE factories instead of using {@link XmlUtility} which provides hardened factory methods.
  *
  * @see https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
  */
@@ -64,7 +64,8 @@ public class XmlFactoriesTestSupport {
     Files.walkFileTree(getRoot(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-        if (".git".equals(dir.getFileName().toString())) {
+        Path fileName = dir.getFileName();
+        if (fileName != null && ".git".equals(fileName.toString())) {
           return FileVisitResult.SKIP_SUBTREE;
         }
         return FileVisitResult.CONTINUE;
@@ -72,7 +73,8 @@ public class XmlFactoriesTestSupport {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        if (file.getFileName().toString().toLowerCase().endsWith(".java") && !isExcluded(file.toString())) {
+        Path fileName = file.getFileName();
+        if (fileName != null && fileName.toString().toLowerCase().endsWith(".java") && !isExcluded(file.toString())) {
           checkFile(file);
         }
         return FileVisitResult.CONTINUE;

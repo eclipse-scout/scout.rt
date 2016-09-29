@@ -32,7 +32,11 @@ public class ServletContextMimeTypeDetector implements IMimeTypeDetector {
     if (servletContext == null) {
       return null;
     }
-    String name = path.getFileName().toString();
+    Path fileName = path.getFileName();
+    if (fileName == null) {
+      return null;
+    }
+    String name = fileName.toString();
     return servletContext.getMimeType(name);
   }
 }

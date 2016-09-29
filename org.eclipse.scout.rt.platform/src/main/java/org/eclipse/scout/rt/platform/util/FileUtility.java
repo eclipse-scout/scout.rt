@@ -212,9 +212,10 @@ public final class FileUtility {
       }
 
       String[] children = sourceLocation.list();
-      for (int i = 0; i < children.length; i++) {
-        copyTree(new File(sourceLocation, children[i]), new File(
-            targetLocation, children[i]));
+      if (children != null && children.length > 0) {
+        for (int i = 0; i < children.length; i++) {
+          copyTree(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
+        }
       }
     }
     else {
@@ -234,8 +235,10 @@ public final class FileUtility {
         list.add(f);
       }
       String[] children = f.list();
-      for (int i = 0; i < children.length; i++) {
-        listTreeRec(new File(f, children[i]), list, includeFiles, includeFolders);
+      if (children != null && children.length > 0) {
+        for (int i = 0; i < children.length; i++) {
+          listTreeRec(new File(f, children[i]), list, includeFiles, includeFolders);
+        }
       }
     }
     else {
@@ -253,10 +256,16 @@ public final class FileUtility {
   }
 
   private static void addFolderToJar(File baseDir, File srcdir, JarOutputStream zOut) throws IOException {
-    if ((!srcdir.exists()) || (!srcdir.isDirectory())) {
+    if (!srcdir.exists() || !srcdir.isDirectory()) {
       throw new IOException("source directory " + srcdir + " does not exist or is not a folder");
     }
-    for (File f : srcdir.listFiles()) {
+
+    File[] files = srcdir.listFiles();
+    if (files == null || files.length < 1) {
+      return;
+    }
+
+    for (File f : files) {
       if (f.exists() && (!f.isHidden())) {
         if (f.isDirectory()) {
           addFolderToJar(baseDir, f, zOut);

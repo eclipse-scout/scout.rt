@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -252,12 +253,15 @@ public class JettyServer {
    * Returns all direct files contained in the directory 'absoluteDirectoryPath'.
    */
   private static Set<String> listFilesFromDirectory(String absoluteDirectoryPath, String relativeDirectorySearchPath) {
-    Set<String> resources = new HashSet<>();
-
-    for (File file : new File(absoluteDirectoryPath).listFiles()) {
-      resources.add(relativeDirectorySearchPath + file.getName() + (file.isDirectory() ? URIUtil.SLASH : ""));
+    File[] listFiles = new File(absoluteDirectoryPath).listFiles();
+    if (listFiles == null || listFiles.length < 1) {
+      return Collections.emptySet();
     }
 
+    Set<String> resources = new HashSet<>(listFiles.length);
+    for (File file : listFiles) {
+      resources.add(relativeDirectorySearchPath + file.getName() + (file.isDirectory() ? URIUtil.SLASH : ""));
+    }
     return resources;
   }
 

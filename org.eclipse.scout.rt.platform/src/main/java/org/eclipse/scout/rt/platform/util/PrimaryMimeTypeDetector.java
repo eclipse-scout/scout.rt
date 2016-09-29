@@ -34,7 +34,12 @@ public class PrimaryMimeTypeDetector implements IMimeTypeDetector {
     if (path == null) {
       return null;
     }
-    String name = path.getFileName().toString();
+    Path fileName = path.getFileName();
+    if (fileName == null) {
+      return null;
+    }
+
+    String name = fileName.toString();
     int dot = name.lastIndexOf('.');
     if (dot < 0) {
       return null;

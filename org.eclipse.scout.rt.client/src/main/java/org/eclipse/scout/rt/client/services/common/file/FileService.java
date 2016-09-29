@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -106,14 +107,18 @@ public class FileService implements IFileService {
 
   private String[][] getFiles(String folderBase, FilenameFilter filter, boolean useServerFolderStructureOnClient) {
     File path = getFileLocation(useServerFolderStructureOnClient ? folderBase : "", null, false);
-    ArrayList<String> dirList = new ArrayList<String>();
-    ArrayList<String> fileList = new ArrayList<String>();
-    String[] dir = path.list(filter);
-    for (int i = 0; i < dir.length; i++) {
+    String[] dirs = path.list(filter);
+    if (dirs == null || dirs.length < 1) {
+      return new String[][]{};
+    }
+
+    List<String> dirList = new ArrayList<String>();
+    List<String> fileList = new ArrayList<String>();
+    for (int i = 0; i < dirs.length; i++) {
       try {
-        File file = new File(path.getCanonicalPath() + "/" + dir[i]);
-        if (file.exists() && file.isDirectory()) {
-          String[][] tmp = getFiles((folderBase == null ? dir[i] : folderBase + "/" + dir[i]), filter, true);
+        File file = new File(path.getCanonicalPath() + "/" + dirs[i]);
+        if (file.isDirectory()) {
+          String[][] tmp = getFiles((folderBase == null ? dirs[i] : folderBase + "/" + dirs[i]), filter, true);
           for (String[] f : tmp) {
             dirList.add(f[0]);
             fileList.add(f[1]);
@@ -121,7 +126,7 @@ public class FileService implements IFileService {
         }
         else {
           dirList.add(folderBase);
-          fileList.add(dir[i]);
+          fileList.add(dirs[i]);
         }
       }
       catch (IOException e) {
