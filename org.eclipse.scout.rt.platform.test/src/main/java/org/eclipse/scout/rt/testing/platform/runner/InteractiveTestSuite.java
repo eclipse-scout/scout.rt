@@ -68,7 +68,7 @@ public class InteractiveTestSuite extends Runner {
         }
         lastLine = line;
         Method runMethod;
-        try {
+        try { // NOSONAR
           runMethod = m_annotatedClass.getMethod("run", Runner.class, RunNotifier.class);
         }
         catch (Throwable t) {

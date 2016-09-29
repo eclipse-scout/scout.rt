@@ -72,7 +72,7 @@ public class DefaultAuthToken {
         customArgs = null;
       }
       byte[] signature;
-      try {
+      try { // NOSONAR
         signature = HexUtility.decode(parts[parts.length - 1]);
       }
       catch (RuntimeException e) {

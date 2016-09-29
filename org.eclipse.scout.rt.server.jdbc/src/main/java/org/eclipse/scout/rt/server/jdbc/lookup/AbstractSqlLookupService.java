@@ -90,18 +90,23 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
       sortData(data, getConfiguredSortColumn());
     }
     try {
-      Class<?> genericsParameterClass = Object.class;
-      try {
-        genericsParameterClass = TypeCastUtility.getGenericsParameterClass(getClass(), ILookupService.class);
-      }
-      catch (IllegalArgumentException e) { // NOSONAR
-        LOG.warn("Unable to calculate type parameters for lookup service [{}]. No key type validation will be performed.", getClass().getName());
-      }
+      Class<?> genericsParameterClass = determineGenericsParameterClass();
       return createLookupRowArray(data, call, genericsParameterClass);
     }
     catch (IllegalArgumentException e) {
       throw new ProcessingException("Unable to load lookup rows for lookup service '" + getClass().getName() + "'.", e);
     }
+  }
+
+  protected Class<?> determineGenericsParameterClass() {
+    Class<?> genericsParameterClass = Object.class;
+    try {
+      genericsParameterClass = TypeCastUtility.getGenericsParameterClass(getClass(), ILookupService.class);
+    }
+    catch (IllegalArgumentException e) { // NOSONAR
+      LOG.warn("Unable to calculate type parameters for lookup service [{}]. No key type validation will be performed.", getClass().getName());
+    }
+    return genericsParameterClass;
   }
 
   @Override

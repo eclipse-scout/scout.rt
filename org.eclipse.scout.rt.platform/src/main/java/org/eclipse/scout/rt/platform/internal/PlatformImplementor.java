@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -32,8 +30,6 @@ import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
-import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,44 +189,6 @@ public class PlatformImplementor implements IPlatform {
     }
     LOG.warn("Using {}. Please verify that this application really has no client or server side {}", SimpleBeanDecorationFactory.class.getName(), IBeanDecorationFactory.class.getSimpleName());
     m_beanManager.setBeanDecorationFactory(new SimpleBeanDecorationFactory());
-  }
-
-  protected void validateBeanManager() {
-    try {
-      //collect all service interfaces
-      HashSet<Class> serviceInterfaces = new HashSet<>();
-      for (IBean bean : getBeanManager().getRegisteredBeans(IService.class)) {
-        for (Class<?> i : BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class)) {
-          if (IService.class.isAssignableFrom(i)) {
-            serviceInterfaces.add(i);
-          }
-        }
-      }
-      StringBuilder sb = new StringBuilder();
-      for (Class s : serviceInterfaces) {
-        if (s.equals(IService.class)) {
-          continue;
-        }
-        try {
-          @SuppressWarnings("unchecked")
-          List<IBean<Object>> list = getBeanManager().getBeans(s);
-          if (list.size() <= 1) {
-            continue;
-          }
-          sb.append("-------- ").append(s.getName()).append(" --------\n");
-          for (IBean<?> bean : list) {
-            sb.append(" @Order(").append(BeanHierarchy.orderOf(bean)).append(") ").append(bean.getBeanClazz()).append('\n');
-          }
-        }
-        catch (Exception e) {
-          LOG.warn("Could not list beans of class [{}]", s.getName(), e);
-        }
-      }
-      LOG.info("Query classes that are resolving to multiple beans\n{}", sb);
-    }
-    catch (Exception e) {
-      LOG.warn("Could not validate bean manager", e);
-    }
   }
 
   protected void startCreateImmediatelyBeans() {

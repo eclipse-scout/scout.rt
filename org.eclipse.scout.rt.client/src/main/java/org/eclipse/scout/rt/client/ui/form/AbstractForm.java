@@ -2324,7 +2324,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       List<BinaryResource> a = new FileChooser(Collections.singletonList("xml"), false).startChooser();
       if (a.size() == 1) {
         BinaryResource newPath = a.get(0);
-        try (InputStream in = new ByteArrayInputStream(newPath.getContent())) {
+        try (InputStream in = new ByteArrayInputStream(newPath.getContent())) { // NOSONAR
           Document doc = XmlUtility.getXmlDocument(in);
           // load xml to search
           loadFromXml(doc.getDocumentElement());

@@ -126,7 +126,7 @@ public final class MailUtility {
       }
       else {
         Object content = null;
-        try {
+        try { // NOSONAR
           // getContent might throw a MessagingException for legitimate parts (e.g. some images end up in a javax.imageio.IIOException for example).
           content = part.getContent();
         }
@@ -206,7 +206,7 @@ public final class MailUtility {
         try (InputStream in = mimePart.getInputStream()) {
           if (in != null) {
             byte[] content = IOUtility.readBytes(in);
-            try {
+            try { // NOSONAR
               text = new String(content, getCharacterEncodingOfMimePart(mimePart));
             }
             catch (UnsupportedEncodingException e) {
@@ -657,7 +657,7 @@ public final class MailUtility {
       //set the com.sun.mail.handlers.text_plain to level 0 (programmatic) to prevent others from overriding in level 0
       final String className = "com.sun.mail.handlers.text_plain";
       Class textPlainClass;
-      try {
+      try { // NOSONAR
         textPlainClass = Class.forName(className);
       }
       catch (ClassNotFoundException e) {

@@ -224,7 +224,7 @@ public class BlockingCondition implements IBlockingCondition {
             nanos = m_unblockedCondition.awaitNanos(nanos);
           }
           else {
-            try {
+            try { // NOSONAR
               nanos = m_unblockedCondition.awaitNanos(nanos);
             }
             catch (final InterruptedException e) {

@@ -319,7 +319,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
               .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()));
 
           int timeout = CONFIG.getPropertyValue(SessionStoreHousekeepingMaxWaitShutdownProperty.class).intValue();
-          try {
+          try { // NOSONAR
             future.awaitDone(timeout, TimeUnit.SECONDS);
           }
           catch (TimedOutException e) {

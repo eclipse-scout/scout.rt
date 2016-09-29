@@ -283,7 +283,7 @@ public class CsvHelper {
         for (colIndex = 0; colIndex < cellList.size(); colIndex++) {
           if (m_ignoredColumns == null || m_ignoredColumns.length == 0 || m_ignoredColumns.length < colIndex || !m_ignoredColumns[colIndex]) {
             cell = cellList.get(colIndex);
-            try {
+            try { // NOSONAR
               objList.add(importCell(cell, getColumnFormat(colIndex)));
             }
             catch (RuntimeException e) {

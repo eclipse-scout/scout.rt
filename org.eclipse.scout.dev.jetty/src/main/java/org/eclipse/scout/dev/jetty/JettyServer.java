@@ -110,7 +110,7 @@ public class JettyServer {
           while (true) {
             String command = StringUtility.trim(br.readLine());
             if ("shutdown".equalsIgnoreCase(command)) {
-              try {
+              try { // NOSONAR
                 LOG.warn("Shutting down...");
                 server.stop();
                 return;

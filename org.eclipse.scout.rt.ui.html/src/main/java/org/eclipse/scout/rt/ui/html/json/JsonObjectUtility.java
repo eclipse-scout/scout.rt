@@ -219,7 +219,7 @@ public final class JsonObjectUtility {
           missingNames.add(key);
         }
         for (String key : nameArray) {
-          try {
+          try { // NOSONAR
             Field f = type.getField(key);
             if (Modifier.isStatic(f.getModifiers())) {
               continue;
