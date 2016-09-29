@@ -296,6 +296,7 @@ public final class TypeCastUtility {
     return newArray;
   }
 
+  @SuppressWarnings("squid:S138")
   private Object castBasicValueImpl(Object o, Class fromType, Class toType) {
     // null check
     if (o == null) {

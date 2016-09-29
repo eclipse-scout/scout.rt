@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class DataModelAttributeInjector implements DataModelConstants {
 
+  @SuppressWarnings("squid:S138")
   public void injectOperators(IDataModelAttribute attribute) {
     List<IDataModelAttributeOp> opList = new ArrayList<IDataModelAttributeOp>();
     switch (attribute.getType()) {

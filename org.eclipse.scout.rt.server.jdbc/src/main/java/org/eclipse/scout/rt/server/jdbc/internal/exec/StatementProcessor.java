@@ -896,7 +896,7 @@ public class StatementProcessor implements IStatementProcessor {
     return o;
   }
 
-  @SuppressWarnings("squid:S2583")
+  @SuppressWarnings({"squid:S2583", "squid:S138"})
   private IBindInput createInputRec(ValueInputToken bindToken, String[] path, Object bindBase, Class nullType) {
     boolean terminal = (path.length == 1);
     Object o = null;
@@ -1174,7 +1174,7 @@ public class StatementProcessor implements IStatementProcessor {
     return o;
   }
 
-  @SuppressWarnings({"unchecked", "squid:S2583"})
+  @SuppressWarnings({"unchecked", "squid:S2583", "squid:S138"})
   private IBindOutput createOutputRec(ValueOutputToken bindToken, String[] path, final Object bindBase) {
     boolean terminal = (path.length == 1);
     Object o = null;

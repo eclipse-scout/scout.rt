@@ -127,7 +127,7 @@ public final class EntityContributionUtility {
    *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
    *          its onw plus all of these child tags (proxy)
    */
-  @SuppressWarnings("bsiRulesDefinition:htmlInString")
+  @SuppressWarnings({"bsiRulesDefinition:htmlInString", "squid:S138"})
   public static EntityContribution mergeContributions(EntityStrategy entityStrategy, final String entityPartWithTags, EntityContribution childContributions, boolean consumeChildContributions) {
     String entityPart = entityPartWithTags;
     EntityContribution parentContrib = new EntityContribution();
@@ -177,6 +177,7 @@ public final class EntityContributionUtility {
         final String s = buf.toString();
         if (StringUtility.getTag(entityPart, "fromParts") != null) {
           entityPart = StringUtility.replaceTags(entityPart, "fromParts", new ITagProcessor() {
+
             @Override
             public String processTag(String tagName, String tagContent) {
               return tagContent + s;
@@ -190,6 +191,7 @@ public final class EntityContributionUtility {
       entityPart = StringUtility.removeTagBounds(entityPart, "fromParts");
       // extend the where section
       if (childContributions.getWhereParts().size() > 0) {
+
         final String s = CollectionUtility.format(childContributions.getWhereParts(), " AND ");
         if (StringUtility.getTag(entityPart, "whereParts") != null) {
           entityPart = StringUtility.replaceTags(entityPart, "whereParts", new ITagProcessor() {

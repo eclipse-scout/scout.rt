@@ -1505,6 +1505,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return StringUtility.replaceTags(sql, "attribute", processor);
   }
 
+  @SuppressWarnings("squid:S138")
   public String createSqlOpValuePart(Integer aggregationType, String sql, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind) {
     String[] names = (bindNames != null ? bindNames.toArray(new String[bindNames.size()]) : new String[0]);
     Object[] values = (bindValues != null ? bindValues.toArray(new Object[bindValues.size()]) : new Object[0]);
