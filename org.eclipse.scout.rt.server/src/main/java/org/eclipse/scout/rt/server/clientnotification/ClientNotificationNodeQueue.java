@@ -84,7 +84,7 @@ public class ClientNotificationNodeQueue {
     m_sessionUserCacheLock.writeLock().lock();
     try {
       m_sessions.add(sessionId);
-      Set<String> userSessions = m_userToSessions.get(sessionId);
+      Set<String> userSessions = m_userToSessions.get(userId);
       if (userSessions == null) {
         userSessions = new HashSet<>();
         m_userToSessions.put(userId, userSessions);
@@ -200,7 +200,10 @@ public class ClientNotificationNodeQueue {
   }
 
   public boolean isRelevant(IClientNotificationAddress address) {
-    return address.isNotifyAllSessions() || address.isNotifyAllNodes() || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds()) || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
+    return address.isNotifyAllSessions()
+        || address.isNotifyAllNodes()
+        || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds())
+        || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
   }
 
   public Set<String /*sessionId*/> getAllSessionIds() {

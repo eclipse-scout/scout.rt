@@ -31,6 +31,7 @@ public class ClientNotificationRegistryTest {
   private static final String TEST_NODE = "Node1";
   private static final String TEST_NOTIFICATION = "testNotification";
   private static final String TEST_SESSION = "testSessionId";
+  private static final String TEST_SESSION_2 = "testSessionId2";
   private static final String TEST_USER = "User1";
   private static final int TEST_QUEUE_EXPIRE_TIMEOUT = 10 + 60 * 1000;
 
@@ -83,6 +84,20 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
+   * Register/unregister does not affect consumption.
+   */
+  @Test
+  public void testNotificationsUnregisteredSingleSession() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+    reg.registerSession("testNodeId", TEST_SESSION, TEST_USER);
+    reg.registerSession("testNodeId", TEST_SESSION_2, TEST_USER);
+    reg.unregisterSession("testNodeId", TEST_SESSION_2, TEST_USER);
+    reg.putForUser(TEST_USER, TEST_NOTIFICATION);
+    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
+    assertEquals(1, notificationsNode.size());
+  }
+
+  /**
    * Tests that a notification for a single user is only consumed by nodes that have the user registered.
    */
   @Test
@@ -103,7 +118,7 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
-   * Tests that multiple notificaitions for a user are consumed in the correct order.
+   * Tests that multiple notifications for a user are consumed in the correct order.
    */
   @Test
   public void testMultipleNotifications() throws Exception {
@@ -116,6 +131,16 @@ public class ClientNotificationRegistryTest {
     assertEquals(2, notificationsN1.size());
     assertEquals(TEST_NOTIFICATION, notificationsN1.get(0).getNotification());
     assertEquals("notification2", notificationsN1.get(1).getNotification());
+  }
+
+  @Test
+  public void testNotificationsForAllSessions() {
+    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+    reg.registerSession("testNodeId", TEST_SESSION, TEST_USER);
+    reg.registerSession("testNodeId", TEST_SESSION_2, TEST_USER);
+    reg.putForAllSessions(TEST_NOTIFICATION);
+    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
+    assertEquals(1, notificationsNode.size());
   }
 
   @Test
