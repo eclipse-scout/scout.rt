@@ -91,6 +91,8 @@
   __include("scout/keystroke/TabItemKeyStroke.js");
   // Misc. elements
   __include("scout/boxbuttons/BoxButtons.js");
+  __include("scout/carousel/Carousel.js");
+  __include("scout/carousel/CarouselLayout.js");
   __include("scout/cell/Cell.js");
   __include("scout/collapsehandle/CollapseHandle.js");
   __include("scout/focus/FocusManager.js");
