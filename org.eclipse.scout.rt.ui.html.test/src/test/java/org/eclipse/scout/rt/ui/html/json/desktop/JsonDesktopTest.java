@@ -309,10 +309,16 @@ public class JsonDesktopTest {
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     jsonDesktop.handleModelOpenUri(new BinaryResource("foo.txt", null), OpenUriAction.DOWNLOAD);
+    jsonDesktop.handleModelOpenUri(new BinaryResource("TP6 ARL ; Zulassung (UVV) - Bearbeitung elektr. Fax-Eingang [-8874 , ABC-Prüfbericht] (1).pdf", null), OpenUriAction.DOWNLOAD);
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
-    JSONObject data = events.get(0).getData();
-    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/4fd8cc85ca9eebd2fa3c550069ce2846", data.getString("uri")); // counter = 0 first for test run
-    assertEquals("download", data.getString("action"));
+    JSONObject[] data = new JSONObject[2];
+    data[0] = events.get(0).getData();
+    data[1] = events.get(1).getData();
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data[0].getString("uri")); // counter = 0 first for test run
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId()
+        + "/2/1/TP6%2520ARL%2520%253B%2520Zulassung%2520%2528UVV%2529%2520-%2520Bearbeitung%2520elektr.%2520Fax-Eingang%2520%255B-8874%2520%252C%2520ABC-Pr%25C3%25BCfbericht%255D%2520%25281%2529.pdf", data[1].getString("uri")); // counter = 1 second for test run
+    assertEquals("download", data[0].getString("action"));
+    assertEquals("download", data[1].getString("action"));
 
     // cleanup
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
