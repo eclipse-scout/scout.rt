@@ -20,12 +20,11 @@ import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
+@SuppressWarnings({"serial", "squid:S2057"})
 public class DesktopEvent extends EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
 
   public static final int TYPE_DESKTOP_CLOSED = 100;
   /**
@@ -77,7 +76,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private IOutline m_outline;
   private IForm m_form;
   private IForm m_activeForm;
-  private IFormField m_focusedField;
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
   private String m_uri;
@@ -171,26 +169,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
 
   public IOutline getOutline() {
     return m_outline;
-  }
-
-  /**
-   * this feature isn't supported in html ui
-   *
-   * @deprecated will be removed in o-release
-   */
-  @Deprecated
-  public IFormField getFocusedField() {
-    return m_focusedField;
-  }
-
-  /**
-   * this feature isn't supported in html ui
-   *
-   * @deprecated will be removed in o-release
-   */
-  @Deprecated
-  public void setFocusedField(IFormField f) {
-    m_focusedField = f;
   }
 
   public IForm getActiveForm() {

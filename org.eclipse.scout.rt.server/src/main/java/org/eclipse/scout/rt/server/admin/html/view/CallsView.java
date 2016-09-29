@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class CallsView extends DefaultView {
-  private static final long serialVersionUID = -6384422619943413978L;
+
   private CallInspector m_selectedCall;
 
   public CallsView(AdminSession as) {
@@ -58,8 +58,6 @@ public class CallsView extends DefaultView {
   public void produceBody(HtmlComponent p) {
     final SessionInspector session = getAdminSession().getTopView().getSessionsView().getSelectedSession();
     p.linkAction("Clear calls", new AbstractHtmlAction("clearCalls") {
-
-      private static final long serialVersionUID = -3828169591206468632L;
 
       @Override
       public void run() {
@@ -129,7 +127,6 @@ public class CallsView extends DefaultView {
       p.focusAnchor();
     }
     p.startLinkAction(new AbstractHtmlAction("selectCall." + callKey) {
-      private static final long serialVersionUID = 1L;
 
       @Override
       public void run() {

@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
+@SuppressWarnings({"serial", "squid:S2057"})
 public class ButtonEvent extends EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
   /**
    * event when button was clicked
    */
@@ -34,7 +34,7 @@ public class ButtonEvent extends EventObject implements IModelEvent {
   public static final int TYPE_REQUEST_POPUP = 4;
 
   private final int m_type;
-  private ArrayList<IMenu> m_popupMenuList;
+  private List<IMenu> m_popupMenuList;
 
   public ButtonEvent(IButton source, int type) {
     super(source);
@@ -51,13 +51,19 @@ public class ButtonEvent extends EventObject implements IModelEvent {
   }
 
   public void addPopupMenus(List<IMenu> menus) {
+    if (menus == null || menus.isEmpty()) {
+      return;
+    }
     if (m_popupMenuList == null) {
-      m_popupMenuList = new ArrayList<IMenu>();
+      m_popupMenuList = new ArrayList<IMenu>(menus.size());
     }
     m_popupMenuList.addAll(menus);
   }
 
   public void addPopupMenu(IMenu menu) {
+    if (menu == null) {
+      return;
+    }
     if (m_popupMenuList == null) {
       m_popupMenuList = new ArrayList<IMenu>();
     }

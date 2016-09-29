@@ -52,7 +52,6 @@ public class HtmlTable extends HtmlComponent {
       sortId = m_tableId + ".sortCol." + columnIndex;
     }
     startLinkAction(new AbstractHtmlAction(sortId) {
-      private static final long serialVersionUID = -4385730186131757304L;
 
       @Override
       public void run() {

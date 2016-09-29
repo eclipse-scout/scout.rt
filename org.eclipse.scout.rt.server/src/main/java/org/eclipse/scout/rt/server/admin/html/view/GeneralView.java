@@ -35,8 +35,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class GeneralView extends DefaultView {
 
-  private static final long serialVersionUID = -5324529296371616980L;
-
   public GeneralView(AdminSession as) {
     super(as);
   }
@@ -142,7 +140,6 @@ public class GeneralView extends DefaultView {
       p.br();
       if (inst.acceptCall(IPingService.class.getName(), "ping")) {
         p.linkAction("IPingService.ping (click to toggle)", new AbstractHtmlAction("IPingService.ignore") {
-          private static final long serialVersionUID = -7667956603352457067L;
 
           @Override
           public void run() {
@@ -153,7 +150,6 @@ public class GeneralView extends DefaultView {
       }
       else {
         p.startLinkAction(new AbstractHtmlAction("IPingService.accept") {
-          private static final long serialVersionUID = 8429237856017595619L;
 
           @Override
           public void run() {
@@ -181,7 +177,6 @@ public class GeneralView extends DefaultView {
   }
 
   private class P_EnableAction extends AbstractHtmlAction {
-    private static final long serialVersionUID = 3594131240310244266L;
     private boolean m_enabled;
 
     public P_EnableAction(boolean b) {
@@ -196,7 +191,6 @@ public class GeneralView extends DefaultView {
   }
 
   private class P_SetTimeoutAction extends AbstractHtmlAction {
-    private static final long serialVersionUID = -2870869345515125996L;
     private long m_minutes;
 
     public P_SetTimeoutAction(long minutes) {

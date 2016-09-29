@@ -23,14 +23,12 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * LookupCall for cases where no backend service exists.<br>
  * Data is directly provided by {@link #execCreateLookupRows()}
- * <p>
- * Does not implements serializable, since this special subclass is not intended to be exchanged between gui and server.
  *
  * @see LookupCall
  */
 @ClassId("6a7d238a-11ab-478b-a3fb-7a99494b711d")
+@SuppressWarnings({"serial", "squid:S2057"})
 public class LocalLookupCall<T> extends LookupCall<T> {
-  private static final long serialVersionUID = 0L;
 
   @Override
   @SuppressWarnings("squid:S1185") // method is required to satisfy LookupCall quality checks that require equals to be overridden

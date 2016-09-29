@@ -10,16 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.html.view;
 
-import java.io.Serializable;
-
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.IView;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
-public class TopView extends DefaultView implements Serializable {
-  private static final long serialVersionUID = -4145097068331865304L;
+public class TopView extends DefaultView {
+
   private MessagesView m_messagesView;
   private GeneralView m_generalView;
   private ServicesView m_servicesView;
@@ -95,7 +93,6 @@ public class TopView extends DefaultView implements Serializable {
           final IView finalV = v;
           p.startLinkAction(
               new AbstractHtmlAction("tab." + v.getClass().getSimpleName()) {
-                private static final long serialVersionUID = 2904441773328750585L;
 
                 @Override
                 public void run() {

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.admin.html;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,9 +27,8 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
-public class AdminSession implements Serializable {
+public class AdminSession {
 
-  private static final long serialVersionUID = -7854819245981897318L;
   private TopView m_topView;
   private Map<String, AbstractHtmlAction> m_actionMap;
 

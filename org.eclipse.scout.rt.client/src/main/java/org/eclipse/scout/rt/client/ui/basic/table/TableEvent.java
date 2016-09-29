@@ -30,8 +30,9 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"serial", "squid:S2057"})
 public class TableEvent extends java.util.EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
+
   private static Logger LOG = LoggerFactory.getLogger(TableEvent.class);
   /**
    * Column visibility and/or order and/or width changed

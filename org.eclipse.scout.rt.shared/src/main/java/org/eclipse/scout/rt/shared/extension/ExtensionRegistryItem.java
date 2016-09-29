@@ -16,6 +16,8 @@ import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
 
+  private static final long serialVersionUID = 1L;
+
   private final ClassIdentifier m_ownerClass;
   private final Class<?> m_declaringClass;
   private final Class<?> m_extensionClass;

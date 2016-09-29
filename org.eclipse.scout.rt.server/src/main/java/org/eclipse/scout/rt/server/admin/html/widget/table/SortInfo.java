@@ -10,10 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.html.widget.table;
 
-import java.io.Serializable;
-
-public class SortInfo implements Serializable {
-  private static final long serialVersionUID = 8320003242979252331L;
+public class SortInfo {
 
   private int m_columnIndex = -1;
   private boolean m_ascending = true;

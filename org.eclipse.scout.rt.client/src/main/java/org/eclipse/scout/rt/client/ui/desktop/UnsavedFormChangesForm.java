@@ -250,9 +250,9 @@ public class UnsavedFormChangesForm extends AbstractForm {
     return StringUtility.join(" - ", StringUtility.nvl(f.getTitle(), f.getClass().getName()), f.getSubTitle());
   }
 
+  @SuppressWarnings({"serial", "squid:S2057"})
   @ClassId("70052229-e6e5-43f3-bac5-cabe6e4525d3")
   public static class UnsavedFormsLookupCall extends LocalLookupCall<IForm> {
-    private static final long serialVersionUID = 1L;
     private List<IForm> m_unsavedForms;
 
     public void setUnsavedForms(List<IForm> unsavedForms) {

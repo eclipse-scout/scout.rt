@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.shared.extension;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,9 @@ import java.util.List;
  *
  * @since 5.2.0
  */
-public class ExtensionContext {
+public class ExtensionContext implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private final ExtensionScope<ExtensionRegistryItem> m_contributionScope;
   private final ExtensionScope<ExtensionRegistryItem> m_extensionScope;

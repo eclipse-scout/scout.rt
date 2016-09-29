@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet;
 
+import java.io.Serializable;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +31,9 @@ import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnab
  * @since 5.2
  */
 @ApplicationScoped
-public class HttpServletControl {
+public class HttpServletControl implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   public static final String HTTP_HEADER_X_FRAME_OPTIONS = "X-Frame-Options";
   public static final String SAMEORIGIN = "SAMEORIGIN";

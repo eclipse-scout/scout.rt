@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
+@SuppressWarnings({"serial", "squid:S2057"})
 public class PlannerEvent extends java.util.EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
 
   public static final int TYPE_RESOURCES_INSERTED = 100;
   public static final int TYPE_RESOURCES_UPDATED = 101;
@@ -29,8 +29,8 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
   public static final int TYPE_ACTIVITY_ACTION = 104;
   public static final int TYPE_ALL_RESOURCES_DELETED = 105;
 
-  private int m_type;
-  private List<? extends Resource> m_resources = CollectionUtility.emptyArrayList();
+  private final int m_type;
+  private List<? extends Resource> m_resources;
   private List<IMenu> m_popupMenus;
 
   public PlannerEvent(IPlanner source, int type) {
@@ -42,7 +42,7 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
     super(source);
     m_type = type;
     if (CollectionUtility.hasElements(resources)) {
-      m_resources = resources;
+      m_resources = CollectionUtility.arrayList(resources);
     }
   }
 
@@ -71,24 +71,26 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
    * used by TYPE_NEW_ACTIVITY_POPUP and TYPE_EDIT_ACTIVITY_POPUP to add actions
    */
   public void addPopupMenu(IMenu menu) {
-    if (menu != null) {
-      if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
-      }
-      m_popupMenus.add(menu);
+    if (menu == null) {
+      return;
     }
+    if (m_popupMenus == null) {
+      m_popupMenus = new ArrayList<IMenu>();
+    }
+    m_popupMenus.add(menu);
   }
 
   /**
    * used by TYPE_NEW_ACTIVITY_POPUP and TYPE_EDIT_ACTIVITY_POPUP to add actions
    */
   public void addPopupMenus(List<IMenu> menus) {
-    if (menus != null) {
-      if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
-      }
-      m_popupMenus.addAll(menus);
+    if (menus == null) {
+      return;
     }
+    if (m_popupMenus == null) {
+      m_popupMenus = new ArrayList<IMenu>(menus.size());
+    }
+    m_popupMenus.addAll(menus);
   }
 
   /**

@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 /**
  * Form lifecycle for observing form "open" event attach to IDesktop and listen for FORM_ADDED
  */
+@SuppressWarnings({"serial", "squid:S2057"})
 public class FormEvent extends EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
   // state
   public static final int TYPE_ACTIVATED = 510;
   public static final int TYPE_LOAD_BEFORE = 1000;

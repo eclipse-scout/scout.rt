@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "squid:S2057"})
 public class CalendarEvent extends java.util.EventObject implements IModelEvent {
 
   /**
@@ -37,13 +37,14 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
    */
   public static final int TYPE_NEW_POPUP = 31;
 
-  private int m_type;
-  private CalendarComponent m_component;
-  private List<IMenu> m_popupMenus;
+  private final int m_type;
+  private final CalendarComponent m_component;
+  private List<IMenu> m_popupMenus; // lazy created
 
   public CalendarEvent(ICalendar source, int type) {
     super(source);
     m_type = type;
+    m_component = null;
   }
 
   public CalendarEvent(ICalendar source, int type, CalendarComponent comp) {
@@ -69,24 +70,26 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
    * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to add actions
    */
   public void addPopupMenu(IMenu menu) {
-    if (menu != null) {
-      if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
-      }
-      m_popupMenus.add(menu);
+    if (menu == null) {
+      return;
     }
+    if (m_popupMenus == null) {
+      m_popupMenus = new ArrayList<IMenu>();
+    }
+    m_popupMenus.add(menu);
   }
 
   /**
    * used by {@value #TYPE_COMPONENT_POPUP} and {@link #TYPE_NEW_POPUP} to add actions
    */
   public void addPopupMenus(List<IMenu> menus) {
-    if (menus != null) {
-      if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
-      }
-      m_popupMenus.addAll(menus);
+    if (menus == null) {
+      return;
     }
+    if (m_popupMenus == null) {
+      m_popupMenus = new ArrayList<IMenu>(menus.size());
+    }
+    m_popupMenus.addAll(menus);
   }
 
   /**
@@ -103,9 +106,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
     if (m_popupMenus != null) {
       return m_popupMenus.size();
     }
-    else {
-      return 0;
-    }
+    return 0;
   }
 
   @Override

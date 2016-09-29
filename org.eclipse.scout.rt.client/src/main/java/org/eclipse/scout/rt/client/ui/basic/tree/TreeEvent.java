@@ -27,8 +27,9 @@ import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"serial", "squid:S2057"})
 public class TreeEvent extends EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
+
   private static Logger LOG = LoggerFactory.getLogger(TreeEvent.class);
 
   /**
@@ -141,8 +142,6 @@ public class TreeEvent extends EventObject implements IModelEvent {
    * @since 5.1
    */
   public static final int TYPE_NODES_CHECKED = 870;
-
-  // next 880
 
   private final int m_type;
   private ITreeNode m_commonParentNode;

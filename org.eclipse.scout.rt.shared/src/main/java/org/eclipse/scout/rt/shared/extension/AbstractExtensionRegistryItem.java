@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-public abstract class AbstractExtensionRegistryItem {
+import java.io.Serializable;
 
+public abstract class AbstractExtensionRegistryItem implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   private final long m_order;
   private final Double m_newModelOrder;
 

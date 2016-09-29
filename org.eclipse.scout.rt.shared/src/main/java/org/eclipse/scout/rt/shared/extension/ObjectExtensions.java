@@ -25,14 +25,6 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
   private List<EXTENSION> m_extensions;
   private ExtensionContext m_extensionContext;
 
-  /**
-   * @deprecated Use {@link #ObjectExtensions(Object, boolean)} instead. Will be removed in O-release.
-   */
-  @Deprecated
-  public ObjectExtensions(OWNER owner) {
-    this(owner, false);
-  }
-
   public ObjectExtensions(OWNER owner, boolean requiresNewScope) {
     m_owner = owner;
     m_requiresNewScope = requiresNewScope;

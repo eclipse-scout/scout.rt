@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 
 public class ExtensionRegistryMoveItem extends AbstractExtensionRegistryItem {
 
+  private static final long serialVersionUID = 1L;
+
   private final ClassIdentifier m_modelClassIdentifier;
   private final ClassIdentifier m_newModelContainerClassIdentifier;
 

@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.html.view;
 
-import java.io.Serializable;
-
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.IView;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 
-public class DefaultView implements IView, Serializable {
-  private static final long serialVersionUID = 6592783497055556993L;
+public class DefaultView implements IView {
+
   private AdminSession m_as;
 
   public DefaultView(AdminSession as) {

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.reflect;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
@@ -20,8 +19,7 @@ import java.lang.reflect.Method;
  * This lenient implementation creates a FastPropertyDescriptor with an optional getter method and an optional setter
  * method so they exist.
  */
-public class FastPropertyDescriptor implements Serializable {
-  private static final long serialVersionUID = 1L;
+public class FastPropertyDescriptor {
 
   private final Class<?> m_beanClass;
   private final String m_name;

@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.html;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-public abstract class AbstractHtmlAction implements Runnable, Serializable {
-  private static final long serialVersionUID = -1352934517273013173L;
+public abstract class AbstractHtmlAction implements Runnable {
+
   private Map<String, String> m_formParameters = new HashMap<String, String>();
   private String m_plainText;
   private String m_htmlText;

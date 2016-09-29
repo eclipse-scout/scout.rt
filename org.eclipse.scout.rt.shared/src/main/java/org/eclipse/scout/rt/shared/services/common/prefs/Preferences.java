@@ -62,17 +62,29 @@ public class Preferences implements IPreferences {
   private static final long serialVersionUID = 1L;
 
   private final String m_name;
-  private final ISession m_session;
+  private final transient ISession m_session;
   private final Map<String, String> m_prefs;
-  private final EventListenerList m_eventListeners;
+  private final transient EventListenerList m_eventListeners;
   private boolean m_dirty;
 
   protected Preferences(String name, ISession userScope) {
+    this(name, userScope, new LinkedHashMap<String, String>(), false);
+  }
+
+  protected Preferences(Preferences other) {
+    this(other.m_name, other.m_session, other.m_prefs, other.m_dirty);
+  }
+
+  protected Preferences(String name, ISession userScope, Map<String, String> prefs, boolean dirty) {
     m_name = name;
     m_session = userScope;
-    m_prefs = new LinkedHashMap<>();
+    m_prefs = prefs;
     m_eventListeners = new EventListenerList();
-    m_dirty = false;
+    m_dirty = dirty;
+  }
+
+  private Object readResolve() {
+    return new Preferences(this);
   }
 
   /**

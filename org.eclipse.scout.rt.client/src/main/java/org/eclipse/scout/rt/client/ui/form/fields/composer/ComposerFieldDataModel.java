@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 /**
  * create a data model based on inner classes of the composer field
  */
+@SuppressWarnings({"serial", "squid:S2057"})
 public class ComposerFieldDataModel extends AbstractDataModel {
-  private static final long serialVersionUID = 1L;
 
   private final IComposerField m_field;
 
