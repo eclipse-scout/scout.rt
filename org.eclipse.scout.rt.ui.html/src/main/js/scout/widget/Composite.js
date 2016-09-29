@@ -12,6 +12,7 @@ scout.Composite.prototype._render = function($parent) {
 };
 
 scout.Composite.prototype._renderProperties = function() {
+  scout.Composite.parent.prototype._renderProperties.call(this);
   this._renderWidgets();
 };
 
