@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (c) 2010-2015 BSI Business Systems Integration AG.
@@ -12,12 +12,11 @@
 
 -->
 <included>
-
   <!-- This file is included in all scout test logback configurations -->
 
-  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, jobName=%X{scout.job.name}, cid=%X{scout.correlation.id}" />
+  <variable scope="context" name="mdcPattern" value="jobName=%X{scout.job.name}, cid=%X{scout.correlation.id}" />
   <variable scope="context" name="mdcPatternWithoutEmptyValues" value="%replace(${mdcPattern}){'(, )?\\w+=((?=\\1)|, |$)', ''}" />
-  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
+  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger.%method\\(%file:%line\\) - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
@@ -45,5 +44,5 @@
     <appender-ref ref="STDERR" />
   </root>
 
-  <logger level="WARN" name="org.quartz" />
+  <logger name="org.quartz" level="WARN" />
 </included>
