@@ -295,7 +295,7 @@ scout.HtmlComponent.prototype.debug = function() {
  * @memberOf scout.HtmlComponent
  */
 scout.HtmlComponent.install = function($comp, session) {
-  if (!$comp || !$comp.length) {
+  if (!$comp) {
     throw new Error('Missing argument "$comp"');
   }
   if (!session) {

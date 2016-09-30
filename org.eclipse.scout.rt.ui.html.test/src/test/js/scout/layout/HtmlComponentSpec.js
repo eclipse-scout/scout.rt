@@ -56,9 +56,15 @@ describe("HtmlComponent", function() {
     };
   };
 
-  describe("Ctor", function() {
+  describe("install", function() {
 
-    it("sets data 'htmlComponent' when Ctor is called", function() {
+    it("does NOT set data 'htmlComponent' when constructor is called", function() {
+      spyOn(jqueryMock, 'data');
+      var htmlComp = new scout.HtmlComponent(jqueryMock, session);
+      expect(jqueryMock.data).not.toHaveBeenCalled();
+    });
+
+    it("sets data 'htmlComponent' when install() is called", function() {
       spyOn(jqueryMock, 'data');
       var htmlComp = scout.HtmlComponent.install(jqueryMock, session);
       expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
