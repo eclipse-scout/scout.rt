@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.math.BigInteger;
 import java.security.AccessController;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -101,9 +101,11 @@ public class UiSession implements IUiSession {
    */
   private static final long ADDITIONAL_POLLING_DELAY = 100;
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
+  // Because static fields are initialized before the bean manager is ready (class is initialized by Jandex scan),
+  // the following beans must be set lazily. See the corresponding static getters.
   private static final FinalValue<HttpSessionHelper> HTTP_SESSION_HELPER = new FinalValue<>();
   private static final FinalValue<JsonRequestHelper> JSON_REQUEST_HELPER = new FinalValue<>();
-  private static final FinalValue<Random> RANDOM = new FinalValue<>();
+  private static final FinalValue<SecureRandom> SECURE_RANDOM = new FinalValue<>();
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -262,13 +264,7 @@ public class UiSession implements IUiSession {
   }
 
   protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
-    Random random = RANDOM.setIfAbsentAndGet(new Callable<Random>() {
-      @Override
-      public Random call() throws Exception {
-        return SecurityUtility.createSecureRandom();
-      }
-    });
-    String id = new BigInteger(130, random).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
+    String id = new BigInteger(130, getSecureRandom()).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
     return jsonStartupReq.getPartId() + ":" + id;
   }
 
@@ -1133,6 +1129,15 @@ public class UiSession implements IUiSession {
       @Override
       public JsonRequestHelper call() throws Exception {
         return BEANS.get(JsonRequestHelper.class);
+      }
+    });
+  }
+
+  protected static SecureRandom getSecureRandom() {
+    return SECURE_RANDOM.setIfAbsentAndGet(new Callable<SecureRandom>() {
+      @Override
+      public SecureRandom call() throws Exception {
+        return SecurityUtility.createSecureRandom();
       }
     });
   }
