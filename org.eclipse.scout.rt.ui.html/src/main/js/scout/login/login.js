@@ -12,9 +12,14 @@ scout.login = {
 
   /**
    * opts:
-   * - redirectUrl: URL to redirect to after successful login
-   * - prepareRedirectUrl: function(s) that is called on the redirectUrl before opening it
-   * - logoUrl: default points to 'res/logo.png'
+   * - authUrl: URL to be used for the authentication. Default is 'auth'
+   * - userDataKey: name of the user parameter in the data object sent with the authentication request. Default is 'user'.
+   * - passwordDataKey: name of the password parameter in the data object sent with the authentication request. Default is 'password'.
+   * - redirectUrl: URL to redirect to after a successful login. If not specified the prepareRedirectUrl function is used to compute the redirectUrl.
+   * - prepareRedirectUrl: function that is called on the redirectUrl before opening it. Default is scout.LoginBox.prepareRedirectUrl.
+   * - logoUrl: default points to 'res/logo.png',
+   * - messageKey: if set a message is displayed above the user field. Default is undefined.
+   * - texts: texts to be used in the login box. Default texts are in English.
    */
   init: function(opts) {
     var deferreds = this._bootstrap();

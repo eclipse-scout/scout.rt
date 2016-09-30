@@ -10,24 +10,28 @@
  ******************************************************************************/
 scout.LoginBox = function() {
   scout.LoginBox.parent.call(this);
-};
-scout.inherits(scout.LoginBox, scout.Box);
 
-scout.LoginBox.prototype.init = function(opts) {
-  var defaultOpts = {
-    logoUrl: 'res/logo.png'
-  };
-  this.options = $.extend({}, defaultOpts, opts);
-  var defaultTexts = {
+  this.authUrl = 'auth';
+  this.redirectUrl;
+  this.logoUrl = 'res/logo.png';
+  this.userDataKey = 'user';
+  this.passwordDataKey = 'password';
+  this.additionalData = {};
+  this.prepareRedirectUrlFunc = scout.LoginBox.prepareRedirectUrl;
+  this.messageKey;
+  this.texts = {
     'ui.Login': 'Login',
     'ui.LoginFailed': 'Login failed',
     'ui.User': 'Username',
     'ui.Password': 'Password'
   };
-  this.options.texts = $.extend({}, defaultTexts, opts.texts);
+};
+scout.inherits(scout.LoginBox, scout.Box);
 
-  this.texts = new scout.TextMap(this.options.texts);
-  this.logoUrl = this.options.logoUrl;
+scout.LoginBox.prototype.init = function(options) {
+  options = options || {};
+  options.texts = new scout.TextMap($.extend(this.texts, options.texts));
+  $.extend(this, options);
 };
 
 scout.LoginBox.prototype.render = function($parent) {
@@ -36,14 +40,14 @@ scout.LoginBox.prototype.render = function($parent) {
   this.$container.addClass('login-box');
   this.$content.addClass('login-box-content ');
   this.$form = $('<form>')
-    .attr('action', 'auth')
+    .attr('action', this.authUrl)
     .attr('method', 'post')
     .submit(this._onLoginFormSubmit.bind(this))
     .appendTo(this.$content);
-  if (this.options.messageKey) {
+  if (this.messageKey) {
     this.$message = $('<div>')
       .attr('id', 'message-box')
-      .text(this.texts.get(this.options.messageKey))
+      .text(this.texts.get(this.messageKey))
       .appendTo(this.$form);
   }
   this.$user = $('<input>')
@@ -71,15 +75,20 @@ scout.LoginBox.prototype._resetButtonText = function() {
     .removeClass('login-error');
 };
 
+scout.LoginBox.prototype.data = function() {
+  var data = {};
+  data[this.userDataKey] = this.$user.val();
+  data[this.passwordDataKey] = this.$password.val();
+  $.extend(data, this.additionalData);
+  return data;
+};
+
 scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
   // Prevent default submit action
   event.preventDefault();
 
   var url = this.$form.attr('action');
-  var data = {
-    user: this.$user.val(),
-    password: this.$password.val()
-  };
+  var data = this.data();
 
   this.$button
     .removeClass('login-error')
@@ -99,12 +108,11 @@ scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
 
 scout.LoginBox.prototype._onPostDone = function(data) {
   // Calculate target URL
-  var url = this.options.redirectUrl;
+  var url = this.redirectUrl;
   if (!url) {
     url = (window.location.href || '').trim();
-    var prepareRedirectUrlFunc = this.options.prepareRedirectUrlFunc || scout.LoginBox.prepareRedirectUrl;
-    // Remove login.html and everything after it from the URL
-    url = prepareRedirectUrlFunc(url);
+    // Remove login and everything after it from the URL
+    url = this.prepareRedirectUrlFunc(url);
   }
 
   // Go to target URL
