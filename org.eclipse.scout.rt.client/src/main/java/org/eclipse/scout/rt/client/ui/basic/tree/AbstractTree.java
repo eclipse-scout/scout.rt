@@ -1830,57 +1830,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes) {
-    if (!CollectionUtility.hasElements(nodes)) {
-      return CollectionUtility.hashSet();
-    }
-    try {
-      setTreeChanging(true);
-      Set<ITreeNode> resolvedNodes = new HashSet<ITreeNode>(nodes.size());
-      for (ITreeNode node : nodes) {
-        ITreeNode resolvedNode = resolveVirtualNode(node);
-        if (resolvedNode != null) {
-          resolvedNodes.add(resolvedNode);
-        }
-      }
-      return resolvedNodes;
-    }
-    finally {
-      setTreeChanging(false);
-    }
-  }
-
-  @Override
-  public ITreeNode resolveVirtualNode(ITreeNode node) {
-    if (node instanceof IVirtualTreeNode) {
-      IVirtualTreeNode vnode = (IVirtualTreeNode) node;
-      if (vnode.getResolvedNode() != null && vnode.getResolvedNode().getTree() == this) {
-        return vnode.getResolvedNode();
-      }
-      if (vnode.getTree() != this) {
-        return null;
-      }
-      ITreeNode parentNode = vnode.getParentNode();
-      if (parentNode == null) {
-        return null;
-      }
-      try {
-        setTreeChanging(true);
-        //
-        ITreeNode resolvedNode = parentNode.resolveVirtualChildNode(vnode);
-        if (resolvedNode != vnode && vnode.getResolvedNode() == null) {
-          vnode.setResolvedNode(resolvedNode);
-        }
-        return resolvedNode;
-      }
-      finally {
-        setTreeChanging(false);
-      }
-    }
-    return node;
-  }
-
-  @Override
   public boolean visitTree(ITreeVisitor v) {
     return TreeUtility.visitNodeRec(getRootNode(), v);
   }
@@ -2040,16 +1989,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
     nodes = resolveNodes(nodes);
-    try {
-      nodes = resolveVirtualNodes(nodes);
-    }
-    catch (RuntimeException e) {
-      LOG.warn("could not resolve virtual nodes.", e);
-    }
     if (nodes == null) {
       nodes = CollectionUtility.hashSet();
     }
-    HashSet<ITreeNode> newSelection = new HashSet<ITreeNode>();
+    Set<ITreeNode> newSelection = new HashSet<ITreeNode>();
     if (append) {
       newSelection.addAll(m_selectedNodes);
       newSelection.addAll(nodes);
@@ -2287,19 +2230,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private ITreeNode resolveNode(ITreeNode node) {
-    if (node instanceof IVirtualTreeNode && ((IVirtualTreeNode) node).getResolvedNode() != null) {
-      node = ((IVirtualTreeNode) node).getResolvedNode();
-    }
-    // unwrapping
     if (node == null) {
       return null;
     }
-    else if (node.getTree() == this) {
+    if (node.getTree() == this) {
       return node;
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -2925,9 +2862,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         pushUIProcessor();
         try {
           setTreeChanging(true);
-          //
           nodes = resolveNodes(nodes);
-          nodes = CollectionUtility.arrayList(resolveVirtualNodes(nodes));
           if (nodes.size() > 0) {
             setNodesChecked(nodes, checked, true);
           }
@@ -2957,9 +2892,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         pushUIProcessor();
         try {
           setTreeChanging(true);
-          //
           node = resolveNode(node);
-          node = resolveVirtualNode(node);
           if (node != null && (node.isExpanded() != on || node.isExpandedLazy() != lazy)) {
             if (on && (node.isChildrenDirty() || node.isChildrenVolatile())) {
               node.loadChildren();
@@ -2987,11 +2920,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public void setNodeSelectedAndExpandedFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
-        //
         try {
           setTreeChanging(true);
           node = resolveNode(node);
-          node = resolveVirtualNode(node);
           if (node != null) {
             if (node.isChildrenDirty() || node.isChildrenVolatile()) {
               node.loadChildren();
@@ -3026,7 +2957,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         try {
           setTreeChanging(true);
 
-          Set<ITreeNode> validNodes = resolveVirtualNodes(resolveNodes(nodes));
+          List<ITreeNode> validNodes = resolveNodes(nodes);
 
           // remove filtered (invisible) nodes from selection
           Iterator<ITreeNode> iterator = validNodes.iterator();
@@ -3066,7 +2997,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         pushUIProcessor();
         node = resolveNode(node);
-        node = resolveVirtualNode(node);
         if (node != null) {
           fireNodeClick(node, mouseButton);
         }
@@ -3080,9 +3010,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public void fireNodeActionFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
-        //
         node = resolveNode(node);
-        node = resolveVirtualNode(node);
         if (node != null) {
           fireNodeAction(node);
         }
@@ -3096,8 +3024,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public TransferObject fireNodesDragRequestFromUI() {
       try {
         pushUIProcessor();
-        //
-        Collection<ITreeNode> nodes = resolveVirtualNodes(getSelectedNodes());
+        Collection<ITreeNode> nodes = getSelectedNodes();
         return fireNodesDragRequest(nodes);
       }
       finally {
@@ -3120,9 +3047,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public void fireNodeDropTargetChangedFromUI(ITreeNode node) {
       try {
         pushUIProcessor();
-        //
         node = resolveNode(node);
-        node = resolveVirtualNode(node);
         if (node != null) {
           fireNodeDropTargetChanged(node);
         }
@@ -3136,9 +3061,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     public void fireNodeDropActionFromUI(ITreeNode node, TransferObject dropData) {
       try {
         pushUIProcessor();
-        //
         node = resolveNode(node);
-        node = resolveVirtualNode(node);
         fireNodeDropAction(node, dropData);
       }
       finally {

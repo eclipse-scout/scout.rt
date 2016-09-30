@@ -85,24 +85,6 @@ public final class PageWithTableChains {
     }
   }
 
-  public static class PageWithTableCreateVirtualChildPageChain<T extends ITable> extends AbstractPageWithTableChain<T> {
-
-    public PageWithTableCreateVirtualChildPageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
-      super(extensions);
-    }
-
-    public IPage<?> execCreateVirtualChildPage(final ITableRow row) {
-      MethodInvocation<IPage> methodInvocation = new MethodInvocation<IPage>() {
-        @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
-          setReturnValue(next.execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain.this, row));
-        }
-      };
-      callChain(methodInvocation, row);
-      return methodInvocation.getReturnValue();
-    }
-  }
-
   public static class PageWithTableInitSearchFormChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
     public PageWithTableInitSearchFormChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {

@@ -18,9 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
@@ -118,9 +116,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void attachNode(ITreeNode node, boolean attachChildren) {
-    // Don't attach virtual nodes if they are already resolved
-    node = TreeUtility.unwrapResolvedNode(node);
-
     if (attachChildren) {
       attachNodes(node.getChildNodes(), attachChildren);
     }
@@ -152,11 +147,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected JSONObject treeNodeToJson(ITreeNode node) {
-    // Virtual and resolved nodes are equal in maps, but they don't behave the same. For example, a
-    // a virtual page does not return a detail table, while the resolved node does. Therefore, we
-    // want to always use the resolved node, if it exists.
-    node = TreeUtility.unwrapResolvedNode(node);
-
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
@@ -175,9 +165,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     }
     else if (node instanceof IPageWithTable) {
       nodeType = "table";
-    }
-    else if (node instanceof IVirtualTreeNode) {
-      nodeType = "virtual";
     }
     if (nodeType != null) {
       putProperty(json, "nodeType", nodeType);
@@ -266,13 +253,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);
     addActionEvent("pageChanged", jsonEvent);
-  }
-
-  @Override
-  protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
-    super.putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, virtualNode);
-    putNodeType(jsonNode, node);
-    BEANS.get(InspectorInfo.class).put(getUiSession(), jsonNode, node);
   }
 
   /**

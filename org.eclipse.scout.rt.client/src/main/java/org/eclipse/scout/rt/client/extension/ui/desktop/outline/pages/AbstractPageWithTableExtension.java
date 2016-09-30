@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
@@ -40,11 +39,6 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   @Override
   public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) {
     chain.execPopulateTable();
-  }
-
-  @Override
-  public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) {
-    return chain.execCreateVirtualChildPage(row);
   }
 
   @Override

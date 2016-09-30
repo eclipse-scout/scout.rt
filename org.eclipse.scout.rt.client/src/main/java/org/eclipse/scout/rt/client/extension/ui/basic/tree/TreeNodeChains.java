@@ -14,8 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class TreeNodeChains {
@@ -78,24 +76,6 @@ public final class TreeNodeChains {
         }
       };
       callChain(methodInvocation);
-    }
-  }
-
-  public static class TreeNodeResolveVirtualChildNodeChain extends AbstractTreeNodeChain {
-
-    public TreeNodeResolveVirtualChildNodeChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
-      super(extensions);
-    }
-
-    public ITreeNode execResolveVirtualChildNode(final IVirtualTreeNode node) {
-      MethodInvocation<ITreeNode> methodInvocation = new MethodInvocation<ITreeNode>() {
-        @Override
-        protected void callMethod(ITreeNodeExtension<? extends AbstractTreeNode> next) {
-          setReturnValue(next.execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain.this, node));
-        }
-      };
-      callChain(methodInvocation, node);
-      return methodInvocation.getReturnValue();
     }
   }
 }

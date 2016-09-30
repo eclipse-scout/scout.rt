@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeResolveVirtualChildNodeChain;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -84,9 +83,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
   protected IContributionOwner m_contributionHolder;
-  // hash code is received from a virtual tree node when resolving to this node
-  // this node is not attached to a virtual node if m_hashCode is null
-  private Integer m_hashCode = null;
+
   private final ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>> m_objectExtensions;
 
   public AbstractTreeNode() {
@@ -188,12 +185,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   protected void execDecorateCell(Cell cell) {
   }
 
-  @ConfigOperation
-  @Order(30)
-  protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) {
-    return node;
-  }
-
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
@@ -262,36 +253,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    *          live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
-  }
-
-  @Override
-  public int hashCode() {
-    if (m_hashCode != null) {
-      return m_hashCode.intValue();
-    }
-    return super.hashCode();
-  }
-
-  /**
-   * This method sets the internally used hash code. Should only be used by {@link VirtualTreeNode} when resolving this
-   * real node.
-   *
-   * @param hashCode
-   */
-  void setHashCode(int hashCode) {
-    if (m_hashCode != null) {
-      LOG.warn("Overriding the hash code of an object will lead to inconsistent behavior of hash maps etc."
-          + " setHashCode() must not be called more than once.");
-    }
-    m_hashCode = Integer.valueOf(hashCode);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof IVirtualTreeNode && ((IVirtualTreeNode) obj).getResolvedNode() == this) {
-      return true;
-    }
-    return super.equals(obj);
   }
 
   /*
@@ -425,35 +386,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public void setRejectedByUser(boolean rejectedByUser) {
     m_rejectedByUser = rejectedByUser;
-  }
-
-  @Override
-  public ITreeNode resolveVirtualChildNode(ITreeNode node) {
-    if (m_tree != null && node instanceof IVirtualTreeNode && node.getTree() == m_tree && node.getParentNode() == this) {
-      try {
-        m_tree.setTreeChanging(true);
-        //
-        ITreeNode resolvedNode = interceptResolveVirtualChildNode((IVirtualTreeNode) node);
-        if (node != resolvedNode) {
-          if (resolvedNode == null) {
-            m_tree.removeChildNode(this, node);
-          }
-          else {
-            replaceChildNodeInternal(node.getChildNodeIndex(), resolvedNode);
-            onVirtualChildNodeResolved(resolvedNode);
-          }
-          return resolvedNode;
-        }
-      }
-      finally {
-        m_tree.setTreeChanging(false);
-      }
-    }
-    return node;
-  }
-
-  protected void onVirtualChildNodeResolved(ITreeNode resolvedNode) {
-    m_tree.updateNode(resolvedNode);
   }
 
   @Override
@@ -885,7 +817,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
         if (node == null) {
           continue;
         }
-        node = TreeUtility.unwrapResolvedNode(node);
         collector.add(node);
         if (recursive) {
           node.collectChildNodes(collector, recursive);
@@ -1159,12 +1090,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     public void execDispose(TreeNodeDisposeChain chain) {
       getOwner().execDispose();
     }
-
-    @Override
-    public ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node) {
-      return getOwner().execResolveVirtualChildNode(node);
-    }
-
   }
 
   protected final void interceptDecorateCell(Cell cell) {
@@ -1183,12 +1108,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     TreeNodeDisposeChain chain = new TreeNodeDisposeChain(extensions);
     chain.execDispose();
-  }
-
-  protected final ITreeNode interceptResolveVirtualChildNode(IVirtualTreeNode node) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    TreeNodeResolveVirtualChildNodeChain chain = new TreeNodeResolveVirtualChildNodeChain(extensions);
-    return chain.execResolveVirtualChildNode(node);
   }
 
   @Override

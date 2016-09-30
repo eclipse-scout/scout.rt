@@ -259,7 +259,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
     }
     boolean removed = false;
     for (Iterator<? extends ITreeNode> it = m_nodes.iterator(); it.hasNext();) {
-      final ITreeNode node = TreeUtility.unwrapResolvedNode(it.next());
+      final ITreeNode node = it.next();
       if (nodesToRemove.contains(node)) {
         it.remove();
         removed = true;

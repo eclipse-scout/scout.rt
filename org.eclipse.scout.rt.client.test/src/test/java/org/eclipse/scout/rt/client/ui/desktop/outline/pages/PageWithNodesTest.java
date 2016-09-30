@@ -14,9 +14,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -52,7 +55,37 @@ public class PageWithNodesTest {
     Assert.assertEquals(4, page.m_execPageDataLoadedCalled);
   }
 
-  public static class PageWithTableOutline extends AbstractOutline {
+  @Test
+  public void testLazyLoading() {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    PageWithTableOutline o = new PageWithTableOutline();
+    desktop.setAvailableOutlines(Collections.singletonList(o));
+    desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
+
+    Assert.assertTrue(o.getActivePage() instanceof PageWithNodes);
+    PageWithNodes pageWithNodes = (PageWithNodes) o.getActivePage();
+    Assert.assertEquals(1, pageWithNodes.m_execCreateChildPages);
+
+    for (IPage<?> p : pageWithNodes.getChildPages()) {
+      Assert.assertEquals(0, ((PageWithNode) p).m_execCreateChildPages);
+      Assert.assertEquals(0, ((PageWithNode) p).m_execInitDetailForm);
+    }
+
+    IPage<?> firstChildPage = pageWithNodes.getChildPage(0);
+    IPage<?> secondChildPage = pageWithNodes.getChildPage(1);
+    firstChildPage.getTree().getUIFacade().setNodesSelectedFromUI(Collections.<ITreeNode> singletonList(firstChildPage));
+
+    Assert.assertEquals(1, ((PageWithNode) firstChildPage).m_execCreateChildPages);
+    Assert.assertEquals(1, ((PageWithNode) firstChildPage).m_execInitDetailForm);
+    Assert.assertTrue(((PageWithNode) firstChildPage).m_firePageChanged > 0);
+
+    Assert.assertEquals(0, ((PageWithNode) secondChildPage).m_execCreateChildPages);
+    Assert.assertEquals(0, ((PageWithNode) secondChildPage).m_execInitDetailForm);
+    Assert.assertEquals(0, ((PageWithNode) secondChildPage).m_firePageChanged);
+  }
+
+  private static class PageWithTableOutline extends AbstractOutline {
 
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) {
@@ -60,9 +93,10 @@ public class PageWithNodesTest {
     }
   }
 
-  public static class PageWithNodes extends AbstractPageWithNodes {
+  private static class PageWithNodes extends AbstractPageWithNodes {
 
-    public int m_execPageDataLoadedCalled = 0;
+    private int m_execPageDataLoadedCalled = 0;
+    private int m_execCreateChildPages = 0;
 
     @Override
     protected void execPageDataLoaded() {
@@ -72,6 +106,7 @@ public class PageWithNodesTest {
 
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) {
+      m_execCreateChildPages++;
       pageList.add(new PageWithNode());
       pageList.add(new PageWithNode());
       pageList.add(new PageWithNode());
@@ -79,7 +114,30 @@ public class PageWithNodesTest {
     }
   }
 
-  public static class PageWithNode extends AbstractPageWithNodes {
+  private static class PageWithNode extends AbstractPageWithNodes {
+    private int m_execCreateChildPages = 0;
+    private int m_execInitDetailForm = 0;
+    private int m_firePageChanged = 0;
 
+    @Override
+    protected Class<? extends IForm> getConfiguredDetailForm() {
+      return ScoutInfoForm.class;
+    }
+
+    @Override
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
+      m_execCreateChildPages++;
+    }
+
+    @Override
+    protected void firePageChanged(IPage page) {
+      super.firePageChanged(page);
+      m_firePageChanged++;
+    }
+
+    @Override
+    protected void execInitDetailForm() {
+      m_execInitDetailForm++;
+    }
   }
 }

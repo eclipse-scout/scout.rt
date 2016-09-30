@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
-import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -47,6 +46,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
@@ -63,13 +65,9 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ClassId("ef0d789e-dfbf-4715-9ab7-eedaefc936f3")
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
 
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
@@ -87,6 +85,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private boolean m_detailFormVisible;
   private boolean m_pageMenusAdded;
   private DataChangeListener m_internalDataChangeListener;
+  private final TreeListener m_treeListener;
   private final String m_userPreferenceContext;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
@@ -184,6 +183,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public AbstractPage(boolean callInitializer, String userPreferenceContext) {
     super(false);
     m_userPreferenceContext = userPreferenceContext;
+    m_treeListener = new InteralTreeListener();
     if (callInitializer) {
       callInitializer();
     }
@@ -499,31 +499,25 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public IPage<?> getChildPage(final int childIndex) {
-    ///make it model thread safe
-    // TOOD [mvi] why not always in model thread?
-    if (ModelJobs.isModelThread()) {
-      try {
-        return (IPage) getTree().resolveVirtualNode(getChildNode(childIndex));
-      }
-      catch (RuntimeException e) {
-        LOG.error("failed to create the real page from the virtual page", e);
-      }
+  public void setTreeInternal(ITree tree, boolean includeSubtree) {
+    ITree oldTree = getTree();
+    if (oldTree != null) {
+      oldTree.removeTreeListener(m_treeListener);
     }
+    super.setTreeInternal(tree, includeSubtree);
+    if (tree == null) {
+      return;
+    }
+    tree.addTreeListener(m_treeListener);
+  }
+
+  @Override
+  public IPage<?> getChildPage(final int childIndex) {
     return (IPage) getChildNode(childIndex);
   }
 
   @Override
   public List<IPage<?>> getChildPages() {
-    // TOOD [mvi] why not always in model thread?
-    if (ModelJobs.isModelThread()) {
-      try {
-        getTree().resolveVirtualNodes(getChildNodes());
-      }
-      catch (RuntimeException e) {
-        LOG.error("failed to create the real page from the virtual page", e);
-      }
-    }
     List<IPage<?>> childPages = new ArrayList<IPage<?>>();
     for (ITreeNode childNode : getChildNodes()) {
       childPages.add((IPage) childNode);
@@ -558,6 +552,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       BEANS.get(ExceptionHandler.class).handle(e);
     }
     // automatically remove all data change listeners
+    ITree tree = getTree();
+    if (tree != null) {
+      tree.removeTreeListener(m_treeListener);
+    }
     if (m_internalDataChangeListener != null) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
@@ -778,12 +776,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  protected void onVirtualChildNodeResolved(ITreeNode resolvedNode) {
-    super.onVirtualChildNodeResolved(resolvedNode);
-    firePageChanged((IPage) resolvedNode);
-  }
-
-  @Override
   public List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
     ITableRow row = parentTablePage.getTableRowFor(this);
     if (row == null) {
@@ -881,6 +873,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageInitDetailFormChain chain = new PageInitDetailFormChain(extensions);
     chain.execInitDetailForm();
+  }
+
+  /**
+   * Adapter listener that delegates NODE_UPDATED tree events to pageChanged events
+   */
+  protected class InteralTreeListener extends TreeAdapter {
+    @Override
+    public void treeChanged(TreeEvent e) {
+      AbstractPage<T> page = AbstractPage.this;
+      if (TreeEvent.TYPE_NODES_UPDATED == e.getType() && e.getChildNodes().contains(page)) {
+        firePageChanged(page);
+      }
+    }
   }
 
   protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {

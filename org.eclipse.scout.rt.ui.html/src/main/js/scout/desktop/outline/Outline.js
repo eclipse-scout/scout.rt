@@ -641,10 +641,6 @@ scout.Outline.prototype._computeDetailContent = function() {
     // Detail content is shown for the selected node only
     return null;
   }
-  if (selectedPage.nodeType === 'virtual') {
-    // If node is virtual it is not known yet whether there is a detail form or not -> wait until node gets resolved
-    return null;
-  }
 
   // if there is a detail form, use this
   if (selectedPage.detailForm && selectedPage.detailFormVisible && selectedPage.detailFormVisibleByUi) {

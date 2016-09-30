@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
@@ -43,7 +42,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableContro
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -313,80 +311,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             return childPage;
           }
         });
-  }
-
-  /**
-   * Creates a virtual child page for every table row that was added to this page's table. The virtual page is a place
-   * holder for a real page and is transformed (resolved) into the real page when it is activated for the first time.
-   * This reduces memory consumption and improves performance for large table pages, where most of the child pages are
-   * never activated, but solely displayed in the outline tree.
-   * <p>
-   * Subclasses can override this method. In most cases it is preferable to override
-   * {@link #interceptCreateChildPage(ITableRow)} instead.<br/>
-   * This default implementation checks whether {@code execCreateChildPage} is overridden and returns a new virtual
-   * page, or {@code null} otherwise.
-   *
-   * @param row
-   *          a table row for which a new virtual child page should be created
-   * @return a new virtual child page for {@code row}
-   * @see VirtualPage
-   * @see IVirtualTreeNode
-   */
-  @ConfigOperation
-  @Order(111)
-  protected IPage<?> execCreateVirtualChildPage(ITableRow row) {
-    if (!isLeaf()) {
-      return createVirtualChildPage(row);
-    }
-    return null;
-  }
-
-  protected IPage<?> createVirtualChildPageInternal(ITableRow row) {
-    IPage<?> virtualPage = interceptCreateVirtualChildPage(row);
-    if (virtualPage == null && isAlwaysCreateChildPage()) {
-      virtualPage = createVirtualChildPage(row);
-    }
-    return virtualPage;
-  }
-
-  protected IPage<?> createVirtualChildPage(ITableRow row) {
-    return new VirtualPage();
-  }
-
-  /**
-   * Resolves a virtual tree node and returns the real tree node.
-   * <p>
-   * This implementation does the following:
-   * <ul>
-   * <li>returns {@code null} if no table row is linked to {@code node}
-   * <li>else creates a new child page by calling {@link #interceptCreateChildPage(ITableRow)}, links the table row to
-   * the new tree node and returns the new node.
-   * </ul>
-   *
-   * @param node
-   *          the virtual tree node to be resolved
-   * @return a new real tree node, replacing the virtual tree node
-   */
-  @Override
-  protected ITreeNode execResolveVirtualChildNode(IVirtualTreeNode node) {
-    ITableRow row = getTableRowFor(node);
-    if (row == null) {
-      return null;
-    }
-    //remove old association
-    unlinkTableRowWithPage(row);
-    //add new association
-    IPage<?> childPage = createChildPageInternal(row);
-    if (childPage != null) {
-      node.setResolvedNode(childPage);
-      ICell tableCell = getTable().getSummaryCell(row);
-      childPage.setRejectedByUser(row.isRejectedByUser());
-      childPage.setFilterAccepted(row.isFilterAccepted());
-      childPage.setEnabledInternal(row.isEnabled());
-      childPage.getCellForUpdate().updateFrom(tableCell);
-      linkTableRowWithPage(row, childPage);
-    }
-    return childPage;
   }
 
   private Class<? extends ITable> getConfiguredTable() {
@@ -875,7 +799,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           }
         }
         if (newSelectedNode != null) {
-          newSelectedNode = tree.resolveVirtualNode(newSelectedNode);
           tree.selectNode(newSelectedNode);
         }
       }
@@ -983,8 +906,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             List<ITableRow> tableRows = e.getRows();
             for (ITableRow element : tableRows) {
               try {
-                IPage<?> childPage = createVirtualChildPageInternal(element);
+                IPage<?> childPage = createChildPageInternal(element);
                 if (childPage != null) {
+                  childPage.setRejectedByUser(element.isRejectedByUser());
+                  childPage.setFilterAccepted(element.isFilterAccepted());
+                  childPage.setEnabledInternal(element.isEnabled());
                   ICell tableCell = getTable().getSummaryCell(element);
                   updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
                   linkTableRowWithPage(element, childPage);
@@ -1054,12 +980,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     chain.execPopulateTable();
   }
 
-  protected final IPage<?> interceptCreateVirtualChildPage(ITableRow row) {
-    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
-    PageWithTableCreateVirtualChildPageChain<T> chain = new PageWithTableCreateVirtualChildPageChain<T>(extensions);
-    return chain.execCreateVirtualChildPage(row);
-  }
-
   protected final void interceptInitSearchForm() {
     List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<T>(extensions);
@@ -1085,11 +1005,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     @Override
     public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) {
       getOwner().execPopulateTable();
-    }
-
-    @Override
-    public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) {
-      return getOwner().execCreateVirtualChildPage(row);
     }
 
     @Override

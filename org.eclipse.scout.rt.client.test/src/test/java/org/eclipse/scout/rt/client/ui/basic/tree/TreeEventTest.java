@@ -152,53 +152,6 @@ public class TreeEventTest {
   }
 
   @Test
-  public void testContainsNodeSingleVirtualResolvedNode() {
-    ITree tree = mock(ITree.class);
-    ITreeNode nodeA = mockNode("a");
-    TreeEvent event = new TreeEvent(tree, TreeEvent.TYPE_NODE_ACTION, wrapByVirtualNode(nodeA));
-    assertTrue(event.containsNode(nodeA));
-  }
-
-  @Test
-  public void testContainsNodeMultipleVirtualResolvedNode() {
-    ITree tree = mock(ITree.class);
-    ITreeNode nodeA = mockNode("a");
-    ITreeNode nodeB = mockNode("b");
-    TreeEvent event = new TreeEvent(tree, TreeEvent.TYPE_NODE_ACTION, Arrays.asList(wrapByVirtualNode(nodeA), wrapByVirtualNode(nodeB)));
-    assertTrue(event.containsNode(nodeA));
-    assertTrue(event.containsNode(nodeB));
-  }
-
-  @Test
-  public void testContainsNodeSingleVirtualUnresolvedNode() {
-    ITree tree = mock(ITree.class);
-    ITreeNode nodeA = mockNode("a");
-    TreeEvent event = new TreeEvent(tree, TreeEvent.TYPE_NODE_ACTION, new VirtualTreeNode());
-    assertFalse(event.containsNode(nodeA));
-  }
-
-  @Test
-  public void testContainsNodeMultipleVirtualUnrResolvedNode() {
-    ITree tree = mock(ITree.class);
-    ITreeNode nodeA = mockNode("a");
-    ITreeNode nodeB = mockNode("b");
-    TreeEvent event = new TreeEvent(tree, TreeEvent.TYPE_NODE_ACTION, Arrays.asList(new VirtualTreeNode(), new VirtualTreeNode()));
-    assertFalse(event.containsNode(nodeA));
-    assertFalse(event.containsNode(nodeB));
-  }
-
-  /**
-   * Currently it is not supported that a {@link VirtualTreeNode} references another {@link VirtualTreeNode}.
-   */
-  @Test
-  public void testContainsNodeSingleRecursiveVirtualResolvedNode() {
-    ITree tree = mock(ITree.class);
-    ITreeNode nodeA = mockNode("a");
-    TreeEvent event = new TreeEvent(tree, TreeEvent.TYPE_NODE_ACTION, wrapByVirtualNode(wrapByVirtualNode(wrapByVirtualNode(nodeA))));
-    assertFalse(event.containsNode(nodeA));
-  }
-
-  @Test
   public void testSetNodesSameParent() {
     ITree tree = mock(ITree.class);
     ITreeNode parent = mockNode("parent");
@@ -249,12 +202,6 @@ public class TreeEventTest {
 
     assertEquals(Arrays.asList(nodeA, nodeB), event.getNodes());
     assertEquals(parentA, event.getCommonParentNode());
-  }
-
-  private VirtualTreeNode wrapByVirtualNode(ITreeNode nodeA) {
-    VirtualTreeNode virtualNodaA = new VirtualTreeNode();
-    virtualNodaA.setResolvedNode(nodeA);
-    return virtualNodaA;
   }
 
   private List<ITreeNode> mockNodes(String... nodeIds) {

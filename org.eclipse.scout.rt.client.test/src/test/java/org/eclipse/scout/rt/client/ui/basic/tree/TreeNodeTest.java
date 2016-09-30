@@ -153,51 +153,6 @@ public class TreeNodeTest {
     assertEquals(Collections.emptySet(), m_nodesCollector);
   }
 
-  @Test
-  public void testCollectChildNodesResolvedVirtualNode() {
-    ITreeNode nodeA = mockNode("a");
-    m_rootNode.addChildNodesInternal(0, Collections.singletonList(wrapByVirtualNode(nodeA)), false);
-
-    m_rootNode.collectChildNodes(m_nodesCollector, false);
-    assertEquals(Collections.singleton(nodeA), m_nodesCollector);
-    m_nodesCollector.clear();
-
-    m_rootNode.collectChildNodes(m_nodesCollector, true);
-    assertEquals(Collections.singleton(nodeA), m_nodesCollector);
-    m_nodesCollector.clear();
-  }
-
-  @Test
-  public void testCollectChildNodesRecursiveResolvedVirtualNode() {
-    P_TreeNode nodeA = new P_TreeNode();
-    m_rootNode.addChildNodesInternal(0, Collections.singletonList(wrapByVirtualNode(nodeA)), false);
-
-    ITreeNode nodeB = mockNode("b");
-    nodeA.addChildNodesInternal(0, Collections.singletonList(wrapByVirtualNode(nodeB)), false);
-
-    m_rootNode.collectChildNodes(m_nodesCollector, false);
-    assertEquals(CollectionUtility.hashSet(nodeA), m_nodesCollector);
-    m_nodesCollector.clear();
-
-    m_rootNode.collectChildNodes(m_nodesCollector, true);
-    assertEquals(CollectionUtility.hashSet(nodeA, nodeB), m_nodesCollector);
-    m_nodesCollector.clear();
-
-    nodeA.collectChildNodes(m_nodesCollector, false);
-    assertEquals(CollectionUtility.hashSet(nodeB), m_nodesCollector);
-    m_nodesCollector.clear();
-
-    nodeA.collectChildNodes(m_nodesCollector, true);
-    assertEquals(CollectionUtility.hashSet(nodeB), m_nodesCollector);
-    m_nodesCollector.clear();
-  }
-
-  private VirtualTreeNode wrapByVirtualNode(ITreeNode nodeA) {
-    VirtualTreeNode virtualNodaA = new VirtualTreeNode();
-    virtualNodaA.setResolvedNode(nodeA);
-    return virtualNodaA;
-  }
-
   private ITreeNode mockNode(String nodeId) {
     ITreeNode node = m_mockNodes.get(nodeId);
     if (node != null) {

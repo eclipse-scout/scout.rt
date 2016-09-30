@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 
 /**
  * Tree node used in {@link ITree}.
- * <p>
- * Note that a {@link IVirtualTreeNode} is equal to its resolved node {@link IVirtualTreeNode#getResolvedNode()} with
- * regard to {@link #equals(Object)} and {@link #hashCode()}
  */
 public interface ITreeNode {
   int STATUS_NON_CHANGED = 0;
@@ -329,7 +326,6 @@ public interface ITreeNode {
   /**
    * Collects child nodes of this node and adds them the given collector. If recursive is <code>true</code>, grand
    * children are visited as well.<br/>
-   * <b>Note:</b> {@link IVirtualTreeNode} instances are dereferenced if possible.
    */
   void collectChildNodes(Set<ITreeNode> collector, boolean recursive);
 
@@ -354,11 +350,6 @@ public interface ITreeNode {
   void setChildrenLoaded(boolean b);
 
   void ensureChildrenLoaded();
-
-  /**
-   * see {@link ITree#resolveVirtualNode(ITreeNode)}
-   */
-  ITreeNode resolveVirtualChildNode(ITreeNode node);
 
   /**
    * Convenience for getTree().updateNode(this);

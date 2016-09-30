@@ -26,11 +26,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -515,16 +513,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       putProperty(jsonNode, "enabled", node.isEnabled());
       putProperty(jsonNode, "lazyExpandingEnabled", node.isLazyExpandingEnabled());
 
-      // Check for virtual nodes that were replaces with real nodes (this will have triggered an NODES_UPDATED event).
-      // This would not really be necessary, as both nodes are considered "equal" (see implementation of VirtualTreeNode),
-      // but some properties have to be updated in the UI, therefore we replace the nodes in our internal maps.
-      ITreeNode cachedNode = optTreeNodeForNodeId(nodeId);
-      if (cachedNode instanceof IVirtualTreeNode && cachedNode != node) {
-        m_treeNodeIds.put(node, nodeId);
-        m_treeNodes.put(nodeId, node);
-        putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, (IVirtualTreeNode) cachedNode);
-      }
-
       jsonNodes.put(jsonNode);
     }
     if (jsonNodes.length() == 0) {
@@ -781,7 +769,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       int childNodeIndex = 0;
       // Find the node in the parents childNodes list (skipping non-accepted nodes)
       for (ITreeNode childNode : node.getParentNode().getChildNodes()) {
-        childNode = TreeUtility.unwrapResolvedNode(childNode);
         // Only count accepted nodes
         if (isNodeAccepted(childNode)) {
           if (childNode == node) {
@@ -796,11 +783,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected JSONObject treeNodeToJson(ITreeNode node) {
-    // Virtual and resolved nodes are equal in maps, but they don't behave the same. For example, a
-    // a virtual node does not return child nodes, while the resolved node does. Therefore, we
-    // want to always use the resolved node, if it exists.
-    node = TreeUtility.unwrapResolvedNode(node);
-
     JSONObject json = new JSONObject();
     putProperty(json, "id", getOrCreateNodeId(node));
     putProperty(json, "expanded", node.isExpanded());
@@ -1005,23 +987,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       }
     }
     return checkInfo;
-  }
-
-  /**
-   * Called by {@link #handleModelNodesUpdated(TreeEvent)} when it has detected that a virtual tree node was resolved to
-   * a real node. Subclasses may override this method to put any updated properties to the JSON response.
-   *
-   * @param jsonNode
-   *          {@link JSONObject} sent to the UI for the resolved node. Updated properties may be put in here.
-   * @param nodeId
-   *          The ID of the resolved node.
-   * @param node
-   *          The new, resolved node
-   * @param cachedNode
-   *          The old, virtual node
-   */
-  protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
-    // empty default implementation
   }
 
   protected static class CheckedInfo {

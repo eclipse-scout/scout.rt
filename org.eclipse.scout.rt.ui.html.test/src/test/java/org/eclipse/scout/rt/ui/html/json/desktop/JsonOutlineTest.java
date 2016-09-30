@@ -85,7 +85,6 @@ public class JsonOutlineTest {
     outline.selectNode(tablePage);
 
     IPage rowPage = (IPage) tablePage.getTreeNodeFor(tablePage.getTable().getRow(0));
-    rowPage = (IPage) tablePage.resolveVirtualChildNode((rowPage));
     outline.selectNode(rowPage);
 
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);

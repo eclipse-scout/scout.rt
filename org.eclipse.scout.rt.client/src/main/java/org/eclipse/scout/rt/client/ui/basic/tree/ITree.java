@@ -22,9 +22,7 @@ import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.VirtualPage;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
@@ -151,24 +149,6 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppL
   String getPathText(ITreeNode node);
 
   String getPathText(ITreeNode node, String delimiter);
-
-  /**
-   * A virtual node is a marker tree node used to optimize performance in large trees. It is used mainly in the
-   * {@link IPage}, {@link IOutline} area with {@link VirtualPage}s
-   * <p>
-   * This method resolves a virtual node by its real node and generates a {@link TreeEvent#TYPE_NODES_UPDATED} event.
-   * <p>
-   * Basically all ui calls such as drag, drop, select, expand etc. automatically call this method. Further also
-   * {@link IPage#getChildPage(int)} and {@link IPage#getChildPages()} automatically calls this method.
-   * <p>
-   * see {@link IVirtualTreeNode} and {@link VirtualPage}
-   */
-  ITreeNode resolveVirtualNode(ITreeNode node);
-
-  /**
-   * see {@link #resolveVirtualNode(ITreeNode)}
-   */
-  Set<ITreeNode> resolveVirtualNodes(Collection<? extends ITreeNode> nodes);
 
   Object getProperty(String name);
 

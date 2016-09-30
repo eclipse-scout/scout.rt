@@ -142,7 +142,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       if (type == TreeEvent.TYPE_NODES_INSERTED && event.hasNodes()) {
         Collection<ITreeNode> nodes = event.getNodes();
         for (ITreeNode node : nodes) {
-          node = TreeUtility.unwrapResolvedNode(node);
           if (node != null && insertedTreeNodes.add(node)) {
             node.collectChildNodes(insertedTreeNodes, true);
           }
@@ -609,7 +608,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         if (node == null) {
           continue;
         }
-        node = TreeUtility.unwrapResolvedNode(node);
         m_nodesToRemove.add(node);
         m_allNodesToRemove.add(node);
         if (node.getChildNodeCount() > 0) {

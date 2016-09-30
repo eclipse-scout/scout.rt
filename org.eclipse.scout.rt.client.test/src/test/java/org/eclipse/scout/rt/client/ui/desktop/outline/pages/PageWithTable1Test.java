@@ -20,9 +20,12 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -80,7 +83,33 @@ public class PageWithTable1Test {
     Assert.assertEquals(4, page.m_execPageDataLoadedCalled);
   }
 
-  public static class PageWithTableOutline extends AbstractOutline {
+  @Test
+  public void testLazyLoading() {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    PageWithTableOutline o = new PageWithTableOutline();
+    desktop.setAvailableOutlines(Collections.singletonList(o));
+    desktop.setOutline(PageWithTableOutline.class);
+    desktop.activateFirstPage();
+
+    Assert.assertTrue(o.getActivePage() instanceof PageWithTable);
+    PageWithTable pageWithNodes = (PageWithTable) o.getActivePage();
+    Assert.assertEquals(1, pageWithNodes.m_execPageDataLoadedCalled);
+    Assert.assertEquals(1, pageWithNodes.m_execCreateChildPage);
+
+    for (IPage<?> p : pageWithNodes.getChildPages()) {
+      Assert.assertEquals(0, ((PageWithNode) p).m_execCreateChildPages);
+      Assert.assertEquals(0, ((PageWithNode) p).m_execInitDetailForm);
+      Assert.assertEquals(0, ((PageWithNode) p).m_firePageChanged);
+    }
+
+    IPage<?> firstChildPage = pageWithNodes.getChildPage(0);
+    firstChildPage.getTree().getUIFacade().setNodesSelectedFromUI(Collections.<ITreeNode> singletonList(firstChildPage));
+    Assert.assertEquals(1, ((PageWithNode) firstChildPage).m_execCreateChildPages);
+    Assert.assertEquals(1, ((PageWithNode) firstChildPage).m_execInitDetailForm);
+    Assert.assertTrue(((PageWithNode) firstChildPage).m_firePageChanged > 0);
+  }
+
+  private static class PageWithTableOutline extends AbstractOutline {
 
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) {
@@ -88,9 +117,10 @@ public class PageWithTable1Test {
     }
   }
 
-  public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
+  private static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
-    public int m_execPageDataLoadedCalled = 0;
+    private int m_execPageDataLoadedCalled = 0;
+    private int m_execCreateChildPage = 0;
 
     @Override
     protected void execLoadData(SearchFilter filter) {
@@ -105,6 +135,7 @@ public class PageWithTable1Test {
 
     @Override
     protected IPage<?> execCreateChildPage(ITableRow row) {
+      m_execCreateChildPage++;
       return new PageWithNode();
     }
 
@@ -127,7 +158,30 @@ public class PageWithTable1Test {
     }
   }
 
-  public static class PageWithNode extends AbstractPageWithNodes {
+  private static class PageWithNode extends AbstractPageWithNodes {
+    private int m_execCreateChildPages = 0;
+    private int m_execInitDetailForm = 0;
+    private int m_firePageChanged = 0;
 
+    @Override
+    protected Class<? extends IForm> getConfiguredDetailForm() {
+      return ScoutInfoForm.class;
+    }
+
+    @Override
+    protected void firePageChanged(IPage page) {
+      super.firePageChanged(page);
+      m_firePageChanged++;
+    }
+
+    @Override
+    protected void execCreateChildPages(List<IPage<?>> pageList) {
+      m_execCreateChildPages++;
+    }
+
+    @Override
+    protected void execInitDetailForm() {
+      m_execInitDetailForm++;
+    }
   }
 }

@@ -13,11 +13,8 @@ package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDisposeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeResolveVirtualChildNodeChain;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
 public abstract class AbstractTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER> implements ITreeNodeExtension<OWNER> {
@@ -39,11 +36,6 @@ public abstract class AbstractTreeNodeExtension<OWNER extends AbstractTreeNode> 
   @Override
   public void execDispose(TreeNodeDisposeChain chain) {
     chain.execDispose();
-  }
-
-  @Override
-  public ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node) {
-    return chain.execResolveVirtualChildNode(node);
   }
 
 }
