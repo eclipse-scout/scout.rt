@@ -46,7 +46,7 @@ scout.BenchColumn.prototype._keyStrokeBindTarget = function() {
 
 scout.BenchColumn.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('bench-column');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 };
 

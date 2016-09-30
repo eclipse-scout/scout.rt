@@ -680,7 +680,7 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
   if (cssClass) {
     this.$container.addClass(cssClass);
   }
-  var htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  var htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   this.htmlComp = htmlComp;
 };

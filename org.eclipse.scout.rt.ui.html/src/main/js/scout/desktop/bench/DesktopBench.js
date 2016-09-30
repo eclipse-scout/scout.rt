@@ -86,7 +86,7 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function() {
 
 scout.DesktopBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-bench');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 
   this.htmlComp.setLayout(this._createLayout());
 

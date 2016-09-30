@@ -94,7 +94,7 @@ scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
 scout.Desktop.prototype._render = function($parent) {
   this.$container = $parent;
   this.$container.addClass('desktop');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 
   // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)

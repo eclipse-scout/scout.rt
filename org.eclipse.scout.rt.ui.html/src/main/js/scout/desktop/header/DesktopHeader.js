@@ -31,7 +31,7 @@ scout.DesktopHeader.prototype._init = function(model) {
 
 scout.DesktopHeader.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-header');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
   this._renderViewButtonBoxVisible();
   this._renderViewTabs();

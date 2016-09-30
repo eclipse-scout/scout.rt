@@ -136,7 +136,7 @@ scout.FileChooser.prototype._render = function($parent) {
     onClick: this._onCancelButtonClicked.bind(this)
   });
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.FormLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 

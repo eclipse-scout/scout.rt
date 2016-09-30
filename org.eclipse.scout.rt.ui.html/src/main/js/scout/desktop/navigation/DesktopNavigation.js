@@ -36,13 +36,13 @@ scout.DesktopNavigation.prototype._init = function(model) {
 
 scout.DesktopNavigation.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-navigation');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
   this.htmlComp.layoutData = this.layoutData;
 
   this.$body = this.$container.appendDiv('navigation-body')
     .on('mousedown', this._onNavigationBodyMousedown.bind(this));
-  this.htmlCompBody = new scout.HtmlComponent(this.$body, this.session);
+  this.htmlCompBody = scout.HtmlComponent.install(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
 
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);

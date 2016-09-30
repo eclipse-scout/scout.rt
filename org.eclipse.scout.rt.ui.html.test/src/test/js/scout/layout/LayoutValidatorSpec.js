@@ -23,7 +23,7 @@ describe("LayoutValidator", function() {
 
     it("keeps track of invalid html components", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
 
       htmlComp.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
@@ -32,10 +32,10 @@ describe("LayoutValidator", function() {
 
     it("considers only the topmost component", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
 
       var $compChild = $('<div>').appendTo($comp);
-      var htmlCompChild = new scout.HtmlComponent($compChild, session);
+      var htmlCompChild = scout.HtmlComponent.install($compChild, session);
 
       htmlCompChild.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
@@ -44,10 +44,10 @@ describe("LayoutValidator", function() {
 
     it("and validate roots", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      new scout.HtmlComponent($comp, session);
+      scout.HtmlComponent.install($comp, session);
 
       var $compChild = $('<div>').appendTo($comp);
-      var htmlCompChild = new scout.HtmlComponent($compChild, session);
+      var htmlCompChild = scout.HtmlComponent.install($compChild, session);
       htmlCompChild.validateRoot = true;
 
       htmlCompChild.invalidateLayoutTree();
@@ -57,9 +57,9 @@ describe("LayoutValidator", function() {
 
     it("makes sure parent components are put in front of child components", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
       var $grandchild = $comp.appendDiv().appendDiv();
-      var htmlGrandChild = new scout.HtmlComponent($grandchild, session);
+      var htmlGrandChild = scout.HtmlComponent.install($grandchild, session);
 
       htmlGrandChild.invalidateLayoutTree(false);
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
@@ -76,7 +76,7 @@ describe("LayoutValidator", function() {
 
     it("calls validateLayout for each invalid html component", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
       spyOn(htmlComp, 'validateLayout');
 
       htmlComp.invalidateLayoutTree();
@@ -87,7 +87,7 @@ describe("LayoutValidator", function() {
 
     it("does not call validateLayout if component has been removed", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
       spyOn(htmlComp, 'validateLayout');
 
       htmlComp.invalidateLayoutTree();
@@ -98,7 +98,7 @@ describe("LayoutValidator", function() {
 
     it("does not call validateLayout if component has been detached, but does not remove from invalid components either", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
       spyOn(htmlComp, 'validateLayout');
 
       htmlComp.invalidateLayoutTree();
@@ -114,7 +114,7 @@ describe("LayoutValidator", function() {
 
     it("removes the component from the list of invalidate components after validation", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      var htmlComp = scout.HtmlComponent.install($comp, session);
       spyOn(htmlComp, 'validateLayout');
 
       htmlComp.invalidateLayoutTree();

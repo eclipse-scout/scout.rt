@@ -38,7 +38,7 @@ scout.DatePicker.prototype._render = function($parent) {
     .appendDiv('date-picker')
     .on('swipe', this._onSwipe.bind(this));
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DatePickerLayout(this));
 
   this._$header = this._append$Header();

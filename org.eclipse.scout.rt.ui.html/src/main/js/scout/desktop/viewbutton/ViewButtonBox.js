@@ -26,7 +26,7 @@ scout.ViewButtonBox.prototype._init = function(model) {
 
 scout.ViewButtonBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-button-box');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
   this.viewMenuTab = scout.create('ViewMenuTab', {parent: this,
     viewMenus: this._viewButtons('MENU')

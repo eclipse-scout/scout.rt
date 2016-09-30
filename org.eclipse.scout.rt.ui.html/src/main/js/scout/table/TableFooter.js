@@ -44,7 +44,7 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$window = $parent.window();
   this._$body = $parent.body();
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableFooterLayout(this));
 
   // --- container for an open control ---

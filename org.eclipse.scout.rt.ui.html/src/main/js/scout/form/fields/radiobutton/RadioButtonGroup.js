@@ -51,7 +51,7 @@ scout.RadioButtonGroup.prototype._render = function($parent) {
   this.addContainer($parent, 'radiobutton-group');
 
   this.$body = this.$container.appendDiv('radiobutton-group-body');
-  htmlBodyContainer = new scout.HtmlComponent(this.$body, this.session);
+  htmlBodyContainer = scout.HtmlComponent.install(this.$body, this.session);
   htmlBodyContainer.setLayout(new scout.LogicalGridLayout(env.smallColumnGap, env.formRowGap));
 
   this.formFields.forEach(function(formField) {

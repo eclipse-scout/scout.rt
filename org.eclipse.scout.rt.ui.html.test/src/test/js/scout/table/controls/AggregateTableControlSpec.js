@@ -47,7 +47,7 @@ describe("AggregateTableControl", function() {
         fields: []
       }
     };
-    form.htmlComp = new scout.HtmlComponent(form.$container, session);
+    form.htmlComp = scout.HtmlComponent.install(form.$container, session);
     return form;
   }
 

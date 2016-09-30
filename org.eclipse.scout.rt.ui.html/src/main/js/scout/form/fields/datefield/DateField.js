@@ -80,7 +80,7 @@ scout.DateField.prototype._render = function($parent) {
     this.addMandatoryIndicator();
   }
 
-  this.htmlDateTimeComposite = new scout.HtmlComponent(this.$field, this.session);
+  this.htmlDateTimeComposite = scout.HtmlComponent.install(this.$field, this.session);
   this.htmlDateTimeComposite.setLayout(new scout.DateTimeCompositeLayout(this));
 };
 
@@ -117,7 +117,7 @@ scout.DateField.prototype._renderHasDate = function() {
         .on('blur', this._onDateFieldBlur.bind(this));
     }
 
-    new scout.HtmlComponent(this.$dateField, this.session);
+    scout.HtmlComponent.install(this.$dateField, this.session);
 
     this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
       .on('mousedown', this._onDateIconClick.bind(this));
@@ -149,7 +149,7 @@ scout.DateField.prototype._renderHasTime = function() {
     }
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
       .on('mousedown', this._onTimeIconClick.bind(this));
-    new scout.HtmlComponent(this.$timeField, this.session);
+    scout.HtmlComponent.install(this.$timeField, this.session);
 
     this.invalidateLayout();
 

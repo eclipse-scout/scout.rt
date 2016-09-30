@@ -23,7 +23,7 @@ scout.SimpleTabArea.prototype._init = function(model) {
 
 scout.SimpleTabArea.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('simple-tab-area');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SimpleTabAreaLayout(this));
 };
 

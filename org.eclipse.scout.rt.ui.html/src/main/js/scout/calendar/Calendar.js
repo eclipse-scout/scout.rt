@@ -133,7 +133,7 @@ scout.Calendar.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('calendar');
 
   var layout = new scout.CalendarLayout(this);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 

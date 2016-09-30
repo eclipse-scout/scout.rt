@@ -43,12 +43,12 @@ scout.SimpleTabBox.prototype._keyStrokeBindTarget = function() {
 
 scout.SimpleTabBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-tab-box');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SimpleTabBoxLayout(this));
 
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
-  this.viewContent = new scout.HtmlComponent(this.$viewContent, this.session);
+  this.viewContent = scout.HtmlComponent.install(this.$viewContent, this.session);
   this.viewContent.setLayout(new scout.SimpleTabViewContentLayout(this));
 };
 

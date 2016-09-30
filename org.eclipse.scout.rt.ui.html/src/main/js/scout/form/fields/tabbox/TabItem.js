@@ -56,7 +56,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this.$tabContainer = $parent.appendDiv('tab-item')
     .data('tabItem', this)
     .on('mousedown', this._onTabMouseDown.bind(this));
-  this.tabHtmlComp = new scout.HtmlComponent(this.$tabContainer, this.session);
+  this.tabHtmlComp = scout.HtmlComponent.install(this.$tabContainer, this.session);
 
   this.addLabel();
   this.addStatus();

@@ -98,7 +98,7 @@ scout.Form.prototype._renderForm = function($parent) {
     this.$container.addClass(this.uiCssClass);
   }
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.pixelBasedSizing = false;
   if (this.isDialog()) {
     layout = new scout.DialogLayout(this);

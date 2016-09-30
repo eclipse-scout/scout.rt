@@ -8,7 +8,7 @@ scout.inherits(scout.Composite, scout.Widget);
 
 scout.Composite.prototype._render = function($parent) {
   this.$container = $parent.appendDiv();
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 };
 
 scout.Composite.prototype._renderProperties = function() {

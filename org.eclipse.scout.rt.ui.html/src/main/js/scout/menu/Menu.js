@@ -52,7 +52,7 @@ scout.Menu.prototype._render = function($parent) {
     this._renderItem($parent);
   }
   this.$container.unfocusable();
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 };
 
 scout.Menu.prototype._remove = function() {

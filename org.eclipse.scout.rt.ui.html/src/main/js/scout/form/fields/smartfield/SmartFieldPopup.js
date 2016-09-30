@@ -30,7 +30,7 @@ scout.SmartFieldPopup.prototype._render = function($parent) {
     .appendDiv('smart-field-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this));
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;
 };

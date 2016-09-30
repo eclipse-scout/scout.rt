@@ -21,7 +21,7 @@ scout.CompactTree.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('compact-tree');
 
   var layout = new scout.TreeLayout(this);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
 
   this.$data = this.$container.appendDiv('tree-data');

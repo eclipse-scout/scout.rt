@@ -241,7 +241,7 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
 
 scout.Table.prototype._render = function($parent) {
   this.$container = this.$parent.appendDiv('table');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 

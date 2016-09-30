@@ -36,8 +36,6 @@ scout.HtmlComponent = function($comp, session) {
    */
   this.pixelBasedSizing = true;
   this.session = session;
-  // link DOM element with this instance
-  $comp.data('htmlComponent', this);
 };
 
 /**
@@ -289,6 +287,27 @@ scout.HtmlComponent.prototype.debug = function() {
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * Creates a new HtmlComponent and links it to the given $comp element, so it can be
+ * retrieved again with scout.HtmlComponent.get($comp).
+ *
+ * @memberOf scout.HtmlComponent
+ */
+scout.HtmlComponent.install = function($comp, session) {
+  if (!$comp || !$comp.length) {
+    throw new Error('Missing argument "$comp"');
+  }
+  if (!session) {
+    throw new Error('Missing argument "session"');
+  }
+
+  var htmlComp = new scout.HtmlComponent($comp, session);
+  // link DOM element with the new instance
+  $comp.data('htmlComponent', htmlComp);
+
+  return htmlComp;
+};
 
 /**
  * Static method to get the HtmlComponent associated with the given DOM $comp.

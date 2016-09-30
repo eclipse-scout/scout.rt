@@ -23,7 +23,7 @@ scout.SequenceBox.prototype._render = function($parent) {
   this.addField($parent.makeDiv());
   this.addStatus();
   this._handleStatus();
-  var htmlComp = new scout.HtmlComponent(this.$field, this.session);
+  var htmlComp = scout.HtmlComponent.install(this.$field, this.session);
   htmlComp.setLayout(new scout.LogicalGridLayout(scout.HtmlEnvironment.smallColumnGap, 0));
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];

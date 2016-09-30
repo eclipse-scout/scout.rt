@@ -125,7 +125,7 @@ scout.Planner.prototype._render = function($parent) {
   // basics, layout etc.
   this.$container = $parent.appendDiv('planner');
   var layout = new scout.PlannerLayout(this);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 

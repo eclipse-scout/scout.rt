@@ -39,7 +39,7 @@ scout.SplitBox.prototype._render = function($parent) {
   // Create split area
   this._$splitArea = $parent.makeDiv('split-area');
   this.addField(this._$splitArea);
-  this.htmlSplitArea = new scout.HtmlComponent(this._$splitArea, this.session);
+  this.htmlSplitArea = scout.HtmlComponent.install(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
   this._$window = $parent.window();
   this._$body = $parent.body();

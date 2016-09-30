@@ -38,7 +38,7 @@ scout.MenuBox.prototype._initMenu = function(menu) {
 scout.MenuBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('menu-box');
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBoxLayout(this));
 };
 

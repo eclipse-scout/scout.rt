@@ -20,7 +20,7 @@ scout.ListBox.prototype._render = function($parent) {
   this.addMandatoryIndicator();
   this.addFieldContainer($parent.makeDiv());
 
-  var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
+  var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));
 
   if (this.table) {

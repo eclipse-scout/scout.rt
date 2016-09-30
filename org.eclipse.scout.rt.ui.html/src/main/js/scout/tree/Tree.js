@@ -291,7 +291,7 @@ scout.Tree.prototype._render = function($parent) {
   }
 
   var layout = new scout.TreeLayout(this);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 
@@ -304,7 +304,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this))
     .on('scroll', this._onDataScroll.bind(this));
-  new scout.HtmlComponent(this.$data, this.session);
+  scout.HtmlComponent.install(this.$data, this.session);
 
   if (this.isHorizontalScrollingEnabled()) {
     this.$data.toggleClass('scrollable-tree', true);

@@ -22,7 +22,7 @@ describe('PopupWindow', function() {
       modelClass: 'Foo',
       session: session,
       render: function() {},
-      htmlComp: new scout.HtmlComponent($sandbox, session)
+      htmlComp: scout.HtmlComponent.install($sandbox, session)
     };
 
     // window mock

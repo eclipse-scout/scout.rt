@@ -23,7 +23,7 @@ scout.OutlineOverview.prototype._init = function(options) {
 
 scout.OutlineOverview.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('outline-overview');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.$content = this.$container.appendDiv('outline-overview-content');
   this.$content.appendDiv('outline-overview-icon').icon(this.outline.iconId);
   this.$content.appendDiv('outline-overview-title').text(this.outline.title);

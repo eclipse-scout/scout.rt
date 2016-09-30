@@ -563,7 +563,7 @@ scout.Outline.prototype._renderDetailContent = function() {
 scout.Outline.prototype._ensurePageLayout = function(page) {
   // selected page now has content (menubar and form) -> needs a layout
   // always create new htmlComp, otherwise we would have to remove them when $node or outline gets remvoed
-  page.htmlComp = new scout.HtmlComponent(page.$node, this.session);
+  page.htmlComp = scout.HtmlComponent.install(page.$node, this.session);
   page.htmlComp.setLayout(new scout.PageLayout(this, page));
 };
 

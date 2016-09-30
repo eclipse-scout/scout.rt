@@ -114,7 +114,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this.addLabel();
   this.addStatus();
   this.$body = this.$container.appendDiv('group-box-body');
-  htmlBody = new scout.HtmlComponent(this.$body, this.session);
+  htmlBody = scout.HtmlComponent.install(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
   if (this.scrollable) {
     scout.scrollbars.install(this.$body, {

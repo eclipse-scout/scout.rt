@@ -60,7 +60,7 @@ describe("HtmlComponent", function() {
 
     it("sets data 'htmlComponent' when Ctor is called", function() {
       spyOn(jqueryMock, 'data');
-      var htmlComp = new scout.HtmlComponent(jqueryMock, session);
+      var htmlComp = scout.HtmlComponent.install(jqueryMock, session);
       expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
     });
 
@@ -71,7 +71,7 @@ describe("HtmlComponent", function() {
     addWidthHeightMock(jqueryMock);
 
     it("returns getBoundingClientRect() of JQuery comp", function() {
-      var htmlComp = new scout.HtmlComponent(jqueryMock, session);
+      var htmlComp = scout.HtmlComponent.install(jqueryMock, session);
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
@@ -87,7 +87,7 @@ describe("HtmlComponent", function() {
 
     beforeEach(function() {
       $comp = $('<div>').appendTo(session.$entryPoint);
-      htmlComp = new scout.HtmlComponent($comp, session);
+      htmlComp = scout.HtmlComponent.install($comp, session);
       htmlComp.layout = new LayoutMock();
     });
 
@@ -127,7 +127,7 @@ describe("HtmlComponent", function() {
         borderBottomWidth: '11px',
         borderLeftWidth: '12px'
       });
-      var htmlComp = new scout.HtmlComponent(jqueryObj, session);
+      var htmlComp = scout.HtmlComponent.install(jqueryObj, session);
       var expected = new scout.Insets(15, 18, 21, 24);
       var actual = htmlComp.getInsets({
         includeMargin: true

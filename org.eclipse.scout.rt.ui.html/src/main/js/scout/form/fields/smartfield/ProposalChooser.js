@@ -27,7 +27,7 @@ scout.ProposalChooser.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
 scout.ProposalChooser.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('proposal-chooser');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
   this.model.render(this.$container);
   if (this.model instanceof scout.Tree) {

@@ -54,13 +54,13 @@ scout.TabBox.prototype._render = function($parent) {
     .appendDiv('tab-area')
     .on('keydown', this._onKeyDown.bind(this));
   this.addStatus();
-  var htmlAreaComp = new scout.HtmlComponent(this._$tabArea, this.session);
+  var htmlAreaComp = scout.HtmlComponent.install(this._$tabArea, this.session);
   htmlAreaComp.setLayout(new scout.TabAreaLayout(this));
 
   this.menuBar.render(this._$tabArea);
 
   this._$tabContent = this.$container.appendDiv('tab-content');
-  var htmlCompContent = new scout.HtmlComponent(this._$tabContent, this.session);
+  var htmlCompContent = scout.HtmlComponent.install(this._$tabContent, this.session);
   htmlCompContent.setLayout(new scout.SingleLayout());
 };
 

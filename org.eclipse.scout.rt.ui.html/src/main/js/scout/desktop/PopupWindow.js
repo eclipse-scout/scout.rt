@@ -48,7 +48,7 @@ scout.PopupWindow.prototype._onReady = function() {
   scout.prepareDOM(myDocument);
 
   this.$container = $('.scout', myDocument);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SingleLayout());
   this.$container.height($myWindow.height());
   this.form.render(this.$container);

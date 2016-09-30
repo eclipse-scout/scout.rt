@@ -74,10 +74,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   this.$headerItem.select(true);
 
   this.$container = $parent.appendDiv('table-header-menu');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.$body = this.$container.appendDiv('table-header-menu-body');
-  new scout.HtmlComponent(this.$body, this.session);
+  scout.HtmlComponent.install(this.$body, this.session);
   scout.scrollbars.install(this.$body, {
     parent: this,
     axis: 'y'
@@ -87,7 +87,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // only add right column if filter has a filter-table or filter-fields
   if (this.hasFilterTable || this.hasFilterFields) {
     this.$columnFilters = this.$body.appendDiv('table-header-menu-filters');
-    var htmlColumnFiltes = new scout.HtmlComponent(this.$columnFilters, this.session);
+    var htmlColumnFiltes = scout.HtmlComponent.install(this.$columnFilters, this.session);
     htmlColumnFiltes.setLayout(new scout.RowLayout());
   }
 
@@ -557,7 +557,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
 
   this.$filterTableGroup = this.$columnFilters
     .appendDiv('table-header-menu-group first');
-  var htmlComp = new scout.HtmlComponent(this.$filterTableGroup, this.session);
+  var htmlComp = scout.HtmlComponent.install(this.$filterTableGroup, this.session);
   htmlComp.setLayout(new scout.RowLayout());
 
   $filterActions = this.$filterTableGroup
@@ -571,7 +571,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
     .text(this._filterByText());
-  new scout.HtmlComponent(this.$filterTableGroupTitle, this.session);
+  scout.HtmlComponent.install(this.$filterTableGroupTitle, this.session);
 
   this.filterTable = scout.create('Table', {
     parent: this,
@@ -678,12 +678,12 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() {
     filter: this.filter
   });
   this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
-  var htmlComp = new scout.HtmlComponent(this.$filterFieldsGroup, this.session);
+  var htmlComp = scout.HtmlComponent.install(this.$filterFieldsGroup, this.session);
   htmlComp.setLayout(new scout.RowLayout());
   var $filterFieldsText = this.$filterFieldsGroup
     .appendDiv('table-header-menu-group-text')
     .text(this.filter.filterFieldsTitle());
-  htmlComp = new scout.HtmlComponent($filterFieldsText, this.session);
+  htmlComp = scout.HtmlComponent.install($filterFieldsText, this.session);
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
   return this.$filterFieldsGroup;
 };
