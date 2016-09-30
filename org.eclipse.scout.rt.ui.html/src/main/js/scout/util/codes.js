@@ -18,12 +18,12 @@ scout.codes = {
   },
 
   init: function(data) {
-    var codeTypeId, codeType;
-    for (codeTypeId in data) {
-      codeType = new scout.CodeType();
+    data = data || {};
+    Object.keys(data).forEach(function(codeTypeId) {
+      var codeType = new scout.CodeType();
       codeType.init(data[codeTypeId]);
       this.registry[codeType.id] = codeType;
-    }
+    }, this);
   },
 
   /**

@@ -620,7 +620,6 @@ scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
     for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
       this.maxNodeWidth = Math.max(this.visibleNodesFlat[i].width, this.maxNodeWidth);
     }
-    var width = Math.max(this.maxNodeWidth, this.$data.outerWidth()); // TODO BSH: check if widht have to be used in next statement
     this.$data.find('.tree-node').css('width', this.maxNodeWidth);
     this.nodeWidthDirty = false;
   }

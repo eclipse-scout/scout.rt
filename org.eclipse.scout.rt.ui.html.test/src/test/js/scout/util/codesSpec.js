@@ -31,6 +31,13 @@ describe('scout.codes', function() {
     });
   });
 
+  it('can init without data', function() {
+    var emptyRegistry = {};
+    scout.codes.registry =  emptyRegistry;
+    scout.codes.init();
+    expect(scout.codes.registry).toBe(emptyRegistry);
+  });
+
   it('finds a code type by ID', function() {
     var codeType = scout.codes.codeType(CODE_TYPE);
     expect(codeType instanceof scout.CodeType).toBe(true);
