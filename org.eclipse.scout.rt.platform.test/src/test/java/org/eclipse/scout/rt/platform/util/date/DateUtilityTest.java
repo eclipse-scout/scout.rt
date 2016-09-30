@@ -320,6 +320,11 @@ public class DateUtilityTest {
     String date2 = "2014-01-10 10:10:10.111";
     assertDateEquals(date2, DateUtility.addMonths(dateOf(date1), 1));
     assertDateEquals(date1, DateUtility.addMonths(dateOf(date2), -1));
+
+    date1 = "2013-09-30 10:10:10.111";
+    date2 = "2013-10-30 10:10:10.111";
+    assertDateEquals(date2, DateUtility.addMonths(dateOf(date1), 1));
+    assertDateEquals(date1, DateUtility.addMonths(dateOf(date2), -1));
   }
 
   @Test
