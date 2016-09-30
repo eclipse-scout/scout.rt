@@ -1163,19 +1163,46 @@ $.fn.appendAppLink = function(appLinkBean, func) {
 };
 
 /**
- * @param func Either a function to be called when the app link has been clicked.
- * Or an object with a method named _onAppLinkAction (e.g. an instance of BeanField).
+ * @param appLinkBean
+ *          Either
+ *           - an AppLinkBean with both (1) a ref attribute which will be mapped to the
+ *             data-ref attribute of the element and (2) a text attribute which will be
+ *             set as the text of the element.
+ *           - or just a ref, which will be mapped to the data-ref attribute of the
+ *             element.
+ * @param func
+ *          Optional. Either
+ *           - a function to be called when the app link has been clicked
+ *           - or an object with a method named _onAppLinkAction (e.g. an instance of
+ *             BeanField)
+ *          If func is not set, the _onAppLinkAction of the inner most widget relative to
+ *          this element (if any) will be called when the app link has been clicked.
  */
 $.fn.appLink = function(appLinkBean, func) {
-  if (typeof func === 'object' && func._onAppLinkAction) {
+  if (!func) {
+    func = function(event) {
+      var widget = scout.Widget.getWidgetFor(this);
+      if (widget && widget._onAppLinkAction) {
+        widget._onAppLinkAction(event);
+      }
+    }.bind(this);
+  } else if (typeof func === 'object' && func._onAppLinkAction) {
     func = func._onAppLinkAction.bind(func);
   }
-  return this.addClass('app-link')
-    .text(appLinkBean.name)
+
+  this.addClass('app-link')
     .attr('tabindex', '0')
-    .attr('data-ref', appLinkBean.ref)
     .unfocusable()
     .on('click', func);
+
+  if (typeof appLinkBean === 'string') {
+    this.attr('data-ref', appLinkBean);
+  } else {
+    this
+      .text(appLinkBean.name)
+      .attr('data-ref', appLinkBean.ref);
+  }
+  return this;
 };
 
 /**
