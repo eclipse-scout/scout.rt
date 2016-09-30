@@ -629,10 +629,14 @@ scout.Desktop.prototype.openUri = function(uri, action) {
       this._openUriInIFrame(uri);
     }
   } else if (action === 'open') {
-    // Open in same window.
-    // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
-    // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
-    this._openUriInSameWindow(uri);
+    if (scout.device.isIos()) {
+      // Open in same window.
+      // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
+      // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
+      window.location.href = event.uri;
+    } else {
+      this._openUriInIFrame(event.uri);
+    }
   } else if (action === 'newWindow') {
     this._openUriAsNewWindow(uri);
   }
