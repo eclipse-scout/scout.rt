@@ -32,6 +32,7 @@ import java.util.List;
  * Changes to the original code:
  * -----------------------------
  * - Applied Scout code formatting rules
+ * - equals() method changed to be symmetric
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -614,7 +615,7 @@ public class JSONArray {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(Object o) { // BSI (changed to be symmetric)
     if (o == this) {
       return true;
     }
