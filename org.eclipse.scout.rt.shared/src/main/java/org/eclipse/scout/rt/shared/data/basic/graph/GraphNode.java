@@ -31,6 +31,7 @@ public class GraphNode implements Serializable {
     return new GraphNode();
   }
 
+  @SuppressWarnings("squid:S00107")
   public static GraphNode create(String label, String url, GraphShape shape, GraphColor color, String cssClass, GraphNodeSize size, GraphCoordinate location, Long order) {
     return create()
         .withLabel(label)

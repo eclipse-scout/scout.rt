@@ -1231,7 +1231,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
-  @SuppressWarnings("bsiRulesDefinition:htmlInString")
+  @SuppressWarnings({"bsiRulesDefinition:htmlInString", "squid:S00107"})
   public EntityContribution createAttributePart(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, final boolean plainBind,
       Map<String, String> parentAliasMap) {
     if (stm == null) {
@@ -1428,6 +1428,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
+  @SuppressWarnings("squid:S00107")
   public String createAttributePartSimple(AttributeStrategy attributeStrategy, Integer aggregationType, String stm, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind, Map<String, String> parentAliasMap) {
     EntityContribution contrib = createAttributePart(attributeStrategy, aggregationType, stm, operation, bindNames, bindValues, plainBind, parentAliasMap);
     if (contrib.isEmpty()) {

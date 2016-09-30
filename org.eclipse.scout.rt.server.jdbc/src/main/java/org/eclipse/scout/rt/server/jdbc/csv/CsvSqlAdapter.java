@@ -79,6 +79,7 @@ public class CsvSqlAdapter {
    * @param writeColumnTypes
    *          the sql types of the corresponding column
    */
+  @SuppressWarnings("squid:S00107")
   public void exportDataFromTable(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
       List<String> csvColumnNames, boolean writeColumnNames, List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
@@ -129,6 +130,7 @@ public class CsvSqlAdapter {
    * @param writeColumnTypes
    *          the sql types of the corresponding column
    */
+  @SuppressWarnings("squid:S00107")
   public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumnNames,
       List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
@@ -233,6 +235,7 @@ public class CsvSqlAdapter {
     }
   }
 
+  @SuppressWarnings("squid:S00107")
   public void importDataIntoTable(File f, String encoding, Locale contentLocale, int headerRowCount, String colSeparator, String textDelimiter, String tableName, String groupKeyColumnName, Object groupKeyValue, String lineNumberColumnName,
       List<String> csvColumnNames, List<String> csvColumnTypes, boolean allowVariableColumnCount) {
     if (encoding == null) {

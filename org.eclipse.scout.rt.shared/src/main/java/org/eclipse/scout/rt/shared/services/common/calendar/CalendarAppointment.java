@@ -44,6 +44,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
    * @param body
    * @param cssClass
    */
+  @SuppressWarnings("squid:S00107")
   public CalendarAppointment(Object itemId, Object person, Date startDate, Date endDate, boolean fullDay, String subject, String body, String cssClass) {
     setItemId(itemId);
     setPerson(person);

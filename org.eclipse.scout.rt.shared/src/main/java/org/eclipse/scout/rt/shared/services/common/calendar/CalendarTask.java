@@ -37,6 +37,7 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
    * @param body
    * @param cssClass
    */
+  @SuppressWarnings("squid:S00107")
   public CalendarTask(Object id, Object responsibleId, Date startDate, Date dueDate, Date completeDate, String subject, String body, String cssClass) {
     setItemId(id);
     setResponsible(responsibleId);

@@ -51,6 +51,7 @@ public final class GridData {
     this(x, y, w, h, weightX, weightY, false, false, -1, -1, true, true, 0, 0);
   }
 
+  @SuppressWarnings("squid:S00107")
   public GridData(int x, int y, int w, int h, double weightX, double weightY, boolean useUiWidth, boolean useUiHeight, int horizontalAlignment, int verticalAlignment, boolean fillHorizontal, boolean fillVertical, int widthInPixel,
       int heightInPixel) {
     this.x = x;
