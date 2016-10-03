@@ -42,6 +42,12 @@
   &.collapsed > .menubar {
     display: none;
   }
+
+  &.loading {
+    & > .loading-indicator {
+      #scout.loading-indicator();
+    }
+  }
 }
 
 .group-box-title {

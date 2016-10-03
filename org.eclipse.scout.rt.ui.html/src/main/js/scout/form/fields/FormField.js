@@ -47,7 +47,10 @@ scout.FormField = function() {
   this._addCloneProperties(['displayText']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
-  this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
+  // Object to handle the 'loading' property (different for tile fields)
+  this.loadingSupport = new scout.LoadingSupport({
+    widget: this
+  });
   this.disabledStyle = scout.FormField.DisabledStyle.DEFAULT;
   this.touched = false;
   this.empty = true;
@@ -347,9 +350,7 @@ scout.FormField.prototype._renderMenusVisible = function() {
 };
 
 scout.FormField.prototype._renderLoading = function() {
-  if (this.loadingSupport) {
-    this.loadingSupport.renderLoading();
-  }
+  this.loadingSupport.renderLoading();
 };
 
 scout.FormField.prototype._renderDisabledStyle = function() {
