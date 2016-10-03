@@ -15,7 +15,7 @@ scout.PopupBlockerHandler = function(session) {
 scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windowSpecs) {
   var popup;
 
-  windowSpecs = windowSpecs || 'location=no,toolbar=no,menubar=no,resizable=yes';
+  windowSpecs = windowSpecs || 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes';
   windowName = windowName || 'scout_' + new Date().getTime();
 
   if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER) {
