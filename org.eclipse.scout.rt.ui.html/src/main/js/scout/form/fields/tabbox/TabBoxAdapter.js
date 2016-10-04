@@ -15,3 +15,10 @@ scout.TabBoxAdapter = function() {
 };
 scout.inherits(scout.TabBoxAdapter, scout.CompositeFieldAdapter);
 
+/**
+ * @override ModelAdapter.js
+ */
+scout.TabBoxAdapter.prototype.exportAdapterData = function(adapterData) {
+  delete adapterData.selectedTab;
+  return adapterData;
+};

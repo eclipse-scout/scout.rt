@@ -45,6 +45,8 @@ scout.Session = function() {
   this.requestTimeoutPing = 5000; // ms
   this.backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(true);
 
+  // This property is enabled by URL parameter &adapterExportEnabled=1. Default is false
+  this.adapterExportEnabled = false;
   this._adapterDataCache = {};
   this._busyCounter = 0; // >0 = busy
   this._busyIndicator;
@@ -102,7 +104,7 @@ scout.Session.prototype.init = function(model) {
   }
   this.$entryPoint = options.$entryPoint;
   this.partId = scout.nvl(options.portletPartId, this.partId);
-  this.forceNewClientSession = (this.url.getParameter('forceNewClientSession') || options.forceNewClientSession);
+  this.forceNewClientSession = scout.nvl(this.url.getParameter('forceNewClientSession'), options.forceNewClientSession);
   if (this.forceNewClientSession) {
     this.clientSessionId = null;
   } else {
@@ -118,6 +120,10 @@ scout.Session.prototype.init = function(model) {
   this.remote = scout.nvl(options.remote, this.remote);
   if (options.backgroundJobPollingEnabled === false) {
     this.backgroundJobPollingSupport.enabled = false;
+  }
+
+  if (this.url.getParameter('adapterExportEnabled')) {
+    this.adapterExportEnabled = true;
   }
 
   // Install focus management for this session (cannot be created in constructor, because this.$entryPoint is required)
@@ -1313,7 +1319,10 @@ scout.Session.prototype._onWindowUnload = function() {
  */
 scout.Session.prototype._getAdapterData = function(id) {
   var adapterData = this._adapterDataCache[id];
-  delete this._adapterDataCache[id];
+  var deleteAdapterData = !this.adapterExportEnabled;
+  if (deleteAdapterData) {
+    delete this._adapterDataCache[id];
+  }
   return adapterData;
 };
 

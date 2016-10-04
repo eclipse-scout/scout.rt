@@ -233,8 +233,15 @@ scout._globalAjaxSetup = function() {
  * not be found, nothing is returned.
  */
 scout.adapter = function(adapterId, sessionIndex) {
+  var session = scout.getSession(sessionIndex);
+  if (session && session.modelAdapterRegistry) {
+    return session.modelAdapterRegistry[adapterId];
+  }
+};
+
+scout.getSession = function(sessionIndex) {
   if (!scout.sessions) {
-    return;
+    return null;
   }
   var session;
   if (scout.sessions.length === 1) {
@@ -249,8 +256,60 @@ scout.adapter = function(adapterId, sessionIndex) {
     }
     session = scout.sessions[sessionIndex];
   }
+  return session;
+};
+
+/**
+ * This method exports the adapter with the given ID as JSON, it returns an plain object containing the
+ * configuration of the adapter. You can transform that object into JSON by calling <code>JSON.stringify</code>.
+ * This method can only be called through the browser JavaScript console.
+ * Here's an example of how to call the method:
+ *
+ * JSON.stringify(scout.exportAdapter(4))
+ *
+ * @param adapterId
+ */
+scout.exportAdapter = function(adapterId, sessionIndex) {
+  var session = scout.getSession(sessionIndex);
   if (session && session.modelAdapterRegistry) {
-    return session.modelAdapterRegistry[adapterId];
+    var adapter = session.getModelAdapter(adapterId);
+    var adapterData = cloneAdapterData(adapterId);
+    resolveAdapterReferences(adapter, adapterData);
+    return adapterData;
+  }
+
+  function cloneAdapterData(adapterId) {
+    var adapterData = session.getAdapterData(adapterId);
+    adapterData = $.extend(true, {}, adapterData);
+    return adapterData;
+  }
+
+  function resolveAdapterReferences(adapter, adapterData) {
+    var tmpAdapter, tmpAdapterData;
+    adapter._adapterProperties.forEach(function(adapterPropertyName) {
+      var adapterPropertyValue = adapterData[adapterPropertyName];
+      if (!adapterPropertyValue) {
+        return; // nothing to do when property is null
+      }
+      if (Array.isArray(adapterPropertyValue)) {
+        // value is an array of adapter IDs
+        var adapterDataArray = [];
+        adapterPropertyValue.forEach(function(adapterId) {
+          tmpAdapter = session.getModelAdapter(adapterId);
+          tmpAdapterData = cloneAdapterData(adapterId);
+          resolveAdapterReferences(tmpAdapter, tmpAdapterData);
+          adapterDataArray.push(tmpAdapterData);
+        });
+        adapterData[adapterPropertyName] = adapterDataArray;
+      } else {
+        // value is an adapter ID
+        tmpAdapter = session.getModelAdapter(adapterPropertyValue);
+        tmpAdapterData = cloneAdapterData(adapterPropertyValue);
+        resolveAdapterReferences(tmpAdapter, tmpAdapterData);
+        adapterData[adapterPropertyName] = tmpAdapterData;
+      }
+    });
+    adapterData = adapter.exportAdapterData(adapterData);
   }
 };
 

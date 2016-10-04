@@ -82,7 +82,8 @@ scout.ModelAdapter.prototype._postCreateWidget = function() {
 
 scout.ModelAdapter.prototype._initModel = function(model, parent) {
   // Make a copy to prevent a modification of the given model
-  model = $.extend({}, model);
+  var deepCopy = this.session.adapterExportEnabled;
+  model = $.extend(deepCopy, {}, model);
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(model);
@@ -404,4 +405,12 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 
 scout.ModelAdapter.prototype.toString = function() {
   return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id + ']';
+};
+
+/**
+ * This method is used to modify adapterData before the data is exported (as used for JSON export).
+ */
+scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
+  delete adapterData.owner;
+  return adapterData;
 };

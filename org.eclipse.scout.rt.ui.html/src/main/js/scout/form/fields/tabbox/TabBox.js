@@ -243,3 +243,9 @@ scout.TabBox.prototype._renderStatusPosition = function() {
 scout.TabBox.prototype.getFields = function() {
   return this.tabItems;
 };
+
+scout.TabBox.prototype.getTabItem = function(tabId) {
+  return scout.arrays.find(this.tabItems, function(tabItem) {
+    return tabItem.id === tabId;
+  });
+};
