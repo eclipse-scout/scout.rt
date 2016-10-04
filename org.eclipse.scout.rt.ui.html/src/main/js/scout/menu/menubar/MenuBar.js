@@ -44,6 +44,9 @@ scout.MenuBar = function() {
         this.updateDefaultMenu();
       } else if (event.changedProperties.indexOf('visible') > -1) {
         this.updateVisibility();
+        // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).
+        // If the menu is rendered, the menu itself triggers invalidateLayoutTree (see Menu.js#_renderVisible)
+        this.invalidateLayoutTree();
       }
     }
   }.bind(this);
