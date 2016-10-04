@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.WebContentService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,30 +50,28 @@ public class JsonModelsLoader extends AbstractResourceLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonModelsLoader.class);
 
-  private IWebContentService m_resourceLocator = BEANS.get(WebContentService.class);
+  private static final String REGEX_PATTERN = "^(.*?)(-module|-macro)?(.json)$";
 
-  private static final String REGEX_PATTERN = "^(.*)(.json)$";
+  /**
+   * Only file names for which a file (with '-macro' or '-module' suffix) exists are accepted.
+   */
+  public static boolean acceptFile(String file) {
+    if (StringUtility.isNullOrEmpty(file)) {
+      return false;
+    }
 
-  public static boolean matchesFile(String file) {
-    return file != null && file.matches(REGEX_PATTERN);
+    Pattern pattern = Pattern.compile(REGEX_PATTERN);
+    Matcher matcher = pattern.matcher(file);
+    if (!matcher.find()) {
+      return false;
+    }
+
+    return getJsonFileUrl(file) != null;
   }
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
-    Pattern pattern = Pattern.compile(REGEX_PATTERN);
-    Matcher matcher = pattern.matcher(pathInfo);
-    if (!matcher.find()) {
-      return null;
-    }
-    String fileNameWithoutExtension = matcher.group(1);
-    String fileExtension = matcher.group(2);
-    JSONObject json = getJson(fileNameWithoutExtension + "-macro" + fileExtension);
-    if (json == null) {
-      json = getJson(fileNameWithoutExtension + "-module" + fileExtension);
-    }
-    if (json == null) {
-      return null;
-    }
+    JSONObject json = getJson(pathInfo);
     JSONObject output = buildModelsJson(json);
     LOG.info("Successfully loaded models JSON '" + pathInfo + "'");
     return new BinaryResource(pathInfo, output.toString().getBytes());
@@ -122,22 +119,42 @@ public class JsonModelsLoader extends AbstractResourceLoader {
     return file.replace('/', '.');
   }
 
-  protected boolean isModule(String file) {
+  protected static boolean isModule(String file) {
     return file != null && file.endsWith("-module.json");
   }
 
-  protected boolean isMacro(String file) {
+  protected static boolean isMacro(String file) {
     return file != null && file.endsWith("-macro.json");
   }
 
-  protected JSONObject getJson(String pathInfo) throws IOException {
+  protected static URL getJsonFileUrl(String pathInfo) {
+    Pattern pattern = Pattern.compile(REGEX_PATTERN);
+    Matcher matcher = pattern.matcher(pathInfo);
+    if (!matcher.find()) {
+      return null;
+    }
+
+    String fileNameWithoutExtension = matcher.group(1);
+    String fileExtension = matcher.group(3);
+
     URL jsonUrl;
     if (isMacro(pathInfo)) {
-      jsonUrl = m_resourceLocator.getWebContentResource(pathInfo);
+      jsonUrl = BEANS.get(WebContentService.class).getWebContentResource(pathInfo);
     }
     else {
-      jsonUrl = m_resourceLocator.getScriptSource(pathInfo);
+      jsonUrl = BEANS.get(WebContentService.class).getScriptSource(pathInfo);
     }
+    if (jsonUrl == null) {
+      jsonUrl = BEANS.get(WebContentService.class).getWebContentResource(fileNameWithoutExtension + "-macro" + fileExtension);
+      if (jsonUrl == null) {
+        jsonUrl = BEANS.get(WebContentService.class).getScriptSource(fileNameWithoutExtension + "-module" + fileExtension);
+      }
+    }
+    return jsonUrl;
+  }
+
+  protected JSONObject getJson(String pathInfo) throws IOException {
+    URL jsonUrl = getJsonFileUrl(pathInfo);
     if (jsonUrl == null) {
       LOG.warn("Failed to load resource {}", pathInfo);
       return null;
