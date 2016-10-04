@@ -125,20 +125,22 @@ scout.LoginBox.prototype._onPostDone = function(data) {
 
 scout.LoginBox.prototype._onPostFail = function(jqXHR, textStatus, errorThrown) {
   // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
-  setTimeout(function() {
-    this.$button
-      .setEnabled(true)
-      .html('')
-      .text(this.texts.get('ui.LoginFailed'))
-      .addClass('login-error');
-    this.$user
-      .val('')
-      .focus()
-      .one('input.resetLoginError', this._resetButtonText.bind(this));
-    this.$password
-      .val('')
-      .one('input.resetLoginError', this._resetButtonText.bind(this));
-  }.bind(this), 300);
+  setTimeout(this._onPostFailImpl.bind(this, jqXHR, textStatus, errorThrown), 300);
+};
+
+scout.LoginBox.prototype._onPostFailImpl = function(jqXHR, textStatus, errorThrown) {
+  this.$button
+    .setEnabled(true)
+    .html('')
+    .text(this.texts.get('ui.LoginFailed'))
+    .addClass('login-error');
+  this.$user
+    .val('')
+    .focus()
+    .one('input.resetLoginError', this._resetButtonText.bind(this));
+  this.$password
+    .val('')
+    .one('input.resetLoginError', this._resetButtonText.bind(this));
 };
 
 // ----- Helper functions -----
