@@ -97,3 +97,7 @@ scout.ImageField.prototype._onImageError = function(event) {
   scout.scrollbars.update(this.$fieldContainer);
   this.invalidateLayoutTree();
 };
+
+scout.ImageField.prototype.setImageUrl = function(imageUrl) {
+  this.setProperty('imageUrl', imageUrl);
+};

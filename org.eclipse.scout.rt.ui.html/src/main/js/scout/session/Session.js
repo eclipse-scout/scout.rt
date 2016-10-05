@@ -122,6 +122,10 @@ scout.Session.prototype.init = function(model) {
     this.backgroundJobPollingSupport.enabled = false;
   }
 
+  if (this.url.getParameter('inspector')) {
+    this.inspector = true;
+  }
+
   if (this.url.getParameter('adapterExportEnabled')) {
     this.adapterExportEnabled = true;
   }

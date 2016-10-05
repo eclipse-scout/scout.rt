@@ -480,6 +480,7 @@ scout.TableAdapter.prototype.onModelAction = function(event) {
  */
 scout.TableAdapter.prototype.exportAdapterData = function(adapterData) {
   adapterData = scout.TableAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+  delete adapterData.selectedRows;
   adapterData.rows = [];
   adapterData.columns.forEach(function(column) {
     delete column.classId;
