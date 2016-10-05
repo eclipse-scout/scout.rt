@@ -204,4 +204,23 @@ public final class SharedConfigProperties {
       return "scout.permission.level.check.cache.ttl";
     }
   }
+
+  /**
+   * If this property is set to true, the TextKeyTextProviderService will be registered with high priority, and each
+   * call to TEXTS.getText() will return the given text key. This is useful for debug/testing purposes or exporting
+   * forms to JSON.
+   */
+  public static class TextProvidersShowKeysProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.text.providers.show.keys";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return false;
+    }
+  }
+
 }

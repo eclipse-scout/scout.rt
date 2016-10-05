@@ -33,7 +33,7 @@ public class ScoutTexts {
 
   private static volatile ScoutTexts DEFAULT;
 
-  private final List<? extends ITextProviderService> m_textProviders;
+  private List<? extends ITextProviderService> m_textProviders;
 
   public ScoutTexts() {
     this(BEANS.all(ITextProviderService.class));
@@ -108,5 +108,9 @@ public class ScoutTexts {
 
   public String getTextWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
     return getTextInternal(locale, key, fallback, messageArguments);
+  }
+
+  public void reloadTextProviders() {
+    m_textProviders = BEANS.all(ITextProviderService.class);
   }
 }
