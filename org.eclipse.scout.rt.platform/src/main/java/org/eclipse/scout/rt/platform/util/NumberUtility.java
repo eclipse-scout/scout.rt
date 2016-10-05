@@ -34,7 +34,7 @@ public final class NumberUtility {
   /**
    * Converts a Number to a Double.
    *
-   * @param The
+   * @param n
    *          Number to be converted.
    * @return The converted Double. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
@@ -54,7 +54,7 @@ public final class NumberUtility {
   /**
    * Converts a Number to an Integer.
    *
-   * @param The
+   * @param n
    *          Number to be converted.
    * @return The converted Integer. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
@@ -68,7 +68,7 @@ public final class NumberUtility {
   /**
    * Converts a Number to a Long.
    *
-   * @param The
+   * @param n
    *          Number to be converted.
    * @return The converted Long. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
@@ -106,7 +106,7 @@ public final class NumberUtility {
   /**
    * Converts a Double to a BigDecimal.
    *
-   * @param The
+   * @param d
    *          Double to be converted.
    * @return The converted BigDecimal. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
@@ -120,7 +120,7 @@ public final class NumberUtility {
   /**
    * Converts a Long to a BigInteger.
    *
-   * @param The
+   * @param l
    *          Long to be converted.
    * @return The converted BigInteger. Returns <code>null</code> when the input parameter is <code>null</code>.
    */
@@ -134,7 +134,7 @@ public final class NumberUtility {
   /**
    * Computes the median of a vararg of doubles.
    *
-   * @param The
+   * @param a
    *          vararg of doubles.
    * @return The median. Returns 0 if the parameter is null or an empty array.
    */
@@ -230,7 +230,7 @@ public final class NumberUtility {
   /**
    * Computes the maximum value of a vararg of doubles.
    *
-   * @param The
+   * @param a
    *          vararg of doubles.
    * @return The maximum. Returns 0 if the parameter is null or the length of the vararg is 0.
    */
