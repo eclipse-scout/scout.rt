@@ -29,3 +29,12 @@ scout.ValueFieldAdapter.prototype._onWidgetEvent = function(event) {
     scout.ValueFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
 };
+
+/**
+ * @override ModelAdapter.js
+ */
+scout.ValueFieldAdapter.prototype.exportAdapterData = function(adapterData) {
+  adapterData = scout.ValueFieldAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+  delete adapterData.displayText;
+  return adapterData;
+};

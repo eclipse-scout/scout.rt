@@ -21,7 +21,7 @@ scout.ButtonAdapter.prototype._postCreateWidget = function() {
 
   var formAdapter = this.widget.getForm().modelAdapter;
   if (formAdapter.attached) {
-    this.resolveKeyStrokeScope();
+    this._resolveKeyStrokeScope();
     return;
   }
   // KeyStrokeScope is another widget (form or formfield) which may not be initialized and attached to the adapter yet.
@@ -46,4 +46,13 @@ scout.ButtonAdapter.prototype._onWidgetEvent = function(event) {
   } else {
     scout.ButtonAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
+};
+
+/**
+ * @override ModelAdapter.js
+ */
+scout.ButtonAdapter.prototype.exportAdapterData = function(adapterData) {
+  adapterData = scout.ButtonAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+  delete adapterData.keyStrokeScope; // FIXME [awe] 6.1 - add log messages about deleted properties to exported json
+  return adapterData;
 };

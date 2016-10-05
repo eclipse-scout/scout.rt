@@ -412,5 +412,7 @@ scout.ModelAdapter.prototype.toString = function() {
  */
 scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
   delete adapterData.owner;
+  delete adapterData.classId;
+  delete adapterData.modelClass;
   return adapterData;
 };

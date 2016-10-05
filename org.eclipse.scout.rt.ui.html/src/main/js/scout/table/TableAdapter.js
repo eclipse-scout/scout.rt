@@ -474,3 +474,16 @@ scout.TableAdapter.prototype.onModelAction = function(event) {
     scout.TableAdapter.parent.prototype.onModelAction.call(this, event);
   }
 };
+
+/**
+ * @override ModelAdapter.js
+ */
+scout.TableAdapter.prototype.exportAdapterData = function(adapterData) {
+  adapterData = scout.TableAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+  adapterData.rows = [];
+  adapterData.columns.forEach(function(column) {
+    delete column.classId;
+    delete column.modelClass;
+  });
+  return adapterData;
+};
