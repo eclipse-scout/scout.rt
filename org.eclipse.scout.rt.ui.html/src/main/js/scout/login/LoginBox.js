@@ -11,7 +11,9 @@
 scout.LoginBox = function() {
   scout.LoginBox.parent.call(this);
 
+  this.postDataType;
   this.authUrl = 'auth';
+  this.onPostDoneFunc = function() {};
   this.redirectUrl;
   this.logoUrl = 'res/logo.png';
   this.userDataKey = 'user';
@@ -32,6 +34,10 @@ scout.LoginBox.prototype.init = function(options) {
   options = options || {};
   options.texts = new scout.TextMap($.extend(this.texts, options.texts));
   $.extend(this, options);
+
+  if (this.redirectUrl) {
+    this.onPostDoneFunc = this.redirect;
+  }
 };
 
 scout.LoginBox.prototype.render = function($parent) {
@@ -101,12 +107,17 @@ scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
       .append($('<div>').addClass('login-button-loading'));
   }
 
-  $.post(url, data)
-    .done(this._onPostDone.bind(this))
-    .fail(this._onPostFail.bind(this));
+  $.ajax({
+    type: 'POST',
+    url: url,
+    data: data,
+    dataType: this.postDataType
+  })
+  .done(this._onPostDone.bind(this))
+  .fail(this._onPostFail.bind(this));
 };
 
-scout.LoginBox.prototype._onPostDone = function(data) {
+scout.LoginBox.prototype.redirect = function(data) {
   // Calculate target URL
   var url = this.redirectUrl;
   if (!url) {
@@ -121,6 +132,11 @@ scout.LoginBox.prototype._onPostDone = function(data) {
   } else {
     window.location.reload();
   }
+};
+
+scout.LoginBox.prototype._onPostDone = function(data) {
+  this.remove();
+  this.onPostDoneFunc.call(this, data);
 };
 
 scout.LoginBox.prototype._onPostFail = function(jqXHR, textStatus, errorThrown) {
