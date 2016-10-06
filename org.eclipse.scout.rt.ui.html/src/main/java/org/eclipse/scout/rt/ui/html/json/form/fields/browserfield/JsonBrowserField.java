@@ -99,6 +99,12 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
         return getModel().getExternalWindowFieldText();
       }
     });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_AUTO_CLOSE_EXTERNAL_WINDOW, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAutoCloseExternalWindow();
+      }
+    });
   }
 
   @Override
