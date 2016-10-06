@@ -28,6 +28,7 @@ scout.CompositeField.prototype.visit = function(visitor) {
 };
 
 /**
+ * Sets the given displayStyle recursively on all fields of the composite field.
  * @override FormField.js
  */
 scout.CompositeField.prototype.setDisabledStyle = function(disabledStyle) {
@@ -35,4 +36,15 @@ scout.CompositeField.prototype.setDisabledStyle = function(disabledStyle) {
     field.setDisabledStyle(disabledStyle);
   });
   scout.CompositeField.parent.prototype.setDisabledStyle.call(this, disabledStyle);
+};
+
+/**
+ * Enables or disables recursively all fields of the composite field.
+ * @override Widget.js
+ */
+scout.CompositeField.prototype.setEnabled = function(enabled) {
+  this.getFields().forEach(function(field) {
+    field.setEnabled(enabled);
+  });
+  scout.CompositeField.parent.prototype.setEnabled.call(this, enabled);
 };

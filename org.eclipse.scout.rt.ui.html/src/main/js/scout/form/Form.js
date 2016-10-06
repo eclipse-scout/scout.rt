@@ -278,6 +278,21 @@ scout.Form.prototype._renderIconId = function() {
 };
 
 /**
+ * @override Widget.js
+ */
+scout.Form.prototype.setEnabled = function(enabled) {
+  scout.Form.parent.prototype.setEnabled.call(this, enabled);
+  this.rootGroupBox.setEnabled(enabled);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Form.prototype.setDisabledStyle = function(disabledStyle) {
+  this.rootGroupBox.setDisabledStyle(disabledStyle);
+};
+
+/**
  * Method invoked when:
  *  - this is a 'detailForm' and the outline content is displayed;
  *  - this is a 'view' and the view tab is selected;
@@ -363,8 +378,6 @@ scout.Form.prototype._uninstallFocusContext = function() {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
 };
-
-
 
 /**
  * === Method required for objects that act as 'displayParent' ===

@@ -149,6 +149,10 @@ input, .input-field, textarea, .clipboard-field > .field {
   &.has-error:focus {
     #scout.glow(@error-glow-color);
   }
+
+  &.read-only {
+    #scout.read-only();
+  }
 }
 
 input {
@@ -161,10 +165,6 @@ input {
 
   /* text inputs on safari have 2px top and bottom margin -> remove*/
   margin: 0;
-
-  &.read-only {
-    #scout.read-only();
-  }
 }
 
 input[type="radio"] {
@@ -316,10 +316,6 @@ textarea {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
-  &.read-only {
-    #scout.read-only();
-  }
 }
 
 /* cursor handling */
