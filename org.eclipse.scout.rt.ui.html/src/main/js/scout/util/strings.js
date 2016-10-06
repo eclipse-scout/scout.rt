@@ -280,6 +280,22 @@ scout.strings = {
 
   toUpperCaseFirstLetter: function(string) {
     return string.substring(0, 1).toUpperCase() + string.substring(1);
+  },
+
+  /**
+   * Returns the number of unicode characters in the given string.
+   * As opposed to the string.length property, astral symbols are
+   * counted as one single character.
+   * Example: <code>'\uD83D\uDC4D'.length</code> returns 2, whereas
+   * <code>scout.strings.countCharpoints('\uD83D\uDC4D')</code> returns 1.
+   * (\uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D))
+   */
+  countCodePoints: function(string) {
+    return string
+      // Replace every surrogate pair with a BMP symbol.
+      .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_')
+      // and then get the length.
+      .length;
   }
 
 };

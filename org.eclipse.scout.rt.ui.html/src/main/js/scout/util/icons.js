@@ -32,7 +32,7 @@ scout.icons = {
     if (scout.strings.startsWith(iconId, 'font:')) {
       icon.iconType = scout.Icon.IconType.FONT_ICON;
       iconId = iconId.substr(5);
-      if (iconId.length === 1) {
+      if (scout.strings.countCodePoints(iconId) === 1) {
         // default icon-font scoutIcons
         icon.font = scout.Icon.DEFAULT_FONT;
         icon.iconCharacter = iconId;
@@ -55,10 +55,11 @@ scout.icons = {
     if (result && result.length === 2) {
       iconId = result[1];
       tmp = iconId.split('.');
-      if (tmp.length === 1) {
+      var tmpLength = scout.strings.countCodePoints(tmp);
+      if (tmpLength === 1) {
         // look for icon in scout.icons.[0]
         value = scout.icons[tmp];
-      } else if (tmp.length === 2) {
+      } else if (tmpLength === 2) {
         // look for icon in global object [0].icons.[1]
         // FIXME [awe] 6.1 register a kind of icon lookup-service instead of this naming convention?
         value = window[tmp[0]].icons[tmp[1]];
@@ -68,6 +69,7 @@ scout.icons = {
     }
     return value;
   }
+
 };
 
 scout.Icon = function() {

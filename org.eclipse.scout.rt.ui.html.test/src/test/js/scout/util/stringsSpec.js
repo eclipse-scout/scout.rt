@@ -373,4 +373,14 @@ describe("scout.strings", function() {
 
   });
 
+  describe("countCodePoints", function() {
+
+    it("returns the number of codepoints in a string", function() {
+      expect(scout.strings.countCodePoints('')).toBe(0);
+      expect(scout.strings.countCodePoints('foo')).toBe(3);
+      expect(scout.strings.countCodePoints('\uD83D\uDC4D')).toBe(1); //\uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D)
+    });
+
+  });
+
 });
