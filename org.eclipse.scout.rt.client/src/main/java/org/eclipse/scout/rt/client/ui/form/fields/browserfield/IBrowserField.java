@@ -64,6 +64,7 @@ public interface IBrowserField extends IFormField {
   String PROP_SHOW_IN_EXTERNAL_WINDOW = "showInExternalWindow";
   String PROP_EXTERNAL_WINDOW_FIELD_TEXT = "externalWindowFieldText";
   String PROP_EXTERNAL_WINDOW_BUTTON_TEXT = "externalWindowButtonText";
+  String PROP_AUTO_CLOSE_EXTERNAL_WINDOW = "autoCloseExternalWindow";
 
   IBrowserFieldUIFacade getUIFacade();
 
@@ -216,4 +217,20 @@ public interface IBrowserField extends IFormField {
    * @see #getExternalWindowButtonText()
    */
   void setExternalWindowButtonText(String externalWindowButtonText);
+
+  /**
+   * Determines if the external window should be auto closed when this field gets removed.
+   * <p>
+   * NOTE: Auto closing only makes sense, if content is shown in an external window. (@see #isShowInExternalWindow())
+   * </p>
+   *
+   * @return <code>true</code> when the external window will be auto closed, <code>false</code> otherwise.
+   * @see #isShowInExternalWindow()
+   */
+  boolean isAutoCloseExternalWindow();
+
+  /**
+   * @see #isAutoCloseExternalWindow()
+   */
+  void setAutoCloseExternalWindow(boolean autoCloseExternalWindow);
 }

@@ -130,6 +130,15 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
+   * @see IBrowserField#isAutoCloseExternalWindow()
+   */
+  @Order(230)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoCloseExternalWindow() {
+    return false;
+  }
+
+  /**
    * This callback is invoked when the application has received a post-message from the embedded browser (IFRAME) or
    * external window.
    * <p>
@@ -185,6 +194,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     setShowInExternalWindow(getConfiguredShowInExternalWindow());
     setExternalWindowButtonText(getConfiguredExternalWindowButtonText());
     setExternalWindowFieldText(getConfiguredExternalWindowFieldText());
+    setAutoCloseExternalWindow(getConfiguredAutoCloseExternalWindow());
   }
 
   @Override
@@ -416,6 +426,16 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   @Override
   public String getExternalWindowFieldText() {
     return propertySupport.getPropertyString(PROP_EXTERNAL_WINDOW_FIELD_TEXT);
+  }
+
+  @Override
+  public boolean isAutoCloseExternalWindow() {
+    return propertySupport.getPropertyBool(PROP_AUTO_CLOSE_EXTERNAL_WINDOW);
+  }
+
+  @Override
+  public void setAutoCloseExternalWindow(boolean autoCloseExternalWindow) {
+    propertySupport.setPropertyBool(PROP_AUTO_CLOSE_EXTERNAL_WINDOW, autoCloseExternalWindow);
   }
 
   protected class P_UIFacade implements IBrowserFieldUIFacade {

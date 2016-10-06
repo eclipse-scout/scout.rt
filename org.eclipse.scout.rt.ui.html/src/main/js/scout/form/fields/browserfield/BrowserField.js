@@ -220,6 +220,14 @@ scout.BrowserField.prototype._remove = function() {
   scout.BrowserField.parent.prototype._remove.call(this);
   this.myWindow.removeEventListener('message', this._postMessageListener);
   this._postMessageListener = null;
+
+  // if content is shown in an external window and auto close is set to true
+  if(this.showInExternalWindow && this.autoCloseExternalWindow) {
+    // try to close popup window (if it is not already closed)
+    if (this._popupWindow && !this._popupWindow.closed) {
+      this._popupWindow.close();
+    }
+  }
 };
 
 /**
