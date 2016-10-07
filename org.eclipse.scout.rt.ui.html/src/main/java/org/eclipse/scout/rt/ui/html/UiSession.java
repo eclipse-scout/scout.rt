@@ -54,8 +54,8 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -104,9 +104,14 @@ public class UiSession implements IUiSession {
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
   // Because static fields are initialized before the bean manager is ready (class is initialized by Jandex scan),
   // the following beans must be set lazily. See the corresponding static getters.
-  private static final FinalValue<HttpSessionHelper> HTTP_SESSION_HELPER = new FinalValue<>();
-  private static final FinalValue<JsonRequestHelper> JSON_REQUEST_HELPER = new FinalValue<>();
-  private static final FinalValue<SecureRandom> SECURE_RANDOM = new FinalValue<>();
+  private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
+  private static final LazyValue<JsonRequestHelper> JSON_REQUEST_HELPER = new LazyValue<>(JsonRequestHelper.class);
+  private static final LazyValue<SecureRandom> SECURE_RANDOM = new LazyValue<>(new Callable<SecureRandom>() {
+    @Override
+    public SecureRandom call() throws Exception {
+      return SecurityUtility.createSecureRandom();
+    }
+  });
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -1117,30 +1122,15 @@ public class UiSession implements IUiSession {
   }
 
   protected static HttpSessionHelper getHttpSessionHelper() {
-    return HTTP_SESSION_HELPER.setIfAbsentAndGet(new Callable<HttpSessionHelper>() {
-      @Override
-      public HttpSessionHelper call() throws Exception {
-        return BEANS.get(HttpSessionHelper.class);
-      }
-    });
+    return HTTP_SESSION_HELPER.get();
   }
 
   protected static JsonRequestHelper getJsonRequestHelper() {
-    return JSON_REQUEST_HELPER.setIfAbsentAndGet(new Callable<JsonRequestHelper>() {
-      @Override
-      public JsonRequestHelper call() throws Exception {
-        return BEANS.get(JsonRequestHelper.class);
-      }
-    });
+    return JSON_REQUEST_HELPER.get();
   }
 
   protected static SecureRandom getSecureRandom() {
-    return SECURE_RANDOM.setIfAbsentAndGet(new Callable<SecureRandom>() {
-      @Override
-      public SecureRandom call() throws Exception {
-        return SecurityUtility.createSecureRandom();
-      }
-    });
+    return SECURE_RANDOM.get();
   }
 
   /**
