@@ -532,7 +532,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           // find last EitherOrNode
           EitherOrNode orNode = null;
           for (ITreeNode n : parent.getChildNodes()) {
-            if (n instanceof EitherOrNode && ((EitherOrNode) n).isBeginOfEitherOr()) {
+            if (n instanceof EitherOrNode && ((EitherOrNode) n).isEndOfEitherOr()) {
               orNode = (EitherOrNode) n;
             }
           }
