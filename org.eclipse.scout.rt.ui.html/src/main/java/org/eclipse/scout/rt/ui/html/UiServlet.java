@@ -184,7 +184,7 @@ public class UiServlet extends HttpServlet {
           }
         }
         // No handler was able to handle the request
-        LOG.info("404_NOT_FOUND_POST: {}", req.getPathInfo());
+        LOG.info("404_NOT_FOUND: {} {}", req.getMethod(), req.getPathInfo());
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       }
       catch (Exception t) {
