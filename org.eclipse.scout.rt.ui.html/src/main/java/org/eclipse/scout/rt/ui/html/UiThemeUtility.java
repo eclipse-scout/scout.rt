@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiThemeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +119,7 @@ public final class UiThemeUtility {
   public static void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
     theme = defaultIfNull(theme);
     if (resp != null) {
-      CookieUtility.addCookie(resp, THEME_COOKIE_NAME, theme);
+      CookieUtility.addPersistentCookie(resp, THEME_COOKIE_NAME, theme);
     }
     session.setAttribute(THEME_SESSION_ATTRIBUTE, theme);
   }

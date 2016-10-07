@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
@@ -330,7 +331,7 @@ public class UiSession implements IUiSession {
   }
 
   protected void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
-    CookieUtility.addCookie(resp, PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
+    CookieUtility.addPersistentCookie(resp, PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
   }
 
   /**
