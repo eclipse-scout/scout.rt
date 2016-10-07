@@ -73,7 +73,7 @@ public class HttpServletControl implements Serializable {
   }
 
   protected void parseRequest(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
-    UrlHints.updateHints(req);
+    UrlHints.updateHints(req, resp);
   }
 
   protected void setResponseHeaders(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
