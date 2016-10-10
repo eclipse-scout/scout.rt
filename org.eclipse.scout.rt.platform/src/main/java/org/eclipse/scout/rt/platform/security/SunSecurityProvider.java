@@ -34,7 +34,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
@@ -60,21 +59,21 @@ public class SunSecurityProvider implements ISecurityProvider {
   protected static final int BUF_SIZE = 8192;
 
   @Override
-  public byte[] decrypt(byte[] encryptedData, String password, byte[] salt, int keyLen) {
+  public byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen) {
     return doCrypt(encryptedData, password, salt, Cipher.DECRYPT_MODE, keyLen);
   }
 
   @Override
-  public byte[] encrypt(byte[] clearTextData, String password, byte[] salt, int keyLen) {
+  public byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen) {
     return doCrypt(clearTextData, password, salt, Cipher.ENCRYPT_MODE, keyLen);
   }
 
-  protected byte[] doCrypt(byte[] input, String password, byte[] salt, int mode, int keyLen) {
+  protected byte[] doCrypt(byte[] input, char[] password, byte[] salt, int mode, int keyLen) {
     if (input == null) {
-      throw new IllegalArgumentException("input must not be null");
+      throw new IllegalArgumentException("input must not be null.");
     }
-    if (StringUtility.isNullOrEmpty(password)) {
-      throw new IllegalArgumentException("password must not be empty.");
+    if (password == null) {
+      throw new IllegalArgumentException("password must not be null.");
     }
     if (salt == null || salt.length < 1) {
       throw new IllegalArgumentException("salt must be provided.");
@@ -101,7 +100,7 @@ public class SunSecurityProvider implements ISecurityProvider {
 
     try {
       SecretKeyFactory factory = SecretKeyFactory.getInstance(getSecretKeyAlgorithm(), getCipherAlgorithmProvider());
-      KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, getKeyDerivationIterationCount(), keyLen + (GCM_INITIALIZATION_VECTOR_LEN * 8));
+      KeySpec spec = new PBEKeySpec(password, salt, getKeyDerivationIterationCount(), keyLen + (GCM_INITIALIZATION_VECTOR_LEN * 8));
       SecretKey tmp = factory.generateSecret(spec);
 
       // derive Key and Initialization Vector
@@ -151,7 +150,7 @@ public class SunSecurityProvider implements ISecurityProvider {
    * {@link #getPasswordHashSecretKeyAlgorithm()}.
    */
   @Override
-  public byte[] createPasswordHash(String password, byte[] salt, int iterations) {
+  public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
     if (password == null) {
       throw new IllegalArgumentException("no password provided");
     }
@@ -165,7 +164,7 @@ public class SunSecurityProvider implements ISecurityProvider {
 
     try {
       SecretKeyFactory skf = SecretKeyFactory.getInstance(getPasswordHashSecretKeyAlgorithm(), getCipherAlgorithmProvider());
-      PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, 256);
+      PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, 256);
       SecretKey key = skf.generateSecret(spec);
       byte[] res = key.getEncoded();
       return res;
@@ -176,7 +175,7 @@ public class SunSecurityProvider implements ISecurityProvider {
   }
 
   @Override
-  public byte[] createHash(InputStream data, byte[] salt) {
+  public byte[] createHash(InputStream data, byte[] salt, int iterations) {
     if (data == null) {
       throw new IllegalArgumentException("no data provided");
     }
@@ -194,6 +193,10 @@ public class SunSecurityProvider implements ISecurityProvider {
       }
 
       byte[] key = digest.digest();
+      for (int i = 1; i < iterations; i++) {
+        key = digest.digest(key);
+        digest.reset();
+      }
       return key;
     }
     catch (NoSuchAlgorithmException | NoSuchProviderException | IOException e) {

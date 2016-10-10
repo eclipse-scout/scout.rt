@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.FilterChain;
@@ -27,6 +25,7 @@ import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -93,13 +92,13 @@ public class FormBasedAccessController implements IAccessController {
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
     response.setDateHeader("Expires", 0); // prevents caching at the proxy server
 
-    final Entry<String, char[]> credentials = readCredentials(request);
+    final Pair<String, char[]> credentials = readCredentials(request);
     if (credentials == null) {
       handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, response);
       return true;
     }
 
-    final int status = m_config.getCredentialVerifier().verify(credentials.getKey(), credentials.getValue());
+    final int status = m_config.getCredentialVerifier().verify(credentials.getLeft(), credentials.getRight());
     if (status != ICredentialVerifier.AUTH_OK) {
       handleForbidden(status, response);
       return true;
@@ -112,7 +111,7 @@ public class FormBasedAccessController implements IAccessController {
     }
 
     // Put authenticated Subject onto HTTP session.
-    final Principal principal = m_config.getPrincipalProducer().produce(credentials.getKey());
+    final Principal principal = m_config.getPrincipalProducer().produce(credentials.getLeft());
     BEANS.get(ServletFilterHelper.class).putPrincipalOnSession(request, principal);
     return true;
   }
@@ -135,7 +134,7 @@ public class FormBasedAccessController implements IAccessController {
   /**
    * Reads the credentials sent by 'login.js' from request parameters.
    */
-  protected Entry<String, char[]> readCredentials(final HttpServletRequest request) {
+  protected Pair<String, char[]> readCredentials(final HttpServletRequest request) {
     final String user = request.getParameter("user");
     if (StringUtility.isNullOrEmpty(user)) {
       return null;
@@ -152,9 +151,7 @@ public class FormBasedAccessController implements IAccessController {
       return null;
     }
 
-    // TODO BSH Use a dedicated "Credential" object here instead of a data structure that belongs to java.util.Map
-    //          (See also IPassword in ConfigFileCredentialVerifier. Another alternative would be the "Pair" class.)
-    return new SimpleEntry<>(user, password.toCharArray());
+    return new Pair<>(user, password.toCharArray());
   }
 
   /**

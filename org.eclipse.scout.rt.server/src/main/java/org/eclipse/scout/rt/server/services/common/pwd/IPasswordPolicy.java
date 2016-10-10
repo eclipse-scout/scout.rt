@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 
 /**
  * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG
- * 
+ *
  * @version 3.x
  */
 
@@ -33,6 +33,6 @@ public interface IPasswordPolicy {
    * @throws ProcessingException
    *           when newPassword does not conform to this policy
    */
-  void check(String userId, String newPassword, String userName, int historyIndex);
+  void check(String userId, char[] newPassword, String userName, int historyIndex);
 
 }

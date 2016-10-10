@@ -41,12 +41,12 @@ public interface IPasswordManagementService extends IService {
   /**
    * change the password of a user
    */
-  void changePassword(String userId, String oldPassword, String newPassword);
+  void changePassword(String userId, char[] oldPassword, char[] newPassword);
 
   /**
    * reset the password of a user <br>
    * In the implementation make sure to use sufficient permission rights to enable this method.
    */
-  void resetPassword(String userId, String newPassword);
+  void resetPassword(String userId, char[] newPassword);
 
 }

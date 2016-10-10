@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.security;
 
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -225,7 +226,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
     }
 
     protected byte[] toBytes(final char[] password) {
-      return String.valueOf(password).getBytes(CHARSET);
+      return CHARSET.encode(CharBuffer.wrap(password)).array();
     }
 
     @Override
@@ -240,6 +241,6 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
   public static void main(final String[] args) {
     final String plainTextPassword = args[0];
 
-    System.out.printf("plain-text: %s,  password-hash: %s", plainTextPassword, new HashedPassword(args[0].toCharArray(), SecurityUtility.createRandomBytes())); // NOSONAR
+    System.out.printf("plain-text: %s,  password-hash: %s", plainTextPassword, new HashedPassword(plainTextPassword.toCharArray(), SecurityUtility.createRandomBytes())); // NOSONAR
   }
 }

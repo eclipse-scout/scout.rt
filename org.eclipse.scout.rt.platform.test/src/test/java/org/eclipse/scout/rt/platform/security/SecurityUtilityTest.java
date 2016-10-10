@@ -29,7 +29,7 @@ public class SecurityUtilityTest {
   private static final boolean IS_JAVA_18_OR_NEWER = CompareUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
   private static final int KEY_LEN = 128;
   private static final Charset ENCODING = StandardCharsets.UTF_8;
-  private static final String PASSWORD = "insecure";
+  private static final char[] PASSWORD = "insecure".toCharArray();
 
   @Test
   public void testEncryption() throws Exception {
@@ -56,12 +56,12 @@ public class SecurityUtilityTest {
   @Test(expected = IllegalArgumentException.class)
   public void testEncryptNoData() throws Exception {
     final byte[] salt = SecurityUtility.createRandomBytes();
-    SecurityUtility.encrypt(null, "pass", salt, KEY_LEN);
+    SecurityUtility.encrypt(null, "pass".toCharArray(), salt, KEY_LEN);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testEncryptNoSalt() throws Exception {
-    SecurityUtility.encrypt("test".getBytes(ENCODING), "pass", null, KEY_LEN);
+    SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), null, KEY_LEN);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -73,7 +73,7 @@ public class SecurityUtilityTest {
   @Test(expected = IllegalArgumentException.class)
   public void testEncryptWrongKeyLen() throws Exception {
     final byte[] salt = SecurityUtility.createRandomBytes();
-    SecurityUtility.encrypt("test".getBytes(ENCODING), "pass", salt, 4);
+    SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, 4);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -180,20 +180,19 @@ public class SecurityUtilityTest {
       return;
     }
 
-    final String pwd = "testpwd";
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
     final int iterations = 10000;
 
     // test hash
-    byte[] hash1 = SecurityUtility.hashPassword(pwd, salt, iterations);
-    byte[] hash2 = SecurityUtility.hashPassword(pwd, salt2, iterations);
-    byte[] hash3 = SecurityUtility.hashPassword(pwd, salt, iterations);
-    byte[] hash4 = SecurityUtility.hashPassword("", salt, iterations);
-    byte[] hash5 = SecurityUtility.hashPassword(pwd, salt, iterations + 1);
+    byte[] hash1 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
+    byte[] hash2 = SecurityUtility.hashPassword(PASSWORD, salt2, iterations);
+    byte[] hash3 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
+    byte[] hash4 = SecurityUtility.hashPassword("".toCharArray(), salt, iterations);
+    byte[] hash5 = SecurityUtility.hashPassword(PASSWORD, salt, iterations + 1);
 
     // ensure hashing was executed
-    Assert.assertFalse(Arrays.equals(pwd.getBytes(ENCODING), hash1));
+    Assert.assertFalse(Arrays.equals(String.valueOf(PASSWORD).getBytes(ENCODING), hash1));
 
     // ensure different salts matter
     Assert.assertFalse(Arrays.equals(hash1, hash2));
@@ -219,7 +218,7 @@ public class SecurityUtilityTest {
 
     ok = false;
     try {
-      SecurityUtility.hashPassword(pwd, null, iterations);
+      SecurityUtility.hashPassword(PASSWORD, null, iterations);
     }
     catch (IllegalArgumentException e) {
       ok = true;
@@ -228,7 +227,7 @@ public class SecurityUtilityTest {
 
     ok = false;
     try {
-      SecurityUtility.hashPassword(pwd, new byte[]{}, iterations);
+      SecurityUtility.hashPassword(PASSWORD, new byte[]{}, iterations);
     }
     catch (IllegalArgumentException e) {
       ok = true;
@@ -236,7 +235,7 @@ public class SecurityUtilityTest {
     Assert.assertTrue(ok);
     ok = false;
     try {
-      SecurityUtility.hashPassword(pwd, salt, 0);
+      SecurityUtility.hashPassword(PASSWORD, salt, 0);
     }
     catch (IllegalArgumentException e) {
       ok = true;
@@ -244,7 +243,7 @@ public class SecurityUtilityTest {
     Assert.assertTrue(ok);
     ok = false;
     try {
-      SecurityUtility.hashPassword(pwd, salt, -1);
+      SecurityUtility.hashPassword(PASSWORD, salt, -1);
     }
     catch (IllegalArgumentException e) {
       ok = true;
@@ -252,7 +251,7 @@ public class SecurityUtilityTest {
     Assert.assertTrue(ok);
     ok = false;
     try {
-      SecurityUtility.hashPassword(pwd, salt, 9999);
+      SecurityUtility.hashPassword(PASSWORD, salt, 9999);
     }
     catch (IllegalArgumentException e) {
       ok = true;

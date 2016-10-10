@@ -180,7 +180,7 @@ public class DefaultPasswordForm extends AbstractForm {
         throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
-      svc.resetPassword(getUserId(), getNewPasswordField().getValue());
+      svc.resetPassword(getUserId(), getNewPasswordField().getValue().toCharArray());
     }
   }
 
@@ -191,7 +191,7 @@ public class DefaultPasswordForm extends AbstractForm {
         throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
-      svc.changePassword(getUserId(), getOldPasswordField().getValue(), getNewPasswordField().getValue());
+      svc.changePassword(getUserId(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());
     }
   }
 }

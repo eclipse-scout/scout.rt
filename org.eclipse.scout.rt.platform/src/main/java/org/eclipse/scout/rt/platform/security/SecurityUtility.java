@@ -48,16 +48,16 @@ public final class SecurityUtility {
   }
 
   /**
-   * See {@link ISecurityProvider#decrypt(byte[], String, byte[], int)}
+   * See {@link ISecurityProvider#decrypt(byte[], char[], byte[], int)}
    */
-  public static byte[] decrypt(byte[] encryptedData, String password, byte[] salt, int keyLen) {
+  public static byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen) {
     return BEANS.get(ISecurityProvider.class).decrypt(encryptedData, password, salt, keyLen);
   }
 
   /**
-   * See {@link ISecurityProvider#encrypt(byte[], String, byte[], int)}
+   * See {@link ISecurityProvider#encrypt(byte[], char[], byte[], int)}
    */
-  public static byte[] encrypt(byte[] clearTextData, String password, byte[] salt, int keyLen) {
+  public static byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen) {
     return BEANS.get(ISecurityProvider.class).encrypt(clearTextData, password, salt, keyLen);
   }
 
@@ -88,16 +88,16 @@ public final class SecurityUtility {
   }
 
   /**
-   * @see ISecurityProvider#createPasswordHash(String, byte[], int)
+   * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
    */
-  public static byte[] hashPassword(String password, byte[] salt, int iterations) {
+  public static byte[] hashPassword(char[] password, byte[] salt, int iterations) {
     return BEANS.get(ISecurityProvider.class).createPasswordHash(password, salt, iterations);
   }
 
   /**
    * Creates a hash for the given data using the given salt.<br>
    * <br>
-   * <b>Important:</b> For hashing of passwords use {@link #hashPassword(String, byte[], int)}!
+   * <b>Important:</b> For hashing of passwords use {@link #hashPassword(char[], byte[], int)}!
    *
    * @param data
    *          The data to hash. Must not be <code>null</code>.
@@ -109,7 +109,7 @@ public final class SecurityUtility {
    * @throws IllegalArgumentException
    *           If data is <code>null</code>.
    * @see ISecurityProvider#createHash(InputStream, byte[])
-   * @see ISecurityProvider#createPasswordHash(String, byte[], int)
+   * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
    */
   public static byte[] hash(byte[] data, byte[] salt) {
     if (data == null) {
@@ -122,7 +122,7 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#createHash(InputStream, byte[])}
    */
   public static byte[] hash(InputStream data, byte[] salt) {
-    return BEANS.get(ISecurityProvider.class).createHash(data, salt);
+    return BEANS.get(ISecurityProvider.class).createHash(data, salt, 3557 /* number of default cycles for backwards compatibility */);
   }
 
   /**

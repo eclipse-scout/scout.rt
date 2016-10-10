@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.pwd;
 
+import java.util.Arrays;
+
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -29,28 +31,47 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
   }
 
   @Override
-  public void check(String userId, String newPassword, String userName, int historyIndex) {
-    if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH) {
-      throwFailure("PasswordMin8Chars");
+  public void check(String userId, char[] newPassword, String userName, int historyIndex) {
+    if (newPassword == null || newPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new VetoException(ScoutTexts.get("PasswordMin8Chars"));
     }
-    else if (!newPassword.matches(".*[0-9]+.*")) {
-      throwFailure("PasswordMinOneDigit");
+    if (historyIndex >= 0) {
+      throw new VetoException(ScoutTexts.get("PasswordNotSameAsLasts"));
     }
-    else if (!newPassword.matches(".*[[a-z]|[A-Z]]+.*")) {
-      throwFailure("PasswordMinOneChar");
+
+    char[] charsInPasswordSorted = Arrays.copyOf(newPassword, newPassword.length);
+    Arrays.sort(charsInPasswordSorted);
+    if (!containsOneOf(charsInPasswordSorted, "0123456789")) {
+      throw new VetoException(ScoutTexts.get("PasswordMinOneDigit"));
     }
-    else if (!newPassword.matches(".*[!|@|#|\\$|%|\\^|&|\\*|\\(|\\)|_|\\+|\\||~|\\-|=|\\\\|`|\\{|\\}|\\[|\\]|:|\"|;|'|<|>|?|,|.|/]+.*")) {
-      throwFailure("PasswordMinOnNonStdChar");
+    if (!containsOneOf(charsInPasswordSorted, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+      throw new VetoException(ScoutTexts.get("PasswordMinOneChar"));
     }
-    else if (userName != null && newPassword.toUpperCase().indexOf(userName.toUpperCase()) >= 0) {
-      throwFailure("PasswordUsernameNotPartOfPass");
+    if (!containsOneOf(charsInPasswordSorted, "!@#$%^&*()_+|~-=\\`{}[]:\";'<>?,./")) {
+      throw new VetoException(ScoutTexts.get("PasswordMinOnNonStdChar"));
     }
-    else if (historyIndex >= 0) {
-      throwFailure("PasswordNotSameAsLasts");
+    if (containsUsername(newPassword, userName)) {
+      throw new VetoException(ScoutTexts.get("PasswordUsernameNotPartOfPass"));
     }
   }
 
-  protected void throwFailure(String msgId) {
-    throw new VetoException(ScoutTexts.get(msgId));
+  private static boolean containsUsername(char[] newPassword, String userName) {
+    if (userName == null) {
+      return false;
+    }
+    StringBuilder b = new StringBuilder(newPassword.length);
+    for (char c : newPassword) {
+      b.append(Character.toUpperCase(c));
+    }
+    return b.indexOf(userName.toUpperCase()) >= 0;
+  }
+
+  private static boolean containsOneOf(char[] charsOfPasswordSorted, String charsToSearch) {
+    for (char toFind : charsToSearch.toCharArray()) {
+      if (Arrays.binarySearch(charsOfPasswordSorted, toFind) >= 0) {
+        return true;
+      }
+    }
+    return false;
   }
 }

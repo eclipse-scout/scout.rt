@@ -80,19 +80,21 @@ public interface ISecurityProvider {
   /**
    * Creates a hash for the given data using the given salt.<br>
    * <br>
-   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(String, byte[], int)}!
+   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[], int)}!
    *
    * @param data
    *          The {@link InputStream} providing the data to hash.
    * @param salt
    *          the salt to use. Use {@link #createSecureRandomBytes(int)} to generate a random salt per instance.
+   * @param iterations
+   *          the number of hashing iterations. There is always at least one cycle executed.
    * @return the hash
    * @throws IllegalArgumentException
    *           If data is <code>null</code>.
    * @throws ProcessingException
    *           If there is an error creating the hash
    */
-  byte[] createHash(InputStream data, byte[] salt);
+  byte[] createHash(InputStream data, byte[] salt, int iterations);
 
   /**
    * Creates a hash for the given password.<br>
@@ -118,11 +120,11 @@ public interface ISecurityProvider {
    * @throws ProcessingException
    *           If there is an error creating the hash. <br>
    */
-  byte[] createPasswordHash(String password, byte[] salt, int iterations);
+  byte[] createPasswordHash(char[] password, byte[] salt, int iterations);
 
   /**
    * Encrypts the given data using the given key and salt.<br>
-   * Use {@link #decrypt(byte[], String, byte[], int)} to decrypt the data again (using the same key, salt and keyLen).
+   * Use {@link #decrypt(byte[], char[], byte[], int)} to decrypt the data again (using the same key, salt and keyLen).
    *
    * @param clearTextData
    *          The data to encrypt.
@@ -142,12 +144,12 @@ public interface ISecurityProvider {
    *           If the clear text data, salt or password is <code>null</code> or empty or an unsupported keyLen has been
    *           provided.
    */
-  byte[] encrypt(byte[] clearTextData, String password, byte[] salt, int keyLen);
+  byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen);
 
   /**
    * Decrypts the data using the given key and salt.<br>
    * This method is intended to decrypt data that was previously encrypted using
-   * {@link #encrypt(byte[], String, byte[], int)}.<br>
+   * {@link #encrypt(byte[], char[], byte[], int)}.<br>
    *
    * @param encryptedData
    *          The encrypted data that should be decrypted.
@@ -164,7 +166,7 @@ public interface ISecurityProvider {
    *           If the encrypted data, salt or password is <code>null</code> or empty or an unsupported keyLen has been
    *           provided.
    */
-  byte[] decrypt(byte[] encryptedData, String password, byte[] salt, int keyLen);
+  byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen);
 
   /**
    * Creates a new secure random instance. The returned instance has already been seeded and is ready to use.
