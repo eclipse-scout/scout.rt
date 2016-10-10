@@ -39,7 +39,6 @@ scout.SmartField = function() {
   /**
    * This property is used to prevent multiple acceptProposal request to the server (blur, aboutToBlur, acceptInput from Action).
    */
-  this._acceptedInput = false;
   this._tabPrevented = null;
   this._pendingProposalTyped = null;
   this._navigating = false;
@@ -310,7 +309,6 @@ scout.SmartField.prototype._onKeyUp = function(e) {
 
 scout.SmartField.prototype._onFocus = function(e) {
   this._oldDisplayText = this._readDisplayText();
-  this._acceptedInput = false;
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
@@ -461,7 +459,10 @@ scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, 
   this._send('acceptProposal', {// FIXME [6.1] cgu move to adapter
     displayText: displayText,
     chooser: chooser,
-    forceClose: forceClose
+    forceClose: forceClose,
+    coalesce: function(previous) {
+      return this.type === previous.type;
+    }
   });
 };
 
@@ -539,7 +540,6 @@ scout.SmartField.prototype.openPopup = function() {
     this.popup = null;
   }.bind(this));
   if (this.touch) {
-    this._acceptedInput = false;
     // Error message is shown on touch popup as well, don't show twice
     this._hideStatusMessage();
   }
@@ -560,11 +560,7 @@ scout.SmartField.prototype.virtual = function() {
  * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function(whileTyping) {
-  if (this._acceptedInput) {
-    return;
-  }
   this._acceptProposal(true);
-  this._acceptedInput = true;
 };
 
 /**
