@@ -16,6 +16,7 @@ import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
@@ -38,14 +39,9 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public final class SecurityUtility {
 
   /**
-   * Specifies the default iteration count for hashing.
-   */
-  private static final int DEFAULT_HASHING_CYCLES = 3557;
-
-  /**
    * Number of random bytes to be created by default.
    */
-  private static final int DEFAULT_RANDOM_SIZE = 16;
+  private static final int DEFAULT_RANDOM_SIZE = 32;
 
   private SecurityUtility() {
     // no instances of this class
@@ -73,12 +69,12 @@ public final class SecurityUtility {
   }
 
   /**
-   * Generates 16 random bytes.
+   * Generates 32 random bytes.
    *
    * @return the created random bytes.
    * @throws ProcessingException
    *           If the current platform does not support the random number generation algorithm.
-   * @see ISecurityProvider#createRandomBytes(int)
+   * @see ISecurityProvider#createSecureRandomBytes(int)
    */
   public static byte[] createRandomBytes() {
     return createRandomBytes(DEFAULT_RANDOM_SIZE);
@@ -92,49 +88,41 @@ public final class SecurityUtility {
   }
 
   /**
-   * Creates a hash using the given data input and salt.
-   *
-   * @param data
-   *          the data to hash
-   * @param salt
-   *          the salt to use. Use {@link #createRandomBytes()} to generate a random salt per instance.
-   * @return the hash
-   * @throws ProcessingException
-   *           If there is an error creating the hash
-   * @throws IllegalArgumentException
-   *           If data is null.
+   * @see ISecurityProvider#createPasswordHash(String, byte[], int)
    */
-  public static byte[] hash(byte[] data, byte[] salt) {
-    return hash(data, salt, DEFAULT_HASHING_CYCLES);
+  public static byte[] hashPassword(String password, byte[] salt, int iterations) {
+    return BEANS.get(ISecurityProvider.class).createPasswordHash(password, salt, iterations);
   }
 
   /**
-   * Creates a hash using the given data input and salt.
+   * Creates a hash for the given data using the given salt.<br>
+   * <br>
+   * <b>Important:</b> For hashing of passwords use {@link #hashPassword(String, byte[], int)}!
    *
    * @param data
-   *          the data to hash
+   *          The data to hash. Must not be <code>null</code>.
    * @param salt
-   *          the salt to use. Use {@link #createRandomBytes()} to generate a random salt per instance.
-   * @param iterations
-   *          the number of cycles to hash. There is always at least one cycle executed.
+   *          The salt to use. Use {@link #createRandomBytes(int)} to generate a random salt per instance.
    * @return the hash
    * @throws ProcessingException
    *           If there is an error creating the hash
    * @throws IllegalArgumentException
-   *           If data is null.
+   *           If data is <code>null</code>.
+   * @see ISecurityProvider#createHash(InputStream, byte[])
+   * @see ISecurityProvider#createPasswordHash(String, byte[], int)
    */
-  public static byte[] hash(byte[] data, byte[] salt, int iterations) {
+  public static byte[] hash(byte[] data, byte[] salt) {
     if (data == null) {
       throw new IllegalArgumentException("no data provided");
     }
-    return hash(new ByteArrayInputStream(data), salt, iterations);
+    return hash(new ByteArrayInputStream(data), salt);
   }
 
   /**
-   * See {@link ISecurityProvider#createHash(InputStream, byte[], int)}
+   * See {@link ISecurityProvider#createHash(InputStream, byte[])}
    */
-  public static byte[] hash(InputStream data, byte[] salt, int iterations) {
-    return BEANS.get(ISecurityProvider.class).createHash(data, salt, iterations);
+  public static byte[] hash(InputStream data, byte[] salt) {
+    return BEANS.get(ISecurityProvider.class).createHash(data, salt);
   }
 
   /**
@@ -164,6 +152,7 @@ public final class SecurityUtility {
    *           When there is an error creating the signature.
    * @throws IllegalArgumentException
    *           if the private key or data is <code>null</code>.
+   * @see ISecurityProvider#createSignature(byte[], InputStream)
    */
   public static byte[] createSignature(byte[] privateKey, byte[] data) {
     if (data == null) {
@@ -195,6 +184,7 @@ public final class SecurityUtility {
    *           If there is an error validating the signature.
    * @throws IllegalArgumentException
    *           if one of the arguments is <code>null</code>.
+   * @see ISecurityProvider#verifySignature(byte[], InputStream, byte[])
    */
   public static boolean verifySignature(byte[] publicKey, byte[] data, byte[] signatureToVerify) {
     if (data == null) {
@@ -222,6 +212,7 @@ public final class SecurityUtility {
    *           if there is an error creating the MAC
    * @throws IllegalArgumentException
    *           if the password or data is <code>null</code>.
+   * @see ISecurityProvider#createMac(byte[], InputStream)
    */
   public static byte[] createMac(byte[] password, byte[] data) {
     if (data == null) {
@@ -239,8 +230,9 @@ public final class SecurityUtility {
       return null;
     }
 
-    final List<String> principalNames = new ArrayList<>(subject.getPrincipals().size());
-    for (final Principal principal : subject.getPrincipals()) {
+    Set<Principal> principals = subject.getPrincipals();
+    final List<String> principalNames = new ArrayList<>(principals.size());
+    for (final Principal principal : principals) {
       principalNames.add(principal.getName());
     }
     return StringUtility.join(", ", principalNames);

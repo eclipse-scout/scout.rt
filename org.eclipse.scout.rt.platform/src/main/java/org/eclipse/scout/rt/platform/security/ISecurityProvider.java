@@ -78,21 +78,47 @@ public interface ISecurityProvider {
   KeyPairBytes createKeyPair();
 
   /**
-   * Creates a hash using the given data and salt.
+   * Creates a hash for the given data using the given salt.<br>
+   * <br>
+   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(String, byte[], int)}!
    *
    * @param data
    *          The {@link InputStream} providing the data to hash.
    * @param salt
-   *          the salt to use. Use {@link #createRandomBytes()} to generate a random salt per instance.
-   * @param iterations
-   *          the number of hashing iterations. There is always at least one cycle executed.
+   *          the salt to use. Use {@link #createSecureRandomBytes(int)} to generate a random salt per instance.
    * @return the hash
    * @throws IllegalArgumentException
-   *           If data is null.
+   *           If data is <code>null</code>.
    * @throws ProcessingException
    *           If there is an error creating the hash
    */
-  byte[] createHash(InputStream data, byte[] salt, int iterations);
+  byte[] createHash(InputStream data, byte[] salt);
+
+  /**
+   * Creates a hash for the given password.<br>
+   *
+   * @param password
+   *          The password to create the hash for. Must not be <code>null</code>.
+   * @param salt
+   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
+   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
+   *          Remember to save the salt with the hashed password! Must not be <code>null</code> or an empty array.
+   * @param iterations
+   *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
+   *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
+   *          year as technology improves. As by May 2016 at least 10000 iterations are recommended. Therefore this
+   *          method will not accept values below that limit.<br>
+   *          Experimentation is important. To provide a good security use an iteration count so that the call to this
+   *          method requires one half second to execute (on the production system). Also consider the number of users
+   *          and the number of logins executed to find a value that scales in your environment.
+   * @return the password hash
+   * @throws IllegalArgumentException
+   *           If the password is <code>null</code>, the salt is <code>null</code> or empty or iterations is not
+   *           positive.
+   * @throws ProcessingException
+   *           If there is an error creating the hash. <br>
+   */
+  byte[] createPasswordHash(String password, byte[] salt, int iterations);
 
   /**
    * Encrypts the given data using the given key and salt.<br>
@@ -101,12 +127,12 @@ public interface ISecurityProvider {
    * @param clearTextData
    *          The data to encrypt.
    * @param password
-   *          The password to use for the encryption. Must not be null or empty.
+   *          The password to use for the encryption. Must not be <code>null</code> or empty.
    * @param salt
-   *          The salt to use for the encryption. Must not be null or empty. It is important to create a separate random
-   *          salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes()} to generate a
-   *          new salt for a key. It is safe to store the salt in clear text alongside the encrypted data. This salt
-   *          will then be used to decrypt the data again.
+   *          The salt to use for the encryption. Must not be <code>null</code> or empty. It is important to create a
+   *          separate random salt for each key! Salts may not be shared by several keys. Use
+   *          {@link #createSecureRandomBytes(int)} to generate a new salt for a key. It is safe to store the salt in
+   *          clear text alongside the encrypted data. This salt will then be used to decrypt the data again.
    * @param keyLen
    *          The key length (in bits) to use.
    * @return The encrypted data.
@@ -126,7 +152,7 @@ public interface ISecurityProvider {
    * @param encryptedData
    *          The encrypted data that should be decrypted.
    * @param password
-   *          The password to use for the decryption. Must not be null or empty.
+   *          The password to use for the decryption. Must not be <code>null</code> or empty.
    * @param salt
    *          The salt to use for the decryption. This is the same salt that was used to encrypt the data.
    * @param keyLen
@@ -207,7 +233,7 @@ public interface ISecurityProvider {
       if (obj == null) {
         return false;
       }
-      if (!(obj instanceof KeyPairBytes)) {
+      if (getClass() != obj.getClass()) {
         return false;
       }
       KeyPairBytes other = (KeyPairBytes) obj;

@@ -50,6 +50,11 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class SunSecurityProvider implements ISecurityProvider {
 
   /**
+   * Specifies the minimum of password hash iterations.
+   */
+  protected static final int MIN_PASSWORD_HASH_ITERATIONS = 10000;
+
+  /**
    * Buffer size for {@link InputStream} read.
    */
   protected static final int BUF_SIZE = 8192;
@@ -139,8 +144,39 @@ public class SunSecurityProvider implements ISecurityProvider {
     return rnd;
   }
 
+  /**
+   * If this method throws a NoSuchAlgorithmException, this may be because you are using an older Java version. In this
+   * case it is safe to replace the algorithm with "PBKDF2WithHmacSHA1". SHA1 is still safe in the context of PBKDF2. To
+   * do so replace this bean with your own implementation overwriting the method
+   * {@link #getPasswordHashSecretKeyAlgorithm()}.
+   */
   @Override
-  public byte[] createHash(InputStream data, byte[] salt, int iterations) {
+  public byte[] createPasswordHash(String password, byte[] salt, int iterations) {
+    if (password == null) {
+      throw new IllegalArgumentException("no password provided");
+    }
+    if (salt == null || salt.length < 1) {
+      throw new IllegalArgumentException("no salt provided");
+    }
+    if (iterations < MIN_PASSWORD_HASH_ITERATIONS) {
+      throw new IllegalArgumentException("iterations must be > " + MIN_PASSWORD_HASH_ITERATIONS);
+    }
+    // other checks are done by the PBEKeySpec constructor
+
+    try {
+      SecretKeyFactory skf = SecretKeyFactory.getInstance(getPasswordHashSecretKeyAlgorithm(), getCipherAlgorithmProvider());
+      PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, 256);
+      SecretKey key = skf.generateSecret(spec);
+      byte[] res = key.getEncoded();
+      return res;
+    }
+    catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchProviderException e) {
+      throw new ProcessingException("Unable to create password hash.", e);
+    }
+  }
+
+  @Override
+  public byte[] createHash(InputStream data, byte[] salt) {
     if (data == null) {
       throw new IllegalArgumentException("no data provided");
     }
@@ -158,10 +194,6 @@ public class SunSecurityProvider implements ISecurityProvider {
       }
 
       byte[] key = digest.digest();
-      for (int i = 1; i < iterations; i++) {
-        key = digest.digest(key);
-        digest.reset();
-      }
       return key;
     }
     catch (NoSuchAlgorithmException | NoSuchProviderException | IOException e) {
@@ -361,6 +393,13 @@ public class SunSecurityProvider implements ISecurityProvider {
     // Password-based key-derivation algorithm (<a href="http://tools.ietf.org/search/rfc2898">PKCS #5 2.0</a>)
     // using The HmacSHA algorithm (<a href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a>) as pseudo-random function.
     return "PBKDF2WithHmacSHA256";
+  }
+
+  /**
+   * @return The algorithm to use for password hashing.
+   */
+  protected String getPasswordHashSecretKeyAlgorithm() {
+    return "PBKDF2WithHmacSHA512";
   }
 
   /**

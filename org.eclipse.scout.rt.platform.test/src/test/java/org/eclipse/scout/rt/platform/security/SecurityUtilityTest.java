@@ -134,19 +134,16 @@ public class SecurityUtilityTest {
     final byte[] data = "testdata".getBytes(ENCODING);
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
-    byte[] hash = SecurityUtility.hash(data, salt, 1);
+    byte[] hash = SecurityUtility.hash(data, salt);
     byte[] hash2 = SecurityUtility.hash(data, salt);
-    byte[] hash3 = SecurityUtility.hash(data, salt2, 1);
-    byte[] hash4 = SecurityUtility.hash(data, null, 1);
-    byte[] hash5 = SecurityUtility.hash(data, null, 1);
-    byte[] hash6 = SecurityUtility.hash(data, null);
-    byte[] hash7 = SecurityUtility.hash(data, salt);
-    byte[] hash8 = SecurityUtility.hash(new byte[]{}, salt);
+    byte[] hash3 = SecurityUtility.hash(data, salt2);
+    byte[] hash4 = SecurityUtility.hash(data, salt);
+    byte[] hash5 = SecurityUtility.hash(new byte[]{}, salt);
 
     // ensure null input throws exception
     boolean nullNotAllowed = false;
     try {
-      SecurityUtility.hash(null, salt);
+      SecurityUtility.hash((byte[]) null, salt);
     }
     catch (IllegalArgumentException e) {
       nullNotAllowed = true;
@@ -155,7 +152,7 @@ public class SecurityUtilityTest {
 
     nullNotAllowed = false;
     try {
-      SecurityUtility.hash((InputStream) null, salt, 1);
+      SecurityUtility.hash((InputStream) null, salt);
     }
     catch (IllegalArgumentException e) {
       nullNotAllowed = true;
@@ -164,22 +161,103 @@ public class SecurityUtilityTest {
 
     // ensure hashing was executed
     Assert.assertFalse(Arrays.equals(data, hash));
-    Assert.assertFalse(Arrays.equals(data, hash2));
     Assert.assertFalse(Arrays.equals(data, hash3));
-
-    // ensure different iterations matter
-    Assert.assertFalse(Arrays.equals(hash, hash2));
-    Assert.assertFalse(Arrays.equals(hash5, hash6));
 
     // ensure different salts matter
     Assert.assertFalse(Arrays.equals(hash, hash3));
 
     // ensure same input -> same output
-    Assert.assertArrayEquals(hash2, hash7);
-    Assert.assertArrayEquals(hash4, hash5);
+    Assert.assertTrue(Arrays.equals(hash, hash2));
 
     // ensure different input -> different output
-    Assert.assertFalse(Arrays.equals(hash7, hash8));
+    Assert.assertFalse(Arrays.equals(hash4, hash5));
+  }
+
+  @Test
+  public void testHashPassword() {
+    if (!IS_JAVA_18_OR_NEWER) {
+      // only supported in java 1.8 or newer
+      return;
+    }
+
+    final String pwd = "testpwd";
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    final byte[] salt2 = SecurityUtility.createRandomBytes();
+    final int iterations = 10000;
+
+    // test hash
+    byte[] hash1 = SecurityUtility.hashPassword(pwd, salt, iterations);
+    byte[] hash2 = SecurityUtility.hashPassword(pwd, salt2, iterations);
+    byte[] hash3 = SecurityUtility.hashPassword(pwd, salt, iterations);
+    byte[] hash4 = SecurityUtility.hashPassword("", salt, iterations);
+    byte[] hash5 = SecurityUtility.hashPassword(pwd, salt, iterations + 1);
+
+    // ensure hashing was executed
+    Assert.assertFalse(Arrays.equals(pwd.getBytes(ENCODING), hash1));
+
+    // ensure different salts matter
+    Assert.assertFalse(Arrays.equals(hash1, hash2));
+
+    // ensure same input -> same output
+    Assert.assertTrue(Arrays.equals(hash1, hash3));
+
+    // ensure different input -> different output
+    Assert.assertFalse(Arrays.equals(hash4, hash1));
+
+    // ensure different iterations matter
+    Assert.assertFalse(Arrays.equals(hash5, hash1));
+
+    // test invalid values
+    boolean ok = false;
+    try {
+      SecurityUtility.hashPassword(null, salt, iterations);
+    }
+    catch (IllegalArgumentException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
+
+    ok = false;
+    try {
+      SecurityUtility.hashPassword(pwd, null, iterations);
+    }
+    catch (IllegalArgumentException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
+
+    ok = false;
+    try {
+      SecurityUtility.hashPassword(pwd, new byte[]{}, iterations);
+    }
+    catch (IllegalArgumentException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
+    ok = false;
+    try {
+      SecurityUtility.hashPassword(pwd, salt, 0);
+    }
+    catch (IllegalArgumentException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
+    ok = false;
+    try {
+      SecurityUtility.hashPassword(pwd, salt, -1);
+    }
+    catch (IllegalArgumentException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
+    ok = false;
+    try {
+      SecurityUtility.hashPassword(pwd, salt, 9999);
+    }
+    catch (IllegalArgumentException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
   }
 
   @Test
