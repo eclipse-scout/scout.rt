@@ -71,4 +71,168 @@ describe("TableFooterSpec", function() {
     });
   });
 
+  describe("TableStatusTooltip", function() {
+
+    it("shows ERROR tooltip", function() {
+      var model = helper.createModelFixture(2);
+      model.tableStatusVisible = true;
+      model.tableStatus = {
+        severity: scout.Status.Severity.ERROR,
+        message: 'Table has an error'
+      };
+      var table = helper.createTable(model);
+
+      // Check that status and tooltip is rendered when table is rendered
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+      expect(table.tableStatus.uiState).toBe(undefined);
+
+      // Check that status and tooltip are re-rendered when table is removed and rendered again
+      table.remove();
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+
+      // Check that tooltip is hidden after mouse click on status
+      table.footer._$infoTableStatusIcon.trigger('mousedown');
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
+      expect(table.tableStatus.uiState).toBe('user-hidden');
+
+      // Check that tooltip stays hidden when table is removed and rendered again
+      table.remove();
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
+      expect(table.tableStatus.uiState).toBe('user-hidden');
+
+      // Check that tooltip is shown after second mouse click on status
+      table.footer._$infoTableStatusIcon.trigger('mousedown');
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+      expect(table.tableStatus.uiState).toBe('user-shown');
+
+      // Check that tooltip stays visible when table is removed and rendered again
+      table.remove();
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+      expect(table.tableStatus.uiState).toBe('user-shown');
+    });
+
+    it("shows INFO tooltip when table is rendered", function() {
+      var model = helper.createModelFixture(2);
+      model.tableStatusVisible = true;
+      model.tableStatus = {
+        severity: scout.Status.Severity.INFO,
+        message: 'Table has an information'
+      };
+      var table = helper.createTable(model);
+
+      // Check that status and tooltip is rendered when table is rendered
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+      expect(table.tableStatus.uiState).toBe('auto-hidden'); // because auto-removal is already scheduled at INFO level
+
+      // Check that tooltip is hidden automatically after 5s
+      jasmine.clock().tick(5100);
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
+      expect(table.tableStatus.uiState).toBe('auto-hidden');
+
+      // Check that tooltip is not rendered automatically when table is removed and rendered again
+      table.remove();
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
+      expect(table.tableStatus.uiState).toBe('auto-hidden');
+
+      // Check that tooltip is shown again with a mouse click and _not_ hidden automatically again after 5s
+      table.footer._$infoTableStatusIcon.trigger('mousedown');
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+      expect(table.tableStatus.uiState).toBe('user-shown');
+      jasmine.clock().tick(5100);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
+      expect(table.tableStatus.uiState).toBe('user-shown');
+
+      // Check that tooltip is not rendered automatically when table is removed and rendered again
+      table.remove();
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
+      expect(table.tableStatus.uiState).toBe('auto-hidden');
+    });
+
+    it("hides INFO tooltip when user clicks in table", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.tableStatusVisible = true;
+      model.tableStatus = {
+        severity: scout.Status.Severity.INFO,
+        message: 'Table has an information'
+      };
+      var table = helper.createTable(model);
+      expect(table.tableStatus.uiState).toBe(undefined);
+
+      // Check visible
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.tableStatus.uiState).toBe('auto-hidden'); // because auto-removal is already scheduled at INFO level
+
+      // Click "outside" (first row)
+      table.$rows().eq(0).trigger('mousedown');
+
+      // Check invisible
+      expect(table.footer._tableStatusTooltip).toBe(null);
+      expect(table.tableStatus.uiState).toBe('auto-hidden');
+    });
+
+    it("does not hide ERROR tooltip when user clicks in table", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.tableStatusVisible = true;
+      model.tableStatus = {
+        severity: scout.Status.Severity.ERROR,
+        message: 'Table has an error'
+      };
+      var table = helper.createTable(model);
+      expect(table.tableStatus.uiState).toBe(undefined);
+
+      // Check visible
+      table.render(session.$entryPoint);
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.tableStatus.uiState).toBe(undefined);
+
+      // Click "outside" (first row)
+      table.$rows().eq(0).trigger('mousedown');
+
+      // Check invisible
+      expect(table.footer._tableStatusTooltip.rendered).toBe(true);
+      expect(table.tableStatus.uiState).toBe(undefined);
+    });
+
+  });
+
 });

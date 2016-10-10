@@ -307,15 +307,18 @@ scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
 scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
   var visible = this.table.tableStatus;
   if (visible) {
-    // If the uiState of the tableStatus was not yet manually changed, or the user
-    // explicitly activated it (relevant when changing pages), show the tooltip
-    // when the "info visible" animation has finished. Otherwise, we don't show
-    // the tooltip to not disturb the user.
+    // If the uiState of the tableStatus was not set to hidden (either manually by the
+    // user or automatically by a timeout or other event), show the tooltip when the
+    // "info visible" animation has finished. Otherwise, we don't show the tooltip to
+    // not disturb the user.
     var complete = null;
-    if (this.table.tableStatus.uiState !== 'user-hidden') {
+    if (!scout.isOneOf(this.table.tableStatus.uiState, 'user-hidden', 'auto-hidden')) {
       this._$infoTableStatus.addClass('tooltip-active'); // color icon before animation starts
       complete = function() {
-        this._showTableStatusTooltip();
+        // Same check is required again, because this function is called asynchronously
+        if (this.table.tableStatus && !scout.isOneOf(this.table.tableStatus.uiState, 'user-hidden', 'auto-hidden')) {
+          this._showTableStatusTooltip();
+        }
       }.bind(this);
     }
     this._setInfoVisible(this._$infoTableStatus, true, complete);
@@ -499,12 +502,19 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
   this._$infoTableStatus.addClass('tooltip-active');
   this._tableStatusTooltip.on('remove', function() {
     this._$infoTableStatus.removeClass('tooltip-active');
+    // When the tooltip is removed (e.g. because of the auto-remove timeout, or
+    // The user clicked somewhere) set the uiStatus accordingly. Otherwise, it
+    // might pop up again when the table layout is revalidated.
+    clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
+    if (this.table.tableStatus && !this.table.tableStatus.isError()) {
+      this.table.tableStatus.uiState = 'auto-hidden';
+    }
   }.bind(this));
 
   // Auto-hide unimportant messages
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
   if (!tableStatus.isError() && !this.table.tableStatus.uiState) {
-    // Remember auto-hidden, in case the user changes outline before timeout elapses
+    // Already set status to 'auto-hidden', in case the user changes outline before timeout elapses
     this.table.tableStatus.uiState = 'auto-hidden';
     this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {
       this._hideTableStatusTooltip();
@@ -527,11 +537,13 @@ scout.TableFooter.prototype.onControlSelected = function(control) {
 scout.TableFooter.prototype._onStatusMousedown = function(event) {
   // Toggle tooltip
   if (this._tableStatusTooltip) {
-    this.table.tableStatus.uiState = 'user-hidden';
     this._hideTableStatusTooltip();
+    this.table.tableStatus.uiState = 'user-hidden';
   } else {
-    this.table.tableStatus.uiState = 'user-shown';
     this._showTableStatusTooltip();
+    if (this._tableStatusTooltip.rendered) {
+      this.table.tableStatus.uiState = 'user-shown';
+    }
   }
 };
 
