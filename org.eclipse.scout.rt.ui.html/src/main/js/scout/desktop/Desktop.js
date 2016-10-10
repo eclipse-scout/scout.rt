@@ -523,6 +523,7 @@ scout.Desktop.prototype.goOffline = function() {
     return;
   }
   this.offline = true;
+  this._removeOfflineNotification();
   this._offlineNotification = scout.create('DesktopNotification:Offline', {
     parent: this,
     closable: false,
@@ -536,15 +537,14 @@ scout.Desktop.prototype.goOffline = function() {
 };
 
 scout.Desktop.prototype.goOnline = function() {
-  if (!this._hideOfflineMessagePending) {
-    this.hideOfflineMessage();
-  }
+  this._removeOfflineNotification();
 };
 
-scout.Desktop.prototype.hideOfflineMessage = function() {
-  this._hideOfflineMessagePending = false;
-  this.removeNotification(this._offlineNotification);
-  this._offlineNotification = null;
+scout.Desktop.prototype._removeOfflineNotification = function() {
+  if (this._offlineNotification) {
+    setTimeout(this.removeNotification.bind(this, this._offlineNotification), 3000);
+    this._offlineNotification = null;
+  }
 };
 
 scout.Desktop.prototype.addNotification = function(notification) {
@@ -921,8 +921,7 @@ scout.Desktop.prototype.onReconnectingSucceeded = function() {
   }
   this.offline = false;
   this._offlineNotification.reconnectSucceeded();
-  this._hideOfflineMessagePending = true;
-  setTimeout(this.hideOfflineMessage.bind(this), 3000);
+  this._removeOfflineNotification();
 };
 
 scout.Desktop.prototype.onReconnectingFailed = function() {

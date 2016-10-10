@@ -771,9 +771,23 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
 scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown, request) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-  // Status code = 0 -> no connection
-  // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
-  var offline = (!jqXHR.status || jqXHR.status >= 12000);
+  var offline = (
+    // Status code = 0 -> no connection
+    !jqXHR.status ||
+    // Status code >= 12000 comes from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
+    jqXHR.status >= 12000 ||
+    // Status code 503 = Service Unavailable
+    // Status code 504 = Gateway Timeout
+    // Those codes usually happen when some network component between browser and UI server (e.g. a load balancer)
+    // has a short outage, most likely only temporarily. Therefore, we treat them like a lost connection.
+    // Otherwise, the polling loop would break, eventually causing the HTTP session to be invalidated on the
+    // server due to inactivity. Going offline starts the reconnector which regularly emits ping requests.
+    // This allows us to reconnect to the server as soon as the connection is fixed, hopefully saving the
+    // HTTP session from inactivation.
+    jqXHR.status === 503 ||
+    jqXHR.status === 504
+  );
+
   if (offline) {
     if (this.ready) {
       this.goOffline();
