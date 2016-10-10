@@ -71,6 +71,10 @@ scout.TextMap.prototype._exists = function(textKey) {
   return this.map.hasOwnProperty(textKey);
 };
 
+scout.TextMap.prototype.add = function(textKey, text) {
+  this.map[textKey] = text;
+};
+
 scout.TextMap.prototype.setParent = function(parent) {
   this.parent = parent;
 };

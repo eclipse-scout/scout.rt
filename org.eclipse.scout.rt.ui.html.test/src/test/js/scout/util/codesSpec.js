@@ -21,9 +21,9 @@ describe('scout.codes', function() {
         codes: [
           {
             id: 12346,
-            text: {
+            texts: {
               'de': 'Foo-de',
-              'default': 'Foo-default'
+              'en': 'Foo-en'
             }
           }
         ]
@@ -64,4 +64,23 @@ describe('scout.codes', function() {
     expect(func).toThrowError();
   });
 
+  describe('add', function() {
+    it('adds a code type or an array of code types', function() {
+      var codeType = {
+        id: 'codeType.123',
+        codes: [{
+          id: 'code.123',
+          text: 'a text'
+        }]
+      };
+      expect(scout.codes.registry['codeType.123']).toBeUndefined();
+
+      scout.codes.add(codeType);
+      expect(scout.codes.codeType('codeType.123').id).toBe('codeType.123');
+      expect(scout.codes.codeType('codeType.123').get('code.123').id).toBe('code.123');
+
+      // cleanup
+      delete scout.codes.registry['codeType.123'];
+    });
+  });
 });

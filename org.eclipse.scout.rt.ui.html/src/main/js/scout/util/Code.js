@@ -17,27 +17,26 @@ scout.Code.prototype.init = function(model) {
   this.id = model.id;
   this._text = model.text;
   this.modelClass = model.modelClass;
+
+  // If model contains a text map, generate a text key and add the texts to the text maps of the session
+  if (model.texts) {
+    if (this._text) {
+      throw new Error('Either set texts or text property, not both.');
+    }
+    var key = scout.codes.registerTexts(this, model.texts);
+    // Convert to ${textKey:key} so that text() may resolve it
+    this._text = scout.texts.buildKey(key);
+  }
 };
 
-scout.Code.prototype.text = function(locale) {
-  if (!scout.objects.isPlainObject(this._text)) {
-    return this._text; // FIXME [awe] 6.1 support for (plain) text or text like '${textKey:foo.bar}' - should we pass session instead of locale?
+/**
+ * @param vararg the language tag or the locale (object with a property languageTag) to load the text for.
+ */
+scout.Code.prototype.text = function(vararg) {
+  var languageTag = vararg;
+  if (typeof vararg === 'object') {
+    languageTag = vararg.languageTag;
   }
-
-  var i, text,
-    tags = scout.texts.splitLanguageTag(locale.languageTag);
-  for (i = 0; i < tags.length; i++) {
-    text = this._text[tags[i]];
-    if (text) {
-      break;
-    }
-  }
-  if (!text) { // FIXME [awe] 6.1 - review this with C.GU. Can we reuse parts of TextMap for this? How to define 'default' language?
-    text = this._text['default'];
-  }
-  if (!text) {
-    text = '[missing text for code ' + this.id + ']';
-  }
-  return text;
+  return scout.texts.resolveText(this._text, languageTag);
 };
 

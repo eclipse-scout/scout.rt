@@ -10,6 +10,11 @@
  ******************************************************************************/
 scout.codes = {
 
+  /**
+   * This default language is used whenever a code registers its texts in scout.texts.
+   */
+  defaultLanguage: 'en',
+
   registry: {},
 
   bootstrap: function() {
@@ -73,6 +78,32 @@ scout.codes = {
       throw new Error('No CodeType found for id=' + codeTypeId);
     }
     return codeType;
+  },
+
+  generateTextKey: function(code) {
+    // Use __ as prefix to reduce the possibility of overriding 'real' keys
+    return '__code.' + code.id;
+  },
+
+  /**
+   * Registers texts for a code. It uses the method generateTextKey to generate the text key.
+   * The texts for the default locale specified by scout.codes.defaultLanguage are used as default texts.
+   *
+   * @param code the code to register the text for
+   * @param texts an object with the languageTag as key and the translated text as value
+   * @return the generated text key
+   */
+  registerTexts: function(code, texts) {
+    var key = scout.codes.generateTextKey(code);
+    for (var languageTag in texts) { // NOSONAR
+      var text = texts[languageTag];
+      // Use defaultLanguage as default, if specified (may be changed or set to null by the app).
+      if (languageTag && languageTag === this.defaultLanguage) {
+        languageTag = 'default';
+      }
+      scout.texts.get(languageTag).add(key, text);
+    }
+    return key;
   }
 
 };

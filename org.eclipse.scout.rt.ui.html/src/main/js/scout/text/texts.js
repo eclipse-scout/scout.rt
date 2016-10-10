@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.texts = {
 
-  TEXT_KEY_REGEX: /\$\{textKey\:([a-zA-Z0-9\.]*)\}/,
+  TEXT_KEY_REGEX: /\$\{textKey\:([^\}]*)\}/,
 
   textsByLocale: {},
 
@@ -76,16 +76,18 @@ scout.texts = {
   },
 
   /**
-   * Returns the Texts object for the given language tag.
+   * Returns the (modifiable) TextMap for the given language tag.
    */
   get: function(languageTag) {
     var texts = this._get(languageTag);
-    if (!texts) {
-      this.link(languageTag);
+    if (texts) {
+      return texts;
     }
+
+    this.link(languageTag);
     texts = this._get(languageTag);
     if (!texts) {
-      throw new Error('texts still missing.');
+      throw new Error('Texts missing for the language tag ' + languageTag);
     }
     return texts;
   },
@@ -117,15 +119,41 @@ scout.texts = {
     return textMap;
   },
 
+  /**
+   * @param key to convert into a string with the form '${textKey:AKey}'.
+   * @return text containing the text key like like '${textKey:AKey}'.
+   */
+  buildKey: function(key) {
+    return '${textKey:' + key + '}';
+  },
+
+  /**
+   * @param value text which contains a text key like '${textKey:AKey}'.
+   * @return the resolved key or the unchanged value if the text key could not be extracted.
+   */
   resolveKey: function(value) {
     var result = this.TEXT_KEY_REGEX.exec(value);
     if (result && result.length === 2) {
       return result[1];
     }
+    return value;
   },
 
   /**
-   * Utility function to easily replace an object property which contains a text-key like ${textKey:Version}.
+   * @param value text which contains a text key like '${textKey:AKey}'.
+   * @param languageTag the languageTag to use for the text lookup with the resolved key.
+   * @return the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
+   */
+  resolveText: function(value, languageTag) {
+    var key = scout.texts.resolveKey(value);
+    if (key !== value) {
+      return scout.texts.get(languageTag).get(key);
+    }
+    return value;
+  },
+
+  /**
+   * Utility function to easily replace an object property which contains a text key like '${textKey:AKey}'.
    *
    * @param object object having a text property which contains a text-key
    * @param textProperty (optional) name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
@@ -134,9 +162,10 @@ scout.texts = {
   resolveTextProperty: function(object, textProperty, session) {
     textProperty = textProperty || 'text';
     session = object.session || session;
-    var key = scout.texts.resolveKey(object[textProperty]);
-    if (key) {
-      object[textProperty] = session.text(key);
+    var value = object[textProperty];
+    var text = this.resolveText(value, session.locale.languageTag);
+    if (text !== value) {
+      object[textProperty] = text;
     }
   }
 };
