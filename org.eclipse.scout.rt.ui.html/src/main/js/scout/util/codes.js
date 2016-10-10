@@ -20,8 +20,17 @@ scout.codes = {
   init: function(data) {
     data = data || {};
     Object.keys(data).forEach(function(codeTypeId) {
-      var codeType = new scout.CodeType();
-      codeType.init(data[codeTypeId]);
+      this.add(data[codeTypeId]);
+    }, this);
+  },
+
+  /**
+   * @param codes one or more codeTypes, maybe an object or an array
+   */
+  add: function(codeTypes) {
+    codeTypes = scout.arrays.ensure(codeTypes);
+    codeTypes.forEach(function(codeType) {
+      codeType = scout.CodeType.ensure(codeType);
       this.registry[codeType.id] = codeType;
     }, this);
   },

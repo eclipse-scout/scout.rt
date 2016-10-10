@@ -41,3 +41,13 @@ scout.CodeType.prototype.get = function(codeId) {
   }
   return code;
 };
+
+scout.CodeType.ensure = function(codeType) {
+  if (!codeType) {
+    return codeType;
+  }
+  if (codeType instanceof scout.CodeType) {
+    return codeType;
+  }
+  return scout.create('CodeType', codeType);
+};
