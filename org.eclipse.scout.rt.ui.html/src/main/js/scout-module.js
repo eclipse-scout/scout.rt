@@ -13,6 +13,7 @@
   __include("scout/main.js");
   __include("scout/App.js");
   __include("scout/RemoteApp.js");
+  __include("scout/Extension.js");
   __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
   __include("scout/widget/LoadingSupport.js");

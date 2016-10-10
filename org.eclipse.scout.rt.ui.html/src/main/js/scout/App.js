@@ -68,6 +68,8 @@ scout.App.prototype._init = function(options) {
   scout._installGlobalMouseDownInterceptor(document);
   scout._globalAjaxSetup();
 
+  this.installExtensions();
+
   $('.scout').each(function(i, elem) {
     var $entryPoint = $(elem);
     options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
@@ -116,4 +118,13 @@ scout.App.prototype.onDesktopReady = function(desktop) {
   // NOP
 };
 
-
+/**
+ * Override this method to install extensions to Scout objects. Since the extension feature replaces functions
+ * on the prototype of the Scout objects you must apply 'function patches' to Scout framework or other code before
+ * the extensions are installed.
+ *
+ * The default implementation does nothing.
+ */
+scout.App.prototype.installExtensions = function() {
+  // NOP
+};
