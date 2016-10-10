@@ -20,7 +20,8 @@ scout.inherits(scout.PageWithNodes, scout.Page);
 scout.PageWithNodes.prototype._createTable = function() {
   var nodeColumn = scout.create('Column', {
     index: 0,
-    id: 'NodeColumn'
+    id: 'NodeColumn',
+    session: this.session
   });
   var table = scout.create('Table', {
     parent: this.parent,
