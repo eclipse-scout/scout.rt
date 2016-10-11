@@ -315,6 +315,20 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getCssClass();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CONTEXT_COLUMN, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getContextColumn();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (value == null) {
+          return null;
+        }
+        return m_jsonColumns.get(value).getId();
+      }
+    });
   }
 
   @Override
@@ -516,6 +530,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (ITable.PROP_CONTEXT_COLUMN.equals(propertyName)) {
+      String contextColumnId = data.optString(propertyName);
+      IColumn column = optColumn(contextColumnId);
+      addPropertyEventFilterCondition(ITable.PROP_CONTEXT_COLUMN, column);
+      getModel().getUIFacade().setContextColumnFromUI(column);
+    }
+  }
+
   protected void handleUiColumnOrganizeAction(JsonEvent event) {
     JSONObject data = event.getData();
     String action = data.getString("action");
@@ -541,10 +565,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       LOG.info("Requested table-row doesn't exist anymore -> skip rowClicked event");
       return;
     }
-    IColumn column = extractColumn(event.getData());
     ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
     rows.add(tableRow);
-    getModel().getUIFacade().setContextColumnFromUI(column);
     MouseButton mouseButton = extractMouseButton(event.getData());
     getModel().getUIFacade().fireRowClickFromUI(tableRow, mouseButton);
   }

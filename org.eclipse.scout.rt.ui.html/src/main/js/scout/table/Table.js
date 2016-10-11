@@ -52,6 +52,7 @@ scout.Table = function(model) {
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
   this.virtual = true;
+  this.contextColumn;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -89,6 +90,7 @@ scout.Table.prototype._init = function(model) {
   this._syncMenus(this.menus);
   this._syncTableControls(this.tableControls);
   this._syncTableStatus(this.tableStatus);
+  this._syncContextColumn(this.contextColumn);
   this._applyFilters(this.rows);
   this._calculateValuesForBackgroundEffect();
   this._group();
@@ -359,6 +361,7 @@ scout.Table.prototype._onRowMouseDown = function(event) {
     var row = this._$mouseDownRow.data('row');
     this.checkRow(row, !row.checked);
   }
+  this.setContextColumn(this._columnAtX(event.pageX));
 };
 
 scout.Table.prototype._onRowMouseUp = function(event) {
@@ -390,10 +393,8 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   }
   if ($appLink) {
     this._sendAppLinkAction(column.id, $appLink.data('ref'));
-  } else if (column.guiOnly) {
-    this._sendRowClicked($row, mouseButton);
   } else {
-    this._sendRowClicked($row, mouseButton, column.id);
+    this._sendRowClicked($row, mouseButton);
   }
 };
 
@@ -475,6 +476,28 @@ scout.Table.prototype._renderTableStatus = function() {
 
 scout.Table.prototype._renderLoading = function() {
   this.loadingSupport.renderLoading();
+};
+
+scout.Table.prototype.setContextColumn = function(contextColumn) {
+  if (this.contextColumn === contextColumn) {
+    return;
+  }
+  this._setProperty('contextColumn', contextColumn);
+  var data = {
+    contextColumn: contextColumn.id
+  };
+  if (contextColumn.guiOnly) {
+    data.contextColumn = null;
+  }
+  this._send('property', data);
+};
+
+scout.Table.prototype._syncContextColumn = function(contextColumnId) {
+  this.contextColumn = this._columnById(contextColumnId);
+};
+
+scout.Table.prototype._renderContextColumn = function() {
+  // nop
 };
 
 scout.Table.prototype._hasVisibleTableControls = function() {
@@ -1449,14 +1472,11 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
   this._updateMenuBar();
 };
 
-scout.Table.prototype._sendRowClicked = function($row, mouseButton, columnId) {
+scout.Table.prototype._sendRowClicked = function($row, mouseButton) {
   var data = {
     rowId: $row.data('row').id,
     mouseButton: mouseButton
   };
-  if (columnId !== undefined) {
-    data.columnId = columnId;
-  }
   this._send('rowClicked', data);
 };
 
