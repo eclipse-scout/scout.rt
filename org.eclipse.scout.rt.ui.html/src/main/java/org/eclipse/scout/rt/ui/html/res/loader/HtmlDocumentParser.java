@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
@@ -157,7 +158,7 @@ public class HtmlDocumentParser {
       return null;
     }
     String fingerprint = Long.toHexString(script.getResource().getFingerprint());
-    return new Pair<>(script, fingerprint);
+    return new ImmutablePair<>(script, fingerprint);
   }
 
   /**

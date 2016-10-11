@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -151,7 +152,7 @@ public class FormBasedAccessController implements IAccessController {
       return null;
     }
 
-    return new Pair<>(user, password.toCharArray());
+    return new ImmutablePair<>(user, password.toCharArray());
   }
 
   /**

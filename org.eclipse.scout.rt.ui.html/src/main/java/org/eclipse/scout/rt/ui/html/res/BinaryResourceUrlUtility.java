@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -135,7 +136,7 @@ public final class BinaryResourceUrlUtility {
       fingerprint = Long.valueOf(fingerprintString);
     }
 
-    return new Pair<>(filename, fingerprint);
+    return new ImmutablePair<>(filename, fingerprint);
   }
 
   private static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {

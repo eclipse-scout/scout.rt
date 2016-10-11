@@ -1,35 +1,24 @@
 package org.eclipse.scout.rt.platform.util;
 
 /**
- * A simple pair class, having two properties <code>left</code> and <code>right</code> with different generic types.
+ * A simple abstract pair class, having two properties <code>left</code> and <code>right</code> with different generic
+ * types. See {@link MutablePair} and {@link ImmutablePair} for implementations.
  *
  * @since 6.0
  */
-public class Pair<L, R> {
+@SuppressWarnings("squid:S00118")
+public abstract class Pair<L, R> {
 
-  private final L m_left;
+  public abstract L getLeft();
 
-  private final R m_right;
-
-  public Pair(L left, R right) {
-    m_left = left;
-    m_right = right;
-  }
-
-  public L getLeft() {
-    return m_left;
-  }
-
-  public R getRight() {
-    return m_right;
-  }
+  public abstract R getRight();
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((m_left == null) ? 0 : m_left.hashCode());
-    result = prime * result + ((m_right == null) ? 0 : m_right.hashCode());
+    result = prime * result + ((getLeft() == null) ? 0 : getLeft().hashCode());
+    result = prime * result + ((getRight() == null) ? 0 : getRight().hashCode());
     return result;
   }
 
@@ -45,20 +34,20 @@ public class Pair<L, R> {
       return false;
     }
     Pair other = (Pair) obj;
-    if (m_left == null) {
-      if (other.m_left != null) {
+    if (getLeft() == null) {
+      if (other.getLeft() != null) {
         return false;
       }
     }
-    else if (!m_left.equals(other.m_left)) {
+    else if (!getLeft().equals(other.getLeft())) {
       return false;
     }
-    if (m_right == null) {
-      if (other.m_right != null) {
+    if (getRight() == null) {
+      if (other.getRight() != null) {
         return false;
       }
     }
-    else if (!m_right.equals(other.m_right)) {
+    else if (!getRight().equals(other.getRight())) {
       return false;
     }
     return true;
@@ -67,9 +56,8 @@ public class Pair<L, R> {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
-        .attr("left", m_left)
-        .attr("right", m_right)
+        .attr("left", getLeft())
+        .attr("right", getRight())
         .toString();
   }
-
 }
