@@ -13,7 +13,7 @@ scout.LoginBox = function() {
 
   this.postDataType;
   this.authUrl = 'auth';
-  this.onPostDoneFunc = function() {};
+  this.onPostDoneFunc = this.redirect.bind(this);
   this.redirectUrl;
   this.logoUrl = 'res/logo.png';
   this.userDataKey = 'user';
@@ -34,10 +34,6 @@ scout.LoginBox.prototype.init = function(options) {
   options = options || {};
   options.texts = new scout.TextMap($.extend(this.texts, options.texts));
   $.extend(this, options);
-
-  if (this.redirectUrl) {
-    this.onPostDoneFunc = this.redirect;
-  }
 };
 
 scout.LoginBox.prototype.render = function($parent) {
