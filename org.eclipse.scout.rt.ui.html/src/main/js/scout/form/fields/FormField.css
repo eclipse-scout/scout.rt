@@ -30,6 +30,12 @@
     position: absolute;
   }
 
+  /* Class that applies the same vertical padding to the .field as to the label (useful e.g. for html fields) */
+  &.borderless-field-padding-y > .field {
+    padding-top: @borderless-field-padding-y;
+    padding-bottom: @borderless-field-padding-y;
+  }
+
   & > .mandatory-indicator {
     position: absolute;
     visibility: hidden;
