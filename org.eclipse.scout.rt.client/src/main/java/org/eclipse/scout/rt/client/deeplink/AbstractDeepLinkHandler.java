@@ -55,6 +55,13 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
     }
   }
 
+  /**
+   * Implement logic to display the deep-link's corresponding entity. If the handler is not able to process the
+   * deep-link URL a {@link DeepLinkException} must be thrown to ensure correct handling in the UI.
+   *
+   * @param matcher
+   * @throws DeepLinkException
+   */
   protected abstract void handleImpl(Matcher matcher) throws DeepLinkException;
 
 }
