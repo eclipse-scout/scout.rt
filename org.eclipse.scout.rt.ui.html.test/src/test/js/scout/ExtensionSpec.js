@@ -31,9 +31,10 @@ describe('Extension', function() {
     scout.inherits(scout.MyExtension1, scout.Extension);
 
     scout.MyExtension1.prototype.init = function() {
-      this.extend(scout.MyStringField.prototype, '_init');
-      this.extend(scout.MyStringField.prototype, '_renderProperties');
-      this.extend(scout.MyStringField.prototype, '_renderInputMasked');
+      var proto = scout.MyStringField.prototype;
+      this.extend(proto, '_init');
+      this.extend(proto, '_renderProperties');
+      this.extend(proto, '_renderInputMasked');
     };
 
     scout.MyExtension1.prototype._init = function(model) {
@@ -60,8 +61,9 @@ describe('Extension', function() {
     scout.inherits(scout.MyExtension2, scout.Extension);
 
     scout.MyExtension2.prototype.init = function() {
-      this.extend(scout.MyStringField.prototype, '_init');
-      this.extend(scout.MyStringField.prototype, '_renderProperties');
+      var proto = scout.MyStringField.prototype;
+      this.extend(proto, '_init');
+      this.extend(proto, '_renderProperties');
     };
 
     scout.MyExtension2.prototype._init = function(model) {

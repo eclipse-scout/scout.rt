@@ -519,6 +519,29 @@ describe('Column', function() {
     });
   });
 
+  describe('cell getters', function() {
+
+    it('cell() should return cell of given row', function() {
+      var model = helper.createModelFixture(3, 2);
+      var table = helper.createTable(model);
+      var row1 = table.rows[1];
+      var column1 = table.columns[1];
+      var cell1 = row1.cells[1];
+      expect(column1.cell(row1)).toBe(cell1);
+    });
+
+    it('selectedCell() should return cell from selected row', function() {
+      var model = helper.createModelFixture(3, 2);
+      var table = helper.createTable(model);
+      var row1 = table.rows[1];
+      var column1 = table.columns[1];
+      var cell1 = row1.cells[1];
+      table.selectRows([row1]);
+      expect(column1.selectedCell()).toBe(cell1);
+    });
+
+  });
+
   describe('calculateMinMaxValues', function() {
     it('calculates the min/max values based on rounded values', function() {
       var model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');

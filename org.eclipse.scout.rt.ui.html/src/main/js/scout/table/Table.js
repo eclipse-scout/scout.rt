@@ -2415,6 +2415,16 @@ scout.Table.prototype.$aggregateRows = function() {
   return this.$data.find('.table-aggregate-row');
 };
 
+/**
+ * @returns the first selected row of this table or null when no row is selected
+ */
+scout.Table.prototype.selectedRow = function() {
+  if (this.selectedRows.length > 0) {
+    return this.selectedRows[0];
+  }
+  return null;
+};
+
 scout.Table.prototype.$selectedRows = function() {
   if (!this.$data) {
     return $();
@@ -2447,7 +2457,7 @@ scout.Table.prototype.$cell = function(column, $row) {
   return $row.children().eq(columnIndex);
 };
 
-scout.Table.prototype._columnById = function(columnId) {
+scout.Table.prototype._columnById = function(columnId) { // FIXME [awe] 6.1 make this public
   return scout.arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });

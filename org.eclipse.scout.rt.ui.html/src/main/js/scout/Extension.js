@@ -54,8 +54,4 @@ scout.Extension.prototype.extend = function(extended, funcName) {
  * @param extensions an Array of strings containing extension class names
  * @static
  */
-scout.Extension.install = function(extensions) {
-  extensions.forEach(function(ext) {
-    scout.create(ext);
-  });
-};
+

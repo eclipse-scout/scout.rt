@@ -637,6 +637,16 @@ describe("Table", function() {
       expect(eventTriggered).toBe(true);
     });
 
+    it("selectedRow() returns first selected row or null when table has no selection", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.selectRows([table.rows[1], table.rows[2]]);
+      expect(table.selectedRow()).toBe(table.rows[1]);
+
+      table.selectRows([]);
+      expect(table.selectedRow()).toBe(null);
+    });
+
   });
 
   describe("toggle selection", function() {

@@ -58,6 +58,7 @@
     "Menu": {
       "defaultMenu": false,
       "separator": false,
+      "outlineMenuWrapper": false,
       "childActions": [],
       "menuTypes": ["Table.EmptySpace"]
     },

@@ -98,7 +98,7 @@ scout.Column.prototype._initCell = function(cellModel) {
 };
 
 scout.Column.prototype.buildCellForRow = function(row) {
-  var cell = this.table.cell(this, row);
+  var cell = this.cell(row);
   return this.buildCell(cell, row);
 };
 
@@ -225,7 +225,7 @@ scout.Column.prototype._cellStyle = function(cell) {
 
 scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
-    cell = this.table.cell(this, row);
+    cell = this.cell(row);
 
   if (this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey) {
     this.table.prepareCellEdit(this, row, true);
@@ -235,7 +235,7 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
 scout.Column.prototype.startCellEdit = function(row, field) {
   var popup,
     $row = row.$row,
-    cell = this.table.cell(this, row),
+    cell = this.cell(row),
     $cell = this.table.$cell(this, $row);
 
   cell.field = field;
@@ -255,10 +255,10 @@ scout.Column.prototype.startCellEdit = function(row, field) {
 
 // TODO CGU/AWE cleanup these cellValue/TextForXY methods, currently they are very confusing
 /**
- * Returns the cell value to be used for grouping and filtering (chart, column filter).
+ * @returns the cell value to be used for grouping and filtering (chart, column filter).
  */
 scout.Column.prototype.cellValueForGrouping = function(row) {
-  var cell = this.table.cell(this, row);
+  var cell = this.cell(row);
   if (cell.value !== undefined) {
     return this._preprocessValueForGrouping(cell.value);
   }
@@ -281,11 +281,26 @@ scout.Column.prototype._preprocessTextForValueGrouping = function(text, htmlEnab
 };
 
 /**
- * Returns the cell text to be used for table grouping
+ * @returns the cell text to be used for table grouping
  */
 scout.Column.prototype.cellTextForGrouping = function(row) {
-  var cell = this.table.cell(this, row);
+  var cell = this.cell(row);
   return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
+};
+
+/**
+ * @returns the cell object for this column from the given row.
+ */
+scout.Column.prototype.cell = function(row) {
+  return this.table.cell(this, row);
+};
+
+/**
+ * @returns the cell object for this column from the first selected row in the table.
+ */
+scout.Column.prototype.selectedCell = function() {
+  var selectedRow = this.table.selectedRow();
+  return this.table.cell(this, selectedRow);
 };
 
 scout.Column.prototype._preprocessTextForGrouping = function(text, htmlEnabled) {
@@ -296,10 +311,10 @@ scout.Column.prototype._preprocessTextForGrouping = function(text, htmlEnabled) 
 };
 
 /**
- * Returns the cell text to be used for the text filter
+ * @returns the cell text to be used for the text filter
  */
 scout.Column.prototype.cellTextForTextFilter = function(row) {
-  var cell = this.table.cell(this, row);
+  var cell = this.cell(row);
   return this._preprocessTextForTextFilter(cell.text, cell.htmlEnabled);
 };
 
@@ -355,7 +370,7 @@ scout.Column.prototype.setAggregationFunction = function(func) {
 };
 
 scout.Column.prototype.createAggrGroupCell = function(row) {
-  var cell = this.table.cell(this, row);
+  var cell = this.cell(row);
   return {
     // value necessary for value based columns (e.g. checkbox column)
     value: cell.value,
@@ -436,7 +451,7 @@ scout.Column.prototype._renderBackgroundEffect = function() {
     if (!row.$row) {
       return;
     }
-    var cell = this.table.cell(this, row),
+    var cell = this.cell(row),
       $cell = this.table.$cell(this, row.$row);
 
     if (cell.value !== undefined) {
