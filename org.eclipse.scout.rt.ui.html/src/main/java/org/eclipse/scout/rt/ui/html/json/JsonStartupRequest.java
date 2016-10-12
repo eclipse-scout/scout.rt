@@ -79,12 +79,13 @@ public class JsonStartupRequest extends JsonRequest {
     if (params == null) {
       return Collections.emptyMap();
     }
-
     Map<String, String> map = new HashMap<>(params.length());
     JSONArray names = params.names();
-    for (int i = 0; i < names.length(); i++) {
-      String name = names.getString(i);
-      map.put(name, params.getString(name));
+    if (names != null) {
+      for (int i = 0; i < names.length(); i++) {
+        String name = names.getString(i);
+        map.put(name, params.optString(name, null));
+      }
     }
     return Collections.unmodifiableMap(map);
   }
