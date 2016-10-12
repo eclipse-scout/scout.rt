@@ -412,7 +412,7 @@ scout.FormField.prototype.focus = function() {
   if (this.$field) {
     this.session.focusManager.requestFocus(this.$field[0]);
   } else {
-    var element =  this.session.focusManager.findFirstFocusableElement(this.$container);
+    var element = this.session.focusManager.findFirstFocusableElement(this.$container);
     this.session.focusManager.requestFocus(element);
   }
 };
@@ -473,6 +473,12 @@ scout.FormField.prototype._showStatusMessage = function() {
       // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
       this.tooltip.remove();
       this.tooltip = null;
+    }
+
+    // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
+    // (Parsing and validation will be handled by the cell/column itself)
+    if (this.mode === scout.FormField.MODE_CELLEDITOR) {
+      return;
     }
   }
 
