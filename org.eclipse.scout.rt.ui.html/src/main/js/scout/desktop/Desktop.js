@@ -581,8 +581,8 @@ scout.Desktop.prototype._goOnline = function() {
 scout.Desktop.prototype._removeOfflineNotification = function() {
   if (this._offlineNotification) {
     setTimeout(this.removeNotification.bind(this, this._offlineNotification), 3000);
+    this._offlineNotification = null;
   }
-  this._offlineNotification = null;
 };
 
 scout.Desktop.prototype.addNotification = function(notification) {
