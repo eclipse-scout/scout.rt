@@ -28,7 +28,15 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -72,7 +80,7 @@ public class JettyServer {
 
     String contextPath = "/";
     String contextPathConfig = System.getProperty(WEB_APP_CONTEXT_PATH);
-    if (contextPathConfig != null && StringUtility.hasText(contextPathConfig)) {
+    if (StringUtility.hasText(contextPathConfig)) {
       if (!contextPathConfig.startsWith("/")) {
         contextPathConfig = "/" + contextPathConfig;
       }
@@ -80,8 +88,9 @@ public class JettyServer {
     }
 
     WebAppContext webApp = createWebApp(webappFolder, contextPath);
+    Handler serverHandler = createServerHandler(webApp);
     Server server = new Server(port);
-    server.setHandler(webApp);
+    server.setHandler(serverHandler);
     server.start();
     startConsoleHandler(server);
     if (LOG.isInfoEnabled()) {
@@ -101,7 +110,7 @@ public class JettyServer {
     }
   }
 
-  private void startConsoleHandler(final Server server) {
+  protected void startConsoleHandler(final Server server) {
     Thread t = new Thread("Console input handler") {
       @Override
       public void run() {
@@ -152,6 +161,25 @@ public class JettyServer {
     });
 
     webAppContext.configure();
+    return webAppContext;
+  }
+
+  /**
+   * @return the main handler to be set to the {@link Server}. The default implementation just returns the given
+   *         {@link WebAppContext}, unless a special context path is set. In that case, it wraps the given
+   *         <code>webAppContext</code> in a {@link P_RedirectToContextPathHandler} which redirects all GET requests to
+   *         URIs outside the context path to the context path.
+   *         <p>
+   *         This simplifies the use of a custom context path by redirecting all requests that do NOT start with the
+   *         specified context path to the context path (e.g. /login?debug=true to /myapp/login?debug=true). Custom
+   *         context paths are required when multiple Scout UI servers are run in parallel with different ports, because
+   *         otherwise they would destroy each others HTTP session (cookies are not specific to the port, only to the
+   *         host and context path).
+   */
+  protected Handler createServerHandler(WebAppContext webAppContext) {
+    if (!"/".equals(webAppContext.getContextPath())) {
+      return new P_RedirectToContextPathHandler(webAppContext);
+    }
     return webAppContext;
   }
 
@@ -211,6 +239,80 @@ public class JettyServer {
   }
 
   /**
+   * {@link Handler} that can be set as the {@link Server}s main handler. It wraps the given {@link ContextHandler} and
+   * redirects all GET requests for URIs outside of the context path to the context path. Non-GET requests are
+   * <i>not</i> redirected.
+   * <p>
+   * Example for contextPath = <code>/myapp</code>:
+   * <table border=1 cellspacing=0 cellpadding=3>
+   * <tr>
+   * <th>Request URI</th>
+   * <th>Redirected to</th>
+   * </tr>
+   * <tr>
+   * <td><code>/</code></td>
+   * <td><code>/myapp/</code></td>
+   * </tr>
+   * <tr>
+   * <td><code>/?param=1</code></td>
+   * <td><code>/myapp/?param=1</code></td>
+   * </tr>
+   * <tr>
+   * <td><code>/login</code></td>
+   * <td><code>/myapp/login</code></td>
+   * </tr>
+   * <tr>
+   * <td><code>/myapp</code></td>
+   * <td><i>not redirected</i></td>
+   * </tr>
+   * <tr>
+   * <td><code>/myapp/myservlet</code></td>
+   * <td><i>not redirected</i></td>
+   * </tr>
+   * </table>
+   */
+  protected class P_RedirectToContextPathHandler extends HandlerWrapper {
+
+    protected final String m_contextPath;
+
+    public P_RedirectToContextPathHandler(ContextHandler contextHandler) {
+      setHandler(contextHandler);
+      m_contextPath = contextHandler.getContextPath();
+    }
+
+    @Override
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+      // No redirection for non-GET requests
+      if (!"GET".equals(request.getMethod())) {
+        super.handle(target, baseRequest, request, response);
+        return;
+      }
+
+      // If requestURI starts with context path, redirect is not necessary -> delegate to original context handler
+      String requestURI = StringUtility.nvl(request.getRequestURI(), "/");
+      if (!"GET".equals(request.getMethod()) || requestURI.startsWith(m_contextPath)) {
+        super.handle(target, baseRequest, request, response);
+        return;
+      }
+
+      // Otherwise redirect to the specified context path (while preserving all other parts of the URI)
+      StringBuilder redirectUri = new StringBuilder();
+      redirectUri.append(request.getScheme()).append("://").append(request.getServerName());
+      if (("http".equals(request.getScheme()) && request.getServerPort() != 80) || ("https".equals(request.getScheme()) && request.getServerPort() != 443)) {
+        redirectUri.append(":").append(request.getServerPort());
+      }
+      redirectUri.append(m_contextPath);
+      if (!"/".equals(requestURI)) {
+        redirectUri.append(requestURI);
+      }
+      if (request.getQueryString() != null) {
+        redirectUri.append("?").append(request.getQueryString());
+      }
+      response.sendRedirect(redirectUri.toString());
+    }
+  }
+
+  /**
    * Returns a directory-like listing of all the paths to resources which are located in other (dependent) JAR files.
    * Those JAR files are placed in the web application's '/WEB-INF/lib' directory, and their resources located in the
    * '/META-INF/resources' folder.
@@ -220,7 +322,7 @@ public class JettyServer {
    *
    * @see 'javax.servlet.ServletContext.getResourcePaths(String)' for the specification.
    */
-  static Set<String> getResourcePathsFromDependentJars(ClassLoader classloader, String path) {
+  protected static Set<String> getResourcePathsFromDependentJars(ClassLoader classloader, String path) {
     path = path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH;
 
     Set<String> resources = new HashSet<>();
@@ -252,7 +354,7 @@ public class JettyServer {
   /**
    * Returns all direct files contained in the directory 'absoluteDirectoryPath'.
    */
-  private static Set<String> listFilesFromDirectory(String absoluteDirectoryPath, String relativeDirectorySearchPath) {
+  protected static Set<String> listFilesFromDirectory(String absoluteDirectoryPath, String relativeDirectorySearchPath) {
     File[] listFiles = new File(absoluteDirectoryPath).listFiles();
     if (listFiles == null || listFiles.length < 1) {
       return Collections.emptySet();
@@ -268,7 +370,7 @@ public class JettyServer {
   /**
    * Returns all direct files contained in a JAR in the directory 'absoluteDirectoryPath'.
    */
-  private static Set<String> listFilesFromJar(String absoluteDirectoryPath, String relativeDirectorySearchPath) throws IOException {
+  protected static Set<String> listFilesFromJar(String absoluteDirectoryPath, String relativeDirectorySearchPath) throws IOException {
     Set<String> resources = new HashSet<>();
 
     String absoluteJarFilePath = absoluteDirectoryPath.substring(0, absoluteDirectoryPath.indexOf('!')); // path to the JAR file.
