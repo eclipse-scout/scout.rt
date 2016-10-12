@@ -95,7 +95,6 @@ scout.FormField.DisabledStyle = {
   READ_ONLY: 1
 };
 
-
 /**
  * @override
  */
@@ -432,7 +431,7 @@ scout.FormField.prototype.focus = function() {
   if (this.$field) {
     this.session.focusManager.requestFocus(this.$field[0]);
   } else {
-    var element =  this.session.focusManager.findFirstFocusableElement(this.$container);
+    var element = this.session.focusManager.findFirstFocusableElement(this.$container);
     this.session.focusManager.requestFocus(element);
   }
 };
@@ -492,6 +491,12 @@ scout.FormField.prototype._showStatusMessage = function() {
     if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
       // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
       this.tooltip.destroy();
+    }
+
+    // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
+    // (parsing and validation will be handled by the cell/column itself)
+    if (this.mode === scout.FormField.MODE_CELLEDITOR) {
+      return;
     }
   }
 
