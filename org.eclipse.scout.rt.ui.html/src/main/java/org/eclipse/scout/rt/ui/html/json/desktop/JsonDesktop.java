@@ -451,7 +451,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelOutlineContentActivate() {
-    addActionEvent(EVENT_OUTLINE_CONTENT_ACTIVATE).protect();
+    addActionEvent(EVENT_OUTLINE_CONTENT_ACTIVATE);
   }
 
   protected void handleModelFormShow(IForm form) {
