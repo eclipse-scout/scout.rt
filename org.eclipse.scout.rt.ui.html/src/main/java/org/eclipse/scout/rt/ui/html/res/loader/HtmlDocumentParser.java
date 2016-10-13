@@ -216,7 +216,7 @@ public class HtmlDocumentParser {
         // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
         replacement = "\n" + replacement.trim() + "\n";
         m.appendReplacement(sb, replacement);
-        LOG.info("Resolved include '{}'", includeName);
+        LOG.debug("Resolved include '{}'", includeName);
       }
     }
     m.appendTail(sb);
