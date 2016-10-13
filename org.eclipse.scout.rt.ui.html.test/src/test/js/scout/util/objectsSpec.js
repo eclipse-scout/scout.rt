@@ -145,4 +145,74 @@ describe("scout.objects", function() {
     });
   });
 
+  describe('findChildObjectByKey', function() {
+
+    var obj = {
+      id: 'root',
+      value: '.root',
+      main: {
+        id: 'main',
+        value: '.root.main',
+        sub: {
+          id: 'subMain',
+          value: '.root.main.sub',
+          array: [{
+            id: 'arrayObj1',
+            value: '.root.main.sub.array.obj1'
+          }]
+        }
+      },
+      second: {
+        id: 'second',
+        value: '.root.second'
+      },
+      array: [{
+        array: [{
+          id: 'arrayObj2',
+          value: '.root.array.array.obj2',
+          sub: {
+            id: 'arrayObj2sub',
+            value: '.root.array.array.obj2.sub'
+          }
+        }]
+      }, {
+        id: 'arrayObj3',
+        value: '.root.array.obj3'
+      }]
+    };
+
+    it('find root object', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'id', 'root');
+      expect(child.value).toBe('.root');
+    });
+    it('find object in tree', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'id', 'subMain');
+      expect(child.value).toBe('.root.main.sub');
+    });
+    it('find object in array', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'id', 'arrayObj3');
+      expect(child.value).toBe('.root.array.obj3');
+    });
+    it('find object in nested array', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'id', 'arrayObj2sub');
+      expect(child.value).toBe('.root.array.array.obj2.sub');
+    });
+    it('find object in array within the tree', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'id', 'arrayObj1');
+      expect(child.value).toBe('.root.main.sub.array.obj1');
+    });
+    it('search for not existing property', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'nope', 'arrayObj1');
+      expect(child).toBe(null);
+    });
+    it('search for not existing id', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'id', 'nope');
+      expect(child).toBe(null);
+    });
+    it('search for not existing property and value', function() {
+      var child = scout.objects.findChildObjectByKey(obj, 'nope', 'nope');
+      expect(child).toBe(null);
+    });
+  });
+
 });

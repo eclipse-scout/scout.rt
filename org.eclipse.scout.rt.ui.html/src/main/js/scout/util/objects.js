@@ -69,9 +69,9 @@ scout.objects = {
    * @param properties a single property or an array of properties
    * @returns {Boolean}
    */
-  someOwnProperties : function(obj, properties) {
+  someOwnProperties: function(obj, properties) {
     var propArr = scout.arrays.ensure(properties);
-    return propArr.some(function (prop){
+    return propArr.some(function(prop) {
       return obj.hasOwnProperty(prop);
     });
   },
@@ -85,9 +85,9 @@ scout.objects = {
    * @param properties a single property or an array of properties
    * @returns {Boolean}
    */
-  someProperties : function(obj, properties) {
+  someProperties: function(obj, properties) {
     var propArr = scout.arrays.ensure(properties);
-    return propArr.some(function (prop){
+    return propArr.some(function(prop) {
       return prop in obj;
     });
   },
@@ -114,6 +114,40 @@ scout.objects = {
       }
     }
     return copy;
+  },
+
+  /**
+   * Returns the first object with the given property and propertyValue or null if there is no such object within parentObj.
+   * @param parentObj
+   * @param property property to search for
+   * @param propertyValue value of the property
+   * @returns {Object}
+   */
+  findChildObjectByKey: function(parentObj, property, propertyValue) {
+    if (parentObj === undefined || parentObj === null || typeof parentObj !== 'object') {
+      return null;
+    }
+    if (parentObj[property] === propertyValue) {
+      return parentObj;
+    }
+    var child;
+    if (Array.isArray(parentObj)) {
+      for (var i = 0; i < parentObj.length; i++) {
+        child = scout.objects.findChildObjectByKey(parentObj[i], property, propertyValue);
+        if (child) {
+          return child;
+        }
+      }
+    }
+    for (var prop in parentObj) {
+      if (parentObj.hasOwnProperty(prop)) {
+        child = scout.objects.findChildObjectByKey(parentObj[prop], property, propertyValue);
+        if (child) {
+          return child;
+        }
+      }
+    }
+    return null;
   },
 
   /**

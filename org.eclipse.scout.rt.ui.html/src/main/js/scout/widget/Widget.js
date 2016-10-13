@@ -54,6 +54,8 @@ scout.Widget = function() {
 };
 
 scout.Widget.prototype.init = function(model) {
+  var staticModel = this._jsonModel();
+  $.extend(model, staticModel);
   this._init(model);
   this._initKeyStrokeContext();
   this.initialized = true;
@@ -88,24 +90,10 @@ scout.Widget.prototype._init = function(model) {
 };
 
 /**
- * Loads a JSON model from *-module.json. The ID of the model to load must be equals
- * to the given modelId. Optional additional model properties are added
- * to the JSON model. You should call this function in your Widget#_init function.
- *
- * @param modelId ID to lookup the model definition in the models.json. You should use
- *    the class name of the class that uses this function as model ID
- * @param model additional model properties to be merged into the loaded JSON model,
- *     must have a property 'parent'
+ * Default implementation simply returns undefined. A Subclass
+ * may override this method to load or extend a JSON model with scout.models.getModel or scout.models.extend.
  */
-scout.Widget.prototype._loadJsonModel = function(modelId, model) {
-  var jsonModel = scout.models.get(modelId, model.parent);
-  if (!jsonModel) {
-    jsonModel = {};
-  }
-  if (model) {
-    $.extend(jsonModel, model);
-  }
-  return jsonModel;
+scout.Widget.prototype._jsonModel = function() {
 };
 
 /**

@@ -209,6 +209,10 @@ scout.Action.prototype._doAction = function() {
   this.trigger('doAction');
 };
 
+scout.Action.prototype.setText = function(text) {
+  this.setProperty('text', text);
+};
+
 scout.Action.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
 };
