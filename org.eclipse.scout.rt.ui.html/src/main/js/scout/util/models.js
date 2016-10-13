@@ -25,8 +25,12 @@ scout.models = {
     this.modelMap = data;
   },
 
-  getModel: function(modelId) {
-    return scout.models.get(modelId, 'model');
+  getModel: function(modelId, parent) {
+    var model = scout.models.get(modelId, 'model');
+    if (parent) { // FIXME [awe] 6.1 - review with cyrill - in some cases (without subclasses) we still need the parent parameter (but it is more a convenience feature)
+      model.parent = parent;
+    }
+    return model;
   },
 
   getExtension: function(extensionId) {
