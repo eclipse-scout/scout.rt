@@ -115,6 +115,7 @@
   __include("scout/menu/MenuExecKeyStroke.js");
   __include("scout/menu/MenuItemsOrder.js");
   __include("scout/menu/ContextMenuPopup.js");
+  __include("scout/menu/ContextMenuPopupLayout.js");
   __include("scout/menu/menuNavigationKeyStrokes.js");
   __include("scout/menu/ButtonAdapterMenu.js");
   __include("scout/menu/menubox/MenuBox.js");

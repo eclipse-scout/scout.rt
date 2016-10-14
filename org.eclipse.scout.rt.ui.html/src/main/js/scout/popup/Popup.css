@@ -148,6 +148,12 @@
 .context-menu > .menu-item {
   height: @menu-item-height;
 
+  & > .text {
+    #scout.overflow-ellipsis();
+    /* default is inline, inline-block is necessary so that max-width set by JS is respected */
+    display: inline-block;
+  }
+
   &.menu-textandicon > .icon {
     padding-right: 10px;
   }
