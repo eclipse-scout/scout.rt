@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
@@ -95,10 +94,7 @@ public class CodeService implements ICodeService {
    * @return new cache key
    */
   protected <T extends ICodeType<?, ?>> CodeTypeCacheKey createCacheKey(Class<T> type) {
-    if (type == null) {
-      return null;
-    }
-    return new CodeTypeCacheKey(resolveCodeTypeClass(type));
+    return BEANS.get(CodeTypeCacheUtility.class).createCacheKey(type);
   }
 
   @SuppressWarnings("unchecked")
@@ -251,12 +247,12 @@ public class CodeService implements ICodeService {
     if (type == null) {
       return;
     }
-    getCache().invalidate(new CodeTypeCacheEntryFilter(resolveCodeTypeClass(type)), true);
+    getCache().invalidate(BEANS.get(CodeTypeCacheUtility.class).createEntryFilter(type), true);
   }
 
   @Override
   public void invalidateCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    CodeTypeCacheEntryFilter filter = new CodeTypeCacheEntryFilter(resolveCodeTypeClasses(types));
+    CodeTypeCacheEntryFilter filter = BEANS.get(CodeTypeCacheUtility.class).createEntryFilter(types);
     if (filter.getCodeTypeClasses().isEmpty()) {
       return;
     }
@@ -275,27 +271,20 @@ public class CodeService implements ICodeService {
     return getCodeTypes(list);
   }
 
+  /**
+   * @deprecated use {@link CodeTypeCacheUtility}. Will be removed in Oxygen release.
+   */
+  @Deprecated
   protected <T extends ICodeType<?, ?>> Class<T> resolveCodeTypeClass(Class<T> type) {
-    if (type == null) {
-      return null;
-    }
-    final IBean<T> bean = BEANS.getBeanManager().optBean(type);
-    if (bean == null || bean.getBeanClazz() == null) {
-      return type;
-    }
-    @SuppressWarnings("unchecked")
-    Class<T> activeCodeTypeClass = (Class<T>) bean.getBeanClazz();
-    return (Class<T>) activeCodeTypeClass;
+    return BEANS.get(CodeTypeCacheUtility.class).resolveCodeTypeClass(type);
   }
 
+  /**
+   * @deprecated use {@link CodeTypeCacheUtility}. Will be removed in Oxygen release.
+   */
+  @Deprecated
   protected List<Class<? extends ICodeType<?, ?>>> resolveCodeTypeClasses(List<Class<? extends ICodeType<?, ?>>> types) {
-    List<Class<? extends ICodeType<?, ?>>> result = new ArrayList<>();
-    if (types == null) {
-      return result;
-    }
-    for (Class<? extends ICodeType<?, ?>> type : types) {
-      result.add(resolveCodeTypeClass(type));
-    }
-    return result;
+    return BEANS.get(CodeTypeCacheUtility.class).resolveCodeTypeClasses(types);
   }
+
 }
