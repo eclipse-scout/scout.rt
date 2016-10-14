@@ -153,7 +153,7 @@ scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
   }
 };
 
-scout.StringField.prototype._renderInputMasked = function(inputMasked) {
+scout.StringField.prototype._renderInputMasked = function() {
   if (this.multilineText) {
     return;
   }
