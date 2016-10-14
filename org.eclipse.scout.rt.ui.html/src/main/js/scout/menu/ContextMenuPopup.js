@@ -38,6 +38,10 @@ scout.ContextMenuPopup.prototype._initKeyStrokeContext = function() {
   scout.menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
 };
 
+scout.ContextMenuPopup.prototype._createLayout = function() {
+  return new scout.ContextMenuPopupLayout(this);
+};
+
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
   this._installScrollbars();
@@ -394,6 +398,13 @@ scout.ContextMenuPopup.prototype.updateMenuItems = function(menuItems) {
  */
 scout.ContextMenuPopup.prototype._getMenuItems = function() {
   return this.menuItems;
+};
+
+/**
+ * Currently rendered $menuItems
+ */
+scout.ContextMenuPopup.prototype.$menuItems = function() {
+  return this.$body.children('.menu-item');
 };
 
 /**
