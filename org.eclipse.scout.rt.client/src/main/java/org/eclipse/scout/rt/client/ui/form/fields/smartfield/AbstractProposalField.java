@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 @ClassId("61dd2913-49f2-4637-8d05-b0c324ee172a")
 public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY> implements IProposalField<LOOKUP_KEY> {
 
-  private IContentAssistFieldUIFacade m_uiFacade;
+  private final IContentAssistFieldUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
 
   public AbstractProposalField() {
     this(true);
@@ -51,7 +51,6 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     setMaxLength(getConfiguredMaxLength());
     setTrimText(getConfiguredTrimText());
     setAutoCloseChooser(getConfiguredAutoCloseChooser());
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ProposalFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   }
 
   @Override
@@ -187,13 +186,13 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
         }
       }
       if (validValue != null) {
-          if (isTrimText()) {
-            validValue = validValue.trim();
-          }
-          if (validValue.length() > getMaxLength()) {
-            validValue = validValue.substring(0, getMaxLength());
-          }
+        if (isTrimText()) {
+          validValue = validValue.trim();
         }
+        if (validValue.length() > getMaxLength()) {
+          validValue = validValue.substring(0, getMaxLength());
+        }
+      }
     }
     return validValue;
   }
