@@ -25,6 +25,12 @@ scout.models = {
     this.modelMap = data;
   },
 
+  /**
+   * returns a json model from modelMap. The model needs to be of type 'model'
+   * @param modelId the id of the model
+   * @param parent Optional: if this parameter is given, a property 'parent' will be assigned to this parameter
+   * @returns {Object}
+   */
   getModel: function(modelId, parent) {
     var model = scout.models.get(modelId, 'model');
     if (parent) { // FIXME [awe] 6.1 - review with cyrill - in some cases (without subclasses) we still need the parent parameter (but it is more a convenience feature)
@@ -33,11 +39,22 @@ scout.models = {
     return model;
   },
 
+  /**
+   * returns a json extension from modelMap. The extension needs to be of type 'extension'
+   * @param extensionId the id of the extension
+   * @returns {Object}
+   */
   getExtension: function(extensionId) {
     return scout.models.get(extensionId, 'extension');
   },
 
-  get: function(id, type) {
+  /**
+   * returns a copy of the json file in modelMap
+   * @param id json file id
+   * @param type value of type property
+   * @returns {Object}
+   */
+  _get: function(id, type) {
     var json = this.modelMap[id];
     if (!json) {
       throw new Error('No JSON file defined for id=\'' + id + '\'. ' +
@@ -50,6 +67,49 @@ scout.models = {
     return $.extend(true, {}, json);
   },
 
+  /**
+   * extends parentModel with the contents of extension. parentModel will be changed and returned.
+   * @param extension extension to the parentModel. Needs a property id on the parentModel to find the extension point.
+   * Syntax of the extension:
+   * Adding or overriding a property:
+   * {
+   *  "id": "..."
+   *  "type": "extension"
+   *  "extensions": [{
+   *      "operation": "appendTo"
+   *      "target": {
+   *      "id": "someObjectID"
+   *      }
+   *      "extension": {
+   *        "propertyX": "xyz"
+   *      }
+   *     }
+   *    ]
+   *  }
+   * Adding new Object to the tree:
+   * {
+   *  "id": "..."
+   *  "type": "extension"
+   *  "extensions": [{
+   *      "operation": "insert"
+   *      "target": {
+   *      "id": "someObjectID"
+   *      "property": "collectionOfsomeObject"
+   *      "before": "somObjectIDInPropertyArray"    //(alternative "index":0)
+   *      }
+   *      "extension": {
+   *          "id": "newObjectID",
+   *           "propertyx": "someThing",
+   *           "collectiony": [...]
+   *      }
+   *     }
+   *    ]
+   *  }
+   *
+   *  to extend the root object directly, target.root: true can be used instead of target.id
+   * @param parentModel object which contains id's as properties
+   * @returns parentModel extended by extension
+   */
   extend: function(extension, parentModel) {
     if(typeof extension === 'string') {
         extension = scout.models.getExtension(extension);
@@ -75,7 +135,7 @@ scout.models = {
         var targetArray = targetObject[target.property];
         var insertAt = targetArray.length;
         if (target.before) {
-          insertAt = targetArray.findIndex(function(element) {
+          insertAt = scout.arrays.findIndex(targetArray,function(element) {
             return element.id === target.before;
           });
           if (insertAt === -1) {

@@ -220,6 +220,22 @@ scout.arrays = {
     }
   },
 
+  /**
+   * Alternative implementation of Array.findIndex(callback [, thisArg]), which is supported by most browsers.
+   * See Array.findIndex for a detailed description.
+   */
+  findIndex: function(arr, predicate, thisArg){
+    if (!arr || !predicate) {
+      return -1;
+    }
+    for (var i = 0; i < arr.length; i++) {
+      if (predicate.call(thisArg, arr[i], i, arr)) {
+        return i;
+      }
+    }
+    return -1;
+  },
+
   find: function(arr, predicate) {
     if (!arr || !predicate) {
       return null;

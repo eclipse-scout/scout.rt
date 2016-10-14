@@ -327,6 +327,28 @@ describe("scout.arrays", function() {
     });
 
   });
+
+  describe("findIndex", function() {
+
+    it("returns the index of the element for which the given predicate returns true", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+
+      expect(scout.arrays.findIndex()).toBe(-1);
+      expect(scout.arrays.findIndex()).toBe(-1);
+
+      var index = scout.arrays.findIndex(arr, function(element) {
+        return element === 'c';
+      });
+      expect(index).toBe(2);
+
+      index = scout.arrays.findIndex(arr, function(element) {
+        return element === 'z';
+      });
+      expect(index).toBe(-1);
+    });
+
+  });
+
   describe("find", function() {
 
     it("returns the element for which the given predicate returns true", function() {

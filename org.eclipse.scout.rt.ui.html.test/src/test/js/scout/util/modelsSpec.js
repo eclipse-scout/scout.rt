@@ -223,7 +223,7 @@ describe("scout.models", function() {
       scout.models.extend(newObjectInTreeIndexed, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('fixed index insert');
     });
-    it('insert new object into tree object with fixed index', function() {
+    it('insert new object into tree object with relative index', function() {
       scout.models.extend(newObjectInTreeRelativeindex, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
     });
