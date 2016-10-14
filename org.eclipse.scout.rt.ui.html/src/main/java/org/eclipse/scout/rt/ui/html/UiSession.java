@@ -300,16 +300,14 @@ public class UiSession implements IUiSession {
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupReq) {
-    String browserId = currentHttpRequest().getHeader("User-Agent");
-    BrowserInfo browserInfo = BrowserInfo.createFrom(browserId);
-
+    BrowserInfo browserInfo = BrowserInfo.createFrom(currentHttpRequest());
     UserAgents userAgentBuilder = UserAgents
         .create()
         .withUiLayer(UiLayer.HTML)
         .withUiDeviceType(UiDeviceType.DESKTOP)
         .withUiEngineType(browserInfo.getEngineType())
         .withUiSystem(browserInfo.getSystem())
-        .withDeviceId(browserId);
+        .withDeviceId(browserInfo.getUserAgent());
 
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {

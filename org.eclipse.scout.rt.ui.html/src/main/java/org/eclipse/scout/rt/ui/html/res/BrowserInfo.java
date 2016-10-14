@@ -10,12 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
-import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ui.UiEngineType;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -26,7 +32,10 @@ import org.slf4j.LoggerFactory;
  * Helper to retrieve information about the HTTP client by parsing the user agent string.
  * <p>
  * This class was originally copied from org.eclipse.scout.rt.ui.rap.
+ * <p>
+ * Use {@link #createFrom(HttpServletRequest)} to get the {@link BrowserInfo} cached on the {@link HttpSession}
  */
+@Bean
 public class BrowserInfo {
   private static final Logger LOG = LoggerFactory.getLogger(BrowserInfo.class);
 
@@ -117,7 +126,9 @@ public class BrowserInfo {
     }
   }
 
-  private final String m_userAgent;
+  protected static final String BROWSER_INFO_ATTRIBUTE_NAME = "scout.htmlui.httpsession.browserinfo";
+
+  private FinalValue<String> m_userAgent = new FinalValue<String>();
 
   private UiEngineType m_engineType = UiEngineType.UNKNOWN;
   private BrowserVersion m_engineVersion;
@@ -135,10 +146,10 @@ public class BrowserInfo {
   private boolean m_isTablet = false;
   private boolean m_isStandalone = false;
 
-  public BrowserInfo(String userAgent) {
-    m_userAgent = (userAgent == null ? "" : userAgent);
-
+  public BrowserInfo init(String userAgent) {
+    m_userAgent.set(StringUtility.emptyIfNull(userAgent));
     initInfos();
+    return this;
   }
 
   protected void initInfos() {
@@ -147,91 +158,93 @@ public class BrowserInfo {
   }
 
   protected void initBrowserInfo() {
+    String userAgent = getUserAgent();
     // Opera
     String regex = "Opera[\\s\\/]([0-9\\.]*)";
-    boolean isOpera = StringUtility.containsRegEx(m_userAgent, regex);
+    boolean isOpera = StringUtility.containsRegEx(userAgent, regex);
     if (isOpera) {
       setOpera(true);
       setEngineType(UiEngineType.OPERA);
-      setEngineVersion(extractVersion(m_userAgent, regex));
+      setEngineVersion(extractVersion(userAgent, regex));
       return;
     }
 
     // Konqueror
     regex = "KHTML\\/([0-9-\\.]*)";
-    boolean isKonqueror = StringUtility.containsRegEx(m_userAgent, regex);
+    boolean isKonqueror = StringUtility.containsRegEx(userAgent, regex);
     if (isKonqueror) {
       setWebkit(true);
       setEngineType(UiEngineType.KONQUEROR);
-      setEngineVersion(extractVersion(m_userAgent, regex));
+      setEngineVersion(extractVersion(userAgent, regex));
       return;
     }
 
     // Webkit Browsers
     regex = "AppleWebKit\\/([^ ]+)";
-    boolean isWebkit = (m_userAgent.indexOf("AppleWebKit") != -1) && StringUtility.containsRegEx(m_userAgent, regex);
+    boolean isWebkit = (userAgent.indexOf("AppleWebKit") != -1) && StringUtility.containsRegEx(userAgent, regex);
     if (isWebkit) {
       setWebkit(true);
-      if (m_userAgent.indexOf("Chrome") != -1) {
+      if (userAgent.indexOf("Chrome") != -1) {
         setEngineType(UiEngineType.CHROME);
       }
-      else if (m_userAgent.indexOf("Safari") != -1) {
-        if (m_userAgent.indexOf("Android") != -1) {
+      else if (userAgent.indexOf("Safari") != -1) {
+        if (userAgent.indexOf("Android") != -1) {
           setEngineType(UiEngineType.ANDROID);
         }
         else {
           setEngineType(UiEngineType.SAFARI);
         }
       }
-      else if (m_userAgent.indexOf("Mobile") != -1) {
+      else if (userAgent.indexOf("Mobile") != -1) {
         // iPad reports this in fullscreen mode
         setEngineType(UiEngineType.SAFARI);
         setStandalone(true);
       }
-      setEngineVersion(extractVersion(m_userAgent, regex));
+      setEngineVersion(extractVersion(userAgent, regex));
       return;
     }
 
     // Internet Explorer
     regex = "(?:MSIE\\s+|Trident/)([^\\);]+)(\\)|;)";
-    boolean isMshtml = StringUtility.containsRegEx(m_userAgent, regex);
+    boolean isMshtml = StringUtility.containsRegEx(userAgent, regex);
     if (isMshtml) {
       setMshtml(true);
       setEngineType(UiEngineType.IE);
-      setEngineVersion(extractVersion(m_userAgent, regex));
+      setEngineVersion(extractVersion(userAgent, regex));
       return;
     }
 
     // Gecko Browsers (Mozilla)
     regex = "rv\\:([^\\);]+)(\\)|;)";
-    boolean isGecko = (m_userAgent.indexOf("Gecko") != -1) && StringUtility.containsRegEx(m_userAgent, regex);
+    boolean isGecko = (userAgent.indexOf("Gecko") != -1) && StringUtility.containsRegEx(userAgent, regex);
     if (isGecko) {
       setGecko(true);
-      if (m_userAgent.indexOf("Firefox") != -1) {
+      if (userAgent.indexOf("Firefox") != -1) {
         setEngineType(UiEngineType.FIREFOX);
       }
-      setEngineVersion(extractVersion(m_userAgent, regex));
+      setEngineVersion(extractVersion(userAgent, regex));
       return;
     }
   }
 
   protected void initSystemInfo() {
-    if (m_userAgent.indexOf("Windows") != -1 || m_userAgent.indexOf("Win32") != -1 || m_userAgent.indexOf("Win64") != -1 || m_userAgent.indexOf("Win95") != -1) {
+    String userAgent = getUserAgent();
+    if (userAgent.indexOf("Windows") != -1 || userAgent.indexOf("Win32") != -1 || userAgent.indexOf("Win64") != -1 || userAgent.indexOf("Win95") != -1) {
       setSystem(UiSystem.WINDOWS);
-      if (m_userAgent.indexOf("Windows Phone") != -1 || m_userAgent.indexOf("IEMobile") != -1) {
-        setSystemVersion(parseWindowsPhoneVersion(m_userAgent));
+      if (userAgent.indexOf("Windows Phone") != -1 || userAgent.indexOf("IEMobile") != -1) {
+        setSystemVersion(parseWindowsPhoneVersion(userAgent));
         setMobile(true);
       }
       else {
-        setSystemVersion(parseWindowsVersion(m_userAgent));
+        setSystemVersion(parseWindowsVersion(userAgent));
       }
     }
-    else if (m_userAgent.indexOf("Macintosh") != -1 || m_userAgent.indexOf("MacPPC") != -1 || m_userAgent.indexOf("MacIntel") != -1 || m_userAgent.indexOf("Mac_PowerPC") != -1) {
+    else if (userAgent.indexOf("Macintosh") != -1 || userAgent.indexOf("MacPPC") != -1 || userAgent.indexOf("MacIntel") != -1 || userAgent.indexOf("Mac_PowerPC") != -1) {
       setSystem(UiSystem.OSX);
     }
-    else if (m_userAgent.indexOf("Android") != -1) {
+    else if (userAgent.indexOf("Android") != -1) {
       setSystem(UiSystem.ANDROID);
-      setSystemVersion(parseAndroidVersion(m_userAgent));
+      setSystemVersion(parseAndroidVersion(userAgent));
 
       // Update mobile/tablet flags based on android version
       if (getSystemVersion() == null || getSystemVersion().getMajor() <= 2) {
@@ -250,23 +263,29 @@ public class BrowserInfo {
         }
       }
     }
-    else if (m_userAgent.indexOf("X11") != -1 || m_userAgent.indexOf("Linux") != -1 || m_userAgent.indexOf("BSD") != -1 || m_userAgent.indexOf("SunOS") != -1 || m_userAgent.indexOf("DragonFly") != -1) {
+    else if (userAgent.indexOf("X11") != -1 || userAgent.indexOf("Linux") != -1 || userAgent.indexOf("BSD") != -1 || userAgent.indexOf("SunOS") != -1 || userAgent.indexOf("DragonFly") != -1) {
       setSystem(UiSystem.UNIX);
     }
-    else if (m_userAgent.indexOf("iPad") != -1) {
+    else if (userAgent.indexOf("iPad") != -1) {
       setSystem(UiSystem.IOS);
-      setSystemVersion(parseIosVersion(m_userAgent));
+      setSystemVersion(parseIosVersion(userAgent));
       setTablet(true);
     }
-    else if (m_userAgent.indexOf("iPhone") != -1 || m_userAgent.indexOf("iPod") != -1) {
+    else if (userAgent.indexOf("iPhone") != -1 || userAgent.indexOf("iPod") != -1) {
       setSystem(UiSystem.IOS);
-      setSystemVersion(parseIosVersion(m_userAgent));
+      setSystemVersion(parseIosVersion(userAgent));
       setMobile(true);
     }
   }
 
+  /**
+   * @return never <code>null</code>
+   * @throws AssertionException
+   *           if object was not initialized using {@link #init(String)}
+   */
   public String getUserAgent() {
-    return m_userAgent;
+    Assertions.assertTrue(m_userAgent.isSet());
+    return m_userAgent.get();
   }
 
   public boolean isWebkit() {
@@ -430,12 +449,7 @@ public class BrowserInfo {
     if (m_engineType != other.m_engineType) {
       return false;
     }
-    if (m_userAgent == null) {
-      if (other.m_userAgent != null) {
-        return false;
-      }
-    }
-    else if (!m_userAgent.equals(other.m_userAgent)) {
+    if (!CompareUtility.equals(m_userAgent.get(), other.m_userAgent.get())) {
       return false;
     }
     if (m_engineVersion == null) {
@@ -470,28 +484,33 @@ public class BrowserInfo {
     }
     sb.append(" / EngineType: ").append(getEngineType());
     sb.append(" / EngineVersion: ").append(getEngineVersion());
-    sb.append(" / UserAgent: ").append(m_userAgent);
+    sb.append(" / UserAgent: ").append(m_userAgent.get());
     return sb.toString();
   }
 
+  /**
+   * Creates {@link BrowserInfo} based on user agent on {@code request}. The {@link BrowserInfo} is cached on the
+   * {@link HttpSession} if a session exists.
+   */
   public static BrowserInfo createFrom(HttpServletRequest request) {
-    if (LOG.isTraceEnabled()) {
-      Enumeration headerNames = request.getHeaderNames();
-      while (headerNames.hasMoreElements()) {
-        String headerName = (String) headerNames.nextElement();
-        String header = request.getHeader(headerName);
-        headerName = headerName + (headerName.length() <= 11 ? "\t\t" : "\t");
-        LOG.trace(headerName + header);
+    // BrowserInfo is cached on HTTP session
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      BrowserInfo browserInfo = (BrowserInfo) session.getAttribute(BROWSER_INFO_ATTRIBUTE_NAME);
+      if (browserInfo != null) {
+        return browserInfo;
       }
     }
-
     String userAgent = request.getHeader("User-Agent");
-    return createFrom(userAgent);
+    BrowserInfo browserInfo = createFrom(userAgent);
+    if (session != null) {
+      session.setAttribute(BROWSER_INFO_ATTRIBUTE_NAME, browserInfo);
+    }
+    return browserInfo;
   }
 
   public static BrowserInfo createFrom(String userAgent) {
-    BrowserInfo info = new BrowserInfo(userAgent);
-
+    BrowserInfo info = BEANS.get(BrowserInfo.class).init(userAgent);
     if (LOG.isTraceEnabled()) {
       LOG.trace(info.toString());
     }

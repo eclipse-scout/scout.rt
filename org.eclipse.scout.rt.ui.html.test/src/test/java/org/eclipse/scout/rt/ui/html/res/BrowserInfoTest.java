@@ -11,16 +11,24 @@
 package org.eclipse.scout.rt.ui.html.res;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.eclipse.scout.rt.shared.ui.UiEngineType;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
 import org.eclipse.scout.rt.ui.html.res.BrowserInfo.BrowserVersion;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 
 /**
  * The list of user agents for all tests that start with "bulkTests*" was initially retrieved from
@@ -160,6 +168,7 @@ public class BrowserInfoTest {
     checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.1.17) Gecko/20110123 (like Firefox/3.x) SeaMonkey/2.0.12", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.FIREFOX));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20120422 Firefox/12.0 SeaMonkey/2.9", FLAGS_DESKTOP_WINDOWS);
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 10.0; <64-bit tags>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Safari/<WebKit Rev> Edge/<EdgeHTML Rev>.<Windows Build>", FLAGS_DESKTOP_WINDOWS);
 
     assertPassed();
   }
@@ -419,6 +428,9 @@ public class BrowserInfoTest {
     checkBrowserInfoFlags("Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25", FLAGS_MOBILE_TABLET);
     checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; XBLWP7; ZuneWP7) UCBrowser/2.9.0.263", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Linux; U; Android 2.3.3; en-us ; LS670 Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1/UCBrowser/8.6.1.262/145/355", FLAGS_MOBILE_MOBILE);
+    checkBrowserInfoFlags(
+        "Mozilla/5.0 (Windows Phone 10.0; Android <Android Version>; <Device Manufacturer>; <Device Model>) AppleWebKit/<WebKit Rev> (KHTML, like Gecko) Chrome/<Chrome Rev> Mobile Safari/<WebKit Rev> Edge/<EdgeHTML Rev>.<Windows Build>",
+        FLAGS_MOBILE_WINDOWS_PHONE);
 
     assertPassed();
   }
@@ -769,7 +781,7 @@ public class BrowserInfoTest {
       return;
     }
 
-    BrowserInfo info = BrowserInfo.createFrom(userAgentString);
+    BrowserInfo info = newBrowserInfo(userAgentString);
 
     List<String> failedTests = new ArrayList<>();
     if (flags.isMobile() != null && flags.isMobile() != info.isMobile()) {
@@ -927,7 +939,7 @@ public class BrowserInfoTest {
   public void testCreateBrowserInfo() {
     Map<String, BrowserInfo> testMap = initTestMap();
     for (String userAgent : testMap.keySet()) {
-      BrowserInfo createdBrowserInfo = BrowserInfo.createFrom(userAgent);
+      BrowserInfo createdBrowserInfo = newBrowserInfo(userAgent);
       BrowserInfo expectedBrowserInfo = testMap.get(userAgent);
 
       //Ignore versions if not explicitly set
@@ -940,6 +952,44 @@ public class BrowserInfoTest {
 
       assertEquals(expectedBrowserInfo, createdBrowserInfo);
     }
+  }
+
+  private static final String TEST_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36";
+
+  @Test
+  public void testCreateFromRequest() {
+    BrowserInfo browserInfoOnSession = newBrowserInfo(TEST_USER_AGENT);
+    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    HttpSession session = Mockito.mock(HttpSession.class);
+    Mockito.when(request.getSession(false)).thenReturn(session);
+    Mockito.when(request.getHeader("User-Agent")).thenReturn(TEST_USER_AGENT);
+    Mockito.when(session.getAttribute(Mockito.eq(BrowserInfo.BROWSER_INFO_ATTRIBUTE_NAME))).thenReturn(null, browserInfoOnSession);
+
+    BrowserInfo browserInfo = BrowserInfo.createFrom(request);
+    assertBrowserInfo(browserInfo);
+
+    BrowserInfo browserInfo2 = BrowserInfo.createFrom(request);
+    assertBrowserInfo(browserInfo2);
+    assertSame(browserInfoOnSession, browserInfo2);
+
+    Mockito.verify(session).setAttribute(Mockito.matches(BrowserInfo.BROWSER_INFO_ATTRIBUTE_NAME), Mockito.argThat(new ArgumentMatcher<BrowserInfo>() {
+      @Override
+      public boolean matches(Object argument) {
+        assertBrowserInfo((BrowserInfo) argument);
+        return argument instanceof BrowserInfo;
+      }
+    }));
+  }
+
+  protected void assertBrowserInfo(BrowserInfo browserInfo) {
+    assertTrue(browserInfo.isDesktop());
+    assertTrue(browserInfo.isWebkit());
+    assertFalse(browserInfo.isStandalone());
+    assertFalse(browserInfo.isGecko());
+    assertFalse(browserInfo.isMobile());
+    assertFalse(browserInfo.isMshtml());
+    assertFalse(browserInfo.isOpera());
+    assertFalse(browserInfo.isTablet());
   }
 
   private Map<String, BrowserInfo> initTestMap() {
@@ -955,7 +1005,7 @@ public class BrowserInfoTest {
   private void putIosBrowsers(Map<String, BrowserInfo> testMap) {
     //iPhone 4S
     String userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25";
-    BrowserInfo browserInfo = new BrowserInfo(userAgent);
+    BrowserInfo browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.SAFARI);
     browserInfo.setSystem(UiSystem.IOS);
     browserInfo.setWebkit(true);
@@ -965,7 +1015,7 @@ public class BrowserInfoTest {
 
     //iPad 3
     userAgent = "Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.SAFARI);
     browserInfo.setSystem(UiSystem.IOS);
     browserInfo.setWebkit(true);
@@ -975,7 +1025,7 @@ public class BrowserInfoTest {
 
     //iPad 3 (home screen icon mode)
     userAgent = "Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Mobile/9B176";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.SAFARI);
     browserInfo.setSystem(UiSystem.IOS);
     browserInfo.setWebkit(true);
@@ -988,7 +1038,7 @@ public class BrowserInfoTest {
   private void putAndroidBrowsers(Map<String, BrowserInfo> testMap) {
     //Samsung tablet GT P7500
     String userAgent = "Mozilla/5.0 (Linux; U; Android 3.2; de-de; GT-P7500 Build/HTJ85B) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13";
-    BrowserInfo browserInfo = new BrowserInfo(userAgent);
+    BrowserInfo browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.ANDROID);
     browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
@@ -998,7 +1048,7 @@ public class BrowserInfoTest {
 
     //Samsung Galaxy S2 Android Browser
     userAgent = "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; SAMSUNG GT-I9100/I9100BULPD Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.ANDROID);
     browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
@@ -1008,7 +1058,7 @@ public class BrowserInfoTest {
 
     //Samsung Galaxy S2 Google Chrome
     userAgent = "Mozilla/5.0 (Linux; Android 4.0.3; GT-I9100 Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.CHROME);
     browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
@@ -1018,7 +1068,7 @@ public class BrowserInfoTest {
 
     //Samsung Galaxy S2 Dolphin Browser
     userAgent = "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; GT-I9100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.ANDROID);
     browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
@@ -1028,7 +1078,7 @@ public class BrowserInfoTest {
 
     //Samsung Nexus S Firefox, Android 4.1.2
     userAgent = "Mozilla/5.0 (Android; Mobile; rv:17.0) Gecko/17.0 Firefox/17.0";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.FIREFOX);
     browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setGecko(true);
@@ -1040,7 +1090,7 @@ public class BrowserInfoTest {
   private void putWindowsBrowsers(Map<String, BrowserInfo> testMap) {
     //Windows 7, IE 9
     String userAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)";
-    BrowserInfo browserInfo = new BrowserInfo(userAgent);
+    BrowserInfo browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.IE);
     browserInfo.setEngineVersion(new BrowserInfo.BrowserVersion(9, 0, 0));
     browserInfo.setSystem(UiSystem.WINDOWS);
@@ -1050,7 +1100,7 @@ public class BrowserInfoTest {
 
     //Windows 7, Google Chrome 22.0.1229.94
     userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.CHROME);
     browserInfo.setSystem(UiSystem.WINDOWS);
     browserInfo.setWebkit(true);
@@ -1059,7 +1109,7 @@ public class BrowserInfoTest {
 
     //Nokia Lumia 800
     userAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; NOKIA; Lumia 800)";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.IE);
     browserInfo.setEngineVersion(new BrowserInfo.BrowserVersion(9, 0, 0));
     browserInfo.setSystem(UiSystem.WINDOWS);
@@ -1070,7 +1120,7 @@ public class BrowserInfoTest {
 
     //Windows Phone 8 HTC
     userAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; HTC; Windows Phone 8X by HTC)";
-    browserInfo = new BrowserInfo(userAgent);
+    browserInfo = newBrowserInfo(userAgent);
     browserInfo.setEngineType(UiEngineType.IE);
     browserInfo.setEngineVersion(new BrowserInfo.BrowserVersion(10, 0, 0));
     browserInfo.setSystem(UiSystem.WINDOWS);
@@ -1078,5 +1128,9 @@ public class BrowserInfoTest {
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(8, 0, 0));
     testMap.put(userAgent, browserInfo);
+  }
+
+  protected BrowserInfo newBrowserInfo(String userAgent) {
+    return new BrowserInfo().init(userAgent);
   }
 }

@@ -140,7 +140,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     String filename = filenameAndFingerprint.getLeft();
     BinaryResource binaryResource = getModel().getUIFacade().requestBinaryResourceFromUI(filename);
     BinaryResourceHolder holder = new BinaryResourceHolder(binaryResource);
-    holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor());
+    holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor(getUiSession()));
     return holder;
   }
 
