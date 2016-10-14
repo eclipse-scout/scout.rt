@@ -35,13 +35,13 @@ describe("scout.models", function() {
 
     it('load object without type', function() {
       expect(function() {
-        scout.models.get('object', 'model');
+        scout.models._get('object', 'model');
       }).toThrow(new Error('object is not of type \'model\''));
     });
 
     it('ensure the object is a copy', function() {
-      scout.models.get('model', 'model').value = 'changed';
-      expect(scout.models.get('model', 'model').value).toBe('modelValue');
+      scout.models._get('model', 'model').value = 'changed';
+      expect(scout.models._get('model', 'model').value).toBe('modelValue');
     });
 
   });
