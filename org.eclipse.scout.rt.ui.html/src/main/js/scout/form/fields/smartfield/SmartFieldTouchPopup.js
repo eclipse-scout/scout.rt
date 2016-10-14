@@ -16,8 +16,8 @@ scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
 scout.SmartFieldTouchPopup.prototype._init = function(options) {
   scout.SmartFieldTouchPopup.parent.prototype._init.call(this, options);
-  this._field.on('acceptProposal', this._onFieldAcceptOrDeleteProposal.bind(this));
-  this._field.on('deleteProposal', this._onFieldAcceptOrDeleteProposal.bind(this));
+  this._delegateEvents(['acceptProposal', 'proposalTyped', 'cancelProposal']);
+  this._delegateDisplayTextChanges(['acceptProposal', 'deleteProposal']);
 };
 
 scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
@@ -44,12 +44,27 @@ scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function() {
  */
 scout.SmartFieldTouchPopup.prototype._onMouseDownOutside = function(event) {
   // Sync display text first because accept input needs the correct display text
-  this._touchField.setDisplayText(this._field.displayText);
+  this._delegateDisplayText();
   this._touchField.acceptInput();
   this.close();
 };
 
-scout.SmartFieldTouchPopup.prototype._onFieldAcceptOrDeleteProposal = function(event) {
-  // Delegate to original field
-  this._touchField.setDisplayText(event.displayText);
+// Info: cannot name this method _syncDisplayText because of naming-conflict with our _sync* functions from the Scout framework
+scout.SmartFieldTouchPopup.prototype._delegateDisplayText = function() {
+  this._touchField.setDisplayText(this._field.displayText);
+};
+
+scout.SmartFieldTouchPopup.prototype._delegateEvents = function(eventTypes) {
+  var that = this;
+  eventTypes.forEach(function(eventType) {
+    that._field.on(eventType, function(event) {
+      that._touchField.events.trigger(event.type, event);
+    });
+  });
+};
+
+scout.SmartFieldTouchPopup.prototype._delegateDisplayTextChanges = function(eventTypes) {
+  eventTypes.forEach(function(eventType) {
+    this._field.on(eventType, this._delegateDisplayText.bind(this));
+  }, this);
 };

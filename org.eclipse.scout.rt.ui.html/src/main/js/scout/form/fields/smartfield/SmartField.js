@@ -267,7 +267,10 @@ scout.SmartField.prototype._delegateToProposalChooser = function(event) {
     this._pendingProposalTyped.func();
     this._clearPendingProposalTyped();
   }
-  this.proposalChooser.delegateEvent(event);
+  if (this.proposalChooser) {
+    // in some rare cases proposal chooser has been disposed in the meantime --> do nothing
+    this.proposalChooser.delegateEvent(event);
+  }
 };
 
 scout.SmartField.prototype._onKeyUp = function(e) {
