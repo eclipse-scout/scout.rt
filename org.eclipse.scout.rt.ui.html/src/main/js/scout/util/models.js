@@ -32,7 +32,7 @@ scout.models = {
    * @returns {Object}
    */
   getModel: function(modelId, parent) {
-    var model = scout.models.get(modelId, 'model');
+    var model = scout.models._get(modelId, 'model');
     if (parent) { // FIXME [awe] 6.1 - review with cyrill - in some cases (without subclasses) we still need the parent parameter (but it is more a convenience feature)
       model.parent = parent;
     }
@@ -45,7 +45,7 @@ scout.models = {
    * @returns {Object}
    */
   getExtension: function(extensionId) {
-    return scout.models.get(extensionId, 'extension');
+    return scout.models._get(extensionId, 'extension');
   },
 
   /**
