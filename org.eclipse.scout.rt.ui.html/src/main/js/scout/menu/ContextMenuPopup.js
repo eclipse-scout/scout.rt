@@ -40,10 +40,15 @@ scout.ContextMenuPopup.prototype._initKeyStrokeContext = function() {
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
-  scout.scrollbars.install(this.$body, {
-    parent: this
-  });
+  this._installScrollbars();
   this._renderMenuItems();
+};
+
+scout.ContextMenuPopup.prototype._installScrollbars = function() {
+  scout.scrollbars.install(this.$body, {
+    parent: this,
+    axis: 'y'
+  });
 };
 
 /**
@@ -116,9 +121,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
           this.updateNextToSelected('menu-item', parentMenu.$container);
 
           parentMenu.$subMenuBody.detach();
-          scout.scrollbars.install(this.$body, {
-            parent: this
-          });
+          this._installScrollbars();
           this.$body.css('box-shadow', "");
           this.bodyAnimating = false;
         }
@@ -230,9 +233,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
           scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
           parentMenu.parentMenu.$subMenuBody.detach();
           this.$body.cssTop(topMargin);
-          scout.scrollbars.install(this.$body, {
-            parent: this
-          });
+          this._installScrollbars();
           this._updateFirstLastClass();
           this.$body.css('box-shadow', '');
         }
@@ -269,9 +270,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
     }
     parentMenu.parentMenu.$subMenuBody.detach();
-    scout.scrollbars.install(this.$body, {
-      parent: this
-    });
+    this._installScrollbars();
     this._updateFirstLastClass();
   }
 };
