@@ -271,20 +271,4 @@ public class CodeService implements ICodeService {
     return getCodeTypes(list);
   }
 
-  /**
-   * @deprecated use {@link CodeTypeCacheUtility}. Will be removed in Oxygen release.
-   */
-  @Deprecated
-  protected <T extends ICodeType<?, ?>> Class<T> resolveCodeTypeClass(Class<T> type) {
-    return BEANS.get(CodeTypeCacheUtility.class).resolveCodeTypeClass(type);
-  }
-
-  /**
-   * @deprecated use {@link CodeTypeCacheUtility}. Will be removed in Oxygen release.
-   */
-  @Deprecated
-  protected List<Class<? extends ICodeType<?, ?>>> resolveCodeTypeClasses(List<Class<? extends ICodeType<?, ?>>> types) {
-    return BEANS.get(CodeTypeCacheUtility.class).resolveCodeTypeClasses(types);
-  }
-
 }
