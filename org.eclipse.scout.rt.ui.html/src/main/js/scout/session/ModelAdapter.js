@@ -411,6 +411,14 @@ scout.ModelAdapter.prototype.toString = function() {
  * This method is used to modify adapterData before the data is exported (as used for JSON export).
  */
 scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
+  // use last part of class-name as ID (because that's better than having only a number as ID)
+  var modelClass = adapterData.modelClass;
+  if (modelClass) {
+    var pos = Math.max(0,
+        modelClass.lastIndexOf('$') + 1,
+        modelClass.lastIndexOf('.') + 1);
+    adapterData.id = modelClass.substring(pos);
+  }
   delete adapterData.owner;
   delete adapterData.classId;
   delete adapterData.modelClass;

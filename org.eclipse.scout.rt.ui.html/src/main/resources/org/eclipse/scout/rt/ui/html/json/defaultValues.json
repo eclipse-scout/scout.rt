@@ -126,8 +126,11 @@
     },
     "Table": {
       "autoResizeColumns": false,
+      "columnAddable": false,
       "checkable": false,
       "enabled": true,
+      "filters": [],
+      "hasReloadHandler": false,
       "headerEnabled": true,
       "headerVisible": true,
       "keyStrokes": [],

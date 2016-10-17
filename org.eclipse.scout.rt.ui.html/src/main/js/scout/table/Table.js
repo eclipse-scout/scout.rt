@@ -12,10 +12,12 @@ scout.Table = function() {
   scout.Table.parent.call(this);
 
   this.autoResizeColumns = false;
+  this.columnAddable = false;
   this.checkable = false;
   this.enabled = true;
   this.headerEnabled = true;
   this.headerVisible = true;
+  this.hasReloadHandler = false;
   this.keyStrokes = [];
   this.keyboardNavigation = true;
   this.menus = [];
@@ -30,6 +32,7 @@ scout.Table = function() {
   this.tableControls = [];
   this.tableStatusVisible = false;
   this.footerVisible = false;
+  this.filters = [];
   this.columns = [];
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
