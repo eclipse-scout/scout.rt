@@ -111,7 +111,7 @@ public class FormBasedAccessController implements IAccessController {
       session.invalidate();
     }
 
-    // Put authenticated Subject onto HTTP session.
+    // Put authenticated principal onto (new) HTTP session
     final Principal principal = m_config.getPrincipalProducer().produce(credentials.getLeft());
     BEANS.get(ServletFilterHelper.class).putPrincipalOnSession(request, principal);
     return true;
