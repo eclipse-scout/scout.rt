@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
@@ -24,31 +27,25 @@ public final class JandexFolderIndexer {
   private JandexFolderIndexer() {
   }
 
-  public static Index createFolderIndex(File folder, Indexer indexer) throws IOException {
-    if (folder.exists()) {
-      scanDirectory(folder, indexer);
-    }
+  public static Index createFolderIndex(Path folderPath, Indexer indexer) throws IOException {
+    scanDirectory(folderPath, indexer);
     return indexer.complete();
   }
 
-  static void scanDirectory(File folder, Indexer indexer) throws IOException {
-    File[] files = folder.listFiles();
-    if (files == null || files.length < 1) {
-      return;
-    }
-
-    for (File f : files) {
-      if (f.isDirectory()) {
-        if (!f.getName().startsWith(".")) {
-          scanDirectory(f, indexer);
+  static void scanDirectory(Path dir, final Indexer indexer) throws IOException {
+    Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+        if (attrs.isDirectory() && path.toString().startsWith(".")) {
+          return FileVisitResult.SKIP_SUBTREE;
         }
-      }
-      else if (f.isFile() && f.getName().endsWith(CLASS_EXT)) {
-        URL url = f.toURI().toURL();
-        try (InputStream in = url.openStream()) {
-          indexer.index(in);
+        if (!attrs.isDirectory() && path.toString().endsWith(CLASS_EXT)) {
+          try (InputStream in = Files.newInputStream(path)) {
+            indexer.index(in);
+          }
         }
+        return FileVisitResult.CONTINUE;
       }
-    }
+    });
   }
 }

@@ -108,7 +108,7 @@ public class JandexInventoryBuilder {
         Indexer indexer = new Indexer();
         File scoutXmlFolder = new File(url.toURI());
         File classesFolder = scoutXmlFolder.getParentFile().getParentFile();
-        Index index = JandexFolderIndexer.createFolderIndex(classesFolder, indexer);
+        Index index = JandexFolderIndexer.createFolderIndex(classesFolder.toPath(), indexer);
         m_indexList.add(index);
         saveIndexFile(new File(classesFolder, JANDEX_INDEX_PATH), index);
         return;
