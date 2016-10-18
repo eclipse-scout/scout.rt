@@ -1881,7 +1881,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       // clicked has to be after selected otherwise it is not possible to get the selected row in execRowClick
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
     });
 
     it("sends only click if row already is selected", function() {
@@ -1893,7 +1893,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
 
       // Reset internal state because there is no "sleep" in JS
       table._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
@@ -1916,7 +1916,7 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowsChecked', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowsChecked', 'rowClicked']);
     });
 
   });
@@ -2187,7 +2187,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       // first selection event for first row, second selection event for remaining rows (including first row)
-      expect(requestData).toContainEventTypesExactly(['rowsSelected']);
+      expect(requestData).toContainEventTypesExactly(['property', 'rowsSelected']);
 
       var event = [new scout.Event(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
@@ -2212,7 +2212,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       // exactly only one selection event for first row
-      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
+      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
 
       var event = [new scout.Event(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id]
