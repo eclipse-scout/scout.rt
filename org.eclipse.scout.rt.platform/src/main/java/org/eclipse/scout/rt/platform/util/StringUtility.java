@@ -1741,7 +1741,10 @@ public final class StringUtility {
    * @param s
    * @param regex
    * @return
+   * @deprecated Use {@link #containsRegEx(String, String)}, {@link #containsString(String, String)} or
+   *             {@link #containsStringIgnoreCase(String, String)} instead. This method will be removed in "P" release.
    */
+  @Deprecated
   public static boolean contains(String s, String regex) {
     if (s == null || regex == null) {
       return false;

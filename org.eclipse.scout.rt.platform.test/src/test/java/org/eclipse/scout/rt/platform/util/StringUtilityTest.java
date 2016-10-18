@@ -529,6 +529,7 @@ public class StringUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation") // test it nevertheless...
   public void testContains() {
     assertFalse(StringUtility.contains(null, null));
     assertFalse(StringUtility.contains("abc", null));
