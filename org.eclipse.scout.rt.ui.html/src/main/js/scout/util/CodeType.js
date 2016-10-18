@@ -22,16 +22,30 @@ scout.CodeType.prototype.init = function(model) {
   var i, code;
   if (model.codes) {
     for (i = 0; i < model.codes.length; i++) {
-      code = new scout.Code();
-      code.init(model.codes[i]);
-      this.add(code);
+      this._initCode(model.codes[i]);
     }
   }
 };
 
-scout.CodeType.prototype.add = function(code) {
+scout.CodeType.prototype._initCode = function(modelCode, parentCode) {
+  var i;
+  var code = new scout.Code();
+  code.init(modelCode);
+  this.add(code, parentCode);
+  if(modelCode.children) {
+    for (i = 0; i < modelCode.children.length; i++) {
+      this._initCode(modelCode.children[i], code);
+    }
+  }
+};
+
+scout.CodeType.prototype.add = function(code, parentCode) {
   this.codes.push(code);
   this.codeMap[code.id] = code;
+  if(parentCode) {
+    parentCode.childCodes.push(code);
+    code.parentCode = parentCode;
+  }
 };
 
 scout.CodeType.prototype.get = function(codeId) {
@@ -40,6 +54,21 @@ scout.CodeType.prototype.get = function(codeId) {
     throw new Error('No code found for id=' + codeId);
   }
   return code;
+};
+
+scout.CodeType.prototype.getCodes = function(rootOnly) {
+  if (rootOnly) {
+    var rootCodes = [];
+    for (var i = 0; i < this.codes.length; i++) {
+      if (!this.codes[i].parentCode) {
+        rootCodes.push(this.codes[i]);
+      }
+    }
+    return rootCodes;
+  }
+  else {
+    return this.codes;
+  }
 };
 
 scout.CodeType.ensure = function(codeType) {

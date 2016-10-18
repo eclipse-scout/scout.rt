@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.Code = function() {
   this.id;
+  this.parentCode;
+  this.childCodes = [];
 };
 
 scout.Code.prototype.init = function(model) {
