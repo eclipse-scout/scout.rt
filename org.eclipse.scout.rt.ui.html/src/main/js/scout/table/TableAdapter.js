@@ -11,6 +11,7 @@
 scout.TableAdapter = function() {
   scout.TableAdapter.parent.call(this);
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
+  this._addRemoteProperties(['contextColumn']);
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 
@@ -237,6 +238,20 @@ scout.TableAdapter.prototype._sendAppLinkAction = function(column, ref) {
   this._send('appLinkAction', {
     columnId: column.id,
     ref: ref
+  });
+};
+
+scout.TableAdapter.prototype._sendContextColumn = function(contextColumn) {
+  if (contextColumn.guiOnly) {
+    contextColumn = null;
+    this.widget.contextColumn = null;
+  }
+  var columnId = null;
+  if (contextColumn) {
+    columnId = contextColumn.id;
+  }
+  this._send('property', {
+    contextColumn: columnId
   });
 };
 

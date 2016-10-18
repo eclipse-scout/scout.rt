@@ -69,6 +69,7 @@ scout.Table = function() {
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
   this.virtual = true;
+  this.contextColumn;
 };
 scout.inherits(scout.Table, scout.Widget);
 
@@ -364,6 +365,7 @@ scout.Table.prototype._onRowMouseDown = function(event) {
     var row = this._$mouseDownRow.data('row');
     this.checkRow(row, !row.checked);
   }
+  this.setContextColumn(this._columnAtX(event.pageX));
 };
 
 scout.Table.prototype._onRowMouseUp = function(event) {
@@ -396,10 +398,8 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   row = $row.data('row');
   if ($appLink) {
     this._triggerAppLinkAction(column, $appLink.data('ref'));
-  } else if (column.guiOnly) {
-    this._triggerRowClicked(row, mouseButton);
   } else {
-    this._triggerRowClicked(row, mouseButton, column);
+    this._triggerRowClicked(row, mouseButton);
   }
 };
 
@@ -468,6 +468,10 @@ scout.Table.prototype._renderTableStatus = function() {
 
 scout.Table.prototype._renderLoading = function() {
   this.loadingSupport.renderLoading();
+};
+
+scout.Table.prototype.setContextColumn = function(contextColumn) {
+  this.setProperty('contextColumn', contextColumn);
 };
 
 scout.Table.prototype._hasVisibleTableControls = function() {
@@ -1448,9 +1452,6 @@ scout.Table.prototype._triggerRowClicked = function(row, mouseButton, column) {
     row: row,
     mouseButton: mouseButton
   };
-  if (column !== undefined) {
-    event.column = column;
-  }
   this.trigger('rowClicked', event);
 };
 
