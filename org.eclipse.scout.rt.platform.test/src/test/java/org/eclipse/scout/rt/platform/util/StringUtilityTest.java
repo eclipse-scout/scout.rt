@@ -20,6 +20,8 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.junit.Test;
 
@@ -501,4 +503,204 @@ public class StringUtilityTest {
     assertArrayEquals(new String[]{"Chuck", "Norris"}, StringUtility.tokenize("Chuck Norris", ' '));
   }
 
+  @Test
+  public void testStartsWith() {
+    assertFalse(StringUtility.startsWith(null, null));
+    assertFalse(StringUtility.startsWith("abc", null));
+    assertFalse(StringUtility.startsWith(null, "abc"));
+    assertFalse(StringUtility.startsWith("123", "abc"));
+    assertTrue(StringUtility.startsWith("abc", ""));
+    assertTrue(StringUtility.startsWith("abc", "a"));
+    assertTrue(StringUtility.startsWith("abc", "abc"));
+    assertFalse(StringUtility.startsWith("abc", "abcd"));
+    assertTrue(StringUtility.startsWith("abc", "bc", 1));
+  }
+
+  @Test
+  public void testEndsWith() {
+    assertFalse(StringUtility.endsWith(null, null));
+    assertFalse(StringUtility.endsWith("abc", null));
+    assertFalse(StringUtility.endsWith(null, "abc"));
+    assertFalse(StringUtility.endsWith("123", "abc"));
+    assertTrue(StringUtility.endsWith("abc", ""));
+    assertTrue(StringUtility.endsWith("abc", "c"));
+    assertTrue(StringUtility.endsWith("abc", "abc"));
+    assertFalse(StringUtility.endsWith("abc", "zabc"));
+  }
+
+  @Test
+  public void testContains() {
+    assertFalse(StringUtility.contains(null, null));
+    assertFalse(StringUtility.contains("abc", null));
+    assertFalse(StringUtility.contains(null, "abc"));
+    assertFalse(StringUtility.contains("123", "abc"));
+    assertTrue(StringUtility.contains("abc", ""));
+    assertTrue(StringUtility.contains("abc", "b"));
+    assertTrue(StringUtility.contains("abc", "abc"));
+    assertFalse(StringUtility.contains("abc", "abcd"));
+    assertTrue(StringUtility.contains("ab.c", "."));
+    assertTrue(StringUtility.contains("abc", ".")); // <-- !
+    assertTrue(StringUtility.contains("ab.c", "ab\\.c")); // <-- !
+    assertTrue(StringUtility.contains("Der\nweisse\nHai", "^we"));
+  }
+
+  @Test
+  public void testContainsRegEx() {
+    assertFalse(StringUtility.containsRegEx(null, null));
+    assertFalse(StringUtility.containsRegEx("abc", null));
+    assertFalse(StringUtility.containsRegEx(null, "abc"));
+    assertFalse(StringUtility.containsRegEx("123", "abc"));
+    assertTrue(StringUtility.containsRegEx("abc", ""));
+    assertTrue(StringUtility.containsRegEx("abc", "b"));
+    assertFalse(StringUtility.containsRegEx("ABC", "b"));
+    assertTrue(StringUtility.containsRegEx("abc", "abc"));
+    assertFalse(StringUtility.containsRegEx("abc", "abcd"));
+    assertTrue(StringUtility.containsRegEx("ab.c", "."));
+    assertTrue(StringUtility.containsRegEx("abc", ".")); // <-- difference between containsString() and containsRegEx()
+    assertTrue(StringUtility.containsRegEx("ab.c", "ab\\.c")); // <-- difference between containsString() and containsRegEx()
+    assertTrue(StringUtility.containsRegEx("Schätzung", "ät"));
+    assertFalse(StringUtility.containsRegEx("Schätzung", "ÄT"));
+    assertFalse(StringUtility.containsRegEx("Der weiße Hai", "weiss"));
+    assertTrue(StringUtility.containsRegEx("Der\nweisse\nHai", "^we"));
+    assertFalse(StringUtility.containsRegEx("Der\nweisse\nHai", "^we", 0));
+
+    assertTrue(StringUtility.containsRegEx("Schätzung", "ät", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE));
+    assertTrue(StringUtility.containsRegEx("Schätzung", "ÄT", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE));
+    // The following test does _not_ return the expected result (it should be true), but
+    // it is included for completeness' sake. See JavaDoc of containsStringIgnoreCase().
+    assertFalse(StringUtility.containsRegEx("Der weiße Hai", "weiss", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE));
+  }
+
+  @Test(expected = PatternSyntaxException.class)
+  public void testContainsRegEx_invalid() {
+    assertFalse(StringUtility.containsRegEx("abc", "b("));
+  }
+
+  @Test
+  public void testContainsString() {
+    assertFalse(StringUtility.containsString(null, null));
+    assertFalse(StringUtility.containsString("abc", null));
+    assertFalse(StringUtility.containsString(null, "abc"));
+    assertFalse(StringUtility.containsString("123", "abc"));
+    assertTrue(StringUtility.containsString("abc", ""));
+    assertTrue(StringUtility.containsString("abc", "b"));
+    assertTrue(StringUtility.containsString("abc", "abc"));
+    assertFalse(StringUtility.containsString("abc", "abcd"));
+    assertTrue(StringUtility.containsString("ab.c", "."));
+    assertFalse(StringUtility.containsString("abc", ".")); // <-- difference between containsString() and containsRegEx()
+    assertFalse(StringUtility.containsString("ab.c", "ab\\.c")); // <-- difference between containsString() and containsRegEx()
+    assertTrue(StringUtility.containsString("Schätzung", "ät"));
+    assertFalse(StringUtility.containsString("Schätzung", "ÄT"));
+    assertFalse(StringUtility.containsString("Der weiße Hai", "weiss"));
+  }
+
+  @Test
+  public void testContainsStringIgnoreCase() {
+    assertFalse(StringUtility.containsStringIgnoreCase(null, null));
+    assertFalse(StringUtility.containsStringIgnoreCase("abc", null));
+    assertFalse(StringUtility.containsStringIgnoreCase(null, "abc"));
+    assertFalse(StringUtility.containsStringIgnoreCase("123", "abc"));
+    assertTrue(StringUtility.containsStringIgnoreCase("abc", ""));
+    assertTrue(StringUtility.containsStringIgnoreCase("abc", "B"));
+    assertTrue(StringUtility.containsStringIgnoreCase("AbC", "aBc"));
+    assertFalse(StringUtility.containsStringIgnoreCase("abC", "abcD"));
+    assertTrue(StringUtility.containsStringIgnoreCase("aB.c", "."));
+    assertFalse(StringUtility.containsStringIgnoreCase("aBc", "."));
+    assertFalse(StringUtility.containsStringIgnoreCase("aB.c", "ab\\.c"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Schätzung", "ät"));
+    assertTrue(StringUtility.containsStringIgnoreCase("SCHÄTZUNG", "ät"));
+    assertFalse(StringUtility.containsStringIgnoreCase("SCHAETZUNG", "ät"));
+    assertFalse(StringUtility.containsStringIgnoreCase("Schätzung", "aet"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Schätzung", "ÄT"));
+    assertFalse(StringUtility.containsStringIgnoreCase("Crème fraîche", "CREME"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Crème fraîche", "CRÈME"));
+    assertFalse(StringUtility.containsStringIgnoreCase("Crème fraîche", "AI"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Crème fraîche", "AÎ"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Der weiße Hai", "e"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Der weiße Hai", "der"));
+    assertTrue(StringUtility.containsStringIgnoreCase("Der weiße Hai", "hai"));
+    // The following tests do _not_ return the expected result (both should be true), but
+    // they are included for completeness' sake. See JavaDoc of containsStringIgnoreCase().
+    assertFalse(StringUtility.containsStringIgnoreCase("Der weiße Hai", "WEISS"));
+    assertFalse(StringUtility.containsStringIgnoreCase("DER WEISSE HAI", "weiß"));
+  }
+
+  @Test
+  public void testLength() {
+    assertEquals(0, StringUtility.length(null));
+    assertEquals(0, StringUtility.length(""));
+    assertEquals(1, StringUtility.length("a"));
+    assertEquals(4, StringUtility.length("a\\ \u00B6"));
+  }
+
+  @Test
+  public void testIndexOf() {
+    assertEquals(-1, StringUtility.indexOf(null, 'x'));
+    assertEquals(-1, StringUtility.indexOf(null, 0));
+    assertEquals(-1, StringUtility.indexOf("abc", 0));
+    assertEquals(-1, StringUtility.indexOf("", 'x'));
+    assertEquals(-1, StringUtility.indexOf("abc", 'x'));
+    assertEquals(2, StringUtility.indexOf("abxc", 'x'));
+    assertEquals(0, StringUtility.indexOf("xaxbxcx", 'x'));
+
+    assertEquals(-1, StringUtility.indexOf("xaxbxcx", 'x', 500));
+    assertEquals(0, StringUtility.indexOf("xaxbxcx", 'x', -500));
+    assertEquals(2, StringUtility.indexOf("xaxbxcx", 'x', 1));
+
+    assertEquals(-1, StringUtility.indexOf(null, null));
+    assertEquals(-1, StringUtility.indexOf(null, ""));
+    assertEquals(-1, StringUtility.indexOf(null, "xy"));
+    assertEquals(-1, StringUtility.indexOf("abc", null));
+    assertEquals(-1, StringUtility.indexOf("abc", "xy"));
+    assertEquals(-1, StringUtility.indexOf("", "xy"));
+    assertEquals(3, StringUtility.indexOf("axbxyc", "xy"));
+    assertEquals(0, StringUtility.indexOf("xyaxybxycxy", "xy"));
+
+    assertEquals(-1, StringUtility.indexOf("xyaxybxycxy", "xy", 500));
+    assertEquals(0, StringUtility.indexOf("xyaxybxycxy", "xy", -500));
+    assertEquals(3, StringUtility.indexOf("xyaxybxycxy", "xy", 1));
+  }
+
+  @Test
+  public void testLastIndexOf() {
+    assertEquals(-1, StringUtility.lastIndexOf(null, 'x'));
+    assertEquals(-1, StringUtility.lastIndexOf(null, 0));
+    assertEquals(-1, StringUtility.lastIndexOf("abc", 0));
+    assertEquals(-1, StringUtility.lastIndexOf("", 'x'));
+    assertEquals(-1, StringUtility.lastIndexOf("abc", 'x'));
+    assertEquals(2, StringUtility.lastIndexOf("abxc", 'x'));
+    assertEquals(6, StringUtility.lastIndexOf("xaxbxcx", 'x'));
+
+    assertEquals(6, StringUtility.lastIndexOf("xaxbxcx", 'x', 500));
+    assertEquals(-1, StringUtility.lastIndexOf("xaxbxcx", 'x', -500));
+    assertEquals(2, StringUtility.lastIndexOf("xaxbxcx", 'x', 3));
+
+    assertEquals(-1, StringUtility.lastIndexOf(null, null));
+    assertEquals(-1, StringUtility.lastIndexOf(null, ""));
+    assertEquals(-1, StringUtility.lastIndexOf(null, "xy"));
+    assertEquals(-1, StringUtility.lastIndexOf("abc", null));
+    assertEquals(-1, StringUtility.lastIndexOf("abc", "xy"));
+    assertEquals(-1, StringUtility.lastIndexOf("", "xy"));
+    assertEquals(3, StringUtility.lastIndexOf("axbxyc", "xy"));
+    assertEquals(9, StringUtility.lastIndexOf("xyaxybxycxy", "xy"));
+
+    assertEquals(9, StringUtility.lastIndexOf("xyaxybxycxy", "xy", 500));
+    assertEquals(-1, StringUtility.lastIndexOf("xyaxybxycxy", "xy", -500));
+    assertEquals(3, StringUtility.lastIndexOf("xyaxybxycxy", "xy", 5));
+  }
+
+  @Test
+  public void testMatches() {
+    assertFalse(StringUtility.matches(null, null));
+    assertFalse(StringUtility.matches("abc", null));
+    assertFalse(StringUtility.matches(null, "abc"));
+    assertFalse(StringUtility.matches("abc", "b"));
+    assertTrue(StringUtility.matches("abc", ".*b.*"));
+    assertFalse(StringUtility.matches("a\nbc", ".*a.*b.*"));
+    assertTrue(StringUtility.matches("abc", "(?i).*B.*"));
+
+    assertFalse(StringUtility.matches(null, null, 0));
+    assertTrue(StringUtility.matches("a\nbc", ".*b.*", Pattern.DOTALL));
+    assertTrue(StringUtility.matches("Der weisse Hai", ".*AI", Pattern.CASE_INSENSITIVE));
+  }
 }
