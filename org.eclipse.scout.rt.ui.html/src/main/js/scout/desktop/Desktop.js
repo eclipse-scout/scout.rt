@@ -633,12 +633,14 @@ scout.Desktop.prototype.openUri = function(uri, action) {
       // Open in same window.
       // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
       // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
-      window.location.href = uri;
+      this._openUriInSameWindow(uri);
     } else {
       this._openUriInIFrame(uri);
     }
   } else if (action === 'newWindow') {
     this._openUriAsNewWindow(uri);
+  } else if (action === 'sameWindow') {
+    this._openUriInSameWindow(uri);
   }
 };
 

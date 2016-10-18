@@ -44,7 +44,14 @@ public enum OpenUriAction implements IOpenUriAction {
    * opened to show this content. The application's location does not change. Note that this action may be prevented by
    * the browser's popup blocker mechanism.
    */
-  NEW_WINDOW("newWindow");
+  NEW_WINDOW("newWindow"),
+
+  /**
+   * The URI represents another web page or application that will replace the running application. The current window's
+   * location will be changed to the URI, causing the application to be unloaded. The associated session will not be
+   * destroyed immediately, but housekeeping will shut it down eventually, due to it's imminent inactivity.
+   */
+  SAME_WINDOW("sameWindow");
 
   private final String m_identifier;
 
