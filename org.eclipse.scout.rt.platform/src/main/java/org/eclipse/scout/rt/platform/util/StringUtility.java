@@ -1796,8 +1796,8 @@ public final class StringUtility {
    * Attempts to match the entire region against the regex.
    * </p>
    * <p>
-   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more
-   * information} </small>
+   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
+   * </small>
    * </p>
    *
    * @param s
@@ -1820,9 +1820,6 @@ public final class StringUtility {
   /**
    * Creates a new string repeating the <code>token</code> <code>repetitions</code> times. If <code>repetitions</code>
    * <= 0 an empty string is returned.
-   *
-   * @param token
-   * @param repetitions
    */
   public static String repeat(CharSequence token, int repetitions) {
     StringBuilder sb = new StringBuilder();
@@ -1835,10 +1832,6 @@ public final class StringUtility {
   /**
    * Similar to {@link #nvl(Object, String)} but returns <code>valueWhenEmpty</code> not only if value is null, but as
    * well when the String representation of <code>value</code> is empty or contains only whitespaces.
-   *
-   * @param property
-   * @param string
-   * @return
    */
   public static String substituteWhenEmpty(Object value, String valueWhenEmpty) {
     String stringValue = nvl(value, null);
@@ -1862,8 +1855,12 @@ public final class StringUtility {
   }
 
   /**
-   * @param s
-   * @return
+   * Escapes the following characters in the given string that have a special meaning in regular expressions by
+   * prefixing them with <code>\</code> (backslash):
+   * <p>
+   * <code>^ [ . $ { * ( \ + ) | ? &lt; &gt;</code>
+   *
+   * @return the escaped string (<code>""</code> if the input was <code>null</code>)
    */
   public static String escapeRegexMetachars(String s) {
     if (s == null) {
@@ -1898,5 +1895,241 @@ public final class StringUtility {
       sb.append(ch[i]);
     }
     return sb.toString();
+  }
+
+  /**
+   * Null-safe version of {@link String#startsWith(String)}.
+   *
+   * @return <code>false</code> if either <code>s</code> or <code>prefix</code> is <code>null</code>
+   */
+  public static boolean startsWith(String s, String prefix) {
+    if (s == null || prefix == null) {
+      return false;
+    }
+    return s.startsWith(prefix);
+  }
+
+  /**
+   * Null-safe version of {@link String#startsWith(String, int)}.
+   *
+   * @return <code>false</code> if either <code>s</code> or <code>prefix</code> is <code>null</code>
+   */
+  public static boolean startsWith(String s, String prefix, int toffset) {
+    if (s == null || prefix == null) {
+      return false;
+    }
+    return s.startsWith(prefix, toffset);
+  }
+
+  /**
+   * Null-safe version of {@link String#endsWith(String)}.
+   *
+   * @return <code>false</code> if either <code>s</code> or <code>suffix</code> is <code>null</code>
+   */
+  public static boolean endsWith(String s, String suffix) {
+    if (s == null || suffix == null) {
+      return false;
+    }
+    return s.endsWith(suffix);
+  }
+
+  /**
+   * Null-safe version of {@link String#contains(CharSequence)}.
+   * <p>
+   * If you want <code>substr</code> to be interpreted as a regular expression, use
+   * {@link #containsRegEx(String, String)} or {@link #matches(String, String)} instead.
+   *
+   * @return <code>false</code> if either <code>s</code> or <code>substr</code> is <code>null</code>
+   */
+  public static boolean containsString(String s, String substr) {
+    if (s == null || substr == null) {
+      return false;
+    }
+    return s.contains(substr);
+  }
+
+  /**
+   * Checks if <code>substr</code> is contained in <code>s</code> <b>without</b> considering capitalization, i.e. it
+   * returns <code>true</code> for <code>"This is Some Example</code> and <code>"soME"</code>.
+   * <p>
+   * This method returns <code>false</code> if any of the arguments is <code>null</code>
+   * <p>
+   * <h2>Important note about "special" characters</h2> This method will probably not find all matches for certain
+   * character pairs such as <code>SS</code>/<code>ß</code>. This is a limitation of the JRE. It only uses "simple case
+   * folding" (1:1 mapping from lower case to upper case characters), not "full case folding" (m:n mapping between lower
+   * case and upper case letters or letter combinations).
+   * <p>
+   * See also <a href="http://stackoverflow.com/questions/19135354">this discussion on StackOverflow</a>:
+   * <blockquote><cite>(...) Java provides (at least in theory) Unicode support for case-insensitive reg-exp matching.
+   * The wording in the Java API documentation is that matching is done "in a manner consistent with the Unicode
+   * Standard". The problem is however, that the Unicode standard defines different levels of support for case
+   * conversion and case-insensitive matching and the API documentation does not specify which level is supported by the
+   * Java language.
+   * <p>
+   * Although not documented, at least in Oracle's Java VM, the reg-exp implementation is limited to so called simple
+   * case-insensitive matching. (...)</cite></blockquote>
+   */
+  public static boolean containsStringIgnoreCase(String s, String substr) {
+    if (s == null || substr == null) {
+      return false;
+    }
+    // regionMatches() seems to be faster than using regular expressions, http://stackoverflow.com/a/25379180
+    // Also, using regex would not fix the "special character" issue described in the javadoc.
+    int lenS = s.length();
+    int lenSubstr = substr.length();
+    if (lenSubstr > lenS) {
+      return false;
+    }
+    for (int i = 0; i <= lenS - lenSubstr; i++) {
+      boolean matches = s.regionMatches(true, i, substr, 0, lenSubstr);
+      if (matches) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the given <code>regex</code> matches part of the given input string <code>s</code>, i.e. the pattern is
+   * automatically enclosed with <code>.*</code> before matching it. This method is null-safe.
+   * <p>
+   * The following pattern flags are used by default:
+   * <ul>
+   * <li>{@link Pattern#MULTILINE}
+   * <li>{@link Pattern#DOTALL}
+   * </ul>
+   * <p>
+   * This method treats <code>regex</code> as a regular expression. If you want to match the string as literal, use
+   * {@link #containsString(String, String)} instead.
+   *
+   * @throws PatternSyntaxException
+   *           if <code>regex</code> is not a valid regular expression
+   */
+  public static boolean containsRegEx(String s, String regex) {
+    return containsRegEx(s, regex, Pattern.MULTILINE | Pattern.DOTALL);
+  }
+
+  /**
+   * Checks if the given <code>regex</code> matches part of the given input string <code>s</code>, i.e. the pattern is
+   * automatically enclosed with <code>.*</code> before matching it. This method is null-safe.
+   * <p>
+   * This method treats <code>regex</code> as a regular expression. If you want to match the string as literal, use
+   * {@link #containsString(String, String)} instead.
+   *
+   * @throws PatternSyntaxException
+   *           if <code>regex</code> is not a valid regular expression
+   */
+  public static boolean containsRegEx(String s, String regex, int flags) {
+    if (s == null || regex == null) {
+      return false;
+    }
+    Pattern p = Pattern.compile(".*" + regex + ".*", flags);
+    return p.matcher(s).matches();
+  }
+
+  /**
+   * Null-safe version of {@link String#matches(String)}.
+   *
+   * @return <code>false</code> if either <code>s</code> or <code>regex</code> is <code>null</code>
+   */
+  public static boolean matches(String s, String regex) {
+    if (s == null || regex == null) {
+      return false;
+    }
+    return s.matches(regex);
+  }
+
+  /**
+   * Like {@link #matches(String, String)}, but allows setting the flags to be used while matching (see
+   * {@link Pattern#compile(String, int)}). This method is null-safe.
+   *
+   * @return <code>false</code> if either <code>s</code> or <code>regex</code> is <code>null</code>
+   */
+  public static boolean matches(String s, String regex, int flags) {
+    if (s == null || regex == null) {
+      return false;
+    }
+    return Pattern.compile(regex, flags).matcher(s).matches();
+  }
+
+  /**
+   * Null-safe version of {@link String#length()}.
+   *
+   * @return <code>0</code> if <code>s</code> is <code>null</code>
+   */
+  public static int length(String s) {
+    return (s == null ? 0 : s.length());
+  }
+
+  /**
+   * Null-safe version of {@link String#indexOf(int)}.
+   *
+   * @return <code>-1</code> if <code>s</code> is <code>null</code>
+   */
+  public static int indexOf(String s, int ch) {
+    return (s == null ? -1 : s.indexOf(ch));
+  }
+
+  /**
+   * Null-safe version of {@link String#indexOf(String)}.
+   *
+   * @return <code>-1</code> if either <code>s</code> or <code>str</code> is <code>null</code>
+   */
+  public static int indexOf(String s, String str) {
+    return (s == null || str == null ? -1 : s.indexOf(str));
+  }
+
+  /**
+   * Null-safe version of {@link String#indexOf(int, int)}.
+   *
+   * @return <code>-1</code> if <code>s</code> is <code>null</code>
+   */
+  public static int indexOf(String s, int ch, int fromIndex) {
+    return (s == null ? -1 : s.indexOf(ch, fromIndex));
+  }
+
+  /**
+   * Null-safe version of {@link String#indexOf(String, int)}.
+   *
+   * @return <code>-1</code> if either <code>s</code> or <code>str</code> is <code>null</code>
+   */
+  public static int indexOf(String s, String str, int fromIndex) {
+    return (s == null || str == null ? -1 : s.indexOf(str, fromIndex));
+  }
+
+  /**
+   * Null-safe version of {@link String#lastIndexOf(int)}.
+   *
+   * @return <code>-1</code> if <code>s</code> is <code>null</code>
+   */
+  public static int lastIndexOf(String s, int ch) {
+    return (s == null ? -1 : s.lastIndexOf(ch));
+  }
+
+  /**
+   * Null-safe version of {@link String#lastIndexOf(String)}.
+   *
+   * @return <code>-1</code> if either <code>s</code> or <code>str</code> is <code>null</code>
+   */
+  public static int lastIndexOf(String s, String str) {
+    return (s == null || str == null ? -1 : s.lastIndexOf(str));
+  }
+
+  /**
+   * Null-safe version of {@link String#lastIndexOf(int, int)}.
+   *
+   * @return <code>-1</code> if <code>s</code> is <code>null</code>
+   */
+  public static int lastIndexOf(String s, int ch, int fromIndex) {
+    return (s == null ? -1 : s.lastIndexOf(ch, fromIndex));
+  }
+
+  /**
+   * Null-safe version of {@link String#lastIndexOf(String, int)}.
+   *
+   * @return <code>-1</code> if either <code>s</code> or <code>str</code> is <code>null</code>
+   */
+  public static int lastIndexOf(String s, String str, int fromIndex) {
+    return (s == null || str == null ? -1 : s.lastIndexOf(str, fromIndex));
   }
 }
