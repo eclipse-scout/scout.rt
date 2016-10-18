@@ -52,7 +52,7 @@ public class WebappEventListener implements ServletContextListener {
   public void contextDestroyed(ServletContextEvent sce) {
     ServletContextRegistration.servletContext = null;
     IPlatform platform = Platform.get();
-    if (platform != null) {
+    if (platform != null && platform.getState() != IPlatform.State.PlatformStopped) {
       platform.stop();
     }
   }

@@ -1884,6 +1884,30 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
+    // close messageboxes
+    for (IMessageBox m : getMessageBoxes()) {
+      if (m != null) {
+        try {
+          m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+        }
+        catch (RuntimeException e) {
+          LOG.error("Exception while closing messagebox", e);
+        }
+      }
+    }
+
+    // close filechoosers
+    for (IFileChooser f : getFileChoosers()) {
+      if (f != null) {
+        try {
+          f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
+        }
+        catch (RuntimeException e) {
+          LOG.error("Exception while closing filechooser", e);
+        }
+      }
+    }
+
     // close open forms
     for (IForm form : showedForms) {
       if (form != null) {
@@ -1896,7 +1920,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
-    // outlines
+    // dispose outlines
     for (IOutline outline : getAvailableOutlines()) {
       try {
         outline.disposeTree();
