@@ -47,20 +47,20 @@ public class PlatformStartTest {
 
   @Test
   public void testInitialize() {
-    ClassLoader loader = new PlatformOverrideClassLoader(getClass().getClassLoader(), FixturePlatform.class);
+    ClassLoader loader = new PlatformOverrideClassLoader(getClass().getClassLoader(), FixturePlatformWithReentrantCall.class);
     Thread.currentThread().setContextClassLoader(loader);
 
     Platform.set(null);
     IPlatform p = Platform.get();
     p.awaitPlatformStarted();
     assertNotNull(p);
-    assertEquals(FixturePlatform.class, p.getClass());
-    assertSame(p, FixturePlatform.reentrantPlatform);
+    assertEquals(FixturePlatformWithReentrantCall.class, p.getClass());
+    assertSame(p, FixturePlatformWithReentrantCall.reentrantPlatform);
   }
 
   @Test
   public void testPerformance() throws Exception {
-    ClassLoader loader = new PlatformOverrideClassLoader(getClass().getClassLoader(), FixturePlatform.class);
+    ClassLoader loader = new PlatformOverrideClassLoader(getClass().getClassLoader(), FixturePlatformWithReentrantCall.class);
     Thread.currentThread().setContextClassLoader(loader);
 
     Platform.set(null);
@@ -95,15 +95,38 @@ public class PlatformStartTest {
     }
   }
 
-  public static class FixturePlatform extends DefaultPlatform {
+  @Test
+  public void testStartStop() throws Exception {
+    Platform.set(new FixturePlatformWithMinimalBeanManager());
+    IPlatform p = Platform.get();
+    p.start(new PlatformStateLatch());
+    p.awaitPlatformStarted();
+
+    p.stop();
+    assertEquals(IPlatform.State.PlatformStopped, p.getState());
+  }
+
+  public static class FixturePlatformWithReentrantCall extends DefaultPlatform {
     static IPlatform reentrantPlatform;
 
     @Override
     protected BeanManagerImplementor createBeanManager() {
       BeanManagerImplementor context = new BeanManagerImplementor();
+      context.registerClass(SimpleBeanDecorationFactory.class);
       //make a recursive call to the platform
       reentrantPlatform = Platform.get();
       reentrantPlatform.getBeanManager();
+      return context;
+    }
+  }
+
+  public static class FixturePlatformWithMinimalBeanManager extends DefaultPlatform {
+    static IPlatform reentrantPlatform;
+
+    @Override
+    protected BeanManagerImplementor createBeanManager() {
+      BeanManagerImplementor context = new BeanManagerImplementor();
+      context.registerClass(SimpleBeanDecorationFactory.class);
       return context;
     }
   }
