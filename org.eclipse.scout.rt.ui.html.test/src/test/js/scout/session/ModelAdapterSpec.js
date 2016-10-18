@@ -335,6 +335,24 @@ describe('ModelAdapter', function() {
     });
 
 
+    describe('export adapter', function() {
+
+      it('exportAdapterData should export last part of model-class as ID', function() {
+        var adapter = new scout.ModelAdapter();
+
+        // regular top-level classes (.)
+        var model = {modelClass: 'com.bsiag.sandbox.FooField'};
+        adapter.exportAdapterData(model);
+        expect(model.id).toBe('FooField');
+
+        // inner classes ($)
+        model = {modelClass: 'com.bsiag.sandbox.FooBox$BarField'};
+        adapter.exportAdapterData(model);
+        expect(model.id).toBe('BarField');
+      });
+
+    });
+
     describe('adapters', function() {
 
       it('creates and registers adapters', function() {

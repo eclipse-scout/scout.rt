@@ -1114,10 +1114,10 @@ scout.Widget.prototype.callSetter = function(propertyName, value) {
  * Returns the widget with the requested ID or null if no widget has been found.
  * @param widgetId
  */
-scout.Widget.prototype.getWidgetById = function(widgetId) {
-  return getRecWidgetById(this, widgetId);
+scout.Widget.prototype.widget = function(widgetId) {
+  return _recWidget(this, widgetId);
 
-  function getRecWidgetById(widget, widgetId) {
+  function _recWidget(widget, widgetId) {
     if (widget.id === widgetId) {
       return widget;
     }
@@ -1128,7 +1128,7 @@ scout.Widget.prototype.getWidgetById = function(widgetId) {
         if (child.id === widgetId) {
           return child;
         } else {
-          child = getRecWidgetById(child, widgetId);
+          child = _recWidget(child, widgetId);
           if (child) {
             return child;
           }
@@ -1138,6 +1138,13 @@ scout.Widget.prototype.getWidgetById = function(widgetId) {
       return null;
     }
   }
+};
+
+/**
+ * @deprecated Use this.widget() instead
+ */
+scout.Widget.prototype.getWidgetById = function(widgetId) {
+  return this.widget(widgetId);
 };
 
 scout.Widget.prototype.requestFocus = function() {
