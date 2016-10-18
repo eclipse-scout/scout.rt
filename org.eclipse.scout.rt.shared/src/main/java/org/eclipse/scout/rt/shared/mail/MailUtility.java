@@ -489,7 +489,7 @@ public final class MailUtility {
     Object messageContent = msg.getContent();
 
     Multipart multiPart = null;
-    if (messageContent instanceof Multipart && StringUtility.contains(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
+    if (messageContent instanceof Multipart && StringUtility.containsStringIgnoreCase(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
       // already contains attachments
       // use the existing multipart
       multiPart = (Multipart) messageContent;
@@ -508,7 +508,7 @@ public final class MailUtility {
       String message = (String) messageContent;
 
       String contentTypeHeader = StringUtility.join(" ", msg.getHeader(CONTENT_TYPE_ID));
-      if (StringUtility.contains(contentTypeHeader, "html")) {
+      if (StringUtility.containsStringIgnoreCase(contentTypeHeader, "html")) {
         // html
         multiPartBody.setContent(message, MailUtility.CONTENT_TYPE_TEXT_HTML);
         multiPartBody.setHeader(CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_HTML);

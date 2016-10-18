@@ -149,7 +149,7 @@ public class BrowserInfo {
   protected void initBrowserInfo() {
     // Opera
     String regex = "Opera[\\s\\/]([0-9\\.]*)";
-    boolean isOpera = StringUtility.contains(m_userAgent, regex);
+    boolean isOpera = StringUtility.containsRegEx(m_userAgent, regex);
     if (isOpera) {
       setOpera(true);
       setEngineType(UiEngineType.OPERA);
@@ -159,7 +159,7 @@ public class BrowserInfo {
 
     // Konqueror
     regex = "KHTML\\/([0-9-\\.]*)";
-    boolean isKonqueror = StringUtility.contains(m_userAgent, regex);
+    boolean isKonqueror = StringUtility.containsRegEx(m_userAgent, regex);
     if (isKonqueror) {
       setWebkit(true);
       setEngineType(UiEngineType.KONQUEROR);
@@ -169,7 +169,7 @@ public class BrowserInfo {
 
     // Webkit Browsers
     regex = "AppleWebKit\\/([^ ]+)";
-    boolean isWebkit = (m_userAgent.indexOf("AppleWebKit") != -1) && StringUtility.contains(m_userAgent, regex);
+    boolean isWebkit = (m_userAgent.indexOf("AppleWebKit") != -1) && StringUtility.containsRegEx(m_userAgent, regex);
     if (isWebkit) {
       setWebkit(true);
       if (m_userAgent.indexOf("Chrome") != -1) {
@@ -194,7 +194,7 @@ public class BrowserInfo {
 
     // Internet Explorer
     regex = "(?:MSIE\\s+|Trident/)([^\\);]+)(\\)|;)";
-    boolean isMshtml = StringUtility.contains(m_userAgent, regex);
+    boolean isMshtml = StringUtility.containsRegEx(m_userAgent, regex);
     if (isMshtml) {
       setMshtml(true);
       setEngineType(UiEngineType.IE);
@@ -204,7 +204,7 @@ public class BrowserInfo {
 
     // Gecko Browsers (Mozilla)
     regex = "rv\\:([^\\);]+)(\\)|;)";
-    boolean isGecko = (m_userAgent.indexOf("Gecko") != -1) && StringUtility.contains(m_userAgent, regex);
+    boolean isGecko = (m_userAgent.indexOf("Gecko") != -1) && StringUtility.containsRegEx(m_userAgent, regex);
     if (isGecko) {
       setGecko(true);
       if (m_userAgent.indexOf("Firefox") != -1) {
