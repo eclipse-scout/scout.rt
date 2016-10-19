@@ -117,7 +117,7 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
         m_jsonMenuAdapters.remove(adapter);
       }
     }
-    List<IJsonAdapter<?>> menuAdapters = getParent().attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
+    List<IJsonAdapter<?>> menuAdapters = getParent().attachAdapters(getModel().getChildActions(), getFilter());
     m_jsonMenuAdapters.addAll(menuAdapters);
 
     IJsonAdapter<?> parent = getParent();
