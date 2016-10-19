@@ -71,7 +71,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$content = this.$container.appendDiv('messagebox-content');
   this.$header = this.$content.appendDiv('messagebox-label messagebox-header');
   this.$body = this.$content.appendDiv('messagebox-label messagebox-body');
-  this.$html = this.$content.appendDiv('messagebox-label messagebox-html');
+  this.$html = this.$content.appendDiv('messagebox-label messagebox-html prevent-initial-focus');
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
   var boxButtons = new scout.BoxButtons(this.$buttons, this._onButtonClick.bind(this));
@@ -158,6 +158,10 @@ scout.MessageBox.prototype._renderBody = function(text) {
 scout.MessageBox.prototype._renderHtml = function(text) {
   this.$html.html(text);
   this.$html.setVisible(text);
+  // Don't change focus when a link is clicked by mouse
+  this.$html.find('a, .app-link')
+    .attr('tabindex', '0')
+    .unfocusable();
 };
 
 scout.MessageBox.prototype._renderHiddenText = function(text) {

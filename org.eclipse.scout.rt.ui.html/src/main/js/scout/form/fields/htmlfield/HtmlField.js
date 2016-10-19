@@ -48,9 +48,12 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   }
   this.$field.html(this.displayText);
 
-  // Add action and focus behavior to app-links
+  // Add action to app-links
   this.$field.find('.app-link')
-    .on('click', this._onAppLinkAction.bind(this))
+    .on('click', this._onAppLinkAction.bind(this));
+
+  // Don't change focus when a link is clicked by mouse
+  this.$field.find('a, .app-link')
     .attr('tabindex', '0')
     .unfocusable();
 
