@@ -317,7 +317,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     }
   }
 
-  private void applyLookupResult(ITableRow tableRow, List<? extends ILookupRow<?>> result) {
+  protected void applyLookupResult(ITableRow tableRow, List<? extends ILookupRow<?>> result) {
     // disable row changed trigger on row
     try {
       tableRow.setRowChanging(true);
