@@ -17,8 +17,9 @@ scout.codes = {
 
   registry: {},
 
-  bootstrap: function() {
-    return $.ajaxJson('res/codes.json')
+  bootstrap: function(url) {
+    url = scout.nvl(url, 'res/codes.json');
+    return $.ajaxJson(url)
       .done(this.init.bind(this));
   },
 

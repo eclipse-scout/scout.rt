@@ -733,8 +733,6 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     this._copyAdapterData(message.adapterData);
   }
 
-
-
   if (message.events) {
     this.processingEvents = true;
     try {

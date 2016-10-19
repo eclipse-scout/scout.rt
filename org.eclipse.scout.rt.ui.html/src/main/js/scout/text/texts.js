@@ -14,8 +14,9 @@ scout.texts = {
 
   textsByLocale: {},
 
-  bootstrap: function() {
-    return $.ajaxJson('res/texts.json')
+  bootstrap: function(url) {
+    url = scout.nvl(url, 'res/texts.json');
+    return $.ajaxJson(url)
       .done(this.init.bind(this));
   },
 

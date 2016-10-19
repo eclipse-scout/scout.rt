@@ -12,8 +12,9 @@ scout.locales = {
 
   localesMap: {},
 
-  bootstrap: function() {
-    return $.ajaxJson('res/locales.json')
+  bootstrap: function(url) {
+    url = scout.nvl(url, 'res/locales.json');
+    return $.ajaxJson(url)
       .done(this.init.bind(this));
   },
 
