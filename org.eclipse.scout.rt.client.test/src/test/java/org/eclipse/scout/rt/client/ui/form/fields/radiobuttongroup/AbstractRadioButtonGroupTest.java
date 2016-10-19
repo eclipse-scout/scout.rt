@@ -136,13 +136,13 @@ public class AbstractRadioButtonGroupTest {
   public void testEnabledDisabled() {
     assertAllButtonsEnabled(true, m_group);
 
-    m_group.getRadioButton2().setEnabled(false);
+    m_group.getRadioButton2().setEnabled(false, true, true);
     assertTrue(!m_group.getRadioButton2().isEnabled());
 
-    m_group.setEnabled(false);
+    m_group.setEnabled(false, true, true);
     assertAllButtonsEnabled(false, m_group);
 
-    m_group.setEnabled(true);
+    m_group.setEnabled(true, false, true);
     assertAllButtonsEnabled(true, m_group);
   }
 
@@ -243,12 +243,7 @@ public class AbstractRadioButtonGroupTest {
 
   private void assertAllButtonsEnabled(boolean enabled, IRadioButtonGroup<?> group) {
     for (IRadioButton<?> btn : m_group.getButtons()) {
-      if (enabled) {
-        assertTrue(btn.isEnabled());
-      }
-      else {
-        assertTrue(!btn.isEnabled());
-      }
+      assertEquals(enabled, btn.isEnabledIncludingParents());
     }
   }
 

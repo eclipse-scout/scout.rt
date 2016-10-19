@@ -207,10 +207,14 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    *          live and mutable collection of configured fields, yet not initialized
    */
   protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
-    if (getLookupCall() != null) {
-      // Use the LookupCall
-      List<ILookupRow<T>> lookupRows = getLookupRows();
-      for (ILookupRow<T> row : lookupRows) {
+    if (getLookupCall() == null) {
+      return;
+    }
+
+    // Use the LookupCall
+    List<ILookupRow<T>> lookupRows = getLookupRows();
+    for (ILookupRow<T> row : lookupRows) {
+      if (row.isActive()) {
         IRadioButton<T> radioButton = createEmptyRadioButtonForLookupRow();
         radioButton.setEnabled(row.isEnabled());
         radioButton.setLabel(row.getText());
@@ -219,7 +223,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         radioButton.setBackgroundColor(row.getBackgroundColor());
         radioButton.setForegroundColor(row.getForegroundColor());
         radioButton.setFont(row.getFont());
-        radioButton.setEnabled(row.isActive());
+        radioButton.setCssClass(row.getCssClass());
+        radioButton.setIconId(row.getIconId());
         fields.addLast(radioButton);
       }
     }
@@ -518,32 +523,6 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  /**
-   * broadcast this change to all children
-   */
-  @Override
-  public void setEnabled(boolean b) {
-    super.setEnabled(b);
-    // recursively down all children
-    for (IFormField f : m_fields) {
-      f.setEnabled(b);
-    }
-  }
-
-  /**
-   * when granting of enabled property changes, broadcast and set this property on all children that have no permission
-   * set
-   */
-  @Override
-  public void setEnabledGranted(boolean b) {
-    super.setEnabledGranted(b);
-    for (IFormField f : getFields()) {
-      if (f.getEnabledPermission() == null) {
-        f.setEnabledGranted(b);
-      }
-    }
-  }
-
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> c) {
     return CompositeFieldUtility.getFieldByClass(this, c);
@@ -583,27 +562,17 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
-    // myself
-    if (!visitor.visitField(this, startLevel, 0)) {
-      return false;
+  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
+    IFormField thisField = null;
+    if (includeThis) {
+      thisField = this;
     }
-    // children
-    int index = 0;
-    for (IFormField field : m_fields) {
-      if (field instanceof ICompositeField) {
-        if (!((ICompositeField) field).visitFields(visitor, startLevel + 1)) {
-          return false;
-        }
-      }
-      else {
-        if (!visitor.visitField(field, startLevel, index)) {
-          return false;
-        }
-      }
-      index++;
-    }
-    return true;
+    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, m_fields, level, fieldIndex);
+  }
+
+  @Override
+  public boolean visitFields(IFormFieldVisitor visitor) {
+    return acceptVisitor(visitor, 0, 0, true);
   }
 
   private void syncValueToButtons() {

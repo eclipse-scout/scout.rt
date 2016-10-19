@@ -49,7 +49,7 @@ scout.BrowserField.prototype._render = function($parent) {
   this._messageListener = this._onMessage.bind(this);
   this.myWindow.addEventListener('message', this._messageListener);
 
-  if (this.enabled) {
+  if (this.enabledComputed) {
     // use setTimeout to call method, because _openPopupWindow must be called after layouting
     setTimeout(this._openPopupWindow.bind(this, true), 20);
   }
@@ -219,7 +219,7 @@ scout.BrowserField.prototype._remove = function() {
   this._messageListener = null;
 
   // if content is shown in an external window and auto close is set to true
-  if(this.showInExternalWindow && this.autoCloseExternalWindow) {
+  if (this.showInExternalWindow && this.autoCloseExternalWindow) {
     // try to close popup window (if it is not already closed)
     if (this._popupWindow && !this._popupWindow.closed) {
       this._popupWindow.close();

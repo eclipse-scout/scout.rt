@@ -152,16 +152,16 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
   }
 
-  // box is only visible when it has at least one visible item
   @Override
   protected void handleFieldVisibilityChanged() {
+    // box is only visible when it has at least one visible item
     super.handleFieldVisibilityChanged();
 
     if (isInitialized()) {
       rebuildFieldGrid();
     }
 
-    if (getVisibleFieldCount() > 0) {
+    if (hasVisibleFieldsInternal()) {
       final IGroupBox selectedBox = getSelectedTab();
       if (selectedBox == null) {
         for (IGroupBox box : getGroupBoxes()) {

@@ -909,27 +909,17 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Override
-  public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
-    // myself
-    if (!visitor.visitField(this, startLevel, 0)) {
-      return false;
+  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
+    IFormField thisField = null;
+    if (includeThis) {
+      thisField = this;
     }
-    // children
-    int index = 0;
-    for (IFormField field : m_fields) {
-      if (field instanceof ICompositeField) {
-        if (!((ICompositeField) field).visitFields(visitor, startLevel + 1)) {
-          return false;
-        }
-      }
-      else {
-        if (!visitor.visitField(field, startLevel, index)) {
-          return false;
-        }
-      }
-      index++;
-    }
-    return true;
+    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, m_fields, level, fieldIndex);
+  }
+
+  @Override
+  public boolean visitFields(IFormFieldVisitor visitor) {
+    return acceptVisitor(visitor, 0, 0, true);
   }
 
   @Override

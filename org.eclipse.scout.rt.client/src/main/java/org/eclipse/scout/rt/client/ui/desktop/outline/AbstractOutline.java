@@ -57,6 +57,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +67,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractOutline.class);
-
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
   private static final IMenuTypeMapper TABLE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {
@@ -76,9 +78,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   };
 
-  // visible is defined as: visibleGranted && visibleProperty
-  private boolean m_visibleGranted;
-  private boolean m_visibleProperty;
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This Outline is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
+
   private IPage<?> m_contextPage;
   private IPageChangeStrategy m_pageChangeStrategy;
   private OptimisticLock m_contextPageOptimisticLock;
@@ -281,7 +287,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   protected void initConfig() {
-    m_visibleGranted = true;
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_contextPageOptimisticLock = new OptimisticLock();
     setPageChangeStrategy(createPageChangeStrategy());
     m_outlineMediator = createOutlineMediator();
@@ -462,13 +468,12 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    return isVisible(IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
-    calculateVisible();
+  public void setVisibleGranted(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
@@ -477,13 +482,23 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public void setVisible(boolean b) {
-    m_visibleProperty = b;
-    calculateVisible();
+  public void setVisible(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE);
   }
 
   private void calculateVisible() {
-    propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
+    propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible));
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
+    calculateVisible();
+  }
+
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
   }
 
   @Override

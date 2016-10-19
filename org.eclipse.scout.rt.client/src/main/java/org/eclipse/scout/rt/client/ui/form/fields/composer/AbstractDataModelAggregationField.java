@@ -67,12 +67,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
 
   public void setAttribute(IDataModelAttribute attribute) {
     ((DataModelAggregationLookupCall) getLookupCall()).setAttribute(attribute);
-    if (attribute != null) {
-      setEnabled(true);
-    }
-    else {
-      setEnabled(false);
-    }
+    setEnabled(attribute != null);
     interceptAttributeChanged(attribute);
     refreshDisplayText();
   }

@@ -22,7 +22,6 @@ scout.WizardProgressField = function() {
 };
 scout.inherits(scout.WizardProgressField, scout.FormField);
 
-
 scout.WizardProgressField.prototype._init = function(model) {
   scout.WizardProgressField.parent.prototype._init.call(this, model);
   this._updateStepsMap();
@@ -69,10 +68,10 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       .addClass(step.cssClass)
       .data('wizard-step', step);
     step.$step = $step;
-    if (this.enabled && step.enabled && step.actionEnabled) {
+    if (this.enabledComputed && step.enabled && step.actionEnabled) {
       $step.addClass('action-enabled');
       $step.on('click', this._onStepClick.bind(this));
-    } else if (!this.enabled || !step.enabled) {
+    } else if (!this.enabledComputed || !step.enabled) {
       $step.addClass('disabled');
     }
     if (scout.strings.hasText(step.tooltipText)) {

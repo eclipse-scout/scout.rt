@@ -66,7 +66,8 @@ public class ClipboardForm extends AbstractForm {
   }
 
   protected void checkOkButtonEnabled() {
-    getOkButton().setEnabled(getHandler() instanceof CopyHandler || getClipboardField().getValue() != null && !getClipboardField().getValue().isEmpty());
+    boolean okButtonEnabled = getHandler() instanceof CopyHandler || getClipboardField().getValue() != null && !getClipboardField().getValue().isEmpty();
+    getOkButton().setEnabled(okButtonEnabled, true, false);
   }
 
   @Override

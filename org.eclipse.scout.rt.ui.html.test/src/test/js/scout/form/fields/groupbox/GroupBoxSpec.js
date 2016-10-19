@@ -30,15 +30,27 @@ describe("GroupBox", function() {
     return field;
   }
 
+  function expectEnabled(field, expectedEnabled, expectedEnabledComputed, hasClass) {
+    expect(field.enabled).toBe(expectedEnabled);
+    expect(field.enabledComputed).toBe(expectedEnabledComputed);
+    if (hasClass) {
+      if (field.$field) {
+        expect(field.$field).toHaveClass(hasClass);
+      } else {
+        expect(field.$container).toHaveClass(hasClass);
+      }
+    }
+  }
+
   describe("_render", function() {
     var groupBox, model = {
-        id: '2',
-        label: "fooBar",
-        gridData: {
-          x: 0,
-          y: 0
-        }
-      };
+      id: '2',
+      label: "fooBar",
+      gridData: {
+        x: 0,
+        y: 0
+      }
+    };
 
     beforeEach(function() {
       groupBox = createField(model);
@@ -67,7 +79,10 @@ describe("GroupBox", function() {
         mainBox: true
       });
       rootGroupBox = scout.create('GroupBox', model);
-      form = scout.create('Form', {parent: session.desktop, rootGroupBox: rootGroupBox});
+      form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: rootGroupBox
+      });
       session.desktop.$container = $('#sandbox');
     });
 
@@ -83,7 +98,6 @@ describe("GroupBox", function() {
   });
 
   describe('focus', function() {
-
     it('focus first focusable field in groupBox', function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       groupBox.render(session.$entryPoint);
@@ -91,7 +105,22 @@ describe("GroupBox", function() {
       groupBox.focus();
       expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(true);
     });
+  });
 
+  describe('enabled', function() {
+    it('propagation', function() {
+      var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, false, 2);
+      groupBoxWithTwoChildren.render(session.$entryPoint);
+
+      expectEnabled(groupBoxWithTwoChildren, true, true);
+      expectEnabled(groupBoxWithTwoChildren.getFields()[0], true, true);
+      expectEnabled(groupBoxWithTwoChildren.getFields()[1], true, true);
+
+      groupBoxWithTwoChildren.setEnabled(false);
+      expectEnabled(groupBoxWithTwoChildren, false, false, 'disabled');
+      expectEnabled(groupBoxWithTwoChildren.getFields()[0], true, false, 'disabled');
+      expectEnabled(groupBoxWithTwoChildren.getFields()[1], true, false, 'disabled');
+    });
   });
 
 });

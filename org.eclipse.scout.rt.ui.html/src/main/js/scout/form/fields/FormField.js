@@ -40,6 +40,11 @@ scout.FormField = function() {
   this.$fieldContainer;
 
   /**
+   * The computed enabled state. The difference to the 'enabled' property is that this member also considers the enabled-states of the parent widgets.
+   */
+  this.enabledComputed = true;
+
+  /**
    * The status label is used for error-status, tooltip-icon and menus.
    */
   this.$status;
@@ -101,6 +106,7 @@ scout.FormField.prototype._init = function(model) {
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);
   this._syncGridData(this.gridData);
+  this._syncEnabled(this.enabled);
   this._updateEmpty();
 };
 
@@ -293,6 +299,15 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
 };
 
+scout.FormField.prototype._syncEnabled = function(enabled) {
+  this._setProperty('enabled', enabled);
+  var parentEnabled = enabled;
+  if (this.parent.initialized && this.parent.enabledComputed !== undefined) {
+    parentEnabled = this.parent.enabledComputed;
+  }
+  this.recomputeEnabled(parentEnabled);
+};
+
 /**
  * @override
  */
@@ -300,7 +315,7 @@ scout.FormField.prototype._renderEnabled = function() {
   scout.FormField.parent.prototype._renderEnabled.call(this);
   this._updateDisabledCopyOverlay();
   if (this.$field) {
-    this.$field.setEnabled(this.enabled);
+    this.$field.setEnabled(this.enabledComputed);
   }
 };
 
@@ -354,7 +369,6 @@ scout.FormField.prototype._renderLoading = function() {
 scout.FormField.prototype._renderPreventInitialFocus = function() {
   this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
 };
-
 
 scout.FormField.prototype._getCurrentMenus = function() {
   var menuTypes;
@@ -433,6 +447,14 @@ scout.FormField.prototype.focus = function() {
   } else {
     var element = this.session.focusManager.findFirstFocusableElement(this.$container);
     this.session.focusManager.requestFocus(element);
+  }
+};
+
+scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
+  this.enabledComputed = this.enabled && parentEnabled;
+
+  if (this.rendered) {
+    this._renderEnabled(); // refresh
   }
 };
 
@@ -791,7 +813,7 @@ scout.FormField.prototype._uninstallDragAndDropHandler = function(event) {
 
 scout.FormField.prototype._updateDisabledCopyOverlay = function() {
   if (this.disabledCopyOverlay && !scout.device.supportsCopyFromDisabledInputFields()) {
-    if (this.enabled) {
+    if (this.enabledComputed) {
       this._removeDisabledCopyOverlay();
     } else {
       this._renderDisabledCopyOverlay();

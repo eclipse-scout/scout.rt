@@ -37,6 +37,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   private static final Logger LOG = LoggerFactory.getLogger(AbstractStringField.class);
 
   private IStringFieldUIFacade m_uiFacade;
+  private boolean m_enabledProcessing;
 
   public AbstractStringField() {
     this(true);
@@ -491,13 +492,23 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   @Override
+  public boolean isEnabledProcessing() {
+    return m_enabledProcessing;
+  }
+
+  private void setEnabledProcessing(boolean b) {
+    m_enabledProcessing = b;
+  }
+
+  @Override
   public void doAction() {
-    if (isHasAction() && isEnabled() && isVisible() && isEnabledProcessingButton()) {
+    if (isHasAction() && isEnabled() && isVisible() && isEnabledProcessing()) {
       try {
+        setEnabledProcessing(false);
         interceptAction();
       }
       finally {
-        setEnabledProcessingButton(true);
+        setEnabledProcessing(true);
       }
     }
   }

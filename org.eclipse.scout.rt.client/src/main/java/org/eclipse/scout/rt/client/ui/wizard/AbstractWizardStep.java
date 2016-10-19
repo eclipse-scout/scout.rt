@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -42,19 +44,45 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 @ClassId("39d99aa9-002c-4367-9558-20225928fbd1")
 public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPropertyObserver implements IWizardStep<FORM>, IPropertyObserver, IExtensibleObject {
 
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String ACTION_RUNNING = "ACTION_RUNNING";
+
   private IWizard m_wizard;
   private FORM m_form;
   private FormListener m_formListener;
-  private boolean m_performingWizardStepAction;
   private int m_activationCounter;
-  private boolean m_initialized;
   private final ObjectExtensions<AbstractWizardStep<FORM>, IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>> m_objectExtensions;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}.<br>
+   * 7 dimensions remain for custom use. This WizardStep is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
+
+  /**
+   * Provides 8 dimensions for enabled state.<br>
+   * Internally used: {@link IDimensions#ENABLED}.<br>
+   * 7 dimensions remain for custom use. This WizardStep is enabled, if all dimensions are enabled (all bits set).
+   */
+  private byte m_enabled;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #ACTION_RUNNING}
+   */
+  private byte m_flags;
 
   public AbstractWizardStep() {
     this(true);
   }
 
   public AbstractWizardStep(boolean callInitializer) {
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
+    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_objectExtensions = new ObjectExtensions<AbstractWizardStep<FORM>, IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>>(this, false);
     if (callInitializer) {
       callInitializer();
@@ -62,10 +90,11 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   protected void callInitializer() {
-    if (!m_initialized) {
-      interceptInitConfig();
-      m_initialized = true;
+    if (isInitialized()) {
+      return;
     }
+    interceptInitConfig();
+    setInitialized();
   }
 
   /*
@@ -353,6 +382,14 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     m_wizard = w;
   }
 
+  private boolean isInitialized() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+  }
+
   @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
@@ -400,7 +437,33 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   @Override
   public void setEnabled(boolean enabled) {
-    propertySupport.setPropertyBool(PROP_ENABLED, enabled);
+    setEnabled(enabled, IDimensions.ENABLED);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
+    setEnabledInternal();
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
+  }
+
+  private void setEnabledInternal() {
+    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
+    setVisibleInternal();
+  }
+
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
   }
 
   @Override
@@ -410,7 +473,11 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   @Override
   public void setVisible(boolean visible) {
-    propertySupport.setPropertyBool(PROP_VISIBLE, visible);
+    setVisible(visible, IDimensions.VISIBLE);
+  }
+
+  private void setVisibleInternal() {
+    propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible));
   }
 
   @Override
@@ -477,11 +544,11 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   protected boolean isPerformingWizardStepAction() {
-    return m_performingWizardStepAction;
+    return FLAGS_BIT_HELPER.isBitSet(ACTION_RUNNING, m_flags);
   }
 
   protected void setPerformingWizardStepAction(boolean performingWizardStepAction) {
-    m_performingWizardStepAction = performingWizardStepAction;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ACTION_RUNNING, performingWizardStepAction, m_flags);
   }
 
   @Override

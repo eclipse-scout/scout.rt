@@ -31,6 +31,20 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
+scout.RadioButtonGroup.prototype.getFields = function() {
+  return this.formFields;
+};
+
+/**
+ * @override FormField.js
+ */
+scout.RadioButtonGroup.prototype.visit = function(visitor) {
+  scout.RadioButtonGroup.parent.prototype.visit.call(this, visitor);
+  this.formFields.forEach(function(field) {
+    field.visit(visitor);
+  });
+};
+
 scout.RadioButtonGroup.prototype._init = function(model) {
   scout.RadioButtonGroup.parent.prototype._init.call(this, model);
 
@@ -75,13 +89,23 @@ scout.RadioButtonGroup.prototype._renderEnabled = function() {
   this._provideTabIndex();
 };
 
+/**
+ * @override FormField.js
+ */
+scout.RadioButtonGroup.prototype.recomputeEnabled = function(parentEnabled) {
+  scout.RadioButtonGroup.parent.prototype.recomputeEnabled.call(this, parentEnabled);
+  this.getFields().forEach(function(field) {
+    field.recomputeEnabled(this.enabledComputed);
+  }, this);
+};
+
 scout.RadioButtonGroup.prototype._provideTabIndex = function() {
   var tabSet;
   this.radioButtons.forEach(function(radioButton) {
-    if (radioButton.enabled && this.enabled && !tabSet) {
+    if (radioButton.enabledComputed && this.enabledComputed && !tabSet) {
       radioButton.setTabbable(true);
       tabSet = radioButton;
-    } else if (tabSet && this.enabled && radioButton.enabled && radioButton.selected) {
+    } else if (tabSet && this.enabledComputed && radioButton.enabledComputed && radioButton.selected) {
       tabSet.setTabbable(false);
       radioButton.setTabbable(true);
       tabSet = radioButton;
@@ -95,7 +119,7 @@ scout.RadioButtonGroup.prototype.selectButton = function(radioButtonToSelect) {
   this.selectedButton = null;
   this.radioButtons.forEach(function(radioButton) {
     if (radioButton === radioButtonToSelect) {
-      if (!radioButton.enabled) {
+      if (!radioButton.enabledComputed) {
         return;
       }
       radioButton.setSelected(true);

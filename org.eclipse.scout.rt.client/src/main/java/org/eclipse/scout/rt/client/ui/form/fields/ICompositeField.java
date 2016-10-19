@@ -20,14 +20,23 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
  */
 public interface ICompositeField extends IFormField {
 
-  String PROP_VISIBLE_FIELD_COUNT = "visibleFieldCount";
+  String PROP_HAS_VISIBLE_FIELDS = "hasVisibleFields";
 
   /**
    * Returns the index of the first occurrence of the {@link IFormField} element, or -1 if the element can't be found.
    */
   int getFieldIndex(IFormField comp);
 
-  boolean visitFields(IFormFieldVisitor visitor, int startLevel);
+  /**
+   * Visits this field and all of its child fields recursively.
+   * 
+   * @param visitor
+   *          The visitor to use. Must not be <code>null</code>.
+   * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
+   * @see IFormField#acceptVisitor(IFormFieldVisitor, int, int, boolean)
+   * @see IFormFieldVisitor#visitField(IFormField, int, int)
+   */
+  boolean visitFields(IFormFieldVisitor visitor);
 
   /**
    * recalculate and re-assign the logical x,y,w,h to each field in the groupbox

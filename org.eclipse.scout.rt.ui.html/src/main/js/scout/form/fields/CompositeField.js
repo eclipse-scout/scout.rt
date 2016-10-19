@@ -21,10 +21,10 @@ scout.CompositeField.prototype.getFields = function() {
 };
 
 scout.CompositeField.prototype.visit = function(visitor) {
+  scout.CompositeField.parent.prototype.visit.call(this, visitor);
   this.getFields().forEach(function(field) {
     field.visit(visitor);
   });
-  scout.CompositeField.parent.prototype.visit.call(this, visitor);
 };
 
 /**
@@ -39,12 +39,11 @@ scout.CompositeField.prototype.setDisabledStyle = function(disabledStyle) {
 };
 
 /**
- * Enables or disables recursively all fields of the composite field.
- * @override Widget.js
+ * @override FormField.js
  */
-scout.CompositeField.prototype.setEnabled = function(enabled) {
+scout.CompositeField.prototype.recomputeEnabled = function(parentEnabled) {
+  scout.CompositeField.parent.prototype.recomputeEnabled.call(this, parentEnabled);
   this.getFields().forEach(function(field) {
-    field.setEnabled(enabled);
-  });
-  scout.CompositeField.parent.prototype.setEnabled.call(this, enabled);
+    field.recomputeEnabled(this.enabledComputed);
+  }, this);
 };

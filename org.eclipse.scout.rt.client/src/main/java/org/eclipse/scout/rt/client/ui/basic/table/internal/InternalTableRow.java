@@ -34,25 +34,31 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  */
 public class InternalTableRow extends TableRow implements ITableRow, ICellObserver {
 
+  private static final String REJECTED_BY_USER = "REJECTED_BY_USER";
+  private static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
+
   private ITable m_table;
   private int m_rowIndex;
   private int m_rowChanging = 0;
-  private boolean m_rowPropertiesChanged;
-  private boolean m_filterAccepted = true;
-  private boolean m_rejectedByUser;
-  private final Map<ICell, Set<Integer>> m_updatedCells = new HashMap<>();
+  private final Map<ICell, Set<Integer>> m_updatedCells;
 
   private InternalTableRow() {
     super(null);
+    m_updatedCells = new HashMap<>();
+    setFilterAcceptedInternal(true);
   }
 
   public InternalTableRow(ITable table) {
     super(table.getColumnSet());
+    m_updatedCells = new HashMap<>(table.getColumnSet().getColumnCount());
+    setFilterAcceptedInternal(true);
     m_table = table;
   }
 
   public InternalTableRow(ITable table, ITableRow row) {
     super(table.getColumnSet(), row);
+    m_updatedCells = new HashMap<>(table.getColumnSet().getColumnCount());
+    setFilterAcceptedInternal(true);
     setEnabled(row.isEnabled());
     m_rowIndex = row.getRowIndex();
     for (IColumn<?> c : table.getColumns()) {
@@ -77,10 +83,9 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   public void setStatus(int status) {
     try {
       setRowChanging(true);
-      //
       if (getStatus() != status) {
         super.setStatus(status);
-        m_rowPropertiesChanged = true;
+        setRowPropertiesChanged(true);
       }
     }
     finally {
@@ -102,7 +107,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
       //
       if (isEnabled() != b) {
         super.setEnabled(b);
-        m_rowPropertiesChanged = true;
+        setRowPropertiesChanged(true);
       }
     }
     finally {
@@ -135,23 +140,23 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
 
   @Override
   public boolean isFilterAccepted() {
-    return m_filterAccepted;
+    return FLAGS_BIT_HELPER.isBitSet(FILTER_ACCEPTED, m_flags);
   }
 
   /**
    * do not use this internal method
    */
   public void setFilterAcceptedInternal(boolean b) {
-    m_filterAccepted = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(FILTER_ACCEPTED, b, m_flags);
   }
 
   @Override
   public boolean isRejectedByUser() {
-    return m_rejectedByUser;
+    return FLAGS_BIT_HELPER.isBitSet(REJECTED_BY_USER, m_flags);
   }
 
   public void setRejectedByUser(boolean rejectedByUser) {
-    m_rejectedByUser = rejectedByUser;
+    m_flags = FLAGS_BIT_HELPER.changeBit(REJECTED_BY_USER, rejectedByUser, m_flags);
   }
 
   @Override
@@ -234,24 +239,16 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     }
     else {
       m_rowChanging--;
-      if (m_rowChanging == 0 && m_rowPropertiesChanged) {
-        m_rowPropertiesChanged = false;
+      if (m_rowChanging == 0 && isRowPropertiesChanged()) {
+        setRowPropertiesChanged(false);
         if (getTable() != null) {
           getTable().updateRow(this);
         }
-        m_updatedCells.clear();
+        if (m_updatedCells != null) {
+          m_updatedCells.clear();
+        }
       }
     }
-  }
-
-  @Override
-  public boolean isRowPropertiesChanged() {
-    return m_rowPropertiesChanged;
-  }
-
-  @Override
-  public void setRowPropertiesChanged(boolean b) {
-    m_rowPropertiesChanged = b;
   }
 
   @Override
@@ -286,8 +283,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   public void touch() {
     try {
       setRowChanging(true);
-      //
-      m_rowPropertiesChanged = true;
+      setRowPropertiesChanged(true);
     }
     finally {
       setRowChanging(false);
@@ -375,7 +371,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
       //
       if (CompareUtility.notEquals(getIconId(), id)) {
         super.setIconId(id);
-        m_rowPropertiesChanged = true;
+        setRowPropertiesChanged(true);
       }
     }
     finally {
@@ -444,11 +440,10 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   public void cellChanged(ICell cell, int changedBit) {
     try {
       setRowChanging(true);
-      //
       if (isStatusNonchanged() && isRowUpdate(changedBit)) {
         setStatusUpdated();
       }
-      m_rowPropertiesChanged = true;
+      setRowPropertiesChanged(true);
       // Remember changed column
       setCellChanged(cell, changedBit);
     }

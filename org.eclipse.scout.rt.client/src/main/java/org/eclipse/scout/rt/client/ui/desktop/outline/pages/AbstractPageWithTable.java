@@ -65,6 +65,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -77,14 +78,15 @@ import org.slf4j.LoggerFactory;
  */
 @ClassId("b131ace3-9d63-46d9-9659-e288ca26b367")
 public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPageWithTable.class);
+  static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
+  static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
+  static final String LIMITED_RESULT = "LIMITED_RESULT";
+  static final String ALWAYS_CREATE_CHILD_PAGE = "ALWAYS_CREATE_CHILD_PAGE";
 
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;
-  private boolean m_searchRequired;
-  private boolean m_searchActive;
-  private boolean m_limitedResult;
-  private boolean m_alwaysCreateChildPage;
 
   public AbstractPageWithTable() {
     this(true, null);
@@ -116,7 +118,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   protected void callMinimalInitializer() {
     setChildrenDirty(true);
     setLeafInternal(getConfiguredLeaf());
-    setEnabledInternal(getConfiguredEnabled());
+    setEnabled(getConfiguredEnabled(), IDimensions.ENABLED);
     setExpandedInternal(getConfiguredExpanded());
   }
 
@@ -321,7 +323,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_searchActive = true;
+    setSearchActive(true);
     setSearchRequired(getConfiguredSearchRequired());
     setAlwaysCreateChildPage(getConfiguredAlwaysCreateChildPage());
   }
@@ -556,7 +558,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Override
   public final T getTable() {
     if (super.getTable() == null) {
-      ensureInitialized();
+      callInitializer(); // no effect if already initialized
     }
     return (T) super.getTable();
   }
@@ -597,12 +599,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   public boolean isSearchRequired() {
-    return m_searchRequired;
+    return FLAGS_BIT_HELPER.isBitSet(SEARCH_REQUIRED, m_flags);
   }
 
   @Override
-  public void setSearchRequired(boolean b) {
-    m_searchRequired = b;
+  public void setSearchRequired(boolean searchRequired) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(SEARCH_REQUIRED, searchRequired, m_flags);
   }
 
   @Override
@@ -615,14 +617,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   public boolean isSearchActive() {
-    return m_searchActive;
+    return FLAGS_BIT_HELPER.isBitSet(SEARCH_ACTIVE, m_flags);
   }
 
   @Override
-  public void setSearchActive(boolean b) {
-    m_searchActive = b;
+  public void setSearchActive(boolean searchActive) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(SEARCH_ACTIVE, searchActive, m_flags);
     if (isSelectedNode()) {
-      getOutline().setSearchForm(m_searchActive ? getSearchFormInternal() : null);
+      getOutline().setSearchForm(searchActive ? getSearchFormInternal() : null);
     }
   }
 
@@ -633,22 +635,22 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @since 3.10.0-M3
    */
   protected boolean isLimitedResult() {
-    return m_limitedResult;
+    return FLAGS_BIT_HELPER.isBitSet(LIMITED_RESULT, m_flags);
   }
 
   @Override
   public boolean isAlwaysCreateChildPage() {
-    return m_alwaysCreateChildPage;
+    return FLAGS_BIT_HELPER.isBitSet(ALWAYS_CREATE_CHILD_PAGE, m_flags);
   }
 
   @Override
   public void setAlwaysCreateChildPage(boolean alwaysCreateChildPage) {
-    m_alwaysCreateChildPage = alwaysCreateChildPage;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ALWAYS_CREATE_CHILD_PAGE, alwaysCreateChildPage, m_flags);
   }
 
   @Override
   public void pageActivatedNotify() {
-    ensureInitialized();
+    callInitializer(); // no effect if already initialized
     ensureSearchFormCreated();
     ensureSearchFormStarted();
     super.pageActivatedNotify();
@@ -673,7 +675,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   protected void importPageData(AbstractTablePageData tablePageData) {
     getTable().importFromTableBeanData(tablePageData);
-    m_limitedResult = tablePageData.isLimitedResult();
+    m_flags = FLAGS_BIT_HELPER.changeBit(LIMITED_RESULT, tablePageData.isLimitedResult(), m_flags);
   }
 
   /**
@@ -839,7 +841,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           if (updateChildPageCells) {
             // update tree nodes from table rows
             ICell tableCell = getTable().getSummaryCell(row);
-            page.setEnabledInternal(row.isEnabled());
+            page.setEnabled(row.isEnabled(), IDimensions.ENABLED);
             page.getCellForUpdate().updateFrom(tableCell);
           }
         }
@@ -910,7 +912,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                 if (childPage != null) {
                   childPage.setRejectedByUser(element.isRejectedByUser());
                   childPage.setFilterAccepted(element.isFilterAccepted());
-                  childPage.setEnabledInternal(element.isEnabled());
+                  childPage.setEnabled(element.isEnabled(), IDimensions.ENABLED);
                   ICell tableCell = getTable().getSummaryCell(element);
                   updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);
                   linkTableRowWithPage(element, childPage);

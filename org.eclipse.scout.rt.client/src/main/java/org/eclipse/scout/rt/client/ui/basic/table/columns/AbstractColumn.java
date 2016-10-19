@@ -65,8 +65,10 @@ import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -77,30 +79,42 @@ import org.slf4j.LoggerFactory;
 
 @ClassId("ebe15e4d-017b-4ac0-9a5a-2c9e07c8ad6f")
 public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver implements IColumn<VALUE>, IExtensibleObject {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
 
-  // DO NOT init members, this has the same effect as if they were set AFTER
-  // initConfig()
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String DISPLAYABLE = "DISPLAYABLE";
+  private static final String PRIMARY_KEY = "PRIMARY_KEY";
+  private static final String SUMMARY = "SUMMARY";
+  private static final String INITIALLY_VISIBLE = "INITIALLY_VISIBLE";
+  private static final String INITIALLY_GROUPED = "INITIALLY_GROUPED";
+  private static final String INITIALLY_SORTED_ASC = "INITIALLY_SORTED_ASC";
+  private static final String INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_BEGIN";
+  private static final String INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END";
+
   private ITable m_table;
-  private final HeaderCell m_headerCell;
-  private boolean m_primaryKey;
-  private boolean m_summary;
-  private boolean m_initialized;
+
   /**
-   * A column is presented to the user when it is displayable AND visible this column is visible to the user only used
-   * when displayable=true
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}, {@link #DISPLAYABLE}.<br>
+   * 5 dimensions remain for custom use. This column is visible, if all dimensions are visible (all bits set).
    */
-  private boolean m_visibleProperty;
-  private boolean m_visibleGranted;
+  private byte m_visible;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently all are used: {@link #INITIALIZED}, {@link #PRIMARY_KEY}, {@link #SUMMARY}, {@link #INITIALLY_VISIBLE},
+   * {@link #INITIALLY_SORTED_ASC}, {@link #INITIALLY_GROUPED}, {@link #INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END},
+   * {@link #INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN}
+   */
+  private byte m_flags;
+
   private int m_initialWidth;
-  private boolean m_initialVisible;
-  private boolean m_initialGrouped;
   private int m_initialSortIndex;
-  private boolean m_initialSortAscending;
-  private boolean m_initialAlwaysIncludeSortAtBegin;
-  private boolean m_initialAlwaysIncludeSortAtEnd;
 
   private final ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> m_objectExtensions;
+  private final HeaderCell m_headerCell;
 
   public AbstractColumn() {
     this(true);
@@ -108,6 +122,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   public AbstractColumn(boolean callInitializer) {
     m_headerCell = new HeaderCell();
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this, false);
     if (callInitializer) {
       callInitializer();
@@ -115,14 +130,14 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   protected final void callInitializer() {
-    if (!m_initialized) {
+    if (!isInitialized()) {
       interceptInitConfig();
-      m_initialized = true;
+      m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
     }
   }
 
   protected boolean isInitialized() {
-    return m_initialized;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
   }
 
   protected Map<String, Object> getPropertiesMap() {
@@ -815,7 +830,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   protected void initConfig() {
     setAutoOptimizeWidth(getConfiguredAutoOptimizeWidth());
-    m_visibleGranted = true;
     m_headerCell.setText(getConfiguredHeaderText());
     if (getConfiguredHeaderTooltipText() != null) {
       m_headerCell.setTooltipText(getConfiguredHeaderTooltipText());
@@ -847,8 +861,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setOrder(calculateViewOrder());
     setWidth(getConfiguredWidth());
     setFixedWidth(getConfiguredFixedWidth());
-    m_primaryKey = getConfiguredPrimaryKey();
-    m_summary = getConfiguredSummary();
+    m_flags = FLAGS_BIT_HELPER.changeBit(PRIMARY_KEY, getConfiguredPrimaryKey(), m_flags);
+    m_flags = FLAGS_BIT_HELPER.changeBit(SUMMARY, getConfiguredSummary(), m_flags);
     setEditable(getConfiguredEditable());
     setMandatory(getConfiguredMandatory());
     setVisibleColumnIndexHint(-1);
@@ -896,13 +910,12 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     // Apply prefs only if header is enabled (because the user is not able to change or reset anything if the header is disabled)
     if (getTable() != null && getTable().isHeaderEnabled()) {
       ClientUIPreferences env = ClientUIPreferences.getInstance();
-      setVisible(env.getTableColumnVisible(this, m_visibleProperty));
+      setVisible(env.getTableColumnVisible(this, isVisible(IDimensions.VISIBLE)));
       if (!isFixedWidth()) {
         setWidth(env.getTableColumnWidth(this, getWidth()));
       }
       setVisibleColumnIndexHint(env.getTableColumnViewIndex(this, getVisibleColumnIndexHint()));
     }
-    //
     interceptInitColumn();
   }
 
@@ -970,22 +983,22 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean isInitialVisible() {
-    return m_initialVisible;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_VISIBLE, m_flags);
   }
 
   @Override
   public void setInitialVisible(boolean b) {
-    m_initialVisible = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_VISIBLE, b, m_flags);
   }
 
   @Override
   public boolean isInitialGrouped() {
-    return m_initialGrouped;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_GROUPED, m_flags);
   }
 
   @Override
   public void setInitialGrouped(boolean b) {
-    m_initialGrouped = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_GROUPED, b, m_flags);
   }
 
   @Override
@@ -1000,32 +1013,32 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean isInitialSortAscending() {
-    return m_initialSortAscending;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_SORTED_ASC, m_flags);
   }
 
   @Override
   public void setInitialSortAscending(boolean b) {
-    m_initialSortAscending = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_SORTED_ASC, b, m_flags);
   }
 
   @Override
   public boolean isInitialAlwaysIncludeSortAtBegin() {
-    return m_initialAlwaysIncludeSortAtBegin;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, m_flags);
   }
 
   @Override
   public void setInitialAlwaysIncludeSortAtBegin(boolean b) {
-    m_initialAlwaysIncludeSortAtBegin = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, b, m_flags);
   }
 
   @Override
   public boolean isInitialAlwaysIncludeSortAtEnd() {
-    return m_initialAlwaysIncludeSortAtEnd;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END, m_flags);
   }
 
   @Override
   public void setInitialAlwaysIncludeSortAtEnd(boolean b) {
-    m_initialAlwaysIncludeSortAtEnd = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END, b, m_flags);
   }
 
   /**
@@ -1041,17 +1054,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       b = true;
     }
     setVisibleGranted(b);
-  }
-
-  @Override
-  public boolean isVisibleGranted() {
-    return m_visibleGranted;
-  }
-
-  @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
-    calculateVisible();
   }
 
   @Override
@@ -1759,13 +1761,27 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean isDisplayable() {
-    return propertySupport.getPropertyBool(PROP_DISPLAYABLE);
+    return isVisible(DISPLAYABLE);
   }
 
   @Override
-  public void setDisplayable(boolean b) {
-    propertySupport.setPropertyBool(PROP_DISPLAYABLE, b);
-    calculateVisible();
+  public void setDisplayable(boolean displayable) {
+    boolean old = isDisplayable();
+    if (old == displayable) {
+      return;
+    }
+    setVisible(displayable, DISPLAYABLE);
+    propertySupport.firePropertyChange(PROP_DISPLAYABLE, old, displayable);
+  }
+
+  @Override
+  public boolean isVisibleGranted() {
+    return isVisible(IDimensions.VISIBLE_GRANTED);
+  }
+
+  @Override
+  public void setVisibleGranted(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
@@ -1775,27 +1791,32 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setVisible(boolean b) {
-    m_visibleProperty = b;
-    calculateVisible();
-  }
-
-  private void calculateVisible() {
-    propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && isDisplayable() && m_visibleProperty);
+    setVisible(b, IDimensions.VISIBLE);
   }
 
   @Override
-  public boolean isVisibleInternal() {
-    return m_visibleProperty;
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
+    calculateVisible();
+  }
+
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
+  }
+
+  private void calculateVisible() {
+    propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible));
   }
 
   @Override
   public boolean isPrimaryKey() {
-    return m_primaryKey;
+    return FLAGS_BIT_HELPER.isBitSet(PRIMARY_KEY, m_flags);
   }
 
   @Override
   public boolean isSummary() {
-    return m_summary;
+    return FLAGS_BIT_HELPER.isBitSet(SUMMARY, m_flags);
   }
 
   @Override

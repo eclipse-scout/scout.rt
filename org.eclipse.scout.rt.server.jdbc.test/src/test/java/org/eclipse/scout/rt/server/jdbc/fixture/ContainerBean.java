@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.server.jdbc.fixture;
 
 import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
-import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 
 public class ContainerBean {
   private TableFieldBeanData m_tableFieldBeanData;
-  private TableHolderFilter m_tableHolderFilter;
   private TableBeanHolderFilter m_tableBeanHolderFilter;
 
   public TableFieldBeanData getTableFieldBeanData() {
@@ -24,14 +22,6 @@ public class ContainerBean {
 
   public void setTableFieldBeanData(TableFieldBeanData tableFieldBeanData) {
     m_tableFieldBeanData = tableFieldBeanData;
-  }
-
-  public TableHolderFilter getTableHolderFilter() {
-    return m_tableHolderFilter;
-  }
-
-  public void setTableHolderFilter(TableHolderFilter tableHolderFilter) {
-    m_tableHolderFilter = tableHolderFilter;
   }
 
   public TableBeanHolderFilter getTableBeanHolderFilter() {

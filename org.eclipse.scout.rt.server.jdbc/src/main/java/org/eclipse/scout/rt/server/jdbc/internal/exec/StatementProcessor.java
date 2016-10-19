@@ -33,10 +33,8 @@ import org.eclipse.scout.rt.platform.holders.BeanArrayHolderFilter;
 import org.eclipse.scout.rt.platform.holders.IBeanArrayHolder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
-import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
-import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
@@ -911,14 +909,7 @@ public class StatementProcessor implements IStatementProcessor {
         found = true;
       }
       if (found) {
-        // special case: table holder and table filter are preemptive terminals
-        if (o instanceof ITableHolder) {
-          return new TableHolderInput((ITableHolder) o, null, path[1], bindToken);
-        }
-        else if (o instanceof TableHolderFilter) {
-          return new TableHolderInput(((TableHolderFilter) o).getTableHolder(), ((TableHolderFilter) o).getFilteredRows(), path[1], bindToken);
-        }
-        else if (o instanceof ITableBeanHolder) {
+        if (o instanceof ITableBeanHolder) {
           return new TableBeanHolderInput((ITableBeanHolder) o, null, path[1], bindToken);
         }
         else if (o instanceof TableBeanHolderFilter) {
@@ -947,14 +938,7 @@ public class StatementProcessor implements IStatementProcessor {
       if (((NVPair) bindBase).getName().equals(path[0])) {
         o = ((NVPair) bindBase).getValue();
         found = true;
-        // special case: table holder and table filter are preemptive terminals
-        if (o instanceof ITableHolder) {
-          return new TableHolderInput((ITableHolder) o, null, path[1], bindToken);
-        }
-        else if (o instanceof TableHolderFilter) {
-          return new TableHolderInput(((TableHolderFilter) o).getTableHolder(), ((TableHolderFilter) o).getFilteredRows(), path[1], bindToken);
-        }
-        else if (o instanceof ITableBeanHolder) {
+        if (o instanceof ITableBeanHolder) {
           return new TableBeanHolderInput((ITableBeanHolder) o, null, path[1], bindToken);
         }
         else if (o instanceof TableBeanHolderFilter) {
@@ -976,37 +960,6 @@ public class StatementProcessor implements IStatementProcessor {
             }
           }
         }
-      }
-    }
-    else if (bindBase instanceof ITableHolder) {
-      // handle all terminal cases for table holder
-      ITableHolder table = (ITableHolder) bindBase;
-      try {
-        Method m = table.getClass().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1), new Class[]{int.class});
-        if (m != null) {
-          found = true;
-          return new TableHolderInput(table, null, path[0], bindToken);
-        }
-      }
-      catch (NoSuchMethodException | SecurityException t) {
-        found = false;
-        // nop
-      }
-    }
-    else if (bindBase instanceof TableHolderFilter) {
-      // handle all terminal cases for table holder filter
-      TableHolderFilter filter = (TableHolderFilter) bindBase;
-      ITableHolder table = filter.getTableHolder();
-      try {
-        Method m = table.getClass().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1), new Class[]{int.class});
-        if (m != null) {
-          found = true;
-          return new TableHolderInput(table, filter.getFilteredRows(), path[0], bindToken);
-        }
-      }
-      catch (NoSuchMethodException | SecurityException t) {
-        // nop
-        found = false;
       }
     }
     else if (bindBase instanceof ITableBeanHolder) {
@@ -1189,11 +1142,6 @@ public class StatementProcessor implements IStatementProcessor {
         found = true;
       }
       if (found) {
-        // special case: table holder is preemptive terminal
-        if (o instanceof ITableHolder) {
-          ITableHolder table = (ITableHolder) o;
-          return new TableHolderOutput(table, path[1], bindToken);
-        }
         if (o instanceof ITableBeanHolder) {
           ITableBeanHolder table = (ITableBeanHolder) o;
           return new TableBeanHolderOutput(table, path[1], bindToken);
@@ -1230,12 +1178,7 @@ public class StatementProcessor implements IStatementProcessor {
       if (((NVPair) bindBase).getName().equals(path[0])) {
         o = ((NVPair) bindBase).getValue();
         found = true;
-        // special case: table holder is preemptive terminal
-        if (o instanceof ITableHolder) {
-          ITableHolder table = (ITableHolder) o;
-          return new TableHolderOutput(table, path[1], bindToken);
-        }
-        else if (o instanceof ITableBeanHolder) {
+        if (o instanceof ITableBeanHolder) {
           ITableBeanHolder table = (ITableBeanHolder) o;
           return new TableBeanHolderOutput(table, path[1], bindToken);
         }
@@ -1259,21 +1202,6 @@ public class StatementProcessor implements IStatementProcessor {
             throw new ProcessingException("output bind " + bindToken + " is not a valid output container");
           }
         }
-      }
-    }
-    else if (bindBase instanceof ITableHolder) {
-      // handle all terminal cases for table holder
-      ITableHolder table = (ITableHolder) bindBase;
-      try {
-        Method m = table.getClass().getMethod("get" + Character.toUpperCase(path[0].charAt(0)) + path[0].substring(1), new Class[]{int.class});
-        if (m != null) {
-          found = true;
-          return new TableHolderOutput(table, path[0], bindToken);
-        }
-      }
-      catch (NoSuchMethodException | SecurityException t) {
-        // nop
-        found = false;
       }
     }
     else if (bindBase instanceof ITableBeanHolder) {
@@ -1334,10 +1262,7 @@ public class StatementProcessor implements IStatementProcessor {
             Method getter = pd != null ? pd.getReadMethod() : null;
             if (getter != null) {
               o = getter.invoke(bindBase, (Object[]) null);
-              if (o instanceof ITableHolder) {
-                throw new ProcessingException("output bind '" + bindToken.getName() + "' is a table and should not be a terminal");
-              }
-              else if (o instanceof ITableBeanHolder) {
+              if (o instanceof ITableBeanHolder) {
                 throw new ProcessingException("output bind '" + bindToken.getName() + "' is a table bean and should not be a terminal");
               }
               else if (o instanceof IBeanArrayHolder) {

@@ -207,16 +207,16 @@ scout.DateField.prototype._syncTimeFormatPattern = function(timeFormatPattern) {
 };
 
 /**
- * @override BasicField.js
+ * @override FormField.js
  */
 scout.DateField.prototype._renderEnabled = function() {
   scout.DateField.parent.prototype._renderEnabled.call(this);
-  this.$container.setEnabled(this.enabled);
+  this.$container.setEnabled(this.enabledComputed);
   if (this.$dateField) {
-    this.$dateField.setEnabled(this.enabled);
+    this.$dateField.setEnabled(this.enabledComputed);
   }
   if (this.$timeField) {
-    this.$timeField.setEnabled(this.enabled);
+    this.$timeField.setEnabled(this.enabledComputed);
   }
 };
 

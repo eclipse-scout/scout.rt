@@ -147,7 +147,7 @@ public class BookmarkViewForm extends AbstractForm {
           }
 
           @Override
-          protected int getConfiguredLabelPosition() {
+          protected byte getConfiguredLabelPosition() {
             return IFormField.LABEL_POSITION_ON_FIELD;
           }
 

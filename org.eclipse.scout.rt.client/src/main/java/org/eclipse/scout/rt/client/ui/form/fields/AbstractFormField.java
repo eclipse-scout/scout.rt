@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -60,7 +60,9 @@ import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -77,51 +79,69 @@ import org.w3c.dom.Element;
 @ClassId("cb3204c4-71bf-4dc6-88a4-3a8f81a7ca10")
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField, IContributionOwner, IExtensibleObject {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractFormField.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper LABEL_VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String ENABLED_SLAVE = "ENABLED_SLAVE";
+  private static final String TOUCHED = "TOUCHED";
+  private static final String LABEL_VISIBLE = "LABEL_VISIBLE";
+  private static final String MASTER_REQUIRED = "MASTER_REQUIRED";
+
+  /**
+   * Provides 8 dimensions for enabled state.<br>
+   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}, {@link #ENABLED_SLAVE}.<br>
+   * 5 dimensions remain for custom use. This FormField is enabled, if all dimensions are enabled (all bits set).
+   */
+  private byte m_enabled;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This FormField is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
+
+  /**
+   * Provides 8 dimensions for label visibility.<br>
+   * Internally used: {@link #LABEL_VISIBLE}.<br>
+   * 7 dimensions remain for custom use. This FormField's label is visible, if all dimensions are visible (all bits
+   * set).
+   */
+  private byte m_labelVisible;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #TOUCHED}, {@link #MASTER_REQUIRED}
+   */
+  private byte m_flags;
 
   private IForm m_form;
-  private boolean m_initialized;
-  // special property/members
-  // enabled is defined as: enabledGranted AND enabledProperty AND enabledSlave AND enabledProcessing
-  private Permission m_enabledPermission;
-  private boolean m_enabledGranted;
-  private boolean m_enabledProperty;
-  private boolean m_enabledSlave;
-  private boolean m_enabledProcessingButton;
-  // visible is defined as: visibleGranted AND visibleProperty
-  private Permission m_visiblePermission;
-  private boolean m_visibleGranted;
-  private boolean m_visibleProperty;
-  protected int m_valueChangeTriggerEnabled = 1;// >=1 is true
-  // master/slave
-  private IValueField<?> m_masterField;
-  private boolean m_masterRequired;
-  // label visibility
-  private boolean m_labelVisible;
-  private boolean m_labelSuppressed;
-  private int m_labelPosition;
+  private byte m_labelPosition;
+  private byte m_labelHorizontalAlignment;
   private int m_labelWidthInPixel;
-  private int m_labelHorizontalAlignment;
-  // force save needed
-  private boolean m_touched;
-  //
+  private Permission m_visiblePermission;
+  private Permission m_enabledPermission;
+  private IValueField<?> m_masterField;
+  protected int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
   private DataChangeListener m_internalDataChangeListener;
   protected ContributionComposite m_contributionHolder;
-  private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
-
   private String m_initialLabel;
+  private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
 
   public AbstractFormField() {
     this(true);
   }
 
   public AbstractFormField(boolean callInitializer) {
-    m_enabledGranted = true;
-    m_enabledSlave = true;
-    m_enabledProcessingButton = true;
-    m_visibleGranted = true;
+    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
+    m_labelVisible = NamedBitMaskHelper.ALL_BITS_SET; // default label visible
     m_objectExtensions = new ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>>(this, false);
     if (callInitializer) {
       callInitializer();
@@ -144,16 +164,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected final void callInitializer() {
-    if (!m_initialized) {
-      try {
-        setValueChangeTriggerEnabled(false);
-        interceptInitConfig();
-      }
-      finally {
-        setValueChangeTriggerEnabled(true);
-      }
-      m_initialized = true;
+    if (isInitialized()) {
+      return;
     }
+
+    try {
+      setValueChangeTriggerEnabled(false);
+      interceptInitConfig();
+    }
+    finally {
+      setValueChangeTriggerEnabled(true);
+    }
+    setInitialized();
   }
 
   @Override
@@ -170,13 +192,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return m_objectExtensions.getExtension(c);
   }
 
-  public static String parseFormFieldId(String className) {
-    String s = className;
-    int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
-    s = s.substring(i + 1);
-    return s;
-  }
-
   /**
    * @return The text to show as the label of the current {@link IFormField}.
    */
@@ -191,9 +206,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    *
    * @since 17.11.2009
    */
-  @ConfigProperty(ConfigProperty.LABEL_POSITION)
   @Order(15)
-  protected int getConfiguredLabelPosition() {
+  @ConfigProperty(ConfigProperty.LABEL_POSITION)
+  protected byte getConfiguredLabelPosition() {
     return LABEL_POSITION_DEFAULT;
   }
 
@@ -209,12 +224,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * @since 19.11.2009
-   * @return negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
-   *         ui
+   * @return one of the following {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_LEFT},
+   *         {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_CENTER}, {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_RIGHT}
+   *         or {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
    */
-  @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
   @Order(17)
-  protected int getConfiguredLabelHorizontalAlignment() {
+  @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
+  protected byte getConfiguredLabelHorizontalAlignment() {
     return LABEL_HORIZONTAL_ALIGNMENT_DEFAULT;
   }
 
@@ -225,8 +241,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Specifies if the form field is enabled initially.<br>
-   * Affects only the field itself. In case of a composite field the property does not get broadcasted initially.
+   * Specifies if the form field is enabled initially.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
@@ -870,7 +885,11 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public boolean isInitialized() {
-    return m_initialized;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
   }
 
   /**
@@ -1006,6 +1025,14 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
+  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
+    if (!includeThis) {
+      return true;
+    }
+    return CompositeFieldUtility.applyFormFieldVisitor(visitor, this, null, level, fieldIndex);
+  }
+
+  @Override
   public IForm getForm() {
     return m_form;
   }
@@ -1066,7 +1093,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void addSubtreePropertyChangeListener(PropertyChangeListener listener) {
-    if (listener != null && m_subtreePropertyChangeSupport == null) {
+    if (listener == null) {
+      return;
+    }
+    if (m_subtreePropertyChangeSupport == null) {
       m_subtreePropertyChangeSupport = new BasicPropertySupport(this);
     }
     m_subtreePropertyChangeSupport.addPropertyChangeListener(listener);
@@ -1074,7 +1104,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void addSubtreePropertyChangeListener(String propName, PropertyChangeListener listener) {
-    if (listener != null && m_subtreePropertyChangeSupport == null) {
+    if (listener == null) {
+      return;
+    }
+    if (m_subtreePropertyChangeSupport == null) {
       m_subtreePropertyChangeSupport = new BasicPropertySupport(this);
     }
     m_subtreePropertyChangeSupport.addPropertyChangeListener(propName, listener);
@@ -1286,12 +1319,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public int getLabelPosition() {
+  public byte getLabelPosition() {
     return m_labelPosition;
   }
 
   @Override
-  public void setLabelPosition(int position) {
+  public void setLabelPosition(byte position) {
     m_labelPosition = position;
   }
 
@@ -1306,12 +1339,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public int getLabelHorizontalAlignment() {
+  public byte getLabelHorizontalAlignment() {
     return m_labelHorizontalAlignment;
   }
 
   @Override
-  public void setLabelHorizontalAlignment(int a) {
+  public void setLabelHorizontalAlignment(byte a) {
     m_labelHorizontalAlignment = a;
   }
 
@@ -1341,24 +1374,26 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public void setLabelVisible(boolean b) {
-    m_labelVisible = b;
-    calculateLabelVisible();
-  }
-
-  private void calculateLabelVisible() {
-    propertySupport.setPropertyBool(PROP_LABEL_VISIBLE, m_labelVisible && (!m_labelSuppressed));
+  public void setLabelVisible(boolean labelVisible) {
+    setLabelVisible(labelVisible, LABEL_VISIBLE);
   }
 
   @Override
-  public boolean isLabelSuppressed() {
-    return m_labelSuppressed;
+  public void setLabelVisible(boolean visible, String dimension) {
+    m_labelVisible = LABEL_VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_labelVisible);
+    calculateLabelVisibleInternal();
   }
 
   @Override
-  public void setLabelSuppressed(boolean b) {
-    m_labelSuppressed = b;
-    calculateLabelVisible();
+  public boolean isLabelVisible(String dimension) {
+    return LABEL_VISIBLE_BIT_HELPER.isBitSet(dimension, m_labelVisible);
+  }
+
+  /**
+   * Do not use this internal method
+   */
+  protected void calculateLabelVisibleInternal() {
+    propertySupport.setPropertyBool(PROP_LABEL_VISIBLE, NamedBitMaskHelper.allBitsSet(m_labelVisible));
   }
 
   @Override
@@ -1379,83 +1414,164 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void setEnabledPermission(Permission p) {
     m_enabledPermission = p;
-    boolean b;
+    boolean b = true;
     if (p != null) {
       b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      /*
-       * inherited permission from container
-       */
-      ICompositeField container = getParentField();
-      if (container != null) {
-        b = container.isEnabledGranted();
-      }
-      else {
-        b = getForm().isEnabledGranted();
-      }
     }
     setEnabledGranted(b);
   }
 
   @Override
   public boolean isEnabledGranted() {
-    return m_enabledGranted;
+    return isEnabled(IDimensions.ENABLED_GRANTED);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled) {
+    setEnabledGranted(enabled, false);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled, boolean updateParents) {
+    setEnabledGranted(enabled, updateParents, false);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren) {
+    setEnabled(enabled, updateParents, updateChildren, IDimensions.ENABLED_GRANTED);
+  }
+
+  private void setEnabledSlave(boolean enabled) {
+    setEnabled(enabled, ENABLED_SLAVE);
   }
 
   @Override
   public boolean getEnabledProperty() {
-    return m_enabledProperty;
+    return isEnabled(IDimensions.ENABLED);
   }
 
   @Override
-  public void setEnabledGranted(boolean b) {
-    m_enabledGranted = b;
-    calculateEnabled();
-  }
-
-  @Override
-  public boolean isEnabledProcessingButton() {
-    return m_enabledProcessingButton;
-  }
-
-  @Override
-  public void setEnabledProcessingButton(boolean b) {
-    m_enabledProcessingButton = b;
-    calculateEnabled();
-  }
-
-  @Override
-  public void setEnabled(boolean b) {
-    m_enabledProperty = b;
-    if (b) {
-      m_enabledSlave = true;
+  public void setEnabled(boolean enabled) {
+    setEnabled(enabled, false);
+    if (enabled) {
+      setEnabledSlave(true);
     }
-    calculateEnabled();
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents) {
+    setEnabled(enabled, updateParents, false);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren) {
+    setEnabled(enabled, updateParents, updateChildren, IDimensions.ENABLED);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    setEnabled(enabled, false, dimension);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents, final String dimension) {
+    setEnabled(enabled, updateParents, false, dimension);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren, final String dimension) {
+    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
+    calculateEnabledInternal();
+
+    if (enabled && updateParents) {
+      // also enable all parents
+      visitParents(new IFormFieldVisitor() {
+        @Override
+        public boolean visitField(IFormField field, int level, int fieldIndex) {
+          field.setEnabled(true, dimension);
+          return true;
+        }
+      });
+    }
+
+    if (updateChildren) {
+      // propagate change to children
+      acceptVisitor(new IFormFieldVisitor() {
+        @Override
+        public boolean visitField(IFormField field, int level, int fieldIndex) {
+          field.setEnabled(enabled, dimension);
+          return true;
+        }
+      }, 0, 0, false);
+    }
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
+  }
+
+  @Override
+  public boolean isEnabledIncludingParents() {
+    if (!isEnabled()) {
+      return false;
+    }
+
+    return visitParents(new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        return field.isEnabled();
+      }
+    });
+  }
+
+  @Override
+  public boolean visitParents(IFormFieldVisitor v) {
+    return visitParents(v, -1);
+  }
+
+  protected boolean visitParents(IFormFieldVisitor v, int level) {
+    IFormField curField = this.getParentField();
+    IFormField lastField = this;
+    if (curField == null) {
+      curField = getOuterFormField(lastField);
+      if (curField == null) {
+        return true;
+      }
+    }
+
+    do {
+      lastField = curField;
+      boolean continueVisiting = v.visitField(curField, level, 0);
+      if (!continueVisiting) {
+        return false;
+      }
+      curField = curField.getParentField();
+      if (curField == null) {
+        curField = getOuterFormField(lastField);
+      }
+      level--;
+    }
+    while (curField != null);
+    return true;
+  }
+
+  protected IFormField getOuterFormField(IFormField owner) {
+    if (owner == null) {
+      return null;
+    }
+    IForm innerForm = owner.getForm();
+    if (innerForm == null) {
+      return null;
+    }
+    return innerForm.getOuterFormField();
   }
 
   /**
-   * no access control for system buttons CANCEL and CLOSE
+   * Do not use this internal method
    */
-  protected void calculateEnabled() {
-    // access control
-    boolean applyAccessControl = true;
-    if (this instanceof IButton) {
-      IButton but = (IButton) this;
-      switch (but.getSystemType()) {
-        case IButton.SYSTEM_TYPE_CANCEL:
-        case IButton.SYSTEM_TYPE_CLOSE: {
-          applyAccessControl = false;
-          break;
-        }
-      }
-    }
-    if (applyAccessControl) {
-      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledSlave);
-    }
-    else {
-      propertySupport.setPropertyBool(PROP_ENABLED, m_enabledProperty && m_enabledSlave);
-    }
+  protected void calculateEnabledInternal() {
+    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
   }
 
   @Override
@@ -1471,21 +1587,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void setVisiblePermission(Permission p) {
     m_visiblePermission = p;
-    boolean b;
+    boolean b = true;
     if (p != null) {
       b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      /*
-       * inherite permission from container
-       */
-      ICompositeField container = getParentField();
-      if (container != null) {
-        b = container.isVisibleGranted();
-      }
-      else {
-        b = true;
-      }
     }
     setVisibleGranted(b);
   }
@@ -1506,7 +1610,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   public final void checkSaveNeeded() {
     if (isInitialized()) {
       try {
-        propertySupport.setPropertyBool(PROP_SAVE_NEEDED, m_touched || interceptIsSaveNeeded());
+        propertySupport.setPropertyBool(PROP_SAVE_NEEDED, isTouched() || interceptIsSaveNeeded());
       }
       catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
@@ -1514,9 +1618,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }
 
+  private boolean isTouched() {
+    return FLAGS_BIT_HELPER.isBitSet(TOUCHED, m_flags);
+  }
+
+  private void setTouched(boolean touched) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(TOUCHED, touched, m_flags);
+  }
+
   @Override
   public void touch() {
-    m_touched = true;
+    setTouched(true);
     checkSaveNeeded();
   }
 
@@ -1526,7 +1638,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public final void markSaved() {
     try {
-      m_touched = false;
+      setTouched(false);
       interceptMarkSaved();
       checkSaveNeeded();
     }
@@ -1556,13 +1668,22 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    return isVisible(IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
-    calculateVisibleInternal();
+  public void setVisibleGranted(boolean visible) {
+    setVisibleGranted(visible, false);
+  }
+
+  @Override
+  public void setVisibleGranted(boolean visible, boolean updateParents) {
+    setVisibleGranted(visible, updateParents, false);
+  }
+
+  @Override
+  public void setVisibleGranted(boolean visible, boolean updateParents, boolean updateChildren) {
+    setVisible(visible, updateParents, updateChildren, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
@@ -1571,9 +1692,56 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public void setVisible(boolean b) {
-    m_visibleProperty = b;
+  public void setVisible(boolean visible) {
+    setVisible(visible, false);
+  }
+
+  @Override
+  public void setVisible(boolean visible, boolean updateParents) {
+    setVisible(visible, updateParents, false);
+  }
+
+  @Override
+  public void setVisible(boolean visible, boolean updateParents, boolean updateChildren) {
+    setVisible(visible, updateParents, updateChildren, IDimensions.VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean visible, boolean updateParents, final String dimension) {
+    setVisible(visible, updateParents, false, dimension);
+  }
+
+  @Override
+  public void setVisible(final boolean visible, final boolean updateParents, final boolean updateChildren, final String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
     calculateVisibleInternal();
+
+    if (visible && updateParents) {
+      // also enable all parents
+      visitParents(new IFormFieldVisitor() {
+        @Override
+        public boolean visitField(IFormField field, int level, int fieldIndex) {
+          field.setVisible(true, dimension);
+          return true;
+        }
+      });
+    }
+
+    if (updateChildren) {
+      // propagate change to children
+      acceptVisitor(new IFormFieldVisitor() {
+        @Override
+        public boolean visitField(IFormField field, int level, int fieldIndex) {
+          field.setVisible(visible, dimension);
+          return true;
+        }
+      }, 0, 0, false);
+    }
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    setVisible(visible, false, dimension);
   }
 
   @ConfigOperation
@@ -1581,31 +1749,37 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
+  }
+
+  @Override
+  public boolean isVisibleIncludingParents() {
+    if (!isVisible()) {
+      return false;
+    }
+
+    return visitParents(new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        return field.isVisible();
+      }
+    });
+  }
+
   /**
-   * do not use this internal method, there is no access control for system buttons CANCEL and CLOSE
+   * Do not use this internal method
    */
   protected void calculateVisibleInternal() {
-    // access control
-    boolean applyAccessControl = true;
-    if (this instanceof IButton) {
-      IButton but = (IButton) this;
-      switch (but.getSystemType()) {
-        case IButton.SYSTEM_TYPE_CANCEL:
-        case IButton.SYSTEM_TYPE_CLOSE: {
-          applyAccessControl = false;
-          break;
-        }
-      }
+    boolean changed = propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible) && interceptCalculateVisible());
+    if (!changed) {
+      return;
     }
-    boolean changed;
-    if (applyAccessControl) {
-      changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty && interceptCalculateVisible());
-    }
-    else {
-      changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleProperty && interceptCalculateVisible());
-    }
-    if (changed && getForm() != null) {
-      getForm().structureChanged(this);
+
+    IForm form = getForm();
+    if (form != null) {
+      form.structureChanged(this);
     }
   }
 
@@ -1869,8 +2043,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (field != null) {
       m_currentMasterListener = new P_MasterListener();
       field.addMasterListener(m_currentMasterListener);
-      m_enabledSlave = (field.getValue() != null || !isMasterRequired());
-      setEnabledGranted(m_enabledGranted);
+      setEnabledSlave(field.getValue() != null || !isMasterRequired());
     }
     m_masterField = field;
   }
@@ -1890,13 +2063,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public void setMasterRequired(boolean b) {
-    m_masterRequired = b;
+  public void setMasterRequired(boolean masterRequired) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(MASTER_REQUIRED, masterRequired, m_flags);
   }
 
   @Override
   public boolean isMasterRequired() {
-    return m_masterRequired;
+    return FLAGS_BIT_HELPER.isBitSet(MASTER_REQUIRED, m_flags);
   }
 
   @Override
@@ -1978,8 +2151,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     public void masterChanged(Object newMasterValue) {
       // only active if the unique listener itself
       if (this == m_currentMasterListener) {
-        m_enabledSlave = (newMasterValue != null || !isMasterRequired());
-        setEnabledGranted(m_enabledGranted);
+        setEnabledSlave(newMasterValue != null || !isMasterRequired());
         try {
           interceptChangedMasterValue(newMasterValue);
         }
@@ -1988,7 +2160,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       }
     }
-  }// end class
+  }
 
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call

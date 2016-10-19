@@ -20,12 +20,12 @@ scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
   var fieldBefore,
     focusedButton = $(event.target).data('radiobutton');
   this.field.radioButtons.some(function(radioButton) {
-    if (fieldBefore && radioButton.enabled && radioButton.visible) {
+    if (fieldBefore && radioButton.enabledComputed && radioButton.visible) {
       radioButton.select();
       this.field.session.focusManager.requestFocus(radioButton.$field);
       return true;
     }
-    if (radioButton === focusedButton && radioButton.enabled && radioButton.visible) {
+    if (radioButton === focusedButton && radioButton.enabledComputed && radioButton.visible) {
       fieldBefore = radioButton;
     }
   }, this);

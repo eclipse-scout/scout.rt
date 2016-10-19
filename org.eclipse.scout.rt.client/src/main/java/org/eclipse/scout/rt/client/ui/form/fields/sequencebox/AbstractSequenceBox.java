@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 @ClassId("e71e8b93-1168-4f5e-8781-4774f01eee26")
 public abstract class AbstractSequenceBox extends AbstractCompositeField implements ISequenceBox {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSequenceBox.class);
+  private static final String LABEL_VISIBLE_SEQUENCE = "LABEL_VISIBLE_SEQUENCE";
 
   private boolean m_autoCheckFromTo;
   private OptimisticLock m_labelCompositionLock;
@@ -217,7 +218,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
           });
     }
     updateLabelComposition();
-    updateFieldStatusVisible();
+    hideFieldStatusOfChildren();
     // attach change triggers
     attachCheckFromToListeners();
   }
@@ -332,7 +333,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   /**
    * Sets the status to invisible of every field.
    */
-  protected void updateFieldStatusVisible() {
+  protected void hideFieldStatusOfChildren() {
     List<IFormField> fields = getFields();
     for (IFormField field : fields) {
       field.setStatusVisible(false);
@@ -365,16 +366,17 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * {@link #interceptIsLabelSuffixCandidate(IFormField)} returns true.
    * </p>
    */
-  @ConfigOperation
   @Order(210)
+  @ConfigOperation
   protected String execCreateLabelSuffix() {
-    for (IFormField f : getFields()) {
-      f.setLabelSuppressed(false);
+    List<IFormField> fields = getFields();
+    for (IFormField f : fields) {
+      f.setLabelVisible(true, LABEL_VISIBLE_SEQUENCE);
     }
 
-    for (IFormField formField : getFields()) {
+    for (IFormField formField : fields) {
       if (interceptIsLabelSuffixCandidate(formField)) {
-        formField.setLabelSuppressed(true);
+        formField.setLabelVisible(false, LABEL_VISIBLE_SEQUENCE);
         return formField.getLabel();
       }
     }

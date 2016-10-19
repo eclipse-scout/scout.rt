@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.wrappedform;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -22,7 +24,9 @@ import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -221,15 +225,25 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
-    // myself
-    if (!visitor.visitField(this, startLevel, 0)) {
-      return false;
+  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
+    Collection<IFormField> innerFormRootGroupBox = null;
+    FORM innerForm = getInnerForm();
+    if (innerForm != null) {
+      IGroupBox rootGroupBox = innerForm.getRootGroupBox();
+      if (rootGroupBox != null) {
+        innerFormRootGroupBox = Collections.<IFormField> singletonList(rootGroupBox);
+      }
     }
-    if (getInnerForm() != null) {
-      return getInnerForm().getRootGroupBox().visitFields(visitor, startLevel);
+    IFormField thisField = null;
+    if (includeThis) {
+      thisField = this;
     }
-    return true;
+    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, innerFormRootGroupBox, level, fieldIndex);
+  }
+
+  @Override
+  public boolean visitFields(IFormFieldVisitor visitor) {
+    return acceptVisitor(visitor, 0, 0, true);
   }
 
   @Override

@@ -14,6 +14,14 @@ scout.TreeBox = function() {
 };
 scout.inherits(scout.TreeBox, scout.ValueField);
 
+scout.TreeBox.prototype._init = function(model) {
+  scout.TreeBox.parent.prototype._init.call(this, model);
+  if (this.filterBox) {
+    this.filterBox.enabledComputed = true; // filter is always enabled
+    this.filterBox.recomputeEnabled(true);
+  }
+};
+
 scout.TreeBox.prototype._render = function($parent) {
   this.addContainer($parent, 'tree-box');
   this.addLabel();

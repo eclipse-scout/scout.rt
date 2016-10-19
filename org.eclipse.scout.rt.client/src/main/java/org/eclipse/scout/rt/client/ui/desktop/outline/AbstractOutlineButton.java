@@ -97,7 +97,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
     }
     if (m_outline != null) {
       setVisible(m_outline.isVisible());
-      setEnabled(m_outline.isEnabled());
+      setEnabled(m_outline.isEnabled(), true, false);
       setLabel(m_outline.getTitle());
       setTooltipText(m_outline.getTitle());
       setSelected(desktop.getOutline() == m_outline);
@@ -125,7 +125,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
                 setVisible((Boolean) v);
               }
               else if (n.equals(IOutline.PROP_ENABLED)) {
-                setEnabled((Boolean) v);
+                setEnabled((Boolean) v, true, false);
               }
               else if (n.equals(IOutline.PROP_TITLE)) {
                 setLabel((String) v);

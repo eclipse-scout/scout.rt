@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
-import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
@@ -77,7 +76,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    */
   @Override
   protected boolean execCalculateVisible() {
-    return getVisibleFieldCount() > 0;
+    return hasVisibleFieldsInternal();
   }
 
   @Override
@@ -153,14 +152,14 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   public void addField(IFormField f) {
     CompositeFieldUtility.addField(f, this, m_fields);
     f.addPropertyChangeListener(m_fieldPropertyChangeListener);
-    handleFildsChanged();
+    handleFieldsChanged();
   }
 
   @Override
   public void removeField(IFormField f) {
     CompositeFieldUtility.removeField(f, this, m_fields);
     f.removePropertyChangeListener(m_fieldPropertyChangeListener);
-    handleFildsChanged();
+    handleFieldsChanged();
   }
 
   @Override
@@ -176,7 +175,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   /**
    * Updates this composite field's state after a child field has been added or removed.
    */
-  protected void handleFildsChanged() {
+  protected void handleFieldsChanged() {
     handleFieldVisibilityChanged();
     checkSaveNeeded();
     checkEmpty();
@@ -377,32 +376,17 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
-    // myself
-    if (!visitor.visitField(this, startLevel, 0)) {
-      return false;
+  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
+    IFormField thisField = null;
+    if (includeThis) {
+      thisField = this;
     }
-    // children
-    int index = 0;
-    for (IFormField field : m_fields) {
-      if (field instanceof ICompositeField) {
-        if (!((ICompositeField) field).visitFields(visitor, startLevel + 1)) {
-          return false;
-        }
-      }
-      else if (field instanceof IWrappedFormField) {
-        if (!((IWrappedFormField) field).visitFields(visitor, startLevel + 1)) {
-          return false;
-        }
-      }
-      else {
-        if (!visitor.visitField(field, startLevel, index)) {
-          return false;
-        }
-      }
-      index++;
-    }
-    return true;
+    return CompositeFieldUtility.applyFormFieldVisitor(visitor, thisField, m_fields, level, fieldIndex);
+  }
+
+  @Override
+  public boolean visitFields(IFormFieldVisitor visitor) {
+    return acceptVisitor(visitor, 0, 0, true);
   }
 
   @Override
@@ -445,44 +429,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * when granting of enabled property changes, broadcast and set this property on all children that have no permission
-   * set
-   */
-  @Override
-  public void setEnabledGranted(boolean b) {
-    super.setEnabledGranted(b);
-    for (IFormField f : getFields()) {
-      if (f.getEnabledPermission() == null) {
-        f.setEnabledGranted(b);
-      }
-    }
-  }
-
-  /**
-   * when granting of visible property changes, do not broadcast and set this property on all children that have no
-   * permission set
-   */
-  @Override
-  @SuppressWarnings("squid:S1185")
-  public void setVisibleGranted(boolean b) {
-    super.setVisibleGranted(b);
-  }
-
-  /**
-   * if initialized broadcast this change to all children.
-   */
-  @Override
-  public void setEnabled(boolean b) {
-    super.setEnabled(b);
-    // recursively down all children only if initialized.
-    if (isInitialized()) {
-      for (IFormField f : m_fields) {
-        f.setEnabled(b);
-      }
-    }
-  }
-
-  /**
    * Sets the property on the field and on every child. <br>
    * During the initialization phase the children are not informed.
    *
@@ -504,28 +450,34 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     }
   }
 
-  // box is only visible when it has at least one visible item
   protected void handleFieldVisibilityChanged() {
-    int visCount = 0;
+    // box is only visible when it has at least one visible item
+    setHasVisibleFieldsInternal(calcHasVisibleFieldsInternal());
+    calculateVisibleInternal();
+  }
+
+  protected boolean calcHasVisibleFieldsInternal() {
+    if (CollectionUtility.isEmpty(m_fields)) {
+      return false;
+    }
     for (IFormField field : m_fields) {
       if (field.isVisible()) {
-        visCount++;
+        return true;
       }
     }
-    setVisibleFieldCount(visCount);
-    calculateVisibleInternal();
+    return false;
   }
 
   @Override
   public void rebuildFieldGrid() {
   }
 
-  protected void setVisibleFieldCount(int n) {
-    propertySupport.setPropertyInt(PROP_VISIBLE_FIELD_COUNT, n);
+  protected void setHasVisibleFieldsInternal(boolean hasVisibleFields) {
+    propertySupport.setPropertyBool(PROP_HAS_VISIBLE_FIELDS, hasVisibleFields);
   }
 
-  protected int getVisibleFieldCount() {
-    return propertySupport.getPropertyInt(PROP_VISIBLE_FIELD_COUNT);
+  protected boolean hasVisibleFieldsInternal() {
+    return propertySupport.getPropertyBool(PROP_HAS_VISIBLE_FIELDS);
   }
 
   /**

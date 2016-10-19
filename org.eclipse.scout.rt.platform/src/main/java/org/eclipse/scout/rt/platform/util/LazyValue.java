@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 * &#64;Bean
 * public class MyBean {
 *
-*   private static final LazyBeanHolder<MyHelper> STATIC_HELPER = new LazyBeanHolder<>(MyHelper.class);
+*   private static final LazyValue<MyHelper> STATIC_HELPER = new LazyValue<>(MyHelper.class);
 *
 *   public void myMethod() {
 *     ...

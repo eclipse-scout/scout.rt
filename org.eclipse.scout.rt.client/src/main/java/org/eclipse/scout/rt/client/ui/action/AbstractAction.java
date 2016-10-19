@@ -36,6 +36,8 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -46,22 +48,45 @@ import org.slf4j.LoggerFactory;
 
 @ClassId("d3cdbb0d-4c53-4854-b6f2-23465050c3c5")
 public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String ACTION_RUNNING = "ACTION_RUNNING";
+  private static final String INHERIT_ACCESSIBILITY = "INHERIT_ACCESSIBILITY";
+  private static final String TOGGLE_ACTION = "TOGGLE_ACTION";
+  private static final String SEPARATOR = "SEPARATOR";
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
 
-  private boolean m_initialized;
+  /**
+   * Provides 8 dimensions for enabled state.<br>
+   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}, {@link #ACTION_RUNNING},
+   * {@link #ENABLED_INHERIT_ACCESSIBILITY}.<br>
+   * 4 dimensions remain for custom use. This Action is enabled, if all dimensions are enabled (all bits set).
+   */
+  private byte m_enabled;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This Action is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #INHERIT_ACCESSIBILITY}, {@link #TOGGLE_ACTION}, {@link #SEPARATOR}
+   */
+  private byte m_flags;
+
+  /**
+   * {@link IAction#HORIZONTAL_ALIGNMENT_LEFT} or {@link IAction#HORIZONTAL_ALIGNMENT_RIGHT}
+   */
+  private byte m_horizontalAlignment;
+
   private final IActionUIFacade m_uiFacade;
-  private boolean m_inheritAccessibility;
-  // enabled is defined as: enabledGranted AND enabledProperty AND enabledProcessing AND enabledInheritAccessibility
-  private boolean m_enabledGranted;
-  private boolean m_enabledProperty;
-  private boolean m_enabledProcessingAction;
-  private boolean m_enabledInheritAccessibility;
-  private boolean m_visibleProperty;
-  private boolean m_visibleGranted;
-  private boolean m_toggleAction;
-  private boolean m_separator;
-  private int m_horizontalAlignment;
-
   private final ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>> m_objectExtensions;
 
   public AbstractAction() {
@@ -70,10 +95,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   public AbstractAction(boolean callInitializer) {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
-    m_enabledGranted = true;
-    m_enabledProcessingAction = true;
-    m_enabledInheritAccessibility = true;
-    m_visibleGranted = true;
+    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
+    m_flags = NamedBitMaskHelper.NO_BITS_SET; // default all to false. are initialized in initConfig()
     m_objectExtensions = new ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>>(this, false);
     if (callInitializer) {
       callInitializer();
@@ -81,10 +105,11 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   protected void callInitializer() {
-    if (!m_initialized) {
-      interceptInitConfig();
-      m_initialized = true;
+    if (isInitialized()) {
+      return;
     }
+    interceptInitConfig();
+    setInitialized();
   }
 
   /**
@@ -210,15 +235,16 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   /**
    * Configures the horizontal alignment of this action in the user interface. The horizontal alignment is only required
-   * when the action is displayed in a menu-bar. Negative return value for left and positive for right alignment.
+   * if the action is displayed in a menu-bar. Use {@link IAction#HORIZONTAL_ALIGNMENT_LEFT} or
+   * {@link IAction#HORIZONTAL_ALIGNMENT_RIGHT}.
    * <p>
    * Subclasses can override this method. The default is {@link IAction#HORIZONTAL_ALIGNMENT_LEFT}.
    *
    * @return Horizontal alignment of this action.
    */
-  @ConfigProperty(ConfigProperty.INTEGER)
   @Order(130)
-  protected int getConfiguredHorizontalAlignment() {
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected byte getConfiguredHorizontalAlignment() {
     return HORIZONTAL_ALIGNMENT_LEFT;
   }
 
@@ -453,43 +479,22 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, text);
   }
 
+  private boolean isInitialized() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+  }
+
   @Override
   public boolean isSeparator() {
-    return m_separator;
+    return FLAGS_BIT_HELPER.isBitSet(SEPARATOR, m_flags);
   }
 
   @Override
   public void setSeparator(boolean b) {
-    m_separator = b;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
-  }
-
-  @Override
-  public boolean isThisAndParentsEnabled() {
-    if (!isEnabled()) {
-      return false;
-    }
-    IAction temp = this;
-    while (temp instanceof IActionNode) {
-      temp = ((IActionNode) temp).getParent();
-      if (temp == null) {
-        return true;
-      }
-      if (!temp.isEnabled()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public void setEnabled(boolean b) {
-    m_enabledProperty = b;
-    setEnabledInternal();
+    m_flags = FLAGS_BIT_HELPER.changeBit(SEPARATOR, b, m_flags);
   }
 
   @Override
@@ -515,22 +520,27 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public boolean isToggleAction() {
-    return m_toggleAction;
+    return FLAGS_BIT_HELPER.isBitSet(TOGGLE_ACTION, m_flags);
   }
 
   @Override
   public void setToggleAction(boolean b) {
-    m_toggleAction = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(TOGGLE_ACTION, b, m_flags);
   }
 
   @Override
-  public boolean isVisible() {
-    return propertySupport.getPropertyBool(PROP_VISIBLE);
+  public boolean isInheritAccessibility() {
+    return FLAGS_BIT_HELPER.isBitSet(INHERIT_ACCESSIBILITY, m_flags);
   }
 
   @Override
-  public boolean isThisAndParentsVisible() {
-    if (!isVisible()) {
+  public void setInheritAccessibility(boolean b) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(INHERIT_ACCESSIBILITY, b, m_flags);
+  }
+
+  @Override
+  public boolean isEnabledIncludingParents() {
+    if (!isEnabled()) {
       return false;
     }
     IAction temp = this;
@@ -539,7 +549,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       if (temp == null) {
         return true;
       }
-      if (!temp.isVisible()) {
+      if (!temp.isEnabled()) {
         return false;
       }
     }
@@ -547,30 +557,23 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setVisible(boolean b) {
-    m_visibleProperty = b;
-    setVisibleInternal();
+  public boolean isEnabled() {
+    return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
   @Override
-  public boolean isInheritAccessibility() {
-    return m_inheritAccessibility;
-  }
-
-  @Override
-  public void setInheritAccessibility(boolean b) {
-    m_inheritAccessibility = b;
+  public void setEnabled(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED);
   }
 
   @Override
   public void setEnabledInheritAccessibility(boolean b) {
-    m_enabledInheritAccessibility = b;
-    setEnabledInternal();
+    setEnabled(b, ENABLED_INHERIT_ACCESSIBILITY);
   }
 
   @Override
   public boolean isEnabledInheritAccessibility() {
-    return m_enabledInheritAccessibility;
+    return isEnabled(ENABLED_INHERIT_ACCESSIBILITY);
   }
 
   /**
@@ -591,7 +594,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public boolean isEnabledGranted() {
-    return m_enabledGranted;
+    return isEnabled(IDimensions.ENABLED_GRANTED);
   }
 
   /**
@@ -599,51 +602,94 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * when false, overrides isEnabled with false
    */
   @Override
-  public void setEnabledGranted(boolean b) {
-    m_enabledGranted = b;
-    setEnabledInternal();
+  public void setEnabledGranted(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED_GRANTED);
   }
 
   @Override
   public boolean isEnabledProcessingAction() {
-    return m_enabledProcessingAction;
+    return isEnabled(ACTION_RUNNING);
+  }
+
+  private void setEnabledProcessingAction(boolean enabledProcessing) {
+    setEnabled(enabledProcessing, ACTION_RUNNING);
   }
 
   @Override
-  public void setEnabledProcessingAction(boolean b) {
-    m_enabledProcessingAction = b;
+  public void setEnabled(boolean enabled, String dimension) {
+    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
     setEnabledInternal();
   }
 
+  @Override
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
+  }
+
   private void setEnabledInternal() {
-    propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledProcessingAction && m_enabledInheritAccessibility);
+    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
+  }
+
+  @Override
+  public boolean isVisible() {
+    return propertySupport.getPropertyBool(PROP_VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE);
+  }
+
+  private void setVisibleInternal() {
+    propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible));
+  }
+
+  @Override
+  public boolean isVisibleIncludingParents() {
+    if (!isVisible()) {
+      return false;
+    }
+    IAction temp = this;
+    while (temp instanceof IActionNode) {
+      temp = ((IActionNode) temp).getParent();
+      if (temp == null) {
+        return true;
+      }
+      if (!temp.isVisible()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
+    setVisibleInternal();
+  }
+
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
   }
 
   @Override
   public void setVisiblePermission(Permission p) {
-    boolean b;
+    boolean visibleByPerm = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
+      visibleByPerm = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
-    else {
-      b = true;
-    }
-    setVisibleGranted(b);
+    setVisibleGranted(visibleByPerm);
   }
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    return isVisible(IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
-    setVisibleInternal();
-  }
-
-  private void setVisibleInternal() {
-    propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
+  public void setVisibleGranted(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
@@ -687,12 +733,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public int getHorizontalAlignment() {
+  public byte getHorizontalAlignment() {
     return m_horizontalAlignment;
   }
 
   @Override
-  public void setHorizontalAlignment(int horizontalAlignment) {
+  public void setHorizontalAlignment(byte horizontalAlignment) {
     m_horizontalAlignment = horizontalAlignment;
   }
 
@@ -715,7 +761,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   protected class P_UIFacade implements IActionUIFacade {
     @Override
     public void fireActionFromUI() {
-      if (isThisAndParentsEnabled() && isThisAndParentsVisible()) {
+      if (isEnabledIncludingParents() && isVisibleIncludingParents()) {
         doAction();
       }
     }

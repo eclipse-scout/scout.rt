@@ -18,13 +18,11 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
-
-  public AbstractTreeNodeBuilder() {
-  }
 
   protected abstract ITreeNode createEmptyTreeNode();
 
@@ -33,9 +31,9 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
   }
 
   public List<ITreeNode> createTreeNodes(List<? extends ILookupRow<LOOKUP_ROW_TYPE>> lookupRows, int nodeStatus, boolean markChildrenLoaded) {
-    ArrayList<ITreeNode> rootNodes = new ArrayList<>();
-    HashMap<Object, ITreeNode> nodeMap = new HashMap<>();
-    HashMap<LOOKUP_ROW_TYPE, ArrayList<ITreeNode>> parentChildMap = new HashMap<>();
+    List<ITreeNode> rootNodes = new ArrayList<>();
+    Map<Object, ITreeNode> nodeMap = new HashMap<>();
+    Map<LOOKUP_ROW_TYPE, ArrayList<ITreeNode>> parentChildMap = new HashMap<>();
     if (lookupRows != null) {
       for (ILookupRow<LOOKUP_ROW_TYPE> row : lookupRows) {
         ITreeNode node = createTreeNode(row, nodeStatus, markChildrenLoaded);
@@ -72,7 +70,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
     ITreeNode treeNode = createEmptyTreeNode();
     // fill values to treeNode
     treeNode.setPrimaryKey(lookupRow.getKey());
-    treeNode.setEnabledInternal(lookupRow.isEnabled());
+    treeNode.setEnabled(lookupRow.isEnabled(), IDimensions.ENABLED);
     treeNode.setStatusInternal(nodeStatus);
     if (markChildrenLoaded) {
       treeNode.setChildrenLoaded(markChildrenLoaded);

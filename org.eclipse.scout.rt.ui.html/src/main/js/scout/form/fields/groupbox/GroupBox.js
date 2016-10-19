@@ -232,7 +232,7 @@ scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
  * @override
  */
 scout.GroupBox.prototype.getFields = function() {
-  return this.controls;
+  return this.fields;
 };
 
 scout.GroupBox.prototype._renderBorderVisible = function() {

@@ -16,8 +16,9 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-public interface IDataModelEntity extends IPropertyObserver, IOrdered {
+public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleDimension {
 
   String PROP_VISIBLE = "visible";
 

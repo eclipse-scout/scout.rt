@@ -107,7 +107,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
         }
 
         @Override
-        protected int getConfiguredLabelPosition() {
+        protected byte getConfiguredLabelPosition() {
           return LABEL_POSITION_TOP;
         }
 

@@ -16,6 +16,8 @@ import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
@@ -26,7 +28,7 @@ import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
  * A typical NEW menu on a table that is only visible on the empty space of the table and only when the table field is
  * enabled would have emptySpaceAction=false;
  */
-public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
+public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension {
 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";
@@ -38,8 +40,8 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   String PROP_KEY_STROKE = "keyStroke";
   String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
-  int HORIZONTAL_ALIGNMENT_LEFT = -1;
-  int HORIZONTAL_ALIGNMENT_RIGHT = 1;
+  byte HORIZONTAL_ALIGNMENT_LEFT = -1;
+  byte HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
   void initAction();
 
@@ -150,8 +152,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
    */
   boolean isEnabledProcessingAction();
 
-  void setEnabledProcessingAction(boolean b);
-
   /**
    * Access control<br>
    * when false, visible property cannot be set to true
@@ -182,18 +182,18 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   int acceptVisitor(IActionVisitor visitor);
 
   /**
-   * Looks this action and its every parent are enabled
+   * Checks if this action and all its parent actions are enabled
    *
    * @since 3.8.1
    */
-  boolean isThisAndParentsEnabled();
+  boolean isEnabledIncludingParents();
 
   /**
-   * Looks this action and its every parent are visible
+   * Checks if this action and all of its parent actions are visible.
    *
    * @since 3.8.1
    */
-  boolean isThisAndParentsVisible();
+  boolean isVisibleIncludingParents();
 
   /**
    * The container of the action, e.g. {@link org.eclipse.scout.rt.client.ui.basic.table.ITable ITable}
@@ -210,9 +210,9 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
    * @param horizontalAlignment
    *          negative for left and positive for right alignment
    */
-  void setHorizontalAlignment(int horizontalAlignment);
+  void setHorizontalAlignment(byte horizontalAlignment);
 
-  int getHorizontalAlignment();
+  byte getHorizontalAlignment();
 
   void setView(boolean visible, boolean enabled);
 

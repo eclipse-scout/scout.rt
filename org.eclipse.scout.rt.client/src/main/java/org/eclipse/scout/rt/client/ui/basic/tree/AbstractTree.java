@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -66,8 +65,10 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -79,35 +80,47 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTree extends AbstractPropertyObserver implements ITree, IContributionOwner, IExtensibleObject {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTree.class);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
+  private static final String AUTO_TITLE = "AUTO_TITLE";
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String SAVE_AND_RESTORE_SCROLLBARS = "SAVE_AND_RESTORE_SCROLLBARS";
+  private static final String ACTION_RUNNING = "ACTION_RUNNING";
 
-  private final EventListenerList m_listenerList = new EventListenerList();
-  private ITreeUIFacade m_uiFacade;
-  private boolean m_initialized;
+  private final EventListenerList m_listenerList;
+  private final Set<ITreeNode> m_checkedNodes;
+  private final Map<Object, ITreeNode> m_deletedNodes;
+  private final List<ITreeNodeFilter> m_nodeFilters;
+  private final ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>> m_objectExtensions;
 
-  // enabled is defined as: enabledGranted && enabledProperty && enabledSlave // NOSONAR
-  private boolean m_enabledGranted;
-  private boolean m_enabledProperty;
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #AUTO_DISCARD_ON_DELETE}, {@link #AUTO_TITLE},
+   * {@link #ACTION_RUNNING}, {@link #SAVE_AND_RESTORE_SCROLLBARS}
+   */
+  private byte m_flags;
 
-  private Set<ITreeNode> m_checkedNodes = new HashSet<ITreeNode>();
+  /**
+   * Provides 8 dimensions for enabled state.<br>
+   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This Tree is enabled, if all dimensions are enabled (all bits set).
+   */
+  private byte m_enabled;
+
   private ITreeNode m_rootNode;
   private int m_treeChanging;
-  private boolean m_autoDiscardOnDelete;
-  private boolean m_autoTitle;
-  private final HashMap<Object, ITreeNode> m_deletedNodes;
   private AbstractEventBuffer<TreeEvent> m_eventBuffer;
 
+  private ITreeUIFacade m_uiFacade;
   private Set<ITreeNode> m_nodeDecorationBuffer = new HashSet<ITreeNode>();
   private Set<ITreeNode> m_selectedNodes = new HashSet<ITreeNode>();
-  private final List<ITreeNodeFilter> m_nodeFilters;
   private List<IKeyStroke> m_baseKeyStrokes;
   private IEventHistory<TreeEvent> m_eventHistory;
-  // only do one action at a time
-  private boolean m_actionRunning;
-  private boolean m_saveAndRestoreScrollbars;
   private ITreeNode m_lastSeenDropNode;
   private IContributionOwner m_contributionHolder;
-  private final ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>> m_objectExtensions;
   private List<IMenu> m_currentNodeMenus;
 
   public AbstractTree() {
@@ -115,9 +128,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   public AbstractTree(boolean callInitialzier) {
+    m_listenerList = new EventListenerList();
+    m_checkedNodes = new HashSet<ITreeNode>();
     m_deletedNodes = new HashMap<Object, ITreeNode>();
     m_nodeFilters = new ArrayList<ITreeNodeFilter>(1);
-    m_actionRunning = false;
     m_objectExtensions = new ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>>(this, false);
     if (callInitialzier) {
       callInitializer();
@@ -125,10 +139,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   protected void callInitializer() {
-    if (!m_initialized) {
-      interceptInitConfig();
-      m_initialized = true;
+    if (isInitialized()) {
+      return;
     }
+    interceptInitConfig();
+    setInitialized();
   }
 
   @Override
@@ -425,20 +440,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   *
-   * @param url
-   * @param path
-   *          {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url (http://local/...)
-   */
-  @ConfigOperation
-  @Order(18)
-  protected void execHyperlinkAction(URL url, String path, boolean local) {
-  }
-
-  /**
    * Called when an app link has been clicked.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -446,19 +447,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(18)
   protected void execAppLinkAction(String ref) {
-    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
-    URL url = null;
-    boolean local = false;
-    if (ref != null) {
-      try {
-        url = new URL(ref);
-        local = "local".equals(url.getHost());
-      }
-      catch (MalformedURLException e) {
-        LOG.error("Malformed URL '{}'", ref, e);
-      }
-    }
-    execHyperlinkAction(url, ref, local);
   }
 
   /**
@@ -569,7 +557,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   protected void initConfig() {
-    m_enabledGranted = true;
+    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
@@ -903,6 +891,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return propertySupport.hasProperty(name);
   }
 
+  private boolean isInitialized() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+  }
+
   @Override
   public String getTitle() {
     return propertySupport.getPropertyString(PROP_TITLE);
@@ -915,12 +911,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isAutoTitle() {
-    return m_autoTitle;
+    return FLAGS_BIT_HELPER.isBitSet(AUTO_TITLE, m_flags);
   }
 
   @Override
   public void setAutoTitle(boolean b) {
-    m_autoTitle = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(AUTO_TITLE, b, m_flags);
   }
 
   @Override
@@ -1015,31 +1011,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setEnabledPermission(Permission p) {
-    boolean b;
+    boolean enabled = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
+      enabled = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
-    else {
-      b = true;
-    }
-    setEnabledGranted(b);
+    setEnabledGranted(enabled);
   }
 
   @Override
   public boolean isEnabledGranted() {
-    return m_enabledGranted;
+    return isEnabled(IDimensions.ENABLED_GRANTED);
   }
 
   @Override
-  public void setEnabledGranted(boolean b) {
-    m_enabledGranted = b;
-    calculateEnabled();
+  public void setEnabledGranted(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED_GRANTED);
   }
 
   @Override
-  public void setEnabled(boolean b) {
-    m_enabledProperty = b;
-    calculateEnabled();
+  public void setEnabled(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED);
   }
 
   @Override
@@ -1047,8 +1038,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
+    calculateEnabled();
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
+  }
+
   private void calculateEnabled() {
-    propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty);
+    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
   }
 
   @Override
@@ -1274,24 +1276,25 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isAutoDiscardOnDelete() {
-    return m_autoDiscardOnDelete;
+    return FLAGS_BIT_HELPER.isBitSet(AUTO_DISCARD_ON_DELETE, m_flags);
   }
 
   @Override
   public void setAutoDiscardOnDelete(boolean on) {
-    m_autoDiscardOnDelete = on;
+    m_flags = FLAGS_BIT_HELPER.changeBit(AUTO_DISCARD_ON_DELETE, on, m_flags);
   }
 
   @Override
   public void setNodeEnabledPermission(ITreeNode node, Permission p) {
     node = resolveNode(node);
-    if (node != null) {
-      boolean oldValue = node.isEnabled();
-      node.setEnabledPermissionInternal(p);
-      boolean newValue = node.isEnabled();
-      if (oldValue != newValue) {
-        fireNodesUpdated(node.getParentNode(), CollectionUtility.hashSet(node));
-      }
+    if (node == null) {
+      return;
+    }
+    boolean oldValue = node.isEnabled();
+    AbstractTreeNode.setEnabledPermission(p, node);
+    boolean newValue = node.isEnabled();
+    if (oldValue != newValue) {
+      fireNodesUpdated(node.getParentNode(), CollectionUtility.hashSet(node));
     }
   }
 
@@ -1316,11 +1319,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setNodeEnabled(ITreeNode node, boolean b) {
+  public void setNodeEnabled(ITreeNode node, boolean enabled) {
     node = resolveNode(node);
     if (node != null) {
       boolean oldValue = node.isEnabled();
-      node.setEnabledInternal(b);
+      node.setEnabled(enabled, IDimensions.ENABLED);
       boolean newValue = node.isEnabled();
       if (oldValue != newValue) {
         fireNodesUpdated(node.getParentNode(), CollectionUtility.arrayList(node));
@@ -1329,11 +1332,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setNodeEnabledGranted(ITreeNode node, boolean b) {
+  public void setNodeEnabledGranted(ITreeNode node, boolean enabled) {
     node = resolveNode(node);
     if (node != null) {
       boolean oldValue = node.isEnabled();
-      node.setEnabledGrantedInternal(b);
+      node.setEnabled(enabled, IDimensions.ENABLED_GRANTED);
       boolean newValue = node.isEnabled();
       if (oldValue != newValue) {
         fireNodesUpdated(node.getParentNode(), CollectionUtility.arrayList(node));
@@ -1342,12 +1345,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setNodeVisiblePermission(ITreeNode node, Permission p) {
+  public void setNodeVisiblePermission(ITreeNode node, Permission permission) {
     node = resolveNode(node);
     if (node != null) {
-      node.setVisiblePermissionInternal(p);
-      // dont fire observers since visibility change only has an effect when
-      // used in init method
+      AbstractTreeNode.setVisiblePermission(permission, node);
+      // don't fire observers since visibility change only has an effect when used in init method
     }
   }
 
@@ -1372,22 +1374,20 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setNodeVisible(ITreeNode node, boolean b) {
+  public void setNodeVisible(ITreeNode node, boolean visible) {
     node = resolveNode(node);
     if (node != null) {
-      node.setVisibleInternal(b);
-      // dont fire observers since visibility change only has an effect when
-      // used in init method
+      node.setVisible(visible, IDimensions.VISIBLE);
+      // don't fire observers since visibility change only has an effect when used in init method
     }
   }
 
   @Override
-  public void setNodeVisibleGranted(ITreeNode node, boolean b) {
+  public void setNodeVisibleGranted(ITreeNode node, boolean visible) {
     node = resolveNode(node);
     if (node != null) {
-      node.setVisibleGrantedInternal(b);
-      // dont fire observers since visibility change only has an effect when
-      // used in init method
+      node.setVisible(visible, IDimensions.VISIBLE_GRANTED);
+      // don't fire observers since visibility change only has an effect when used in init method
     }
   }
 
@@ -2487,21 +2487,24 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void fireNodeAction(ITreeNode node) {
-    if (!m_actionRunning) {
+    if (isActionRunning()) {
+      return;
+    }
+    if (node == null || node.isInitializing() || !node.isLeaf()) {
+      return;
+    }
+
+    try {
+      setActionRunning(true);
       try {
-        m_actionRunning = true;
-        if (node != null && !node.isInitializing() && node.isLeaf()) {
-          try {
-            interceptNodeAction(node);
-          }
-          catch (Exception ex) {
-            BEANS.get(ExceptionHandler.class).handle(ex);
-          }
-        }
+        interceptNodeAction(node);
       }
-      finally {
-        m_actionRunning = false;
+      catch (Exception ex) {
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
+    }
+    finally {
+      setActionRunning(false);
     }
   }
 
@@ -2716,14 +2719,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void doAppLinkAction(String ref) {
-    if (!m_actionRunning) {
-      try {
-        m_actionRunning = true;
-        interceptAppLinkAction(ref);
-      }
-      finally {
-        m_actionRunning = false;
-      }
+    if (isActionRunning()) {
+      return;
+    }
+
+    try {
+      setActionRunning(true);
+      interceptAppLinkAction(ref);
+    }
+    finally {
+      setActionRunning(false);
     }
   }
 
@@ -2800,17 +2805,25 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return m_uiFacade;
   }
 
+  private boolean isActionRunning() {
+    return FLAGS_BIT_HELPER.isBitSet(ACTION_RUNNING, m_flags);
+  }
+
+  private void setActionRunning(boolean b) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(ACTION_RUNNING, b, m_flags);
+  }
+
   @Override
   public boolean isSaveAndRestoreScrollbars() {
-    return m_saveAndRestoreScrollbars;
+    return FLAGS_BIT_HELPER.isBitSet(SAVE_AND_RESTORE_SCROLLBARS, m_flags);
   }
 
   @Override
   public void setSaveAndRestoreScrollbars(boolean b) {
-    m_saveAndRestoreScrollbars = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(SAVE_AND_RESTORE_SCROLLBARS, b, m_flags);
   }
 
-  private abstract class P_AbstractCollectingTreeVisitor implements ITreeVisitor {
+  private abstract static class P_AbstractCollectingTreeVisitor implements ITreeVisitor {
     private final List<ITreeNode> m_list = new ArrayList<ITreeNode>();
 
     protected void addNodeToList(ITreeNode node) {
@@ -2822,7 +2835,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }// end private class
 
-  private abstract class P_AbstractCountingTreeVisitor implements ITreeVisitor {
+  private abstract static class P_AbstractCountingTreeVisitor implements ITreeVisitor {
     private int m_count;
 
     protected void addCount(int n) {

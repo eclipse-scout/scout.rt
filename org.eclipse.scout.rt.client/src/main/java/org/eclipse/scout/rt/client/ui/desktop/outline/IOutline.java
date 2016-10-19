@@ -25,8 +25,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayParent {
+public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayParent, IVisibleDimension {
 
   /**
    * The {@link IOutline} which is currently associated with the current thread.

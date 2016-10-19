@@ -343,7 +343,7 @@ public final class StringUtility {
   }
 
   /**
-   * @deprecated Will be removed in 16.0
+   * @deprecated Can be deleted without replacement. Will be removed in Scout 7.0.
    * @param text
    * @return
    */

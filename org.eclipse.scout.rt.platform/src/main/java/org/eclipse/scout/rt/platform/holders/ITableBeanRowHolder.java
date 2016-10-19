@@ -18,24 +18,24 @@ package org.eclipse.scout.rt.platform.holders;
 public interface ITableBeanRowHolder {
 
   /**
-   * same value as {@link ITableHolder#STATUS_NON_CHANGED}.
+   * Describes a row that has not been changed.
    */
-  int STATUS_NON_CHANGED = ITableHolder.STATUS_NON_CHANGED;
+  int STATUS_NON_CHANGED = 0;
 
   /**
-   * same value as {@link ITableHolder#STATUS_INSERTED}.
+   * Describes a row that was inserted.
    */
-  int STATUS_INSERTED = ITableHolder.STATUS_INSERTED;
+  int STATUS_INSERTED = 1;
 
   /**
-   * same value as {@link ITableHolder#STATUS_UPDATED}.
+   * Describes a row that was updated.
    */
-  int STATUS_UPDATED = ITableHolder.STATUS_UPDATED;
+  int STATUS_UPDATED = 2;
 
   /**
-   * same value as {@link ITableHolder#STATUS_DELETED}.
+   * Describes a row that has been deleted.
    */
-  int STATUS_DELETED = ITableHolder.STATUS_DELETED;
+  int STATUS_DELETED = 3;
 
   /**
    * @return Returns this row's state.

@@ -25,7 +25,7 @@ scout.RadioButtonGroupLeftKeyStroke.prototype.handle = function(event) {
       this.field.session.focusManager.requestFocus(fieldBefore.$field);
       return true;
     }
-    if (radioButton.enabled && radioButton.visible) {
+    if (radioButton.enabledComputed && radioButton.visible) {
       fieldBefore = radioButton;
     }
   }, this);

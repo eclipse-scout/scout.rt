@@ -40,12 +40,15 @@ import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
-  private final EventListenerList m_listenerList = new EventListenerList();
+
+  private final EventListenerList m_listenerList;
+  private final IButtonUIFacade m_uiFacade;
+  private final OptimisticLock m_uiFacadeSetSelectedLock;
+
   private int m_systemType;
   private int m_displayStyle;
   private boolean m_processButton;
-  private final IButtonUIFacade m_uiFacade;
-  private final OptimisticLock m_uiFacadeSetSelectedLock;
+  private boolean m_enabledProcessing;
 
   public AbstractButton() {
     this(true);
@@ -53,6 +56,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   public AbstractButton(boolean callInitializer) {
     super(false);
+    m_enabledProcessing = true;
+    m_listenerList = new EventListenerList();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     m_uiFacadeSetSelectedLock = new OptimisticLock();
     if (callInitializer) {
@@ -254,6 +259,27 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
+  @Override
+  public void setVisibleGranted(boolean visible) {
+    if (isIgnoreGrantedFlagChange(visible)) {
+      return;
+    }
+    super.setVisibleGranted(visible);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled) {
+    if (isIgnoreGrantedFlagChange(enabled)) {
+      return;
+    }
+    super.setEnabledGranted(enabled);
+  }
+
+  protected boolean isIgnoreGrantedFlagChange(boolean newFlagVal) {
+    boolean ignoreGrantedFlag = getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
+    return ignoreGrantedFlag && !newFlagVal; // cannot set the flag to false if this is a cancel or close button
+  }
+
   /*
    * Properties
    */
@@ -325,6 +351,16 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
+  public boolean isEnabledProcessing() {
+    return m_enabledProcessing;
+  }
+
+  @Override
+  public void setEnabledProcessing(boolean b) {
+    m_enabledProcessing = b;
+  }
+
+  @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
   }
@@ -340,15 +376,15 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   public void doClick() {
-    if (isEnabled() && isVisible() && isEnabledProcessingButton()) {
+    if (isEnabled() && isVisible() && isEnabledProcessing()) {
       try {
-        setEnabledProcessingButton(false);
+        setEnabledProcessing(false);
 
         fireButtonClicked();
         interceptClickAction();
       }
       finally {
-        setEnabledProcessingButton(true);
+        setEnabledProcessing(true);
       }
     }
   }

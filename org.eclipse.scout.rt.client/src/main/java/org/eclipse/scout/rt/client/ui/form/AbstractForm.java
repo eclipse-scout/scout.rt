@@ -71,7 +71,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
@@ -123,6 +122,7 @@ import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -146,64 +146,74 @@ import org.w3c.dom.Element;
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractForm.class);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper STATE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String CACHE_BOUNDS = "CACHE_BOUNDS";
+  private static final String ASK_IF_NEED_SAVE = "ASK_IF_NEED_SAVE";
+  private static final String BUTTONS_ARMED = "BUTTONS_ARMED";
+  private static final String CLOSE_TIMER_ARMED = "CLOSE_TIMER_ARMED";
+  private static final String SHOW_ON_START = "SHOW_ON_START";
+  private static final String FORM_STORED = "FORM_STORED";
+  private static final String FORM_LOADING = "FORM_LOADING";
+  private static final String FORM_STARTED = "FORM_STARTED";
 
-  private boolean m_initialized;
-  private final EventListenerList m_listenerList = new EventListenerList();
+  private final PreferredValue<IDisplayParent> m_displayParent;
+  private final EventListenerList m_listenerList;
+  private final PreferredValue<Boolean> m_modal; // no property, is fixed
+  private final IBlockingCondition m_blockingCondition;
+  private final ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>> m_objectExtensions;
+  private final IEventHistory<FormEvent> m_eventHistory;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #CACHE_BOUNDS}, {@link #ASK_IF_NEED_SAVE}, {@link #BUTTONS_ARMED} ,
+   * {@link #CLOSE_TIMER_ARMED}, {@link #SHOW_ON_START}
+   */
+  private byte m_flags;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #FORM_STORED}, {@link #FORM_LOADING}, {@link #FORM_STARTED}
+   */
+  private byte m_states;
+
   private IFormUIFacade m_uiFacade;
   private IWizardStep m_wizardStep;
-  private final PreferredValue<Boolean> m_modal = new PreferredValue<Boolean>(false, false); // no property, is fixed
-  private boolean m_cacheBounds; // no property is fixed
-  private boolean m_askIfNeedSave;
-  private boolean m_buttonsArmed;
-  private boolean m_closeTimerArmed;
-  private boolean m_formStored;
-  private boolean m_formLoading;
-  private boolean m_formStarted;
-  private final IBlockingCondition m_blockingCondition;
-  private boolean m_showOnStart;
   private int m_displayHint;// no property, is fixed
   private String m_displayViewId;// no property, is fixed
-  private int m_closeType = IButton.SYSTEM_TYPE_NONE;
+  private int m_closeType;
   private String m_cancelVerificationText;
   private IGroupBox m_mainBox;
   private IWrappedFormField m_wrappedFormField;
-  private P_SystemButtonListener m_systemButtonListener;
-
+  private ButtonListener m_systemButtonListener;
+  private String m_classId;
+  private ClientRunContext m_initialClientRunContext; // ClientRunContext of the calling context during initialization.
   private IFormHandler m_handler; // never null (ensured by setHandler())
-  // access control
-  private boolean m_enabledGranted;
-  private boolean m_visibleGranted;
-  // search
   private SearchFilter m_searchFilter;
-  //validate content assistant
   private IValidateContentDescriptor m_currentValidateContentDescriptor;
 
   // current timers
   private IFuture<?> m_closeTimerFuture;
   private Map<String, IFuture<Void>> m_timerFutureMap;
   private DataChangeListener m_internalDataChangeListener;
-  private final IEventHistory<FormEvent> m_eventHistory;
 
   // field replacement support
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
   private IContributionOwner m_contributionHolder;
-  private final ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>> m_objectExtensions;
-
-  private String m_classId;
-
-  private final PreferredValue<IDisplayParent> m_displayParent = new PreferredValue<>(null, false);
-  private ClientRunContext m_initialClientRunContext; // ClientRunContext of the calling context during initialization.
 
   public AbstractForm() {
     this(true);
   }
 
   public AbstractForm(boolean callInitializer) {
+    m_listenerList = new EventListenerList();
+    m_modal = new PreferredValue<Boolean>(false, false);
+    m_closeType = IButton.SYSTEM_TYPE_NONE;
+    m_displayParent = new PreferredValue<>(null, false);
     m_eventHistory = createEventHistory();
     setHandler(new NullFormHandler());
-    m_enabledGranted = true;
-    m_visibleGranted = true;
-    m_formLoading = true;
+    setFormLoading(true);
     m_blockingCondition = Jobs.newBlockingCondition(false);
     m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this, true);
 
@@ -238,7 +248,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void callInitializer() {
-    if (m_initialized) {
+    if (isInitialized()) {
       return;
     }
 
@@ -247,12 +257,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     // Run the initialization on behalf of this Form.
     ClientRunContexts.copyCurrent().withForm(this).run(new IRunnable() {
-
       @Override
       public void run() throws Exception {
         interceptInitConfig();
         postInitConfig();
-        m_initialized = true;
+        setInitialized();
       }
     });
   }
@@ -728,26 +737,34 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     setButtonsArmed(true);
   }
 
+  private boolean isInitialized() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+  }
+
   @Override
   public void setEnabledPermission(Permission p) {
-    boolean b;
+    boolean b = true;
     if (p != null) {
       b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
     }
     setEnabledGranted(b);
   }
 
   @Override
   public boolean isEnabledGranted() {
-    return m_enabledGranted;
+    IGroupBox box = getRootGroupBox();
+    if (box == null) {
+      return false;
+    }
+    return box.isEnabledGranted();
   }
 
   @Override
   public void setEnabledGranted(boolean b) {
-    m_enabledGranted = b;
     IGroupBox box = getRootGroupBox();
     if (box != null) {
       box.setEnabledGranted(b);
@@ -756,27 +773,27 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setVisiblePermission(Permission p) {
-    boolean b;
+    boolean b = true;
     if (p != null) {
       b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
     }
     setVisibleGranted(b);
   }
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    IGroupBox box = getRootGroupBox();
+    if (box == null) {
+      return false;
+    }
+    return box.isVisibleGranted();
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
+  public void setVisibleGranted(boolean visible) {
     IGroupBox box = getRootGroupBox();
     if (box != null) {
-      box.setVisibleGranted(b);
+      box.setVisibleGranted(visible);
     }
   }
 
@@ -904,7 +921,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
         setButtonsArmed(true);
         setCloseTimerArmed(true);
-        m_formStarted = true;
+        setFormStarted(true);
 
         // Notify the UI to display this form.
         if (isShowOnStart()) {
@@ -931,14 +948,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_wizardStep = wizardStep;
     setShowOnStart(false);
     setAskIfNeedSave(false);
+    final String systemButtonHiddenInWizard = "systemButtonHiddenInWizard";
     // hide top level process buttons with a system type
     for (IFormField f : getRootGroupBox().getFields()) {
       if (f instanceof IButton) {
         IButton b = (IButton) f;
         if (b.getSystemType() != IButton.SYSTEM_TYPE_NONE) {
           // hide
-          b.setVisible(false);
-          b.setVisibleGranted(false);
+          b.setVisible(false, systemButtonHiddenInWizard);
         }
       }
     }
@@ -1159,11 +1176,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (owner instanceof IForm) {
       ((IForm) owner).visitFields(visitor);
     }
-    else if (owner instanceof ICompositeField) {
-      ((ICompositeField) owner).visitFields(visitor, 0);
-    }
-    else if (owner instanceof IWrappedFormField) {
-      ((IWrappedFormField) owner).visitFields(visitor, 0);
+    else if (owner instanceof IFormField) {
+      ((IFormField) owner).acceptVisitor(visitor, 0, 0, true);
     }
     return result.getValue();
   }
@@ -1318,7 +1332,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean visitFields(IFormFieldVisitor visitor) {
-    return getRootGroupBox().visitFields(visitor, 0);
+    return getRootGroupBox().visitFields(visitor);
   }
 
   /**
@@ -1451,21 +1465,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isFormStored() {
-    return m_formStored;
+    return STATE_BIT_HELPER.isBitSet(FORM_STORED, m_states);
   }
 
   @Override
   public void setFormStored(boolean b) {
-    m_formStored = b;
+    m_states = STATE_BIT_HELPER.changeBit(FORM_STORED, b, m_states);
   }
 
   @Override
   public boolean isFormLoading() {
-    return m_formLoading;
+    return STATE_BIT_HELPER.isBitSet(FORM_LOADING, m_states);
   }
 
   private void setFormLoading(boolean b) {
-    m_formLoading = b;
+    m_states = STATE_BIT_HELPER.changeBit(FORM_LOADING, b, m_states);
   }
 
   /**
@@ -1578,13 +1592,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       throw new VetoException(msg);
     }
     fireFormStoreBefore();
-    m_formStored = true;
+    setFormStored(true);
     try {
       rebuildSearchFilter();
       m_searchFilter.setCompleted(true);
       getHandler().onStore();
       interceptStored();
-      if (!m_formStored) {
+      if (!isFormStored()) {
         //the form was marked as not stored in AbstractFormHandler#execStore() or AbstractForm#execStored().
         ProcessingException e = new ProcessingException("Form was marked as not stored.");
         e.consume();
@@ -1597,11 +1611,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         m_searchFilter.clear();
       }
       // store was not successfully stored
-      m_formStored = false;
+      setFormStored(false);
       throwVetoExceptionInternal(e);
       // if exception was caught and suppressed, this form was after all successfully stored
-      // normally this code is not reached since the exception will  be passed out
-      m_formStored = true;
+      // normally this code is not reached since the exception will be passed out
+      setFormStored(true);
     }
     fireFormStoreAfter();
   }
@@ -1931,14 +1945,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setAllEnabled(final boolean b) {
-    P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField f, int level, int fieldIndex) {
-        f.setEnabled(b);
-        return true;
-      }
-    };
-    visitFields(v);
+    IGroupBox box = getRootGroupBox();
+    if (box != null) {
+      box.setEnabled(b, false, true);
+    }
   }
 
   @Override
@@ -2019,7 +2029,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           public boolean visitField(IFormField field, int level, int fieldIndex) {
             if (field instanceof IButton) {
               IButton b = (IButton) field;
-              if (b.isEnabled() && b.isVisible() && b.isEnabledProcessingButton()) {
+              if (b.isEnabled() && b.isVisible() && b.isEnabledProcessing()) {
                 enabledSystemTypes.add(b.getSystemType());
                 enabledSystemButtons.add(b);
               }
@@ -2030,13 +2040,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         try {
           visitFields(v);
           for (IButton b : enabledSystemButtons) {
-            b.setEnabledProcessingButton(false);
+            b.setEnabledProcessing(false);
           }
           interceptOnCloseRequest(kill, enabledSystemTypes);
         }
         finally {
           for (IButton b : enabledSystemButtons) {
-            b.setEnabledProcessingButton(true);
+            b.setEnabledProcessing(true);
           }
         }
       }
@@ -2078,7 +2088,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       setButtonsArmed(false);
       setCloseTimerArmed(false);
-      m_formStarted = false;
+      setFormStarted(false);
 
       // Cancel and remove timers
       Iterator<IFuture<Void>> iterator = m_timerFutureMap.values().iterator();
@@ -2124,12 +2134,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isFormStartable() {
-    return !m_formStarted && !isBlockingInternal();
+    return !isFormStarted() && !isBlockingInternal();
   }
 
   @Override
   public boolean isFormStarted() {
-    return m_formStarted;
+    return STATE_BIT_HELPER.isBitSet(FORM_STARTED, m_states);
+  }
+
+  private void setFormStarted(boolean started) {
+    m_states = STATE_BIT_HELPER.changeBit(FORM_STARTED, started, m_states);
   }
 
   protected boolean isBlockingInternal() {
@@ -2302,7 +2316,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
         return true;
       }
-    }, 0);
+    });
   }
 
   @Override
@@ -2606,12 +2620,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isShowOnStart() {
-    return m_showOnStart;
+    return FLAGS_BIT_HELPER.isBitSet(SHOW_ON_START, m_flags);
   }
 
   @Override
   public void setShowOnStart(boolean showOnStart) {
-    m_showOnStart = showOnStart;
+    m_flags = FLAGS_BIT_HELPER.changeBit(SHOW_ON_START, showOnStart, m_flags);
   }
 
   @Override
@@ -2627,12 +2641,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setCacheBounds(boolean cacheBounds) {
-    m_cacheBounds = cacheBounds;
+    m_flags = FLAGS_BIT_HELPER.changeBit(CACHE_BOUNDS, cacheBounds, m_flags);
   }
 
   @Override
   public boolean isCacheBounds() {
-    return m_cacheBounds;
+    return FLAGS_BIT_HELPER.isBitSet(CACHE_BOUNDS, m_flags);
   }
 
   @Override
@@ -2707,12 +2721,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isAskIfNeedSave() {
-    return m_askIfNeedSave;
+    return FLAGS_BIT_HELPER.isBitSet(ASK_IF_NEED_SAVE, m_flags);
   }
 
   @Override
   public void setAskIfNeedSave(boolean b) {
-    m_askIfNeedSave = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ASK_IF_NEED_SAVE, b, m_flags);
   }
 
   @Override
@@ -2727,22 +2741,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isButtonsArmed() {
-    return m_buttonsArmed;
+    return FLAGS_BIT_HELPER.isBitSet(BUTTONS_ARMED, m_flags);
   }
 
   @Override
   public void setButtonsArmed(boolean b) {
-    m_buttonsArmed = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(BUTTONS_ARMED, b, m_flags);
   }
 
   @Override
   public boolean isCloseTimerArmed() {
-    return m_closeTimerArmed;
+    return FLAGS_BIT_HELPER.isBitSet(CLOSE_TIMER_ARMED, m_flags);
   }
 
   @Override
   public void setCloseTimerArmed(boolean closeTimerArmed) {
-    m_closeTimerArmed = closeTimerArmed;
+    m_flags = FLAGS_BIT_HELPER.changeBit(CLOSE_TIMER_ARMED, closeTimerArmed, m_flags);
     if (!closeTimerArmed && m_closeTimerFuture != null) {
       m_closeTimerFuture.cancel(false);
       m_closeTimerFuture = null;

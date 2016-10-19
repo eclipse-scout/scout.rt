@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
-import org.eclipse.scout.rt.platform.holders.ITableHolder;
+import org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
@@ -104,7 +104,7 @@ public class SelectInputBindTest {
   public void testBatchUpdateFromTableBeanHolderFilter() throws Exception {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
-    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
+    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
     sql.update("UDPATE my_table SET a=:{active}, s=:{state} where n=:{name} ", filter);
     assertExpectedProtocol(sql);
   }
@@ -117,7 +117,7 @@ public class SelectInputBindTest {
   public void testBatchUpdateFromTableBeanHolderFilterInNVPair() throws Exception {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
-    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
+    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
     sql.update("UDPATE my_table SET a=:{filter.active}, s=:{filter.state} where n=:{filter.name} ", new NVPair("filter", filter));
     assertExpectedProtocol(sql);
   }
@@ -130,7 +130,7 @@ public class SelectInputBindTest {
   public void testBatchUpdateFromTableBeanHolderFilterInMap() throws Exception {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
-    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
+    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
     Map<String, ?> map = Collections.singletonMap("filter", filter);
     sql.update("UDPATE my_table SET a=:{filter.active}, s=:{filter.state} where n=:{filter.name} ", map);
     assertExpectedProtocol(sql);
@@ -144,7 +144,7 @@ public class SelectInputBindTest {
   public void testBatchUpdateFromTableBeanHolderFilterInBean() throws Exception {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
-    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
+    TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
     ContainerBean bean = new ContainerBean();
     bean.setTableBeanHolderFilter(filter);
     sql.update("UDPATE my_table SET a=:{TableBeanHolderFilter.active}, s=:{TableBeanHolderFilter.state} where n=:{TableBeanHolderFilter.name} ", bean);
@@ -154,15 +154,15 @@ public class SelectInputBindTest {
   private TableFieldBeanData createTableFieldBeanData(boolean withAdditionalRows) {
     TableFieldBeanData tableBeanData = new TableFieldBeanData();
     if (withAdditionalRows) {
-      createRow(tableBeanData, ITableHolder.STATUS_INSERTED, false, 6, "xxx");
+      createRow(tableBeanData, ITableBeanRowHolder.STATUS_INSERTED, false, 6, "xxx");
     }
-    createRow(tableBeanData, ITableHolder.STATUS_UPDATED, true, 3, "lorem");
+    createRow(tableBeanData, ITableBeanRowHolder.STATUS_UPDATED, true, 3, "lorem");
     if (withAdditionalRows) {
-      createRow(tableBeanData, ITableHolder.STATUS_DELETED, false, 8, "yyy");
+      createRow(tableBeanData, ITableBeanRowHolder.STATUS_DELETED, false, 8, "yyy");
     }
-    createRow(tableBeanData, ITableHolder.STATUS_UPDATED, false, 6, "ipsum");
+    createRow(tableBeanData, ITableBeanRowHolder.STATUS_UPDATED, false, 6, "ipsum");
     if (withAdditionalRows) {
-      createRow(tableBeanData, ITableHolder.STATUS_INSERTED, true, 2, "zzz");
+      createRow(tableBeanData, ITableBeanRowHolder.STATUS_INSERTED, true, 2, "zzz");
     }
     return tableBeanData;
   }

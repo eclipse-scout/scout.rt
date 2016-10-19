@@ -138,7 +138,7 @@ public final class JsonTestUtility {
 
   public static void initField(ICompositeField compositeField) {
     InitFieldVisitor visitor = new InitFieldVisitor();
-    compositeField.visitFields(visitor, 0);
+    compositeField.visitFields(visitor);
     visitor.handleResult();
   }
 

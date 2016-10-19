@@ -33,6 +33,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -50,7 +52,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable, IExtensibleObject {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelAttribute.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String ALLOW_NULL_OPERATOR = "ALLOW_NULL_OPERATOR";
+  private static final String ALLOW_NOT_OPERATOR = "ALLOW_NOT_OPERATOR";
+  private static final String AGGREGATION_ENABLED = "AGGREGATION_ENABLED";
+  private static final String ACTIVE_FILTER_ENABLED = "ACTIVE_FILTER_ENABLED";
   private static final long serialVersionUID = 1L;
 
   private String m_text;
@@ -59,18 +68,26 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   private List<? extends IDataModelAttributeOp> m_operators;
   private int[] m_aggregationTypes;
   private String m_iconId;
-  private boolean m_allowNullOperator;
-  private boolean m_allowNotOperator;
-  private boolean m_aggregationEnabled;
   private Class<? extends ICodeType> m_codeTypeClass;
   private ILookupCall<?> m_lookupCall;
   private Permission m_visiblePermission;
-  private boolean m_visibleGranted;
-  private boolean m_visibleProperty;
-  private boolean m_visible;
-  private boolean m_activeFilterEnabled;
   private IDataModelEntity m_parentEntity;
   private final ObjectExtensions<AbstractDataModelAttribute, IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> m_objectExtensions;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This DataModelAttribute is visible, if all dimensions are visible (all bits
+   * set).
+   */
+  private byte m_visible;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #ALLOW_NULL_OPERATOR}, {@link #ALLOW_NOT_OPERATOR}, {@link #AGGREGATION_ENABLED},
+   * {@link #ACTIVE_FILTER_ENABLED}
+   */
+  private byte m_flags;
 
   public AbstractDataModelAttribute() {
     this(true);
@@ -218,7 +235,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   protected void initConfig() {
-    m_visibleGranted = true;
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     setNotOperatorEnabled(getConfiguredNotOperatorEnabled());
     setNullOperatorEnabled(getConfiguredNullOperatorEnabled());
     setAggregationEnabled(getConfiguredAggregationEnabled());
@@ -360,22 +377,22 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @Override
   public boolean isNullOperatorEnabled() {
-    return m_allowNullOperator;
+    return FLAGS_BIT_HELPER.isBitSet(ALLOW_NULL_OPERATOR, m_flags);
   }
 
   @Override
   public void setNullOperatorEnabled(boolean b) {
-    m_allowNullOperator = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ALLOW_NULL_OPERATOR, b, m_flags);
   }
 
   @Override
   public boolean isAggregationEnabled() {
-    return m_aggregationEnabled;
+    return FLAGS_BIT_HELPER.isBitSet(AGGREGATION_ENABLED, m_flags);
   }
 
   @Override
   public void setAggregationEnabled(boolean aggregationEnabled) {
-    m_aggregationEnabled = aggregationEnabled;
+    m_flags = FLAGS_BIT_HELPER.changeBit(AGGREGATION_ENABLED, aggregationEnabled, m_flags);
     if (m_aggregationTypes != null) {
       injectAggregationTypes();
     }
@@ -383,12 +400,12 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @Override
   public boolean isNotOperatorEnabled() {
-    return m_allowNotOperator;
+    return FLAGS_BIT_HELPER.isBitSet(ALLOW_NOT_OPERATOR, m_flags);
   }
 
   @Override
   public void setNotOperatorEnabled(boolean b) {
-    m_allowNotOperator = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ALLOW_NOT_OPERATOR, b, m_flags);
   }
 
   @Override
@@ -443,42 +460,42 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    return isVisible(IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
-    calculateVisible();
+  public void setVisibleGranted(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
   public boolean isVisible() {
-    return m_visible;
+    return NamedBitMaskHelper.allBitsSet(m_visible);
   }
 
   @Override
-  public void setVisible(boolean b) {
-    setVisibleProperty(b);
-    calculateVisible();
+  public void setVisible(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE);
   }
 
-  protected void setVisibleProperty(boolean b) {
-    m_visibleProperty = b;
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
   }
 
-  protected boolean isVisibleProperty() {
-    return m_visibleProperty;
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
   }
 
   @Override
   public void setActiveFilterEnabled(boolean active) {
-    m_activeFilterEnabled = active;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ACTIVE_FILTER_ENABLED, active, m_flags);
   }
 
   @Override
   public boolean isActiveFilterEnabled() {
-    return m_activeFilterEnabled;
+    return FLAGS_BIT_HELPER.isBitSet(ACTIVE_FILTER_ENABLED, m_flags);
   }
 
   @Override
@@ -488,14 +505,6 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   public void setParentEntity(IDataModelEntity parent) {
     m_parentEntity = parent;
-  }
-
-  /**
-   * no access control for system buttons CANCEL and CLOSE
-   */
-  private void calculateVisible() {
-    // access control
-    m_visible = m_visibleGranted && m_visibleProperty;
   }
 
   @Override

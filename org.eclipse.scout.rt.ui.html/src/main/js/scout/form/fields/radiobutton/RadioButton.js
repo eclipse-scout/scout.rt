@@ -56,7 +56,7 @@ scout.RadioButton.prototype._mouseDown = function(event) {
 };
 
 scout.RadioButton.prototype.select = function() {
-  if (!this.enabled) {
+  if (!this.enabledComputed) {
     return;
   }
   if (this.parent instanceof scout.RadioButtonGroup) {

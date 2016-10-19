@@ -46,6 +46,21 @@ scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, mainB
   return groupBox;
 };
 
+scout.FormSpecHelper.prototype.createRadioButtonGroup = function(parent, numRadioButtons) {
+  parent = scout.nvl(parent, this.session.desktop);
+  numRadioButtons = scout.nvl(numRadioButtons, 2);
+  var
+    fields = [],
+    radioButtonGroup = scout.create('RadioButtonGroup', {parent: parent});
+
+  for (var i = 0; i < numRadioButtons; i++) {
+    fields.push(scout.create('RadioButton', {parent: radioButtonGroup}));
+  }
+  radioButtonGroup.setProperty('formFields', fields);
+  radioButtonGroup.setProperty('radioButtons', fields);
+  return radioButtonGroup;
+};
+
 scout.FormSpecHelper.prototype.createFormWithFields = function(parent, isModal, numFields) {
   parent = scout.nvl(parent, this.session.desktop);
   var form = scout.create('Form', {

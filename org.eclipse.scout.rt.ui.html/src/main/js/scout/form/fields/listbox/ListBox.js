@@ -14,6 +14,14 @@ scout.ListBox = function() {
 };
 scout.inherits(scout.ListBox, scout.ValueField);
 
+scout.ListBox.prototype._init = function(model) {
+  scout.ListBox.parent.prototype._init.call(this, model);
+  if (this.filterBox) {
+    this.filterBox.enabledComputed = true; // filter is always enabled
+    this.filterBox.recomputeEnabled(true);
+  }
+};
+
 scout.ListBox.prototype._render = function($parent) {
   this.addContainer($parent, 'list-box');
   this.addLabel();

@@ -87,6 +87,13 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
 
   void setSelectionTrackingEnabled(boolean selectionTrackingEnabled);
 
+  /**
+   * StringFields set the property to false while executing an action.
+   *
+   * @return true if the StringField is not in {@link #doAction()}.
+   */
+  boolean isEnabledProcessing();
+
   @Override
   IStringFieldUIFacade getUIFacade();
 

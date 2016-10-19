@@ -105,6 +105,15 @@ public interface IButton extends IFormField {
   void setSelected(boolean b);
 
   /**
+   * Buttons set the property to false while in work.
+   *
+   * @return true if process button is not in {@link #doClick()} action
+   */
+  boolean isEnabledProcessing();
+
+  void setEnabledProcessing(boolean b);
+
+  /**
    * In case button was pressed and armed, this event sets armed=false<br>
    * and prevents the button from firing an action
    */

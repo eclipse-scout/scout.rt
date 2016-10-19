@@ -218,12 +218,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       m_selectedField.setSelectionContext(m_attribute, dataType, op, values);
     }
     for (IFormField f : getFields()) {
-      if (f == m_selectedField) {
-        f.setVisible(true);
-      }
-      else {
-        f.setVisible(false);
-      }
+      f.setVisible(f == m_selectedField);
     }
   }
 

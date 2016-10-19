@@ -15,8 +15,10 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
+public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension {
 
   String PROP_TITLE = "title";
   String PROP_SUB_TITLE = "subTitle";

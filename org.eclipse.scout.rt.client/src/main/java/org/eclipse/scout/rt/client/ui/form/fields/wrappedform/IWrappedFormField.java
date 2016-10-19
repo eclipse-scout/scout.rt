@@ -62,5 +62,13 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
 
   void setInitialFocusEnabled(boolean initialFocusEnabled);
 
-  boolean visitFields(IFormFieldVisitor visitor, int startLevel);
+  /**
+   * Visits this field and all fields of the inner form recursively.
+   *
+   * @param visitor
+   *          The visitor to use. Must not be <code>null</code>.
+   * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
+   * @see IFormFieldVisitor#visitField(IFormField, int, int)
+   */
+  boolean visitFields(IFormFieldVisitor visitor);
 }

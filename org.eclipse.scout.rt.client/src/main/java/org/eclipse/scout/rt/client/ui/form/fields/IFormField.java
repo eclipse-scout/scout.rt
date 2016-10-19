@@ -17,15 +17,22 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.w3c.dom.Element;
 
 /**
@@ -60,7 +67,7 @@ import org.w3c.dom.Element;
  *
  * @see IForm
  */
-public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
+public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension {
   /*
    * Properties
    */
@@ -109,36 +116,36 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_LOADING = "loading";
 
   /**
-   * see {@link #getGridDataHints()}<br>
-   * this marker value defines the field to have a logical spanning all over the group box width
-   */
-  int FULL_WIDTH = 0;
-
-  /**
    * position the label at the default location (normally left of the field)<br>
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
-  int LABEL_POSITION_DEFAULT = 0;
+  byte LABEL_POSITION_DEFAULT = 0;
   /**
    * position the label left of the field<br>
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
-  int LABEL_POSITION_LEFT = 1;
+  byte LABEL_POSITION_LEFT = 1;
   /**
    * position the label on the field, meaning that the label is only displayed when the field is empty (vista style)<br>
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
-  int LABEL_POSITION_ON_FIELD = 2;
+  byte LABEL_POSITION_ON_FIELD = 2;
   /**
    * position the label right of the field<br>
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
-  int LABEL_POSITION_RIGHT = 3;
+  byte LABEL_POSITION_RIGHT = 3;
 
   /**
    * position the label on the top of the field
    */
-  int LABEL_POSITION_TOP = 4;
+  byte LABEL_POSITION_TOP = 4;
+
+  /**
+   * see {@link #getGridDataHints()}<br>
+   * this marker value defines the field to have a logical spanning all over the group box width
+   */
+  int FULL_WIDTH = 0;
 
   /**
    * use the systemwide default label with see {@link #setLabelWidthInPixel(int)} and {@link #getLabelWidthInPixel()}
@@ -152,9 +159,24 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   int LABEL_WIDTH_UI = -1;
 
   /**
-   * use the systemwide default label alignment
+   * use the default label alignment of the UI
    */
-  int LABEL_HORIZONTAL_ALIGNMENT_DEFAULT = 1000;
+  byte LABEL_HORIZONTAL_ALIGNMENT_DEFAULT = 127;
+
+  /**
+   * left alignment
+   */
+  byte LABEL_HORIZONTAL_ALIGNMENT_LEFT = -1;
+
+  /**
+   * center alignment
+   */
+  byte LABEL_HORIZONTAL_ALIGNMENT_CENTER = 0;
+
+  /**
+   * right alignment
+   */
+  byte LABEL_HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
   String STATUS_POSITION_DEFAULT = "default";
 
@@ -316,14 +338,14 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * @since 19.11.2009
    * @return one of the LABEL_POSITION_* constants or a custom constants interpreted by the ui
    */
-  int getLabelPosition();
+  byte getLabelPosition();
 
   /**
    * @since 19.11.2009
    * @param pos
    *          one of the LABEL_POSITION_* constants or a custom constants interpreted by the ui
    */
-  void setLabelPosition(int pos);
+  void setLabelPosition(byte pos);
 
   /**
    * @since 19.11.2009
@@ -343,7 +365,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * @return negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
    *         ui
    */
-  int getLabelHorizontalAlignment();
+  byte getLabelHorizontalAlignment();
 
   /**
    * @since 19.11.2009
@@ -351,26 +373,12 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    *          negative for left, 0 for center and positive for right, LABEL_HORIZONTAL_ALIGNMENT_DEFAULT for default of
    *          ui
    */
-  void setLabelHorizontalAlignment(int a);
+  void setLabelHorizontalAlignment(byte a);
 
   /**
    * @return fully qualified label. This is the path in the container tree
    */
   String getFullyQualifiedLabel(String separator);
-
-  boolean isLabelVisible();
-
-  void setLabelVisible(boolean b);
-
-  /**
-   * Meta property over labelVisible<br>
-   * This property is used to suppress the label even if it is visible<br>
-   * see {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox ISequenceBox} where the label of the
-   * first visible child field is suppressed and appended to the range box's label
-   */
-  boolean isLabelSuppressed();
-
-  void setLabelSuppressed(boolean b);
 
   Object getProperty(String name);
 
@@ -379,69 +387,11 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * <p>
    * <b>Important: </b> Although this method is intended to be used for custom properties, it's actually possible to
    * change main properties as well. Keep in mind that directly changing main properties may result in unexpected
-   * behavior, so do it only if you really know what you are doing. Rather use the officially provided api instead. <br>
-   * Example for an unexpected behavior: setVisible() does not only set the property PROP_VISIBLE but also executes
-   * additional code. This code would NOT be executed by directly setting the property PROP_VISIBLE with setProperty().
+   * behavior, so do it only if necessary. Rather use the provided API instead.<br>
    */
   void setProperty(String name, Object value);
 
   boolean isInitialized();
-
-  Permission getEnabledPermission();
-
-  void setEnabledPermission(Permission p);
-
-  /**
-   * Enabling of a field has two levels: granting and property level.
-   * <p>
-   * This is the "harder" level of granting.
-   * <p>
-   * Note that a field with grantEnabled=false remains disabled even though setEnabled(true) was called.
-   */
-  boolean isEnabledGranted();
-
-  /**
-   * Enabling of a field has two levels: granting and property level.
-   * <p>
-   * This is the "softer" level of property.
-   * <p>
-   * Note that a field with grantEnabled=false remains disabled even though setEnabled(true) was called.
-   */
-  boolean getEnabledProperty();
-
-  void setEnabledGranted(boolean b);
-
-  /**
-   * This property is used by buttons. Buttons set the property to false while in work.
-   *
-   * @return true if process button is not in {@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton#doClick()
-   *         IButton#doClick()} action
-   */
-  boolean isEnabledProcessingButton();
-
-  void setEnabledProcessingButton(boolean b);
-
-  /**
-   * @return {@link #isEnabledGranted()} &amp;&amp; {@link #getEnabledProperty()}
-   */
-  boolean isEnabled();
-
-  /**
-   * do NOT override this method
-   */
-  void setEnabled(boolean b);
-
-  Permission getVisiblePermission();
-
-  void setVisiblePermission(Permission p);
-
-  boolean isVisibleGranted();
-
-  void setVisibleGranted(boolean b);
-
-  boolean isVisible();
-
-  void setVisible(boolean b);
 
   boolean isMandatory();
 
@@ -627,4 +577,411 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setLoading(boolean loading);
 
   boolean isLoading();
+
+  /**
+   * @return If the label of this {@link IFormField} is visible. It is visible if all label-visibility dimensions are
+   *         <code>true</code>.
+   */
+  boolean isLabelVisible();
+
+  /**
+   * Changes the value of the default label-visibility dimension to the given value.
+   *
+   * @param b
+   *          The new value specifying if the label of this {@link IFormField} is visible.
+   */
+  void setLabelVisible(boolean b);
+
+  /**
+   * Checks if the given label-visibility dimension is set to <code>true</code>.
+   *
+   * @param dimension
+   *          The dimension to check. Must not be <code>null</code>.
+   * @return <code>true</code> if the given dimension is set to visible. By default all dimensions are visible.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for label visibility. One dimension is already used by the
+   *           {@link IFormField} itself. Therefore 7 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  boolean isLabelVisible(String dimension);
+
+  /**
+   * Changes the label-visibility value of the given dimension.
+   *
+   * @param visible
+   *          The new value for the given dimension.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for label visibility. One dimension is already used by the
+   *           {@link IFormField} itself. Therefore 7 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  void setLabelVisible(boolean visible, String dimension);
+
+  /**
+   * @return <code>true</code> if this {@link IFormField} and all parent {@link IFormField}s are visible (all
+   *         dimensions).
+   * @see #isVisible()
+   */
+  boolean isVisibleIncludingParents();
+
+  /**
+   * @return If this {@link IFormField} is visible. It is visible if all visibility-dimensions are <code>true</code>.
+   */
+  boolean isVisible();
+
+  /**
+   * Changes the visible property of this {@link IFormField} to the given value.
+   *
+   * @param visible
+   *          The new visible value.
+   */
+  void setVisible(boolean b);
+
+  /**
+   * Changes the visible property of this {@link IFormField} to the given value.
+   *
+   * @param visible
+   *          The new visible value.
+   * @param updateParents
+   *          if <code>true</code> the visible property of all parent {@link IFormField}s are updated to same value as
+   *          well.
+   */
+  void setVisible(boolean visible, boolean updateParents);
+
+  /**
+   * Changes the visible property of this {@link IFormField} to the given value.
+   *
+   * @param visible
+   *          The new visible value.
+   * @param updateParents
+   *          if <code>true</code> the visible property of all parent {@link IFormField}s are updated to same value as
+   *          well.
+   * @param updateChildren
+   *          if <code>true</code> the visible property of all child {@link IFormField}s (recursive) are updated to same
+   *          value as well.
+   */
+  void setVisible(boolean visible, boolean updateParents, boolean updateChildren);
+
+  /**
+   * Sets a new visible-permission that is used to calculate the visible-granted property of this {@link IFormField}.
+   *
+   * @param p
+   *          The new {@link Permission} that is used to calculate the visible-granted value.
+   * @see IAccessControlService#checkPermission(Permission)
+   * @see #setVisibleGranted(boolean)
+   */
+  void setVisiblePermission(Permission p);
+
+  /**
+   * @return The visible-permission of this {@link IFormField}.
+   */
+  Permission getVisiblePermission();
+
+  /**
+   * @return The visible-granted property of this {@link IFormField}.
+   */
+  boolean isVisibleGranted();
+
+  /**
+   * Changes the visible-granted property of this {@link IFormField} to the given value.
+   *
+   * @param visible
+   *          The new visible-granted value.
+   */
+  void setVisibleGranted(boolean b);
+
+  /**
+   * Changes the visible-granted property of this {@link IFormField} to the given value.
+   *
+   * @param visible
+   *          The new visible-granted value.
+   * @param updateParents
+   *          if <code>true</code> the visible-granted property of all parent {@link IFormField}s are updated to same
+   *          value as well.
+   */
+  void setVisibleGranted(boolean visible, boolean updateParents);
+
+  /**
+   * Changes the visible-granted property of this {@link IFormField} to the given value.
+   *
+   * @param visible
+   *          The new visible-granted value.
+   * @param updateParents
+   *          if <code>true</code> the visible-granted property of all parent {@link IFormField}s are updated to same
+   *          value as well.
+   * @param updateChildren
+   *          if <code>true</code> the visible-granted property of all child {@link IFormField}s (recursive) are updated
+   *          to same value as well.
+   */
+  void setVisibleGranted(boolean visible, boolean updateParents, boolean updateChildren);
+
+  /**
+   * Changes the field-visibility value of the given dimension.
+   *
+   * @param visible
+   *          The new visibility value for the given dimension.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
+   *           {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
+   *           dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  @Override
+  void setVisible(boolean visible, String dimension);
+
+  /**
+   * Changes the field-visibility value of the given dimension.
+   *
+   * @param visible
+   *          The new visibility value for the given dimension.
+   * @param updateParents
+   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
+   *           {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
+   *           dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  void setVisible(boolean visible, boolean updateParents, String dimension);
+
+  /**
+   * Changes the field-visibility value of the given dimension.
+   *
+   * @param visible
+   *          The new visibility value for the given dimension.
+   * @param updateParents
+   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
+   * @param updateChildren
+   *          if <code>true</code> all child {@link IFormField}s (recursive) are updated to same value as well.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for visibility. Two dimensions are already used by the
+   *           {@link IFormField} itself ({@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}). Therefore 6
+   *           dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  void setVisible(boolean visible, boolean updateParents, boolean updateChildren, String dimension);
+
+  /**
+   * @return <code>true</code> if this {@link IFormField} and all parent {@link IFormField}s are enabled (all
+   *         dimensions).
+   * @see #isEnabled()
+   */
+  boolean isEnabledIncludingParents();
+
+  /**
+   * @return If this {@link IFormField} is enabled. It is enabled if all enabled-dimensions are <code>true</code>.
+   */
+  boolean isEnabled();
+
+  /**
+   * @return The enabled property value of this {@link IFormField}.
+   */
+  boolean getEnabledProperty();
+
+  /**
+   * Changes the enabled property of this {@link IFormField} to the given value.
+   *
+   * @param enabled
+   *          The new enabled value.
+   */
+  void setEnabled(boolean b);
+
+  /**
+   * Changes the enabled property of this {@link IFormField} to the given value.
+   *
+   * @param enabled
+   *          The new enabled value.
+   * @param updateParents
+   *          if <code>true</code> the enabled property of all parent {@link IFormField}s are updated to same value as
+   *          well.
+   */
+  void setEnabled(boolean enabled, boolean updateParents);
+
+  /**
+   * Changes the enabled property of this {@link IFormField} to the given value.
+   *
+   * @param enabled
+   *          The new enabled value.
+   * @param updateParents
+   *          if <code>true</code> the enabled property of all parent {@link IFormField}s are updated to same value as
+   *          well.
+   * @param updateChildren
+   *          if <code>true</code> the enabled property of all child {@link IFormField}s (recursive) are updated to same
+   *          value as well.
+   */
+  void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren);
+
+  /**
+   * @return The enabled-permission of this {@link IFormField}.
+   */
+  Permission getEnabledPermission();
+
+  /**
+   * Sets a new enabled-permission that is used to calculate the enabled-granted property of this {@link IFormField}.
+   *
+   * @param p
+   *          The new {@link Permission} that is used to calculate the enabled-granted value.
+   * @see IAccessControlService#checkPermission(Permission)
+   * @see #setEnabledGranted(boolean)
+   */
+  void setEnabledPermission(Permission p);
+
+  /**
+   * @return The enable-granted property of this {@link IFormField}.
+   */
+  boolean isEnabledGranted();
+
+  /**
+   * Changes the enabled-granted property of this {@link IFormField} to the given value.
+   *
+   * @param enabled
+   *          The new enable-granted value.
+   */
+  void setEnabledGranted(boolean b);
+
+  /**
+   * Changes the enabled-granted property of this {@link IFormField} to the given value.
+   *
+   * @param enabled
+   *          The new enable-granted value.
+   * @param updateParents
+   *          if <code>true</code> the enabled-granted property of all parent {@link IFormField}s are updated to same
+   *          value as well.
+   */
+  void setEnabledGranted(boolean enabled, boolean updateParents);
+
+  /**
+   * Changes the enabled-granted property of this {@link IFormField} to the given value.
+   *
+   * @param enabled
+   *          The new enable-granted value.
+   * @param updateParents
+   *          if <code>true</code> the enabled-granted property of all parent {@link IFormField}s are updated to same
+   *          value as well.
+   * @param updateChildren
+   *          if <code>true</code> the enabled-granted property of all child {@link IFormField}s (recursive) are updated
+   *          to same value as well.
+   */
+  void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren);
+
+  /**
+   * Changes the enabled-state value of the given dimension.
+   *
+   * @param enabled
+   *          The new enabled-state value for the given dimension.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for enabled-state. Three dimensions are already used by
+   *           the {@link IFormField} itself ({@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED},
+   *           ENABLED_SLAVE). Therefore 5 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  @Override
+  void setEnabled(boolean enabled, String dimension);
+
+  /**
+   * Changes the enabled-state value of the given dimension.
+   *
+   * @param enabled
+   *          The new enabled-state value for the given dimension.
+   * @param updateParents
+   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for enabled-state. Three dimensions are already used by
+   *           the {@link IFormField} itself ({@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED},
+   *           ENABLED_SLAVE). Therefore 5 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  void setEnabled(boolean enabled, boolean updateParents, String dimension);
+
+  /**
+   * Changes the enabled-state value of the given dimension.
+   *
+   * @param enabled
+   *          The new enabled-state value for the given dimension.
+   * @param updateParents
+   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
+   * @param updateChildren
+   *          if <code>true</code> all child {@link IFormField}s (recursive) are updated to same value as well.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. This {@link IFormField} supports up to
+   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for enabled-state. Three dimensions are already used by
+   *           the {@link IFormField} itself ({@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED},
+   *           ENABLED_SLAVE). Therefore 5 dimensions may be used by developers.<br>
+   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
+   *           available by instance but by class!
+   */
+  void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
+
+  /**
+   * Accepts the given {@link IFormFieldVisitor}. This {@link IFormField} and all child {@link IFormField}s are visited
+   * recursively.
+   *
+   * @param visitor
+   *          The {@link IFormFieldVisitor} to use. Must not be <code>null</code>.
+   * @param level
+   *          The start level. Usually zero.
+   * @param fieldIndex
+   *          The field index of this {@link IFormField} in its parent list.
+   * @param includeThis
+   *          <code>true</code> if this {@link IFormField} and all children should be visited. <code>false</code> if
+   *          only the child {@link IFormField}s should be visited.
+   * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
+   * @see IFormFieldVisitor#visitField(IFormField, int, int)
+   */
+  boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis);
+
+  /**
+   * Visits all parent {@link IFormField}s
+   *
+   * @param v
+   *          The {@link IFormFieldVisitor} to use. Must not be <code>null</code>.
+   * @return <code>true</code> if all parent fields have been visited. <code>false</code> if the visitor cancelled the
+   *         visit.
+   * @see IFormFieldVisitor#visitField(IFormField, int, int)
+   */
+  boolean visitParents(IFormFieldVisitor visitor);
 }

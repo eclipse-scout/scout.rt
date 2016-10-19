@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -41,23 +43,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
+
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelEntity.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String ONE_TO_MANY = "ONE_TO_MANY";
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String INITIALIZED_CHILD_ENTITIES = "INITIALIZED_CHILD_ENTITIES";
 
   private double m_order;
   private Permission m_visiblePermission;
-  private boolean m_visibleGranted;
-  private boolean m_visibleProperty;
-  private boolean m_oneToMany;
   private String m_text;
   private String m_iconId;
   private List<IDataModelAttribute> m_attributes;
   private List<IDataModelEntity> m_entities;
   private IDataModelEntity m_parentEntity;
-  private boolean m_initializedChildEntities;
-  private boolean m_initialized;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDataModelEntity, IDataModelEntityExtension<? extends AbstractDataModelEntity>> m_objectExtensions;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #ONE_TO_MANY}, {@link #INITIALIZED_CHILD_ENTITIES}
+   */
+  private byte m_flags;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This DataModelEntity is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
 
   public AbstractDataModelEntity() {
     this(true);
@@ -188,7 +204,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   protected void initConfig() {
-    m_visibleGranted = true;
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_contributionHolder = new ContributionComposite(this);
     setText(getConfiguredText());
     setIconId(getConfiguredIconId());
@@ -242,9 +258,17 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * Runtime
    */
 
+  private boolean isInitialized() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
+  }
+
   @Override
   public final void initEntity() {
-    if (m_initialized) {
+    if (isInitialized()) {
       return;
     }
 
@@ -262,7 +286,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
         LOG.error("attribute {}/{}", this, a, ex);
       }
     }
-    m_initialized = true;
+    setInitialized();
     for (IDataModelEntity e : getEntities()) {
       try {
         e.initEntity();
@@ -297,13 +321,12 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    return isVisible(IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
-    m_visibleGranted = b;
-    calculateVisible();
+  public void setVisibleGranted(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
@@ -312,35 +335,41 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   @Override
-  public void setVisible(boolean b) {
-    setVisibleProperty(b);
+  public void setVisible(boolean visible) {
+    setVisible(visible, IDimensions.VISIBLE);
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
     calculateVisible();
   }
 
-  protected void setVisibleProperty(boolean b) {
-    m_visibleProperty = b;
+  @Override
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
   }
 
-  protected boolean isVisibleProperty() {
-    return m_visibleProperty;
+  private void calculateVisible() {
+    propertySupport.setPropertyBool(PROP_VISIBLE, NamedBitMaskHelper.allBitsSet(m_visible));
   }
 
   @Override
   public boolean isOneToMany() {
-    return m_oneToMany;
+    return FLAGS_BIT_HELPER.isBitSet(ONE_TO_MANY, m_flags);
   }
 
   @Override
   public void setOneToMany(boolean b) {
-    m_oneToMany = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ONE_TO_MANY, b, m_flags);
   }
 
-  /**
-   * no access control for system buttons CANCEL and CLOSE
-   */
-  private void calculateVisible() {
-    // access control
-    propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
+  private boolean isInitializedChildEntities() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED_CHILD_ENTITIES, m_flags);
+  }
+
+  private void setInitializedChildEntities() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED_CHILD_ENTITIES, m_flags);
   }
 
   @Override
@@ -414,44 +443,45 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   @Override
   public void initializeChildEntities(Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap) {
-    if (!m_initializedChildEntities) {
-      m_initializedChildEntities = true;
-      List<Class<IDataModelEntity>> configuredEntities = getConfiguredEntities();
-      List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
-      int numEntities = configuredEntities.size() + contributedEntities.size();
+    if (isInitializedChildEntities()) {
+      return;
+    }
+    setInitializedChildEntities();
+    List<Class<IDataModelEntity>> configuredEntities = getConfiguredEntities();
+    List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
+    int numEntities = configuredEntities.size() + contributedEntities.size();
 
-      Set<IDataModelEntity> newConfiguredInstances = new HashSet<IDataModelEntity>(numEntities);
-      OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
-      for (Class<? extends IDataModelEntity> c : configuredEntities) {
-        //check if a parent is of same type, in that case use reference
-        IDataModelEntity e = instanceMap.get(c);
-        if (e == null) {
-          e = ConfigurationUtility.newInnerInstance(this, c);
-          newConfiguredInstances.add(e);
-          instanceMap.put(c, e);
-        }
-        entities.addOrdered(e);
+    Set<IDataModelEntity> newConfiguredInstances = new HashSet<IDataModelEntity>(numEntities);
+    OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
+    for (Class<? extends IDataModelEntity> c : configuredEntities) {
+      //check if a parent is of same type, in that case use reference
+      IDataModelEntity e = instanceMap.get(c);
+      if (e == null) {
+        e = ConfigurationUtility.newInnerInstance(this, c);
+        newConfiguredInstances.add(e);
+        instanceMap.put(c, e);
       }
-      newConfiguredInstances.addAll(contributedEntities);
-      entities.addAllOrdered(contributedEntities);
-      injectEntitiesInternal(entities);
-      ExtensionUtility.moveModelObjects(entities);
+      entities.addOrdered(e);
+    }
+    newConfiguredInstances.addAll(contributedEntities);
+    entities.addAllOrdered(contributedEntities);
+    injectEntitiesInternal(entities);
+    ExtensionUtility.moveModelObjects(entities);
 
-      m_entities.clear();
-      m_entities.addAll(entities.getOrderedList());
+    m_entities.clear();
+    m_entities.addAll(entities.getOrderedList());
 
-      for (IDataModelEntity e : m_entities) {
-        if (e instanceof AbstractDataModelEntity) {
-          AbstractDataModelEntity adme = (AbstractDataModelEntity) e;
-          if (adme.getParentEntity() != this) {
-            adme.setParentEntity(this);
-          }
+    for (IDataModelEntity e : m_entities) {
+      if (e instanceof AbstractDataModelEntity) {
+        AbstractDataModelEntity adme = (AbstractDataModelEntity) e;
+        if (adme.getParentEntity() != this) {
+          adme.setParentEntity(this);
         }
       }
-      for (IDataModelEntity e : m_entities) {
-        if (newConfiguredInstances.contains(e) || !instanceMap.containsKey(e.getClass())) {
-          e.initializeChildEntities(instanceMap);
-        }
+    }
+    for (IDataModelEntity e : m_entities) {
+      if (newConfiguredInstances.contains(e) || !instanceMap.containsKey(e.getClass())) {
+        e.initializeChildEntities(instanceMap);
       }
     }
   }

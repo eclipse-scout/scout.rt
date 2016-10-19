@@ -17,36 +17,33 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
  * Note: TableRows are equal-consistent by their rowIndex
  */
 public interface ITableRow {
+
   /**
-   * same number as
-   *
-   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_NON_CHANGED
+   * @see {@link ITableBeanRowHolder#STATUS_NON_CHANGED}
    */
-  int STATUS_NON_CHANGED = 0;
+  int STATUS_NON_CHANGED = ITableBeanRowHolder.STATUS_NON_CHANGED;
+
   /**
-   * same number as
-   *
-   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_INSERTED
+   * @see {@link ITableBeanRowHolder#STATUS_INSERTED}
    */
-  int STATUS_INSERTED = 1;
+  int STATUS_INSERTED = ITableBeanRowHolder.STATUS_INSERTED;
+
   /**
-   * same number as
-   *
-   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_UPDATED
+   * @see {@link ITableBeanRowHolder#STATUS_UPDATED}
    */
-  int STATUS_UPDATED = 2;
+  int STATUS_UPDATED = ITableBeanRowHolder.STATUS_UPDATED;
+
   /**
-   * same number as
-   *
-   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_DELETED
+   * @see {@link ITableBeanRowHolder#STATUS_DELETED}
    */
-  int STATUS_DELETED = 3;
+  int STATUS_DELETED = ITableBeanRowHolder.STATUS_DELETED;
 
   ITable getTable();
 

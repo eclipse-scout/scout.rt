@@ -107,8 +107,10 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -126,7 +128,15 @@ import org.slf4j.LoggerFactory;
  */
 @ClassId("e88f7f88-9747-40ea-88bd-744803aef7a7")
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String ACTION_RUNNING = "ACTION_RUNNING";
+  private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
+  private static final String SORT_VALID = "SORT_VALID";
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String INITIAL_MULTI_LINE_TEXT = "INITIAL_MULTI_LINE_TEXT";
 
   public interface IResetColumnsOption {
     String VISIBILITY = "visibility";
@@ -137,51 +147,47 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     String FILTERS = "filters";
   }
 
-  private boolean m_initialized;
   private final OptimisticLock m_initLock;
-  private ColumnSet m_columnSet;
-  /**
-   * synchronized list
-   */
-  private final List<ITableRow> m_rows;
-
+  private final List<ITableRow> m_rows; // synchronized list
   private final Object m_cachedRowsLock;
-  private List<ITableRow> m_cachedRows;
-
   private final Map<CompositeObject, ITableRow> m_deletedRows;
-  private List<ITableRow/* ordered by rowIndex */> m_selectedRows = new ArrayList<ITableRow>();
-  private Set<ITableRow/* ordered by rowIndex */> m_checkedRows = new LinkedHashSet<ITableRow>();
-  private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
-  private ITableUIFacade m_uiFacade;
   private final List<ITableRowFilter> m_rowFilters;
   private final Map<String, BinaryResource> m_attachments;
+  private final KeyStrokeBuffer m_keyStrokeBuffer; // key stroke buffer for select-as-you-type
+  private final EventListenerList m_listenerList;
+  private final Object m_cachedFilteredRowsLock;
+  private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
+
+  /**
+   * Provides 8 dimensions for enabled state.<br>
+   * Internally used: {@link IDimensions#ENABLED}.<br>
+   * 7 dimensions remain for custom use. This Table is enabled, if all dimensions are enabled (all bits set).
+   */
+  private byte m_enabled;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #INITIALIZED}, {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID},
+   * {@link #INITIAL_MULTI_LINE_TEXT}, {@link #ACTION_RUNNING}
+   */
+  private byte m_flags;
+  private ColumnSet m_columnSet;
+  private List<ITableRow> m_cachedRows;
+  private List<ITableRow/* ordered by rowIndex */> m_selectedRows;
+  private Set<ITableRow/* ordered by rowIndex */> m_checkedRows;
+  private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
+  private ITableUIFacade m_uiFacade;
   private String m_userPreferenceContext;
-  // batch mutation
-  private boolean m_autoDiscardOnDelete;
-  private boolean m_sortValid;
-  private boolean m_initialMultiLineText;
   private int m_tableChanging;
   private AbstractEventBuffer<TableEvent> m_eventBuffer;
   private int m_eventBufferLoopDetection;
-
-  private HashSet<ITableRow> m_rowDecorationBuffer = new HashSet<ITableRow>();
-  private Map<Integer, Set<ITableRow>> m_rowValueChangeBuffer = new HashMap<>();
-
-  // key stroke buffer for select-as-you-type
-  private final KeyStrokeBuffer m_keyStrokeBuffer;
-  private final EventListenerList m_listenerList = new EventListenerList();
-  //cell editing
+  private Set<ITableRow> m_rowDecorationBuffer;
+  private Map<Integer, Set<ITableRow>> m_rowValueChangeBuffer;
   private P_CellEditorContext m_editContext;
-  //checkable table
   private IBooleanColumn m_checkableColumn;
-  //auto filter
-  private final Object m_cachedFilteredRowsLock;
   private List<ITableRow> m_cachedFilteredRows;
   private IEventHistory<TableEvent> m_eventHistory;
   private ContributionComposite m_contributionHolder;
-  private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
-  // only do one action at a time
-  private boolean m_actionRunning;
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
@@ -192,6 +198,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   public AbstractTable(boolean callInitializer) {
+    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
+    m_selectedRows = new ArrayList<ITableRow>();
+    m_checkedRows = new LinkedHashSet<ITableRow>();
+    m_rowDecorationBuffer = new HashSet<ITableRow>();
+    m_rowValueChangeBuffer = new HashMap<>();
+    m_listenerList = new EventListenerList();
     m_cachedRowsLock = new Object();
     m_cachedFilteredRowsLock = new Object();
     m_rows = Collections.synchronizedList(new ArrayList<ITableRow>(1));
@@ -200,7 +212,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_rowFilters = new ArrayList<ITableRowFilter>(1);
     m_attachments = new HashMap<>(0);
     m_initLock = new OptimisticLock();
-    m_actionRunning = false;
     m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this, false);
     //add single observer listener
     addTableListener(new P_TableListener());
@@ -1136,7 +1147,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (m_initLock.acquire()) {
         try {
           setTableChanging(true);
-          //
           initTableInternal();
           ActionUtility.initActions(getMenus());
           interceptInitTable();
@@ -1147,7 +1157,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     finally {
-      m_initialized = true;
+      setTableInitialized();
       m_initLock.release();
     }
   }
@@ -1178,14 +1188,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void doAppLinkAction(String ref) {
-    if (!m_actionRunning) {
-      try {
-        m_actionRunning = true;
-        interceptAppLinkAction(ref);
-      }
-      finally {
-        m_actionRunning = false;
-      }
+    if (isActionRunning()) {
+      return;
+    }
+    try {
+      setActionRunning(true);
+      interceptAppLinkAction(ref);
+    }
+    finally {
+      setActionRunning(false);
     }
   }
 
@@ -1299,6 +1310,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
+  }
+
+  private boolean isSortValid() {
+    return FLAGS_BIT_HELPER.isBitSet(SORT_VALID, m_flags);
+  }
+
+  private void setSortValid(boolean valid) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(SORT_VALID, valid, m_flags);
+  }
+
+  private boolean isActionRunning() {
+    return FLAGS_BIT_HELPER.isBitSet(ACTION_RUNNING, m_flags);
+  }
+
+  private void setActionRunning(boolean running) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(ACTION_RUNNING, running, m_flags);
   }
 
   @Override
@@ -1499,12 +1526,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public boolean isInitialMultilineText() {
-    return m_initialMultiLineText;
+    return FLAGS_BIT_HELPER.isBitSet(INITIAL_MULTI_LINE_TEXT, m_flags);
   }
 
   @Override
   public void setInitialMultilineText(boolean on) {
-    m_initialMultiLineText = on;
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIAL_MULTI_LINE_TEXT, on, m_flags);
   }
 
   @Override
@@ -1549,17 +1576,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public boolean isAutoDiscardOnDelete() {
-    return m_autoDiscardOnDelete;
+    return FLAGS_BIT_HELPER.isBitSet(AUTO_DISCARD_ON_DELETE, m_flags);
   }
 
   @Override
   public void setAutoDiscardOnDelete(boolean on) {
-    m_autoDiscardOnDelete = on;
+    m_flags = FLAGS_BIT_HELPER.changeBit(AUTO_DISCARD_ON_DELETE, on, m_flags);
   }
 
   @Override
   public boolean isTableInitialized() {
-    return m_initialized;
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+  }
+
+  private void setTableInitialized() {
+    m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
   }
 
   @Override
@@ -1586,7 +1617,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             //will be going to zero, but process decorations here, so events are added to the event buffer
             processDecorationBuffer();
-            if (!m_sortValid) {
+            if (!isSortValid()) {
               sort();
             }
           }
@@ -2054,7 +2085,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public void setRowState(Collection<? extends ITableRow> rows, int rowState) {
     try {
       setTableChanging(true);
-      //
       for (ITableRow row : rows) {
         row.setStatus(rowState);
       }
@@ -2083,7 +2113,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (getColumnSet().getSortColumnCount() > 0) {
         // restore order of rows according to sort criteria
         if (isTableChanging()) {
-          m_sortValid = false;
+          setSortValid(false);
         }
         else {
           sort();
@@ -2483,8 +2513,23 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public final void setEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_ENABLED, b);
+  public final void setEnabled(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
+    setEnabledInternal();
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
+  }
+
+  private void setEnabledInternal() {
+    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
   }
 
   @Override
@@ -2771,7 +2816,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (getColumnSet().getSortColumnCount() > 0) {
         // restore order of rows according to sort criteria
         if (isTableChanging()) {
-          m_sortValid = false;
+          setSortValid(false);
         }
         else {
           sort();
@@ -3286,7 +3331,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   public void onGroupedColumnInvisible(IColumn<?> col) {
     if (isTableChanging()) {
-      m_sortValid = false;
+      setSortValid(false);
     }
     else {
       sort();
@@ -3316,7 +3361,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     finally {
-      m_sortValid = true;
+      setSortValid(true);
     }
   }
 
@@ -3469,7 +3514,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableChanging(true);
       // TODO [5.2] asa: move to internal?
       if (options.contains(IResetColumnsOption.SORTING)) {
-        m_sortValid = false;
+        setSortValid(false);
       }
       resetColumnsInternal(options);
       interceptResetColumns(options);
@@ -3908,21 +3953,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void fireRowAction(ITableRow row) {
-    if (!m_actionRunning) {
-      try {
-        m_actionRunning = true;
-        if (row != null) {
-          try {
-            interceptRowAction(row);
-          }
-          catch (Exception ex) {
-            BEANS.get(ExceptionHandler.class).handle(ex);
-          }
-        }
-      }
-      finally {
-        m_actionRunning = false;
-      }
+    if (isActionRunning() || row == null) {
+      return;
+    }
+
+    try {
+      setActionRunning(true);
+      interceptRowAction(row);
+    }
+    catch (Exception ex) {
+      BEANS.get(ExceptionHandler.class).handle(ex);
+    }
+    finally {
+      setActionRunning(false);
     }
   }
 

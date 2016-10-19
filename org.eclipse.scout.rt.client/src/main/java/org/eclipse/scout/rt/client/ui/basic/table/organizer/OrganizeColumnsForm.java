@@ -181,7 +181,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           }
 
           @Override
-          protected int getConfiguredLabelPosition() {
+          protected byte getConfiguredLabelPosition() {
             return LABEL_POSITION_TOP;
           }
 
@@ -597,7 +597,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           }
 
           @Override
-          protected int getConfiguredLabelPosition() {
+          protected byte getConfiguredLabelPosition() {
             return LABEL_POSITION_TOP;
           }
 

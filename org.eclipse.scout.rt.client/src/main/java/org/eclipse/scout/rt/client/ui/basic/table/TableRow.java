@@ -22,19 +22,30 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 
 public class TableRow implements ITableRow {
 
+  protected static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String CHECKED = "CHECKED";
+  private static final String ROW_PROPERTIES_CHANGED = "ROW_PROPERTIES_CHANGED";
+
   private final ColumnSet m_columnSet;
+  private final Map<String, Object> m_customValues;
+  protected final List<Cell> m_cells;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link IDimensions#ENABLED}, {@link #CHECKED}, {@link #ROW_PROPERTIES_CHANGED},
+   * {@link #FILTER_ACCEPTED} (in subclass), {@link #REJECTED_BY_USER} (in subclass).
+   */
+  protected byte m_flags;
+
   private int m_status = STATUS_NON_CHANGED;
-  private boolean m_enabled = true;
-  private boolean m_checked;
   private String m_iconId;
   private String m_cssClass;
-  protected final List<Cell> m_cells;
-  private boolean m_rowPropertiesChanged;
   private Set<Integer> m_updatedColumnIndexes;
-  private final Map<String, Object> m_customValues = new HashMap<String, Object>();
 
   /**
    * @param columnSet
@@ -42,17 +53,21 @@ public class TableRow implements ITableRow {
    */
   public TableRow(ColumnSet columnSet) {
     m_columnSet = columnSet;
+    m_customValues = new HashMap<>(0);
+
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
+    setEnabled(true);
     addCells(colCount);
   }
 
   public TableRow(ColumnSet columnSet, ITableRow row) {
     m_columnSet = columnSet;
-    m_customValues.clear();
-    m_customValues.putAll(row.getCustomValues());
+    m_customValues = new HashMap<>(row.getCustomValues());
+
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
+    setEnabled(true);
     copyCells(row);
   }
 
@@ -135,12 +150,12 @@ public class TableRow implements ITableRow {
 
   @Override
   public boolean isEnabled() {
-    return m_enabled;
+    return FLAGS_BIT_HELPER.isBitSet(IDimensions.ENABLED, m_flags);
   }
 
   @Override
   public void setEnabled(boolean b) {
-    m_enabled = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(IDimensions.ENABLED, b, m_flags);
   }
 
   @Override
@@ -150,12 +165,12 @@ public class TableRow implements ITableRow {
 
   @Override
   public boolean isChecked() {
-    return m_checked;
+    return FLAGS_BIT_HELPER.isBitSet(CHECKED, m_flags);
   }
 
   @Override
-  public void setChecked(boolean b) {
-    m_checked = b;
+  public void setChecked(boolean checked) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(CHECKED, checked, m_flags);
   }
 
   @Override
@@ -398,12 +413,12 @@ public class TableRow implements ITableRow {
 
   @Override
   public boolean isRowPropertiesChanged() {
-    return m_rowPropertiesChanged;
+    return FLAGS_BIT_HELPER.isBitSet(ROW_PROPERTIES_CHANGED, m_flags);
   }
 
   @Override
   public void setRowPropertiesChanged(boolean b) {
-    m_rowPropertiesChanged = b;
+    m_flags = FLAGS_BIT_HELPER.changeBit(ROW_PROPERTIES_CHANGED, b, m_flags);
   }
 
   @Override

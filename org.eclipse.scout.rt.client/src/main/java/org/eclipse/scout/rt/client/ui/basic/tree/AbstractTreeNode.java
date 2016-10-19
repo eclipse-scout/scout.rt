@@ -37,6 +37,8 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -49,39 +51,66 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTreeNode.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper EXPANDED_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
+  private static final String REJECTED_BY_USER = "REJECTED_BY_USER";
+  private static final String INITIALIZED = "INITIALIZED";
+  private static final String CHILDREN_LOADED = "CHILDREN_LOADED";
+  private static final String CHILDREN_VOLATILE = "CHILDREN_VOLATILE";
+  private static final String CHILDREN_DIRTY = "CHILDREN_DIRTY";
+  private static final String LEAF = "LEAF";
+  private static final String EXPANDED = "EXPANDED";
+  private static final String EXPANDED_LAZY = "EXPANDED_LAZY";
+  private static final String LAZY_EXPANDING_ENABLED = "LAZY_EXPANDING_ENABLED";
+  private static final String INITIALLY_EXPANDED = "INITIALLY_EXPANDED";
 
-  private boolean m_initialized;
   private int m_initializing = 0; // >0 is true
   private ITree m_tree;
   private ITreeNode m_parentNode;
+
   private final Object m_childNodeListLock;
-  private List<ITreeNode> m_childNodeList;
   private final Object m_filteredChildNodesLock;
+  private final OptimisticLock m_childrenLoadedLock;
+  private final Cell m_cell;
+
+  private List<ITreeNode> m_childNodeList;
   private volatile List<ITreeNode> m_filteredChildNodes;
   private int m_status;
-  private final Cell m_cell;
   private List<IMenu> m_menus;
   private int m_childNodeIndex;
-  private boolean m_childrenLoaded;
-  private final OptimisticLock m_childrenLoadedLock = new OptimisticLock();
-  private boolean m_leaf;
-  private boolean m_initialExpanded;
-  private boolean m_expanded;
-  private boolean m_expandedLazy;
-  private boolean m_lazyExpandingEnabled;
-  private boolean m_childrenVolatile;
-  private boolean m_childrenDirty;
-  private boolean m_filterAccepted;
-  private boolean m_rejectedByUser;
   private Object m_primaryKey;// user object
-  // enabled is defined as: enabledGranted && enabledProperty
-  private boolean m_enabled;
-  private boolean m_enabledGranted;
-  private boolean m_enabledProperty;
-  // visible is defined as: visibleGranted && visibleProperty
-  private boolean m_visible;
-  private boolean m_visibleGranted;
-  private boolean m_visibleProperty;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #EXPANDED}, {@link #EXPANDED_LAZY}, {@link #INITIALLY_EXPANDED},
+   * {@link #LAZY_EXPANDING_ENABLED}
+   */
+  private byte m_expanded;
+
+  /**
+   * Provides 8 dimensions for enabled state.<br>
+   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This TreeNode is enabled, if all dimensions are enabled (all bits set).
+   */
+  private byte m_enabled;
+
+  /**
+   * Provides 8 dimensions for visibility.<br>
+   * Internally used: {@link IDimensions#VISIBLE}, {@link IDimensions#VISIBLE_GRANTED}.<br>
+   * 6 dimensions remain for custom use. This TreeNode is visible, if all dimensions are visible (all bits set).
+   */
+  private byte m_visible;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #CHILDREN_DIRTY}, {@link #CHILDREN_LOADED}, {@link #CHILDREN_VOLATILE},
+   * {@link #FILTER_ACCEPTED}, {@link #LEAF}, {@link #REJECTED_BY_USER}
+   */
+  private byte m_flags;
+
   protected IContributionOwner m_contributionHolder;
 
   private final ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>> m_objectExtensions;
@@ -91,15 +120,14 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   public AbstractTreeNode(boolean callInitializer) {
-    m_filterAccepted = true;
-    m_visibleGranted = true;
-    m_visibleProperty = true;
-    calculateVisible();
-    m_enabledGranted = true;
+    setFilterAccepted(true);
     m_childNodeListLock = new Object();
     m_childNodeList = new ArrayList<ITreeNode>(0);
     m_filteredChildNodesLock = new Object();
+    m_childrenLoadedLock = new OptimisticLock();
     m_cell = new Cell(this);
+    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
+    m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_objectExtensions = new ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>>(this, this instanceof AbstractPage<?>);
     if (callInitializer) {
       callInitializer();
@@ -107,10 +135,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   protected void callInitializer() {
-    if (!m_initialized) {
+    boolean isInitialized = FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
+    if (!isInitialized) {
       interceptInitConfig();
       initTreeNode();
-      m_initialized = true;
+      m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
     }
   }
 
@@ -127,12 +156,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public final <T> T getContribution(Class<T> contribution) {
     return m_contributionHolder.getContribution(contribution);
-  }
-
-  protected void ensureInitialized() {
-    if (!m_initialized) {
-      callInitializer();
-    }
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -202,11 +225,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   protected void initConfig() {
     setLeafInternal(getConfiguredLeaf());
-    setEnabledInternal(getConfiguredEnabled());
+    setEnabled(getConfiguredEnabled(), IDimensions.ENABLED);
     setExpandedInternal(getConfiguredExpanded());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setExpandedLazyInternal(isLazyExpandingEnabled());
-    m_initialExpanded = getConfiguredExpanded();
+    setInitialExpanded(getConfiguredExpanded());
     m_contributionHolder = new ContributionComposite(this);
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -354,7 +377,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isFilterAccepted() {
-    return m_filterAccepted;
+    return FLAGS_BIT_HELPER.isBitSet(FILTER_ACCEPTED, m_flags);
   }
 
   /**
@@ -363,11 +386,13 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   @Override
   public void setFilterAccepted(boolean b) {
-    if (m_filterAccepted != b) {
-      m_filterAccepted = b;
-      if (getParentNode() != null) {
-        getParentNode().resetFilterCache();
-      }
+    if (FLAGS_BIT_HELPER.isBit(FILTER_ACCEPTED, m_flags, b)) {
+      return; // no change
+    }
+
+    m_flags = FLAGS_BIT_HELPER.changeBit(FILTER_ACCEPTED, b, m_flags);
+    if (getParentNode() != null) {
+      getParentNode().resetFilterCache();
     }
   }
 
@@ -380,12 +405,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isRejectedByUser() {
-    return m_rejectedByUser;
+    return FLAGS_BIT_HELPER.isBitSet(REJECTED_BY_USER, m_flags);
   }
 
   @Override
   public void setRejectedByUser(boolean rejectedByUser) {
-    m_rejectedByUser = rejectedByUser;
+    m_flags = FLAGS_BIT_HELPER.changeBit(REJECTED_BY_USER, rejectedByUser, m_flags);
   }
 
   @Override
@@ -410,15 +435,15 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isLeaf() {
-    return m_leaf;
+    return FLAGS_BIT_HELPER.isBitSet(LEAF, m_flags);
   }
 
   /**
    * do not use this method directly use ITree.setNodeLeaf(node,b)
    */
   @Override
-  public void setLeafInternal(boolean b) {
-    m_leaf = b;
+  public void setLeafInternal(boolean leaf) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(LEAF, leaf, m_flags);
   }
 
   @Override
@@ -455,22 +480,22 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isExpanded() {
-    return m_expanded;
+    return EXPANDED_BIT_HELPER.isBitSet(EXPANDED, m_expanded);
   }
 
   @Override
-  public void setExpandedInternal(boolean b) {
-    m_expanded = b;
+  public void setExpandedInternal(boolean expanded) {
+    m_expanded = EXPANDED_BIT_HELPER.changeBit(EXPANDED, expanded, m_expanded);
   }
 
   @Override
   public boolean isInitialExpanded() {
-    return m_initialExpanded;
+    return EXPANDED_BIT_HELPER.isBitSet(INITIALLY_EXPANDED, m_expanded);
   }
 
   @Override
-  public void setInitialExpanded(boolean b) {
-    m_initialExpanded = b;
+  public void setInitialExpanded(boolean expanded) {
+    m_expanded = EXPANDED_BIT_HELPER.changeBit(INITIALLY_EXPANDED, expanded, m_expanded);
   }
 
   @Override
@@ -485,69 +510,54 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isExpandedLazy() {
-    return m_expandedLazy;
+    return EXPANDED_BIT_HELPER.isBitSet(EXPANDED_LAZY, m_expanded);
   }
 
   @Override
   public void setExpandedLazyInternal(boolean expandedLazy) {
-    m_expandedLazy = expandedLazy;
+    m_expanded = EXPANDED_BIT_HELPER.changeBit(EXPANDED_LAZY, expandedLazy, m_expanded);
   }
 
   @Override
   public boolean isLazyExpandingEnabled() {
-    return m_lazyExpandingEnabled;
+    return EXPANDED_BIT_HELPER.isBitSet(LAZY_EXPANDING_ENABLED, m_expanded);
   }
 
   @Override
   public void setLazyExpandingEnabled(boolean lazyExpandingEnabled) {
-    m_lazyExpandingEnabled = lazyExpandingEnabled;
+    if (EXPANDED_BIT_HELPER.isBit(LAZY_EXPANDING_ENABLED, m_expanded, lazyExpandingEnabled)) {
+      return; // no change
+    }
+
+    m_expanded = EXPANDED_BIT_HELPER.changeBit(LAZY_EXPANDING_ENABLED, lazyExpandingEnabled, m_expanded);
 
     // Also set state of expandedLazy as well -> if lazy expanding gets disabled, it is not expected that expandedLazy is still set to true
     // See also Tree.js _applyUpdatedNodeProperties
-    m_expandedLazy = lazyExpandingEnabled && getTree() != null && getTree().isLazyExpandingEnabled();
+    setExpandedLazyInternal(lazyExpandingEnabled && getTree() != null && getTree().isLazyExpandingEnabled());
 
-    boolean changed = lazyExpandingEnabled != m_lazyExpandingEnabled;
-    if (changed && getTree() != null) {
+    if (getTree() != null) {
       getTree().fireNodeChanged(this);
     }
   }
 
   @Override
-  public void setVisiblePermissionInternal(Permission p) {
-    boolean b;
-    if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
-    }
-    setVisibleGrantedInternal(b);
-  }
-
-  @Override
   public boolean isVisible() {
-    return m_visible;
+    return NamedBitMaskHelper.allBitsSet(m_visible);
   }
 
   @Override
   public boolean isVisibleGranted() {
-    return m_visibleGranted;
+    return isVisible(IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
-  public void setVisibleInternal(boolean b) {
-    m_visibleProperty = b;
-    calculateVisible();
+  public void setVisible(boolean visible, String dimension) {
+    m_visible = VISIBLE_BIT_HELPER.changeBit(dimension, visible, m_visible);
   }
 
   @Override
-  public void setVisibleGrantedInternal(boolean b) {
-    m_visibleGranted = b;
-    calculateVisible();
-  }
-
-  private void calculateVisible() {
-    m_visible = m_visibleGranted && m_visibleProperty;
+  public boolean isVisible(String dimension) {
+    return VISIBLE_BIT_HELPER.isBitSet(dimension, m_visible);
   }
 
   @Override
@@ -556,66 +566,56 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       getTree().setNodeVisiblePermission(this, p);
     }
     else {
-      setVisiblePermissionInternal(p);
+      setVisiblePermission(p, this);
     }
   }
 
   @Override
-  public void setVisible(boolean b) {
+  public void setVisible(boolean visible) {
     if (getTree() != null) {
-      getTree().setNodeVisible(this, b);
+      getTree().setNodeVisible(this, visible);
     }
     else {
-      setVisibleInternal(b);
+      setVisible(visible, IDimensions.VISIBLE);
     }
   }
 
   @Override
-  public void setVisibleGranted(boolean b) {
+  public void setVisibleGranted(boolean visible) {
     if (getTree() != null) {
-      getTree().setNodeVisibleGranted(this, b);
+      getTree().setNodeVisibleGranted(this, visible);
     }
     else {
-      setVisibleGrantedInternal(b);
+      setVisible(visible, IDimensions.VISIBLE_GRANTED);
     }
   }
 
-  @Override
-  public void setEnabledPermissionInternal(Permission p) {
-    boolean b;
+  public static void setVisiblePermission(Permission p, ITreeNode node) {
+    boolean visible = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
+      visible = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
-    else {
-      b = true;
-    }
-    setEnabledGrantedInternal(b);
+    node.setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
   @Override
   public boolean isEnabled() {
-    return m_enabled;
+    return NamedBitMaskHelper.allBitsSet(m_enabled);
   }
 
   @Override
   public boolean isEnabledGranted() {
-    return m_enabledGranted;
+    return isEnabled(IDimensions.ENABLED_GRANTED);
   }
 
   @Override
-  public void setEnabledInternal(boolean b) {
-    m_enabledProperty = b;
-    calculateEnabled();
+  public void setEnabled(boolean enabled, String dimension) {
+    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
   }
 
   @Override
-  public void setEnabledGrantedInternal(boolean b) {
-    m_enabledGranted = b;
-    calculateEnabled();
-  }
-
-  private void calculateEnabled() {
-    m_enabled = m_enabledGranted && m_enabledProperty;
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
   }
 
   @Override
@@ -624,48 +624,56 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       getTree().setNodeEnabledPermission(this, p);
     }
     else {
-      setEnabledPermissionInternal(p);
+      setEnabledPermission(p, this);
     }
   }
 
   @Override
-  public void setEnabled(boolean b) {
+  public void setEnabled(boolean enabled) {
     if (getTree() != null) {
-      getTree().setNodeEnabled(this, b);
+      getTree().setNodeEnabled(this, enabled);
     }
     else {
-      setEnabledInternal(b);
+      setEnabled(enabled, IDimensions.ENABLED);
     }
   }
 
   @Override
-  public void setEnabledGranted(boolean b) {
+  public void setEnabledGranted(boolean enabled) {
     if (getTree() != null) {
-      getTree().setNodeEnabledGranted(this, b);
+      getTree().setNodeEnabledGranted(this, enabled);
     }
     else {
-      setEnabledGrantedInternal(b);
+      setEnabled(enabled, IDimensions.ENABLED_GRANTED);
     }
+  }
+
+  public static void setEnabledPermission(Permission p, ITreeNode node) {
+    boolean enabled = true;
+    if (p != null) {
+      enabled = BEANS.get(IAccessControlService.class).checkPermission(p);
+    }
+    node.setEnabled(enabled, IDimensions.ENABLED_GRANTED);
   }
 
   @Override
   public boolean isChildrenVolatile() {
-    return m_childrenVolatile;
+    return FLAGS_BIT_HELPER.isBitSet(CHILDREN_VOLATILE, m_flags);
   }
 
   @Override
   public void setChildrenVolatile(boolean childrenVolatile) {
-    m_childrenVolatile = childrenVolatile;
+    m_flags = FLAGS_BIT_HELPER.changeBit(CHILDREN_VOLATILE, childrenVolatile, m_flags);
   }
 
   @Override
   public boolean isChildrenDirty() {
-    return m_childrenDirty;
+    return FLAGS_BIT_HELPER.isBitSet(CHILDREN_DIRTY, m_flags);
   }
 
   @Override
   public void setChildrenDirty(boolean dirty) {
-    m_childrenDirty = dirty;
+    m_flags = FLAGS_BIT_HELPER.changeBit(CHILDREN_DIRTY, dirty, m_flags);
   }
 
   @Override
@@ -988,15 +996,15 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isChildrenLoaded() {
-    return m_childrenLoaded;
+    return FLAGS_BIT_HELPER.isBitSet(CHILDREN_LOADED, m_flags);
   }
 
   /**
    * do not use this internal method
    */
   @Override
-  public void setChildrenLoaded(boolean b) {
-    m_childrenLoaded = b;
+  public void setChildrenLoaded(boolean loaded) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(CHILDREN_LOADED, loaded, m_flags);
   }
 
   @Override
@@ -1025,8 +1033,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     m_tree = tree;
-    if (m_expanded && m_tree != null) {
-      m_tree.setNodeExpandedInternal(this, m_expanded, m_lazyExpandingEnabled);
+    if (m_tree != null && isExpanded()) {
+      m_tree.setNodeExpandedInternal(this, true, isLazyExpandingEnabled());
     }
     if (includeSubtree) {
       synchronized (m_childNodeListLock) {

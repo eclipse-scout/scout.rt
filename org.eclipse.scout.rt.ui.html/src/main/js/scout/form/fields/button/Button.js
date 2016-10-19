@@ -66,6 +66,20 @@ scout.Button.prototype._initKeyStrokeContext = function() {
   }.bind(this);
 };
 
+/**
+ * @override FormField.js
+ */
+scout.Button.prototype.recomputeEnabled = function(parentEnabled) {
+  if (this._isIgnoreAccessibilityFlags()) {
+    parentEnabled = true;
+  }
+  scout.Button.parent.prototype.recomputeEnabled.call(this, parentEnabled);
+};
+
+scout.Button.prototype._isIgnoreAccessibilityFlags = function() {
+  return this.systemType === scout.Button.SystemType.CANCEL || this.systemType === scout.Button.SystemType.CLOSE;
+};
+
 scout.Button.prototype._initDefaultKeyStrokes = function() {
   this.keyStrokeContext.registerKeyStroke([
     new scout.ButtonKeyStroke(this, 'ENTER'),
@@ -135,7 +149,7 @@ scout.Button.prototype._renderForegroundColor = function() {
  *          has not been performed (e.g. when the button is not enabled).
  */
 scout.Button.prototype.doAction = function() {
-  if (!this.enabled || !this.visible) {
+  if (!this.enabledComputed || !this.visible) {
     return false;
   }
 
@@ -198,8 +212,8 @@ scout.Button.prototype._renderProperties = function() {
 scout.Button.prototype._renderEnabled = function() {
   scout.Button.parent.prototype._renderEnabled.call(this);
   if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
-    this.$link.setEnabled(this.enabled);
-    this.$field.setTabbable(this.enabled && !scout.device.supportsTouch());
+    this.$link.setEnabled(this.enabledComputed);
+    this.$field.setTabbable(this.enabledComputed && !scout.device.supportsTouch());
   }
 };
 
@@ -262,7 +276,7 @@ scout.Button.prototype._syncKeyStroke = function(keyStroke) {
 };
 
 scout.Button.prototype._onClick = function(event) {
-  if (this.enabled) {
+  if (this.enabledComputed) {
     this.doAction();
   }
 };

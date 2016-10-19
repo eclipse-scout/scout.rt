@@ -382,11 +382,6 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
-  public void setEnabledProcessingAction(boolean b) {
-    // NOP
-  }
-
-  @Override
   public boolean isEnabledInheritAccessibility() {
     return m_wrappedMenu.isEnabledInheritAccessibility();
   }
@@ -452,13 +447,13 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
-  public boolean isThisAndParentsEnabled() {
-    return m_wrappedMenu.isThisAndParentsEnabled();
+  public boolean isEnabledIncludingParents() {
+    return m_wrappedMenu.isEnabledIncludingParents();
   }
 
   @Override
-  public boolean isThisAndParentsVisible() {
-    return m_wrappedMenu.isThisAndParentsVisible();
+  public boolean isVisibleIncludingParents() {
+    return m_wrappedMenu.isVisibleIncludingParents();
   }
 
   @Override
@@ -492,12 +487,12 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
-  public int getHorizontalAlignment() {
+  public byte getHorizontalAlignment() {
     return m_wrappedMenu.getHorizontalAlignment();
   }
 
   @Override
-  public void setHorizontalAlignment(int horizontalAlignment) {
+  public void setHorizontalAlignment(byte horizontalAlignment) {
     m_wrappedMenu.setHorizontalAlignment(horizontalAlignment);
   }
 
@@ -514,6 +509,26 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   @Override
   public void setView(boolean visible, boolean enabled) {
     unsupported();
+  }
+
+  @Override
+  public void setVisible(boolean visible, String dimension) {
+    unsupported();
+  }
+
+  @Override
+  public boolean isVisible(String dimension) {
+    return m_wrappedMenu.isVisible(dimension);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    unsupported();
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return m_wrappedMenu.isEnabled(dimension);
   }
 
   @Override

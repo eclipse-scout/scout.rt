@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
@@ -49,7 +50,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  * </p>
  * For every inner column class there is a generated getXYColumn method directly on the table.
  */
-public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IStyleable, IAppLinkCapable, IContextMenuOwner {
+public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
 
   /**
    * String
@@ -565,7 +566,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   void setRowState(Collection<? extends ITableRow> rows, int rowState);
 
-  void setAllRowState(int rowState);
+  void setAllRowState(int state);
 
   void updateRow(ITableRow modifiedRow);
 

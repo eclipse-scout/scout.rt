@@ -227,7 +227,6 @@ public abstract class AbstractTreeBoxFilterBox extends AbstractGroupBox {
         return true;
       }
     }
-
   }
 
   @Order(20)

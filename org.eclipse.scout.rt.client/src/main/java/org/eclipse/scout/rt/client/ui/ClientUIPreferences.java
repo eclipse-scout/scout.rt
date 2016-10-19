@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.prefs.Preferences;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -307,7 +308,7 @@ public class ClientUIPreferences {
 
     String key = createColumnConfigKey(col, configName, TABLE_COLUMN_UIINDEX);
     int viewIndex = col.getVisibleColumnIndexHint();
-    boolean visible = col.isVisibleInternal();
+    boolean visible = col.isVisible(IDimensions.VISIBLE);
     int width = col.getWidth();
     int sortIndex = col.getSortIndex();
     boolean grouped = col.isGroupingActive();

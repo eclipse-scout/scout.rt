@@ -58,7 +58,7 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
     putJsonProperty(new JsonProperty<FORM_FIELD>("labelPosition", model) {
       @Override
       protected Integer modelValue() {
-        return getModel().getLabelPosition();
+        return (int) getModel().getLabelPosition();
       }
     });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_ENABLED, model) {

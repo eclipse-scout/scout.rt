@@ -30,8 +30,9 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable, IHtmlCapable {
+public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable, IHtmlCapable, IVisibleDimension {
   /**
    * type boolean
    */
@@ -271,13 +272,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   boolean isVisible();
 
   void setVisible(boolean b);
-
-  /**
-   * @return Returns the column's internal visible state that does no take permissions or the displayable property into
-   *         account. This method is used by the framework only.
-   * @see IColumn#isVisible()
-   */
-  boolean isVisibleInternal();
 
   /**
    * the value in this column is part of the row primary key

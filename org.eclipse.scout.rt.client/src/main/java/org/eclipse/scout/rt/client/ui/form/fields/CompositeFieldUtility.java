@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public final class CompositeFieldUtility {
 
@@ -80,6 +81,44 @@ public final class CompositeFieldUtility {
     }
   }
 
+  /**
+   * Applies the given {@link IFormFieldVisitor} to the given {@link IFormField}s.
+   * 
+   * @param visitor
+   *          The visitor
+   * @param fieldToVisit
+   *          The field to visit. May be <code>null</code>.
+   * @param childrenOfField
+   *          The children of the given field to visit or <code>null</code> if no children should be visited.
+   * @param level
+   *          The level of the current visit.
+   * @param fieldIndex
+   *          The index of the field currently visited.
+   * @return <code>true</code> if all fields have been visited, <code>false</code> if the visit was aborted by the
+   *         {@link IFormFieldVisitor}.
+   */
+  public static boolean applyFormFieldVisitor(IFormFieldVisitor visitor, IFormField fieldToVisit, Collection<IFormField> childrenOfField, int level, int fieldIndex) {
+    boolean continueVisiting = false;
+    if (fieldToVisit != null) {
+      continueVisiting = visitor.visitField(fieldToVisit, level, fieldIndex);
+      if (!continueVisiting) {
+        return false;
+      }
+    }
+    if (CollectionUtility.isEmpty(childrenOfField)) {
+      return true; // finished
+    }
+    int index = 0;
+    for (IFormField field : childrenOfField) {
+      continueVisiting = field.acceptVisitor(visitor, level + 1, index, true);
+      if (!continueVisiting) {
+        return false;
+      }
+      index++;
+    }
+    return true;
+  }
+
   public static <T extends IFormField> T getFieldByClass(ICompositeField compositeField, final Class<T> formFieldClass) {
     // check local moved fields
     IFormField movedField = getMovedFieldByClass(compositeField, formFieldClass);
@@ -103,7 +142,7 @@ public final class CompositeFieldUtility {
         return found.getValue() == null;
       }
     };
-    compositeField.visitFields(v, 0);
+    compositeField.visitFields(v);
     return found.getValue();
   }
 
@@ -140,7 +179,7 @@ public final class CompositeFieldUtility {
         return found.getValue() == null;
       }
     };
-    compositeField.visitFields(v, 0);
+    compositeField.visitFields(v);
     return found.getValue();
   }
 

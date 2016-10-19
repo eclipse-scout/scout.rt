@@ -109,10 +109,12 @@ class P_BadVisitorCompositeField extends AbstractCompositeField {
   }
 
   @Override
-  public boolean visitFields(IFormFieldVisitor visitor, int startLevel) {
-    visitor.visitField(this, startLevel, 0);
-    ((ICompositeField) getFields().get(0)).visitFields(visitor, startLevel + 1);
-    ((ICompositeField) getFields().get(1)).visitFields(visitor, startLevel + 1);
+  public boolean acceptVisitor(IFormFieldVisitor visitor, int level, int fieldIndex, boolean includeThis) {
+    if (includeThis) {
+      visitor.visitField(this, level, 0);
+    }
+    ((ICompositeField) getFields().get(0)).acceptVisitor(visitor, level + 1, 0, true);
+    ((ICompositeField) getFields().get(1)).acceptVisitor(visitor, level + 1, 1, true);
     return true;
   }
 

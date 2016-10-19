@@ -18,11 +18,13 @@ import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
 /**
  * Tree node used in {@link ITree}.
  */
-public interface ITreeNode {
+public interface ITreeNode extends IVisibleDimension, IEnabledDimension {
   int STATUS_NON_CHANGED = 0;
   int STATUS_INSERTED = 1;
   int STATUS_UPDATED = 2;
@@ -67,19 +69,9 @@ public interface ITreeNode {
   void setExpanded(boolean b);
 
   /**
-   * do not use this method directly use {@link ITree#setNodeEnabledPermission(ITreeNode, boolean)}
-   */
-  void setEnabledPermissionInternal(Permission p);
-
-  /**
    * Note: this method is a Convenience for {@link ITree#setNodeEnabledPermission(this, boolean)}
    */
   void setEnabledPermission(Permission p);
-
-  /**
-   * do not use this method directly use {@link ITree#setNodeEnabledGranted(ITreeNode, boolean)}
-   */
-  void setEnabledGrantedInternal(boolean b);
 
   /**
    * Note: this method is a Convenience for {@link ITree#setNodeEnabledGranted(this, boolean)}
@@ -87,19 +79,9 @@ public interface ITreeNode {
   void setEnabledGranted(boolean b);
 
   /**
-   * do not use this method directly use {@link ITree#setNodeEnabled(ITreeNode, boolean)}
-   */
-  void setEnabledInternal(boolean b);
-
-  /**
    * Note: this method is a Convenience for {@link ITree#setNodeEnabled(this, boolean)}
    */
   void setEnabled(boolean b);
-
-  /**
-   * do not use this method directly use {@link ITree#setNodeVisiblePermission(ITreeNode, boolean)}
-   */
-  void setVisiblePermissionInternal(Permission p);
 
   /**
    * Note: this method is a Convenience for {@link ITree#setNodeVisiblePermission(this, boolean)}
@@ -107,19 +89,9 @@ public interface ITreeNode {
   void setVisiblePermission(Permission p);
 
   /**
-   * do not use this method directly use {@link ITree#setNodeVisibleGranted(ITreeNode, boolean)}
-   */
-  void setVisibleGrantedInternal(boolean b);
-
-  /**
    * Note: this method is a Convenience for {@link ITree#setNodeVisibleGranted(this, boolean)}
    */
   void setVisibleGranted(boolean b);
-
-  /**
-   * do not use this method directly use {@link ITree#setNodeVisible(ITreeNode, boolean)}
-   */
-  void setVisibleInternal(boolean b);
 
   /**
    * Note: this method is a Convenience for {@link ITree#setNodeVisible(this, boolean)}

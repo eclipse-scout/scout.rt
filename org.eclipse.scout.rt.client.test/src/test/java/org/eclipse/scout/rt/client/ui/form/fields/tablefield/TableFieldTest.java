@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -132,13 +131,13 @@ public class TableFieldTest {
   }
 
   private void runImportFormFieldData(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
     assertRowCount(3, tableField);
     assertHiddenColumnValues(false, true, false, tableField);
 
-    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData2, false);
 
     assertRowCount(3, tableField);
@@ -183,13 +182,13 @@ public class TableFieldTest {
   }
 
   private void runImportFormFieldDataWithTableValueSet(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
     assertRowCount(3, tableField);
     assertHiddenColumnValues(false, true, false, tableField);
 
-    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableData2.setValueSet(false);
     tableField.importFormFieldData(tableData2, false);
 
@@ -208,7 +207,7 @@ public class TableFieldTest {
   }
 
   private void runImportFormFieldDataWithNewRow(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
     assertHiddenColumnValues(false, true, false, tableField);
@@ -221,7 +220,7 @@ public class TableFieldTest {
     assertEquals("Sit", tableField.getTable().getStringColumn().getValue(3));
     assertEquals(true, tableField.getTable().getHiddenColumn().getValue(3));
 
-    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData2, false);
 
     assertRowCount(3, tableField);
@@ -249,7 +248,7 @@ public class TableFieldTest {
   }
 
   private void runImportFormFieldDataWithDeletedRow(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
     assertRowCount(3, tableField);
@@ -259,7 +258,7 @@ public class TableFieldTest {
 
     assertRowCount(1, tableField);
 
-    P_TableBean tableData2 = createTableBeanData(true, false, true, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, true, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData2, false);
 
     assertRowCount(3, tableField);
@@ -280,7 +279,7 @@ public class TableFieldTest {
 
   private void importFormFieldDataAndCheckExecContentChangedTriggerd(boolean valueChangeTriggersEnabled) {
     P_TableField tableField = createTableField(false);
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, valueChangeTriggersEnabled);
     assertEquals(valueChangeTriggersEnabled, tableField.m_execContentChangedCalled);
   }
@@ -416,7 +415,7 @@ public class TableFieldTest {
   }
 
   private void runImportFormFieldDataWithUpdatedRow(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
     assertRowCount(3, tableField);
@@ -428,7 +427,7 @@ public class TableFieldTest {
     assertStringColumnValues("Lorem", "Ipsum", "Amet", tableField);
     assertHiddenColumnValues(false, true, true, tableField);
 
-    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData2, false);
 
     assertRowCount(3, tableField);
@@ -484,31 +483,31 @@ public class TableFieldTest {
   }
 
   private void runImportFormFieldDataWithAllRowStates(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
-    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+    assertRowStates(ITableRow.STATUS_NON_CHANGED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData2, false);
 
-    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+    assertRowStates(ITableRow.STATUS_UPDATED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData3 = createTableBeanData(true, false, false, ITableHolder.STATUS_INSERTED);
+    P_TableBean tableData3 = createTableBeanData(true, false, false, ITableRow.STATUS_INSERTED);
     tableField.importFormFieldData(tableData3, false);
 
-    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+    assertRowStates(ITableRow.STATUS_INSERTED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData4 = createTableBeanData(true, false, false, ITableHolder.STATUS_DELETED);
+    P_TableBean tableData4 = createTableBeanData(true, false, false, ITableRow.STATUS_DELETED);
     tableField.importFormFieldData(tableData4, false);
 
     assertEquals(0, tableField.getTable().getRowCount());
@@ -516,62 +515,62 @@ public class TableFieldTest {
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData5 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData5 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData5, true);
 
-    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+    assertRowStates(ITableRow.STATUS_NON_CHANGED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData6 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData6 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData6, true);
 
-    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+    assertRowStates(ITableRow.STATUS_UPDATED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData7 = createTableBeanData(true, false, false, ITableHolder.STATUS_INSERTED);
+    P_TableBean tableData7 = createTableBeanData(true, false, false, ITableRow.STATUS_INSERTED);
     tableField.importFormFieldData(tableData7, true);
 
-    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+    assertRowStates(ITableRow.STATUS_INSERTED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData8 = createTableBeanData(true, false, false, ITableHolder.STATUS_DELETED);
+    P_TableBean tableData8 = createTableBeanData(true, false, false, ITableRow.STATUS_DELETED);
     tableField.importFormFieldData(tableData8, false);
 
     assertEquals(0, tableField.getTable().getRowCount());
   }
 
   private void runImportFormFieldBeanDataWithAllRowStates(P_TableField tableField) {
-    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData1 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData1, false);
 
-    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+    assertRowStates(ITableRow.STATUS_NON_CHANGED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData2 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData2, false);
 
-    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+    assertRowStates(ITableRow.STATUS_UPDATED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData3 = createTableBeanData(true, false, false, ITableHolder.STATUS_INSERTED);
+    P_TableBean tableData3 = createTableBeanData(true, false, false, ITableRow.STATUS_INSERTED);
     tableField.importFormFieldData(tableData3, false);
 
-    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+    assertRowStates(ITableRow.STATUS_INSERTED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData4 = createTableBeanData(true, false, false, ITableHolder.STATUS_DELETED);
+    P_TableBean tableData4 = createTableBeanData(true, false, false, ITableRow.STATUS_DELETED);
     tableField.importFormFieldData(tableData4, false);
 
     assertEquals(0, tableField.getTable().getRowCount());
@@ -579,31 +578,31 @@ public class TableFieldTest {
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData5 = createTableBeanData(false, true, false, ITableHolder.STATUS_NON_CHANGED);
+    P_TableBean tableData5 = createTableBeanData(false, true, false, ITableRow.STATUS_NON_CHANGED);
     tableField.importFormFieldData(tableData5, true);
 
-    assertRowStates(ITableHolder.STATUS_NON_CHANGED, tableField);
+    assertRowStates(ITableRow.STATUS_NON_CHANGED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData6 = createTableBeanData(true, false, false, ITableHolder.STATUS_UPDATED);
+    P_TableBean tableData6 = createTableBeanData(true, false, false, ITableRow.STATUS_UPDATED);
     tableField.importFormFieldData(tableData6, true);
 
-    assertRowStates(ITableHolder.STATUS_UPDATED, tableField);
+    assertRowStates(ITableRow.STATUS_UPDATED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData7 = createTableBeanData(true, false, false, ITableHolder.STATUS_INSERTED);
+    P_TableBean tableData7 = createTableBeanData(true, false, false, ITableRow.STATUS_INSERTED);
     tableField.importFormFieldData(tableData7, true);
 
-    assertRowStates(ITableHolder.STATUS_INSERTED, tableField);
+    assertRowStates(ITableRow.STATUS_INSERTED, tableField);
 
     tableField.getTable().deleteAllRows();
     tableField.getTable().discardAllDeletedRows();
     tableField.getTable().discardAllRows();
-    P_TableBean tableData8 = createTableBeanData(true, false, false, ITableHolder.STATUS_DELETED);
+    P_TableBean tableData8 = createTableBeanData(true, false, false, ITableRow.STATUS_DELETED);
     tableField.importFormFieldData(tableData8, false);
 
     assertEquals(0, tableField.getTable().getRowCount());

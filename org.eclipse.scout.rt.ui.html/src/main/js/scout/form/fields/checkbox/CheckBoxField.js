@@ -69,7 +69,7 @@ scout.CheckBoxField.prototype._onMouseDown = function(event) {
 };
 
 scout.CheckBoxField.prototype.toggleChecked = function() {
-  if (!this.enabled) {
+  if (!this.enabledComputed) {
     return;
   }
   if (this.triStateEnabled) {
@@ -95,8 +95,8 @@ scout.CheckBoxField.prototype.setValue = function(value) {
 scout.CheckBoxField.prototype._renderEnabled = function() {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
   this.$checkBox
-    .setTabbable(this.enabled && !scout.device.supportsTouch())
-    .setEnabled(this.enabled);
+    .setTabbable(this.enabledComputed && !scout.device.supportsTouch())
+    .setEnabled(this.enabledComputed);
 };
 
 scout.CheckBoxField.prototype._renderProperties = function() {

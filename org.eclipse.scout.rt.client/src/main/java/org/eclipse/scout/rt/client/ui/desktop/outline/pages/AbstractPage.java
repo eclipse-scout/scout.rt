@@ -64,11 +64,16 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 @ClassId("ef0d789e-dfbf-4715-9ab7-eedaefc936f3")
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
 
+  static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
+  private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
+  private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {
@@ -81,14 +86,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   private T m_table;
   private IForm m_detailForm;
-  private boolean m_tableVisible;
-  private boolean m_detailFormVisible;
-  private boolean m_pageMenusAdded;
   private DataChangeListener m_internalDataChangeListener;
   private final TreeListener m_treeListener;
   private final String m_userPreferenceContext;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #TABLE_VISIBLE}, {@link #DETAIL_FORM_VISIBLE}, {@link #PAGE_MENUS_ADDED},
+   * {@link AbstractPageWithTable#SEARCH_REQUIRED}, {@link AbstractPageWithTable#SEARCH_ACTIVE},
+   * {@link AbstractPageWithTable#LIMITED_RESULT}, {@link AbstractPageWithTable#ALWAYS_CREATE_CHILD_PAGE}
+   */
+  byte m_flags;
 
   @Override
   public T getTable() {
@@ -588,11 +598,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
+  private boolean isPageMenusAdded() {
+    return FLAGS_BIT_HELPER.isBitSet(PAGE_MENUS_ADDED, m_flags);
+  }
+
+  private void setPageMenusAdded() {
+    m_flags = FLAGS_BIT_HELPER.setBit(PAGE_MENUS_ADDED, m_flags);
+  }
+
   protected void enhanceTableWithPageMenus() {
-    if (m_pageMenusAdded) {
+    if (isPageMenusAdded()) {
       return;
     }
-    m_pageMenusAdded = true;
+    setPageMenusAdded();
     ITable table = getTable();
     if (table != null) {
       ITableContextMenu contextMenu = table.getContextMenu();
@@ -789,28 +807,30 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public boolean isTableVisible() {
-    return m_tableVisible;
+    return FLAGS_BIT_HELPER.isBitSet(TABLE_VISIBLE, m_flags);
   }
 
   @Override
   public void setTableVisible(boolean tableVisible) {
-    if (m_tableVisible != tableVisible) {
-      m_tableVisible = tableVisible;
-      firePageChanged(this);
+    if (isTableVisible() == tableVisible) {
+      return; // no change
     }
+    m_flags = FLAGS_BIT_HELPER.changeBit(TABLE_VISIBLE, tableVisible, m_flags);
+    firePageChanged(this);
   }
 
   @Override
   public boolean isDetailFormVisible() {
-    return m_detailFormVisible;
+    return FLAGS_BIT_HELPER.isBitSet(DETAIL_FORM_VISIBLE, m_flags);
   }
 
   @Override
   public void setDetailFormVisible(boolean detailFormVisible) {
-    if (m_detailFormVisible != detailFormVisible) {
-      m_detailFormVisible = detailFormVisible;
-      firePageChanged(this);
+    if (isDetailFormVisible() == detailFormVisible) {
+      return; // no change
     }
+    m_flags = FLAGS_BIT_HELPER.changeBit(DETAIL_FORM_VISIBLE, detailFormVisible, m_flags);
+    firePageChanged(this);
   }
 
   /**
