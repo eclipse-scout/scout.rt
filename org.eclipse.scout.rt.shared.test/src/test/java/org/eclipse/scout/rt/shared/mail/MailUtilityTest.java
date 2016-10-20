@@ -30,8 +30,10 @@ import javax.activation.DataSource;
 import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Part;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -349,6 +351,35 @@ public class MailUtilityTest {
   @Test(expected = IllegalArgumentException.class)
   public void testMimeMessageAttachmentWithNullDataSource2() {
     new MailAttachment(null, null, null, "mycontentid");
+  }
+
+  @Test
+  public void testInternetAddress1() throws Exception {
+    MailParticipant participant = new MailParticipant()
+        .withEmail("test@gugus.com")
+        .withName("André Böller");
+    InternetAddress address = MailUtility.createInternetAddress(participant);
+    String addressToString = address.toString();
+    String addressPersonal = address.getPersonal();
+    CharsetSafeMimeMessage msg = new CharsetSafeMimeMessage();
+    msg.addRecipient(RecipientType.TO, address);
+
+    InternetAddress address2 = (InternetAddress) msg.getRecipients(RecipientType.TO)[0];
+    Assert.assertEquals(addressToString, address2.toString());
+    Assert.assertEquals(addressPersonal, address2.getPersonal());
+  }
+
+  @Test
+  public void testInternetAddress2() throws Exception {
+    InternetAddress address = new InternetAddress("test@gugus.com", "André Böller", StandardCharsets.UTF_8.name());
+    String addressToString = address.toString();
+    String addressPersonal = address.getPersonal();
+    CharsetSafeMimeMessage msg = new CharsetSafeMimeMessage();
+    msg.addRecipient(RecipientType.TO, address);
+
+    InternetAddress address2 = (InternetAddress) msg.getRecipients(RecipientType.TO)[0];
+    Assert.assertEquals(addressToString, address2.toString());
+    Assert.assertEquals(addressPersonal, address2.getPersonal());
   }
 
   /**

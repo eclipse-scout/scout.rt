@@ -19,7 +19,6 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
 
 public class CharsetSafeMimeMessage extends MimeMessage {
   private String m_charset;
@@ -115,7 +114,7 @@ public class CharsetSafeMimeMessage extends MimeMessage {
       InternetAddress inet = (InternetAddress) address;
       if (inet.getPersonal() != null && inet.getPersonal().length() > 0) {
         try {
-          inet.setPersonal(MimeUtility.encodeText(inet.getPersonal(), m_charset, "Q"));
+          inet.setPersonal(inet.getPersonal(), m_charset);
         }
         catch (UnsupportedEncodingException e) {
           throw new MessagingException("Unable to encode from address", e);
