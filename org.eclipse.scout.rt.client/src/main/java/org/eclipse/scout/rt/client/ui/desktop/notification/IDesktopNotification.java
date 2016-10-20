@@ -32,6 +32,6 @@ public interface IDesktopNotification {
   /**
    * Whether or not the notification can be closed by the user.
    */
-  boolean isCloseable();
+  boolean isClosable();
 
 }
