@@ -71,7 +71,7 @@ describe('SmartField', function() {
       expect(smartField._requestedProposal).toBe(false);
       smartField._openProposal(true);
       expect(smartField._requestedProposal).toBe(true);
-      smartField._syncProposalChooser({});
+      smartField.modelAdapter._syncProposalChooser(null);
       expect(smartField._requestedProposal).toBe(false);
     });
 
@@ -160,6 +160,7 @@ describe('SmartField', function() {
       var expectedEvent = new scout.Event(smartField.id, 'acceptProposal', {
         chooser: false,
         displayText: 'bar',
+        showBusyIndicator: false,
         forceClose: false});
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
