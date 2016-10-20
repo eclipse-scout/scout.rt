@@ -79,6 +79,9 @@ scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   }
 };
 
+/**
+ * @override Columns.js
+ */
 scout.BooleanColumn.prototype._createCellModel = function(value) {
   return {
     value: value
