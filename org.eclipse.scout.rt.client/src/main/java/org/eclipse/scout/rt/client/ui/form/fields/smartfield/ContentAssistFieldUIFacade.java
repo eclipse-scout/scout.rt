@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -39,39 +41,39 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   @Override
-  public void proposalTypedFromUI(String text) {
+  public void proposalTypedFromUI(String displayText) {
     if (ignoreUiEvent()) {
       return;
     }
-    LOG.debug("proposalTypedFromUI text={}", text);
+    LOG.debug("proposalTypedFromUI displayText={}", displayText);
     if (m_field.isProposalChooserRegistered()) {
       m_field.getProposalChooser().deselect();
     }
-    m_field.setDisplayText(text);
+    m_field.setDisplayText(displayText);
 
-    String searchText = toSearchText(text);
+    String searchText = toSearchText(displayText);
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), searchText)) {
       if (m_field.isBrowseLoadIncremental() && m_field.getWildcard().equals(searchText)) {
         IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentParam(null, false);
         m_field.doSearch(searchParam, false);
       }
       else {
-        m_field.doSearch(text, false, false);
+        m_field.doSearch(displayText, false, false);
       }
     }
   }
 
   @Override
-  public void openProposalChooserFromUI(String text, boolean selectCurrentValue) {
+  public void openProposalChooserFromUI(String displayText, boolean browseAll, boolean selectCurrentValue) {
     if (ignoreUiEvent()) {
       return;
     }
-    LOG.debug("openProposalChooserFromUI text={} selectCurrentValue={}", text, selectCurrentValue);
+    LOG.debug("openProposalChooserFromUI displayText={} browseAll={} selectCurrentValue={}", displayText, browseAll, selectCurrentValue);
     if (m_field.isProposalChooserRegistered()) {
       m_field.getProposalChooser().deselect();
     }
-    m_field.setDisplayText(text);
-    String searchText = toSearchText(text);
+    m_field.setDisplayText(displayText);
+    String searchText = toSearchText(browseAll, displayText);
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
     IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), false);
     proposalChooser.dataFetchedDelegate(newResult, m_field.getConfiguredBrowseMaxRowCount());
@@ -80,8 +82,49 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       m_field.doSearch(searchParam, false);
     }
     else {
-      m_field.doSearch(text, selectCurrentValue, false);
+      m_field.doSearch(searchText, selectCurrentValue, false);
     }
+  }
+
+  /**
+   * @return The search text used for a lookup call, depending on the state of the browseAll flag and the error status.
+   */
+  protected String toSearchText(boolean browseAll, String displayText) {
+    // browseAll == false -> search for displayText
+    if (!browseAll) {
+      return toSearchText(displayText);
+    }
+
+    // browseAll == true + no errors -> search for *
+    boolean valid = getField().getErrorStatus() == null;
+    if (valid) {
+      return toSearchText(null);
+    }
+
+    // browseAll == true + errors + error contains NOT_UNIQUE_ERROR_CODE -> search for displayText
+    if (hasNotUniqueErrorCode(getField().getErrorStatus())) {
+      return toSearchText(displayText);
+    }
+
+    // browseAll == true + errors + errors other than NOT_UNIQUE_ERROR_CODE -> search for *
+    return toSearchText(null);
+  }
+
+  protected boolean hasNotUniqueErrorCode(IStatus errorStatus) {
+    if (errorStatus.getCode() == AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE) {
+      return true;
+    }
+
+    if (errorStatus instanceof IMultiStatus) {
+      IMultiStatus multiStatus = (IMultiStatus) errorStatus;
+      for (IStatus child : multiStatus.getChildren()) {
+        if (hasNotUniqueErrorCode(child)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   @Override
@@ -102,32 +145,33 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   @Override
-  public void acceptProposalFromUI(String text, boolean chooser, boolean forceClose) {
+  public void acceptProposalFromUI(String displayText, boolean chooser, boolean forceClose) {
     if (ignoreUiEvent()) {
       return;
     }
-    LOG.debug("acceptProposalFromUI text={} chooser={} forceClose={}", text, chooser, forceClose);
+    boolean modelChooser = getField().isProposalChooserRegistered();
+    LOG.debug("acceptProposalFromUI displayText={} chooser={} modelChooser={} forceClose={}", displayText, chooser, modelChooser, forceClose);
 
-    if (chooser) {
-      // last line of defense: normally the UI prevents this kind of request, but you never know...
-      if (!m_field.isProposalChooserRegistered()) {
-        LOG.debug("acceptProposalFromUI: UI says chooser is open, but the chooser has been unregistered on the model");
-        return;
-      }
-      handleChangedDisplaytext(text, forceClose);
+    // Info: chooser == true && modelChooser == false
+    // This case happens when a lookup call (=background job) terminates and returns no
+    // results at all. In that case the proposal chooser is automatically closed on the model
+    // but the UI is not yet informed about that change. That's why the chooser flag sent from
+    // the UI is still true.
+    if (chooser && modelChooser) {
+      acceptByProposalChooser(displayText, forceClose);
     }
     else {
-      openProposalChooser(text);
+      acceptDisplayTextAndOpenProposalChooser(displayText);
     }
   }
 
-  protected void openProposalChooser(String text) {
+  protected void acceptDisplayTextAndOpenProposalChooser(String displayText) {
     // perform lookup by display text
-    boolean openProposalChooser = acceptByDisplayText(text);
-    openProposalChooserIfNotOpenYet(openProposalChooser, text);
+    boolean openProposalChooser = acceptByDisplayText(displayText);
+    openProposalChooserIfNotOpenYet(openProposalChooser, displayText);
   }
 
-  protected void handleChangedDisplaytext(String text, boolean forceClose) {
+  protected void acceptByProposalChooser(String displayText, boolean forceClose) {
     // When the proposal chooser is open, we must check if the display-text has changed
     // since the last search. When it has changed, we cannot use the accepted proposal
     // and must perform the lookup again instead. This prevents issues as described in
@@ -137,7 +181,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
     //   and the field looks valid, which is wrong
     boolean acceptByLookupRow = true;
-    String searchText = toSearchText(text);
+    String searchText = toSearchText(displayText);
     String lastSearchText = m_field.getProposalChooser().getSearchText();
     if (lastSearchText != null && !lastSearchText.equals(m_field.getWildcard())) {
       acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
@@ -151,8 +195,8 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
         m_field.acceptProposal(lookupRow);
       }
       else {
-        openProposalChooser = acceptByDisplayText(text);
-        openProposalChooserIfNotOpenYet(openProposalChooser, text);
+        openProposalChooser = acceptByDisplayText(displayText);
+        openProposalChooserIfNotOpenYet(openProposalChooser, displayText);
       }
     }
     finally {
@@ -162,10 +206,10 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     }
   }
 
-  private void openProposalChooserIfNotOpenYet(boolean requestedOpen, String searchText) {
+  private void openProposalChooserIfNotOpenYet(boolean requestedOpen, String displayText) {
     if (requestedOpen) {
       if (!m_field.isProposalChooserRegistered()) {
-        openProposalChooserFromUI(searchText, false);
+        openProposalChooserFromUI(displayText, false, false);
       }
       m_field.getProposalChooser().forceProposalSelection();
     }

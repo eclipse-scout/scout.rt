@@ -21,7 +21,7 @@ public interface IContentAssistFieldUIFacade {
    * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
    * {@link IContentAssistField}.
    */
-  void openProposalChooserFromUI(String text, boolean selectCurrentValue);
+  void openProposalChooserFromUI(String text, boolean browseAll, boolean selectCurrentValue);
 
   /**
    * Called when ever a (non-navigation) key is pressed in the smart-field. Proposal chooser must be open.

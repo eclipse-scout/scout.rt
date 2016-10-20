@@ -144,10 +144,30 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       // Check if a property-event-filter prevents the property change to be added to the JSON response
       PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
       if (filteredEvent != null) {
-        //TODO [5.2] cgu: we should add a logic to prevent sending a non changed state. Example: Property changes from A to B and back to A -> No property change event necessary
+        // TODO [5.2] cgu: we should add a logic to prevent sending a non changed state. Example: Property changes from A to B and back to A -> No property change event necessary
         // We could do this by remembering the old value and if an event occurs with the same value as the stored old one -> removePropertyChangeEvent
         // But: This may not be done for every property! If the property event was fired using setPropertyAlwaysFire it must be always. We should probably mark those events, but how?
         // Maybe we should better generate a global event buffer concept -> buffer every event not just table or tree events. This would solve event race conditions too -> we should guarantee that events fired by the model are sent to the gui in the same order
+        addPropertyChangeEvent(jsonProperty, oldValue, newValue);
+        return;
+      }
+
+      // Event is filtered, but we must check if another event has already added a property change event,
+      // in that case we must add the event anyway, because the filter may lead to incorrect behavior
+      // on slow connections. SmartField Example:
+      //
+      // 1 UI: displayText='X' (text is selected)
+      // 2 User selects text with Ctrl + A
+      // 3 User clicks on a row in the proposal-chooser and presses A immediately
+      // 4 two events are sent to the server in the same request:
+      //    1. Table, rowClick   -> sets displayText to 'B' (via Java model)
+      //    2. StringField, acceptProposal -> sets displayText to 'A'
+      //
+      // Expected: after all events have been processed, displayText in the UI should be A
+      // but without this check below, it would be 'B', because the second event sets a filter
+      // for 'A', so when displayText is changed to 'A' it is not sent back to the UI
+      // which is wrong in that case.
+      if (responseAlreadyContainsPropertyChangeEvent(jsonProperty)) {
         addPropertyChangeEvent(jsonProperty, oldValue, newValue);
       }
     }
@@ -157,6 +177,10 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       // to the JSON response (or not).
       handleModelPropertyChange(propertyName, oldValue, newValue);
     }
+  }
+
+  protected boolean responseAlreadyContainsPropertyChangeEvent(JsonProperty<?> jsonProperty) {
+    return getUiSession().currentJsonResponse().containsPropertyChangeEvent(getId(), jsonProperty.getPropertyName());
   }
 
   /**

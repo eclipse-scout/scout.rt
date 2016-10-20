@@ -25,6 +25,13 @@ scout.inherits(scout.ProposalChooser, scout.ModelAdapter);
  */
 scout.ProposalChooser.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
+scout.ProposalChooser.prototype._init = function(model) {
+  scout.ProposalChooser.parent.prototype._init.call(this, model);
+  if (this.model instanceof scout.Table) {
+    this.model.on('rowClicked', this._onModelProposalSelected.bind(this));
+  }
+};
+
 scout.ProposalChooser.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('proposal-chooser');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -34,6 +41,7 @@ scout.ProposalChooser.prototype._render = function($parent) {
     // disable focus on field container
     this.model._onNodeControlMouseDownDoFocus = function() {};
   }
+  this._injectSendFunction();
 
   // status
   this.$status = this.$container
@@ -167,3 +175,38 @@ scout.ProposalChooser.prototype.setVirtual = function(virtual) {
     this.model.setVirtual(virtual);
   }
 };
+
+/**
+ * This function is required because on slow connections issues. When a rowsSelected
+ * event and an acceptProposal event is sent in the same request, the acceptProposal
+ * event "wins". Which means, it sets the displayText to a wrong, old text. To
+ * prevent this, we don't send the acceptProposal event at all, as long as the
+ * displayText has not changed (in that case the displayText of the acceptProposal
+ * event would still win).
+ */
+scout.ProposalChooser.prototype._onModelProposalSelected = function(event) {
+  this.owner.proposalSelected();
+};
+
+/**
+ * We wrap the original _send method of the ProposalChooser.
+ */
+scout.ProposalChooser.prototype._injectSendFunction = function() {
+  var model = this.model;
+  if (!model) {
+    return;
+  }
+  var origSendFunc = scout.objects.mandatoryFunction(model, '_send');
+  var sendFunc = function(type, data, options) {
+    var extOptions = $.extend({}, options);
+    extOptions.showBusyIndicator = false;
+    origSendFunc.call(model, type, data, extOptions);
+  };
+  model._send = sendFunc;
+};
+
+scout.ProposalChooser.prototype._syncModel = function(model) {
+  this._injectSendFunction();
+  this.model = model;
+};
+

@@ -141,7 +141,7 @@ scout.SmartField.prototype._readSearchText = function() {
  * is called and thus the _requestedProposal flag would never be resetted.
  */
 scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
-  $.log.debug('(SmartField#_syncProposalChooser) set _requestedProposal to false');
+  $.log.debug('(SmartFieldAdapter#_syncProposalChooser) set _requestedProposal to false');
   this._requestedProposal = false;
   if (this.embedded) {
     // Never hold the proposal chooser in embedded mode, original smart field takes care of it
@@ -374,6 +374,21 @@ scout.SmartField.prototype._clearPendingProposalTyped = function() {
   this._pendingProposalTyped = null;
 };
 
+scout.SmartField.prototype.proposalSelected = function() {
+  this.proposalSelectedInProgress = true;
+  this._oldDisplayText = this._readDisplayText();
+};
+
+// See comment in ProposalChooserAdapter.js
+scout.SmartField.prototype._abortAcceptProposal = function(displayText) {
+  var abort = this.proposalSelectedInProgress && displayText === this._oldDisplayText;
+  if (abort) {
+    $.log.debug('(SmartField#_abortAcceptProposal) aborted _acceptProposal because displayText has not changed since proposal has been selected');
+    this.proposalSelectedInProgress = false;
+  }
+  return abort;
+};
+
 /**
  * This method is called when the user presses the TAB or ENTER key in the UI, or when _onFieldBlur()
  * or acceptInput(). In case the field is a proposal-field we must send the current displayText
@@ -381,6 +396,7 @@ scout.SmartField.prototype._clearPendingProposalTyped = function() {
  * is not in the list of proposals). We must accept the user defined text in that case.
  */
 scout.SmartField.prototype._acceptProposal = function(forceClose) {
+
   // must clear pending "proposalTyped" events because nothing good happens
   // when proposalTyped arrives _after_ an "acceptProposal" event.
   this._clearPendingProposalTyped();
@@ -391,6 +407,11 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     displayText = this._readSearchText();
 
   $.log.debug('(SmartField#_acceptProposal) displayText=' + displayText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);
+
+  if (this._abortAcceptProposal(displayText)) {
+    return;
+  }
+
   if (proposalChooserOpen) {
     // Always send accept proposal, when proposal chooser is opened,
     // Because user wants to choose the selected proposal from the
@@ -427,12 +448,15 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     this._triggerAcceptProposal(displayText);
   }
 
-  this.session.listen().done(function() {
-    $.log.debug('(SmartField) request done proposalChooser=' + this.proposalChooser);
-    if (this._tabPrevented && !this.proposalChooser) {
-      this._focusNextTabbable();
-    }
-  }.bind(this));
+  this.session.listen().done(this._onSessionDone.bind(this));
+};
+
+scout.SmartField.prototype._onSessionDone = function(event) {
+  $.log.debug('(SmartField#_onSessionDone) request done proposalChooser=' + this.proposalChooser);
+  this.proposalSelectedInProgress = false;
+  if (this._tabPrevented && !this.proposalChooser) {
+    this._focusNextTabbable();
+  }
 };
 
 scout.SmartField.prototype._triggerDeleteProposal = function(displayText) {
@@ -452,12 +476,18 @@ scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
   });
 };
 
+/**
+ * Note: we set showBusyIndicator=false in this request, because without it it could cause two calls
+ * to send/acceptProposal when the user presses Enter. The first one because of the keyDown event
+ * and the second one because of the blur event caused by the busy indicator.
+ */
 scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
   this._syncDisplayText(displayText);
   this._send('acceptProposal', {
     displayText: displayText,
     chooser: chooser,
     forceClose: forceClose,
+    showBusyIndicator: false,
     coalesce: function(previous) {
       return this.type === previous.type;
     }

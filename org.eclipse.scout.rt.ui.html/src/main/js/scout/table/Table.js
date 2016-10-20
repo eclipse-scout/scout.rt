@@ -395,6 +395,7 @@ scout.Table.prototype._onRowMouseUp = function(event) {
     this._sendAppLinkAction(column.id, $appLink.data('ref'));
   } else {
     this._sendRowClicked($row, mouseButton);
+    this._triggerRowClicked($row.data('row'), mouseButton);
   }
 };
 
@@ -2983,6 +2984,14 @@ scout.Table.prototype._triggerRowsFiltered = function() {
 
 scout.Table.prototype._triggerFilterResetted = function() {
   this.trigger('filterResetted');
+};
+
+scout.Table.prototype._triggerRowClicked = function(row, mouseButton) {
+  var event = {
+    row: row,
+    mouseButton: mouseButton
+  };
+  this.trigger('rowClicked', event);
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {

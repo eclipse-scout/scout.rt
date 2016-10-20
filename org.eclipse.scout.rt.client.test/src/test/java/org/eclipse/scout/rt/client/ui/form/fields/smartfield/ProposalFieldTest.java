@@ -49,7 +49,6 @@ import org.junit.runner.RunWith;
 public class ProposalFieldTest {
 
   private static List<IBean<?>> m_beans;
-  private ProposalField m_proposalField = new ProposalField();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -61,8 +60,11 @@ public class ProposalFieldTest {
     TestingUtility.unregisterBeans(m_beans);
   }
 
+  private ProposalField m_proposalField = new ProposalField();
+
   @Before
   public void setUp() {
+    m_proposalField = new ProposalField();
     m_proposalField.registerProposalChooserInternal();
   }
 
@@ -94,7 +96,7 @@ public class ProposalFieldTest {
 
   @Test
   public void testSelectFromProposalChooser() {
-    m_proposalField.getUIFacade().openProposalChooserFromUI("b", false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("b", false, false);
     waitUntilLookupRowsLoaded();
 
     // select a proposal from the proposal chooser table
@@ -111,12 +113,12 @@ public class ProposalFieldTest {
 
   /**
    * Fast typing issue, proposal chooser is open but was unregistered already, text that was typed already should still
-   * be accepted
+   * be accepted. See ticket #174594 and #178933.
    */
   @Test
   @Ignore
   public void testAcceptProposalOnUnregisteredChooser() {
-    m_proposalField.getUIFacade().openProposalChooserFromUI("cus", false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("cus", false, false);
     m_proposalField.unregisterProposalChooserInternal();
 
     m_proposalField.getUIFacade().acceptProposalFromUI("customText123", true, false);
@@ -139,7 +141,7 @@ public class ProposalFieldTest {
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, String expectedValue, int expectedNumProposals) {
-    m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false, false);
     waitUntilLookupRowsLoaded();
 
     boolean proposalChooserOpen = expectedNumProposals > 0;
