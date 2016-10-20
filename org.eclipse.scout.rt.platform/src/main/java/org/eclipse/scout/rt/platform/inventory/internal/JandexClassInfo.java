@@ -51,7 +51,7 @@ public class JandexClassInfo implements IClassInfo {
             m_class = Class.forName(name());
             m_hasNoArgsConstructor = hasNoArgsConstructor(m_class);
           }
-          catch (ClassNotFoundException ex) {
+          catch (ClassNotFoundException | NoClassDefFoundError ex) {
             throw new PlatformException("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
           }
         }
