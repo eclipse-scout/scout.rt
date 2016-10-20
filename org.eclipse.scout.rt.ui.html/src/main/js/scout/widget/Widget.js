@@ -82,6 +82,10 @@ scout.Widget.prototype._init = function(model) {
   this.animateRemoval = scout.nvl(model.animateRemoval, false);
 
   this._eachProperty(model, function(propertyName, value, isAdapterProperty) {
+    if (value === undefined) {
+      // Don't set the value if it is undefined, compared to null which is allowed explicitly ($.extend works in the same way)
+      return;
+    }
     if (isAdapterProperty) {
       value = this._prepareWidgetProperty(propertyName, value);
     }
