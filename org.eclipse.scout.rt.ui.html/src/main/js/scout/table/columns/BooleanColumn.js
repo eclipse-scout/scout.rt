@@ -78,3 +78,10 @@ scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
     // don't call super, no need to send a prepareEdit
   }
 };
+
+scout.BooleanColumn.prototype._createCellModel = function(value) {
+  return {
+    value: value
+  };
+};
+
