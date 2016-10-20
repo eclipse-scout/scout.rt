@@ -1,6 +1,8 @@
 scout.DesktopNotification = function() {
   scout.DesktopNotification.parent.call(this);
   this.closable = true;
+  this.status = scout.Status.info();
+  this.duration;
   this._removeTimeout;
   this._removing = false;
 };
@@ -13,57 +15,79 @@ scout.DesktopNotification.INFINITE = -1;
 
 scout.DesktopNotification.prototype._init = function(model) {
   scout.DesktopNotification.parent.prototype._init.call(this, model);
-  this.id = model.id;
-  this.duration = model.duration;
-  this.status = model.status;
-  this.closable = scout.nvl(model.closable, true);
-  this.desktop = model.desktop || this.parent;
-};
-
-/**
- * @override Widget.hs
- */
-scout.DesktopNotification.prototype._renderProperties = function() {
-  scout.DesktopNotification.parent.prototype._renderProperties.call(this);
-  this._renderMessage();
-  this._renderClosable();
+  this.desktop = model.desktop || this.session.desktop;
 };
 
 scout.DesktopNotification.prototype._render = function($parent) {
-  var cssSeverity,
-    severity = scout.Status.Severity;
-  switch (this.status.severity) {
-    case severity.OK:
-      cssSeverity = 'ok';
-      break;
-    case severity.INFO:
-      cssSeverity = 'info';
-      break;
-    case severity.WARNING:
-      cssSeverity = 'warning';
-      break;
-    case severity.ERROR:
-      cssSeverity = 'error';
-      break;
+  this.$container = $parent.prependDiv('notification');
+  this.$content = this.$container.appendDiv('notification-content');
+  this.$messageText = this.$content.appendDiv('notification-message');
+};
+
+scout.DesktopNotification.prototype._remove = function() {
+  scout.DesktopNotification.parent.prototype._remove.call(this);
+  this._removeCloser();
+};
+
+scout.DesktopNotification.prototype._renderProperties = function() {
+  scout.DesktopNotification.parent.prototype._renderProperties.call(this);
+  this._renderStatus();
+  this._renderClosable();
+};
+
+scout.DesktopNotification.prototype.setStatus = function(status) {
+  this.setProperty('status', status);
+};
+
+scout.DesktopNotification.prototype._syncStatus = function(status) {
+  if (this.rendered) {
+    this._removeStatus();
   }
-  this.$container = $parent
-    .prependDiv('notification')
-    .addClass(cssSeverity);
-  this.$content = this.$container
-    .appendDiv('notification-content');
+  this._setProperty('status', status);
+};
+
+scout.DesktopNotification.prototype._removeStatus = function() {
+  this.$container.removeClass(scout.DesktopNotification.cssClassForSeverity(this.status));
+};
+
+scout.DesktopNotification.prototype._renderStatus = function() {
+  this.$container.addClass(scout.DesktopNotification.cssClassForSeverity(this.status));
+  this._renderMessage();
 };
 
 scout.DesktopNotification.prototype._renderMessage = function() {
-  this.$content.html(scout.strings.nl2br(this.status.message));
+  var message = scout.nvl(scout.strings.nl2br(this.status.message), '');
+  this.$messageText.html(message);
+};
+
+scout.DesktopNotification.prototype.setClosable = function(closable) {
+  this.setProperty('closable', closable);
 };
 
 scout.DesktopNotification.prototype._renderClosable = function() {
-  if (this.closable) {
-    this.$content
-      .addClass('closable')
-      .appendDiv('closer')
-      .on('click', this._onCloseIconClick.bind(this));
+  this.$content.toggleClass('closable', this.closable);
+  if (!this.closable) {
+    this._removeCloser();
+  } else {
+    this._renderCloser();
   }
+};
+
+scout.DesktopNotification.prototype._removeCloser = function() {
+  if (!this.$closer) {
+    return;
+  }
+  this.$closer.remove();
+  this.$closer = null;
+};
+
+scout.DesktopNotification.prototype._renderCloser = function() {
+  if (this.$closer) {
+    return;
+  }
+  this.$closer = this.$content
+    .appendDiv('closer')
+    .on('click', this._onCloseIconClick.bind(this));
 };
 
 scout.DesktopNotification.prototype._onCloseIconClick = function() {
@@ -110,4 +134,25 @@ scout.DesktopNotification.prototype.fadeOut = function(callback) {
       callback();
     }
   }, 300);
+};
+
+scout.DesktopNotification.cssClassForSeverity = function(status) {
+  var cssSeverity,
+    severity = scout.Status.Severity;
+
+  switch (status.severity) {
+    case severity.OK:
+      cssSeverity = 'ok';
+      break;
+    case severity.INFO:
+      cssSeverity = 'info';
+      break;
+    case severity.WARNING:
+      cssSeverity = 'warning';
+      break;
+    case severity.ERROR:
+      cssSeverity = 'error';
+      break;
+  }
+  return cssSeverity;
 };

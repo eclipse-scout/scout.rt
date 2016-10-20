@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Status = function(model) {
+  this.message;
+  this.severity;
   $.extend(this, model);
 };
 
@@ -106,5 +108,14 @@ scout.Status.ensure = function(status) {
 scout.Status.ok = function() {
   return new scout.Status({
     severity: scout.Status.Severity.OK
+  });
+};
+
+/**
+ * @returns a Status object with severity INFO.
+ */
+scout.Status.info = function() {
+  return new scout.Status({
+    severity: scout.Status.Severity.INFO
   });
 };

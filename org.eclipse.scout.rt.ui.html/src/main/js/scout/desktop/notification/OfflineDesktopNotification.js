@@ -6,9 +6,8 @@ scout.inherits(scout.OfflineDesktopNotification, scout.DesktopNotification);
 
 scout.OfflineDesktopNotification.prototype._render = function($parent) {
   scout.OfflineDesktopNotification.parent.prototype._render.call(this, $parent);
-  this.$messageText = this.$content
-    .addClass('offline-message')
-    .appendDiv('offline-message-text');
+  this.$content.addClass('offline-message');
+  this.$messageText.addClass('offline-message-text');
 
   this.$reconnect = this.$content
     .appendDiv('reconnect')
@@ -18,14 +17,6 @@ scout.OfflineDesktopNotification.prototype._render = function($parent) {
   if (scout.device.supportsCssAnimation()) {
     this.$reconnect.addClass('reconnect-animated');
   }
-};
-
-/**
- * @override DesktopNotification.js
- */
-scout.OfflineDesktopNotification.prototype._renderMessage = function() {
-  this.$messageText.text(scout.strings.hasText(this.status.message) ?
-      this.status.message : '');
 };
 
 scout.OfflineDesktopNotification.prototype.reconnect = function() {
