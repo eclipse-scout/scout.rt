@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
-import org.eclipse.scout.rt.client.ui.CssClasses;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -38,7 +37,6 @@ import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
@@ -64,8 +62,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
-  protected String getConfiguredCssClass() {
-    return StringUtility.join(" ", super.getConfiguredCssClass(), CssClasses.PREVENT_INITIAL_FOCUS);
+  protected boolean getConfiguredPreventInitialFocus() {
+    return true;
   }
 
   /**

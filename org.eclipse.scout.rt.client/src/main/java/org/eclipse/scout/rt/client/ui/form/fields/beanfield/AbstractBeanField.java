@@ -43,6 +43,11 @@ public abstract class AbstractBeanField<VALUE> extends AbstractValueField<VALUE>
   }
 
   @Override
+  protected boolean getConfiguredPreventInitialFocus() {
+    return true;
+  }
+
+  @Override
   protected String execFormatValue(VALUE value) {
     // Bean fields should not have a display text by default, because it cannot be generated automatically
     // from the value bean. To suppress the default Object.toString() result, we return "" here. However,

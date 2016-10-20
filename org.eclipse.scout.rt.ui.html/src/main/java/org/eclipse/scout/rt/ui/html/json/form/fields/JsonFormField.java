@@ -200,5 +200,11 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getKeyStrokes();
       }
     });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_PREVENT_INITIAL_FOCUS, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isPreventInitialFocus();
+      }
+    });
   }
 }

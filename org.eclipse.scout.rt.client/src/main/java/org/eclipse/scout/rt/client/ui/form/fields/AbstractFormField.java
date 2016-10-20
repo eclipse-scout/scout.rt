@@ -666,6 +666,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
+   * @return <code>false</code> if this field can get the initial focus when the form is opened (default). Set to
+   *         <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
+   *         be manually focusable by the user.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(195)
+  protected boolean getConfiguredPreventInitialFocus() {
+    return false;
+  }
+
+  /**
    * Configures whether or not the space for the status is visible.
    * <p>
    * If set to false, the space is not visible unless there is a status message, tooltip or menu. <br>
@@ -823,6 +834,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       setLabelFont(FontSpec.parse(getConfiguredLabelFont()));
     }
     setFocusable(getConfiguredFocusable());
+    setPreventInitialFocus(getConfiguredPreventInitialFocus());
     setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), getConfiguredGridUseUiWidth(), getConfiguredGridUseUiHeight(),
         getConfiguredHorizontalAlignment(), getConfiguredVerticalAlignment(), getConfiguredFillHorizontal(), getConfiguredFillVertical(), getConfiguredWidthInPixel(), getConfiguredHeightInPixel()));
     setMasterRequired(getConfiguredMasterRequired());
@@ -1833,6 +1845,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public boolean isFocusable() {
     return propertySupport.getPropertyBool(PROP_FOCUSABLE);
+  }
+
+  @Override
+  public void setPreventInitialFocus(boolean preventInitialFocus) {
+    propertySupport.setPropertyBool(PROP_PREVENT_INITIAL_FOCUS, preventInitialFocus);
+  }
+
+  @Override
+  public boolean isPreventInitialFocus() {
+    return propertySupport.getPropertyBool(PROP_PREVENT_INITIAL_FOCUS);
   }
 
   @Override

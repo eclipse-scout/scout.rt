@@ -96,6 +96,13 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_FOCUSABLE = "focusable";// Build 205
 
   /**
+   * if the field can get the initial focus when the form is opened, value is of type {@link Boolean}
+   *
+   * @since 6.1
+   */
+  String PROP_PREVENT_INITIAL_FOCUS = "preventInitialFocus";
+
+  /**
    * Flag to indicate whether this field is currently loading data. Default is <code>false</code>. The exact
    * interpretation of this flag (and also if it should be respected at all) is left to the UI.
    */
@@ -569,6 +576,10 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   boolean isFocusable();
 
   void setFocusable(boolean b);
+
+  boolean isPreventInitialFocus();
+
+  void setPreventInitialFocus(boolean preventInitialFocus);
 
   /**
    * Convenience for {@link IForm#requestFocus(IFormField)}

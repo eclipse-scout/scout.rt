@@ -147,6 +147,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelBackgroundColor();
   this._renderGridData();
   this._renderLoading();
+  this._renderPreventInitialFocus();
 };
 
 scout.FormField.prototype._remove = function() {
@@ -355,6 +356,11 @@ scout.FormField.prototype._renderLoading = function() {
 scout.FormField.prototype._renderDisabledStyle = function() {
   // NOP - implemented by subclasses
 };
+
+scout.FormField.prototype._renderPreventInitialFocus = function() {
+  this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
+};
+
 
 scout.FormField.prototype._getCurrentMenus = function() {
   var menuTypes;
