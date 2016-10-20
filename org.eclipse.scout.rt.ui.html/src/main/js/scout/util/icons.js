@@ -55,11 +55,10 @@ scout.icons = {
     if (result && result.length === 2) {
       iconId = result[1];
       tmp = iconId.split('.');
-      var tmpLength = scout.strings.countCodePoints(tmp);
-      if (tmpLength === 1) {
+      if (tmp.length === 1) {
         // look for icon in scout.icons.[0]
         value = scout.icons[tmp];
-      } else if (tmpLength === 2) {
+      } else if (tmp.length === 2) {
         // look for icon in global object [0].icons.[1]
         // FIXME [awe] 6.1 register a kind of icon lookup-service instead of this naming convention?
         value = window[tmp[0]].icons[tmp[1]];
