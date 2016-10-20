@@ -239,12 +239,35 @@ scout.objects = {
   },
 
   /**
+   * @returns the function identified by funcName from the given object. The function will return an error
+   *     if that function does not exist. Use this function if you modify an existing framework function
+   *     to find problems after refactorings / renamings as soon as possible.
+   */
+  mandatoryFunction: function(obj, funcName) {
+    var func = obj[funcName];
+    if (!func || typeof func !== 'function') {
+      throw new Error('Function \'' + funcName + '\' does not exist on object. Check if it has been renamed or moved.', obj);
+    }
+    return func;
+  },
+
+  /**
+   * Use this method to replace a function on a prototype of an object. It checks if that function exists
+   * by calling <code>mandatoryFunction</code>.
+   */
+  replacePrototypeFunction: function(obj, funcName, func) {
+    var proto = obj.prototype;
+    this.mandatoryFunction(proto, funcName);
+    proto[funcName] = func;
+  },
+
+  /**
    * TODO [5.2] bsh: Document
    *
    * How to use:
-   *   scout.objects.checkMethodOverrides().join('\n')
+   *   scout.objects.checkFunctionOverrides().join('\n')
    */
-  checkMethodOverrides: function() {
+  checkFunctionOverrides: function() {
     var whitelist = [
       'ModelAdapter.init',
       'ModelAdapter._init',
@@ -252,9 +275,9 @@ scout.objects = {
     ];
     var result1 = [
       'Legend:',
-      '[!] Method includes super call, and parent method uses arguments',
-      ' ~  Method includes super call, but parent method does not use arguments',
-      '    Method does not include super call',
+      '[!] Function includes super call, and parent function uses arguments',
+      ' ~  Function includes super call, but parent function does not use arguments',
+      '    Function does not include super call',
       '',
       'Wrong number of arguments:'
     ];

@@ -74,7 +74,7 @@ public class SmartFieldSingleResultTest {
       }
     });
 
-    m_smartField.getUIFacade().openProposalChooserFromUI("", false);
+    m_smartField.getUIFacade().openProposalChooserFromUI("", true, false);
     bc.waitFor();
 
     // Without the bugfix the accepted proposal would be "SingleResult"

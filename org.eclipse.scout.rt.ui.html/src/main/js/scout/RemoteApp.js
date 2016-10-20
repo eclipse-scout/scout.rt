@@ -37,7 +37,7 @@ scout.RemoteApp.prototype._init = function(options) {
  * Static method to modify the prototype of scout.Widget.
  */
 scout.RemoteApp.modifyWidgetPrototype = function() {
-  scout.Widget.prototype._createChild = function(model) {
+  scout.objects.replacePrototypeFunction(scout.Widget, '_createChild', function(model) {
     if (model instanceof scout.Widget) {
       return model;
     }
@@ -61,5 +61,5 @@ scout.RemoteApp.modifyWidgetPrototype = function() {
       }
       return null;
     }
-  };
+  });
 };

@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -96,7 +95,7 @@ public class ProposalFieldTest {
 
   @Test
   public void testSelectFromProposalChooser() {
-    m_proposalField.getUIFacade().openProposalChooserFromUI("b", false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("b", false, false);
     waitUntilLookupRowsLoaded();
 
     // select a proposal from the proposal chooser table
@@ -113,18 +112,15 @@ public class ProposalFieldTest {
 
   /**
    * Fast typing issue, proposal chooser is open but was unregistered already, text that was typed already should still
-   * be accepted
+   * be accepted. See ticket #174594 and #178933.
    */
   @Test
-  @Ignore
   public void testAcceptProposalOnUnregisteredChooser() {
-    m_proposalField.getUIFacade().openProposalChooserFromUI("cus", false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("cus", false, false);
     m_proposalField.unregisterProposalChooserInternal();
 
     m_proposalField.getUIFacade().acceptProposalFromUI("customText123", true, false);
 
-    // FIXME 15.2 [awe, mru] - can we still reproduce this problem in the UI? if not -> delete this test, if so -> write a selenium test which reproduces the problem in the UI
-    // in that case we must also find a solution that works for ticket #174594 and #178933.
     assertEquals("customText123", m_proposalField.getDisplayText());
     assertEquals("customText123", m_proposalField.getValue());
   }
@@ -151,12 +147,12 @@ public class ProposalFieldTest {
   @Test
   public void testLookupRowWithUntrimmedProposalThatCloses() throws Exception {
     m_proposalField.setTrimText(false);
-    m_proposalField.getUIFacade().openProposalChooserFromUI(" abc ", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" abc ", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI(" abc ", true, true);
     assertEquals(" abc ", m_proposalField.getValue());
     m_proposalField.setTrimText(true);
     assertEquals("abc", m_proposalField.getValue());
-    m_proposalField.getUIFacade().openProposalChooserFromUI(" def ", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" def ", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI(" def ", true, true);
     assertEquals("def", m_proposalField.getValue());
   }
@@ -164,12 +160,12 @@ public class ProposalFieldTest {
   @Test
   public void testLookupRowWithUntrimmedProposalThatKeepsOpen() throws Exception {
     m_proposalField.setTrimText(false);
-    m_proposalField.getUIFacade().openProposalChooserFromUI(" abc ", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" abc ", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI(" abc ", true, false);
     assertEquals(" abc ", m_proposalField.getValue());
     m_proposalField.setTrimText(true);
     assertEquals("abc", m_proposalField.getValue());
-    m_proposalField.getUIFacade().openProposalChooserFromUI(" def ", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(" def ", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI(" def ", true, false);
     assertEquals("def", m_proposalField.getValue());
   }
@@ -188,12 +184,12 @@ public class ProposalFieldTest {
   @Test
   public void testLookupRowWithTooLongProposalThatCloses() throws Exception {
     m_proposalField.setMaxLength(32);
-    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567890", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567890", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI("1234567890", true, true);
     assertEquals("1234567890", m_proposalField.getValue());
     m_proposalField.setMaxLength(8);
     assertEquals("12345678", m_proposalField.getValue());
-    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567abc", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567abc", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI("1234567abc", true, true);
     assertEquals("1234567a", m_proposalField.getValue());
   }
@@ -201,12 +197,12 @@ public class ProposalFieldTest {
   @Test
   public void testLookupRowWithTooLongProposalThatKeepsOpen() throws Exception {
     m_proposalField.setMaxLength(32);
-    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567890", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567890", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI("1234567890", true, false);
     assertEquals("1234567890", m_proposalField.getValue());
     m_proposalField.setMaxLength(8);
     assertEquals("12345678", m_proposalField.getValue());
-    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567abc", true);
+    m_proposalField.getUIFacade().openProposalChooserFromUI("1234567abc", false, true);
     m_proposalField.getUIFacade().acceptProposalFromUI("1234567abc", true, false);
     assertEquals("1234567a", m_proposalField.getValue());
   }
@@ -215,7 +211,7 @@ public class ProposalFieldTest {
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, String expectedValue, int expectedNumProposals) {
-    m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false);
+    m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false, false);
     waitUntilLookupRowsLoaded();
 
     boolean proposalChooserOpen = expectedNumProposals > 0;

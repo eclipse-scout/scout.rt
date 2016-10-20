@@ -10,12 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
-import org.eclipse.scout.rt.platform.status.IMultiStatus;
-import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -85,7 +81,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiProposalTyped(JsonEvent event) {
-    String text = getDisplayTextAndAddFilter(event);
+    String text = getDisplayText(event);
     getModel().getUIFacade().proposalTypedFromUI(text);
   }
 
@@ -94,7 +90,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiAcceptProposal(JsonEvent event) {
-    String text = getDisplayTextAndAddFilter(event);
+    String text = getDisplayText(event);
     boolean chooser = event.getData().getBoolean("chooser");
     boolean forceClose = event.getData().getBoolean("forceClose");
     getModel().getUIFacade().acceptProposalFromUI(text, chooser, forceClose);
@@ -104,34 +100,21 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     getModel().getUIFacade().cancelProposalChooserFromUI();
   }
 
+  // Note: we intentionally do NOT add filter conditions for the displayText of the smart-field, because
+  // while processing the multiple events from the UI (from proposal-chooser, table and smart-field) the
+  // displayText may change multiple times on the model. So in some cases the filter let pass the wrong
+  // value in the end. Because the filter caused more harm than good, we removed it completely.
+
   protected void handleUiOpenProposal(JsonEvent event) {
     boolean browseAll = event.getData().optBoolean("browseAll");
-    String displayText = event.getData().optString("displayText", null);
-    if (browseAll && (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && !checkStatusContainsCode(getModel().getErrorStatus(), AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE)))) {
-      displayText = "*";
-    }
-    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+    String displayText = getDisplayText(event);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
-    LOG.debug("handle openProposal -> openProposalFromUI. displayText={} selectCurrentValue={}", displayText, selectCurrentValue);
-    getModel().getUIFacade().openProposalChooserFromUI(displayText, selectCurrentValue);
+    LOG.debug("handle openProposal -> openProposalFromUI. displayText={} browseAll={} selectCurrentValue={}", displayText, browseAll, selectCurrentValue);
+    getModel().getUIFacade().openProposalChooserFromUI(displayText, browseAll, selectCurrentValue);
   }
 
-  protected String getDisplayTextAndAddFilter(JsonEvent event) {
-    String text = event.getData().optString("displayText", null);
-    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, text);
-    return text;
-  }
-
-  protected boolean checkStatusContainsCode(IMultiStatus status, int code) {
-    for (IStatus child : status.getChildren()) {
-      if (child instanceof IMultiStatus && checkStatusContainsCode((IMultiStatus) child, code)) {
-        return true;
-      }
-      if (child.getCode() == code) {
-        return true;
-      }
-    }
-    return false;
+  protected String getDisplayText(JsonEvent event) {
+    return event.getData().optString("displayText", null);
   }
 
   @Override

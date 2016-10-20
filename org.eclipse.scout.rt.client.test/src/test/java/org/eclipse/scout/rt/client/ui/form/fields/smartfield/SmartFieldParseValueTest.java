@@ -132,7 +132,7 @@ public class SmartFieldParseValueTest {
    */
   void testMatch(String searchText, Long expectedValue, String expectedDisplayText, int expectedNumProposals,
       boolean expectedProposalChooserOpen, boolean expectValidationError) {
-    m_smartField.getUIFacade().openProposalChooserFromUI(searchText, false);
+    m_smartField.getUIFacade().openProposalChooserFromUI(searchText, false, false);
     waitUntilLookupRowsLoaded();
 
     if (expectedNumProposals > 0) {

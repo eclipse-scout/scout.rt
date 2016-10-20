@@ -29,3 +29,17 @@ scout.SmartFieldAdapter.prototype._onWidgetEvent = function(event) {
     scout.SmartFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
 };
+
+/**
+ * We must reset the flag _requestedProposal in the _sync function of the adapter
+ * Because the _sync function of the widget is only called, when the value has
+ * changed. However, we must always set the flag to false.
+ *
+ * Note: we should try to move this flag to the adapter completely. It does not
+ * belong to the widget.
+ */
+scout.SmartFieldAdapter.prototype._syncProposalChooser = function(proposalChooser) {
+  $.log.debug('(SmartFieldAdapter#_syncProposalChooser) set _requestedProposal to false');
+  this.widget._requestedProposal = false;
+  this.widget.callSetter('proposalChooser', proposalChooser);
+};

@@ -334,7 +334,7 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.setBrowseHierarchy(true);
     f.setValue(10L);
-    f.getUIFacade().openProposalChooserFromUI("Red", true);
+    f.getUIFacade().openProposalChooserFromUI("Red", false, true);
     waitForProposalResult(IProposalChooser.PROP_SEARCH_RESULT);
 
     //single result
@@ -361,7 +361,7 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.setValue(initialValue);
     ILookupRow<Long> initialLookupRow = f.getCurrentLookupRow();
-    f.getUIFacade().openProposalChooserFromUI("Red", true);
+    f.getUIFacade().openProposalChooserFromUI("Red", false, true);
     f.getUIFacade().cancelProposalChooserFromUI();
     assertEquals(initialValue, f.getValue());
     assertEquals(initialLookupRow, f.getCurrentLookupRow());
@@ -372,7 +372,7 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.setBrowseHierarchy(true);
 
-    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", true, false);
 
     waitForProposalResult(IProposalChooser.PROP_SEARCH_RESULT);
     //single result
@@ -393,7 +393,7 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.setBrowseHierarchy(true);
 
-    m_styleField.getUIFacade().openProposalChooserFromUI("unknown", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("unknown", false, false);
 
     waitForProposalResult(IProposalChooser.PROP_STATUS);
     //single result
@@ -413,7 +413,7 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.setBrowseHierarchy(true);
     ((StyleLookupCall) f.getLookupCall()).allowLookup(false);
-    m_styleField.getUIFacade().openProposalChooserFromUI("Red", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("Red", false, false);
     waitForProposalResult(IProposalChooser.PROP_STATUS);
     @SuppressWarnings("unchecked")
     TreeProposalChooser<Long> treeProposalChooser = ((TreeProposalChooser<Long>) f.getProposalChooser());
@@ -505,7 +505,7 @@ public class SmartFieldTest {
 
   @Test
   public void testDefaultSelectionWithOnlyOneResult() throws Exception {
-    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", true, false);
     waitUntilLookupRowsLoaded();
 
     m_styleField.getUIFacade().proposalTypedFromUI("Y");
@@ -528,7 +528,7 @@ public class SmartFieldTest {
 
   @Test
   public void testNoDefaultSelectionWithMoreThanOneResult() throws Exception {
-    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", true, false);
     waitUntilLookupRowsLoaded();
 
     // select a proposal from the proposal chooser table
@@ -545,7 +545,7 @@ public class SmartFieldTest {
   @Test
   public void testDeleteProposal() throws Exception {
     m_styleField.setValue(10L);
-    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", true, false);
     waitUntilLookupRowsLoaded();
     assertTrue(m_styleField.isProposalChooserRegistered());
     m_styleField.getUIFacade().deleteProposalFromUI();
