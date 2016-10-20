@@ -18,7 +18,7 @@ public class JsonDesktopNotification implements IJsonObject {
     JSONObject json = new JSONObject();
     json.put("status", JsonStatus.toJson(m_notification.getStatus()));
     json.put("duration", m_notification.getDuration());
-    json.put("closeable", m_notification.isCloseable());
+    json.put("closable", m_notification.isClosable());
     json.put("id", getNotificationId(m_notification));
     return json;
   }

@@ -25,10 +25,10 @@ public class DesktopNotification implements IDesktopNotification {
     m_closable = true;
   }
 
-  public DesktopNotification(IStatus status, long duration, boolean closeable) {
+  public DesktopNotification(IStatus status, long duration, boolean closable) {
     m_status = status;
     m_duration = duration;
-    m_closable = closeable;
+    m_closable = closable;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class DesktopNotification implements IDesktopNotification {
   }
 
   @Override
-  public boolean isCloseable() {
+  public boolean isClosable() {
     return m_closable;
   }
 
