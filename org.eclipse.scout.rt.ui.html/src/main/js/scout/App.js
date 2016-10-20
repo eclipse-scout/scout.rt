@@ -92,7 +92,6 @@ scout.App.prototype._createSession = function($entryPoint, options) {
   session.render(function() {
     this.onSessionReady(session);
     session._renderDesktop();
-    this.onDesktopReady(session.desktop);
 
     // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
     session.layoutValidator.validate();
