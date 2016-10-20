@@ -563,7 +563,7 @@ public final class MailUtility {
     try {
       InternetAddress internetAddress = new InternetAddress(IDN.toASCII(participant.getEmail()));
       if (StringUtility.hasText(participant.getName())) {
-        internetAddress.setPersonal(participant.getName());
+        internetAddress.setPersonal(participant.getName(), StandardCharsets.UTF_8.name());
       }
       return internetAddress;
     }
