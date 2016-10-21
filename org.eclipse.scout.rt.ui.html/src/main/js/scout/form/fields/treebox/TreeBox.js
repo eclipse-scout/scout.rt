@@ -30,6 +30,7 @@ scout.TreeBox.prototype._render = function($parent) {
   if (this.filterBox) {
     // TODO [5.2] bsh: Tree | Only render when filter active
     this._renderFilterBox();
+    this.tree.htmlComp.pixelBasedSizing = true;
   }
 };
 

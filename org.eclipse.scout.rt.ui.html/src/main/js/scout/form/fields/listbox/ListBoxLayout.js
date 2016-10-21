@@ -20,23 +20,20 @@ scout.ListBoxLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     size = htmlContainer.getSize(),
     height = size.height,
-    minHeight = 0,
-    heightCalculated;
-
-  this.pixelBasedSizing = true;
+    filterBoxHeight;
 
   if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
-    heightCalculated = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height ;
-    height -= heightCalculated;
+    filterBoxHeight = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height;
+    height -= filterBoxHeight;
   }
+
   height = Math.max(height, 20);
   var htmlTable = scout.HtmlComponent.get(this.table.$container);
-  htmlTable.pixelBasedSizing = true;
   htmlTable.setSize(new scout.Dimension(size.width, height));
 
   if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
     var htmlFilterBox = scout.HtmlComponent.get(this.filterBox.$container);
-    htmlFilterBox.setSize(new scout.Dimension(size.width, Math.max(minHeight, heightCalculated)));
+    htmlFilterBox.setSize(new scout.Dimension(size.width, filterBoxHeight));
   }
 };
 

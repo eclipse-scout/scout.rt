@@ -18,8 +18,9 @@ scout.ListBox.prototype._render = function($parent) {
   this.addContainer($parent, 'list-box');
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addFieldContainer($parent.makeDiv());
+  this.addStatus();
 
+  this.addFieldContainer($parent.makeDiv());
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));
 
@@ -28,9 +29,8 @@ scout.ListBox.prototype._render = function($parent) {
   }
   if (this.filterBox) {
     this._renderFilterBox();
+    this.table.htmlComp.pixelBasedSizing = true;
   }
-
-  this.addStatus();
 };
 
 scout.ListBox.prototype._renderTable = function() {
