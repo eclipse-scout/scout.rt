@@ -233,7 +233,7 @@ scout.scrollbars = {
       elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp,
       elementH = elementBounds.height + scrollOffsetDown;
 
-    //There are some elements which has a hight of 0 (Checkboxes / Radiobuttons) -> try to get field and figure out its height and offset
+    //There are some elements which has a height of 0 (Checkboxes / Radiobuttons) -> try to get field and figure out its height and offset
     // TODO CGU remove this hack, fix checkbox and radio buttons
     if (elementH === scrollOffsetDown && $element.data('valuefield') && $element.data('valuefield').$container) {
       $element = $element.data('valuefield').$container;
