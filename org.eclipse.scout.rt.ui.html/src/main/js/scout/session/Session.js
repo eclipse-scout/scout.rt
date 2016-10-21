@@ -122,11 +122,13 @@ scout.Session.prototype.init = function(model) {
     this.backgroundJobPollingSupport.enabled = false;
   }
 
-  if (this.url.getParameter('inspector')) {
+  // Set inspector flag by looking at URL params. This is required when running in offline mode.
+  // In online mode, the server may override this flag again, see _processStartupResponse().
+  if (this.url.getParameter('debug') === 'true' || this.url.getParameter('inspector') === 'true') {
     this.inspector = true;
   }
 
-  if (this.url.getParameter('adapterExportEnabled')) {
+  if (this.url.getParameter('adapterExportEnabled') === 'true') {
     this.adapterExportEnabled = true;
   }
 
@@ -324,7 +326,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
     return;
   }
 
-  // Enable inspector mode if required
+  // Enable inspector mode if server requests it (e.g. when server is running in development mode)
   if (data.startupData.inspector) {
     this.inspector = true;
   }
