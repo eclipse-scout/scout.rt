@@ -41,6 +41,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
@@ -65,6 +66,26 @@ public final class XmlUtility {
   public static final String INDENT_AMOUNT_TRANSFORMER_PROPERTY = "{http://xml.apache.org/xslt}indent-amount";
 
   private XmlUtility() {
+  }
+
+  /**
+   * @return a new secure {@link SchemaFactory} with disabled xml-external-entity
+   */
+  public static SchemaFactory newSchemaFactory() {
+    SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    try {
+      factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    }
+    catch (SAXException e) {
+      LOG.warn("Property '{}' cannot be set in the current SchemaFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, factory.getClass().getName(), e);
+    }
+    try {
+      factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    }
+    catch (SAXException e) {
+      LOG.warn("Property '{}' cannot be set in the current SchemaFactory: {}", XMLConstants.ACCESS_EXTERNAL_SCHEMA, factory.getClass().getName(), e);
+    }
+    return factory;
   }
 
   /**
