@@ -54,6 +54,7 @@ scout.FormField = function() {
   this.disabledStyle = scout.FormField.DisabledStyle.DEFAULT;
   this.touched = false;
   this.empty = true;
+  this.preventInitialFocus = false;
 
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected

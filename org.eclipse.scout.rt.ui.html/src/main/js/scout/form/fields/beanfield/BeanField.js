@@ -13,6 +13,8 @@
  */
 scout.BeanField = function() {
   scout.BeanField.parent.call(this);
+
+  this.preventInitialFocus = true;
 };
 scout.inherits(scout.BeanField, scout.ValueField);
 

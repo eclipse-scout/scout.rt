@@ -11,6 +11,7 @@
 scout.HtmlField = function() {
   scout.HtmlField.parent.call(this);
   this.scrollBarEnabled = false;
+  this.preventInitialFocus = true;
 };
 scout.inherits(scout.HtmlField, scout.ValueField);
 

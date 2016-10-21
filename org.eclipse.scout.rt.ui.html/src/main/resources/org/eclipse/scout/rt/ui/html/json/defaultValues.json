@@ -23,6 +23,7 @@
       "statusPosition": "default",
       "menus": [],
       "menusVisible": false,
+      "preventInitialFocus": false,
       "gridData": {
         "x": -1,
         "y": -1,
@@ -200,10 +201,14 @@
       "scrollBarEnabled": false
     },
     "HtmlField": {
-      "scrollBarEnabled": false
+      "scrollBarEnabled": false,
+      "preventInitialFocus": true
     },
     "BrowserField": {
       "scrollBarEnabled": false
+    },
+    "BeanField": {
+      "preventInitialFocus": true
     },
 
     // Other objects
