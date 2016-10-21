@@ -1,6 +1,9 @@
 package org.eclipse.scout.rt.client.ui;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 
 /**
  * Represents a geographical location. Format is decimal degrees.
@@ -9,23 +12,71 @@ import java.io.Serializable;
  * @since 6.1
  */
 public class Coordinates implements Serializable {
-
   private static final long serialVersionUID = 1L;
-  private String m_latitude;
-  private String m_longitude;
 
+  private final String m_latitude;
+  private final String m_longitude;
+
+  /**
+   * @param latitude
+   *          Latitude (φ, y coordinate)
+   * @param longitude
+   *          Longitude (λ, x coordinate)
+   */
   public Coordinates(String latitude, String longitude) {
-    super();
     m_latitude = latitude;
     m_longitude = longitude;
   }
 
+  /**
+   * @param latitude
+   *          Latitude (φ, y coordinate)
+   * @param longitude
+   *          Longitude (λ, x coordinate)
+   */
+  public Coordinates(BigDecimal latitude, BigDecimal longitude) {
+    m_latitude = (latitude == null ? null : latitude.toPlainString());
+    m_longitude = (longitude == null ? null : longitude.toPlainString());
+  }
+
+  /**
+   * Latitude (φ, y coordinate)
+   * <p>
+   * Example: Berne, Switzerland has latitude <code>7.45</code>
+   * <p>
+   * Format should be "decimal degree" (see {@link Coordinates})
+   */
   public String getLatitude() {
     return m_latitude;
   }
 
+  /**
+   * Latitude (φ, y coordinate)
+   * <p>
+   * Example: Berne, Switzerland has latitude <code>7.45</code>
+   */
+  public BigDecimal getLatitudeAsBigDecimal() {
+    return NumberUtility.getBigDecimalValue(getLatitude());
+  }
+
+  /**
+   * Longitude (λ, x coordinate)
+   * <p>
+   * Example: Berne, Switzerland has longitude <code>46.95</code>
+   * <p>
+   * Format should be "decimal degree" (see {@link Coordinates})
+   */
   public String getLongitude() {
     return m_longitude;
+  }
+
+  /**
+   * Longitude (λ, x coordinate)
+   * <p>
+   * Example: Berne, Switzerland has longitude <code>46.95</code>
+   */
+  public BigDecimal getLongitudeAsBigDecimal() {
+    return NumberUtility.getBigDecimalValue(getLongitude());
   }
 
   @Override
@@ -68,4 +119,8 @@ public class Coordinates implements Serializable {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "Coordinates [m_latitude=" + m_latitude + ", m_longitude=" + m_longitude + "]";
+  }
 }

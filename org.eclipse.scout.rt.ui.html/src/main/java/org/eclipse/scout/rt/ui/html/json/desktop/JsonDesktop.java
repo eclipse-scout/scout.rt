@@ -159,8 +159,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       getModel().getUIFacade().fireGeolocationFailed(errorCode, errorMessage);
       return;
     }
-    String longitude = event.getData().getString("longitude");
     String latitude = event.getData().getString("latitude");
+    String longitude = event.getData().getString("longitude");
     getModel().getUIFacade().fireGeolocationDetermined(latitude, longitude);
   }
 
