@@ -15,17 +15,6 @@ scout.DesktopAdapter = function() {
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
 
-/**
- * Geolocation service is initialized in _init function of Desktop.js. Since the model adapter
- * is in the middle of creating the widget, we cannot send a property change to the server at that
- * point in time. That's why we must send this property change later.
- *
- * @override ModelAdapter.js
- */
-scout.DesktopAdapter.prototype._postCreateWidget = function() {
-  this._sendProperty('geolocationServiceAvailable', this.widget.geolocationServiceAvailable);
-};
-
 scout.DesktopAdapter.prototype._goOffline = function() {
   this.widget.goOffline();
 };

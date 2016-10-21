@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import org.eclipse.scout.rt.platform.context.PropertyMap;
+import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
+
 /**
  * The desktop model (may) consist of
  * <ul>
@@ -45,11 +48,17 @@ public interface IDesktopUIFacade {
   /**
    * GUI fires this event when a UiSession has been attached to the desktop. The desktop is open at this point. The
    * event occurs after openFromUI().
-   *
-   * @param deepLinkPath
-   *          The deep-link path which was passed as URL parameter to the Scout application (if available). This
-   *          parameter may be null.
    */
+  void fireGuiAttached();
+
+  /**
+   * @deprecated Do not use this method anymore, use {@link #fireGuiAttached()} instead. The argument
+   *             <code>deepLinkPath</code> is ignored! It's value is available in {@link PropertyMap#CURRENT} under the
+   *             key {@link DeepLinkUrlParameter#DEEP_LINK}.
+   *             <p>
+   *             This method will be removed in "P" release.
+   */
+  @Deprecated
   void fireGuiAttached(String deepLinkPath);
 
   /**

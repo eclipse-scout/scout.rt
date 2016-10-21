@@ -96,7 +96,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
   /**
    * {@link Boolean}
    */
-  String PROP_GEO_LOCATION_SERVICE_AVAILABLE = "geolocationServiceAvailable";
+  String PROP_GEOLOCATION_SERVICE_AVAILABLE = "geolocationServiceAvailable";
   /**
    * {@link Boolean}
    */

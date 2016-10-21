@@ -159,7 +159,8 @@
       "views": [],
       "viewButtons": [],
       "messageBoxes": [],
-      "fileChoosers": []
+      "fileChoosers": [],
+      "geolocationServiceAvailable": true
     },
     "Outline": {
       "autoToggleBreadcrumbStyle": true,

@@ -82,6 +82,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -94,10 +95,12 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -1571,12 +1574,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public boolean isGeolocationServiceAvailable() {
-    return propertySupport.getPropertyBool(PROP_GEO_LOCATION_SERVICE_AVAILABLE);
+    return propertySupport.getPropertyBool(PROP_GEOLOCATION_SERVICE_AVAILABLE);
   }
 
   @Override
   public void setGeolocationServiceAvailable(boolean available) {
-    propertySupport.setPropertyBool(PROP_GEO_LOCATION_SERVICE_AVAILABLE, available);
+    propertySupport.setPropertyBool(PROP_GEOLOCATION_SERVICE_AVAILABLE, available);
   }
 
   @Override
@@ -1984,7 +1987,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopClosed();
   }
 
-  private void attachGui(String deepLinkPath) {
+  private void attachGui() {
     if (isGuiAvailable()) {
       return;
     }
@@ -2003,6 +2006,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
+    final String geolocationServiceAvailableStr = PropertyMap.CURRENT.get().get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+    final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
+    setGeolocationServiceAvailable(geolocationServiceAvailable);
+
+    final String deepLinkPath = PropertyMap.CURRENT.get().get(DeepLinkUrlParameter.DEEP_LINK);
     activateDefaultView(deepLinkPath);
   }
 
@@ -2315,8 +2323,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
+    public void fireGuiAttached() {
+      attachGui();
+    }
+
+    @SuppressWarnings("deprecation") // TODO BSH Remove in P release
+    @Override
     public void fireGuiAttached(String deepLinkPath) {
-      attachGui(deepLinkPath);
+      fireGuiAttached();
     }
 
     @Override

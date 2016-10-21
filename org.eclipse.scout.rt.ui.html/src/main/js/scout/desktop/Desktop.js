@@ -34,7 +34,7 @@ scout.Desktop = function() {
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
-  this.geolocationServiceAvailable = false;
+  this.geolocationServiceAvailable = scout.device.supportsGeolocation();
   this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
@@ -59,7 +59,6 @@ scout.Desktop.prototype._init = function(model) {
   this.resolveTextKeys(['title']);
   this._syncViewButtons(this.viewButtons);
   this._syncMenus(this.menus);
-  this.geolocationServiceAvailable = scout.device.supportsGeolocation();
 };
 
 /**

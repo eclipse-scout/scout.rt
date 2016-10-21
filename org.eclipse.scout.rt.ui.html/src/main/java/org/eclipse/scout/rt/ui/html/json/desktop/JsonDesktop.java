@@ -142,9 +142,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
       getModel().getUIFacade().setHeaderVisibleFromUI(visible);
     }
-    else if (IDesktop.PROP_GEO_LOCATION_SERVICE_AVAILABLE.equals(propertyName)) {
+    else if (IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE.equals(propertyName)) {
       boolean available = data.getBoolean(propertyName);
-      addPropertyEventFilterCondition(IDesktop.PROP_GEO_LOCATION_SERVICE_AVAILABLE, available);
+      addPropertyEventFilterCondition(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE, available);
       getModel().getUIFacade().setGeoLocationServiceAvailableFromUI(available);
     }
     else {
@@ -309,6 +309,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       @Override
       protected Object modelValue() {
         return getModel().isHeaderVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isGeolocationServiceAvailable();
       }
     });
   }

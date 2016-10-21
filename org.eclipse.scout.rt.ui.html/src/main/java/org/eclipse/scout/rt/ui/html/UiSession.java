@@ -64,7 +64,6 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -373,16 +372,16 @@ public class UiSession implements IUiSession {
       public JsonClientSession<?> call() throws Exception {
         return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-        .withSession(clientSession, true))
+    }, ModelJobs.newInput(
+        ClientRunContexts.copyCurrent()
+            .withSession(clientSession, true))
         .withName("Starting JsonClientSession")
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 
     return BEANS.get(UiJobs.class).awaitAndGet(future);
   }
 
-  protected void startDesktop(Map<String, String> startupParams) {
-    final String deepLinkPath = startupParams.get(DeepLinkUrlParameter.DEEP_LINK);
+  protected void startDesktop(Map<String, String> sessionStartupParams) {
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -392,10 +391,12 @@ public class UiSession implements IUiSession {
         if (!desktop.isOpened()) {
           uiFacade.openFromUI();
         }
-        uiFacade.fireGuiAttached(deepLinkPath);
+        uiFacade.fireGuiAttached();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-        .withSession(m_clientSession, true))
+    }, ModelJobs.newInput(
+        ClientRunContexts.copyCurrent()
+            .withSession(m_clientSession, true)
+            .withProperties(sessionStartupParams)) // Make startup parameters available at {@link PropertyMap#CURRENT} during desktop attaching
         .withName("Starting Desktop")
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 

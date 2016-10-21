@@ -84,6 +84,6 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    */
   protected void simulateDesktopOpened(IDesktop desktop) {
     desktop.getUIFacade().openFromUI();
-    desktop.getUIFacade().fireGuiAttached(null);
+    desktop.getUIFacade().fireGuiAttached();
   }
 }

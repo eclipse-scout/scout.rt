@@ -280,12 +280,23 @@ scout.Session.prototype._sendStartupRequest = function() {
 };
 
 /**
- * Extracts session startup parameters from URL: query string parameters and the URL itself with key 'url'
+ * Creates an object to send to the server as "startupParams".
+ *
+ * Default params:
+ * "url":
+ *   browser URL (without query and hash part)
+ * "geolocationServiceAvailable":
+ *   true if browser supports geo location services
+ *
+ * Additionally, all query parameters from the URL are put in the resulting object.
  */
 scout.Session.prototype._createSessionStartupParams = function() {
   var params = {
-    url: this.url.baseUrlRaw
+    url: this.url.baseUrlRaw,
+    geolocationServiceAvailable: scout.device.supportsGeolocation()
   };
+
+  // Extract query parameters from URL and put them in the resulting object
   var urlParameterMap = this.url.parameterMap;
   for (var prop in urlParameterMap) {
     params[prop] = urlParameterMap[prop];
