@@ -19,18 +19,21 @@ scout.inherits(scout.TreeBoxLayout, scout.AbstractLayout);
 scout.TreeBoxLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     size = htmlContainer.getSize(),
-    height = size.height;
+    height = size.height,
+    filterBoxHeight;
 
   if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
-    height -= scout.HtmlEnvironment.formRowHeight;
+    filterBoxHeight = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height;
+    height -= filterBoxHeight;
   }
 
+  height = Math.max(height, 20);
   var htmlTree = scout.HtmlComponent.get(this.tree.$container);
   htmlTree.setSize(new scout.Dimension(size.width, height));
 
   if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
     var htmlFilterBox = scout.HtmlComponent.get(this.filterBox.$container);
-    htmlFilterBox.setSize(new scout.Dimension(size.width, scout.HtmlEnvironment.formRowHeight));
+    htmlFilterBox.setSize(new scout.Dimension(size.width, filterBoxHeight));
   }
 };
 
