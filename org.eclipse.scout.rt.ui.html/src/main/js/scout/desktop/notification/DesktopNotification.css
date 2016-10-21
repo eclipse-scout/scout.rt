@@ -98,7 +98,15 @@
   }
 }
 
-.offline-message > .reconnect-animated::after {
+.notification-message {
+  display: inline-block;
+}
+
+.notification-loader {
+  display: inline-block;
+}
+
+.notification-loader.animated::after {
   #scout.animation(rotation 0.9s linear infinite);
   content: '';
   display: inline-block;
