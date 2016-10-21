@@ -20,6 +20,10 @@
   & > .input-field[placeholder]:empty::before {
     #scout.fake-placeholder();
   }
+
+  & > .input-field[placeholder].disabled:empty::before {
+    #scout.placeholder-disabled();
+  }
 }
 
 .smart-field {

@@ -24,9 +24,11 @@
   }
 
   & > .input-field[placeholder]:empty::before {
-    /* placeholder only works for input elements -> fake it */
-    #scout.placeholder();
-    content: attr(placeholder);
+    #scout.fake-placeholder();
+  }
+
+  & > .input-field[placeholder].disabled:empty::before {
+    #scout.placeholder-disabled();
   }
 
   /** Prediction input field is in the back of the actual input field -> make actual input field transparent */

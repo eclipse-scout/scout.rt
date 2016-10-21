@@ -79,6 +79,8 @@ body {
 
   &::-webkit-input-placeholder {
     #scout.placeholder-disabled();
+    /* Fill color is inherited, make sure it is ignored and the current color is used instead. Needed for iOS, see usage of -webkit-text-fill-color below*/
+    -webkit-text-fill-color: currentcolor;
   }
   &:-moz-placeholder { /* older versions of firefox */
     #scout.placeholder-disabled();
@@ -163,17 +165,23 @@ textarea,
 input {
   padding: 0 @text-field-padding-x;
 
-  /* remove platform specific styling, mainly used to remove shadow on ios safari */
+  /* remove platform specific styling, mainly used to remove shadow on iOS Safari */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 
-  /* text inputs on safari have 2px top and bottom margin -> remove*/
+  /* text inputs on Safari have 2px top and bottom margin -> remove*/
   margin: 0;
+
+  &.disabled {
+    /* Only setting the color has no effect for input elements on iOS Safari -> set fill color, too */
+    /* It is activated for input elements only since the rule would be inherited by sub elements and therefore would change theirs colors as well */
+    -webkit-text-fill-color: currentcolor;
+  }
 }
 
 input[type="radio"] {
-  /*radiobutton in activ filter (smartfield) should be displayed as radiobutton */
+  /* radiobutton in active filter (smartfield) should be displayed as radiobutton */
   -webkit-appearance: radio;
   -moz-appearance: radio;
   appearance: radio;
