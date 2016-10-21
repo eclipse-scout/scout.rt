@@ -122,11 +122,16 @@ body {
   -moz-user-select: -moz-none;
 }
 
-input, textarea, button {
+input,
+textarea,
+button {
   #scout.font-text-normal();
 }
 
-input, .input-field, textarea, .clipboard-field > .field {
+input,
+textarea,
+.input-field,
+.clipboard-field > .field {
   background-color: @control-background-color;
   color: @control-color;
   border: 1px solid @border-color;
@@ -173,9 +178,8 @@ input[type="radio"] {
 
 .input-field {
   padding:  @text-field-padding-y @text-field-padding-x;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  #scout.overflow-ellipsis-nowrap();
+  #scout.user-select(text);
 }
 
 button {
