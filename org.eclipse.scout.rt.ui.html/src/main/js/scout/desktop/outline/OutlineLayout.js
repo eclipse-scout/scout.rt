@@ -38,9 +38,14 @@ scout.OutlineLayout.prototype._layout = function($container) {
       }
     }
 
-    // Remove width and height from non selected nodes (at this point we don't know the previously selected node anymore, so we need process all rendered)
-    this.outline.$nodes().each(function(i, elem) {
-      var $node = $(elem);
+    // Remove width and height from non selected nodes (at this point we don't know the previously selected node anymore, so we need to process all visible nodes)
+    // It is not enough to only process rendered nodes, we need to update the detached nodes as well
+    this.outline.visibleNodesFlat.forEach(function(node) {
+      var $node = node.$node;
+      if (!$node) {
+        // Do nothing if node has never been rendered
+        return;
+      }
       // check for style.height to prevent unnecessary updates, no need to update nodes without a fixed height
       if ($node.isSelected() || !$node[0].style.height || $node[0].style.height === 'auto') {
         return;
@@ -48,7 +53,6 @@ scout.OutlineLayout.prototype._layout = function($container) {
 
       $node.css('height', 'auto')
         .css('width', 'auto');
-      var node = $node.data('node');
       node.height = $node.outerHeight(true);
     });
   }
