@@ -25,11 +25,11 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
-import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
 /**
@@ -77,8 +77,8 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
       @Override
       public void intercept(HttpServletRequest req, HttpServletResponse resp) {
-        BrowserInfo browserInfo = BrowserInfo.createFrom(req);
-        if (browserInfo.isMshtml()) {
+        HttpClientInfo httpClientInfo = HttpClientInfo.get(req);
+        if (httpClientInfo.isMshtml()) {
           // Send headers only for IE
           super.intercept(req, resp);
         }

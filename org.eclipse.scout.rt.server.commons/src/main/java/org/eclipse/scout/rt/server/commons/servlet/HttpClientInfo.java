@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.res;
+package org.eclipse.scout.rt.server.commons.servlet;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,19 +33,19 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class was originally copied from org.eclipse.scout.rt.ui.rap.
  * <p>
- * Use {@link #createFrom(HttpServletRequest)} to get the {@link BrowserInfo} cached on the {@link HttpSession}
+ * Use {@link #get(HttpServletRequest)} to get the {@link HttpClientInfo} cached on the {@link HttpSession}
  */
 @Bean
-public class BrowserInfo {
-  private static final Logger LOG = LoggerFactory.getLogger(BrowserInfo.class);
+public class HttpClientInfo {
+  private static final Logger LOG = LoggerFactory.getLogger(HttpClientInfo.class);
 
-  public static class BrowserVersion implements Comparable<BrowserVersion> {
+  public static class Version implements Comparable<Version> {
 
     private final int m_major;
     private final int m_minor;
     private final int m_micro;
 
-    public BrowserVersion(int major, int minor, int micro) {
+    public Version(int major, int minor, int micro) {
       m_major = major;
       m_minor = minor;
       m_micro = micro;
@@ -89,7 +89,7 @@ public class BrowserInfo {
       if (getClass() != obj.getClass()) {
         return false;
       }
-      BrowserVersion other = (BrowserVersion) obj;
+      Version other = (Version) obj;
       if (m_major != other.m_major) {
         return false;
       }
@@ -103,7 +103,7 @@ public class BrowserInfo {
     }
 
     @Override
-    public int compareTo(BrowserVersion o) {
+    public int compareTo(Version o) {
       if (o == this) {
         return 0;
       }
@@ -126,12 +126,12 @@ public class BrowserInfo {
     }
   }
 
-  protected static final String BROWSER_INFO_ATTRIBUTE_NAME = "scout.htmlui.httpsession.browserinfo";
+  protected static final String HTTP_CLIENT_INFO_ATTRIBUTE_NAME = "scout.htmlui.httpsession.httpclientinfo";
 
   private FinalValue<String> m_userAgent = new FinalValue<String>();
 
   private UiEngineType m_engineType = UiEngineType.UNKNOWN;
-  private BrowserVersion m_engineVersion;
+  private Version m_engineVersion;
   // Basic engine types
   private boolean m_isWebkit = false;
   private boolean m_isGecko = false;
@@ -139,25 +139,25 @@ public class BrowserInfo {
   private boolean m_isOpera = false;
 
   private UiSystem m_system = UiSystem.UNKNOWN;
-  private BrowserVersion m_systemVersion;
+  private Version m_systemVersion;
 
   // Flags
   private boolean m_isMobile = false;
   private boolean m_isTablet = false;
   private boolean m_isStandalone = false;
 
-  public BrowserInfo init(String userAgent) {
+  public HttpClientInfo init(String userAgent) {
     m_userAgent.set(StringUtility.emptyIfNull(userAgent));
     initInfos();
     return this;
   }
 
   protected void initInfos() {
-    initBrowserInfo();
+    initHttpClientInfo();
     initSystemInfo();
   }
 
-  protected void initBrowserInfo() {
+  protected void initHttpClientInfo() {
     String userAgent = getUserAgent();
     // Opera
     String regex = "Opera[\\s\\/]([0-9\\.]*)";
@@ -304,6 +304,10 @@ public class BrowserInfo {
     m_isGecko = isGecko;
   }
 
+  /**
+   * @return {@code true} if the HTTP client is Microsoft Internet Explorer. Returns {@code false} for other browsers
+   *         including Microsoft Edge.
+   */
   public boolean isMshtml() {
     return m_isMshtml;
   }
@@ -363,19 +367,19 @@ public class BrowserInfo {
     m_system = system;
   }
 
-  public BrowserVersion getEngineVersion() {
+  public Version getEngineVersion() {
     return m_engineVersion;
   }
 
-  protected void setEngineVersion(BrowserVersion engineVersion) {
+  protected void setEngineVersion(Version engineVersion) {
     m_engineVersion = engineVersion;
   }
 
-  public BrowserVersion getSystemVersion() {
+  public Version getSystemVersion() {
     return m_systemVersion;
   }
 
-  protected void setSystemVersion(BrowserVersion systemVersion) {
+  protected void setSystemVersion(Version systemVersion) {
     m_systemVersion = systemVersion;
   }
 
@@ -413,7 +417,7 @@ public class BrowserInfo {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    BrowserInfo other = (BrowserInfo) obj;
+    HttpClientInfo other = (HttpClientInfo) obj;
     if (m_isGecko != other.m_isGecko) {
       return false;
     }
@@ -489,28 +493,29 @@ public class BrowserInfo {
   }
 
   /**
-   * Creates {@link BrowserInfo} based on user agent on {@code request}. The {@link BrowserInfo} is cached on the
-   * {@link HttpSession} if a session exists.
+   * Creates {@link HttpClientInfo} based on user agent on {@code request}.
+   * <p>
+   * The {@link HttpClientInfo} is cached on the {@link HttpSession} if a session exists.
    */
-  public static BrowserInfo createFrom(HttpServletRequest request) {
-    // BrowserInfo is cached on HTTP session
+  public static HttpClientInfo get(HttpServletRequest request) {
+    // HttpClientInfo is cached on HTTP session
     HttpSession session = request.getSession(false);
     if (session != null) {
-      BrowserInfo browserInfo = (BrowserInfo) session.getAttribute(BROWSER_INFO_ATTRIBUTE_NAME);
-      if (browserInfo != null) {
-        return browserInfo;
+      HttpClientInfo httpClientInfo = (HttpClientInfo) session.getAttribute(HTTP_CLIENT_INFO_ATTRIBUTE_NAME);
+      if (httpClientInfo != null) {
+        return httpClientInfo;
       }
     }
     String userAgent = request.getHeader("User-Agent");
-    BrowserInfo browserInfo = createFrom(userAgent);
+    HttpClientInfo httpClientInfo = createFrom(userAgent);
     if (session != null) {
-      session.setAttribute(BROWSER_INFO_ATTRIBUTE_NAME, browserInfo);
+      session.setAttribute(HTTP_CLIENT_INFO_ATTRIBUTE_NAME, httpClientInfo);
     }
-    return browserInfo;
+    return httpClientInfo;
   }
 
-  public static BrowserInfo createFrom(String userAgent) {
-    BrowserInfo info = BEANS.get(BrowserInfo.class).init(userAgent);
+  public static HttpClientInfo createFrom(String userAgent) {
+    HttpClientInfo info = BEANS.get(HttpClientInfo.class).init(userAgent);
     if (LOG.isTraceEnabled()) {
       LOG.trace(info.toString());
     }
@@ -524,7 +529,7 @@ public class BrowserInfo {
    * The regex pattern is automatically enclosed in <code>.*?</code> and <code>.*</code>. This ensures that for mulitple
    * matches, the 'most left' is used to construct the version.
    */
-  protected static BrowserVersion extractVersion(String userAgent, String regex) {
+  protected static Version extractVersion(String userAgent, String regex) {
     Matcher matcher = Pattern.compile(".*?" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL).matcher(userAgent);
     if (matcher.matches()) {
       String s = matcher.group(1);
@@ -534,24 +539,24 @@ public class BrowserInfo {
     return null;
   }
 
-  protected static BrowserVersion parseAndroidVersion(String userAgent) {
+  protected static Version parseAndroidVersion(String userAgent) {
     return extractVersion(userAgent, "Android\\s([^\\s;]+)");
   }
 
-  protected static BrowserVersion parseIosVersion(String userAgent) {
+  protected static Version parseIosVersion(String userAgent) {
     userAgent = userAgent.replace('_', '.');
     return extractVersion(userAgent, "\\sOS\\s([^\\s;]+)");
   }
 
-  protected static BrowserVersion parseWindowsPhoneVersion(String userAgent) {
+  protected static Version parseWindowsPhoneVersion(String userAgent) {
     return extractVersion(userAgent, "Windows\\sPhone\\s(?:OS )?([^\\s;]+)");
   }
 
-  protected static BrowserVersion parseWindowsVersion(String userAgent) {
+  protected static Version parseWindowsVersion(String userAgent) {
     return extractVersion(userAgent, "Windows\\sNT\\s([^\\s;]+)");
   }
 
-  protected static BrowserVersion createVersion(String versionString) {
+  protected static Version createVersion(String versionString) {
     // Searches for 3 groups containing numbers separated with a dot.
     // Group 3 is optional (MSIE only has a major and a minor version, no micro)
     versionString = versionString.replaceAll("^[/\\s]*", "");
@@ -566,6 +571,6 @@ public class BrowserInfo {
         }
       }
     }
-    return new BrowserVersion(vArr[0], vArr[1], vArr[2]);
+    return new Version(vArr[0], vArr[1], vArr[2]);
   }
 }

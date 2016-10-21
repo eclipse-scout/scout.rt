@@ -42,6 +42,8 @@ public class HttpServletControl implements Serializable {
   public static final String XSS_MODE_BLOCK = "1; mode=block";
 
   public static final String HTTP_HEADER_CSP = "Content-Security-Policy";
+
+  /** Legacy header for content security policy used by Internet Explorer */
   public static final String HTTP_HEADER_CSP_LEGACY = "X-Content-Security-Policy";
 
   public static final String CSP_REPORT_URL = "csp-report";
@@ -84,9 +86,12 @@ public class HttpServletControl implements Serializable {
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
 
     if (CONFIG.getPropertyValue(CspEnabledProperty.class)) {
-      // TODO [6.1] AWE/BSH Check user agent for legacy header
-      resp.setHeader(HTTP_HEADER_CSP, getCspToken());
-      resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspToken());
+      if (HttpClientInfo.get(req).isMshtml()) {
+        resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspToken());
+      }
+      else {
+        resp.setHeader(HTTP_HEADER_CSP, getCspToken());
+      }
     }
   }
 }

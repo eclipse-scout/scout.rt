@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
@@ -82,7 +83,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonRequestHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
-import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -299,14 +299,14 @@ public class UiSession implements IUiSession {
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupReq) {
-    BrowserInfo browserInfo = BrowserInfo.createFrom(currentHttpRequest());
+    HttpClientInfo httpClientInfo = HttpClientInfo.get(currentHttpRequest());
     UserAgents userAgentBuilder = UserAgents
         .create()
         .withUiLayer(UiLayer.HTML)
         .withUiDeviceType(UiDeviceType.DESKTOP)
-        .withUiEngineType(browserInfo.getEngineType())
-        .withUiSystem(browserInfo.getSystem())
-        .withDeviceId(browserInfo.getUserAgent());
+        .withUiEngineType(httpClientInfo.getEngineType())
+        .withUiSystem(httpClientInfo.getSystem())
+        .withDeviceId(httpClientInfo.getUserAgent());
 
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {
