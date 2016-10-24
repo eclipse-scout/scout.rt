@@ -229,9 +229,13 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
     cell = this.cell(row);
 
-  if (this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey) {
+  if (this.isCellEditable(row, cell, event)) {
     this.table.prepareCellEdit(this, row, true);
   }
+};
+
+scout.Column.prototype.isCellEditable = function(row, cell, event) {
+  return this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
 };
 
 scout.Column.prototype.startCellEdit = function(row, field) {

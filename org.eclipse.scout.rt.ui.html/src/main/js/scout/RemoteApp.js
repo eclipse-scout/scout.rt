@@ -38,6 +38,7 @@ scout.RemoteApp.prototype._init = function(options) {
  * Static method to modify the prototype of scout.Widget.
  */
 scout.RemoteApp.modifyWidgetPrototype = function() {
+  // _createChild
   scout.objects.replacePrototypeFunction(scout.Widget, '_createChild', function(model) {
     if (model instanceof scout.Widget) {
       return model;
@@ -90,5 +91,12 @@ scout.RemoteApp.modifyTablePrototype = function() {
     this.trigger('cancelCellEdit', {
       field: field
     });
+  });
+};
+
+scout.RemoteApp.modifyBooleanColumnPrototype = function() {
+  // _toggleCellValue
+  scout.objects.replacePrototypeFunction(scout.BooleanColumn, '_toggleCellValue', function() {
+    // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
   });
 };

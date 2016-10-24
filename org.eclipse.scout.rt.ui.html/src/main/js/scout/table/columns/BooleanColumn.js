@@ -68,15 +68,27 @@ scout.BooleanColumn.prototype._cellCssClass = function(cell) {
   return cssClass;
 };
 
+/**
+ * This function does intentionally _not_ call the super function (prepareCellEdit) because we don't want to
+ * show an editor for BooleanColumns when user clicks on a cell.
+ */
 scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
-  var row = $row.data('row');
+  var row = $row.data('row'),
+    cell = this.cell(row);
 
   if (this.table.checkableColumn === this) {
     this.table.checkRow(row, !row.checked);
-  } else {
-    // editable column behaviour -> server will handle the click, see AbstractTable#interceptRowClickSingleObserver
-    // don't call super, no need to send a prepareEdit
+  } else if (this.isCellEditable(row, cell, event)) {
+    this._toggleCellValue(row, cell);
   }
+};
+
+/**
+ * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
+ * @see RemoteApp.js
+ */
+scout.BooleanColumn.prototype._toggleCellValue = function(row, cell) {
+  this.table.setCellValue(this, row, !cell.value);
 };
 
 /**

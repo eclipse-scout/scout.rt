@@ -2159,6 +2159,7 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
  * @param saveEditorValue when this parameter is set to true, the value of the editor field is set as
  *    new value on the edited cell. In remote case this parameter is always false, because the cell
  *    value is updated by an updateRow event instead.
+ * @see RemoteApp.js
  */
 scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
   if (!this.rendered) {
@@ -2190,11 +2191,16 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
 
 /**
  * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
+ * @see RemoteApp.js
  */
 scout.Table.prototype.completeCellEdit = function(field) {
   this.endCellEdit(field, true);
 };
 
+/**
+ * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
+ * @see RemoteApp.js
+ */
 scout.Table.prototype.cancelCellEdit = function(field) {
   this.endCellEdit(field);
 };
