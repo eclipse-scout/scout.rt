@@ -1469,7 +1469,8 @@ scout.Table.prototype._triggerRowAction = function(row, column) {
  */
 scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCellEdit) {
   this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-  this._triggerPrepareCellEdit(row, column);
+  var field = column.createDefaultEditor(row);
+  this.startCellEdit(column, row, field);
 };
 
 scout.Table.prototype.cell = function(column, row) {
@@ -2153,20 +2154,49 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
   return popup;
 };
 
-scout.Table.prototype.endCellEdit = function(field) {
+/**
+ * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
+ * @param saveEditorValue when this parameter is set to true, the value of the editor field is set as
+ *    new value on the edited cell. In remote case this parameter is always false, because the cell
+ *    value is updated by an updateRow event instead.
+ */
+scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
   if (!this.rendered) {
-    this._postRenderActions.push(this.endCellEdit.bind(this, field));
+    this._postRenderActions.push(this.endCellEdit.bind(this, field, saveEditorValue));
     return;
   }
 
-  // the cellEditorPopup could already be removed by scrolling(out of view range) or be removed by update rows
+  // the cellEditorPopup could already be removed by scrolling (out of view range) or be removed by update rows
   if (this.cellEditorPopup) {
-    // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
-    // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
+    var context = this.cellEditorPopup;
+
+    // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is
+    // uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
+    // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can
+    // be avoided if removing the popup first.
     this.cellEditorPopup.destroy();
     this.cellEditorPopup = null;
+
+    // Must store context in a local variable and call setCellValue _after_ cellEditorPopup is set to null
+    // because in updateRows we check if the popup is still there and start cell editing mode again.
+    saveEditorValue = scout.nvl(saveEditorValue, false);
+    if (saveEditorValue) {
+      this.setCellValue(context.column, context.row, field.value);
+    }
   }
+
   field.destroy();
+};
+
+/**
+ * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
+ */
+scout.Table.prototype.completeCellEdit = function(field) {
+  this.endCellEdit(field, true);
+};
+
+scout.Table.prototype.cancelCellEdit = function(field) {
+  this.endCellEdit(field);
 };
 
 scout.Table.prototype.scrollTo = function(row) {
@@ -2833,25 +2863,6 @@ scout.Table.prototype._triggerAppLinkAction = function(column, ref) {
   this.trigger('appLinkAction', {
     column: column,
     ref: ref
-  });
-};
-
-scout.Table.prototype._triggerPrepareCellEdit = function(row, column) {
-  this.trigger('prepareCellEdit', {
-    row: row,
-    column: column
-  });
-};
-
-scout.Table.prototype._triggerCompleteCellEdit = function(field) {
-  this.trigger('completeCellEdit', {
-    field: field
-  });
-};
-
-scout.Table.prototype._triggerCancelCellEdit = function(field) {
-  this.trigger('cancelCellEdit', {
-    field: field
   });
 };
 
@@ -3624,6 +3635,12 @@ scout.Table.prototype._detach = function() {
 
 scout.Table.prototype.setVirtual = function(virtual) {
   this._setProperty('virtual', virtual);
+};
+
+scout.Table.prototype.setCellValue = function(column, row, value) {
+  var cloneRow = row.clone(); // FIXME [awe] 6.1 - review with C.GU - is it Ok to make a clone here? Or is it better to make updateRows with oldRow === updatedRow?
+  column.setCellValue(cloneRow, value);
+  this.updateRows([cloneRow]);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

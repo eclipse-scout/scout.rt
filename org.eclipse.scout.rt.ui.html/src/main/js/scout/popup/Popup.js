@@ -78,7 +78,15 @@ scout.Popup.prototype._createKeyStrokeContext = function() {
 scout.Popup.prototype._initKeyStrokeContext = function() {
   scout.Popup.parent.prototype._initKeyStrokeContext.call(this);
 
-  this.keyStrokeContext.registerKeyStroke(new scout.CloseKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(this._createCloseKeyStroke());
+};
+
+/**
+ * Override this method to provide a key stroke which closes the popup.
+ * The default impl. returns a CloseKeyStroke which handles the ESC key.
+ */
+scout.Popup.prototype._createCloseKeyStroke = function() {
+  return new scout.CloseKeyStroke(this);
 };
 
 scout.Popup.prototype._createLayout = function() {

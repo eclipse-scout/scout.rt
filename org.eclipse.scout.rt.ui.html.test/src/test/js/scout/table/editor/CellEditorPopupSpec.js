@@ -359,7 +359,7 @@ describe("CellEditor", function() {
       row0.cells[0].editable = true;
       table.render(session.$entryPoint);
       startAndAssertCellEdit(table, table.columns[0], row0);
-      spyOn(table, '_triggerCancelCellEdit');
+      spyOn(table, 'cancelCellEdit');
 
       table.deleteRows([row0]);
 
@@ -367,14 +367,14 @@ describe("CellEditor", function() {
       expect($findPopup().length).toBe(0);
 
       // Check whether cancel edit has been called
-      expect(table._triggerCancelCellEdit).toHaveBeenCalled();
+      expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
     it("closes popup if all rows get deleted", function() {
       row0.cells[0].editable = true;
       table.render(session.$entryPoint);
       startAndAssertCellEdit(table, table.columns[0], row0);
-      spyOn(table, '_triggerCancelCellEdit');
+      spyOn(table, 'cancelCellEdit');
 
       table.deleteAllRows();
 
@@ -382,7 +382,7 @@ describe("CellEditor", function() {
       expect($findPopup().length).toBe(0);
 
       // Check whether cancel edit has been called
-      expect(table._triggerCancelCellEdit).toHaveBeenCalled();
+      expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
   });

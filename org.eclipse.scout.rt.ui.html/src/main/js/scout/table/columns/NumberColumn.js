@@ -41,12 +41,12 @@ scout.NumberColumn.prototype._initCell = function(cell) {
 
 scout.NumberColumn.prototype.createAggrValueCell = function(value) {
   var formattedValue = this.decimalFormat.format(value);
-  return {
+  return this.initCell({
     text: formattedValue,
     iconId: (formattedValue ? this.aggrSymbol : null),
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
-  };
+  });
 };
 
 /**

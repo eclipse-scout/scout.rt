@@ -192,14 +192,14 @@ describe('Column', function() {
 
     var table = helper.createTable(model);
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
-    expect(table.rows[0].cells[0].encodedText).toBeFalsy();
+    expect(table.rows[0].cells[0]._cacheEncodedText).toBeFalsy();
 
     spyOn(scout.strings, 'encode').and.callThrough();
     table.render(session.$entryPoint);
 
     expect(scout.strings.encode.calls.count()).toBe(6); // header and table cells
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
-    expect(table.rows[0].cells[0].encodedText).toBe('&lt;b&gt;hi&lt;/b&gt;');
+    expect(table.rows[0].cells[0].encodedText()).toBe('&lt;b&gt;hi&lt;/b&gt;');
     expect(table.rows[0].$row.find('.table-cell').eq(0).text()).toBe('<b>hi</b>');
 
     // re render -> encode must not be called again

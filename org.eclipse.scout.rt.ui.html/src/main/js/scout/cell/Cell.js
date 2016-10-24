@@ -12,12 +12,12 @@ scout.Cell = function() {
   this.$cell;
   this.checked = false;
   this.cssClass;
-  this.encodedText;
   this.editable = false;
   this.errorStatus;
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;
   this.iconId;
+  this._cacheEncodedText;
   this.text;
   this.value;
 };
@@ -33,3 +33,24 @@ scout.Cell.prototype._init = function(model) {
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
 };
+
+scout.Cell.prototype.update = function(model) {
+  var oldText = this.text;
+  $.extend(this, model);
+
+  // reset cached encodedText, so when encodedText() is called the next time
+  // will be set to the a new value
+  if (oldText !== this.text) {
+    this._cacheEncodedText = null;
+  }
+};
+
+scout.Cell.prototype.encodedText = function() {
+  if (!this._cacheEncodedText) {
+    // Encode text and cache it, encoding is expensive
+    this._cacheEncodedText = scout.strings.encode(this.text);
+  }
+  return this._cacheEncodedText;
+};
+
+

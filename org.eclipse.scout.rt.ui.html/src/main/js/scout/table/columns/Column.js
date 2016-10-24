@@ -65,7 +65,11 @@ scout.Column.prototype.initCell = function(vararg) {
   if (vararg instanceof scout.Cell) {
     return vararg;
   }
+  var cellModel = this._createCellModelInternal(vararg);
+  return scout.create('Cell', cellModel);
+};
 
+scout.Column.prototype._createCellModelInternal = function(vararg) {
   var cellModel;
   if (scout.objects.isPlainObject(vararg)) {
     cellModel = vararg;
@@ -74,7 +78,7 @@ scout.Column.prototype.initCell = function(vararg) {
     cellModel = this._createCellModel(vararg);
   }
   this._initCell(cellModel);
-  return scout.create('Cell', cellModel);
+  return cellModel;
 };
 
 /**
@@ -103,13 +107,11 @@ scout.Column.prototype.buildCellForRow = function(row) {
 };
 
 scout.Column.prototype.buildCell = function(cell, row) {
+  scout.assertParameter('cell', cell, scout.Cell);
+
   var text = cell.text || '';
   if (!cell.htmlEnabled) {
-    if (!cell.encodedText) {
-      // Encode text and cache it, encoding is expensive
-      cell.encodedText = scout.strings.encode(text);
-    }
-    text = cell.encodedText;
+    text = cell.encodedText();
     if (this.table.multilineText) {
       text = scout.strings.nl2br(text, false);
     }
@@ -369,22 +371,27 @@ scout.Column.prototype.setAggregationFunction = function(func) {
   }
 };
 
+scout.Column.prototype.setCellValue = function(row, value) {
+  var cellModel = this._createCellModelInternal(value);
+  this.cell(row).update(cellModel);
+};
+
 scout.Column.prototype.createAggrGroupCell = function(row) {
   var cell = this.cell(row);
-  return {
+  return this.initCell({
     // value necessary for value based columns (e.g. checkbox column)
     value: cell.value,
     text: this.cellTextForGrouping(row),
     iconId: cell.iconId,
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
-  };
+  });
 };
 
 scout.Column.prototype.createAggrEmptyCell = function() {
-  return {
+  return this.initCell({
     empty: true
-  };
+  });
 };
 
 scout.Column.prototype.setBackgroundEffect = function(effect) {
@@ -541,6 +548,17 @@ scout.Column.prototype.createFilter = function(model) {
     session: this.session,
     table: this.table,
     column: this
+  });
+};
+
+/**
+ * @returns a field instance used as editor when a cell of this column is in edit mode.
+ */
+scout.Column.prototype.createDefaultEditor = function(row) {
+  return scout.create('StringField', {
+    parent: this.table,
+    labelVisible: false,
+    displayText: this.cell(row).text
   });
 };
 

@@ -31,6 +31,7 @@ function sandboxSession(options) {
   // Since most of the tests are written to simulate RemoteApp behavior we must run
   // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
   scout.RemoteApp.modifyWidgetPrototype();
+  scout.RemoteApp.modifyTablePrototype();
 
   var session = scout.create('scout.Session', options, {
     ensureUniqueId: false

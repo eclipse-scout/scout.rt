@@ -30,6 +30,7 @@ scout.RemoteApp.prototype._createSession = function($entryPoint, options) {
  */
 scout.RemoteApp.prototype._init = function(options) {
   scout.RemoteApp.modifyWidgetPrototype();
+  scout.RemoteApp.modifyTablePrototype();
   scout.RemoteApp.parent.prototype._init.call(this, options);
 };
 
@@ -61,5 +62,33 @@ scout.RemoteApp.modifyWidgetPrototype = function() {
       }
       return null;
     }
+  });
+};
+
+/**
+ * Static method to modify the prototype of scout.Table.
+ */
+scout.RemoteApp.modifyTablePrototype = function() {
+  // prepareCellEdit
+  scout.objects.replacePrototypeFunction(scout.Table, 'prepareCellEdit', function(column, row, openFieldPopupOnCellEdit) {
+    this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
+    this.trigger('prepareCellEdit', {
+      column: column,
+      row: row
+    });
+  });
+
+  // completeCellEdit
+  scout.objects.replacePrototypeFunction(scout.Table, 'completeCellEdit', function(field) {
+    this.trigger('completeCellEdit', {
+      field: field
+    });
+  });
+
+  // cancelCellEdit
+  scout.objects.replacePrototypeFunction(scout.Table, 'cancelCellEdit', function(field) {
+    this.trigger('cancelCellEdit', {
+      field: field
+    });
   });
 };

@@ -46,3 +46,12 @@ scout.TableRow.prototype._initCells = function() {
 scout.TableRow.prototype.getTable = function() {
   return this.parent;
 };
+
+scout.TableRow.prototype.clone = function() {
+  var cloneRow = $.extend({}, this);
+  cloneRow.cells = [];
+  this.cells.forEach(function(cell) {
+    cloneRow.cells.push($.extend({}, cell));
+  });
+  return cloneRow;
+};

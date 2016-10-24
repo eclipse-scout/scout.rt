@@ -1396,15 +1396,15 @@ describe("Table", function() {
       for (var i = 0; i < rows.length; i++) {
         value = column0Values[Math.floor(i / 4)];
         text = value.toString();
-        rows[i].cells[0] = helper.createModelCell(text, value);
+        rows[i].cells[0] = column0.initCell(helper.createModelCell(text, value));
 
         value = column1Values[(Math.floor(i / 2)) % 2];
         text = value.toString();
-        rows[i].cells[1] = helper.createModelCell(text, value);
+        rows[i].cells[1] = column1.initCell(helper.createModelCell(text, value));
 
         value = column2Values[i % 2];
         text = value.toString();
-        rows[i].cells[2] = helper.createModelCell(text, value);
+        rows[i].cells[2] = column2.initCell(helper.createModelCell(text, value));
 
         j = i + 1;
         rows[i].cells[3].value = j;

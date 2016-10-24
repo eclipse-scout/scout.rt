@@ -40,9 +40,15 @@ scout.CellEditorPopup.prototype._initKeyStrokeContext = function() {
 
   this.keyStrokeContext.registerKeyStroke([
     new scout.CellEditorCompleteEditKeyStroke(this),
-    new scout.CellEditorCancelEditKeyStroke(this),
     new scout.CellEditorTabKeyStroke(this)
   ]);
+};
+
+/**
+ * @override Popup.js
+ */
+scout.CellEditorPopup.prototype._createCloseKeyStroke = function() {
+  return new scout.CellEditorCancelEditKeyStroke(this);
 };
 
 /**
@@ -137,12 +143,12 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
   field.acceptInput();
 
-  this.table._triggerCompleteCellEdit(field);
+  this.table.completeCellEdit(field);
   this.completeCellEditRequested = true;
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {
-  this.table._triggerCancelCellEdit(this.cell.field);
+  this.table.cancelCellEdit(this.cell.field);
   this.remove();
 };
 
