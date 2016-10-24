@@ -31,6 +31,7 @@ scout.RemoteApp.prototype._createSession = function($entryPoint, options) {
 scout.RemoteApp.prototype._init = function(options) {
   scout.RemoteApp.modifyWidgetPrototype();
   scout.RemoteApp.modifyTablePrototype();
+  scout.RemoteApp.modifyBooleanColumnPrototype();
   scout.RemoteApp.parent.prototype._init.call(this, options);
 };
 
@@ -96,7 +97,7 @@ scout.RemoteApp.modifyTablePrototype = function() {
 
 scout.RemoteApp.modifyBooleanColumnPrototype = function() {
   // _toggleCellValue
-  scout.objects.replacePrototypeFunction(scout.BooleanColumn, '_toggleCellValue', function() {
+  scout.objects.replacePrototypeFunction(scout.BooleanColumn, '_toggleCellValue', function(row, cell) {
     // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
   });
 };

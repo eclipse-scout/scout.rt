@@ -32,6 +32,7 @@ function sandboxSession(options) {
   // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
   scout.RemoteApp.modifyWidgetPrototype();
   scout.RemoteApp.modifyTablePrototype();
+  scout.RemoteApp.modifyBooleanColumnPrototype();
 
   var session = scout.create('scout.Session', options, {
     ensureUniqueId: false
