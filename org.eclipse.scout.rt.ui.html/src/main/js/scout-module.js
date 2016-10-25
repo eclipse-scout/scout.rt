@@ -39,6 +39,8 @@
   __include("scout/util/inspector.js");
   __include("scout/util/locales.js");
   __include("scout/util/logging.js");
+  __include("scout/util/LookupCall.js");
+  __include("scout/util/CodeLookupCall.js"); // requires LookupCall.js
   __include("scout/util/mimeTypes.js");
   __include("scout/util/models.js");
   __include("scout/util/numbers.js");
@@ -202,6 +204,7 @@
   __include("scout/table/columns/DateColumn.js"); // requires Column.js
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
+  __include("scout/table/columns/SmartColumn.js"); // requires Column.js
   __include("scout/table/controls/TableControl.js");
   __include("scout/table/controls/TableControlAdapter.js");
   __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormMenu and TableControl

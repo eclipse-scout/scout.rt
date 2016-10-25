@@ -35,8 +35,13 @@ scout.Cell.prototype._init = function(model) {
 };
 
 scout.Cell.prototype.update = function(model) {
-  var oldText = this.text;
+  this.setText(model.text);
   $.extend(this, model);
+};
+
+scout.Cell.prototype.setText = function(text) {
+  var oldText = this.text;
+  this.text = text;
 
   // reset cached encodedText, so when encodedText() is called the next time
   // will be set to the a new value

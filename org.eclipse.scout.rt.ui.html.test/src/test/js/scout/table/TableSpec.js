@@ -215,6 +215,23 @@ describe("Table", function() {
       expect($cells0.eq(1).text()).toBe('newCellText1');
     });
 
+    it("does not fail if the row to update is the same instance as the existing one", function() {
+      table.render(session.$entryPoint);
+      var $rows = table.$rows();
+      var $cells0 = table.$cellsForRow($rows.eq(0));
+      expect($cells0.eq(0).text()).toBe('cellText0');
+      expect($cells0.eq(1).text()).toBe('cellText1');
+
+      table.rows[0].cells[0].setText('newCellText0');
+      table.rows[0].cells[1].setText('newCellText1');
+      table.updateRows([table.rows[0]]);
+
+      $rows = table.$rows();
+      $cells0 = table.$cellsForRow($rows.eq(0));
+      expect($cells0.eq(0).text()).toBe('newCellText0');
+      expect($cells0.eq(1).text()).toBe('newCellText1');
+    });
+
     it("does not destroy selection", function() {
       model = helper.createModelFixture(2, 3);
       model.rows[0].cells[0].text = 'cellText0';

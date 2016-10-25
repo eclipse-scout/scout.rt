@@ -2049,6 +2049,10 @@ scout.Table.prototype.deleteAllRows = function() {
   }
 };
 
+scout.Table.prototype.updateRow = function(row) {
+  this.updateRows([row]);
+};
+
 scout.Table.prototype.updateRows = function(rows) {
   var filterChanged, newHiddenRows = [];
 
@@ -2088,9 +2092,9 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.rendered && oldRow.$row) {
       // render row and replace div in DOM
       var $updatedRow = $(this._buildRowDiv(updatedRow));
-      scout.Table.linkRowToDiv(updatedRow, $updatedRow);
       $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
       oldRow.$row.replaceWith($updatedRow);
+      scout.Table.linkRowToDiv(updatedRow, $updatedRow);
       this._destroyTooltipsForRow(updatedRow);
       this._removeCellEditorForRow(updatedRow);
       this._installRow(updatedRow);
@@ -3645,9 +3649,8 @@ scout.Table.prototype.setVirtual = function(virtual) {
 };
 
 scout.Table.prototype.setCellValue = function(column, row, value) {
-  var cloneRow = row.clone(); // FIXME [awe] 6.1 - review with C.GU - is it Ok to make a clone here? Or is it better to make updateRows with oldRow === updatedRow?
-  column.setCellValue(cloneRow, value);
-  this.updateRows([cloneRow]);
+  column.setCellValue(row, value);
+  this.updateRow(row);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

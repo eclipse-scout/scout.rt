@@ -61,7 +61,7 @@ scout.Column.prototype.init = function(model) {
  *
  * @see JsonCell.java
  */
-scout.Column.prototype.initCell = function(vararg) {
+scout.Column.prototype.initCell = function(vararg, row) {
   if (vararg instanceof scout.Cell) {
     return vararg;
   }
@@ -71,7 +71,7 @@ scout.Column.prototype.initCell = function(vararg) {
 
 scout.Column.prototype._createCellModelInternal = function(vararg) {
   var cellModel;
-  if (scout.objects.isPlainObject(vararg)) {
+  if (vararg && scout.objects.isPlainObject(vararg)) {
     cellModel = vararg;
   } else {
     // in this case 'vararg' is only a scalar value, typically a string

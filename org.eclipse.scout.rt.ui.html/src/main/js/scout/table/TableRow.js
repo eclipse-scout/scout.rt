@@ -37,7 +37,7 @@ scout.TableRow.prototype._initCells = function() {
   this.getTable().columns.forEach(function(column) {
     if (!column.guiOnly) {
       var cell = this.cells[column.index];
-      cell = column.initCell(cell);
+      cell = column.initCell(cell, this);
       this.cells[column.index] = cell;
     }
   }, this);
@@ -45,13 +45,4 @@ scout.TableRow.prototype._initCells = function() {
 
 scout.TableRow.prototype.getTable = function() {
   return this.parent;
-};
-
-scout.TableRow.prototype.clone = function() {
-  var cloneRow = $.extend({}, this);
-  cloneRow.cells = [];
-  this.cells.forEach(function(cell) {
-    cloneRow.cells.push($.extend({}, cell));
-  });
-  return cloneRow;
 };
