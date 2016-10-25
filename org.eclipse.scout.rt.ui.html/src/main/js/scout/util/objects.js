@@ -262,6 +262,20 @@ scout.objects = {
   },
 
   /**
+   * @returns a real Array for the pseudo-array 'arguments'.
+   */
+  argumentsToArray: function(args) {
+    return Array.prototype.slice.call(args);
+  },
+
+  /**
+   * Used to loop over 'arguments' pseudo-array with forEach.
+   */
+  forEachArgument: function(args, func) {
+    return this.argumentsToArray(args).forEach(func);
+  },
+
+  /**
    * TODO [5.2] bsh: Document
    *
    * How to use:
