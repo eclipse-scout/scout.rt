@@ -18,9 +18,11 @@ describe('scout.codes', function() {
     scout.codes.init({
       12345: {
         id: 12345,
+        objectType: 'CodeType',
         codes: [
           {
             id: 12346,
+            objectType: 'Code',
             texts: {
               'de': 'Foo-de',
               'en': 'Foo-en'
@@ -68,8 +70,10 @@ describe('scout.codes', function() {
     it('adds a code type or an array of code types', function() {
       var codeType = {
         id: 'codeType.123',
+        objectType: 'CodeType',
         codes: [{
           id: 'code.123',
+          objectType: 'Code',
           text: 'a text'
         }]
       };

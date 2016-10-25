@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- scout.CodeType = function() {
+scout.CodeType = function() {
   this.id;
   this.codes = [];
   this.codeMap = {};
@@ -27,24 +27,24 @@ scout.CodeType.prototype.init = function(model) {
   }
 };
 
-scout.CodeType.prototype._initCode = function(modelCode, parentCode) {
+scout.CodeType.prototype._initCode = function(modelCode, parent) {
   var i;
-  var code = new scout.Code();
-  code.init(modelCode);
-  this.add(code, parentCode);
-  if(modelCode.children) {
+  var code;
+  code = scout.create(modelCode);
+  this.add(code, parent);
+  if (modelCode.children) {
     for (i = 0; i < modelCode.children.length; i++) {
       this._initCode(modelCode.children[i], code);
     }
   }
 };
 
-scout.CodeType.prototype.add = function(code, parentCode) {
+scout.CodeType.prototype.add = function(code, parent) {
   this.codes.push(code);
   this.codeMap[code.id] = code;
-  if(parentCode) {
-    parentCode.childCodes.push(code);
-    code.parentCode = parentCode;
+  if (parent) {
+    parent.children.push(code);
+    code.parent = parent;
   }
 };
 
@@ -60,13 +60,12 @@ scout.CodeType.prototype.getCodes = function(rootOnly) {
   if (rootOnly) {
     var rootCodes = [];
     for (var i = 0; i < this.codes.length; i++) {
-      if (!this.codes[i].parentCode) {
+      if (!this.codes[i].parent) {
         rootCodes.push(this.codes[i]);
       }
     }
     return rootCodes;
-  }
-  else {
+  } else {
     return this.codes;
   }
 };

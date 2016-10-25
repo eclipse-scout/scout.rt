@@ -10,8 +10,8 @@
  ******************************************************************************/
 scout.Code = function() {
   this.id;
-  this.parentCode;
-  this.childCodes = [];
+  this.parent;
+  this.children = [];
 };
 
 scout.Code.prototype.init = function(model) {
@@ -41,4 +41,3 @@ scout.Code.prototype.text = function(vararg) {
   }
   return scout.texts.resolveText(this._text, languageTag);
 };
-
