@@ -14,6 +14,21 @@ scout.TableField = function() {
 };
 scout.inherits(scout.TableField, scout.FormField);
 
+scout.TableField.prototype._init = function(model) {
+  scout.TableField.parent.prototype._init.call(this, model);
+
+  this._delegatePropertyChange('enabled');
+  this._delegatePropertyChange('disabledStyle');
+};
+
+scout.TableField.prototype._delegatePropertyChange = function(propertyName) {
+  this.on('propertyChange', function(event) {
+    if (event.newProperties.hasOwnProperty(propertyName)) {
+      this.table.setProperty(propertyName, event.newProperties[propertyName]);
+    }
+  }.bind(this));
+};
+
 scout.TableField.prototype._render = function($parent) {
   this.addContainer($parent, 'table-field');
   this.addLabel();
@@ -39,3 +54,4 @@ scout.TableField.prototype._removeTable = function() {
   }
   this._removeField();
 };
+

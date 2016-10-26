@@ -51,7 +51,6 @@ scout.FormField = function() {
   this.loadingSupport = new scout.LoadingSupport({
     widget: this
   });
-  this.disabledStyle = scout.FormField.DisabledStyle.DEFAULT;
   this.touched = false;
   this.empty = true;
   this.preventInitialFocus = false;
@@ -87,14 +86,6 @@ scout.FormField.MODE_DEFAULT = 'default';
  * Indicates the field to be used within a cell editor.
  */
 scout.FormField.MODE_CELLEDITOR = 'celleditor';
-
-/**
- * Enum used to define different styles used when the field is disabled.
- */
-scout.FormField.DisabledStyle = {
-  DEFAULT: 0,
-  READ_ONLY: 1
-};
 
 /**
  * @override
@@ -306,12 +297,18 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
  * @override
  */
 scout.FormField.prototype._renderEnabled = function() {
-  this.$container.setEnabled(this.enabled);
+  scout.FormField.parent.prototype._renderEnabled.call(this);
+  this._updateDisabledCopyOverlay();
   if (this.$field) {
     this.$field.setEnabled(this.enabled);
   }
-  this._renderDisabledStyle();
-  this._updateDisabledCopyOverlay();
+};
+
+/**
+ * @override Wigdet.js
+ */
+scout.FormField.prototype._renderDisabledStyle = function() {
+  this._renderDisabledStyleInternal(this.$field);
 };
 
 scout.FormField.prototype._renderFont = function() {
@@ -352,10 +349,6 @@ scout.FormField.prototype._renderMenusVisible = function() {
 
 scout.FormField.prototype._renderLoading = function() {
   this.loadingSupport.renderLoading();
-};
-
-scout.FormField.prototype._renderDisabledStyle = function() {
-  // NOP - implemented by subclasses
 };
 
 scout.FormField.prototype._renderPreventInitialFocus = function() {
@@ -873,23 +866,4 @@ scout.FormField.prototype.validate = function() {
 
 scout.FormField.prototype._updateEmpty = function() {
   // NOP
-};
-
-scout.FormField.prototype.setDisabledStyle = function(disabledStyle) {
-  this.setProperty('disabledStyle', disabledStyle);
-};
-
-/**
- * This function is used by subclasses to render the read-only class for a given $field.
- * Some fields like DateField have two input fields and thus cannot use the this.$field property.
- */
-scout.FormField.prototype._renderDisabledStyleInternal = function($field) {
-  if (!$field) {
-    return;
-  }
-  if (this.enabled) {
-    $field.removeClass('read-only');
-  } else {
-    $field.toggleClass('read-only', this.disabledStyle === scout.FormField.DisabledStyle.READ_ONLY);
-  }
 };

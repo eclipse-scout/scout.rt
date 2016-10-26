@@ -3202,9 +3202,11 @@ scout.Table.prototype._removeFooter = function() {
 };
 
 /**
- * @override
+ * @override Widget.js
  */
 scout.Table.prototype._renderEnabled = function() {
+  scout.Table.parent.prototype._renderEnabled.call(this);
+
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);
   this.$container.setTabbable(enabled);
@@ -3217,6 +3219,14 @@ scout.Table.prototype._renderEnabled = function() {
       $row.find('input').setEnabled(enabled && row.enabled);
     });
   }
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Table.prototype._renderDisabledStyle = function() {
+  scout.Table.parent.prototype._renderDisabledStyle.call(this);
+  this._renderDisabledStyleInternal(this.$data);
 };
 
 scout.Table.prototype._renderAutoResizeColumns = function() {

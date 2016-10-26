@@ -147,10 +147,6 @@ scout.SmartField.prototype._renderDisplayText = function() {
   scout.fields.valOrText(this, this.$field, this.displayText);
 };
 
-scout.SmartField.prototype._renderDisabledStyle = function() {
-  this._renderDisabledStyleInternal(this.$field);
-};
-
 scout.SmartField.prototype._readDisplayText = function() {
   // in case of touch mode a 'div' is rendered and not an 'input' -> use text not val
   return scout.fields.valOrText(this, this.$field);

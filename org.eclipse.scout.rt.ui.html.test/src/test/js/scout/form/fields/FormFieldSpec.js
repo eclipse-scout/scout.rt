@@ -111,7 +111,7 @@ describe('FormField', function() {
 
     it('sets css class \'read-only\' when field is disabled and setDisabledStyle has been called ', function() {
       formField.render(session.$entryPoint);
-      formField.setDisabledStyle(scout.FormField.DisabledStyle.READ_ONLY);
+      formField.setDisabledStyle(scout.Widget.DisabledStyle.READ_ONLY);
       formField.setEnabled(false);
       expect(formField.$field.attr('class')).toContain('read-only');
       formField.setEnabled(true);

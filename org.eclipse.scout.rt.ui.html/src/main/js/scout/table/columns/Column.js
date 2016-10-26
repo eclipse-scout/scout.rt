@@ -559,11 +559,12 @@ scout.Column.prototype.createFilter = function(model) {
  * @returns a field instance used as editor when a cell of this column is in edit mode.
  */
 scout.Column.prototype.createDefaultEditor = function(row) {
-  return scout.create('StringField', {
+  var field = scout.create('StringField', {
     parent: this.table,
-    labelVisible: false,
-    displayText: this.cell(row).text
+    labelVisible: false
   });
+  field.setValue(this.cell(row).text);
+  return field;
 };
 
 /**

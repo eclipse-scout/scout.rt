@@ -34,6 +34,7 @@ scout.Widget = function() {
   this.destroyed = false;
 
   this.enabled = true;
+  this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
   this.visible = true;
 
   this.$container;
@@ -51,6 +52,14 @@ scout.Widget = function() {
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
   this.events = this._createEventSupport();
   this.keyStrokeContext = this._createKeyStrokeContext();
+};
+
+/**
+ * Enum used to define different styles used when the field is disabled.
+ */
+scout.Widget.DisabledStyle = {
+  DEFAULT: 0,
+  READ_ONLY: 1
 };
 
 scout.Widget.prototype.init = function(model) {
@@ -444,6 +453,30 @@ scout.Widget.prototype._renderEnabled = function() {
     return;
   }
   this.$container.setEnabled(this.enabled);
+  this._renderDisabledStyle();
+};
+
+scout.Widget.prototype.setDisabledStyle = function(disabledStyle) {
+  this.setProperty('disabledStyle', disabledStyle);
+};
+
+scout.Widget.prototype._renderDisabledStyle = function() {
+  this._renderDisabledStyleInternal(this.$container);
+};
+
+/**
+ * This function is used by subclasses to render the read-only class for a given $field.
+ * Some fields like DateField have two input fields and thus cannot use the this.$field property.
+ */
+scout.Widget.prototype._renderDisabledStyleInternal = function($element) {
+  if (!$element) {
+    return;
+  }
+  if (this.enabled) {
+    $element.removeClass('read-only');
+  } else {
+    $element.toggleClass('read-only', this.disabledStyle === scout.Widget.DisabledStyle.READ_ONLY);
+  }
 };
 
 scout.Widget.prototype.setVisible = function(visible) {

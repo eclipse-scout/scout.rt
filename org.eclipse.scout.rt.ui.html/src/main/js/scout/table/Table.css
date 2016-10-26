@@ -130,7 +130,7 @@
     margin-top: -1px;
   }
 
-  &.disabled {
+  &.disabled:not(.read-only) {
     background-color: @control-disabled-background-color;
   }
 
@@ -154,7 +154,7 @@
     /* An additional max-width: must be added in browser. */
   }
 
-  .disabled > .table-row > & {
+  .disabled:not(.read-only) > .table-row > & {
     color: @disabled-color;
   }
 
