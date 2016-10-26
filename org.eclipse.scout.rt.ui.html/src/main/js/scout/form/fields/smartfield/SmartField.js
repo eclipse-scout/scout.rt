@@ -42,6 +42,8 @@ scout.SmartField = function() {
   this._tabPrevented = null;
   this._pendingProposalTyped = null;
   this._navigating = false;
+  this.lookupCall;
+  this.codeType;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -59,6 +61,8 @@ scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this.popup = model.popup;
+  this._syncLookupCall(this.lookupCall);
+  this._syncCodeType(this.codeType);
 };
 
 scout.SmartField.prototype.createPopup = function() {
@@ -100,18 +104,35 @@ scout.SmartField.prototype._remove = function() {
   this.popup = null;
 };
 
-/**
- * Method invoked if being rendered within a cell-editor (mode='scout.FormField.MODE_CELLEDITOR'), and once the editor finished its rendering.
- */
-scout.SmartField.prototype.onCellEditorRendered = function(options) {
-  if (options.openFieldPopup) {
-    this._onClick();
-  }
-};
-
 scout.SmartField.prototype._renderProperties = function() {
   scout.SmartField.parent.prototype._renderProperties.call(this);
   this._renderProposalChooser();
+};
+
+scout.SmartField.prototype._syncLookupCall = function(lookupCall) {
+  if (typeof lookupCall === 'string') {
+    lookupCall = scout.create(lookupCall);
+  }
+  this._setProperty('lookupCall', lookupCall);
+};
+
+scout.SmartField.prototype._syncCodeType = function(codeType) {
+  this._setProperty('codeType', codeType);
+  if (!codeType) {
+    return;
+  }
+  var lookupCall = scout.create('CodeLookupCall', {
+    session: this.session,
+    codeType: codeType
+  });
+  this.setProperty('lookupCall', lookupCall);
+};
+
+scout.SmartField.prototype._formatValue = function(value) {
+  if (!this.lookupCall) {
+    return '';
+  }
+  return this.lookupCall.textById(value);
 };
 
 scout.SmartField.prototype._syncDisplayText = function(displayText) {
@@ -216,7 +237,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
   }
 
   // We must prevent default focus handling
-  if (e.which === scout.keys.TAB && this.mode !== scout.FormField.MODE_CELLEDITOR ) {
+  if (e.which === scout.keys.TAB && this.mode !== scout.FormField.MODE_CELLEDITOR) {
     if (this._isPreventDefaultTabHandling()) {
       e.preventDefault();
       this._tabPrevented = {
@@ -486,7 +507,7 @@ scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
  */
 scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
   this._syncDisplayText(displayText);
-  this._send('acceptProposal', {// FIXME [6.1] cgu move to adapter
+  this._send('acceptProposal', { // FIXME [6.1] cgu move to adapter
     displayText: displayText,
     chooser: chooser,
     forceClose: forceClose,
@@ -603,5 +624,14 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
 
   if (!eventOnField && !eventOnPopup) {
     this.acceptInput(); // event outside this field.
+  }
+};
+
+/**
+ * Method invoked if being rendered within a cell-editor (mode='scout.FormField.MODE_CELLEDITOR'), and once the editor finished its rendering.
+ */
+scout.SmartField.prototype.onCellEditorRendered = function(options) {
+  if (options.openFieldPopup) {
+    this._onClick();
   }
 };

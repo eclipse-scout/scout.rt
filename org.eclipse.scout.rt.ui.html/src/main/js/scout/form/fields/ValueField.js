@@ -127,32 +127,39 @@ scout.ValueField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
 
-scout.ValueField.prototype._syncValue = function(newValue) {
+scout.ValueField.prototype._syncValue = function(value) {
   var oldValue = this.value;
-  this.value = newValue;
-  this._updateDisplayText(newValue);
-  if (this._valueChanged(newValue, oldValue)) {
-    this._updateTouched();
-    this._updateEmpty();
-  }
-  this.triggerPropertyChange('value', oldValue, newValue);
+  this.value = value;
+  this._updateTouched();
+  this._updateEmpty();
+  this.triggerPropertyChange('value', oldValue, value);
+  this._updateDisplayText();
 };
 
 scout.ValueField.prototype._updateDisplayText = function() {
-  var displayText = this._formatValue(this.value);
-  this.setDisplayText(displayText);
+  var returned = this._formatValue(this.value);
+  if (returned && $.isFunction(returned.promise)) {
+    // Promise is returned -> set display text later
+    returned
+      .done(this.setDisplayText.bind(this))
+      .fail(function() {
+        this.setDisplayText('');
+        $.log.error('Could not resolve display text.');
+      }.bind(this));
+  } else {
+    this.setDisplayText(returned);
+  }
 };
 
+/**
+ * @returns the formatted string or a promise
+ */
 scout.ValueField.prototype._formatValue = function(value) {
   return scout.nvl(value, ''); // FIXME [awe] 6.1 - check impl. for fields other than StringField
 };
 
 scout.ValueField.prototype._updateTouched = function() {
-  this.touched = this._valueChanged(this.value, this._initialValue);
-};
-
-scout.ValueField.prototype._valueChanged = function(newValue, oldValue) {
-  return newValue !== oldValue;
+  this.touched = !scout.objects.equals(this.value, this._initialValue);
 };
 
 scout.ValueField.prototype.addField = function($field) {
@@ -213,8 +220,8 @@ scout.ValueField.prototype.markAsSaved = function() {
 };
 
 /**
- * @override FormField.js
+ * @override
  */
 scout.ValueField.prototype._updateEmpty = function() {
-  this.empty = !!this.value;
+  this.empty = this.value === null || this.value === undefined;
 };

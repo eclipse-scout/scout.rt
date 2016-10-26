@@ -1167,7 +1167,7 @@ scout.DateField.prototype.shiftSelectedDate = function(years, months, days) {
 
 // TODO awe, cgu: (value-field): we should refactor this setTimestamp / formatTimestamp
 // as soon as we have implemented parse/format/validation logic on ValueField.js. This
-// should work like the Java client (AbstractValueField) does.
+// should work like the Java client (AbstractValueField) does. Also rename timestamp to value
 scout.DateField.prototype.setTimestamp = function(timestamp) {
   if (this.timestamp === timestamp) {
     return;
@@ -1202,4 +1202,12 @@ scout.DateField.prototype.formatTimestamp = function(timestamp) {
 scout.DateField.prototype._renderDisabledStyle = function() {
   this._renderDisabledStyleInternal(this.$dateField);
   this._renderDisabledStyleInternal(this.$timeField);
+};
+
+/**
+ * @override
+ */
+scout.DateField.prototype._updateEmpty = function() {
+  // TODO [6.1] CGU remove this method as soon as timestamp is renamed to value. Then the default implementation of value field may be used
+  this.empty = this.timestamp === null || this.timestamp === undefined;
 };
