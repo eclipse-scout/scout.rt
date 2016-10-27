@@ -45,12 +45,9 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   }
 
   public Object invokeService(ServiceTunnelRequest request) {
-    final IFuture<?> future = IFuture.CURRENT.get();
-    if (future != null && future.isCancelled()) {
-      throw new CancellationException("Future is already cancelled");
-    }
+    final long t0 = System.nanoTime();
 
-    long t0 = System.nanoTime();
+    checkAlreadyCancelled(request);
     beforeTunnel(request);
     ServiceTunnelResponse response = tunnel(request);
     afterTunnel(t0, response);
@@ -107,6 +104,28 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * information to the request.
    */
   protected void beforeTunnel(ServiceTunnelRequest serviceRequest) {
+  }
+
+  /**
+   * Will throw a CancellationException if the future is already cancelled.
+   *
+   * @throws CancellationException
+   */
+  protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) throws CancellationException {
+    final IFuture<?> future = IFuture.CURRENT.get();
+    if (future != null && future.isCancelled()) {
+      final StringBuilder cancellationExceptionText = new StringBuilder();
+      cancellationExceptionText.append("Future is already cancelled.");
+      if (serviceRequest != null) {
+        cancellationExceptionText.append(" (Request was '");
+        cancellationExceptionText.append(serviceRequest.getServiceInterfaceClassName());
+        cancellationExceptionText.append(".");
+        cancellationExceptionText.append(serviceRequest.getOperation());
+        cancellationExceptionText.append("(..)')");
+      }
+
+      throw new CancellationException(cancellationExceptionText.toString());
+    }
   }
 
   /**
