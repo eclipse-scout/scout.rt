@@ -13,7 +13,7 @@ scout.App.prototype.init = function(options) {
   var deferreds = this._bootstrap(options.bootstrap);
   $.when.apply($, deferreds)
     .done(function() {
-      this._init();
+      this._init(options);
       deferredInit.resolve();
     }.bind(this));
   return deferredInit;
