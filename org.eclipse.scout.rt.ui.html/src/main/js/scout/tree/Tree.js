@@ -1944,15 +1944,25 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
   });
 };
 
+scout.Tree.prototype.updateNode = function(node) {
+  this.updateNodes([node]);
+};
+
 scout.Tree.prototype.updateNodes = function(nodes) {
   // Update model
   var anyPropertiesChanged = false;
   for (var i = 0; i < nodes.length; i++) {
     var updatedNode = nodes[i];
     var oldNode = this.nodesMap[updatedNode.id];
+    var propertiesChanged;
 
-    scout.defaultValues.applyTo(updatedNode, 'TreeNode');
-    var propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
+    if (updatedNode === oldNode) { // FIXME [awe] 6.1 - review with C.GU (same subject as in Table#updateRows) -> Ok, write a test
+      propertiesChanged = true;
+    } else {
+      scout.defaultValues.applyTo(updatedNode, 'TreeNode');
+      propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
+    }
+
     anyPropertiesChanged = anyPropertiesChanged || propertiesChanged;
     if (propertiesChanged) {
       if (this._applyFiltersForNode(oldNode)) {

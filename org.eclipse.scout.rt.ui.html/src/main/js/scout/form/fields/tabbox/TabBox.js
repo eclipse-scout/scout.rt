@@ -123,6 +123,14 @@ scout.TabBox.prototype.rebuildTabs = function() {
   }
 };
 
+scout.TabBox.prototype.selectTabById = function(tabId) {
+  var tab = this.getTabItem(tabId);
+  if (!tab) {
+    throw new Error('Tab with ID \'' + tabId + '\' does not exist');
+  }
+  this.setSelectedTab(tab);
+};
+
 scout.TabBox.prototype.setSelectedTab = function(selectedTab) {
   this.setProperty('selectedTab', selectedTab);
 };

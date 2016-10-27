@@ -128,3 +128,6 @@ scout.TreeNode.prototype._onLoadChildrenDone = function() {
   this._loadChildrenPromise = null;
 };
 
+scout.TreeNode.prototype.setText = function(text) {
+  this.text = text;
+};

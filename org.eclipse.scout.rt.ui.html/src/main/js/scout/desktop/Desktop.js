@@ -925,3 +925,7 @@ scout.Desktop.prototype.onReconnectingFailed = function() {
   }
   this._offlineNotification.reconnectFailed();
 };
+
+scout.Desktop.prototype.dataChange = function(dataType) {
+  this.events.trigger('dataChange', dataType);
+};

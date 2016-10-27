@@ -39,6 +39,20 @@ describe('TabBox', function() {
 
   });
 
+  describe('selection', function() {
+
+    it('should select tabs by ID', function() {
+      var tabItemA = helper.createTabItem({id: 'Foo'});
+      var tabItemB = helper.createTabItem({id: 'Bar'});
+      var tabBox = helper.createTabBox([tabItemA, tabItemB]);
+      tabBox.selectTabById('Foo');
+      expect(tabBox.selectedTab).toBe(tabItemA);
+      tabBox.selectTabById('Bar');
+      expect(tabBox.selectedTab).toBe(tabItemB);
+    });
+
+  });
+
   describe('key handling', function() {
 
     it('supports left/right keys to select a tab-item', function() {
