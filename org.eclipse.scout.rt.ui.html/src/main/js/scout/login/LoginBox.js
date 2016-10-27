@@ -11,7 +11,9 @@
 scout.LoginBox = function() {
   scout.LoginBox.parent.call(this);
 
-  this.postDataType;
+  this.ajaxOptions = {
+    type: 'POST'
+  };
   this.authUrl = 'auth';
   this.onPostDoneFunc = this.redirect.bind(this);
   this.redirectUrl;
@@ -33,6 +35,7 @@ scout.inherits(scout.LoginBox, scout.Box);
 scout.LoginBox.prototype.init = function(options) {
   options = options || {};
   options.texts = new scout.TextMap($.extend(this.texts, options.texts));
+  options.ajaxOptions = $.extend(this.ajaxOptions, options.ajaxOptions);
   $.extend(this, options);
 };
 
@@ -103,14 +106,13 @@ scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
       .append($('<div>').addClass('login-button-loading'));
   }
 
-  $.ajax({
-    type: 'POST',
+  var options = $.extend({}, this.ajaxOptions, {
     url: url,
-    data: data,
-    dataType: this.postDataType
-  })
-  .done(this._onPostDone.bind(this))
-  .fail(this._onPostFail.bind(this));
+    data: data
+  });
+  $.ajax(options)
+    .done(this._onPostDone.bind(this))
+    .fail(this._onPostFail.bind(this));
 };
 
 scout.LoginBox.prototype.redirect = function(data) {
