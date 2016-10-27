@@ -32,6 +32,8 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
@@ -283,6 +285,9 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
         }
       }
 
+    }
+    catch (ThreadInterruptedException | TimedOutException e) {
+      throw e;
     }
     catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
