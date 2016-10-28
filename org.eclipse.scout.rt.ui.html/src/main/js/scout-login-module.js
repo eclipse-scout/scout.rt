@@ -23,7 +23,7 @@
   __include("scout/login/LoginBox.js");
   __include("scout/login/logout.js");
   __include("scout/login/LogoutBox.js");
-// TODO [6.1] PBZ;CGU dependencies needed by ObjectFactory, would be nice to avoid this dependency since logingbox is not a widget
+  // TODO [6.1] PBZ;CGU dependencies needed by ObjectFactory, would be nice to avoid this dependency since login box is not a widget
   __include("scout/widget/Widget.js");
   __include("scout/session/ModelAdapter.js");
 }(window.scout = window.scout || {}, jQuery)); // NOSONAR

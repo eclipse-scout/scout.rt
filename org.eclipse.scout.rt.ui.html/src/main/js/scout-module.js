@@ -441,6 +441,11 @@
   __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
   __include("scout/form/fields/wrappedform/WrappedFormFieldAdapter.js");
+  // Login, logout
+  __include("scout/login/login.js");
+  __include("scout/login/LoginBox.js");
+  __include("scout/login/logout.js");
+  __include("scout/login/LogoutBox.js");
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
