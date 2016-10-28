@@ -116,17 +116,15 @@ scout.Form.prototype._renderForm = function($parent) {
       start: function(event, ui) {
         this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
         this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
-      }.bind(this),
-
-      resize: function(event, ui) {
-        var autoSizeOld = this.htmlComp.layout.autoSize;
-        this.htmlComp.layout.autoSize = false;
-        this.htmlComp.revalidateLayout();
-        this.htmlComp.layout.autoSize = autoSizeOld;
-        // jquery ui resize event bubbles up to the window -> never propagate
-        return false;
       }.bind(this)
     });
+    this.$container.on('resize', function(e) {
+      var autoSizeOld = this.htmlComp.layout.autoSize;
+      this.htmlComp.layout.autoSize = false;
+      this.htmlComp.revalidateLayout();
+      this.htmlComp.layout.autoSize = autoSizeOld;
+      return false;
+    }.bind(this));
     this._updateTitle();
   } else {
     layout = new scout.FormLayout(this);
