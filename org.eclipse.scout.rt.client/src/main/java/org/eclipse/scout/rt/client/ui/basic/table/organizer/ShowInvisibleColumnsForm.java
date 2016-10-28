@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
@@ -72,6 +73,11 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
 
   protected int getConfiguredMainBoxGridColumnCount() {
     return 1;
+  }
+
+  @Override
+  protected IDisplayParent getConfiguredDisplayParent() {
+    return getDesktop();
   }
 
   @Order(10)
