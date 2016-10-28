@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -60,16 +61,24 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   // never null
   private volatile Pattern[] m_userIdSearchPatterns;
-  private final ICache<K, PermissionCollection> m_cache;
+  private volatile ICache<K, PermissionCollection> m_cache;
 
   public AbstractAccessControlService() {
-    m_cache = createCacheBuilder().build();
     m_userIdSearchPatterns = new Pattern[]{
         Pattern.compile(".*\\\\([^/@]+)"),
         Pattern.compile(".*\\\\([^/@]+)[/@].*"),
         Pattern.compile("([^/@]+)"),
         Pattern.compile("([^/@]+)[/@].*"),
     };
+  }
+
+  /**
+   * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly
+   * once.
+   */
+  @PostConstruct
+  protected void initCache() {
+    m_cache = createCacheBuilder().build();
   }
 
   /**

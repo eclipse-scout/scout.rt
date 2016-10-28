@@ -49,6 +49,10 @@ public class CodeService implements ICodeService {
 
   private volatile ICache<CodeTypeCacheKey, ICodeType<?, ?>> m_cache;
 
+  /**
+   * Creates and initializes a new cache. Executed in {@link PostConstruct} to ensure that the cache created exactly
+   * once.
+   */
   @PostConstruct
   protected void initCache() {
     m_cache = createCacheBuilder().build();
