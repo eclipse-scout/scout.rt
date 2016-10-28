@@ -163,6 +163,16 @@ public class JsonResponse {
     return addActionEvent(eventTarget, eventType, eventData);
   }
 
+  public boolean containsPropertyChangeEvent(String id, String propertyName) {
+    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
+      JsonEvent event = it.next();
+      if (JsonEventType.PROPERTY.getEventType().matches(event.getType()) && event.getTarget().equals(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Registers the given adapter as a holder of buffered events. Before executing {@link #toJson()} those buffers are
    * consumed automatically. (Additionally, all registered buffers can be consumed manually with

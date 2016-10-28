@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -81,7 +82,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiProposalTyped(JsonEvent event) {
-    String text = getDisplayText(event);
+    String text = getDisplayTextAndAddFilter(event);
     getModel().getUIFacade().proposalTypedFromUI(text);
   }
 
@@ -90,7 +91,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiAcceptProposal(JsonEvent event) {
-    String text = getDisplayText(event);
+    String text = getDisplayTextAndAddFilter(event);
     boolean chooser = event.getData().getBoolean("chooser");
     boolean forceClose = event.getData().getBoolean("forceClose");
     getModel().getUIFacade().acceptProposalFromUI(text, chooser, forceClose);
@@ -107,14 +108,16 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   protected void handleUiOpenProposal(JsonEvent event) {
     boolean browseAll = event.getData().optBoolean("browseAll");
-    String displayText = getDisplayText(event);
+    String displayText = getDisplayTextAndAddFilter(event);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
     LOG.debug("handle openProposal -> openProposalFromUI. displayText={} browseAll={} selectCurrentValue={}", displayText, browseAll, selectCurrentValue);
     getModel().getUIFacade().openProposalChooserFromUI(displayText, browseAll, selectCurrentValue);
   }
 
-  protected String getDisplayText(JsonEvent event) {
-    return event.getData().optString("displayText", null);
+  protected String getDisplayTextAndAddFilter(JsonEvent event) {
+    String displayText = event.getData().optString("displayText", null);
+    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+    return displayText;
   }
 
   @Override
