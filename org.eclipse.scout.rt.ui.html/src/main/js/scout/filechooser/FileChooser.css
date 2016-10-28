@@ -99,12 +99,12 @@
     left: 0;
   }
 
-  &.shown {
+  &.animate-open {
     #scout.animation-name(fade-short-drop);
     #scout.animation-duration(0.5s);
   }
 
-  &.modality-highlight {
+  &.animate-modality-highlight {
     #scout.animation-shake();
   }
 }

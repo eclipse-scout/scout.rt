@@ -121,7 +121,7 @@ scout.Form.prototype._renderForm = function($parent) {
   }
 
   if (this.isDialog()) {
-    this.$container.addClassForAnimation('shown');
+    this.$container.addClassForAnimation('animate-open');
   }
 };
 
