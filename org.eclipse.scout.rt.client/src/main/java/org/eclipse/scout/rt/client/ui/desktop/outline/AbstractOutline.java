@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineInitDefaultDetailFormChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -273,8 +274,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * @see #ensureDefaultDetailFormCreated()
    * @see #ensureDefaultDetailFormStarted()
    */
-  @ConfigOperation
   @Order(120)
+  @ConfigOperation
   protected void execInitDefaultDetailForm() {
   }
 
@@ -744,7 +745,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     IForm form = createDefaultDetailForm();
     if (form != null) {
       setDefaultDetailForm(form);
-      execInitDefaultDetailForm();
+      interceptInitDefaultDetailForm();
     }
   }
 
@@ -905,6 +906,12 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     chain.execCreateChildPages(pageList);
   }
 
+  protected final void interceptInitDefaultDetailForm() {
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
+    OutlineInitDefaultDetailFormChain chain = new OutlineInitDefaultDetailFormChain(extensions);
+    chain.execInitDefaultDetailForm();
+  }
+
   protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER> implements IOutlineExtension<OWNER> {
 
     public LocalOutlineExtension(OWNER owner) {
@@ -919,6 +926,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     @Override
     public IPage<?> execCreateRootPage(OutlineCreateRootPageChain chain) {
       return getOwner().execCreateRootPage();
+    }
+
+    @Override
+    public void execInitDefaultDetailForm(OutlineInitDefaultDetailFormChain chain) {
+      getOwner().execInitDefaultDetailForm();
     }
   }
 

@@ -177,6 +177,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     return getTransactionMap(false).entrySet();
   }
 
+  @SuppressWarnings("squid:S2160")
   public abstract static class AbstractMapTransactionMember<K, V> extends AbstractMap<K, V> implements ITransactionMember {
     private final String m_memberId;
 

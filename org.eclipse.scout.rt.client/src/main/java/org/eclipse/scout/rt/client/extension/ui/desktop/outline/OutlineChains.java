@@ -64,4 +64,21 @@ public final class OutlineChains {
       return methodInvocation.getReturnValue();
     }
   }
+
+  public static class OutlineInitDefaultDetailFormChain extends AbstractOutlineChain {
+
+    public OutlineInitDefaultDetailFormChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
+      super(extensions);
+    }
+
+    public void execInitDefaultDetailForm() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) {
+          next.execInitDefaultDetailForm(OutlineInitDefaultDetailFormChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeExtension
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineInitDefaultDetailFormChain;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -41,4 +42,8 @@ public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> ex
     chain.execNodesChecked(nodes);
   }
 
+  @Override
+  public void execInitDefaultDetailForm(OutlineInitDefaultDetailFormChain chain) {
+    chain.execInitDefaultDetailForm();
+  }
 }
