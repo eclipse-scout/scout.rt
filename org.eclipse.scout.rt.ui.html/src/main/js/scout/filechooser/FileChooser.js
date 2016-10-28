@@ -140,7 +140,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.FormLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 
-  this.$container.addClassForAnimation('shown');
+  this.$container.addClassForAnimation('animate-open');
   // Prevent resizing when file chooser is dragged off the viewport
   this.$container.addClass('calc-helper');
   this.$container.css('min-width', this.$container.width());

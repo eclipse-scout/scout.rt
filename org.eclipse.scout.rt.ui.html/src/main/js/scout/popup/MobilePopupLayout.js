@@ -36,7 +36,7 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
 
   // The first time it gets layouted, add shown class to be able to animate
   if (!htmlPopup.layouted) {
-    htmlPopup.$comp.addClassForAnimation('shown');
+    htmlPopup.$comp.addClassForAnimation('animate-open');
   }
 };
 

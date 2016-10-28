@@ -35,12 +35,12 @@
   margin-bottom: 15px;
   top: 0px; /* must be specified otherwise dialogs will be positioned at end of document and increase document size */
 
-  &.shown {
+  &.animate-open {
     #scout.animation(fadeIn ease-in 1);
     #scout.animation-duration(0.15s);
   }
 
-  &.modality-highlight {
+  &.animate-modality-highlight {
     #scout.animation-shake();
   }
 

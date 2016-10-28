@@ -116,7 +116,7 @@ scout.MessageBox.prototype._render = function($parent) {
   boxButtons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
-  this.$container.addClassForAnimation('shown');
+  this.$container.addClassForAnimation('animate-open');
 };
 
 scout.MessageBox.prototype._postRender = function() {

@@ -34,7 +34,7 @@
       margin-top: -4px;
     }
 
-    &.modality-highlight {
+    &.animate-modality-highlight {
       #scout.animation-flash-gray();
     }
   }

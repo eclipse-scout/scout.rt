@@ -19,7 +19,7 @@
   margin-top: 30px;
   #scout.drop-shadow(@x: 0px, @y: 0px, @blur: 30px, @spread: 5px, @alpha: 0.5);
 
-  &.shown {
+  &.animate-open {
     #scout.animation-name(slidein-bottom);
     #scout.animation-duration(0.5s);
   }
