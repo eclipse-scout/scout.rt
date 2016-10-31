@@ -30,14 +30,15 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addContainer($parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addField($parent.makeDiv());
-
-  this.$checkBox = this.$field
+  this.addFieldContainer($parent.makeDiv());
+  
+  this.$checkBox = this.$fieldContainer
     .appendDiv('check-box')
     .on('mousedown', this._onMouseDown.bind(this))
     .data('valuefield', this);
-
-  this.$checkBoxLabel = this.$field
+  this.addField(this.$checkBox);
+  
+  this.$checkBoxLabel = this.$fieldContainer
     .appendDiv('label')
     .on('mousedown', this._onMouseDown.bind(this));
 
@@ -116,6 +117,27 @@ scout.CheckBoxField.prototype._renderLabel = function() {
   this.$checkBoxLabel.textOrNbsp(this.label, 'empty');
   // Make sure the empty label is as height as the other labels, especially important for top labels
   this.$label.html('&nbsp;');
+};
+
+/**
+ * @override
+ */
+scout.CheckBoxField.prototype._renderFont = function() {
+  scout.styles.legacyStyle(this, this.$fieldContainer);
+};
+
+/**
+ * @override
+ */
+scout.CheckBoxField.prototype._renderForegroundColor = function() {
+  scout.styles.legacyStyle(this, this.$fieldContainer);
+};
+
+/**
+ * @override
+ */
+scout.CheckBoxField.prototype._renderBackgroundColor = function() {
+  scout.styles.legacyStyle(this, this.$fieldContainer);
 };
 
 scout.CheckBoxField.prototype._renderGridData = function() {
