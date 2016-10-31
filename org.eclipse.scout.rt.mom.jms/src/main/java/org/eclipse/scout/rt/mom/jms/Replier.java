@@ -23,8 +23,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -130,17 +129,19 @@ public class Replier {
    * Allows to intercept the exception if request processing failed.
    */
   protected Throwable interceptRequestReplyException(final Throwable t) {
+    Throwable interceptedThrowable = t;
+
+    // Replace platformException to ensure serialization is possible
+    if (t instanceof PlatformException) {
+      interceptedThrowable = new RuntimeException(t.getMessage());
+    }
+
     // Unset cause and stracktrace (security)
-    if (t.getCause() == t) {
-      t.initCause(null);
+    if (interceptedThrowable.getCause() == t) {
+      interceptedThrowable.initCause(null);
     }
-    t.setStackTrace(new StackTraceElement[0]);
+    interceptedThrowable.setStackTrace(new StackTraceElement[0]);
 
-    // Unset cause in status to break recursion
-    if (t instanceof ProcessingException) {
-      ((ProcessingStatus) ((ProcessingException) t).getStatus()).setException(null);
-    }
-
-    return t;
+    return interceptedThrowable;
   }
 }

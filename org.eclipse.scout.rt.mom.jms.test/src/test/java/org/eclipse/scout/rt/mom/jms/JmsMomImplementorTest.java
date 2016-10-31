@@ -1084,9 +1084,9 @@ public class JmsMomImplementorTest {
     // Initiate 'request-reply' communication
     try {
       MOM.request(JmsTestMom.class, destination, null);
-      fail("VetoException expected");
+      fail("RuntimeException expected");
     }
-    catch (VetoException e) {
+    catch (RuntimeException e) {
       assertEquals(0, e.getStackTrace().length); // security
     }
   }

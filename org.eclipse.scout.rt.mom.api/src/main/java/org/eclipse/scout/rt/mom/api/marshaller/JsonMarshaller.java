@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.mom.api.marshaller;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
@@ -9,10 +8,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 
-import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * This marshaller allows to transport an object's JSON representation as textual data across the network.
+ * This marshaller allows to transport an object's JSON representation as textual data across the network. It uses the
+ * jackson-databind library.
  * <p>
  * If using an {@link IEncrypter}, consider the usage of {@link JsonAsBytesMarshaller}, because encrypter produces
  * binary data. If still using this marshaller, data is additionally encoded into Base64 format.
@@ -25,17 +25,21 @@ public class JsonMarshaller implements IMarshaller {
 
   public static final String PROP_OBJECT_TYPE = "x-scout.mom.json.objecttype";
 
+  protected final ObjectMapper m_objectMapper;
+
+  public JsonMarshaller() {
+    m_objectMapper = createObjectMapper();
+  }
+
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {
     if (transferObject == null) {
       return null;
     }
 
-    try (StringWriter writer = new StringWriter()) {
-      JSON.std.write(transferObject, writer);
-
+    try {
       context.put(PROP_OBJECT_TYPE, transferObject.getClass().getName());
-      return writer.getBuffer().toString();
+      return m_objectMapper.writeValueAsString(transferObject);
     }
     catch (final IOException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
@@ -51,7 +55,7 @@ public class JsonMarshaller implements IMarshaller {
 
     try {
       final Class<?> objectType = Class.forName(context.get(PROP_OBJECT_TYPE));
-      return JSON.std.beanFrom(objectType, jsonText);
+      return m_objectMapper.readValue(jsonText, objectType);
     }
     catch (final IOException | ClassNotFoundException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
@@ -61,5 +65,13 @@ public class JsonMarshaller implements IMarshaller {
   @Override
   public int getMessageType() {
     return MESSAGE_TYPE_TEXT;
+  }
+
+  /**
+   * Create new {@link ObjectMapper} instance.<br/>
+   * Override or extend this method to create a custom configured {@link ObjectMapper} instance.
+   */
+  protected ObjectMapper createObjectMapper() {
+    return new ObjectMapper();
   }
 }
