@@ -15,8 +15,8 @@ scout.mimeTypes = {
 
   TEXT_PLAIN: 'text/plain',
   TEXT_HTML: 'text/html',
-  
-  IMAGE_PNG: 'image/png',  
+
+  IMAGE_PNG: 'image/png',
   IMAGE_JPG: 'image/jpg',
   IMAGE_JPEG: 'image/jpeg',
   IMAGE_GIF: 'image/gif',
