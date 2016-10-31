@@ -39,10 +39,15 @@ scout.SmartColumn.prototype._createCellModel = function(id) {
 };
 
 scout.SmartColumn.prototype.initCell = function(model, row) {
-  var cell = scout.SmartColumn.parent.prototype.initCell.call(this, model);
+  var cell = scout.SmartColumn.parent.prototype.initCell.call(this, model),
+    value = cell.value;
+
+  if (value === null || value === undefined) {
+    return cell;
+  }
 
   // FIXME CGU This needs to be done as well if cell value changes
-  this.lookupCall.textById(cell.value).done(function(text) {
+  this.lookupCall.textById(value).done(function(text) {
     cell.setText(text);
     this.table.updateRow(row);
   }.bind(this));

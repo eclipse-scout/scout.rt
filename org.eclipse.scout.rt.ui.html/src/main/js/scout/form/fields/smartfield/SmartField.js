@@ -132,6 +132,9 @@ scout.SmartField.prototype._formatValue = function(value) {
   if (!this.lookupCall) {
     return '';
   }
+  if (value === null || value === undefined) {
+    return '';
+  }
   return this.lookupCall.textById(value);
 };
 
