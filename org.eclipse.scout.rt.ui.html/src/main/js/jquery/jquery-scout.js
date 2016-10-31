@@ -255,6 +255,20 @@ $.resolvedPromise = function() {
 };
 
 /**
+ * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
+ */
+$.promiseAll = function(promises) {
+  promises = scout.arrays.ensure(promises);
+  var deferred = $.Deferred();
+  $.when.apply($, promises).done(function() {
+    deferred.resolve.apply(this, arguments);
+  }).fail(function() {
+    deferred.reject.apply(this, arguments);
+  });
+  return deferred.promise();
+};
+
+/**
  * Shorthand for an AJAX request for a JSON file with UTF8 encoding
  * and a default fail handler which simply throws an Error.
  *
