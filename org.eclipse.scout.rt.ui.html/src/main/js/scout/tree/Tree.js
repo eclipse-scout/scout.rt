@@ -364,13 +364,18 @@ scout.Tree.prototype._onDataScroll = function() {
   this.scrollToSelection = scrollToSelectionBackup;
 };
 
-scout.Table.prototype.setScrollTop = function(scrollTop) {
-  scout.scrollbars.scrollTop(this.$data, scrollTop);
+
+scout.Tree.prototype.setScrollTop = function(scrollTop) {
   this.scrollTop = scrollTop;
+  if(this.rendered){
+scout.scrollbars.scrollTop(this.$data, scrollTop);
 
   // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   this._renderViewport();
+  }
 };
+
+
 
 scout.Tree.prototype._renderViewport = function() {
   if (this.runningAnimations > 0 || this._renderViewportBlocked) {
