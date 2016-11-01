@@ -47,9 +47,14 @@ scout.SmartColumn.prototype.initCell = function(model, row) {
   }
 
   // FIXME CGU This needs to be done as well if cell value changes
+  // FIXME [awe, cgu] 6.1 - it's a bad idea to call updateRow here, because when a row and a cell is initialized and
+  // the deferred is resolved immediately the table throws an error because the row is not yet added to the table :-(
+  // check if (initialized) below
   this.lookupCall.textById(value).done(function(text) {
     cell.setText(text);
-    this.table.updateRow(row);
+    if (this.table.rows.indexOf(row) > -1) { // add function hasRow()?
+      this.table.updateRow(row);
+    }
   }.bind(this));
 
   return cell;

@@ -275,6 +275,7 @@ scout.exportAdapter = function(adapterId, sessionIndex) {
     var adapter = session.getModelAdapter(adapterId);
     var adapterData = cloneAdapterData(adapterId);
     resolveAdapterReferences(adapter, adapterData);
+    adapterData.type = 'model'; // property 'type' is required for models.js
     return adapterData;
   }
 

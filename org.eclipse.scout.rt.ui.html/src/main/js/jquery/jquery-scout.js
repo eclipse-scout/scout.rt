@@ -239,19 +239,29 @@ $.pxToNumber = function(pixel) {
 };
 
 /**
+ * Use this function as shorthand of this:
+ * <code>$.Deferred().resolve([arguments]);</code>
+ *
+ * @param all arguments of this function are passed to the resolve function of the deferred
  * @return a deferred for an already resolved jQuery.Deferred object.
  */
 $.resolvedDeferred = function() {
   var deferred = $.Deferred();
-  deferred.resolve();
+  deferred.resolve.apply(deferred, arguments);
   return deferred;
 };
 
 /**
+ * Use this function as shorthand of this:
+ * <code>$.Deferred().resolve([arguments]).promise();</code>
+ *
+ * @param all arguments of this function are passed to the resolve function of the deferred
  * @return a promise for an already resolved jQuery.Deferred object.
  */
 $.resolvedPromise = function() {
-  return $.resolvedDeferred().promise();
+  var deferred = $.Deferred();
+  deferred.resolve.apply(deferred, arguments);
+  return deferred.promise();
 };
 
 /**
