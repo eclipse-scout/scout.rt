@@ -166,11 +166,22 @@ public class JsonResponse {
   public boolean containsPropertyChangeEvent(String id, String propertyName) {
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
-      if (JsonEventType.PROPERTY.getEventType().matches(event.getType()) && event.getTarget().equals(id)) {
+      if (JsonEventType.PROPERTY.getEventType().matches(event.getType()) &&
+          event.getTarget().equals(id) &&
+          containsPropertyName(event, propertyName)) {
         return true;
       }
     }
     return false;
+  }
+
+  protected boolean containsPropertyName(JsonEvent event, String propertyName) {
+    JSONObject data = event.getData();
+    JSONObject properties = data.getJSONObject("properties");
+    if (properties == null) {
+      return false;
+    }
+    return properties.has(propertyName);
   }
 
   /**
