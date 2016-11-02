@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Code = function() {
+  this.active;
   this.id;
   this.parent;
   this.children = [];
@@ -16,6 +17,8 @@ scout.Code = function() {
 
 scout.Code.prototype.init = function(model) {
   scout.assertParameter('id', model.id);
+
+  this.active = model.active;
   this.id = model.id;
   this._text = model.text;
   this.modelClass = model.modelClass;
