@@ -146,17 +146,12 @@ scout.DesktopBench.prototype._renderOutlineContent = function() {
     // Request focus on first element in outline content
     this.session.focusManager.validateFocus();
   }
-  if (this.outlineContent instanceof scout.Table) {
-    this.outlineContent.restoreScrollPosition();
-  }
+
 };
 
 scout.DesktopBench.prototype._removeOutlineContent = function() {
   if (!this.outlineContent) {
     return;
-  }
-  if (this.outlineContent instanceof scout.Table) {
-    this.outlineContent.storeScrollPosition();
   }
   this.removeView(this.outlineContent, false);
 };

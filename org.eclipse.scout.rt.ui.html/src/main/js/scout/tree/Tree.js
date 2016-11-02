@@ -24,6 +24,8 @@ scout.Tree = function() {
   this.multiCheck = true;
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
+  this.scrollToSelection = false;
+  this.scrollTop = 0;
   this.selectedNodes = [];
   this.checkedNodes = [];
   this.groupedNodes = {};
@@ -367,12 +369,16 @@ scout.Tree.prototype._onDataScroll = function() {
   this.scrollToSelection = scrollToSelectionBackup;
 };
 
-scout.Table.prototype.setScrollTop = function(scrollTop) {
-  scout.scrollbars.scrollTop(this.$data, scrollTop);
-  this._setProperty('scrollTop', scrollTop);
+scout.Tree.prototype.setScrollTop = function(scrollTop) {
+  this.setProperty('scrollTop', scrollTop);
+//call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+  if(this.rendered){
+    this._renderViewport();
+  }
+};
 
-  // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  this._renderViewport();
+scout.Tree.prototype._renderScrollTop = function() {
+  scout.scrollbars.scrollTop(this.$data, this.scrollTop);
 };
 
 scout.Tree.prototype._renderViewport = function() {
@@ -1049,7 +1055,6 @@ scout.Tree.prototype._renderSelection = function() {
       node.$node.select(true);
     }
   }, this);
-
 
   // Update 'group' markers for all rendered nodes
   for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {

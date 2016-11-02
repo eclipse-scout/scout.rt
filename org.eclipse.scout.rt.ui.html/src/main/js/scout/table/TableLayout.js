@@ -67,6 +67,7 @@ scout.TableLayout.prototype.layout = function($container) {
   }
 
   this.table.setViewRangeSize(this.table.calculateViewRangeSize());
+  this.table._renderScrollTop();
   // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
   this.table._renderViewport();
 

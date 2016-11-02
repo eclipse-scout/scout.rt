@@ -27,6 +27,7 @@ scout.Table = function() {
   this.multilineText = false;
   this.rows = [];
   this.scrollToSelection = false;
+  this.scrollTop = 0;
   this.selectedRows = [];
   this.sortEnabled = true;
   this.tableControls = [];
@@ -280,7 +281,6 @@ scout.Table.prototype._render = function($parent) {
     test.remove();
   }
 
-  this.scrollTop = 0;
   this._calculateRowBorderWidth();
   this._updateRowWidth();
   this._updateRowHeight();
@@ -591,16 +591,6 @@ scout.Table.prototype.updateScrollbars = function() {
   scout.scrollbars.update(this.$data);
 };
 
-scout.Table.prototype.storeScrollPosition = function() {
-  this.storedScrollTop = this.scrollTop;
-};
-
-scout.Table.prototype.restoreScrollPosition = function() {
-  if (this.storedScrollTop) {
-    this.setScrollTop(this.storedScrollTop);
-    this.storedScrollTop = null;
-  }
-};
 
 scout.Table.prototype._sort = function(animateAggregateRows) {
   var sortColumns = this._sortColumns();
@@ -2230,11 +2220,15 @@ scout.Table.prototype.scrollPageDown = function() {
 };
 
 scout.Table.prototype.setScrollTop = function(scrollTop) {
-  scout.scrollbars.scrollTop(this.$data, scrollTop);
-  this._setProperty('scrollTop', scrollTop);
-
+  this.setProperty('scrollTop', scrollTop);
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  this._renderViewport();
+  if(this.rendered){
+    this._renderViewport();
+  }
+};
+
+scout.Table.prototype._renderScrollTop = function() {
+  scout.scrollbars.scrollTop(this.$data, this.scrollTop);
 };
 
 scout.Table.prototype.revealSelection = function() {
@@ -3650,7 +3644,7 @@ scout.Table.prototype._detach = function() {
   this.$container.detach();
   // Detach helper stores the current scroll pos and restores in attach.
   // To make it work scrollTop needs to be reseted here otherwise viewport won't be rendered by _onDataScroll
-  this.scrollTop = 0;
+//  this.scrollTop = 0;
   scout.Table.parent.prototype._detach.call(this);
 };
 

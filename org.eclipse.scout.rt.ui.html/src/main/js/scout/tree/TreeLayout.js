@@ -62,6 +62,8 @@ scout.TreeLayout.prototype._layout = function($container) {
   }
 
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
+
+  this.tree._renderScrollTop();
   // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
   this.tree._renderViewport();
 };
