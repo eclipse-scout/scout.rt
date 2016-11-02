@@ -1032,6 +1032,9 @@ scout.Table.prototype._removeGroupColumn = function(column) {
 scout.Table.prototype._buildRowDiv = function(row) {
   var rowWidth = this.rowWidth;
   var rowClass = 'table-row';
+  if(row.cssClass){
+    rowClass += ' '+row.cssClass;
+  }
   if (!row.enabled) {
     rowClass += ' disabled';
   }
