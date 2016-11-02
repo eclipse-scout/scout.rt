@@ -133,7 +133,7 @@ public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
 
     @Override
     public void stateChanged(final PlatformEvent event) {
-      if (State.PlatformStopping.equals(event.getState())) {
+      if (event.getState() == State.PlatformStopping) {
         BEANS.get(ClusterMom.class).destroy();
       }
     }

@@ -899,7 +899,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
     @Override
     public void stateChanged(final PlatformEvent event) {
-      if (State.PlatformStopping.equals(event.getState())) {
+      if (event.getState() == State.PlatformStopping) {
         for (final AbstractSqlService sqlService : BEANS.all(AbstractSqlService.class)) {
           sqlService.destroy();
         }

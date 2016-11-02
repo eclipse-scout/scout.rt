@@ -284,7 +284,7 @@ public class RunMonitorCancelRegistry {
 
     @Override
     public void stateChanged(final PlatformEvent event) {
-      if (State.PlatformStopping.equals(event.getState())) {
+      if (event.getState() == State.PlatformStopping) {
         BEANS.get(RunMonitorCancelRegistry.class).destroy();
       }
     }

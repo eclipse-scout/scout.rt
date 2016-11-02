@@ -282,7 +282,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
     @Override
     public void stateChanged(final PlatformEvent event) {
-      if (State.PlatformStopping.equals(event.getState())) {
+      if (event.getState() == State.PlatformStopping) {
         for (final ClusterSynchronizationService service : BEANS.all(ClusterSynchronizationService.class)) {
           service.disable();
         }
