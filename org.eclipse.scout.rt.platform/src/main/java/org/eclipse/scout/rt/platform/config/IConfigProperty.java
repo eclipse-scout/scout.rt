@@ -11,15 +11,13 @@
 package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Represents a scout application configuration property. This property may be stored in any source.
  * <p>
- * A config property has a constant value never changing during runtime.
+ * A config property has a constant value that never changing during runtime.
  */
-@Bean
 @ApplicationScoped
 public interface IConfigProperty<DATA_TYPE> {
 
@@ -47,5 +45,4 @@ public interface IConfigProperty<DATA_TYPE> {
    * @return the error that occured when creating this property value. This error is thrown in {@link #getValue()}
    */
   PlatformException getError();
-
 }
