@@ -39,6 +39,17 @@ scout.NumberColumn.prototype._initCell = function(cell) {
   }
 };
 
+/**
+ * Override this method to create a cell model object based on the given scalar value.
+ */
+scout.NumberColumn.prototype._createCellModel = function(text) {
+  var formattedNumber = this.decimalFormat.format(text);
+  return {
+    text: formattedNumber,
+    value: text
+  };
+};
+
 scout.NumberColumn.prototype.createAggrValueCell = function(value) {
   var formattedValue = this.decimalFormat.format(value);
   return this.initCell({
