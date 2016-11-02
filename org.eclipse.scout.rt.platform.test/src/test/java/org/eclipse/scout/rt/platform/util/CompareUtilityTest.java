@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +25,7 @@ import org.junit.Test;
  *
  * @since 3.8.1
  */
+@SuppressWarnings("deprecation")
 public class CompareUtilityTest {
 
   private static final String TEST_STRING = "test";
@@ -58,8 +58,8 @@ public class CompareUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with respect to
-   * {@link java.util.Date} and {@link java.sql.Timestamp}. Comparison with null.
+   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with
+   * respect to {@link java.util.Date} and {@link java.sql.Timestamp}. Comparison with null.
    */
   @Test
   public void testTimestampDateEquality_NullComparison() {
@@ -70,8 +70,8 @@ public class CompareUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with respect to
-   * {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
+   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with
+   * respect to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison between _equal_ dates of different types.
    */
   @Test
@@ -84,8 +84,8 @@ public class CompareUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with respect to
-   * {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
+   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with
+   * respect to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison between _unequal_ dates of different types
    */
   @Test
@@ -97,8 +97,8 @@ public class CompareUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with respect to
-   * {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
+   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with
+   * respect to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison of objects of non-related types
    */
   @Test
@@ -111,8 +111,8 @@ public class CompareUtilityTest {
   }
 
   /**
-   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with respect to
-   * {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
+   * Tests {@link org.eclipse.scout.rt.platform.util.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with
+   * respect to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
    * Test comparison of non-Date/Timestamp objects
    */
   @Test

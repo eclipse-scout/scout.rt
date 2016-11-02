@@ -95,7 +95,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
     if (isCreateExpiringMap()) {
       boolean touchOnGet = isTouchOnGet() || getSizeBound() != null;
       long timeToLive = NumberUtility.nvl(getTimeToLive(), -1L);
-      int targetSize = NumberUtility.nvl(getSizeBound(), -1L);
+      int targetSize = NumberUtility.nvl(getSizeBound(), -1);
       return new ConcurrentExpiringMap<>(this.<K, ExpiringElement<V>> createConcurrentMap(), timeToLive, touchOnGet, targetSize);
     }
     else if (isThreadSafe()) {

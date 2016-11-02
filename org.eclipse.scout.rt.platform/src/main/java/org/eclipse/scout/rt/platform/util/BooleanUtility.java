@@ -10,21 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-/**
- * Title: BSI Scout V3 Copyright:
- * 
- * @version 3.x
- */
-
 public final class BooleanUtility {
 
   private BooleanUtility() {
   }
 
+  /**
+   * @return {@code b} if not {@code null} otherwise {@code false}.
+   */
   public static boolean nvl(Boolean b) {
     return nvl(b, false);
   }
 
+  /**
+   * @return {@code b} if not {@code null} otherwise {@code defaultValue}.
+   */
   public static boolean nvl(Boolean b, boolean defaultValue) {
     if (b == null) {
       return defaultValue;

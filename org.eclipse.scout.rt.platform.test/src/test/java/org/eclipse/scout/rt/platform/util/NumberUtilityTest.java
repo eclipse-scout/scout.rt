@@ -176,4 +176,51 @@ public class NumberUtilityTest {
     assertEquals(Integer.MIN_VALUE, NumberUtility.longToInt(Long.MIN_VALUE));
     assertEquals(Integer.MAX_VALUE, NumberUtility.longToInt(Long.MAX_VALUE));
   }
+
+  @Test
+  public void testNvl() {
+    Number n1 = 1;
+    Integer i2 = 2;
+    Float f3 = 3.0f;
+    assertEquals(1, NumberUtility.nvl(n1, null));
+    assertEquals(Integer.valueOf(2), NumberUtility.nvl(i2, null));
+    assertEquals(Float.valueOf(3f), NumberUtility.nvl(f3, null));
+    assertEquals(1, NumberUtility.nvl((Number) null, n1));
+  }
+
+  @Test
+  public void testNvlInteger() {
+    Integer value = null;
+    assertEquals(100, NumberUtility.nvl(value, 100));
+    assertEquals(Integer.valueOf(100), NumberUtility.nvl(value, new Integer(100)));
+    value = 100;
+    assertEquals(100, NumberUtility.nvl(value, 101));
+  }
+
+  @Test
+  public void testNvlLong() {
+    Long value = null;
+    assertEquals(100l, NumberUtility.nvl(value, 100));
+    assertEquals(Long.valueOf(100l), NumberUtility.nvl(value, new Long(100)));
+    value = 100l;
+    assertEquals(100l, NumberUtility.nvl(value, 101));
+  }
+
+  @Test
+  public void testNvlFloat() {
+    Float value = null;
+    assertEquals(100.0f, NumberUtility.nvl(value, 100.0f), 0);
+    assertEquals(Float.valueOf(100.0f), NumberUtility.nvl(value, new Float(100.0)));
+    value = 100.0f;
+    assertEquals(100.0f, NumberUtility.nvl(value, 101.0f), 0);
+  }
+
+  @Test
+  public void testNvlDouble() {
+    Double value = null;
+    assertEquals(100.0, NumberUtility.nvl(value, 100.0), 0);
+    assertEquals(Double.valueOf(100.0), NumberUtility.nvl(value, new Double(100.0)));
+    value = 100.0;
+    assertEquals(100.0, NumberUtility.nvl(value, 101.0), 0);
+  }
 }

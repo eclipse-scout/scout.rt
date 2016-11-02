@@ -394,51 +394,53 @@ public final class NumberUtility {
   }
 
   /**
-   * Imitates the <code>nvl</code> function of Oracle SQL.
-   *
-   * @param value
-   * @param valueWhenNull
-   * @return value if value is not <code>null</code>, otherwise valueWhenNull.
+   * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
+   * @deprecated Use {@link ObjectUtility#nvl(Object, Object)} instead<br>
+   *             TODO [7.1] pbz: remove this method
    */
-  public static <T> T nvl(T value, T valueWhenNull) {
-    if (value != null) {
-      return value;
-    }
-    else {
-      return valueWhenNull;
-    }
+  @Deprecated
+  public static <T extends Number> T nvl(T value, T valueWhenNull) {
+    return ObjectUtility.nvl(value, valueWhenNull);
   }
 
   /**
-   * Imitates the <code>nvl</code> function of Oracle SQL.
-   *
-   * @param value
-   * @param valueWhenNull
-   * @return value if value is not <code>null</code>, otherwise valueWhenNull
+   * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
    */
-  public static int nvl(Integer value, Number valueWhenNull) {
+  public static int nvl(Integer value, int valueWhenNull) {
     if (value != null) {
-      return value;
+      return value.intValue();
     }
-    else {
-      return valueWhenNull.intValue();
-    }
+    return valueWhenNull;
   }
 
   /**
-   * Imitates the <code>nvl</code> function of Oracle SQL.
-   *
-   * @param value
-   * @param valueWhenNull
-   * @return value if value is not <code>null</code>, otherwise valueWhenNull
+   * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
    */
-  public static long nvl(Long value, Number valueWhenNull) {
+  public static long nvl(Long value, long valueWhenNull) {
     if (value != null) {
-      return value;
+      return value.longValue();
     }
-    else {
-      return valueWhenNull.longValue();
+    return valueWhenNull;
+  }
+
+  /**
+   * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
+   */
+  public static float nvl(Float value, float valueWhenNull) {
+    if (value != null) {
+      return value.floatValue();
     }
+    return valueWhenNull;
+  }
+
+  /**
+   * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
+   */
+  public static double nvl(Double value, double valueWhenNull) {
+    if (value != null) {
+      return value.doubleValue();
+    }
+    return valueWhenNull;
   }
 
   /**
