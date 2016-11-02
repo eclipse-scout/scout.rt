@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * @see IMom
  * @since 6.1
  */
+@CreateImmediately
 public class ClusterMom extends AbstractMomDelegate implements IMomTransport {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClusterMom.class);
