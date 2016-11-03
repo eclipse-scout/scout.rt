@@ -158,10 +158,6 @@
     content: @icon-angle-right;
     color: @border-color;
 
-    .tree-node.leaf > & {
-      content: '';
-    }
-
     .tree-node.lazy > & {
       #scout.font-text-normal();
       content: '+';

@@ -803,7 +803,7 @@ scout.Tree.prototype._$buildNode = function(node) {
   node.$node = $node;
   $node.appendSpan('text');
 
-  this._renderTreeItemControl($node);
+  this._renderTreeItemControl(node);
 
   if (this.checkable) {
     this._renderTreeItemCheckbox(node);
@@ -838,6 +838,7 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
   $node.toggleClass('group', !!this.groupedNodes[node.id]);
   $node.setEnabled(!!node.enabled);
+  $node.children('.tree-node-control').setVisible(!node.leaf);
   $node.children('.tree-node-checkbox')
     .children('.check-box')
     .toggleClass('disabled', !(this.enabled && node.enabled));
@@ -870,11 +871,13 @@ scout.Tree.prototype._decorateNode = function(node) {
   }
 };
 
-scout.Tree.prototype._renderTreeItemControl = function($node) {
+scout.Tree.prototype._renderTreeItemControl = function(node) {
+  var $node = node.$node;
   var $control = $node.prependDiv('tree-node-control');
   if (this.checkable) {
     $control.addClass('checkable');
   }
+  $control.setVisible(!node.leaf);
 };
 
 scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
