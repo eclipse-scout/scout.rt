@@ -48,7 +48,11 @@ public class DefaultAuthToken {
     return privateKey != null || publicKey != null;
   }
 
-  public static String create() {
+  /**
+   * @return a new {@link DefaultAuthToken} for the running {@link Subject}. Does return null if there is no subject or
+   *         if {@link #isEnabled()} returns false.
+   */
+  public static DefaultAuthToken create() {
     if (!DefaultAuthToken.isEnabled()) {
       return null;
     }
@@ -62,7 +66,7 @@ public class DefaultAuthToken {
     String userId = CollectionUtility.firstElement(subject.getPrincipals()).getName();
     DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
     token.init(userId);
-    return token.toString();
+    return token;
   }
 
   private String m_userId;

@@ -152,7 +152,11 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) {
-    return DefaultAuthToken.create();
+    DefaultAuthToken token = DefaultAuthToken.create();
+    if (token == null) {
+      return null;
+    }
+    return token.toString();
   }
 
   /**
