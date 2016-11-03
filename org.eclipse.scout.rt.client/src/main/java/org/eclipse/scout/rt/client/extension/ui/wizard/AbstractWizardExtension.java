@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreate
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardDecorateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardNextStepChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPostStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPreviousStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
@@ -60,6 +61,11 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   @Override
   public void execStart(WizardStartChain chain) {
     chain.execStart();
+  }
+
+  @Override
+  public void execPostStart(WizardPostStartChain chain) {
+    chain.execPostStart();
   }
 
   @Override
