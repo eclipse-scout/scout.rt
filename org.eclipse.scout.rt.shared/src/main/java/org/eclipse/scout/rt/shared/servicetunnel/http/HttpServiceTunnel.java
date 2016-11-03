@@ -15,10 +15,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessController;
 import java.util.concurrent.Callable;
-
-import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
@@ -28,7 +25,6 @@ import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
@@ -156,20 +152,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) {
-    if (!DefaultAuthToken.isEnabled()) {
-      return null;
-    }
-
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null || subject.getPrincipals().isEmpty()) {
-      // can happen e.g. when the container is shutting down
-      return null;
-    }
-
-    String userId = CollectionUtility.firstElement(subject.getPrincipals()).getName();
-    DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
-    token.init(userId);
-    return token.toString();
+    return DefaultAuthToken.create();
   }
 
   /**

@@ -13,13 +13,18 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility.HexOutputStream;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -41,6 +46,23 @@ public class DefaultAuthToken {
     byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
     byte[] publicKey = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
     return privateKey != null || publicKey != null;
+  }
+
+  public static String create() {
+    if (!DefaultAuthToken.isEnabled()) {
+      return null;
+    }
+
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null || subject.getPrincipals().isEmpty()) {
+      // can happen e.g. when the container is shutting down
+      return null;
+    }
+
+    String userId = CollectionUtility.firstElement(subject.getPrincipals()).getName();
+    DefaultAuthToken token = BEANS.get(DefaultAuthToken.class);
+    token.init(userId);
+    return token.toString();
   }
 
   private String m_userId;
