@@ -29,7 +29,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   public List<IDeviceTransformer> getTransformers() {
     if (m_transformers == null) {
       m_transformers = createTransformers();
-      LOG.info("Using following device transformers{}", m_transformers);
+      LOG.debug("Using following device transformers{}", m_transformers);
     }
     return m_transformers;
   }
