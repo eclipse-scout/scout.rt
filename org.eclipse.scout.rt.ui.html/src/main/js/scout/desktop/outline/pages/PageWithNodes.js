@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.PageWithNodes = function() {
   scout.PageWithNodes.parent.call(this);
-  this.nodeType = "nodes";
+  this.nodeType = 'nodes'; // FIXME [awe] 6.1 - discuss with C.GU - use instanceof PageWithX instead?
 };
 scout.inherits(scout.PageWithNodes, scout.Page);
 
@@ -40,36 +40,42 @@ scout.PageWithNodes.prototype._onDetailTableRowAction = function(event) {
   this.getOutline().selectNode(nodeToSelect);
 };
 
-/**
- * @override Page.js
- */
-scout.PageWithNodes.prototype._loadTableData = function() {
-  var i = 0, row, rows = [],
-    deferred = $.Deferred(); // FIXME [awe] 6.1 - use $.resolvedDeferred here (it's a sync OP)
-  this.childNodes.forEach(function(node) {
-    // we add an additional property 'node' to the table-row. This way, we
-    // don't need an additional map to link the table-row with the tree-node
-    row = {
-      id: i.toString(),
-      cells: [node.text],
-      node: node
-    };
-    rows.push(row);
-    i++;
-  });
-  deferred.resolve(rows);
-  return deferred;
+scout.PageWithNodes.prototype._rebuildDetailTable = function(childPages) {
+  var table = this.detailTable;
+  this._unlinkAllTableRows(table.rows);
+  table.deleteAllRows();
+  var tableRows = this._createTableRowsForChildPages(childPages);
+  table.insertRows(tableRows);
+};
+
+scout.PageWithNodes.prototype._unlinkAllTableRows = function(tableRows) {
+  tableRows.forEach(function(tableRow) {
+    this._unlinkTableRowWithPage(tableRow, tableRow.page);
+  }, this);
+};
+
+scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPages) {
+  return childPages.map(function(childPage) {
+    var tableRow = scout.create('TableRow', {
+      parent: this.detailTable,
+      cells: [childPage.text]}
+    );
+    this._linkTableRowWithPage(tableRow, childPage);
+    return tableRow;
+  }, this);
 };
 
 /**
  * @override TreeNode.js
  */
 scout.PageWithNodes.prototype.loadChildren = function() {
+  this.childrenLoaded = false;
   return this._createChildPages().done(function(childPages) {
+    this._rebuildDetailTable(childPages);
     if (childPages.length > 0) {
       this.getOutline().insertNodes(childPages, this);
     }
-    this.loadTableData();
+    this.childrenLoaded = true;
   }.bind(this));
 };
 

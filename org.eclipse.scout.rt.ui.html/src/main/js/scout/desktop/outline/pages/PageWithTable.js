@@ -11,16 +11,42 @@
 scout.PageWithTable = function() {
   scout.PageWithTable.parent.call(this);
 
-  this.nodeType = "table";
-  this.alwaysCreateChildPage = true; // FIXME [awe] 6.1 - change to default 'false'. Check if AutoLeafPageWithNodes work
+  this.nodeType = 'table';
+  this.alwaysCreateChildPage = false;
 };
 scout.inherits(scout.PageWithTable, scout.Page);
+
+/**
+ * @override Page.js
+ */
+scout.PageWithTable.prototype._initTable = function(table) {
+  table.on('rowsInserted', this._onTableRowsInserted.bind(this));
+  table.on('rowAction', this._onTableRowAction.bind(this));
+};
+
+scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
+  if (this.leaf) { // when page is a leaf we do nothing at all
+    return;
+  }
+
+  var tableRows = event.rows,
+    childPages = tableRows.map(function(row) {
+      return this._createChildPageInternal(row);
+    }, this);
+
+  this.getOutline().mediator.onTableRowsInserted(tableRows, childPages, this);
+};
+
+scout.PageWithTable.prototype._onTableRowAction = function(event) {
+  this.getOutline().mediator.onTableRowAction(event, this);
+};
 
 scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
   var childPage = this.createChildPage(tableRow);
   if (childPage === null && this.alwaysCreateChildPage) {
     childPage = this.createDefaultChildPage(tableRow);
   }
+  this._linkTableRowWithPage(tableRow, childPage);
   return childPage;
 };
 
@@ -33,12 +59,11 @@ scout.PageWithTable.prototype.createChildPage = function(tableRow) {
 };
 
 scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
-  return new scout.AutoLeafPageWithNodes(tableRow);
+  return scout.create('AutoLeafPageWithNodes', {
+    parent: this.getOutline(),
+    tableRow: tableRow
+  });
 };
-
-// FIXME [awe] 6.1 - check P_TableListener usage:
-// AbstractPageWithTable#P_TableListener hat einen listener auf der table, über die listener wird
-// der baum mit der tabelle synchronisiert
 
 /**
  * @override TreeNode.js
@@ -48,16 +73,72 @@ scout.PageWithTable.prototype.loadChildren = function() {
   if (!this.detailTable) {
     return $.resolvedDeferred();
   }
+  return this.loadTableData();
+};
 
-  return this.loadTableData()
-    .done(function() {
-      var childPage, childNodes = [];
-      this.detailTable.rows.forEach(function(row) {
-        childPage = this._createChildPageInternal(row);
-        if (childPage !== null) {
-          childNodes.push(childPage);
-        }
-      }, this);
-      this.getOutline().insertNodes(childNodes, this);
-    }.bind(this));
+// see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
+scout.PageWithTable.prototype.loadTableData = function() {
+  // FIXME [awe] 6.1 - check if we ever DO NOT have a detailTable (also in Page.js) I guess for the JS only case we always have a table
+  // perhaps we must do something different for the online case.
+  if (this.detailTable) {
+    this.detailTable.deleteAllRows();
+    return this._loadTableData()
+      .done(this._onLoadTableDataDone.bind(this))
+      .fail(this._onLoadTableDataFail.bind(this))
+      .always(this._onLoadTableDataAlways.bind(this));
+  } else {
+    return $.resolvedDeferred();
+  }
+};
+
+/**
+ * Override this method to load table data (rows to be added to table).
+ * This is an asynchronous operation working with a Deferred. When table data load is successful
+ * <code>_onLoadTableData(data)</code> will be called. When a failure occurs while loading table
+ * data <code>_onLoadTableFail(data)</code> will be called.
+ * <p>
+ * When you want to return static data you still need a deferred. But you can resolve it
+ * immediately. Example code:
+ * <code>
+ *   var deferred = $.Deferred();
+ *   deferred.resolve([{...},{...}]);
+ *   return deferred;
+ * </code>
+ *
+ * @return jQuery.Deferred
+ */
+scout.PageWithTable.prototype._loadTableData = function() {
+  return $.resolvedDeferred();
+};
+
+/**
+ * This method is called when table data load is successful. It should transform the table data
+ * object to table rows.
+ *
+ * @param tableData data loaded by <code>_loadTableData</code>
+ */
+scout.PageWithTable.prototype._onLoadTableDataDone = function(tableData) {
+  var rows = this._transformTableDataToTableRows(tableData);
+  if (rows && rows.length > 0) {
+    this.detailTable.insertRows(rows);
+  }
+};
+
+scout.PageWithTable.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThrown) {
+  $.log.error('Failed to load tableData. error=' + textStatus);
+};
+
+scout.PageWithTable.prototype._onLoadTableDataAlways = function() {
+  this.childrenLoaded = true;
+};
+
+/**
+ * This method converts the loaded table data, which can be any object, into table rows.
+ * You must override this method unless tableData is already an array of table rows.
+ *
+ * @param tableData
+ * @returns
+ */
+scout.PageWithTable.prototype._transformTableDataToTableRows = function(tableData) {
+  return tableData;
 };

@@ -309,6 +309,7 @@
   __include("scout/desktop/outline/DetailTableTreeFilter.js");
   __include("scout/desktop/outline/Outline.js");
   __include("scout/desktop/outline/OutlineAdapter.js");
+  __include("scout/desktop/outline/OutlineMediator.js");
   __include("scout/desktop/outline/OutlineOverview.js");
   __include("scout/desktop/outline/OutlineLayout.js");
   __include("scout/desktop/outline/OutlineViewButton.js"); // requires ViewButton.js

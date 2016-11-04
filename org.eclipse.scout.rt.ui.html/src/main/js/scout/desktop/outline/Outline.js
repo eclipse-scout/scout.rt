@@ -32,6 +32,7 @@ scout.Outline = function() {
   this._nodeIdToRowMap = {};
   this._scrolldirections = 'y';
   this.titleVisible = true;
+  this.mediator;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -40,6 +41,7 @@ scout.Outline.prototype._init = function(model) {
   this.addFilter(new scout.DetailTableTreeFilter(), true);
   scout.Outline.parent.prototype._init.call(this, model);
 
+  this.mediator = this._createMediator();
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
@@ -67,6 +69,14 @@ scout.Outline.prototype._init = function(model) {
   this._syncOutlineOverviewVisible(this.outlineOverviewVisible);
   this._syncMenus(this.menus);
   this.updateDetailContent();
+};
+
+/**
+ * This function returns the outline mediator instance. When we're in an online Scout application we must
+ * return a null instance here, because mediation is done server-side.
+ */
+scout.Outline.prototype._createMediator = function() {
+  return scout.create('OutlineMediator');
 };
 
 /**

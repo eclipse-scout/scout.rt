@@ -72,8 +72,8 @@ scout.NavigateDownButton.prototype._drill = function() {
     var rows = this.node.detailTable.selectedRows;
     if (rows.length > 0) {
       var row = rows[0];
-      if (row.node) { // FIXME [awe] 6.1 - check this, should work the same way for online/offline case
-        drillNode = row.node;
+      if (row.page) { // FIXME [awe] 6.1 - check this, should work the same way for online/offline case
+        drillNode = row.page;
       } else {
         drillNode = this.outline.nodesMap[row.nodeId];
       }
