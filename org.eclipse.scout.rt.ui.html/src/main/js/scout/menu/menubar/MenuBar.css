@@ -10,6 +10,8 @@
  ******************************************************************************/
 @menubar-height: @logical-grid-height;
 @menu-item-margin-right: 20px;
+@menu-item-margin-right-small: 6px;
+@menu-item-margin-right-between-buttons: @menu-item-margin-right-small;
 
 /* Mixins */
 
@@ -210,8 +212,12 @@
           margin-right: @menu-item-margin-right;
         }
 
+        &.left-of-button {
+          margin-right: @menu-item-margin-right-between-buttons;
+        }
+
         &.small-gap {
-          margin-right: 6px;
+          margin-right: @menu-item-margin-right-small;
         }
 
         &.small {
