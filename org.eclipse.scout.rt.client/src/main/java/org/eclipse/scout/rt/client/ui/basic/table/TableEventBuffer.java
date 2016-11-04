@@ -354,11 +354,10 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   }
 
   /**
-   * @return Returns the next event's type or <code>-1</code> if {@link ListIterator#hasNext()} returns
-   *         <code>false</code>. The iterator is moved back to its initial position (i.e.
-   *         {@link ListIterator#previous()}).
+   * @return the next event's type or <code>-1</code> if {@link ListIterator#hasNext()} returns <code>false</code>. The
+   *         iterator is moved back to its initial position (i.e. {@link ListIterator#previous()}).
    */
-  private int lookAheadEventType(ListIterator<TableEvent> it) {
+  protected int lookAheadEventType(ListIterator<TableEvent> it) {
     if (!it.hasNext()) {
       return -1;
     }
