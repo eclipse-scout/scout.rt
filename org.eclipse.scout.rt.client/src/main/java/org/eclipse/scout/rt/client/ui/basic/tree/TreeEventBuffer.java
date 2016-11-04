@@ -272,11 +272,10 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * @return Returns the next event's type or <code>-1</code> if {@link ListIterator#hasNext()} returns
-   *         <code>false</code>. The iterator is moved back to its initial position (i.e.
-   *         {@link ListIterator#previous()}).
+   * @return the next event's type or <code>-1</code> if {@link ListIterator#hasNext()} returns <code>false</code>. The
+   *         iterator is moved back to its initial position (i.e. {@link ListIterator#previous()}).
    */
-  private int lookAheadEventType(ListIterator<TreeEvent> it) {
+  protected int lookAheadEventType(ListIterator<TreeEvent> it) {
     if (!it.hasNext()) {
       return -1;
     }
@@ -288,7 +287,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     }
   }
 
-  public int identicalEventHashCode(TreeEvent event) {
+  /**
+   * Computes a hash value for identical tree events. This method must be kept in sync with
+   * {@link #isIdenticalEvent(TreeEvent, TreeEvent)}.
+   */
+  protected int identicalEventHashCode(TreeEvent event) {
     final int prime = 31;
     int result = 1;
     result = prime * result + event.getType();
