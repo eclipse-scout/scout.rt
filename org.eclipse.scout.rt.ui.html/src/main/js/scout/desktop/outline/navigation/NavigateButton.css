@@ -8,11 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.navigate-button.up {
-  color: @navigate-up-button-color;
-  border-color: @navigate-up-button-border-color;
+.navigate-button {
 
-  & > .font-icon {
+  &.up {
     color: @navigate-up-button-color;
+    border-color: @navigate-up-button-border-color;
+
+    & > .font-icon {
+      color: @navigate-up-button-color;
+    }
   }
 }

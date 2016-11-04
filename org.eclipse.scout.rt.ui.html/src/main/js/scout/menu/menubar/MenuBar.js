@@ -184,6 +184,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
       this.updateVisibility();
       this.updateDefaultMenu();
       this.updateLastItemMarker();
+      this.updateLeftOfButtonMarker();
     }
   }
 };
@@ -201,6 +202,7 @@ scout.MenuBar.prototype._updateItems = function() {
   this._renderMenuItems(this._orderedMenuItems.right, true);
   this.updateDefaultMenu();
   this.updateLastItemMarker();
+  this.updateLeftOfButtonMarker();
 
   // Make first valid MenuItem tabbable so that it can be focused. All other items
   // are not tabbable. But they can be selected with the arrow keys.
@@ -296,6 +298,31 @@ scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
   this._setProperty('defaultMenu', defaultMenu);
   if (this.defaultMenu && this.defaultMenu.rendered) {
     this.defaultMenu.$container.addClass('default-menu');
+  }
+};
+
+/**
+ * Add class 'left-of-button' to every menu item which is on the left of a button
+ */
+scout.MenuBar.prototype.updateLeftOfButtonMarker = function() {
+  this._updateLeftOfButtonMarker(this._orderedMenuItems.left);
+  this._updateLeftOfButtonMarker(this._orderedMenuItems.right);
+};
+
+scout.MenuBar.prototype._updateLeftOfButtonMarker = function(items) {
+  var item, previousItem;
+
+  items = items.filter(function(item) {
+    return item.visible && item.rendered;
+  });
+
+  for (var i = 0; i < items.length; i++) {
+    item = items[i];
+    item.$container.removeClass('left-of-button');
+    if (i > 0 && item.isButton()) {
+      previousItem = items[i - 1];
+      previousItem.$container.addClass('left-of-button');
+    }
   }
 };
 
