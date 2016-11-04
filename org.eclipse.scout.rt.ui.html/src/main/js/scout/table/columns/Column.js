@@ -21,7 +21,6 @@ scout.Column = function() {
   this.summary = false;
   this.type = 'text';
   this.width = 60;
-  this.uiSortPossible = false;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
   this.showSeparator = true; // currently a UI-only property, defaults to true
   this.filterType = 'TextColumnUserFilter';
@@ -568,14 +567,24 @@ scout.Column.prototype.createDefaultEditor = function(row) {
 };
 
 /**
- * Override this method to install a specific compare function on a column instance.
+ * Override this function to install a specific compare function on a column instance.
  * The default impl. installs a generic comparator working with less than and greater than.
  *
- * @return Whether or not it was possible to install a compare function. If not, client side sorting is disabled.
- *   Default impl. returns a
+ * @returns whether or not it was possible to install a compare function. If not, client side sorting is disabled.
  */
-scout.Column.prototype.prepareForSorting = function() {
+scout.Column.prototype.installComparator = function() {
   return this.comparator.install(this.session);
+};
+
+/**
+ * @returns whether or not this column can be used to sort on the client side. In a JS only the flag 'uiSortPossible'
+ *     is never set and defaults to true. As a side effect of this function a comparator is installed on each column.
+ *     In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the
+ *     server or can be sorted by the client.
+ */
+scout.Column.prototype.isUiSortPossible = function() {
+  var uiSortPossible = scout.nvl(this.uiSortPossible, true);
+  return uiSortPossible && this.installComparator();
 };
 
 scout.Column.prototype.compare = function(row1, row2) {

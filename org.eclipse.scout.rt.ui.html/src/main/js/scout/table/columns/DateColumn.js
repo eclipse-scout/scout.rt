@@ -12,7 +12,6 @@ scout.DateColumn = function() {
   scout.DateColumn.parent.call(this);
   this.hasDate = true;
   this.hasTime = false;
-  this.uiSortPossible = true;
   this.filterType = 'DateColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
 };

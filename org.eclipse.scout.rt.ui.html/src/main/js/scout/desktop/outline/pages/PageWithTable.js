@@ -22,16 +22,24 @@ scout.inherits(scout.PageWithTable, scout.Page);
 scout.PageWithTable.prototype._initTable = function(table) {
   table.on('rowsInserted', this._onTableRowsInserted.bind(this));
   table.on('rowAction', this._onTableRowAction.bind(this));
+  table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
 };
 
+/**
+ * We must set childNodeIndex on each created childPage because it is required to
+ * determine the order of nodes in the tree.
+ */
 scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
   if (this.leaf) { // when page is a leaf we do nothing at all
     return;
   }
 
-  var tableRows = event.rows,
+  var cni = 0, // child node index
+    tableRows = event.rows,
     childPages = tableRows.map(function(row) {
-      return this._createChildPageInternal(row);
+      var childPage = this._createChildPageInternal(row);
+      childPage.childNodeIndex = cni++;
+      return childPage;
     }, this);
 
   this.getOutline().mediator.onTableRowsInserted(tableRows, childPages, this);
@@ -39,6 +47,13 @@ scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
 
 scout.PageWithTable.prototype._onTableRowAction = function(event) {
   this.getOutline().mediator.onTableRowAction(event, this);
+};
+
+scout.PageWithTable.prototype._onTableRowOrderChanged = function(event) {
+  if (event.animating) { // do nothing while row order animation is in progress
+    return;
+  }
+  this.getOutline().mediator.onTableRowOrderChanged(event, this);
 };
 
 scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {

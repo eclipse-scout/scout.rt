@@ -597,8 +597,7 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   var sortColumns = this._sortColumns();
 
   // Initialize comparators
-  var clientSideSortingPossible = this.uiSortPossible && this._prepareColumnsForSorting(sortColumns);
-  if (!clientSideSortingPossible) {
+  if (!this._isUiSortPossible(sortColumns)) {
     return false;
   }
   this.clearAggregateRows(animateAggregateRows);
@@ -624,6 +623,17 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   return true;
 };
 
+/**
+ * In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
+ * its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
+ * 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
+ * @see RemoteApp.js
+ */
+scout.Table.prototype._isUiSortPossible = function(sortColumns) {
+  var uiSortPossible = scout.nvl(this.uiSortPossible, true);
+  return uiSortPossible && this._isColumnsUiSortPossible(sortColumns);
+};
+
 scout.Table.prototype._sortColumns = function() {
   var sortColumns = [];
   for (var c = 0; c < this.columns.length; c++) {
@@ -647,30 +657,22 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
         // columns with !sortActive are always sorted ascending (sortAscending represents last state for those, thus not considered)
         result = -result;
       }
-
       if (result !== 0) {
         return result;
       }
     }
-
     return 0;
   }
   this.rows.sort(compare.bind(this));
 };
 
-// initialize comparators
-scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
-  var i, column;
-  for (i = 0; i < sortColumns.length; i++) {
-    column = sortColumns[i];
-    if (!column.uiSortPossible) {
-      return false;
-    }
-    if (!column.prepareForSorting()) {
-      return false;
-    }
-  }
-  return true;
+/**
+ * @returns whether or not the column can be sorted (as a side effect a comparator is installed on each column)
+ */
+scout.Table.prototype._isColumnsUiSortPossible = function(sortColumns) {
+  return sortColumns.every(function(column) {
+    return column.isUiSortPossible();
+  });
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {

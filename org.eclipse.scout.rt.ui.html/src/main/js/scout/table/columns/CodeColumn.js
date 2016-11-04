@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.CodeColumn = function() { // FIXME [awe] 6.1 - discuss with C.GU - rename to SmartColumn (as in Java)?
+scout.CodeColumn = function() { // FIXME [awe] 6.1 - discuss with C.GU - keep CodeColumn or use SmartColumn with codeLookup?
   scout.CodeColumn.parent.call(this);
   this.codeType;
   this.uiSortPossible = true;

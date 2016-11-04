@@ -12,7 +12,6 @@ scout.SmartColumn = function() {
   scout.SmartColumn.parent.call(this);
   this.codeType;
   this.lookupCall;
-  this.uiSortPossible = true;
 };
 scout.inherits(scout.SmartColumn, scout.Column);
 

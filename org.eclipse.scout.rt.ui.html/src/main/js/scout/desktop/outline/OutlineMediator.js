@@ -14,8 +14,12 @@ scout.OutlineMediator = function() {
 scout.OutlineMediator.prototype.init = function(model) {
 };
 
+scout.OutlineMediator.prototype._skipEvent = function(page) {
+  return page === null || page.getOutline() === null || page.leaf;
+};
+
 scout.OutlineMediator.prototype.onTableRowsInserted = function(tableRows, childPages, pageWithTable) {
-  if (pageWithTable === null || pageWithTable.getTree() === null || pageWithTable.leaf) {
+  if (this._skipEvent(pageWithTable)) {
     return;
   }
   pageWithTable.getTree().insertNodes(childPages, pageWithTable);
@@ -36,8 +40,20 @@ scout.OutlineMediator.prototype.onTableRowAction = function(event, page) {
   outline.setNodeExpanded(childPage, true);
 };
 
-//public void mediateTableRowsUpdated(TableEvent e, IPageWithTable<?> pageWithTable) {
-//
-//public void mediateTableRowsDeleted(List<? extends IPage> childNodes, IPageWithTable pageWithTable) {
-//
+scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWithTable) {
+  if (this._skipEvent(pageWithTable)) {
+    return;
+  }
 
+  var table = event.source;
+  var childPages = pageWithTable.pagesForTableRows(table.rows);
+
+  if (childPages.length === 0 || !childPages[0]) {
+    return;
+  } // FIXME [awe] 6.1 - remove this hack, solve in pagesForTableRows (deal with case that outline has no child pages yet)
+
+  pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
+};
+
+//public void mediateTableRowsUpdated(TableEvent e, IPageWithTable<?> pageWithTable) {
+//public void mediateTableRowsDeleted(List<? extends IPage> childNodes, IPageWithTable pageWithTable) {

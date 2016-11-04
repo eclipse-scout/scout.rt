@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.NumberColumn = function() {
   scout.NumberColumn.parent.call(this);
-  this.uiSortPossible = true;
   this.filterType = 'NumberColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
 };
