@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -125,33 +126,35 @@ public class ServiceTunnelServletTest {
     });
   }
 
+  /**
+   * If a {@link IServerSession} already exists, no new session should be created.
+   */
   @Test
   public void testNoNewServerSessionOnLookup() throws ServletException {
-    final TestServerSession testSession = new TestServerSession();
-    ICacheEntry cacheMock = mock(ICacheEntry.class);
-    when(cacheMock.getValue()).thenReturn(testSession);
-    when(cacheMock.isActive()).thenReturn(true);
+    RunContexts
+        .empty()
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_requestMock)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_responseMock)
+        .run(new IRunnable() {
 
-    when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
-
-    createServletRunContext(m_requestMock, m_responseMock).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            IServerSession session1 = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("id1", ServerRunContexts.empty());
+            IServerSession session2 = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("id1", ServerRunContexts.empty());
+            assertNotNull(session1);
+            assertSame(session1, session2);
+          }
+        });
   }
 
   /**
    * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerRunContext) in 4 different threads within
    * the same HTTP session. Test ensures that the same server session is returned in all threads and that
-   *
-   * @link ServerSessionProvider#provide(ServerJobInput)} is called only once.
+   * {@link ServerSessionProvider#provide(ServerRunContext)}} is called only once.
    */
   @Test
   public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException {
-    final Map<String, ICacheEntry<?>> cache = new HashMap<>();
+    final Map<String, IServerSession> cache = new HashMap<>();
 
     final TestServerSession testServerSession = new TestServerSession();
     testServerSession.start("testSessionId");
@@ -209,27 +212,26 @@ public class ServiceTunnelServletTest {
     };
   }
 
-  private Answer<Object> putValueInCache(final Map<String, ICacheEntry<?>> cache) {
+  private Answer<Object> putValueInCache(final Map<String, IServerSession> cache) {
     return new Answer<Object>() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
         Object[] args = invocation.getArguments();
         String key = (String) args[0];
-        ICacheEntry<?> value = (ICacheEntry<?>) args[1];
+        IServerSession value = (IServerSession) args[1];
         cache.put(key, value);
         return null;
       }
     };
   }
 
-  private Answer<Object> getCachedValue(final Map<String, ICacheEntry<?>> cache) {
+  private Answer<Object> getCachedValue(final Map<String, IServerSession> cache) {
     return new Answer<Object>() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
         Object[] args = invocation.getArguments();
         String key = (String) args[0];
-        ICacheEntry<?> cacheEntry = cache.get(key);
-        return cacheEntry;
+        return cache.get(key);
       }
     };
   }
@@ -266,7 +268,7 @@ public class ServiceTunnelServletTest {
 
         @Override
         public IServerSession call() throws Exception {
-          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
+          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession("testSessionId", ServerRunContexts.empty().withClientNodeId("testNodeId"));
         }
       });
     }
