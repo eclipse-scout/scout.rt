@@ -94,6 +94,21 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     return getInnerForm() != null && getInnerForm().isSaveNeeded();
   }
 
+  @Override
+  protected void execMarkSaved() {
+    if (getInnerForm() != null) {
+      getInnerForm().markSaved();
+    }
+  }
+
+  @Override
+  protected boolean execIsEmpty() {
+    if (getInnerForm() != null) {
+      return getInnerForm().isEmpty();
+    }
+    return super.execIsEmpty();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   protected void initConfig() {
@@ -164,6 +179,8 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
 
     propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
     calculateVisibleInternal();
+    checkSaveNeeded();
+    checkEmpty();
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
       if (m_manageInnerFormLifeCycle && m_innerForm.isFormStartable()) { // TODO [5.2] dwi: Remove 'started check' once assertion is in place
@@ -288,6 +305,9 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
       }
       else if (e.getPropertyName().equals(IFormField.PROP_SAVE_NEEDED)) {
         checkSaveNeeded();
+      }
+      else if (e.getPropertyName().equals(IFormField.PROP_EMPTY)) {
+        checkEmpty();
       }
     }
   }// end private class
