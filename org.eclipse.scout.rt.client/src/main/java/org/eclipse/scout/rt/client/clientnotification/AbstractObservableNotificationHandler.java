@@ -173,11 +173,14 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     if (currentSession instanceof IClientSession) {
       IClientSession[] sessions = {(IClientSession) currentSession};
       for (IClientSession session : sessions) {
-        synchronized (m_listeners) {
-          EventListenerList listeners = m_listeners.get(session);
-          scheduleHandlingNotifications(notification, listeners, session);
-        }
+        scheduleHandlingNotifications(notification, getListenerList(session), session);
       }
+    }
+  }
+
+  private EventListenerList getListenerList(IClientSession session) {
+    synchronized (m_listeners) {
+      return m_listeners.get(session);
     }
   }
 
