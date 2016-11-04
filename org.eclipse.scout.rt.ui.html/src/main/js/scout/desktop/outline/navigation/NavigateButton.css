@@ -18,4 +18,10 @@
       color: @navigate-up-button-color;
     }
   }
+
+  .menubar > .menubox > &.menu-item.down.menu-button:not(.last) {
+    /* Right and left margin of the navigate buttons should be equal.
+    Setting this margin-right is especially necessary if on the right side of these buttons is another button. */
+    margin-right: @bench-padding-x;
+  }
 }
