@@ -5,6 +5,12 @@ scout.FormLifecycle = function() {
   this.handlers = {
     'save': this._defaultSave.bind(this)
   };
+
+  // FIXME CGU awe: why not always add lifecycle? remove case may remove it or empty method
+  // FIXME CGU awe: on ui we should use destroy, not dispose. Event name should not contain 'form'.
+  // FIXME CGU awe: Form lifecycle methods should be available on form delegating to lifecycle
+  // FIXME CGU awe: do we need the 'do' prefix?
+  // FIXME CGU awe: form.close() currently only works for remote case, delegate to lifecycle in js case
 };
 
 // Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI

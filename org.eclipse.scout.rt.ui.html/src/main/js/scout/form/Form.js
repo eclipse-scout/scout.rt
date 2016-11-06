@@ -24,6 +24,7 @@ scout.Form = function() {
   this.fileChoosers = [];
   this.closable = true;
   this.cacheBounds = false;
+  this.resizable = true;
   this.rootGroupBox;
   this._locked;
   this.formController;
@@ -70,7 +71,7 @@ scout.Form.prototype._init = function(model) {
 scout.Form.prototype._syncRootGroupBox = function(rootGroupBox) {
   this._setProperty('rootGroupBox', rootGroupBox);
   if (this.rootGroupBox &&
-     (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
+    (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
     this.rootGroupBox.menuBar.bottom();
   }
 };
@@ -111,20 +112,22 @@ scout.Form.prototype._renderForm = function($parent) {
         .appendDiv('closer')
         .on('click', this.close.bind(this));
     }
-    var $myWindow = this.$container.window();
-    this.$container.resizable({
-      start: function(event, ui) {
-        this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
-        this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
-      }.bind(this)
-    });
-    this.$container.on('resize', function(e) {
-      var autoSizeOld = this.htmlComp.layout.autoSize;
-      this.htmlComp.layout.autoSize = false;
-      this.htmlComp.revalidateLayout();
-      this.htmlComp.layout.autoSize = autoSizeOld;
-      return false;
-    }.bind(this));
+    if (this.resizable) {
+      var $myWindow = this.$container.window();
+      this.$container.resizable({
+        start: function(event, ui) {
+          this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
+          this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
+        }.bind(this)
+      });
+      this.$container.on('resize', function(e) {
+        var autoSizeOld = this.htmlComp.layout.autoSize;
+        this.htmlComp.layout.autoSize = false;
+        this.htmlComp.revalidateLayout();
+        this.htmlComp.layout.autoSize = autoSizeOld;
+        return false;
+      }.bind(this));
+    }
     this._updateTitle();
   } else {
     layout = new scout.FormLayout(this);
