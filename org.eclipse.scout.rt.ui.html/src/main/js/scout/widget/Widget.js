@@ -36,6 +36,7 @@ scout.Widget = function() {
   this.enabled = true;
   this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
   this.visible = true;
+  this.loading = false;
 
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
@@ -51,6 +52,7 @@ scout.Widget = function() {
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
   this.events = this._createEventSupport();
+  this.loadingSupport = this._createLoadingSupport();
   this.keyStrokeContext = this._createKeyStrokeContext();
 };
 
@@ -106,8 +108,7 @@ scout.Widget.prototype._init = function(model) {
  * Default implementation simply returns undefined. A Subclass
  * may override this method to load or extend a JSON model with scout.models.getModel or scout.models.extend.
  */
-scout.Widget.prototype._jsonModel = function() {
-};
+scout.Widget.prototype._jsonModel = function() {};
 
 /**
  * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
@@ -244,6 +245,7 @@ scout.Widget.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderVisible();
   this._renderCssClass();
+  this._renderLoading();
 };
 
 /**
@@ -516,14 +518,21 @@ scout.Widget.prototype.setCssClass = function(cssClass) {
 };
 
 /**
- * Adds default loading support to the widget. The default loading support hides
- * the whole field $container when the field is in loading state. Override this
- * method if you want to hide something else for a special field.
+ * Creates nothing by default. If a widget needs loading support, override this method and return a loading support.
  */
-scout.Widget.prototype.addLoadingSupport = function() {
-  this.loadingSupport = new scout.LoadingSupport({
-    widget: this
-  });
+scout.Widget.prototype._createLoadingSupport = function() {
+  return null;
+};
+
+scout.Widget.prototype.setLoading = function(loading) {
+  this.setProperty('loading', loading);
+};
+
+scout.Widget.prototype._renderLoading = function() {
+  if (!this.loadingSupport) {
+    return;
+  }
+  this.loadingSupport.renderLoading();
 };
 
 //--- Layouting / HtmlComponent methods ---

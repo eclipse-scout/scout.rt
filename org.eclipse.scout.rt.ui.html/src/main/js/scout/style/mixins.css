@@ -431,8 +431,7 @@
     }
   }
 
-  .loading-indicator() {
-    @loading-animation-size: 30px;
+  .loading-indicator(@loading-animation-size: 30px) {
     display: inline-block;
     position: absolute;
     top: 50%;

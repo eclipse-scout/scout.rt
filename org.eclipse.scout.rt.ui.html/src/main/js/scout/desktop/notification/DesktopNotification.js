@@ -5,7 +5,6 @@ scout.DesktopNotification = function() {
   this.duration;
   this._removeTimeout;
   this._removing = false;
-  this.loading = false;
 };
 scout.inherits(scout.DesktopNotification, scout.Widget);
 
@@ -39,7 +38,6 @@ scout.DesktopNotification.prototype._renderProperties = function() {
   scout.DesktopNotification.parent.prototype._renderProperties.call(this);
   this._renderStatus();
   this._renderClosable();
-  this._renderLoading();
 };
 
 scout.DesktopNotification.prototype.setStatus = function(status) {
@@ -67,10 +65,9 @@ scout.DesktopNotification.prototype._renderMessage = function() {
   this.$messageText.html(message);
 };
 
-scout.DesktopNotification.prototype.setLoading = function(loading) {
-  this.setProperty('loading', loading);
-};
-
+/**
+ * @override
+ */
 scout.DesktopNotification.prototype._renderLoading = function() {
   this.$container.toggleClass('loading', this.loading);
   this.$loader.setVisible(this.loading);

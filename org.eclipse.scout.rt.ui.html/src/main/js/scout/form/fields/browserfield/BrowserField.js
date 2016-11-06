@@ -15,9 +15,6 @@ scout.BrowserField = function() {
   this._popupWindow;
   this._externalWindowTextField;
   this._externalWindowButton;
-  this.loadingSupport = new scout.LoadingSupport({
-    widget: this
-  });
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 

@@ -42,9 +42,6 @@ scout.Table = function() {
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
-  this.loadingSupport = new scout.LoadingSupport({
-    widget: this
-  });
   this.header;
   this.footer;
   this._filterMap = {};
@@ -149,6 +146,15 @@ scout.Table.prototype._initColumns = function() {
 
   // Sync head and tail sort columns
   this._syncHeadAndTailSortColumns();
+};
+
+/**
+ * @override
+ */
+scout.Table.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this
+  });
 };
 
 /**
@@ -296,7 +302,6 @@ scout.Table.prototype._renderProperties = function() {
   this._renderFooterVisible();
   this._renderDropType();
   this._renderCheckableStyle();
-  this._renderLoading();
 };
 
 scout.Table.prototype._remove = function() {
@@ -464,10 +469,6 @@ scout.Table.prototype._onDataScroll = function() {
 
 scout.Table.prototype._renderTableStatus = function() {
   this.trigger('statusChanged');
-};
-
-scout.Table.prototype._renderLoading = function() {
-  this.loadingSupport.renderLoading();
 };
 
 scout.Table.prototype.setContextColumn = function(contextColumn) {

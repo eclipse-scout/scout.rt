@@ -313,6 +313,12 @@ button {
       #scout.sub-menu-icon();
     }
   }
+
+  &.loading {
+    & > .loading-indicator {
+      #scout.loading-indicator(20px);
+    }
+  }
 }
 
 textarea {

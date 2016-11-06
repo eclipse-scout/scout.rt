@@ -13,6 +13,7 @@ scout.Button = function() {
   this._addAdapterProperties(['menus']);
 
   this.systemType = scout.Button.SystemType.NONE;
+  this.defaultButton = true;
   this.processButton = true;
   this.selected = false;
   this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
@@ -88,6 +89,18 @@ scout.Button.prototype._initDefaultKeyStrokes = function() {
 };
 
 /**
+ * @override
+ */
+scout.Button.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this,
+    $container: function() {
+      return this.$field;
+    }.bind(this)
+  });
+};
+
+/**
  * The button form-field has no label and no status. Additionally it also has no container.
  * Container and field are the same thing.
  */
@@ -135,6 +148,16 @@ scout.Button.prototype._remove = function() {
   scout.Button.parent.prototype._remove.call(this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
   this.$submenuIcon = null;
+};
+
+/**
+ * @override
+ */
+scout.Button.prototype._renderProperties = function() {
+  scout.Button.parent.prototype._renderProperties.call(this);
+  this._renderIconId();
+  this._renderSelected();
+  this._renderDefaultButton();
 };
 
 scout.Button.prototype._renderForegroundColor = function() {
@@ -185,25 +208,17 @@ scout.Button.prototype._openPopup = function() {
   popup.open();
   return popup;
 };
+
 scout.Button.prototype._doActionTogglesSubMenu = function() {
   return false;
 };
 
-scout.Button.prototype.setSelected = function(selected) {
-  this.setProperty('selected', selected);
+scout.Button.prototype.setDefaultButton = function(defaultButton) {
+  this.setProperty('defaultButton', defaultButton);
 };
 
-scout.Button.prototype.setIconId = function(iconId) {
-  this.setProperty('iconId', iconId);
-};
-
-/**
- * @override
- */
-scout.Button.prototype._renderProperties = function() {
-  scout.Button.parent.prototype._renderProperties.call(this);
-  this._renderIconId();
-  this._renderSelected();
+scout.Button.prototype._renderDefaultButton = function() {
+  this.$field.toggleClass('default', this.defaultButton);
 };
 
 /**
@@ -215,6 +230,10 @@ scout.Button.prototype._renderEnabled = function() {
     this.$link.setEnabled(this.enabledComputed);
     this.$field.setTabbable(this.enabledComputed && !scout.device.supportsTouch());
   }
+};
+
+scout.Button.prototype.setSelected = function(selected) {
+  this.setProperty('selected', selected);
 };
 
 scout.Button.prototype._renderSelected = function() {
@@ -235,6 +254,10 @@ scout.Button.prototype._renderLabel = function() {
   }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
+};
+
+scout.Button.prototype.setIconId = function(iconId) {
+  this.setProperty('iconId', iconId);
 };
 
 /**

@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
-
 /**
  * @param options The following properties are supported:
  *  [options] mandatory
@@ -29,6 +28,10 @@ scout.LoadingSupport = function(options) {
   this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
 
   this._loadingIndicatorTimeoutId;
+};
+
+scout.LoadingSupport.prototype.setLoadingIndicatorDelay = function(loadingIndicatorDelay) {
+  this.loadingIndicatorDelay = loadingIndicatorDelay;
 };
 
 scout.LoadingSupport.prototype.renderLoading = function() {

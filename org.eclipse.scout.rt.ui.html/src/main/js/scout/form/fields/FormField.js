@@ -18,7 +18,6 @@ scout.FormField = function() {
   this.labelVisible = true;
   this.labelPosition = scout.FormField.LABEL_POSITION_DEFAULT;
   this.labelWidthInPixel = 0;
-  this.loading = false;
   this.mandatory = false;
   this.statusVisible = true;
   this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT;
@@ -52,10 +51,6 @@ scout.FormField = function() {
   this._addCloneProperties(['displayText']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
-  // Object to handle the 'loading' property (different for tile fields)
-  this.loadingSupport = new scout.LoadingSupport({
-    widget: this
-  });
   this.touched = false;
   this.empty = true;
   this.preventInitialFocus = false;
@@ -97,6 +92,15 @@ scout.FormField.MODE_CELLEDITOR = 'celleditor';
  */
 scout.FormField.prototype._createKeyStrokeContext = function() {
   return new scout.KeyStrokeContext();
+};
+
+/**
+ * @override
+ */
+scout.FormField.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this
+  });
 };
 
 scout.FormField.prototype._init = function(model) {
@@ -144,7 +148,6 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabelForegroundColor();
   this._renderLabelBackgroundColor();
   this._renderGridData();
-  this._renderLoading();
   this._renderPreventInitialFocus();
 };
 
@@ -360,10 +363,6 @@ scout.FormField.prototype._renderMenus = function() {
 
 scout.FormField.prototype._renderMenusVisible = function() {
   this._updateMenus();
-};
-
-scout.FormField.prototype._renderLoading = function() {
-  this.loadingSupport.renderLoading();
 };
 
 scout.FormField.prototype._renderPreventInitialFocus = function() {
