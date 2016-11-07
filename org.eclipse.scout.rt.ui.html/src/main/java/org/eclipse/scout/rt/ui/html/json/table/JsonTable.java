@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
@@ -859,7 +860,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       }
     }
     JSONObject jsonRow = new JSONObject();
-    putProperty(jsonRow, "id", getOrCreatedRowId(row));
+    putProperty(jsonRow, "id", getOrCreateRowId(row));
     putProperty(jsonRow, "cells", jsonCells);
     putProperty(jsonRow, "checked", row.isChecked());
     putProperty(jsonRow, "enabled", row.isEnabled());
@@ -907,7 +908,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return getModel().getColumnSet().getVisibleColumns();
   }
 
-  protected String getOrCreatedRowId(ITableRow row) {
+  protected String getOrCreateRowId(ITableRow row) {
     if (row == null) {
       return null;
     }
@@ -940,7 +941,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * Ignore deleted or filtered rows, because for the UI, they don't exist
    */
   protected boolean isRowAccepted(ITableRow row) {
-    if (row.isStatusDeleted()) {
+    if (row.getTable() == null || row.isStatusDeleted()) {
       return false;
     }
     if (!row.isFilterAccepted()) {
@@ -1391,9 +1392,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelRequestFocusInCell(TableEvent event) {
+    final ITableRow row = CollectionUtility.firstElement(event.getRows());
+    if (row == null || !isRowAccepted(row)) {
+      return;
+    }
+
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_ROW_ID, getOrCreatedRowId(event.getRows().iterator().next()));
-    putProperty(jsonEvent, PROP_COLUMN_ID, getColumnId(event.getColumns().iterator().next()));
+    putProperty(jsonEvent, PROP_ROW_ID, getOrCreateRowId(row));
+    putProperty(jsonEvent, PROP_COLUMN_ID, getColumnId(CollectionUtility.firstElement(event.getColumns())));
     addActionEvent(EVENT_REQUEST_FOCUS_IN_CELL, jsonEvent).protect();
   }
 
