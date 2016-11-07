@@ -45,6 +45,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   public AbstractStringField(boolean callInitializer) {
     super(callInitializer);
+    m_enabledProcessing = true;
   }
 
   @Override
