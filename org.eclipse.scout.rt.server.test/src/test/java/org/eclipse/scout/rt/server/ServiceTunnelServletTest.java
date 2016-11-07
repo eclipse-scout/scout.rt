@@ -127,17 +127,13 @@ public class ServiceTunnelServletTest {
   @Test
   public void testNoNewServerSessionOnLookup() throws ServletException {
     final TestServerSession testSession = new TestServerSession();
-    ICacheEntry cacheMock = mock(ICacheEntry.class);
-    when(cacheMock.getValue()).thenReturn(testSession);
-    when(cacheMock.isActive()).thenReturn(true);
-
-    when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
+    when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(testSession);
 
     ServletRunContexts.copyCurrent().withServletRequest(m_requestMock).withServletResponse(m_responseMock).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
+        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("id", ServerRunContexts.empty()));
       }
     });
   }
@@ -150,7 +146,7 @@ public class ServiceTunnelServletTest {
    */
   @Test
   public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException {
-    final Map<String, ICacheEntry<?>> cache = new HashMap<>();
+    final Map<String, IServerSession> cache = new HashMap<>();
 
     final TestServerSession testServerSession = new TestServerSession();
     testServerSession.start("testSessionId");
@@ -208,27 +204,26 @@ public class ServiceTunnelServletTest {
     };
   }
 
-  private Answer<Object> putValueInCache(final Map<String, ICacheEntry<?>> cache) {
+  private Answer<Object> putValueInCache(final Map<String, IServerSession> cache) {
     return new Answer<Object>() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
         Object[] args = invocation.getArguments();
         String key = (String) args[0];
-        ICacheEntry<?> value = (ICacheEntry<?>) args[1];
+        IServerSession value = (IServerSession) args[1];
         cache.put(key, value);
         return null;
       }
     };
   }
 
-  private Answer<Object> getCachedValue(final Map<String, ICacheEntry<?>> cache) {
+  private Answer<Object> getCachedValue(final Map<String, IServerSession> cache) {
     return new Answer<Object>() {
       @Override
       public Object answer(InvocationOnMock invocation) throws Throwable {
         Object[] args = invocation.getArguments();
         String key = (String) args[0];
-        ICacheEntry<?> cacheEntry = cache.get(key);
-        return cacheEntry;
+        return cache.get(key);
       }
     };
   }
@@ -265,7 +260,7 @@ public class ServiceTunnelServletTest {
 
         @Override
         public IServerSession call() throws Exception {
-          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
+          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession("testSessionId", ServerRunContexts.empty().withClientNodeId("testNodeId"));
         }
       });
     }

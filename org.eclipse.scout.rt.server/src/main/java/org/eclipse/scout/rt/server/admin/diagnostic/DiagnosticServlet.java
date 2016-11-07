@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
@@ -52,7 +53,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
       public void run() throws Exception {
         ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
         serverRunContext.withUserAgent(UserAgents.createDefault());
-        serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext.copy()));
+        serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext.copy()));
 
         invokeDiagnosticService(serverRunContext);
       }

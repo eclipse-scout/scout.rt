@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.io.Serializable;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
@@ -22,13 +21,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
@@ -45,11 +43,13 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistrationHandle;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
+import org.eclipse.scout.rt.server.session.IServerSessionLifecycleHandler;
+import org.eclipse.scout.rt.server.session.ServerSessionCache;
+import org.eclipse.scout.rt.server.session.ServerSessionLifecycleHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,8 +93,7 @@ public class ServiceTunnelServlet extends HttpServlet {
       public void run() throws Exception {
         ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
         serverRunContext.withUserAgent(UserAgents.createDefault());
-        serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext));
-
+        serverRunContext.withSession(lookupServerSessionOnHttpSession(Sessions.randomSessionId(), serverRunContext));
         invokeAdminService(serverRunContext);
       }
     }, ServletExceptionTranslator.class);
@@ -250,66 +249,17 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   // === SESSION LOOKUP ===
 
-  @Internal
   protected IServerSession lookupServerSessionOnHttpSession(final String sessionId, final ServerRunContext serverRunContext) throws ServletException {
-    final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+    //create, only, if no serverSession available for sessionId
+    Assertions.assertNotNull(sessionId, "sessionId must not be null");
+    Assertions.assertNotNull(serverRunContext, "serverRunContext must not be null");
+    final HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    final String clientNodeId = serverRunContext.getClientNodeId();
 
-    //external request: apply locking, this is the session initialization phase
-    final IHttpSessionCacheService cacheService = BEANS.get(IHttpSessionCacheService.class);
-    IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), servletRequest, servletResponse);
-    if (serverSession == null) {
-      synchronized (servletRequest.getSession()) {
-        serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), servletRequest, servletResponse); // double checking
-        if (serverSession == null) {
-          final IServerSession newServerSession = createServerSession(sessionId, serverRunContext);
+    //create and register new session
+    IServerSessionLifecycleHandler lifecycleHandler = new ServerSessionLifecycleHandler(sessionId, clientNodeId, serverRunContext);
 
-          servletRequest.getSession(true)
-              .setAttribute("scout.httpsession.binding.listener", new ScoutSessionBindingListener(newServerSession, serverRunContext.getClientNodeId()));
-
-          cacheService.put(IServerSession.class.getName(), newServerSession, servletRequest, servletResponse);
-
-          // only register session for client notifications if client node id is available
-          if (serverRunContext.getClientNodeId() != null) {
-            BEANS.get(IClientNotificationService.class).registerSession(serverRunContext.getClientNodeId(), newServerSession.getId(), newServerSession.getUserId());
-          }
-
-          return newServerSession;
-        }
-
-      }
-    }
-    return serverSession;
-  }
-
-  private static class ScoutSessionBindingListener implements HttpSessionBindingListener, Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private final IServerSession m_session;
-    private final String m_clientNodeId;
-
-    public ScoutSessionBindingListener(IServerSession session, String clientNodeId) {
-      m_session = session;
-      m_clientNodeId = clientNodeId;
-    }
-
-    @Override
-    public void valueBound(final HttpSessionBindingEvent event) {
-      // NOOP
-    }
-
-    @Override
-    public void valueUnbound(final HttpSessionBindingEvent event) {
-      m_session.stop();
-      BEANS.get(IClientNotificationService.class).unregisterSession(m_clientNodeId, m_session.getId(), m_session.getUserId());
-    }
-  }
-
-  /**
-   * Method invoked to create a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
-   */
-  protected IServerSession createServerSession(final String sessionId, final ServerRunContext serverRunContext) {
-    return BEANS.get(ServerSessionProvider.class).provide(sessionId, serverRunContext.copy());
+    return BEANS.get(ServerSessionCache.class).getOrCreate(lifecycleHandler, req.getSession());
   }
 
   // === Helper methods ===
