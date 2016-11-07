@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.slf4j.Logger;
@@ -237,7 +237,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
       @Override
       public boolean visit(ITreeNode node) {
-        if (node.getCell().getValue() instanceof ILookupRow && CompareUtility.equals(((ILookupRow) node.getCell().getValue()).getKey(), key)) {
+        if (node.getCell().getValue() instanceof ILookupRow && ObjectUtility.equals(((ILookupRow) node.getCell().getValue()).getKey(), key)) {
           holder.setValue(node);
           return false;
         }

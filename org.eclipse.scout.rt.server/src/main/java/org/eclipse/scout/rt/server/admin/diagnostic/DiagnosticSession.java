@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.Application
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
@@ -57,7 +57,7 @@ public class DiagnosticSession {
     }
 
     String format = req.getParameter("format");
-    if (CompareUtility.equals("xml", format)) {
+    if (ObjectUtility.equals("xml", format)) {
       doXmlResponse(res);
     }
     else {
@@ -228,7 +228,7 @@ public class DiagnosticSession {
   private String getDiagnosticItemsXML(List<List<String>> result) {
     StringBuilder buf = new StringBuilder();
     for (List<String> status : result) {
-      if (!CompareUtility.equals(DiagnosticFactory.STATUS_TITLE, status.get(2))) {
+      if (ObjectUtility.notEquals(DiagnosticFactory.STATUS_TITLE, status.get(2))) {
         buf.append("<status name='" + status.get(0) + "' status='" + status.get(2) + "'>");
         buf.append(status.get(1));
         buf.append("</status>");

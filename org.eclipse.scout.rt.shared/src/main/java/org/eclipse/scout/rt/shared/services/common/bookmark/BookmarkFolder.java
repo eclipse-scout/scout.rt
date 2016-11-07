@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class BookmarkFolder implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -146,7 +146,7 @@ public class BookmarkFolder implements Serializable {
    */
   public Bookmark getBookmark(String title) {
     for (Bookmark b : getBookmarks()) {
-      if (CompareUtility.equals(b.getTitle(), title)) {
+      if (ObjectUtility.equals(b.getTitle(), title)) {
         return b;
       }
     }
@@ -158,7 +158,7 @@ public class BookmarkFolder implements Serializable {
    */
   public BookmarkFolder getFolder(String title) {
     for (BookmarkFolder f : getFolders()) {
-      if (CompareUtility.equals(f.getTitle(), title)) {
+      if (ObjectUtility.equals(f.getTitle(), title)) {
         return f;
       }
     }

@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,7 +284,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
       return false;
     }
     for (ITreeNode node : m_nodes) {
-      if (CompareUtility.equals(node, nodeToFind)) {
+      if (ObjectUtility.equals(node, nodeToFind)) {
         return true;
       }
     }

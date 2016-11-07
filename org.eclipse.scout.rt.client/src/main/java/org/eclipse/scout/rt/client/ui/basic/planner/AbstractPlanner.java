@@ -45,8 +45,8 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -864,7 +864,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setDisplayModeOption(int displayMode, DisplayModeOptions displayModeOption) {
     DisplayModeOptions previousDisplayModeOption = getDisplayModeOptions().put(displayMode, displayModeOption);
-    if (!CompareUtility.equals(displayModeOption, previousDisplayModeOption)) {
+    if (ObjectUtility.notEquals(displayModeOption, previousDisplayModeOption)) {
       propertySupport.firePropertyChange(new PropertyChangeEvent(this, PROP_DISPLAY_MODE_OPTIONS, null, getDisplayModeOptions()));
     }
   }

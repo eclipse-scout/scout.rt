@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.extension.InheritOuterExtensionScope;
 import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.slf4j.Logger;
@@ -429,7 +429,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
         Iterator<ExtensionRegistryMoveItem> iterator = moveItems.iterator();
         while (iterator.hasNext()) {
           ExtensionRegistryMoveItem moveItem = iterator.next();
-          if (CompareUtility.equals(moveItem.getNewModelOrder(), newOrder) && CompareUtility.equals(moveItem.getNewModelContainerClassIdentifier(), newContainerClassIdentifier)) {
+          if (ObjectUtility.equals(moveItem.getNewModelOrder(), newOrder) && ObjectUtility.equals(moveItem.getNewModelContainerClassIdentifier(), newContainerClassIdentifier)) {
             iterator.remove();
             changed = true;
           }

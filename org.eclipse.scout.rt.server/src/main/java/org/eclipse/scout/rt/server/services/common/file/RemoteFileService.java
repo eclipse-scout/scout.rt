@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.ServerConfigProperties.RemoteFilesRootDirProperty;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
@@ -103,7 +103,7 @@ public class RemoteFileService implements IRemoteFileService {
       if (!includeContent) {
         // no content requested
       }
-      else if (CompareUtility.equals(spec.getName(), result.getName()) && result.getLastModified() <= spec.getLastModified() && result.getPartStartPosition() == spec.getPartStartPosition()) {
+      else if (ObjectUtility.equals(spec.getName(), result.getName()) && result.getLastModified() <= spec.getLastModified() && result.getPartStartPosition() == spec.getPartStartPosition()) {
         // no content change, keep null
       }
       else {

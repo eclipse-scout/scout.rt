@@ -46,7 +46,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
@@ -228,7 +228,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
         }
         else {
           int index = Math.max(-1, Math.min(oldSelectionDirectChildIndex, getChildNodeCount() - 1));
-          if (index >= 0 && index < getChildNodeCount() && CompareUtility.equals(oldSelectedText, getChildNode(index).getCell().getText())) {
+          if (index >= 0 && index < getChildNodeCount() && ObjectUtility.equals(oldSelectedText, getChildNode(index).getCell().getText())) {
             tree.selectNode(getChildNode(index));
           }
           else if (index >= 0 && index < getChildNodeCount()) {

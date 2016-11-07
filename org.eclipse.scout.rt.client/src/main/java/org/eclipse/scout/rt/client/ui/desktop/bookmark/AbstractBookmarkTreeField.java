@@ -47,7 +47,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -767,7 +767,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           bm.setIconId(form.getBookmark().getIconId());
           bm.setOrder(form.getBookmark().getOrder());
           final BookmarkFolder newBmFolder = form.getFolder() != null ? form.getFolder() : form.getBookmarkRootFolder();
-          if (!CompareUtility.equals(oldBmFolder, newBmFolder)) {
+          if (ObjectUtility.notEquals(oldBmFolder, newBmFolder)) {
             //find new folder node
             final AtomicReference<ITreeNode> newContainerNode = new AtomicReference<ITreeNode>(getTree().getRootNode());
             tree.visitTree(new ITreeVisitor() {

@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlDirectJdbcConnectionProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverNameProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverUnloadProperty;
@@ -743,7 +744,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     String s = getSequenceNextvalStatement(sequenceName);
     Object[][] ret = createStatementProcessor(s, null, 0).processSelect(getTransaction(), getStatementCache(), null);
     if (ret.length == 1) {
-      return NumberUtility.toLong(NumberUtility.nvl((Number) ret[0][0], 0));
+      return NumberUtility.toLong(ObjectUtility.nvl((Number) ret[0][0], 0));
     }
     return 0L;
   }

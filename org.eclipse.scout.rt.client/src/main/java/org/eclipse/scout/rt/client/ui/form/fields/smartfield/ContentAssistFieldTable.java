@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -137,7 +137,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
   @Override
   public boolean select(LOOKUP_KEY key) {
     for (ITableRow row : getRows()) {
-      if (CompareUtility.equals(key, getKeyColumn().getValue(row).getKey())) {
+      if (ObjectUtility.equals(key, getKeyColumn().getValue(row).getKey())) {
         selectRow(row);
         if (isCheckable()) {
           checkRow(row, true);

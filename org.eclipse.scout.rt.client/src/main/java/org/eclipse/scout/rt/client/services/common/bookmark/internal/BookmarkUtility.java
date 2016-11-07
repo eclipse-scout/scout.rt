@@ -47,8 +47,8 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
@@ -152,7 +152,7 @@ public final class BookmarkUtility {
     if (!sortMap.isEmpty()) {
       // check ambiguity
       CompositeObject nextKey = sortMap.firstKey();
-      if (CompareUtility.equals(bestMatchingKey.getComponent(0), nextKey.getComponent(0)) && CompareUtility.equals(bestMatchingKey.getComponent(1), nextKey.getComponent(1))) {
+      if (ObjectUtility.equals(bestMatchingKey.getComponent(0), nextKey.getComponent(0)) && ObjectUtility.equals(bestMatchingKey.getComponent(1), nextKey.getComponent(1))) {
         LOG.warn("More than one pages found for page class [{}] and bookmark Identifier [{}]", className, bookmarkIdentifier);
       }
     }
@@ -660,7 +660,7 @@ public final class BookmarkUtility {
       byte[] newData = tablePageState.getTableCustomizerData();
       ITableCustomizer tc = tablePage.getTable().getTableCustomizer();
       byte[] curData = tc.getSerializedData();
-      if (!CompareUtility.equals(curData, newData)) {
+      if (ObjectUtility.notEquals(curData, newData)) {
         tc.removeAllColumns();
         tc.setSerializedData(newData);
         table.resetColumnConfiguration();
@@ -682,7 +682,7 @@ public final class BookmarkUtility {
       byte[] newData = tablePageState.getUserFilterData();
       TableUserFilterManager ufm = tablePage.getTable().getUserFilterManager();
       byte[] curData = ufm.getSerializedData();
-      if (!CompareUtility.equals(curData, newData)) {
+      if (ObjectUtility.notEquals(curData, newData)) {
         try {
           ufm.setSerializedData(newData);
         }
@@ -698,10 +698,10 @@ public final class BookmarkUtility {
         boolean doSearch = true;
         String newSearchFilterState = tablePageState.getSearchFilterState();
         String oldSearchFilterState = "" + createSearchFilterCRC(searchForm.getSearchFilter());
-        if (CompareUtility.equals(oldSearchFilterState, newSearchFilterState)) {
+        if (ObjectUtility.equals(oldSearchFilterState, newSearchFilterState)) {
           String newSearchFormState = tablePageState.getSearchFormState();
           String oldSearchFormState = searchForm.storeToXmlString();
-          if (CompareUtility.equals(oldSearchFormState, newSearchFormState)) {
+          if (ObjectUtility.equals(oldSearchFormState, newSearchFormState)) {
             doSearch = false;
           }
         }

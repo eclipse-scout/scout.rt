@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Filter which accepts all Futures that are assigned to the given {@link IExecutionSemaphore}.
@@ -30,6 +30,6 @@ public class ExecutionSemaphoreFutureFilter implements IFilter<IFuture<?>> {
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return CompareUtility.equals(m_semaphore, future.getJobInput().getExecutionSemaphore());
+    return ObjectUtility.equals(m_semaphore, future.getJobInput().getExecutionSemaphore());
   }
 }

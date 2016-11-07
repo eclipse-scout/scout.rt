@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferenc
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public final class ClientConfigProperties {
   private ClientConfigProperties() {
@@ -28,7 +28,7 @@ public final class ClientConfigProperties {
 
     @Override
     protected String parse(String value) {
-      if (CompareUtility.isOneOf(value, "small", "medium", "large")) {
+      if (ObjectUtility.isOneOf(value, "small", "medium", "large")) {
         return value;
       }
       throw new PlatformException("Invalid value for property '" + getKey() + "': '" + value + "'. Valid values are small, medium or large");

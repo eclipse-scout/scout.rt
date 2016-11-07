@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
@@ -187,9 +187,9 @@ public class CodeLookupCallTest {
   }
 
   private static boolean equals(ILookupRow<?> row1, ILookupRow<?> row2) {
-    return CompareUtility.equals(row1.getBackgroundColor(), row2.getBackgroundColor()) && CompareUtility.equals(row1.getFont(), row2.getFont()) && CompareUtility.equals(row1.getForegroundColor(), row2.getForegroundColor())
-        && CompareUtility.equals(row1.getIconId(), row2.getIconId()) && CompareUtility.equals(row1.getKey(), row2.getKey()) && CompareUtility.equals(row1.getParentKey(), row2.getParentKey())
-        && CompareUtility.equals(row1.getText(), row2.getText()) && CompareUtility.equals(row1.getTooltipText(), row2.getTooltipText());
+    return ObjectUtility.equals(row1.getBackgroundColor(), row2.getBackgroundColor()) && ObjectUtility.equals(row1.getFont(), row2.getFont()) && ObjectUtility.equals(row1.getForegroundColor(), row2.getForegroundColor())
+        && ObjectUtility.equals(row1.getIconId(), row2.getIconId()) && ObjectUtility.equals(row1.getKey(), row2.getKey()) && ObjectUtility.equals(row1.getParentKey(), row2.getParentKey())
+        && ObjectUtility.equals(row1.getText(), row2.getText()) && ObjectUtility.equals(row1.getTooltipText(), row2.getTooltipText());
   }
 
   private class P_NewCodeLookupCall extends CodeLookupCall<Integer> {

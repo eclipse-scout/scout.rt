@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -458,7 +458,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   public IRadioButton<T> getButtonFor(T value) {
     for (IRadioButton<T> b : getButtons()) {
       T radioValue = b.getRadioValue();
-      if (CompareUtility.equals(radioValue, value)) {
+      if (ObjectUtility.equals(radioValue, value)) {
         return b;
       }
     }

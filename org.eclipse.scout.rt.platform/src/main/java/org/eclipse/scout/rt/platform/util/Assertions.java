@@ -225,7 +225,7 @@ public final class Assertions {
    *           if <code>value1</code> is not equals with <code>value2</code>.
    */
   public static <T> T assertEquals(final T value1, final Object value2, final String msg, final Object... msgArgs) {
-    if (!CompareUtility.equals(value1, value2)) {
+    if (ObjectUtility.notEquals(value1, value2)) {
       fail(msg, msgArgs);
     }
     return value1;
@@ -262,7 +262,7 @@ public final class Assertions {
    *           if <code>value1</code> is equals with <code>value2</code>.
    */
   public static <T> T assertNotEquals(final T value1, final Object value2, final String msg, final Object... msgArgs) {
-    if (CompareUtility.equals(value1, value2)) {
+    if (ObjectUtility.equals(value1, value2)) {
       fail(msg, msgArgs);
     }
     return value1;

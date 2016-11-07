@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.resource.MimeType;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
@@ -66,7 +66,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     // serve only /json
     String pathInfo = req.getPathInfo();
-    if (CompareUtility.notEquals(pathInfo, "/json")) {
+    if (ObjectUtility.notEquals(pathInfo, "/json")) {
       return false;
     }
 

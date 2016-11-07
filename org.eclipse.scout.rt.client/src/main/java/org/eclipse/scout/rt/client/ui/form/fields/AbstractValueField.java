@@ -42,8 +42,8 @@ import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
@@ -287,7 +287,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   protected boolean execIsSaveNeeded() {
-    return !CompareUtility.equals(getValue(), getInitValue());
+    return ObjectUtility.notEquals(getValue(), getInitValue());
   }
 
   @Override

@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ui.UiEngineType;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -453,7 +453,7 @@ public class HttpClientInfo {
     if (m_engineType != other.m_engineType) {
       return false;
     }
-    if (!CompareUtility.equals(m_userAgent.get(), other.m_userAgent.get())) {
+    if (ObjectUtility.notEquals(m_userAgent.get(), other.m_userAgent.get())) {
       return false;
     }
     if (m_engineVersion == null) {

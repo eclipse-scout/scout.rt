@@ -17,9 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.Adler32;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -234,8 +234,8 @@ public final class BinaryResource implements Serializable {
     }
     BinaryResource other = (BinaryResource) obj;
     return this.m_lastModified == other.m_lastModified
-        && CompareUtility.equals(this.m_filename, other.m_filename)
-        && CompareUtility.equals(this.m_contentType, other.m_contentType)
+        && ObjectUtility.equals(this.m_filename, other.m_filename)
+        && ObjectUtility.equals(this.m_contentType, other.m_contentType)
         && Arrays.equals(m_content, other.m_content);
   }
 

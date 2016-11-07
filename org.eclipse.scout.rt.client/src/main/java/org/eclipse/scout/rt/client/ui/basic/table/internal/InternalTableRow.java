@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -369,7 +369,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     try {
       setRowChanging(true);
       //
-      if (CompareUtility.notEquals(getIconId(), id)) {
+      if (ObjectUtility.notEquals(getIconId(), id)) {
         super.setIconId(id);
         setRowPropertiesChanged(true);
       }
@@ -413,7 +413,7 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   @Override
   public Object validateValue(ICell cell, Object value) {
     Object oldValue = cell.getValue();
-    if (CompareUtility.equals(oldValue, value)) {
+    if (ObjectUtility.equals(oldValue, value)) {
       // no change in value
       return value;
     }

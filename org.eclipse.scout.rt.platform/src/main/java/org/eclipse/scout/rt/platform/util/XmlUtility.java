@@ -231,7 +231,7 @@ public final class XmlUtility {
         Element e = (Element) n;
         if (e.hasAttribute(requiredAttributeName)) {
           String val = e.getAttribute(requiredAttributeName);
-          if (CompareUtility.equals(requiredAttributeValue, val)) {
+          if (ObjectUtility.equals(requiredAttributeValue, val)) {
             result.add(e);
           }
         }

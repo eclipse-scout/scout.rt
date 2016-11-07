@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
 import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSnapshot;
 import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -262,7 +262,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   public boolean/* changed */ setPropertyNoFire(String name, Object newValue) {
     Object oldValue = m_props.get(name);
     m_props.put(name, newValue);
-    return !CompareUtility.equals(oldValue, newValue);
+    return ObjectUtility.notEquals(oldValue, newValue);
   }
 
   /**
@@ -274,7 +274,7 @@ public class BasicPropertySupport implements IEventListenerSource {
       oldValue = defaultOldValueWhenNull;
     }
     m_props.put(name, newValue);
-    if (CompareUtility.equals(oldValue, newValue)) {
+    if (ObjectUtility.equals(oldValue, newValue)) {
       // no change
       return false;
     }
@@ -455,7 +455,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   }
 
   public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-    if (CompareUtility.equals(oldValue, newValue)) {
+    if (ObjectUtility.equals(oldValue, newValue)) {
       return;
     }
     firePropertyChangeImpl(propertyName, oldValue, newValue);

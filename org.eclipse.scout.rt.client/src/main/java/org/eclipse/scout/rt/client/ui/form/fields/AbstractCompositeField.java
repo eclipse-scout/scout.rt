@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
@@ -258,7 +258,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       }
 
       // quick check for well known Scout classes
-      if (CompareUtility.isOneOf(c,
+      if (ObjectUtility.isOneOf(c,
           AbstractCompositeField.class,
           AbstractGroupBox.class,
           AbstractSequenceBox.class,

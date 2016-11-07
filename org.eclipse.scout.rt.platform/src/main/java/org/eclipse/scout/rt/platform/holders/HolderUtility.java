@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.holders;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
@@ -25,7 +25,7 @@ public final class HolderUtility {
   public static boolean containEqualValues(IHolder a, IHolder b) {
     Object va = a.getValue();
     Object vb = b.getValue();
-    return CompareUtility.equals(va, vb);
+    return ObjectUtility.equals(va, vb);
   }
 
   public static <T> void setAndCastValue(IHolder<T> h, Object value) {

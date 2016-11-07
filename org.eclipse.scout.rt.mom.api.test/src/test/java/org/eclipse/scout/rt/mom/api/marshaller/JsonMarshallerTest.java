@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.junit.Test;
 
 public class JsonMarshallerTest {
@@ -100,7 +100,7 @@ public class JsonMarshallerTest {
 
       TestObject o = (TestObject) obj;
 
-      return CompareUtility.equals(o.m_field1, m_field1) && CompareUtility.equals(o.m_field2, m_field2);
+      return ObjectUtility.equals(o.m_field1, m_field1) && o.m_field2 == m_field2;
     }
   }
 }

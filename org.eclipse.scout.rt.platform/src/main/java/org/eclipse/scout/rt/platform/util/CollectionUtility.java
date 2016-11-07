@@ -72,7 +72,7 @@ public final class CollectionUtility {
       Iterator<? extends T> it1 = c1.iterator();
       Iterator<? extends T> it2 = c2.iterator();
       while (it1.hasNext()) {
-        if (!CompareUtility.equals(it1.next(), it2.next())) {
+        if (ObjectUtility.notEquals(it1.next(), it2.next())) {
           return false;
         }
       }

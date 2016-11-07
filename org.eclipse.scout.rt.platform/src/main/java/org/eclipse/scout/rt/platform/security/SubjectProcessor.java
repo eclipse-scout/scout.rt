@@ -20,7 +20,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Processor to run the subsequent sequence of actions on behalf of the given {@link Subject}.
@@ -55,6 +55,6 @@ public class SubjectProcessor<RESULT> implements ICallableInterceptor<RESULT> {
 
   @Override
   public boolean isEnabled() {
-    return CompareUtility.notEquals(m_subject, Subject.getSubject(AccessController.getContext()));
+    return ObjectUtility.notEquals(m_subject, Subject.getSubject(AccessController.getContext()));
   }
 }

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
@@ -184,7 +184,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     String searchText = toSearchText(displayText);
     String lastSearchText = m_field.getProposalChooser().getSearchText();
     if (lastSearchText != null && !lastSearchText.equals(m_field.getWildcard())) {
-      acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
+      acceptByLookupRow = ObjectUtility.equals(searchText, lastSearchText);
     }
 
     boolean openProposalChooser = false;

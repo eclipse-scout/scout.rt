@@ -15,7 +15,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
 /**
@@ -39,7 +39,7 @@ public class ServerRunContextProducer extends RunContextProducer {
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
 
     // Ensure that the session belongs to the specified subject.
-    if (serverRunContext.getSession() == null || CompareUtility.notEquals(serverRunContext.getSubject(), subject)) {
+    if (serverRunContext.getSession() == null || ObjectUtility.notEquals(serverRunContext.getSubject(), subject)) {
       serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
     }
 

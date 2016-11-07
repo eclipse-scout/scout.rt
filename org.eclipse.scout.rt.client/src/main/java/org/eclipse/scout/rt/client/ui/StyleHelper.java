@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -47,7 +47,7 @@ public class StyleHelper {
   public String removeCssClass(String cssClasses, String cssClass) {
     String[] classes = StringUtility.split(cssClasses, " ");
     for (int i = 0; i < classes.length; i++) {
-      if (CompareUtility.equals(classes[i], cssClass)) {
+      if (ObjectUtility.equals(classes[i], cssClass)) {
         classes[i] = null;
       }
     }

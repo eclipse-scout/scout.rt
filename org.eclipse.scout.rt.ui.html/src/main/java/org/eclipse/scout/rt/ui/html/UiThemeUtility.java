@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiThemeProperty;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public final class UiThemeUtility {
     theme = defaultIfNull(theme);
 
     // store theme in session so we must not check 2 and 3 again for the next requests
-    if (session != null && !CompareUtility.equals(theme, themeFromSession)) {
+    if (session != null && ObjectUtility.notEquals(theme, themeFromSession)) {
       session.setAttribute(THEME_SESSION_ATTRIBUTE, theme);
     }
 

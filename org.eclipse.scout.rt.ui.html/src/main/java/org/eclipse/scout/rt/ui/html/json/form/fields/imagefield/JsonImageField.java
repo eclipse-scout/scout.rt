@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -132,7 +132,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
-    if (CompareUtility.isOneOf(propertyName, IImageField.PROP_IMAGE, IImageField.PROP_IMAGE_ID)) {
+    if (ObjectUtility.isOneOf(propertyName, IImageField.PROP_IMAGE, IImageField.PROP_IMAGE_ID)) {
       handleModelImageOrImageIdChanged();
     }
     else {

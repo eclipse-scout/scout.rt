@@ -35,8 +35,8 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
@@ -358,13 +358,13 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
       return null;
     }
     BinaryResource binaryResource = getBinaryResource();
-    if (binaryResource != null && CompareUtility.equals(binaryResource.getFilename(), filename)) {
+    if (binaryResource != null && ObjectUtility.equals(binaryResource.getFilename(), filename)) {
       return binaryResource;
     }
     Set<BinaryResource> attachments = getAttachments();
     if (attachments != null) {
       for (BinaryResource attachment : attachments) {
-        if (CompareUtility.equals(attachment.getFilename(), filename)) {
+        if (ObjectUtility.equals(attachment.getFilename(), filename)) {
           return attachment;
         }
       }

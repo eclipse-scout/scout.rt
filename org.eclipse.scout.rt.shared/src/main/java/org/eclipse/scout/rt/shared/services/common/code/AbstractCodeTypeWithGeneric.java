@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
@@ -397,7 +397,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (CompareUtility.equals(code.getId(), id)) {
+        if (ObjectUtility.equals(code.getId(), id)) {
           result.setValue(m_index);
         }
         else {

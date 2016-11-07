@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.shared.data.basic.table.SortSpec;
 import org.slf4j.Logger;
@@ -552,7 +551,7 @@ public class ColumnSet {
   public IColumn getFirstDefinedVisibileColumn() {
     int colIdx = m_columns.size();
     for (int i = 0; i < m_visibleIndexes.length; i++) {
-      if (CompareUtility.compareTo(m_visibleIndexes[i], colIdx) < 0) {
+      if (Integer.compare(m_visibleIndexes[i], colIdx) < 0) {
         colIdx = m_visibleIndexes[i];
       }
     }

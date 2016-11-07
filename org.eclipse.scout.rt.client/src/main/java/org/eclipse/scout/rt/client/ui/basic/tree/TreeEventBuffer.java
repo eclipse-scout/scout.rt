@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * A buffer for tree events ({@link TreeEvent}s) with coalesce functionality:
@@ -331,13 +331,13 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     boolean identical = event1.getType() == event2.getType()
         && event1.isConsumed() == event2.isConsumed()
         && event1.getNodeCount() == event2.getNodeCount()
-        && CompareUtility.equals(event1.getCommonParentNode(), event2.getCommonParentNode())
+        && ObjectUtility.equals(event1.getCommonParentNode(), event2.getCommonParentNode())
         && CollectionUtility.equalsCollection(event1.getNodes(), event2.getNodes(), true)
         && CollectionUtility.equalsCollection(event1.getDeselectedNodes(), event2.getDeselectedNodes(), true)
         && CollectionUtility.equalsCollection(event1.getNewSelectedNodes(), event2.getNewSelectedNodes(), true)
         && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus())
-        && CompareUtility.equals(event1.getDragObject(), event2.getDragObject())
-        && CompareUtility.equals(event1.getDropObject(), event2.getDropObject());
+        && ObjectUtility.equals(event1.getDragObject(), event2.getDragObject())
+        && ObjectUtility.equals(event1.getDropObject(), event2.getDropObject());
     return identical;
   }
 

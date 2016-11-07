@@ -18,9 +18,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
@@ -135,7 +135,7 @@ public class ScriptFileBuilder {
   }
 
   protected ScriptOutput processLibrary(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
-    if (!CompareUtility.isOneOf(script.getNodeType(), ScriptSource.NodeType.LIBRARY, ScriptSource.NodeType.LIBRARY_MINIFIED)) {
+    if (!ObjectUtility.isOneOf(script.getNodeType(), ScriptSource.NodeType.LIBRARY, ScriptSource.NodeType.LIBRARY_MINIFIED)) {
       throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + ScriptSource.NodeType.LIBRARY + " or " + ScriptSource.NodeType.LIBRARY_MINIFIED + ", but got " + script.getNodeType());
     }
     long lastModified = script.getURL().openConnection().getLastModified();

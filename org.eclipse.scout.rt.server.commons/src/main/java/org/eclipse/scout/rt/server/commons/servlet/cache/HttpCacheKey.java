@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Cache key is a composite of 'resourcePath' and 'locale'. When a resource is not dependent on a Locale, it should use
@@ -67,7 +67,7 @@ public final class HttpCacheKey implements Serializable {
       return false;
     }
     HttpCacheKey other = (HttpCacheKey) obj;
-    return CompareUtility.equals(m_resourcePath, other.m_resourcePath) && CompareUtility.equals(m_attributes, other.m_attributes);
+    return ObjectUtility.equals(m_resourcePath, other.m_resourcePath) && ObjectUtility.equals(m_attributes, other.m_attributes);
   }
 
   @Override

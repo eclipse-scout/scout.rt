@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -204,7 +204,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
 
   @Override
   protected boolean lookupRowMatchesValue(ILookupRow<LOOKUP_KEY> lookupRow, String value) {
-    return CompareUtility.equals(lookupRow.getText(), value);
+    return ObjectUtility.equals(lookupRow.getText(), value);
   }
 
   @Override

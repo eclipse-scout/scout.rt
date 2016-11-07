@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 @Bean
@@ -23,7 +23,7 @@ public class DesktopEventFilter extends AbstractEventFilter<DesktopEvent, Deskto
   public DesktopEvent filter(DesktopEvent event) {
     for (DesktopEventFilterCondition condition : getConditions()) {
       if (condition.getType() == event.getType()) {
-        if (CompareUtility.equals(event.getForm(), condition.getForm())) {
+        if (ObjectUtility.equals(event.getForm(), condition.getForm())) {
           return null;
         }
         if (condition.isCheckDisplayParents() && checkIfEventOnParent(condition.getForm(), event)) {
@@ -35,7 +35,7 @@ public class DesktopEventFilter extends AbstractEventFilter<DesktopEvent, Deskto
   }
 
   private boolean checkIfEventOnParent(IForm form, DesktopEvent event) {
-    if (CompareUtility.equals(event.getForm(), form)) {
+    if (ObjectUtility.equals(event.getForm(), form)) {
       return true;
     }
     else if (form.getDisplayParent() instanceof IForm) {

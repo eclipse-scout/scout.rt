@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.slf4j.Logger;
@@ -115,7 +115,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
         addErrorStatus(new ValidationFailedStatus<Object>(e, value));
       }
     }
-    if (CompareUtility.equals(m_value, value)) {
+    if (ObjectUtility.equals(m_value, value)) {
       return false;
     }
     else {
@@ -131,7 +131,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public void setText(String s) {
-    if (CompareUtility.notEquals(m_text, s)) {
+    if (ObjectUtility.notEquals(m_text, s)) {
       m_text = s;
       notifyObserver(TEXT_BIT);
     }
@@ -144,7 +144,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
 
   @Override
   public void setCssClass(String cssClass) {
-    if (CompareUtility.notEquals(m_cellSpecialization.getCssClass(), cssClass)) {
+    if (ObjectUtility.notEquals(m_cellSpecialization.getCssClass(), cssClass)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setCssClass(cssClass);
       setValueInternal(CSS_CLASS_BIT, newStyle);
@@ -157,7 +157,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public void setIconId(String s) {
-    if (CompareUtility.notEquals(m_cellSpecialization.getIconId(), s)) {
+    if (ObjectUtility.notEquals(m_cellSpecialization.getIconId(), s)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setIconId(s);
       setValueInternal(ICON_ID_BIT, newStyle);
@@ -177,7 +177,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
         setValueInternal(TOOLTIP_BIT, newStyle);
       }
     }
-    else if (CompareUtility.notEquals(m_cellSpecialization.getIconId(), s)) {
+    else if (ObjectUtility.notEquals(m_cellSpecialization.getIconId(), s)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setTooltipText(s);
       setValueInternal(TOOLTIP_BIT, newStyle);
@@ -197,7 +197,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
         setValueInternal(MANDATORY_BIT, newStyle);
       }
     }
-    else if (CompareUtility.notEquals(m_cellSpecialization.isMandatory(), mandatory)) {
+    else if (ObjectUtility.notEquals(m_cellSpecialization.isMandatory(), mandatory)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setMandatory(mandatory);
       setValueInternal(MANDATORY_BIT, newStyle);
@@ -223,7 +223,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public void setBackgroundColor(String c) {
-    if (CompareUtility.notEquals(m_cellSpecialization.getBackgroundColor(), c)) {
+    if (ObjectUtility.notEquals(m_cellSpecialization.getBackgroundColor(), c)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setBackgroundColor(c);
       setValueInternal(BG_COLOR_BIT, newStyle);
@@ -236,7 +236,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public void setForegroundColor(String c) {
-    if (CompareUtility.notEquals(m_cellSpecialization.getForegroundColor(), c)) {
+    if (ObjectUtility.notEquals(m_cellSpecialization.getForegroundColor(), c)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setForegroundColor(c);
       setValueInternal(FG_COLOR_BIT, newStyle);
@@ -249,7 +249,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public void setFont(FontSpec f) {
-    if (m_cellSpecialization.getFont() == null && f != null || m_cellSpecialization.getFont() != null && f == null || CompareUtility.notEquals(m_cellSpecialization.getFont(), f)) {
+    if (m_cellSpecialization.getFont() == null && f != null || m_cellSpecialization.getFont() != null && f == null || ObjectUtility.notEquals(m_cellSpecialization.getFont(), f)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setFont(f);
       setValueInternal(FONT_BIT, newStyle);

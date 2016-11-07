@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -222,7 +222,7 @@ public final class DataModelUtility {
   public static IDataModelEntity findEntity(List<? extends IDataModelEntity> entities, String simpleName, Map<String, String> metaData) {
     if (entities != null) {
       for (IDataModelEntity e : entities) {
-        if (e.getClass().getSimpleName().equals(simpleName) && CompareUtility.equals(e.getMetaDataOfEntity(), metaData)) {
+        if (e.getClass().getSimpleName().equals(simpleName) && ObjectUtility.equals(e.getMetaDataOfEntity(), metaData)) {
           return e;
         }
       }
@@ -237,7 +237,7 @@ public final class DataModelUtility {
   public static IDataModelAttribute findAttribute(List<? extends IDataModelAttribute> attributes, String simpleName, Map<String, String> metaData) {
     if (attributes != null) {
       for (IDataModelAttribute a : attributes) {
-        if (a.getClass().getSimpleName().equals(simpleName) && CompareUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
+        if (a.getClass().getSimpleName().equals(simpleName) && ObjectUtility.equals(a.getMetaDataOfAttribute(), metaData)) {
           return a;
         }
       }

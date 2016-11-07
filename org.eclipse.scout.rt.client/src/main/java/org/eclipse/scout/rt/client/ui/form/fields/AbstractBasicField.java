@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Implementation for {@link IBasicField}. Handle properties and event methods that deals with basic fields.
@@ -83,7 +83,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   public void setDisplayText(String s) {
     String oldDisplayText = getDisplayText();
     super.setDisplayText(s);
-    if (CompareUtility.notEquals(oldDisplayText, s)) {
+    if (ObjectUtility.notEquals(oldDisplayText, s)) {
       interceptExecChangedDisplayText();
     }
   }

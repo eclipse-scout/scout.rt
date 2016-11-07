@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
@@ -67,7 +67,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
         for (Iterator<WeakReference<IClientSession>> it = userSessions.iterator(); it.hasNext();) {
           WeakReference<IClientSession> ref = it.next();
           IClientSession clientSession = ref.get();
-          if (clientSession == null || CompareUtility.equals(clientSession.getId(), session.getId())) {
+          if (clientSession == null || ObjectUtility.equals(clientSession.getId(), session.getId())) {
             it.remove();
           }
         }
@@ -181,7 +181,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
   protected boolean isCurrentSession(String userId) {
     IClientSession currentSession = (IClientSession) IClientSession.CURRENT.get();
-    return currentSession != null && CompareUtility.equals(currentSession.getUserId(), userId);
+    return currentSession != null && ObjectUtility.equals(currentSession.getUserId(), userId);
   }
 
   @Override

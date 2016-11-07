@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -250,7 +250,7 @@ public class DefaultValuesFilter {
       // Types do not match
       return false;
     }
-    return CompareUtility.equals(value, defaultValue);
+    return ObjectUtility.equals(value, defaultValue);
   }
 
   /**
@@ -371,7 +371,7 @@ public class DefaultValuesFilter {
     }
 
     public void popProperty(String propertyName) {
-      if (CompareUtility.notEquals(m_propertyStack.peek(), propertyName)) {
+      if (ObjectUtility.notEquals(m_propertyStack.peek(), propertyName)) {
         throw new IllegalStateException("'" + propertyName + "' is not the last element in the stack: [" + CollectionUtility.format(m_propertyStack) + "]");
       }
       m_propertyStack.pop();

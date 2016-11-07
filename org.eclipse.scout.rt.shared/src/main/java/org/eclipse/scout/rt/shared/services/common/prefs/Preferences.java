@@ -21,8 +21,8 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.Logger;
@@ -328,7 +328,7 @@ public class Preferences implements IPreferences {
       oldValue = m_prefs.put(key, value);
     }
 
-    if (!CompareUtility.equals(oldValue, value)) {
+    if (ObjectUtility.notEquals(oldValue, value)) {
       m_dirty = true;
 
       // listener notification

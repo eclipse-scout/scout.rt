@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * A buffer for table events ({@link TableEvent}) with coalesce functionality:
@@ -414,10 +414,10 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         && event1.getRowCount() == event2.getRowCount()
         && CollectionUtility.equalsCollection(event1.getRows(), event2.getRows())
         && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus())
-        && CompareUtility.equals(event1.getDragObject(), event2.getDragObject())
-        && CompareUtility.equals(event1.getDropObject(), event2.getDropObject())
-        && CompareUtility.equals(event1.getCopyObject(), event2.getCopyObject())
-        && CompareUtility.equals(event1.getColumns(), event2.getColumns());
+        && ObjectUtility.equals(event1.getDragObject(), event2.getDragObject())
+        && ObjectUtility.equals(event1.getDropObject(), event2.getDropObject())
+        && ObjectUtility.equals(event1.getCopyObject(), event2.getCopyObject())
+        && ObjectUtility.equals(event1.getColumns(), event2.getColumns());
     return identical;
   }
 

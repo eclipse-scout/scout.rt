@@ -101,9 +101,9 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
@@ -3268,7 +3268,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
 
       Object cellValue = keyColumns.get(keyIndex).getValue(row);
-      if (!CompareUtility.equals(key, cellValue)) {
+      if (ObjectUtility.notEquals(key, cellValue)) {
         return false;
       }
 

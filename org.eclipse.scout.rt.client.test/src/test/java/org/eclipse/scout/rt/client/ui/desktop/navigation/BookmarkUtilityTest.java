@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.Serializable;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.junit.Test;
@@ -169,7 +169,7 @@ public class BookmarkUtilityTest {
       LOG.debug(output);
     }
 
-    assertTrue(CompareUtility.equals(in, out));
+    assertTrue(ObjectUtility.equals(in, out));
     if (in != null && out != null) {
       assertTrue(in.getClass().equals(out.getClass()));
     }
@@ -183,7 +183,7 @@ public class BookmarkUtilityTest {
       LOG.debug(output);
     }
 
-    assertTrue(CompareUtility.equals(VerboseUtility.dumpObject(in), VerboseUtility.dumpObject(out)));
+    assertTrue(ObjectUtility.equals(VerboseUtility.dumpObject(in), VerboseUtility.dumpObject(out)));
   }
 
   private static class SerializablePrimaryKey implements Serializable {

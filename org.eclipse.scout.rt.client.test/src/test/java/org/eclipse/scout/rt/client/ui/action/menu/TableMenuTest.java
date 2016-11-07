@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -311,7 +311,7 @@ public class TableMenuTest {
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
         setEnabled(true);
-        setVisible(CompareUtility.equals(getPrenameColumn().getSelectedValue(), "Hugo"));
+        setVisible(ObjectUtility.equals(getPrenameColumn().getSelectedValue(), "Hugo"));
       }
     }
 

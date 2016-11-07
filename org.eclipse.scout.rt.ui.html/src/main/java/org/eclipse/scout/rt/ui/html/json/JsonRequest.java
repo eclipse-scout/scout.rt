@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class JsonRequest {
 
   protected void validate(final RequestType requestType, JSONObject request) {
     // Ensure request contains an UI session ID, except for the startup and the ping request
-    if (!CompareUtility.isOneOf(requestType, RequestType.STARTUP_REQUEST, RequestType.PING_REQUEST)) {
+    if (!ObjectUtility.isOneOf(requestType, RequestType.STARTUP_REQUEST, RequestType.PING_REQUEST)) {
       Assertions.assertTrue(request.has(PROP_UI_SESSION_ID), "Missing property '{}' in request {}", PROP_UI_SESSION_ID, request);
     }
 

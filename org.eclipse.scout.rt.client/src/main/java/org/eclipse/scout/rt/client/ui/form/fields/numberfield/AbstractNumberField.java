@@ -32,9 +32,9 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -272,7 +272,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   }
 
   private int compareInternal(NUMBER a, NUMBER b) {
-    return CompareUtility.compareTo(NumberUtility.numberToBigDecimal(a), NumberUtility.numberToBigDecimal(b));
+    return ObjectUtility.compareTo(NumberUtility.numberToBigDecimal(a), NumberUtility.numberToBigDecimal(b));
   }
 
   /**
@@ -369,7 +369,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   }
 
   private void throwNumberTooLarge() {
-    if (getMinValue() == null || CompareUtility.equals(getMinValue(), getMinPossibleValue())) {
+    if (getMinValue() == null || ObjectUtility.equals(getMinValue(), getMinPossibleValue())) {
       throw new VetoException(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())));
     }
     else {
@@ -378,7 +378,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   }
 
   private void throwNumberTooSmall() {
-    if (getMaxValue() == null || CompareUtility.equals(getMaxValue(), getMaxPossibleValue())) {
+    if (getMaxValue() == null || ObjectUtility.equals(getMaxValue(), getMaxPossibleValue())) {
       throw new VetoException(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())));
     }
     else {

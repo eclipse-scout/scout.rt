@@ -61,7 +61,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -775,7 +775,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   private boolean contentEquals(Cell cell, IValueField<VALUE> field) {
-    return CompareUtility.equals(cell.getText(), field.getDisplayText()) && CompareUtility.equals(cell.getValue(), editFieldToCellValue(field)) && CompareUtility.equals(cell.getErrorStatus(), field.getErrorStatus());
+    return ObjectUtility.equals(cell.getText(), field.getDisplayText()) && ObjectUtility.equals(cell.getValue(), editFieldToCellValue(field)) && ObjectUtility.equals(cell.getErrorStatus(), field.getErrorStatus());
   }
 
   /**
@@ -1299,7 +1299,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       List<ITableRow> foundRows = new ArrayList<ITableRow>();
       for (int i = 0; i < m_table.getRowCount(); i++) {
         ITableRow row = m_table.getRow(i);
-        if (CompareUtility.isOneOf(getValue(row), values)) {
+        if (ObjectUtility.isOneOf(getValue(row), values)) {
           foundRows.add(row);
         }
       }
@@ -1313,7 +1313,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     List<ITableRow> foundRows = new ArrayList<ITableRow>();
     for (int i = 0; i < m_table.getRowCount(); i++) {
       ITableRow row = m_table.getRow(i);
-      if (CompareUtility.equals(value, getValue(row))) {
+      if (ObjectUtility.equals(value, getValue(row))) {
         foundRows.add(row);
       }
     }
@@ -1324,7 +1324,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public ITableRow findRow(VALUE value) {
     for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
       ITableRow row = m_table.getRow(i);
-      if (CompareUtility.equals(value, getValue(row))) {
+      if (ObjectUtility.equals(value, getValue(row))) {
         return row;
       }
     }
@@ -1335,7 +1335,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public boolean contains(VALUE value) {
     for (int i = 0, ni = m_table.getRowCount(); i < ni; i++) {
       ITableRow row = m_table.getRow(i);
-      if (CompareUtility.equals(value, getValue(row))) {
+      if (ObjectUtility.equals(value, getValue(row))) {
         return true;
       }
     }

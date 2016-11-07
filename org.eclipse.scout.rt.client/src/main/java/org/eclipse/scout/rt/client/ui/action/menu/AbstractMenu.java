@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,7 +193,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
           if (action instanceof IMenu) {
             IMenu menu = (IMenu) action;
             try {
-              if (!CompareUtility.equals(menu.getOwnerValue(), ownerValue)) {
+              if (ObjectUtility.notEquals(menu.getOwnerValue(), ownerValue)) {
                 menu.handleOwnerValueChanged(ownerValue);
               }
             }

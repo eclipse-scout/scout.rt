@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.data.basic;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class MemoryOptimizedObject implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public class MemoryOptimizedObject implements Serializable {
         m_data = newData;
         m_bits = (short) (m_bits - (1 << bitPos));
       }
-      return !CompareUtility.equals(oldValue, newValue);
+      return ObjectUtility.notEquals(oldValue, newValue);
     }
     else {
       if (newValue != null) {

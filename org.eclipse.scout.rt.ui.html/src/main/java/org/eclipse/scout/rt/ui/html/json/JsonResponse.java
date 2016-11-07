@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -155,8 +155,8 @@ public class JsonResponse {
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
       // Same target and same type --> remove existing event
-      if (CompareUtility.equals(event.getTarget(), eventTarget) &&
-          CompareUtility.equals(event.getType(), eventType)) {
+      if (ObjectUtility.equals(event.getTarget(), eventTarget) &&
+          ObjectUtility.equals(event.getType(), eventType)) {
         it.remove();
       }
     }
@@ -373,11 +373,11 @@ public class JsonResponse {
     // Remove all related events
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
-      if (CompareUtility.equals(event.getTarget(), id)) {
+      if (ObjectUtility.equals(event.getTarget(), id)) {
         // Event is targeted to the removed adapter
         it.remove();
       }
-      else if (removedAdapter != null && event.getReference() != null && CompareUtility.equals(event.getReference(), id)) {
+      else if (removedAdapter != null && event.getReference() != null && ObjectUtility.equals(event.getReference(), id)) {
         // Event is not directly targeted to the removed adapter but "references" it. If the adapter
         // was not yet sent to the UI (= it was contained in the m_adapterMap) we may safely purge
         // the event. Example: "showForm" + "hideForm" in the same request.
@@ -391,7 +391,7 @@ public class JsonResponse {
     // Unregister as buffered events adapter (we are no longer interested in those buffered events)
     for (Iterator<IJsonAdapter<?>> it = m_bufferedEventsAdapters.iterator(); it.hasNext();) {
       IJsonAdapter<?> adapter = it.next();
-      if (CompareUtility.equals(adapter.getId(), id)) {
+      if (ObjectUtility.equals(adapter.getId(), id)) {
         it.remove();
       }
     }

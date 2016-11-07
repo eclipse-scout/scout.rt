@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +132,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
   }
 
   protected boolean isIdenticalEvent(T event1, T event2) {
-    return CompareUtility.equals(event1, event2);
+    return ObjectUtility.equals(event1, event2);
   }
 
   @Override

@@ -50,9 +50,9 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -1019,7 +1019,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * matches. Override this method to implement another behavior.
    */
   protected boolean lookupRowMatchesValue(ILookupRow<LOOKUP_KEY> lookupRow, VALUE value) {
-    return CompareUtility.equals(lookupRow.getKey(), value);
+    return ObjectUtility.equals(lookupRow.getKey(), value);
   }
 
   //search and update the field with the result

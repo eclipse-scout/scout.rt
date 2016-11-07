@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
@@ -129,7 +129,7 @@ public class CodeService implements ICodeService {
     Locale locale = NlsLocale.get();
     for (Entry<CodeTypeCacheKey, ICodeType<?, ?>> entry : getCache().getUnmodifiableMap().entrySet()) {
       CodeTypeCacheKey key = entry.getKey();
-      if (CompareUtility.equals(key.getLocale(), locale)) {
+      if (ObjectUtility.equals(key.getLocale(), locale)) {
         ICodeType<?, ?> ct = entry.getValue();
         if (ct != null && id.equals(ct.getId())) {
           return (ICodeType<T, ?>) ct;

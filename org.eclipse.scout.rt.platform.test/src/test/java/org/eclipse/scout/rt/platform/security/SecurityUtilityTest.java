@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class SecurityUtilityTest {
 
-  private static final boolean IS_JAVA_18_OR_NEWER = CompareUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
+  private static final boolean IS_JAVA_18_OR_NEWER = ObjectUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
   private static final int KEY_LEN = 128;
   private static final Charset ENCODING = StandardCharsets.UTF_8;
   private static final char[] PASSWORD = "insecure".toCharArray();

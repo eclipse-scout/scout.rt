@@ -18,7 +18,7 @@ import java.util.Collection;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.BeanClassFilter;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.IgnoredCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType1;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType2;
@@ -66,7 +66,7 @@ public class CodeTypeClassInventoryTest {
 
     @Override
     public boolean accept(IClassInfo ci) {
-      return super.accept(ci) && CompareUtility.notEquals(ci.name(), TestCodeType1.class.getName());
+      return super.accept(ci) && ObjectUtility.notEquals(ci.name(), TestCodeType1.class.getName());
     }
   }
 

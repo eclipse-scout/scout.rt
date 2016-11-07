@@ -155,7 +155,7 @@ public class FinalValueTest {
 
     assertTrue(s.isSet());
     // exact assertion about value is not possible because execution order is not deterministic
-    assertTrue(CompareUtility.isOneOf(value, "scheduled thread", "test thread"));
+    assertTrue(ObjectUtility.isOneOf(value, "scheduled thread", "test thread"));
   }
 
   private void assertTestValue(FinalValue<String> s) {

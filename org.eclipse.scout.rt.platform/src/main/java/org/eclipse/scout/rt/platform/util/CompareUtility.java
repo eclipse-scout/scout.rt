@@ -13,12 +13,9 @@ package org.eclipse.scout.rt.platform.util;
 import java.util.Collection;
 
 /**
- * Utility class for comparing objects considering <code>null</code> values and other commonly used special cases.
- *
- * @deprecated Use {@link ObjectUtilit} instead<br>
- *             TODO [7.1] pbz: remove this utility
+ * Utility class for comparing objects considering <code>null</code> values and other commonly used special cases.<br>
+ * TODO [7.1] pbz: remove this utility
  */
-@Deprecated
 public final class CompareUtility {
 
   private CompareUtility() {
@@ -83,6 +80,10 @@ public final class CompareUtility {
     return ObjectUtility.notEquals(a, b);
   }
 
+  /**
+   * @deprecated Use {@link ObjectUtility#compareTo(Comparable, Comparable)} instead
+   */
+  @Deprecated
   public static <T extends Comparable<T>> int compareTo(T a, T b) {
     return ObjectUtility.compareTo(a, b);
   }

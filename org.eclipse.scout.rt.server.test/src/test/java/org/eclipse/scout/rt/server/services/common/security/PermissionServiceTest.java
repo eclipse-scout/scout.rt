@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
@@ -54,10 +54,10 @@ public class PermissionServiceTest {
       boolean testPermission1Found = false;
       boolean testPermission2Found = false;
       for (Class<?> b : result) {
-        if (CompareUtility.equals(b.getName(), TestPermission1.class.getName())) {
+        if (ObjectUtility.equals(b.getName(), TestPermission1.class.getName())) {
           testPermission1Found = true;
         }
-        if (CompareUtility.equals(b.getName(), TestPermission2.class.getName())) {
+        if (ObjectUtility.equals(b.getName(), TestPermission2.class.getName())) {
           testPermission2Found = true;
         }
       }
@@ -118,7 +118,7 @@ public class PermissionServiceTest {
 
     @Override
     protected boolean acceptClassName(String className) {
-      return super.acceptClassName(className) && CompareUtility.notEquals(className, TestPermission1.class.getName());
+      return super.acceptClassName(className) && ObjectUtility.notEquals(className, TestPermission1.class.getName());
     }
   }
 
