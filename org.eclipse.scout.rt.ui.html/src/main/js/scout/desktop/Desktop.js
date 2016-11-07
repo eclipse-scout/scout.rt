@@ -240,6 +240,7 @@ scout.Desktop.prototype._renderBenchVisible = function() {
   this.animateLayoutChange = this.rendered;
   if (this.benchVisible) {
     this._renderBench();
+    this._renderInBackground();
   } else {
     this._removeBench();
   }
@@ -358,7 +359,7 @@ scout.Desktop.prototype._removeSplitter = function() {
 };
 
 scout.Desktop.prototype._renderInBackground = function() {
-  if (this.navigationVisible && this.benchVisible) {
+  if (this.bench) {
     this.bench.$container.toggleClass('drop-shadow', this.inBackground);
   }
 };
@@ -459,6 +460,10 @@ scout.Desktop.prototype.setMenus = function(menus) {
   if (this.header) {
     this.header.setMenus(menus);
   }
+};
+
+scout.Desktop.prototype.setNavigationHandleVisible = function(visible) {
+  this.setProperty('navigationHandleVisible', visible);
 };
 
 scout.Desktop.prototype.setNavigationVisible = function(visible) {
@@ -671,6 +676,7 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
   if (!this.inBackground || this.displayStyle === scout.Desktop.DisplayStyle.BENCH) {
     return;
   }
+
   this.inBackground = false;
   this._setOutlineActivated();
 

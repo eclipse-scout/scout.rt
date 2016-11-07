@@ -134,6 +134,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
   }
   if (this.session.desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT && !this.session.desktop.bench) {
     // Show bench and hide navigation if this is the first view to be shown
+    this.session.desktop.sendOutlineToBack();
     this.session.desktop.switchToBench();
   }
   this.session.desktop.bench.addView(view, selectView);
