@@ -73,9 +73,9 @@ scout.codes = {
     return this.codeType(codeTypeId).get(codeId);
   },
 
-  codeType: function(codeTypeId) {
+  codeType: function(codeTypeId, optional) {
     var codeType = this.registry[codeTypeId];
-    if (!codeType) {
+    if (!optional && !codeType) {
       throw new Error('No CodeType found for id=' + codeTypeId);
     }
     return codeType;
