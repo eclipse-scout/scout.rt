@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimeoutRunContextStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.TransactionAddFailureOnAnyExceptionStatement;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -263,8 +264,10 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
-    // install statement to re-throw the first exception handled by JUnitExceptionHandler.
-    return super.possiblyExpectingExceptions(method, test, new ThrowHandledExceptionStatement(next));
+    // install statements to
+    // 1) re-throw the first exception handled by JUnitExceptionHandler
+    // 2) add a failure to the current transaction, so that it is rolled-back.
+    return super.possiblyExpectingExceptions(method, test, new TransactionAddFailureOnAnyExceptionStatement(new ThrowHandledExceptionStatement(next)));
   }
 
   protected long getTimeoutMillis(Method method) {
