@@ -229,6 +229,40 @@ $.injectScript = function(url, options) {
   return deferred.promise();
 };
 
+/**
+ * Dynamically load a stylesheet from the server. A new <style> tag is added to the head element.
+ * A jQuery deferred object is returned which can be used to execute code after the loading has been complete:
+ *
+ *   $injectStyle('http://www....').done(function() { ... });
+ *
+ * Options (optional):
+ *
+ * NAME              DEFAULT             DESCRIPTION
+ * --------------------------------------------------------------------------------------------
+ * document          window.document     Which document to inject the script to.
+ */
+$.injectStyle = function(url, options) {
+  options = options || {};
+  var deferred = $.Deferred();
+
+  var myDocument = options.document || window.document;
+  var styleTag = myDocument.createElement('link');
+  $(styleTag)
+    .attr('rel', 'stylesheet')
+    .attr('type', 'text/css')
+    .attr('href', url)
+    .on('load error', function(event) {
+      if (event.type === 'error') {
+        deferred.reject();
+      } else {
+        deferred.resolve();
+      }
+    });
+  myDocument.head.appendChild(styleTag);
+
+  return deferred.promise();
+};
+
 $.pxToNumber = function(pixel) {
   if (!pixel) {
     // parseFloat would return NaN if pixel is '' or undefined
