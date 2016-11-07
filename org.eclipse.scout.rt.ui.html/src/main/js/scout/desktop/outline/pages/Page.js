@@ -98,21 +98,12 @@ scout.Page.prototype.getOutline = function() {
 };
 
 /**
- * @returns a child page of this page which is linked to the given table row
- */
-scout.Page.prototype.pageForTableRow = function(tableRow) { // XXX [awe] 6.1 - unnötig, da wir deine beziehung row/page haben (link)
-  return scout.arrays.find(this.childNodes, function(childPage) {
-    return tableRow === childPage.tableRow;
-  });
-};
-
-/**
  * @returns an array of child pages for the given table rows. The order of the child pages is the same as the order of the rows.
  *   which means this function can be used to sort child pages in the same order as the table.
  */
 scout.Page.prototype.pagesForTableRows = function(tableRows) {
   return tableRows.map(function(tableRow) {
-    return this.pageForTableRow(tableRow);
+    return tableRow.page;
   }, this);
 };
 

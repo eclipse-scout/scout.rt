@@ -26,7 +26,7 @@ scout.OutlineMediator.prototype.onTableRowsInserted = function(tableRows, childP
 };
 
 scout.OutlineMediator.prototype.onTableRowAction = function(event, page) {
-  var childPage = page.pageForTableRow(event.row);
+  var childPage = event.row.page;
   if (!childPage) {
     return;
   }

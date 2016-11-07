@@ -289,6 +289,47 @@ describe("Table", function() {
     });
   });
 
+
+  describe("insertRows", function() {
+
+    var model, table, rows, row0, row1,
+      events = '',
+      rowsOnInsert;
+
+    // we sort 1st column desc which means Z is before A
+    beforeEach(function() {
+      model = helper.createModelFixture(1, 0);
+      table = helper.createTable(model);
+      table.sort(table.columns[0], 'desc');
+      table.on('rowsInserted', function(event) {
+        events += 'rowsInserted ';
+        rowsOnInsert = event.rows;
+      });
+      table.on('rowOrderChanged', function() {
+        events += 'rowOrderChanged';
+      });
+    });
+
+    it("rowsInserted event must be triggered before rowOrderChanged event", function() {
+      table.insertRows([
+        helper.createModelRow(1, ['A']),
+        helper.createModelRow(1, ['Z'])
+      ]);
+
+      // we expect exactly this order of events when new rows are inserted
+      expect(events).toBe('rowsInserted rowOrderChanged');
+
+      // when rowsInserted event occurs we expect the rows provided by the event in the order they have been inserted (no sorting is done here)
+      expect(rowsOnInsert[0].cells[0].text).toBe('A');
+      expect(rowsOnInsert[1].cells[0].text).toBe('Z');
+
+      // expect the rows in the table to be sorted as defined by the sort-column
+      expect(table.rows[0].cells[0].text).toBe('Z');
+      expect(table.rows[1].cells[0].text).toBe('A');
+    });
+
+  });
+
   describe("deleteRows", function() {
     var model, table, rows, row0, row1, row2;
 

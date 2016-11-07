@@ -1928,6 +1928,8 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
     this.rows.push(row);
   }, this);
+  // this event should be triggered before the rowOrderChanged event (triggered by the _sort function).
+  this._triggerRowsInserted(rows);
 
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
@@ -1960,7 +1962,6 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     this._renderViewport();
     this.invalidateLayoutTree();
   }
-  this._triggerRowsInserted(rows);
 };
 
 scout.Table.prototype.deleteRow = function(row) {
