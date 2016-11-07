@@ -251,7 +251,15 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   @Override
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
     // install statement to re-throw the first exception handled by JUnitExceptionHandler.
-    return super.possiblyExpectingExceptions(method, test, new ThrowHandledExceptionStatement(next));
+    return super.possiblyExpectingExceptions(method, test, interceptPossiblyExpectingExceptions(next));
+  }
+
+  /**
+   * @deprecated This method is temporarily only and will be removed in Scout 6.1 release.
+   */
+  @Deprecated
+  protected Statement interceptPossiblyExpectingExceptions(Statement next) {
+    return new ThrowHandledExceptionStatement(next);
   }
 
   protected long getTimeoutMillis(Method method) {

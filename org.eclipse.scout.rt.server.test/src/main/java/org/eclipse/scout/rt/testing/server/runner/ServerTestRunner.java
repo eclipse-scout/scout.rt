@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContex
 import org.eclipse.scout.rt.testing.server.runner.statement.ClientNotificationsStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.TimeoutServerRunContextStatement;
+import org.eclipse.scout.rt.testing.server.runner.statement.TransactionAddFailureOnAnyExceptionStatement;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,5 +121,12 @@ public class ServerTestRunner extends PlatformTestRunner {
       return interceptedAfterStatement;
     }
     return new TimeoutServerRunContextStatement(interceptedAfterStatement, 0);
+  }
+
+  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  protected Statement interceptPossiblyExpectingExceptions(Statement next) {
+    return new TransactionAddFailureOnAnyExceptionStatement(super.interceptPossiblyExpectingExceptions(next));
   }
 }

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
-import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
+import org.eclipse.scout.rt.testing.server.runner.ServerSafeStatementInvoker;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 
@@ -53,7 +53,8 @@ public class TimeoutServerRunContextStatement extends Statement {
   }
 
   protected void evaluateWithTimeout() throws Throwable {
-    final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+    @SuppressWarnings("deprecation")
+    final ServerSafeStatementInvoker invoker = new ServerSafeStatementInvoker(m_next);
 
     final IFuture<Void> future = Jobs.schedule(invoker, Jobs.newInput()
         .withRunContext(ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW)) // Run in new TX, because the same TX is not allowed to be used by multiple threads.

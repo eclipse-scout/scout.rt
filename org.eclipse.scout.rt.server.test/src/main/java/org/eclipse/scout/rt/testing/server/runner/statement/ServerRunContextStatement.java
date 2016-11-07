@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerSafeStatementInvoker;
 import org.junit.runners.model.Statement;
 
 /**
@@ -70,7 +70,8 @@ public class ServerRunContextStatement extends Statement {
               .withUserAgent(userAgent));
 
       // Run the test on behalf of a ServerRunContext.
-      final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+      @SuppressWarnings("deprecation")
+      final ServerSafeStatementInvoker invoker = new ServerSafeStatementInvoker(m_next);
       ServerRunContexts.copyCurrent()
           .withSession(serverSession)
           .withSubject(currentSubject) // set the test subject explicitly in case it is different to the session subject
