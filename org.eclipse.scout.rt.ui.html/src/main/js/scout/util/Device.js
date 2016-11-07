@@ -77,7 +77,7 @@ scout.Device.Type = {
  * Also loads device specific scripts (e.g. fast click for ios devices)
  */
 scout.Device.prototype.bootstrap = function() {
-  var deferreds = [];
+  var promises = [];
 
   // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
   this.unselectableAttribute = this.getUnselectableAttribute();
@@ -87,15 +87,15 @@ scout.Device.prototype.bootstrap = function() {
 
   if (this._needsFastClick()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
-    deferreds.push(this._loadFastClickDeferred());
+    promises.push(this._loadFastClickDeferred());
   } else if (this.isIos()){
     this._installActiveHandler();
   }
 
   if (this.hasOnScreenKeyboard()) {
-    deferreds.push(this._loadJQueryMobileDeferred());
+    promises.push(this._loadJQueryMobileDeferred());
   }
-  return deferreds;
+  return promises;
 };
 
 /**

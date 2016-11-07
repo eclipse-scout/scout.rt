@@ -18,7 +18,7 @@ scout.logging = {
    * @returns $.deferred
    */
   bootstrap: function() {
-    var deferred;
+    var promise;
     var location = new scout.URL();
     var enabled = location.getParameter('logging');
     $.log = new scout.NullLogger();
@@ -33,7 +33,7 @@ scout.logging = {
       };
       if (typeof log4javascript === 'undefined') {
         // If log4javascript is not yet installed, dynamically load the library
-        deferred = $.injectScript('res/log4javascript.js')
+        promise = $.injectScript('res/log4javascript.js')
           .done(function(script, textStatus) {
             initLog4Javascript();
           });
@@ -41,7 +41,7 @@ scout.logging = {
         initLog4Javascript();
       }
     }
-    return deferred;
+    return promise;
   },
 
   parseLevel: function(level) {

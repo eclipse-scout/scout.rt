@@ -9,35 +9,31 @@ scout.App = function() { //
  * The actual initialization does not get started before these bootstrap scripts are loaded.
  */
 scout.App.prototype.init = function(options) {
-  var deferredInit = $.Deferred();
-  var deferreds = this._bootstrap(options.bootstrap);
-  $.when.apply($, deferreds)
-    .done(function() {
-      this._init(options);
-      deferredInit.resolve();
-    }.bind(this));
-  return deferredInit;
+  var promises = this._bootstrap(options.bootstrap);
+  return $.promiseAll(promises).then(function() {
+    this._init(options);
+  }.bind(this));
 };
 
 /**
- * Executes the default bootstrap functions and returns an array of deferred objects.<p>
- * The actual session startup begins only when every of these deferred objects are completed.
+ * Executes the default bootstrap functions and returns an array of promises.<p>
+ * The actual session startup begins only when every of these promises are completed.
  * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
- * The individual bootstrap functions may return null or undefined, a single deferred or multiple deferreds as an array.
+ * The individual bootstrap functions may return null or undefined, a single promise or multiple promises as an array.
  */
 scout.App.prototype._bootstrap = function(options) {
   options = options || {};
-  var deferredValues = this._doBootstrap(options);
+  var promiseValues = this._doBootstrap(options);
 
-  var deferreds = [];
-  deferredValues.forEach(function(value) {
+  var promises = [];
+  promiseValues.forEach(function(value) {
     if (Array.isArray(value)) {
-      deferreds.concat(value);
+      promises.concat(value);
     } else if (value) {
-      deferreds.push(value);
+      promises.push(value);
     }
   });
-  return deferreds;
+  return promises;
 };
 
 scout.App.prototype._doBootstrap = function(options) {
