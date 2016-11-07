@@ -311,6 +311,9 @@ describe("Table", function() {
     });
 
     it("rowsInserted event must be triggered before rowOrderChanged event", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['Z'])
