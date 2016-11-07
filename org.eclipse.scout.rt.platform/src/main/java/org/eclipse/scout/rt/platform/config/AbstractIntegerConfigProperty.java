@@ -13,15 +13,15 @@ package org.eclipse.scout.rt.platform.config;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Config property for {@link Long} values.
+ * Config property for {@link Integer} values.
  */
-public abstract class AbstractLongConfigProperty extends AbstractConfigProperty<Long> {
+public abstract class AbstractIntegerConfigProperty extends AbstractConfigProperty<Integer> {
 
   @Override
-  protected Long parse(String value) {
+  protected Integer parse(String value) {
     if (!StringUtility.hasText(value)) {
       return null;
     }
-    return Long.parseLong(value);
+    return Integer.parseInt(value);
   }
 }
