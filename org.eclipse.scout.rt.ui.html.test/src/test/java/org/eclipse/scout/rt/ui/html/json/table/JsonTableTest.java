@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
@@ -94,7 +95,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreatedRowId(row));
+    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreateRowId(row));
     jsonTable.handleUiEvent(event);
 
     assertTrue(row.isSelected());
@@ -137,7 +138,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreatedRowId(row));
+    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreateRowId(row));
     jsonTable.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
@@ -167,7 +168,7 @@ public class JsonTableTest {
 
     // ----------
 
-    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreatedRowId(row2));
+    JsonEvent event = createJsonRowsSelectedEvent(jsonTable.getOrCreateRowId(row2));
 
     assertFalse(row2.isSelected());
     assertFalse(row4.isSelected());
@@ -600,8 +601,8 @@ public class JsonTableTest {
     assertNotNull(jsonTable.tableRowIdsMap().get(row1));
     assertNotNull(jsonTable.tableRowIdsMap().get(row2));
 
-    String row0Id = jsonTable.getOrCreatedRowId(row0);
-    String row1Id = jsonTable.getOrCreatedRowId(row1);
+    String row0Id = jsonTable.getOrCreateRowId(row0);
+    String row1Id = jsonTable.getOrCreateRowId(row1);
     assertNotNull(row0Id);
     assertNotNull(jsonTable.getTableRow(row0Id));
     assertNotNull(row1Id);
@@ -691,7 +692,7 @@ public class JsonTableTest {
 
     // Now filter the first row
     ITableRow row = table.getRow(0);
-    String row0Id = jsonTable.getOrCreatedRowId(row);
+    String row0Id = jsonTable.getOrCreateRowId(row);
     assertNotNull(row0Id);
     assertNotNull(jsonTable.getTableRow(row0Id));
 
@@ -778,8 +779,8 @@ public class JsonTableTest {
 
     jsonTable.toJson();
 
-    String row0Id = jsonTable.getOrCreatedRowId(row0);
-    String row2Id = jsonTable.getOrCreatedRowId(row2);
+    String row0Id = jsonTable.getOrCreateRowId(row0);
+    String row2Id = jsonTable.getOrCreateRowId(row2);
 
     JsonEvent event = createJsonRowsFilteredEvent(row0Id, row2Id);
     jsonTable.handleUiEvent(event);
@@ -838,9 +839,9 @@ public class JsonTableTest {
     ITableRow row0 = table.getRow(0);
     ITableRow row1 = table.getRow(1);
     ITableRow row2 = table.getRow(2);
-    String row0Id = jsonTable.getOrCreatedRowId(row0);
-    String row1Id = jsonTable.getOrCreatedRowId(row1);
-    String row2Id = jsonTable.getOrCreatedRowId(row2);
+    String row0Id = jsonTable.getOrCreateRowId(row0);
+    String row1Id = jsonTable.getOrCreateRowId(row1);
+    String row2Id = jsonTable.getOrCreateRowId(row2);
     assertNotNull(row0Id);
     assertNotNull(jsonTable.getTableRow(row0Id));
 
@@ -897,8 +898,8 @@ public class JsonTableTest {
 
     jsonTable.toJson();
 
-    String row0Id = jsonTable.getOrCreatedRowId(row0);
-    String row2Id = jsonTable.getOrCreatedRowId(row2);
+    String row0Id = jsonTable.getOrCreateRowId(row0);
+    String row2Id = jsonTable.getOrCreateRowId(row2);
 
     table.addRowFilter(new ITableRowFilter() {
       @Override
@@ -938,7 +939,7 @@ public class JsonTableTest {
 
     jsonTable.toJson();
 
-    String row0Id = jsonTable.getOrCreatedRowId(row0);
+    String row0Id = jsonTable.getOrCreateRowId(row0);
 
     JsonEvent event = createJsonRowsFilteredEvent(row0Id);
     jsonTable.handleUiEvent(event);
@@ -1213,6 +1214,131 @@ public class JsonTableTest {
     assertEquals(lastEvent.optString("type"), "rowOrderChanged");
     JSONArray rowIds = lastEvent.optJSONArray("rowIds");
     assertTrue(rowIds.length() == 3);
+  }
+
+  /**
+   * Tests if a RequestFocusInCell-Event get discarded when now row is set/available in the Event
+   */
+  @Test
+  public void testRequestFocusInCellRowRequired() {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetColumns();
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    // Response should contain no events
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+
+    // Request Focus without a row
+    table.requestFocusInCell(table.getColumns().get(0), null);
+
+    // Events should not be in the response
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+    // And also not in the event buffer
+    assertEquals(0, jsonTable.eventBuffer().size());
+
+    // So there should be no events at all in the response
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    assertNull(response.optJSONArray("events"));
+  }
+
+  /**
+   * Tests if a RequestFocusInCell-Event gets discarded when all rows of the table get deleted
+   */
+  public void testRequestFocusInCellCoalesce() {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetColumns();
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    // Response should contain no events
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+
+    // Request Focus without a row
+    table.requestFocusInCell(table.getColumns().get(0), table.getRow(0));
+
+    table.deleteAllRows();
+
+    // Events should not yet be in the response
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+    // And there should only one delete event
+    assertEquals(1, jsonTable.eventBuffer().size());
+    assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, jsonTable.eventBuffer().getBufferInternal().get(0).getType());
+  }
+
+  /**
+   * Tests if a RequestFocusInCell-Event gets discarded when all rows of the table get deleted and the table has
+   * setAutoDiscardOnDelete set to true
+   */
+  @Test
+  public void testRequestFocusInCellCoalesceWithtAutoDiscardOnDelete() {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.setAutoDiscardOnDelete(true);
+    table.resetColumns();
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    // Response should contain no events
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+
+    // Request Focus without a row
+    table.requestFocusInCell(table.getColumns().get(0), table.getRow(0));
+
+    table.deleteAllRows();
+
+    // Events should not yet be in the response
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+    // And there should only one delete event
+    assertEquals(1, jsonTable.eventBuffer().size());
+    assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, jsonTable.eventBuffer().getBufferInternal().get(0).getType());
+  }
+
+  @Test
+  public void testRequestFocusInCellCoalesceInMultipleResponses() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetColumns();
+    table.setAutoDiscardOnDelete(true);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    // Response should contain no events
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+
+    // Request Focus without a row
+    final ITableRow row = table.getRow(0);
+    table.requestFocusInCell(table.getColumns().get(0), row);
+
+    table.deleteAllRows();
+
+    // Events should not yet be in the response
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+    // And there should only one delete event
+    assertEquals(1, jsonTable.eventBuffer().size());
+    assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, jsonTable.eventBuffer().getBufferInternal().get(0).getType());
+
+    // So there should be no events at all in the response
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    assertNull(response.optJSONArray("events"));
+
+    // end current request
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // try to requestFocusInCell on deleted row
+    table.requestFocusInCell(table.getColumns().get(0), row);
+
+    // Events should not be in the response
+    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
+    // And also not in the event buffer
+    assertEquals(0, jsonTable.eventBuffer().size());
+
+    // So there should be no events at all in the response
+    JSONObject response2 = m_uiSession.currentJsonResponse().toJson();
+    assertNull(response2.optJSONArray("events"));
   }
 
   @Test

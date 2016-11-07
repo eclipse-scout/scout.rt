@@ -517,7 +517,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       case TableEvent.TYPE_ROWS_DELETED:
       case TableEvent.TYPE_ROWS_DRAG_REQUEST:
       case TableEvent.TYPE_ROWS_INSERTED:
-      case TableEvent.TYPE_ROWS_UPDATED: {
+      case TableEvent.TYPE_ROWS_UPDATED:
+      case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL: {
         return true;
       }
       default: {
