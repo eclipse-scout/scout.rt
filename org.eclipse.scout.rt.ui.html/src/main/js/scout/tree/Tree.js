@@ -101,7 +101,9 @@ scout.Tree.prototype._init = function(model) {
 
 /**
  * Iterates through the given array and converts node-models to instances of scout.TreeNode (or a subclass).
- * If the array element is already a TreeNode the function leaves the element untouched.
+ * If the array element is already a TreeNode the function leaves the element untouched. This function also
+ * ensures that the attribute childNodeIndex is set. By default we use the order of the nodes array as index
+ * but only if childNodeIndex is undefined.
  *
  * @param nodes Array of node-models (plain object) or nodes (instance of scout.TreeNode)
  */
@@ -109,6 +111,7 @@ scout.Tree.prototype._ensureTreeNodes = function(nodes) {
   var i, node;
   for (i = 0; i < nodes.length; i++) {
     node = nodes[i];
+    node.childNodeIndex = scout.nvl(node.childNodeIndex, i);
     if (node instanceof scout.TreeNode) {
       continue;
     }

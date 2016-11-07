@@ -34,12 +34,9 @@ scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
     return;
   }
 
-  var cni = 0, // child node index
-    tableRows = event.rows,
+  var tableRows = event.rows,
     childPages = tableRows.map(function(row) {
-      var childPage = this._createChildPageInternal(row);
-      childPage.childNodeIndex = cni++;
-      return childPage;
+      return this._createChildPageInternal(row);
     }, this);
 
   this.getOutline().mediator.onTableRowsInserted(tableRows, childPages, this);

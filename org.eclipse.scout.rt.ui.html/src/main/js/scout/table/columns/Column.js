@@ -11,6 +11,8 @@
 scout.Column = function() {
   this.cssClass;
   this.editable = false;
+  this.removable = false;
+  this.modifiable = false;
   this.fixedWidth = false;
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;

@@ -11,6 +11,7 @@
 scout.Table = function() {
   scout.Table.parent.call(this);
 
+  this.rowIconVisible = false;
   this.autoResizeColumns = false;
   this.columnAddable = false;
   this.checkable = false;

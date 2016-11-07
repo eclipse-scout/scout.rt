@@ -127,9 +127,10 @@
     },
     "Table": {
       "autoResizeColumns": false,
-      "columnAddable": false,
       "checkable": false,
+      "columnAddable": false,
       "enabled": true,
+      "dropType": 0,
       "filters": [],
       "hasReloadHandler": false,
       "headerEnabled": true,
@@ -140,6 +141,7 @@
       "multiCheck": true,
       "multiSelect": true,
       "multilineText": false,
+      "rowIconVisible": false,
       "rows": [],
       "scrollToSelection": false,
       "selectedRows": [],
@@ -226,17 +228,22 @@
     },
     "Column": {
       "editable": false,
+      "enabled": true,
       "fixedWidth": false,
       "horizontalAlignment": -1,
       "htmlEnabled": false,
+      "initialAlwaysIncludeSortAtBegin": false,
+      "initialAlwaysIncludeSortAtEnd": false,
       "mandatory": false,
+      "modifiable": false,
+      "removable": false,
       "sortActive": false,
       "sortAscending": true,
       "sortIndex": -1,
       "summary": false,
       "type": "text",
-      "width": 60,
-      "uiSortPossible": false
+      "uiSortPossible": false,
+      "width": 60
     },
     "DateColumn": {
       "hasDate": true,
@@ -307,7 +314,9 @@
         "TableOrganizeMenu": null
       },
       "OutlineViewButton": null,
-      "TableControl": null
+      "TableControl": {
+        "FormTableControl": null
+      }
     },
     "Tree": {
       "Outline": {

@@ -49,11 +49,7 @@ describe("Tree", function() {
   });
 
   describe("insertNodes", function() {
-    var model;
-    var tree;
-    var node0;
-    var node1;
-    var node2;
+    var model, tree, node0, node1, node2;
 
     beforeEach(function() {
       model = helper.createModelFixture(3, 1, true);
@@ -64,6 +60,35 @@ describe("Tree", function() {
     });
 
     describe("inserting a child", function() {
+
+      it("inserts in a reasonable order if childNodeIndex is not set", function() {
+        // we want to start with an empty tree for this test
+        var rootNodeModel = helper.createModelNode('0', 'root');
+        rootNodeModel.expanded = true;
+        model = helper.createModel([rootNodeModel]);
+        tree = helper.createTree(model);
+        tree.render(session.$entryPoint);
+
+        // child nodes
+        var nodeModels = [
+          helper.createModelNode('0_0', 'node0'),
+          helper.createModelNode('0_1', 'node1'),
+          helper.createModelNode('0_2', 'node2')
+        ];
+        // make sure nodes _DON'T_ have a childNodeIndex (since that's usually the case when a programmer calls insertNodes in JS only)
+        nodeModels.forEach(function(node) {
+          delete node.childNodeIndex;
+        });
+        var rootNode = tree.nodes[0];
+        tree.insertNodes(nodeModels, rootNode);
+
+        // assert order in DOM is 0_0, 0_1, 0_2 (= same order as in array)
+        var orderedNodeIdString = '';
+        tree.$container.find("[data-level='1']").each(function() {
+          orderedNodeIdString += $(this).attr('data-nodeid') + ',';
+        });
+        expect(orderedNodeIdString).toBe('0_0,0_1,0_2,');
+      });
 
       it("updates model", function() {
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
