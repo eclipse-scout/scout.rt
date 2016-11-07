@@ -192,7 +192,7 @@ describe('Column', function() {
 
     var table = helper.createTable(model);
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
-    expect(table.rows[0].cells[0]._cacheEncodedText).toBeFalsy();
+    expect(table.rows[0].cells[0]._cachedEncodedText).toBeFalsy();
 
     spyOn(scout.strings, 'encode').and.callThrough();
     table.render(session.$entryPoint);

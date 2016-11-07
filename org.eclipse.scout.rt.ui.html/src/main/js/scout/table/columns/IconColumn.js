@@ -18,8 +18,8 @@ scout.inherits(scout.IconColumn, scout.Column);
 /**
  * @override
  */
-scout.IconColumn.prototype.initCell = function(cell) {
-  cell = scout.IconColumn.parent.prototype.initCell.call(this, cell);
+scout.IconColumn.prototype._initCell = function(cell) {
+  scout.IconColumn.parent.prototype._initCell.call(this, cell);
   cell.text = null; // only display icon, no text
   cell.iconId = cell.value || cell.iconId;
   return cell;

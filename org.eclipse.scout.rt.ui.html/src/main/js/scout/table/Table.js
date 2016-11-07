@@ -1473,21 +1473,20 @@ scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCe
 
 scout.Table.prototype.cell = function(column, row) {
   var cell;
-  // Row Icon column and cell icon column don't not have cells -> generate one
+  // Row Icon column and cell icon column don't have cells -> generate them on the fly
   if (column === this.rowIconColumn || column === this.checkableColumn) {
     if (column === this.rowIconColumn) {
-      cell = {
+      cell = scout.create('Cell', {
         iconId: row.iconId,
         cssClass: 'row-icon-cell ' + row.cssClass
-      };
+      });
     } else if (column === this.checkableColumn) {
-      cell = {
+      cell = scout.create('Cell', {
         value: row.checked,
         editable: true,
         cssClass: row.cssClass
-      };
+      });
     }
-    scout.defaultValues.applyTo(cell, 'Cell');
     return cell;
   }
   return row.cells[column.index];

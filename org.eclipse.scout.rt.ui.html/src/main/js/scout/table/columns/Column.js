@@ -99,7 +99,6 @@ scout.Column.prototype._initCell = function(cellModel) {
   if (cellModel.horizontalAlignment === undefined) {
     cellModel.horizontalAlignment = this.horizontalAlignment;
   }
-  cellModel.parent = this;
 };
 
 scout.Column.prototype.buildCellForRow = function(row) {
@@ -112,7 +111,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
 
   var text = cell.text || '';
   if (!cell.htmlEnabled) {
-    text = cell.encodedText();
+    text = cell.encodedText() || '';
     if (this.table.multilineText) {
       text = scout.strings.nl2br(text, false);
     }

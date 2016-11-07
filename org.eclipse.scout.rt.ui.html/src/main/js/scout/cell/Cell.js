@@ -17,7 +17,7 @@ scout.Cell = function() {
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;
   this.iconId;
-  this._cacheEncodedText;
+  this._cachedEncodedText;
   this.text;
   this.value;
 };
@@ -27,9 +27,6 @@ scout.Cell.prototype.init = function(model) {
 };
 
 scout.Cell.prototype._init = function(model) {
-  if (!model.parent) {
-    throw new Error('missing property \'parent\'');
-  }
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
 };
@@ -46,16 +43,14 @@ scout.Cell.prototype.setText = function(text) {
   // reset cached encodedText, so when encodedText() is called the next time
   // will be set to the a new value
   if (oldText !== this.text) {
-    this._cacheEncodedText = null;
+    this._cachedEncodedText = null;
   }
 };
 
 scout.Cell.prototype.encodedText = function() {
-  if (!this._cacheEncodedText) {
+  if (!this._cachedEncodedText) {
     // Encode text and cache it, encoding is expensive
-    this._cacheEncodedText = scout.strings.encode(this.text);
+    this._cachedEncodedText = scout.strings.encode(this.text);
   }
-  return this._cacheEncodedText;
+  return this._cachedEncodedText;
 };
-
-
