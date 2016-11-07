@@ -418,6 +418,31 @@ scout.FormField.prototype.setTooltipText = function(tooltipText) {
   this.setProperty('tooltipText', tooltipText);
 };
 
+/**
+ * Changes the enabled property of this form field to the given value.
+ * @param enabled
+ *          Required. The new enabled value
+ * @param updateParents
+ *          Optional. If true the enabled property of all parent form fields are updated to same value as well.
+ * @param updateChildren
+ *          Optional. If true the enabled property of all child form fields (recursive) are updated to same value as well.
+ */
+scout.FormField.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
+  scout.FormField.parent.prototype.setEnabled.call(this, enabled);
+
+  if (enabled && updateParents) {
+    this.visitParents(function(field) {
+      field.setEnabled(true);
+    });
+  }
+
+  if (updateChildren) {
+    this.visit(function(field) {
+      field.setEnabled(enabled);
+    });
+  }
+};
+
 scout.FormField.prototype.setErrorStatus = function(errorStatus) {
   this.setProperty('errorStatus', errorStatus);
 };
@@ -868,6 +893,17 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
 
 scout.FormField.prototype.visit = function(visitor) {
   visitor(this);
+};
+
+/**
+ * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
+ */
+scout.FormField.prototype.visitParents = function(visitor) {
+  var curParent = this.parent;
+  while (curParent instanceof scout.FormField) {
+    visitor(curParent);
+    curParent = curParent.parent;
+  }
 };
 
 scout.FormField.prototype.markAsSaved = function() {
