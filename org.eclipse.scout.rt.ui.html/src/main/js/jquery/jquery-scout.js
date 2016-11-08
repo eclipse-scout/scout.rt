@@ -247,15 +247,17 @@ $.injectStyle = function(url, options) {
 
   var myDocument = options.document || window.document;
   var styleTag = myDocument.createElement('link');
-  $(styleTag)
+  var $styleTag = $(styleTag);
+  $styleTag
     .attr('rel', 'stylesheet')
     .attr('type', 'text/css')
     .attr('href', url)
     .on('load error', function(event) {
       if (event.type === 'error') {
         deferred.reject();
+        $styleTag.remove();
       } else {
-        deferred.resolve();
+        deferred.resolve($styleTag);
       }
     });
   myDocument.head.appendChild(styleTag);
