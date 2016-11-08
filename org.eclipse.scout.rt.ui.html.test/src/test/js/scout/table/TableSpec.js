@@ -128,6 +128,27 @@ describe("Table", function() {
     });
   });
 
+  describe("rowIcons and checkable rows", function() {
+
+    var model, table, row;
+
+    it("creates an artificial cell when a rowIcon is set on a row", function() {
+      model = helper.createModelFixture(1);
+      model.rowIconVisible = true;
+      table = helper.createTable(model);
+      row = helper.createModelRow(1, ['Foo']);
+      row.rowIcon = scout.icons.HOME;
+      table.insertRow(row);
+
+      var columns = table.columns;
+      expect(columns.length).toBe(2);
+      expect(columns[0] instanceof scout.IconColumn).toBe(true);
+      var cell = table.cell(table.columns[0], table.rows[0]);
+      expect(cell.cssClass).toBe('row-icon-cell');
+    });
+
+  });
+
   describe("insertRows", function() {
     var model, table;
 

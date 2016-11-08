@@ -1471,24 +1471,25 @@ scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCe
   this.startCellEdit(column, row, field);
 };
 
+/**
+ * @returns returns a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
+ */
 scout.Table.prototype.cell = function(column, row) {
-  var cell;
-  // Row Icon column and cell icon column don't have cells -> generate them on the fly
-  if (column === this.rowIconColumn || column === this.checkableColumn) {
-    if (column === this.rowIconColumn) {
-      cell = scout.create('Cell', {
-        iconId: row.iconId,
-        cssClass: 'row-icon-cell ' + row.cssClass
-      });
-    } else if (column === this.checkableColumn) {
-      cell = scout.create('Cell', {
-        value: row.checked,
-        editable: true,
-        cssClass: row.cssClass
-      });
-    }
-    return cell;
+  if (column === this.rowIconColumn) {
+    return scout.create('Cell', {
+      iconId: row.iconId,
+      cssClass: scout.strings.join(' ', 'row-icon-cell', row.cssClass)
+    });
   }
+
+  if (column === this.checkableColumn) {
+    return scout.create('Cell', {
+      value: row.checked,
+      editable: true,
+      cssClass: row.cssClass
+    });
+  }
+
   return row.cells[column.index];
 };
 
