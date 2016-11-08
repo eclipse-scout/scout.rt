@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.services.common.clipboard;
+package org.eclipse.scout.rt.ui.html.clipboard;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -30,12 +30,16 @@ public class HtmlScoutClipboardService implements IClipboardService {
   public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(mimeTypes);
+    execInitClipboardForm(form);
     form.startPaste();
     form.waitFor();
     if (form.isFormStored()) {
       return form.getClipboardField().getValue();
     }
     return Collections.emptyList();
+  }
+
+  protected void execInitClipboardForm(ClipboardForm form) {
   }
 
   @Override
