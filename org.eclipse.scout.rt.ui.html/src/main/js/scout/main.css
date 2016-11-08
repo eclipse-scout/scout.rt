@@ -457,6 +457,14 @@ a,
   #scout.white-space-nowrap();
 }
 
+.startup-error {
+  #scout.user-select(text);
+  #scout.drop-shadow-large();
+  margin: 100px 50px;
+  padding: 20px;
+  border: 1px solid @focus-border-color;
+}
+
 /* --- z-index --- */
 /* Rule: All child elements of .scout get the same z-index 0 assigned. This spawns a new stacking context for each */
 /* of these elements (iff they are "positioned"). To bring a new element to the top, add it to the end of the list. */
