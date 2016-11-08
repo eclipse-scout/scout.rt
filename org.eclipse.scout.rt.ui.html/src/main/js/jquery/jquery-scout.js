@@ -230,39 +230,30 @@ $.injectScript = function(url, options) {
 };
 
 /**
- * Dynamically load a stylesheet from the server. A new <style> tag is added to the head element.
- * A jQuery deferred object is returned which can be used to execute code after the loading has been complete:
+ * Dynamically add a style sheet to the document. A new <style> tag is added to the head element.
+ * A jQuery object referring to the new style tag is returned.
  *
- *   $injectStyle('http://www....').done(function() { ... });
+ *   $injectStyle('p { text-color: orange; }').done(function() { ... });
  *
  * Options (optional):
  *
  * NAME              DEFAULT             DESCRIPTION
  * --------------------------------------------------------------------------------------------
- * document          window.document     Which document to inject the script to.
+ * document          window.document     Which document to inject the style to.
  */
-$.injectStyle = function(url, options) {
+$.injectStyle = function(data, options) {
   options = options || {};
   var deferred = $.Deferred();
 
   var myDocument = options.document || window.document;
-  var styleTag = myDocument.createElement('link');
+  var styleTag = myDocument.createElement('style');
   var $styleTag = $(styleTag);
   $styleTag
-    .attr('rel', 'stylesheet')
     .attr('type', 'text/css')
-    .attr('href', url)
-    .on('load error', function(event) {
-      if (event.type === 'error') {
-        deferred.reject();
-        $styleTag.remove();
-      } else {
-        deferred.resolve($styleTag);
-      }
-    });
+    .html(data);
   myDocument.head.appendChild(styleTag);
 
-  return deferred.promise();
+  return $styleTag;
 };
 
 $.pxToNumber = function(pixel) {
