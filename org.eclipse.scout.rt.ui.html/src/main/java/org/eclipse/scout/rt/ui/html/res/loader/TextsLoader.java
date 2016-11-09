@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,7 +15,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
-import org.eclipse.scout.rt.ui.html.res.loader.AbstractResourceLoader;
 import org.json.JSONObject;
 
 public class TextsLoader extends AbstractResourceLoader {
@@ -53,9 +53,10 @@ public class TextsLoader extends AbstractResourceLoader {
     }
 
     // Create a binary resource
-    byte[] content = jsonTexts.toString(2).getBytes();
+    byte[] content = jsonTexts.toString(2).getBytes(StandardCharsets.UTF_8);
     return BinaryResources.create()
         .withFilename("texts.json")
+        .withCharset(StandardCharsets.UTF_8)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(content)
         .build();

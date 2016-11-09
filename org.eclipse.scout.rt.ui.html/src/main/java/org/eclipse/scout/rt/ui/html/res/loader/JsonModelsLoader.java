@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.res.WebContentService;
@@ -74,7 +76,12 @@ public class JsonModelsLoader extends AbstractResourceLoader {
     JSONObject json = getJson(pathInfo);
     JSONObject output = buildModelsJson(json);
     LOG.info("Successfully loaded models JSON '" + pathInfo + "'");
-    return new BinaryResource(pathInfo, output.toString().getBytes());
+    return BinaryResources.create()
+        .withFilename(pathInfo)
+        .withCharset(StandardCharsets.UTF_8)
+        .withContentType(FileUtility.getContentTypeForExtension("json"))
+        .withContent(output.toString().getBytes(StandardCharsets.UTF_8))
+        .build();
   }
 
   /**
