@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerValueBoxChains.ComposerValueBoxChangedValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerValueBoxChains.ComposerValueBoxInitOperatorToFieldMapChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerValueBoxExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -64,7 +65,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractComposerValueBox extends AbstractGroupBox implements IComposerValueBox {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractComposerValueBox.class);
 
-  private Map<Integer/*operator*/, Map<Integer/*dataType*/, IComposerValueField>> m_opTypeToFieldMap;
+  private Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> m_operatorTypeToFieldMap;
   //selection context
   private IDataModelAttribute m_attribute;
   private IComposerValueField m_selectedField;
@@ -109,8 +110,48 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_opTypeToFieldMap = new HashMap<Integer, Map<Integer, IComposerValueField>>();
-    //specific operators
+
+    HashMap<Integer, Map<Integer, IComposerValueField>> operatorTypeToFieldMap = new HashMap<Integer, Map<Integer, IComposerValueField>>();
+    interceptInitOperatorToFieldMap(operatorTypeToFieldMap);
+    m_operatorTypeToFieldMap = operatorTypeToFieldMap;
+
+    m_valueChangedListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent e) {
+        if (IValueField.PROP_VALUE.equals(e.getPropertyName())) {
+          try {
+            interceptChangedValue();
+          }
+          catch (Exception ex) {
+            LOG.error("fire value change on {}", e.getSource(), ex);
+          }
+        }
+      }
+    };
+
+    for (IFormField f : getFields()) {
+      f.setLabelVisible(false);
+      f.setLabel(ScoutTexts.get("Value"));
+      f.setVisible(false);
+      if (f instanceof ISequenceBox) {
+        List<IFormField> sequenceBoxChildFields = ((ISequenceBox) f).getFields();
+        if (CollectionUtility.hasElements(sequenceBoxChildFields)) {
+          IFormField firstField = CollectionUtility.firstElement(sequenceBoxChildFields);
+          firstField.setLabelVisible(false);
+          if (sequenceBoxChildFields.size() > 1) {
+            IFormField secondField = CollectionUtility.getElement(sequenceBoxChildFields, 1);
+            secondField.setLabel(ScoutTexts.get("and"));
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Initializes the mapping from operator to field.
+   */
+  protected void execInitOperatorToFieldMap(Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> operatorTypeToFieldMap) {
+    // specific operators
     HashMap<Integer, IComposerValueField> betweenMap = new HashMap<Integer, IComposerValueField>();
     betweenMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(BetweenDateField.class));
     betweenMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(BetweenDateTimeField.class));
@@ -123,10 +164,12 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     betweenMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(BetweenIntegerField.class));
     betweenMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(BetweenLongField.class));
     betweenMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(BetweenTimeField.class));
-    m_opTypeToFieldMap.put(DataModelConstants.OPERATOR_BETWEEN, betweenMap);
-    m_opTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_BETWEEN, betweenMap);
-    m_opTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_TIME_BETWEEN, betweenMap);
-    //type defaults
+
+    operatorTypeToFieldMap.put(DataModelConstants.OPERATOR_BETWEEN, betweenMap);
+    operatorTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_BETWEEN, betweenMap);
+    operatorTypeToFieldMap.put(DataModelConstants.OPERATOR_DATE_TIME_BETWEEN, betweenMap);
+
+    // type defaults
     HashMap<Integer, IComposerValueField> defaultMap = new HashMap<Integer, IComposerValueField>();
     defaultMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(DateField.class));
     defaultMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(DateTimeField.class));
@@ -147,37 +190,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     defaultMap.put(IDataModelAttribute.TYPE_RICH_TEXT, getFieldByClass(StringField.class));
     defaultMap.put(IDataModelAttribute.TYPE_SMART, getFieldByClass(SmartField.class));
     defaultMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(TimeField.class));
-    m_opTypeToFieldMap.put(0, defaultMap);
-    //
-    m_valueChangedListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (IValueField.PROP_VALUE.equals(e.getPropertyName())) {
-          try {
-            interceptChangedValue();
-          }
-          catch (Exception ex) {
-            LOG.error("fire value change on {}", e.getSource(), ex);
-          }
-        }
-      }
-    };
-    for (IFormField f : getFields()) {
-      f.setLabelVisible(false);
-      f.setLabel(ScoutTexts.get("Value"));
-      f.setVisible(false);
-      if (f instanceof ISequenceBox) {
-        List<IFormField> sequenceBoxChildFields = ((ISequenceBox) f).getFields();
-        if (CollectionUtility.hasElements(sequenceBoxChildFields)) {
-          IFormField firstField = CollectionUtility.firstElement(sequenceBoxChildFields);
-          firstField.setLabelVisible(false);
-          if (sequenceBoxChildFields.size() > 1) {
-            IFormField secondField = CollectionUtility.getElement(sequenceBoxChildFields, 1);
-            secondField.setLabel(ScoutTexts.get("and"));
-          }
-        }
-      }
-    }
+
+    operatorTypeToFieldMap.put(0, defaultMap);
   }
 
   /**
@@ -200,10 +214,10 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     if (dataType == IDataModelAttribute.TYPE_INHERITED) {
       dataType = attribute.getType();
     }
-    Map<Integer, IComposerValueField> typeToFieldMap = m_opTypeToFieldMap.get(op.getOperator());
+    Map<Integer, IComposerValueField> typeToFieldMap = m_operatorTypeToFieldMap.get(op.getOperator());
     if (typeToFieldMap == null) {
       //default
-      typeToFieldMap = m_opTypeToFieldMap.get(0);
+      typeToFieldMap = m_operatorTypeToFieldMap.get(0);
     }
     IComposerValueField valueField = typeToFieldMap.get(dataType);
     //clear old
@@ -1334,6 +1348,12 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     chain.execChangedValue();
   }
 
+  protected final void interceptInitOperatorToFieldMap(Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> operatorTypeToFieldMap) {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    ComposerValueBoxInitOperatorToFieldMapChain chain = new ComposerValueBoxInitOperatorToFieldMapChain(extensions);
+    chain.execInitOperatorToFieldMap(operatorTypeToFieldMap);
+  }
+
   protected static class LocalComposerValueBoxExtension<OWNER extends AbstractComposerValueBox> extends LocalGroupBoxExtension<OWNER> implements IComposerValueBoxExtension<OWNER> {
 
     public LocalComposerValueBoxExtension(OWNER owner) {
@@ -1344,11 +1364,15 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     public void execChangedValue(ComposerValueBoxChangedValueChain chain) {
       getOwner().execChangedValue();
     }
+
+    @Override
+    public void execInitOperatorToFieldMap(ComposerValueBoxInitOperatorToFieldMapChain chain, Map<Integer, Map<Integer, IComposerValueField>> operatorTypeToFieldMap) {
+      getOwner().execInitOperatorToFieldMap(operatorTypeToFieldMap);
+    }
   }
 
   @Override
   protected IComposerValueBoxExtension<? extends AbstractComposerValueBox> createLocalExtension() {
     return new LocalComposerValueBoxExtension<AbstractComposerValueBox>(this);
   }
-
 }

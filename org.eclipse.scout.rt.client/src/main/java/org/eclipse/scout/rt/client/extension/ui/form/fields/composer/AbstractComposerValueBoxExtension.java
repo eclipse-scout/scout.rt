@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 
+import java.util.Map;
+
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerValueBoxChains.ComposerValueBoxChangedValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerValueBoxChains.ComposerValueBoxInitOperatorToFieldMapChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerValueBox;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerValueField;
 
 public abstract class AbstractComposerValueBoxExtension<OWNER extends AbstractComposerValueBox> extends AbstractGroupBoxExtension<OWNER> implements IComposerValueBoxExtension<OWNER> {
 
@@ -23,5 +27,10 @@ public abstract class AbstractComposerValueBoxExtension<OWNER extends AbstractCo
   @Override
   public void execChangedValue(ComposerValueBoxChangedValueChain chain) {
     chain.execChangedValue();
+  }
+
+  @Override
+  public void execInitOperatorToFieldMap(ComposerValueBoxInitOperatorToFieldMapChain chain, Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> operatorTypeToFieldMap) {
+    chain.execInitOperatorToFieldMap(operatorTypeToFieldMap);
   }
 }

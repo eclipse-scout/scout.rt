@@ -16,6 +16,7 @@ import java.security.Permission;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -285,11 +286,26 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    */
 
   protected void injectOperators() {
-    new DataModelAttributeInjector().injectOperators(this);
+    List<IDataModelAttributeOp> operatorList = new ArrayList<IDataModelAttributeOp>();
+    for (IDataModelAttributeOperatorProvider injector : BEANS.all(IDataModelAttributeOperatorProvider.class)) {
+      injector.injectOperators(this, operatorList);
+    }
+
+    setOperators(operatorList);
   }
 
   protected void injectAggregationTypes() {
-    new DataModelAttributeInjector().injectAggregationTypes(this);
+    List<Integer> aggregationTypeList = new ArrayList<>();
+    for (IDataModelAttributeAggregationTypeProvider injector : BEANS.all(IDataModelAttributeAggregationTypeProvider.class)) {
+      injector.injectAggregationTypes(this, aggregationTypeList);
+    }
+
+    int[] a = new int[aggregationTypeList.size()];
+    for (int i = 0; i < a.length; i++) {
+      a[i] = aggregationTypeList.get(i);
+    }
+
+    setAggregationTypes(a);
   }
 
   @Override

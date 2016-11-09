@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerValueBox;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerValueField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class ComposerValueBoxChains {
@@ -40,6 +42,23 @@ public final class ComposerValueBoxChains {
         @Override
         protected void callMethod(IComposerValueBoxExtension<? extends AbstractComposerValueBox> next) {
           next.execChangedValue(ComposerValueBoxChangedValueChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class ComposerValueBoxInitOperatorToFieldMapChain extends AbstractComposerValueBoxChain {
+
+    public ComposerValueBoxInitOperatorToFieldMapChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions);
+    }
+
+    public void execInitOperatorToFieldMap(final Map<Integer /* operator */, Map<Integer /* field type */, IComposerValueField>> operatorTypeToFieldMap) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IComposerValueBoxExtension<? extends AbstractComposerValueBox> next) {
+          next.execInitOperatorToFieldMap(ComposerValueBoxInitOperatorToFieldMapChain.this, operatorTypeToFieldMap);
         }
       };
       callChain(methodInvocation);
