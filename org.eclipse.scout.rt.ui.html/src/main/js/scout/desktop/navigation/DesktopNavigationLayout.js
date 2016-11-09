@@ -73,7 +73,7 @@ scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($containe
 
   prefSize.height += prefSizeBoxes.height;
   prefSize.width = Math.max(prefSize.width, prefSizeBoxes.width);
-  prefSize.add(htmlContainer.getInsets());
+  prefSize = prefSize.add(htmlContainer.getInsets());
 
   return prefSize;
 };
