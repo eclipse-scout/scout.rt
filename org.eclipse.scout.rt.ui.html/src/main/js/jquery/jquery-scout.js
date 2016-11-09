@@ -243,7 +243,6 @@ $.injectScript = function(url, options) {
  */
 $.injectStyle = function(data, options) {
   options = options || {};
-  var deferred = $.Deferred();
 
   var myDocument = options.document || window.document;
   var styleTag = myDocument.createElement('style');
