@@ -24,15 +24,19 @@
   &.up {
     margin-bottom: 5px;
   }
+}
 
-  & > .widget-container {
-    position: absolute;
-    border-top: solid 1px @border-color;
-    background-color: @control-background-color;
+.touch-popup-field {
+  position: absolute;
+}
 
-    & > .proposal-chooser > .table {
-      overflow: inherit;
-    }
+.touch-popup-widget-container {
+  position: absolute;
+  border-top: solid 1px @border-color;
+  background-color: @control-background-color;
+
+  & > .proposal-chooser > .table {
+    overflow: inherit;
   }
 }
 

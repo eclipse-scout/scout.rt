@@ -66,7 +66,7 @@ scout.TouchPopup.prototype.prefLocation = function($container, openingDirectionY
 scout.TouchPopup.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('touch-popup');
 
-  this._$widgetContainer = this.$container.appendDiv('widget-container');
+  this._$widgetContainer = this.$container.appendDiv('touch-popup-widget-container');
   this._widgetContainerHtmlComp = scout.HtmlComponent.install(this._$widgetContainer, this.session);
   this._widgetContainerHtmlComp.setLayout(new scout.SingleLayout());
 
@@ -75,6 +75,7 @@ scout.TouchPopup.prototype._render = function($parent) {
 
   // Move to top
   this._field.$container.insertBefore(this._$widgetContainer);
+  this._field.$container.addClass('touch-popup-field');
 
   if (this._widget) {
     this._widget.render(this._$widgetContainer);

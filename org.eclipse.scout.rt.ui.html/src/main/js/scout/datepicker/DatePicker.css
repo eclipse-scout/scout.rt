@@ -190,7 +190,7 @@
   content: @icon-angle-right;
 }
 
-.widget-container {
+.touch-popup-widget-container {
   & > .date-picker {
     border: none;
   }
