@@ -40,6 +40,7 @@ public class TestHttpSession implements HttpSession {
 
   @Override
   public void setMaxInactiveInterval(int interval) {
+    //NOP
   }
 
   @Override
@@ -80,6 +81,7 @@ public class TestHttpSession implements HttpSession {
 
   @Override
   public void putValue(String name, Object value) {
+    //NOP
   }
 
   @Override
@@ -89,6 +91,7 @@ public class TestHttpSession implements HttpSession {
 
   @Override
   public void removeValue(String name) {
+    //NOP
   }
 
   @Override

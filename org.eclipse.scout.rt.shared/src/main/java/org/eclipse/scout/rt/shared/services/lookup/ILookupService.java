@@ -14,25 +14,28 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.service.IService;
 
+/**
+ * Service for querying data in content-assist fields/smartfields.
+ */
 public interface ILookupService<KEY_TYPE> extends IService {
 
   /**
-   * Lookup by performing a "key" filter and activating the <key> tags
+   * Lookup by key using {@link ILookupCall#getKey()}
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByKey(ILookupCall<KEY_TYPE> call);
 
   /**
-   * Lookup by performing a "text" filter and activating the <text> tags
+   * Lookup by text using {@link ILookupCall#getText()}
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByText(ILookupCall<KEY_TYPE> call);
 
   /**
-   * Lookup by performing a "all" filter and activating the <all> tags
+   * Lookup all rows using the browse hint{@link ILookupCall#getAll()}
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByAll(ILookupCall<KEY_TYPE> call);
 
   /**
-   * Lookup by performing a "recursion" filter and activating the <rec> tags
+   * Lookup child rows by parent for lazy loading hierarchical data, using {@link ILookupCall#getRec()} (parent)
    */
   List<? extends ILookupRow<KEY_TYPE>> getDataByRec(ILookupCall<KEY_TYPE> call);
 }
