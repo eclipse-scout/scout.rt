@@ -116,6 +116,13 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_LOADING = "loading";
 
   /**
+   * Style to apply when the field is rendered as "disabled".
+   * <p>
+   * Note that this property may be moved to the not-yet-existing "IWidget" in the future.
+   */
+  String PROP_DISABLED_STYLE = "disabledStyle";
+
+  /**
    * position the label at the default location (normally left of the field)<br>
    * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
    */
@@ -181,6 +188,10 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String STATUS_POSITION_DEFAULT = "default";
 
   String STATUS_POSITION_TOP = "top";
+
+  int DISABLED_STYLE_DEFAULT = 0;
+
+  int DISABLED_STYLE_READ_ONLY = 1;
 
   IForm getForm();
 
@@ -984,4 +995,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * @see IFormFieldVisitor#visitField(IFormField, int, int)
    */
   boolean visitParents(IFormFieldVisitor visitor);
+
+  void setDisabledStyle(int disabledStyle);
+
+  int getDisabledStyle();
 }

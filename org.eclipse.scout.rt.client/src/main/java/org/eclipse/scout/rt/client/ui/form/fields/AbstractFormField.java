@@ -249,6 +249,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(35)
+  protected int getConfiguredDisabledStyle() {
+    return DISABLED_STYLE_DEFAULT;
+  }
+
   /**
    * Specifies if the form field is visible initially.<br>
    * Affects only the field itself. In case of a composite field the property does not get broadcasted initially.
@@ -817,6 +823,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_contributionHolder = new ContributionComposite(this);
 
     setEnabled(getConfiguredEnabled());
+    setDisabledStyle(getConfiguredDisabledStyle());
     setVisible(getConfiguredVisible());
     setMandatory(getConfiguredMandatory());
     setOrder(calculateViewOrder());
@@ -1577,6 +1584,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public boolean isEnabled() {
     return propertySupport.getPropertyBool(PROP_ENABLED);
+  }
+
+  @Override
+  public void setDisabledStyle(int disabledStyle) {
+    propertySupport.setPropertyInt(PROP_DISABLED_STYLE, disabledStyle);
+  }
+
+  @Override
+  public int getDisabledStyle() {
+    return propertySupport.getPropertyInt(PROP_DISABLED_STYLE);
   }
 
   @Override

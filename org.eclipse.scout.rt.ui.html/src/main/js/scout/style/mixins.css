@@ -101,7 +101,7 @@
 
   /* Use dashed line instead of solid to avoid visual conflict with editable fields */
   .read-only() {
-    background-color: @background-color;
+    background-color: transparent;
     border-color: transparent;
     border-bottom: dashed 1px @border-color;
     color: @text-color;

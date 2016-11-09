@@ -474,7 +474,14 @@ scout.Widget.prototype._renderDisabledStyleInternal = function($element) {
   if (!$element) {
     return;
   }
-  if (this.enabled) {
+  var enabled = this.enabled;
+  // For FormFields, the parents' "enabledness" must be considered as well (e.g. when a field is enabled,
+  // but the parent group box is not, the field has enabled=true but is rendered as disabled). This
+  // instance check may probably be removed in the future, when enabledComputed is move to Widget.js
+  if (this instanceof scout.FormField) {
+    enabled = this.enabledComputed;
+  }
+  if (enabled) {
     $element.removeClass('read-only');
   } else {
     $element.toggleClass('read-only', this.disabledStyle === scout.Widget.DisabledStyle.READ_ONLY);
