@@ -158,7 +158,7 @@ scout.Widget.prototype.destroy = function() {
   }
 
   if (this.animateRemoval && this.rendered) {
-    this.on('remove', function() {
+    this.one('remove', function() {
       this.destroy();
     }.bind(this));
     this.remove();
@@ -397,6 +397,17 @@ scout.Widget.prototype.setParent = function(parent) {
   }
 
   if (this.parent) {
+    // Don't link to new parent yet if removal is still pending.
+    // After the animation the parent will remove its children.
+    // If they are already linked to a new parent, removing the children is not possible anymore.
+    // This may lead to an "Already rendered" exception if the new parent wants to render its children.
+    if (this.parent._isRemovalPending()) {
+      this.parent.one('remove', function() {
+        this.setParent(parent);
+      }.bind(this));
+      return;
+    }
+
     this.parent.off('destroy', this._parentDestroyHandler);
 
     if (this.parent !== this.owner) {
