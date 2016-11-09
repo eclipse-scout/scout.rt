@@ -13,7 +13,7 @@ scout.Button = function() {
   this._addAdapterProperties(['menus']);
 
   this.systemType = scout.Button.SystemType.NONE;
-  this.defaultButton = true;
+  this.defaultButton = false;
   this.processButton = true;
   this.selected = false;
   this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
