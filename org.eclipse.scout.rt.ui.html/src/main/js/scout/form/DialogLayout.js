@@ -43,11 +43,15 @@ scout.DialogLayout.prototype.layout = function($container) {
   // 1. Ensure the dialog is not larger than viewport
   dialogSize.width = Math.min(maxWidth, prefSize.width);
   dialogSize.height = Math.min(maxHeight, prefSize.height);
+
   // 2. Ensure the dialog can only get larger, not smaller.
   //    This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but
   //    the user previously enlarged the dialog.
-  dialogSize.width = Math.max(dialogSize.width, currentBounds.width);
-  dialogSize.height = Math.max(dialogSize.height, currentBounds.height);
+  //    This must not happen when the dialog is layouted the first time (-> when it is opened, because it has not the right size yet and may get too big)
+  if (htmlComp.layouted) {
+    dialogSize.width = Math.max(dialogSize.width, currentBounds.width);
+    dialogSize.height = Math.max(dialogSize.height, currentBounds.height);
+  }
 
   scout.graphics.setSize(htmlComp.$comp, dialogSize);
   scout.DialogLayout.parent.prototype.layout.call(this, $container);
