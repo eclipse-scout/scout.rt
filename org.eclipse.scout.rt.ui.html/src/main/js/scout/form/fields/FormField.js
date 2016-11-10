@@ -423,9 +423,9 @@ scout.FormField.prototype.setTooltipText = function(tooltipText) {
  * @param enabled
  *          Required. The new enabled value
  * @param updateParents
- *          Optional. If true the enabled property of all parent form fields are updated to same value as well.
+ *          (optional) If true the enabled property of all parent form fields are updated to same value as well.
  * @param updateChildren
- *          Optional. If true the enabled property of all child form fields (recursive) are updated to same value as well.
+ *          (optional) If true the enabled property of all child form fields (recursive) are updated to same value as well.
  */
 scout.FormField.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
   scout.FormField.parent.prototype.setEnabled.call(this, enabled);
