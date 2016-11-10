@@ -260,14 +260,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public void setVisibleGranted(boolean visible) {
-    if (isIgnoreGrantedFlagChange(visible)) {
-      return;
-    }
-    super.setVisibleGranted(visible);
-  }
-
-  @Override
   public void setEnabledGranted(boolean enabled) {
     if (isIgnoreGrantedFlagChange(enabled)) {
       return;

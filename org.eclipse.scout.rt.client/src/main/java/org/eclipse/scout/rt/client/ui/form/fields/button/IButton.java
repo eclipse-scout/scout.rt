@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
@@ -139,4 +140,12 @@ public interface IButton extends IFormField {
   void setView(boolean visible, boolean enabled);
 
   Object getKeyStrokeScope();
+
+  /**
+   * Note: This method has no effect if the button is of system type {@link #SYSTEM_TYPE_CANCEL} or
+   * {@link #SYSTEM_TYPE_CLOSE}. This allows the user to still close a form that is entirely disabled
+   * ({@link IForm#setEnabledGranted(boolean)}).
+   */
+  @Override
+  void setEnabledGranted(boolean enabled);
 }
