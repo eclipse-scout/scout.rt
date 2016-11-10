@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.extension.fixture;
 
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -76,5 +77,9 @@ public class BasicForm extends AbstractForm {
     @Order(1000)
     public class CloseButton extends AbstractCloseButton {
     }
+  }
+
+  public class ModifyHandler extends AbstractFormHandler {
+
   }
 }

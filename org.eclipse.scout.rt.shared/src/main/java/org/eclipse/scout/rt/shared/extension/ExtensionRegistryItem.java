@@ -63,6 +63,10 @@ public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
         else {
           resultingInstance = (T) BeanUtility.createInstance(m_extensionClass, declaringObject);
         }
+        if (resultingInstance == null) {
+          // case where an inner class from the extension owner is subclassed within an extension in order to inherit the behavior, but it's not a replacement
+          resultingInstance = (T) BeanUtility.createInstance(m_extensionClass, declaringObject, owner);
+        }
       }
     }
     catch (RuntimeException e) {
