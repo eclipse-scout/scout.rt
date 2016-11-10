@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldTest.P_GroupBoxWithOneField.P_InnerField;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.MoveFieldsTestForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.MoveFieldsTestForm.MainBox.TopBox.SubBox.StringField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.AbstractTemplateFieldsBox;
@@ -42,6 +43,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormEx.BottomBo
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormEx.BottomBoxEx.CityField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsageForm;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -76,6 +80,18 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
     assertTrue(form.getBottomBox() instanceof BottomBoxEx);
     assertSame(form.getNameField(), form.getFieldByClass(BottomBoxEx.class).getFieldByClass(NameField.class));
     assertSame(form.getFieldByClass(CityField.class), form.getBottomBox().getFieldByClass(CityField.class));
+  }
+
+  @Test
+  public void testMoveToEmptyBox() {
+    P_GroupBoxWithOneField source = new P_GroupBoxWithOneField();
+    P_InnerField fieldToMove = source.getFieldByClass(P_InnerField.class);
+    ICompositeField target = new AbstractGroupBox() {
+    };
+    assertFalse(target.isVisible()); // hidden because it is empty
+
+    source.moveFieldTo(fieldToMove, target);
+    assertTrue(target.isVisible()); // visible now because the execCalculateVisible() is true now
   }
 
   /**
@@ -544,6 +560,11 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
     for (int i = 0; i < expectedClasses.length; i++) {
       assertSame(expectedClasses[i], objects.get(i).getClass());
+    }
+  }
+
+  public static class P_GroupBoxWithOneField extends AbstractGroupBox {
+    public class P_InnerField extends AbstractStringField {
     }
   }
 }
