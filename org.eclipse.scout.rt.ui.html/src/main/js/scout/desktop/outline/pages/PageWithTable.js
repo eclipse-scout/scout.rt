@@ -136,8 +136,8 @@ scout.PageWithTable.prototype._onLoadTableDataDone = function(tableData) {
   }
 };
 
-scout.PageWithTable.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThrown) {
-  $.log.error('Failed to load tableData. error=' + textStatus);
+scout.PageWithTable.prototype._onLoadTableDataFail = function(error) {
+  $.log.error('Failed to load tableData. error=', error);
 };
 
 scout.PageWithTable.prototype._onLoadTableDataAlways = function() {
