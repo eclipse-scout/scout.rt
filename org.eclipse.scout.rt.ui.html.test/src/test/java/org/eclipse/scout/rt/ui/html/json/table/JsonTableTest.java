@@ -1239,6 +1239,7 @@ public class JsonTableTest {
   /**
    * Tests if a RequestFocusInCell-Event gets discarded when all rows of the table get deleted
    */
+  @Test
   public void testRequestFocusInCellCoalesce() {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(2);

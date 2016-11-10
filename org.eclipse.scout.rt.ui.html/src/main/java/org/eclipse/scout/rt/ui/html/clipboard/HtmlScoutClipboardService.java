@@ -30,6 +30,8 @@ public class HtmlScoutClipboardService implements IClipboardService {
   public Collection<BinaryResource> getClipboardContents(MimeType... mimeTypes) {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(mimeTypes);
+    execInitClipboardForm(form);
+
     form.startPaste();
     form.waitFor();
     if (form.isFormStored()) {
@@ -38,7 +40,13 @@ public class HtmlScoutClipboardService implements IClipboardService {
     return Collections.emptyList();
   }
 
+  /**
+   * Callback to modify the clipboard-form before it is started.
+   *
+   * @param form
+   */
   protected void execInitClipboardForm(ClipboardForm form) {
+    // default empty
   }
 
   @Override
@@ -61,6 +69,7 @@ public class HtmlScoutClipboardService implements IClipboardService {
         .build();
 
     form.getClipboardField().setValue(Collections.singleton(binaryResource));
+    execInitClipboardForm(form);
     form.startCopy();
   }
 }

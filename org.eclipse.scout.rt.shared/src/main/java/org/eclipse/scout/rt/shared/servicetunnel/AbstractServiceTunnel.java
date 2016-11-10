@@ -111,7 +111,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    *
    * @throws CancellationException
    */
-  protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) throws CancellationException {
+  protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) {
     final IFuture<?> future = IFuture.CURRENT.get();
     if (future != null && future.isCancelled()) {
       final StringBuilder cancellationExceptionText = new StringBuilder();
