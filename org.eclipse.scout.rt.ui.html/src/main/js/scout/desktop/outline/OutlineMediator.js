@@ -25,6 +25,13 @@ scout.OutlineMediator.prototype.onTableRowsInserted = function(tableRows, childP
   pageWithTable.getTree().insertNodes(childPages, pageWithTable);
 };
 
+scout.OutlineMediator.prototype.onTableRowsDeleted = function(tableRows, childPages, pageWithTable) {
+  if (this._skipEvent(pageWithTable)) {
+    return;
+  }
+  pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
+};
+
 scout.OutlineMediator.prototype.onTableRowAction = function(event, page) {
   var childPage = event.row.page;
   if (!childPage) {

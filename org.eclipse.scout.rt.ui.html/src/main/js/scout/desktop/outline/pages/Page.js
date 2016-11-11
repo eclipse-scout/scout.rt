@@ -119,3 +119,10 @@ scout.Page.prototype._pageParam = function(paramProperties) {
   $.extend(param, paramProperties);
   return param;
 };
+
+scout.Page.prototype.reloadPage = function () {
+  var outline = this.getOutline();
+  if (outline) {
+    this.loadChildren();
+  }
+};

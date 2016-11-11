@@ -25,6 +25,7 @@ scout.TreeNode = function() {
   this.leaf = false;
   this.level;
   this.parentNode;
+  this.destroyed = false;
   this.rendered = false;
   this.text;
 
@@ -37,6 +38,21 @@ scout.TreeNode = function() {
 scout.TreeNode.prototype.init = function(model) {
   this._init(model);
   scout.texts.resolveTextProperty(this, 'text', this.parent.session);
+};
+
+scout.TreeNode.prototype.destroy = function() {
+  if (this.destroyed) {
+    throw new Error('TreeNode already destroyed');
+  }
+  this._destroy();
+  this.destroyed = true;
+};
+
+/**
+ * Override this method to do something when TreeNode gets destroyed. The default impl. does nothing.
+ */
+scout.TreeNode.prototype._destroy = function() {
+  // NOP
 };
 
 scout.TreeNode.prototype.getTree = function() {

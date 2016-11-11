@@ -2013,7 +2013,8 @@ scout.Table.prototype.deleteRows = function(rows) {
 };
 
 scout.Table.prototype.deleteAllRows = function() {
-  var filterChanged = this._filterCount() > 0 && this._filteredRows.length > 0;
+  var filterChanged = this._filterCount() > 0 && this._filteredRows.length > 0,
+    rows = this.rows;
 
   // Update HTML
   if (this.rendered) {
@@ -2037,7 +2038,7 @@ scout.Table.prototype.deleteAllRows = function() {
   }
   this._group();
   this._updateBackgroundEffect();
-  this._triggerAllRowsDeleted();
+  this._triggerAllRowsDeleted(rows);
 
   // Update HTML
   if (this.rendered) {
@@ -2835,21 +2836,21 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
 };
 
 scout.Table.prototype._triggerRowsInserted = function(rows) {
-  var event = {
+  this.trigger('rowsInserted', {
     rows: rows
-  };
-  this.trigger('rowsInserted', event);
+  });
 };
 
 scout.Table.prototype._triggerRowsDeleted = function(rows) {
-  var event = {
+  this.trigger('rowsDeleted', {
     rows: rows
-  };
-  this.trigger('rowsDeleted', event);
+  });
 };
 
-scout.Table.prototype._triggerAllRowsDeleted = function() {
-  this.trigger('allRowsDeleted');
+scout.Table.prototype._triggerAllRowsDeleted = function(rows) {
+  this.trigger('allRowsDeleted', {
+    rows: rows
+  });
 };
 
 scout.Table.prototype._triggerRowsSelected = function(debounce) {

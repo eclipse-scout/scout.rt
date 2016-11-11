@@ -270,7 +270,7 @@ $.pxToNumber = function(pixel) {
  * <code>$.Deferred().resolve([arguments]);</code>
  *
  * @param all arguments of this function are passed to the resolve function of the deferred
- * @return a deferred for an already resolved jQuery.Deferred object.
+ * @returns {$.Deferred} a deferred for an already resolved jQuery.Deferred object.
  */
 $.resolvedDeferred = function() {
   var deferred = $.Deferred();
@@ -283,7 +283,7 @@ $.resolvedDeferred = function() {
  * <code>$.Deferred().resolve([arguments]).promise();</code>
  *
  * @param all arguments of this function are passed to the resolve function of the deferred
- * @return a promise for an already resolved jQuery.Deferred object.
+ * @returns {$.Deferred} a promise for an already resolved jQuery.Deferred object.
  */
 $.resolvedPromise = function() {
   var deferred = $.Deferred();

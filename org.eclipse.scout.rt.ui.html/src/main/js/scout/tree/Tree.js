@@ -279,6 +279,7 @@ scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
   scout.arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
   this._removeFromFlatList(node, false); //ensure node is not longer in visible nodes list.
+  node.destroy();
 
   if (this._onNodeDeleted) { // Necessary for subclasses
     this._onNodeDeleted(node);

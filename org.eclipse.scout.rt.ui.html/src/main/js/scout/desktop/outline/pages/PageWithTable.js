@@ -20,9 +20,24 @@ scout.inherits(scout.PageWithTable, scout.Page);
  * @override Page.js
  */
 scout.PageWithTable.prototype._initTable = function(table) {
+  table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
   table.on('rowsInserted', this._onTableRowsInserted.bind(this));
   table.on('rowAction', this._onTableRowAction.bind(this));
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
+};
+
+scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
+  if (this.leaf) { // when page is a leaf we do nothing at all
+    return;
+  }
+  var tableRows = scout.arrays.ensure(event.rows),
+    childPages = tableRows.map(function(row) {
+      var childPage = row.page;
+      this._unlinkTableRowWithPage(row, childPage);
+      return childPage;
+    }, this);
+
+  this.getOutline().mediator.onTableRowsDeleted(tableRows, childPages, this);
 };
 
 /**
@@ -34,7 +49,7 @@ scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
     return;
   }
 
-  var tableRows = event.rows,
+  var tableRows = scout.arrays.ensure(event.rows),
     childPages = tableRows.map(function(row) {
       return this._createChildPageInternal(row);
     }, this);
