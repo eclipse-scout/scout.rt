@@ -17,7 +17,7 @@ scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 scout.SmartFieldTouchPopup.prototype._init = function(options) {
   scout.SmartFieldTouchPopup.parent.prototype._init.call(this, options);
   this._delegateEvents(['acceptProposal', 'proposalTyped', 'cancelProposal']);
-  this._delegateDisplayTextChanges(['acceptProposal', 'deleteProposal']);
+  this._delegateDisplayTextChanges(['acceptProposal', 'proposalTyped', 'deleteProposal']);
 };
 
 scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
