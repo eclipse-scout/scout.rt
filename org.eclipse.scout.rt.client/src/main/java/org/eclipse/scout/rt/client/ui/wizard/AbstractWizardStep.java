@@ -44,11 +44,12 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 @ClassId("39d99aa9-002c-4367-9558-20225928fbd1")
 public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPropertyObserver implements IWizardStep<FORM>, IPropertyObserver, IExtensibleObject {
 
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
   private static final String INITIALIZED = "INITIALIZED";
   private static final String ACTION_RUNNING = "ACTION_RUNNING";
+
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, ACTION_RUNNING);
 
   private IWizard m_wizard;
   private FORM m_form;

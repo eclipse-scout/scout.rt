@@ -27,9 +27,12 @@ import org.eclipse.scout.rt.shared.dimension.IDimensions;
 
 public class TableRow implements ITableRow {
 
-  protected static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
   private static final String CHECKED = "CHECKED";
   private static final String ROW_PROPERTIES_CHANGED = "ROW_PROPERTIES_CHANGED";
+  protected static final String REJECTED_BY_USER = "REJECTED_BY_USER";
+  protected static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
+
+  protected static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(CHECKED, IDimensions.ENABLED, ROW_PROPERTIES_CHANGED, REJECTED_BY_USER, FILTER_ACCEPTED);
 
   private final ColumnSet m_columnSet;
   private final Map<String, Object> m_customValues;

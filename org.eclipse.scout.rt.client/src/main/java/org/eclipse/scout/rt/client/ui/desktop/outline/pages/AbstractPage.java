@@ -70,10 +70,16 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 @ClassId("ef0d789e-dfbf-4715-9ab7-eedaefc936f3")
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
 
-  static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
   private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
+  static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
+  static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
+  static final String LIMITED_RESULT = "LIMITED_RESULT";
+  static final String ALWAYS_CREATE_CHILD_PAGE = "ALWAYS_CREATE_CHILD_PAGE";
+
+  static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
+      LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {

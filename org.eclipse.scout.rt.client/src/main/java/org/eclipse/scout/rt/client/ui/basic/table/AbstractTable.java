@@ -129,14 +129,15 @@ import org.slf4j.LoggerFactory;
 @ClassId("e88f7f88-9747-40ea-88bd-744803aef7a7")
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final String ACTION_RUNNING = "ACTION_RUNNING";
+  private static final String INITIALIZED = "INITIALIZED";
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
   private static final String SORT_VALID = "SORT_VALID";
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String INITIAL_MULTI_LINE_TEXT = "INITIAL_MULTI_LINE_TEXT";
+  private static final String ACTION_RUNNING = "ACTION_RUNNING";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, AUTO_DISCARD_ON_DELETE, SORT_VALID, INITIAL_MULTI_LINE_TEXT, ACTION_RUNNING);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED);
 
   public interface IResetColumnsOption {
     String VISIBILITY = "visibility";

@@ -25,6 +25,15 @@ public class NamedBitMaskHelperTest {
   }
 
   @Test
+  public void testUsedBitNames() {
+    NamedBitMaskHelper bitMask = new NamedBitMaskHelper();
+    Assert.assertEquals(0, bitMask.usedBits());
+
+    bitMask = new NamedBitMaskHelper(BIT_NAMES[0], BIT_NAMES[3]);
+    Assert.assertEquals(2, bitMask.usedBits());
+  }
+
+  @Test
   public void testValues() {
     byte holder = 0;
     NamedBitMaskHelper bitMask = new NamedBitMaskHelper();
@@ -103,6 +112,14 @@ public class NamedBitMaskHelperTest {
 
     try {
       bitMask.setBit(BIT_NAMES[NamedBitMaskHelper.NUM_BITS], holder);
+      Assert.fail("overflow check wrong");
+    }
+    catch (IllegalStateException e) {
+      // ok
+    }
+
+    try {
+      bitMask = new NamedBitMaskHelper(BIT_NAMES);
       Assert.fail("overflow check wrong");
     }
     catch (IllegalStateException e) {

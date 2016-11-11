@@ -45,12 +45,13 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelEntity.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
-  private static final String ONE_TO_MANY = "ONE_TO_MANY";
   private static final String INITIALIZED = "INITIALIZED";
+  private static final String ONE_TO_MANY = "ONE_TO_MANY";
   private static final String INITIALIZED_CHILD_ENTITIES = "INITIALIZED_CHILD_ENTITIES";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelEntity.class);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, ONE_TO_MANY, INITIALIZED_CHILD_ENTITIES);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
 
   private double m_order;
   private Permission m_visiblePermission;

@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractOutline.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
   private static final IMenuTypeMapper TABLE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {

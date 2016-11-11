@@ -145,9 +145,6 @@ import org.w3c.dom.Element;
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractForm.class);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper STATE_BIT_HELPER = new NamedBitMaskHelper();
   private static final String INITIALIZED = "INITIALIZED";
   private static final String CACHE_BOUNDS = "CACHE_BOUNDS";
   private static final String ASK_IF_NEED_SAVE = "ASK_IF_NEED_SAVE";
@@ -157,6 +154,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private static final String FORM_STORED = "FORM_STORED";
   private static final String FORM_LOADING = "FORM_LOADING";
   private static final String FORM_STARTED = "FORM_STARTED";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractForm.class);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, CACHE_BOUNDS, ASK_IF_NEED_SAVE,
+      BUTTONS_ARMED, CLOSE_TIMER_ARMED, SHOW_ON_START);
+  private static final NamedBitMaskHelper STATE_BIT_HELPER = new NamedBitMaskHelper(FORM_STORED, FORM_LOADING, FORM_STARTED);
 
   private final PreferredValue<IDisplayParent> m_displayParent;
   private final EventListenerList m_listenerList;

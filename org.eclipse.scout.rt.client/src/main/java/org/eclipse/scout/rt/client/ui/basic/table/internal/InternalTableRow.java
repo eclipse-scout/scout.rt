@@ -34,9 +34,6 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  */
 public class InternalTableRow extends TableRow implements ITableRow, ICellObserver {
 
-  private static final String REJECTED_BY_USER = "REJECTED_BY_USER";
-  private static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
-
   private ITable m_table;
   private int m_rowIndex;
   private int m_rowChanging = 0;

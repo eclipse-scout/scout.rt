@@ -49,16 +49,17 @@ import org.slf4j.LoggerFactory;
 @ClassId("d3cdbb0d-4c53-4854-b6f2-23465050c3c5")
 public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
   private static final String ACTION_RUNNING = "ACTION_RUNNING";
+  private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
+  private static final String INITIALIZED = "INITIALIZED";
   private static final String INHERIT_ACCESSIBILITY = "INHERIT_ACCESSIBILITY";
   private static final String TOGGLE_ACTION = "TOGGLE_ACTION";
   private static final String SEPARATOR = "SEPARATOR";
-  private static final String INITIALIZED = "INITIALIZED";
-  private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ACTION_RUNNING, ENABLED_INHERIT_ACCESSIBILITY);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, INHERIT_ACCESSIBILITY, TOGGLE_ACTION, SEPARATOR);
 
   /**
    * Provides 8 dimensions for enabled state.<br>

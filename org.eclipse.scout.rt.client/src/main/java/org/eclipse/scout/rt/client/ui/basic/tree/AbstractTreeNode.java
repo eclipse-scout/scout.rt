@@ -50,22 +50,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, IContributionOwner, IExtensibleObject {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractTreeNode.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper EXPANDED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
-  private static final String REJECTED_BY_USER = "REJECTED_BY_USER";
+
   private static final String INITIALIZED = "INITIALIZED";
+  private static final String CHILDREN_DIRTY = "CHILDREN_DIRTY";
   private static final String CHILDREN_LOADED = "CHILDREN_LOADED";
   private static final String CHILDREN_VOLATILE = "CHILDREN_VOLATILE";
-  private static final String CHILDREN_DIRTY = "CHILDREN_DIRTY";
+  private static final String FILTER_ACCEPTED = "FILTER_ACCEPTED";
   private static final String LEAF = "LEAF";
+  private static final String REJECTED_BY_USER = "REJECTED_BY_USER";
   private static final String EXPANDED = "EXPANDED";
   private static final String EXPANDED_LAZY = "EXPANDED_LAZY";
-  private static final String LAZY_EXPANDING_ENABLED = "LAZY_EXPANDING_ENABLED";
   private static final String INITIALLY_EXPANDED = "INITIALLY_EXPANDED";
+  private static final String LAZY_EXPANDING_ENABLED = "LAZY_EXPANDING_ENABLED";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTreeNode.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, CHILDREN_DIRTY, CHILDREN_LOADED, CHILDREN_VOLATILE, FILTER_ACCEPTED, LEAF, REJECTED_BY_USER);
+  private static final NamedBitMaskHelper EXPANDED_BIT_HELPER = new NamedBitMaskHelper(EXPANDED, EXPANDED_LAZY, INITIALLY_EXPANDED, LAZY_EXPANDING_ENABLED);
 
   private int m_initializing = 0; // >0 is true
   private ITree m_tree;
@@ -85,7 +87,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #EXPANDED}, {@link #EXPANDED_LAZY}, {@link #INITIALLY_EXPANDED},
+   * Currently used: {@link #INITIALIZED}, {@link #EXPANDED}, {@link #EXPANDED_LAZY}, {@link #INITIALLY_EXPANDED},
    * {@link #LAZY_EXPANDING_ENABLED}
    */
   private byte m_expanded;

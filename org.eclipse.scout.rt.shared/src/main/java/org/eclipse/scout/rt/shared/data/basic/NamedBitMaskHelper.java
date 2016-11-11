@@ -35,9 +35,28 @@ public final class NamedBitMaskHelper {
   private final Map<String /*bit-name*/, Byte /*bit-mask to access that position*/> m_masksByBitName;
   private byte m_nextIndex; // holds the next bit position to use
 
-  public NamedBitMaskHelper() {
+  /**
+   * Creates a new instance of this helper with the given bit names already consumed in the order provided.
+   * 
+   * @param usedBitNames
+   *          The bit names to consume eagerly.
+   */
+  public NamedBitMaskHelper(String... usedBitNames) {
     m_masksByBitName = new ConcurrentHashMap<>(NUM_BITS);
     m_nextIndex = 0;
+
+    if (usedBitNames != null && usedBitNames.length > 0) {
+      for (String usedName : usedBitNames) {
+        bitMaskFor(usedName);
+      }
+    }
+  }
+
+  /**
+   * Creates a new instance of this helper with no used bit names.
+   */
+  public NamedBitMaskHelper() {
+    this((String[]) null);
   }
 
   /**

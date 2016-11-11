@@ -54,14 +54,15 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable, IExtensibleObject {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelAttribute.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final long serialVersionUID = 1L;
   private static final String ALLOW_NULL_OPERATOR = "ALLOW_NULL_OPERATOR";
   private static final String ALLOW_NOT_OPERATOR = "ALLOW_NOT_OPERATOR";
   private static final String AGGREGATION_ENABLED = "AGGREGATION_ENABLED";
   private static final String ACTIVE_FILTER_ENABLED = "ACTIVE_FILTER_ENABLED";
-  private static final long serialVersionUID = 1L;
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelAttribute.class);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(ALLOW_NULL_OPERATOR, ALLOW_NOT_OPERATOR, AGGREGATION_ENABLED, ACTIVE_FILTER_ENABLED);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
 
   private String m_text;
   private int m_type;

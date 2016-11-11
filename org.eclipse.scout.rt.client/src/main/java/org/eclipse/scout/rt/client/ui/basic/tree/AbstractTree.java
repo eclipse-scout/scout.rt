@@ -81,14 +81,14 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTree extends AbstractPropertyObserver implements ITree, IContributionOwner, IExtensibleObject {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractTree.class);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
+  private static final String INITIALIZED = "INITIALIZED";
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
   private static final String AUTO_TITLE = "AUTO_TITLE";
-  private static final String INITIALIZED = "INITIALIZED";
-  private static final String SAVE_AND_RESTORE_SCROLLBARS = "SAVE_AND_RESTORE_SCROLLBARS";
   private static final String ACTION_RUNNING = "ACTION_RUNNING";
+  private static final String SAVE_AND_RESTORE_SCROLLBARS = "SAVE_AND_RESTORE_SCROLLBARS";
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractTree.class);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, AUTO_DISCARD_ON_DELETE, AUTO_TITLE, ACTION_RUNNING, SAVE_AND_RESTORE_SCROLLBARS);
 
   private final EventListenerList m_listenerList;
   private final Set<ITreeNode> m_checkedNodes;

@@ -80,10 +80,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPageWithTable.class);
-  static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
-  static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
-  static final String LIMITED_RESULT = "LIMITED_RESULT";
-  static final String ALWAYS_CREATE_CHILD_PAGE = "ALWAYS_CREATE_CHILD_PAGE";
 
   private ISearchForm m_searchForm;
   private FormListener m_searchFormListener;

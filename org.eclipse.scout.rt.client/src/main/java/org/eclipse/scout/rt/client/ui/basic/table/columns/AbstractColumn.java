@@ -80,11 +80,8 @@ import org.slf4j.LoggerFactory;
 @ClassId("ebe15e4d-017b-4ac0-9a5a-2c9e07c8ad6f")
 public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver implements IColumn<VALUE>, IExtensibleObject {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String DISPLAYABLE = "DISPLAYABLE";
+  private static final String INITIALIZED = "INITIALIZED";
   private static final String PRIMARY_KEY = "PRIMARY_KEY";
   private static final String SUMMARY = "SUMMARY";
   private static final String INITIALLY_VISIBLE = "INITIALLY_VISIBLE";
@@ -92,6 +89,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private static final String INITIALLY_SORTED_ASC = "INITIALLY_SORTED_ASC";
   private static final String INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_BEGIN";
   private static final String INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED, DISPLAYABLE);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, PRIMARY_KEY, SUMMARY, INITIALLY_VISIBLE,
+      INITIALLY_GROUPED, INITIALLY_SORTED_ASC, INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END);
 
   private ITable m_table;
 

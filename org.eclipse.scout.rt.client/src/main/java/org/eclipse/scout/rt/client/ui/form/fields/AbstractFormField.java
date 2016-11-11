@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
@@ -80,16 +81,17 @@ import org.w3c.dom.Element;
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField, IContributionOwner, IExtensibleObject {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractFormField.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper LABEL_VISIBLE_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper();
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper();
-  private static final String INITIALIZED = "INITIALIZED";
   private static final String ENABLED_SLAVE = "ENABLED_SLAVE";
+  private static final String INITIALIZED = "INITIALIZED";
   private static final String TOUCHED = "TOUCHED";
   private static final String LABEL_VISIBLE = "LABEL_VISIBLE";
   private static final String MASTER_REQUIRED = "MASTER_REQUIRED";
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractFormField.class);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
+  private static final NamedBitMaskHelper LABEL_VISIBLE_BIT_HELPER = new NamedBitMaskHelper(LABEL_VISIBLE);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ENABLED_SLAVE);
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, TOUCHED, MASTER_REQUIRED);
 
   /**
    * Provides 8 dimensions for enabled state.<br>
@@ -107,8 +109,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Provides 8 dimensions for label visibility.<br>
-   * Internally used: {@link #LABEL_VISIBLE}.<br>
-   * 7 dimensions remain for custom use. This FormField's label is visible, if all dimensions are visible (all bits
+   * Internally used: {@link #LABEL_VISIBLE} and one level by the {@link AbstractSequenceBox}.<br>
+   * 6 dimensions remain for custom use. This FormField's label is visible, if all dimensions are visible (all bits
    * set).
    */
   private byte m_labelVisible;
