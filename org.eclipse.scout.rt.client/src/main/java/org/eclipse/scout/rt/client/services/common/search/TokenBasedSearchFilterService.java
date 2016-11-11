@@ -22,7 +22,12 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.AndNodeToken;
 
+/**
+ * @deprecated Will be removed in the O release.
+ */
+@SuppressWarnings("deprecation")
 @Order(5200)
+@Deprecated
 public class TokenBasedSearchFilterService extends DefaultSearchFilterService {
 
   @Override

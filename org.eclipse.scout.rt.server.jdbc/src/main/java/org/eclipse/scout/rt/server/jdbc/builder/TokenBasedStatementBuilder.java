@@ -40,7 +40,11 @@ import org.slf4j.LoggerFactory;
  * Checks the value type of every bind to avoid unexpected type injections. Makes sure no sql injection is applied.
  * <p>
  * subclass to add token mappings and handle complex tokens in {@link #buildToken(int, Object[])}
+ *
+ * @deprecated Will be removed in the O release.
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class TokenBasedStatementBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(TokenBasedStatementBuilder.class);
 
@@ -198,7 +202,7 @@ public class TokenBasedStatementBuilder {
   /**
    * Just adds the (localized) bind value for :S, replaces :S by the new bind name inside the statement and returns the
    * localized s
-   * 
+   *
    * @param sql
    * @param sValue
    *          is the value for the :S bind

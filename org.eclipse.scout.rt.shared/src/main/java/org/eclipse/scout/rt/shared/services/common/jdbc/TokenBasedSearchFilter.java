@@ -18,7 +18,10 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Use the {@link TokenBasedSearchFilterService} on the client side to use this class
+ * 
+ * @deprecated Will be removed in the O release.
  */
+@Deprecated
 public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
   private static final long serialVersionUID = 0L;
 

@@ -17,6 +17,10 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
+/**
+ * @deprecated Will be removed in the O release.
+ */
+@Deprecated
 public class LegacyStatementBuilder {
 
   private ISqlStyle m_sqlStyle;

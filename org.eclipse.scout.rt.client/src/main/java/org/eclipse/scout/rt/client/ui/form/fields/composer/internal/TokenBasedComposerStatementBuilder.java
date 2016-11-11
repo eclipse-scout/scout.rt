@@ -23,6 +23,11 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.E
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.OrNodeToken;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.TreeNodeToken;
 
+/**
+ * @deprecated Will be removed in the O release.
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class TokenBasedComposerStatementBuilder {
 
   private final TokenBasedSearchFilterService m_service;
