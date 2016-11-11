@@ -46,7 +46,7 @@
     }
   }
 
-  &.mandatory > .mandatory-indicator {
+  &.mandatory > .mandatory-indicator:not(.read-only) {
     visibility: visible;
   }
 

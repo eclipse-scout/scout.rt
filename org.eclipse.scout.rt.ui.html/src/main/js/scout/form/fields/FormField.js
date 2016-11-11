@@ -327,6 +327,7 @@ scout.FormField.prototype._renderEnabled = function() {
  */
 scout.FormField.prototype._renderDisabledStyle = function() {
   this._renderDisabledStyleInternal(this.$field);
+  this._renderDisabledStyleInternal(this.$mandatory);
 };
 
 scout.FormField.prototype._renderFont = function() {

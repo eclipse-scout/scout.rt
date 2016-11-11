@@ -1202,6 +1202,7 @@ scout.DateField.prototype.formatTimestamp = function(timestamp) {
 scout.DateField.prototype._renderDisabledStyle = function() {
   this._renderDisabledStyleInternal(this.$dateField);
   this._renderDisabledStyleInternal(this.$timeField);
+  this._renderDisabledStyleInternal(this.$mandatory);
 };
 
 /**
