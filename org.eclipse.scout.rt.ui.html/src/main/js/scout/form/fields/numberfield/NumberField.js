@@ -38,6 +38,7 @@ scout.NumberField.prototype._render = function($parent) {
 };
 
 scout.NumberField.prototype._renderGridData = function() {
+  scout.NumberField.parent.prototype._renderGridData.call(this);
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });

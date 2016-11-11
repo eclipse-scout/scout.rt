@@ -43,6 +43,7 @@ scout.LabelField.prototype._renderWrapText = function() {
 };
 
 scout.LabelField.prototype._renderGridData = function() {
+  scout.LabelField.parent.prototype._renderGridData.call(this);
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });

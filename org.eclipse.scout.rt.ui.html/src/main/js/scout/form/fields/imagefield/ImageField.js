@@ -74,6 +74,7 @@ scout.ImageField.prototype._renderScrollBarEnabled = function() {
 };
 
 scout.ImageField.prototype._renderGridData = function() {
+  scout.ImageField.parent.prototype._renderGridData.call(this);
   this._updateInnerAlignment();
 };
 

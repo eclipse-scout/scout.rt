@@ -304,7 +304,7 @@ scout.FormField.prototype._renderLabelBackgroundColor = function() {
 };
 
 scout.FormField.prototype._renderGridData = function() {
-  // NOP
+  this.invalidateLayoutTree();
 };
 
 scout.FormField.prototype._renderMenus = function() {
