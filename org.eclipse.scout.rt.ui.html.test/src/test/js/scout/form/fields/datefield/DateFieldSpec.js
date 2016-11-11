@@ -187,6 +187,7 @@ describe("DateField", function() {
       var events = [
         new scout.Event(dateField.id, 'displayTextChanged', {
           displayText: '11.02.2015',
+          whileTyping: false,
           showBusyIndicator: true
         }),
         new scout.Event(dateField.id, 'timestampChanged', {
@@ -260,6 +261,7 @@ describe("DateField", function() {
       var events = [
         new scout.Event(dateField.id, 'displayTextChanged', {
           displayText: '01.02.2016',
+          whileTyping: false,
           showBusyIndicator: true
         }),
         new scout.Event(dateField.id, 'timestampChanged', {

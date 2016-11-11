@@ -32,15 +32,6 @@ scout.ValueField.prototype._readDisplayText = function() {
   return this.$field.val();
 };
 
-/**
- * Called before the displayText is sent to the server.
- *
- * @param displayText never null or undefined
- */
-scout.ValueField.prototype._validateDisplayText = function(displayText, whileTyping) {
-  return displayText;
-};
-
 scout.ValueField.prototype._onFieldBlur = function() {
   this.acceptInput(false);
 };
@@ -54,7 +45,6 @@ scout.ValueField.prototype._onFieldBlur = function() {
  * <p>
  * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerDisplayTextChanged().
  * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
- *
  */
 scout.ValueField.prototype.acceptInput = function(whileTyping) {
   whileTyping = !!whileTyping; // cast to boolean
@@ -62,18 +52,16 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
 
   // trigger only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
-    this._parseAndSetValue(displayText, whileTyping);
+    if (whileTyping) {
+      this.setDisplayText(displayText, whileTyping);
+    } else {
+      this._parseAndSetValue(displayText); // this also calls setDisplayText()
+    }
   }
 };
 
-scout.ValueField.prototype._parseAndSetValue = function(displayText, whileTyping) {
-  var validatedDisplayText = this._validateDisplayText(displayText, whileTyping);
-  this.displayText = validatedDisplayText;
-  if (displayText !== validatedDisplayText) {
-    this._renderDisplayText();
-  }
-  this._triggerDisplayTextChanged(validatedDisplayText, whileTyping);
-  this.setValue(this._parseValue(validatedDisplayText));
+scout.ValueField.prototype._parseAndSetValue = function(displayText) {
+  this.setValue(this._parseValue(displayText));
 };
 
 scout.ValueField.prototype._parseValue = function(displayText) {
@@ -109,17 +97,18 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
 scout.ValueField.prototype._triggerDisplayTextChanged = function(displayText, whileTyping) {
   var event = {
     displayText: displayText,
-    whileTyping: whileTyping
+    whileTyping: !!whileTyping
   };
   this.trigger('displayTextChanged', event);
 };
 
 /**
  * Not used by acceptInput by purpose, because display text doesn't have to be rendered again.
- * May be used to just modify the display text without validation
+ * May be used to just modify the display text without validation XXX
  */
-scout.ValueField.prototype.setDisplayText = function(displayText) {
+scout.ValueField.prototype.setDisplayText = function(displayText, whileTyping) {
   this.setProperty('displayText', displayText);
+  this._triggerDisplayTextChanged(displayText, whileTyping);
 };
 
 // FIXME [awe] 6.1 - check fields like DateField where setTimestamp is used instead of setValue
@@ -129,7 +118,7 @@ scout.ValueField.prototype.setValue = function(value) {
 
 scout.ValueField.prototype._syncValue = function(value) {
   var oldValue = this.value;
-  this.value = value;
+  this.value = this._validateValue(value);
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, value);
@@ -149,6 +138,13 @@ scout.ValueField.prototype._updateDisplayText = function() {
   } else {
     this.setDisplayText(returned);
   }
+};
+
+/**
+ * @returns the validated value
+ */
+scout.ValueField.prototype._validateValue = function(value) {
+  return value;
 };
 
 /**

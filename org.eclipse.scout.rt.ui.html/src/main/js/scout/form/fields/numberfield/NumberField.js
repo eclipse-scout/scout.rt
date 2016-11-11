@@ -60,13 +60,6 @@ scout.NumberField.prototype.acceptInput = function(whileTyping) {
   scout.NumberField.parent.prototype.acceptInput.call(this, whileTyping);
 };
 
-scout.NumberField.prototype.setDisplayText = function(value) {
-  this._setProperty('displayText', scout.objects.isNumber(value) ? value.toString() : '');
-  if (this.rendered) {
-    this._renderDisplayText();
-  }
-};
-
 scout.NumberField.prototype.parse = function() {
   var number = null;
   try {

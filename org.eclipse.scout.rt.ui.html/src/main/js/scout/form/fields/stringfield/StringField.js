@@ -324,11 +324,11 @@ scout.StringField.prototype.triggerSelectionChange = function() {
   });
 };
 
-scout.StringField.prototype._validateDisplayText = function(displayText, whileTyping) {
-  if (!whileTyping && this.trimText) {
-    displayText = displayText.trim();
+scout.StringField.prototype._validateValue = function(value) {
+  if (this.trimText) {
+    value = value.trim();
   }
-  return scout.StringField.parent.prototype._validateDisplayText(displayText, whileTyping);
+  return scout.StringField.parent.prototype._validateValue(value);
 };
 
 /**

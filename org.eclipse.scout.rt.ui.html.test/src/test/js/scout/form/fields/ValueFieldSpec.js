@@ -75,6 +75,26 @@ describe('ValueField', function() {
       expect(field.value).toBe('Foo');
     });
 
+    it('sets value and display text when accept input is called', function() {
+      field._parseValue = function(displayText) {
+        return (displayText === 'blau' ? 'gelb' : displayText);
+      };
+      field._validateValue = function(value) {
+        return (value === 'gelb' ? 'rot' : value);
+      };
+      field._formatValue = function(value) {
+        return (value === 'rot' ? 'lila' : value);
+      };
+      field._readDisplayText = function() {
+        return 'blau';
+      };
+      field.acceptInput();
+      // 'blau' -> (parse) 'gelb' -> (validate) 'rot'
+      expect(field.value).toBe('rot');
+      // 'blau' -> (parse) 'gelb' -> (validate) 'rot' -> (format) 'lila'
+      expect(field.displayText).toBe('lila');
+    });
+
   });
 
   describe('validation: initialValue, touched, empty and mandatory', function() {
