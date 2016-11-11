@@ -749,6 +749,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     !jqXHR.status ||
     // Status code >= 12000 comes from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
     jqXHR.status >= 12000 ||
+    // Status code 502 = Bad Gateway
     // Status code 503 = Service Unavailable
     // Status code 504 = Gateway Timeout
     // Those codes usually happen when some network component between browser and UI server (e.g. a load balancer)
@@ -757,6 +758,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     // server due to inactivity. Going offline starts the reconnector which regularly emits ping requests.
     // This allows us to reconnect to the server as soon as the connection is fixed, hopefully saving the
     // HTTP session from inactivation.
+    jqXHR.status === 502 ||
     jqXHR.status === 503 ||
     jqXHR.status === 504
   );
