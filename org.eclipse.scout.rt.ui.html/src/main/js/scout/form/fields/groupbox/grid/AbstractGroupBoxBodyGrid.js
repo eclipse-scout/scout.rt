@@ -57,7 +57,7 @@ scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox, recursive
 
 scout.AbstractGroupBoxBodyGrid.prototype.layoutAllStatic = function(fields) {
   var hints = [];
-  fields.foreach(function(v) {
+  fields.forEach(function(v) {
     hints.push(scout.GridData.createFromHints(v, 1));
   });
   var totalGridW = hints.reduce(function(x, y) {
@@ -68,7 +68,7 @@ scout.AbstractGroupBoxBodyGrid.prototype.layoutAllStatic = function(fields) {
     var y1 = y.y + y.h;
     return y1 > x ? y1 : x;
   }, 0);
-  fields.foreach(function(v) {
+  fields.forEach(function(v) {
     v.gridData = scout.GridData.createFromHints(v, totalGridW);
   });
   this.gridRows = totalGridH;
