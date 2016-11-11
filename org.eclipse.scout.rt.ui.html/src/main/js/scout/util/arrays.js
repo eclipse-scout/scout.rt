@@ -84,7 +84,12 @@ scout.arrays = {
   },
 
   insert: function(arr, element, index) {
-    arr.splice(index, 0, element);
+    scout.arrays.insertArray(arr, element, index);
+  },
+
+  insertArray: function(arr, elements, index) {
+    elements = scout.arrays.ensure(elements);
+    Array.prototype.splice.apply(arr, [index, 0].concat(elements));
   },
 
   move: function(arr, fromIndex, toIndex) {

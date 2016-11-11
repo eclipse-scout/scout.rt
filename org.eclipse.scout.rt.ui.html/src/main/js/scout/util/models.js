@@ -68,7 +68,8 @@ scout.models = {
   },
 
   /**
-   * extends parentModel with the contents of extension. parentModel will be changed and returned.
+   * extends parentModel with the contents of extension. The extension property can be an object or an array of objects.
+   * ParentModel will be changed and returned.
    * @param extension extension to the parentModel. Needs a property id on the parentModel to find the extension point.
    * Syntax of the extension:
    * Adding or overriding a property:
@@ -145,7 +146,7 @@ scout.models = {
         if ($.isNumeric(target.index)) {
           insertAt = target.index;
         }
-        scout.arrays.insert(targetArray, extensionConfig.extension, insertAt);
+        scout.arrays.insertArray(targetArray, extensionConfig.extension, insertAt);
       }
     }.bind(this));
     return parentModel;

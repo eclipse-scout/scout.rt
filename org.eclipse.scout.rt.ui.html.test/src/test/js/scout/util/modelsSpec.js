@@ -191,6 +191,27 @@ describe("scout.models", function() {
       }]
     };
 
+    var newObjectInTreeRelativeindexWithArray = {
+        type: 'extension',
+        extensions: [{
+          operation: 'insert',
+          target: {
+            id: 'child2',
+            property: 'childs',
+            before: 'child3'
+          },
+          extension: [{
+            id: 'newObj',
+            value: 'relative index insert'
+          },
+          {
+            id: 'newObj2',
+            value: 'relative index insert2'
+          }]
+        }
+        ]
+      };
+
     beforeEach(function() {
       parentObj = $.extend(true, {}, originalparent);
     });
@@ -226,6 +247,11 @@ describe("scout.models", function() {
     it('insert new object into tree object with relative index', function() {
       scout.models.extend(newObjectInTreeRelativeindex, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
+    });
+    it('insert new object into tree object with relative index and two extension elements', function() {
+      scout.models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
+      expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
+      expect(parentObj.rootContainer.childs[1].childs[1].value).toBe('relative index insert2');
     });
     it('insert object referenced by String', function() {
       var models ={};
