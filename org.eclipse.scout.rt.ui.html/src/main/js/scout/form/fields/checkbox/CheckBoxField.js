@@ -31,13 +31,13 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
   this.addFieldContainer($parent.makeDiv());
-  
+
   this.$checkBox = this.$fieldContainer
     .appendDiv('check-box')
     .on('mousedown', this._onMouseDown.bind(this))
     .data('valuefield', this);
   this.addField(this.$checkBox);
-  
+
   this.$checkBoxLabel = this.$fieldContainer
     .appendDiv('label')
     .on('mousedown', this._onMouseDown.bind(this));
@@ -141,6 +141,7 @@ scout.CheckBoxField.prototype._renderBackgroundColor = function() {
 };
 
 scout.CheckBoxField.prototype._renderGridData = function() {
+  scout.CheckBoxField.parent.prototype._renderGridData.call(this);
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });

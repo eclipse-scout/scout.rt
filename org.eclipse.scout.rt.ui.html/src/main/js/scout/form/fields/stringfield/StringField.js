@@ -252,6 +252,7 @@ scout.StringField.prototype._renderTrimText = function() {
 };
 
 scout.StringField.prototype._renderGridData = function() {
+  scout.StringField.parent.prototype._renderGridData.call(this);
   this.updateInnerAlignment({
     useHorizontalAlignment: (this.multilineText ? false : true)
   });
