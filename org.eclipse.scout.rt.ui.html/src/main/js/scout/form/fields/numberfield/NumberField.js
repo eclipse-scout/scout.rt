@@ -61,10 +61,10 @@ scout.NumberField.prototype.acceptInput = function(whileTyping) {
   scout.NumberField.parent.prototype.acceptInput.call(this, whileTyping);
 };
 
-scout.NumberField.prototype.parse = function() {
+scout.NumberField.prototype.parse = function(displayText) {
   var number = null;
   try {
-    number = this.decimalFormat.parse(this.displayText);
+    number = this.decimalFormat.parse(scout.nvl(displayText, this.displayText));
   } catch(e) {
     // catch Error thrown when number isNaN
   }
@@ -75,10 +75,7 @@ scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
     // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
-    input = input
-      .replace(new RegExp('[' + this.decimalFormat.groupingChar + ']', 'g'), '')
-      .replace(new RegExp('[' + this.decimalFormat.decimalSeparatorChar + ']', 'g'), '.')
-      .replace(/\s/g, '');
+    input = this.decimalFormat.normalizeString(input);
 
     // if only math symbols are in the input string...
     if (this.calc.isFormula(input)) {
@@ -93,4 +90,12 @@ scout.NumberField.prototype._parse = function() {
       }
     }
   }
+};
+
+scout.NumberField.prototype._parseValue = function(displayText) {
+  return this.parse(displayText);
+};
+
+scout.NumberField.prototype._formatValue = function(value) {
+  return this.decimalFormat.format(value, false);
 };

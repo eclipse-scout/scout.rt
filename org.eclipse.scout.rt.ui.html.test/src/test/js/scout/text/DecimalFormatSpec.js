@@ -278,7 +278,6 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(-12345.6789)).toBe('M12~345!67');
 
       decimalFormat.allAfter = 0;
-      decimalFormat.pattern = '#,##0';
       expect(decimalFormat.format(-1000.1234)).toBe('M1~000');
       expect(decimalFormat.format(1000.1234)).toBe('1~001');
     });
