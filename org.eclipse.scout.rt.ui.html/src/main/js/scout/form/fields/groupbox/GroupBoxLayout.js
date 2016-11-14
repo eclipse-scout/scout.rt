@@ -40,10 +40,6 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   if (htmlMenuBar) {
     menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
     htmlMenuBar.setSize(menuBarSize);
-    if (!this._groupBox.borderVisible) {
-      var padding = this._groupBox.menuBar.position === 'top' ? 14 : 16;
-      htmlGbBody.$comp.css('padding-' + this._groupBox.menuBar.position, padding);
-    }
   } else {
     menuBarSize = new scout.Dimension(0, 0);
   }
@@ -122,10 +118,6 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
     htmlMenuBar = this._htmlMenuBar();
     if (htmlMenuBar) {
       prefSize.height += htmlMenuBar.getPreferredSize().height;
-      //in this case there is no padding. add some padding to width.
-      if (!this._groupBox.borderVisible) {
-        prefSize.height += this._groupBox.menuBar.position === 'top' ? 14 : 16;
-      }
     }
   } else {
     prefSize = new scout.Dimension(0, 0);

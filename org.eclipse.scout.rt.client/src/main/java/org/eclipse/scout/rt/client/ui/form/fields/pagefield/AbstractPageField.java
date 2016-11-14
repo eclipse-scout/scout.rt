@@ -187,7 +187,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
 
     @Override
     protected double getConfiguredGridWeightY() {
-      return 0.001;
+      return 0;
     }
 
     @Override
