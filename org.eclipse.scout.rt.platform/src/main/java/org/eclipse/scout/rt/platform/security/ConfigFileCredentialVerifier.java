@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.security;
 
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -226,7 +227,10 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
     }
 
     protected byte[] toBytes(final char[] password) {
-      return CHARSET.encode(CharBuffer.wrap(password)).array();
+      ByteBuffer bytes = CHARSET.encode(CharBuffer.wrap(password));
+      byte[] result = new byte[bytes.remaining()];
+      bytes.get(result);
+      return result;
     }
 
     @Override
