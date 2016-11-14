@@ -35,7 +35,7 @@ scout.DateField = function() {
   this.popup;
   this.oldDisplayText = '';
   this.timestamp = null;
-  this._addCloneProperties(['timestamp', 'timestampAsDate']);
+  this._addCloneProperties(['timestamp', 'timestampAsDate', 'hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern']);
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
