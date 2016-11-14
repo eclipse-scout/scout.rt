@@ -20,6 +20,10 @@ scout.inherits(scout.CodeColumn, scout.Column);
  * @override Columns.js
  */
 scout.CodeColumn.prototype._createCellModel = function(codeId) {
+  if (scout.objects.isNullOrUndefined(codeId)) {
+    return scout.CodeColumn.parent.prototype._createCellModel('');
+  }
+
   var code = scout.codes.get(this.codeType, codeId);
   return {
     text: code.text(this.session.locale),

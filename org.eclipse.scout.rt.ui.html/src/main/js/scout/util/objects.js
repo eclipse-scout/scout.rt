@@ -190,6 +190,10 @@ scout.objects = {
     return typeof obj === 'string';
   },
 
+  isNullOrUndefined: function(obj) {
+    return obj === null || obj === undefined;
+  },
+
   /**
    * Returns an array containing the values of all object properties. By default, only
    * 'own' properties are returned. The optional argument 'all' can be set to true to

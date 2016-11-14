@@ -101,7 +101,7 @@ describe("scout.objects", function() {
 
   });
 
-  describe('isNumeric', function() {
+  describe('isNumber', function() {
     it('returns true when argument is a number', function() {
       expect(scout.objects.isNumber(0)).toBe(true);
       expect(scout.objects.isNumber(1)).toBe(true);
@@ -112,6 +112,15 @@ describe("scout.objects", function() {
 
       expect(scout.objects.isNumber(undefined)).toBe(false);
       expect(scout.objects.isNumber('foo')).toBe(false);
+    });
+  });
+
+  describe('isNullOrUndefined', function() {
+    it('returns true when argument is null or undefined, but not when 0 or any other value', function() {
+      expect(scout.objects.isNullOrUndefined(null)).toBe(true);
+      expect(scout.objects.isNullOrUndefined(undefined)).toBe(true);
+      expect(scout.objects.isNullOrUndefined(0)).toBe(false);
+      expect(scout.objects.isNullOrUndefined('foo')).toBe(false);
     });
   });
 

@@ -41,7 +41,7 @@ scout.SmartColumn.prototype.initCell = function(model, row) {
   var cell = scout.SmartColumn.parent.prototype.initCell.call(this, model),
     value = cell.value;
 
-  if (value === null || value === undefined) {
+  if (scout.objects.isNullOrUndefined(value)) {
     return cell;
   }
 
