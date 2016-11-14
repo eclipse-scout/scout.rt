@@ -53,7 +53,9 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
   // trigger only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
     if (whileTyping) {
-      this.setDisplayText(displayText, whileTyping);
+      // Don't call setDisplayText() to prevent re-rendering of display text (which is unnecessary and
+      // might change the cursor position).
+      this._callSetProperty('displayText', displayText);
     } else {
       this._parseAndSetValue(displayText); // this also calls setDisplayText()
     }
@@ -103,11 +105,7 @@ scout.ValueField.prototype._triggerDisplayTextChanged = function(displayText, wh
   this.trigger('displayTextChanged', event);
 };
 
-/**
- * Not used by acceptInput by purpose, because display text doesn't have to be rendered again.
- * May be used to just modify the display text without validation XXX
- */
-scout.ValueField.prototype.setDisplayText = function(displayText, whileTyping) {
+scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
 };
 
