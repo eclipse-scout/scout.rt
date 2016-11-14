@@ -149,8 +149,8 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
   }
 
   protected void handleUiSelectionChanged(JsonEvent event) {
-    int selectionStart = (int) event.getData().get(IStringField.PROP_SELECTION_START);
-    int selectionEnd = (int) event.getData().get(IStringField.PROP_SELECTION_END);
+    int selectionStart = event.getData().getInt(IStringField.PROP_SELECTION_START);
+    int selectionEnd = event.getData().getInt(IStringField.PROP_SELECTION_END);
     addPropertyEventFilterCondition(IStringField.PROP_SELECTION_START, selectionStart);
     addPropertyEventFilterCondition(IStringField.PROP_SELECTION_END, selectionEnd);
     getModel().getUIFacade().setSelectionFromUI(selectionStart, selectionEnd);
