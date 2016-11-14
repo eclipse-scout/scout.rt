@@ -57,6 +57,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
     } else {
       this._parseAndSetValue(displayText); // this also calls setDisplayText()
     }
+    this._triggerDisplayTextChanged(displayText, whileTyping);
   }
 };
 
@@ -108,7 +109,6 @@ scout.ValueField.prototype._triggerDisplayTextChanged = function(displayText, wh
  */
 scout.ValueField.prototype.setDisplayText = function(displayText, whileTyping) {
   this.setProperty('displayText', displayText);
-  this._triggerDisplayTextChanged(displayText, whileTyping);
 };
 
 // FIXME [awe] 6.1 - check fields like DateField where setTimestamp is used instead of setValue
