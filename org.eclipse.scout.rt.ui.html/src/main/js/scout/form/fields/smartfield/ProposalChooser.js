@@ -13,7 +13,7 @@ scout.ProposalChooser = function() {
   this._addAdapterProperties(['model']);
   this.$container;
   this.$status;
-  this.$activeFilter;
+  this.activeFilter;
   this.htmlComp;
 
   this._updateStatusTimeout;

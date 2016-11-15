@@ -92,16 +92,11 @@
   }
 }
 
-.measurement {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-}
-
 .proposal-chooser {
 
   & > .active-filter {
     padding-left: 7px;
+    position: absolute;
   }
 
   & > .status {
@@ -144,7 +139,12 @@
     overflow: hidden;
 
     & > .table-data > .table-row {
-      padding-left: @text-field-padding-x - 8px;
+
+      /* Add a bit of extra padding to the first cell, so the text in the proposal chooser
+       * table is exactly left-aligned with the text in the text-field above */
+      & > .table-cell.first {
+        padding-left: @table-cell-padding-left + 2px;
+      }
 
       &.selected {
         background-color: @item-selection-background-color;

@@ -29,6 +29,38 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       this._table = layout._proposalChooser.model;
     },
     /**
+     * Clears the given CSS property and stores the old value as data with prefix 'backup'
+     * which is used to restore the CSS property later.
+     */
+    cssBackup: function($element, property) {
+      var oldValue = $element.css(property);
+      $element
+        .css(property, '')
+        .data('backup' + property, oldValue);
+    },
+    cssRestore: function($element, property) {
+      var dataProperty = 'backup' + property,
+        oldValue = $element.data(dataProperty);
+      $element
+        .css(property, oldValue)
+        .removeData(dataProperty);
+    },
+    /**
+     * Go through all rows and cells and call the given modifyFunc (backup/restore) on each element.
+     */
+    modifyTableData: function(modifyFunc) {
+      var that = this;
+      this._table.$rows().each(function() {
+        var $row = $(this);
+        modifyFunc($row, 'width');
+        that._table.$cellsForRow($row).each(function() {
+          var $cell = $(this);
+          modifyFunc($cell, 'min-width');
+          modifyFunc($cell, 'max-width');
+        })
+      });
+    },
+    /**
      * Modifies the table in a way that the preferred width may be read.
      * Removes explicit widths on rows, cells, fillers and sets display to inline-block.
      */
@@ -42,15 +74,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
 
       this.modifyFiller(this._table.$fillBefore);
       this.modifyFiller(this._table.$fillAfter);
-
-      var $rows = this._table.$rows();
-      $rows.each(function(i, elem) {
-        var $row = $(elem);
-        $row.css('width', '');
-        this._table.$cellsForRow($row)
-          .css('min-width', '')
-          .css('max-width', '');
-      }.bind(this));
+      this.modifyTableData(this.cssBackup);
     },
 
     modifyFiller: function($filler) {
@@ -70,6 +94,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
 
       this.restoreFiller(this._table.$fillBefore);
       this.restoreFiller(this._table.$fillAfter);
+      this.modifyTableData(this.cssRestore);
     },
 
     restoreFiller: function($filler) {
