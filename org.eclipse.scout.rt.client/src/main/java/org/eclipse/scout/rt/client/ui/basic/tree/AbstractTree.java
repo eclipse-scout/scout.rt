@@ -1413,7 +1413,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public boolean isNodeChecked(ITreeNode node) {
     if (node != null) {
-      return getCheckedNodes().contains(node);
+      return m_checkedNodes.contains(node);
     }
     else {
       return false;
@@ -1455,7 +1455,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         //uncheck others in single-check mode
         if (checked && !isMultiCheck()) {
           List<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
-          for (ITreeNode cn : getCheckedNodes()) {
+          final Iterator<ITreeNode> checkedNodesIterator = m_checkedNodes.iterator();
+          while (checkedNodesIterator.hasNext()) {
+            ITreeNode cn = checkedNodesIterator.next();
             if (cn != node) {
               m_checkedNodes.remove(cn);
               uncheckedNodes.add(cn);
