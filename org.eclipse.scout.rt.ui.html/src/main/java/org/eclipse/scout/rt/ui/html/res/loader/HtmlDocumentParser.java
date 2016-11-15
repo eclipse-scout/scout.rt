@@ -41,16 +41,17 @@ import org.slf4j.LoggerFactory;
 public class HtmlDocumentParser {
   private static final Logger LOG = LoggerFactory.getLogger(HtmlDocumentParser.class);
 
-  private static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\"\\s]+)=\"([^\"]*)\"");
-  private static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message(.*?)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout\\:stylesheet src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout\\:script src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final String PATTERN_BASE_TAG = "<scout\\:base\\s*/>";
+  protected static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout:include\\s+template=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout:message(.*?)\\s*/?>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout:stylesheet\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout:script\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL);
 
-  private final HtmlDocumentParserParameters m_params;
-  private final IHttpResourceCache m_cache;
-  private String m_workingContent;
+  protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
+
+  protected final HtmlDocumentParserParameters m_params;
+  protected final IHttpResourceCache m_cache;
+  protected String m_workingContent;
 
   public HtmlDocumentParser(HtmlDocumentParserParameters params) {
     m_params = params;
@@ -60,12 +61,16 @@ public class HtmlDocumentParser {
   public byte[] parseDocument(byte[] document) throws IOException {
     // the order of calls is important: first we must resolve all includes
     m_workingContent = new String(document, StandardCharsets.UTF_8);
+    replaceAllTags();
+    return m_workingContent.getBytes(StandardCharsets.UTF_8);
+  }
+
+  protected void replaceAllTags() throws IOException {
     replaceIncludeTags();
     replaceBaseTags();
     replaceMessageTags();
     replaceStylesheetTags();
     replaceScriptTags();
-    return m_workingContent.getBytes(StandardCharsets.UTF_8);
   }
 
   @SuppressWarnings("squid:S1149")
@@ -200,7 +205,7 @@ public class HtmlDocumentParser {
       basePath += "/";
     }
     String baseTag = "<base href=\"" + basePath + "\">";
-    m_workingContent = m_workingContent.replaceAll(PATTERN_BASE_TAG, baseTag);
+    m_workingContent = PATTERN_BASE_TAG.matcher(m_workingContent).replaceAll(baseTag);
   }
 
   @SuppressWarnings("squid:S1149")
@@ -265,7 +270,7 @@ public class HtmlDocumentParser {
             text = js.toString();
             break;
           case "plain":
-            // Plain normal replacement
+            // Plain normal replacement (only supports one key, because we don't know how to separate multiple keys)
             text = TEXTS.get(keys.get(0));
             break;
           case "tag":

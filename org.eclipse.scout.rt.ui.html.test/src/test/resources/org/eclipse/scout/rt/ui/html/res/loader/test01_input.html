@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My Application</title>
+    <scout:base>
+    <scout:include
+      template="head.html"/>
+    <scout:stylesheet src="res/myapp-all-macro.css">
+    <scout:script src="res/jquery-all-macro.js"          />
+    <scout:script src="res/myapp-all-macro.js" />
+    <scout:script src="res/index.js" />
+  </head>
+  <body>
+    <scout:include template="no-script.html" />
+    <div class="scout" data-partid="1"></div>
+    <scout:message style="plain" key="one" key="two">
+    <scout:message style="javascript" key="three" />
+  </body>
+</html>

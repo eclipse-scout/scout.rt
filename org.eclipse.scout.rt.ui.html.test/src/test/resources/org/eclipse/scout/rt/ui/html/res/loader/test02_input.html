@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <scout:include template="title.html" />
+    <scout:include template="head.html" />
+    <scout:stylesheet src="res/myapp-login-all-macro.css" />
+    <scout:script src="res/jquery-all-macro.js" />
+    <scout:script src="res/myapp-login-all-macro.js" />
+    <scout:script src="res/login.js" />
+    <scout:script src="res/other-login.js" />
+  </head>
+  <body>
+    <div class="page">
+      <scout:include template="no-script.html" />
+      <scout:include template="header.html" />
+      <scout:include template="footer.html" />
+    </div>
+    <scout:message style="tag"
+      key="ui.Login" key="ui.LoginFailed"
+      key="ui.User" key="ui.Password" key="ui.Token" key="ui.Email"
+      key="ui.NotYetRegistered" key="ui.PasswordForgotten"
+      key="ui.FacebookLogin" />
+  </body>
+</html>
