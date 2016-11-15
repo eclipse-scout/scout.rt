@@ -140,3 +140,8 @@ scout.CheckBoxField.prototype._renderGridData = function() {
     useHorizontalAlignment: true
   });
 };
+
+scout.CheckBoxField.prototype.prepareForCellEdit = function(opts) {
+  scout.CheckBoxField.parent.prototype.prepareForCellEdit.call(this, opts);
+  this.$checkBoxLabel.hide();
+};

@@ -83,8 +83,18 @@
     }
   }
 
-  &.cell-editor-field > .check-box {
-    margin-left: @check-box-size;
-    margin-top: 0px;
+  /* Same spacings as defined in CellEditorPopup.csss, but as margin, not as padding */
+  & > .cell-editor-field.check-box {
+    padding: 0;
+    margin: 0 @table-cell-padding-right - 1px 0 @table-cell-padding-left - 1px;
+  }
+
+  &.halign-right > .cell-editor-field.check-box {
+    margin-right: @table-cell-padding-left - 1px;
+    margin-left: @table-cell-padding-right - 1px;
+  }
+
+  &.halign-center > .cell-editor-field.check-box {
+    margin-right: @table-cell-padding-left - 1px;
   }
 }
