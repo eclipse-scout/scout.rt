@@ -43,7 +43,7 @@ scout.Extension.prototype.extend = function(extended, funcName) {
   var wrapper = function() {
     extension.extended = this;
     extension.next = origFunc.bind(this);
-    extension[funcName].apply(extension, arguments);
+    return extension[funcName].apply(extension, arguments);
   };
   extended[funcName] = wrapper;
 };
