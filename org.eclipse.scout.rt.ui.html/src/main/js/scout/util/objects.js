@@ -195,9 +195,11 @@ scout.objects = {
   },
 
   /**
-   * Returns an array containing the values of all object properties. By default, only
-   * 'own' properties are returned. The optional argument 'all' can be set to true to
-   * change that behavior.
+   * Returns values from the given (map) object. By default only values of 'own' properties are returned.
+   *
+   * @returns {Array} an Array with values
+   * @param {Object} obj
+   * @param {boolean} [all] can be set to true to return all properties instead of own properties
    */
   values: function(obj, all) {
     var values = [];

@@ -10,6 +10,7 @@
  ******************************************************************************/
 describe("Tree", function() {
   var session;
+  /** @type {scout.TreeSpecHelper} */
   var helper;
 
   beforeEach(function() {
@@ -2276,4 +2277,29 @@ describe("Tree", function() {
       });
     });
   });
+
+  describe("destroy tree nodes", function() {
+
+    var tree;
+
+    beforeEach(function() {
+      var model = helper.createModelFixture(2, 1, false);
+      tree = helper.createTree(model);
+    });
+
+    it("should destroy all tree nodes and set destroyed flag", function()  {
+      var nodesMapCopy = $.extend({}, tree.nodesMap);
+      scout.objects.values(nodesMapCopy).forEach(function(node) {
+        expect(node.destroyed).toBe(false);
+      });
+      tree.destroy();
+      scout.objects.values(nodesMapCopy).forEach(function(node) {
+        expect(node.destroyed).toBe(true);
+      });
+      expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
+      expect(scout.objects.countOwnProperties(tree.nodes.length)).toBe(0);
+    });
+
+  });
+
 });

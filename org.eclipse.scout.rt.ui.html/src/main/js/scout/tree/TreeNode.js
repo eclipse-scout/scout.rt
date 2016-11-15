@@ -42,9 +42,8 @@ scout.TreeNode.prototype.init = function(model) {
 
 scout.TreeNode.prototype.destroy = function() {
   if (this.destroyed) {
+    // Already destroyed, do nothing
     return;
-    // throw new Error('TreeNode already destroyed');
-    // FIXME [awe] 6.1 - check why treeNodes are sometimes destroyed more than once (input from P.BZ)
   }
   this._destroy();
   this.destroyed = true;
