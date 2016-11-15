@@ -158,6 +158,13 @@ public class StringUtilityTest {
     assertEquals(0, StringUtility.split(null, null).length);
     assertEquals(0, StringUtility.split("", null).length);
     assertArrayEquals(new String[]{"boo", "and", "foo"}, StringUtility.split("boo:and:foo", ":"));
+
+    // Split with limit
+    assertArrayEquals(new String[]{"boo", "and:foo:hugo:bla"}, StringUtility.split("boo:and:foo:hugo:bla", ":", 2));
+    assertArrayEquals(new String[]{"boo", "and", "foo", "hugo", "bla"}, StringUtility.split("boo:and:foo:hugo:bla", ":", 99));
+    assertArrayEquals(new String[]{"boo:and:foo:hugo:bla"}, StringUtility.split("boo:and:foo:hugo:bla", ":", 1));
+    assertArrayEquals(new String[]{"boo", "and", "foo", "hugo", "bla"}, StringUtility.split("boo:and:foo:hugo:bla", ":", 0));
+    assertArrayEquals(new String[]{"boo", "and", "foo", "hugo", "bla"}, StringUtility.split("boo:and:foo:hugo:bla", ":", -1));
   }
 
   // UTF-8 length is 13 to avoid accidental buffer size matches
