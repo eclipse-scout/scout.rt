@@ -1084,7 +1084,6 @@ public final class StringUtility {
   /**
    * Format phone numbers (to international phone number format - eg +41 41 882 32 21)
    *
-   * @since
    * @param phoneNumber
    *          Unformatted/Formatted phone number with optional country code. Brackets for area code and special
    *          characters (like -) for local number is supported.
@@ -1204,8 +1203,11 @@ public final class StringUtility {
   }
 
   /**
-   * Splits the string around matches of the regex. Returns an empty array if the provided string is null or has length
-   * null. Otherwise, the method returns the result of {@link java.lang.String#split}.
+   * Null-safe version of {@link String#split(String)}.
+   * <p>
+   * Splits the string around matches of the <code>regex</code>. Returns an empty array if the provided string
+   * <code>s</code> is <code>null</code> or has length 0. Otherwise, the method returns the result of
+   * {@link java.lang.String#split(String)}.
    */
   public static String[] split(String s, String regex) {
     if (s == null || s.length() == 0) {
@@ -1215,8 +1217,20 @@ public final class StringUtility {
   }
 
   /**
-   * @param s
-   * @return
+   * Null-safe version of {@link String#split(String, int)}.
+   * <p>
+   * Splits the string around matches of the <code>regex</code>, but returns at most <code>limit</code> elements.
+   * Returns an empty array if the provided string <code>s</code> is <code>null</code> or has length 0. Otherwise, the
+   * method returns the result of {@link java.lang.String#split(String, int)}.
+   */
+  public static String[] split(String s, String regex, int limit) {
+    if (s == null || s.length() == 0) {
+      return new String[0];
+    }
+    return s.split(regex, limit);
+  }
+
+  /**
    * @since 3.8.2
    */
   public static String splitCamelCase(String s) {
@@ -1255,9 +1269,6 @@ public final class StringUtility {
 
   /**
    * Returns a copy of the {@link String} with leading and trailing newlines omitted.
-   *
-   * @param s
-   * @return
    */
   public static String trimNewLines(String s) {
     if (s == null) {
@@ -1351,8 +1362,6 @@ public final class StringUtility {
   /**
    * Returns the string-representation of <code>value</code>, or <code>valueWhenNull</code> if value is null.
    *
-   * @param value
-   * @param valueWhenNull
    * @see #substituteWhenEmpty(Object, String)
    */
   public static String nvl(Object value, String valueWhenNull) {
@@ -1475,8 +1484,6 @@ public final class StringUtility {
    * {@link Object#toString()} is invoked.<br />
    * <code>null</code> values or those {@link Object#toString()} is empty are neglected.
    *
-   * @param delimiter
-   * @param values
    * @return never <code>null</code>, empty String in case no elements are appended
    * @since 3.8.1
    */
@@ -1800,9 +1807,6 @@ public final class StringUtility {
    * </small>
    * </p>
    *
-   * @param s
-   * @param regex
-   * @return
    */
   public static boolean contains(String s, String regex) {
     if (s == null || regex == null) {
