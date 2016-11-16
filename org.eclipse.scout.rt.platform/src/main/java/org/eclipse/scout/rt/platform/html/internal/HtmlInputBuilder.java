@@ -41,7 +41,7 @@ public class HtmlInputBuilder extends EmptyHtmlNodeBuilder implements IHtmlInput
 
   @Override
   public IHtmlInput value(Object value) {
-    addAttribute("value", StringUtility.nvl(value, ""));
+    addAttribute("value", StringUtility.emptyIfNull(value));
     return this;
   }
 

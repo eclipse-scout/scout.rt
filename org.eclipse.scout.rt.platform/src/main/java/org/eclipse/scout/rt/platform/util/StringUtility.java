@@ -1289,7 +1289,10 @@ public final class StringUtility {
    * Returns the string-representation of <code>value</code>, or <code>valueWhenNull</code> if value is null.
    *
    * @see #substituteWhenEmpty(Object, String)
+   * @deprecated Use {@link ObjectUtility#nvl(Object, Object)} instead<br>
+   *             TODO [7.1] pbz: remove this method
    */
+  @Deprecated
   public static String nvl(Object value, String valueWhenNull) {
     if (value != null) {
       return value.toString();
@@ -1772,11 +1775,14 @@ public final class StringUtility {
   }
 
   /**
-   * Similar to {@link #nvl(Object, String)} but returns <code>valueWhenEmpty</code> not only if value is null, but as
-   * well when the String representation of <code>value</code> is empty or contains only whitespaces.
+   * Similar to {@link #toString(Object, String)} but returns <code>valueWhenEmpty</code> not only if value is null, but
+   * as well when the String representation of <code>value</code> is empty or contains only whitespaces.
+   *
+   * @deprecated TODO [7.1] pbz: remove this method
    */
+  @Deprecated
   public static String substituteWhenEmpty(Object value, String valueWhenEmpty) {
-    String stringValue = nvl(value, null);
+    String stringValue = ObjectUtility.toString(value);
     return hasText(stringValue) ? stringValue : valueWhenEmpty;
   }
 

@@ -15,7 +15,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Exception translator to work with {@link PlatformException}s.
@@ -54,7 +54,7 @@ public class PlatformExceptionTranslator implements IExceptionTranslator<Platfor
       return (PlatformException) t;
     }
     else {
-      return new PlatformException(StringUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t)
+      return new PlatformException(ObjectUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t)
           .withContextInfo("translator", PlatformExceptionTranslator.class.getName());
     }
   }

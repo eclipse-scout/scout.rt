@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.slf4j.Logger;
@@ -63,8 +63,8 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle a {@link FutureCancelledException}. Typically, such an exception is thrown when waiting on a
-   * cancelled job.
+   * Method invoked to handle a {@link FutureCancelledException}. Typically, such an exception is thrown when waiting on
+   * a cancelled job.
    * <p>
    * The default implementation logs it with debug level.
    */
@@ -118,7 +118,7 @@ public class ExceptionHandler {
    * The default implementation logs the throwable as <code>ERROR</code>.
    */
   protected void handleThrowable(final Throwable t) {
-    LOG.error("{}:{}", t.getClass().getSimpleName(), StringUtility.nvl(t.getMessage(), "n/a"), t);
+    LOG.error("{}:{}", t.getClass().getSimpleName(), ObjectUtility.nvl(t.getMessage(), "n/a"), t);
   }
 
   /**

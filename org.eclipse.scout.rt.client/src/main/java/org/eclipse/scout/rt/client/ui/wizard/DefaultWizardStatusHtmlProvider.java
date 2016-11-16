@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         topPart = HTML.div(w.getSubTitle()).cssClass("infoBox").toHtml();
       }
       if (w.getActiveStep() != null && (w.getActiveStep().getTooltipText() != null || w.getActiveStep().getSubTitle() != null)) {
-        bottomPart = HTML.div(StringUtility.nvl(w.getActiveStep().getSubTitle(), w.getActiveStep().getTooltipText())).cssClass("infoBox").toHtml();
+        bottomPart = HTML.div(ObjectUtility.nvl(w.getActiveStep().getSubTitle(), w.getActiveStep().getTooltipText())).cssClass("infoBox").toHtml();
       }
       int index = 1;
       for (IWizardStep<?> step : w.getSteps()) {

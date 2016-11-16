@@ -139,14 +139,14 @@ public class StoreAndLoadXml3FormTest {
 
     assertEquals("t3", f.getText3Field().getValue());
 
-    String text1FieldVal = StringUtility.nvl(f.getText1Field().getValue(), "")
-        + StringUtility.nvl(f.getG1Box().getText1Field().getValue(), "")
-        + StringUtility.nvl(f.getG2Box().getText1Field().getValue(), "");
+    String text1FieldVal = StringUtility.emptyIfNull(f.getText1Field().getValue())
+        + StringUtility.emptyIfNull(f.getG1Box().getText1Field().getValue())
+        + StringUtility.emptyIfNull(f.getG2Box().getText1Field().getValue());
     assertEquals("g2t1", text1FieldVal);
 
-    String text2FieldVal = StringUtility.nvl(f.getG3G4Text2Field().getValue(), "")
-        + StringUtility.nvl(f.getG1Box().getText2Field().getValue(), "")
-        + StringUtility.nvl(f.getG2Box().getText2Field().getValue(), "");
+    String text2FieldVal = StringUtility.emptyIfNull(f.getG3G4Text2Field().getValue())
+        + StringUtility.emptyIfNull(f.getG1Box().getText2Field().getValue())
+        + StringUtility.emptyIfNull(f.getG2Box().getText2Field().getValue());
     assertEquals("g3g2", text2FieldVal);
   }
 

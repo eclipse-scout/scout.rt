@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
      *          optional info to be appended to the thread name, else <code>null</code>.
      */
     public void updateThreadName(final String threadName, final String executionInfo) {
-      String name = String.format("%s-%s", StringUtility.nvl(threadName, m_originalThreadName), m_sequence);
+      String name = String.format("%s-%s", ObjectUtility.nvl(threadName, m_originalThreadName), m_sequence);
       if (StringUtility.hasText(executionInfo)) {
         name = String.format("%s %s", name, executionInfo);
       }

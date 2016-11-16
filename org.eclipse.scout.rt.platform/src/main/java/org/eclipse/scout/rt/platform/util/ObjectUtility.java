@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Utility for null-safe operations on {@link Object}.
@@ -131,6 +132,19 @@ public final class ObjectUtility {
     else {
       return a.compareTo(b);
     }
+  }
+
+  /**
+   * Null-safe {@code value.toString()} implementation.
+   * <ul>
+   * <li>Use {@link Objects#toString(Object, String)} if a default value in case of {@code null} is required<br>
+   * <li>Use {@link Objects#toString(Object)} if a a null value should be returned as string "null"
+   * </ul>
+   *
+   * @return {@code value.toString()} if {@code value} is not {@code null}, else returns {@code null} Objects.()
+   */
+  public static String toString(Object value) {
+    return Objects.toString(value, null);
   }
 
   /**

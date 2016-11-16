@@ -369,6 +369,7 @@ public class StringUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void testNvl() {
     assertEquals("value", StringUtility.nvl("value", "subsitute"));
     assertEquals("subsitute", StringUtility.nvl(null, "subsitute"));
@@ -388,6 +389,7 @@ public class StringUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void testSubstituteWhenEmpty() {
     assertEquals("value", StringUtility.substituteWhenEmpty("value", "subsitute"));
     assertEquals("subsitute", StringUtility.substituteWhenEmpty(null, "subsitute"));

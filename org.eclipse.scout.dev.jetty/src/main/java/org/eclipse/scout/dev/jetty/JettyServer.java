@@ -39,6 +39,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,7 +290,7 @@ public class JettyServer {
       }
 
       // If requestURI starts with context path, redirect is not necessary -> delegate to original context handler
-      String requestURI = StringUtility.nvl(request.getRequestURI(), "/");
+      String requestURI = ObjectUtility.nvl(request.getRequestURI(), "/");
       if (!"GET".equals(request.getMethod()) || requestURI.startsWith(m_contextPath)) {
         super.handle(target, baseRequest, request, response);
         return;

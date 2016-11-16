@@ -15,7 +15,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Default exception translator to work with runtime exceptions.
@@ -51,7 +51,7 @@ public class DefaultRuntimeExceptionTranslator implements IExceptionTranslator<R
       return (RuntimeException) t;
     }
     else {
-      return new PlatformException(StringUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t)
+      return new PlatformException(ObjectUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t)
           .withContextInfo("translator", DefaultRuntimeExceptionTranslator.class.getName());
     }
   }

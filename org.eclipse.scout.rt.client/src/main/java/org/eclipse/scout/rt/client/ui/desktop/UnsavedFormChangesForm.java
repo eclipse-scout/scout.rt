@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -247,7 +248,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
   }
 
   private static String getFormDisplayName(IForm f) {
-    return StringUtility.join(" - ", StringUtility.nvl(f.getTitle(), f.getClass().getName()), f.getSubTitle());
+    return StringUtility.join(" - ", ObjectUtility.nvl(f.getTitle(), f.getClass().getName()), f.getSubTitle());
   }
 
   @SuppressWarnings({"serial", "squid:S2057"})

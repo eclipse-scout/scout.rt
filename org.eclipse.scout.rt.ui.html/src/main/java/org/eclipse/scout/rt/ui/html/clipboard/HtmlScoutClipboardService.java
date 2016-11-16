@@ -65,7 +65,7 @@ public class HtmlScoutClipboardService implements IClipboardService {
     // anonymous text paste, no filename
     BinaryResource binaryResource = BinaryResources.create()
         .withContentType(MimeType.TXT.getType())
-        .withContent(StringUtility.nvl(textContents, "").getBytes(StandardCharsets.UTF_8))
+        .withContent(StringUtility.emptyIfNull(textContents).getBytes(StandardCharsets.UTF_8))
         .build();
 
     form.getClipboardField().setValue(Collections.singleton(binaryResource));

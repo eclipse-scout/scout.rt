@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public abstract class AbstractHttpSessionCacheService implements IHttpSessionCac
   private final IObjectSerializer m_objs;
 
   //expiration time in milliseconds
-  private final AtomicLong m_defaultExpirationTime = new AtomicLong(Long.parseLong(StringUtility.nvl(ConfigUtility.getProperty("org.eclipse.scout.rt.server.commons.cache.AbstractHttpSessionCacheService#expiration"), "3600000")));
+  private final AtomicLong m_defaultExpirationTime = new AtomicLong(Long.parseLong(ObjectUtility.nvl(ConfigUtility.getProperty("org.eclipse.scout.rt.server.commons.cache.AbstractHttpSessionCacheService#expiration"), "3600000")));
 
   protected AbstractHttpSessionCacheService() {
     m_objs = SerializationUtility.createObjectSerializer();

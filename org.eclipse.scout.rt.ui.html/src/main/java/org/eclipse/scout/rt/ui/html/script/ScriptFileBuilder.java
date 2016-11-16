@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
@@ -165,7 +164,7 @@ public class ScriptFileBuilder {
     int pos = 0;
     while (mat.find()) {
       buf.write(content.substring(pos, mat.start()).getBytes(StandardCharsets.UTF_8));
-      String includePath = basePath + StringUtility.nvl(mat.group(1), mat.group(2));
+      String includePath = basePath + ObjectUtility.nvl(mat.group(1), mat.group(2));
       ScriptSource includeScript = locateNonFragmentScript(includePath);
       byte[] replacement = null;
       if (includeScript != null) {
@@ -235,7 +234,7 @@ public class ScriptFileBuilder {
     int pos = 0;
     while (mat.find()) {
       buf.append(content.substring(pos, mat.start()));
-      String includePath = StringUtility.nvl(mat.group(1), mat.group(2));
+      String includePath = ObjectUtility.nvl(mat.group(1), mat.group(2));
       ScriptSource includeFragment = locateFragmentScript(includePath, script.getFileType());
       String replacement = null;
       if (includeFragment != null) {

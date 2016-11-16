@@ -22,7 +22,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +54,10 @@ public class GzipServletFilter implements Filter {
   @Override
   public void init(FilterConfig config) throws ServletException {
     // read config
-    m_getMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("get_min_size"), "256"));
-    m_postMinSize = Integer.parseInt(StringUtility.nvl(config.getInitParameter("post_min_size"), "256"));
-    m_getPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("get_pattern"), ".*\\.(html|css|js|json|txt)"), Pattern.CASE_INSENSITIVE);
-    m_postPattern = Pattern.compile(StringUtility.nvl(config.getInitParameter("post_pattern"), ".*/json"), Pattern.CASE_INSENSITIVE);
+    m_getMinSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("get_min_size"), "256"));
+    m_postMinSize = Integer.parseInt(ObjectUtility.nvl(config.getInitParameter("post_min_size"), "256"));
+    m_getPattern = Pattern.compile(ObjectUtility.nvl(config.getInitParameter("get_pattern"), ".*\\.(html|css|js|json|txt)"), Pattern.CASE_INSENSITIVE);
+    m_postPattern = Pattern.compile(ObjectUtility.nvl(config.getInitParameter("post_pattern"), ".*/json"), Pattern.CASE_INSENSITIVE);
   }
 
   @Override

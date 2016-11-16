@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -57,7 +58,6 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
@@ -101,7 +101,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
-    final String symbolicName = StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM");
+    final String symbolicName = Objects.toString(properties.get(SYMBOLIC_NAME), "MOM");
     if (Platform.get().inDevelopmentMode()) {
       LOG.info("{} configuration: {}", symbolicName, properties);
     }
@@ -470,7 +470,7 @@ public class JmsMomImplementor implements IMomImplementor {
     final String applicationVersion = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
     final String now = DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS");
-    return String.format("%s [application='%s:%s', nodeId='%s', created on=%s]", StringUtility.nvl(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId, now);
+    return String.format("%s [application='%s:%s', nodeId='%s', created on=%s]", Objects.toString(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId, now);
   }
 
   /**

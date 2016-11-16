@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Default exception translator to work with checked exceptions and runtime exceptions, but not with {@link Throwable}.
@@ -54,7 +54,7 @@ public class DefaultExceptionTranslator implements IExceptionTranslator<Exceptio
       return (Exception) t;
     }
     else {
-      return new PlatformException(StringUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t)
+      return new PlatformException(ObjectUtility.nvl(t.getMessage(), t.getClass().getSimpleName()), t)
           .withContextInfo("translator", DefaultExceptionTranslator.class.getName());
     }
   }

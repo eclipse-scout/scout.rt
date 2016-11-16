@@ -154,4 +154,19 @@ public class ObjectUtilityTest {
     assertEquals(1, ObjectUtility.compareTo("a", null));
     assertTrue(ObjectUtility.compareTo("a", "b") < 0);
   }
+
+  @Test
+  public void testToString() {
+    assertEquals("value", ObjectUtility.toString("value"));
+    assertEquals("5", ObjectUtility.toString(Integer.valueOf(5)));
+    assertNull(ObjectUtility.toString(null));
+
+    Object o = new Object() {
+      @Override
+      public String toString() {
+        return "object";
+      }
+    };
+    assertEquals("object", ObjectUtility.toString(o));
+  }
 }
