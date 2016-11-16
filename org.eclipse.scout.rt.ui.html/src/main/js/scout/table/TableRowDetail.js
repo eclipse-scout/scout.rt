@@ -11,26 +11,26 @@
 scout.TableRowDetail = function() {
   scout.TableRowDetail.parent.call(this);
   this.table;
-  this.tableRow;
+  this.row;
 };
 scout.inherits(scout.TableRowDetail, scout.Widget);
 
 scout.TableRowDetail.prototype._init = function(model) {
   scout.TableRowDetail.parent.prototype._init.call(this, model);
   this.table = model.table;
-  this.tableRow = model.tableRow;
+  this.row = model.row;
 };
 
 scout.TableRowDetail.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('table-row-detail');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this._renderTableRow();
+  this._renderRow();
 };
 
-scout.TableRowDetail.prototype._renderTableRow = function() {
+scout.TableRowDetail.prototype._renderRow = function() {
   this.table.columns.forEach(function(column) {
     var name = column.text;
-    var value = this.table.cellText(column, this.tableRow);
+    var value = this.table.cellText(column, this.row);
     if (scout.strings.empty(value)) {
       return;
     }

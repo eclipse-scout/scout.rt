@@ -19,7 +19,7 @@ scout.inherits(scout.AutoLeafPageWithNodes, scout.Page);
  * @override Page.js
  */
 scout.AutoLeafPageWithNodes.prototype._init = function(model) {
-  scout.assertParameter('tableRow', model.tableRow, scout.TableRow);
+  scout.assertParameter('row', model.row, scout.TableRow);
   scout.AutoLeafPageWithNodes.parent.prototype._init.call(this, model);
-  this.text = this.tableRow.cells[0];
+  this.text = this.row.cells[0];
 };

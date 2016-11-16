@@ -44,24 +44,24 @@ scout.PageWithNodes.prototype._rebuildDetailTable = function(childPages) {
   var table = this.detailTable;
   this._unlinkAllTableRows(table.rows);
   table.deleteAllRows();
-  var tableRows = this._createTableRowsForChildPages(childPages);
-  table.insertRows(tableRows);
+  var rows = this._createTableRowsForChildPages(childPages);
+  table.insertRows(rows);
 };
 
-scout.PageWithNodes.prototype._unlinkAllTableRows = function(tableRows) {
-  tableRows.forEach(function(tableRow) {
-    this._unlinkTableRowWithPage(tableRow, tableRow.page);
+scout.PageWithNodes.prototype._unlinkAllTableRows = function(rows) {
+  rows.forEach(function(row) {
+    this._unlinkTableRowWithPage(row, row.page);
   }, this);
 };
 
 scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPages) {
   return childPages.map(function(childPage) {
-    var tableRow = scout.create('TableRow', {
+    var row = scout.create('TableRow', {
       parent: this.detailTable,
       cells: [childPage.text]}
     );
-    this._linkTableRowWithPage(tableRow, childPage);
-    return tableRow;
+    this._linkTableRowWithPage(row, childPage);
+    return row;
   }, this);
 };
 
@@ -81,7 +81,7 @@ scout.PageWithNodes.prototype.loadChildren = function() {
 
 /**
  * Override this method to create child pages for this page. The default impl. returns an empty array.
- * @return jQuery.Deferred
+ * @return {$.Deferred}
  */
 scout.PageWithNodes.prototype._createChildPages = function() {
   return $.resolvedDeferred();

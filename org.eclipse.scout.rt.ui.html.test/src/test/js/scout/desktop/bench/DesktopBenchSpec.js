@@ -101,7 +101,7 @@ describe("DesktopBench", function() {
 
       bench.updateOutlineContent();
 
-      // test that replcaeView is called once
+      // test that replace view is called once
 
       expect(form.attached).toBeTruthy();
       expect(bench.outlineContent === outline.nodes[0].detailForm).toBeTruthy();
@@ -131,7 +131,7 @@ describe("DesktopBench", function() {
 
       outline.selectNodes(outline.nodes[1]);
 
-      // test that replcaeView is called once
+      // test that replace view is called once
 
       expect(form.attached).toBeTruthy();
       expect(bench.outlineContent === outline.nodes[1].detailForm).toBeTruthy();

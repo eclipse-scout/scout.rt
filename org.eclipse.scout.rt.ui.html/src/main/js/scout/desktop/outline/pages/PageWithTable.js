@@ -24,20 +24,21 @@ scout.PageWithTable.prototype._initTable = function(table) {
   table.on('rowsInserted', this._onTableRowsInserted.bind(this));
   table.on('rowAction', this._onTableRowAction.bind(this));
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
+  table.on('rowsFiltered', this._onTableRowsFiltered.bind(this));
 };
 
 scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
   if (this.leaf) { // when page is a leaf we do nothing at all
     return;
   }
-  var tableRows = scout.arrays.ensure(event.rows),
-    childPages = tableRows.map(function(row) {
+  var rows = scout.arrays.ensure(event.rows),
+    childPages = rows.map(function(row) {
       var childPage = row.page;
       this._unlinkTableRowWithPage(row, childPage);
       return childPage;
     }, this);
 
-  this.getOutline().mediator.onTableRowsDeleted(tableRows, childPages, this);
+  this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
 };
 
 /**
@@ -49,12 +50,12 @@ scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
     return;
   }
 
-  var tableRows = scout.arrays.ensure(event.rows),
-    childPages = tableRows.map(function(row) {
+  var rows = scout.arrays.ensure(event.rows),
+    childPages = rows.map(function(row) {
       return this._createChildPageInternal(row);
     }, this);
 
-  this.getOutline().mediator.onTableRowsInserted(tableRows, childPages, this);
+  this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
 };
 
 scout.PageWithTable.prototype._onTableRowAction = function(event) {
@@ -68,12 +69,16 @@ scout.PageWithTable.prototype._onTableRowOrderChanged = function(event) {
   this.getOutline().mediator.onTableRowOrderChanged(event, this);
 };
 
-scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
-  var childPage = this.createChildPage(tableRow);
+scout.PageWithTable.prototype._onTableRowsFiltered = function(event) {
+  this.getOutline().mediator.onTableRowsFiltered(event, this);
+};
+
+scout.PageWithTable.prototype._createChildPageInternal = function(row) {
+  var childPage = this.createChildPage(row);
   if (childPage === null && this.alwaysCreateChildPage) {
-    childPage = this.createDefaultChildPage(tableRow);
+    childPage = this.createDefaultChildPage(row);
   }
-  this._linkTableRowWithPage(tableRow, childPage);
+  this._linkTableRowWithPage(row, childPage);
   return childPage;
 };
 
@@ -81,14 +86,14 @@ scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
  * Override this method to return a specific Page instance for the given table-row.
  * The default impl. returns null, which means a AutoLeaftPageWithNodes instance will be created for the table-row.
  */
-scout.PageWithTable.prototype.createChildPage = function(tableRow) {
+scout.PageWithTable.prototype.createChildPage = function(row) {
   return null;
 };
 
-scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
+scout.PageWithTable.prototype.createDefaultChildPage = function(row) {
   return scout.create('AutoLeafPageWithNodes', {
     parent: this.getOutline(),
-    tableRow: tableRow
+    row: row
   });
 };
 

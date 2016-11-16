@@ -18,14 +18,14 @@ scout.OutlineMediator.prototype._skipEvent = function(page) {
   return page === null || page.getOutline() === null || page.leaf;
 };
 
-scout.OutlineMediator.prototype.onTableRowsInserted = function(tableRows, childPages, pageWithTable) {
+scout.OutlineMediator.prototype.onTableRowsInserted = function(rows, childPages, pageWithTable) {
   if (this._skipEvent(pageWithTable)) {
     return;
   }
   pageWithTable.getTree().insertNodes(childPages, pageWithTable);
 };
 
-scout.OutlineMediator.prototype.onTableRowsDeleted = function(tableRows, childPages, pageWithTable) {
+scout.OutlineMediator.prototype.onTableRowsDeleted = function(rows, childPages, pageWithTable) {
   if (this._skipEvent(pageWithTable)) {
     return;
   }
@@ -62,5 +62,10 @@ scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWit
   pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
 };
 
+scout.OutlineMediator.prototype.onTableRowsFiltered = function(event, page) {
+  // page.getOutline().filter();
+  // FIXME [awe] 6.1 - this already happens in Outline#_onDetailTableRowsFiltered, think about how to distinct between
+  // online and JS-only case
+};
+
 //public void mediateTableRowsUpdated(TableEvent e, IPageWithTable<?> pageWithTable) {
-//public void mediateTableRowsDeleted(List<? extends IPage> childNodes, IPageWithTable pageWithTable) {

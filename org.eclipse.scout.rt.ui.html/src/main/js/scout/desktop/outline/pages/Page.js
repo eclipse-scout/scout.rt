@@ -63,14 +63,14 @@ scout.Page.prototype._initTable = function(table) {
   // NOP
 };
 
-scout.Page.prototype._linkTableRowWithPage = function(tableRow, page) {
-  tableRow.page = page;
-  page.tableRow = tableRow;
+scout.Page.prototype._linkTableRowWithPage = function(row, page) {
+  row.page = page;
+  page.row = row;
 };
 
-scout.Page.prototype._unlinkTableRowWithPage = function(tableRow, page) {
-  delete tableRow.page;
-  delete page.tableRow;
+scout.Page.prototype._unlinkTableRowWithPage = function(row, page) {
+  delete row.page;
+  delete page.row;
 };
 
 scout.Page.prototype._ensureDetailForm = function() {
@@ -101,9 +101,9 @@ scout.Page.prototype.getOutline = function() {
  * @returns an array of child pages for the given table rows. The order of the child pages is the same as the order of the rows.
  *   which means this function can be used to sort child pages in the same order as the table.
  */
-scout.Page.prototype.pagesForTableRows = function(tableRows) {
-  return tableRows.map(function(tableRow) {
-    return tableRow.page;
+scout.Page.prototype.pagesForTableRows = function(rows) {
+  return rows.map(function(row) {
+    return row.page;
   }, this);
 };
 

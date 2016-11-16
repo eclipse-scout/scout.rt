@@ -658,7 +658,7 @@ scout.Outline.prototype._computeDetailContent = function() {
     return scout.create('TableRowDetail', {
       parent: this,
       table: selectedPage.parentNode.detailTable,
-      tableRow: selectedPage.row
+      row: selectedPage.row
     });
   }
   return null;
@@ -949,7 +949,7 @@ scout.Outline.prototype._triggerPageChanged = function(page) {
 /* event handling */
 
 scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
-  this.filter();
+  // this.filter(); // FIXME [awe] 6.1 - consider doing this only in OutlineMediator
 };
 
 scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
@@ -978,7 +978,6 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
  * @override Tree.js
  */
 scout.Outline.prototype._nodesSelectedInternal = function() {
-  // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
   var activePage = this.activePage();
   if (activePage) {
     activePage.activate();
@@ -987,9 +986,6 @@ scout.Outline.prototype._nodesSelectedInternal = function() {
   }
 };
 
-// FIXME [awe] 6.1 - DesktopBenchSpec anschauen. 2 Tests failen weil updateOutlineContent zu oft aufgerufen wird.
-// prüfen, ob es richtig ist hier pageChanged zu triggern, oder ob hier ein eigenes event nötig ist, das evtl.
-// weniger macht (auch mit Java code vergleichen)
 scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
   this.pageChanged(activePage);
 };
@@ -1009,5 +1005,7 @@ scout.Outline.prototype.pageChanged = function(page) {
     this.updateDetailContent();
   }
 
+  // FIXME [awe] 6.1 - check when pageChanged is triggered in Java code. We do it too often in JS code (Java does not
+  // trigger the event when children are loaded
   this._triggerPageChanged(page);
 };
