@@ -11,6 +11,7 @@
 describe("TableField", function() {
   var session;
   var helper;
+  /** @type {scout.TableSpecHelper} */
   var tableHelper;
 
   beforeEach(function() {
@@ -92,5 +93,60 @@ describe("TableField", function() {
       tableField.setProperty('table', table);
       expect(tableField.table.$container).toHaveClass('field');
     });
+  });
+
+  describe('requiresSave', function() {
+
+    var tableField, firstRow;
+
+    beforeEach(function() {
+      tableField = createTableFieldWithTable();
+      firstRow = tableField.table.rows[0];
+      expect(tableField.requiresSave).toBe(false);
+    });
+
+    it('should require save when row has been updated', function() {
+      tableField.table.updateRow(firstRow);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+    });
+
+    it('should require save when row has been deleted', function() {
+      tableField.table.deleteRow(firstRow);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+    });
+
+    it('should require save when row has been inserted', function() {
+      var rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
+      tableField.table.insertRow(rowModel);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+    });
+
+    it('should NOT require save when row has been inserted and deleted again', function() {
+      var rowModel = tableHelper.createModelRow('new', ['foo', 'bar']);
+      tableField.table.insertRow(rowModel);
+      var insertedRow = tableField.table.rowsMap['new'];
+      tableField.table.deleteRow(insertedRow);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+    });
+
+    it('should require save when row has been checked', function() {
+      tableField.table.setProperty('checkable', true);
+      tableField.table.checkRow(firstRow);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+    });
+
+    it('should NOT require save when row has been checked and unchecked again', function() {
+      tableField.table.setProperty('checkable', true);
+      tableField.table.checkRow(firstRow);
+      tableField.table.uncheckRow(firstRow);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+    });
+
   });
 });

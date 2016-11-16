@@ -49,9 +49,9 @@ scout.FormField = function() {
   this.$status;
   this._addAdapterProperties(['keyStrokes', 'menus']);
   this._addCloneProperties(['displayText']);
-  this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
   this.touched = false;
+  this.requiresSave = false;
   this.empty = true;
   this.preventInitialFocus = false;
 
@@ -909,6 +909,27 @@ scout.FormField.prototype.visitParents = function(visitor) {
 
 scout.FormField.prototype.markAsSaved = function() {
   this.touched = false;
+  this.updateRequiresSave();
+};
+
+/**
+ * Updates the requiresSave property by checking if the field is touched or if computeRequiresSave() returns true.
+ */
+scout.FormField.prototype.updateRequiresSave = function() {
+  if (!this.initialized) {
+    return;
+  }
+  this.requiresSave = this.touched || this.computeRequiresSave();
+};
+
+/**
+ * Override this function in order to return whether or not this field requires to be saved.
+ * The default impl. returns false.
+ *
+ * @returns {boolean}
+ */
+scout.FormField.prototype.computeRequiresSave = function() {
+  return false;
 };
 
 scout.FormField.prototype.validate = function() {

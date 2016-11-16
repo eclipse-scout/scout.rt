@@ -1852,12 +1852,11 @@ scout.Table.prototype.checkRow = function(row, checked) {
 };
 
 scout.Table.prototype.checkRows = function(rows, options) {
-  var opts = {
-    checked: true,
-    checkOnlyEnabled: true
-  };
-  $.extend(opts, options);
-  var updatedRows = [];
+  var opts = $.extend({
+      checked: true,
+      checkOnlyEnabled: true
+    }, options);
+  var checkedRows = [];
   if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
     return;
   }
@@ -1870,20 +1869,20 @@ scout.Table.prototype.checkRows = function(rows, options) {
       for (var i = 0; i < this.rows.length; i++) {
         if (this.rows[i].checked) {
           this.rows[i].checked = false;
-          updatedRows.push(this.rows[i]);
+          checkedRows.push(this.rows[i]);
         }
       }
     }
     row.checked = opts.checked;
-    updatedRows.push(row);
+    checkedRows.push(row);
   }, this);
 
   if (this.rendered) {
-    updatedRows.forEach(function(row) {
+    checkedRows.forEach(function(row) {
       this._renderRowChecked(row);
     }, this);
   }
-  this._triggerRowsChecked(updatedRows);
+  this._triggerRowsChecked(checkedRows);
 };
 
 scout.Table.prototype.uncheckRow = function(row) {
@@ -1891,8 +1890,10 @@ scout.Table.prototype.uncheckRow = function(row) {
 };
 
 scout.Table.prototype.uncheckRows = function(rows, options) {
-  options.checked = false;
-  this.checkRows(rows, options);
+  var opts = $.extend({
+      checked: false
+    }, options);
+  this.checkRows(rows, opts);
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
@@ -2056,9 +2057,7 @@ scout.Table.prototype.updateRows = function(rows) {
   var filterChanged, newHiddenRows = [];
 
   // Update model
-  for (var i = 0; i < rows.length; i++) {
-    var updatedRow = rows[i];
-
+  rows.forEach(function(updatedRow) {
     var oldRow = this.rowsMap[updatedRow.id];
     if (!oldRow) {
       throw new Error('Update event received for non existing row. RowId: ' + updatedRow.id);
@@ -2069,7 +2068,7 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = updatedRow;
     }
-    //TODO CGU remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
+    // TODO CGU remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
@@ -2098,7 +2097,9 @@ scout.Table.prototype.updateRows = function(rows) {
       this._removeCellEditorForRow(updatedRow);
       this._installRow(updatedRow);
     }
-  }
+  }, this);
+
+  this._triggerRowsUpdated(rows);
 
   if (filterChanged) {
     this._rowsFiltered(newHiddenRows);
@@ -2847,6 +2848,12 @@ scout.Table.prototype._triggerRowsDeleted = function(rows) {
   });
 };
 
+scout.Table.prototype._triggerRowsUpdated = function(rows) {
+  this.trigger('rowsUpdated', {
+    rows: rows
+  });
+};
+
 scout.Table.prototype._triggerAllRowsDeleted = function(rows) {
   this.trigger('allRowsDeleted', {
     rows: rows
@@ -2859,9 +2866,9 @@ scout.Table.prototype._triggerRowsSelected = function(debounce) {
   });
 };
 
-scout.Table.prototype._triggerRowsChecked = function(updatedRows) {
+scout.Table.prototype._triggerRowsChecked = function(rows) {
   this.trigger('rowsChecked', {
-    updatedRows: updatedRows
+    rows: rows
   });
 };
 

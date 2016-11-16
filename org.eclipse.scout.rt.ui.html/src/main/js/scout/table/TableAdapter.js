@@ -177,7 +177,7 @@ scout.TableAdapter.prototype._sendCancelCellEdit = function(field) {
 };
 
 scout.TableAdapter.prototype._onWidgetRowsChecked = function(event) {
-  this._sendRowsChecked(event.updatedRows);
+  this._sendRowsChecked(event.rows);
 };
 
 scout.TableAdapter.prototype._sendRowsChecked = function(rows) {

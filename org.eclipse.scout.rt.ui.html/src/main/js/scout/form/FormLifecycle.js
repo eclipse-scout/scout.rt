@@ -202,15 +202,22 @@ scout.FormLifecycle.prototype.markAsSaved = function() {
   });
 };
 
-// Java: isSaveNeeded, checkSaveNeeded
+/**
+ * Visits all form fields and calls the updateRequiresSave() function. If any
+ * field has the requiresSave flag set to true, this function returns true,
+ * false otherwise.
+ *
+ * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
+ */
 scout.FormLifecycle.prototype.requiresSave = function() {
-  var touched = false;
+  var requiresSave = false;
   this.form.visitFields(function(field) {
-    if (field.touched) {
-      touched = true;
+    field.updateRequiresSave();
+    if (field.requiresSave) {
+      requiresSave = true;
     }
   });
-  return touched;
+  return requiresSave;
 };
 
 scout.FormLifecycle.prototype.session = function() {
