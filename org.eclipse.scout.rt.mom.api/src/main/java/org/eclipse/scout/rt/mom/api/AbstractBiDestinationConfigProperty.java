@@ -1,0 +1,62 @@
+package org.eclipse.scout.rt.mom.api;
+
+import org.eclipse.scout.rt.mom.api.IDestination.IDestinationType;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
+
+/**
+ * Config property for {@link IBiDestination}s (<i>request-reply messaging</i>). For {@link IDestination}s, use
+ * {@link AbstractDestinationConfigProperty}.
+ * <p>
+ * The expected format for config values is described here: {@link DestinationConfigPropertyParser}.
+ * <p>
+ * <h3>Example usage:</h3> <i>Application code:</i>
+ *
+ * <pre>
+ * public class PersonLoaderQueueConfig extends AbstractBiDestinationConfigProperty&lt;PersonKey, PersonBean&gt; {
+ *
+ *   &#64;Override
+ *   public String getKey() {
+ *     return "scout.mom.myMom.destination.personLoaderQueue";
+ *   }
+ *
+ *   &#64;Override
+ *   protected IDestinationType getType() {
+ *     return DestinationType.QUEUE;
+ *   }
+ * }
+ *
+ * ...
+ *
+ * // Usage
+ * PersonBean result = MOM.request(MyMom.class, CONFIG.getPropertyValue(PersonLoaderQueueConfig.class), requestKey);
+ * </pre>
+ *
+ * <i>config.properties</i>:
+ *
+ * <pre>
+ * scout.mom.myMom.destination.personLoaderQueue=lookup:///service/PersonQueue
+ * </pre>
+ *
+ * @see IBiDestination
+ * @see IDestination
+ * @since 6.1
+ */
+public abstract class AbstractBiDestinationConfigProperty<REQUEST, REPLY> extends AbstractConfigProperty<IBiDestination<REQUEST, REPLY>> {
+
+  // -----------------------------------------------------------------------------------
+  // Implementation note: The same code exists in AbstractDestinationConfigProperty.
+  // If you change something here, make sure to change it in the other class as well!
+  // -----------------------------------------------------------------------------------
+
+  @Override
+  protected IBiDestination<REQUEST, REPLY> parse(final String value) {
+    final DestinationConfigPropertyParser p = BEANS.get(DestinationConfigPropertyParser.class).parse(value);
+    return MOM.newBiDestination(p.getDestinationName(), getType(), p.getResolveMethod(), p.getParameters());
+  }
+
+  /**
+   * @return The destination type (must not be <code>null</code>)
+   */
+  protected abstract IDestinationType getType();
+}

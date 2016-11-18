@@ -22,6 +22,7 @@ import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.Topic;
@@ -31,6 +32,8 @@ import javax.naming.NamingException;
 
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
+import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
+import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
@@ -52,12 +55,13 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
@@ -433,17 +437,22 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   public Destination lookupJmsDestination(final IDestination<?> destination, final Session session) {
+    Assertions.assertTrue(ObjectUtility.isOneOf(destination.getResolveMethod(), ResolveMethod.LOOKUP, ResolveMethod.DEFINE), "Unsupported resolve method [{}]", destination);
+    Assertions.assertTrue(ObjectUtility.isOneOf(destination.getType(), DestinationType.QUEUE, DestinationType.TOPIC), "Unsupported destination type [{}]", destination);
     try {
-      switch (destination.getType()) {
-        case IDestination.TOPIC:
-          return session.createTopic(destination.getName());
-        case IDestination.QUEUE:
-          return session.createQueue(destination.getName());
-        case IDestination.JNDI_LOOKUP:
-          return (Destination) m_context.lookup(destination.getName());
-        default:
-          throw new PlatformException("Not supported destination [type={}]", destination.getType());
+      // Lookup
+      if (destination.getResolveMethod() == ResolveMethod.LOOKUP) {
+        final Object object = Assertions.assertNotNull(m_context.lookup(destination.getName()));
+        final Class<?> expectedType = (destination.getType() == DestinationType.QUEUE ? Queue.class : Topic.class);
+        Assertions.assertInstance(object, expectedType, "The looked up object is of type '{}', but expected type '{}' [{}]", object.getClass().getName(), expectedType.getName(), destination);
+        return (Destination) object;
       }
+
+      // Define
+      if (destination.getType() == DestinationType.QUEUE) {
+        return session.createQueue(destination.getName());
+      }
+      return session.createTopic(destination.getName());
     }
     catch (final JMSException | NamingException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);

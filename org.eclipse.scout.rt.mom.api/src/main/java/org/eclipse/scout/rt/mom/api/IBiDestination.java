@@ -6,9 +6,10 @@ package org.eclipse.scout.rt.mom.api;
  * <p>
  * Typically, request-reply is used with a queue destination. If using a topic, it is the first reply which is returned.
  * <p>
- * A destination with the same <i>name</i> and <i>type</i> are considered 'equals'. This is a lightweight object with no
- * physical messaging resources allocated, and which can be constructed even if not connected to the network or broker,
- * e.g. in static initialization sections.
+ * This is a lightweight object with no physical messaging resources allocated, and which can be constructed even if not
+ * connected to the network or broker, e.g. in static initialization sections.
+ * <p>
+ * Two destinations with the same <i>name</i> are considered 'equals'.
  * <p>
  * See {@link IMom} documentation for more information about the difference between topic and queue based messaging.
  *

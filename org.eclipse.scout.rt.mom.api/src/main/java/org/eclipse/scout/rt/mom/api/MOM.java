@@ -1,7 +1,12 @@
 package org.eclipse.scout.rt.mom.api;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
+import org.eclipse.scout.rt.mom.api.IDestination.IDestinationType;
+import org.eclipse.scout.rt.mom.api.IDestination.IResolveMethod;
+import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
@@ -12,6 +17,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
@@ -51,16 +57,25 @@ public final class MOM {
    * The destination returned is a lightweight object with no physical messaging resources allocated, and which can be
    * constructed even if not connected to the network or broker, i.e. in a static initializer block.
    * <p>
-   * A destination with the same <i>name</i> and <i>type</i> are considered 'equals'.
+   * Two destinations with the same <i>name</i> are considered 'equals'.
    *
    * @param <DTO>
    *          the type of the transfer object which is sent or received over this destination.
-   * @see IDestination#TOPIC
-   * @see IDestination#QUEUE
-   * @see IDestination#JNDI_LOOKUP
+   * @param name
+   *          the symbolic name for the destination
+   * @param destinationType
+   *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
+   * @param resolveMethod
+   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#LOOKUP}
+   * @param properties
+   *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
+   *          no properties are required)
+   * @throws AssertionException
+   *           if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
+   *           empty
    */
-  public static <DTO> IDestination<DTO> newDestination(final String name, final int destinationType) {
-    return new Destination<DTO, Void>(name, destinationType);
+  public static <DTO> IDestination<DTO> newDestination(final String name, final IDestinationType destinationType, final IResolveMethod resolveMethod, final Map<String, String> properties) {
+    return new Destination<DTO, Void>(name, destinationType, resolveMethod, properties);
   }
 
   /**
@@ -70,18 +85,27 @@ public final class MOM {
    * The destination returned is a lightweight object with no physical messaging resources allocated, and which can be
    * constructed even if not connected to the network or broker, i.e. in a static initializer block.
    * <p>
-   * A destination with the same <i>name</i> and <i>type</i> are considered 'equals'.
+   * Two destinations with the same <i>name</i> are considered 'equals'.
    *
    * @param <REQUEST>
    *          the type of the request object which is sent or received over this destination.
    * @param <REPLY>
    *          the type of the reply object which is sent or received over this destination.
-   * @see IDestination#TOPIC
-   * @see IDestination#QUEUE
-   * @see IDestination#JNDI_LOOKUP
+   * @param name
+   *          the symbolic name for the destination
+   * @param destinationType
+   *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
+   * @param resolveMethod
+   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#LOOKUP}
+   * @param properties
+   *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
+   *          no properties are required)
+   * @throws AssertionException
+   *           if one of <code>name</code>, <code>type</code> or <code>resolveMethod</code> is <code>null</code> or
+   *           empty
    */
-  public static <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final int destinationType) {
-    return new Destination<REQUEST, REPLY>(name, destinationType);
+  public static <REQUEST, REPLY> IBiDestination<REQUEST, REPLY> newBiDestination(final String name, final IDestinationType destinationType, final IResolveMethod resolveMethod, final Map<String, String> properties) {
+    return new Destination<REQUEST, REPLY>(name, destinationType, resolveMethod, properties);
   }
 
   /**
@@ -99,7 +123,7 @@ public final class MOM {
    * mode and without expiration.
    *
    * @param transport
-   *          specifies the MOM used as transport to publish the message, i.e. {@link ClusterMom}.
+   *          specifies the MOM used as transport to publish the message, e.g. {@link ClusterMom}.
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
    *          documentation for more information about the difference between topic and queue based messaging.
@@ -121,7 +145,7 @@ public final class MOM {
    * Publishes the given message to the given destination.
    *
    * @param transport
-   *          specifies the MOM used as transport to publish the message, i.e. {@link ClusterMom}.
+   *          specifies the MOM used as transport to publish the message, e.g. {@link ClusterMom}.
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
    *          documentation for more information about the difference between topic and queue based messaging.

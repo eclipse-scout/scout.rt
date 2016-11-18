@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.mom.IMomDestinations;
+import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
@@ -150,7 +150,7 @@ public class ClusterSynchronizationServiceTest {
   @Test
   public void testTransactionalSendMultipleMessages() throws Exception {
     ArgumentCaptor<ClusterNotificationMessage> msgCaptor = ArgumentCaptor.forClass(ClusterNotificationMessage.class);
-    doNothing().when(m_nullMomImplementorSpy).publish(eq(IMomDestinations.CLUSTER_NOTIFICATION_TOPIC), msgCaptor.capture(), any(PublishInput.class));
+    doNothing().when(m_nullMomImplementorSpy).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), msgCaptor.capture(), any(PublishInput.class));
 
     m_svc.publishTransactional("Testnotification1");
     m_svc.publishTransactional("Testnotification2");
@@ -158,7 +158,7 @@ public class ClusterSynchronizationServiceTest {
     ITransaction.CURRENT.get().commitPhase2();
 
     // verify
-    verify(m_nullMomImplementorSpy, times(2)).publish(eq(IMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
+    verify(m_nullMomImplementorSpy, times(2)).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
     assertEquals(2, m_svc.getStatusInfo().getSentMessageCount());
 
     List<ClusterNotificationMessage> messages = msgCaptor.getAllValues();
@@ -185,7 +185,7 @@ public class ClusterSynchronizationServiceTest {
   @Test
   public void testTransactionalWithCoalesce() throws Exception {
     ArgumentCaptor<ClusterNotificationMessage> msgCaptor = ArgumentCaptor.forClass(ClusterNotificationMessage.class);
-    doNothing().when(m_nullMomImplementorSpy).publish(eq(IMomDestinations.CLUSTER_NOTIFICATION_TOPIC), msgCaptor.capture(), any(PublishInput.class));
+    doNothing().when(m_nullMomImplementorSpy).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), msgCaptor.capture(), any(PublishInput.class));
 
     m_svc.publishTransactional(new BookmarkChangedClientNotification());
     m_svc.publishTransactional(new BookmarkChangedClientNotification());
@@ -194,7 +194,7 @@ public class ClusterSynchronizationServiceTest {
     ITransaction.CURRENT.get().commitPhase2();
 
     // verify
-    verify(m_nullMomImplementorSpy, times(2)).publish(eq(IMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
+    verify(m_nullMomImplementorSpy, times(2)).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
     assertEquals(2, m_svc.getStatusInfo().getSentMessageCount());
 
     List<ClusterNotificationMessage> messages = msgCaptor.getAllValues();
@@ -203,12 +203,12 @@ public class ClusterSynchronizationServiceTest {
   }
 
   private void assertNoMessageSent() {
-    verify(m_nullMomImplementorSpy, never()).publish(eq(IMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
+    verify(m_nullMomImplementorSpy, never()).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
     assertEmptyNodeInfo(m_svc.getStatusInfo());
   }
 
   private void assertSingleMessageSent() {
-    verify(m_nullMomImplementorSpy, times(1)).publish(eq(IMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
+    verify(m_nullMomImplementorSpy, times(1)).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), any(IClusterNotificationMessage.class), any(PublishInput.class));
     IClusterNodeStatusInfo statusInfo = m_svc.getStatusInfo();
     assertEquals(0, statusInfo.getReceivedMessageCount());
     assertEquals(1, statusInfo.getSentMessageCount());

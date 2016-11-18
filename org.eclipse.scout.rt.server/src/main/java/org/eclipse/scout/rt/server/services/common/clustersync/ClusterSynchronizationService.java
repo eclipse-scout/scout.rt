@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.mom.IMomDestinations;
+import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
@@ -119,10 +119,10 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       }
 
       try {
-        m_subscription = MOM.subscribe(ClusterMom.class, IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, this, null);
+        m_subscription = MOM.subscribe(ClusterMom.class, IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC, this, null);
       }
       catch (RuntimeException e) {
-        LOG.error("Failed to subscribe to {}", IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, e);
+        LOG.error("Failed to subscribe to {}", IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC, e);
         return false;
       }
     }
@@ -148,7 +148,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       }
     }
     catch (RuntimeException e) {
-      LOG.error("Failed to unsubscribe from {}", IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, e);
+      LOG.error("Failed to unsubscribe from {}", IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC, e);
     }
     return true;
   }
@@ -180,7 +180,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
    */
   private void publishInternal(List<IClusterNotificationMessage> messages) {
     for (IClusterNotificationMessage message : messages) {
-      MOM.publish(ClusterMom.class, IMomDestinations.CLUSTER_NOTIFICATION_TOPIC, message);
+      MOM.publish(ClusterMom.class, IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC, message);
     }
     for (IClusterNotificationMessage im : messages) {
       getStatusInfoInternal().updateSentStatus(im);
