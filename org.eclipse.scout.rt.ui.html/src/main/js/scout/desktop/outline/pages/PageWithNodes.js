@@ -10,7 +10,8 @@
  ******************************************************************************/
 scout.PageWithNodes = function() {
   scout.PageWithNodes.parent.call(this);
-  this.nodeType = 'nodes'; // FIXME [awe] 6.1 - discuss with C.GU - use instanceof PageWithX instead?
+
+  this.nodeType = scout.Page.NodeType.NODES;
 };
 scout.inherits(scout.PageWithNodes, scout.Page);
 

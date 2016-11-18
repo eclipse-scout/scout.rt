@@ -528,7 +528,7 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       tree._isGroupingEnd = function(node) {
-        return node.nodeType === 'groupingParent';
+        return node.nodeType === scout.Page.NodeType.TABLE;
       };
 
       var $groupNodes = tree.$data.find('.tree-node.group');
@@ -1516,7 +1516,7 @@ describe("Tree", function() {
     it("Sets css class group on every element within the same group", function() {
       tree.render(session.$entryPoint);
       tree._isGroupingEnd = function(node) {
-        return node.nodeType === 'groupingParent';
+        return node.nodeType === scout.Page.NodeType.TABLE;
       };
 
       tree.selectNodes([]);
@@ -1530,14 +1530,14 @@ describe("Tree", function() {
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
 
-      node1.nodeType = 'groupingParent';
+      node1.nodeType = scout.Page.NodeType.TABLE;
       tree.selectNodes(child1);
       tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(child1.$node[0]);
 
-      node1.nodeType = 'groupingParent';
+      node1.nodeType = scout.Page.NodeType.TABLE;
       tree.selectNodes(grandchild1);
       tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');

@@ -100,7 +100,7 @@ scout.NavigateDownButton.prototype._drill = function() {
 
     // If the parent node is a table page node, expand the drillNode
     // --> Same logic as in OutlineMediator.mediateTableRowAction()
-    if (parentNode && parentNode.nodeType === 'table') {
+    if (parentNode && parentNode.nodeType === scout.Page.NodeType.TABLE) {
       this.outline.expandNode(drillNode);
     }
   }

@@ -8,6 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * @class
+ * @constructor
+ */
 scout.TreeNode = function() {
   this.$node; // FIXME [awe] 6.1 discuss with CGU... properties without assignment do not exist after ctor call
   this.attached = false;
@@ -23,7 +28,7 @@ scout.TreeNode = function() {
   this.initialized;
   this.lazyExpandingEnabled = false;
   this.leaf = false;
-  this.level;
+  this.level = 0;
   this.parentNode;
   this.destroyed = false;
   this.rendered = false;

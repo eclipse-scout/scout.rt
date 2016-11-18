@@ -8,6 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * @extends {scout.Tree}
+ * @class
+ * @constructor
+ */
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
@@ -83,6 +89,10 @@ scout.Outline.prototype._createMediator = function() {
 scout.Outline.prototype._createTreeNode = function(nodeModel) {
   nodeModel.parent = this;
   return scout.create('Page', nodeModel);
+};
+
+scout.Outline.prototype._applyNodeDefaultValues = function(node) {
+  scout.defaultValues.applyTo(node, 'Page');
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -183,7 +193,6 @@ scout.Outline.prototype._renderEnabled = function() {
  */
 scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
-  node.detailFormVisibleByUi = true;
   this._initDetailTableAndForm(node);
   this.trigger('initPage', {page: node});
 };
@@ -450,7 +459,7 @@ scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedN
  * @override
  */
 scout.Outline.prototype._isGroupingEnd = function(node) {
-  return node.nodeType === 'table';
+  return node.nodeType === scout.Page.NodeType.TABLE;
 };
 
 /**
@@ -608,7 +617,7 @@ scout.Outline.prototype._computeDetailContent = function() {
     return selectedPage.detailForm;
     // otherwise show the content of the table row
     // but never if parent is a node page -> the table contains only one column with no essential information
-  } else if (selectedPage.row && selectedPage.parentNode.nodeType === 'table') {
+  } else if (selectedPage.row && selectedPage.parentNode.nodeType === scout.Page.NodeType.TABLE) {
     return scout.create('TableRowDetail', {
       parent: this,
       table: selectedPage.parentNode.detailTable,

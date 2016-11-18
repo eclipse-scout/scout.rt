@@ -49,6 +49,16 @@ scout.icons = {
     return icon;
   },
 
+  /**
+   * Resolves the value of an iconId property, where the value can contain a reference to
+   * an icon constant in these formats:
+   * <ul>
+   *   <li><code>${iconId:ANGLE_UP}</code> references constant scout.icon.ANGLE_UP</li>
+   *   <li><code>${iconId:foo.BAR}</code> references constant foo.icon.BAR, this is used for custom objects with icon constants</li>
+   * </ul>
+   * @param {string} value
+   * @returns {string}
+   */
   resolveIconId: function(value) {
     var iconId, tmp,
       result = this.ICON_ID_REGEX.exec(value);
@@ -60,7 +70,6 @@ scout.icons = {
         value = scout.icons[tmp];
       } else if (tmp.length === 2) {
         // look for icon in global object [0].icons.[1]
-        // FIXME [awe] 6.1 register a kind of icon lookup-service instead of this naming convention?
         value = window[tmp[0]].icons[tmp[1]];
       } else {
         $.log.warn('Invalid iconId: ' + value);

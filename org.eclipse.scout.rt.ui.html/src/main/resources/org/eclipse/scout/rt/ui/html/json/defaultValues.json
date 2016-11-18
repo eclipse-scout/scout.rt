@@ -268,6 +268,10 @@
       "leaf": false,
       "childNodes": [],
       "filterAccepted": true
+    },
+    "Page": {
+      "detailTableVisible": true,
+      "detailFormVisible": true
     }
   },
 
@@ -333,6 +337,9 @@
       "DateColumn": null,
       "StringColumn": null,
       "NumberColumn": null
+    },
+    "TreeNode": {
+      "Page": null
     }
   }
 }

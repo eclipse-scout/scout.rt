@@ -8,13 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * This class is used differently in online and JS-only case. In the online case we only have instances
+ * of Page in an outline. The server sets the property <code>nodeType</code> which is used to distinct
+ * between pages with tables and pages with nodes in some cases. In the JS only case, Page is an abstract
+ * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
+ * Implementations of these classes contain code which loads table data or child nodes.
+ *
+ * @extends {scout.TreeNode}
+ * @class
+ * @constructor
+ */
 scout.Page = function() {
   scout.Page.parent.call(this);
 
+  /**
+   * This property is set by the server, see: JsonOutline#putNodeType.
+   */
+  this.nodeType;
   this.detailTable;
   this.detailTableVisible = true;
   this.detailForm;
   this.detailFormVisible = true;
+  this.detailFormVisibleByUi = true
 
   /**
    * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
@@ -23,6 +40,18 @@ scout.Page = function() {
   this.tableStatusVisible = true;
 };
 scout.inherits(scout.Page, scout.TreeNode);
+
+/**
+ * This enum defines a node-type. This is basically used for the online case where we only have instances
+ * of scout.Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
+ * instead.
+ *
+ * @type {{NODES: string, TABLE: string}}
+ */
+scout.Page.NodeType = {
+  NODES: 'nodes',
+  TABLE: 'table'
+};
 
 /**
  * Override this function to return a detail form which is displayed in the outline when this page is selected.

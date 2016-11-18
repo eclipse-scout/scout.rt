@@ -404,7 +404,7 @@ scout.Desktop.prototype.updateSplitterPosition = function() {
   if (!this.splitter) {
     return;
   }
-  // FIXME awe: (user-prefs) Use user-preferences instead of sessionStorage
+  // TODO awe: (user-prefs) Use user-preferences instead of sessionStorage
   var storedSplitterPosition = this.cacheSplitterPosition && sessionStorage.getItem('scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
     // Restore splitter position

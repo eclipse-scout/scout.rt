@@ -11,7 +11,7 @@
 scout.PageWithTable = function() {
   scout.PageWithTable.parent.call(this);
 
-  this.nodeType = 'table';
+  this.nodeType = scout.Page.NodeType.TABLE;
   this.alwaysCreateChildPage = false;
 };
 scout.inherits(scout.PageWithTable, scout.Page);

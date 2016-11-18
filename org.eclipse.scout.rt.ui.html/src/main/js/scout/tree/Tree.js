@@ -8,6 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * @class
+ * @constructor
+ */
 scout.Tree = function() {
   scout.Tree.parent.call(this);
 
@@ -232,42 +237,29 @@ scout.Tree.prototype._updateFlatListAndSelectionPath = function(node, parentNode
 };
 
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {
-  // FIXME [awe] 6.1 move this code to TreeNode#init
-  this.nodesMap[node.id] = node;
-
-  if (parentNode) {
-    node.parentNode = parentNode;
-    node.level = node.parentNode.level + 1;
-  } else {
-    node.level = 0;
-  }
-
   this.nodesMap[node.id] = node;
   if (parentNode) {
     node.parentNode = parentNode;
     node.level = node.parentNode.level + 1;
-  } else {
-    node.level = 0;
   }
-  node.rendered = false;
-  node.attached = false;
   if (node.checked) {
     this.checkedNodes.push(node);
   }
-  scout.defaultValues.applyTo(node, 'TreeNode');
-  if (node.childNodes === undefined) {
-    node.childNodes = [];
-  }
-
   this._initTreeNodeInternal(node, parentNode);
-
   this._updateMarkChildrenChecked(node, true, node.checked);
-
   node.initialized = true;
 };
 
+scout.Tree.prototype._applyNodeDefaultValues = function(node) {
+  scout.defaultValues.applyTo(node, 'TreeNode');
+};
+
+/**
+ * Override this function if you want a custom node init before filtering.
+ * The default impl. applies default values to the given node.
+ */
 scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
-  // override this if you want a custom node init before filtering.
+  this._applyNodeDefaultValues(node);
 };
 
 scout.Tree.prototype.destroy = function() {
@@ -1970,7 +1962,7 @@ scout.Tree.prototype.updateNodes = function(nodes) {
     if (updatedNode === oldNode) {
       propertiesChanged = true;
     } else {
-      scout.defaultValues.applyTo(updatedNode, 'TreeNode');
+      this._applyNodeDefaultValues(updatedNode);
       propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
     }
 
