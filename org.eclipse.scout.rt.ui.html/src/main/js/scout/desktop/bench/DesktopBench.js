@@ -289,18 +289,17 @@ scout.DesktopBench.prototype.updateOutlineContent = function() {
   if (!this.outlineContentVisible || !this.outline) {
     return;
   }
-  var content;
-  var selectedPages = this.outline.selectedNodes;
-  if (selectedPages.length === 0) {
+  var content,
+    selectedPage = this.outline.selectedNode();
+  if (selectedPage) {
+    // Outline does not support multi selection
+    content = this._computeDetailContentForPage(selectedPage);
+  } else {
     if (this.outline.defaultDetailForm) {
       content = this._computeDefaultDetailForm();
     } else if (this.outline.outlineOverview) {
       content = this._computeOutlineOverview();
     }
-  } else {
-    // Outline does not support multi selection -> [0]
-    var selectedPage = selectedPages[0];
-    content = this._computeDetailContentForPage(selectedPage);
   }
   if (content) {
     if (content instanceof scout.Table) {
@@ -343,7 +342,7 @@ scout.DesktopBench.prototype._onOutlineNodesSelected = function(event) {
 };
 
 scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
-  var selectedPage = this.outline.selectedNodes[0];
+  var selectedPage = this.outline.selectedNode();
   if (!event.page && !selectedPage || event.page === selectedPage) {
     this.updateOutlineContent();
   }

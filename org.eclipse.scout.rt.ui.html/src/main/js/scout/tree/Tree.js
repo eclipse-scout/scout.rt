@@ -2364,7 +2364,7 @@ scout.Tree.prototype._isGroupingEnd = function(node) {
 };
 
 /**
- * @returns the first selected node or null when no node is selected.
+ * @returns {scout.TreeNode} the first selected node or null when no node is selected.
  */
 scout.Tree.prototype.selectedNode = function() {
   if (this.selectedNodes.length === 0) {

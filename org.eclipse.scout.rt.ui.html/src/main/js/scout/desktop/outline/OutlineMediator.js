@@ -54,18 +54,11 @@ scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWit
 
   var table = event.source;
   var childPages = pageWithTable.pagesForTableRows(table.rows);
-
-  if (childPages.length === 0 || !childPages[0]) {
-    return;
-  } // FIXME [awe] 6.1 - remove this hack, solve in pagesForTableRows (deal with case that outline has no child pages yet)
-
   pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
 };
 
 scout.OutlineMediator.prototype.onTableRowsFiltered = function(event, page) {
-  // page.getOutline().filter();
-  // FIXME [awe] 6.1 - this already happens in Outline#_onDetailTableRowsFiltered, think about how to distinct between
-  // online and JS-only case
+  page.getOutline().filter();
 };
 
 //public void mediateTableRowsUpdated(TableEvent e, IPageWithTable<?> pageWithTable) {

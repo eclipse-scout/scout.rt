@@ -37,16 +37,32 @@ scout.Page.prototype.createDetailForm = function() {
  */
 scout.Page.prototype._init = function(model) {
   scout.Page.parent.prototype._init.call(this, model);
-  if (model.detailTable) { // FIXME [awe] 6.1 - try to get rid of this switch (required for case when server sends detailTable)
-    this.detailTable = model.detailTable;
+  this._internalInitTable();
+  this._internalInitDetailForm();
+};
+
+scout.Page.prototype._internalInitTable = function() {
+  var table = this.detailTable;
+  if (table) {
+    // this case is used for Scout classic
+    table = this.getOutline()._createChild(table);
   } else {
-    var table = this._createTable();
-    this._initTable(table);
-    this.detailTable = table;
-    if (this.detailTable) {
-      this.detailTable.setTableStatusVisible(this.tableStatusVisible);
-    }
+    table = this._createTable();
   }
+
+  if (table) {
+    this._initTable(table);
+    table.setTableStatusVisible(this.tableStatusVisible);
+  }
+  this.detailTable = table;
+};
+
+scout.Page.prototype._internalInitDetailForm = function() {
+  var detailForm = this.detailForm;
+  if (detailForm) {
+    detailForm = this.getOutline()._createChild(detailForm);
+  }
+  this.detailForm = detailForm;
 };
 
 /**
@@ -57,20 +73,15 @@ scout.Page.prototype._createTable = function() {
 };
 
 /**
- * Override this function to initialize the internal (detail) table. Default impl. does nothing.
+ * Override this function to initialize the internal (detail) table. Default impl. delegates
+ * <code>rowsFiltered</code> events to the outline mediator.
  */
 scout.Page.prototype._initTable = function(table) {
-  // NOP
+  table.on('rowsFiltered', this._onTableRowsFiltered.bind(this));
 };
 
-scout.Page.prototype._linkTableRowWithPage = function(row, page) {
-  row.page = page;
-  page.row = row;
-};
-
-scout.Page.prototype._unlinkTableRowWithPage = function(row, page) {
-  delete row.page;
-  delete page.row;
+scout.Page.prototype._onTableRowsFiltered = function(event) {
+  this.getOutline().mediator.onTableRowsFiltered(event, this);
 };
 
 scout.Page.prototype._ensureDetailForm = function() {
@@ -125,4 +136,20 @@ scout.Page.prototype.reloadPage = function () {
   if (outline) {
     this.loadChildren();
   }
+};
+
+/**
+ * @static
+ */
+scout.Page.linkRowWithPage = function(row, page) {
+  row.page = page;
+  page.row = row;
+};
+
+/**
+ * @static
+ */
+scout.Page.unlinkRowWithPage = function(row, page) {
+  delete row.page;
+  delete page.row;
 };

@@ -1136,6 +1136,26 @@ describe("Tree", function() {
       expect(node0.$node.isSelected()).toBe(true);
     });
 
+    it("selectedNode()", function() {
+      var model = helper.createModelFixture(2, 2);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      var node1 = tree.nodes[1];
+
+      // single selection
+      tree.selectNode(node0);
+      expect(tree.selectedNode()).toBe(node0);
+      tree.deselectAll();
+
+      // multi selection
+      tree.selectNodes([node0, node1]);
+      expect(tree.selectedNode()).toBe(node0);
+      tree.deselectAll();
+
+      // no selection
+      expect(tree.selectedNode()).toBe(null);
+    });
+
     it("expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)", function() {
       var model = helper.createModelFixture(3, 3, false);
       var tree = helper.createTree(model);

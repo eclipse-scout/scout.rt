@@ -67,6 +67,12 @@ scout.OutlineSpecHelper.prototype.createOutline = function(model) {
   return tree;
 };
 
+scout.OutlineSpecHelper.prototype.createOutlineAdapter = function(model) {
+  var outlineAdapter = new scout.OutlineAdapter();
+  outlineAdapter.init(model);
+  return outlineAdapter;
+};
+
 /**
  * Creates an outline with 3 nodes, the first node has a visible detail form
  */
@@ -84,7 +90,8 @@ scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
  */
 scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailTable = function() {
   var model = this.createModelFixture(3, 2, true);
-  var outline = this.createOutline(model);
+  var adapter = this.createOutlineAdapter(model);
+  var outline = adapter.createWidget(model, this.session.desktop);
   var node = outline.nodes[0];
   node.detailTable = new scout.TableSpecHelper(this.session).createTableWithOneColumn();
   node.detailTableVisible = true;

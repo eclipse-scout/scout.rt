@@ -26,14 +26,15 @@ scout.models = {
   },
 
   /**
-   * returns a json model from modelMap. The model needs to be of type 'model'
-   * @param modelId the id of the model
-   * @param parent Optional: if this parameter is given, a property 'parent' will be assigned to this parameter
+   * Returns a json model from modelMap. The model needs to be of type 'model'.
+   *
+   * @param {string} modelId the id of the model
+   * @param {Object} [parent] if this parameter is given, a property 'parent' will be assigned to this parameter
    * @returns {Object}
    */
   getModel: function(modelId, parent) {
     var model = scout.models._get(modelId, 'model');
-    if (parent) { // FIXME [awe] 6.1 - review with cyrill - in some cases (without subclasses) we still need the parent parameter (but it is more a convenience feature)
+    if (parent) {
       model.parent = parent;
     }
     return model;
@@ -111,12 +112,12 @@ scout.models = {
    * @param parentModel object which contains id's as properties
    * @returns parentModel extended by extension
    */
-  extend: function(extension, parentModel) {
-    if(typeof extension === 'string') {
-        extension = scout.models.getExtension(extension);
+  extend: function (extension, parentModel) {
+    if (typeof extension === 'string') {
+      extension = scout.models.getExtension(extension);
     }
     scout.assertParameter('extensions', extension.extensions);
-    extension.extensions.forEach(function(extensionConfig) {
+    extension.extensions.forEach(function (extensionConfig) {
       scout.assertParameter('operation', extensionConfig.operation);
       var target = extensionConfig.target;
       scout.assertParameter('target', target);
@@ -136,7 +137,7 @@ scout.models = {
         var targetArray = targetObject[target.property];
         var insertAt = targetArray.length;
         if (target.before) {
-          insertAt = scout.arrays.findIndex(targetArray,function(element) {
+          insertAt = scout.arrays.findIndex(targetArray, function (element) {
             return element.id === target.before;
           });
           if (insertAt === -1) {

@@ -17,14 +17,14 @@ scout.PageWithTable = function() {
 scout.inherits(scout.PageWithTable, scout.Page);
 
 /**
- * @override Page.js
+ * @override scout.Page
  */
 scout.PageWithTable.prototype._initTable = function(table) {
+  scout.PageWithTable.parent.prototype._initTable.call(this, table);
   table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
   table.on('rowsInserted', this._onTableRowsInserted.bind(this));
   table.on('rowAction', this._onTableRowAction.bind(this));
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
-  table.on('rowsFiltered', this._onTableRowsFiltered.bind(this));
 };
 
 scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
@@ -34,7 +34,7 @@ scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
   var rows = scout.arrays.ensure(event.rows),
     childPages = rows.map(function(row) {
       var childPage = row.page;
-      this._unlinkTableRowWithPage(row, childPage);
+      scout.Page.unlinkRowWithPage(row, childPage);
       return childPage;
     }, this);
 
@@ -69,16 +69,12 @@ scout.PageWithTable.prototype._onTableRowOrderChanged = function(event) {
   this.getOutline().mediator.onTableRowOrderChanged(event, this);
 };
 
-scout.PageWithTable.prototype._onTableRowsFiltered = function(event) {
-  this.getOutline().mediator.onTableRowsFiltered(event, this);
-};
-
 scout.PageWithTable.prototype._createChildPageInternal = function(row) {
   var childPage = this.createChildPage(row);
   if (childPage === null && this.alwaysCreateChildPage) {
     childPage = this.createDefaultChildPage(row);
   }
-  this._linkTableRowWithPage(row, childPage);
+  scout.Page.linkRowWithPage(row, childPage);
   return childPage;
 };
 
@@ -137,7 +133,7 @@ scout.PageWithTable.prototype.loadTableData = function() {
  *   return deferred;
  * </code>
  *
- * @return jQuery.Deferred
+ * @return {$.Deferred}
  */
 scout.PageWithTable.prototype._loadTableData = function() {
   return $.resolvedDeferred();

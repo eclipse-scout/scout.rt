@@ -46,22 +46,22 @@ describe("DesktopBench", function() {
     it("called when an outline page gets selected", function() {
       spyOn(bench, 'updateOutlineContent');
       outline.selectNodes(outline.nodes[1]);
-      expect(bench.updateOutlineContent.calls.count()).toEqual(2);
+      expect(bench.updateOutlineContent.calls.count()).toEqual(1);
     });
 
     it("doesn't get called if page already is selected", function() {
       spyOn(bench, 'updateOutlineContent');
       outline.selectNodes(outline.nodes[1]);
-      expect(bench.updateOutlineContent.calls.count()).toEqual(2);
+      expect(bench.updateOutlineContent.calls.count()).toEqual(1);
 
       outline.selectNodes(outline.nodes[1]);
+      expect(bench.updateOutlineContent.calls.count()).toEqual(1);
+
+      outline.selectNodes([]);
       expect(bench.updateOutlineContent.calls.count()).toEqual(2);
 
       outline.selectNodes([]);
-      expect(bench.updateOutlineContent.calls.count()).toEqual(3);
-
-      outline.selectNodes([]);
-      expect(bench.updateOutlineContent.calls.count()).toEqual(3);
+      expect(bench.updateOutlineContent.calls.count()).toEqual(2);
     });
 
     it("sets detailForm as outlineContent if node gets selected", function() {

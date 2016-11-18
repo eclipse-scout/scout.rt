@@ -50,8 +50,8 @@ scout.PageWithNodes.prototype._rebuildDetailTable = function(childPages) {
 
 scout.PageWithNodes.prototype._unlinkAllTableRows = function(rows) {
   rows.forEach(function(row) {
-    this._unlinkTableRowWithPage(row, row.page);
-  }, this);
+    scout.Page.unlinkRowWithPage(row);
+  });
 };
 
 scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPages) {
@@ -60,7 +60,7 @@ scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPage
       parent: this.detailTable,
       cells: [childPage.text]}
     );
-    this._linkTableRowWithPage(row, childPage);
+    scout.Page.linkRowWithPage(row, childPage);
     return row;
   }, this);
 };

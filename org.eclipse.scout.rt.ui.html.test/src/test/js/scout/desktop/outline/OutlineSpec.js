@@ -241,18 +241,18 @@ describe("Outline", function() {
 
       outline.selectNodes(node0);
       var selectionListenerCount = node0.detailTable.events._eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 4); // destroy and propertyChange listener
+      expect(selectionListenerCount).toBe(initialListenerCount + 3); // destroy and propertyChange listener
 
       outline.selectNodes(node1);
       selectionListenerCount = node0.detailTable.events._eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount+2); // listeners removed
+      expect(selectionListenerCount).toBe(initialListenerCount + 1); // listeners removed
 
       outline.selectNodes(node0);
       selectionListenerCount = node0.detailTable.events._eventListeners.length;
-      expect(selectionListenerCount).toBe(initialListenerCount + 5); // listeners attached again
+      expect(selectionListenerCount).toBe(initialListenerCount + 3); // listeners attached again
 
       outline.nodes[0].detailTable.destroy();
-      expect(node0.detailTable.events._eventListeners.length).toBe(3); // every listener should be removed now
+      expect(node0.detailTable.events._eventListeners.length).toBe(1); // every listener should be removed now
     });
   });
 

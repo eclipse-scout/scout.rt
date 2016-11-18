@@ -20,12 +20,13 @@ scout.TabBox = function() {
   this._$tabArea;
   this._$tabContent;
 
-  this._tabItemPropertyChangeListener = function(event) {
-    if (event.changedProperties.length > 0) {
-      if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
-        // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
-        return;
-      }
+  this._tabItemPropertyChangeHandler = function(event) {
+    var numProperties = event.changedProperties.length;
+    if (numProperties === 1 && event.changedProperties[0] === 'enabled') {
+      // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
+      return;
+    }
+    if (numProperties > 0) {
       scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
     }
   }.bind(this);
@@ -85,14 +86,14 @@ scout.TabBox.prototype._remove = function() {
 scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
-    tabItem.on('propertyChange', this._tabItemPropertyChangeListener);
+    tabItem.on('propertyChange', this._tabItemPropertyChangeHandler);
   }, this);
 };
 
 scout.TabBox.prototype._removeTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.removeTab();
-    tabItem.off('propertyChange', this._tabItemPropertyChangeListener);
+    tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
   }, this);
 };
 

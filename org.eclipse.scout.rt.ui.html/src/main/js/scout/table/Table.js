@@ -2464,7 +2464,7 @@ scout.Table.prototype.$aggregateRows = function() {
 };
 
 /**
- * @returns the first selected row of this table or null when no row is selected
+ * @returns {scout.TableRow} the first selected row of this table or null when no row is selected
  */
 scout.Table.prototype.selectedRow = function() {
   if (this.selectedRows.length > 0) {

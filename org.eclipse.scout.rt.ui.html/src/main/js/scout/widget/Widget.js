@@ -130,8 +130,13 @@ scout.Widget.prototype._createChildren = function(models) {
   return widgets;
 };
 
+/**
+ * Calls {@link scout.create} for the given model, or if model is already a scout.Widget simply returns the widget.
+ *
+ * @param model {Object|scout.Widget}
+ * @returns {scout.Widget}
+ */
 scout.Widget.prototype._createChild = function(model) {
-  // FIXME [6.1] awe Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
   if (model instanceof scout.Widget) {
     return model;
   }

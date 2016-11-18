@@ -22,14 +22,12 @@ scout.Outline = function() {
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
-  this._detailTableListener;
   this.inBackground = false;
   this.embedDetailContent = false;
   this.compact = false;
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
-  this._nodeIdToRowMap = {};
   this._scrolldirections = 'y';
   this.titleVisible = true;
   this.mediator;
@@ -186,46 +184,23 @@ scout.Outline.prototype._renderEnabled = function() {
 scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
+  this._initDetailTableAndForm(node);
+  this.trigger('initPage', {page: node});
+};
+
+scout.Outline.prototype._initDetailTableAndForm = function(node) {
   if (node.detailTable) {
-    node.detailTable = this._createChild(node.detailTable);
     this._initDetailTable(node);
   }
   if (node.detailForm) {
-    node.detailForm = this._createChild(node.detailForm);
     this._initDetailForm(node);
-  }
-
-  if (node.parentNode && node.parentNode.detailTable) {
-    // link node with row, if it hasn't been linked yet
-    if (node.id in this._nodeIdToRowMap) {
-      node.row = this._nodeIdToRowMap[node.id];
-      if (!node.row) {
-        throw new Error('node.row is not defined');
-      }
-      delete this._nodeIdToRowMap[node.id];
-    }
   }
 };
 
 scout.Outline.prototype._initDetailTable = function(node) {
-  var that = this;
-
   if (this.navigateButtonsVisible) {
     this._appendNavigateButtonsForDetailTable(node);
   }
-
-  // link already existing rows (rows which are inserted later are linked by _onDetailTableRowInitialized)
-  node.detailTable.rows.forEach(function(row) {
-    this._linkNodeWithRow(row);
-  }, this);
-
-  this._detailTableListener = {
-    func: function(event) {
-      event.detailTable = node.detailTable;
-      that._onDetailTableEvent(event);
-    }
-  };
-  node.detailTable.addListener(this._detailTableListener);
 };
 
 scout.Outline.prototype._initDetailForm = function(node) {
@@ -235,7 +210,6 @@ scout.Outline.prototype._initDetailForm = function(node) {
 
   // Mark form as detail form
   node.detailForm.detailForm = true;
-
   node.detailForm.one('destroy', function() {
     // Unlink detail form if it was closed. May happen in the following case:
     // The form gets closed on execPageDeactivated. No pageChanged event will
@@ -244,19 +218,6 @@ scout.Outline.prototype._initDetailForm = function(node) {
     // Also make sure other objects hold no reference to a destroyed form (e.g. bench)
     this._triggerPageChanged(node);
   }.bind(this));
-};
-
-scout.Outline.prototype._linkNodeWithRow = function(row) {
-  var node = this.nodesMap[row.nodeId];
-  if (node) {
-    node.row = row;
-    if (!node.row) {
-      throw new Error('node.row is not defined');
-    }
-  } else {
-    // Prepare for linking later because node has not been inserted yet
-    this._nodeIdToRowMap[row.nodeId] = row;
-  }
 };
 
 /**
@@ -326,7 +287,7 @@ scout.Outline.prototype.handleInitialExpanded = function() {
 scout.Outline.prototype._onNodeDeleted = function(node) {
   // Destroy table, which is attached at the root adapter. Form gets destroyed by form close event
   if (node.detailTable) {
-    node.detailTable.removeListener(this._detailTableListener);
+    node.detailTable.off('rowInitialized', this._detailTableRowHandler);
     node.detailTable.destroy();
     node.detailTable = null;
   }
@@ -355,6 +316,10 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
     }
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, debounceSend);
+  // FIXME XXX hier wurde früher noch updateDetailContent (nochmals) aufgerufen, das ist aber unnötig
+  // da dies schon als folge vom nodesSelectedInternal passiert. Allerdings hatte es auch den neben
+  // effekt dass attachDetailsMenuListener nochmals ausgeführt wurde und so das "versehentliche" entfernen
+  // vom changeListener behoben hat
   this.updateDetailContent();
 };
 
@@ -362,8 +327,6 @@ scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
   this._updateDetailForm();
 };
-
-
 
 scout.Outline.prototype._syncOutlineOverviewVisible = function(outlineOverviewVisible) {
   this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
@@ -453,24 +416,15 @@ scout.Outline.prototype._removeNavigateButtonsForDetailTable = function(node) {
 };
 
 /**
- * Returns the selected row or null when no row is selected. When multiple rows are selected
- * the first selected row is returned.
+ * @returns {scout.TableRow} the selected row or null when no row is selected. When multiple rows are selected
+ *    the first selected row is returned.
  */
 scout.Outline.prototype.selectedRow = function() {
-  var table, node,
-    nodes = this.selectedNodes;
-  if (nodes.length === 0) {
+  var node = this.selectedNode();
+  if (!node || !node.detailTable) {
     return null;
   }
-  node = nodes[0];
-  if (!node.detailTable) {
-    return null;
-  }
-  table = node.detailTable;
-  if (table.selectedRows.length === 0) {
-    return null;
-  }
-  return table.selectedRows[0];
+  return node.detailTable.selectedRow();
 };
 
 scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode) {
@@ -553,7 +507,7 @@ scout.Outline.prototype._renderDetailContent = function() {
   if (!this.detailContent || this.detailContent.rendered) {
     return;
   }
-  var page = this.selectedNodes[0];
+  var page = this.selectedNode();
   if (!page.rendered) {
     return;
   }
@@ -643,7 +597,7 @@ scout.Outline.prototype.updateDetailContent = function() {
 };
 
 scout.Outline.prototype._computeDetailContent = function() {
-  var selectedPage = this.selectedNodes[0];
+  var selectedPage = this.selectedNode();
   if (!selectedPage) {
     // Detail content is shown for the selected node only
     return null;
@@ -738,6 +692,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
 /**
  * Attaches a listener to the given menu container (which is the detail table or the detail table of the parent node)
  * in order to get dynamic menu changes and update the detailMenus on such a change event.
+ * The impl. is lazy because it is only used in mobile mode.
  */
 scout.Outline.prototype._attachDetailMenusListener = function(menuContainer) {
   if (!this._detailMenusChangeHandler) {
@@ -760,7 +715,7 @@ scout.Outline.prototype._attachDetailMenusListener = function(menuContainer) {
 
   if (!this._detailMenusNodesSelectedHandler) {
     // This nodes selection listener removes the property change listeners from the old menu containers (detail content) whenever a node gets selected
-    // UpdateDetailMenus is called afterwards and attaches the property change listeners to the new detail content
+    // updateDetailMenus() is called afterwards and attaches the property change listeners to the new detail content
     // This guarantees that no events are fired for non selected nodes
     this._detailMenusNodesSelectedHandler = {
       outline: this,
@@ -804,11 +759,8 @@ scout.Outline.prototype._renderDetailMenuBar = function() {
   if (this.detailMenuBar.rendered) {
     return;
   }
-  if (this.selectedNodes.length === 0) {
-    return;
-  }
-  var node = this.selectedNodes[0];
-  if (!node.rendered) {
+  var node = this.selectedNode();
+  if (!node || !node.rendered) {
     return;
   }
 
@@ -851,11 +803,8 @@ scout.Outline.prototype._renderNodeMenuBar = function() {
   if (this.nodeMenuBar.rendered) {
     return;
   }
-  if (this.selectedNodes.length === 0) {
-    return;
-  }
-  var node = this.selectedNodes[0];
-  if (!node.rendered) {
+  var node = this.selectedNode();
+  if (!node || !node.rendered) {
     return;
   }
 
@@ -946,39 +895,12 @@ scout.Outline.prototype._triggerPageChanged = function(page) {
   });
 };
 
-/* event handling */
-
-scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
-  // this.filter(); // FIXME [awe] 6.1 - consider doing this only in OutlineMediator
-};
-
-scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
-  this._linkNodeWithRow(event.row);
-  var node = this.nodesMap[event.row.nodeId];
-
-  // If a row, which was already linked to a node, gets initialized again, re apply the filter to make sure the node has the correct state
-  if (this.rendered && node && this._applyFiltersForNode(node)){
-    if (node.isFilterAccepted()) {
-      this._addToVisibleFlatList(node, false);
-    } else {
-      this._removeFromFlatList(node, false);
-    }
-  }
-};
-
-scout.Outline.prototype._onDetailTableEvent = function(event) {
-  if (event.type === 'rowInitialized') {
-    this._onDetailTableRowInitialized(event);
-  } else if (event.type === 'rowsFiltered') {
-    this._onDetailTableRowsFiltered(event);
-  }
-};
-
 /**
  * @override Tree.js
  */
 scout.Outline.prototype._nodesSelectedInternal = function() {
   var activePage = this.activePage();
+  // This block here is similar to what's done in Java's DefaultPageChangeStrategy
   if (activePage) {
     activePage.activate();
     activePage.ensureLoadChildren().done(
@@ -987,25 +909,20 @@ scout.Outline.prototype._nodesSelectedInternal = function() {
 };
 
 scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
-  this.pageChanged(activePage);
+  if (activePage) {
+    this._initDetailTableAndForm(activePage);
+  }
 };
 
 scout.Outline.prototype.pageChanged = function(page) {
   if (page) {
-    if (page.detailForm) {
-      this._initDetailForm(page);
-    }
-    if (page.detailTable) {
-      this._initDetailTable(page);
-    }
+    this._initDetailTableAndForm(page);
   }
 
-  var selectedPage = this.selectedNodes[0];
+  var selectedPage = this.selectedNode();
   if (!page && !selectedPage || page === selectedPage) {
     this.updateDetailContent();
   }
 
-  // FIXME [awe] 6.1 - check when pageChanged is triggered in Java code. We do it too often in JS code (Java does not
-  // trigger the event when children are loaded
   this._triggerPageChanged(page);
 };
