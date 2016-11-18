@@ -290,6 +290,18 @@ describe("Tree", function() {
       child0 = node0.childNodes[0];
     });
 
+    // this test does not create a new node instance/model for an update, but re-uses
+    // an already existing node and simply changes a property of that instance
+    it("update same node instance", function() {
+      expect(node0.leaf).toBe(false);
+      tree.render(session.$entryPoint);
+      node0.leaf = true;
+      tree.updateNode(node0);
+      // we expect that _decorateNode has been called and updates the DOM of the tree
+      var $treeNode = tree.$container.find('[data-nodeid="' + node0.id + '"]').first();
+      expect($treeNode.attr('class')).toContain('leaf');
+    });
+
     describe("enabled update", function() {
       var child0Update;
 

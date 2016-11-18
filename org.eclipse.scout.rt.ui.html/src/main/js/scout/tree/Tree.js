@@ -1961,21 +1961,19 @@ scout.Tree.prototype.updateNode = function(node) {
 };
 
 scout.Tree.prototype.updateNodes = function(nodes) {
-  // Update model
-  var anyPropertiesChanged = false;
-  for (var i = 0; i < nodes.length; i++) {
-    var updatedNode = nodes[i];
-    var oldNode = this.nodesMap[updatedNode.id];
-    var propertiesChanged;
+  nodes.forEach(function(updatedNode) {
+    var propertiesChanged,
+      oldNode = this.nodesMap[updatedNode.id];
 
-    if (updatedNode === oldNode) { // FIXME [awe] 6.1 - review with C.GU (same subject as in Table#updateRows) -> Ok, write a test
+    // if same instance has been updated we must set the flag always to true
+    // because we cannot compare against an "old" node
+    if (updatedNode === oldNode) {
       propertiesChanged = true;
     } else {
       scout.defaultValues.applyTo(updatedNode, 'TreeNode');
       propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
     }
 
-    anyPropertiesChanged = anyPropertiesChanged || propertiesChanged;
     if (propertiesChanged) {
       if (this._applyFiltersForNode(oldNode)) {
         if (!oldNode.isFilterAccepted()) {
@@ -1990,7 +1988,7 @@ scout.Tree.prototype.updateNodes = function(nodes) {
         this._decorateNode(oldNode);
       }
     }
-  }
+  }, this);
 
   this.trigger('nodesUpdated', {
     nodes: nodes
