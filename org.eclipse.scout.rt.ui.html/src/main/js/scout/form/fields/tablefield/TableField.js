@@ -54,7 +54,7 @@ scout.TableField.prototype._render = function($parent) {
 scout.TableField.prototype._syncTable = function(table) {
   if (this.table) {
     this.table.off(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
-  };
+  }
   this._setProperty('table', table);
   if (table) {
     table.on(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);

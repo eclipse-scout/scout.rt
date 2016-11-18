@@ -57,7 +57,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
           var $cell = $(this);
           modifyFunc($cell, 'min-width');
           modifyFunc($cell, 'max-width');
-        })
+        });
       });
     },
     /**
