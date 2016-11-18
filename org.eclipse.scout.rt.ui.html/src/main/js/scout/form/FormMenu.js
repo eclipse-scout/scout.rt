@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.FormMenu = function() {
   scout.FormMenu.parent.call(this);
+  this.form;
+  this.toggleAction = true;
   this._addAdapterProperties('form');
 };
 scout.inherits(scout.FormMenu, scout.Menu);

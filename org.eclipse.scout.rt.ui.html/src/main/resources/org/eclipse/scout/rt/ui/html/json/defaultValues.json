@@ -187,6 +187,9 @@
       "closable": true,
       "cacheBounds": false
     },
+    "FormMenu": {
+      "toggleAction": true
+    },
     "Tree": {
       "displayStyle": "default",
       "autoCheckChildren": false,
@@ -311,7 +314,8 @@
       "ToolButton": null,
       "KeyStroke": null,
       "Menu": {
-        "TableOrganizeMenu": null
+        "TableOrganizeMenu": null,
+        "FormMenu": null
       },
       "OutlineViewButton": null,
       "TableControl": {
