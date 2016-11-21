@@ -83,13 +83,20 @@ scout.Carousel.prototype._renderItemsInternal = function(item, skipRemove) {
 
 scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
   var $window = this.$carouselFilmstrip.window();
-  this.$carouselFilmstrip.on('mousedown', function(event) {
-    var origEvent = event;
+  this.$carouselFilmstrip.on('mousedown touchstart', function(event) {
+    var origPageX = event.pageX;
+    if (!origPageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length == 1) {
+      origPageX = event.originalEvent.touches[0].pageX;
+    }
     var origPosition = this.positionX;
     var minPositionX = this.$container.width() - this.$carouselFilmstrip.width();
     var containerWidth = this.$container.width();
-    $window.on('mousemove.carouselDrag', function(event) {
-      var moveX = event.pageX - origEvent.pageX;
+    $window.on('mousemove.carouselDrag touchmove.carouselDrag', function(event) {
+      var pageX = event.pageX;
+      if (!pageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length == 1) {
+        pageX = event.originalEvent.touches[0].pageX;
+      }
+      var moveX = pageX - origPageX;
       var positionX = origPosition + moveX;
       if (positionX !== this.positionX && positionX <= 0 && positionX >= minPositionX) {
         this.$carouselFilmstrip.css({
@@ -101,7 +108,7 @@ scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
         this._renderItemsInternal(positionX < origPosition ? Math.floor(i) : Math.ceil(i), true);
       }
     }.bind(this));
-    $window.on('mouseup.carouselDrag', function(e) {
+    $window.on('mouseup.carouselDrag touchend.carouselDrag touchcancel.carouselDrag', function(e) {
       $window.off('.carouselDrag');
       // show only whole items
       var mod = this.positionX % containerWidth;
