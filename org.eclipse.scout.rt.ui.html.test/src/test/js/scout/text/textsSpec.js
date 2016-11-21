@@ -29,6 +29,11 @@ describe("scout.texts", function() {
     }
   };
 
+  afterEach(function() {
+    // clear
+    scout.texts.textsByLocale = {};
+  });
+
   describe("init", function() {
 
     it("creates Texts objects for each language tag given in the model", function() {
@@ -48,6 +53,27 @@ describe("scout.texts", function() {
       expect(scout.texts.textsByLocale['default'].parent).toBeUndefined();
       expect(scout.texts.textsByLocale['de'].parent).toBe(scout.texts.textsByLocale['default']);
       expect(scout.texts.textsByLocale['de-CH'].parent).toBe(scout.texts.textsByLocale['de']);
+    });
+
+    it("does not override existing text maps", function() {
+      scout.texts.get('de-CH').add('existingKey', 'existingText');
+      scout.texts.get('de').add('existingDeKey', 'existingDeText');
+      scout.texts.get('de').add('theKey', 'thePreviousText');
+      expect(scout.texts.get('de-CH').get('existingKey')).toBe('existingText');
+      expect(scout.texts.get('de').get('existingDeKey')).toBe('existingDeText');
+      expect(scout.texts.get('de').get('theKey')).toBe('thePreviousText');
+
+      scout.texts.init(model);
+      // Texts which were registered before must still be registered
+      expect(scout.texts.get('de-CH').get('existingKey')).toBe('existingText');
+      expect(scout.texts.get('de').get('existingDeKey')).toBe('existingDeText');
+
+      // New texts need to be registered as well
+      expect(scout.texts.get('de-CH').get('deCHKey1')).toBe('deCH1');
+      expect(scout.texts.get('de').get('deKey2')).toBe('de2');
+
+      // Texts which were registered but are part of the new model too are replaced
+      expect(scout.texts.get('de').get('theKey')).toBe('de');
     });
 
   });

@@ -23,10 +23,7 @@ scout.texts = {
   init: function(model) {
     var languageTags = Object.keys(model);
     languageTags.forEach(function(languageTag) {
-      this.put(languageTag, new scout.TextMap(model[languageTag]));
-    }, this);
-    languageTags.forEach(function(languageTag) {
-      this.link(languageTag);
+      this.get(languageTag).addAll(model[languageTag]);
     }, this);
   },
 
@@ -97,8 +94,14 @@ scout.texts = {
     return this.textsByLocale[languageTag];
   },
 
-  put: function(languageTag, texts) {
-    this.textsByLocale[languageTag] = texts;
+  /**
+   * Registers the text map for the given locale.
+   * If there already is a text map registered for that locale, it will be replaced, meaning existing texts for that locale are deleted.
+   *
+   * @param {scout.TextMap} textMap
+   */
+  put: function(languageTag, textMap) {
+    this.textsByLocale[languageTag] = textMap;
   },
 
   /**

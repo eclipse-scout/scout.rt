@@ -75,6 +75,20 @@ scout.TextMap.prototype.add = function(textKey, text) {
   this.map[textKey] = text;
 };
 
+/**
+ * Adds all texts from the given textMap to this textMap
+ * @param {Object|scout.TextMap} textMap either a plain object or a {@link scout.TextMap}
+ */
+scout.TextMap.prototype.addAll = function(textMap) {
+  if (!textMap) {
+    return;
+  }
+  if (textMap instanceof scout.TextMap) {
+    textMap = textMap.map;
+  }
+  scout.objects.copyOwnProperties(textMap, this.map);
+};
+
 scout.TextMap.prototype.setParent = function(parent) {
   this.parent = parent;
 };
