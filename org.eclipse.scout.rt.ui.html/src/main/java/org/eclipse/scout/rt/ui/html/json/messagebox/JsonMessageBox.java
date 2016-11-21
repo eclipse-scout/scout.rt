@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.messagebox;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
@@ -183,9 +184,10 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
     getModel().getUIFacade().setResultFromUI(resultOption);
   }
 
-  private class P_MessageBoxListener implements MessageBoxListener {
+  protected class P_MessageBoxListener implements MessageBoxListener {
     @Override
     public void messageBoxChanged(MessageBoxEvent event) {
+      ModelJobs.assertModelThread();
       handleModelMessageBoxChanged(event);
     }
   }

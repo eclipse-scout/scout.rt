@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
@@ -550,6 +551,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
 
     @Override
     public void plannerChanged(PlannerEvent event) {
+      ModelJobs.assertModelThread();
       handleModelEvent(event);
     }
   }

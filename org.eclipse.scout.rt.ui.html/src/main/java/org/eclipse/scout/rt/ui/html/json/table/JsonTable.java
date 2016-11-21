@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -1520,10 +1521,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  private class P_TableListener extends TableAdapter {
+  protected class P_TableListener extends TableAdapter {
 
     @Override
     public void tableChanged(final TableEvent e) {
+      ModelJobs.assertModelThread();
       handleModelTableEvent(e);
     }
   }

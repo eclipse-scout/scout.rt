@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -346,11 +347,13 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
 
     @Override
     public void calendarChanged(CalendarEvent e) {
+      ModelJobs.assertModelThread();
       addActionEvent(EVENT_CALENDAR_CHANGED, new JsonCalendarEvent(JsonCalendar.this, e).toJson());
     }
 
     @Override
     public void calendarChangedBatch(List<CalendarEvent> batch) {
+      ModelJobs.assertModelThread();
       JSONArray jsonArray = new JSONArray();
       for (CalendarEvent event : batch) {
         jsonArray.put(new JsonCalendarEvent(JsonCalendar.this, event).toJson());

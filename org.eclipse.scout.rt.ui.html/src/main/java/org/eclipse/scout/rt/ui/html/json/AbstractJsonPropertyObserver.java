@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
@@ -223,9 +224,10 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     m_propertyEventFilter.removeAllConditions();
   }
 
-  private class P_PropertyChangeListener implements PropertyChangeListener {
+  protected class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
+      ModelJobs.assertModelThread();
       handleModelPropertyChange(event);
     }
   }

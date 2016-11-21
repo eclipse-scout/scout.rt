@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -148,6 +149,12 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     addPropertyChangeEvent(IBrowserField.PROP_LOCATION, getLocation());
   }
 
+  protected void handleModelBrowserFieldEvent(BrowserFieldEvent event) {
+    if (BrowserFieldEvent.TYPE_CONTENT_CHANGED == event.getType()) {
+      handleModelContentChanged();
+    }
+  }
+
   @Override
   public void handleUiEvent(JsonEvent event) {
     if (EVENT_POST_MESSAGE.equals(event.getType())) {
@@ -181,12 +188,10 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   }
 
   protected class P_BrowserFieldListener implements BrowserFieldListener {
-
     @Override
     public void browserFieldChanged(BrowserFieldEvent e) {
-      if (BrowserFieldEvent.TYPE_CONTENT_CHANGED == e.getType()) {
-        handleModelContentChanged();
-      }
+      ModelJobs.assertModelThread();
+      handleModelBrowserFieldEvent(e);
     }
   }
 }

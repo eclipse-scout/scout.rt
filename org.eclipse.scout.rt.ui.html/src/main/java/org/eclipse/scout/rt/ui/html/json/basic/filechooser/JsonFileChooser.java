@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserEvent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -129,10 +130,11 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
     return getModel().getMaximumUploadSize();
   }
 
-  private class P_FileChooserListener implements FileChooserListener {
+  protected class P_FileChooserListener implements FileChooserListener {
 
     @Override
     public void fileChooserChanged(FileChooserEvent e) {
+      ModelJobs.assertModelThread();
       handleModelFileChooserEvent(e);
     }
   }

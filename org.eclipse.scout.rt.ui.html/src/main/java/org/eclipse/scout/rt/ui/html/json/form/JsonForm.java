@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -264,6 +265,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
     @Override
     public void formChanged(FormEvent e) {
+      ModelJobs.assertModelThread();
       handleModelFormChanged(e);
     }
   }

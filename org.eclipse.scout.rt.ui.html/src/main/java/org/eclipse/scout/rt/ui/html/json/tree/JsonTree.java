@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -1007,10 +1008,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     }
   }
 
-  private class P_TreeListener extends TreeAdapter {
+  protected class P_TreeListener extends TreeAdapter {
 
     @Override
     public void treeChanged(final TreeEvent e) {
+      ModelJobs.assertModelThread();
       handleModelTreeEvent(e);
     }
   }

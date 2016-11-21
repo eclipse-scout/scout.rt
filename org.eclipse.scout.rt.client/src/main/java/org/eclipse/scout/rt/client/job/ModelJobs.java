@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
@@ -304,6 +305,15 @@ public final class ModelJobs {
   }
 
   /**
+   * Fails if the current thread is not the model thread.
+   */
+  public static void assertModelThread() {
+    if (!ModelJobs.isModelThread()) {
+      throw new WrongThreadException("Only the model thread is allowed to update the UI model.");
+    }
+  }
+
+  /**
    * Returns <code>true</code> if the given Future belongs to a model job.
    */
   public static boolean isModelJob(final IFuture<?> future) {
@@ -348,5 +358,14 @@ public final class ModelJobs {
 
     // Release the current model job permit and wait until all competing model jobs of this session completed their work.
     idleCondition.waitFor();
+  }
+
+  public static class WrongThreadException extends AssertionException {
+
+    private static final long serialVersionUID = 1L;
+
+    public WrongThreadException(final String msg, final Object... msgArgs) {
+      super(msg, msgArgs);
+    }
   }
 }
