@@ -102,7 +102,11 @@ public class ExtensionScope<T extends AbstractExtensionRegistryItem> {
 
     // 1. collect scope items for the given owner type hierarchy
     Set<ScopeItem> items = new HashSet<ScopeItem>();
-    collectScopeItemsRec(ownerType, items, m_scopeItems);
+    ExtensionScope<T> curScope = this;
+    while (curScope != null) {
+      collectScopeItemsRec(ownerType, items, curScope.m_scopeItems);
+      curScope = curScope.m_parentScope;
+    }
 
     if (CollectionUtility.isEmpty(items)) {
       // there are no items that are matching the given owner type
