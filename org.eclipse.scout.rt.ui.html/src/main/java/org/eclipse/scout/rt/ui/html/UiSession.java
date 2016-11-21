@@ -486,10 +486,24 @@ public class UiSession implements IUiSession {
 
     // Inform the model the UI has been detached. There are different cases we handle here:
     // 1. page reload (unload event) dispose method is called once
-    // 2. logout (Session.stop()) dispose methid is called _twice_, 1st call sets the disposing flag,
+    // 2. logout (Session.stop()) dispose method is called _twice_, 1st call sets the disposing flag,
     //    on the 2nd call, the desktop is already gone.
     if (!m_disposing) {
-      getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+      // Current thread is the model thread if dispose is called by clientSession.stop(), otherwise (e.g. page reload) dispose is called from the UI thread
+      if (ModelJobs.isModelThread()) {
+        getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+      }
+      else {
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
+        ModelJobs.schedule(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+          }
+        }, ModelJobs.newInput(clientRunContext)
+            .withName("Detaching Gui")
+            .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
+      }
     }
 
     if (isProcessingJsonRequest()) {
