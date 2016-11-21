@@ -10,7 +10,8 @@
  ******************************************************************************/
 describe('NavigateDownButton', function() {
 
-  var session, outline, menu, node = {};
+  var session, outline, menu,
+    node = new scout.Page();
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -101,7 +102,6 @@ describe('NavigateDownButton', function() {
   });
 
   it('_drill drills down to first selected row in the detail table', function() {
-    var drillNode = {};
     node.detailTable = scout.create('Table', {
       parent: new scout.NullWidget(),
       session: session,
@@ -110,7 +110,10 @@ describe('NavigateDownButton', function() {
         nodeId: '123'
       }]
     });
-    node.detailTable.selectRows(node.detailTable.rows[0]);
+    var drillNode = new scout.Page();
+    var firstRow = node.detailTable.rows[0];
+    scout.Page.linkRowWithPage(firstRow, drillNode);
+    node.detailTable.selectRows(firstRow);
     outline.nodesMap = {
       '123': drillNode
     };

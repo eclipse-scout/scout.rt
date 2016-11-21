@@ -69,18 +69,12 @@ scout.NavigateDownButton.prototype._drill = function() {
   var drillNode;
 
   if (this.node.detailTable) {
-    var rows = this.node.detailTable.selectedRows;
-    if (rows.length > 0) {
-      var row = rows[0];
-      if (row.page) { // FIXME [awe] 6.1 - check this, should work the same way for online/offline case
-        drillNode = row.page;
-      } else {
-        drillNode = this.outline.nodesMap[row.nodeId];
-      }
-    }
+    var row = this.node.detailTable.selectedRow();
+    drillNode = this.node.pageForTableRow(row);
   } else {
     drillNode = this.node.childNodes[0];
   }
+
   if (drillNode) {
     $.log.debug('drill down to node ' + drillNode);
     // Collapse other expanded child nodes

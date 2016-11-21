@@ -20,18 +20,15 @@ scout.OutlineAdapter.prototype._init = function(model) {
   scout.OutlineAdapter.parent.prototype._init.call(this, model);
 };
 
-scout.OutlineAdapter.prototype._initPage = function(page, parentNode) {
-  if (!page.childNodes) {
-    page.childNodes = [];
-  }
-  if (page.detailTable) {
-    page.detailTable = this.session.getOrCreateWidget(page.detailTable, this.widget);
-  }
-  if (page.detailForm) {
-    page.detailForm = this.session.getOrCreateWidget(page.detailForm, this.widget);
-  }
+/**
+ * We must call onWidgetInitPage because this adapter cannot process the 'initPage' event
+ * while the widget is initialized, since the listener is not attached until the widget
+ * is created completely.
+ */
+scout.OutlineAdapter.prototype._postCreateWidget = function() {
+  var outline = this.widget;
+  outline._visitNodes(outline.nodes, this._onWidgetInitPage.bind(this));
 };
-
 scout.OutlineAdapter.prototype._onPageChanged = function(event) {
   var page;
   if (event.nodeId) {
@@ -51,7 +48,7 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
 
 scout.OutlineAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'initPage') {
-    this._onWidgetInitPage(event);
+    this._onWidgetInitPage(event.page);
   } else {
     scout.OutlineAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -65,8 +62,7 @@ scout.OutlineAdapter.prototype.onModelAction = function(event) {
   }
 };
 
-scout.OutlineAdapter.prototype._onWidgetInitPage = function(event) {
-  var page = event.page;
+scout.OutlineAdapter.prototype._onWidgetInitPage = function(page) {
   if (page.detailTable) {
     this._initDetailTable(page);
   }

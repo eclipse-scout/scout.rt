@@ -105,18 +105,12 @@ scout.PageWithTable.prototype.loadChildren = function() {
 };
 
 // see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
-scout.PageWithTable.prototype.loadTableData = function() {
-  // FIXME [awe] 6.1 - check if we ever DO NOT have a detailTable (also in Page.js) I guess for the JS only case we always have a table
-  // perhaps we must do something different for the online case.
-  if (this.detailTable) {
-    this.detailTable.deleteAllRows();
-    return this._loadTableData()
-      .done(this._onLoadTableDataDone.bind(this))
-      .fail(this._onLoadTableDataFail.bind(this))
-      .always(this._onLoadTableDataAlways.bind(this));
-  } else {
-    return $.resolvedDeferred();
-  }
+scout.PageWithTable.prototype.loadTableData = function () {
+  this.detailTable.deleteAllRows();
+  return this._loadTableData()
+    .done(this._onLoadTableDataDone.bind(this))
+    .fail(this._onLoadTableDataFail.bind(this))
+    .always(this._onLoadTableDataAlways.bind(this));
 };
 
 /**
