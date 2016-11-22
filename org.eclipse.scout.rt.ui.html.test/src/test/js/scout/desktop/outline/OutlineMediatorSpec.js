@@ -82,6 +82,9 @@ describe('OutlineMediator', function() {
   });
 
   it('tableRowOrderChanged', function() {
+    if (!scout.device.supportsInternationalization()) {
+      return;
+    }
     var modelRows = [
       tableHelper.createModelRow(0, ['Foo']),
       tableHelper.createModelRow(1, ['Bar'])
