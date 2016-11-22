@@ -10,14 +10,14 @@
  ******************************************************************************/
 describe('OutlineMediator', function() {
 
-  var session;
+  var session, tableModel, detailTable, page, firstColumn;
+
   /** @type {scout.Outline} */
   var outline;
   /** @type {scout.OutlineSpecHelper} */
   var helper;
   /** @type {scout.TableSpecHelper} */
   var tableHelper;
-
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -26,31 +26,26 @@ describe('OutlineMediator', function() {
     tableHelper = new scout.TableSpecHelper(session);
     var model = helper.createModelFixture(1, 1, false);
     outline = helper.createOutline(model);
-  });
 
-  it('tableRowsInserted', function() {
-    var tableModel = tableHelper.createModelFixture(1, 0);
-    var detailTable = tableHelper.createTable(tableModel);
-    var page = scout.create('PageWithTable', {
+    tableModel = tableHelper.createModelFixture(1, 0);
+    detailTable = tableHelper.createTable(tableModel);
+    firstColumn = detailTable.columns[0];
+    page = scout.create('PageWithTable', {
+      childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
       alwaysCreateChildPage: true,
       parent: outline,
       detailTable: detailTable
     });
     outline.insertNodes([page], null);
+  });
+
+  it('tableRowsInserted', function() {
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Foo');
   });
 
   it('tableRowsDeleted', function() {
-    var tableModel = tableHelper.createModelFixture(1, 0);
-    var detailTable = tableHelper.createTable(tableModel);
-    var page = scout.create('PageWithTable', {
-      alwaysCreateChildPage: true,
-      parent: outline,
-      detailTable: detailTable
-    });
-    outline.insertNodes([page], null);
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Foo');
@@ -61,39 +56,19 @@ describe('OutlineMediator', function() {
   });
 
   it('tableRowsUpdated', function() {
-    var tableModel = tableHelper.createModelFixture(1, 0);
-    var detailTable = tableHelper.createTable(tableModel);
-    var page = scout.create('PageWithTable', {
-      alwaysCreateChildPage: true,
-      parent: outline,
-      detailTable: detailTable
-    });
-    outline.insertNodes([page], null);
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Foo');
 
     var firstRow = detailTable.rows[0];
-    var firstColumn = detailTable.columns[0];
     detailTable.setCellValue(firstColumn, firstRow, 'Bar');
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Bar');
   });
 
   it('tableRowAction', function() {
-    var tableModel = tableHelper.createModelFixture(1, 0);
-    var detailTable = tableHelper.createTable(tableModel);
-    var page = scout.create('PageWithTable', {
-      childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
-      alwaysCreateChildPage: true,
-      parent: outline,
-      detailTable: detailTable
-    });
-    outline.insertNodes([page], null);
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
-
     var firstRow = detailTable.rows[0];
-    var firstColumn = detailTable.columns[0];
     var pageForRow = firstRow.page;
 
     expect(page.expanded).toBe(false);
@@ -107,44 +82,26 @@ describe('OutlineMediator', function() {
   });
 
   it('tableRowOrderChanged', function() {
-    var tableModel = tableHelper.createModelFixture(1, 0);
-    var detailTable = tableHelper.createTable(tableModel);
-    var page = scout.create('PageWithTable', {
-      childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
-      alwaysCreateChildPage: true,
-      parent: outline,
-      detailTable: detailTable
-    });
-    outline.insertNodes([page], null);
     var modelRows = [
       tableHelper.createModelRow(0, ['Foo']),
-      tableHelper.createModelRow(0, ['Bar'])
+      tableHelper.createModelRow(1, ['Bar'])
     ];
     detailTable.insertRows(modelRows);
     expect(page.childNodes[0].text).toBe('Foo');
     expect(page.childNodes[1].text).toBe('Bar');
 
-    var firstColumn = detailTable.columns[0];
     detailTable.sort(firstColumn, 'asc');
     expect(page.childNodes[0].text).toBe('Bar');
     expect(page.childNodes[1].text).toBe('Foo');
   });
 
   it('tableRowsFiltered', function() {
-    var tableModel = tableHelper.createModelFixture(1, 0);
-    var detailTable = tableHelper.createTable(tableModel);
-    var page = scout.create('PageWithTable', {
-      childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
-      alwaysCreateChildPage: true,
-      parent: outline,
-      detailTable: detailTable
-    });
-    outline.insertNodes([page], null);
     var modelRows = [
       tableHelper.createModelRow(0, ['Foo']),
-      tableHelper.createModelRow(0, ['Bar'])
+      tableHelper.createModelRow(1, ['Bar'])
     ];
     detailTable.insertRows(modelRows);
+    outline.expandNode(page);
 
     expect(page.childNodes.length).toBe(2);
     var filter = scout.create('TableTextUserFilter', {
@@ -155,9 +112,9 @@ describe('OutlineMediator', function() {
     detailTable.addFilter(filter);
     detailTable.filter();
 
-    // FIXME [awe] 6.1 - fix this unit test
-    // expect(page.childNodes.length).toBe(1);
-    // expect(page.childNodes[0].text).toBe('Bar');
+    expect(page.childNodes.length).toBe(2); // still 2, but
+    expect(page.childNodes[0].filterAccepted).toBe(false); // filter is not accepted for 'Foo'
+    expect(page.childNodes[1].filterAccepted).toBe(true); // filter is accepted for 'Bar'
   });
 
 });
