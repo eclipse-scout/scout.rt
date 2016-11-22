@@ -73,21 +73,22 @@ public final class StringUtility {
   }
 
   /**
-   * Checks whether the given {@link CharSequence} contains visible characters. <br>
-   * More formally: Checks whether the given {@link CharSequence} contains at least one character bigger than the
-   * whitespace character: '\u0020'.
+   * Checks whether the given {@link CharSequence} contains non-whitespace characters.<br>
+   * A character is considered to be whitespace if {@link Character#isWhitespace(char)} returns {@code true}.
    *
-   * @param s
-   *          The {@link CharSequence} to check.
-   * @return <code>true</code> if the provided {@link CharSequence} contains visible characters. <code>false</code>
+   * @param cs
+   *          The {@link CharSequence} to check. May be {@code null}.
+   * @return {@code true} if the provided {@link CharSequence} contains non-whitespace characters. {@code false}
    *         otherwise.
+   * @see Character#isWhitespace(char)
    */
-  public static boolean hasText(CharSequence s) {
-    if (s == null) {
+  public static boolean hasText(CharSequence cs) {
+    int len;
+    if (cs == null || (len = cs.length()) == 0) {
       return false;
     }
-    for (int i = 0; i < s.length(); i++) {
-      if (s.charAt(i) > '\u0020') {
+    for (int i = 0; i < len; i++) {
+      if (!Character.isWhitespace(cs.charAt(i))) {
         return true;
       }
     }
