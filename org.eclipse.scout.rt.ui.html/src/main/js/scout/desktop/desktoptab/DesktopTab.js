@@ -25,10 +25,6 @@ scout.DesktopTab = function() {
       this._cssClassUpdated(event.newProperties.cssClass, event.oldProperties.cssClass);
     }
   }.bind(this);
-
-  // FIXME awe: problem ist, dass Widegt#remove prüft ob rendered ist
-  // im bench mode ist der DesktopTab nicht gerendet, _remove wird
-  // darum nicht aufgerufen und das 'remove event vom tab nie getriggert
   this._removeListener = this._onViewRemoved.bind(this);
 };
 
@@ -41,8 +37,6 @@ scout.DesktopTab.prototype._init = function(options) {
   options.iconId = this.view.iconId;
 
   scout.DesktopTab.parent.prototype._init.call(this, options);
-
-
   this._installListeners();
 };
 

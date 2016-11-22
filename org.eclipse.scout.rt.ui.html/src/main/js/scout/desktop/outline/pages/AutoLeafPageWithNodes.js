@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/**
+ * @class
+ * @augments {scout.Page}
+ */
 scout.AutoLeafPageWithNodes = function() {
   scout.AutoLeafPageWithNodes.parent.call(this);
 
@@ -21,5 +25,5 @@ scout.inherits(scout.AutoLeafPageWithNodes, scout.Page);
 scout.AutoLeafPageWithNodes.prototype._init = function(model) {
   scout.assertParameter('row', model.row, scout.TableRow);
   scout.AutoLeafPageWithNodes.parent.prototype._init.call(this, model);
-  this.text = this.row.cells[0];
+  this.text = this.row.cells[0].text;
 };

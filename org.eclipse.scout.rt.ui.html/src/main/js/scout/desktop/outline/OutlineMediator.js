@@ -32,6 +32,15 @@ scout.OutlineMediator.prototype.onTableRowsDeleted = function(rows, childPages, 
   pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
 };
 
+scout.OutlineMediator.prototype.onTableRowsUpdated = function(event, pageWithTable) {
+  if (this._skipEvent(pageWithTable)) {
+    return;
+  }
+
+  var pages = pageWithTable.updatePagesFromTableRows(event.rows);
+  pageWithTable.getTree().updateNodes(pages);
+};
+
 scout.OutlineMediator.prototype.onTableRowAction = function(event, page) {
   var childPage = event.row.page;
   if (!childPage) {
@@ -61,4 +70,3 @@ scout.OutlineMediator.prototype.onTableRowsFiltered = function(event, page) {
   page.getOutline().filter();
 };
 
-//public void mediateTableRowsUpdated(TableEvent e, IPageWithTable<?> pageWithTable) {

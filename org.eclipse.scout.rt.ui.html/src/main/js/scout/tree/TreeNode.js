@@ -11,7 +11,6 @@
 
 /**
  * @class
- * @constructor
  */
 scout.TreeNode = function() {
   this.$node; // FIXME [awe] 6.1 discuss with CGU... properties without assignment do not exist after ctor call

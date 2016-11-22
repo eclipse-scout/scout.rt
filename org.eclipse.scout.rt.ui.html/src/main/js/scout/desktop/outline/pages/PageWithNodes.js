@@ -8,6 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * @class
+ * @extends scout.Page
+ */
 scout.PageWithNodes = function() {
   scout.PageWithNodes.parent.call(this);
 

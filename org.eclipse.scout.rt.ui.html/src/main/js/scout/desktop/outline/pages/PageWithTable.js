@@ -8,6 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * @class
+ * @extends scout.Page
+ */
 scout.PageWithTable = function() {
   scout.PageWithTable.parent.call(this);
 
@@ -23,6 +28,7 @@ scout.PageWithTable.prototype._initTable = function(table) {
   scout.PageWithTable.parent.prototype._initTable.call(this, table);
   table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
   table.on('rowsInserted', this._onTableRowsInserted.bind(this));
+  table.on('rowsUpdated', this._onTableRowsUpdated.bind(this));
   table.on('rowAction', this._onTableRowAction.bind(this));
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
 };
@@ -57,6 +63,10 @@ scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
 
   this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
 };
+
+scout.PageWithTable.prototype._onTableRowsUpdated = function(event) {
+  this.getOutline().mediator.onTableRowsUpdated(event, this);
+}
 
 scout.PageWithTable.prototype._onTableRowAction = function(event) {
   this.getOutline().mediator.onTableRowAction(event, this);

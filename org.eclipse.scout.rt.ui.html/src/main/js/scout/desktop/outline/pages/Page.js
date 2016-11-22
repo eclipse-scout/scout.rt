@@ -16,9 +16,8 @@
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
  *
- * @extends {scout.TreeNode}
  * @class
- * @constructor
+ * @extends scout.TreeNode
  */
 scout.Page = function() {
   scout.Page.parent.call(this);
@@ -130,16 +129,16 @@ scout.Page.prototype.deactivate = function() {
 };
 
 /**
- * @returns The tree / outline / parent instance. it's all the same, but it's more
- *     intuitive to work with the 'outline' when we deal with pages.
+ * @returns {scout.Outline} the tree / outline / parent instance. it's all the same,
+ *     but it's more intuitive to work with the 'outline' when we deal with pages.
  */
 scout.Page.prototype.getOutline = function() {
   return this.parent;
 };
 
 /**
- * @returns {Array} an array of child pages for the given table rows. The order of the returned
- *   child pages will be the same as the order of the rows.
+ * @returns {Array.<scout.Page>} an array of pages linked with the given rows.
+ *   The order of the returned pages will be the same as the order of the rows.
  */
 scout.Page.prototype.pagesForTableRows = function(rows) {
   return rows.map(this.pageForTableRow);
@@ -153,7 +152,36 @@ scout.Page.prototype.pageForTableRow = function(row) {
 };
 
 /**
- * @returns a page parameter object used to pass to newly created child pages. Sets the parent
+ * Updates the properties enabled, text from the pages linked with the given rows and returns the pages.
+ *
+ * @returns {Array.<scout.Page>} pages linked with the given rows.
+ */
+scout.Page.prototype.updatePagesFromTableRows = function(rows) {
+  return rows.map(function(row) {
+    var page = row.page;
+    page.enabled = row.enabled;
+    page.updateText(row);
+    return page;
+  });
+};
+
+/**
+ * This function creates and sets the text property of this page. The default implementation returns the
+ * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
+ * this function.
+ *
+ * @param {scout.TableRow} row
+ */
+scout.Page.prototype.updateText = function(row) {
+  var text = '';
+  if (row.cells.length >= 1) {
+    text = row.cells[0].text;
+  }
+  this.text = text;
+};
+
+/**
+ * @returns {object} a page parameter object used to pass to newly created child pages. Sets the parent
  *     to our outline instance and adds optional other properties. Typically you'll pass an
  *     object (entity-key or arbitrary data) to a child page.
  */
