@@ -13,11 +13,11 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  * <h3>Example usage:</h3> <i>Application code:</i>
  *
  * <pre>
- * public class PersonChangesTopicConfig extends AbstractDestinationConfigProperty&lt;PersonBean&gt; {
+ * public static class PersonChangesTopicConfig extends AbstractDestinationConfigProperty<Person> {
  *
  *   &#64;Override
  *   public String getKey() {
- *     return "scout.mom.myMom.destination.personChangesTopic";
+ *     return "scout.mom.cluster.destination.personChangesTopic";
  *   }
  *
  *   &#64;Override
@@ -26,16 +26,18 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  *   }
  * }
  *
- * ...
+ * public static final IDestination<Person> PERSON_CHANGES_TOPIC = CONFIG.getPropertyValue(PersonChangesTopicConfig.class);
  *
+ * ....
  * // Usage
- * MOM.publish(MyMom.class, CONFIG.getPropertyValue(PersonChangesTopicConfig.class), thePerson);
+ * MOM.publish(ClusterMom.class, PERSON_CHANGES_TOPIC, person);
+ * ...
  * </pre>
  *
  * <i>config.properties</i>:
  *
  * <pre>
- * scout.mom.myMom.destination.personChangesTopic=lookup:///myApp/topics/personChanges
+ * scout.mom.cluster.destination.personChangesTopic=lookup:///person/changes
  * </pre>
  *
  * @see IBiDestination

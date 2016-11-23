@@ -13,11 +13,11 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  * <h3>Example usage:</h3> <i>Application code:</i>
  *
  * <pre>
- * public class PersonLoaderQueueConfig extends AbstractBiDestinationConfigProperty&lt;PersonKey, PersonBean&gt; {
+ * public static class PersonFinderQueueConfig extends AbstractBiDestinationConfigProperty<Long, Person> {
  *
  *   &#64;Override
  *   public String getKey() {
- *     return "scout.mom.myMom.destination.personLoaderQueue";
+ *     return "scout.mom.cluster.destination.personFinderQueue";
  *   }
  *
  *   &#64;Override
@@ -26,16 +26,18 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  *   }
  * }
  *
- * ...
+ * public static final IBiDestination<Long, Person> PERSON_FINDER_QUEUE = CONFIG.getPropertyValue(PersonFinderQueueConfig.class);
  *
+ * ...
  * // Usage
- * PersonBean result = MOM.request(MyMom.class, CONFIG.getPropertyValue(PersonLoaderQueueConfig.class), requestKey);
+ * Person person = MOM.request(ClusterMom.class, PERSON_FINDER_QUEUE, personId);
+ * ...
  * </pre>
  *
  * <i>config.properties</i>:
  *
  * <pre>
- * scout.mom.myMom.destination.personLoaderQueue=lookup:///service/PersonQueue
+ * scout.mom.cluster.destination.personFinderQueue=lookup:///person/finder
  * </pre>
  *
  * @see IBiDestination
