@@ -136,6 +136,11 @@ public class InteractiveTestSuite extends Runner {
     @Override
     public void testFailure(Failure failure) throws Exception {
       m_failure = failure;
+      Description description = failure.getDescription();
+      System.err.println(String.format("%s#%s - FAILED - %s", description.getClassName(), description.getMethodName(), m_failure));
+      m_failure.getException().printStackTrace(System.err);
+      System.err.flush();
+      System.out.flush();
     }
 
     @Override
@@ -145,6 +150,9 @@ public class InteractiveTestSuite extends Runner {
       }
       else {
         System.err.println(String.format("%s#%s - FAILED - %s", description.getClassName(), description.getMethodName(), m_failure));
+        m_failure.getException().printStackTrace(System.err);
+        System.err.flush();
+        System.out.flush();
       }
     }
   }
