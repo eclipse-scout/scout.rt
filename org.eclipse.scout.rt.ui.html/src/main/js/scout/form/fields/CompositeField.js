@@ -44,11 +44,6 @@ scout.CompositeField.prototype.setDisabledStyle = function(disabledStyle) {
 scout.CompositeField.prototype.recomputeEnabled = function(parentEnabled) {
   scout.CompositeField.parent.prototype.recomputeEnabled.call(this, parentEnabled);
   this.getFields().forEach(function(field) {
-    // FIXME [awe] 6.1 - talk to M.VI, C.GU, this throws an error because of Carousel.js
-    // Maybe we should move recomputeEnabled from FormField to Widget? Carousel.js is not a FormField
-    // but is as a field in CarouselForm.json (jswidgets app).
-    if (field instanceof scout.FormField) {
-      field.recomputeEnabled(this.enabledComputed);
-    }
+    field.recomputeEnabled(this.enabledComputed);
   }, this);
 };

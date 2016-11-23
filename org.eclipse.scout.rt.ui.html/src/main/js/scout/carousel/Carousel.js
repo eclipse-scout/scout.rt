@@ -27,6 +27,7 @@ scout.inherits(scout.Carousel, scout.Widget);
 scout.Carousel.prototype._init = function(model) {
   scout.Carousel.parent.prototype._init.call(this, model);
   this._syncGridData(this.gridData);
+  this.widgets = scout.arrays.ensure(this.widgets);
 };
 
 scout.Carousel.prototype._syncGridData = function(gridData) {
@@ -129,12 +130,11 @@ scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
 
 scout.Carousel.prototype._renderWidgets = function() {
   this.$carouselFilmstrip.empty();
-  this.$carouselItems = [];
-
-  this.widgets = scout.arrays.ensure(this.widgets);
-  this.widgets.forEach(function(widget, i) {
-    this.$carouselItems.push(this.$carouselFilmstrip.appendDiv('carousel-item'));
-    scout.HtmlComponent.install(this.$carouselItems[i], this.session);
+  this.$carouselItems = this.widgets.map(function(widget) {
+    var $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
+    var htmlComp = scout.HtmlComponent.install($carouselItem, this.session);
+    htmlComp.setLayout(new scout.SingleLayout());
+    return $carouselItem;
   }, this);
   this.setCurrentItem(0);
 };

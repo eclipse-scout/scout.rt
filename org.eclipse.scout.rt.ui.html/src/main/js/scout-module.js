@@ -352,6 +352,7 @@
   __include("scout/form/fields/button/ButtonKeyStroke.js");
   __include("scout/form/fields/calendarfield/CalendarField.js");
   __include("scout/form/fields/calendarfield/CalendarFieldAdapter.js");
+  __include("scout/form/fields/carousel/CarouselField.js");
   __include("scout/form/fields/checkbox/CheckBoxField.js");
   __include("scout/form/fields/checkbox/CheckBoxFieldAdapter.js");
   __include("scout/form/fields/checkbox/CheckBoxToggleKeyStroke.js");
