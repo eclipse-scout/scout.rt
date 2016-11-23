@@ -927,6 +927,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     if (!textPattern.endsWith(getWildcard())) {
       textPattern = textPattern + getWildcard();
     }
+    //localLookupCalls should return hierarchical matches as well (children of exact matches), if field is configured accordingly
+    if (isBrowseHierarchy() && getLookupCall() instanceof LocalLookupCall) {
+      ((LocalLookupCall) getLookupCall()).setHierarchicalLookup(true);
+    }
+
     call.setKey(null);
     call.setText(textPattern);
     call.setAll(null);
