@@ -200,7 +200,6 @@
   __include("scout/table/columns/AlphanumericSortingStringColumn.js"); // requires Column.js
   __include("scout/table/columns/BeanColumn.js"); // requires Column.js
   __include("scout/table/columns/BooleanColumn.js"); // requires Column.js
-  __include("scout/table/columns/CodeColumn.js"); // requires Column.js
   __include("scout/table/columns/DateColumn.js"); // requires Column.js
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js

@@ -18,8 +18,7 @@ scout.inherits(scout.NumberColumn, scout.Column);
 /**
  * @override Column.js
  */
-scout.NumberColumn.prototype.init = function(model) {
-  scout.NumberColumn.parent.prototype.init.call(this, model);
+scout.NumberColumn.prototype._init = function(model) {
   if (!(this.decimalFormat instanceof scout.DecimalFormat)) {
     this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
   }

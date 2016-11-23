@@ -20,9 +20,7 @@ scout.inherits(scout.DateColumn, scout.Column);
 scout.DateColumn.DATE_PATTERN = 'dd.MM.yyyy';
 scout.DateColumn.TIME_PATTERN = 'HH:mm';
 
-scout.DateColumn.prototype.init = function(model) {
-  scout.DateColumn.parent.prototype.init.call(this, model);
-
+scout.DateColumn.prototype._init = function(model) {
   this.groupFormatFormatter = new scout.DateFormat(this.session.locale, this.groupFormat);
 };
 

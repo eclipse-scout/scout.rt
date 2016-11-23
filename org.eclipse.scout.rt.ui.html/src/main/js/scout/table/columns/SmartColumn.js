@@ -18,9 +18,9 @@ scout.inherits(scout.SmartColumn, scout.Column);
 /**
  * @override
  */
-scout.SmartColumn.prototype.init = function(model) { // FIXME CGU eigentlich bräuchte es ein _init
-  scout.SmartColumn.parent.prototype.init.call(this, model);
+scout.SmartColumn.prototype._init = function(model) {
   this._syncLookupCall(this.lookupCall);
+  this._syncCodeType(this.codeType);
 };
 
 scout.SmartColumn.prototype._syncLookupCall = function(lookupCall) {
@@ -30,6 +30,16 @@ scout.SmartColumn.prototype._syncLookupCall = function(lookupCall) {
   this.lookupCall = lookupCall;
 };
 
+scout.SmartColumn.prototype._syncCodeType = function(codeType) {
+  this.codeType = codeType;
+  if (!codeType) {
+    return;
+  }
+  this.lookupCall = scout.create('CodeLookupCall', {
+    session: this.session,
+    codeType: codeType
+  });
+};
 
 scout.SmartColumn.prototype._createCellModel = function(id) {
   return {
@@ -57,4 +67,16 @@ scout.SmartColumn.prototype.initCell = function(model, row) {
   }.bind(this));
 
   return cell;
+};
+
+scout.SmartColumn.prototype.cellValueForGrouping = function(row) {
+  return this.cell(row).text;
+};
+
+scout.SmartColumn.prototype.cellTextForGrouping = function(row) {
+  return this.cell(row).text;
+};
+
+scout.SmartColumn.prototype.cellTextForTextFilter = function(row) {
+  return this.cell(row).text;
 };

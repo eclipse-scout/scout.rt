@@ -45,12 +45,19 @@ scout.Column.prototype.init = function(model) {
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.nvl(this.width, 0);
   }
-
   if (this.aggregationFunction) {
     this.setAggregationFunction(this.aggregationFunction);
   }
-
   scout.texts.resolveTextProperty(this);
+  this._init(model);
+};
+
+/**
+ * Override this function in order to implement custom init logic.
+ * The default impl. does nothing.
+ */
+scout.Column.prototype._init = function(model) {
+  // NOP
 };
 
 /**
