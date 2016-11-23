@@ -11,10 +11,13 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.junit.Test;
 
 /**
@@ -125,6 +128,31 @@ public class LocalLookupCallTest {
 
   }
 
+  @Test
+  public void testGetDataByTextHierachic() throws Exception {
+    P_LocalLookupCallHierarchic lc = new P_LocalLookupCallHierarchic();
+    lc.setText("F");
+    lc.setHierarchicLookup(true);
+    List<? extends ILookupRow<String>> rows = lc.getDataByText();
+
+    assertEquals(5, rows.size());
+    // create a simple map to test the hierarchy:
+    // key -> node, value -> parent, root nodes have as parents themselves
+    List<Pair<String, String>> expected = new ArrayList<>();
+    expected.add(new Pair<>("F", "A"));
+    expected.add(new Pair<>("G", "F"));
+    expected.add(new Pair<>("H", "F"));
+    expected.add(new Pair<>("I", "H"));
+    expected.add(new Pair<>("J", "H"));
+
+    List<Pair<String, String>> actual = new ArrayList<>();
+    for (ILookupRow<String> r : rows) {
+      actual.add(new Pair<>(r.getKey(), r.getParentKey()));
+    }
+
+    assertTrue("compare lookup call result with expected result", CollectionUtility.equalsCollection(expected, actual, false));
+  }
+
   private void runGetDataByRec(int expectedLength, Integer parent) {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setRec(parent);
@@ -148,6 +176,25 @@ public class LocalLookupCallTest {
       rows.add(new LookupRow<Integer>(ROW40_KEY, ROW40_TEXT));
       rows.add(new LookupRow<Integer>(ROW50_KEY, ROW50_TEXT));
       return rows;
+    }
+  }
+
+  private class P_LocalLookupCallHierarchic extends LocalLookupCall<String> {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected List<? extends ILookupRow<String>> execCreateLookupRows() {
+      return CollectionUtility.arrayList(
+          new LookupRow<>("A", "A"),
+          new LookupRow<>("B", "B").withParentKey("A"),
+          new LookupRow<>("C", "C").withParentKey("B"),
+          new LookupRow<>("D", "D").withParentKey("B"),
+          new LookupRow<>("E", "E").withParentKey("C"),
+          new LookupRow<>("F", "F").withParentKey("A"),
+          new LookupRow<>("G", "G").withParentKey("F"),
+          new LookupRow<>("H", "H").withParentKey("F"),
+          new LookupRow<>("I", "I").withParentKey("H"),
+          new LookupRow<>("J", "J").withParentKey("H"));
     }
   }
 }
