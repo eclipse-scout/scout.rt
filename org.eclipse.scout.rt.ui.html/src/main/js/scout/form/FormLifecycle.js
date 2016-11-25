@@ -80,37 +80,37 @@ scout.FormLifecycle.prototype._showYesNoCancelMessageBox = function(message, yes
   var session = this.session();
   var model = {
     parent: this.form,
+    displayParent: this.form,
     severity: scout.MessageBox.SEVERITY.WARNING,
     header: message,
     yesButtonText: session.text('Yes'),
     noButtonText: session.text('No'),
     cancelButtonText: session.text('Cancel')
   };
-  var mbController = this.form.messageBoxController;
   var messageBox = scout.create('MessageBox', model);
   messageBox.on('action', function(event) {
-    mbController.unregisterAndRemove(messageBox);
+    messageBox.close();
     if (event.option === 'yes') {
       yesAction();
     } else if (event.option === 'no') {
       noAction();
     }
   });
-  mbController.registerAndRender(messageBox);
+  messageBox.open();
 };
 
 scout.FormLifecycle.prototype._showStatusMessageBox = function(status) {
   // FIXME [awe] 6.1 - make MessageBox easier to use in JS only case (like MessageBoxes in Java)
   var model = {
     parent: this.form,
+    displayParent: this.form,
     severity: scout.MessageBox.SEVERITY.ERROR,
     html: status.message,
     yesButtonText: this.session().text('Ok')
   };
-  var mbController = this.form.messageBoxController;
   var messageBox = scout.create('MessageBox', model);
-  messageBox.on('action', mbController.unregisterAndRemove.bind(mbController, messageBox));
-  mbController.registerAndRender(messageBox);
+  messageBox.on('action', messageBox.close.bind(messageBox));
+  messageBox.open();
 };
 
 scout.FormLifecycle.prototype._validateForm = function() {

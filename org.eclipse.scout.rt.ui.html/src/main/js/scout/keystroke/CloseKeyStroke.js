@@ -22,5 +22,5 @@ scout.CloseKeyStroke = function(field, $drawingArea) {
 scout.inherits(scout.CloseKeyStroke, scout.KeyStroke);
 
 scout.CloseKeyStroke.prototype.handle = function(event) {
-  this.field.close();
+  this.field.abort();
 };

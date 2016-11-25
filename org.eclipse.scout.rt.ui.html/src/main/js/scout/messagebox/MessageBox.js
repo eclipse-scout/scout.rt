@@ -18,7 +18,8 @@ scout.MessageBox = function() {
   this.$yesButton;
   this.$noButton;
   this.$cancelButton;
-  this._$closeButton;
+  this._$abortButton;
+  this.displayParent;
   this.focusListener;
 };
 scout.inherits(scout.MessageBox, scout.Widget);
@@ -50,7 +51,7 @@ scout.MessageBox.prototype._initKeyStrokeContext = function() {
       scout.keys.SPACE, scout.keys.ENTER
     ]),
     new scout.CloseKeyStroke(this, function() {
-      return this._$closeButton;
+      return this._$abortButton;
     }.bind(this))
   ]);
 };
@@ -75,27 +76,27 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
   var boxButtons = new scout.BoxButtons(this.$buttons, this._onButtonClick.bind(this));
-  this._$closeButton = null; // button to be executed when close() is called, e.g. when ESCAPE is pressed
+  this._$abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed
   if (this.yesButtonText) {
     this.$yesButton = boxButtons.addButton({
       text: this.yesButtonText,
       option: 'yes'
     });
-    this._$closeButton = this.$yesButton;
+    this._$abortButton = this.$yesButton;
   }
   if (this.noButtonText) {
     this.$noButton = boxButtons.addButton({
       text: this.noButtonText,
       option: 'no'
     });
-    this._$closeButton = this.$noButton;
+    this._$abortButton = this.$noButton;
   }
   if (this.cancelButtonText) {
     this.$cancelButton = boxButtons.addButton({
       text: this.cancelButtonText,
       option: 'cancel'
     });
-    this._$closeButton = this.$cancelButton;
+    this._$abortButton = this.$cancelButton;
   }
 
   // Render properties
@@ -180,11 +181,28 @@ scout.MessageBox.prototype._onButtonClick = function(event, option) {
 };
 
 /**
- * Used by CloseKeyStroke.js
+ * Renders the message box and links it with the display parent.
+ */
+scout.MessageBox.prototype.open = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.displayParent.messageBoxController.registerAndRender(this);
+};
+
+/**
+ * Destroys the message box and unlinks it from the display parent.
  */
 scout.MessageBox.prototype.close = function() {
-  if (this._$closeButton && this.session.focusManager.requestFocus(this._$closeButton)) {
-    this._$closeButton.click();
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.displayParent.messageBoxController.unregisterAndRemove(this);
+  this.destroy();
+};
+
+/**
+ * Aborts the message box by using the default abort button. Used by the ESC key stroke.
+ */
+scout.MessageBox.prototype.abort = function() {
+  if (this._$abortButton && this.session.focusManager.requestFocus(this._$abortButton)) {
+    this._$abortButton.click();
   }
 };
 
