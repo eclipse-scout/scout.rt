@@ -38,7 +38,8 @@
   __include("scout/util/icons.js");
   __include("scout/util/inspector.js");
   __include("scout/util/locales.js");
-  __include("scout/util/logging.js");
+  __include("scout/logging/logging.js");
+  __include("scout/logging/NullLogger.js");
   __include("scout/util/LookupCall.js");
   __include("scout/util/CodeLookupCall.js"); // requires LookupCall.js
   __include("scout/util/mimeTypes.js");
