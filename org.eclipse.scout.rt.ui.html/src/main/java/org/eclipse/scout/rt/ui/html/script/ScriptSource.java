@@ -18,7 +18,10 @@ public class ScriptSource {
 
   public static enum FileType {
     JS,
-    CSS,
+    /**
+     * CSS and LESS are both handled equally.
+     */
+    STYLESHEET,
     OTHER;
 
     public static FileType resolveFromFilename(String filename) {
@@ -26,8 +29,8 @@ public class ScriptSource {
         if (filename.endsWith(".js")) {
           return JS;
         }
-        if (filename.endsWith(".css")) {
-          return CSS;
+        if (filename.endsWith(".less") || filename.endsWith(".css")) {
+          return STYLESHEET;
         }
       }
       return OTHER;

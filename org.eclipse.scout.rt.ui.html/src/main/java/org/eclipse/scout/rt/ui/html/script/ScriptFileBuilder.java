@@ -30,9 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Process JS and CSS script templates such as <code>scout-module.js</code>
+ * Process JS and LESS (CSS) script templates such as <code>scout-module.js</code>
  * <p>
- * js and css files are automatically compiled if the name matches the names defined in {@link ScriptSource}
+ * js and less files are automatically compiled if the name matches the names defined in {@link ScriptSource}
  * <p>
  * Version is <code>1.2.3</code> or <code>1.2.3-fingerprint</code> where fingerprint is a hex number
  * <p>
@@ -45,18 +45,20 @@ public class ScriptFileBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptFileBuilder.class);
 
   /**
-   * Matches include directives for JS and CSS files. There directives look differently to not confuse the respective
+   * Matches include directives for JS and LESS files. There directives look differently to not confuse the respective
    * editor's syntax high-lighter. Otherwise, the format has no special meaning (i.e. there is no magic "__include"
    * function).
    * <p>
    * <b>JavaScript:</b> <code>__include("file.js");</code><br>
-   * <b>CSS:</b> <code>//@include("file.css")</code>
+   * <b>LESS:</b> <code>@import "file.css";</code>
    * <p>
    * Inner whitespace and trailing semicolon are optional. Both <code>"</code> and <code>'</code> may be used as string
    * delimiter. Content before and after the matched include directive is preserved, except <i>leading</i> space and tab
    * characters (= support for JS formatter).
    */
-  private static final Pattern INCLUDE_PAT = Pattern.compile("^[ \\t]*(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\);*", Pattern.MULTILINE);
+  private static final Pattern JS_INCLUDE_PAT = Pattern.compile("^\\s*__include\\(\\s*(?:\"|')(.*)(?:\"|')\\);*", Pattern.MULTILINE);
+
+  private static final Pattern STYLESHEET_IMPORT_PAT = Pattern.compile("^\\s*@import\\s*\"(.*)\";*", Pattern.MULTILINE);
 
   /**
    * Pattern for a script url that is not a {@link ScriptSource.NodeType#SRC_FRAGMENT}
@@ -65,10 +67,10 @@ public class ScriptFileBuilder {
    * <p>
    *
    * <pre>
-   * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $5="js" or "css"
+   * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $5="js" or "less" or "css"
    * </pre>
    */
-  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css)");
+  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css|less)");
 
   private final IWebContentService m_resourceLocator;
   private final ScriptFileLocator m_scriptLocator;
@@ -116,7 +118,7 @@ public class ScriptFileBuilder {
   }
 
   protected ScriptSource locateFragmentScript(String fragmentPath, FileType fileType) {
-    if (FileType.CSS == fileType && m_theme != null) {
+    if (FileType.STYLESHEET == fileType && m_theme != null) {
       String[] parts = FileUtility.getFilenameParts(fragmentPath);
       String themeFragmentPath = parts[0] + "-" + m_theme + (parts[1] == null ? "" : "." + parts[1]);
       URL url = m_resourceLocator.getScriptSource(themeFragmentPath);
@@ -160,11 +162,11 @@ public class ScriptFileBuilder {
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     long lastModified = script.getURL().openConnection().getLastModified();
     String content = new String(IOUtility.readFromUrl(script.getURL()), StandardCharsets.UTF_8);
-    Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
+    Matcher mat = matcherForScriptType(script, content);
     while (mat.find()) {
       buf.write(content.substring(pos, mat.start()).getBytes(StandardCharsets.UTF_8));
-      String includePath = basePath + ObjectUtility.nvl(mat.group(1), mat.group(2));
+      String includePath = basePath + mat.group(1);
       ScriptSource includeScript = locateNonFragmentScript(includePath);
       byte[] replacement = null;
       if (includeScript != null) {
@@ -202,7 +204,7 @@ public class ScriptFileBuilder {
             buf.write("// !!! NOT PROCESSED\n".getBytes(StandardCharsets.UTF_8));
           }
         }
-        else if (script.getFileType() == ScriptSource.FileType.CSS) {
+        else if (script.getFileType() == ScriptSource.FileType.STYLESHEET) {
           buf.write(("/* --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " --- */\n").getBytes(StandardCharsets.UTF_8));
           if (replacement == null) {
             buf.write("/* !!! NOT PROCESSED */\n".getBytes(StandardCharsets.UTF_8));
@@ -223,6 +225,17 @@ public class ScriptFileBuilder {
     return new ScriptOutput(pathInfo, macroContent.getBytes(StandardCharsets.UTF_8), lastModified);
   }
 
+  protected Matcher matcherForScriptType(ScriptSource script, String content) {
+    Pattern pattern;
+    if (script.getFileType() == FileType.STYLESHEET) {
+      pattern = STYLESHEET_IMPORT_PAT;
+    }
+    else {
+      pattern = JS_INCLUDE_PAT;
+    }
+    return pattern.matcher(content);
+  }
+
   protected ScriptOutput processModuleWithIncludes(String pathInfo, ScriptSource script, boolean compileAndMinify) throws IOException {
     if (script.getNodeType() != ScriptSource.NodeType.SRC_MODULE) {
       throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + ScriptSource.NodeType.SRC_MODULE + ", but got " + script.getNodeType());
@@ -230,11 +243,11 @@ public class ScriptFileBuilder {
     StringBuilder buf = new StringBuilder();
     long lastModified = script.getURL().openConnection().getLastModified();
     String content = new String(IOUtility.readFromUrl(script.getURL()), StandardCharsets.UTF_8);
-    Matcher mat = INCLUDE_PAT.matcher(content);
+    Matcher mat = matcherForScriptType(script, content);
     int pos = 0;
     while (mat.find()) {
       buf.append(content.substring(pos, mat.start()));
-      String includePath = ObjectUtility.nvl(mat.group(1), mat.group(2));
+      String includePath = mat.group(1);
       ScriptSource includeFragment = locateFragmentScript(includePath, script.getFileType());
       String replacement = null;
       if (includeFragment != null) {
@@ -261,7 +274,7 @@ public class ScriptFileBuilder {
             replacement = insertLineNumbers(includePath, replacement);
           }
         }
-        else if (script.getFileType() == ScriptSource.FileType.CSS) {
+        else if (script.getFileType() == ScriptSource.FileType.STYLESHEET) {
           buf.append("/* --- " + (includeFragment == null ? "" : includeFragment.getNodeType() + " ") + includePath + " --- */\n");
           if (replacement == null) {
             buf.append("/* !!! NOT PROCESSED */\n");
@@ -294,7 +307,7 @@ public class ScriptFileBuilder {
     switch (fileType) {
       case JS:
         return BEANS.get(ScriptProcessor.class).compileJs(content);
-      case CSS:
+      case STYLESHEET:
         return BEANS.get(ScriptProcessor.class).compileCss(content);
       default:
         return content;
@@ -305,7 +318,7 @@ public class ScriptFileBuilder {
     switch (fileType) {
       case JS:
         return BEANS.get(ScriptProcessor.class).minifyJs(content);
-      case CSS:
+      case STYLESHEET:
         return BEANS.get(ScriptProcessor.class).minifyCss(content);
       default:
         return content;

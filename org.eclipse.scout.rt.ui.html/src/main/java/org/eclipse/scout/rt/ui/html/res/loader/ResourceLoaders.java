@@ -26,7 +26,7 @@ public class ResourceLoaders {
     if (resourcePath.matches("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*")) {
       return new DynamicResourceLoader(req);
     }
-    if (resourcePath.endsWith(".js") || resourcePath.endsWith(".css")) {
+    if (ScriptFileLoader.acceptFile(resourcePath)) {
       String theme = UiThemeUtility.getThemeForLookup(req);
       boolean minify = UrlHints.isMinifyHint(req);
       return new ScriptFileLoader(theme, minify);

@@ -63,6 +63,7 @@ public class ScriptFileLocator {
   }
 
   protected FileLookup getMacroFileLookup(String parent, String fileName, String fileExtension) {
+    fileExtension = resolveFileExtension(fileExtension);
     String lookupFileName;
     if (fileName.endsWith("-macro")) {
       lookupFileName = parent + fileName + "." + fileExtension;
@@ -82,6 +83,18 @@ public class ScriptFileLocator {
       lookupFileName = fileName + "-module." + fileExtension;
     }
     return new FileLookup(false, lookupFileName, ScriptSource.NodeType.SRC_MODULE);
+  }
+
+  /**
+   * When a stylesheet macro is requested by the browser, it request a resource with a '.css' file extension. On the
+   * server we must actually load a '.less' file for that macro, that's why we must switch the file extension in this
+   * method. We don't do this for modules and fragments.
+   */
+  protected String resolveFileExtension(String extension) {
+    if ("css".equals(extension)) {
+      return "less";
+    }
+    return extension;
   }
 
   protected class FileLookup {

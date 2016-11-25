@@ -123,7 +123,7 @@ public class HtmlDocumentParser {
     }
 
     // append file-extension
-    externalPathSb.append(".").append(filenameParts[1]);
+    externalPathSb.append(".").append(getScriptFileExtension(filenameParts[1]));
     String externalPath = externalPathSb.toString();
 
     // we must put the same resource into the cache with two different cache keys:
@@ -181,6 +181,13 @@ public class HtmlDocumentParser {
       return fileName.substring(0, fileName.length() - 7);
     }
     return fileName;
+  }
+
+  private Object getScriptFileExtension(String extension) {
+    if ("less".equals(extension)) {
+      return "css";
+    }
+    return extension;
   }
 
   protected void replaceStylesheetTags() throws IOException {

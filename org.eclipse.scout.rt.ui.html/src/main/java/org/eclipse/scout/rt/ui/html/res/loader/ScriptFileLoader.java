@@ -17,6 +17,7 @@ import java.util.Collections;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
@@ -68,6 +69,13 @@ public class ScriptFileLoader extends AbstractResourceLoader {
         .withCachingAllowed(true)
         .withCacheMaxAge(HttpCacheControl.MAX_AGE_ONE_YEAR)
         .build();
+  }
+
+  public static boolean acceptFile(String file) {
+    if (StringUtility.isNullOrEmpty(file)) {
+      return false;
+    }
+    return file.endsWith(".js") || file.endsWith(".css") || file.endsWith(".less");
   }
 
 }
