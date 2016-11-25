@@ -159,6 +159,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
   private List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
+  private int m_attachedGuis = 0;
 
   /**
    * do not instantiate a new desktop<br>
@@ -1564,7 +1565,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void setGuiAvailableInternal(boolean guiAvailable) {
-    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, guiAvailable);
+    if (guiAvailable) {
+      m_attachedGuis++;
+    }
+    else {
+      m_attachedGuis--;
+    }
+    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
   }
 
   @Override
@@ -1988,9 +1995,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void attachGui() {
-    if (isGuiAvailable()) {
-      return;
-    }
     setGuiAvailableInternal(true);
 
     // extensions
@@ -2090,9 +2094,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void detachGui() {
-    if (!isGuiAvailable()) {
-      return;
-    }
     setGuiAvailableInternal(false);
 
     // extensions
