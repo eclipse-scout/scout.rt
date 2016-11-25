@@ -584,7 +584,8 @@ scout.Desktop.prototype.removeNotification = function(notification) {
     return;
   }
   if (this.$notifications) {
-    notification.fadeOut(this._onNotificationRemoved.bind(this, notification));
+    notification.fadeOut();
+    notification.one('remove', this._onNotificationRemove.bind(this, notification));
   } else {
     scout.arrays.remove(this.notifications, notification);
   }
@@ -901,7 +902,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   }
 };
 
-scout.Desktop.prototype._onNotificationRemoved = function(notification) {
+scout.Desktop.prototype._onNotificationRemove = function(notification) {
   scout.arrays.remove(this.notifications, notification);
   if (this.notifications.length === 0) {
     this.$notifications.remove();

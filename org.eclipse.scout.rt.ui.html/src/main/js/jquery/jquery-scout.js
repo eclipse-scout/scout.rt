@@ -782,7 +782,6 @@ $.fn.addClassForAnimation = function(className, options) {
     // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
-    // delay must be greater than css animation duration
   }.bind(this));
 };
 

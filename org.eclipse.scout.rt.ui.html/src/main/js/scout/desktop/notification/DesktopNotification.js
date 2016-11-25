@@ -122,31 +122,26 @@ scout.DesktopNotification.prototype.hide = function() {
 
 scout.DesktopNotification.prototype.fadeIn = function($parent) {
   this.render($parent);
-  var $container = this.$container,
-    animationCssClass = 'notification-slide-in';
-  $container.addClass(animationCssClass);
-  // The timeout used here is in-sync with the animation duration used in DesktopNotification.css
-  setTimeout(function() {
-    $container.removeClass(animationCssClass);
-  }, 300);
+  if (!scout.device.supportsCssAnimation()) {
+    return;
+  }
+  this.$container.addClassForAnimation('notification-slide-in');
 };
 
-scout.DesktopNotification.prototype.fadeOut = function(callback) {
-  // prevent fadeOut from running more than once (for instance from setTimeout
-  // in show and from the click of a user).
+scout.DesktopNotification.prototype.fadeOut = function() {
+  if (!scout.device.supportsCssAnimation()) {
+    this.destroy();
+    return;
+  }
+  // prevent fadeOut from running more than once (for instance from the click of a user).
   if (this._removing) {
     return;
   }
   this._removing = true;
-  var $container = this.$container;
-  $container.addClass('notification-fade-out');
-  // The timeout used here is in-sync with the animation duration used in DesktopNotification.css
-  setTimeout(function() {
-    $container.remove();
-    if (callback) {
-      callback();
-    }
-  }, 300);
+  this.$container.addClass('notification-fade-out');
+  this.$container.oneAnimationEnd(function() {
+    this.destroy();
+  }.bind(this));
 };
 
 scout.DesktopNotification.cssClassForSeverity = function(status) {
