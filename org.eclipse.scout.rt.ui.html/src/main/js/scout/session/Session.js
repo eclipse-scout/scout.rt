@@ -392,7 +392,7 @@ scout.Session.prototype._sendRequest = function(request) {
     return; // nothing to send
   }
 
-  if (this.offline) {
+  if (this.offline && !request.unload) { // In Firefox, "offline" is already true when page is unloaded
     this._handleSendWhenOffline(request);
     return;
   }
@@ -424,8 +424,6 @@ scout.Session.prototype._sendRequest = function(request) {
 };
 
 scout.Session.prototype._handleSendWhenOffline = function(request) {
-  // Note: Firefox is offline when page is unloaded
-
   // No need to queue the request when request does not contain events (e.g. log request, unload request)
   if (!request.events) {
     return;
