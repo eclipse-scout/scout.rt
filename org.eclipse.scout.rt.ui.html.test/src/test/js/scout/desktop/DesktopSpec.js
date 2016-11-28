@@ -90,9 +90,9 @@ describe('Desktop', function() {
       expect(ntfc.fadeOut).toHaveBeenCalled();
     });
 
-    it('_onNotificationRemoved - last notifications removes $notifications DIV', function() {
+    it('_onNotificationRemove - last notifications removes $notifications DIV', function() {
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
-      desktop._onNotificationRemoved(ntfc);
+      desktop._onNotificationRemove(ntfc);
       expect(desktop.notifications.length).toBe(0);
       expect(desktop.$container.find('.notifications').length).toBe(0);
       expect(desktop.$notifications).toBe(null);
