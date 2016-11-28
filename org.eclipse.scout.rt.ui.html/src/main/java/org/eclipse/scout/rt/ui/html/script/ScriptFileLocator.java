@@ -75,6 +75,9 @@ public class ScriptFileLocator {
   }
 
   protected FileLookup getModuleFileLookup(String fileName, String fileExtension) {
+    if ("scout-login".equals(fileName) && "css".equals(fileExtension)) {
+      fileExtension = "less"; // FIXME [awe] temp. fix.for directly references modules in html
+    }
     String lookupFileName;
     if (fileName.endsWith("-module")) {
       lookupFileName = fileName + "." + fileExtension;
