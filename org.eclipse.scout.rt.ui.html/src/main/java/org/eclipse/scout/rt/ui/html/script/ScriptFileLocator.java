@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.script;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
@@ -27,7 +29,7 @@ public class ScriptFileLocator {
     m_resourceLocator = resourceLocator;
   }
 
-  protected ScriptSource locateFile(String requestPath, Matcher mat, boolean minified) {
+  protected ScriptSource locateFile(String requestPath, Matcher mat, boolean minified, boolean lenient) {
     // group(3) = fingerprint (not used here)
     String parent = mat.group(1);
     String fileName = mat.group(2);
@@ -37,19 +39,18 @@ public class ScriptFileLocator {
     FileLookup macro = getMacroFileLookup(parent, fileName, fileExtension);
 
     // modules are loaded with and without suffix -module
-    FileLookup module = getModuleFileLookup(fileName, fileExtension);
+    List<FileLookup> modules = getModuleFileLookup(fileName, fileExtension, lenient);
 
     // only (external) libraries are available minified and non-minified
     // all other files are always non-minified on the classpath
     FileLookup library = new FileLookup(true, parent + fileName + "." + fileExtension, ScriptSource.NodeType.LIBRARY);
     FileLookup libraryMinified = new FileLookup(true, parent + fileName + ".min." + fileExtension, ScriptSource.NodeType.LIBRARY_MINIFIED);
 
-    FileLookup[] lookups = new FileLookup[]{
-        macro,
-        module,
-        minified ? libraryMinified : library,
-        minified ? library : libraryMinified
-    };
+    List<FileLookup> lookups = new ArrayList<ScriptFileLocator.FileLookup>(5);
+    lookups.add(macro);
+    lookups.addAll(modules);
+    lookups.add(minified ? libraryMinified : library);
+    lookups.add(minified ? library : libraryMinified);
 
     for (FileLookup lookup : lookups) {
       if (lookup.lookup()) {
@@ -74,10 +75,21 @@ public class ScriptFileLocator {
     return new FileLookup(true, lookupFileName, ScriptSource.NodeType.MACRO);
   }
 
-  protected FileLookup getModuleFileLookup(String fileName, String fileExtension) {
-    if ("scout-login".equals(fileName) && "css".equals(fileExtension)) {
-      fileExtension = "less"; // FIXME [awe] temp. fix.for directly references modules in html
+  /**
+   * When a stylesheet module is requested, we must look for .css AND .less files. This is required because the browser
+   * requests always *.css, and a *.less file must be loaded instead. But a macro can also contain simple *.css files.
+   * So this method must lookup both.
+   */
+  protected List<FileLookup> getModuleFileLookup(String fileName, String fileExtension, boolean lenient) {
+    List<FileLookup> lookups = new ArrayList<>();
+    if (lenient && isCss(fileExtension)) {
+      lookups.add(getModuleFileLookup(fileName, "less"));
     }
+    lookups.add(getModuleFileLookup(fileName, fileExtension));
+    return lookups;
+  }
+
+  protected FileLookup getModuleFileLookup(String fileName, String fileExtension) {
     String lookupFileName;
     if (fileName.endsWith("-module")) {
       lookupFileName = fileName + "." + fileExtension;
@@ -94,10 +106,14 @@ public class ScriptFileLocator {
    * method. We don't do this for modules and fragments.
    */
   protected String resolveFileExtension(String extension) {
-    if ("css".equals(extension)) {
+    if (isCss(extension)) {
       return "less";
     }
     return extension;
+  }
+
+  protected boolean isCss(String extension) {
+    return "css".equals(extension);
   }
 
   protected class FileLookup {

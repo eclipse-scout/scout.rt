@@ -85,7 +85,7 @@ public class ScriptFileBuilder {
   }
 
   public ScriptOutput buildScript(String pathInfo) throws IOException {
-    ScriptSource script = locateNonFragmentScript(pathInfo);
+    ScriptSource script = locateNonFragmentScript(pathInfo, true);
     LOG.info("Building script {} theme={} m_minify={}", script, m_theme, m_minify);
     if (script == null) {
       return null; // not found
@@ -106,10 +106,19 @@ public class ScriptFileBuilder {
     }
   }
 
-  protected ScriptSource locateNonFragmentScript(String requestPath) throws IOException {
+  /**
+   * @param requestPath
+   * @param lenient
+   *          The lenient flag should be set to true when a script is directly requested via HTTP. This is required
+   *          because the browser requests *-module.css or *-macro.css, but on the server we must lookup a *-module.less
+   *          file instead.
+   * @return
+   * @throws IOException
+   */
+  protected ScriptSource locateNonFragmentScript(String requestPath, boolean lenient) throws IOException {
     Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
     if (mat.matches()) {
-      return m_scriptLocator.locateFile(requestPath, mat, m_minify);
+      return m_scriptLocator.locateFile(requestPath, mat, m_minify, lenient);
     }
     else {
       LOG.warn("locate {}: does not match SCRIPT_URL_PATTERN {}", requestPath, SCRIPT_URL_PATTERN.pattern());
@@ -167,7 +176,7 @@ public class ScriptFileBuilder {
     while (mat.find()) {
       buf.write(content.substring(pos, mat.start()).getBytes(StandardCharsets.UTF_8));
       String includePath = basePath + mat.group(1);
-      ScriptSource includeScript = locateNonFragmentScript(includePath);
+      ScriptSource includeScript = locateNonFragmentScript(includePath, false);
       byte[] replacement = null;
       if (includeScript != null) {
         switch (includeScript.getNodeType()) {

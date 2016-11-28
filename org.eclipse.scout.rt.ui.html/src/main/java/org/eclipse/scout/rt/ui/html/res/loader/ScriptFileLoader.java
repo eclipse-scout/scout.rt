@@ -62,13 +62,23 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     }
 
     return BinaryResources.create()
-        .withFilename(out.getPathInfo())
+        .withFilename(translateLess(out.getPathInfo()))
         .withCharset(StandardCharsets.UTF_8)
         .withContent(out.getContent())
         .withLastModified(out.getLastModified())
         .withCachingAllowed(true)
         .withCacheMaxAge(HttpCacheControl.MAX_AGE_ONE_YEAR)
         .build();
+  }
+
+  /**
+   * When the client requests a .css file, we translate the request to a .less file internally.
+   */
+  protected String translateLess(String pathInfo) {
+    if (pathInfo.endsWith(".less")) {
+      return pathInfo.substring(0, pathInfo.length() - 5) + ".css";
+    }
+    return pathInfo;
   }
 
   public static boolean acceptFile(String file) {
