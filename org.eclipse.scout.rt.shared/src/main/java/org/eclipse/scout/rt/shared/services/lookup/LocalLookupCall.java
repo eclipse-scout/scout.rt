@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 
-  private boolean m_isHierarchicLookup;
+  private boolean m_hierarchicalLookup;
 
   public LocalLookupCall() {
   }
@@ -119,7 +119,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
         list.add(row);
       }
     }
-    if (isHierarchicLookup()) {
+    if (isHierarchicalLookup()) {
       Map<T, Set<ILookupRow<T>>> nodeMap = createNodeMap(lookupRows);
       List<ILookupRow<T>> children = new ArrayList<ILookupRow<T>>();
       for (ILookupRow<T> res : list) {
@@ -221,11 +221,11 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     return list;
   }
 
-  public boolean isHierarchicLookup() {
-    return m_isHierarchicLookup;
+  public boolean isHierarchicalLookup() {
+    return m_hierarchicalLookup;
   }
 
-  public void setHierarchicLookup(boolean isHierarchicLookup) {
-    m_isHierarchicLookup = isHierarchicLookup;
+  public void setHierarchicalLookup(boolean hierarchicalLookup) {
+    m_hierarchicalLookup = hierarchicalLookup;
   }
 }

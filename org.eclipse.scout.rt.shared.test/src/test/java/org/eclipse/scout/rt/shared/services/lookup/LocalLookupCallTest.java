@@ -132,7 +132,7 @@ public class LocalLookupCallTest {
   public void testGetDataByTextHierachic() throws Exception {
     P_LocalLookupCallHierarchic lc = new P_LocalLookupCallHierarchic();
     lc.setText("F");
-    lc.setHierarchicLookup(true);
+    lc.setHierarchicalLookup(true);
     List<? extends ILookupRow<String>> rows = lc.getDataByText();
 
     assertEquals(5, rows.size());

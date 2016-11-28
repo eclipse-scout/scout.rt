@@ -179,7 +179,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
         }
         if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
           ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
-          if (row != null && row.getText() != null && (pat.matcher(row.getText().toLowerCase()).matches() || (isHierarchicLookup() && isParentInResultList(getLookupRows(), row)))) {
+          if (row != null && row.getText() != null && (pat.matcher(row.getText().toLowerCase()).matches() || (isHierarchicalLookup() && isParentInResultList(getLookupRows(), row)))) {
             add(row);
           }
         }

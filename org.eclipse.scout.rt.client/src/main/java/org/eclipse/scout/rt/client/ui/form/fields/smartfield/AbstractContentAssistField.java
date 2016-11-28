@@ -937,7 +937,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
     //localLookupCalls should return hierarchical matches as well (children of exact matches), if field is configured accordingly
     if (isBrowseHierarchy() && getLookupCall() instanceof LocalLookupCall) {
-      ((LocalLookupCall) getLookupCall()).setHierarchicLookup(true);
+      ((LocalLookupCall) getLookupCall()).setHierarchicalLookup(true);
     }
 
     call.setKey(null);
