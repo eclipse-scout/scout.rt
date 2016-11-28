@@ -90,12 +90,10 @@ public class SqlConnectionPool {
 
       PoolEntry candidate = null;
       while (candidate == null) {
-        if (candidate == null) {
-          // get next available conn
-          for (Iterator it = m_idleEntries.iterator(); it.hasNext();) {
-            candidate = (PoolEntry) it.next();
-            break;
-          }
+        // get next available conn
+        for (Iterator it = m_idleEntries.iterator(); it.hasNext();) {
+          candidate = (PoolEntry) it.next();
+          break;
         }
         if (candidate == null && m_idleEntries.size() + m_busyEntries.size() < m_poolSize) {
           // create new connection
