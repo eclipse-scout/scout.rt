@@ -66,7 +66,7 @@ scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
 
 scout.PageWithTable.prototype._onTableRowsUpdated = function(event) {
   this.getOutline().mediator.onTableRowsUpdated(event, this);
-}
+};
 
 scout.PageWithTable.prototype._onTableRowAction = function(event) {
   this.getOutline().mediator.onTableRowAction(event, this);

@@ -30,7 +30,7 @@ scout.Page = function() {
   this.detailTableVisible = true;
   this.detailForm;
   this.detailFormVisible = true;
-  this.detailFormVisibleByUi = true
+  this.detailFormVisibleByUi = true;
 
   /**
    * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
