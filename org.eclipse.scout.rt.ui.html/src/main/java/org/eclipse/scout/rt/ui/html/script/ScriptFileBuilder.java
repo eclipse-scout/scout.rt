@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 import org.slf4j.Logger;
@@ -32,42 +31,58 @@ import org.slf4j.LoggerFactory;
 /**
  * Process JS and LESS (CSS) script templates such as <code>scout-module.js</code>
  * <p>
- * js and less files are automatically compiled if the name matches the names defined in {@link ScriptSource}
+ * JS and LESS files are automatically compiled if the name matches the names defined in {@link ScriptSource}
  * <p>
- * Version is <code>1.2.3</code> or <code>1.2.3-fingerprint</code> where fingerprint is a hex number
- * <p>
- * If the fingerprint is the text "fingerprint" then {@link HtmlFileLoader} replaces it with the effective hex
- * fingerprint.
- * <p>
- * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UrlHints}
+ * The JS and CSS minification can be turned on and off using the url param ?minify=true, see {@link UrlHints}
  */
 public class ScriptFileBuilder {
+
   private static final Logger LOG = LoggerFactory.getLogger(ScriptFileBuilder.class);
 
   /**
-   * Matches include directives for JS and LESS files. There directives look differently to not confuse the respective
-   * editor's syntax high-lighter. Otherwise, the format has no special meaning (i.e. there is no magic "__include"
-   * function).
+   * Matches include directives for JS files. They look like JavaScript code to not confuse the editor's syntax
+   * high-lighter, but otherwise the format has no special meaning (i.e. there is no magic "__include" function).
    * <p>
-   * <b>JavaScript:</b> <code>__include("file.js");</code><br>
-   * <b>LESS:</b> <code>@import "file.css";</code>
+   * <b>Format:</b> <code>__include("file.js");</code><br>
    * <p>
-   * Inner whitespace and trailing semicolon are optional. Both <code>"</code> and <code>'</code> may be used as string
-   * delimiter. Content before and after the matched include directive is preserved, except <i>leading</i> space and tab
-   * characters (= support for JS formatter).
+   * Whitespace is optional. The trailing semicolon is optional as well, but putting it at the end of the include
+   * directive is strongly recommended to produce valid JavaScript code (= editor support). Both <code>"</code> and
+   * <code>'</code> may be used as string delimiter. Content before and after the include directive on the same line is
+   * removed. On the other hand, lines that do not contain an include directive are fully preserved. Only one include
+   * directive per line is processed.
    */
-  private static final Pattern JS_INCLUDE_PAT = Pattern.compile("^\\s*__include\\(\\s*(?:\"|')(.*)(?:\"|')\\);*", Pattern.MULTILINE);
+  private static final Pattern JS_INCLUDE_PATTERN = Pattern.compile("^\\s*__include\\s*\\(\\s*[\"'](.*?)[\"']\\s*\\).*$", Pattern.MULTILINE);
 
-  private static final Pattern STYLESHEET_IMPORT_PAT = Pattern.compile("^\\s*@import\\s*\"(.*)\";*", Pattern.MULTILINE);
+  /**
+   * Matches include directives for LESS files. They look like normal LESS &#64;import directives, but are parsed and
+   * replaced by this class.
+   * <p>
+   * <b>Format:</b> <code>@import "file.less";</code>
+   * <p>
+   * Whitespace is optional. The trailing semicolon is optional as well, but putting it at the end of the include
+   * directive is strongly recommended to produce valid LESS code (= editor support). The included filename must be
+   * enclosed in <code>"</code> characters. Content before and after the include directive on the same line is removed.
+   * On the other hand, lines that do not contain an include directive are fully preserved. Only one include directive
+   * per line is processed.
+   */
+  private static final Pattern STYLESHEET_IMPORT_PATTERN = Pattern.compile("^\\s*@import\\s+\"(.*?)\".*$", Pattern.MULTILINE);
 
   /**
    * Pattern for a script url that is not a {@link ScriptSource.NodeType#SRC_FRAGMENT}
    * <p>
-   * <code>path/basename-1.0.0.min.js</code> <code>path/basename-1.0.0-34fce3bc.min.js</code>
-   * <p>
+   * <b>Regex groups:</b> <code>$1$2[-$4][.min].$5</code><br>
+   * <ul>
+   * <li><code>$1</code> = path
+   * <li><code>$2</code> = basename
+   * <li><code>$3</code> = fingerprint (optiona)
+   * <li><code>$4</code> = <code>"js"</code>, <code>"css"</code> or <code>"less"</code>
+   * </ul>
+   * Examples:
    *
    * <pre>
-   * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $5="js" or "less" or "css"
+   * path/basename.js
+   * path/basename.min.js
+   * path/basename-34fce3bc.min.js
    * </pre>
    */
   public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css|less)");
@@ -112,8 +127,6 @@ public class ScriptFileBuilder {
    *          The lenient flag should be set to true when a script is directly requested via HTTP. This is required
    *          because the browser requests *-module.css or *-macro.css, but on the server we must lookup a *-module.less
    *          file instead.
-   * @return
-   * @throws IOException
    */
   protected ScriptSource locateNonFragmentScript(String requestPath, boolean lenient) throws IOException {
     Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
@@ -237,10 +250,10 @@ public class ScriptFileBuilder {
   protected Matcher matcherForScriptType(ScriptSource script, String content) {
     Pattern pattern;
     if (script.getFileType() == FileType.STYLESHEET) {
-      pattern = STYLESHEET_IMPORT_PAT;
+      pattern = STYLESHEET_IMPORT_PATTERN;
     }
     else {
-      pattern = JS_INCLUDE_PAT;
+      pattern = JS_INCLUDE_PATTERN;
     }
     return pattern.matcher(content);
   }
@@ -393,5 +406,4 @@ public class ScriptFileBuilder {
     int c = line.lastIndexOf("/*/");
     return (b >= 0 && (a < 0 || a < b || (c == a)));
   }
-
 }
