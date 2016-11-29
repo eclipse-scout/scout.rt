@@ -128,8 +128,8 @@ public class ClientRunContext extends RunContext {
    * context has that {@link ISession} set in {@link ISession#CURRENT} thread-local.
    *
    * @param applySessionProperties
-   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject} and {@link UserAgent}
-   *          directly onto this context.
+   *          <code>true</code> to apply session properties like {@link Locale}, {@link Subject}, {@link UserAgent} and
+   *          {@link IDesktop} to this context.
    */
   public ClientRunContext withSession(final IClientSession session, final boolean applySessionProperties) {
     m_session = session;
@@ -138,6 +138,7 @@ public class ClientRunContext extends RunContext {
       m_locale = (session != null ? session.getLocale() : null);
       m_userAgent = (session != null ? session.getUserAgent() : null);
       m_subject = (session != null ? session.getSubject() : null);
+      m_desktop = (session != null ? session.getDesktopElseVirtualDesktop() : null);
     }
     return this;
   }
