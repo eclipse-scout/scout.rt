@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
@@ -205,6 +206,30 @@ public class AbstractTreeTest {
 
     m_tree.disposeTree();
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
+  }
+
+  @Test
+  public void testCheckNodes() {
+    m_tree.setCheckable(true);
+    m_tree.setMultiCheck(false);
+
+    m_tree.setNodeChecked(m_node1, true);
+    assertEquals(Collections.singleton(m_node1), m_tree.getCheckedNodes());
+
+    m_tree.setNodeChecked(m_node2, true);
+    assertEquals(Collections.singleton(m_node2), m_tree.getCheckedNodes());
+
+    m_tree.setNodeChecked(m_node1, false);
+    assertEquals(Collections.singleton(m_node2), m_tree.getCheckedNodes());
+
+    m_tree.setNodeChecked(m_node2, false);
+    assertEquals(Collections.emptySet(), m_tree.getCheckedNodes());
+
+    // allow multi check
+    m_tree.setMultiCheck(true);
+    m_tree.setNodeChecked(m_node1, true);
+    m_tree.setNodeChecked(m_node2, true);
+    assertEquals(CollectionUtility.hashSet(m_node1, m_node2), m_tree.getCheckedNodes());
   }
 
   private static void assertDisposed(ITestDisposable... disposables) {

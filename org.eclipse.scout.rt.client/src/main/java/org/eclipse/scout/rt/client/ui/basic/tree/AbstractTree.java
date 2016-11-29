@@ -1454,13 +1454,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
         //uncheck others in single-check mode
         if (checked && !isMultiCheck()) {
-          List<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
-          final Iterator<ITreeNode> checkedNodesIterator = m_checkedNodes.iterator();
-          while (checkedNodesIterator.hasNext()) {
-            ITreeNode cn = checkedNodesIterator.next();
-            if (cn != node) {
-              m_checkedNodes.remove(cn);
-              uncheckedNodes.add(cn);
+          for (Iterator<ITreeNode> it = m_checkedNodes.iterator(); it.hasNext();) {
+            if (it.next() != node) {
+              it.remove();
             }
           }
           break;
