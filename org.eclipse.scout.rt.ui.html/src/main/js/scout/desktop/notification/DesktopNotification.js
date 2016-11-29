@@ -116,6 +116,9 @@ scout.DesktopNotification.prototype.show = function() {
 };
 
 scout.DesktopNotification.prototype.hide = function() {
+  if (this._removing) {
+    return;
+  }
   clearTimeout(this._removeTimeout);
   this.desktop.removeNotification(this);
 };
