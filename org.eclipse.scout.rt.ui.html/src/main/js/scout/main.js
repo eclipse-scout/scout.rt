@@ -70,6 +70,7 @@ scout.isOneOf = function() {
 
 /**
  * Creates a new object instance.<p> Delegates the create call to scout.ObjectFactory#create.
+ * @returns {object}
  */
 scout.create = function(objectType, model, options) {
   return scout.objectFactory.create(objectType, model, options);
