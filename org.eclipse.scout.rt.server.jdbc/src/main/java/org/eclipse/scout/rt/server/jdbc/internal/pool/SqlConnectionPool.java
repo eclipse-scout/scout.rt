@@ -123,7 +123,7 @@ public class SqlConnectionPool {
           catch (Exception e) {
             // remove candidate from idle pool and close it
             m_idleEntries.remove(candidate);
-            LOG.warn("closing dirty connection: {}", candidate.conn);
+            LOG.warn("closing dirty connection: {}", candidate.conn, e);
             try {
               candidate.conn.close();
             }
