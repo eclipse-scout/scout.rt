@@ -76,7 +76,6 @@ public class JsonCell implements IJsonObject {
     json.put("foregroundColor", m_cell.getForegroundColor());
     json.put("backgroundColor", m_cell.getBackgroundColor());
     json.put("font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
-    //TODO [5.2] cgu: maybe only send if it differs from column, same for horizontal alignment. Could be difficult, depends on event order (update before column_structure_changed is bad. maybe solve in model?
     json.put("editable", m_cell.isEditable());
     json.put("htmlEnabled", m_cell.isHtmlEnabled());
     return json;

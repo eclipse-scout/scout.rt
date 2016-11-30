@@ -102,10 +102,11 @@ scout.Column.prototype._createCellModel = function(text) {
  * Override this method to impl. type specific init cell behavior.
  */
 scout.Column.prototype._initCell = function(cellModel) {
-  // when cell doesn't define horiz. alignment - use value from column
-  if (cellModel.horizontalAlignment === undefined) {
-    cellModel.horizontalAlignment = this.horizontalAlignment;
-  }
+  // if cell does not define properties, use column values
+  cellModel.cssClass = scout.nvl(cellModel.cssClass, this.cssClass);
+  cellModel.editable = scout.nvl(cellModel.editable, this.editable);
+  cellModel.horizontalAlignment = scout.nvl(cellModel.horizontalAlignment, this.horizontalAlignment);
+  cellModel.htmlEnabled = scout.nvl(cellModel.htmlEnabled, this.htmlEnabled);
 };
 
 scout.Column.prototype.buildCellForRow = function(row) {
@@ -197,11 +198,8 @@ scout.Column.prototype._cellCssClass = function(cell) {
     cssClass += ' last';
   }
 
-  //TODO [5.2] cgu: cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {
     cssClass += ' ' + cell.cssClass;
-  } else if (this.cssClass) {
-    cssClass += ' ' + this.cssClass;
   }
   return cssClass;
 };
