@@ -25,7 +25,9 @@ scout.SmartColumn.prototype._init = function(model) {
 
 scout.SmartColumn.prototype._syncLookupCall = function(lookupCall) {
   if (typeof lookupCall === 'string') {
-    lookupCall = scout.create(lookupCall);
+    lookupCall = scout.create(lookupCall, {
+      session: this.session
+    });
   }
   this.lookupCall = lookupCall;
 };
