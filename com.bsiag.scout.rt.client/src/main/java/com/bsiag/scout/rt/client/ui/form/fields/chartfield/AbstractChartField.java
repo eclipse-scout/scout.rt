@@ -45,9 +45,11 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
-        if (m_chart != null) {
-          m_chart.setEnabled(isEnabled());
+        if (m_chart == null) {
+          return;
         }
+        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+        m_chart.setEnabled(newEnabled);
       }
     });
   }
