@@ -155,9 +155,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
-        if (m_table != null) {
-          m_table.setEnabled(isEnabled());
+        if (m_table == null) {
+          return;
         }
+        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+        m_table.setEnabled(newEnabled);
       }
     });
   }

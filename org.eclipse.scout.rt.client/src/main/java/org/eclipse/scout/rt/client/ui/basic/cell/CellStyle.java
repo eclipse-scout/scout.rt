@@ -46,11 +46,6 @@ public class CellStyle implements ICellSpecialization {
   }
 
   @Override
-  public void setEnabled(boolean enabled) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void setTooltipText(String tooltip) {
     throw new UnsupportedOperationException();
   }
@@ -63,11 +58,6 @@ public class CellStyle implements ICellSpecialization {
   @Override
   public String getTooltipText() {
     return null;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
   }
 
   @Override

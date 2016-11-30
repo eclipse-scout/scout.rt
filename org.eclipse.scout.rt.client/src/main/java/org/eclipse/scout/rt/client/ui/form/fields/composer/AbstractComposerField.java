@@ -354,9 +354,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent e) {
-          if (m_tree != null) {
-            m_tree.setEnabled(isEnabled());
+          if (m_tree == null) {
+            return;
           }
+          boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+          m_tree.setEnabled(newEnabled);
         }
       });
     }

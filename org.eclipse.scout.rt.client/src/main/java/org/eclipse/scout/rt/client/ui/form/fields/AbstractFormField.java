@@ -1580,7 +1580,23 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Do not use this internal method
    */
   protected void calculateEnabledInternal() {
-    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
+    final boolean enabled = NamedBitMaskHelper.allBitsSet(m_enabled);
+    final String changedProperty = PROP_ENABLED;
+    boolean changed = propertySupport.setPropertyBool(changedProperty, enabled);
+    if (!changed || !isInitialized()) {
+      return;
+    }
+
+    // notify children that their inherited value might have changed
+    acceptVisitor(new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        if (field instanceof AbstractFormField) {
+          ((AbstractFormField) field).propertySupport.firePropertyChange(changedProperty, !enabled, enabled);
+        }
+        return true;
+      }
+    }, 0, 0, false);
   }
 
   @Override

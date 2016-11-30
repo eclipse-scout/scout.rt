@@ -41,10 +41,6 @@ public interface ICellSpecialization extends IStyleable {
 
   void setTooltipText(String tooltip);
 
-  boolean isEnabled();
-
-  void setEnabled(boolean enabled);
-
   boolean isEditable();
 
   void setEditable(boolean editable);

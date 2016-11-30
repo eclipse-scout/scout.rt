@@ -338,17 +338,20 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
-        if (m_table != null) {
-          String name = e.getPropertyName();
-          if (PROP_ENABLED.equals(name)) {
-            m_table.setEnabled(isEnabled());
-          }
-          else if (PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
-            updateCheckedRowsFilter();
-          }
-          else if (PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {
-            updateActiveRowsFilter();
-          }
+        if (m_table == null) {
+          return;
+        }
+
+        String name = e.getPropertyName();
+        if (PROP_ENABLED.equals(name)) {
+          boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+          m_table.setEnabled(newEnabled);
+        }
+        else if (PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
+          updateCheckedRowsFilter();
+        }
+        else if (PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {
+          updateActiveRowsFilter();
         }
       }
     });

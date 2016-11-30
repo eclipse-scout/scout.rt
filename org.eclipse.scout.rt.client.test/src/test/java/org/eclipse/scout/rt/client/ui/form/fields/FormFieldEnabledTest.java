@@ -1,12 +1,27 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithComposer.ComposerField;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithListBox.ListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithTable.TableField;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithTree.TreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_GroupBox.P_RadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_GroupBox.P_RadioButtonGroup.P_Button1;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_GroupBox.P_RadioButtonGroup.P_Button2;
@@ -21,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_InnerFo
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_OuterForm.MainBox.Wrapped;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
+import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -32,10 +48,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.AllButton;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
+import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -75,6 +94,61 @@ public class FormFieldEnabledTest {
     Assert.assertEquals(2 /*listbox filter box is included as well*/, listbox.getFieldCount());
 
     return result;
+  }
+
+  @Test
+  public void testTableInheritance() {
+    P_BoxWithTable box = new P_BoxWithTable();
+    TableField tableField = box.getFieldByClass(TableField.class);
+
+    ITable table = tableField.getTable();
+    box.setEnabled(false);
+
+    Assert.assertFalse(box.isEnabled());
+    Assert.assertFalse(tableField.isEnabledIncludingParents());
+    Assert.assertTrue(tableField.isEnabled());
+    Assert.assertFalse(table.isEnabled());
+    Assert.assertFalse(table.getMenus().get(0).isEnabled());
+  }
+
+  @Test
+  public void testTreeInheritance() {
+    P_BoxWithTree box = new P_BoxWithTree();
+    TreeField treeField = box.getFieldByClass(TreeField.class);
+    ITree tree = treeField.getTree();
+    box.setEnabled(false);
+
+    Assert.assertFalse(box.isEnabled());
+    Assert.assertFalse(treeField.isEnabledIncludingParents());
+    Assert.assertTrue(treeField.isEnabled());
+    Assert.assertFalse(tree.isEnabled());
+    Assert.assertFalse(tree.getMenus().get(0).isEnabled());
+  }
+
+  @Test
+  public void testListBoxInheritance() {
+    P_BoxWithListBox box = new P_BoxWithListBox();
+    ListBox listBox = box.getFieldByClass(ListBox.class);
+    ITable table = listBox.getTable();
+    box.setEnabled(false);
+
+    Assert.assertFalse(box.isEnabled());
+    Assert.assertFalse(listBox.isEnabledIncludingParents());
+    Assert.assertTrue(listBox.isEnabled());
+    Assert.assertFalse(table.isEnabled());
+  }
+
+  @Test
+  public void testComposerInheritance() {
+    P_BoxWithComposer box = new P_BoxWithComposer();
+    ComposerField composerField = box.getFieldByClass(ComposerField.class);
+    ITree tree = composerField.getTree();
+    box.setEnabled(false);
+
+    Assert.assertFalse(box.isEnabled());
+    Assert.assertFalse(composerField.isEnabledIncludingParents());
+    Assert.assertTrue(composerField.isEnabled());
+    Assert.assertFalse(tree.isEnabled());
   }
 
   @Test
@@ -310,6 +384,51 @@ public class FormFieldEnabledTest {
           }
         }
       }
+    }
+  }
+
+  public static class P_BoxWithTable extends AbstractGroupBox {
+    public class TableField extends AbstractTableField<TableField.Table> {
+      public class Table extends AbstractTable {
+        public class LongColumn extends AbstractLongColumn {
+        }
+
+        public class MyMenuMenu extends AbstractMenu {
+          @Override
+          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+            return CollectionUtility.hashSet(TableMenuType.SingleSelection, TableMenuType.MultiSelection);
+          }
+        }
+      }
+    }
+  }
+
+  public static class P_BoxWithTree extends AbstractGroupBox {
+    public class TreeField extends AbstractTreeField {
+      public class Tree extends AbstractTree {
+        public class MyMenuMenu extends AbstractMenu {
+          @Override
+          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+            return CollectionUtility.hashSet(TreeMenuType.SingleSelection, TreeMenuType.MultiSelection);
+          }
+        }
+      }
+    }
+  }
+
+  public static class P_BoxWithListBox extends AbstractGroupBox {
+    public class ListBox extends AbstractListBox<Long> {
+      public class MyMenuMenu extends AbstractMenu {
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
+        }
+      }
+    }
+  }
+
+  public static class P_BoxWithComposer extends AbstractGroupBox {
+    public class ComposerField extends AbstractComposerField {
     }
   }
 }

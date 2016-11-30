@@ -21,13 +21,11 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 public class CellExtension implements ICellSpecialization {
 
   private String m_tooltipText;
-  private boolean m_enabled;
   private boolean m_editable;
   private boolean m_mandatory;
   private CellStyle m_cellStyle;
 
   public CellExtension(ICellSpecialization specialization) {
-    m_enabled = true;
     m_cellStyle = specialization.getCellStyle();
   }
 
@@ -61,16 +59,6 @@ public class CellExtension implements ICellSpecialization {
   @Override
   public void setTooltipText(String tooltipText) {
     m_tooltipText = tooltipText;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return m_enabled;
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    m_enabled = enabled;
   }
 
   @Override

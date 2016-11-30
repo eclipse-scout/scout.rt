@@ -358,17 +358,20 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
-        if (m_tree != null) {
-          String name = e.getPropertyName();
-          if (PROP_ENABLED.equals(name)) {
-            m_tree.setEnabled(isEnabled());
-          }
-          else if (PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
-            updateCheckedNodesFilter();
-          }
-          else if (PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
-            updateActiveNodesFilter();
-          }
+        if (m_tree == null) {
+          return;
+        }
+
+        String name = e.getPropertyName();
+        if (PROP_ENABLED.equals(name)) {
+          boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+          m_tree.setEnabled(newEnabled);
+        }
+        else if (PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
+          updateCheckedNodesFilter();
+        }
+        else if (PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
+          updateActiveNodesFilter();
         }
       }
     });
