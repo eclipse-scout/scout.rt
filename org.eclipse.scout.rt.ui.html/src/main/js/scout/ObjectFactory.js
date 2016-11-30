@@ -118,14 +118,17 @@ scout.ObjectFactory.prototype._createObjectByType = function(objectType, options
 };
 
 /**
- * Creates and initializes a new Scout object.
+ * Creates and initializes a new Scout object. When the created object has an init function, the
+ * model object is passed to that function. Otherwise the init call is omitted.
  *
  * @param objectType A string with the requested objectType. This argument is optional, but if it
  *                   is omitted, the argument "model" becomes mandatory and MUST contain a
- *                   property named "objectType".
+ *                   property named "objectType". If both, objectType and model, are set, the
+ *                   objectType parameter always wins before the model.objectType property.
  * @param model      The model object passed to the constructor function and to the init() method.
  *                   This argument is mandatory if it is the first argument, otherwise it is
- *                   optional (see above).
+ *                   optional (see above). This function may set/overwrite the properties 'id' and
+ *                   'objectType' on the model object.
  * @param options    Options object, see table below. This argument is optional.
  *
  * An error is thrown if the argument list does not match this definition.
@@ -138,20 +141,11 @@ scout.ObjectFactory.prototype._createObjectByType = function(objectType, options
  *                                          scoutClass without the model variant part if the initial
  *                                          objectType could not be resolved.
  *
- * initObject               true            If true, the init() method is called on the newly created
- *                                          scoutObject (with the model as argument).
- *
  * ensureUniqueId           true            Controls if the resulting object should be assigned the
- *                                          attribute "id" if it is not defined. If "initObject" is
- *                                          true, this also happens on the given model object, to
- *                                          allow the init() method to copy the attribute from the
- *                                          model to the scoutObject.
- *
- * ensureObjectType         true            Controls if the resulting object should be assigned the
- *                                          attribute "objectType" if it is not defined. If "initObject"
- *                                          is true, this also happens on the given model object, to
- *                                          allow the init() method to copy the attribute from the
- *                                          model to the scoutObject.
+ *                                          attribute "id" if it is not defined. If the created object has an
+ *                                          init() function, we also set the property 'id' on the model object
+ *                                          to allow the init() function to copy the attribute from the model
+ *                                          to the scoutObject.
  */
 scout.ObjectFactory.prototype.create = function(objectType, model, options) {
   // Normalize arguments
@@ -171,15 +165,12 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
 
   // Create object
   var scoutObject = this._createObjectByType(objectType, options);
-
-  if (scout.nvl(options.initObject, true)) {
+  if (scout.objects.isFunction(scoutObject.init)) {
     if (model) {
       if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
         model.id = this.createUniqueId();
       }
-      if (model.objectType === undefined && scout.nvl(options.ensureObjectType, true)) {
-        model.objectType = objectType;
-      }
+      model.objectType = objectType;
     }
     // Initialize object
     scoutObject.init(model);
@@ -188,7 +179,7 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
   if (scoutObject.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
     scoutObject.id = this.createUniqueId();
   }
-  if (scoutObject.objectType === undefined && scout.nvl(options.ensureObjectType, true)) {
+  if (scoutObject.objectType === undefined) {
     scoutObject.objectType = objectType;
   }
 

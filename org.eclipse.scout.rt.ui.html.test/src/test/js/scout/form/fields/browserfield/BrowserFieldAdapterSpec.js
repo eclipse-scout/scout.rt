@@ -21,7 +21,7 @@ describe('BrowserFieldAdapter', function() {
 
   it('sends postMessage on message', function() {
     var model = createSimpleModel('BrowserField', session, 'foo');
-    var adapter = scout.create('BrowserFieldAdapter', model);
+    var adapter = scout.create('BrowserFieldAdapter', createAdapterModel(model));
     var browserField = adapter.createWidget(model, session.desktop);
     browserField.render(session.$entryPoint);
 

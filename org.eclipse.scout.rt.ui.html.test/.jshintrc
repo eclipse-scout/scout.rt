@@ -32,6 +32,7 @@
     "registerAdapterData": false,
     "createSimpleModel": false,
     "linkWidgetAndAdapter": false,
-    "removePopups": false
+    "removePopups": false,
+    "createAdapterModel": false
   }
 }

@@ -115,7 +115,7 @@ scout.ModelAdapter.prototype._initProperties = function() {
  * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
  */
 scout.ModelAdapter.prototype._createWidget = function(model) {
-  var widget = scout.create(model.objectType, model);
+  var widget = scout.create(model);
   widget._addCloneProperties(['modelClass', 'classId']);
   return widget;
 };

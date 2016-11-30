@@ -100,8 +100,16 @@ scout.Widget.prototype._init = function(model) {
     if (isAdapterProperty) {
       value = this._prepareWidgetProperty(propertyName, value);
     }
-    this[propertyName] = value;
+    this._initProperty(propertyName, value);
   }.bind(this));
+};
+
+/**
+ * This function sets the property value. Override this function when you need special init behavior for certain properties.
+ * For instance you could not simply set the property value, but extend an already existing value.
+ */
+scout.Widget.prototype._initProperty = function(propertyName, value) {
+  this[propertyName] = value;
 };
 
 /**

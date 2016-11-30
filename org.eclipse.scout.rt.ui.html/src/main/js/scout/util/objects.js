@@ -194,6 +194,10 @@ scout.objects = {
     return obj === null || obj === undefined;
   },
 
+  isFunction: function(obj) {
+    return $.isFunction(obj);
+  },
+
   /**
    * Returns values from the given (map) object. By default only values of 'own' properties are returned.
    *

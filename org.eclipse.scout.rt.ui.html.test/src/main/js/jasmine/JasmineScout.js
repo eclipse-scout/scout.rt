@@ -168,6 +168,21 @@ function registerAdapterData(adapterDataArray, session) {
 }
 
 /**
+ * Returns a new object instance having two properties id, objectType from the given widgetModel.
+ * this function is required because the model object passed to the scout.create() function is modified
+ * --> model.objectType is changed to whatever string is passed as parameter objectType
+ *
+ * @param widgetModel
+ */
+function createAdapterModel(widgetModel) {
+  return {
+    id: widgetModel.id,
+    objectType: widgetModel.objectType,
+    session: widgetModel.session
+  };
+}
+
+/**
  * This function links and existing widget with a new adapter instance. This is useful for tests
  * where you have an existing widget and later create a new adapter instance to that widget.
  */

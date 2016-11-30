@@ -23,7 +23,6 @@ describe("GroupBox", function() {
     field.getForm = function() {
       return createSimpleModel('Form', session);
     };
-
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -105,6 +104,17 @@ describe("GroupBox", function() {
       groupBox.focus();
       expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(true);
     });
+  });
+
+  describe('default values', function() {
+
+    it('gridDataHints', function() {
+      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
+      var gdh = groupBox.gridDataHints;
+      expect(gdh.useUiHeight).toBe(true);
+      expect(gdh.w).toBe(scout.FormField.FULL_WIDTH);
+    });
+
   });
 
   describe('enabled', function() {

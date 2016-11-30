@@ -24,7 +24,9 @@ scout.FormField = function() {
   this.menus = [];
   this.menusVisible = false;
   this.gridData;
+  this.gridDataHints = scout.create('GridData');
   this.$label;
+  this.errorStatus;
 
   /**
    * Note the difference between $field and $fieldContainer:
@@ -112,6 +114,32 @@ scout.FormField.prototype._init = function(model) {
   this._syncGridData(this.gridData);
   this._syncEnabled(this.enabled);
   this._updateEmpty();
+};
+
+scout.FormField.prototype._initProperty = function(propertyName, value) {
+  if ('gridDataHints' === propertyName) {
+    this._initGridDataHints(value);
+  } else {
+    scout.FormField.parent.prototype._initProperty.call(this, propertyName, value);
+  }
+};
+
+/**
+ * This function <strong>extends</strong> the default grid data hints of the form field.
+ * The default values for grid data hints are set in the constructor of the FormField and its subclasses.
+ * When the given gridDataHints is a plain object, we extend our default values. When gridDataHints is
+ * already instanceof GridData we overwrite default values completely.
+ * @param gridDataHints
+ * @private
+ */
+scout.FormField.prototype._initGridDataHints = function(gridDataHints) {
+  if (gridDataHints instanceof scout.GridData) {
+    this.gridDataHints = gridDataHints;
+  } else if (scout.objects.isPlainObject(gridDataHints)) {
+    $.extend(this.gridDataHints, gridDataHints);
+  } else {
+    this.gridDataHints = gridDataHints;
+  }
 };
 
 /**

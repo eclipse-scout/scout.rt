@@ -106,27 +106,27 @@ describe('ObjectFactory', function() {
   });
 
   it('puts the object type to the resulting object', function() {
-    var model = {};
-    var object = scout.objectFactory.create('StringField', model, {
-      initObject: false
-    });
-    expect(model.objectType).toBeUndefined();
+    var model = {
+      parent: session.desktop
+      // objectType will be set
+    };
+    var object = scout.objectFactory.create('StringField', model);
+    expect(model.objectType).toBe('StringField');
     expect(object.objectType).toBe('StringField');
   });
 
   it('puts the object type to the resulting object', function() {
     var model = {
-      objectType: 'NumberField'
+      parent: session.desktop,
+      objectType: 'NumberField' // this objectType will be ignored
     };
-    var object = scout.objectFactory.create('StringField', model, {
-      initObject: false
-    });
+    var object = scout.objectFactory.create('StringField', model);
     expect(object instanceof scout.StringField).toBe(true);
-    expect(model.objectType).toBe('NumberField'); // no change, because initObject=false
+    expect(model.objectType).toBe('StringField');
     expect(object.objectType).toBe('StringField');
   });
 
-  it('throws an error if no explit type is specified', function() {
+  it('throws an error if no explicit type is specified', function() {
     expect(function() {
       scout.objectFactory.create(null, {
         objectType: 'NumberField'

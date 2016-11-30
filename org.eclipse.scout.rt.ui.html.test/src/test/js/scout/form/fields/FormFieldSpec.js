@@ -43,6 +43,40 @@ describe('FormField', function() {
 
   });
 
+  describe('_initProperty', function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = new scout.FormField();
+    });
+
+    it('gridDataHints are extended (not replaced) on init when gridDataHints is a plain object', function() {
+      var defaultGridDataHints = formField.gridDataHints;
+      expect(defaultGridDataHints instanceof scout.GridData).toBe(true);
+      // expect one of the many default values of scout.GridData
+      expect(defaultGridDataHints.fillHorizontal).toBe(true);
+
+      model.gridDataHints = {
+        fillHorizontal: false
+      };
+      formField.init(model);
+
+      // we expect to have still the same instance
+      expect(defaultGridDataHints).toBe(formField.gridDataHints);
+      // expect that the default gridDataHints property has been overridden with the property passed to the init function
+      expect(formField.gridDataHints.fillHorizontal).toBe(false);
+    });
+
+    it('gridDataHints are replaced when gridDataHints is instanceof GridData', function() {
+      var gridDataHints = new scout.GridData();
+      model.gridDataHints = gridDataHints;
+      formField.init(model);
+      expect(formField.gridDataHints).toBe(gridDataHints);
+    });
+
+  });
+
   describe('property label position', function() {
     var formField, model;
 
