@@ -27,6 +27,13 @@ scout.CarouselLayout.prototype.layout = function($container) {
     .subtract(this.carousel.htmlComp.getInsets())
     .subtract(this.carousel.htmlCompFilmstrip.getMargins());
 
+  if (this.carousel.statusEnabled && this.carousel.htmlCompStatus) {
+    var carouselStatusSize = this.carousel.htmlCompStatus.getSize().add(this.carousel.htmlCompStatus.getMargins());
+
+    filmstripSize.height -= carouselStatusSize.height;
+    itemSize.height -= carouselStatusSize.height;
+  }
+
   var $carouselItems = this.carousel.$carouselItems;
   filmstripSize.width = $carouselItems.length * filmstripSize.width;
   this.carousel.htmlCompFilmstrip.setSize(filmstripSize);
@@ -38,8 +45,9 @@ scout.CarouselLayout.prototype.layout = function($container) {
 };
 
 scout.CarouselLayout.prototype.preferredLayoutSize = function($container) {
-  if (this.carousel.currentIndex < this.carousel.$carouselItems.length && this.carousel.currentIndex >= 0) {
-    return scout.HtmlComponent.get(this.carousel.$carouselItems[this.carousel.currentIndex]).getPreferredSize();
-  }
-  return new scout.Dimension(1, 1);
+  var dim = (this.carousel.currentIndex < this.carousel.$carouselItems.length && this.carousel.currentIndex >= 0) ?
+    scout.HtmlComponent.get(this.carousel.$carouselItems[this.carousel.currentIndex]).getPreferredSize() :
+    new scout.Dimension(1, 1);
+  dim += this.carousel.htmlCompStatus.getSize().height;
+  return dim;
 };

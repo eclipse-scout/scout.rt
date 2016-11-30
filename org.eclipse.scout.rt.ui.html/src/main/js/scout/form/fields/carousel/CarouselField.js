@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.CarouselField = function() {
   scout.CarouselField.parent.call(this);
+  this.gridDataHints.weightY = 1.0;
+
   this._addAdapterProperties(['carousel']);
 };
 scout.inherits(scout.CarouselField, scout.FormField);

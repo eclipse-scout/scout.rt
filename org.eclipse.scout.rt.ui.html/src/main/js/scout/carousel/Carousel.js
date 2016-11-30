@@ -14,12 +14,17 @@ scout.Carousel = function() {
   this._addAdapterProperties(['widgets']);
 
   // default values
+  this.statusEnabled = true;
+  this.statusItemHtml = '&bull;';
   this.currentItem = 0; // current item
   this.moveThreshold = 0.25; // threshold
   this.widgets = []; // widgets
 
   this.$carouselFilmstrip; // carousel filmstrip
   this.$carouselItems = []; // carousel items
+  this.$carouselStatus; // carousel status bar (containing current position)
+  this.$carouselStatusItems = []; // carousel status items
+
   this.positionX = 0; // last translation position
 };
 scout.inherits(scout.Carousel, scout.Widget);
@@ -50,8 +55,19 @@ scout.Carousel.prototype._render = function($parent) {
 scout.Carousel.prototype._renderProperties = function() {
   scout.Carousel.parent.prototype._renderProperties.call(this);
 
+  this._renderStatusEnabled();
   this._renderWidgets();
   this._renderCurrentItem(); // must be called after renderWidgets
+};
+
+scout.Carousel.prototype._renderStatusEnabled = function() {
+  if (this.statusEnabled && !this.$carouselStatus) {
+    this.$carouselStatus = this.$container.appendDiv('carousel-status');
+    this.htmlCompStatus = scout.HtmlComponent.install(this.$carouselStatus, this.session);
+  }
+  else if (!this.statusEnabled && this.$carouselStatus) {
+    this.$carouselStatus.remove();
+  }
 };
 
 scout.Carousel.prototype.recalcTransformation = function() {
@@ -63,6 +79,14 @@ scout.Carousel.prototype.recalcTransformation = function() {
 
 scout.Carousel.prototype._renderCurrentItem = function() {
   this._renderItemsInternal(undefined, false);
+
+  this.$carouselStatusItems.forEach(function(e, i) {
+    if (i === this.currentItem) {
+      e.addClass('current-item');
+    } else {
+      e.removeClass('current-item');
+    }
+  }.bind(this));
 };
 
 scout.Carousel.prototype._renderItemsInternal = function(item, skipRemove) {
@@ -136,6 +160,16 @@ scout.Carousel.prototype._renderWidgets = function() {
     htmlComp.setLayout(new scout.SingleLayout());
     return $carouselItem;
   }, this);
+
+  if (this.$carouselStatus) {
+    this.$carouselItems.forEach(function() {
+      var $statusItem = this.$carouselStatus.appendDiv('status-item');
+      $statusItem.html(this.statusItemHtml);
+      this.$carouselStatusItems.push($statusItem);
+    }.bind(this));
+  }
+
+  // reset current item
   this.setCurrentItem(0);
 };
 
