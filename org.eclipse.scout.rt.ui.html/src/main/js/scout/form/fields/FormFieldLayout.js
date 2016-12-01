@@ -229,10 +229,10 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       prefSize = htmlField.getPreferredSize()
         .add(htmlContainer.getInsets())
         .add(htmlField.getMargins());
-      prefSize.height += topLabelHeight;
     } else {
       prefSize = this.naturalSize(formField);
     }
+    prefSize.height += topLabelHeight;
   } else {
     prefSize = new scout.Dimension(0, 0);
   }
