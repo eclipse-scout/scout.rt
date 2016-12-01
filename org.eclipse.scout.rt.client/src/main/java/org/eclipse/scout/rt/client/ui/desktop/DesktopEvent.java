@@ -68,6 +68,11 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_NOTIFICATION_REMOVED = 1050;
 
   /**
+   * Event type to trigger a GUI reload.
+   */
+  public static final int TYPE_RELOAD_GUI = 1060;
+
+  /**
    * Event type to request the desktop's geographic position..
    */
   public static final int TYPE_REQUEST_GEOLOCATION = 110;

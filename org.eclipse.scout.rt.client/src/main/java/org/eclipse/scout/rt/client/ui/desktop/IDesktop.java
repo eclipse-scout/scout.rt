@@ -656,6 +656,13 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
   boolean isGuiAvailable();
 
   /**
+   * Triggers a reload of the current UI.
+   * 
+   * @since 6.1
+   */
+  void reloadGui();
+
+  /**
    * This method is used internally within the framework.
    * <p>
    * Called before the desktop gets into its closing state, i.e. the desktop just received a request to close itself.

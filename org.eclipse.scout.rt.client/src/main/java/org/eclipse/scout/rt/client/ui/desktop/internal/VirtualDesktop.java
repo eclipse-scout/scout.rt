@@ -578,6 +578,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void reloadGui() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void setTitle(String s) {
     throw createUnsupportedOperationException();
   }

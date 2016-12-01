@@ -197,6 +197,11 @@ public interface IUiSession {
   void sendDisposeAdapterEvent(IJsonAdapter<?> adapter);
 
   /**
+   * Sends a reload page event to trigger a page reload.
+   */
+  void sendReloadPageEvent();
+
+  /**
    * Sets the new theme (session & cookie) and triggers a reload of the current page in the browser.
    */
   void updateTheme(String theme);

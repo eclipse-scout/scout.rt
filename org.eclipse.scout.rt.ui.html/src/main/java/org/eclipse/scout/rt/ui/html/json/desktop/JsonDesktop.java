@@ -391,6 +391,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       case DesktopEvent.TYPE_REQUEST_GEOLOCATION:
         handleRequestGeolocation(event);
         break;
+      case DesktopEvent.TYPE_RELOAD_GUI:
+        handleModelReloadGui();
+        break;
       default:
         // NOP
     }
@@ -512,6 +515,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   protected void handleModelDesktopClosed() {
     // No need to dispose the JsonDesktop. It is disposed automatically
     // when the JsonClientSession is disposed.
+  }
+
+  protected void handleModelReloadGui() {
+    getUiSession().sendReloadPageEvent();
   }
 
   protected List<JsonEvent> addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent, int position) {

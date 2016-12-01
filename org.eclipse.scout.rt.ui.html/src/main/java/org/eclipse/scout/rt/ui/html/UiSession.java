@@ -59,8 +59,8 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
+import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
@@ -1125,7 +1125,8 @@ public class UiSession implements IUiSession {
     LOG.info("UI theme changed to: {}", theme);
   }
 
-  protected void sendReloadPageEvent() {
+  @Override
+  public void sendReloadPageEvent() {
     m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE);
   }
 

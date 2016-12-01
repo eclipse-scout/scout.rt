@@ -1580,6 +1580,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public void reloadGui() {
+    fireReloadGUI();
+  }
+
+  @Override
   public boolean isGeolocationServiceAvailable() {
     return propertySupport.getPropertyBool(PROP_GEOLOCATION_SERVICE_AVAILABLE);
   }
@@ -1836,6 +1841,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireNotification(int eventType, IDesktopNotification notification) {
     DesktopEvent e = new DesktopEvent(this, eventType, notification);
+    fireDesktopEvent(e);
+  }
+
+  private void fireReloadGUI() {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_RELOAD_GUI);
     fireDesktopEvent(e);
   }
 
