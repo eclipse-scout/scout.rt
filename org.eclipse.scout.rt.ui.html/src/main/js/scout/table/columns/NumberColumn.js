@@ -10,6 +10,10 @@
  ******************************************************************************/
 scout.NumberColumn = function() {
   scout.NumberColumn.parent.call(this);
+  // FIXME CGU move code for aggrFun and backgroundEffect from column.js to numberColumn.js?
+  this.aggregationFunction = 'sum';
+  this.backgroundEffect;
+  this.decimalFormat;
   this.filterType = 'NumberColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
 };

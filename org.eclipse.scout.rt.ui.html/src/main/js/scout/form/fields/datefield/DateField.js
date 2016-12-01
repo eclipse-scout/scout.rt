@@ -11,9 +11,16 @@
 scout.DateField = function() {
   scout.DateField.parent.call(this);
 
+  this.autoTimestamp;
+  this.dateFormatPattern;
+  this.disabledCopyOverlay = true;
   this.hasDate = true;
   this.hasTime = false;
-  this.disabledCopyOverlay = true;
+  this.oldDisplayText = '';
+  this.popup;
+  this.timestamp = null;
+  this.timestampAsDate;
+  this.timeFormatPattern;
 
   this.$dateField;
   this.$timeField;
@@ -32,9 +39,6 @@ scout.DateField = function() {
   // has to be set again. Therefore, we have to store it in a private variable.
   this._modelErrorStatus = null;
 
-  this.popup;
-  this.oldDisplayText = '';
-  this.timestamp = null;
   this._addCloneProperties(['timestamp', 'timestampAsDate', 'hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern']);
 };
 scout.inherits(scout.DateField, scout.ValueField);

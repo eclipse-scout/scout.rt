@@ -16,9 +16,12 @@
 scout.Tree = function() {
   scout.Tree.parent.call(this);
 
-  this.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
+  this.autoToggleBreadcrumbStyle = false;
   this.autoCheckChildren = false;
   this.checkable = false;
+  this.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
+  this.dropType = 0;
+  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.enabled = true;
   this.filterEnabled = false;
   this.lazyExpandingEnabled = true;

@@ -12,13 +12,15 @@ scout.Button = function() {
   scout.Button.parent.call(this);
   this._addAdapterProperties(['menus']);
 
-  this.systemType = scout.Button.SystemType.NONE;
   this.defaultButton = false;
+  this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
+  this.gridDataHints.fillHorizontal = false;
+  this.iconId;
+  this.keyStroke;
   this.processButton = true;
   this.selected = false;
-  this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
-  this.keyStroke;
   this.statusVisible = false;
+  this.systemType = scout.Button.SystemType.NONE;
 
   this.$buttonLabel;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);

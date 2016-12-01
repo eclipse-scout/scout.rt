@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
+  this.autoFit = false;
   this.scrollBarEnabled = false;
 };
 scout.inherits(scout.ImageField, scout.FormField);

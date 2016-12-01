@@ -10,6 +10,9 @@
  ******************************************************************************/
 scout.DateColumn = function() {
   scout.DateColumn.parent.call(this);
+  this.format;
+  this.groupFormat;
+  this.groupFormatFormatter;
   this.hasDate = true;
   this.hasTime = false;
   this.filterType = 'DateColumnUserFilter';

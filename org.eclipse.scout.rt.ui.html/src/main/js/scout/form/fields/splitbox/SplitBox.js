@@ -14,8 +14,11 @@ scout.SplitBox = function() {
 
   this.fieldCollapsed = false;
   this.collapsibleField;
-  this.splitHorizontal; // true = split x-axis, false = split y-axis
-  this._collapseKeyStroke;
+  this.collapseKeyStroke;
+  this.splitHorizontal = true; // true = split x-axis, false = split y-axis
+  this.splitterEnabled = true;
+  this.splitterPosition = 0.5;
+  this.splitterPositionType = scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE;
 
   this._$splitArea;
   this._$splitter;

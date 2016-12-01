@@ -10,6 +10,17 @@
  ******************************************************************************/
 scout.MessageBox = function() {
   scout.MessageBox.parent.call(this);
+
+  this.iconId;
+  this.severity;
+  this.body;
+  this.cancelButtonText;
+  this.copyPasteText;
+  this.header;
+  this.hiddenText;
+  this.html;
+  this.noButtonText;
+  this.yesButtonText;
   this.$container;
   this.$content;
   this.$header;

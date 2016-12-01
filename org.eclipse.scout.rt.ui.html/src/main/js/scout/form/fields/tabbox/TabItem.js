@@ -10,10 +10,11 @@
  ******************************************************************************/
 scout.TabItem = function() {
   scout.TabItem.parent.call(this);
+  this.marked = false;
+  this.selectionKeystroke;
   this.$tabContainer;
   this._tabRendered = false;
   this._tabActive = false;
-  this.selectionKeystroke;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 

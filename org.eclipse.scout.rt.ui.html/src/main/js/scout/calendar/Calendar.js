@@ -12,6 +12,19 @@
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
+  this.displayMode;
+  this.displayCondensed;
+  this.loadInProgress;
+  this.markNoonHour = true;
+  this.markOutOfMonthDays = true;
+  this.selectedDate;
+  this.showDisplayModeSelection = true;
+  this.startHour = 6;
+  this.endHour = 19;
+  this.title;
+  this.useOverflowCells = true;
+  this.viewRange;
+
   // main elements
   this.$container;
   this.$header;

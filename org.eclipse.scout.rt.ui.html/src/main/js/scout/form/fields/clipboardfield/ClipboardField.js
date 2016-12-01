@@ -11,6 +11,8 @@
 scout.ClipboardField = function() {
   scout.ClipboardField.parent.call(this);
 
+  this.dropType = 0;
+  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this._fileUploadWaitRetryCountTimeout = 99;
   this._fullSelectionLength = 0;
 };

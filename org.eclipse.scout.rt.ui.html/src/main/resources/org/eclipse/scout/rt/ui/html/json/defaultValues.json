@@ -11,6 +11,7 @@
 
     // Model adapters
     "FormField": {
+      "disabledStyle": 0,
       "enabled": true,
       "visible": true,
       "keyStrokes": [],
@@ -71,6 +72,9 @@
       "keyStroke": null,
       "statusVisible": false
     },
+    "CheckBoxField": {
+      "triStateEnabled": false
+    },
     "Graph": {
       "graphDepth": 1,
       "toolbarVisible": false
@@ -84,21 +88,44 @@
       "expanded": true,
       "fields": []
     },
+    "TabItem": {
+      "marked": false
+    },
+    "Calendar": {
+      "markNoonHour": true,
+      "markOutOfMonthDays": true,
+      "showDisplayModeSelection": true,
+      "startHour": 6,
+      "endHour": 19,
+      "useOverflowCells": true
+    },
+    "ClipboardField": {
+      "dropType": 0,
+      "dropMaximumSize": 52428800
+    },
     "PlannerField": {
       "splitterPosition": 168
     },
     "Planner": {
+      "activitySelectable": false,
       "availableDisplayModes": [],
+      "headerVisible": true,
       "resources": [],
-      "viewRange": {},
+      "selectionMode": 2,
       "selectionRange": {},
-      "selectedResources": []
+      "selectedResources": [],
+      "viewRange": {}
     },
     "Resource": {
       "activities": []
     },
     "Activity": {
       "level": 0.0
+    },
+    "LabelField": {
+      "htmlEnabled": false,
+      "selectable": true,
+      "wrapText": false
     },
     "SequenceBox": {
       "fields": []
@@ -110,13 +137,25 @@
     },
     "SplitBox": {
       "fieldCollapsed": false,
-      "collapsibleField": null
+      "collapsibleField": null,
+      "splitHorizontal": true,
+      "splitterEnabled": true,
+      "splitterPosition": 0.5,
+      "splitterPositionType": "relative"
     },
     "StringField": {
+      "dropType": 0,
+      "dropMaximumSize": 52428800,
+      "hasAction": false,
       "inputMasked": false,
+      "maxLength": 4000,
       "multilineText": false,
+      "selectionTrackingEnabled": false,
+      "selectionStart": 0,
+      "selectionEnd": 0,
+      "trimText": true,
       "updateDisplayTextOnModify": false,
-      "maxLength": 4000
+      "wrapText": false
     },
     "WrappedFormField": {
       "initialFocusEnabled": false
@@ -131,12 +170,14 @@
       "columnAddable": false,
       "enabled": true,
       "dropType": 0,
+      "dropMaximumSize": 52428800,
       "filters": [],
       "hasReloadHandler": false,
       "headerEnabled": true,
       "headerVisible": true,
       "keyStrokes": [],
       "keyboardNavigation": true,
+      "loading": false,
       "menus": [],
       "multiCheck": true,
       "multiSelect": true,
@@ -191,7 +232,10 @@
       "toggleAction": true
     },
     "Tree": {
+      "autoToggleBreadcrumbStyle": false,
       "displayStyle": "default",
+      "dropType": 0,
+      "dropMaximumSize": 52428800,
       "autoCheckChildren": false,
       "checkable": false,
       "enabled": true,
@@ -204,6 +248,9 @@
       "lazyExpandingEnabled": true
     },
     "ImageField": {
+      "autoFit": false,
+      "dropType": 0,
+      "dropMaximumSize": 52428800,
       "scrollBarEnabled": false
     },
     "HtmlField": {
@@ -211,7 +258,10 @@
       "preventInitialFocus": true
     },
     "BrowserField": {
-      "scrollBarEnabled": false
+      "autoCloseExternalWindow": false,
+      "sandboxEnabled": true,
+      "scrollBarEnabled": false,
+      "showInExternalWindow": false
     },
     "BeanField": {
       "preventInitialFocus": true
@@ -257,7 +307,12 @@
       "uiSortPossible": true
     },
     "NumberColumn": {
-      "uiSortPossible": true
+      "uiSortPossible": true,
+      "aggregationFunction": "sum"
+    },
+    "BooleanColumn": {
+      "horizontalAlignment": 0,
+      "triStateEnabled": false
     },
     "TreeNode": {
       "checked": false,
@@ -299,6 +354,7 @@
         "BeanField": null,
         "CheckBoxField": null,
         "CalendarField": null,
+        "ClipboardField": null,
         "DateField": null,
         "FileChooserField": null,
         "HtmlField": null,

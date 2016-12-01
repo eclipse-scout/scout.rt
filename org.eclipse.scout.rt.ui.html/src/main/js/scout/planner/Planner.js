@@ -11,13 +11,19 @@
 scout.Planner = function() {
   scout.Planner.parent.call(this);
 
-  this.resourceMap = [];
   this.activityMap = [];
+  this.activitySelectable = false;
   this.availableDisplayModes = [];
+  this.displayMode;
+  this.displayModeOptions = {};
+  this.headerVisible = true;
+  this.label;
   this.resources = [];
-  this.viewRange = {};
+  this.resourceMap = [];
+  this.selectionMode = scout.Planner.SelectionMode.MULTI_RANGE;
   this.selectionRange = new scout.DateRange();
   this.selectedResources = [];
+  this.viewRange = {};
 
   // visual
   this._resourceTitleWidth = 20;

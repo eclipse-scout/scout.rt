@@ -17,6 +17,8 @@ scout.dragAndDrop = {
     IMAGE_TRANSFER: 1 << 3 // IDNDSupport.TYPE_IMAGE_TRANSFER (NOSONAR)
   },
 
+  DEFAULT_DROP_MAXIMUM_SIZE: 50 * 1024 * 1024, // 50 MB
+
   /**
    * Mapping function from scout drag types to browser drag types.
    *

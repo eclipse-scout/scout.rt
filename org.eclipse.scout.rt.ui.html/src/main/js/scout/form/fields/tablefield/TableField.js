@@ -10,13 +10,14 @@
  ******************************************************************************/
 scout.TableField = function() {
   scout.TableField.parent.call(this);
-  this._addAdapterProperties(['table']);
 
+  this.gridDataHints.weightY = 1.0;
   this._tableChangedHandler;
   this._deletedRows = [];
   this._insertedRows = [];
   this._updatedRows = [];
   this._checkedRows = [];
+  this._addAdapterProperties(['table']);
 };
 scout.inherits(scout.TableField, scout.FormField);
 

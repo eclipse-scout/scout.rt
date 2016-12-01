@@ -14,9 +14,10 @@
  */
 scout.BooleanColumn = function() {
   scout.BooleanColumn.parent.call(this);
-  this.minWidth = scout.Column.NARROW_MIN_WIDTH;
-  this.filterType = 'ColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
+  this.filterType = 'ColumnUserFilter';
+  this.horizontalAlignment = 0;
+  this.minWidth = scout.Column.NARROW_MIN_WIDTH;
   this.triStateEnabled = false;
 };
 scout.inherits(scout.BooleanColumn, scout.Column);

@@ -11,10 +11,17 @@
 scout.StringField = function() {
   scout.StringField.parent.call(this);
 
+  this.format;
+  this.hasAction = false;
   this.inputMasked = false;
-  this.multilineText = false;
-  this.updateDisplayTextOnModify = false;
   this.maxLength = 4000;
+  this.multilineText = false;
+  this.selectionStart = 0;
+  this.selectionEnd = 0;
+  this.selectionTrackingEnabled = false;
+  this.trimText = true;
+  this.updateDisplayTextOnModify = false;
+  this.wrapText = false;
 
   this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
 };

@@ -10,6 +10,9 @@
  ******************************************************************************/
 scout.LabelField = function() {
   scout.LabelField.parent.call(this);
+  this.htmlEnabled = false;
+  this.selectable = true;
+  this.wrapText = false;
 };
 scout.inherits(scout.LabelField, scout.ValueField);
 

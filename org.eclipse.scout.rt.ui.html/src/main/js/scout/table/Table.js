@@ -11,10 +11,11 @@
 scout.Table = function() {
   scout.Table.parent.call(this);
 
-  this.rowIconVisible = false;
   this.autoResizeColumns = false;
   this.columnAddable = false;
   this.checkable = false;
+  this.dropType = 0;
+  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.enabled = true;
   this.headerEnabled = true;
   this.headerVisible = true;
@@ -26,7 +27,6 @@ scout.Table = function() {
   this.multiCheck = true;
   this.multiSelect = true;
   this.multilineText = false;
-  this.rows = [];
   this.scrollToSelection = false;
   this.scrollTop = 0;
   this.selectedRows = [];
@@ -36,11 +36,13 @@ scout.Table = function() {
   this.footerVisible = false;
   this.filters = [];
   this.columns = [];
+  this.rows = [];
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
   this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
   this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
+  this.rowIconVisible = false;
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this.header;

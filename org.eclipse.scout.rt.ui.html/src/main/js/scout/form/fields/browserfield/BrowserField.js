@@ -11,6 +11,13 @@
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
 
+  this.autoCloseExternalWindow = false;
+  this.externalWindowButtonText;
+  this.externalWindowFieldText;
+  this.location;
+  this.sandboxEnabled = true;
+  this.scrollBarEnabled = false;
+  this.showInExternalWindow = false;
   this._messageListener;
   this._popupWindow;
   this._externalWindowTextField;

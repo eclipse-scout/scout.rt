@@ -14,6 +14,8 @@
  */
 scout.FormField = function() {
   scout.FormField.parent.call(this);
+  this.dropType = 0;
+  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.keyStrokes = [];
   this.labelVisible = true;
   this.labelPosition = scout.FormField.LABEL_POSITION_DEFAULT;
