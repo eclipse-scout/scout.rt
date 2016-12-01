@@ -36,6 +36,7 @@ scout.PopupWithHead.prototype._render = function($parent) {
   this.$parent.window().on('resize', this.resizeHandler);
 
   this.$body = this._$createNewBody();
+  scout.HtmlComponent.install(this.$body, this.session);
   if (this._headVisible) {
     this._renderHead();
   }
