@@ -42,7 +42,7 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
     super.initConfig();
     setChartInternal(createChart());
     // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+    addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_chart == null) {
