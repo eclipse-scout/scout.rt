@@ -13,15 +13,31 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
+
 /**
  * @since 5.2
  */
 public class ChartValueGroupBean implements IChartValueGroupBean {
   private static final long serialVersionUID = 1L;
 
+  private Object m_groupKey;
   private String m_groupName;
   private final List<BigDecimal> m_values = new ArrayList<BigDecimal>();
   private String m_colorHexValue = null;
+  private String m_cssClass = null;
+
+  @Override
+  @IgnoreProperty
+  public Object getGroupKey() {
+    return m_groupKey;
+  }
+
+  @Override
+  @IgnoreProperty
+  public void setGroupKey(Object groupKey) {
+    m_groupKey = groupKey;
+  }
 
   @Override
   public String getGroupName() {
@@ -46,5 +62,15 @@ public class ChartValueGroupBean implements IChartValueGroupBean {
   @Override
   public void setColorHexValue(String colorHexValue) {
     m_colorHexValue = colorHexValue;
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    m_cssClass = cssClass;
   }
 }

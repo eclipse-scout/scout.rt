@@ -18,6 +18,10 @@ import java.util.List;
  */
 public interface IChartValueGroupBean extends Serializable {
 
+  Object getGroupKey();
+
+  void setGroupKey(Object groupKey);
+
   String getGroupName();
 
   void setGroupName(String groupName);
@@ -27,4 +31,8 @@ public interface IChartValueGroupBean extends Serializable {
   String getColorHexValue();
 
   void setColorHexValue(String colorHexValue);
+
+  String getCssClass();
+
+  void setCssClass(String cssClass);
 }
