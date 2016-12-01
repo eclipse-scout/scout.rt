@@ -17,6 +17,7 @@
   __include("scout/util/strings.js");
   __include("scout/util/Device.js");
   __include("scout/util/strings.js");
+  __include("scout/util/objects.js");
   __include("scout/logging/logging.js");
   __include("scout/logging/NullLogger.js");
   __include("scout/util/URL.js");
