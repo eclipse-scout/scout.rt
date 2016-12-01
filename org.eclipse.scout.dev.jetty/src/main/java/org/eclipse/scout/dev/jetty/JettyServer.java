@@ -50,7 +50,7 @@ public class JettyServer {
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
   public static final String WEB_APP_CONTEXT_PATH = "scout.jetty.webapp.contextpath";
-  public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.server.services.common.clustersync.ClusterSynchronizationService.createNodeId()
+  public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.platform.context.NodeIdentifier.compute()
 
   public static void main(String[] args) throws Exception {
     new JettyServer().start();
