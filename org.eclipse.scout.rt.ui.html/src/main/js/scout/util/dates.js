@@ -434,6 +434,14 @@ scout.dates = {
     return dateFormat.format(date);
   },
 
+  /**
+   * Uses the default date and time format patterns from the locale to format the given date.
+   */
+  formatDateTime: function(date, locale, pattern) {
+    var dateFormat = new scout.DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
+    return dateFormat.format(date);
+  },
+
   compare: function(a, b) {
     if (!a && !b) {
       return 0;

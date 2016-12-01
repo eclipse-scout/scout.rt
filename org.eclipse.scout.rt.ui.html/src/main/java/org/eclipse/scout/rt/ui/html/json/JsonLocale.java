@@ -68,9 +68,13 @@ public class JsonLocale implements IJsonObject {
     JSONObject json = new JSONObject();
     DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
     SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
+    DateFormatProvider dateFormatProvider = BEANS.get(DateFormatProvider.class);
+    String dateFormatPattern = dateFormatProvider.getDateFormatPattern(DateFormatProvider.PATTERN_STYLE_ISOLATED_DATE, locale);
+    String timeFormatPattern = dateFormatProvider.getDateFormatPattern(DateFormatProvider.PATTERN_STYLE_ISOLATED_TIME, locale);
     json.put("languageTag", locale.toLanguageTag());
     json.put("decimalFormatPatternDefault", defaultDecimalFormat.toPattern());
-    json.put("dateFormatPatternDefault", defaultDateFormat.toPattern());
+    json.put("dateFormatPatternDefault", dateFormatPattern);
+    json.put("timeFormatPatternDefault", timeFormatPattern);
     json.put("decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
     json.put("dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
     return json;

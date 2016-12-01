@@ -12,6 +12,7 @@ scout.Locale = function(model) {
   this.languageTag = model.languageTag;
   this.decimalFormatPatternDefault = model.decimalFormatPatternDefault;
   this.decimalFormatSymbols = model.decimalFormatSymbols;
+  this.timeFormatPatternDefault = model.timeFormatPatternDefault;
 
   if (this.decimalFormatPatternDefault && this.decimalFormatSymbols) {
     this.decimalFormat = new scout.DecimalFormat(model);
