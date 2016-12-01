@@ -61,7 +61,7 @@ scout.MessageBox.prototype._initKeyStrokeContext = function() {
     new scout.ClickActiveElementKeyStroke(this, [
       scout.keys.SPACE, scout.keys.ENTER
     ]),
-    new scout.CloseKeyStroke(this, function() {
+    new scout.AbortKeyStroke(this, function() {
       return this._$abortButton;
     }.bind(this))
   ]);

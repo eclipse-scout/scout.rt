@@ -92,6 +92,7 @@
   __include("scout/keystroke/ClickActiveElementKeyStroke.js");
   __include("scout/keystroke/FocusAdjacentElementKeyStroke.js");
   __include("scout/keystroke/CloseKeyStroke.js");
+  __include("scout/keystroke/AbortKeyStroke.js");
   __include("scout/keystroke/TabItemKeyStroke.js");
   // Misc. elements
   __include("scout/boxbuttons/BoxButtons.js");
