@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -357,6 +358,20 @@ public class CollectionUtilityTest {
     assertTrue(map.isEmpty());
     map.put(1, "I love Scout");
     assertFalse(map.isEmpty());
+  }
+
+  @Test
+  public void testIsEmpty() {
+    assertTrue(CollectionUtility.isEmpty((Map<?, ?>) null));
+    assertTrue(CollectionUtility.isEmpty((Collection<?>) null));
+    assertTrue(CollectionUtility.isEmpty(new HashMap<String, String>()));
+    assertTrue(CollectionUtility.isEmpty(new ArrayList()));
+    assertFalse(CollectionUtility.isEmpty(CollectionUtility.arrayList("a")));
+    assertFalse(CollectionUtility.isEmpty(CollectionUtility.arrayList("a", "b")));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("a", "b");
+    assertFalse(CollectionUtility.isEmpty(map));
   }
 
   private List<Object> createList(Object... elements) {

@@ -702,6 +702,10 @@ public final class CollectionUtility {
     return list;
   }
 
+  public static boolean isEmpty(Map<?, ?> m) {
+    return m == null || m.isEmpty();
+  }
+
   public static boolean isEmpty(Collection<?> c) {
     return c == null || c.isEmpty();
   }
