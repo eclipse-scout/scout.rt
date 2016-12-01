@@ -21,6 +21,7 @@ scout.mimeTypes = {
   IMAGE_JPEG: 'image/jpeg',
   IMAGE_GIF: 'image/gif',
 
-  JSON: 'application/json'
+  JSON: 'application/json',
+  ZIP: 'application/zip'
 
 };
