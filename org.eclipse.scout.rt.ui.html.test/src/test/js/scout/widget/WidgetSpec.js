@@ -550,6 +550,59 @@ describe('Widget', function() {
       expect(widget.$container).toHaveClass('xy');
     });
 
+    describe("addCssClass", function() {
+
+      it("adds the cssClass to the existing classes", function() {
+        var widget = createWidget({
+          parent: parent
+        });
+        widget.render(session.$entryPoint);
+        widget.addCssClass('custom-class');
+        expect(widget.$container).toHaveClass('custom-class');
+
+        widget.addCssClass('another-class');
+        expect(widget.cssClass).toBe('custom-class another-class');
+        expect(widget.$container).toHaveClass('custom-class');
+        expect(widget.$container).toHaveClass('another-class');
+      });
+
+      it("does not add the same class multiple times", function() {
+        var widget = createWidget({
+          parent: parent
+        });
+        widget.render(session.$entryPoint);
+        widget.addCssClass('custom-class');
+        expect(widget.cssClass).toBe('custom-class');
+
+        widget.addCssClass('custom-class');
+        expect(widget.cssClass).toBe('custom-class');
+      });
+
+    });
+
+    describe("removeCssClass", function() {
+
+      it("removes the cssClass from the existing classes", function() {
+        var widget = createWidget({
+          parent: parent
+        });
+        widget.render(session.$entryPoint);
+        widget.setCssClass('cls1 cls2 cls3');
+        expect(widget.$container).toHaveClass('cls1');
+        expect(widget.$container).toHaveClass('cls2');
+        expect(widget.$container).toHaveClass('cls3');
+
+        widget.removeCssClass('cls2');
+        expect(widget.cssClass).toBe('cls1 cls3');
+        expect(widget.$container).toHaveClass('cls1');
+        expect(widget.$container).not.toHaveClass('cls2');
+        expect(widget.$container).toHaveClass('cls3');
+
+        widget.removeCssClass('cls1 cls3');
+        expect(widget.cssClass).toBe('');
+      });
+
+    });
   });
 
 });

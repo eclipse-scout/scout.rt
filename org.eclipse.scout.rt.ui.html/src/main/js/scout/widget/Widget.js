@@ -548,6 +548,27 @@ scout.Widget.prototype.setCssClass = function(cssClass) {
   this.setProperty('cssClass', cssClass);
 };
 
+scout.Widget.prototype.addCssClass = function(cssClass) {
+  var cssClasses = this.cssClassAsArray();
+  if (cssClasses.indexOf(cssClass) >= 0) {
+    return;
+  }
+  cssClasses.push(cssClass);
+  this.setProperty('cssClass', scout.arrays.format(cssClasses, ' '));
+};
+
+scout.Widget.prototype.removeCssClass = function(cssClass) {
+  var cssClasses = this.cssClassAsArray();
+  var cssClassesToRemove = scout.Widget.cssClassAsArray(cssClass);
+  if (scout.arrays.removeAll(cssClasses, cssClassesToRemove)) {
+    this.setProperty('cssClass', scout.arrays.format(cssClasses, ' '));
+  }
+};
+
+scout.Widget.prototype.cssClassAsArray = function() {
+  return scout.Widget.cssClassAsArray(this.cssClass);
+};
+
 /**
  * Creates nothing by default. If a widget needs loading support, override this method and return a loading support.
  */
@@ -1244,4 +1265,15 @@ scout.Widget.getWidgetFor = function($elem) {
     $elem = $elem.parent();
   }
   return null;
+};
+
+scout.Widget.cssClassAsArray = function(cssClass) {
+  var cssClasses = [],
+    cssClassesStr = cssClass || '';
+
+  cssClassesStr = cssClassesStr.trim();
+  if (cssClassesStr.length > 0) {
+    cssClasses = cssClassesStr.split(' ');
+  }
+  return cssClasses;
 };
