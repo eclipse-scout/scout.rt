@@ -72,7 +72,7 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractContextM
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     super.handleOwnerPropertyChanged(evt);
-    if (IFormField.PROP_ENABLED.equals(evt.getPropertyName())) {
+    if (IFormField.PROP_ENABLED_COMPUTED.equals(evt.getPropertyName())) {
       handleOwnerEnabledChanged();
     }
   }

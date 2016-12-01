@@ -506,8 +506,9 @@ scout.FormField.prototype.focus = function() {
 };
 
 scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
-  this.enabledComputed = this.enabled && parentEnabled;
+  this.setProperty('enabledComputed', this.enabled && parentEnabled);
 
+  // Manually call _renderEnabled(), because _renderEnabledComputed() does not exist
   if (this.rendered) {
     this._renderEnabled(); // refresh
   }

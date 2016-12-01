@@ -77,6 +77,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_PARENT_FIELD = "parentField";
   String PROP_VISIBLE = "visible";
   String PROP_ENABLED = "enabled";
+  String PROP_ENABLED_COMPUTED = "enabledComputed";
   String PROP_MANDATORY = "mandatory";
   String PROP_ORDER = "order";
   String PROP_ERROR_STATUS = "errorStatus";

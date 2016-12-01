@@ -105,11 +105,12 @@ scout.ButtonAdapterMenu.adaptButtonProperties = function(buttonProperties, menuP
   menuProperties = menuProperties || {};
 
   // Plain properties: simply copy, no translation required
-  ['enabled', 'visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'modelClass', 'classId'].forEach(function(prop) {
+  ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'modelClass', 'classId'].forEach(function(prop) {
     menuProperties[prop] = buttonProperties[prop];
   });
 
   // Properties requiring special handling (non-trivial mapping)
+  menuProperties.enabled = buttonProperties.enabledComputed;
   menuProperties.text = buttonProperties.label;
   menuProperties.horizontalAlignment = (buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined);
   menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);

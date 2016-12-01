@@ -162,7 +162,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
     setTreeInternal(tree);
     // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+    addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_tree == null) {

@@ -152,7 +152,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     super.initConfig();
     setTableInternal(createTable());
     // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+    addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent e) {
         if (m_table == null) {

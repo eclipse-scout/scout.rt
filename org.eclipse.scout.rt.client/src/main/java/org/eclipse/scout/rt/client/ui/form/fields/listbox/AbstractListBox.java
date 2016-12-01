@@ -343,7 +343,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         }
 
         String name = e.getPropertyName();
-        if (PROP_ENABLED.equals(name)) {
+        if (PROP_ENABLED_COMPUTED.equals(name)) {
           boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
           m_table.setEnabled(newEnabled);
         }

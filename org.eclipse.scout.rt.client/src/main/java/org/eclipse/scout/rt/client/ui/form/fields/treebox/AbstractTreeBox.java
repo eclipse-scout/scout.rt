@@ -363,7 +363,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         }
 
         String name = e.getPropertyName();
-        if (PROP_ENABLED.equals(name)) {
+        if (PROP_ENABLED_COMPUTED.equals(name)) {
           boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
           m_tree.setEnabled(newEnabled);
         }
