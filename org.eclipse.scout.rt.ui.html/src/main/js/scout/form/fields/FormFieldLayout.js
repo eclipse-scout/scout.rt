@@ -131,7 +131,11 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     formField.$field.toggleClass('compact', fieldBounds.width < scout.FormFieldLayout.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
-      formField.$label.cssWidth(fieldSize.add(fieldMargins).width - formField.$label.cssMarginX());
+      var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
+      if (formField.$mandatory) {
+        fieldWidth += formField.$mandatory.outerWidth(true);
+      }
+      formField.$label.cssWidth(fieldWidth);
     }
   }
 
