@@ -10,22 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.exceptionhandler;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.MalformedURLException;
-import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.security.GeneralSecurityException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -38,161 +41,186 @@ import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 public class ErrorPopup {
 
   private final AtomicBoolean m_parsed = new AtomicBoolean();
-  protected String m_title;
-  protected String m_text;
-  protected String m_detail;
-  protected IHtmlContent m_htmlDetail;
-  protected String m_acceptText;
-  protected ProcessingException m_cause;
+
+  protected String m_header;
+  protected String m_body;
+  protected IHtmlContent m_html;
+  protected String m_yesButtonText;
+  protected String m_noButtonText;
+  protected boolean m_reloadOnYesClick;
+  protected Throwable m_parsedError;
+  protected IStatus m_status;
 
   /**
-   * Opens the popup to desribe the error.
+   * Opens the popup to describe the error.
    */
   public void showMessageBox(Throwable error) {
     ensureErrorParsed(error);
 
-    MessageBoxes.create()
-        .withHeader(m_text)
-        .withBody(m_detail)
-        .withHtml(m_htmlDetail)
-        .withYesButtonText(m_acceptText)
-        .withSeverity(m_cause.getStatus().getSeverity())
+    int result = MessageBoxes.create()
+        .withHeader(m_header)
+        .withBody(m_body)
+        .withHtml(m_html)
+        .withYesButtonText(m_yesButtonText)
+        .withNoButtonText(m_noButtonText)
+        .withSeverity(m_status.getSeverity())
         .show();
+
+    if (m_reloadOnYesClick && result == IMessageBox.YES_OPTION) {
+      ClientSessionProvider.currentSession().getDesktop().reloadGui();
+    }
   }
 
-  @SuppressWarnings("squid:S1643")
-  protected void ensureErrorParsed(Throwable exception) {
+  /**
+   * Fills the member variables based on the given <code>error</code>. This method has no effect after the first
+   * execution.
+   */
+  protected void ensureErrorParsed(Throwable error) {
     if (!m_parsed.compareAndSet(false, true)) {
       return;
     }
 
-    if (exception instanceof UndeclaredThrowableException) {
-      exception = ((UndeclaredThrowableException) exception).getCause();
-    }
-    if (exception instanceof ProcessingException) {
-      m_cause = (ProcessingException) exception;
-    }
-    else {
-      m_cause = new ProcessingException(ScoutTexts.get("ErrorAndRetryTextDefault"), exception).withTitle(ScoutTexts.get("Error"));
-    }
-    m_text = m_cause.getStatus().getTitle();
-    if (m_text == null || m_text.length() == 0) {
-      m_text = ScoutTexts.get("Error");
-    }
-    m_detail = m_cause.getStatus().getBody();
-    m_acceptText = ScoutTexts.get("Ok");
-    Throwable t = exception;
+    m_parsedError = unwrapException(error);
+
+    // Defaults
+    m_header = ScoutTexts.get("Error");
+    m_body = ScoutTexts.get("ErrorAndRetryTextDefault");
+    m_html = HTML.div(StringUtility.box(ScoutTexts.get("CorrelationId") + ": ", CorrelationId.CURRENT.get(), ""))
+        .cssClass("error-popup-correlation-id");
+    m_yesButtonText = ScoutTexts.get("Ok");
+    m_noButtonText = null;
+    m_reloadOnYesClick = false;
+    m_status = new Status(IStatus.ERROR);
+
+    Throwable t = m_parsedError;
+    Throwable rootCause = m_parsedError;
     while (t != null) {
-      String msg = "\n\n" + StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", t.getClass().getSimpleName() + " " + t.getLocalizedMessage()), 80);
-      if (t instanceof HttpException) {
-        int statusCode = ((HttpException) t).getStatusCode();
-        switch (statusCode) {
-          case 401:
-          case 403: {
-            m_title = ScoutTexts.get("ErrorTitleLogin");
-            m_text = ScoutTexts.get("ErrorTextLogin") + msg;
-            break;
-          }
-          default: {
-            createNetErrorMessage(msg);
-          }
-        }
+      if (parseError(t)) {
+        extractStatus(t);
+        m_parsedError = t;
         return;
       }
-      else if (t instanceof GeneralSecurityException) {
-        m_title = ScoutTexts.get("ErrorTitleLogin");
-        m_text = ScoutTexts.get("ErrorTextLogin") + msg;
-        return;
-      }
-      else if (t instanceof SecurityException) {
-        m_title = ScoutTexts.get("ErrorTitleSecurity");
-        m_text = ScoutTexts.get("ErrorTextSecurity") + msg;
-        return;
-      }
-      else if (t instanceof MalformedURLException) {
-        createNetErrorMessage(msg);
-        return;
-      }
-      else if (t instanceof ThreadInterruptedException || t instanceof java.lang.InterruptedException) {
-        m_title = ScoutTexts.get("InterruptedErrorTitle");
-        m_text = ScoutTexts.get("InterruptedErrorText");
-        return;
-      }
-      else if (t instanceof UnknownHostException) {
-        createNetErrorMessage(msg);
-        return;
-      }
-      else if (t instanceof FileNotFoundException) {
-        m_title = ScoutTexts.get("FileNotFoundTitle");
-        m_text = ScoutTexts.get("FileNotFoundMessage", ((FileNotFoundException) t).getMessage());
-        return;
-      }
-      else if (t instanceof NoRouteToHostException) {
-        createNetErrorMessage(msg);
-        return;
-      }
-      else if (t instanceof SocketException) {
-        createNetErrorMessage(msg);
-        return;
-      }
-      else if (t instanceof IOException) {
-        m_title = ScoutTexts.get("IOErrorTitle");
-        m_text = ScoutTexts.get("IOErrorText") + ": " + t.getLocalizedMessage() + msg;
-        m_detail = ScoutTexts.get("IOErrorInfo");
-        return;
-      }
-      else if (t instanceof VetoException) {
-        createVetoExceptionMessage((VetoException) t, msg);
-        return;
-      }
+      rootCause = t;
       t = t.getCause();
     }
-    // default proceed
-    StringWriter buf = new StringWriter();
-    t = exception;
-    String indent = "";
-    while (t != null) {
-      String s = null;
-      if (t instanceof ProcessingException) {
-        s = ((ProcessingException) t).getStatus().getBody();
-      }
-      else {
-        s = t.getMessage();
-      }
-      buf.append(indent);
-      if (s != null) {
-        buf.append(s + (t.getClass() != ProcessingException.class ? " (" + t.getClass().getSimpleName() + ")" : ""));
-      }
-      else {
-        buf.append(t.getClass().getSimpleName());
-      }
-      buf.append("\n");
-      // next
-      indent += "  ";
-      t = t.getCause();
-    }
-    m_detail = StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", buf.toString()), 120);
+    parseUnexpectedProblem(rootCause);
   }
 
-  protected void createNetErrorMessage(String msg) {
-    m_title = ScoutTexts.get("NetErrorTitle");
-    m_text = ScoutTexts.get("NetErrorText") + msg;
-    m_detail = ScoutTexts.get("NetErrorInfo");
+  /**
+   * If the given exception is a "wrapper exception" (as returned by {@link #isWrapperException(Throwable)}), the
+   * wrapped exception is returned. Otherwise, the original exception is returned.
+   */
+  protected Throwable unwrapException(Throwable t) {
+    if (isWrapperException(t)) {
+      return t.getCause();
+    }
+    return t;
   }
 
-  protected void createVetoExceptionMessage(VetoException exception, String msg) {
-    m_text = exception.getStatus().getTitle();
-    if (exception.getHtmlMessage() != null) {
-      m_htmlDetail = exception.getHtmlMessage();
-      m_detail = "";
+  /**
+   * @return <code>true</code> for exceptions of the type {@link UndeclaredThrowableException},
+   *         {@link InvocationTargetException} and {@link ExecutionException}.
+   */
+  protected boolean isWrapperException(final Throwable t) {
+    return t instanceof UndeclaredThrowableException
+        || t instanceof InvocationTargetException
+        || t instanceof ExecutionException;
+  }
+
+  /**
+   * If the given error is a {@link ProcessingException} that has a {@link IProcessingStatus}, this status is set to the
+   * member variable {@link #m_status}. Otherwise, nothing happens.
+   */
+  protected void extractStatus(Throwable t) {
+    if (t instanceof ProcessingException) {
+      IProcessingStatus status = ((ProcessingException) t).getStatus();
+      if (status != null) {
+        m_status = status;
+      }
     }
-    else if (StringUtility.hasText(exception.getStatus().getBody())) {
-      m_detail = exception.getStatus().getBody();
+  }
+
+  /**
+   * @return <code>true</code> if the error was handled by this method and the parsing is finished.
+   */
+  protected boolean parseError(Throwable t) {
+    if (t instanceof VetoException) {
+      parseVetoException((VetoException) t);
+      return true;
+    }
+    // HttpException is thrown by ServiceTunnel
+    // SocketException is the parent of ConnectException (happens when server is not available) and NoRouteToHostException
+    if (t instanceof HttpException || t instanceof UnknownHostException || t instanceof SocketException) {
+      parseNetError(t);
+      return true;
+    }
+    if (t instanceof ThreadInterruptedException || t instanceof java.lang.InterruptedException) {
+      parseInterruptedError(t);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Sets the member variables for an exception of the type {@link VetoException}. No technical info is shown, instead
+   * the text is extracted from the exceptions {@link IProcessingStatus}.
+   */
+  protected void parseVetoException(VetoException ve) {
+    m_header = ve.getStatus().getTitle();
+    if (ve.getHtmlMessage() != null) {
+      m_body = null;
+      m_html = ve.getHtmlMessage();
+    }
+    else if (ve.getStatus().getBody() != null) {
+      m_body = ve.getStatus().getBody();
+      m_html = null;
+    }
+  }
+
+  /**
+   * Sets the member variables for an exception that indicates a problem with another required system (back-end server,
+   * database etc.).
+   */
+  protected void parseNetError(Throwable t) {
+    m_header = ScoutTexts.get("NetErrorTitle");
+    m_body = ScoutTexts.get("NetSystemsNotAvailable") + "\n\n" + ScoutTexts.get("PleaseTryAgainLater");
+  }
+
+  /**
+   * Sets the member variables for an exception that indicates an interruption.
+   */
+  protected void parseInterruptedError(Throwable t) {
+    m_header = ScoutTexts.get("InterruptedErrorTitle");
+    m_body = ScoutTexts.get("InterruptedErrorText");
+    m_html = null;
+    m_status = new Status(IStatus.INFO);
+  }
+
+  /**
+   * Sets the member variables for all errors that were not handled by {@link #parseError(Throwable)}. By default,
+   * produces a generic "some internal problem has happened" message, hiding the technical details.
+   */
+  protected void parseUnexpectedProblem(Throwable error) {
+    String errorCode = null;
+    if (error != null) {
+      extractStatus(error);
+      if (m_status.getCode() > 0) {
+        errorCode = String.valueOf(m_status.getCode());
+      }
+      else {
+        String s = error.getClass().getSimpleName();
+        errorCode = s.charAt(0) + "" + s.length();
+      }
     }
 
-    if (!StringUtility.hasText(m_detail)
-        && m_htmlDetail == null) {
-      m_detail = ScoutTexts.get("VetoErrorText") + msg;
-    }
+    // The application might be in an inconsistent state -> user should reload it.
+    // The same message is shown if an exception occurs on the UI.
+    m_header = ScoutTexts.get("UnexpectedProblem");
+    m_body = StringUtility.join("\n\n",
+        ScoutTexts.get("InternalProcessingErrorMsg", (errorCode == null ? "" : " (" + ScoutTexts.get("ErrorCodeX", errorCode) + ")")),
+        ScoutTexts.get("UiInconsistentMsg"));
+    m_yesButtonText = ScoutTexts.get("Reload");
+    m_noButtonText = ScoutTexts.get("Ignore");
+    m_reloadOnYesClick = true;
   }
 }
