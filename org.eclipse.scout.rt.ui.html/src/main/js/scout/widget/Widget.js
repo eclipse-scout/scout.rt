@@ -66,7 +66,9 @@ scout.Widget.DisabledStyle = {
 
 scout.Widget.prototype.init = function(model) {
   var staticModel = this._jsonModel();
-  $.extend(model, staticModel);
+  if (staticModel) {
+    model = $.extend({}, staticModel, model);
+  }
   this._init(model);
   this._initKeyStrokeContext();
   this.initialized = true;
