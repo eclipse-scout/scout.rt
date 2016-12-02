@@ -133,7 +133,7 @@ scout.Widget.prototype._createChildren = function(models) {
 
   var widgets = [];
   models.forEach(function(model, i) {
-    widgets[i] = this._createChildren(model);
+    widgets[i] = this._createChild(model);
   }, this);
   return widgets;
 };
@@ -1048,11 +1048,13 @@ scout.Widget.prototype._isPreserveOnPropertyChangeProperty = function(propertyNa
 };
 
 scout.Widget.prototype._addProperties = function(propertyName, properties) {
-  if (Array.isArray(properties)) {
-    this[propertyName] = this[propertyName].concat(properties);
-  } else {
-    this[propertyName].push(properties);
-  }
+  properties = scout.arrays.ensure(properties);
+  properties.forEach(function(property){
+    if (this[propertyName].indexOf(property) > -1) {
+      throw new Error(propertyName + ' already contains the property ' + property);
+    }
+    this[propertyName].push(property);
+  }, this);
 };
 
 scout.Widget.prototype._eachProperty = function(model, func) {

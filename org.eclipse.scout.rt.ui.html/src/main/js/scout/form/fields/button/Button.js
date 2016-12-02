@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.Button = function() {
   scout.Button.parent.call(this);
-  this._addAdapterProperties(['menus']);
 
   this.defaultButton = false;
   this.displayStyle = scout.Button.DisplayStyle.DEFAULT;

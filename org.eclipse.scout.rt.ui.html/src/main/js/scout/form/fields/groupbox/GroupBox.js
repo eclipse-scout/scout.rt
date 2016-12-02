@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
-  this._addAdapterProperties(['fields', 'menus']);
+  this._addAdapterProperties(['fields']);
 
   this.fields = [];
   this.menus = [];

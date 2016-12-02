@@ -35,7 +35,7 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
   this.compact = false;
-  this._addCloneProperties(['actionStyle', 'cssClass', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
+  this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
 scout.inherits(scout.Action, scout.Widget);
 
