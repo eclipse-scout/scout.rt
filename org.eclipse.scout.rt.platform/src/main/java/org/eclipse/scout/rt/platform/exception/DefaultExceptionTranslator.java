@@ -76,9 +76,9 @@ public class DefaultExceptionTranslator implements IExceptionTranslator<Exceptio
    * Method invoked to decorate a translated exception, regardless of whether being translated or not.
    */
   public <EXCEPTION extends Throwable> EXCEPTION decorate(final EXCEPTION exception) {
-    if (exception instanceof PlatformException) {
+    if (exception instanceof IThrowableWithContextInfo) {
       // Associate the current user with this exception.
-      ((PlatformException) exception).withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
+      ((IThrowableWithContextInfo) exception).withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())));
     }
     return exception;
   }

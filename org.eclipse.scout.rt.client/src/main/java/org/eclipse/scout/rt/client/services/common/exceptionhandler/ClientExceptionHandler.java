@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
                 .withName("Visualizing PlatformException"))
                 .awaitDone();
           }
-          catch (final ThreadInterruptedException e) {
+          catch (final ThreadInterruptedError e) { // NOSONAR
             // NOOP
           }
         }

@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.NullExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -90,7 +90,7 @@ public class JobExceptionTranslationTest {
 
   @Test
   public void testWithNullExceptionTranslator() throws Throwable {
-    final FutureCancelledException cancellationException = new FutureCancelledException("expected JUnit test exception");
+    final FutureCancelledError cancellationException = new FutureCancelledError("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
@@ -104,7 +104,7 @@ public class JobExceptionTranslationTest {
       future.awaitDoneAndGet(NullExceptionTranslator.class);
       fail("ExecutionException expected");
     }
-    catch (FutureCancelledException e) {
+    catch (FutureCancelledError e) {
       fail("ExecutionException expected");
     }
     catch (ExecutionException e) {

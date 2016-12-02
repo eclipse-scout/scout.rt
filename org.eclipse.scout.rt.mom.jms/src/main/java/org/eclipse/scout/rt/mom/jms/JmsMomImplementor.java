@@ -63,10 +63,10 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -287,7 +287,7 @@ public class JmsMomImplementor implements IMomImplementor {
     catch (final ExecutionException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e); // exception thrown by the replier
     }
-    catch (ThreadInterruptedException | TimedOutException e) {
+    catch (ThreadInterruptedError | TimedOutError e) {
       final Message cancellationMessage = JmsMessageWriter.newInstance(m_defaultSession, BEANS.get(TextMarshaller.class), null)
           .writeReplyId(replyFuture.getReplyId())
           .writeCorrelationId(CorrelationId.CURRENT.get())
@@ -513,9 +513,9 @@ public class JmsMomImplementor implements IMomImplementor {
      *
      * @param timeoutMillis
      *          the maximal time to wait for the job to complete, or {@link PublishInput#INFINITELY} to wait infinitely.
-     * @throws ThreadInterruptedException
+     * @throws ThreadInterruptedError
      *           if interrupted while waiting.
-     * @throws TimedOutException
+     * @throws TimedOutError
      *           if the wait timed out.
      */
     @SuppressWarnings("unchecked")

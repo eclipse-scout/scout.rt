@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -366,7 +367,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
             try {
               interceptAnyFieldChanged((IFormField) e.getSource());
             }
-            catch (RuntimeException t) {
+            catch (RuntimeException | PlatformError t) {
               LOG.error("{} {}={}", e.getSource(), e.getPropertyName(), e.getNewValue(), t);
             }
           }
@@ -674,7 +675,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         try {
           interceptActiveStepChanged();
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
@@ -690,7 +691,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     try {
       interceptRefreshButtonPolicy();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }

@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
@@ -387,7 +387,7 @@ public class InvocationContext<PORT> {
       try {
         future.awaitDone(); // wait until completed or interrupted.
       }
-      catch (final ThreadInterruptedException e) {
+      catch (final ThreadInterruptedError e) { // NOSONAR
         future.cancel(true); // ensure the job to be cancelled once this thread is interrupted.
       }
 

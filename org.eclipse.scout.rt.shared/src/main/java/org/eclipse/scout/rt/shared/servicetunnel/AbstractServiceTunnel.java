@@ -11,14 +11,12 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.CancellationException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -109,13 +107,14 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   /**
    * Will throw a CancellationException if the future is already cancelled.
    *
-   * @throws CancellationException
+   * @throws ThreadInterruptedError
+   *           if the current thread is cancelled
    */
   protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) {
-    final IFuture<?> future = IFuture.CURRENT.get();
-    if (future != null && future.isCancelled()) {
+    final RunMonitor monitor = RunMonitor.CURRENT.get();
+    if (monitor != null && monitor.isCancelled()) {
       final StringBuilder cancellationExceptionText = new StringBuilder();
-      cancellationExceptionText.append("Future is already cancelled.");
+      cancellationExceptionText.append("RunMonitor is already cancelled.");
       if (serviceRequest != null) {
         cancellationExceptionText.append(" (Request was '");
         cancellationExceptionText.append(serviceRequest.getServiceInterfaceClassName());
@@ -124,7 +123,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
         cancellationExceptionText.append("(..)')");
       }
 
-      throw new CancellationException(cancellationExceptionText.toString());
+      throw new ThreadInterruptedError(cancellationExceptionText.toString());
     }
   }
 
@@ -133,7 +132,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * <p>
    * This method returns, once the current {@link RunMonitor} gets cancelled. When being cancelled, a cancellation
    * request is sent to the server, and the {@link ServiceTunnelResponse} returned contains an
-   * {@link ThreadInterruptedException} to indicate cancellation.
+   * {@link ThreadInterruptedError} to indicate cancellation.
    *
    * @return response sent by the server; is never <code>null</code>.
    */

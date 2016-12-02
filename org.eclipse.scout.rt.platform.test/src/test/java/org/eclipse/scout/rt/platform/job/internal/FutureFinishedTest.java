@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -115,7 +115,7 @@ public class FutureFinishedTest {
               .andMatchExecutionHint(jobIdentifier)
               .toFilter(), 10, TimeUnit.SECONDS);
         }
-        catch (TimedOutException e) {
+        catch (TimedOutError e) {
           fail("no timeout expected");
         }
       }
@@ -144,7 +144,7 @@ public class FutureFinishedTest {
         future.awaitDone(1, TimeUnit.NANOSECONDS);
         fail("timeout expected");
       }
-      catch (TimedOutException e) {
+      catch (TimedOutError e) {
         // NOOP
       }
     }
@@ -165,7 +165,7 @@ public class FutureFinishedTest {
         future.awaitFinished(1, TimeUnit.NANOSECONDS);
         fail("timeout expected");
       }
-      catch (TimedOutException e) {
+      catch (TimedOutError e) {
         // NOOP
       }
       try {
@@ -174,7 +174,7 @@ public class FutureFinishedTest {
             .toFilter(), 1, TimeUnit.NANOSECONDS);
         fail("timeout expected");
       }
-      catch (TimedOutException e) {
+      catch (TimedOutError e) {
         // NOOP
       }
     }

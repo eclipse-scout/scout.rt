@@ -10,27 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.concurrent;
 
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-
 /**
  * Indicates that the maximal wait time elapsed while waiting for some condition to become <code>true</code>, e.g. while
  * waiting a job to complete.
  *
- * @since 5.2
+ * @since 6.0
  */
-public class TimedOutException extends PlatformException {
+public class TimedOutError extends AbstractInterruptionError {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * See constructor of {@link PlatformException}
-   */
-  public TimedOutException(final String message, final Object... args) {
+  public TimedOutError(final String message, final Object... args) {
     super(message, args);
   }
 
   @Override
-  public TimedOutException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+  public TimedOutError withContextInfo(final String name, final Object value, final Object... valueArgs) {
     super.withContextInfo(name, value, valueArgs);
     return this;
   }

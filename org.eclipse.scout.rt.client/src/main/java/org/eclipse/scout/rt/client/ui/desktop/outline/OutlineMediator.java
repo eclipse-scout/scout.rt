@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
@@ -35,7 +36,7 @@ public class OutlineMediator {
     try {
       pageWithNodes.rebuildTableInternal();
     }
-    catch (RuntimeException e1) {
+    catch (RuntimeException | PlatformError e1) {
       BEANS.get(ExceptionHandler.class).handle(e1);
     }
   }

@@ -56,9 +56,9 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -1622,7 +1622,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           dataProvider.afterProvide(lookupCall, result);
           callback.onSuccess(result);
         }
-        catch (FutureCancelledException | ThreadInterruptedException e) { // NOSONAR
+        catch (FutureCancelledError | ThreadInterruptedError e) { // NOSONAR
           callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
         }
         catch (final RuntimeException e) { // NOSONAR

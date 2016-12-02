@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 
 /**
  * @since 3.8.1
@@ -41,7 +42,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
       try {
         activePage.ensureChildrenLoaded();
       }
-      catch (RuntimeException e1) {
+      catch (RuntimeException | PlatformError e1) {
         BEANS.get(ExceptionHandler.class).handle(e1);
       }
       if (activePage instanceof IPageWithTable) {

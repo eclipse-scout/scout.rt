@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
@@ -949,7 +950,7 @@ public class ClientUIPreferences {
     try {
       return Preferences.get(session, PREFERENCES_NODE_ID);
     }
-    catch (RuntimeException t) {
+    catch (RuntimeException | PlatformError t) {
       LOG.error("Unable to load preferences.", t);
     }
     return null;
@@ -967,7 +968,7 @@ public class ClientUIPreferences {
     try {
       m_prefs.flush();
     }
-    catch (RuntimeException t) {
+    catch (RuntimeException | PlatformError t) {
       LOG.error("Unable to flush preferences.", t);
     }
   }

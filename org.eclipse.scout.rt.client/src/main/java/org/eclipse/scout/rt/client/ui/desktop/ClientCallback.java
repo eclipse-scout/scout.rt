@@ -8,7 +8,7 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 
 /**
  * {@link Future} implementation intended for issuing a call to a client.
@@ -50,7 +50,7 @@ public class ClientCallback<T> implements Future<T> {
     try {
       m_blockingCondition.waitForUninterruptibly(timeout, unit, ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
     }
-    catch (TimedOutException t) {
+    catch (TimedOutError t) { // NOSONAR
       timedOut();
       throw new TimeoutException();
     }

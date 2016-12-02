@@ -56,9 +56,9 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
@@ -647,11 +647,11 @@ public class UiSession implements IUiSession {
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (ThreadInterruptedException e) { // NOSONAR
+      catch (ThreadInterruptedError e) { // NOSONAR
         future.cancel(true);
         return null;
       }
-      catch (FutureCancelledException e) { // NOSONAR
+      catch (FutureCancelledError e) { // NOSONAR
         return null;
       }
     }
@@ -779,11 +779,11 @@ public class UiSession implements IUiSession {
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (ThreadInterruptedException e) {
+      catch (ThreadInterruptedError e) { // NOSONAR
         future.cancel(true);
         return null;
       }
-      catch (FutureCancelledException e) {
+      catch (FutureCancelledError e) { // NOSONAR
         return null;
       }
     }

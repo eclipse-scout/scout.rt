@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
@@ -551,8 +552,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * Method invoked to intercept an exception before given to the submitter.
    */
   protected <EXCEPTION extends Throwable> EXCEPTION interceptException(final EXCEPTION exception) {
-    if (exception instanceof PlatformException) {
-      ((PlatformException) exception).withContextInfo("job", getJobInput().getName());
+    if (exception instanceof IThrowableWithContextInfo) {
+      ((IThrowableWithContextInfo) exception).withContextInfo("job", getJobInput().getName());
     }
     return exception;
   }

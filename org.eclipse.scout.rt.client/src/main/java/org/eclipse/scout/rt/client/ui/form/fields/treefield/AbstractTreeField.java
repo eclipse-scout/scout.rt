@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -143,7 +144,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     try {
       loadRootNode();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }

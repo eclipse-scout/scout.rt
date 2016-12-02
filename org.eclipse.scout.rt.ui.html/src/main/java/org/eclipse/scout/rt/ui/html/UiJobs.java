@@ -26,10 +26,10 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 
 /**
@@ -64,7 +64,7 @@ public class UiJobs {
    * @param clientSession
    *          session to calculate the jobs to wait for; must not be <code>null</code>.
    * @param exceptionHandler
-   *          to handle {@link TimedOutException} or {@link ThreadInterruptedException}.
+   *          to handle {@link TimedOutError} or {@link ThreadInterruptedError}.
    */
   public void awaitModelJobs(final IClientSession clientSession, final Class<? extends ExceptionHandler> exceptionHandler) {
     Assertions.assertNotNull(clientSession, "'ClientSession' must not be null");
@@ -74,7 +74,7 @@ public class UiJobs {
           ModelJobFutureFilter.INSTANCE,
           new SessionFutureFilter(clientSession)));
     }
-    catch (TimedOutException | ThreadInterruptedException e) {
+    catch (TimedOutError | ThreadInterruptedError e) {
       // Handle exception in proper ClientRunContext.
       ClientRunContexts.copyCurrent().withSession(clientSession, true).run(new IRunnable() {
 
@@ -98,9 +98,9 @@ public class UiJobs {
    * @param future
    *          the {@link IFuture} to wait until 'done' or requiring 'user interaction'.
    * @return the job's result, or <code>null</code> if requires 'user interaction'.
-   * @throws FutureCancelledException
+   * @throws FutureCancelledError
    *           if the job is cancelled.
-   * @throws ThreadInterruptedException
+   * @throws ThreadInterruptedError
    *           if the current thread is interrupted while waiting for the job to complete.
    * @throws RuntimeException
    *           if the job completed with an exception.
@@ -124,9 +124,9 @@ public class UiJobs {
    * The hint {@link ModelJobs#EXECUTION_HINT_UI_INTERACTION_REQUIRED} indicates, whether a job requires 'user
    * interaction'.
    *
-   * @throws ThreadInterruptedException
+   * @throws ThreadInterruptedError
    *           if the current thread is interrupted while waiting for the job to complete.
-   * @throws TimedOutException
+   * @throws TimedOutError
    *           if the job did not complete within the maximal timeout.
    */
   public void await(final IFilter<IFuture<?>> filter) {

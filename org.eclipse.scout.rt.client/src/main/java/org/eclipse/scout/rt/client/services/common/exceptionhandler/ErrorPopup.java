@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 
@@ -154,7 +154,10 @@ public class ErrorPopup {
       parseNetError(t);
       return true;
     }
-    if (t instanceof ThreadInterruptedException || t instanceof java.lang.InterruptedException) {
+    if (t instanceof AbstractInterruptionError ||
+        t instanceof java.lang.InterruptedException ||
+        t instanceof java.util.concurrent.TimeoutException ||
+        t instanceof java.util.concurrent.CancellationException) {
       parseInterruptedError(t);
       return true;
     }

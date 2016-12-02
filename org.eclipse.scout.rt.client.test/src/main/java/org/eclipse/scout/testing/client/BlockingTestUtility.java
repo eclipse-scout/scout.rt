@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
@@ -221,7 +221,7 @@ public final class BlockingTestUtility {
           try {
             blockingCondition.waitFor(m_timeout, m_unit);
           }
-          catch (TimedOutException ex) {
+          catch (TimedOutError ex) { // NOSONAR
             //cancel future and unlock
             if (m_firstException == null) {
               m_firstException = callerException;

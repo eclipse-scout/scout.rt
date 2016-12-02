@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -68,9 +68,9 @@ public class BlockingConditionTest {
       public void run() throws Exception {
         try {
           blockingCondition.waitFor(1, TimeUnit.NANOSECONDS, "hint-blocking");
-          fail("TimedOutException expected");
+          fail("TimedOutError expected");
         }
-        catch (TimedOutException e) {
+        catch (TimedOutError e) {
           assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
         }
       }
@@ -95,9 +95,9 @@ public class BlockingConditionTest {
 
         try {
           blockingCondition.waitFor(10, TimeUnit.SECONDS, "hint-blocking");
-          fail("ThreadInterruptedException expected");
+          fail("ThreadInterruptedError expected");
         }
-        catch (ThreadInterruptedException e) {
+        catch (ThreadInterruptedError e) {
           assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
         }
       }

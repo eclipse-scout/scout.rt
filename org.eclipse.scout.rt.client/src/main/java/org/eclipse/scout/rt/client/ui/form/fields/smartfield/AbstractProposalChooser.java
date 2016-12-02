@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
@@ -191,7 +191,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   }
 
   protected void updateStatus(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    if (result != null && result.getException() instanceof FutureCancelledException) {
+    if (result != null && result.getException() instanceof FutureCancelledError) {
       return;
     }
 

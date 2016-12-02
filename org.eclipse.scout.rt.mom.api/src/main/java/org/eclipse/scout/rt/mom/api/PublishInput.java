@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 
 /**
  * Specifies how to publish a message.
@@ -98,7 +98,7 @@ public class PublishInput {
 
   /**
    * Specifies the maximal time to block the requester in synchronous 'request-reply' communication until a reply is
-   * received. If elapsed, a {@link TimedOutException} is thrown and a cancellation request sent to the consumer.
+   * received. If elapsed, a {@link TimedOutError} is thrown and a cancellation request sent to the consumer.
    */
   public PublishInput withRequestReplyTimeout(final long timeout, final TimeUnit unit) {
     m_requestReplyTimeout = unit.toMillis(timeout);

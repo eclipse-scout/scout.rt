@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -122,7 +122,7 @@ public class AwaitDoneTest {
           .toFilter(), 500, TimeUnit.MILLISECONDS);
       fail("timeout expected");
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       // NOOP
     }
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
@@ -161,7 +161,7 @@ public class AwaitDoneTest {
           .toFilter(), 100, TimeUnit.MILLISECONDS);
       fail("timeout expected");
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       // NOOP
     }
 

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.transaction;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 
@@ -35,7 +35,7 @@ public interface ITransaction extends ICancellable {
   /**
    * Registers the given transaction member to participate in the <code>2-phase-commit-protocol (2PC)</code>.
    *
-   * @throws FutureCancelledException
+   * @throws FutureCancelledError
    *           if the transaction is cancelled.
    */
   void registerMember(ITransactionMember member);
@@ -89,7 +89,7 @@ public interface ITransaction extends ICancellable {
    * {@link ITransactionMember#commitPhase1()} on any member.
    *
    * @return <code>true</code> without if the commit phase 1 was successful on all members.
-   * @throws FutureCancelledException
+   * @throws FutureCancelledError
    *           if the transaction is cancelled.
    */
   boolean commitPhase1();

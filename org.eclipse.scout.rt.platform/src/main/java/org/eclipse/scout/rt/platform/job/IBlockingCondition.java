@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 
 /**
  * A blocking condition allows a thread to wait for a condition to become <code>true</code>. That is similar to the Java
@@ -63,13 +63,13 @@ public interface IBlockingCondition {
    * waiting.
    * <p>
    * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
-   * then {@link ThreadInterruptedException} is thrown with the thread's interrupted status still set. Additionally for
+   * then {@link ThreadInterruptedError} is thrown with the thread's interrupted status still set. Additionally for
    * semaphore aware jobs, this method returns with the semaphore permit re-acquired.
    *
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
-   * @throws ThreadInterruptedException
+   * @throws ThreadInterruptedError
    *           if the current thread's interrupted status is set when it enters this method, or if it is interrupted
    *           while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
    *           method returns with the semaphore permit re-acquired. However, this condition may still be in
@@ -87,10 +87,10 @@ public interface IBlockingCondition {
    * waiting.
    * <p>
    * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
-   * then {@link ThreadInterruptedException} is thrown with the thread's interrupted status still set. Additionally for
+   * then {@link ThreadInterruptedError} is thrown with the thread's interrupted status still set. Additionally for
    * semaphore aware jobs, when it finally returns from this method the semaphore permit will be re-acquired.
    * <p>
-   * If the timeout elapses, then {@link TimedOutException} is thrown. Additionally for semaphore aware jobs, this
+   * If the timeout elapses, then {@link TimedOutError} is thrown. Additionally for semaphore aware jobs, this
    * method returns with the semaphore permit re-acquired.
    *
    * @param timeout
@@ -100,12 +100,12 @@ public interface IBlockingCondition {
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
-   * @throws ThreadInterruptedException
+   * @throws ThreadInterruptedError
    *           if the current thread's interrupted status is set when it enters this method, or if it is interrupted
    *           while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
    *           method returns with the semaphore permit re-acquired. However, this condition may still be in
    *           <em>blocking state</em>.
-   * @throws TimedOutException
+   * @throws TimedOutError
    *           if the wait timed out.<br/>
    *           For semaphore aware jobs, this method returns with the semaphore permit re-acquired. However, this
    *           condition may still be in <em>blocking state</em>.
@@ -143,7 +143,7 @@ public interface IBlockingCondition {
    * it will continue to wait until being unblocked. When it finally returns from this method its interrupted status
    * will still be set.
    * <p>
-   * If the timeout elapses, then {@link TimedOutException} is thrown. Additionally for semaphore aware jobs, this
+   * If the timeout elapses, then {@link TimedOutError} is thrown. Additionally for semaphore aware jobs, this
    * method returns with the semaphore permit re-acquired.
    *
    * @param timeout
@@ -153,7 +153,7 @@ public interface IBlockingCondition {
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
-   * @throws TimedOutException
+   * @throws TimedOutError
    *           if the wait timed out.<br/>
    *           For semaphore aware jobs, this method returns with the semaphore permit re-acquired. However, this
    *           condition may still be in <em>blocking state</em>.

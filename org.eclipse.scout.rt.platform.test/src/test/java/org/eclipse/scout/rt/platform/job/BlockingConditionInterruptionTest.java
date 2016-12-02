@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -143,10 +143,10 @@ public class BlockingConditionInterruptionTest {
 
           protocol.add("afterBlockingCondition");
         }
-        catch (ThreadInterruptedException e) {
+        catch (ThreadInterruptedError e) {
           protocol.add("InterruptedException");
         }
-        catch (TimedOutException e) {
+        catch (TimedOutError e) {
           protocol.add("TimeoutException");
         }
 

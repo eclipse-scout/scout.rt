@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
@@ -322,12 +322,12 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           try { // NOSONAR
             future.awaitDone(timeout, TimeUnit.SECONDS);
           }
-          catch (TimedOutException e) {
+          catch (TimedOutError e) { // NOSONAR
             LOG.warn("Client session did no stop within {} seconds. Canceling shutdown job.", timeout);
             future.cancel(true);
           }
         }
-        catch (ThreadInterruptedException e) {
+        catch (ThreadInterruptedError e) {
           LOG.warn("Interruption encountered while waiting for client session {} to stop. Continuing anyway.", clientSession.getId(), e);
         }
         finally {
@@ -481,10 +481,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
                 .toFilter(), CONFIG.getPropertyValue(SessionStoreMaxWaitAllShutdownProperty.class), TimeUnit.SECONDS);
             LOG.info("Session shutdown complete.");
           }
-          catch (ThreadInterruptedException e) {
+          catch (ThreadInterruptedError e) {
             LOG.warn("Interruption encountered while waiting for all client session to stop. Continuing anyway.", e);
           }
-          catch (TimedOutException e) {
+          catch (TimedOutError e) {
             LOG.warn("Timeout encountered while waiting for all client session to stop. Canceling still running client session shutdown jobs.", e);
 
             Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()

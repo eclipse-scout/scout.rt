@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.Test;
 import org.junit.internal.runners.statements.FailOnTimeout;
@@ -56,7 +56,7 @@ public class TimeoutRunContextStatement extends Statement {
     try {
       future.awaitDone(m_timeoutMillis, TimeUnit.MILLISECONDS);
     }
-    catch (ThreadInterruptedException | TimedOutException e) { // NOSONAR
+    catch (ThreadInterruptedError | TimedOutError e) { // NOSONAR
       future.cancel(true);
       throw new TestTimedOutException(m_timeoutMillis, TimeUnit.MILLISECONDS); // JUnit timeout exception
     }

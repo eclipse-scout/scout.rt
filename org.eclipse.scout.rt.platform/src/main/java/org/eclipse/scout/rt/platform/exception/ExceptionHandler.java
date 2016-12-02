@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.exception;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +31,11 @@ public class ExceptionHandler {
    * This method must not throw an exception.
    */
   public void handle(final Throwable t) {
-    if (t instanceof ThreadInterruptedException) {
-      handleInterruptedException((ThreadInterruptedException) t);
+    if (t instanceof ThreadInterruptedError) {
+      handleInterruptedException((ThreadInterruptedError) t);
     }
-    else if (t instanceof FutureCancelledException) {
-      handleCancelledException((FutureCancelledException) t);
+    else if (t instanceof FutureCancelledError) {
+      handleCancelledException((FutureCancelledError) t);
     }
     else if (t instanceof PlatformException) {
       final PlatformException pe = (PlatformException) t;
@@ -54,21 +54,21 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle an {@link ThreadInterruptedException}.
+   * Method invoked to handle an {@link ThreadInterruptedError}.
    * <p>
    * The default implementation logs it with debug level.
    */
-  protected void handleInterruptedException(final ThreadInterruptedException e) {
+  protected void handleInterruptedException(final ThreadInterruptedError e) {
     LOG.debug("Interruption", e);
   }
 
   /**
-   * Method invoked to handle a {@link FutureCancelledException}. Typically, such an exception is thrown when waiting on
+   * Method invoked to handle a {@link FutureCancelledError}. Typically, such an exception is thrown when waiting on
    * a cancelled job.
    * <p>
    * The default implementation logs it with debug level.
    */
-  protected void handleCancelledException(final FutureCancelledException e) {
+  protected void handleCancelledException(final FutureCancelledError e) {
     LOG.debug("Cancellation", e);
   }
 
@@ -113,7 +113,7 @@ public class ExceptionHandler {
 
   /**
    * Method invoked to handle a {@link Throwable} which is not of the type {@code PlatformException}, or
-   * {@link ThreadInterruptedException}, or {@link FutureCancelledException}.
+   * {@link ThreadInterruptedError}, or {@link FutureCancelledError}.
    * <p>
    * The default implementation logs the throwable as <code>ERROR</code>.
    */

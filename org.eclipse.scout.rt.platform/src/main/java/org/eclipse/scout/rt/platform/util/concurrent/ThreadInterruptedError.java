@@ -10,28 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.concurrent;
 
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.job.IFuture;
-
 /**
- * Indicates that the result of a job cannot be retrieved, or the {@link IFuture}'s completion not be awaited because
- * the job was cancelled.
+ * Indicates that a thread was interrupted while waiting for some condition to become <code>true</code>, e.g. while
+ * waiting for a job to complete.
+ * <p>
+ * Unlike {@link java.lang.InterruptedException}, the thread's interrupted status is not cleared when catching this
+ * error.
  *
  * @since 5.2
  */
-public class FutureCancelledException extends PlatformException {
+public class ThreadInterruptedError extends AbstractInterruptionError {
 
   private static final long serialVersionUID = 1L;
 
   /**
-   * See constructor of {@link PlatformException}
+   * See constructor of {@link AbstractInterruptionError}
    */
-  public FutureCancelledException(final String message, final Object... args) {
+  public ThreadInterruptedError(final String message, final Object... args) {
     super(message, args);
   }
 
   @Override
-  public FutureCancelledException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+  public ThreadInterruptedError withContextInfo(final String name, final Object value, final Object... valueArgs) {
     super.withContextInfo(name, value, valueArgs);
     return this;
   }

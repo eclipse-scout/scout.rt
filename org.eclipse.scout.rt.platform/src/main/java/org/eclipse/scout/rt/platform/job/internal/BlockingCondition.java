@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePositi
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,7 +200,7 @@ public class BlockingCondition implements IBlockingCondition {
 
   /**
    * Waits until signaled or the timeout elapses. If <code>awaitInterruptibly</code> is set to <code>true</code>, this
-   * method returns with an {@link ThreadInterruptedException} upon interruption. For either case, when this method
+   * method returns with an {@link ThreadInterruptedError} upon interruption. For either case, when this method
    * finally returns, the thread's interrupted status will still be set.
    */
   protected void awaitUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
@@ -235,7 +235,7 @@ public class BlockingCondition implements IBlockingCondition {
         }
 
         if (nanos <= 0L) {
-          throw new TimedOutException("Timeout elapsed while waiting for a blocking condition to fall")
+          throw new TimedOutError("Timeout elapsed while waiting for a blocking condition to fall")
               .withContextInfo("blockingCondition", this)
               .withContextInfo("timeout", "{}ms", unit.toMillis(timeout))
               .withContextInfo("thread", Thread.currentThread().getName());
@@ -244,7 +244,7 @@ public class BlockingCondition implements IBlockingCondition {
     }
     catch (final InterruptedException e) {
       interrupted = true;
-      throw new ThreadInterruptedException("Interrupted while waiting for a blocking condition to fall")
+      throw new ThreadInterruptedError("Interrupted while waiting for a blocking condition to fall")
           .withContextInfo("blockingCondition", this)
           .withContextInfo("thread", Thread.currentThread().getName());
     }
@@ -278,7 +278,7 @@ public class BlockingCondition implements IBlockingCondition {
       try {
         semaphore.acquire(futureTask, QueuePosition.HEAD);
       }
-      catch (final ThreadInterruptedException e) {
+      catch (final ThreadInterruptedError e) {
         interrupted = true;
         Thread.interrupted(); // clear interruption status to re-acquire the permit.
         LOG.info("Interrupted while acquiring semaphore permit. Continue to re-acquire the permit. [future={}, semaphore={}]", futureTask, semaphore, e);

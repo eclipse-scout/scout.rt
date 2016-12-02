@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -206,7 +207,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       getTree().removeAllChildNodes(getTree().getRootNode());
       populateFolderContentRec(getTree().getRootNode(), getBookmarkRootFolder());
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       LOG.error(null, e);
     }
     finally {
@@ -424,7 +425,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             }
           }
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error(null, e);
         }
         finally {
@@ -433,7 +434,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         try {
           rebuildBookmarkModel();
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error(null, e);
         }
       }
@@ -940,7 +941,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
                   success = true;
                   break;
                 }
-                catch (RuntimeException e) { // NOSONAR
+                catch (RuntimeException | PlatformError e) { // NOSONAR
                   success = false;
                 }
               }

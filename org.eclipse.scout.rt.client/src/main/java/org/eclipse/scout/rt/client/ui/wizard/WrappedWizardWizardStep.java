@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 
 /**
  * Wizard step containing another wizard. This step invokes the parent's <code>doNextStep()</code> method when
@@ -44,7 +45,7 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
             try {
               m_parentWizard.doNextStep();
             }
-            catch (RuntimeException t) {
+            catch (RuntimeException | PlatformError t) {
               BEANS.get(ExceptionHandler.class).handle(t);
             }
             break;

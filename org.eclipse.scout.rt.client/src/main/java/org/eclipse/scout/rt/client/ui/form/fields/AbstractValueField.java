@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
@@ -354,7 +355,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
           try {
             interceptChangedValue();
           }
-          catch (RuntimeException ex) {
+          catch (RuntimeException | PlatformError ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }
@@ -438,7 +439,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       try {
         interceptChangedValue();
       }
-      catch (RuntimeException ex) {
+      catch (RuntimeException | PlatformError ex) {
         BEANS.get(ExceptionHandler.class).handle(ex);
       }
       fireMasterChanged();

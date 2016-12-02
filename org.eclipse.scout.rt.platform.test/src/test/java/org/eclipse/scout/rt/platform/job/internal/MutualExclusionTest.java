@@ -31,8 +31,8 @@ import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcqu
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Before;
@@ -239,7 +239,7 @@ public class MutualExclusionTest {
       future.awaitDone(1, TimeUnit.SECONDS);
       fail("timeout expected");
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       // NOOP
     }
     assertTrue(mutex.isPermitOwner(m_task1));
@@ -282,7 +282,7 @@ public class MutualExclusionTest {
         try {
           mutex.acquire(m_task2, QueuePosition.TAIL);
         }
-        catch (ThreadInterruptedException e) {
+        catch (ThreadInterruptedError e) {
           interruptedLatch.countDown();
         }
       }

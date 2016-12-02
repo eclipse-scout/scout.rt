@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -400,7 +401,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
       try {
         interceptSelectionChanged(b);
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

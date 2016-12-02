@@ -24,9 +24,9 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -83,7 +83,7 @@ public class ClientNotificationPoller {
         try {
           handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(INode.ID));
         }
-        catch (ThreadInterruptedException | FutureCancelledException e) {
+        catch (ThreadInterruptedError | FutureCancelledError e) {
           LOG.debug("Client notification polling has been interrupted.", e);
         }
         catch (RuntimeException e) {

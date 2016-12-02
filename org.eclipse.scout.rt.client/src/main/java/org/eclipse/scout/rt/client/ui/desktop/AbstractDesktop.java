@@ -84,6 +84,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
@@ -98,7 +99,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -650,7 +651,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       try {
         ks.initAction();
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         LOG.error("could not initialize key stroke '{}'.", ks, e);
       }
     }
@@ -961,7 +962,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     try {
       formKey = form.computeExclusiveKey();
     }
-    catch (final RuntimeException e) {
+    catch (final RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
       return CollectionUtility.emptyArrayList();
     }
@@ -1119,7 +1120,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       try {
         m_outline.getActivePage().ensureChildrenLoaded();
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -1774,7 +1775,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             break;
           }
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
@@ -1935,7 +1936,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           break;
         }
       }
-      catch (RuntimeException t) {
+      catch (RuntimeException | PlatformError t) {
         LOG.error("extension {}", ext, t);
       }
     }
@@ -1946,7 +1947,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         try {
           m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing messagebox", e);
         }
       }
@@ -1958,7 +1959,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         try {
           f.getUIFacade().setResultFromUI(Collections.<BinaryResource> emptyList());
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing filechooser", e);
         }
       }
@@ -1969,9 +1970,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       if (c != null) {
         try {
           c.cancel(true);
-          c.failed(new ThreadInterruptedException("desktop is closing"));
+          c.failed(new ThreadInterruptedError("desktop is closing"));
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing client callback", e);
         }
       }
@@ -1983,7 +1984,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         try {
           form.doClose();
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing form", e);
         }
       }
@@ -1994,7 +1995,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       try {
         outline.disposeTree();
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         LOG.warn("Exception while disposing outline.", e);
       }
     }
@@ -2483,7 +2484,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           return false;
         }
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         LOG.error("Error closing forms", e);
       }
     }
@@ -2504,7 +2505,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         catch (VetoException e) { // NOSONAR
           continueClosing = false;
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }

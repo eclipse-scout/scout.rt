@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -404,7 +405,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
           try {
             unloadNode(page);
           }
-          catch (RuntimeException e) {
+          catch (RuntimeException | PlatformError e) {
             BEANS.get(ExceptionHandler.class).handle(e);
           }
         }
@@ -424,7 +425,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
               selectNode(CollectionUtility.firstElement(children));
             }
           }
-          catch (RuntimeException e) {
+          catch (RuntimeException | PlatformError e) {
             LOG.warn("Exception while selecting first page in outline [{}]", getClass().getName(), e);
           }
         }
@@ -968,7 +969,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     try {
       disposeDefaultDetailForm();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
 

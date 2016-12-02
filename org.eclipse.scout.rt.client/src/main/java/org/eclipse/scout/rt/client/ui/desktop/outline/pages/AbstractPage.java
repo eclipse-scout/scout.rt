@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -357,7 +358,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           desktop.activateBookmark(bm, false);
         }
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -372,7 +373,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           getTree().unloadNode(this);
         }
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -564,7 +565,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       disposeDetailForm();
       disposeTable();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
     // automatically remove all data change listeners

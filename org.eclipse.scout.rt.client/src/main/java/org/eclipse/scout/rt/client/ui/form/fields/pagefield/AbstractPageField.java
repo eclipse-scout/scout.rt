@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 
 /**
  * Representation of a page as a composite of detailForm, table, searchForm for usage inside a {@link IForm}
@@ -112,7 +113,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
               getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
             }
           }
-          catch (RuntimeException ex) {
+          catch (RuntimeException | PlatformError ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }

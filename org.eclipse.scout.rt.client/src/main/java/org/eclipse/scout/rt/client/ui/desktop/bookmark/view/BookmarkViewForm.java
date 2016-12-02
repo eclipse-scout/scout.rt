@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -334,7 +335,7 @@ public class BookmarkViewForm extends AbstractForm {
         try {
           BEANS.get(IBookmarkService.class).loadBookmarks();
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           LOG.error("Could not reload bookmarks.", e);
         }
       }

@@ -68,8 +68,8 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IDisposable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
@@ -781,7 +781,7 @@ public class JmsMomImplementorTest {
       requestFuture.awaitDoneAndGet(200, TimeUnit.MILLISECONDS);
       fail();
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       assertTrue(true);
     }
   }
@@ -863,7 +863,7 @@ public class JmsMomImplementorTest {
           String result = MOM.request(JmsTestMom.class, destination, "hello world");
           testee.set(result);
         }
-        catch (ThreadInterruptedException e) {
+        catch (ThreadInterruptedError e) {
           requestorInterrupted.set(true);
         }
         finally {
@@ -929,7 +929,7 @@ public class JmsMomImplementorTest {
       MOM.request(JmsTestMom.class, destination, "hello world", MOM.newPublishInput()
           .withRequestReplyTimeout(1, TimeUnit.SECONDS));
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       requestorTimedOut.set(true);
     }
     finally {
@@ -1139,7 +1139,7 @@ public class JmsMomImplementorTest {
 
     public TYPE get(long timeout, TimeUnit unit) throws InterruptedException {
       if (!m_latch.await(timeout, unit)) {
-        throw new TimedOutException("timout elapsed while waiting for message");
+        throw new TimedOutError("timout elapsed while waiting for message");
       }
       return m_message;
     }
@@ -1305,7 +1305,7 @@ public class JmsMomImplementorTest {
       capturer.get(2, TimeUnit.SECONDS);
       fail();
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       // expected
     }
 
@@ -1315,7 +1315,7 @@ public class JmsMomImplementorTest {
     try {
       capturer.get(5, TimeUnit.SECONDS);
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       fail();
     }
     finally {

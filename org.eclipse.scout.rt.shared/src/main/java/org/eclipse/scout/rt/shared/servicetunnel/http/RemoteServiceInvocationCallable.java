@@ -19,9 +19,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -104,7 +104,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       request.setUserAgent(m_serviceRequest.getUserAgent());
       m_tunnel.invokeService(request);
     }
-    catch (final FutureCancelledException | ThreadInterruptedException e) { // NOSONAR
+    catch (final FutureCancelledError | ThreadInterruptedError e) { // NOSONAR
       // NOOP: Do not cancel 'cancel-request' to prevent loop.
     }
     catch (RuntimeException | NoSuchMethodException e) {

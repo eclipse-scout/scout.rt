@@ -21,11 +21,11 @@ import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
- * Represents errors that occur during application execution.
+ * Represents errors that occur during application execution which should not be caught by application logic.
  *
- * @since 5.2
+ * @since 6.1
  */
-public class PlatformException extends RuntimeException implements Serializable, IThrowableWithContextInfo {
+public class PlatformError extends Error implements Serializable, IThrowableWithContextInfo {
 
   private static final long serialVersionUID = 1L;
 
@@ -34,13 +34,13 @@ public class PlatformException extends RuntimeException implements Serializable,
   private final List<String> m_contextInfos = new ArrayList<>();
 
   /**
-   * Creates a {@link PlatformException} from the given message.
+   * Creates a {@link PlatformError} from the given message.
    * <p>
    * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the message, which will be replaced
    * by the respective argument.
    * <p>
    * If the last argument is of the type {@link Throwable} and not referenced as formatting anchor in the message, that
-   * {@link Throwable} is used as the exception's cause.
+   * {@link Throwable} is used as the error's cause.
    * <p>
    * Internally, {@link MessageFormatter} is used to provide substitution functionality. Hence, The format is the very
    * same as if using {@link Logger SLF4j Logger}.
@@ -51,14 +51,14 @@ public class PlatformException extends RuntimeException implements Serializable,
    *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
    *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
    */
-  public PlatformException(final String message, final Object... args) {
+  public PlatformError(final String message, final Object... args) {
     this(MessageFormatter.arrayFormat(message, args));
   }
 
   /**
-   * Creates a {@link PlatformException} with the given SLF4j format.
+   * Creates a {@link PlatformError} with the given SLF4j format.
    */
-  protected PlatformException(final FormattingTuple format) {
+  protected PlatformError(final FormattingTuple format) {
     super(format.getMessage(), format.getThrowable());
   }
 
@@ -74,7 +74,7 @@ public class PlatformException extends RuntimeException implements Serializable,
    * {@inheritDoc}
    */
   @Override
-  public PlatformException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+  public PlatformError withContextInfo(final String name, final Object value, final Object... valueArgs) {
     if (value == null) {
       return this;
     }
@@ -140,7 +140,7 @@ public class PlatformException extends RuntimeException implements Serializable,
   }
 
   /**
-   * @return Returns additional context information available on this exception.
+   * @return Returns additional context information available on this error.
    */
   protected String getAdditionalContextInfos() {
     return null;

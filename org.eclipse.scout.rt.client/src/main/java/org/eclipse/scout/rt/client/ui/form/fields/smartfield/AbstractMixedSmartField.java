@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -259,7 +260,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           setCurrentLookupRow(currentLookupRow);
         }
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -290,7 +291,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
         installLookupRowContext(CollectionUtility.firstElement(rows));
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }

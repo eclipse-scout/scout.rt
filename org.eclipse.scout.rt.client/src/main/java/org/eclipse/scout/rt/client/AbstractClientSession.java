@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
@@ -54,8 +55,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -427,7 +428,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         return;
       }
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       m_permitToStop.release();
       throw e;
     }
@@ -484,10 +485,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       try {
         Jobs.getJobManager().awaitDone(runningJobsFilter, delay, TimeUnit.SECONDS);
       }
-      catch (TimedOutException e) {
+      catch (TimedOutError e) { // NOSONAR
         // NOP (not all jobs have been finished within the delay)
       }
-      catch (ThreadInterruptedException e) {
+      catch (ThreadInterruptedError e) {
         LOG.warn("Failed to await for running jobs to complete.", e);
       }
     }

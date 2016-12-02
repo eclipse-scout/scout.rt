@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
@@ -184,9 +184,9 @@ public class ClientSessionTest {
 
     try {
       f.awaitDoneAndGet(1, TimeUnit.SECONDS);
-      fail("must throw a " + TimedOutException.class.getName());
+      fail("must throw a " + TimedOutError.class.getName());
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       //nop
     }
     assertFalse(f.isDone());

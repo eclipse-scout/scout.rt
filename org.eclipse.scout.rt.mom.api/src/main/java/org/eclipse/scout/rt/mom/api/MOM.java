@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 
 /**
  * Message oriented middleware (MOM) for sending and receiving messages between distributed systems. This class is for
@@ -228,7 +228,7 @@ public final class MOM {
    * returned.
    * <p>
    * If the current thread is interrupted while waiting for the reply to receive, this method returns with a
-   * {@link ThreadInterruptedException} and the interruption is propagated to the consumer(s) as well.
+   * {@link ThreadInterruptedError} and the interruption is propagated to the consumer(s) as well.
    * <p>
    * The message is published with default messaging settings, meaning with normal priority, with persistent delivery
    * mode and without expiration.
@@ -244,7 +244,7 @@ public final class MOM {
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
    *          that destination. By default, {@link JsonMarshaller} is used.
    * @return the reply of the consumer.
-   * @throws ThreadInterruptedException
+   * @throws ThreadInterruptedError
    *           if interrupted while waiting for the reply to receive.
    * @throws RuntimeException
    *           if the request failed because the replier threw an exception. If threw a {@link RuntimeException}, it is
@@ -270,7 +270,7 @@ public final class MOM {
    * returned.
    * <p>
    * If the current thread is interrupted while waiting for the reply to receive, this method returns with a
-   * {@link ThreadInterruptedException} and the interruption is propagated to the consumer(s) as well.
+   * {@link ThreadInterruptedError} and the interruption is propagated to the consumer(s) as well.
    *
    * @param transport
    *          specifies the 'transport or network' where to initiate a 'request-reply' communication, e.g.
@@ -285,10 +285,10 @@ public final class MOM {
    * @param input
    *          specifies how to publish the message. Transacted publish of the request is not supported.
    * @return the reply of the consumer.
-   * @throws ThreadInterruptedException
+   * @throws ThreadInterruptedError
    *           if interrupted while waiting for the reply to receive. If interrupted, an interruption request is sent to
    *           the consumer(s).
-   * @throws TimedOutException
+   * @throws TimedOutError
    *           if the timeout specified via {@link PublishInput#withRequestReplyTimeout(long, TimeUnit)} elapsed. If
    *           elapsed, an interruption request is sent to the consumer(s).
    * @throws RuntimeException

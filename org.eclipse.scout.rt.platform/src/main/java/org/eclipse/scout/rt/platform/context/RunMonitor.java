@@ -16,6 +16,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.slf4j.Logger;
@@ -160,7 +161,7 @@ public class RunMonitor implements ICancellable {
       }
       return false; // same behavior like Java Future.
     }
-    catch (final RuntimeException e) {
+    catch (final RuntimeException | PlatformError e) {
       LOG.error("Cancellation failed [cancellable={}]", cancellable, e);
       return false;
     }

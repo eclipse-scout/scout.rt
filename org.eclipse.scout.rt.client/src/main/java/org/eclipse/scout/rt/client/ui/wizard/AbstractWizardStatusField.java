@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
@@ -118,7 +119,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
           try {
             refreshStatus();
           }
-          catch (RuntimeException e) {
+          catch (RuntimeException | PlatformError e) {
             LOG.warn("Could not refresh status", e);
           }
         }

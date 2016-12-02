@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
@@ -1647,7 +1648,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       try {
         propertySupport.setPropertyBool(PROP_SAVE_NEEDED, isTouched() || interceptIsSaveNeeded());
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -1677,7 +1678,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       interceptMarkSaved();
       checkSaveNeeded();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -1695,7 +1696,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       try {
         propertySupport.setPropertyBool(PROP_EMPTY, interceptIsEmpty());
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
@@ -2190,7 +2191,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         try {
           interceptChangedMasterValue(newMasterValue);
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException | PlatformError e) {
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }

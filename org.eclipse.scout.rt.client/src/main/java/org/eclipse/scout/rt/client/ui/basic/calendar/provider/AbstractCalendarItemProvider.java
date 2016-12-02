@@ -40,9 +40,9 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -309,7 +309,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
             .awaitDone();
       }
-      catch (ThreadInterruptedException e) {
+      catch (ThreadInterruptedError e) { // NOSONAR
         // NOOP
       }
     }
@@ -404,7 +404,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         try {
           interceptLoadItemsInBackground(ClientSessionProvider.currentSession(), m_loadingMinDate, m_loadingMaxDate, m_result);
         }
-        catch (ThreadInterruptedException | FutureCancelledException e) { // NOSONAR
+        catch (ThreadInterruptedError | FutureCancelledError e) { // NOSONAR
           // NOOP
         }
         catch (RuntimeException e) {

@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -60,8 +61,8 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
@@ -441,7 +442,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             try {
               getTable().discardAllRows();
             }
-            catch (RuntimeException ex) {
+            catch (RuntimeException | PlatformError ex) {
               BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
@@ -451,7 +452,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             try {
               reloadPage();
             }
-            catch (RuntimeException ex) {
+            catch (RuntimeException | PlatformError ex) {
               BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
@@ -530,7 +531,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         policy.pageSearchFormStarted(this);
       }
     }
-    catch (RuntimeException t) {
+    catch (RuntimeException | PlatformError t) {
       LOG.error("pageCreated {}", getClass().getName(), t);
     }
   }
@@ -658,7 +659,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     try {
       disposeSearchForm();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
@@ -698,7 +699,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         ensureSearchFormStarted();
         interceptPopulateTable();
       }
-      catch (ThreadInterruptedException | FutureCancelledException e) {
+      catch (ThreadInterruptedError | FutureCancelledError e) {
         getTable().discardAllRows();
         setTableStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
         throw e;
@@ -708,7 +709,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         setTableStatus(new Status(ObjectUtility.nvl(e.getDisplayMessage(), ScoutTexts.get("ErrorWhileLoadingData")), IStatus.ERROR));
         throw e;
       }
-      catch (RuntimeException e) {
+      catch (RuntimeException | PlatformError e) {
         getTable().discardAllRows();
         setTableStatus(new Status(ScoutTexts.get("ErrorWhileLoadingData"), IStatus.ERROR));
         throw e;
@@ -758,7 +759,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         loadTableDataImpl();
       }
-      catch (ThreadInterruptedException | FutureCancelledException e) { // NOSONAR
+      catch (ThreadInterruptedError | FutureCancelledError e) { // NOSONAR
         // NOOP
       }
       finally {
@@ -843,7 +844,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         }
       }
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
     return result;
@@ -915,7 +916,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                   childPageList.add(childPage);
                 }
               }
-              catch (RuntimeException ex) {
+              catch (RuntimeException | PlatformError ex) {
                 BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }

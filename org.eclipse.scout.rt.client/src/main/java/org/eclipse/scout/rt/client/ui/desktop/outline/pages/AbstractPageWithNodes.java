@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -126,7 +127,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       table.setReloadHandler(new PageReloadHandler(this));
       table.initTable();
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
     }
     return table;

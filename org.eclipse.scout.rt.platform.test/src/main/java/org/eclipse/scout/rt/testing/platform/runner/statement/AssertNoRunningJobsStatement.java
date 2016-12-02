@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.junit.runners.model.Statement;
 
 /**
@@ -81,7 +81,7 @@ public class AssertNoRunningJobsStatement extends Statement {
       Thread.interrupted(); // clear the thread's interrupted status, in case the JUnit test interrupted the executing thread.
       Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
-    catch (final TimedOutException e) {
+    catch (final TimedOutError e) {
       final List<String> runningJobs = findJobNames(jobFilter);
       if (!runningJobs.isEmpty()) {
         fail(String.format("Test failed because some jobs did not complete yet. [context=%s, jobs=%s]", m_context, runningJobs));

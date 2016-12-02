@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
@@ -250,7 +251,7 @@ public class ComposerAttributeForm extends AbstractForm {
               }
             }
           }
-          catch (RuntimeException e) {
+          catch (RuntimeException | PlatformError e) {
             BEANS.get(ExceptionHandler.class).handle(e);
           }
           // activate corresponding data field

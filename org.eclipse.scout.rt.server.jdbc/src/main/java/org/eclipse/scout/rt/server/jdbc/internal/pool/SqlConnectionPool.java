@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public class SqlConnectionPool {
           }
           catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt(); // Restore the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
-            throw new ThreadInterruptedException("Interrupted while leasing database connection");
+            throw new ThreadInterruptedError("Interrupted while leasing database connection");
           }
         }
         // test candidate connection

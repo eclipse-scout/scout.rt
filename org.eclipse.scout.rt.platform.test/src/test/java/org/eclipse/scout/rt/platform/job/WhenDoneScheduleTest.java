@@ -18,12 +18,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
@@ -149,7 +149,7 @@ public class WhenDoneScheduleTest {
           functionJobRunningLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          throw new ThreadInterruptedException("interrupted", e);
+          throw new ThreadInterruptedError("interrupted", e);
         }
       }
     }, Jobs.newInput()
@@ -484,7 +484,7 @@ public class WhenDoneScheduleTest {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          throw new ThreadInterruptedException("", e);
+          throw new ThreadInterruptedError("", e);
         }
         return result.toUpperCase();
       }
@@ -549,7 +549,7 @@ public class WhenDoneScheduleTest {
       functionFuture.awaitDone(100, TimeUnit.MILLISECONDS);
       fail("timeout expected");
     }
-    catch (TimedOutException e) {
+    catch (TimedOutError e) {
       // NOOP
     }
 
@@ -693,7 +693,7 @@ public class WhenDoneScheduleTest {
           hint2RemovedLatch.unblock();
         }
         catch (InterruptedException e) {
-          throw new ThreadInterruptedException("", e);
+          throw new ThreadInterruptedError("", e);
         }
         return result.toUpperCase();
       }
@@ -732,7 +732,7 @@ public class WhenDoneScheduleTest {
       future.awaitDoneAndGet();
       fail("cancellation excepted");
     }
-    catch (FutureCancelledException e) {
+    catch (FutureCancelledError e) {
       assertTrue(future.isCancelled());
       assertTrue(future.isDone());
     }
