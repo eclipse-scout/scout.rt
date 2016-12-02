@@ -241,16 +241,12 @@ scout.arrays = {
     return -1;
   },
 
-  find: function(arr, predicate) {
-    if (!arr || !predicate) {
+  find: function(arr, predicate, thisArg) {
+    var index = scout.arrays.findIndex(arr, predicate, thisArg);
+    if(index === -1) {
       return null;
     }
-    for (var i = 0; i < arr.length; i++) {
-      var element = arr[i];
-      if (predicate(element, i)) {
-        return element;
-      }
-    }
+    return arr[index];
   },
 
   findFrom: function(arr, startIndex, predicate, backwards) {
