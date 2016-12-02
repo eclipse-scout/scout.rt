@@ -16,20 +16,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.IDN;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.activation.CommandMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.activation.MailcapCommandMap;
 import javax.activation.MimetypesFileTypeMap;
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -610,82 +606,4 @@ public final class MailUtility {
     }
     return characterEncoding;
   }
-
-  static {
-    fixMailcapCommandMap();
-    adjustMailMimeSystemProperties();
-  }
-
-  /**
-   * <p>
-   * Since Java Mail 1.5 <i>mail.mime.encodeparameters</i> has been set to default = <i>true</i> (leading to a RFC-2231
-   * compliant encoding). However some mail clients seem not to handle filename continuations correctly (see RFC-2231,
-   * 3). In this case, long filenames of attachments with special characters might not be displayed correctly (or at
-   * all).
-   * </p>
-   * <p>
-   * Disable <i>mail.mime.encodeparameters</i> for now (pre Java Mail 1.5 setting), the old encoded seem to work better
-   * for all tested mail clients.
-   * </p>
-   *
-   * @see http://www.oracle.com/technetwork/java/javamail/faq/index.html#encodefilename
-   * @see https://javamail.java.net/docs/JavaMail-1.5-changes.txt
-   * @see https://tools.ietf.org/html/rfc2231
-   */
-  private static void adjustMailMimeSystemProperties() {
-    if (System.getProperty("mail.mime.encodeparameters") == null) {
-      System.setProperty("mail.mime.encodeparameters", Boolean.FALSE.toString());
-    }
-    if (System.getProperty("mail.mime.encodefilename") == null) {
-      System.setProperty("mail.mime.encodefilename", Boolean.TRUE.toString());
-    }
-    if (System.getProperty("mail.mime.charset") == null) {
-      System.setProperty("mail.mime.charset", "utf-8");
-    }
-  }
-
-  /**
-   * jax-ws in jre 1.6.0 and priopr to 1.2.7 breaks support for "Umlaute" ä, ö, ü due to a bug in
-   * StringDataContentHandler.writeTo
-   * <p>
-   * This patch uses reflection to eliminate this buggy mapping from the command map and adds the default text_plain
-   * mapping (if available, e.g. sun jre)
-   */
-  @SuppressWarnings({"unchecked", "squid:S1181"})
-  private static void fixMailcapCommandMap() {
-    try {
-      //set the com.sun.mail.handlers.text_plain to level 0 (programmatic) to prevent others from overriding in level 0
-      final String className = "com.sun.mail.handlers.text_plain";
-      Class textPlainClass;
-      try { // NOSONAR
-        textPlainClass = Class.forName(className);
-      }
-      catch (ClassNotFoundException e) {
-        //class not found, cancel
-        LOG.debug("Could not modify Mailcap command map because expected class has not been found", e);
-        return;
-      }
-      CommandMap cmap = MailcapCommandMap.getDefaultCommandMap();
-      if (!(cmap instanceof MailcapCommandMap)) {
-        return;
-      }
-      ((MailcapCommandMap) cmap).addMailcap("text/plain;;x-java-content-handler=" + textPlainClass.getName());
-      //use reflection to clear out all other mappings of text/plain in level 0
-      Field f = MailcapCommandMap.class.getDeclaredField("DB");
-      f.setAccessible(true);
-      Object[] dbArray = (Object[]) f.get(cmap);
-      f = Class.forName("com.sun.activation.registries.MailcapFile").getDeclaredField("type_hash");
-      f.setAccessible(true);
-      Map<Object, Object> db0 = (Map<Object, Object>) f.get(dbArray[0]);
-      Map<Object, Object> typeMap = (Map<Object, Object>) db0.get("text/plain");
-      List<String> handlerList = (List<String>) typeMap.get("content-handler");
-      //put text_plain in front
-      handlerList.remove(className);
-      handlerList.add(0, className);
-    }
-    catch (Throwable t) {
-      LoggerFactory.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
-    }
-  }
-
 }
