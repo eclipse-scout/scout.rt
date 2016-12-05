@@ -293,8 +293,8 @@ $.resolvedPromise = function() {
 /**
  * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
  *
- * @param asArray (optional) when set to true, the resolve and reject functions will transform the
- *    flat arguments list containing the results into an array. Default is false.
+ * @param asArray (optional) when set to true, the resolve function will transform the
+ *    flat arguments list containing the results into an array. The arguments of the reject function won't be touched. Default is false.
  */
 $.promiseAll = function(promises, asArray) {
   asArray = scout.nvl(asArray, false);
@@ -307,11 +307,7 @@ $.promiseAll = function(promises, asArray) {
       deferred.resolve.apply(this, arguments);
     }
   }).fail(function() {
-    if (asArray) {
-      deferred.reject(scout.objects.argumentsToArray(arguments));
-    } else {
-      deferred.reject.apply(this, arguments);
-    }
+    deferred.reject.apply(this, arguments);
   });
   return deferred.promise();
 };
