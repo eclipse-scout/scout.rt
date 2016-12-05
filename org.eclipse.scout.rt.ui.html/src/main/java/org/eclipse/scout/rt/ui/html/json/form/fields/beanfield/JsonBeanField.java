@@ -73,7 +73,7 @@ public class JsonBeanField<BEAN_FIELD extends IBeanField<?>> extends JsonValueFi
   }
 
   protected void handleUiAppLinkAction(JsonEvent event) {
-    String ref = event.getData().getString("ref");
+    String ref = event.getData().optString("ref", null);
     getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 
