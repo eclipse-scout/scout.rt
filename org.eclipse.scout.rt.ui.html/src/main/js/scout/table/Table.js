@@ -3052,6 +3052,10 @@ scout.Table.prototype._ensureFilter = function(filter) {
   return scout.create(filter);
 };
 
+scout.Table.prototype.setTableStatus = function(status) {
+  this.setProperty('tableStatus', status);
+};
+
 scout.Table.prototype._syncTableStatus = function(status) {
   status = scout.Status.ensure(status);
   this._setProperty('tableStatus', status);

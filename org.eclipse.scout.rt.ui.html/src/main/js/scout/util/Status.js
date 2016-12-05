@@ -105,17 +105,43 @@ scout.Status.ensure = function(status) {
 /**
  * @returns a Status object with severity OK.
  */
-scout.Status.ok = function() {
-  return new scout.Status({
+scout.Status.ok = function(model) {
+  model = model || {};
+  model = $.extend({}, model, {
     severity: scout.Status.Severity.OK
   });
+  return new scout.Status(model);
 };
 
 /**
  * @returns a Status object with severity INFO.
  */
-scout.Status.info = function() {
-  return new scout.Status({
+scout.Status.info = function(model) {
+  model = model || {};
+  model = $.extend({}, model, {
     severity: scout.Status.Severity.INFO
   });
+  return new scout.Status(model);
+};
+
+/**
+ * @returns a Status object with severity WARN.
+ */
+scout.Status.warn = function(model) {
+  model = model || {};
+  model = $.extend({}, model, {
+    severity: scout.Status.Severity.WARN
+  });
+  return new scout.Status(model);
+};
+
+/**
+ * @returns a Status object with severity ERROR.
+ */
+scout.Status.error = function(model) {
+  model = model || {};
+  model = $.extend({}, model, {
+    severity: scout.Status.Severity.ERROR
+  });
+  return new scout.Status(model);
 };

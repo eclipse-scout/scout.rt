@@ -115,7 +115,7 @@ scout.PageWithTable.prototype.loadChildren = function() {
 };
 
 // see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
-scout.PageWithTable.prototype.loadTableData = function () {
+scout.PageWithTable.prototype.loadTableData = function() {
   this.detailTable.deleteAllRows();
   return this._loadTableData()
     .done(this._onLoadTableDataDone.bind(this))
@@ -157,6 +157,9 @@ scout.PageWithTable.prototype._onLoadTableDataDone = function(tableData) {
 };
 
 scout.PageWithTable.prototype._onLoadTableDataFail = function(error) {
+  this.detailTable.setTableStatus(scout.Status.error({
+    message: this.session.text("ErrorWhileLoadingData")
+  }));
   $.log.error('Failed to load tableData. error=', error);
 };
 
