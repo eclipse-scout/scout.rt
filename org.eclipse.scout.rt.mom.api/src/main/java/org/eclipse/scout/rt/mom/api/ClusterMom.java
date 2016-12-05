@@ -72,31 +72,31 @@ public class ClusterMom extends AbstractMomTransport {
    * Example to connect to a peer based cluster, which is useful in development mode because there is no central broker:
    *
    * <pre>
-   * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
-   *                               (scout.mom.connectionfactory.name)->ClusterMom\
-   *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
-   *                               <strong>(java.naming.provider.url)->failover:(peer://mom/cluster?persistent=false)\</strong>
-   *                               (connectionFactoryNames)->ClusterMom
+   * scout.mom.cluster.environment[scout.mom.name]=Scout Cluster MOM
+   * scout.mom.cluster.environment[scout.mom.connectionfactory.name]=ClusterMom
+   * scout.mom.cluster.environment[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory
+   * <strong>scout.mom.cluster.environment[java.naming.provider.url]=failover:(peer://mom/cluster?persistent=false)</strong>
+   * scout.mom.cluster.environment[connectionFactoryNames]=ClusterMom
    * </pre>
    *
    * Example to start an embedded broker which accepts remote connections from other hosts:
    *
    * <pre>
-   * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
-   *                               (scout.mom.connectionfactory.name)->ClusterMom\
-   *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
-   *                               <strong>(java.naming.provider.url)->vm:(broker:(tcp://0.0.0.0:5050)?persistent=false\</strong>
-   *                               (connectionFactoryNames)->ClusterMom
+   * scout.mom.cluster.environment[scout.mom.name]=Scout Cluster MOM
+   * scout.mom.cluster.environment[scout.mom.connectionfactory.name]=ClusterMom
+   * scout.mom.cluster.environment[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory
+   * <strong>scout.mom.cluster.environment[java.naming.provider.url]=vm:(broker:(tcp://0.0.0.0:5050)?persistent=false</strong>
+   * scout.mom.cluster.environment[connectionFactoryNames]=ClusterMom
    * </pre>
    *
    * Example to connect to a remote broker:
    *
    * <pre>
-   * scout.mom.cluster.environment=(scout.mom.name)->Scout Cluster MOM\
-   *                               (scout.mom.connectionfactory.name)->ClusterMom\
-   *                               (java.naming.factory.initial)->org.apache.activemq.jndi.ActiveMQInitialContextFactory\
-   *                               <strong>(java.naming.provider.url)->tcp://ip_of_broker:5050\</strong>
-   *                               (connectionFactoryNames)->ClusterMom
+   * scout.mom.cluster.environment[scout.mom.name]=Scout Cluster MOM
+   * scout.mom.cluster.environment[scout.mom.connectionfactory.name]=ClusterMom
+   * scout.mom.cluster.environment[java.naming.factory.initial]=org.apache.activemq.jndi.ActiveMQInitialContextFactory
+   * <strong>scout.mom.cluster.environment[java.naming.provider.url]=tcp://ip_of_broker:5050</strong>
+   * scout.mom.cluster.environment[connectionFactoryNames]=ClusterMom
    * </pre>
    */
   public static class ClusterMomEnvironmentProperty extends AbstractMapConfigProperty {

@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
-public abstract class AbstractBinaryConfigProperty extends AbstractConfigProperty<byte[]> {
+public abstract class AbstractBinaryConfigProperty extends AbstractConfigProperty<byte[], String> {
 
   @Override
   protected byte[] parse(String value) {

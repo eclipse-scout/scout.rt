@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.security.SimplePrincipal;
  *
  * @since 5.1
  */
-public abstract class AbstractSubjectConfigProperty extends AbstractConfigProperty<Subject> {
+public abstract class AbstractSubjectConfigProperty extends AbstractConfigProperty<Subject, String> {
 
   @Override
   protected Subject parse(final String value) {

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -112,8 +113,10 @@ public class ScoutInfoForm extends AbstractForm {
   protected Map<String, Object> getProperties() {
     Map<String, Object> props = new LinkedHashMap<>();
     props.put(ScoutTexts.get("Username"), ClientSessionProvider.currentSession().getUserId());
-    props.put(ScoutTexts.get("Language"), NlsLocale.get().getDisplayLanguage());
-    props.put(ScoutTexts.get("FormattingLocale"), NlsLocale.get());
+
+    Locale locale = NlsLocale.get();
+    props.put(ScoutTexts.get("Language"), locale.getDisplayLanguage(locale));
+    props.put(ScoutTexts.get("FormattingLocale"), locale);
     props.put(ScoutTexts.get("ScoutVersion"), OfficialVersion.VERSION);
     return props;
   }

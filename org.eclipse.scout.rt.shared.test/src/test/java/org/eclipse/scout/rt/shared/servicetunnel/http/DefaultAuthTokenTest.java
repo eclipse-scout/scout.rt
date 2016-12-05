@@ -39,7 +39,7 @@ public class DefaultAuthTokenTest {
   @Replace
   private static class AuthTokenPrivateKeyPropertyEx extends AuthTokenPrivateKeyProperty {
     @Override
-    protected byte[] createValue() {
+    public byte[] getValue(String namespace) {
       return s_pair.getPrivateKey();
     }
   }
@@ -47,7 +47,7 @@ public class DefaultAuthTokenTest {
   @Replace
   private static class AuthTokenPublicKeyPropertyEx extends AuthTokenPublicKeyProperty {
     @Override
-    protected byte[] createValue() {
+    public byte[] getValue(String namespace) {
       return s_pair.getPublicKey();
     }
   }

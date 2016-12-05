@@ -10,28 +10,53 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Utility to extract properties stored in the <code>config.properties</code> file of scout applications.
+ * Helper class to extract properties stored in a config.properties file or one of its imports.
  * <p>
- * The file is located on the classpath, typically in WEB-INF/classes/config.properties or in development
- * src/main/resources
+ * The file is located on the classpath, typically in WEB-INF/classes/config.properties or during development in
+ * src/main/resources.<br>
+ * It can also be specified by setting the system property "{@code config.properties}" that contains an {@link URL}
+ * pointing to the actual properties file.
  * <p>
- * It can also be specified by setting the system property
- * <code>-Dconfig.properties=path-to-config.properties-file</code>
+ * The following formats are supported:
+ * <ul>
+ * <li>Simple Key-Value pairs:<br>
+ * <code>scout.sample.mykey=sample-value</code><br>
+ * Such values can be retrieved using the corresponding methods. E.g.: {@link #getProperty(String)},
+ * {@link #getPropertyInt(String, int)}, {@link #getPropertyBoolean(String, boolean)}, ...</li>
+ * <li>List values:<br>
+ * <code>scout.sample.mylist[0]=value-of-first<br>scout.sample.mylist[1]=value-of-second</code><br>
+ * List values can be retrieved using the method {@link #getPropertyList(String)} or one of its overloads.</li>
+ * <li>Map values:<br>
+ * <code>scout.sample.mymap[first_map_key]=value-of-first<br>scout.sample.mymap[second_map_key]=value-of-second</code><br>
+ * Map values can be retrieved using the method {@link #getPropertyMap(String)} or one of its overloads.</li>
+ * </ul>
  * <p>
- * Properties are simple key-value-pairs.<br>
- * Properties may contain placeholders for other variables: <code>${variableName}</code>. These variables are then
- * resolved once when the properties are initialized.<br>
- * </p>
- * Examples:<br>
+ * A key may be part of a namespace. This way the same key can exist multiple times in the same config file put can be
+ * accessed using one {@link IConfigProperty} instance. Therefore such an instance can return different values for the
+ * same key but different namespaces. A namespace is separated using the pipe character (|).
+ * <p>
+ * Properties may contain placeholders for other properties: <code>${variableName}</code>. These values are then
+ * resolved once when the properties are initialized.
+ * <p>
+ * The special key "<code>import</code>" is reserved and expects an URL pointing to other .properties files.<br>
+ * Such a file can be on the classpath (use {@code classpath:}) or any other supported URL.
+ * <p>
+ * Examples: <br>
  * <code>
- * &lt;ul&gt;<br>
- *    &lt;li&gt;customProperty=customValues&lt;/li&gt;<br>
- *    &lt;li&gt;myProperty=${customProperty}/subfolders&lt;/li&gt;<br>
- * &lt;/ul&gt;<br>
+ * <ul>
+ * <li>import[0]=classpath:myConfigs/other.properties</li>
+ * <li>import[1]=file:/C:/path/to/my/settings.properties</li>
+ * <li>customProperty=customValues</li>
+ * <li>myProperty=${customProperty}/subfolders</li>
+ * <li>my-namespace|myMap[key0]=value0</li>
+ * <li>my-namespace|myMap[key1]=value1</li>
+ * </ul>
  * </code>
  */
 public final class ConfigUtility {
@@ -48,163 +73,175 @@ public final class ConfigUtility {
   private static final PropertiesHelper INSTANCE = new PropertiesHelper(CONFIG_FILE_NAME);
 
   /**
-   * Gets the property with given key. If there is no property with given key, <code>null</code> is returned.<br>
-   * The given key is searched in the following order:
-   * <ol>
-   * <li>in the system properties ({@link System#getProperty(String)})</li>
-   * <li>in properties defined in a <code>config.properties</code>.</li>
-   * <li>in the environment variables ({@link System#getenv(String)})</li>
-   * </ol>
-   *
-   * @param key
-   *          The key of the property.
-   * @return The value of the given property or <code>null</code>.
+   * @see PropertiesHelper#getProperty(String)
    */
   public static String getProperty(String key) {
     return INSTANCE.getProperty(key);
   }
 
   /**
-   * Gets the property with given key. If there is no property with given key, the given default value is returned.<br>
-   * The given key is searched in the following order:
-   * <ol>
-   * <li>in the system properties ({@link System#getProperty(String)})</li>
-   * <li>in properties defined in a <code>config.properties</code></li>
-   * <li>in the environment variables ({@link System#getenv(String)})</li>
-   * </ol>
-   *
-   * @param key
-   *          The key of the property.
-   * @return The value of the given property, the given default value if the property could not be found or
-   *         <code>null</code> if the key is <code>null</code>.
+   * @see PropertiesHelper#getProperty(String, String)
    */
   public static String getProperty(String key, String defaultValue) {
     return INSTANCE.getProperty(key, defaultValue);
   }
 
   /**
-   * Gets the property with given key as boolean. If a property with given key does not exist or is no valid boolean
-   * value, the given default value is returned.
-   *
-   * @param key
-   *          The key of the property.
-   * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid boolean associated with it.
-   * @return The boolean value of the given key or the given default value otherwise.
-   * @since 5.1
-   * @see #getProperty(String)
+   * @see PropertiesHelper#getProperty(String, String, String)
+   */
+  public static String getProperty(String key, String defaultValue, String namespace) {
+    return INSTANCE.getProperty(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyList(String)
+   */
+  public static List<String> getPropertyList(String key) {
+    return INSTANCE.getPropertyList(key);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyList(String, String)
+   */
+  public static List<String> getPropertyList(String key, String namespace) {
+    return INSTANCE.getPropertyList(key, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyList(String, List)
+   */
+  public static List<String> getPropertyList(String key, List<String> defaultValue) {
+    return INSTANCE.getPropertyList(key, defaultValue);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyList(String, List, String)
+   */
+  public static List<String> getPropertyList(String key, List<String> defaultValue, String namespace) {
+    return INSTANCE.getPropertyList(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyMap(String)
+   */
+  public static Map<String, String> getPropertyMap(String key) {
+    return INSTANCE.getPropertyMap(key);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyMap(String, Map)
+   */
+  public static Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue) {
+    return INSTANCE.getPropertyMap(key, defaultValue);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyMap(String, String)
+   */
+  public static Map<String, String> getPropertyMap(String key, String namespace) {
+    return INSTANCE.getPropertyMap(key, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyMap(String, Map, String)
+   */
+  public static Map<String, String> getPropertyMap(String key, Map<String, String> defaultValue, String namespace) {
+    return INSTANCE.getPropertyMap(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyBoolean(String, boolean)
    */
   public static boolean getPropertyBoolean(String key, boolean defaultValue) {
     return INSTANCE.getPropertyBoolean(key, defaultValue);
   }
 
   /**
-   * Gets the property with given key as int. If a property with given key does not exist or is no valid int value, the
-   * given default value is returned.
-   *
-   * @param key
-   *          The key of the property.
-   * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid int associated with it.
-   * @return The int value of the given key or the given default value otherwise.
-   * @since 5.1
-   * @see #getProperty(String)
+   * @see PropertiesHelper#getPropertyBoolean(String, boolean, String)
+   */
+  public static boolean getPropertyBoolean(String key, boolean defaultValue, String namespace) {
+    return INSTANCE.getPropertyBoolean(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyInt(String, int)
    */
   public static int getPropertyInt(String key, int defaultValue) {
     return INSTANCE.getPropertyInt(key, defaultValue);
   }
 
   /**
-   * Gets the property with given key as long. If a property with given key does not exist or is no valid long value,
-   * the given default value is returned.
-   *
-   * @param key
-   *          The key of the property.
-   * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid long associated with it.
-   * @return The long value of the given key or the given default value otherwise.
-   * @since 5.1
-   * @see #getProperty(String)
+   * @see PropertiesHelper#getPropertyInt(String, int, String)
+   */
+  public static int getPropertyInt(String key, int defaultValue, String namespace) {
+    return INSTANCE.getPropertyInt(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyLong(String, long)
    */
   public static long getPropertyLong(String key, long defaultValue) {
     return INSTANCE.getPropertyLong(key, defaultValue);
   }
 
   /**
-   * Gets the property with given key as float. If a property with given key does not exist or is no valid float value,
-   * the given default value is returned.
-   *
-   * @param key
-   *          The key of the property.
-   * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid float associated with it.
-   * @return The float value of the given key or the given default value otherwise.
-   * @since 5.1
-   * @see #getProperty(String)
+   * @see PropertiesHelper#getPropertyLong(String, long, String)
+   */
+  public static long getPropertyLong(String key, long defaultValue, String namespace) {
+    return INSTANCE.getPropertyLong(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyFloat(String, float)
    */
   public static float getPropertyFloat(String key, float defaultValue) {
     return INSTANCE.getPropertyFloat(key, defaultValue);
   }
 
   /**
-   * Gets the property with given key as double. If a property with given key does not exist or is no valid double
-   * value, the given default value is returned.
-   *
-   * @param key
-   *          The key of the property.
-   * @param defaultValue
-   *          The default value to use if the given key does not exist or as no valid double associated with it.
-   * @return The double value of the given key or the given default value otherwise.
-   * @since 5.1
-   * @see #getProperty(String)
+   * @see PropertiesHelper#getPropertyFloat(String, float, String)
+   */
+  public static float getPropertyFloat(String key, float defaultValue, String namespace) {
+    return INSTANCE.getPropertyFloat(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getPropertyDouble(String, double)
    */
   public static double getPropertyDouble(String key, double defaultValue) {
     return INSTANCE.getPropertyDouble(key, defaultValue);
   }
 
   /**
-   * Gets all property key names defined in the loaded config.properties file.
-   *
-   * @return A {@link Set} copy containing all property key names.
+   * @see PropertiesHelper#getPropertyDouble(String, double, String)
+   */
+  public static double getPropertyDouble(String key, double defaultValue, String namespace) {
+    return INSTANCE.getPropertyDouble(key, defaultValue, namespace);
+  }
+
+  /**
+   * @see PropertiesHelper#getAllPropertyNames()
    */
   public static Set<String> getAllPropertyNames() {
     return INSTANCE.getAllPropertyNames();
   }
 
   /**
-   * Gets all properties and the corresponding values loaded from the config.properties file.
-   *
-   * @return A {@link Map} copy containing all entries.
+   * @see PropertiesHelper#getAllEntries()
    */
   public static Map<String, String> getAllEntries() {
     return INSTANCE.getAllEntries();
   }
 
   /**
-   * @return true if the config.properties contains the key
+   * @see PropertiesHelper#hasProperty(String)
    */
   public static boolean hasProperty(String key) {
     return INSTANCE.hasProperty(key);
   }
 
   /**
-   * Resolves all variables of format <code>${variableName}</code> in the given expression according to the current
-   * application context.
-   *
-   * @param s
-   *          The expression to resolve.
-   * @return A {@link String} where all variables have been replaced with their values.
-   * @throws IllegalArgumentException
-   *           if a variable could not be resolved in the current context.
-   */
-  public static String resolve(String s) {
-    return INSTANCE.resolve(s);
-  }
-
-  /**
-   * Specifies if a config.properties has been found and loaded.
-   *
-   * @return <code>true</code> if a config.properties has been loaded, <code>false</code> otherwise.
+   * @see PropertiesHelper#isInitialized()
    */
   public static boolean isInitialized() {
     return INSTANCE.isInitialized();

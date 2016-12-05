@@ -118,6 +118,11 @@ public class PlatformStartTest {
       reentrantPlatform.getBeanManager();
       return context;
     }
+
+    @Override
+    protected void validateConfiguration() {
+      // nop
+    }
   }
 
   public static class FixturePlatformWithMinimalBeanManager extends DefaultPlatform {
@@ -129,6 +134,10 @@ public class PlatformStartTest {
       context.registerClass(SimpleBeanDecorationFactory.class);
       return context;
     }
-  }
 
+    @Override
+    protected void validateConfiguration() {
+      // nop
+    }
+  }
 }

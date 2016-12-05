@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.internal;
 
 import java.awt.GraphicsEnvironment;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -27,7 +29,7 @@ import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.ConfigUtility;
-import org.eclipse.scout.rt.platform.config.IConfigProperty;
+import org.eclipse.scout.rt.platform.config.IConfigurationValidator;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
@@ -181,20 +183,30 @@ public class PlatformImplementor implements IPlatform {
     if (!ConfigUtility.isInitialized()) {
       LOG.info("No {} found. Running with empty configuration.", ConfigUtility.CONFIG_FILE_NAME);
     }
-
     int errorCount = 0;
-    for (IConfigProperty prop : BEANS.all(IConfigProperty.class)) {
-      try {
-        prop.getValue();
-      }
-      catch (Exception ex) {
+    List<IConfigurationValidator> validators = BEANS.all(IConfigurationValidator.class);
+    for (Entry<String, String> config : ConfigUtility.getAllEntries().entrySet()) {
+      if (!isConfigEntryValid(validators, config)) {
         errorCount++;
-        LOG.error("Failed reading config property '{}'", prop.getKey(), ex);
+        LOG.error("Config property with key '{}' does not exist or has an invalid value.", config.getKey());
       }
+    }
+    // the validators are not used anymore. Allow to free resources
+    for (IConfigurationValidator validator : validators) {
+      validator.dispose();
     }
     if (errorCount > 0) {
       throw new PlatformException("Cannot start platform due to " + errorCount + " invalid config properties");
     }
+  }
+
+  protected boolean isConfigEntryValid(List<IConfigurationValidator> validators, Entry<String, String> config) {
+    for (IConfigurationValidator validator : validators) {
+      if (validator.isValid(config.getKey(), config.getValue())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected BeanManagerImplementor createBeanManager() {

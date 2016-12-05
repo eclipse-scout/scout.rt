@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * A config property which represents a Java class.
  */
-public abstract class AbstractClassConfigProperty<TYPE> extends AbstractConfigProperty<Class<? extends TYPE>> {
+public abstract class AbstractClassConfigProperty<TYPE> extends AbstractConfigProperty<Class<? extends TYPE>, String> {
 
   @SuppressWarnings("unchecked")
   @Override

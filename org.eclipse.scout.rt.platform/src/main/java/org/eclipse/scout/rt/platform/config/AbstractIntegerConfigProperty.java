@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * Config property for {@link Integer} values.
  */
-public abstract class AbstractIntegerConfigProperty extends AbstractConfigProperty<Integer> {
+public abstract class AbstractIntegerConfigProperty extends AbstractConfigProperty<Integer, String> {
 
   @Override
   protected Integer parse(String value) {

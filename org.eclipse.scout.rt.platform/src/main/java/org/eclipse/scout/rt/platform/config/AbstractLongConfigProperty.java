@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * Config property for {@link Long} values.
  */
-public abstract class AbstractLongConfigProperty extends AbstractConfigProperty<Long> {
+public abstract class AbstractLongConfigProperty extends AbstractConfigProperty<Long, String> {
 
   @Override
   protected Long parse(String value) {

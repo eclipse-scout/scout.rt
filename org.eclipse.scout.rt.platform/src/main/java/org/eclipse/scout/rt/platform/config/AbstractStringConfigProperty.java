@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
-public abstract class AbstractStringConfigProperty extends AbstractConfigProperty<String> {
+public abstract class AbstractStringConfigProperty extends AbstractConfigProperty<String, String> {
 
   @Override
   protected String parse(String value) {

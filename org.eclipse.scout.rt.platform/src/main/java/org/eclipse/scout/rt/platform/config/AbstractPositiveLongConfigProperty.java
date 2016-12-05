@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
-public abstract class AbstractPositiveLongConfigProperty extends AbstractConfigProperty<Long> {
+public abstract class AbstractPositiveLongConfigProperty extends AbstractConfigProperty<Long, String> {
 
   private static final Pattern LONG_PAT = Pattern.compile("^\\d{1,18}$");
 

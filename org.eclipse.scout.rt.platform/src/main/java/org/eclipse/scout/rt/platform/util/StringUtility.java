@@ -1102,13 +1102,16 @@ public final class StringUtility {
     return formattedPhoneNumber;
   }
 
+  /**
+   * Null-safe version of {@link CharSequence#length()}.
+   *
+   * @return <code>0</code> if <code>s</code> is <code>null</code> or empty.
+   */
   public static int length(CharSequence s) {
     if (s == null) {
       return 0;
     }
-    else {
-      return s.length();
-    }
+    return s.length();
   }
 
   public static String lowercase(String s) {
@@ -1999,15 +2002,6 @@ public final class StringUtility {
       return false;
     }
     return Pattern.compile(regex, flags).matcher(s).matches();
-  }
-
-  /**
-   * Null-safe version of {@link String#length()}.
-   *
-   * @return <code>0</code> if <code>s</code> is <code>null</code>
-   */
-  public static int length(String s) {
-    return (s == null ? 0 : s.length());
   }
 
   /**

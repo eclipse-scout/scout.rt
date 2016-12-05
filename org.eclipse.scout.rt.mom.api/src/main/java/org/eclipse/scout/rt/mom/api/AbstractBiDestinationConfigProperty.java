@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  * @see IDestination
  * @since 6.1
  */
-public abstract class AbstractBiDestinationConfigProperty<REQUEST, REPLY> extends AbstractConfigProperty<IBiDestination<REQUEST, REPLY>> {
+public abstract class AbstractBiDestinationConfigProperty<REQUEST, REPLY> extends AbstractConfigProperty<IBiDestination<REQUEST, REPLY>, String> {
 
   // -----------------------------------------------------------------------------------
   // Implementation note: The same code exists in AbstractDestinationConfigProperty.

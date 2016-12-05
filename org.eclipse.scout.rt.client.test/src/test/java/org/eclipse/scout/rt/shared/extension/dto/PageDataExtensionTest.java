@@ -36,7 +36,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
   @Before
   public void before() {
     final IClientSession session = Mockito.mock(IClientSession.class);
-    System.setProperty("user.area", "@user.home/test");
+    System.setProperty("user.area", "${user.home}/test");
     Mockito.when(session.getUserId()).thenReturn("userid");
     Mockito.when(session.getUserAgent()).thenReturn(UserAgents.createDefault());
     ISession.CURRENT.set(session);
