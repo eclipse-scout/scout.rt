@@ -17,11 +17,6 @@ scout.inherits(scout.TreeLayout, scout.AbstractLayout);
 scout.TreeLayout.prototype.layout = function($container) {
   var htmlContainer = this.tree.htmlComp;
 
-  //FIXME CGU/AWE remove this check as soon as HtmlComp.validateLayout checks for invisible components
-  if (!htmlContainer.isAttachedAndVisible() || !htmlContainer.$comp.isEveryParentVisible()) {
-    return;
-  }
-
   this._layout($container);
   scout.scrollbars.update(this.tree.$data);
 };
