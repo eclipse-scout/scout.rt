@@ -27,11 +27,6 @@ scout.TableLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  //FIXME CGU/AWE remove this check as soon as HtmlComp.validateLayout checks for invisible components
-  if (!htmlContainer.isAttachedAndVisible() || !htmlContainer.$comp.isEveryParentVisible()) {
-    return;
-  }
-
   if (menuBar.visible) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);

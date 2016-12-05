@@ -385,7 +385,12 @@ scout.FormField.prototype._renderLabelBackgroundColor = function() {
 };
 
 scout.FormField.prototype._renderGridData = function() {
-  this.invalidateLayoutTree();
+  if (this.rendered) {
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) { // may be null if $container is detached
+      this.htmlComp.getParent().invalidateLayoutTree();
+    }
+  }
 };
 
 scout.FormField.prototype._renderMenus = function() {
