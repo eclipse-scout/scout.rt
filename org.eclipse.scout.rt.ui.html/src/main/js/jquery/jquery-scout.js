@@ -282,7 +282,7 @@ $.resolvedDeferred = function() {
  * <code>$.Deferred().resolve([arguments]).promise();</code>
  *
  * @param all arguments of this function are passed to the resolve function of the deferred
- * @returns {$.Deferred} a promise for an already resolved jQuery.Deferred object.
+ * @returns {Promise} a promise for an already resolved jQuery.Deferred object.
  */
 $.resolvedPromise = function() {
   var deferred = $.Deferred();

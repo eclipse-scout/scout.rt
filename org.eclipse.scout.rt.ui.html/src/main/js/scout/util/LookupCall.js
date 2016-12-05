@@ -1,7 +1,9 @@
 scout.LookupCall = function() {
+  this.session = null;
 };
 
 scout.LookupCall.prototype.init = function(model) {
+  scout.assertParameter('session', model.session);
   this._init(model);
 };
 
@@ -10,8 +12,8 @@ scout.LookupCall.prototype._init = function(model) {
 };
 
 /**
- * @returns Promise
+ * @returns {Promise}
  */
 scout.LookupCall.prototype.textById = function(id) {
-  // to be implemented by subclasses
+  // To be implemented by subclasses
 };

@@ -111,7 +111,9 @@ scout.SmartField.prototype._renderProperties = function() {
 
 scout.SmartField.prototype._syncLookupCall = function(lookupCall) {
   if (typeof lookupCall === 'string') {
-    lookupCall = scout.create(lookupCall);
+    lookupCall = scout.create(lookupCall, {
+      session: this.session
+    });
   }
   this._setProperty('lookupCall', lookupCall);
 };
