@@ -14,7 +14,7 @@ scout.GroupBox = function() {
   this.menus = [];
   this.menuBarVisible = true;
   this.staticMenus = [];
-  this._addAdapterProperties(['fields', 'menus']);
+  this._addAdapterProperties(['fields']);
   this.$body;
   this.$title;
 

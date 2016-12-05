@@ -364,18 +364,15 @@ scout.Tree.prototype._onDataScroll = function() {
   this.scrollToSelection = scrollToSelectionBackup;
 };
 
-
 scout.Tree.prototype.setScrollTop = function(scrollTop) {
   this.scrollTop = scrollTop;
-  if(this.rendered){
-scout.scrollbars.scrollTop(this.$data, scrollTop);
+  if (this.rendered) {
+    scout.scrollbars.scrollTop(this.$data, scrollTop);
 
-  // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  this._renderViewport();
+    // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+    this._renderViewport();
   }
 };
-
-
 
 scout.Tree.prototype._renderViewport = function() {
   if (this.runningAnimations > 0 || this._renderViewportBlocked) {
@@ -1074,7 +1071,6 @@ scout.Tree.prototype._renderSelection = function() {
       node.$node.select(true);
     }
   }, this);
-
 
   // Update 'group' markers for all rendered nodes
   for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {

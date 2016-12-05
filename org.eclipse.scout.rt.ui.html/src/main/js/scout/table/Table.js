@@ -2288,14 +2288,12 @@ scout.Table.prototype.scrollPageDown = function() {
 scout.Table.prototype.setScrollTop = function(scrollTop) {
 
   this.scrollTop = scrollTop;
-  if(this.rendered){
-scout.scrollbars.scrollTop(this.$data, scrollTop);
-  // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  this._renderViewport();
+  if (this.rendered) {
+    scout.scrollbars.scrollTop(this.$data, scrollTop);
+    // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+    this._renderViewport();
   }
 };
-
-
 
 scout.Table.prototype.revealSelection = function() {
   if (!this.rendered) {

@@ -11,7 +11,6 @@
 scout.Button = function() {
   scout.Button.parent.call(this);
   this.$buttonLabel;
-  this._addAdapterProperties(['menus']);
 
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
 };
