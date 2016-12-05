@@ -14,8 +14,11 @@ import java.security.BasicPermission;
 import java.security.Permission;
 
 /**
- * permission grants nothing
+ * Permission grants nothing
+ *
+ * @deprecated NoAccessPermission will be removed with Scout 6.1
  */
+@Deprecated
 public class NoAccessPermission extends BasicPermission {
   private static final long serialVersionUID = 1L;
 
