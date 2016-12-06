@@ -114,7 +114,10 @@ scout.PageWithTable.prototype.loadChildren = function() {
   return this.loadTableData();
 };
 
-// see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
+/**
+ * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
+ * @returns {$.Deferred}
+ */
 scout.PageWithTable.prototype.loadTableData = function() {
   this.detailTable.deleteAllRows();
   return this._loadTableData()

@@ -123,6 +123,7 @@ scout.TreeNode.prototype.loadChildren = function() {
 /**
  * This method calls loadChildren() but does nothing when children are already loaded or when loadChildren()
  * is already in progress.
+ * @returns {Promise}
  */
 scout.TreeNode.prototype.ensureLoadChildren = function() {
   // when children are already loaded we return an already resolved promise so the caller can continue immediately
