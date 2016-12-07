@@ -17,6 +17,7 @@
   position: absolute;
   z-index: 1;
   cursor: pointer;
+  overflow: hidden;
 
   &.y-axis {
     height: calc(~'100%' - 2 * @scrollbar-margin);
@@ -61,4 +62,14 @@
 .scrollbar-thumb-move,
 .scrollbar-thumb:hover {
   background-color: fade(@scrollbar-thumb-color, 60%);
+}
+
+.container-too-small-for-thumb {
+  border-radius: 0px;
+  background-color: fade(@scrollbar-thumb-color, 15%);
+}
+
+.container-too-small-for-thumb.scrollbar-thumb-move,
+.container-too-small-for-thumb.scrollbar-thumb:hover {
+  background-color: fade(@scrollbar-thumb-color, 15%);
 }
