@@ -9,12 +9,12 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 
 /**
- * MOM which does nothing, and which is useful if running in development mode with no access to the network.
+ * MOM which does nothing. This is useful to disable a MOM on certain environments, e.g. in development mode.
  *
  * @since 6.1
  */
 @ApplicationScoped
-public class NullMomImplementor implements IMomImplementor {
+public final class NullMomImplementor implements IMomImplementor {
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {

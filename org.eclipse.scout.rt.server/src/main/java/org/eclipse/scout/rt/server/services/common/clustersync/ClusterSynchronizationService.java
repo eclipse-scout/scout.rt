@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.mom.api.ClusterMom;
-import org.eclipse.scout.rt.mom.api.ClusterMom.ClusterMomImplementorProperty;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
@@ -109,8 +108,9 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       return true;
     }
 
-    if (ClusterMomImplementorProperty.isNullImplementor()) {
+    if (BEANS.get(ClusterMom.class).isNullTransport()) {
       LOG.info("Cluster synchronization is not enabled.");
+      return false;
     }
 
     synchronized (m_subscriptionLock) {
