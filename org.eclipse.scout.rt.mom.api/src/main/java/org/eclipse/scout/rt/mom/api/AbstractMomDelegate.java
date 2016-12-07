@@ -79,6 +79,9 @@ public abstract class AbstractMomDelegate implements IMom {
 
   @Override
   public void destroy() {
+    if (!m_delegate.isSet()) {
+      return; // don't trigger unnecessary delegate initialization
+    }
     getDelegate().destroy();
   }
 }
