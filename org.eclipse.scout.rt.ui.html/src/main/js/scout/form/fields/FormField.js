@@ -388,7 +388,7 @@ scout.FormField.prototype._renderGridData = function() {
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) { // may be null if $container is detached
-      this.htmlComp.getParent().invalidateLayoutTree();
+      htmlCompParent.invalidateLayoutTree();
     }
   }
 };
