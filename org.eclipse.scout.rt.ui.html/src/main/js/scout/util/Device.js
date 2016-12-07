@@ -102,7 +102,7 @@ scout.Device.prototype.bootstrap = function() {
 /**
  * The 300ms delay exists because the browser does not know whether the user wants to just tab or wants to zoom using double tab.
  * Therefore most browsers add the delay only if zoom is enabled. This works for firefox, chrome (>=32) and safari/ios (>=9.3).
- * It does not work if safari is opened in standalone/homescreen mode. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
+ * It does not work if safari is opened in standalone/homescreen mode or in cordova with the UIWebView. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
  *
  * By default, zooming is disabled and home screen mode is enabled, see meta tags viewport and apple-mobile-web-app-capable in head.html
  */
@@ -112,12 +112,13 @@ scout.Device.prototype._needsFastClick = function() {
     return false;
   }
 
-  if (this.systemVersion >= 9.3 && !this.isStandalone()) {
-    // With Safari >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
+  if (this.systemVersion >= 9.3 && !this.isStandalone() && this.isWKWebView()) {
+    // With iOS >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
+    // It is also necessary if running in a cordova container with UIWebView.
     return false;
   }
 
-  // -> load only for older IOS devices or if standalone mode is enabled
+  // -> load only for older IOS devices or if running in home screen mode or cordova
   return true;
 };
 
@@ -185,6 +186,13 @@ scout.Device.prototype.isWindowsTablet = function() {
  */
 scout.Device.prototype.isStandalone = function() {
   return !!window.navigator.standalone;
+};
+
+/**
+ * Only WKWebView supports indexedDB, so if window.indexedDB is set to true we assume it is running in WKWebView.
+ */
+scout.Device.prototype.isWKWebView = function() {
+  return this.isIos() && !!window.indexedDB;
 };
 
 /**
