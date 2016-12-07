@@ -41,6 +41,11 @@ scout.codes = {
     }, this);
   },
 
+  remove: function(codeTypeId) {
+    delete this.registry[codeTypeId];
+    // FIXME [awe] 6.1 - also clean up texts?
+  },
+
   /**
    * Returns a code for the given codeId. The codeId is a string in the following format:
    *
