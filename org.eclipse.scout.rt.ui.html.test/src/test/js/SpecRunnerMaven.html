@@ -78,12 +78,13 @@
         throw new Error('Error while loading default values: ' + errorThrown);
       });
     }
+    var app = new scout.RemoteApp();
+    app.init();
+
     // breaks scrollbarsSpec in phantomjs
     scout.device.isTableAdditionalDivRequired = function() {
       return false;
     }
-    var app = new scout.RemoteApp();
-    app._bootstrap();
   </script>
 
   $specScriptTags$

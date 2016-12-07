@@ -13,6 +13,23 @@
 // }(window.scout = window.scout || {}, jQuery));
 
 scout.sessions = [];
+scout.appListeners = [];
+
+/**
+ * Adds a listener to the app. If the app is not created yet it remembers the listener and adds it as soon the app is started.
+ */
+scout.addAppListener = function(type, func) {
+  var listener = {
+    type: type,
+    func: func
+  };
+  if (scout.app) {
+    scout.app.events.addListener(listener);
+  } else {
+    this.appListeners.push(listener);
+  }
+  return listener;
+};
 
 /**
     session.start();

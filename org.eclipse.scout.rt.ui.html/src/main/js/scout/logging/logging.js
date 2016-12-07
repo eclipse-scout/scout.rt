@@ -27,11 +27,11 @@ scout.logging = {
 
     $.log = new scout.NullLogger();
     if (!enabled) {
-      return null;
+      return $.resolvedPromise();
     }
     if (window.log4javascript) {
       this.initLog4Javascript(logLevel);
-      return null;
+      return $.resolvedPromise();
     }
 
     // If log4javascript is not yet installed, dynamically load the library

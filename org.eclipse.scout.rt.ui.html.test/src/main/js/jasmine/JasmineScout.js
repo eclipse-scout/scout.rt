@@ -17,6 +17,27 @@ function mostRecentJsonRequest() {
   }
 }
 
+/**
+ * Mocks the bootstrap functions. Otherwise they try to download files, fail and prevent a proper app start.
+ */
+function mockBootstrapFunctions() {
+  scout.models.bootstrap = function() {
+    return $.resolvedPromise();
+  };
+  scout.fonts.bootstrap = function() {
+    return $.resolvedPromise();
+  };
+  scout.locales.bootstrap = function() {
+    return $.resolvedPromise();
+  };
+  scout.texts.bootstrap = function() {
+    return $.resolvedPromise();
+  };
+  scout.codes.bootstrap = function() {
+    return $.resolvedPromise();
+  };
+}
+
 function sandboxSession(options) {
   var $sandbox = $('#sandbox').addClass('scout');
 
@@ -27,12 +48,6 @@ function sandboxSession(options) {
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
   options.remote = true; // required so adapters will be registered in the adapter registry
   options.$entryPoint = $sandbox;
-
-  // Since most of the tests are written to simulate RemoteApp behavior we must run
-  // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
-  scout.RemoteApp.modifyWidgetPrototype();
-  scout.RemoteApp.modifyTablePrototype();
-  scout.RemoteApp.modifyBooleanColumnPrototype();
 
   var session = scout.create('scout.Session', options, {
     ensureUniqueId: false

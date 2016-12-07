@@ -17,8 +17,9 @@
  *
  * @singleton
  */
-scout.Device = function(userAgent) {
-  this.userAgent = userAgent;
+scout.Device = function(model) {
+  // user agent string from browser
+  this.userAgent = model.userAgent;
   this.features = {};
   this.system = scout.Device.System.UNKNOWN;
   this.type = scout.Device.Type.DESKTOP;
@@ -33,11 +34,11 @@ scout.Device = function(userAgent) {
   this.unselectableAttribute = scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
   this.tableAdditionalDivRequired = false;
 
-  if (userAgent) {
-    this._parseSystem(userAgent);
-    this._parseSystemVersion(userAgent);
-    this._parseBrowser(userAgent);
-    this._parseBrowserVersion(userAgent);
+  if (this.userAgent) {
+    this._parseSystem();
+    this._parseSystemVersion();
+    this._parseBrowser();
+    this._parseBrowserVersion();
   }
 };
 
@@ -88,7 +89,7 @@ scout.Device.prototype.bootstrap = function() {
   if (this._needsFastClick()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
     promises.push(this._loadFastClickDeferred());
-  } else if (this.isIos()){
+  } else if (this.isIos()) {
     this._installActiveHandler();
   }
 
@@ -226,7 +227,8 @@ scout.Device.prototype._detectType = function(userAgent) {
   return scout.Device.Type.DESKTOP;
 };
 
-scout.Device.prototype._parseSystem = function(userAgent) {
+scout.Device.prototype._parseSystem = function() {
+  var userAgent = this.userAgent;
   if (userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1) {
     this.system = scout.Device.System.IOS;
   } else if (userAgent.indexOf('Android') > -1) {
@@ -237,9 +239,11 @@ scout.Device.prototype._parseSystem = function(userAgent) {
 /**
  * Currently only supports IOS
  */
-scout.Device.prototype._parseSystemVersion = function(userAgent) {
+scout.Device.prototype._parseSystemVersion = function() {
   var versionRegex,
-    System = scout.Device.System;
+    System = scout.Device.System,
+    userAgent = this.userAgent;
+
   if (this.system === System.IOS) {
     versionRegex = / OS ([0-9]+\.?[0-9]*)/;
     // replace all _ with .
@@ -250,7 +254,9 @@ scout.Device.prototype._parseSystemVersion = function(userAgent) {
   }
 };
 
-scout.Device.prototype._parseBrowser = function(userAgent) {
+scout.Device.prototype._parseBrowser = function() {
+  var userAgent = this.userAgent;
+
   if (userAgent.indexOf('Firefox') > -1) {
     this.browser = scout.Device.Browser.FIREFOX;
   } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
@@ -273,8 +279,11 @@ scout.Device.prototype._parseBrowser = function(userAgent) {
  * - 21.1   match: 21.1
  * - 21.1.3 match: 21.1
  */
-scout.Device.prototype._parseBrowserVersion = function(userAgent) {
-  var versionRegex, browsers = scout.Device.Browser;
+scout.Device.prototype._parseBrowserVersion = function() {
+  var versionRegex,
+    browsers = scout.Device.Browser,
+    userAgent = this.userAgent;
+
   if (this.browser === browsers.INTERNET_EXPLORER) {
     // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
     // additionally in new version the version-number after Trident/ is not the browser-version
@@ -503,4 +512,12 @@ scout.Device.prototype.toString = function() {
     ' features=' + JSON.stringify(this.features) + ']';
 };
 
-scout.device = new scout.Device(navigator.userAgent);
+scout.addAppListener('prepare', function() {
+  if (scout.device) {
+    // Device seems to be created before the app itself, do not override it
+    return;
+  }
+  scout.device = scout.create('Device', {
+    userAgent: navigator.userAgent
+  });
+});

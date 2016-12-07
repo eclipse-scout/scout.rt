@@ -424,3 +424,41 @@ scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
   delete adapterData.modelClass;
   return adapterData;
 };
+
+/**
+ * Static method to modify the prototype of scout.Widget.
+ */
+scout.ModelAdapter.modifyWidgetPrototype = function() {
+  if (!scout.app.remote) {
+    return;
+  }
+
+  // _createChild
+  scout.objects.replacePrototypeFunction(scout.Widget, '_createChild', function(model) {
+    if (model instanceof scout.Widget) {
+      return model;
+    }
+
+    // Remote case
+    var modelAdapter = findModelAdapter(this);
+    if (modelAdapter) { // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
+      return this.session.getOrCreateWidget(model, this); // model is a String, contains (remote) object ID
+    }
+
+    // Local case (default)
+    model.parent = this;
+    return scout.create(model);
+
+    function findModelAdapter(widget) {
+      while (widget) {
+        if (widget.modelAdapter) {
+          return widget.modelAdapter;
+        }
+        widget = widget.parent;
+      }
+      return null;
+    }
+  });
+};
+
+scout.addAppListener('bootstrap', scout.ModelAdapter.modifyWidgetPrototype);

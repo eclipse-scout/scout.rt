@@ -33,7 +33,9 @@ describe('Device', function() {
   }
 
   function bootstrapDevice(userAgent) {
-    var device = new scout.Device(userAgent);
+    var device = new scout.Device({
+      userAgent: userAgent
+    });
     device.bootstrap();
     return device;
   }
@@ -149,7 +151,9 @@ describe('Device', function() {
         scout.Device.Browser.CHROME, 23.0);
 
       function _test(userAgent, expectedBrowser, expectedVersion) {
-        var device = new scout.Device(userAgent);
+        var device = new scout.Device({
+          userAgent: userAgent
+        });
         expect(device.browser).toBe(expectedBrowser);
         expect(device.browserVersion).toEqual(expectedVersion);
       }
