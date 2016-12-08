@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
  * @since 6.1
  */
 @ApplicationScoped
-public final class NullMomImplementor implements IMomImplementor {
+public class NullMomImplementor implements IMomImplementor {
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
