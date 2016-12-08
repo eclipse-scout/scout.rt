@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.mom.api.ClusterMom;
 import org.eclipse.scout.rt.mom.api.ClusterMom.ClusterMomImplementorProperty;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMom;
@@ -39,6 +38,7 @@ import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
+import org.eclipse.scout.rt.server.services.common.clustersync.ClientNotificationClusterNotificationTest.ClusterMomTestImplementor;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
@@ -75,7 +75,8 @@ public class ClusterSynchronizationServiceTest {
   @Before
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ClusterMom.class))); // Register ClusterMom anew to force initialization (application-scoped)
+    // FIXME bsh/pbz: ClusterMomTestImplementor as test workaround
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ClusterMomTestImplementor.class))); // Register ClusterMom anew to force initialization (application-scoped)
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementorProperty.class).withReplace(true))); // Ensure to use NullMom
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withInitialInstance(m_nullMomImplementorSpy)));
     // verify that replacement works

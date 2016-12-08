@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.mom.api.NullMomImplementor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationClusterNotification;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
@@ -55,7 +56,7 @@ public class ClientNotificationClusterNotificationTest {
   @Before
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ClusterMom.class))); // Register ClusterMom anew to force initialization (application-scoped)
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ClusterMomTestImplementor.class))); // Register ClusterMom anew to force initialization (application-scoped)
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementorProperty.class).withReplace(true))); // Ensure to use NullMom
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withInitialInstance(m_nullMomImplementorSpy)));
     // verify that replacement works
@@ -90,7 +91,7 @@ public class ClientNotificationClusterNotificationTest {
     m_svc.onMessage(momMsg);
     IClientNotificationService c = BEANS.get(IClientNotificationService.class);
     List<ClientNotificationMessage> notifications = c.getNotifications(TEST_NODE);
-    assertEquals(notifications.size(), 1);
+    assertEquals(1, notifications.size());
   }
 
   public class ClientNotificationTestRegistry extends ClientNotificationRegistry {
@@ -98,6 +99,17 @@ public class ClientNotificationClusterNotificationTest {
     public void registerSession(String nodeId, String sessionId, String userId) {
       super.registerSession(nodeId, sessionId, userId);
     }
+  }
+
+  // FIXME bsh/pbz: Check this workaround (fixes test because cluster synchronization service is not enabled otherwise)
+  @Replace
+  public static class ClusterMomTestImplementor extends ClusterMom {
+
+    @Override
+    public boolean isNullTransport() {
+      return false;
+    }
+
   }
 
   @Ignore
