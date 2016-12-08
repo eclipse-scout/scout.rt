@@ -36,6 +36,10 @@ scout.Cell.prototype.update = function(model) {
   $.extend(this, model);
 };
 
+scout.Cell.prototype.setValue = function(value) {
+  this.value = value;
+};
+
 scout.Cell.prototype.setText = function(text) {
   var oldText = this.text;
   this.text = text;

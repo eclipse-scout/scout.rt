@@ -43,12 +43,18 @@ scout.SmartColumn.prototype._syncCodeType = function(codeType) {
   });
 };
 
+/**
+ * @override
+ */
 scout.SmartColumn.prototype._createCellModel = function(id) {
   return {
     value: id
   };
 };
 
+/**
+ * @override
+ */
 scout.SmartColumn.prototype.initCell = function(model, row) {
   var cell = scout.SmartColumn.parent.prototype.initCell.call(this, model),
     value = cell.value;
@@ -57,7 +63,14 @@ scout.SmartColumn.prototype.initCell = function(model, row) {
     return cell;
   }
 
-  // FIXME CGU This needs to be done as well if cell value changes
+  // FIXME CGU handle format value, do the lookup for multiple values together? see java for reference implementation
+  this.updateDisplayText(row, cell);
+
+  return cell;
+};
+
+scout.SmartColumn.prototype.updateDisplayText = function(row, cell) {
+  var value = cell.value;
   // FIXME [awe, cgu] 6.1 - it's a bad idea to call updateRow here, because when a row and a cell is initialized and
   // the deferred is resolved immediately the table throws an error because the row is not yet added to the table :-(
   // check if (initialized) below
@@ -67,8 +80,16 @@ scout.SmartColumn.prototype.initCell = function(model, row) {
       this.table.updateRow(row);
     }
   }.bind(this));
+};
 
-  return cell;
+/**
+ * @override
+ */
+scout.SmartColumn.prototype.setCellValue = function(row, value) {
+  // FIXME CGU createCellModel necessary here?
+  var cell = this.cell(row);
+  cell.setValue(value);
+  this.updateDisplayText(row, cell);
 };
 
 scout.SmartColumn.prototype.cellValueForGrouping = function(row) {
