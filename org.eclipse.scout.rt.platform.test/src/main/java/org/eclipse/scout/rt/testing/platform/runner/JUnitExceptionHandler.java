@@ -46,7 +46,7 @@ public class JUnitExceptionHandler extends ExceptionHandler {
     else {
       m_errors.add(t);
       if (m_errors.size() == 1) {
-        LOG.info("Exception will be re-thrown for JUnit assertion. [exception={}]", t.getMessage());
+        LOG.info("Exception will be re-thrown for JUnit assertion. [exception={}]", t.getMessage(), t);
       }
       else {
         LOG.info("Exception will not be re-thrown for JUnit assertion because another exception was already handled. [current exception={}, other exception={}]", t, m_errors.get(0).getMessage());
