@@ -40,20 +40,21 @@ public abstract class AbstractConfiguredMomDelegate extends AbstractMomDelegate 
    */
   public boolean isNullTransport() {
     final Class<? extends IMomImplementor> implementorClass = getConfiguredImplementor();
-    return implementorClass == null || implementorClass == NullMomImplementor.class;
+    return implementorClass == null || NullMomImplementor.class.isAssignableFrom(implementorClass);
   }
 
   @Override
   protected IMomImplementor initDelegate() throws Exception {
     final Class<? extends IMomImplementor> implementorClass = ObjectUtility.nvl(getConfiguredImplementor(), NullMomImplementor.class);
+    final IMomImplementor implementor = BEANS.get(implementorClass);
 
-    if (implementorClass == NullMomImplementor.class) {
-      LOG.info("+++ Using '{}' for transport '{}'. No messages are published and received.", NullMomImplementor.class.getSimpleName(), getClass().getSimpleName());
-      return BEANS.get(NullMomImplementor.class);
+    if (NullMomImplementor.class.isAssignableFrom(implementorClass)) {
+      LOG.info("+++ Using '{}' for transport '{}'. No messages are published and received.", implementorClass.getSimpleName(), getClass().getSimpleName());
+    }
+    else {
+      implementor.init(lookupEnvironment());
     }
 
-    final IMomImplementor implementor = BEANS.get(implementorClass);
-    implementor.init(lookupEnvironment());
     return implementor;
   }
 

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.mom.api.ClusterMom;
-import org.eclipse.scout.rt.mom.api.ClusterMom.ClusterMomImplementorProperty;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
@@ -18,6 +17,7 @@ import org.eclipse.scout.rt.mom.api.NullMomImplementor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationClusterNotification;
@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,8 +55,7 @@ public class ClientNotificationClusterNotificationTest {
   @Before
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ClusterMomTestImplementor.class))); // Register ClusterMom anew to force initialization (application-scoped)
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementorProperty.class).withReplace(true))); // Ensure to use NullMom
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(TestClusterMom.class)));
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withInitialInstance(m_nullMomImplementorSpy)));
     // verify that replacement works
     assertSame("NullMom-Spy expected", m_nullMomImplementorSpy, BEANS.get(NullMomImplementor.class));
@@ -101,23 +99,20 @@ public class ClientNotificationClusterNotificationTest {
     }
   }
 
-  // FIXME bsh/pbz: Check this workaround (fixes test because cluster synchronization service is not enabled otherwise)
+  @IgnoreBean
   @Replace
-  public static class ClusterMomTestImplementor extends ClusterMom {
+  public static class TestClusterMom extends ClusterMom {
+
+    @Override
+    protected Class<? extends IMomImplementor> getConfiguredImplementor() {
+      return NullMomImplementor.class;
+    }
 
     @Override
     public boolean isNullTransport() {
+      // Because we use the NullMomImplementor in the test, the ClusterSynchronizationService could
+      // not be enabled. For the test, we intentionally lie here about the type of transport.
       return false;
-    }
-
-  }
-
-  @Ignore
-  private static class NullMomImplementorProperty extends ClusterMomImplementorProperty {
-
-    @Override
-    protected Class<? extends IMomImplementor> createValue() {
-      return NullMomImplementor.class;
     }
   }
 }
