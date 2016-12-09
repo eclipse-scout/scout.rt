@@ -97,7 +97,7 @@ scout.create = function(objectType, model, options) {
  * Prepares the DOM for scout in the given document. This should be called once while initializing scout.
  * If the target document is not specified, the global "document" variable is used instead.
  *
- * This is used by main.js, login.js and logout.js.
+ * This is used by apps (App, LoginApp, LogoutApp)
  *
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).

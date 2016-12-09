@@ -21,9 +21,9 @@
   __include("scout/logging/logging.js");
   __include("scout/logging/NullLogger.js");
   __include("scout/util/URL.js");
-  __include("scout/login/login.js");
+  __include("scout/login/LoginApp.js");
   __include("scout/login/LoginBox.js");
-  __include("scout/login/logout.js");
+  __include("scout/login/LogoutApp.js");
   __include("scout/login/LogoutBox.js");
   // TODO [6.1] PBZ;CGU dependencies needed by ObjectFactory, would be nice to avoid this dependency since login box is not a widget
   __include("scout/widget/Widget.js");
