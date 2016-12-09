@@ -66,6 +66,10 @@ public interface IButton extends IFormField {
 
   void setProcessButton(boolean on);
 
+  boolean isDefaultButton();
+
+  void setDefaultButton(boolean on);
+
   void addButtonListener(ButtonListener listener);
 
   void removeButtonListener(ButtonListener listener);

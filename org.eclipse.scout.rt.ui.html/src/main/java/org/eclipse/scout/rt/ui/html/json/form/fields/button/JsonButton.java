@@ -30,6 +30,7 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";
+  public static final String PROP_DEFAULT_BUTTON = "defaultButton";
   public static final String PROP_DISPLAY_STYLE = "displayStyle";
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -55,6 +56,12 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
       @Override
       protected Boolean modelValue() {
         return getModel().isProcessButton();
+      }
+    });
+    putJsonProperty(new JsonProperty<IButton>(PROP_DEFAULT_BUTTON, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isDefaultButton();
       }
     });
     putJsonProperty(new JsonProperty<IButton>(PROP_DISPLAY_STYLE, model) {

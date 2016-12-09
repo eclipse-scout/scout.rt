@@ -49,6 +49,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private int m_systemType;
   private int m_displayStyle;
   private boolean m_processButton;
+  private boolean m_defaultButton;
   private boolean m_enabledProcessing;
 
   public AbstractButton() {
@@ -97,6 +98,20 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Order(220)
   protected boolean getConfiguredProcessButton() {
     return true;
+  }
+
+  /**
+   * Configures whether this button is a default button. Default buttons typically have a dedicated look.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   *
+   * @return {@code true} if this button is a default button, {@code false} otherwise
+   * @see IButton
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(225)
+  protected boolean getConfiguredDefaultButton() {
+    return false;
   }
 
   /**
@@ -220,6 +235,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setSystemType(getConfiguredSystemType());
     setDisplayStyleInternal(getConfiguredDisplayStyle());
     setProcessButton(getConfiguredProcessButton());
+    setDefaultButton(getConfiguredDefaultButton());
     setIconId(getConfiguredIconId());
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeScopeClass(getConfiguredKeyStrokeScopeClass());
@@ -341,6 +357,16 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   public void setProcessButton(boolean on) {
     m_processButton = on;
+  }
+
+  @Override
+  public boolean isDefaultButton() {
+    return m_defaultButton;
+  }
+
+  @Override
+  public void setDefaultButton(boolean on) {
+    m_defaultButton = on;
   }
 
   @Override
