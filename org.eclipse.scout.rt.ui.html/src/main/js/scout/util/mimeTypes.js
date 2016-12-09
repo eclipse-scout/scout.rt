@@ -15,6 +15,7 @@ scout.mimeTypes = {
 
   TEXT_PLAIN: 'text/plain',
   TEXT_HTML: 'text/html',
+  TEXT_CSS: 'text/css',
 
   IMAGE_PNG: 'image/png',
   IMAGE_JPG: 'image/jpg',
@@ -22,6 +23,16 @@ scout.mimeTypes = {
   IMAGE_GIF: 'image/gif',
 
   JSON: 'application/json',
-  ZIP: 'application/zip'
+  JAVASCRIPT: 'text/javascript',
+  ZIP: 'application/zip',
+
+  isTextMimeType: function(mimeType) {
+    return scout.isOneOf(mimeType,
+      this.TEXT_PLAIN,
+      this.TEXT_HTML,
+      this.TEXT_CSS,
+      this.JAVASCRIPT,
+      this.JSON);
+  }
 
 };
