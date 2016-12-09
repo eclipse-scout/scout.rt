@@ -171,4 +171,53 @@ describe("HtmlComponent", function() {
 
   });
 
+  describe("validateLayout", function() {
+    var $comp;
+    var $child;
+    var htmlComp;
+    var htmlChild;
+
+    beforeEach(function() {
+      $comp = $('<div>').appendTo(session.$entryPoint);
+      $child = $comp.appendDiv();
+      htmlComp = scout.HtmlComponent.install($comp, session);
+      htmlChild = scout.HtmlComponent.install($child, session);
+    });
+
+    it("calls htmlComp.layout", function() {
+      spyOn(htmlComp.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlComp.layout.layout).toHaveBeenCalled();
+    });
+
+    it("calls layout of the child component", function() {
+      spyOn(htmlChild.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlChild.layout.layout).toHaveBeenCalled();
+    });
+
+    it("does not layout invisible components", function() {
+      $comp.setVisible(false);
+      spyOn(htmlComp.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
+    });
+
+    it("does not layout components with an invisible parent", function() {
+      $comp.setVisible(false);
+      spyOn(htmlChild.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlChild.layout.layout).not.toHaveBeenCalled();
+    });
+
+    it("does not call isParentVisible too many times", function() {
+      spyOn(htmlComp.$comp, 'isEveryParentVisible').and.callThrough();
+      spyOn(htmlChild.$comp, 'isEveryParentVisible').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlComp.$comp.isEveryParentVisible).toHaveBeenCalled();
+      expect(htmlChild.$comp.isEveryParentVisible).not.toHaveBeenCalled();
+    });
+
+  });
+
 });

@@ -26,6 +26,11 @@ scout.HtmlComponent = function($comp, session) {
   this.layouted = false;
 
   /**
+   * Flag to indicate that the component is being layouted.
+   */
+  this.layouting = false;
+
+  /**
    * May be set to temporarily disable invalidation (e.g. if the component gets modified during the layouting process)
    */
   this.suppressInvalidate = false;
@@ -97,10 +102,22 @@ scout.HtmlComponent.prototype.invalidateLayout = function() {
 /**
  * Calls the layout of the component to layout its children but only if the component is not valid.
  * @exception when component has no layout
+ * @return true if validation was successful, false if it could not be executed (e.g. because the element is invisible or detached)
  */
 scout.HtmlComponent.prototype.validateLayout = function() {
   if (!this.layout) {
     throw new Error('Called layout() but component has no layout');
+  }
+  // Don't layout components which don't exist anymore, are invisible or are detached from the DOM
+  if (!this.isAttachedAndVisible()) {
+    return false;
+  }
+  var parent = this.getParent();
+  // Check the visibility of the parents as well.
+  // This check loops to the top of the DOM tree.
+  // To improve performance, the check (isEveryParentVisible) is not executed if the parent already did it, which is the case if parent is being layouted.
+  if ((!parent || !parent.layouting) && !this.$comp.isEveryParentVisible()) {
+    return false;
   }
   if (!this.valid) {
     this.layouting = true;
@@ -111,6 +128,7 @@ scout.HtmlComponent.prototype.validateLayout = function() {
     this.size = this.getSize();
     this.valid = true;
   }
+  return true;
 };
 
 /**

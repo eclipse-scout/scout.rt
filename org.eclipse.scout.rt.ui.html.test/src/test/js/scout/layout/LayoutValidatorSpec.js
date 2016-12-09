@@ -74,32 +74,32 @@ describe("LayoutValidator", function() {
 
   describe("validate", function() {
 
-    it("calls validateLayout for each invalid html component", function() {
+    it("calls layout for each invalid html component", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = scout.HtmlComponent.install($comp, session);
-      spyOn(htmlComp, 'validateLayout');
+      spyOn(htmlComp.layout, 'layout');
 
       htmlComp.invalidateLayoutTree();
       session.layoutValidator.validate();
-      expect(htmlComp.validateLayout).toHaveBeenCalled();
-      expect(htmlComp.validateLayout.calls.count()).toEqual(1);
+      expect(htmlComp.layout.layout).toHaveBeenCalled();
+      expect(htmlComp.layout.layout.calls.count()).toEqual(1);
     });
 
-    it("does not call validateLayout if component has been removed", function() {
+    it("does not call layout if component has been removed", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = scout.HtmlComponent.install($comp, session);
-      spyOn(htmlComp, 'validateLayout');
+      spyOn(htmlComp.layout, 'layout');
 
       htmlComp.invalidateLayoutTree();
       $comp.remove();
       session.layoutValidator.validate();
-      expect(htmlComp.validateLayout).not.toHaveBeenCalled();
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
     });
 
-    it("does not call validateLayout if component has been detached, but does not remove from invalid components either", function() {
+    it("does not call layout if component has been detached, but does not remove from invalid components either", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = scout.HtmlComponent.install($comp, session);
-      spyOn(htmlComp, 'validateLayout');
+      spyOn(htmlComp.layout, 'layout');
 
       htmlComp.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
@@ -107,7 +107,7 @@ describe("LayoutValidator", function() {
 
       $comp.detach();
       session.layoutValidator.validate();
-      expect(htmlComp.validateLayout).not.toHaveBeenCalled();
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
     });
@@ -115,15 +115,15 @@ describe("LayoutValidator", function() {
     it("removes the component from the list of invalidate components after validation", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = scout.HtmlComponent.install($comp, session);
-      spyOn(htmlComp, 'validateLayout');
+      spyOn(htmlComp.layout, 'layout');
 
       htmlComp.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
 
       session.layoutValidator.validate();
-      expect(htmlComp.validateLayout).toHaveBeenCalled();
-      expect(htmlComp.validateLayout.calls.count()).toEqual(1);
+      expect(htmlComp.layout.layout).toHaveBeenCalled();
+      expect(htmlComp.layout.layout.calls.count()).toEqual(1);
       expect(session.layoutValidator._invalidComponents.length).toBe(0);
     });
 

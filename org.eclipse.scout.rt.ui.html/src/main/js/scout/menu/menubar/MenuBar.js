@@ -178,6 +178,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
       return !elem.rendered;
     });
     if (!sameMenuItems || hasUnrenderedMenuItems) {
+      this.updateVisibility();
       this.rebuildItems(); // Re-layout menubar
     } else {
       // Don't rebuild menubar, but update "markers"
