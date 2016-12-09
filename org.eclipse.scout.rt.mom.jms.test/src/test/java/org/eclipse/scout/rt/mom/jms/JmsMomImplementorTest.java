@@ -30,7 +30,7 @@ import javax.jms.Message;
 import javax.naming.Context;
 
 import org.apache.activemq.jndi.ActiveMQInitialContextFactory;
-import org.eclipse.scout.rt.mom.api.AbstractMomDelegate;
+import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMom.EncrypterProperty;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
-import org.eclipse.scout.rt.mom.api.IMomTransport;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
@@ -52,10 +51,10 @@ import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -1555,22 +1554,23 @@ public class JmsMomImplementorTest {
   /**
    * Encapsulates {@link JmsMomImplementor} for testing purpose.
    */
-  @Ignore
-  @ApplicationScoped
-  public static class JmsTestMom extends AbstractMomDelegate implements IMomTransport {
+  @IgnoreBean
+  public static class JmsTestMom extends AbstractMomTransport {
 
     @Override
-    protected IMom initDelegate() throws Exception {
-      final Map<Object, Object> env = new HashMap<>();
+    protected Class<? extends IMomImplementor> getConfiguredImplementor() {
+      return JmsMomImplementor.class;
+    }
+
+    @Override
+    protected Map<String, String> getConfiguredEnvironment() {
+      final Map<String, String> env = new HashMap<>();
       env.put(Context.INITIAL_CONTEXT_FACTORY, ActiveMQInitialContextFactory.class.getName());
       env.put(Context.PROVIDER_URL, "vm://mom/junit?broker.persistent=false");
       env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
       env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
       env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
-
-      JmsMomImplementor testee = new JmsMomImplementor();
-      testee.init(env);
-      return testee;
+      return env;
     }
   }
 }

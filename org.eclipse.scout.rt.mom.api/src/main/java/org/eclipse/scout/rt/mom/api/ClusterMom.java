@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
  * @since 6.1
  */
 @CreateImmediately
-public class ClusterMom extends AbstractConfiguredMomDelegate {
+public class ClusterMom extends AbstractMomTransport {
 
   @PostConstruct
   public void init() {
