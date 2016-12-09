@@ -8,58 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.login = {
-
-  /**
-   * opts:
-   * - authUrl: URL to be used for the authentication. Default is 'auth'
-   * - userDataKey: name of the user parameter in the data object sent with the authentication request. Default is 'user'.
-   * - passwordDataKey: name of the password parameter in the data object sent with the authentication request. Default is 'password'.
-   * - redirectUrl: URL to redirect to after a successful login. If not specified the prepareRedirectUrl function is used to compute the redirectUrl.
-   * - prepareRedirectUrl: function that is called on the redirectUrl before opening it. Default is scout.LoginBox.prepareRedirectUrl.
-   * - logoUrl: default points to 'res/logo.png',
-   * - messageKey: if set a message is displayed above the user field. Default is undefined.
-   * - texts: texts to be used in the login box. Default texts are in English.
-   */
-  init: function(opts) {
-    var deferreds = this._bootstrap();
-    $.when.apply($, deferreds)
-      .done(this._init.bind(this, opts));
-  },
-
-  /**
-   * Executes the default bootstrap functions and returns an array of deferred objects.<p>
-   * The actual startup begins only when every of these deferred objects are completed.
-   * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful startup.
-   * The individual bootstrap functions may return null or undefined, a single deferred or multiple deferreds as an array.
-   */
-  _bootstrap : function() {
-    var deferredValues = [
-      scout.logging.bootstrap()
-    ];
-
-    var deferreds = [];
-    deferredValues.forEach(function(value) {
-      if (Array.isArray(value)) {
-        deferreds.concat(value);
-      } else if (value) {
-        deferreds.push(value);
-      }
-    });
-    return deferreds;
-  },
-
-  /**
-   * Initializes login box
-   */
-  _init : function(options) {
-    options = options || {};
-    options.texts = $.extend({}, scout.texts.readFromDOM(), options.texts);
-
-    scout.prepareDOM();
-    scout.objectFactory.init();
-
-    var loginBox = scout.create('LoginBox', options);
-    loginBox.render($('body'));
-  }
+/**
+ * init options:
+ * - authUrl: URL to be used for the authentication. Default is 'auth'
+ * - userDataKey: name of the user parameter in the data object sent with the authentication request. Default is 'user'.
+ * - passwordDataKey: name of the password parameter in the data object sent with the authentication request. Default is 'password'.
+ * - redirectUrl: URL to redirect to after a successful login. If not specified the prepareRedirectUrl function is used to compute the redirectUrl.
+ * - prepareRedirectUrl: function that is called on the redirectUrl before opening it. Default is scout.LoginBox.prepareRedirectUrl.
+ * - logoUrl: default points to 'res/logo.png',
+ * - messageKey: if set a message is displayed above the user field. Default is undefined.
+ * - texts: texts to be used in the login box. Default texts are in English.
+ */
+scout.LoginApp = function() {
+  scout.LoginApp.parent.call(this);
 };
+scout.inherits(scout.LoginApp, scout.App);
+
+/**
+ * Default adds polyfills too, not required here
+ * @override
+ */
+scout.LoginApp.prototype._prepareEssentials = function(options) {
+  scout.objectFactory.init();
+};
+
+/**
+ * No bootstrapping required
+ * @override
+ */
+scout.App.prototype._doBootstrap = function(options) {
+  return [];
+};
+
+scout.LoginApp.prototype._init = function(options) {
+  options = options || {};
+  options.texts = $.extend({}, scout.texts.readFromDOM(), options.texts);
+  scout.prepareDOM();
+
+  var loginBox = scout.create('LoginBox', options);
+  loginBox.render($('body'));
+};
+
