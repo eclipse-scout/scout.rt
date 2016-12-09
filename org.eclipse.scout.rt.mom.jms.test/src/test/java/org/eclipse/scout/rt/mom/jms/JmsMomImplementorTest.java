@@ -37,11 +37,11 @@ import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
-import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMom.EncrypterProperty;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.MOM;
+import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter.PbePasswordProperty;
 import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter.PbeSaltProperty;
@@ -166,7 +166,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<Person> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Verify
     Person testee = capturer.get();
@@ -188,7 +188,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<byte[]> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Verify
     byte[] testee = capturer.get();
@@ -209,7 +209,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Verify
     String testee = capturer.get();
@@ -312,7 +312,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<Person> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Verify
     Person testee = capturer.get();
@@ -333,7 +333,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Publish a message
     MOM.publish(JmsTestMom.class, topic, "hello world");
@@ -355,7 +355,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Subscribe for the destination
     m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
@@ -364,7 +364,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Publish a message
     MOM.publish(JmsTestMom.class, topic, "hello world");
@@ -389,7 +389,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Verify
     assertFalse(latch.await(200, TimeUnit.MILLISECONDS));
@@ -408,7 +408,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Publish a message
     MOM.publish(JmsTestMom.class, queue, "hello world");
@@ -433,7 +433,7 @@ public class JmsMomImplementorTest {
         msgCounter.incrementAndGet();
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Subscribe for the destination
     m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, new IMessageListener<String>() {
@@ -443,7 +443,7 @@ public class JmsMomImplementorTest {
         msgCounter.incrementAndGet();
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Publish a message
     MOM.publish(JmsTestMom.class, queue, "hello world");
@@ -470,7 +470,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Verify
     assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
@@ -499,7 +499,7 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<String> request) {
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     String testee = MOM.request(JmsTestMom.class, queue, "hello world");
@@ -543,7 +543,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         capturer1.set((String) message.getProperty("prop"));
       }
-    }, null));
+    }));
 
     // Publish a message
     MOM.publish(JmsTestMom.class, topic, "hello world", MOM.newPublishInput()
@@ -575,7 +575,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         latch.countDown();
       }
-    }, null));
+    }));
 
     // Verify
     assertFalse(latch.await(50, TimeUnit.MILLISECONDS)); // expect the message not to be received
@@ -588,8 +588,9 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<String> request) {
         return CorrelationId.CURRENT.get();
       }
-    }, RunContexts.copyCurrent()
-        .withCorrelationId("cid:xyz")));
+    }, MOM.newSubscribeInput()
+        .withRunContext(RunContexts.copyCurrent()
+            .withCorrelationId("cid:xyz"))));
 
     // Initiate 'request-reply' communication
     RunContexts.empty()
@@ -616,7 +617,7 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<String> request) {
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     String testee = MOM.request(JmsTestMom.class, topic, "hello world");
@@ -640,7 +641,7 @@ public class JmsMomImplementorTest {
         msgLatch.countDown();
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Subscribe for the destination
     m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<String, String>() {
@@ -650,7 +651,7 @@ public class JmsMomImplementorTest {
         msgLatch.countDown();
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     String testee = MOM.request(JmsTestMom.class, queue, "hello world");
@@ -674,7 +675,7 @@ public class JmsMomImplementorTest {
         msgLatch.countDown();
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Subscribe for the destination
     m_disposables.add(MOM.reply(JmsTestMom.class, topic, new IRequestListener<String, String>() {
@@ -684,7 +685,7 @@ public class JmsMomImplementorTest {
         msgLatch.countDown();
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     String testee = MOM.request(JmsTestMom.class, topic, "hello world");
@@ -724,7 +725,7 @@ public class JmsMomImplementorTest {
           public String onRequest(IMessage<String> request) {
             return request.getTransferObject().toUpperCase();
           }
-        }, null));
+        }));
       }
     }, Jobs.newInput()
         .withExecutionHint(m_testJobExecutionHint)
@@ -768,7 +769,7 @@ public class JmsMomImplementorTest {
           public String onRequest(IMessage<String> request) {
             return request.getTransferObject().toUpperCase();
           }
-        }, null));
+        }));
       }
     }, Jobs.newInput()
         .withExecutionHint(m_testJobExecutionHint)
@@ -822,7 +823,7 @@ public class JmsMomImplementorTest {
         }
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     final String requestReplyJobId = UUID.randomUUID().toString();
 
@@ -921,7 +922,7 @@ public class JmsMomImplementorTest {
         }
         return request.getTransferObject().toUpperCase();
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     try {
@@ -951,8 +952,9 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<String> message) {
         cid.set(CorrelationId.CURRENT.get());
       }
-    }, RunContexts.copyCurrent()
-        .withCorrelationId("cid:xyz")));
+    }, MOM.newSubscribeInput()
+        .withRunContext(RunContexts.copyCurrent()
+            .withCorrelationId("cid:xyz"))));
 
     RunContexts.copyCurrent()
         .withCorrelationId("cid:abc")
@@ -996,7 +998,7 @@ public class JmsMomImplementorTest {
         result.setFirstname(request.getTransferObject().getFirstname().toUpperCase());
         return result;
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     Person testee = MOM.request(JmsTestMom.class, destination, person);
@@ -1022,7 +1024,7 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<Void> request) {
         throw runtimeException;
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     try {
@@ -1051,7 +1053,7 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<Void> request) {
         throw runtimeException;
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     try {
@@ -1080,7 +1082,7 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<Void> request) {
         throw runtimeException;
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     try {
@@ -1109,7 +1111,7 @@ public class JmsMomImplementorTest {
       public String onRequest(IMessage<Void> request) {
         throw runtimeException;
       }
-    }, null));
+    }));
 
     // Initiate 'request-reply' communication
     try {
@@ -1196,7 +1198,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<Person> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     // Verify
     Person testee = capturer.get();
@@ -1225,7 +1227,7 @@ public class JmsMomImplementorTest {
         public void onMessage(IMessage<Person> message) {
           capturer.set(IMessage.CURRENT.get());
         }
-      }, null));
+      }));
 
       // Verify
       IMessage<Person> testee = (IMessage<Person>) capturer.get();
@@ -1261,7 +1263,7 @@ public class JmsMomImplementorTest {
           capturer.set(IMessage.CURRENT.get());
           return null;
         }
-      }, null));
+      }));
       MOM.request(JmsTestMom.class, queue, person);
 
       // Verify
@@ -1298,7 +1300,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<Person> message) {
         capturer.set(message.getTransferObject());
       }
-    }, null));
+    }));
 
     try {
       capturer.get(2, TimeUnit.SECONDS);
@@ -1367,7 +1369,7 @@ public class JmsMomImplementorTest {
     };
 
     // Register transactional subscriber
-    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, listener, null, IMom.ACKNOWLEDGE_TRANSACTED));
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, queue, listener, MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_TRANSACTED)));
     assertTrue("message expected to be rejected 3 times", message1Latch.await());
 
     // Publish a next message
@@ -1403,7 +1405,7 @@ public class JmsMomImplementorTest {
           throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
         }
       }
-    }, null));
+    }));
 
     try {
       assertTrue("messages expected to be consumed concurrently", latch.await());
@@ -1436,7 +1438,7 @@ public class JmsMomImplementorTest {
           throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
         }
       }
-    }, null, IMom.ACKNOWLEDGE_AUTO_SINGLE_THREADED));
+    }, MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
     try {
       assertFalse("messages not expected to be consumed concurrently", latch.await());
@@ -1445,6 +1447,55 @@ public class JmsMomImplementorTest {
     finally {
       latch.unblock();
     }
+  }
+
+  @Test
+  public void testMessageSelector() throws InterruptedException {
+    final Capturer<String> allCapturer = new Capturer<>();
+    final Capturer<String> johnCapturer = new Capturer<>();
+    final Capturer<String> annaCapturer = new Capturer<>();
+
+    IDestination<String> topic = MOM.newDestination("test/mom/testMessageSelector", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
+    // register subscriber without selector
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
+
+      @Override
+      public void onMessage(IMessage<String> message) {
+        allCapturer.set(message.getTransferObject());
+      }
+    }));
+    // register subscriber with selector '"user = 'john''
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
+
+      @Override
+      public void onMessage(IMessage<String> message) {
+        johnCapturer.set(message.getTransferObject());
+      }
+    }, MOM.newSubscribeInput().withSelector("user = 'john'")));
+
+    // register subscriber with selector 'user = 'anna''
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
+
+      @Override
+      public void onMessage(IMessage<String> message) {
+        annaCapturer.set(message.getTransferObject());
+      }
+    }, MOM.newSubscribeInput().withSelector("user = 'anna'")));
+
+    // Publish the message for anna
+    MOM.publish(JmsTestMom.class, topic, "message-for-anna", MOM.newPublishInput().withProperty("user", "anna"));
+
+    // Verify
+    try {
+      johnCapturer.get(2, TimeUnit.SECONDS);
+      fail("timeout expected");
+    }
+    catch (TimedOutError e) {
+      // NOOP
+    }
+
+    assertEquals("message-for-anna", allCapturer.get(2, TimeUnit.SECONDS));
+    assertEquals("message-for-anna", annaCapturer.get(2, TimeUnit.SECONDS));
   }
 
   private Object testPublishAndConsumeInternal(Object transferObject, IMarshaller marshaller, IEncrypter encrypter) throws InterruptedException {
@@ -1467,7 +1518,7 @@ public class JmsMomImplementorTest {
       public void onMessage(IMessage<Object> msg) {
         capturer.set(msg.getTransferObject());
       }
-    }, null));
+    }));
 
     // Verify
     try {
@@ -1496,7 +1547,7 @@ public class JmsMomImplementorTest {
         public Object onRequest(IMessage<Object> req) {
           return req.getTransferObject();
         }
-      }, null));
+      }));
 
       return MOM.request(JmsTestMom.class, queue, request);
     }

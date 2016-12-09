@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -117,6 +116,14 @@ public final class MOM {
   }
 
   /**
+   * Creates an input to control how to subscribe for messages. The input returned specifies
+   * {@link SubscribeInput#ACKNOWLEDGE_AUTO}.
+   */
+  public static SubscribeInput newSubscribeInput() {
+    return BEANS.get(SubscribeInput.class);
+  }
+
+  /**
    * Publishes the given message to the given destination.
    * <p>
    * The message is published with default messaging settings, meaning with normal priority, with persistent delivery
@@ -138,7 +145,7 @@ public final class MOM {
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
   public static <DTO, TRANSPORT extends IMom & IMomTransport> void publish(final Class<TRANSPORT> transport, final IDestination<DTO> destination, final DTO transferObject) {
-    publish(transport, destination, transferObject, newPublishInput());
+    publish(transport, destination, transferObject, null);
   }
 
   /**
@@ -162,14 +169,14 @@ public final class MOM {
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
   public static <DTO, TRANSPORT extends IMom & IMomTransport> void publish(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
-    BEANS.get(transport).publish(destination, transferObject, input);
+    BEANS.get(transport).publish(destination, transferObject, input != null ? input : newPublishInput());
   }
 
   /**
    * Subscribes the given listener to receive messages sent to the given destination.
    * <p>
-   * This method complies with {@link IMom#ACKNOWLEDGE_AUTO}, where message are received concurrently and acknowledged
-   * automatically.
+   * This method complies with {@link SubscribeInput#ACKNOWLEDGE_AUTO}, where message are received concurrently and
+   * acknowledged automatically.
    *
    * @param transport
    *          specifies the 'transport or network' to subscribe for messages, e.g. {@link ClusterMom}.
@@ -179,16 +186,13 @@ public final class MOM {
    *          messaging.
    * @param listener
    *          specifies the listener to receive messages.
-   * @param runContext
-   *          specifies the optional context in which to receive messages. If not specified, an empty context is
-   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
    * @see #publish(IDestination, Object)
    */
-  public static <DTO, TRANSPORT extends IMom & IMomTransport> ISubscription subscribe(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext) {
-    return subscribe(transport, destination, listener, runContext, IMom.ACKNOWLEDGE_AUTO);
+  public static <DTO, TRANSPORT extends IMom & IMomTransport> ISubscription subscribe(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener) {
+    return subscribe(transport, destination, listener, null);
   }
 
   /**
@@ -202,20 +206,15 @@ public final class MOM {
    *          messaging.
    * @param listener
    *          specifies the listener to receive messages.
-   * @param runContext
-   *          specifies the optional context in which to receive messages. If not specified, an empty context is
-   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
-   * @param acknowledgementMode
-   *          specifies the mode how to acknowledge messages. Supported modes are {@link IMom#ACKNOWLEDGE_AUTO},
-   *          {@link IMom#ACKNOWLEDGE_AUTO_SINGLE_THREADED} and {@link IMom#ACKNOWLEDGE_TRANSACTED}.
+   * @param input
+   *          specifies how to subscribe for messages.
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
    * @see #publish(IDestination, Object)
    */
-  public static <DTO, TRANSPORT extends IMom & IMomTransport> ISubscription subscribe(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext,
-      final int acknowledgementMode) {
-    return BEANS.get(transport).subscribe(destination, listener, runContext, acknowledgementMode);
+  public static <DTO, TRANSPORT extends IMom & IMomTransport> ISubscription subscribe(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
+    return BEANS.get(transport).subscribe(destination, listener, input != null ? input : newSubscribeInput());
   }
 
   /**
@@ -306,6 +305,9 @@ public final class MOM {
 
   /**
    * Subscribes the given listener to receive messages from 'request-reply' communication sent to the given destination.
+   * <p>
+   * This method complies with {@link SubscribeInput#ACKNOWLEDGE_AUTO}, where message are received concurrently and
+   * acknowledged automatically.
    *
    * @param transport
    *          specifies the 'transport or network' where to reply to requests of 'request-reply' communication, e.g.
@@ -316,9 +318,31 @@ public final class MOM {
    *          messaging.
    * @param listener
    *          specifies the listener to receive messages.
-   * @param runContext
-   *          specifies the optional context in which to receive messages. If not specified, an empty context is
-   *          created. In either case, the transaction scope is set to {@link TransactionScope#REQUIRES_NEW}.
+   * @return subscription handle to unsubscribe from the destination.
+   * @param <REQUEST>
+   *          the type of the request object
+   * @param <REPLY>
+   *          the type of the reply object
+   * @see #request(IDestination, Object)
+   */
+  public static <REQUEST, REPLY, TRANSPORT extends IMom & IMomTransport> ISubscription reply(final Class<? extends TRANSPORT> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener) {
+    return reply(transport, destination, listener, null);
+  }
+
+  /**
+   * Subscribes the given listener to receive messages from 'request-reply' communication sent to the given destination.
+   *
+   * @param transport
+   *          specifies the 'transport or network' where to reply to requests of 'request-reply' communication, e.g.
+   *          {@link ClusterMom}.
+   * @param destination
+   *          specifies the target to consume messages from, and is either a topic (pub/sub) or queue (P2P). See
+   *          {@link IMom} documentation for more information about the difference between topic and queue based
+   *          messaging.
+   * @param listener
+   *          specifies the listener to receive messages.
+   * @param input
+   *          specifies how to subscribe for messages.
    * @return subscription handle to unsubscribe from the destination.
    * @param <REQUEST>
    *          the type of the request object
@@ -327,8 +351,8 @@ public final class MOM {
    * @see #request(IDestination, Object)
    */
   public static <REQUEST, REPLY, TRANSPORT extends IMom & IMomTransport> ISubscription reply(final Class<? extends TRANSPORT> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener,
-      final RunContext runContext) {
-    return BEANS.get(transport).reply(destination, listener, runContext);
+      final SubscribeInput input) {
+    return BEANS.get(transport).reply(destination, listener, input != null ? input : newSubscribeInput());
   }
 
   /**

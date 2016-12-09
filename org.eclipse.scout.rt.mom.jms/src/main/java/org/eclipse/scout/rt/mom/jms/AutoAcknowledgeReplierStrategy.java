@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
+import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
@@ -22,34 +23,37 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
- * Allows the subscription of a replier to respond to requests sent to a 'request-reply' destination.
+ * Allows the subscription of a replier to respond to requests sent to a 'request-reply' destination. Requests are
+ * acknowledged automatically upon their receipt.
  *
  * @since 6.1
  */
 @Bean
-public class Replier {
+public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
 
   protected JmsMomImplementor m_mom;
+  protected boolean m_singleThreaded;
 
-  public Replier init(final JmsMomImplementor mom) {
+  public AutoAcknowledgeReplierStrategy init(final JmsMomImplementor mom, final boolean singleThreaded) {
     m_mom = mom;
+    m_singleThreaded = singleThreaded;
     return this;
   }
 
-  /**
-   * Registers a replier to respond to requests sent to the specified 'request-reply' destination.
-   */
-  public <REQUEST, REPLY> ISubscription subscribe(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext) throws JMSException {
+  @Override
+  public <REQUEST, REPLY> ISubscription subscribe(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) throws JMSException {
     final Session session = m_mom.getConnection().createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
     try {
-      installMessageListener(destination, listener, runContext, session);
+      installMessageListener(destination, listener, session, input);
       return new JmsSubscription(session, destination);
     }
     catch (JMSException | RuntimeException e) {
@@ -58,11 +62,12 @@ public class Replier {
     }
   }
 
-  protected <REQUEST, REPLY> void installMessageListener(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext, final Session session) throws JMSException {
+  protected <REQUEST, REPLY> void installMessageListener(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final Session session, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
+    final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
-    final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session));
+    final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session), input.getSelector());
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
@@ -70,7 +75,8 @@ public class Replier {
         final String replyId = assertNotNull(jmsRequest.getStringProperty(PROP_REPLY_ID), "missing 'replyId' [msg={}]", jmsRequest);
 
         // Read and process the message asynchronously because JMS session is single-threaded. This allows concurrent message processing.
-        Jobs.schedule(new IRunnable() {
+        // Unlike AutoAcknowledgeSubscriptionStrategy, a job is scheduled for 'single-threaded' mode to support cancellation (execution hint).
+        final IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -96,6 +102,10 @@ public class Replier {
             .withName("Receiving JMS request [dest={}]", destination)
             .withExceptionHandling(BEANS.get(MomExceptionHandler.class), true)
             .withExecutionHint(replyId)); // Register for cancellation
+
+        if (m_singleThreaded) {
+          future.awaitDone();
+        }
       }
     });
   }

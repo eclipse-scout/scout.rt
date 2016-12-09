@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -113,8 +112,8 @@ public abstract class AbstractMomTransport implements IMom, IMomTransport {
   }
 
   @Override
-  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final int acknowledgementMode) {
-    return getDelegate().subscribe(destination, listener, runContext, acknowledgementMode);
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
+    return getDelegate().subscribe(destination, listener, input);
   }
 
   @Override
@@ -123,8 +122,8 @@ public abstract class AbstractMomTransport implements IMom, IMomTransport {
   }
 
   @Override
-  public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext) {
-    return getDelegate().reply(destination, listener, runContext);
+  public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) {
+    return getDelegate().reply(destination, listener, input);
   }
 
   @Override

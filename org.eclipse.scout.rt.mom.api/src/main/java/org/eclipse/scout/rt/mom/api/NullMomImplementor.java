@@ -5,7 +5,6 @@ import java.util.Map;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 
 /**
@@ -27,7 +26,7 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
-  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final int acknowledgementMode) {
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
     return new P_NullSubscription(destination);
   }
 
@@ -37,7 +36,7 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
-  public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final RunContext runContext) {
+  public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) {
     return new P_NullSubscription(destination);
   }
 

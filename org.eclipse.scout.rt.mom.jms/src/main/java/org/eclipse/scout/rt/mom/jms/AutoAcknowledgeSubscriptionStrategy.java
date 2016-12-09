@@ -10,26 +10,28 @@ import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
+import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Messages are acknowledged automatically upon their receipt. This strategy has less footprint than
- * {@link TransactedStrategy}, and allows for serial and concurrent message processing.
+ * {@link TransactedSubscriptionStrategy}, and allows for serial and concurrent message processing.
  *
  * @see IMom#ACKNOWLEDGE_AUTO
  * @see IMom#ACKNOWLEDGE_AUTO_SINGLE_THREADED
  * @since 6.1
  */
 @Bean
-public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
+public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrategy {
 
   protected JmsMomImplementor m_mom;
   protected boolean m_singleThreaded;
@@ -41,10 +43,10 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
   }
 
   @Override
-  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext) throws JMSException {
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) throws JMSException {
     final Session session = m_mom.getConnection().createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
     try {
-      installMessageListener(destination, listener, runContext, session);
+      installMessageListener(destination, listener, session, input);
       return new JmsSubscription(session, destination);
     }
     catch (JMSException | RuntimeException e) {
@@ -53,11 +55,12 @@ public class AutoAcknowledgeStrategy implements ISubscriptionStrategy {
     }
   }
 
-  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final Session session) throws JMSException {
+  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session session, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
+    final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
-    final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session));
+    final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session), input.getSelector());
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override

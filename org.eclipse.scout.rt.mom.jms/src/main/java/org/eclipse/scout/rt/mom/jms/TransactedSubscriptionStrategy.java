@@ -13,11 +13,13 @@ import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
+import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
@@ -29,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * @since 6.1
  */
 @Bean
-public class TransactedStrategy implements ISubscriptionStrategy {
+public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
 
   protected JmsMomImplementor m_mom;
 
@@ -39,10 +41,10 @@ public class TransactedStrategy implements ISubscriptionStrategy {
   }
 
   @Override
-  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext) throws JMSException {
+  public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) throws JMSException {
     final Session transactedSession = m_mom.getConnection().createSession(true, Session.SESSION_TRANSACTED);
     try {
-      installMessageListener(destination, listener, runContext, transactedSession);
+      installMessageListener(destination, listener, transactedSession, input);
       return new JmsSubscription(transactedSession, destination);
     }
     catch (JMSException | RuntimeException e) {
@@ -51,11 +53,12 @@ public class TransactedStrategy implements ISubscriptionStrategy {
     }
   }
 
-  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final RunContext runContext, final Session transactedSession) throws JMSException {
+  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session transactedSession, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
+    final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
-    final MessageConsumer consumer = transactedSession.createConsumer(m_mom.lookupJmsDestination(destination, transactedSession));
+    final MessageConsumer consumer = transactedSession.createConsumer(m_mom.lookupJmsDestination(destination, transactedSession), input.getSelector());
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
@@ -77,11 +80,11 @@ public class TransactedStrategy implements ISubscriptionStrategy {
             .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
             .run(new IRunnable() {
 
-          @Override
-          public void run() throws Exception {
-            handleMessage(listener, message);
-          }
-        });
+              @Override
+              public void run() throws Exception {
+                handleMessage(listener, message);
+              }
+            });
       }
     });
   }
