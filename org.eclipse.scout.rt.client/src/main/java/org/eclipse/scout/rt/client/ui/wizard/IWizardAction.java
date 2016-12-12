@@ -14,6 +14,8 @@ import java.security.Permission;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
+import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
 /**
  * An interface for "wizard actions", i.e. buttons or menus that are used for wizard navigation like "next", "previous"
@@ -25,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
  * {@link #setLabel(String)} and {@link #getLabel()} have to be implemented. The calls may just be delegated to
  * {@link IMenu#setText(String)} and {@link IMenu#getText()}, respectively.
  */
-public interface IWizardAction {
+public interface IWizardAction extends IVisibleDimension, IEnabledDimension {
 
   void setView(boolean visible, boolean enabled);
 
