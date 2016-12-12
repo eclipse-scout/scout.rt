@@ -102,9 +102,10 @@ scout.Device.prototype.bootstrap = function() {
 /**
  * The 300ms delay exists because the browser does not know whether the user wants to just tab or wants to zoom using double tab.
  * Therefore most browsers add the delay only if zoom is enabled. This works for firefox, chrome (>=32) and safari/ios (>=9.3).
- * It does not work if safari is opened in standalone/homescreen mode or in cordova with the UIWebView. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
- *
+ * It does not work if safari is opened in standalone/homescreen mode or in cordova. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
  * By default, zooming is disabled and home screen mode is enabled, see meta tags viewport and apple-mobile-web-app-capable in head.html
+ * <p>
+ * @return true if it is an older iOS (< 9.3), running in homescreen mode or running in a cordova container. Otherwise false.
  */
 scout.Device.prototype._needsFastClick = function() {
   if (!this.isIos()) {
@@ -112,9 +113,9 @@ scout.Device.prototype._needsFastClick = function() {
     return false;
   }
 
-  if (this.systemVersion >= 9.3 && !this.isStandalone() && this.isWKWebView()) {
+  if (this.systemVersion >= 9.3 && !this.isStandalone() && this.browser !== scout.Device.Browser.UNKNOWN) {
     // With iOS >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
-    // It is also necessary if running in a cordova container with UIWebView.
+    // It is also necessary if running in a cordova container (browser is set to unknown in that case)
     return false;
   }
 
@@ -186,13 +187,6 @@ scout.Device.prototype.isWindowsTablet = function() {
  */
 scout.Device.prototype.isStandalone = function() {
   return !!window.navigator.standalone;
-};
-
-/**
- * Only WKWebView supports indexedDB, so if window.indexedDB is set to true we assume it is running in WKWebView.
- */
-scout.Device.prototype.isWKWebView = function() {
-  return this.isIos() && !!window.indexedDB;
 };
 
 /**
