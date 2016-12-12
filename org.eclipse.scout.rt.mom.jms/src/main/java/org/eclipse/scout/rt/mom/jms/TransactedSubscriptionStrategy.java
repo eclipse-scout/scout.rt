@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -55,7 +54,6 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
 
   protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session transactedSession, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
-    final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
     final MessageConsumer consumer = transactedSession.createConsumer(m_mom.lookupJmsDestination(destination, transactedSession), input.getSelector());
@@ -66,7 +64,7 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
         // Do not process asynchronously due to transacted acknowledgment.
         // This guarantees that messages do not arrive concurrently, which is required to commit or rollback a single message.
 
-        final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
+        final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller);
         final IMessage<DTO> message = messageReader.readMessage();
 
         runContext.copy()

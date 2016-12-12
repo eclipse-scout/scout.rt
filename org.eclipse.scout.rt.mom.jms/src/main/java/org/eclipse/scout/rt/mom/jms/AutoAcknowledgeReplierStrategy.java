@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -64,7 +63,6 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
 
   protected <REQUEST, REPLY> void installMessageListener(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final Session session, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
-    final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
     final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session), input.getSelector());
@@ -80,7 +78,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
 
           @Override
           public void run() throws Exception {
-            final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller, encrypter);
+            final JmsMessageReader<REQUEST> requestReader = JmsMessageReader.newInstance(jmsRequest, marshaller);
             final IMessage<REQUEST> request = requestReader.readMessage();
             final Destination replyTopic = requestReader.readReplyTo();
 
@@ -93,7 +91,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
 
                   @Override
                   public void run() throws Exception {
-                    final Message replyMessage = handleRequest(listener, marshaller, encrypter, request, replyId);
+                    final Message replyMessage = handleRequest(listener, marshaller, request, replyId);
                     m_mom.send(m_mom.getDefaultProducer(), replyTopic, replyMessage, jmsRequest.getJMSDeliveryMode(), jmsRequest.getJMSPriority(), Message.DEFAULT_TIME_TO_LIVE);
                   }
                 });
@@ -113,11 +111,11 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
   /**
    * Delegates the request to the listener, and returns the message to be replied.
    */
-  protected <REPLY, REQUEST> Message handleRequest(final IRequestListener<REQUEST, REPLY> listener, final IMarshaller marshaller, final IEncrypter encrypter, final IMessage<REQUEST> request, final String replyId)
+  protected <REPLY, REQUEST> Message handleRequest(final IRequestListener<REQUEST, REPLY> listener, final IMarshaller marshaller, final IMessage<REQUEST> request, final String replyId)
       throws JMSException, GeneralSecurityException {
     try {
       final REPLY reply = listener.onRequest(request);
-      return JmsMessageWriter.newInstance(m_mom.getDefaultSession(), marshaller, encrypter)
+      return JmsMessageWriter.newInstance(m_mom.getDefaultSession(), marshaller)
           .writeTransferObject(reply)
           .writeRequestReplySuccess(true)
           .writeReplyId(replyId)
@@ -126,7 +124,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
     }
     catch (final Exception e) { // NOSONAR
       BEANS.get(ExceptionHandler.class).handle(e);
-      return JmsMessageWriter.newInstance(m_mom.getDefaultSession(), marshaller, encrypter)
+      return JmsMessageWriter.newInstance(m_mom.getDefaultSession(), marshaller)
           .writeTransferObject(interceptRequestReplyException(e))
           .writeRequestReplySuccess(false)
           .writeReplyId(replyId)

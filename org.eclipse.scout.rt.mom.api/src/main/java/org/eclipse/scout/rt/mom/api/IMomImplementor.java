@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.naming.InitialContext;
 
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 
@@ -47,10 +46,4 @@ public interface IMomImplementor extends IMom {
    */
   void setDefaultMarshaller(IMarshaller marshaller);
 
-  /**
-   * Sets the given {@link IEncrypter} to be used if no specific encrypter is registered for a {@link IDestination}. If
-   * not set, the encrypter as configured in property {@link EncrypterProperty} is used. By default, no encrypter is
-   * configured.
-   */
-  void setDefaultEncrypter(IEncrypter encrypter);
 }

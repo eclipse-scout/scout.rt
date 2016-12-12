@@ -44,7 +44,6 @@ import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.PublishInput;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -97,13 +96,11 @@ public class JmsMomImplementor implements IMomImplementor {
   protected final Map<String, ReplyFuture> m_replyFutureMap = new ConcurrentHashMap<>();
 
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
-  protected final Map<IDestination, IEncrypter> m_encrypters = new ConcurrentHashMap<>();
 
   protected final Map<Integer, ISubscriptionStrategy> m_subscriptionStrategies = new ConcurrentHashMap<>();
   protected final Map<Integer, IReplierStrategy> m_replierStrategies = new ConcurrentHashMap<>();
 
   protected IMarshaller m_defaultMarshaller;
-  protected IEncrypter m_defaultEncrypter;
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
@@ -159,10 +156,6 @@ public class JmsMomImplementor implements IMomImplementor {
     // Set default marshaller
     m_defaultMarshaller = BEANS.get(CONFIG.getPropertyValue(MarshallerProperty.class));
 
-    // Set default encrypter
-    final Class<? extends IEncrypter> encrypterClazz = CONFIG.getPropertyValue(EncrypterProperty.class);
-    m_defaultEncrypter = (encrypterClazz != null ? BEANS.get(encrypterClazz) : null);
-
     // Start the connection
     m_connection.start();
     LOG.info("{} initialized: {}", symbolicName, m_connection);
@@ -188,9 +181,8 @@ public class JmsMomImplementor implements IMomImplementor {
 
   protected <DTO> void publishNonTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
     final IMarshaller marshaller = lookupMarshaller(destination);
-    final IEncrypter encrypter = lookupEncrypter(destination);
 
-    final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
+    final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
         .writeTransferObject(transferObject)
         .writeProperties(input.getProperties(), true)
         .writeCorrelationId(CorrelationId.CURRENT.get())
@@ -201,7 +193,6 @@ public class JmsMomImplementor implements IMomImplementor {
   protected <DTO> void publishTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
     final ITransaction currentTransaction = assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
     final IMarshaller marshaller = lookupMarshaller(destination);
-    final IEncrypter encrypter = lookupEncrypter(destination);
 
     // Register transaction member for transacted publishing.
     final JmsTransactionMember txMember = currentTransaction.registerMemberIfAbsent(m_momUid, new IFunction<String, JmsTransactionMember>() {
@@ -226,7 +217,7 @@ public class JmsMomImplementor implements IMomImplementor {
     final Session transactedSession = txMember.getTransactedSession();
     final MessageProducer transactedProducer = txMember.getTransactedProducer();
 
-    final Message message = JmsMessageWriter.newInstance(transactedSession, marshaller, encrypter)
+    final Message message = JmsMessageWriter.newInstance(transactedSession, marshaller)
         .writeTransferObject(transferObject)
         .writeProperties(input.getProperties(), true)
         .writeCorrelationId(CorrelationId.CURRENT.get())
@@ -257,16 +248,15 @@ public class JmsMomImplementor implements IMomImplementor {
     assertFalse(input.isTransactional(), "transactional mode not supported for 'request-reply' communication");
 
     final IMarshaller marshaller = lookupMarshaller(destination);
-    final IEncrypter encrypter = lookupEncrypter(destination);
 
     // Prepare to receive the reply message
     final String replyId = String.format("scout.mom.requestreply.uid-%s", UUID.randomUUID()); // JMS message ID not applicable because unknown until sent
-    final ReplyFuture<REPLY> replyFuture = new ReplyFuture<>(marshaller, encrypter, replyId);
+    final ReplyFuture<REPLY> replyFuture = new ReplyFuture<>(marshaller, replyId);
 
     m_replyFutureMap.put(replyId, replyFuture);
     try {
       // Prepare the request message
-      final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller, encrypter)
+      final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
           .writeReplyTo(m_replyQueue)
           .writeReplyId(replyId)
           .writeProperties(input.getProperties(), true)
@@ -297,7 +287,7 @@ public class JmsMomImplementor implements IMomImplementor {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e); // exception thrown by the replier
     }
     catch (ThreadInterruptedError | TimedOutError e) {
-      final Message cancellationMessage = JmsMessageWriter.newInstance(m_defaultSession, BEANS.get(TextMarshaller.class), null)
+      final Message cancellationMessage = JmsMessageWriter.newInstance(m_defaultSession, BEANS.get(TextMarshaller.class))
           .writeReplyId(replyFuture.getReplyId())
           .writeCorrelationId(CorrelationId.CURRENT.get())
           .build();
@@ -344,18 +334,6 @@ public class JmsMomImplementor implements IMomImplementor {
     };
   }
 
-  @Override
-  public IRegistrationHandle registerEncrypter(final IDestination<?> destination, final IEncrypter encrypter) {
-    m_encrypters.put(destination, encrypter);
-    return new IRegistrationHandle() {
-
-      @Override
-      public void dispose() {
-        m_encrypters.remove(encrypter);
-      }
-    };
-  }
-
   /**
    * Registers the given {@link ISubscriptionStrategy} to receive message (fire-and-forget messaging).
    */
@@ -379,18 +357,6 @@ public class JmsMomImplementor implements IMomImplementor {
       return marshaller;
     }
     return m_defaultMarshaller;
-  }
-
-  /**
-   * Returns the {@link IEncrypter} registered for the given destination, or <code>null</code> if not set.
-   */
-  public IEncrypter lookupEncrypter(final IDestination<?> destination) {
-    final IEncrypter encrypter = m_encrypters.get(destination);
-    if (encrypter != null) {
-      return encrypter;
-    }
-
-    return m_defaultEncrypter;
   }
 
   /**
@@ -506,13 +472,11 @@ public class JmsMomImplementor implements IMomImplementor {
     protected final IBlockingCondition m_condition = Jobs.newBlockingCondition(true);
     private final String m_replyId;
     private final IMarshaller m_marshaller;
-    private final IEncrypter m_encrypter;
 
     protected volatile Message m_reply;
 
-    public ReplyFuture(final IMarshaller marshaller, final IEncrypter encrypter, final String replyId) {
+    public ReplyFuture(final IMarshaller marshaller, final String replyId) {
       m_marshaller = marshaller;
-      m_encrypter = encrypter;
       m_replyId = replyId;
     }
 
@@ -545,7 +509,7 @@ public class JmsMomImplementor implements IMomImplementor {
       }
 
       // Evaluate the reply
-      final JmsMessageReader reader = JmsMessageReader.newInstance(m_reply, m_marshaller, m_encrypter);
+      final JmsMessageReader reader = JmsMessageReader.newInstance(m_reply, m_marshaller);
       final Object reply = reader.readMessage().getTransferObject();
       if (reader.readRequestReplySuccess()) {
         return (REPLY) reply;
@@ -575,10 +539,5 @@ public class JmsMomImplementor implements IMomImplementor {
   @Override
   public void setDefaultMarshaller(final IMarshaller marshaller) {
     m_defaultMarshaller = marshaller;
-  }
-
-  @Override
-  public void setDefaultEncrypter(final IEncrypter encrypter) {
-    m_defaultEncrypter = encrypter;
   }
 }

@@ -20,7 +20,6 @@ import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -68,7 +67,7 @@ public class JmsMessageWriter {
 
   /**
    * Writes the given transfer object, and uses the writer's {@link IMarshaller} to transform the object into its
-   * transport type. If an {@link IEncrypter} is given, the object is encrypted accordingly.
+   * transport type.
    *
    * @see JmsMessageReader#readTransferObject()
    */
@@ -91,7 +90,7 @@ public class JmsMessageWriter {
   }
 
   /**
-   * Writes the given property, and encrypts it if requested and if an {@link IEncrypter} is given.
+   * Writes the given property.
    *
    * @see JmsMessageReader#readProperty(String, boolean)
    */
@@ -191,12 +190,7 @@ public class JmsMessageWriter {
   /**
    * Creates a new writer instance.
    */
-  public static JmsMessageWriter newInstance(final Session session, final IMarshaller marshaller, final IEncrypter encrypter) throws JMSException {
-    if (encrypter == null) {
-      return BEANS.get(JmsMessageWriter.class).init(session, marshaller);
-    }
-    else {
-      return BEANS.get(JmsCipherMessageWriter.class).init(session, marshaller, encrypter);
-    }
+  public static JmsMessageWriter newInstance(final Session session, final IMarshaller marshaller) throws JMSException {
+    return BEANS.get(JmsMessageWriter.class).init(session, marshaller);
   }
 }

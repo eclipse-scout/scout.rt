@@ -6,8 +6,6 @@ package org.eclipse.scout.rt.mom.api;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
@@ -36,11 +34,11 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
  * meaning there is no open connection for the time of blocking.
  * <p>
  * Message addressing is based on destinations (queues or topics), which additionally allow to register for a
- * {@link IMarshaller}, and optionally for an {@link IEncrypter}. A marshaller is used to transform the transfer object
- * into its transport representation, like text in JSON format, or bytes for the object's serialization data. An
- * encrypter allows end-to-end message encryption, which may be required depending on the messaging topology you choose.
- * However, even if working with a secure transport layer, messages may temporarily be stored like when being delivered
- * to queues - end-to-end encryption ensures confidentiality, integrity, and authenticity of those messages.
+ * {@link IMarshaller}. A marshaller is used to transform the transfer object into its transport representation, like
+ * text in JSON format, or bytes for the object's serialization data. An encrypter allows end-to-end message encryption,
+ * which may be required depending on the messaging topology you choose. However, even if working with a secure
+ * transport layer, messages may temporarily be stored like when being delivered to queues - end-to-end encryption
+ * ensures confidentiality, integrity, and authenticity of those messages.
  *
  * @since 6.1
  */
@@ -168,30 +166,9 @@ public interface IMom {
   IRegistrationHandle registerMarshaller(IDestination<?> destination, IMarshaller marshaller);
 
   /**
-   * Allows end-to-end encryption for transfer objects sent to the given destination. By default, no encryption is used.
-   *
-   * @return registration handle to unregister the encrypter from the destination.
-   * @see ClusterAesEncrypter
-   */
-  IRegistrationHandle registerEncrypter(IDestination<?> destination, IEncrypter encrypter);
-
-  /**
    * Destroys this MOM and releases all associated resources.
    */
   void destroy();
-
-  /**
-   * Specifies the default {@link IEncrypter} to use if no encrypter is specified for a destination.
-   * <p>
-   * By default, no encrypter is used.
-   */
-  class EncrypterProperty extends AbstractClassConfigProperty<IEncrypter> {
-
-    @Override
-    public String getKey() {
-      return "scout.mom.encrypter";
-    }
-  }
 
   /**
    * Specifies the default {@link IMarshaller} to use if no marshaller is specified for a destination.

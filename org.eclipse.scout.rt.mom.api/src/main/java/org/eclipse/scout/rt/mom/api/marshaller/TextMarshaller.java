@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 
 import java.util.Map;
 
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
@@ -10,9 +9,6 @@ import org.eclipse.scout.rt.platform.Bean;
  * network.
  * <p>
  * This marshaller does not support the serialization of exceptions.
- * <p>
- * If using an {@link IEncrypter}, consider the usage of {@link TextAsBytesMarshaller}, because encrypter produces
- * binary data. If still using this marshaller, data is additionally encoded into Base64 format.
  *
  * @see IMarshaller#MESSAGE_TYPE_TEXT
  * @since 6.1

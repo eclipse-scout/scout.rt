@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -129,11 +128,6 @@ public abstract class AbstractMomTransport implements IMom, IMomTransport {
   @Override
   public IRegistrationHandle registerMarshaller(final IDestination<?> destination, final IMarshaller marshaller) {
     return getDelegate().registerMarshaller(destination, marshaller);
-  }
-
-  @Override
-  public IRegistrationHandle registerEncrypter(final IDestination<?> destination, final IEncrypter encrypter) {
-    return getDelegate().registerEncrypter(destination, encrypter);
   }
 
   @Override

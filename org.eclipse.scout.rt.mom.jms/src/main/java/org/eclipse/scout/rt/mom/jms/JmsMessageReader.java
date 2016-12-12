@@ -19,7 +19,6 @@ import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.eclipse.scout.rt.mom.api.IMessage;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -62,7 +61,7 @@ public class JmsMessageReader<DTO> {
   }
 
   /**
-   * Reads the transfer object by using the readers's {@link IMarshaller} and {@link IEncrypter} if encrypted.
+   * Reads the transfer object by using the readers's {@link IMarshaller}.
    *
    * @see JmsMessageWriter#writeTransferObject(Object)
    */
@@ -88,7 +87,7 @@ public class JmsMessageReader<DTO> {
   }
 
   /**
-   * Reads the given property, and decrypts it if requested and if an {@link IEncrypter} is given.
+   * Reads the given property.
    *
    * @see JmsMessageWriter#writeProperty(String, String, boolean)
    */
@@ -202,12 +201,7 @@ public class JmsMessageReader<DTO> {
    * Creates a new reader instance.
    */
   @SuppressWarnings("unchecked")
-  public static <DTO> JmsMessageReader<DTO> newInstance(final Message message, final IMarshaller marshaller, final IEncrypter encrypter) throws JMSException, GeneralSecurityException {
-    if (encrypter == null) {
-      return BEANS.get(JmsMessageReader.class).init(message, marshaller);
-    }
-    else {
-      return BEANS.get(JmsCipherMessageReader.class).init(message, marshaller, encrypter);
-    }
+  public static <DTO> JmsMessageReader<DTO> newInstance(final Message message, final IMarshaller marshaller) throws JMSException, GeneralSecurityException {
+    return BEANS.get(JmsMessageReader.class).init(message, marshaller);
   }
 }

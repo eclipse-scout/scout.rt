@@ -7,8 +7,6 @@ import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.IDestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.IResolveMethod;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
-import org.eclipse.scout.rt.mom.api.encrypter.ClusterAesEncrypter;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
@@ -36,11 +34,11 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
  * meaning there is no open connection for the time of blocking.
  * <p>
  * Message addressing is based on destinations (queues or topics), which additionally allow to register for a
- * {@link IMarshaller}, and optionally for an {@link IEncrypter}. A marshaller is used to transform the transfer object
- * into its transport representation, like text in JSON format, or bytes for the object's serialization data. An
- * encrypter allows end-to-end message encryption, which may be required depending on the messaging topology you choose.
- * However, even if working with a secure transport layer, messages may temporarily be stored like when being delivered
- * to queues - end-to-end encryption ensures confidentiality, integrity, and authenticity of those messages.
+ * {@link IMarshaller}. A marshaller is used to transform the transfer object into its transport representation, like
+ * text in JSON format, or bytes for the object's serialization data. An encrypter allows end-to-end message encryption,
+ * which may be required depending on the messaging topology you choose. However, even if working with a secure
+ * transport layer, messages may temporarily be stored like when being delivered to queues - end-to-end encryption
+ * ensures confidentiality, integrity, and authenticity of those messages.
  *
  * @see IMom
  * @since 6.1
@@ -371,15 +369,5 @@ public final class MOM {
    */
   public static <TRANSPORT extends IMom & IMomTransport> IRegistrationHandle registerMarshaller(final Class<? extends TRANSPORT> transport, final IDestination<?> destination, final IMarshaller marshaller) {
     return BEANS.get(transport).registerMarshaller(destination, marshaller);
-  }
-
-  /**
-   * Allows end-to-end encryption for transfer objects sent to the given destination. By default, no encryption is used.
-   *
-   * @return registration handle to unregister the encrypter from the destination.
-   * @see ClusterAesEncrypter
-   */
-  public static <TRANSPORT extends IMom & IMomTransport> IRegistrationHandle registerEncrypter(final Class<? extends TRANSPORT> transport, final IDestination<?> destination, final IEncrypter encrypter) {
-    return BEANS.get(transport).registerEncrypter(destination, encrypter);
   }
 }

@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.mom.api;
 
 import java.util.Map;
 
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -46,17 +45,7 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
-  public IRegistrationHandle registerEncrypter(final IDestination<?> destination, final IEncrypter encrypter) {
-    return IRegistrationHandle.NULL_HANDLE;
-  }
-
-  @Override
   public void setDefaultMarshaller(final IMarshaller marshaller) {
-    // NOOP
-  }
-
-  @Override
-  public void setDefaultEncrypter(final IEncrypter encrypter) {
     // NOOP
   }
 

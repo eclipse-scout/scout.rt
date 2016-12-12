@@ -21,11 +21,6 @@ public interface IJmsMomProperties {
   String PROP_MARSHALLER_CONTEXT = "x-scout.mom.marshaller.properties";
 
   /**
-   * The property id to query the keys of an encryption context.
-   */
-  String PROP_ENCRYPTER_CONTEXT = "x-scout.mom.encryption.properties";
-
-  /**
    * The property ID to indicate whether this is a <code>null</code> object.
    */
   String PROP_NULL_OBJECT = "x-scout.mom.transferobject.null";

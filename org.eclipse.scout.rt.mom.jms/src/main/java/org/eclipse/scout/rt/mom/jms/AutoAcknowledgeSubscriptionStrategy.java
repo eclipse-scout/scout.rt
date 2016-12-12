@@ -11,7 +11,6 @@ import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.api.encrypter.IEncrypter;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -57,7 +56,6 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
 
   protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session session, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
-    final IEncrypter encrypter = m_mom.lookupEncrypter(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
     final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session), input.getSelector());
@@ -69,7 +67,7 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
 
           @Override
           public void run() throws Exception {
-            final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller, encrypter);
+            final JmsMessageReader<DTO> messageReader = JmsMessageReader.newInstance(jmsMessage, marshaller);
             final IMessage<DTO> message = messageReader.readMessage();
 
             runContext.copy()
