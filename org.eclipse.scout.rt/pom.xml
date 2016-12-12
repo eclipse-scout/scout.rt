@@ -65,6 +65,7 @@
 
     <module>../org.eclipse.scout.rt.ui.html</module>
     <module>../org.eclipse.scout.rt.ui.html.test</module>
+	<module>../org.eclipse.scout.rt.ui.html.selenium</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor.test</module>
     <module>../org.eclipse.scout.rt.svg.ui.html</module>
