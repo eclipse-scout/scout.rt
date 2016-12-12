@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.platform.security;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -21,9 +22,8 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -34,6 +34,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
@@ -58,70 +60,85 @@ public class SunSecurityProvider implements ISecurityProvider {
    */
   protected static final int BUF_SIZE = 8192;
 
-  @Override
-  public byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen) {
-    return doCrypt(encryptedData, password, salt, Cipher.DECRYPT_MODE, keyLen);
-  }
+  /**
+   * Length (in bytes) of Initialization Vector for Galois/Counter Mode (as defined in
+   * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>
+   * ).
+   */
+  protected static final int GCM_INITIALIZATION_VECTOR_LEN = 16;
+
+  /**
+   * Length (in bits) of authentication tag T of Initialization Vector for Galois/Counter Mode (as defined in
+   * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP 800-38D</a>
+   * ).
+   */
+  protected static final int GCM_AUTH_TAG_BIT_LEN = 128;
 
   @Override
-  public byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen) {
-    return doCrypt(clearTextData, password, salt, Cipher.ENCRYPT_MODE, keyLen);
-  }
-
-  protected byte[] doCrypt(byte[] input, char[] password, byte[] salt, int mode, int keyLen) {
-    if (input == null) {
-      throw new IllegalArgumentException("input must not be null.");
-    }
-    if (password == null) {
-      throw new IllegalArgumentException("password must not be null.");
-    }
-    if (salt == null || salt.length < 1) {
-      throw new IllegalArgumentException("salt must be provided.");
-    }
-    if (keyLen != 128 && keyLen != 192 && keyLen != 256) {
-      throw new IllegalArgumentException("key length must be 128, 192 or 256.");
-    }
-
-    /**
-     * Length (in bytes) of Initialization Vector for Galois/Counter Mode (as defined in
-     * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP
-     * 800-38D</a> ).
-     */
-    @SuppressWarnings("squid:S00117")
-    final int GCM_INITIALIZATION_VECTOR_LEN = 16;
-
-    /**
-     * Length (in bits) of authentication tag T of Initialization Vector for Galois/Counter Mode (as defined in
-     * <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST Special Publication SP
-     * 800-38D</a> ).
-     */
-    @SuppressWarnings("squid:S00117")
-    final int GCM_AUTH_TAG_BIT_LEN = 128;
+  public EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen) {
+    Assertions.assertGreater(Assertions.assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
+    Assertions.assertGreater(Assertions.assertNotNull(salt, "salt must be provided.").length, 0, "empty salt is not allowed.");
+    Assertions.assertTrue(keyLen == 128 || keyLen == 192 || keyLen == 256, "key length must be 128, 192 or 256.");
 
     try {
       SecretKeyFactory factory = SecretKeyFactory.getInstance(getSecretKeyAlgorithm(), getCipherAlgorithmProvider());
       KeySpec spec = new PBEKeySpec(password, salt, getKeyDerivationIterationCount(), keyLen + (GCM_INITIALIZATION_VECTOR_LEN * 8));
-      SecretKey tmp = factory.generateSecret(spec);
+      SecretKey tmpSecret = factory.generateSecret(spec);
 
       // derive Key and Initialization Vector
-      byte[] encoded = tmp.getEncoded();
+      byte[] encoded = tmpSecret.getEncoded();
       byte[] iv = new byte[GCM_INITIALIZATION_VECTOR_LEN];
       byte[] key = new byte[keyLen / 8];
       System.arraycopy(encoded, 0, key, 0, key.length);
       System.arraycopy(encoded, key.length, iv, 0, GCM_INITIALIZATION_VECTOR_LEN);
 
-      SecretKey secret = new SecretKeySpec(key, getCipherAlgorithm());
+      SecretKey secretKey = new SecretKeySpec(key, getCipherAlgorithm());
       GCMParameterSpec parameters = new GCMParameterSpec(GCM_AUTH_TAG_BIT_LEN, iv);
+      return new EncryptionKey(secretKey, parameters);
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw new ProcessingException("Unable to create secret. Algorithm could not be found. Make sure to use JRE 1.8 or newer.", e);
+    }
+    catch (InvalidKeySpecException | NoSuchProviderException e) {
+      throw new ProcessingException("Unable to create secret.", e);
+    }
+  }
 
+  @Override
+  public void encrypt(InputStream clearTextData, OutputStream encryptedData, EncryptionKey key) {
+    doCrypt(clearTextData, encryptedData, key, Cipher.ENCRYPT_MODE);
+  }
+
+  @Override
+  public void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key) {
+    doCrypt(encryptedData, clearTextData, key, Cipher.DECRYPT_MODE);
+  }
+
+  protected void doCrypt(InputStream input, OutputStream output, EncryptionKey key, int mode) {
+    Assertions.assertNotNull(key, "key must not be null.");
+    if (input == null) {
+      throw new AssertionException("input must not be null.");
+    }
+    if (output == null) {
+      throw new AssertionException("output must not be null.");
+    }
+
+    try {
       Cipher cipher = Cipher.getInstance(getCipherAlgorithm() + "/" + getCipherAlgorithmMode() + "/" + getCipherAlgorithmPadding(), getCipherAlgorithmProvider());
-      cipher.init(mode, secret, parameters);
+      cipher.init(mode, key.get(), key.params());
 
-      return cipher.doFinal(input);
+      try (OutputStream out = new CipherOutputStream(output, cipher)) {
+        int n;
+        byte[] buf = new byte[BUF_SIZE];
+        while ((n = input.read(buf)) >= 0) {
+          out.write(buf, 0, n);
+        }
+      }
     }
     catch (NoSuchAlgorithmException e) {
       throw new ProcessingException("Unable to crypt data. Algorithm could not be found. Make sure to use JRE 1.8 or newer.", e);
     }
-    catch (InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+    catch (NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchProviderException | IOException e) {
       throw new ProcessingException("Unable to crypt data.", e);
     }
   }
@@ -135,11 +152,9 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public byte[] createSecureRandomBytes(int numBytes) {
-    if (numBytes < 1) {
-      throw new IllegalArgumentException(numBytes + " is not a valid number for random bytes.");
-    }
+    Assertions.assertGreater(numBytes, 0, "{} is not a valid number for random bytes.", numBytes);
     byte[] rnd = new byte[numBytes];
-    new SecureRandom().nextBytes(rnd);
+    new SecureRandom().nextBytes(rnd); // do not use createSecureRandom() here so that we do not waste one byte.
     return rnd;
   }
 
@@ -151,15 +166,9 @@ public class SunSecurityProvider implements ISecurityProvider {
    */
   @Override
   public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
-    if (password == null) {
-      throw new IllegalArgumentException("no password provided");
-    }
-    if (salt == null || salt.length < 1) {
-      throw new IllegalArgumentException("no salt provided");
-    }
-    if (iterations < MIN_PASSWORD_HASH_ITERATIONS) {
-      throw new IllegalArgumentException("iterations must be > " + MIN_PASSWORD_HASH_ITERATIONS);
-    }
+    Assertions.assertGreater(Assertions.assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
+    Assertions.assertGreater(Assertions.assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
+    Assertions.assertGreaterOrEqual(iterations, MIN_PASSWORD_HASH_ITERATIONS, "iterations must be > {}", MIN_PASSWORD_HASH_ITERATIONS);
     // other checks are done by the PBEKeySpec constructor
 
     try {
@@ -177,7 +186,7 @@ public class SunSecurityProvider implements ISecurityProvider {
   @Override
   public byte[] createHash(InputStream data, byte[] salt, int iterations) {
     if (data == null) {
-      throw new IllegalArgumentException("no data provided");
+      throw new AssertionException("no data provided");
     }
     try {
       MessageDigest digest = MessageDigest.getInstance(getDigestAlgorithm(), getDigestAlgorithmProvider());
@@ -224,12 +233,11 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public byte[] createSignature(byte[] privateKey, InputStream data) {
+    Assertions.assertGreater(Assertions.assertNotNull(privateKey, "no private key provided").length, 0, "empty private key not allowed");
     if (data == null) {
-      throw new IllegalArgumentException("no data provided");
+      throw new AssertionException("no data provided");
     }
-    if (privateKey == null) {
-      throw new IllegalArgumentException("no private key provided");
-    }
+
     try {
       // create private key from bytes
       KeyFactory keyFactory = KeyFactory.getInstance(getKeyPairGenerationAlgorithm(), getSignatureProvider());
@@ -255,15 +263,12 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public boolean verifySignature(byte[] publicKey, InputStream data, byte[] signatureToVerify) {
+    Assertions.assertGreater(Assertions.assertNotNull(publicKey, "no public key provided").length, 0, "empty public key not allowed");
+    Assertions.assertGreater(Assertions.assertNotNull(signatureToVerify, "no signature provided").length, 0, "empty signature not allowed");
     if (data == null) {
-      throw new IllegalArgumentException("no data provided");
+      throw new AssertionException("no data provided");
     }
-    if (publicKey == null) {
-      throw new IllegalArgumentException("no public key provided");
-    }
-    if (signatureToVerify == null) {
-      throw new IllegalArgumentException("no signature provided");
-    }
+
     try {
       // create public key from bytes
       KeyFactory keyFactory = KeyFactory.getInstance(getKeyPairGenerationAlgorithm(), getSignatureProvider());
@@ -289,12 +294,11 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public byte[] createMac(byte[] password, InputStream data) {
+    Assertions.assertGreater(Assertions.assertNotNull(password, "no password provided").length, 0, "empty password not allowed");
     if (data == null) {
-      throw new IllegalArgumentException("no data provided");
+      throw new AssertionException("no data provided");
     }
-    if (password == null) {
-      throw new IllegalArgumentException("no password provided");
-    }
+
     try {
       String algorithm = getMacAlgorithm();
       SecretKeySpec key = new SecretKeySpec(password, 0, password.length, algorithm);

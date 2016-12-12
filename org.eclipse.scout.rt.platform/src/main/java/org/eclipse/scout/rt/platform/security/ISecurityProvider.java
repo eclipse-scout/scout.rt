@@ -1,11 +1,17 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.Key;
 import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+
+import javax.crypto.Cipher;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * <h3>{@link ISecurityProvider}</h3> Provider class for encryption & decryption, hashing and creation of random
@@ -20,14 +26,14 @@ public interface ISecurityProvider {
    * Create a Message Authentication Code (MAC) for the given data and password.
    *
    * @param password
-   *          The password to create the authentication code.
+   *          The password to create the authentication code. Must not be {@code null} or empty.
    * @param data
    *          The {@link InputStream} that provides the data for which the MAC should be created.
    * @return The created authentication code.
    * @throws ProcessingException
    *           if there is an error creating the MAC
-   * @throws IllegalArgumentException
-   *           if the password or data is <code>null</code>.
+   * @throws AssertionException
+   *           if the password is {@code null} or empty or if the data is {@code null}.
    */
   byte[] createMac(byte[] password, InputStream data);
 
@@ -42,8 +48,8 @@ public interface ISecurityProvider {
    * @return The signature bytes.
    * @throws ProcessingException
    *           If there is an error creating the signature.
-   * @throws IllegalArgumentException
-   *           if the private key or {@link InputStream} is <code>null</code>.
+   * @throws AssertionException
+   *           if the private key is {@code null} or and empty array or if the {@link InputStream} is {@code null}.
    */
   byte[] createSignature(byte[] privateKey, InputStream data);
 
@@ -57,12 +63,11 @@ public interface ISecurityProvider {
    *          The {@link InputStream} providing the data to verify.
    * @param signatureToVerify
    *          The signature that should be verified against.
-   * @return <code>true</code> if the given signature is valid for the given data and public key. <code>false</code>
-   *         otherwise.
+   * @return {@code true} if the given signature is valid for the given data and public key. {@code false} otherwise.
    * @throws ProcessingException
    *           If there is an error validating the signature.
-   * @throws IllegalArgumentException
-   *           If one of the arguments is <code>null</code>.
+   * @throws AssertionException
+   *           If one of the arguments is {@code null} or an empty array.
    */
   boolean verifySignature(byte[] publicKey, InputStream data, byte[] signatureToVerify);
 
@@ -85,12 +90,13 @@ public interface ISecurityProvider {
    * @param data
    *          The {@link InputStream} providing the data to hash.
    * @param salt
-   *          the salt to use. Use {@link #createSecureRandomBytes(int)} to generate a random salt per instance.
+   *          the salt to use or {@code null} if not salt should be used (not recommended!). Use
+   *          {@link #createSecureRandomBytes(int)} to generate a random salt per instance.
    * @param iterations
    *          the number of hashing iterations. There is always at least one cycle executed.
    * @return the hash
-   * @throws IllegalArgumentException
-   *           If data is <code>null</code>.
+   * @throws AssertionException
+   *           If data is {@code null}.
    * @throws ProcessingException
    *           If there is an error creating the hash
    */
@@ -100,11 +106,11 @@ public interface ISecurityProvider {
    * Creates a hash for the given password.<br>
    *
    * @param password
-   *          The password to create the hash for. Must not be <code>null</code>.
+   *          The password to create the hash for. Must not be {@code null} or empty.
    * @param salt
    *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
    *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
-   *          Remember to save the salt with the hashed password! Must not be <code>null</code> or an empty array.
+   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
    * @param iterations
    *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
    *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
@@ -114,59 +120,81 @@ public interface ISecurityProvider {
    *          method requires one half second to execute (on the production system). Also consider the number of users
    *          and the number of logins executed to find a value that scales in your environment.
    * @return the password hash
-   * @throws IllegalArgumentException
-   *           If the password is <code>null</code>, the salt is <code>null</code> or empty or iterations is not
-   *           positive.
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           <li>The number of iterations is too small.</li>
+   *           </ul>
    * @throws ProcessingException
    *           If there is an error creating the hash. <br>
    */
   byte[] createPasswordHash(char[] password, byte[] salt, int iterations);
 
   /**
-   * Encrypts the given data using the given key and salt.<br>
-   * Use {@link #decrypt(byte[], char[], byte[], int)} to decrypt the data again (using the same key, salt and keyLen).
+   * Encrypts the given data using the given {@link EncryptionKey}.<br>
+   * Use {@link #decrypt(InputStream, OutputStream, EncryptionKey)} to decrypt the data again using the same key.
    *
    * @param clearTextData
-   *          The data to encrypt.
-   * @param password
-   *          The password to use for the encryption. Must not be <code>null</code> or empty.
-   * @param salt
-   *          The salt to use for the encryption. Must not be <code>null</code> or empty. It is important to create a
-   *          separate random salt for each key! Salts may not be shared by several keys. Use
-   *          {@link #createSecureRandomBytes(int)} to generate a new salt for a key. It is safe to store the salt in
-   *          clear text alongside the encrypted data. This salt will then be used to decrypt the data again.
-   * @param keyLen
-   *          The key length (in bits) to use.
-   * @return The encrypted data.
-   * @throws ProcessingException
-   *           If there is an error during encryption.
-   * @throws IllegalArgumentException
-   *           If the clear text data, salt or password is <code>null</code> or empty or an unsupported keyLen has been
-   *           provided.
+   *          An {@link InputStream} providing the clear text data. The {@link InputStream} is not closed by this
+   *          method!
+   * @param encryptedData
+   *          The encrypted data is written to this {@link OutputStream}. The {@link OutputStream} will be automatically
+   *          closed by this method call.
+   * @param key
+   *          The {@link EncryptionKey} to use.
+   * @throws AssertionException
+   *           If one of the parameters is {@code null}.
+   * @see #createEncryptionKey(char[], byte[], int)
+   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
    */
-  byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen);
+  void encrypt(InputStream clearTextData, OutputStream encryptedData, EncryptionKey key);
 
   /**
-   * Decrypts the data using the given key and salt.<br>
-   * This method is intended to decrypt data that was previously encrypted using
-   * {@link #encrypt(byte[], char[], byte[], int)}.<br>
+   * Decrypts the given data using the given {@link EncryptionKey}.<br>
+   * Use {@link #encrypt(InputStream, OutputStream, EncryptionKey)} to encrypt the data using the same key.
    *
    * @param encryptedData
-   *          The encrypted data that should be decrypted.
-   * @param password
-   *          The password to use for the decryption. Must not be <code>null</code> or empty.
-   * @param salt
-   *          The salt to use for the decryption. This is the same salt that was used to encrypt the data.
-   * @param keyLen
-   *          The key length (in bits) to use.
-   * @return The original clear text data.
-   * @throws ProcessingException
-   *           If there is an error during decryption.
-   * @throws IllegalArgumentException
-   *           If the encrypted data, salt or password is <code>null</code> or empty or an unsupported keyLen has been
-   *           provided.
+   *          An {@link InputStream} providing the encrypted text data. The {@link InputStream} is not closed by this
+   *          method!
+   * @param clearTextData
+   *          The clear text data is written to this {@link OutputStream}. The {@link OutputStream} will be
+   *          automatically closed by this method call.
+   * @param key
+   *          The {@link EncryptionKey} to use.
+   * @throws AssertionException
+   *           If one of the parameters is {@code null}.
+   * @see #createEncryptionKey(char[], byte[], int)
+   * @see #encrypt(InputStream, OutputStream, EncryptionKey)
    */
-  byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen);
+  void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key);
+
+  /**
+   * Creates a new {@link EncryptionKey} to be used with {@link #encrypt(InputStream, OutputStream, EncryptionKey)} or
+   * {@link #decrypt(InputStream, OutputStream, EncryptionKey)}.
+   *
+   * @param password
+   *          The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *          random salt for each key! Salts may not be shared by several keys. Use
+   *          {@link #createSecureRandomBytes(int)} to generate a new salt. It is safe to store the salt in clear text
+   *          alongside the encrypted data.
+   * @param keyLen
+   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @return The {@link EncryptionKey} used to encrypt or decrypt data.
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           <li>The key length is not valid.</li>
+   *           </ul>
+   * @see #encrypt(InputStream, OutputStream, EncryptionKey)
+   * @see #decrypt(InputStream, OutputStream, EncryptionKey)
+   */
+  EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen);
 
   /**
    * Creates a new secure random instance. The returned instance has already been seeded and is ready to use.
@@ -177,20 +205,47 @@ public interface ISecurityProvider {
   SecureRandom createSecureRandom();
 
   /**
-   * Generates a user-specified number of random bytes.
+   * Generates a user-specified number of secure random bytes.
    *
    * @param numBytes
-   *          The number of bytes to create.
+   *          The number of bytes to create. Must be >= 1;
    * @return the created random bytes.
-   * @throws IllegalArgumentException
+   * @throws AssertionException
    *           if the size is less than 1.
    */
   byte[] createSecureRandomBytes(int numBytes);
 
   /**
+   * Class describing a symmetric encryption key.
+   */
+  class EncryptionKey {
+    private final Key m_key;
+    private final AlgorithmParameterSpec m_params;
+
+    public EncryptionKey(Key key, AlgorithmParameterSpec params) {
+      m_key = key;
+      m_params = params;
+    }
+
+    /**
+     * @return The {@link Key} instance.
+     */
+    public Key get() {
+      return m_key;
+    }
+
+    /**
+     * @return The {@link AlgorithmParameterSpec} needed to initialize a {@link Cipher} with this key.
+     */
+    public AlgorithmParameterSpec params() {
+      return m_params;
+    }
+  }
+
+  /**
    * Public and private key bytes.
    */
-  public final class KeyPairBytes {
+  class KeyPairBytes {
 
     private final byte[] m_privateKey;
     private final byte[] m_publicKey;

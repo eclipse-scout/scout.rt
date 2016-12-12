@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -20,11 +22,14 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.security.ISecurityProvider.EncryptionKey;
 import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -35,6 +40,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * @since 5.1
  * @see Base64Utility
  * @see HexUtility
+ * @see ISecurityProvider
  */
 public final class SecurityUtility {
 
@@ -43,29 +49,146 @@ public final class SecurityUtility {
    */
   private static final int DEFAULT_RANDOM_SIZE = 32;
 
+  private static final LazyValue<ISecurityProvider> SECURITY_PROVIDER = new LazyValue<>(ISecurityProvider.class);
+
   private SecurityUtility() {
     // no instances of this class
   }
 
   /**
-   * See {@link ISecurityProvider#decrypt(byte[], char[], byte[], int)}
+   * See {@link ISecurityProvider#encrypt(InputStream, OutputStream, EncryptionKey)}
    */
-  public static byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen) {
-    return BEANS.get(ISecurityProvider.class).decrypt(encryptedData, password, salt, keyLen);
+  public static void encrypt(InputStream clearTextData, OutputStream encryptedData, EncryptionKey key) {
+    SECURITY_PROVIDER.get().encrypt(clearTextData, encryptedData, key);
   }
 
   /**
-   * See {@link ISecurityProvider#encrypt(byte[], char[], byte[], int)}
+   * See {@link ISecurityProvider#decrypt(InputStream, OutputStream, EncryptionKey)}
+   */
+  public static void decrypt(InputStream encryptedData, OutputStream clearTextData, EncryptionKey key) {
+    SECURITY_PROVIDER.get().decrypt(encryptedData, clearTextData, key);
+  }
+
+  /**
+   * See {@link ISecurityProvider#createEncryptionKey(char[], byte[], int)}
+   */
+  public static EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen) {
+    return SECURITY_PROVIDER.get().createEncryptionKey(password, salt, keyLen);
+  }
+
+  /**
+   * Encrypts the given bytes using the given {@link EncryptionKey}.<br>
+   * Use {@link #createEncryptionKey(char[], byte[], int)} to create a key instance.
+   *
+   * @param clearTextData
+   *          The clear text data. Must not be {@code null}.
+   * @param key
+   *          The {@link EncryptionKey} to use. Must not be {@code null}.
+   * @return The encrypted bytes
+   * @throws AssertionException
+   *           on invalid input.
+   * @throws ProcessingException
+   *           if there is an error during encryption.
+   */
+  public static byte[] encrypt(byte[] clearTextData, EncryptionKey key) {
+    return doCrypt(clearTextData, key, true);
+  }
+
+  /**
+   * Decrypts the given bytes using the given {@link EncryptionKey}.<br>
+   * Use {@link #createEncryptionKey(char[], byte[], int)} to create a key instance.
+   *
+   * @param encryptedData
+   *          The encrypted bytes. Must not be {@code null}.
+   * @param key
+   *          The {@link EncryptionKey} to use. Must not be {@code null}.
+   * @return The clear text data.
+   * @throws AssertionException
+   *           on invalid input
+   * @throws ProcessingException
+   *           if there is an error during decryption.
+   */
+  public static byte[] decrypt(byte[] encryptedData, EncryptionKey key) {
+    return doCrypt(encryptedData, key, false);
+  }
+
+  /**
+   * Encrypts the given clear text bytes using the given password and salt.
+   *
+   * @param clearTextData
+   *          The clear text data. Must not be {@code null}.
+   * @param password
+   *          The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *          random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *          generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @return The encrypted bytes.
+   * @throws AssertionException
+   *           on invalid input
+   * @throws ProcessingException
+   *           if there is an error during encryption.
    */
   public static byte[] encrypt(byte[] clearTextData, char[] password, byte[] salt, int keyLen) {
-    return BEANS.get(ISecurityProvider.class).encrypt(clearTextData, password, salt, keyLen);
+    return doCrypt(clearTextData, password, salt, keyLen, true);
+  }
+
+  /**
+   * @param encryptedData
+   *          The encrypted bytes. Must not be {@code null}.
+   * @param password
+   *          The password to use to create the key. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use for the key. Must not be {@code null} or empty. It is important to create a separate
+   *          random salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes(int)} to
+   *          generate a new salt. It is safe to store the salt in clear text alongside the encrypted data.
+   * @param keyLen
+   *          The length of the key (in bits). Must be one of 128, 192 or 256.
+   * @return The clear text bytes.
+   * @throws AssertionException
+   *           on invalid input
+   * @throws ProcessingException
+   *           if there is an error during decryption.
+   */
+  public static byte[] decrypt(byte[] encryptedData, char[] password, byte[] salt, int keyLen) {
+    return doCrypt(encryptedData, password, salt, keyLen, false);
+  }
+
+  static byte[] doCrypt(byte[] data, char[] password, byte[] salt, int keyLen, boolean encrypt) {
+    EncryptionKey key = createEncryptionKey(password, salt, keyLen);
+    return doCrypt(data, key, encrypt);
+  }
+
+  static byte[] doCrypt(byte[] data, EncryptionKey key, boolean encrypt) {
+    Assertions.assertNotNull(data, "no data provided");
+
+    // no need to close ByteArray-Streams
+    ByteArrayInputStream input = new ByteArrayInputStream(data);
+    int expectedOutSize = input.available();
+    int aesBlockSize = 16;
+    if (encrypt) {
+      expectedOutSize = ((expectedOutSize / aesBlockSize) + 2) * aesBlockSize;
+    }
+    else {
+      expectedOutSize -= 8;
+    }
+    ByteArrayOutputStream result = new ByteArrayOutputStream(expectedOutSize);
+    if (encrypt) {
+      encrypt(input, result, key);
+    }
+    else {
+      decrypt(input, result, key);
+    }
+    return result.toByteArray();
   }
 
   /**
    * See {@link ISecurityProvider#createSecureRandomBytes(int)}
    */
   public static byte[] createRandomBytes(int numBytes) {
-    return BEANS.get(ISecurityProvider.class).createSecureRandomBytes(numBytes);
+    return SECURITY_PROVIDER.get().createSecureRandomBytes(numBytes);
   }
 
   /**
@@ -84,14 +207,14 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#createSecureRandom()}
    */
   public static SecureRandom createSecureRandom() {
-    return BEANS.get(ISecurityProvider.class).createSecureRandom();
+    return SECURITY_PROVIDER.get().createSecureRandom();
   }
 
   /**
    * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
    */
   public static byte[] hashPassword(char[] password, byte[] salt, int iterations) {
-    return BEANS.get(ISecurityProvider.class).createPasswordHash(password, salt, iterations);
+    return SECURITY_PROVIDER.get().createPasswordHash(password, salt, iterations);
   }
 
   /**
@@ -100,21 +223,19 @@ public final class SecurityUtility {
    * <b>Important:</b> For hashing of passwords use {@link #hashPassword(char[], byte[], int)}!
    *
    * @param data
-   *          The data to hash. Must not be <code>null</code>.
+   *          The data to hash. Must not be {@code null}.
    * @param salt
    *          The salt to use. Use {@link #createRandomBytes(int)} to generate a random salt per instance.
    * @return the hash
    * @throws ProcessingException
    *           If there is an error creating the hash
-   * @throws IllegalArgumentException
-   *           If data is <code>null</code>.
+   * @throws AssertionException
+   *           If data is {@code null}.
    * @see ISecurityProvider#createHash(InputStream, byte[])
    * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
    */
   public static byte[] hash(byte[] data, byte[] salt) {
-    if (data == null) {
-      throw new IllegalArgumentException("no data provided");
-    }
+    Assertions.assertNotNull(data, "no data provided");
     return hash(new ByteArrayInputStream(data), salt);
   }
 
@@ -122,21 +243,21 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#createHash(InputStream, byte[])}
    */
   public static byte[] hash(InputStream data, byte[] salt) {
-    return BEANS.get(ISecurityProvider.class).createHash(data, salt, 3557 /* number of default cycles for backwards compatibility */);
+    return SECURITY_PROVIDER.get().createHash(data, salt, 3557 /* number of default cycles for backwards compatibility */);
   }
 
   /**
    * See {@link ISecurityProvider#createKeyPair()}
    */
   public static KeyPairBytes generateKeyPair() {
-    return BEANS.get(ISecurityProvider.class).createKeyPair();
+    return SECURITY_PROVIDER.get().createKeyPair();
   }
 
   /**
    * See {@link ISecurityProvider#createSignature(byte[], InputStream)}
    */
   public static byte[] createSignature(byte[] privateKey, InputStream data) {
-    return BEANS.get(ISecurityProvider.class).createSignature(privateKey, data);
+    return SECURITY_PROVIDER.get().createSignature(privateKey, data);
   }
 
   /**
@@ -150,14 +271,12 @@ public final class SecurityUtility {
    * @return The signature bytes.
    * @throws ProcessingException
    *           When there is an error creating the signature.
-   * @throws IllegalArgumentException
-   *           if the private key or data is <code>null</code>.
+   * @throws AssertionException
+   *           if the private key or data is {@code null}.
    * @see ISecurityProvider#createSignature(byte[], InputStream)
    */
   public static byte[] createSignature(byte[] privateKey, byte[] data) {
-    if (data == null) {
-      throw new IllegalArgumentException("no data provided");
-    }
+    Assertions.assertNotNull(data, "no data provided");
     return createSignature(privateKey, new ByteArrayInputStream(data));
   }
 
@@ -165,7 +284,7 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#verifySignature(byte[], InputStream, byte[])}
    */
   public static boolean verifySignature(byte[] publicKey, InputStream data, byte[] signatureToVerify) {
-    return BEANS.get(ISecurityProvider.class).verifySignature(publicKey, data, signatureToVerify);
+    return SECURITY_PROVIDER.get().verifySignature(publicKey, data, signatureToVerify);
   }
 
   /**
@@ -175,21 +294,18 @@ public final class SecurityUtility {
    * @param publicKey
    *          The public key bytes.
    * @param data
-   *          The data for which the signature should be validated.
+   *          The data for which the signature should be validated. Must not be {@code null}
    * @param signatureToVerify
    *          The signature that should be verified against.
-   * @return <code>true</code> if the given signature is valid for the given data and public key. <code>false</code>
-   *         otherwise.
+   * @return {@code true} if the given signature is valid for the given data and public key. {@code false} otherwise.
    * @throws ProcessingException
    *           If there is an error validating the signature.
-   * @throws IllegalArgumentException
-   *           if one of the arguments is <code>null</code>.
+   * @throws AssertionException
+   *           if one of the arguments is {@code null}.
    * @see ISecurityProvider#verifySignature(byte[], InputStream, byte[])
    */
   public static boolean verifySignature(byte[] publicKey, byte[] data, byte[] signatureToVerify) {
-    if (data == null) {
-      throw new IllegalArgumentException("no data provided");
-    }
+    Assertions.assertNotNull(data, "no data provided");
     return verifySignature(publicKey, new ByteArrayInputStream(data), signatureToVerify);
   }
 
@@ -197,7 +313,7 @@ public final class SecurityUtility {
    * See {@link ISecurityProvider#createMac(byte[], InputStream)}
    */
   public static byte[] createMac(byte[] password, InputStream data) {
-    return BEANS.get(ISecurityProvider.class).createMac(password, data);
+    return SECURITY_PROVIDER.get().createMac(password, data);
   }
 
   /**
@@ -206,24 +322,22 @@ public final class SecurityUtility {
    * @param password
    *          The password to create the authentication code.
    * @param data
-   *          The data for which the code should be created.
+   *          The data for which the code should be created. Must not be {@code null}.
    * @return The created authentication code.
    * @throws ProcessingException
    *           if there is an error creating the MAC
-   * @throws IllegalArgumentException
-   *           if the password or data is <code>null</code>.
+   * @throws AssertionException
+   *           if the password or data is {@code null}.
    * @see ISecurityProvider#createMac(byte[], InputStream)
    */
   public static byte[] createMac(byte[] password, byte[] data) {
-    if (data == null) {
-      throw new IllegalArgumentException("no data provided");
-    }
+    Assertions.assertNotNull(data, "no data provided");
     return createMac(password, new ByteArrayInputStream(data));
   }
 
   /**
-   * @return the principal names of the given {@link Subject}, or <code>null</code> if the given {@link Subject} is
-   *         <code>null</code>. Multiple principal names are separated by comma.
+   * @return the principal names of the given {@link Subject}, or {@code null} if the given {@link Subject} is
+   *         {@code null}. Multiple principal names are separated by comma.
    */
   public static String getPrincipalNames(Subject subject) {
     if (subject == null) {

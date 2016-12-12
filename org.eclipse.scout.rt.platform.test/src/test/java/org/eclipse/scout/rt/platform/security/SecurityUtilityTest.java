@@ -16,28 +16,30 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(PlatformTestRunner.class)
 public class SecurityUtilityTest {
 
-  private static final boolean IS_JAVA_18_OR_NEWER = ObjectUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
+  private static final Logger LOG = LoggerFactory.getLogger(SecurityUtilityTest.class);
+
   private static final int KEY_LEN = 128;
   private static final Charset ENCODING = StandardCharsets.UTF_8;
   private static final char[] PASSWORD = "insecure".toCharArray();
 
   @Test
   public void testEncryption() throws Exception {
-    if (!IS_JAVA_18_OR_NEWER) {
-      // encryption only supported in java 1.8 or newer
+    if (!isEncryptionSupported()) {
       return;
     }
-
     final String origData = "origData";
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] inputBytes = origData.getBytes(ENCODING);
@@ -53,60 +55,73 @@ public class SecurityUtilityTest {
     Assert.assertEquals(origData, decryptedString);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  protected boolean isEncryptionSupported() {
+    boolean isJava18OrNewer = ObjectUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
+    if (!isJava18OrNewer) {
+      // encryption only supported in java 1.8 or newer
+      LOG.warn("Encryption tests skipped because it is not supported by this Java version. At least a JRE 1.8 is required.");
+      return false;
+    }
+    return true;
+  }
+
+  @Test(expected = AssertionException.class)
   public void testEncryptNoData() throws Exception {
+    if (!isEncryptionSupported()) {
+      throw new AssertionException("not supported but expected.");
+    }
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt(null, "pass".toCharArray(), salt, KEY_LEN);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testEncryptNoSalt() throws Exception {
     SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), null, KEY_LEN);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testEncryptNoKey() throws Exception {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt("test".getBytes(ENCODING), null, salt, KEY_LEN);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testEncryptWrongKeyLen() throws Exception {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, 4);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testCreateSignatureWrongArg1() throws Exception {
     SecurityUtility.createSignature(null, new byte[]{});
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testCreateSignatureWrongArg2() throws Exception {
     SecurityUtility.createSignature(new byte[]{}, (byte[]) null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testCreateSignatureWrongArg3() throws Exception {
     SecurityUtility.createSignature(new byte[]{}, (InputStream) null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testVerifySignatureWrongArg1() throws Exception {
     SecurityUtility.verifySignature(new byte[]{}, (byte[]) null, new byte[]{});
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testVerifySignatureWrongArg2() throws Exception {
     SecurityUtility.verifySignature(null, new byte[]{}, new byte[]{});
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testVerifySignatureWrongArg3() throws Exception {
     SecurityUtility.verifySignature(new byte[]{}, new byte[]{}, null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testVerifySignatureWrongArg4() throws Exception {
     SecurityUtility.verifySignature(new byte[]{}, (InputStream) null, new byte[]{});
   }
@@ -123,7 +138,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.createRandomBytes(0);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       illegalExc = true;
     }
     Assert.assertTrue(illegalExc);
@@ -145,7 +160,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hash((byte[]) null, salt);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       nullNotAllowed = true;
     }
     Assert.assertTrue(nullNotAllowed);
@@ -154,7 +169,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hash((InputStream) null, salt);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       nullNotAllowed = true;
     }
     Assert.assertTrue(nullNotAllowed);
@@ -175,7 +190,7 @@ public class SecurityUtilityTest {
 
   @Test
   public void testHashPassword() {
-    if (!IS_JAVA_18_OR_NEWER) {
+    if (!isEncryptionSupported()) {
       // only supported in java 1.8 or newer
       return;
     }
@@ -188,7 +203,7 @@ public class SecurityUtilityTest {
     byte[] hash1 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
     byte[] hash2 = SecurityUtility.hashPassword(PASSWORD, salt2, iterations);
     byte[] hash3 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
-    byte[] hash4 = SecurityUtility.hashPassword("".toCharArray(), salt, iterations);
+    byte[] hash4 = SecurityUtility.hashPassword("other".toCharArray(), salt, iterations);
     byte[] hash5 = SecurityUtility.hashPassword(PASSWORD, salt, iterations + 1);
 
     // ensure hashing was executed
@@ -211,7 +226,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hashPassword(null, salt, iterations);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       ok = true;
     }
     Assert.assertTrue(ok);
@@ -220,16 +235,23 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hashPassword(PASSWORD, null, iterations);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       ok = true;
     }
     Assert.assertTrue(ok);
-
+    ok = false;
+    try {
+      SecurityUtility.hashPassword("".toCharArray(), salt, iterations);
+    }
+    catch (AssertionException e) {
+      ok = true;
+    }
+    Assert.assertTrue(ok);
     ok = false;
     try {
       SecurityUtility.hashPassword(PASSWORD, new byte[]{}, iterations);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       ok = true;
     }
     Assert.assertTrue(ok);
@@ -237,7 +259,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hashPassword(PASSWORD, salt, 0);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       ok = true;
     }
     Assert.assertTrue(ok);
@@ -245,7 +267,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hashPassword(PASSWORD, salt, -1);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       ok = true;
     }
     Assert.assertTrue(ok);
@@ -253,7 +275,7 @@ public class SecurityUtilityTest {
     try {
       SecurityUtility.hashPassword(PASSWORD, salt, 9999);
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       ok = true;
     }
     Assert.assertTrue(ok);
@@ -271,17 +293,17 @@ public class SecurityUtilityTest {
     Assert.assertFalse(Arrays.equals(mac3, mac2));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testCreateMacWrongArg1() throws Exception {
     SecurityUtility.createMac(null, new byte[]{});
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testCreateMacWrongArg2() throws Exception {
     SecurityUtility.createMac(new byte[]{}, (byte[]) null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testCreateMacWrongArg3() throws Exception {
     SecurityUtility.createMac(new byte[]{}, (InputStream) null);
   }
@@ -323,8 +345,7 @@ public class SecurityUtilityTest {
 
   @Test
   public void testDecryptionApiStability() throws Exception {
-    if (!IS_JAVA_18_OR_NEWER) {
-      // encryption only supported in java 1.8 or newer
+    if (!isEncryptionSupported()) {
       return;
     }
 
