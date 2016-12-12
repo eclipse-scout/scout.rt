@@ -27,8 +27,8 @@ public class DestinationConfigPropertyParserTest {
 
   @Test(expected = AssertionException.class)
   public void testFailIfParsedTwice() {
-    m_parser.parse("lookup:///simpleQueue");
-    m_parser.parse("lookup:///anotherSimpleQueue");
+    m_parser.parse("jndi:///simpleQueue");
+    m_parser.parse("jndi:///anotherSimpleQueue");
   }
 
   @Test(expected = AssertionException.class)
@@ -43,12 +43,12 @@ public class DestinationConfigPropertyParserTest {
 
   @Test(expected = AssertionException.class)
   public void testFailEmptyName() {
-    m_parser.parse("lookup:///?param=1");
+    m_parser.parse("jndi:///?param=1");
   }
 
   @Test(expected = AssertionException.class)
   public void testFailEmptyNameOpaque() {
-    m_parser.parse("lookup:");
+    m_parser.parse("jndi:");
   }
 
   @Test
@@ -62,34 +62,34 @@ public class DestinationConfigPropertyParserTest {
   }
 
   @Test
-  public void testLookupQueueThreeSlashes() {
-    m_parser.parse("lookup:///simpleQueue");
+  public void testJndiLookupQueueThreeSlashes() {
+    m_parser.parse("jndi:///simpleQueue");
     assertEquals("simpleQueue", m_parser.getDestinationName());
-    assertEquals(ResolveMethod.LOOKUP, m_parser.getResolveMethod());
+    assertEquals(ResolveMethod.JNDI, m_parser.getResolveMethod());
     assertEquals(0, m_parser.getParameters().size());
   }
 
   @Test
-  public void testLookupQueueTwoSlashes() {
-    m_parser.parse("lookup://simpleQueue");
+  public void testJndiLookupQueueTwoSlashes() {
+    m_parser.parse("jndi://simpleQueue");
     assertEquals("simpleQueue", m_parser.getDestinationName());
-    assertEquals(ResolveMethod.LOOKUP, m_parser.getResolveMethod());
+    assertEquals(ResolveMethod.JNDI, m_parser.getResolveMethod());
     assertEquals(0, m_parser.getParameters().size());
   }
 
   @Test
-  public void testLookupQueueOpaque() {
-    m_parser.parse("lookup:simpleQueue");
+  public void testJndiLookupQueueOpaque() {
+    m_parser.parse("jndi:simpleQueue");
     assertEquals("simpleQueue", m_parser.getDestinationName());
-    assertEquals(ResolveMethod.LOOKUP, m_parser.getResolveMethod());
+    assertEquals(ResolveMethod.JNDI, m_parser.getResolveMethod());
     assertEquals(0, m_parser.getParameters().size());
   }
 
   @Test
-  public void testLookupTopic() {
-    m_parser.parse("lookup:///my/special/Topic");
+  public void testJndiLookupTopic() {
+    m_parser.parse("jndi:///my/special/Topic");
     assertEquals("my/special/Topic", m_parser.getDestinationName());
-    assertEquals(ResolveMethod.LOOKUP, m_parser.getResolveMethod());
+    assertEquals(ResolveMethod.JNDI, m_parser.getResolveMethod());
     assertEquals(0, m_parser.getParameters().size());
   }
 

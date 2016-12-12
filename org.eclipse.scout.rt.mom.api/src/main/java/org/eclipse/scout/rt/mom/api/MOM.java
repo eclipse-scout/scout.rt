@@ -65,7 +65,7 @@ public final class MOM {
    * @param destinationType
    *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
    * @param resolveMethod
-   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#LOOKUP}
+   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
    * @param properties
    *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
    *          no properties are required)
@@ -95,7 +95,7 @@ public final class MOM {
    * @param destinationType
    *          the type of the resource that this destination represents, e.g. {@link DestinationType#QUEUE}
    * @param resolveMethod
-   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#LOOKUP}
+   *          the method how to resolve the actual destination, e.g. {@link ResolveMethod#JNDI}
    * @param properties
    *          optional map of additional properties used to resolve the destination (may be set to <code>null</code> if
    *          no properties are required)

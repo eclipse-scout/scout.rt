@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * [ <i>ResolveMethod</i> <code>":"</code> ] <code>"///"</code> <i>DestinationName</i> [ <code>"?"</code>
  * <i>Parameters</i></code> ]
  * <ul>
- * <li><b>ResolveMethod</b> (optional), one of <code>"lookup"</code>, <code>"define"</code>. If omitted,
+ * <li><b>ResolveMethod</b> (optional), one of <code>"jndi"</code>, <code>"define"</code>. If omitted,
  * <code>"define"</code> is assumed.
  * <li><b>DestinationName</b> (mandatory) is the symbolic name of the destination.
  * <li><b>Parameters</b> (optional) is a list of key-value pairs. Key and value are separated by <code>=</code>, pairs
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * Example values:
  * <ul>
- * <li><code>lookup:///comp/env/jms/globalNewsTopic</code>
+ * <li><code>jndi:///comp/env/jms/globalNewsTopic</code>
  * <li><code>define:///mySubject?durable=true&security=off</code>
  * </ul>
  * <h3>Recommended Format / Special Characters / Escaping</h3>
@@ -39,13 +39,13 @@ import org.slf4j.LoggerFactory;
  * Special characters must be escaped using the URL encoding scheme (UTF-8). Because the value is parsed using the
  * {@link URI} class, it must be a valid URI. Technically, all valid URIs are accepted by the parser, including "opaque"
  * URIs. However, we recommend to always use non-opaque URIs with <i>three slashes</i> after the scheme, e.g.
- * <code>lookup:///myQueue</code>.
+ * <code>jndi:///myQueue</code>.
  * <p>
  * Using three slashes has the advantage that encoded special characters are supported anywhere in the destination name.
  * In this format, the URI's "host" part (which does not support special characters by definition) is empty and all the
  * information is contained in the "path" part (which does support encoded special characters). The parser will
  * automatically skip the empty host and strip the leading slash from the path. For example, the value
- * <code>lookup:///%2Fres</code> resolves to the destination name "/res".
+ * <code>jndi:///%2Fres</code> resolves to the destination name "/res".
  * <p>
  * Here are some commonly used characters and their encoded representation:
  * <ul>

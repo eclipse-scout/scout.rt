@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  * <i>config.properties</i>:
  *
  * <pre>
- * scout.mom.cluster.destination.personChangesTopic=lookup:///person/changes
+ * scout.mom.cluster.destination.personChangesTopic=jndi:///person/changes
  * </pre>
  *
  * @see IBiDestination

@@ -453,11 +453,11 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   public Destination lookupJmsDestination(final IDestination<?> destination, final Session session) {
-    Assertions.assertTrue(ObjectUtility.isOneOf(destination.getResolveMethod(), ResolveMethod.LOOKUP, ResolveMethod.DEFINE), "Unsupported resolve method [{}]", destination);
+    Assertions.assertTrue(ObjectUtility.isOneOf(destination.getResolveMethod(), ResolveMethod.JNDI, ResolveMethod.DEFINE), "Unsupported resolve method [{}]", destination);
     Assertions.assertTrue(ObjectUtility.isOneOf(destination.getType(), DestinationType.QUEUE, DestinationType.TOPIC), "Unsupported destination type [{}]", destination);
     try {
       // Lookup
-      if (destination.getResolveMethod() == ResolveMethod.LOOKUP) {
+      if (destination.getResolveMethod() == ResolveMethod.JNDI) {
         final Object object = Assertions.assertNotNull(m_context.lookup(destination.getName()));
         final Class<?> expectedType = (destination.getType() == DestinationType.QUEUE ? Queue.class : Topic.class);
         Assertions.assertInstance(object, expectedType, "The looked up object is of type '{}', but expected type '{}' [{}]", object.getClass().getName(), expectedType.getName(), destination);

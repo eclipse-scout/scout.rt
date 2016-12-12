@@ -69,7 +69,7 @@ public interface IDestination<DTO> {
    * <p>
    * By default, the following resolve methods are supported:
    * <ul>
-   * <li>{@link ResolveMethod#LOOKUP}
+   * <li>{@link ResolveMethod#JNDI}
    * <li>{@link ResolveMethod#DEFINE}
    * </ul>
    */
@@ -86,9 +86,9 @@ public interface IDestination<DTO> {
     DEFINE("define"),
 
     /**
-     * Destination is looked up (e.g. via JNDI).
+     * Destination is looked up via JNDI.
      */
-    LOOKUP("lookup");
+    JNDI("jndi");
 
     private final String m_identifier;
 

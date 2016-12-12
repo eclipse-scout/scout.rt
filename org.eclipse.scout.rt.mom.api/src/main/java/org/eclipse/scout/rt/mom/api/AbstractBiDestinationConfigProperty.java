@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
  * <i>config.properties</i>:
  *
  * <pre>
- * scout.mom.cluster.destination.personFinderQueue=lookup:///person/finder
+ * scout.mom.cluster.destination.personFinderQueue=jndi:///person/finder
  * </pre>
  *
  * @see IBiDestination
