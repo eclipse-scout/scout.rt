@@ -70,8 +70,7 @@ scout.LayoutValidator.prototype.validate = function() {
   clearTimeout(this._validateTimeoutId);
   this._validateTimeoutId = null;
   this._invalidComponents.slice().forEach(function(comp) {
-    // don't layout components which don't exist anymore or are detached from the DOM
-    if (comp.isAttachedAndVisible() && comp.$comp.isEveryParentVisible()) { 
+    if (comp.isAttached()) { // don't layout components which don't exist anymore or are detached from the DOM
       comp.validateLayout();
       scout.arrays.remove(this._invalidComponents, comp);
     }
