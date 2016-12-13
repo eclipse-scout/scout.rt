@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.runner.Description;
@@ -27,12 +29,37 @@ import org.junit.runners.model.RunnerBuilder;
  * Tests") . However, the console output will inform you correctly about the test results.
  */
 public class InteractiveTestSuite extends Runner {
+  private boolean m_humanInterface;
+
   private final Class<?> m_annotatedClass;
   private final RunnerBuilder m_builder;
 
   public InteractiveTestSuite(Class<?> klass, RunnerBuilder builder) {
     m_annotatedClass = klass;
     m_builder = builder;
+  }
+
+  private boolean checkIfHumanInterface() {
+    if (m_humanInterface) {
+      return true;
+    }
+    try {
+      long ts = System.currentTimeMillis();
+      while (true) {
+        if (System.in.available() > 0) {
+          m_humanInterface = true;
+          return true;
+        }
+        Thread.sleep(100L);
+        if (System.currentTimeMillis() - ts > 30000L) {
+          System.out.println("Auto-close.");
+          throw new InterruptedException();
+        }
+      }
+    }
+    catch (Exception e) { // NOSONAR
+      return false;
+    }
   }
 
   @Override
@@ -47,8 +74,6 @@ public class InteractiveTestSuite extends Runner {
     String lastLine = "";
     while (true) {
       try {
-        //com.bsiag.bsicrm.server.test.MyTest
-        //com.bsiag.bsicrm.server.task.Sql92ExtendedEntityTest
         System.out.println("********");
         System.out.println("[Enter fully qualified test class name, enter to repeat last test, '.' to exit]");
         if (!checkIfHumanInterface()) {
@@ -84,7 +109,8 @@ public class InteractiveTestSuite extends Runner {
         }
       }
       catch (Throwable ex) {
-        System.out.println("Cannot load test " + lastLine + ": " + ex);
+        System.out.println("Cannot load test " + lastLine);
+        ex.printStackTrace(System.out);
       }
     }
   }
@@ -97,36 +123,14 @@ public class InteractiveTestSuite extends Runner {
     }
     finally {
       notifier.removeListener(listener);
-    }
-  }
-
-  private boolean m_humanInterface;
-
-  private boolean checkIfHumanInterface() {
-    if (m_humanInterface) {
-      return true;
-    }
-    try {
-      long ts = System.currentTimeMillis();
-      while (true) {
-        if (System.in.available() > 0) {
-          m_humanInterface = true;
-          return true;
-        }
-        Thread.sleep(100L);
-        if (System.currentTimeMillis() - ts > 30000L) {
-          System.out.println("Auto-close.");
-          throw new InterruptedException();
-        }
-      }
-    }
-    catch (Exception e) { // NOSONAR
-      return false;
+      listener.showSummary();
     }
   }
 
   private static class RunListenerImpl extends RunListener {
     private Failure m_failure;
+    private final Set<String> m_failedList = new LinkedHashSet<>();
+    private final Set<String> m_successList = new LinkedHashSet<>();
 
     @Override
     public void testStarted(Description description) throws Exception {
@@ -137,7 +141,9 @@ public class InteractiveTestSuite extends Runner {
     public void testFailure(Failure failure) throws Exception {
       m_failure = failure;
       Description description = failure.getDescription();
-      System.err.println(String.format("%s#%s - FAILED - %s", description.getClassName(), description.getMethodName(), m_failure));
+      String msg = String.format("FAILED %s#%s - %s", description.getClassName(), description.getMethodName(), m_failure.getMessage());
+      m_failedList.add(msg);
+      System.err.println(msg);
       m_failure.getException().printStackTrace(System.err);
       System.err.flush();
       System.out.flush();
@@ -146,13 +152,31 @@ public class InteractiveTestSuite extends Runner {
     @Override
     public void testFinished(Description description) throws Exception {
       if (m_failure == null) {
-        System.out.println(String.format("%s#%s - SUCCESS", description.getClassName(), description.getMethodName()));
+        String msg = String.format("SUCCESS %s#%s", description.getClassName(), description.getMethodName());
+        m_successList.add(msg);
+        System.out.println(msg);
       }
       else {
-        System.err.println(String.format("%s#%s - FAILED - %s", description.getClassName(), description.getMethodName(), m_failure));
+        String msg = String.format("FAILED %s#%s - %s", description.getClassName(), description.getMethodName(), m_failure.getMessage());
+        m_failedList.add(msg);
+        System.err.println(msg);
         m_failure.getException().printStackTrace(System.err);
         System.err.flush();
         System.out.flush();
+      }
+    }
+
+    private void showSummary() {
+      if (m_failedList.isEmpty()) {
+        System.out.println("SUMMARY: ALL " + m_successList.size() + " PASSED");
+        return;
+      }
+      System.out.println("SUMMARY: " + (m_failedList.isEmpty() ? "" : m_failedList.size() + " FAILED ") + (m_successList.isEmpty() ? "" : m_successList.size() + " PASSED"));
+      for (String s : m_failedList) {
+        System.out.println(s);
+      }
+      for (String s : m_successList) {
+        System.out.println(s);
       }
     }
   }
