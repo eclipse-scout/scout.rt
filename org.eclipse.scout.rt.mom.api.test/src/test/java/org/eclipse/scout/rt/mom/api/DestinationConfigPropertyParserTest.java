@@ -135,7 +135,12 @@ public class DestinationConfigPropertyParserTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testMissingResolveMethodWithSlashes() {
+  public void testMissingResolveMethodWithSlashesAndColon() {
     m_parser.parse(":///hello");
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testMissingResolveMethodWithSlashes() {
+    m_parser.parse("///hello");
   }
 }

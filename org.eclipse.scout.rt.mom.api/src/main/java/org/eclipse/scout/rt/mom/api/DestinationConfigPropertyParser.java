@@ -20,8 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Helper to parse config values for MOM {@link Destination}s. The value must be specified in the format of an URI:
  * <p>
- * [ <i>ResolveMethod</i> <code>":"</code> ] <code>"///"</code> <i>DestinationName</i> [ <code>"?"</code>
- * <i>Parameters</i></code> ]
+ * <i>ResolveMethod</i> <code>":///"</code> <i>DestinationName</i> [ <code>"?"</code> <i>Parameters</i></code> ]
  * <ul>
  * <li><b>ResolveMethod</b> (optional), one of <code>"jndi"</code>, <code>"define"</code>. If omitted,
  * <code>"define"</code> is assumed.
