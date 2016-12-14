@@ -7,7 +7,6 @@ import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_NULL_OBJECT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REQUEST_REPLY_SUCCESS;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,15 +48,15 @@ public class JmsMessageReader<DTO> {
   /**
    * Initializes this reader.
    */
-  protected JmsMessageReader init(final Message message, final IMarshaller marshaller) throws JMSException, GeneralSecurityException {
+  protected JmsMessageReader init(final Message message, final IMarshaller marshaller) throws JMSException {
     m_message = assertNotNull(message, "Message not specified");
     m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
     initContext();
     return this;
   }
 
-  protected void initContext() throws JMSException, GeneralSecurityException {
-    m_marshallerContext = readContext(PROP_MARSHALLER_CONTEXT, true);
+  protected void initContext() throws JMSException {
+    m_marshallerContext = readContext(PROP_MARSHALLER_CONTEXT);
   }
 
   /**
@@ -66,7 +65,7 @@ public class JmsMessageReader<DTO> {
    * @see JmsMessageWriter#writeTransferObject(Object)
    */
   @SuppressWarnings("unchecked")
-  public DTO readTransferObject() throws JMSException, GeneralSecurityException {
+  public DTO readTransferObject() throws JMSException {
     if (Boolean.valueOf(m_marshallerContext.get(PROP_NULL_OBJECT))) {
       return null;
     }
@@ -88,10 +87,8 @@ public class JmsMessageReader<DTO> {
 
   /**
    * Reads the given property.
-   *
-   * @see JmsMessageWriter#writeProperty(String, String, boolean)
    */
-  public String readProperty(final String property, final boolean decrypt) throws JMSException, GeneralSecurityException {
+  public String readProperty(final String property) throws JMSException {
     return m_message.getStringProperty(property);
   }
 
@@ -130,7 +127,7 @@ public class JmsMessageReader<DTO> {
     return Boolean.valueOf(m_marshallerContext.get(PROP_REQUEST_REPLY_SUCCESS));
   }
 
-  public IMessage<DTO> readMessage() throws JMSException, GeneralSecurityException {
+  public IMessage<DTO> readMessage() throws JMSException {
     final DTO transferObject = readTransferObject();
     return new IMessage<DTO>() {
 
@@ -142,9 +139,9 @@ public class JmsMessageReader<DTO> {
       @Override
       public String getProperty(final String property) {
         try {
-          return readProperty(property, true);
+          return readProperty(property);
         }
-        catch (JMSException | GeneralSecurityException e) {
+        catch (JMSException e) {
           throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
         }
       }
@@ -163,25 +160,25 @@ public class JmsMessageReader<DTO> {
   /**
    * Reads the given {@link Map} from message properties.
    *
-   * @see JmsMessageWriter#writeContext(String, Map, boolean)
+   * @see JmsMessageWriter#writeContext(String, Map)
    */
   @SuppressWarnings("unchecked")
-  protected Map<String, String> readContext(final String property, final boolean decrypt) throws JMSException, GeneralSecurityException {
-    final String json = readProperty(property, decrypt);
+  protected Map<String, String> readContext(final String property) throws JMSException {
+    final String json = readProperty(property);
     return (Map<String, String>) BEANS.get(JsonMarshaller.class).unmarshall(json, Collections.singletonMap(JsonMarshaller.PROP_OBJECT_TYPE, HashMap.class.getName()));
   }
 
   /**
    * @see JmsMessageWriter#writeTextMessage(TextMessage, String)
    */
-  protected String readTextMessage(final TextMessage message) throws JMSException, GeneralSecurityException {
+  protected String readTextMessage(final TextMessage message) throws JMSException {
     return message.getText();
   }
 
   /**
    * @see JmsMessageWriter#writeBytesMessage(BytesMessage, byte[])
    */
-  protected byte[] readBytesMessage(final BytesMessage message) throws JMSException, GeneralSecurityException {
+  protected byte[] readBytesMessage(final BytesMessage message) throws JMSException {
     long length = message.getBodyLength();
     if (length == Integer.MAX_VALUE) {
       LOG.warn("BytesMessage received is empty");
@@ -201,7 +198,7 @@ public class JmsMessageReader<DTO> {
    * Creates a new reader instance.
    */
   @SuppressWarnings("unchecked")
-  public static <DTO> JmsMessageReader<DTO> newInstance(final Message message, final IMarshaller marshaller) throws JMSException, GeneralSecurityException {
+  public static <DTO> JmsMessageReader<DTO> newInstance(final Message message, final IMarshaller marshaller) throws JMSException {
     return BEANS.get(JmsMessageReader.class).init(message, marshaller);
   }
 }

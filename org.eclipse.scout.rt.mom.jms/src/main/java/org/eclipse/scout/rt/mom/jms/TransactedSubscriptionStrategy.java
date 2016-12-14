@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.mom.jms;
 
-import java.security.GeneralSecurityException;
 import java.util.UUID;
 
 import javax.jms.JMSException;
@@ -60,7 +59,7 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
-      public void onJmsMessage(final Message jmsMessage) throws JMSException, GeneralSecurityException {
+      public void onJmsMessage(final Message jmsMessage) throws JMSException {
         // Do not process asynchronously due to transacted acknowledgment.
         // This guarantees that messages do not arrive concurrently, which is required to commit or rollback a single message.
 

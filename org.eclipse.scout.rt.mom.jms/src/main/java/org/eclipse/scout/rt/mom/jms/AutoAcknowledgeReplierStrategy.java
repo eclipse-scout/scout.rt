@@ -3,8 +3,6 @@ package org.eclipse.scout.rt.mom.jms;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.security.GeneralSecurityException;
-
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -69,7 +67,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
-      public void onJmsMessage(final Message jmsRequest) throws JMSException, GeneralSecurityException {
+      public void onJmsMessage(final Message jmsRequest) throws JMSException {
         final String replyId = assertNotNull(jmsRequest.getStringProperty(PROP_REPLY_ID), "missing 'replyId' [msg={}]", jmsRequest);
 
         // Read and process the message asynchronously because JMS session is single-threaded. This allows concurrent message processing.
@@ -111,8 +109,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
   /**
    * Delegates the request to the listener, and returns the message to be replied.
    */
-  protected <REPLY, REQUEST> Message handleRequest(final IRequestListener<REQUEST, REPLY> listener, final IMarshaller marshaller, final IMessage<REQUEST> request, final String replyId)
-      throws JMSException, GeneralSecurityException {
+  protected <REPLY, REQUEST> Message handleRequest(final IRequestListener<REQUEST, REPLY> listener, final IMarshaller marshaller, final IMessage<REQUEST> request, final String replyId) throws JMSException {
     try {
       final REPLY reply = listener.onRequest(request);
       return JmsMessageWriter.newInstance(m_mom.getDefaultSession(), marshaller)
@@ -139,7 +136,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
   protected Throwable interceptRequestReplyException(final Throwable t) {
     Throwable interceptedThrowable = t;
 
-    // Replace platformException to ensure serialization is possible
+    // Replace PlatformException to ensure serialization
     if (t instanceof PlatformException) {
       interceptedThrowable = new RuntimeException(t.getMessage());
     }

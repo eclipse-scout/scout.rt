@@ -8,7 +8,6 @@ import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REQUEST_REPLY_SUCCESS;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -71,7 +70,7 @@ public class JmsMessageWriter {
    *
    * @see JmsMessageReader#readTransferObject()
    */
-  public JmsMessageWriter writeTransferObject(final Object transferObject) throws JMSException, GeneralSecurityException {
+  public JmsMessageWriter writeTransferObject(final Object transferObject) throws JMSException {
     final Object transportObject = m_marshaller.marshall(transferObject, m_marshallerContext);
     m_marshallerContext.put(PROP_NULL_OBJECT, Boolean.valueOf(transferObject == null).toString());
 
@@ -92,9 +91,9 @@ public class JmsMessageWriter {
   /**
    * Writes the given property.
    *
-   * @see JmsMessageReader#readProperty(String, boolean)
+   * @see JmsMessageReader#readProperty(String)
    */
-  public JmsMessageWriter writeProperty(final String property, final String value, final boolean encrypt) throws JMSException, GeneralSecurityException {
+  public JmsMessageWriter writeProperty(final String property, final String value) throws JMSException {
     if (value == null) {
       return this;
     }
@@ -104,11 +103,11 @@ public class JmsMessageWriter {
   }
 
   /**
-   * Convenience method for {@link #writeProperty(String, String, boolean)} to write multiple properties.
+   * Convenience method for {@link #writeProperty(String, String)} to write multiple properties.
    */
-  public JmsMessageWriter writeProperties(final Map<String, String> properties, final boolean encrypt) throws JMSException, GeneralSecurityException {
+  public JmsMessageWriter writeProperties(final Map<String, String> properties) throws JMSException {
     for (final Entry<String, String> property : properties.entrySet()) {
-      writeProperty(property.getKey(), property.getValue(), encrypt);
+      writeProperty(property.getKey(), property.getValue());
     }
     return this;
   }
@@ -135,8 +134,8 @@ public class JmsMessageWriter {
    * Writes the reply id used to follow a 'request-reply' communication, and must be unique for every communication
    * initiated.
    */
-  public JmsMessageWriter writeReplyId(final String replyId) throws JMSException, GeneralSecurityException {
-    return writeProperty(PROP_REPLY_ID, replyId, false);
+  public JmsMessageWriter writeReplyId(final String replyId) throws JMSException {
+    return writeProperty(PROP_REPLY_ID, replyId);
   }
 
   /**
@@ -152,14 +151,14 @@ public class JmsMessageWriter {
   /**
    * @see JmsMessageReader#readTextMessage(TextMessage)
    */
-  protected void writeTextMessage(final TextMessage message, final String text) throws JMSException, GeneralSecurityException {
+  protected void writeTextMessage(final TextMessage message, final String text) throws JMSException {
     message.setText(text);
   }
 
   /**
    * @see JmsMessageReader#readBytesMessage(BytesMessage)
    */
-  protected void writeBytesMessage(final BytesMessage message, final byte[] data) throws JMSException, GeneralSecurityException {
+  protected void writeBytesMessage(final BytesMessage message, final byte[] data) throws JMSException {
     final byte[] bytes = (data != null ? data : new byte[0]);
     message.writeBytes(bytes);
   }
@@ -167,23 +166,23 @@ public class JmsMessageWriter {
   /**
    * Writes the given {@link Map} as message properties.
    *
-   * @see JmsMessageReader#readContext(String, boolean)
+   * @see JmsMessageReader#readContext(String)
    */
-  protected JmsMessageWriter writeContext(final String property, final Map<String, String> context, final boolean encrypt) throws JMSException, GeneralSecurityException {
+  protected JmsMessageWriter writeContext(final String property, final Map<String, String> context) throws JMSException {
     if (context.isEmpty()) {
       return this;
     }
 
     final String json = (String) BEANS.get(JsonMarshaller.class).marshall(context, new HashMap<String, String>());
-    writeProperty(property, json, encrypt);
+    writeProperty(property, json);
     return this;
   }
 
   /**
    * Finish writing and get the message.
    */
-  public Message build() throws JMSException, GeneralSecurityException {
-    writeContext(PROP_MARSHALLER_CONTEXT, m_marshallerContext, true);
+  public Message build() throws JMSException {
+    writeContext(PROP_MARSHALLER_CONTEXT, m_marshallerContext);
     return m_message;
   }
 

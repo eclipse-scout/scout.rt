@@ -35,10 +35,11 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
  * <p>
  * Message addressing is based on destinations (queues or topics), which additionally allow to register for a
  * {@link IMarshaller}. A marshaller is used to transform the transfer object into its transport representation, like
- * text in JSON format, or bytes for the object's serialization data. An encrypter allows end-to-end message encryption,
- * which may be required depending on the messaging topology you choose. However, even if working with a secure
- * transport layer, messages may temporarily be stored like when being delivered to queues - end-to-end encryption
- * ensures confidentiality, integrity, and authenticity of those messages.
+ * text in JSON format, or bytes for the object's serialization data.
+ * <p>
+ * End-to-end security may be achieved by using a secure communication protocol, or by encrypting the messages in the
+ * {@link IMarshaller}. However, if relying on a secure transport layer, messages may temporarily be stored in
+ * clear-text like when being delivered to queues.
  *
  * @since 6.1
  */

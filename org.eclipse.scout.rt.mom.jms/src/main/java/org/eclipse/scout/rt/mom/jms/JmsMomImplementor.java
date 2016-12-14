@@ -7,7 +7,6 @@ import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
@@ -174,23 +173,23 @@ public class JmsMomImplementor implements IMomImplementor {
         publishNonTransactional(destination, transferObject, input);
       }
     }
-    catch (final JMSException | GeneralSecurityException e) {
+    catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
 
-  protected <DTO> void publishNonTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
+  protected <DTO> void publishNonTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException {
     final IMarshaller marshaller = lookupMarshaller(destination);
 
     final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
         .writeTransferObject(transferObject)
-        .writeProperties(input.getProperties(), true)
+        .writeProperties(input.getProperties())
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
     send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
-  protected <DTO> void publishTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException, GeneralSecurityException {
+  protected <DTO> void publishTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException {
     final ITransaction currentTransaction = assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
     final IMarshaller marshaller = lookupMarshaller(destination);
 
@@ -219,7 +218,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
     final Message message = JmsMessageWriter.newInstance(transactedSession, marshaller)
         .writeTransferObject(transferObject)
-        .writeProperties(input.getProperties(), true)
+        .writeProperties(input.getProperties())
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
     send(transactedProducer, lookupJmsDestination(destination, transactedSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
@@ -259,7 +258,7 @@ public class JmsMomImplementor implements IMomImplementor {
       final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
           .writeReplyTo(m_replyQueue)
           .writeReplyId(replyId)
-          .writeProperties(input.getProperties(), true)
+          .writeProperties(input.getProperties())
           .writeCorrelationId(CorrelationId.CURRENT.get())
           .writeTransferObject(requestObject)
           .build();
@@ -268,7 +267,7 @@ public class JmsMomImplementor implements IMomImplementor {
       // Wait until the reply is received
       return waitForReply(replyFuture, input.getRequestReplyTimeout());
     }
-    catch (final JMSException | GeneralSecurityException e) {
+    catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
     finally {
@@ -279,7 +278,7 @@ public class JmsMomImplementor implements IMomImplementor {
   /**
    * Waits until received the reply. If interrupted or the timeout elapses, the request is cancelled.
    */
-  protected <REPLY> REPLY waitForReply(final ReplyFuture<REPLY> replyFuture, final long timeout) throws JMSException, GeneralSecurityException {
+  protected <REPLY> REPLY waitForReply(final ReplyFuture<REPLY> replyFuture, final long timeout) throws JMSException {
     try {
       return replyFuture.awaitDoneAndGet(timeout);
     }
@@ -464,6 +463,11 @@ public class JmsMomImplementor implements IMomImplementor {
     return String.format("%s [application='%s:%s', nodeId='%s', created on=%s]", Objects.toString(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId, now);
   }
 
+  @Override
+  public void setDefaultMarshaller(final IMarshaller marshaller) {
+    m_defaultMarshaller = marshaller;
+  }
+
   /**
    * Future to wait for a reply to receive.
    */
@@ -499,7 +503,7 @@ public class JmsMomImplementor implements IMomImplementor {
      *           if the wait timed out.
      */
     @SuppressWarnings("unchecked")
-    public REPLY awaitDoneAndGet(final long timeoutMillis) throws JMSException, GeneralSecurityException, ExecutionException {
+    public REPLY awaitDoneAndGet(final long timeoutMillis) throws JMSException, ExecutionException {
       // Wait until the reply is received
       if (timeoutMillis == PublishInput.INFINITELY) {
         m_condition.waitFor();
@@ -523,21 +527,9 @@ public class JmsMomImplementor implements IMomImplementor {
     }
   }
 
+  /**
+   * Exception Handler used in MOM.
+   */
   public static class MomExceptionHandler extends ExceptionHandler {
-
-    @Override
-    public void handle(final Throwable t) {
-      if (t instanceof GeneralSecurityException) {
-        LOG.warn("Decryption failed, either because of a bad authenticity token or a cipher problem. Message is discarded.", t);
-      }
-      else {
-        super.handle(t);
-      }
-    }
-  }
-
-  @Override
-  public void setDefaultMarshaller(final IMarshaller marshaller) {
-    m_defaultMarshaller = marshaller;
   }
 }
