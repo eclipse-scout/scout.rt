@@ -4,8 +4,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 
 /**
- * Marker interface for a {@link IMom} initialized with a transport to connect to a messaging system like a network or
- * broker, and which is used by the application to send and receive messages.
+ * Represents a transport to connect to a messaging system like a network or broker, and which is used by the
+ * application to send and receive messages.
  * <p>
  * The transport is a singleton (@{@link ApplicationScoped}).
  * <p>
@@ -16,5 +16,5 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
  * @since 6.1
  */
 @ApplicationScoped
-public interface IMomTransport {
+public interface IMomTransport extends IMom {
 }

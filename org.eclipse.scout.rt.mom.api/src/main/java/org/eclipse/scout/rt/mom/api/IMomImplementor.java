@@ -10,13 +10,15 @@ import javax.naming.InitialContext;
 
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * Represents a implementor for {@link IMom}.
+ * Represents an implementor for {@link IMom}.
  *
  * @see IMom
  * @since 6.1
  */
+@Bean
 public interface IMomImplementor extends IMom {
 
   /**

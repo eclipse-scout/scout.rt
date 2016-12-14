@@ -143,7 +143,7 @@ public final class MOM {
    * @see #newTopic(String)
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
-  public static <DTO, TRANSPORT extends IMom & IMomTransport> void publish(final Class<TRANSPORT> transport, final IDestination<DTO> destination, final DTO transferObject) {
+  public static <DTO> void publish(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final DTO transferObject) {
     publish(transport, destination, transferObject, null);
   }
 
@@ -167,7 +167,7 @@ public final class MOM {
    * @see #newTopic(String)
    * @see #subscribe(IDestination, IMessageListener, RunContext)
    */
-  public static <DTO, TRANSPORT extends IMom & IMomTransport> void publish(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
+  public static <DTO> void publish(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     BEANS.get(transport).publish(destination, transferObject, input != null ? input : newPublishInput());
   }
 
@@ -190,7 +190,7 @@ public final class MOM {
    *          the type of the transfer object a subscription is created for.
    * @see #publish(IDestination, Object)
    */
-  public static <DTO, TRANSPORT extends IMom & IMomTransport> ISubscription subscribe(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener) {
+  public static <DTO> ISubscription subscribe(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener) {
     return subscribe(transport, destination, listener, null);
   }
 
@@ -212,7 +212,7 @@ public final class MOM {
    *          the type of the transfer object a subscription is created for.
    * @see #publish(IDestination, Object)
    */
-  public static <DTO, TRANSPORT extends IMom & IMomTransport> ISubscription subscribe(final Class<? extends TRANSPORT> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
+  public static <DTO> ISubscription subscribe(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
     return BEANS.get(transport).subscribe(destination, listener, input != null ? input : newSubscribeInput());
   }
 
@@ -253,7 +253,7 @@ public final class MOM {
    *          the type of the reply object
    * @see {@link #reply(IDestination, IRequestListener, RunContext)}
    */
-  public static <REQUEST, REPLY, TRANSPORT extends IMom & IMomTransport> REPLY request(final Class<? extends TRANSPORT> transport, final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject) {
+  public static <REQUEST, REPLY> REPLY request(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject) {
     return BEANS.get(transport).request(destination, requestObject, newPublishInput());
   }
 
@@ -298,7 +298,7 @@ public final class MOM {
    *          the type of the reply object
    * @see #reply(IDestination, IRequestListener, RunContext)
    */
-  public static <REQUEST, REPLY, TRANSPORT extends IMom & IMomTransport> REPLY request(final Class<? extends TRANSPORT> transport, final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject, final PublishInput input) {
+  public static <REQUEST, REPLY> REPLY request(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject, final PublishInput input) {
     return BEANS.get(transport).request(destination, requestObject, input);
   }
 
@@ -324,7 +324,7 @@ public final class MOM {
    *          the type of the reply object
    * @see #request(IDestination, Object)
    */
-  public static <REQUEST, REPLY, TRANSPORT extends IMom & IMomTransport> ISubscription reply(final Class<? extends TRANSPORT> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener) {
+  public static <REQUEST, REPLY> ISubscription reply(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener) {
     return reply(transport, destination, listener, null);
   }
 
@@ -349,7 +349,7 @@ public final class MOM {
    *          the type of the reply object
    * @see #request(IDestination, Object)
    */
-  public static <REQUEST, REPLY, TRANSPORT extends IMom & IMomTransport> ISubscription reply(final Class<? extends TRANSPORT> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener,
+  public static <REQUEST, REPLY> ISubscription reply(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener,
       final SubscribeInput input) {
     return BEANS.get(transport).reply(destination, listener, input != null ? input : newSubscribeInput());
   }
@@ -368,7 +368,7 @@ public final class MOM {
    * @see JsonMarshaller
    * @see ObjectMarshaller
    */
-  public static <TRANSPORT extends IMom & IMomTransport> IRegistrationHandle registerMarshaller(final Class<? extends TRANSPORT> transport, final IDestination<?> destination, final IMarshaller marshaller) {
+  public static IRegistrationHandle registerMarshaller(final Class<? extends IMomTransport> transport, final IDestination<?> destination, final IMarshaller marshaller) {
     return BEANS.get(transport).registerMarshaller(destination, marshaller);
   }
 }

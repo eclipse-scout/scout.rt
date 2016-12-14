@@ -21,11 +21,11 @@ import org.slf4j.LoggerFactory;
  * @see IMom
  * @since 6.1
  */
-public abstract class AbstractMomTransport implements IMom, IMomTransport {
+public abstract class AbstractMomTransport implements IMomTransport {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractMomTransport.class);
 
-  private final FinalValue<IMom> m_delegate = new FinalValue<>();
+  protected final FinalValue<IMom> m_delegate = new FinalValue<>();
 
   /**
    * @return the {@link IMomImplementor} class to use in this MOM. If <code>null</code> is returned, the

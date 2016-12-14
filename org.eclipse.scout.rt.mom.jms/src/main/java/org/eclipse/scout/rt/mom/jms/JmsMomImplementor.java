@@ -46,7 +46,6 @@ import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
@@ -78,7 +77,6 @@ import org.slf4j.LoggerFactory;
  *
  * @since 6.1
  */
-@Bean
 public class JmsMomImplementor implements IMomImplementor {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsMomImplementor.class);

@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.mom.api;
 import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 
 /**
@@ -11,7 +10,6 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
  *
  * @since 6.1
  */
-@ApplicationScoped
 public class NullMomImplementor implements IMomImplementor {
 
   @Override

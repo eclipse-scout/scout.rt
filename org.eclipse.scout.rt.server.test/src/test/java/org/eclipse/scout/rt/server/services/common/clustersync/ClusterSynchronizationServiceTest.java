@@ -27,13 +27,13 @@ import java.util.List;
 
 import org.eclipse.scout.rt.mom.api.ClusterMom;
 import org.eclipse.scout.rt.mom.api.IMessage;
-import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.NullMomImplementor;
 import org.eclipse.scout.rt.mom.api.PublishInput;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
@@ -69,16 +69,22 @@ public class ClusterSynchronizationServiceTest {
   private ClusterNotificationMessage m_message;
   private ClusterSynchronizationService m_svc = null;
 
-  private IMom m_nullMomImplementorSpy;
+  private IMomImplementor m_nullMomImplementorSpy;
   private List<IBean<?>> m_beans = new ArrayList<>();
 
   @Before
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(TestClusterMom.class)));
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withInitialInstance(m_nullMomImplementorSpy)));
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withProducer(new IBeanInstanceProducer<IMomImplementor>() {
+
+      @Override
+      public IMomImplementor produce(IBean<IMomImplementor> bean) {
+        return m_nullMomImplementorSpy;
+      }
+    })));
     // verify that replacement works
-    assertSame("NullMom-Spy expected", m_nullMomImplementorSpy, BEANS.get(NullMomImplementor.class));
+    assertSame("NullMomImplementor-Spy expected", m_nullMomImplementorSpy, BEANS.get(NullMomImplementor.class));
 
     ClusterNotificationProperties testProps = new ClusterNotificationProperties(TEST_NODE, TEST_USER);
     m_message = new ClusterNotificationMessage("notification", testProps);
