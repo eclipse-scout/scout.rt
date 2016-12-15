@@ -54,14 +54,14 @@ public class SeleniumUtil {
    * Returns an XPath selector that matches an element with a text which is equals the given text.
    */
   public static By byText(String text) {
-    return By.xpath("//*[text() = '" + text + "']");
+    return By.xpath(".//*[text() = '" + text + "']");
   }
 
   /**
    * Returns an XPath selector that matches an element with a text which contains the given text.
    */
   public static By byContainsText(String text) {
-    return By.xpath("//*[contains(text(), '" + text + "')]");
+    return By.xpath(".//*[contains(text(), '" + text + "')]");
   }
 
   /**
