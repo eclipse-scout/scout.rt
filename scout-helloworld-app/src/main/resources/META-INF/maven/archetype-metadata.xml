@@ -201,6 +201,7 @@
           <directory>src/main/js</directory>
           <includes>
             <include>**/*.css</include>
+            <include>**/*.less</include>
             <include>**/*.js</include>
           </includes>
         </fileSet>
@@ -208,6 +209,7 @@
           <directory>src/main/resources</directory>
           <includes>
             <include>**/*.css</include>
+            <include>**/*.less</include>
             <include>**/*.xml</include>
             <include>**/*.js</include>
             <include>**/*.json</include>
