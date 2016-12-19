@@ -152,32 +152,47 @@ scout.Page.prototype.pageForTableRow = function(row) {
 };
 
 /**
- * Updates the properties enabled, text from the pages linked with the given rows and returns the pages.
+ * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
  *
  * @returns {Array.<scout.Page>} pages linked with the given rows.
  */
 scout.Page.prototype.updatePagesFromTableRows = function(rows) {
   return rows.map(function(row) {
     var page = row.page;
-    page.enabled = row.enabled;
-    page.updateText(row);
+    page.updatePageFromTableRow(row);
     return page;
   });
 };
 
 /**
- * This function creates and sets the text property of this page. The default implementation returns the
+ * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
+ *
+ * @returns {scout.Page} page linked with the given row.
+ */
+scout.Page.prototype.updatePageFromTableRow = function(row) {
+  var page = row.page;
+  page.enabled = row.enabled;
+  page.text = page.computeTextForRow(row);
+  if (row.cells.length >= 1) {
+    page.htmlEnabled = row.cells[0].htmlEnabled;
+    page.cssClass = row.cells[0].cssClass;
+  }
+  return page;
+};
+
+/**
+ * This function creates the text property of this page. The default implementation returns the
  * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
  * this function.
  *
  * @param {scout.TableRow} row
  */
-scout.Page.prototype.updateText = function(row) {
+scout.Page.prototype.computeTextForRow = function(row) {
   var text = '';
   if (row.cells.length >= 1) {
     text = row.cells[0].text;
   }
-  this.text = text;
+  return text;
 };
 
 /**

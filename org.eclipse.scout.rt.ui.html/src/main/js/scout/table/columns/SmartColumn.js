@@ -63,6 +63,11 @@ scout.SmartColumn.prototype.initCell = function(model, row) {
     return cell;
   }
 
+  if (!row) {
+    // omitted when creating aggregate cells
+    return cell;
+  }
+
   // FIXME CGU handle format value, do the lookup for multiple values together? see java for reference implementation
   this.updateDisplayText(row, cell);
 
