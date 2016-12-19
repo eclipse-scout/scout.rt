@@ -88,6 +88,10 @@ scout.TableHeader.prototype._renderColumns = function() {
 };
 
 scout.TableHeader.prototype._renderColumn = function(column, index) {
+  if (!column.isVisible()) {
+    return;
+  }
+
   var columnWidth = column.width,
     marginLeft = '',
     marginRight = '',

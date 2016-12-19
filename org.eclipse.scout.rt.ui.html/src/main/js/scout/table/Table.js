@@ -461,6 +461,10 @@ scout.Table.prototype.onContextMenu = function(event) {
   scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
 };
 
+scout.Table.prototype.onColumnVisibilityChanged = function(column) {
+  this._redraw();
+};
+
 scout.Table.prototype._onDataScroll = function() {
   var scrollTop = this.$data[0].scrollTop;
   if (this.scrollTop === scrollTop) {
@@ -1047,9 +1051,13 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (row.checked && this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     rowClass += ' checked';
   }
-  var rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
-  for (var c = 0; c < this.columns.length; c++) {
-    rowDiv += this.columns[c].buildCellForRow(row);
+  var i, column,
+    rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
+  for (var i = 0; i < this.columns.length; i++) {
+    column = this.columns[i];
+    if (column.isVisible()) {
+      rowDiv += column.buildCellForRow(row);
+    }
   }
   rowDiv += '</div>';
 

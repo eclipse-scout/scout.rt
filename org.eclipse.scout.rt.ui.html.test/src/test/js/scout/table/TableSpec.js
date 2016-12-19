@@ -2690,4 +2690,28 @@ describe("Table", function() {
 
   });
 
+  describe("Column visibility", function() {
+
+    it("update headers and rows when visibility of a column changes", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      expect(table.columns[0].isVisible()).toBe(true);
+      expect(table.columns[1].isVisible()).toBe(true);
+      expect(table.$container.find('.table-header-item:not(.filler)').length).toBe(2);
+      expect(table.$container.find('.table-cell').length).toBe(2);
+
+      table.columns[1].setVisible(false);
+
+      // when column is invisible it must be removed from the header
+      // also the cells of this column must be removed from all table rows
+      expect(table.columns[0].isVisible()).toBe(true);
+      expect(table.columns[1].isVisible()).toBe(false);
+      expect(table.$container.find('.table-header-item:not(.filler)').length).toBe(1);
+      expect(table.$container.find('.table-cell').length).toBe(1);
+    });
+
+  });
+
 });

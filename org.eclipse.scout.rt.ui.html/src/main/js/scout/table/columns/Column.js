@@ -27,6 +27,8 @@ scout.Column = function() {
   this.showSeparator = true; // currently a UI-only property, defaults to true
   this.filterType = 'TextColumnUserFilter';
   this.comparator = scout.comparators.TEXT;
+  this.displayable = true;
+  this.visible = true;
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 50;
@@ -597,4 +599,32 @@ scout.Column.prototype.compare = function(row1, row2) {
   var valueA = this.table.cellValue(this, row1);
   var valueB = this.table.cellValue(this, row2);
   return this.comparator.compare(valueA, valueB);
+};
+
+scout.Column.prototype.isVisible = function() {
+  return this.displayable && this.visible;
+};
+
+scout.Column.prototype.setVisible = function(visible) {
+  if (this.visible === visible) {
+    return;
+  }
+  this._syncVisible(visible);
+};
+
+scout.Column.prototype._syncVisible = function(visible) {
+  this.visible = visible;
+  this.table.onColumnVisibilityChanged(this);
+};
+
+scout.Column.prototype.setDisplayable = function(displayable) {
+  if (this.displayable === displayable) {
+    return;
+  }
+  this._syncDisplayable('displayable', displayable);
+};
+
+scout.Column.prototype._syncDisplayable = function(displayable) {
+  this.displayable = displayable;
+  this.table.onColumnVisibilityChanged(this);
 };
