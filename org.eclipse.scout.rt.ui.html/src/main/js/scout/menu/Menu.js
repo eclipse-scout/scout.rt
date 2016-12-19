@@ -270,6 +270,10 @@ scout.Menu.prototype.isButton = function() {
   return scout.Action.ActionStyle.BUTTON === this.actionStyle;
 };
 
+scout.Menu.prototype.setChildActions = function(childActions) {
+  this.setProperty('childActions', childActions);
+};
+
 scout.Menu.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
