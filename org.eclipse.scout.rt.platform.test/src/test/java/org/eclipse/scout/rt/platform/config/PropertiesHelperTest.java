@@ -318,7 +318,7 @@ public class PropertiesHelperTest {
     Path tmpFile = Files.createTempFile("properties-helper-test", ".properties");
     try {
       Files.write(tmpFile, IOUtility.readBytes(PropertiesHelperTest.class.getClassLoader().getResourceAsStream(SAMPLE_CONFIG_PROPS)));
-      System.setProperty(PropertiesHelper.IMPORT_KEY + "[1]", tmpFile.toString());
+      System.setProperty(PropertiesHelper.IMPORT_KEY + "[1]", tmpFile.toUri().toURL().toString());
 
       PropertiesHelper h6 = new PropertiesHelper(HELPER_CONFIG_PROPS);
       assertEquals("aotherValb", h6.getProperty("keyWithPlaceholderFromImport"));
