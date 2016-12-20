@@ -57,8 +57,8 @@ scout.Desktop.prototype._init = function(model) {
   this._popstateHandler = this.onPopstate.bind(this);
   this.updateSplitterVisibility();
   this.resolveTextKeys(['title']);
-  this._syncViewButtons(this.viewButtons);
-  this._syncMenus(this.menus);
+  this._setViewButtons(this.viewButtons);
+  this._setMenus(this.menus);
 };
 
 /**
@@ -446,12 +446,12 @@ scout.Desktop.prototype.setOutline = function(outline) {
   }
 };
 
-scout.Desktop.prototype._syncViewButtons = function(viewButtons) {
+scout.Desktop.prototype._setViewButtons = function(viewButtons) {
   this.updateKeyStrokes(viewButtons, this.viewButtons);
   this._setProperty('viewButtons', viewButtons);
 };
 
-scout.Desktop.prototype._syncMenus = function(menus) {
+scout.Desktop.prototype._setMenus = function(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
 };

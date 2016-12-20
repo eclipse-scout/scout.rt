@@ -56,7 +56,7 @@ scout.Action.prototype._init = function(model) {
   this.actionKeyStroke = this._createActionKeyStroke();
   this.resolveTextKeys(['text', 'tooltipText']);
   this.resolveIconIds(['iconId']);
-  this._syncKeyStroke(this.keyStroke);
+  this._setKeyStroke(this.keyStroke);
 };
 
 scout.Action.prototype._renderProperties = function() {
@@ -217,7 +217,7 @@ scout.Action.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
 };
 
-scout.Action.prototype._syncKeyStroke = function(keyStroke) {
+scout.Action.prototype._setKeyStroke = function(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
 };

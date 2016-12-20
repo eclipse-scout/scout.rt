@@ -45,7 +45,7 @@ scout.NumberField.prototype._renderGridData = function() {
   });
 };
 
-scout.NumberField.prototype._syncDecimalFormat = function(decimalFormat) {
+scout.NumberField.prototype._setDecimalFormat = function(decimalFormat) {
   decimalFormat = scout.DecimalFormat.ensure(this.session.locale, decimalFormat);
   this._setProperty('decimalFormat', decimalFormat);
 };

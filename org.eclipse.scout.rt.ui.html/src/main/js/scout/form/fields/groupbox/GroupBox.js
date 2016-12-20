@@ -38,7 +38,7 @@ scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
-  this._syncFields(this.fields);
+  this._setFields(this.fields);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -49,7 +49,7 @@ scout.GroupBox.prototype._init = function(model) {
   this._updateMenuBar();
 };
 
-scout.GroupBox.prototype._syncFields = function(fields) {
+scout.GroupBox.prototype._setFields = function(fields) {
   this._setProperty('fields', fields);
   this._prepareFields();
 };
@@ -66,7 +66,7 @@ scout.GroupBox.prototype._initKeyStrokeContext = function() {
 /**
  * @override FormField.js
  */
-scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes) {
+scout.GroupBox.prototype._setKeyStrokes = function(keyStrokes) {
   keyStrokes = scout.arrays.ensure(keyStrokes);
 
   var groupBoxRenderingHints = {
@@ -89,7 +89,7 @@ scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes) {
       keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
     }, this);
 
-  scout.GroupBox.parent.prototype._syncKeyStrokes.call(this, keyStrokes);
+  scout.GroupBox.parent.prototype._setKeyStrokes.call(this, keyStrokes);
 };
 
 /**
@@ -374,8 +374,8 @@ scout.GroupBox.prototype._computeStatusVisible = function() {
   return scout.GroupBox.parent.prototype._computeStatusVisible.call(this) && this._computeTitleVisible();
 };
 
-scout.GroupBox.prototype._syncMenus = function(menus) {
-  scout.GroupBox.parent.prototype._syncMenus.call(this, menus);
+scout.GroupBox.prototype._setMenus = function(menus) {
+  scout.GroupBox.parent.prototype._setMenus.call(this, menus);
 
   if (this.menuBar) {
     // updateMenuBar is required because menuBar is not created yet when synMenus is called initially

@@ -52,7 +52,7 @@ scout.TableField.prototype._render = function($parent) {
   this._renderTable();
 };
 
-scout.TableField.prototype._syncTable = function(table) {
+scout.TableField.prototype._setTable = function(table) {
   if (this.table) {
     this.table.off(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
   }

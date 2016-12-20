@@ -117,8 +117,7 @@ describe("DateField", function() {
       var dateField = createField(model);
       dateField.render(session.$entryPoint);
 
-      dateField._syncDisplayText('');
-      dateField._renderDisplayText();
+      dateField.setDisplayText('');
       expect(dateField.dateDisplayText).toBe('');
       expect(dateField.timeDisplayText).toBe('');
       expect(dateField.$dateField.val()).toBe('');
@@ -486,9 +485,9 @@ describe("DateField", function() {
       expectDate(date, 2016, 4, 3);
     });
 
-    it("_syncAllowedDates must convert date strings into Dates", function() {
+    it("_setAllowedDates must convert date strings into Dates", function() {
       var dateField = createField(createModel());
-      dateField._syncAllowedDates(["2016-02-14"]);
+      dateField._setAllowedDates(["2016-02-14"]);
       expectDate(dateField.allowedDates[0], 2016, 2, 14);
     });
 

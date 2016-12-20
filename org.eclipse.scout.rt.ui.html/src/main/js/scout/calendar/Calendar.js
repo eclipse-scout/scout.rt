@@ -113,33 +113,33 @@ scout.Calendar.prototype._init = function(model) {
     parent: this
   });
   this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-  this._syncSelectedDate(model.selectedDate);
-  this._syncDisplayMode(model.displayMode);
+  this._setSelectedDate(model.selectedDate);
+  this._setDisplayMode(model.displayMode);
   this._exactRange = this._calcExactRange();
   this._yearPanel.setViewRange(this._exactRange);
   this.viewRange = this._calcViewRange();
 };
 
-scout.Calendar.prototype._syncSelectedDate = function(date) {
+scout.Calendar.prototype._setSelectedDate = function(date) {
   date = scout.dates.ensure(date);
   this._setProperty('selectedDate', date);
   this._yearPanel.selectDate(this.selectedDate);
 };
 
-scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
+scout.Calendar.prototype._setDisplayMode = function(displayMode) {
   this._setProperty('displayMode', displayMode);
   this._yearPanel.setDisplayMode(this.displayMode);
 };
 
-scout.Calendar.prototype._syncViewRange = function(viewRange) {
+scout.Calendar.prototype._setViewRange = function(viewRange) {
   viewRange = scout.DateRange.ensure(viewRange);
   this._setProperty('viewRange', viewRange);
 };
 
-scout.Calendar.prototype._syncMenus = function(menus) {
+scout.Calendar.prototype._setMenus = function(menus) {
   this._setProperty('menus', menus);
   // FIXME awe: (calendar) here we should update the menu-bar (see Table.js)
-  $.log.debug('(Calendar#_syncMenus) impl.');
+  $.log.debug('(Calendar#_setMenus) impl.');
 };
 
 scout.Calendar.prototype._render = function($parent) {

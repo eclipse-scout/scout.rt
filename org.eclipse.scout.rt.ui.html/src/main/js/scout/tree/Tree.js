@@ -102,9 +102,9 @@ scout.Tree.prototype._init = function(model) {
   });
   this.menuBar.bottom();
   this._updateItemPath(true);
-  this._syncDisplayStyle(this.displayStyle);
-  this._syncKeyStrokes(this.keyStrokes);
-  this._syncMenus(this.menus);
+  this._setDisplayStyle(this.displayStyle);
+  this._setKeyStrokes(this.keyStrokes);
+  this._setMenus(this.menus);
 };
 
 /**
@@ -173,7 +173,7 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function() {
   });
 };
 
-scout.Tree.prototype._syncMenus = function(menus) {
+scout.Tree.prototype._setMenus = function(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
   this._updateMenuBar();
@@ -188,7 +188,7 @@ scout.Tree.prototype._updateMenuBar = function() {
   }
 };
 
-scout.Tree.prototype._syncKeyStrokes = function(keyStrokes) {
+scout.Tree.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
 };
@@ -1260,14 +1260,14 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle) {
     return;
   }
   this._renderViewportBlocked = true;
-  this._syncDisplayStyle(displayStyle);
+  this._setDisplayStyle(displayStyle);
   if (this.rendered) {
     this._renderDisplayStyle();
   }
   this._renderViewportBlocked = false;
 };
 
-scout.Tree.prototype._syncDisplayStyle = function(displayStyle) {
+scout.Tree.prototype._setDisplayStyle = function(displayStyle) {
   this._setProperty('displayStyle', displayStyle);
 
   if (displayStyle && this.selectedNodes.length > 0) {

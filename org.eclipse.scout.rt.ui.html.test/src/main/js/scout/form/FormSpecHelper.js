@@ -67,7 +67,7 @@ scout.FormSpecHelper.prototype.createFormWithFields = function(parent, isModal, 
     parent: parent,
     displayHint: isModal ? 'dialog' : 'view'});
   var rootGroupBox = this.createGroupBoxWithFields(form, true, numFields);
-  form._syncRootGroupBox(rootGroupBox);
+  form._setRootGroupBox(rootGroupBox);
   return form;
 };
 

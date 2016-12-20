@@ -20,8 +20,8 @@ scout.inherits(scout.TabItem, scout.GroupBox);
 
 scout.TabItem.prototype._init = function(model) {
   scout.TabItem.parent.prototype._init.call(this, model);
-  this._syncStatusVisible(this.statusVisible);
-  this._syncMenusVisible(this.menusVisible);
+  this._setStatusVisible(this.statusVisible);
+  this._setMenusVisible(this.menusVisible);
 };
 
 scout.TabItem.prototype._removeCssClass = function() {
@@ -206,7 +206,7 @@ scout.TabItem.prototype.addStatus = function() {
     .cssWidth(scout.HtmlEnvironment.fieldStatusWidth);
 };
 
-scout.TabItem.prototype._syncStatusVisible = function() {
+scout.TabItem.prototype._setStatusVisible = function() {
   // Always invisible to not waste space, icon will be visible if status needs to be shown
   this._setProperty('statusVisible', false);
 };
@@ -258,7 +258,7 @@ scout.TabItem.prototype._renderStatusVisible = function() {
   }
 };
 
-scout.TabItem.prototype._syncMenusVisible = function() {
+scout.TabItem.prototype._setMenusVisible = function() {
   // Always invisible because menus are displayed in menu bar and not with status icon
   // Actually not needed at the moment because only value fields have menus (at least at the java model).
   // But actually we should change this so that menus are possible for every form field

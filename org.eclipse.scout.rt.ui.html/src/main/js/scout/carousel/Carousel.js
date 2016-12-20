@@ -31,11 +31,11 @@ scout.inherits(scout.Carousel, scout.Widget);
 
 scout.Carousel.prototype._init = function(model) {
   scout.Carousel.parent.prototype._init.call(this, model);
-  this._syncGridData(this.gridData);
+  this._setGridData(this.gridData);
   this.widgets = scout.arrays.ensure(this.widgets);
 };
 
-scout.Carousel.prototype._syncGridData = function(gridData) {
+scout.Carousel.prototype._setGridData = function(gridData) {
   this._setProperty('gridData', new scout.GridData(gridData));
 };
 

@@ -22,7 +22,7 @@ scout.DateFieldAdapter.prototype._initProperties = function(model) {
   }
 };
 
-scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
+scout.DateFieldAdapter.prototype._setErrorStatus = function(errorStatus) {
   // always store the error status from the server in a separate property
   if (errorStatus) {
     this.widget._modelErrorStatus = new scout.Status(errorStatus);

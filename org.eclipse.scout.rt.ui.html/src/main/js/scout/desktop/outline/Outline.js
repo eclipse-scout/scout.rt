@@ -50,7 +50,7 @@ scout.Outline.prototype._init = function(model) {
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this.resolveTextKeys(['title']);
-  this._syncDefaultDetailForm(this.defaultDetailForm);
+  this._setDefaultDetailForm(this.defaultDetailForm);
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
 
   // menu bars
@@ -69,9 +69,9 @@ scout.Outline.prototype._init = function(model) {
   });
   this.detailMenuBar.bottom();
 
-  this._syncDefaultDetailForm(this.defaultDetailForm);
-  this._syncOutlineOverviewVisible(this.outlineOverviewVisible);
-  this._syncMenus(this.menus);
+  this._setDefaultDetailForm(this.defaultDetailForm);
+  this._setOutlineOverviewVisible(this.outlineOverviewVisible);
+  this._setMenus(this.menus);
   this.updateDetailContent();
 };
 
@@ -332,12 +332,12 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
   this.updateDetailContent();
 };
 
-scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
+scout.Outline.prototype._setDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
   this._updateDetailForm();
 };
 
-scout.Outline.prototype._syncOutlineOverviewVisible = function(outlineOverviewVisible) {
+scout.Outline.prototype._setOutlineOverviewVisible = function(outlineOverviewVisible) {
   this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
   this._updateDetailForm();
 };
@@ -367,12 +367,12 @@ scout.Outline.prototype._updateDetailForm = function() {
   }
 };
 
-scout.Outline.prototype._syncNavigateButtonsVisible = function(navigateButtonsVisible) {
+scout.Outline.prototype._setNavigateButtonsVisible = function(navigateButtonsVisible) {
   this._setProperty('navigateButtonsVisible', navigateButtonsVisible);
-  this._visitNodes(this.nodes, this._syncNavigateButtonsVisibleForNode.bind(this));
+  this._visitNodes(this.nodes, this._setNavigateButtonsVisibleForNode.bind(this));
 };
 
-scout.Outline.prototype._syncNavigateButtonsVisibleForNode = function(node, parentNode) {
+scout.Outline.prototype._setNavigateButtonsVisibleForNode = function(node, parentNode) {
   if (this.navigateButtonsVisible) {
     if (node.detailForm) {
       this._appendNavigateButtonsForDetailForm(node);
@@ -888,11 +888,11 @@ scout.Outline.prototype.activePage = function() {
 /**
  * @override Tree.js (don't call parent)
  */
-scout.Outline.prototype._syncMenus = function(menus) {
+scout.Outline.prototype._setMenus = function(menus) {
   var oldMenus = this.menus;
   this.updateKeyStrokes(menus, oldMenus);
   this._setProperty('menus', menus);
-  if (this.titleMenuBar) { // _syncMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
+  if (this.titleMenuBar) { // _setMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
     var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
     this.titleMenuBar.setMenuItems(menuItems);
   }

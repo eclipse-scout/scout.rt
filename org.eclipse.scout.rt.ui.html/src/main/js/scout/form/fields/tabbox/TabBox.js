@@ -139,7 +139,7 @@ scout.TabBox.prototype.setSelectedTab = function(selectedTab) {
   this.setProperty('selectedTab', selectedTab);
 };
 
-scout.TabBox.prototype._syncSelectedTab = function(tab, notifyServer) {
+scout.TabBox.prototype._setSelectedTab = function(tab, notifyServer) {
   if (this.selectedTab === tab) {
     return;
   }
@@ -222,8 +222,8 @@ scout.TabBox.prototype._renderTabContent = function() {
   }
 };
 
-scout.TabBox.prototype._syncMenus = function(menus) {
-  scout.TabBox.parent.prototype._syncMenus.call(this, menus);
+scout.TabBox.prototype._setMenus = function(menus) {
+  scout.TabBox.parent.prototype._setMenus.call(this, menus);
   if (this.menuBar) {
     // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
     this._updateMenuBar(menus);

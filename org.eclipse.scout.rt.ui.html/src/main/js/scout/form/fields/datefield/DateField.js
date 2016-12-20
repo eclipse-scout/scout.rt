@@ -54,12 +54,12 @@ scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this.popup = model.popup;
-  this._syncDateFormatPattern(this.dateFormatPattern);
-  this._syncTimeFormatPattern(this.timeFormatPattern);
-  this._syncTimestamp(this.timestamp);
-  this._syncAutoTimestamp(this.autoTimestamp);
-  this._syncDisplayText(this.displayText);
-  this._syncAllowedDates(this.allowedDates);
+  this._setDateFormatPattern(this.dateFormatPattern);
+  this._setTimeFormatPattern(this.timeFormatPattern);
+  this._setTimestamp(this.timestamp);
+  this._setAutoTimestamp(this.autoTimestamp);
+  this._setDisplayText(this.displayText);
+  this._setAllowedDates(this.allowedDates);
 };
 
 scout.DateField.prototype.createPopup = function() {
@@ -193,7 +193,7 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
   return null;
 };
 
-scout.DateField.prototype._syncDateFormatPattern = function(dateFormatPattern) {
+scout.DateField.prototype._setDateFormatPattern = function(dateFormatPattern) {
   this._setProperty('dateFormatPattern', dateFormatPattern);
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
 };
@@ -205,7 +205,7 @@ scout.DateField.prototype._renderDateFormatPattern = function() {
   this.getDatePicker().dateFormat = this.isolatedDateFormat;
 };
 
-scout.DateField.prototype._syncTimeFormatPattern = function(timeFormatPattern) {
+scout.DateField.prototype._setTimeFormatPattern = function(timeFormatPattern) {
   this._setProperty('timeFormatPattern', timeFormatPattern);
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
 };
@@ -245,7 +245,7 @@ scout.DateField.prototype._renderTimeDisplayText = function() {
   scout.fields.valOrText(this, this.$timeField, this.timeDisplayText);
 };
 
-scout.DateField.prototype._syncDisplayText = function(displayText) {
+scout.DateField.prototype._setDisplayText = function(displayText) {
   var dateText = '',
     timeText = '',
     parts;
@@ -262,18 +262,18 @@ scout.DateField.prototype._syncDisplayText = function(displayText) {
   this.timeDisplayText = timeText;
 };
 
-scout.DateField.prototype._syncTimestamp = function(timestamp) {
+scout.DateField.prototype._setTimestamp = function(timestamp) {
   // TODO CGU [6.1] no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
   timestamp = scout.dates.ensure(timestamp);
   this.timestampAsDate = timestamp;
 };
 
-scout.DateField.prototype._syncAutoTimestamp = function(autoTimestamp) {
+scout.DateField.prototype._setAutoTimestamp = function(autoTimestamp) {
   autoTimestamp = scout.dates.ensure(autoTimestamp);
   this.autoTimestampAsDate = autoTimestamp;
 };
 
-scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
+scout.DateField.prototype._setAllowedDates = function(allowedDates) {
   if (Array.isArray(allowedDates)) {
     var convAllowedDates = [];
     allowedDates.forEach(function(dateString) {

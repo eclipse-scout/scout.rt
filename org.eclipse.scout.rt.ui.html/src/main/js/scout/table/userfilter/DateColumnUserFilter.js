@@ -88,7 +88,7 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
  * rename timestampAsDate to value (also on JsonDateField)
  * use Date object everywhere and todays 'timestamp' date-string
  * only when we communicate with the UI server. Then remove the toJsonDate
- * function used here and work with the Date object. Implement a _syncValue
+ * function used here and work with the Date object. Implement a _setValue
  * method to convert the date-string into a Date object in DateField.js
  *
  * @override ColumnUserFilter.js

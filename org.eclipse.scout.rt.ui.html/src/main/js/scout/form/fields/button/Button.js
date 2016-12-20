@@ -45,7 +45,7 @@ scout.Button.DisplayStyle = {
 
 scout.Button.prototype._init = function(model) {
   scout.Button.parent.prototype._init.call(this, model);
-  this._syncKeyStroke(this.keyStroke);
+  this._setKeyStroke(this.keyStroke);
 };
 
 /**
@@ -294,7 +294,7 @@ scout.Button.prototype._renderIconId = function() {
   }
 };
 
-scout.Button.prototype._syncKeyStroke = function(keyStroke) {
+scout.Button.prototype._setKeyStroke = function(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };

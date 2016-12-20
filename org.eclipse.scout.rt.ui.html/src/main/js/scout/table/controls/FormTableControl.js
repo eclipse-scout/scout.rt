@@ -16,7 +16,7 @@ scout.inherits(scout.FormTableControl, scout.TableControl);
 
 scout.FormTableControl.prototype._init = function(model) {
   scout.FormTableControl.parent.prototype._init.call(this, model);
-  this._syncForm(this.form);
+  this._setForm(this.form);
 };
 
 scout.FormTableControl.prototype._createLayout = function() {
@@ -59,7 +59,7 @@ scout.FormTableControl.prototype.isContentAvailable = function() {
   return !!this.form;
 };
 
-scout.FormTableControl.prototype._syncForm = function(form) {
+scout.FormTableControl.prototype._setForm = function(form) {
   if (form) {
     form.rootGroupBox.menuBar.bottom();
   }

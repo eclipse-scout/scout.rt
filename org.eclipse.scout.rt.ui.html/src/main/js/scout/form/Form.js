@@ -51,7 +51,7 @@ scout.Form.prototype._init = function(model) {
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
 
-  this._syncRootGroupBox(this.rootGroupBox);
+  this._setRootGroupBox(this.rootGroupBox);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
@@ -68,7 +68,7 @@ scout.Form.prototype._init = function(model) {
   }.bind(this));
 };
 
-scout.Form.prototype._syncRootGroupBox = function(rootGroupBox) {
+scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
   this._setProperty('rootGroupBox', rootGroupBox);
   if (this.rootGroupBox &&
     (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {

@@ -110,11 +110,11 @@ scout.FormField.prototype._createLoadingSupport = function() {
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
   this.resolveTextKeys(['label']);
-  this._syncKeyStrokes(this.keyStrokes);
-  this._syncMenus(this.menus);
-  this._syncErrorStatus(this.errorStatus);
-  this._syncGridData(this.gridData);
-  this._syncEnabled(this.enabled);
+  this._setKeyStrokes(this.keyStrokes);
+  this._setMenus(this.menus);
+  this._setErrorStatus(this.errorStatus);
+  this._setGridData(this.gridData);
+  this._setEnabled(this.enabled);
   this._updateEmpty();
 };
 
@@ -340,7 +340,7 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
 };
 
-scout.FormField.prototype._syncEnabled = function(enabled) {
+scout.FormField.prototype._setEnabled = function(enabled) {
   this._setProperty('enabled', enabled);
   var parentEnabled = enabled;
   if (this.parent.initialized && this.parent.enabledComputed !== undefined) {
@@ -435,21 +435,21 @@ scout.FormField.prototype._updateMenus = function() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };
 
-scout.FormField.prototype._syncGridData = function(gridData) {
+scout.FormField.prototype._setGridData = function(gridData) {
   this._setProperty('gridData', new scout.GridData(gridData));
 };
 
-scout.FormField.prototype._syncKeyStrokes = function(keyStrokes) {
+scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
 };
 
-scout.FormField.prototype._syncMenus = function(menus) {
+scout.FormField.prototype._setMenus = function(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
 };
 
-scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
+scout.FormField.prototype._setErrorStatus = function(errorStatus) {
   errorStatus = scout.Status.ensure(errorStatus);
   this._setProperty('errorStatus', errorStatus);
 };

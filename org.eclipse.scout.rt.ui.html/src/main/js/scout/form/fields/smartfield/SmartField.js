@@ -61,8 +61,8 @@ scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this.popup = model.popup;
-  this._syncLookupCall(this.lookupCall);
-  this._syncCodeType(this.codeType);
+  this._setLookupCall(this.lookupCall);
+  this._setCodeType(this.codeType);
 };
 
 scout.SmartField.prototype.createPopup = function() {
@@ -109,7 +109,7 @@ scout.SmartField.prototype._renderProperties = function() {
   this._renderProposalChooser();
 };
 
-scout.SmartField.prototype._syncLookupCall = function(lookupCall) {
+scout.SmartField.prototype._setLookupCall = function(lookupCall) {
   if (typeof lookupCall === 'string') {
     lookupCall = scout.create(lookupCall, {
       session: this.session
@@ -118,7 +118,7 @@ scout.SmartField.prototype._syncLookupCall = function(lookupCall) {
   this._setProperty('lookupCall', lookupCall);
 };
 
-scout.SmartField.prototype._syncCodeType = function(codeType) {
+scout.SmartField.prototype._setCodeType = function(codeType) {
   this._setProperty('codeType', codeType);
   if (!codeType) {
     return;
@@ -140,7 +140,7 @@ scout.SmartField.prototype._formatValue = function(value) {
   return this.lookupCall.textById(value);
 };
 
-scout.SmartField.prototype._syncDisplayText = function(displayText) {
+scout.SmartField.prototype._setDisplayText = function(displayText) {
   this._oldDisplayText = displayText;
   this._setProperty('displayText', displayText);
 };
@@ -166,7 +166,7 @@ scout.SmartField.prototype._readSearchText = function() {
  * does not return any proposals in a proposal field, neither _renderProposalChooser nor _removeProposalChooser
  * is called and thus the _requestedProposal flag would never be resetted.
  */
-scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
+scout.SmartField.prototype._setProposalChooser = function(proposalChooser) {
   if (this.embedded) {
     // Never hold the proposal chooser in embedded mode, original smart field takes care of it
     // This makes sure proposal chooser does not get rendered twice.
@@ -491,7 +491,7 @@ scout.SmartField.prototype._triggerDeleteProposal = function(displayText) {
 };
 
 scout.SmartField.prototype._sendDeleteProposal = function(displayText) {
-  this._syncDisplayText(displayText);
+  this._setDisplayText(displayText);
   this._send('deleteProposal'); // FIXME [6.1] cgu move to adapter
 };
 
@@ -507,7 +507,7 @@ scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
  * and the second one because of the blur event caused by the busy indicator.
  */
 scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
-  this._syncDisplayText(displayText);
+  this._setDisplayText(displayText);
   this._send('acceptProposal', { // FIXME [6.1] cgu move to adapter
     displayText: displayText,
     chooser: chooser,

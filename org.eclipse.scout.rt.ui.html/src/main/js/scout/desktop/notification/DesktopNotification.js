@@ -44,7 +44,7 @@ scout.DesktopNotification.prototype.setStatus = function(status) {
   this.setProperty('status', status);
 };
 
-scout.DesktopNotification.prototype._syncStatus = function(status) {
+scout.DesktopNotification.prototype._setStatus = function(status) {
   if (this.rendered) {
     this._removeStatus();
   }

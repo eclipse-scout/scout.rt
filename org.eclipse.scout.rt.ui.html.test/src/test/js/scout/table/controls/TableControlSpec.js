@@ -69,7 +69,7 @@ describe("TableControl", function() {
 
     it("opens and closes the control container", function() {
       var action = createAction(createModel());
-      table._syncTableControls([action]);
+      table._setTableControls([action]);
       table.render(session.$entryPoint);
       var $controlContainer = table.footer.$controlContainer;
 
@@ -85,7 +85,7 @@ describe("TableControl", function() {
     it("removes the content of the previous selected control without closing the container", function() {
       var action = createAction(createModel());
       var action2 = createAction(createModel());
-      table._syncTableControls([action, action2]);
+      table._setTableControls([action, action2]);
 
       action.selected = true;
       table.render(session.$entryPoint);
@@ -115,7 +115,7 @@ describe("TableControl", function() {
       var model2 = createModel();
       var adapter2 = createTableControlAdapter(model);
       var action2 = adapter2.createWidget(model, session.desktop);
-      table._syncTableControls([action, action2]);
+      table._setTableControls([action, action2]);
 
       action.selected = true;
       table.render(session.$entryPoint);

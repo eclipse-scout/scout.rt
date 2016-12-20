@@ -31,7 +31,7 @@ scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
 scout.SplitBox.prototype._init = function(model) {
   scout.SplitBox.parent.prototype._init.call(this, model);
-  this._syncCollapseKeyStroke(this.collapseKeyStroke);
+  this._setCollapseKeyStroke(this.collapseKeyStroke);
   this._updateCollapseHandle();
 };
 
@@ -211,7 +211,7 @@ scout.SplitBox.prototype._renderProperties = function() {
   this._renderCollapseHandle(); // renders collapseHandle _and_ collapseKeyStroke
 };
 
-scout.SplitBox.prototype._syncSplitterPosition = function(splitterPosition) {
+scout.SplitBox.prototype._setSplitterPosition = function(splitterPosition) {
   this._setProperty('splitterPosition', splitterPosition);
   // If splitter position is explicitly set by an event, no recalculation is necessary
   this._oldSplitterPositionType = null;
@@ -221,7 +221,7 @@ scout.SplitBox.prototype._renderSplitterPosition = function() {
   this.newSplitterPosition(this.splitterPosition);
 };
 
-scout.SplitBox.prototype._syncSplitterPositionType = function(splitterPositionType) {
+scout.SplitBox.prototype._setSplitterPositionType = function(splitterPositionType) {
   if (this.rendered && !this._oldSplitterPositionType) {
     this._oldSplitterPositionType = this.splitterPositionType;
     // We need to recalculate the splitter position. Because this requires the proper
@@ -293,7 +293,7 @@ scout.SplitBox.prototype.setCollapsibleField = function(field) {
 };
 
 scout.SplitBox.prototype._updateCollapseHandle = function() {
-  // always unregister key stroke first (although it may have been added by _syncCollapseKeyStroke before)
+  // always unregister key stroke first (although it may have been added by _setCollapseKeyStroke before)
   if (this.collapseKeyStroke) {
     this.unregisterKeyStrokes(this.collapseKeyStroke);
   }
@@ -345,7 +345,7 @@ scout.SplitBox.prototype._renderCollapsibleField = function() {
   }
 };
 
-scout.SplitBox.prototype._syncCollapseKeyStroke = function(keyStroke) {
+scout.SplitBox.prototype._setCollapseKeyStroke = function(keyStroke) {
   if (keyStroke) {
     if (this.collapseKeyStroke instanceof scout.KeyStroke) {
       this.unregisterKeyStrokes(this.collapseKeyStroke);

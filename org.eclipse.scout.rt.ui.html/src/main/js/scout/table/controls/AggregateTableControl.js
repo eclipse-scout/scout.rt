@@ -151,12 +151,12 @@ scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(
   this.setEnabled(enabled);
 };
 
-scout.AggregateTableControl.prototype._syncEnabled = function(enabled) {
+scout.AggregateTableControl.prototype._setEnabled = function(enabled) {
   this._setProperty('enabled', enabled);
   this._updateEnabledAndSelectedState();
 };
 
-scout.AggregateTableControl.prototype._syncSelected = function(selected) {
+scout.AggregateTableControl.prototype._setSelected = function(selected) {
   this._setProperty('selected', selected);
   this._updateEnabledAndSelectedState();
 };

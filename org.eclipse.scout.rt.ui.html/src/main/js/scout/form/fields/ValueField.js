@@ -114,7 +114,7 @@ scout.ValueField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
 
-scout.ValueField.prototype._syncValue = function(value) {
+scout.ValueField.prototype._setValue = function(value) {
   var oldValue = this.value;
   this.value = this._validateValue(value);
   this._updateTouched();

@@ -31,7 +31,7 @@ scout.DesktopNavigation.prototype._init = function(model) {
   this.layoutData = model.layoutData || {};
   this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
-  this._syncOutline(model.outline);
+  this._setOutline(model.outline);
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
@@ -98,7 +98,7 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
   this.setProperty('outline', outline);
 };
 
-scout.DesktopNavigation.prototype._syncOutline = function(outline) {
+scout.DesktopNavigation.prototype._setOutline = function(outline) {
   var currentDisplayStyle;
   if (this.outline) {
     currentDisplayStyle = this.outline.displayStyle;

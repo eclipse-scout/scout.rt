@@ -25,5 +25,5 @@ scout.inherits(scout.TabItemKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.TabItemKeyStroke.prototype.handle = function(event) {
-  this.field.parent._syncSelectedTab(this.field);
+  this.field.parent.setSelectedTab(this.field);
 };

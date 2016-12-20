@@ -117,12 +117,12 @@ scout.Table.prototype._init = function(model) {
   });
   this.menuBar.bottom();
 
-  this._syncSelectedRows(this.selectedRows);
+  this._setSelectedRows(this.selectedRows);
   this.setFilters(this.filters);
-  this._syncKeyStrokes(this.keyStrokes);
-  this._syncMenus(this.menus);
-  this._syncTableControls(this.tableControls);
-  this._syncTableStatus(this.tableStatus);
+  this._setKeyStrokes(this.keyStrokes);
+  this._setMenus(this.menus);
+  this._setTableControls(this.tableControls);
+  this._setTableStatus(this.tableStatus);
   this._applyFilters(this.rows);
   this._calculateValuesForBackgroundEffect();
   this._group();
@@ -158,10 +158,10 @@ scout.Table.prototype._initColumns = function() {
   if (this.rowIconVisible) {
     this._insertRowIconColumn();
   }
-  this._syncCheckable(this.checkable);
+  this._setCheckable(this.checkable);
 
   // Sync head and tail sort columns
-  this._syncHeadAndTailSortColumns();
+  this._setHeadAndTailSortColumns();
 };
 
 /**
@@ -346,7 +346,7 @@ scout.Table.prototype._renderTableControls = function() {
   }
 };
 
-scout.Table.prototype._syncTableControls = function(controls) {
+scout.Table.prototype._setTableControls = function(controls) {
   var i;
   for (i = 0; i < this.tableControls.length; i++) {
     this.keyStrokeContext.unregisterKeyStroke(this.tableControls[i]);
@@ -2981,7 +2981,7 @@ scout.Table.prototype._renderHeaderEnabled = function() {
   this._renderTableHeader();
 };
 
-scout.Table.prototype._syncCheckable = function(checkable) {
+scout.Table.prototype._setCheckable = function(checkable) {
   this._setProperty('checkable', checkable);
 
   var column = this.checkableColumn;
@@ -2997,7 +2997,7 @@ scout.Table.prototype.hasPermanentHeadOrTailSortColumns = function() {
   return this._permanentHeadSortColumns.length !== 0 || this._permanentTailSortColumns.length !== 0;
 };
 
-scout.Table.prototype._syncHeadAndTailSortColumns = function() {
+scout.Table.prototype._setHeadAndTailSortColumns = function() {
   // find all sort columns (head and tail sort columns should always be included)
   var sortColumns = this.columns.filter(function(c) {
     return c.sortIndex >= 0;
@@ -3018,7 +3018,7 @@ scout.Table.prototype._syncHeadAndTailSortColumns = function() {
   }, this);
 };
 
-scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
+scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
   this._setProperty('rowIconVisible', rowIconVisible);
   var column = this.rowIconColumn;
   if (this.rowIconVisible && !column) {
@@ -3029,7 +3029,7 @@ scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
   }
 };
 
-scout.Table.prototype._syncSelectedRows = function(selectedRows) {
+scout.Table.prototype._setSelectedRows = function(selectedRows) {
   if (typeof selectedRows[0] === 'string') {
     selectedRows = this._rowsByIds(selectedRows);
   }
@@ -3040,7 +3040,7 @@ scout.Table.prototype.setMenus = function(menus) {
   this.setProperty('menus', menus);
 };
 
-scout.Table.prototype._syncMenus = function(menus, oldMenus) {
+scout.Table.prototype._setMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this._setProperty('menus', menus);
   this._updateMenuBar();
@@ -3061,7 +3061,7 @@ scout.Table.prototype._updateMenuBar = function() {
   }
 };
 
-scout.Table.prototype._syncKeyStrokes = function(keyStrokes) {
+scout.Table.prototype._setKeyStrokes = function(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
 };
@@ -3094,7 +3094,7 @@ scout.Table.prototype.setTableStatus = function(status) {
   this.setProperty('tableStatus', status);
 };
 
-scout.Table.prototype._syncTableStatus = function(status) {
+scout.Table.prototype._setTableStatus = function(status) {
   status = scout.Status.ensure(status);
   this._setProperty('tableStatus', status);
 };

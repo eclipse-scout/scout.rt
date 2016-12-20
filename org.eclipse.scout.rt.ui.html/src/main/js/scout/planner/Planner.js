@@ -97,13 +97,13 @@ scout.Planner.prototype._init = function(model) {
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }
-  this._syncDisplayMode(this.displayMode);
-  this._syncAvailableDisplayModes(this.availableDisplayModes);
-  this._syncViewRange(this.viewRange);
-  this._syncSelectedResources(this.selectedResources);
-  this._syncSelectedActivity(this.selectedActivity);
-  this._syncSelectionRange(this.selectionRange);
-  this._syncMenus(this.menus);
+  this._setDisplayMode(this.displayMode);
+  this._setAvailableDisplayModes(this.availableDisplayModes);
+  this._setViewRange(this.viewRange);
+  this._setSelectedResources(this.selectedResources);
+  this._setSelectedActivity(this.selectedActivity);
+  this._setSelectionRange(this.selectionRange);
+  this._setMenus(this.menus);
 
   this._tooltipSupport = new scout.TooltipSupport({
     parent: this,
@@ -1072,7 +1072,7 @@ scout.Planner.prototype._afterYearPanelWidthChange = function() {
   }
 };
 
-scout.Planner.prototype._syncMenus = function(menus) {
+scout.Planner.prototype._setMenus = function(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
   this._updateMenuBar();
@@ -1119,31 +1119,31 @@ scout.Planner.prototype._renderDisplayMode = function() {
   // done by PlannerHeader.js
 };
 
-scout.Planner.prototype._syncViewRange = function(viewRange) {
+scout.Planner.prototype._setViewRange = function(viewRange) {
   viewRange = scout.DateRange.ensure(viewRange);
   this._setProperty('viewRange', viewRange);
   this._yearPanel.setViewRange(this.viewRange);
   this._yearPanel.selectDate(this.viewRange.from);
 };
 
-scout.Planner.prototype._syncDisplayMode = function(displayMode) {
+scout.Planner.prototype._setDisplayMode = function(displayMode) {
   this._setProperty('displayMode', displayMode);
   this._yearPanel.setDisplayMode(this.displayMode);
   this._header.setDisplayMode(this.displayMode);
 };
 
-scout.Planner.prototype._syncAvailableDisplayModes = function(availableDisplayModes) {
+scout.Planner.prototype._setAvailableDisplayModes = function(availableDisplayModes) {
   this._setProperty('availableDisplayModes', availableDisplayModes);
   this._header.setAvailableDisplayModes(this.availableDisplayModes);
 };
 
-scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
+scout.Planner.prototype._setSelectionRange = function(selectionRange) {
   selectionRange = scout.DateRange.ensure(selectionRange);
   this._setProperty('selectionRange', selectionRange);
   this._updateMenuBar();
 };
 
-scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
+scout.Planner.prototype._setSelectedResources = function(selectedResources) {
   if (typeof selectedResources[0] === 'string') {
     selectedResources = this._resourcesByIds(selectedResources);
   }
@@ -1223,7 +1223,7 @@ scout.Planner.prototype._renderSelectionRange = function() {
     .cssWidth(width);
 };
 
-scout.Planner.prototype._syncSelectedActivity = function(selectedActivity) {
+scout.Planner.prototype._setSelectedActivity = function(selectedActivity) {
   if (typeof selectedActivity === 'string') {
     selectedActivity = this._activityById(selectedActivity);
   }
@@ -1301,7 +1301,7 @@ scout.Planner.prototype.setViewRange = function(viewRange) {
   if (this.viewRange === viewRange) {
     return;
   }
-  this._syncViewRange(viewRange);
+  this._setViewRange(viewRange);
 
   if (this.rendered) {
     this._renderViewRange();

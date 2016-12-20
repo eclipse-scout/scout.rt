@@ -675,10 +675,10 @@ scout.Column.prototype.setVisible = function(visible) {
   if (this.visible === visible) {
     return;
   }
-  this._syncVisible(visible);
+  this._setVisible(visible);
 };
 
-scout.Column.prototype._syncVisible = function(visible) {
+scout.Column.prototype._setVisible = function(visible) {
   this.visible = visible;
   this.table.onColumnVisibilityChanged(this);
 };
@@ -687,10 +687,10 @@ scout.Column.prototype.setDisplayable = function(displayable) {
   if (this.displayable === displayable) {
     return;
   }
-  this._syncDisplayable('displayable', displayable);
+  this._setDisplayable('displayable', displayable);
 };
 
-scout.Column.prototype._syncDisplayable = function(displayable) {
+scout.Column.prototype._setDisplayable = function(displayable) {
   this.displayable = displayable;
   this.table.onColumnVisibilityChanged(this);
 };

@@ -49,7 +49,6 @@ scout.SmartFieldTouchPopup.prototype._onMouseDownOutside = function(event) {
   this.close();
 };
 
-// Info: cannot name this method _syncDisplayText because of naming-conflict with our _sync* functions from the Scout framework
 scout.SmartFieldTouchPopup.prototype._delegateDisplayText = function() {
   this._touchField.setDisplayText(this._field.displayText);
 };

@@ -19,11 +19,11 @@ scout.inherits(scout.SmartColumn, scout.Column);
  * @override
  */
 scout.SmartColumn.prototype._init = function(model) {
-  this._syncLookupCall(this.lookupCall);
-  this._syncCodeType(this.codeType);
+  this._setLookupCall(this.lookupCall);
+  this._setCodeType(this.codeType);
 };
 
-scout.SmartColumn.prototype._syncLookupCall = function(lookupCall) {
+scout.SmartColumn.prototype._setLookupCall = function(lookupCall) {
   if (typeof lookupCall === 'string') {
     lookupCall = scout.create(lookupCall, {
       session: this.session
@@ -32,7 +32,7 @@ scout.SmartColumn.prototype._syncLookupCall = function(lookupCall) {
   this.lookupCall = lookupCall;
 };
 
-scout.SmartColumn.prototype._syncCodeType = function(codeType) {
+scout.SmartColumn.prototype._setCodeType = function(codeType) {
   this.codeType = codeType;
   if (!codeType) {
     return;
