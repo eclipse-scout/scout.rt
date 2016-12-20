@@ -71,10 +71,22 @@ scout.Table = function() {
   this._filterMenusHandler = this._filterMenus.bind(this);
   this.virtual = true;
   this.contextColumn;
+  this.aggregateStyle = scout.Table.AggregateStyle.BOTTOM;
 };
 scout.inherits(scout.Table, scout.Widget);
 
-//FIXME CGU [6.1] create StringColumn.js incl. defaultValues from defaultValues.json
+// FIXME CGU [6.1] create StringColumn.js incl. defaultValues from defaultValues.json
+
+scout.Table.AggregateStyle = {
+  /**
+   * Aggregate row is rendered on top of the row-group.
+   */
+  TOP: 'top',
+  /**
+   * Aggregate row is rendered on the bottom of the row-group (default).
+   */
+  BOTTOM: 'bottom'
+};
 
 scout.Table.CheckableStyle = {
   /**
@@ -87,6 +99,7 @@ scout.Table.CheckableStyle = {
    */
   TABLE_ROW: 'tableRow'
 };
+
 scout.Table.SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
 
 scout.Table.prototype._init = function(model) {
@@ -1053,7 +1066,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   }
   var i, column,
     rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
-  for (var i = 0; i < this.columns.length; i++) {
+  for (i = 0; i < this.columns.length; i++) {
     column = this.columns[i];
     if (column.isVisible()) {
       rowDiv += column.buildCellForRow(row);
@@ -1628,8 +1641,9 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
 };
 
 scout.Table.prototype._group = function(animate) {
-  var rows, nextRow, newGroup,
+  var rows, nextRow, newGroup, firstRow, lastRow,
     groupColumns = this._groupedColumns(),
+    aggrStyleTop = this.aggregateStyle === scout.Table.AggregateStyle.TOP,
     states = [];
 
   this.clearAggregateRows();
@@ -1639,7 +1653,11 @@ scout.Table.prototype._group = function(animate) {
 
   rows = this.filteredRows();
   this._forEachColumn('aggrStart', states);
+
   rows.forEach(function(row, r) {
+    if (!firstRow) {
+      firstRow = row;
+    }
     this._forEachColumn('aggrStep', states, row);
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
@@ -1647,12 +1665,16 @@ scout.Table.prototype._group = function(animate) {
     newGroup = (r === rows.length - 1) || this._isNewGroup(groupColumns, row, nextRow);
     // if group is finished: add group row
     if (newGroup) {
-      //finish aggregation
+      // finish aggregation
       this._forEachColumn('aggrFinish', states);
-      //append sum row
-      this._addAggregateRow(states, row, nextRow);
-      //reset after group
+      // append sum row
+      this._addAggregateRow(states,
+        aggrStyleTop ? lastRow : row,
+        aggrStyleTop ? firstRow : nextRow);
+      // reset after group
       this._forEachColumn('aggrStart', states);
+      firstRow = null;
+      lastRow = row;
     }
   }.bind(this));
 
@@ -1728,7 +1750,9 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
 };
 
 scout.Table.prototype._renderAggregateRows = function(animate) {
-  var c, cell, column, row, contents, $cell, $aggregateRow;
+  var c, cell, column, row, contents, $cell, $aggregateRow,
+    aggrStyleTop = this.aggregateStyle === scout.Table.AggregateStyle.TOP,
+    insertFunc = aggrStyleTop ? 'insertBefore' : 'insertAfter';
   animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
@@ -1736,7 +1760,13 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    row = aggregateRow.prevRow;
+
+    if (aggrStyleTop) {
+      row = aggregateRow.nextRow;
+    } else {
+      row = aggregateRow.prevRow;
+    }
+
     if (!row || !row.$row) {
       return;
     }
@@ -1758,7 +1788,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       $cell.appendTo($aggregateRow);
     }
 
-    $aggregateRow.insertAfter(row.$row).width(this.rowWidth);
+    $aggregateRow[insertFunc](row.$row).width(this.rowWidth);
     aggregateRow.height = $aggregateRow.outerHeight(true);
     aggregateRow.$row = $aggregateRow;
     if (animate) {

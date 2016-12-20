@@ -1567,6 +1567,28 @@ describe("Table", function() {
       expect(table._aggregateRows.length).toBe(2);
     });
 
+    it("considers aggregateStyle -> aggregate rows must be rendered previous to the grouped rows", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
+      prepareTable();
+      table.aggregateStyle = scout.Table.AggregateStyle.TOP;
+      prepareContent();
+      render(table);
+      addGrouping(table, column0, false);
+
+      var // check in the DOM if the aggregate row comes previous to the first row of the group
+        $mixedRows = table.$data.children('.table-row,.table-aggregate-row'),
+        $aggregateRows = table.$data.find('.table-aggregate-row'),
+        aggrRow1Pos = $mixedRows.index($aggregateRows.get(0)),
+        aggrRow2Pos = $mixedRows.index($aggregateRows.get(1)),
+        rowFirstPos = $mixedRows.index(table.$data.find('.table-row.first')),
+        rowLastPos = $mixedRows.index(table.$data.find('.table-row.last'));
+
+      expect(aggrRow1Pos < rowFirstPos).toBe(true);
+      expect(aggrRow2Pos < rowLastPos).toBe(true);
+    });
+
     it("considers view range -> only renders an aggregate row for rendered rows", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
