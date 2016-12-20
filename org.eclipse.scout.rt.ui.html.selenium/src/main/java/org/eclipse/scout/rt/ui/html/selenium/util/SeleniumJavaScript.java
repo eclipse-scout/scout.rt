@@ -30,6 +30,7 @@ public final class SeleniumJavaScript {
    *
    * @param test
    */
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static void injectSeleniumScript(AbstractSeleniumTest test) {
     try (InputStream is = test.getClass().getClassLoader().getResourceAsStream("selenium.js")) {
       LOG.info("Found resource selenium.js " + (is != null));

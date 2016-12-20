@@ -15,8 +15,6 @@ scout.TreeLayout = function(tree) {
 scout.inherits(scout.TreeLayout, scout.AbstractLayout);
 
 scout.TreeLayout.prototype.layout = function($container) {
-  var htmlContainer = this.tree.htmlComp;
-
   this._layout($container);
   scout.scrollbars.update(this.tree.$data);
 };

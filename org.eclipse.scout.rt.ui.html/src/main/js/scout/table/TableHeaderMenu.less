@@ -103,7 +103,7 @@
 .table-header-menu-whiter {
   height: 1px;
   position: absolute;
-  left: 0px;
+  left: 0;
   background-color: @table-header-menu-background-color;
 
   .table-header-menu.down & {
@@ -132,7 +132,7 @@
 
 .table-header-menu-group-text {
   #scout.font-text-normal(@font-weight-bold);
-  font-weight:bold;
+  font-weight: bold;
   color: @text-color;
   line-height: 22px;
   height: 22px;
@@ -276,7 +276,7 @@
   &.group::before,
   &.group-add::before {
     position: relative;
-    top: 0px;
+    top: 0;
     font-size: 20px;
     line-height: 20px;
     content: @icon-group;
@@ -295,7 +295,7 @@
   &.aggregation-function {
     &::before {
       position: relative;
-      top: 0px;
+      top: 0;
       font-size: 20px;
       line-height: 20px;
     }
@@ -330,7 +330,7 @@
   }
 
   &.color-bar-chart {
-    background-image: linear-gradient(to right, @column-background-effect-bar-chart-background-color 0%, @column-background-effect-bar-chart-background-color  65%, @palette-white 65%, @palette-white 100% );
+    background-image: linear-gradient(to right, @column-background-effect-bar-chart-background-color 0, @column-background-effect-bar-chart-background-color  65%, @palette-white 65%, @palette-white 100% );
   }
 
   &.color {
@@ -354,14 +354,14 @@
 }
 
 .table-header-menu-filter {
-  position:relative;
+  position: relative;
   width: 200px;
   float: left;
   clear: both;
   height: 30px;
   line-height: 30px;
   cursor: pointer;
-  padding: 0px 20px 0px 8px;
+  padding: 0 20px 0 8px;
   #scout.overflow-ellipsis-nowrap();
   border-top: 1px solid @table-header-menu-cmd-border-color;
 
@@ -395,7 +395,6 @@
 }
 
 .table-header-menu-filter-actions {
-  display: inline;
   float: right;
   line-height: 22px;
 }

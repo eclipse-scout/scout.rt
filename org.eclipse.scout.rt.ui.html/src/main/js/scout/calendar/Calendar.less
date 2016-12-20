@@ -63,7 +63,6 @@
   background-color: @button-background-color;
   border: 1px solid @border-color;
   border-radius: @border-radius;
-  cursor: pointer;
   margin-right: 5px;
   line-height: @calendar-header-buttons;
 
@@ -177,7 +176,7 @@
 
   /* Default colors used when component has no specific class */
   background-color: @palette-blue-0;
-  border-left-color:  @palette-blue-1;
+  border-left-color: @palette-blue-1;
 
   &:hover {
     background-color: @palette-blue-1;
@@ -234,7 +233,7 @@
 .calendar-list-container {
   display: inline-block;
   vertical-align: top;
-  width: 0%;
+  width: 0;
   padding: 0;
   background-color: @palette-white;
   overflow: hidden;
@@ -242,7 +241,7 @@
 
 .calendar-list {
   width: 270px;
-  padding: 0px 0px 0px 30px;
+  padding: 0 0 0 30px;
   height: 100%;
 
   & > .calendar-component {
@@ -265,7 +264,7 @@
     position: absolute;
     height: 1px;
     width: 100%;
-    left: 0px;
+    left: 0;
     bottom: -1px;
     content: '';
     background-color: @palette-gray-5;
@@ -314,7 +313,7 @@
 }
 
 .calendar-day {
-  padding: 0px;
+  padding: 0;
 
   &.out {
     background-color: @calendar-out-background-color;
@@ -345,7 +344,7 @@
     font-weight: normal;
     border: solid 4px @highlight-color;
     border-radius: 50%;
-    background-color:  @highlight-color;
+    background-color: @highlight-color;
     color: @palette-white;
   }
 
@@ -357,7 +356,7 @@
     height: 23px;
     border: solid 4px @item-selection-border-color;
     border-radius: 50%;
-    background-color:  @item-selection-border-color;
+    background-color: @item-selection-border-color;
     color: @palette-white;
   }
 
@@ -375,8 +374,8 @@
     &.component-task {
       position: absolute;
       word-break: break-all;
-      left: 0px;
-      margin: 0px;
+      left: 0;
+      margin: 0;
       width: 100%;
       height: 24px;
       line-height: 24px;
@@ -429,8 +428,8 @@
   position: absolute;
   width: 1px;
   height: 100%;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   content: '';
   background-color: @palette-gray-5;
 }
@@ -439,8 +438,8 @@
   position: absolute;
   height: 1px;
   width: 100%;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   content: '';
   background-color: @palette-gray-5;
 }
@@ -450,7 +449,7 @@
   content: attr(data-day-name);
   color: @calendar-day-color;
   left: 7px;
-  bottom: 0px;
+  bottom: 0;
   z-index: 1; /* draw over calendar items */
   line-height: @calendar-title-height;
 }
@@ -467,7 +466,7 @@
 .calendar-week-axis {
   position: absolute;
   left: @calendar-week-name-width - 6px;
-  width:  calc(~'100%' - 8px);
+  width: calc(~'100%' - 8px);
 }
 
 .calendar-week-axis::after {
@@ -489,8 +488,8 @@
 
 .calendar-week-task {
   position: absolute;
-  left: 0px;
-  width:  100%;
+  left: 0;
+  width: 100%;
 }
 
 .calendar-week-task::after {

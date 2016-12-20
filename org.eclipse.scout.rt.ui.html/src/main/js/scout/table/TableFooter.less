@@ -14,7 +14,7 @@
 
 .table-footer {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   height: @table-footer-height;
   width: 100%;
   white-space: nowrap;
@@ -25,7 +25,7 @@
 .table-control-resize {
   position: absolute;
   width: 100%;
-  left: 0px;
+  left: 0;
   height: 16px;
   cursor: row-resize;
   z-index: 1;
@@ -130,7 +130,6 @@
   vertical-align: top;
   padding-top: @table-control-padding / 2;
   padding-bottom: 0;
-  display: inline-block;
   height: @table-footer-height - 1px; /* subtract border-top of .table-footer */
   color: @table-info-color;
   cursor: pointer;

@@ -29,7 +29,10 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-public class SeleniumDriver {
+public final class SeleniumDriver {
+
+  private SeleniumDriver() {
+  }
 
   private static void logProperty(String property, String value) {
     System.out.println("set property '" + property + "': " + ObjectUtility.nvl(value, "[not set]"));
@@ -89,7 +92,7 @@ public class SeleniumDriver {
             .withEnvironment(env) // <--
             .build(),
         options);
-    //RemoteWebDriver driver = new ChromeDriver(options);
+    //RemoteWebDriver driver = new ChromeDriver(options)
     // </WORKAROUND>
 
     driver.manage().timeouts().setScriptTimeout(10000, TimeUnit.SECONDS);

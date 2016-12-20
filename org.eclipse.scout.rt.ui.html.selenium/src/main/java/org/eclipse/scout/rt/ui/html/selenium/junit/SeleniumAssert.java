@@ -17,7 +17,11 @@ import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
 import org.openqa.selenium.WebElement;
 
-public class SeleniumAssert {
+public final class SeleniumAssert {
+
+  private SeleniumAssert() {
+    super();
+  }
 
   /**
    * Fails when the given element does not contain all of the given CSS classes.

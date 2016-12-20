@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility methods for Selenium tests
  */
-public class SeleniumUtil {
+public final class SeleniumUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(SeleniumUtil.class);
 
@@ -41,6 +41,9 @@ public class SeleniumUtil {
    * wait only 10% of the time we wait on the CI-server. The CI-server uses 1.0 as wait-factor (see pom.xml)
    */
   private static final double SLOW_DOWN_FACTOR = 0.1;
+
+  private SeleniumUtil() {
+  }
 
   public static By byAttributeValue(String attribute, String value) {
     return byAttributeValue(attribute, value, null);

@@ -23,21 +23,21 @@
   <artifactId>org.eclipse.scout.rt.ui.html.selenium</artifactId>
   <packaging>jar</packaging>
 
-    <dependencies>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.json</artifactId>
-      </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.json</artifactId>
+    </dependency>
 
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.client</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.client</artifactId>
+    </dependency>
 
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.platform</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.platform</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>

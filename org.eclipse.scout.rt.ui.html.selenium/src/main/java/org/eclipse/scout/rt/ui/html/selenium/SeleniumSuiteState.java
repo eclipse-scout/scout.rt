@@ -17,31 +17,34 @@ import org.openqa.selenium.WebDriver;
  * instance over multiple tests. This makes the tests run faster, since starting/stopping the web driver is a slow
  * operation.
  */
-public class SeleniumSuiteState {
+public final class SeleniumSuiteState {
 
-  private static boolean m_suiteStarted = false;
+  private static boolean s_suiteStarted = false;
 
-  private static WebDriver m_driver;
+  private static WebDriver s_driver;
+
+  private SeleniumSuiteState() {
+  }
 
   public static void setUpBeforeClass() {
-    m_suiteStarted = true;
-    m_driver = SeleniumDriver.setUpDriver();
+    s_suiteStarted = true;
+    s_driver = SeleniumDriver.setUpDriver();
     System.out.println("Selenium driver started by SeleniumTestSuite");
   }
 
   public static void tearDownAfterClass() {
-    m_suiteStarted = false;
-    m_driver.quit();
-    m_driver = null;
+    s_suiteStarted = false;
+    s_driver.quit();
+    s_driver = null;
     System.out.println("Selenium driver terminated by SeleniumTestSuite");
   }
 
   public static boolean isSuiteStarted() {
-    return m_suiteStarted;
+    return s_suiteStarted;
   }
 
   public static WebDriver getDriver() {
-    return m_driver;
+    return s_driver;
   }
 
 }

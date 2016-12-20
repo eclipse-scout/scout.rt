@@ -11,7 +11,7 @@
 .year-panel-container {
   display: inline-block;
   vertical-align: top;
-  width: 0%;
+  width: 0;
   background-color: @palette-white;
   overflow: hidden;
 }
@@ -45,7 +45,7 @@
     position: absolute;
     height: 1px;
     width: 100%;
-    left: 0px;
+    left: 0;
     bottom: -1px;
     content: '';
     background-color: @palette-gray-5;
@@ -102,8 +102,8 @@
 
   & > .year-month::before{
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     width: 100%;
     content: attr(data-title);
     font-weight: bold;
@@ -112,13 +112,13 @@
 
   & > .year-month::after{
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     right: 19px;
     height: calc(~'100%' -  20px);
     width: 26%;
     content: '';
     background-color: @palette-gray-7;
     opacity: 0.10;
-    pointer-events: none
+    pointer-events: none;
   }
 }

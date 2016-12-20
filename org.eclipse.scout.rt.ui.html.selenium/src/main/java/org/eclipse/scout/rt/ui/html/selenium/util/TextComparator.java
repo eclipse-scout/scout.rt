@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 /**
  * A few text comparator implementations to be used with {@link SeleniumExpectedConditions}.
  */
+@SuppressWarnings("squid:S00118")
 abstract class TextComparator {
 
   abstract boolean compare(String expected, String actual);
@@ -30,5 +31,4 @@ abstract class TextComparator {
       return actual.contains(expected);
     }
   }
-
 }

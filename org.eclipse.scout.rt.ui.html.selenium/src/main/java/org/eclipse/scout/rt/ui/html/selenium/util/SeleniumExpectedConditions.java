@@ -13,7 +13,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  * This class provides <code>ExceptedCondition</code>s used in Scout Selenium tests. It is used in addition to
  * Selenium's class {@link ExpectedConditions}.
  */
-public class SeleniumExpectedConditions {
+public final class SeleniumExpectedConditions {
+
+  private SeleniumExpectedConditions() {
+  }
 
   /**
    * Same as {@link ExpectedConditions#elementToBeClickable(org.openqa.selenium.By)} but with a parent element which is
@@ -45,7 +48,7 @@ public class SeleniumExpectedConditions {
           WebElement activeElement = driver.switchTo().activeElement();
           return !activeElement.equals(element);
         }
-        catch (StaleElementReferenceException e) {
+        catch (StaleElementReferenceException e) { // NOSONAR
           return null;
         }
       }
@@ -134,7 +137,7 @@ public class SeleniumExpectedConditions {
             return comparator.compare(value, m_actualValue);
           }
         }
-        catch (StaleElementReferenceException e) {
+        catch (StaleElementReferenceException e) { // NOSONAR
           return null;
         }
       }
@@ -155,7 +158,7 @@ public class SeleniumExpectedConditions {
           List<WebElement> elements = table.findElements(By.className("table-row"));
           return numRows == elements.size();
         }
-        catch (StaleElementReferenceException e) {
+        catch (StaleElementReferenceException e) { // NOSONAR
           return null;
         }
       }

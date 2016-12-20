@@ -101,7 +101,7 @@
   /*** Fade with Short Drop ***/
 
   .keyframes-fade-short-drop() {
-    00% {
+    0% {
       margin-top: -40px;
       opacity: 0;
     }
@@ -110,7 +110,7 @@
       opacity: 0.9;
     }
     100% {
-      margin-top: 0px;
+      margin-top: 0;
       opacity: 1;
     }
   }
@@ -122,7 +122,7 @@
        Moves the element into screen from bottom up */
 
   .keyframes-slidein-bottom() {
-    00% {
+    0% {
       #scout.transform(translateY(100%));
     }
   }
@@ -157,7 +157,7 @@
   /*** Zoom Bounce ***/
 
   .keyframes-zoom-bounce() {
-    00% {
+    0% {
       #scout.transform(scale(0.75, 0.75));
     }
     25% {
@@ -174,7 +174,7 @@
   /*** Rotation ***/
 
   .keyframes-rotation () {
-    00% {
+    0% {
       #scout.transform(rotate(0deg));
     }
     100% {
@@ -188,7 +188,7 @@
   /*** Rotation-Reverse ***/
 
   .keyframes-rotation-reverse () {
-    00% {
+    0% {
       #scout.transform(rotate(-0deg));
     }
     100% {
@@ -202,7 +202,7 @@
   /*** Pulse Opacity ***/
 
   .keyframes-pulse-opacity () {
-    00% {
+    0% {
       opacity: 1.0;
     }
     50% {
@@ -219,7 +219,7 @@
   /*** Pulsate ***/
 
   .keyframes-pulsate () {
-    00% {
+    0% {
       #scout.transform(scale(0.1));
       opacity: 0.0;
     }
@@ -238,7 +238,7 @@
   /*** Attention ***/
 
   .keyframes-attention () {
-    00% {
+    0% {
       #scout.transform(scale3d(1, 1, 1));
     }
     10% {
@@ -258,7 +258,7 @@
   /*** Rotate-X ***/
 
   .keyframes-rotate-x () {
-    00% {
+    0% {
       #scout.transform(perspective(120px) rotateY(0deg));
     }
     50% {
@@ -275,10 +275,10 @@
   /*** Animate Dot ***/
 
   .keyframes-animate-dot () {
-    00%   { color: @text-color;     bottom:0px; }
+    0%   { color: @text-color;     bottom:0; }
     25%  { color: @palette-gray-5; bottom:4px; }
-    50%  { color: @text-color;     bottom:0px; }
-    100% { color: @text-color;     bottom:0px; }
+    50%  { color: @text-color;     bottom:0; }
+    100% { color: @text-color;     bottom:0; }
   }
 
   @-webkit-keyframes animateDot { .keyframes-animate-dot(); }
@@ -295,16 +295,16 @@
   }
 
   .keyframes-shake() {
-    00% { #scout.transform(translate(2px, 1px) rotate(0deg)); }
-    10% { #scout.transform(translate(-1px, -2px) rotate(-1deg)); }
-    20% { #scout.transform(translate(-3px, 0px) rotate(1deg)); }
-    30% { #scout.transform(translate(0px, 2px) rotate(0deg)); }
-    40% { #scout.transform(translate(1px, -1px) rotate(1deg)); }
-    50% { #scout.transform(translate(-1px, 2px) rotate(-1deg)); }
-    60% { #scout.transform(translate(-3px, 1px) rotate(0deg)); }
-    70% { #scout.transform(translate(2px, 1px) rotate(-1deg)); }
-    80% { #scout.transform(translate(-1px, -1px) rotate(1deg)); }
-    90% { #scout.transform(translate(2px, 2px) rotate(0deg)); }
+    0%   { #scout.transform(translate(2px, 1px) rotate(0deg)); }
+    10%  { #scout.transform(translate(-1px, -2px) rotate(-1deg)); }
+    20%  { #scout.transform(translate(-3px, 0) rotate(1deg)); }
+    30%  { #scout.transform(translate(0, 2px) rotate(0deg)); }
+    40%  { #scout.transform(translate(1px, -1px) rotate(1deg)); }
+    50%  { #scout.transform(translate(-1px, 2px) rotate(-1deg)); }
+    60%  { #scout.transform(translate(-3px, 1px) rotate(0deg)); }
+    70%  { #scout.transform(translate(2px, 1px) rotate(-1deg)); }
+    80%  { #scout.transform(translate(-1px, -1px) rotate(1deg)); }
+    90%  { #scout.transform(translate(2px, 2px) rotate(0deg)); }
     100% { #scout.transform(translate(1px, -2px) rotate(-1deg)); }
   }
 
@@ -321,10 +321,10 @@
   }
 
   .keyframes-flash-gray() {
-    00% { background-color: @palette-white; }
-    25% { background-color: @palette-gray-5; }
-    50% { background-color: @palette-white; }
-    75% { background-color: @palette-gray-5; }
+    0%   { background-color: @palette-white; }
+    25%  { background-color: @palette-gray-5; }
+    50%  { background-color: @palette-white; }
+    75%  { background-color: @palette-gray-5; }
     100% { background-color: @palette-white; }
   }
 

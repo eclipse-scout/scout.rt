@@ -21,7 +21,7 @@ body {
   #scout.font-text-normal();
   height: 100%;
   width: 100%;
-  margin: 0px;
+  margin: 0;
   overflow: hidden;
   cursor: default;
   color: @text-color;
@@ -59,11 +59,11 @@ body {
 /* - Password reveal button: https://msdn.microsoft.com/en-us/library/windows/apps/hh465773.aspx */
 /* Note: Set width/height to 0 instead of "display: none", because of http://stackoverflow.com/a/17986002 */
 ::-ms-clear {
-  width : 0;
+  width: 0;
   height: 0;
 }
 ::-ms-reveal {
-  width : 0;
+  width: 0;
   height: 0;
 }
 
@@ -189,7 +189,7 @@ input[type="radio"] {
 }
 
 .input-field {
-  padding:  @text-field-padding-y @text-field-padding-x;
+  padding: @text-field-padding-y @text-field-padding-x;
   #scout.overflow-ellipsis-nowrap();
   #scout.user-select(text);
 }
@@ -376,8 +376,8 @@ button::-moz-focus-inner {
   width: 100%;
   height: 20px;
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   margin-top: -5px;
   cursor: move;
 }

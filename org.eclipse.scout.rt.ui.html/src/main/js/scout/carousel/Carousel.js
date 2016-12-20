@@ -110,7 +110,7 @@ scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
   var $window = this.$carouselFilmstrip.window();
   this.$carouselFilmstrip.on('mousedown touchstart', function(event) {
     var origPageX = event.pageX;
-    if (!origPageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length == 1) {
+    if (!origPageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length === 1) {
       origPageX = event.originalEvent.touches[0].pageX;
     }
     var origPosition = this.positionX;
@@ -118,7 +118,7 @@ scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
     var containerWidth = this.$container.width();
     $window.on('mousemove.carouselDrag touchmove.carouselDrag', function(event) {
       var pageX = event.pageX;
-      if (!pageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length == 1) {
+      if (!pageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length === 1) {
         pageX = event.originalEvent.touches[0].pageX;
       }
       var moveX = pageX - origPageX;

@@ -81,7 +81,7 @@ public class AssertNoRunningJobsStatement extends Statement {
       Thread.interrupted(); // clear the thread's interrupted status, in case the JUnit test interrupted the executing thread.
       Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
-    catch (final TimedOutError e) {
+    catch (final TimedOutError e) { // NOSONAR
       final List<String> runningJobs = findJobNames(jobFilter);
       if (!runningJobs.isEmpty()) {
         fail(String.format("Test failed because some jobs did not complete yet. [context=%s, jobs=%s]", m_context, runningJobs));

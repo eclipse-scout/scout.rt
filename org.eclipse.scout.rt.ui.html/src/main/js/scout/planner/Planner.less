@@ -44,9 +44,9 @@
 
 .planner-scale {
   position: absolute;
-  right: 0px;
+  right: 0;
   height: @planner-scale-height;
-  border-bottom:  1px solid @palette-gray-5;
+  border-bottom: 1px solid @palette-gray-5;
   width: 100%;
   /* for horizontal scrollbars */
   overflow: hidden;
@@ -56,7 +56,7 @@
     display: inline-block;
     position: relative;
     white-space: nowrap;
-    padding: 0px 0px 0px 5px;
+    padding: 0 0 0 5px;
 
     &.label-invisible {
       color: transparent;
@@ -94,7 +94,7 @@
    height: 100%;
    float: left;
    #scout.overflow-ellipsis-nowrap();
-   padding: 0px @resource-padding-x;
+   padding: 0 @resource-padding-x;
    font-size: 17px;
    color: @palette-gray-7;
    line-height: @planner-scale-height;
@@ -103,7 +103,7 @@
 
 .planner-grid {
   position: absolute;
-  right: 0px;
+  right: 0;
   width: 100%;
   overflow: hidden;
 }
@@ -117,7 +117,7 @@
     line-height: @planner-resource-minheight;
     height: 100%;
     width: @planner-resource-title-width;
-    padding: 0px @resource-padding-x;
+    padding: 0 @resource-padding-x;
     float: left;
     #scout.overflow-ellipsis-nowrap();
   }
@@ -144,8 +144,8 @@
         border-left: 2px solid @item-selection-border-color;
         border-right: 2px solid @item-selection-border-color;
         position: absolute;
-        top: 0px;
-        left: 0px;
+        top: 0;
+        left: 0;
         width: 6px;
         height: 100%;
         cursor: col-resize;
@@ -156,9 +156,9 @@
         border-left: 2px solid @item-selection-border-color;
         border-right: 2px solid @item-selection-border-color;
         position: absolute;
-        top: 0px;
-        right: 0px;
-        width: 6px;
+        top: 0;
+        right: 0;
+        width: 6;
         height: 100%;
         cursor: col-resize;
       }
@@ -169,7 +169,7 @@
 .planner-activity {
   position: absolute;
   top: 1px;
-  width: 0px;
+  width: 0;
   height: @planner-resource-minheight - 3px;
   line-height: @planner-resource-minheight - 3px;
   background-color: @palette-cyan-4;
@@ -186,7 +186,7 @@
   position: absolute;
   height: 100%;
   width: 1px;
-  top: 0px;
+  top: 0;
   background-color: rgba(0, 0, 0, 0.07);
   pointer-events: none;
 
@@ -200,7 +200,7 @@
   position: absolute;
   height: 100%;
   width: 1px;
-  top: 0px;
+  top: 0;
   background-color: rgba(0, 0, 0, 0.2);
   pointer-events: none;
 }

@@ -37,9 +37,6 @@ public class LocalLookupCall<T> extends LookupCall<T> {
 
   private boolean m_hierarchicalLookup;
 
-  public LocalLookupCall() {
-  }
-
   @Override
   @SuppressWarnings("squid:S1185") // method is required to satisfy LookupCall quality checks that require equals to be overridden
   public boolean equals(Object obj) {

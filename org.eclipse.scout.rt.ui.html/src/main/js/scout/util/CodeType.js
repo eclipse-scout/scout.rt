@@ -19,21 +19,18 @@ scout.CodeType.prototype.init = function(model) {
   this.id = model.id;
   this.modelClass = model.modelClass;
 
-  var i, code;
   if (model.codes) {
-    for (i = 0; i < model.codes.length; i++) {
+    for (var i = 0; i < model.codes.length; i++) {
       this._initCode(model.codes[i]);
     }
   }
 };
 
 scout.CodeType.prototype._initCode = function(modelCode, parent) {
-  var i;
-  var code;
-  code = scout.create(modelCode);
+  var code = scout.create(modelCode);
   this.add(code, parent);
   if (modelCode.children) {
-    for (i = 0; i < modelCode.children.length; i++) {
+    for (var i = 0; i < modelCode.children.length; i++) {
       this._initCode(modelCode.children[i], code);
     }
   }

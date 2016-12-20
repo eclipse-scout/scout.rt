@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.ui.html.selenium.junit;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -59,6 +60,7 @@ public class ScreenshotRule implements TestRule {
     };
   }
 
+  @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
   public void captureScreenshot(Description description) {
     try {
       File screenshotDir = new File("target/surefire-reports/");
@@ -68,12 +70,12 @@ public class ScreenshotRule implements TestRule {
       String methodName = description.getMethodName();
       File screenshotFile = new File(screenshotDir, "screenshot-" + timestamp + "-" + className + "." + methodName + ".png");
 
-      FileOutputStream out = new FileOutputStream(screenshotFile);
-      System.out.println("Test failed, took as screenshot: " + screenshotFile);
-      out.write(((TakesScreenshot) m_driver).getScreenshotAs(OutputType.BYTES));
-      out.close();
+      try (FileOutputStream out = new FileOutputStream(screenshotFile)) {
+        System.out.println("Test failed, took as screenshot: " + screenshotFile);
+        out.write(((TakesScreenshot) m_driver).getScreenshotAs(OutputType.BYTES));
+      }
     }
-    catch (Exception e) {
+    catch (IOException e) { // NOSONAR
       System.err.println("Could not take a screenshot because of: " + e.getMessage());
     }
   }
