@@ -195,11 +195,23 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
 
 scout.BrowserField.prototype._popupWindowOpen = function() {
   if (this._popupWindow && !this._popupWindow.closed) {
-    this._send('externalWindowState', { 'windowState': scout.BrowserField.windowStates.WINDOW_OPEN });
+    this._send('externalWindowState', {
+      'windowState': scout.BrowserField.windowStates.WINDOW_OPEN
+    });
     var popupInterval = window.setInterval(function() {
-      if (this._popupWindow === null || this._popupWindow.closed) {
+      var popupWindowClosed = false;
+      try {
+        popupWindowClosed = this._popupWindow === null || this._popupWindow.closed;
+      } catch (e) {
+        // for some unknown reason, IE sometimes throws a "SCRIPT16386" error while trying to read '._popupWindow.closed'.
+        $.log.info('Reading the property popupWindow.closed threw an error (Retry in 500ms)');
+        return;
+      }
+      if (popupWindowClosed) {
         window.clearInterval(popupInterval);
-        this._send('externalWindowState', { 'windowState': scout.BrowserField.windowStates.WINDOW_CLOSED });
+        this._send('externalWindowState', {
+          'windowState': scout.BrowserField.windowStates.WINDOW_CLOSED
+        });
       }
     }.bind(this), 500);
   }
