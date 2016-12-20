@@ -43,58 +43,8 @@ scout.SmartColumn.prototype._syncCodeType = function(codeType) {
   });
 };
 
-/**
- * @override
- */
-scout.SmartColumn.prototype._createCellModel = function(id) {
-  return {
-    value: id
-  };
-};
-
-/**
- * @override
- */
-scout.SmartColumn.prototype.initCell = function(model, row) {
-  var cell = scout.SmartColumn.parent.prototype.initCell.call(this, model),
-    value = cell.value;
-
-  if (scout.objects.isNullOrUndefined(value)) {
-    return cell;
-  }
-
-  if (!row) {
-    // omitted when creating aggregate cells
-    return cell;
-  }
-
-  // FIXME CGU handle format value, do the lookup for multiple values together? see java for reference implementation
-  this.updateDisplayText(row, cell);
-
-  return cell;
-};
-
-scout.SmartColumn.prototype.updateDisplayText = function(row, cell) {
-  var value = cell.value;
-  // FIXME [awe, cgu] 6.1 - it's a bad idea to call updateRow here, because when a row and a cell is initialized and
-  // the deferred is resolved immediately the table throws an error because the row is not yet added to the table :-(
-  // check if (initialized) below
-  this.lookupCall.textById(value).done(function(text) {
-    cell.setText(text);
-    if (this.table.rows.indexOf(row) > -1) { // add function hasRow()?
-      this.table.updateRow(row);
-    }
-  }.bind(this));
-};
-
-/**
- * @override
- */
-scout.SmartColumn.prototype.setCellValue = function(row, value) {
-  // FIXME CGU createCellModel necessary here?
-  var cell = this.cell(row);
-  cell.setValue(value);
-  this.updateDisplayText(row, cell);
+scout.SmartColumn.prototype._formatValue = function(value) {
+  return this.lookupCall.textById(value);
 };
 
 scout.SmartColumn.prototype.cellValueForGrouping = function(row) {

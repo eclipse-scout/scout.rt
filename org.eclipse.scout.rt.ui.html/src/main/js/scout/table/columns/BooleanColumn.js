@@ -25,6 +25,14 @@ scout.inherits(scout.BooleanColumn, scout.Column);
 /**
  * @override
  */
+scout.BooleanColumn.prototype._formatValue = function(value) {
+  // cell renders a checkbox, text is not visible
+  return null;
+};
+
+/**
+ * @override
+ */
 scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   var style, content, tooltipText, tooltip, cssClass, checkBoxCssClass;
   var enabled = row.enabled;
@@ -86,18 +94,17 @@ scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
 
 /**
  * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
- * @see RemoteApp.js
+ * @see TableAdapter.js
  */
 scout.BooleanColumn.prototype._toggleCellValue = function(row, cell) {
-  this.table.setCellValue(this, row, !cell.value);
+  this.setCellValue(row, !cell.value);
 };
 
 /**
- * @override Columns.js
+ * @override
  */
-scout.BooleanColumn.prototype._createCellModel = function(value) {
-  return {
-    value: value
-  };
+scout.BooleanColumn.prototype._createDefaultEditor = function(row) {
+  return scout.create('CheckBoxField', {
+    parent: this.table
+  });
 };
-

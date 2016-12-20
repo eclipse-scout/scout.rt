@@ -269,6 +269,105 @@ describe('Column', function() {
     });
   });
 
+  describe('initCell', function() {
+    var table, model;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(1, 0);
+      table = helper.createTable(model);
+    });
+
+    it('sets the value and the text', function() {
+      table.insertRows([{
+        cells: ['cell 1']
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell 1');
+      expect(row.cells[0].text).toEqual('cell 1');
+    });
+
+    it('calls formatValue to format the text', function() {
+      table.columns[0]._formatValue = function(value) {
+        return value.toUpperCase();
+      };
+      table.insertRows([{
+        cells: ['cell 1']
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell 1');
+      expect(row.cells[0].text).toEqual('CELL 1');
+    });
+
+    it('does not format the value if a text is provided', function() {
+      table.columns[0]._formatValue = function(value) {
+        return value.toUpperCase();
+      };
+      table.insertRows([{
+        cells: [{
+          value: 'cell 1',
+          text: 'cell text 1'
+        }]
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell 1');
+      expect(row.cells[0].text).toEqual('cell text 1');
+    });
+
+    it('sets the value if only text is provided', function() {
+      table.columns[0]._formatValue = function(value) {
+        return value.toUpperCase();
+      };
+      table.insertRows([{
+        cells: [{
+          text: 'cell text 1'
+        }]
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell text 1');
+      expect(row.cells[0].text).toEqual('cell text 1');
+    });
+
+  });
+
+  describe('setCellValue', function() {
+    var table, model;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 0);
+      table = helper.createTable(model);
+    });
+
+    it('sets the value and the text', function() {
+      table.insertRows([{
+        cells: ['cell 1', 'cell 2']
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell 1');
+      expect(row.cells[0].text).toEqual('cell 1');
+
+      table.setCellValue(table.columns[0], row, 'new cell value');
+      expect(row.cells[0].value).toEqual('new cell value');
+      expect(row.cells[0].text).toEqual('new cell value');
+    });
+
+    it('calls formatValue to format the text', function() {
+      table.columns[0]._formatValue = function(value) {
+        return value.toUpperCase();
+      };
+      table.insertRows([{
+        cells: ['cell 1', 'cell 2']
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell 1');
+      expect(row.cells[0].text).toEqual('CELL 1');
+
+      table.setCellValue(table.columns[0], row, 'new cell value');
+      expect(row.cells[0].value).toEqual('new cell value');
+      expect(row.cells[0].text).toEqual('NEW CELL VALUE');
+    });
+
+  });
+
   describe('background effect', function() {
     var rgbLevel0 = 'rgb(255, 175, 175)';
     var rgbLevel50 = 'rgb(213, 195, 161)';
@@ -286,7 +385,7 @@ describe('Column', function() {
     scout.styles.put('column-background-effect-gradient2-start', {
       backgroundColor: rgbLevel100
     });
-    scout.styles.put('column-background-effect-gradient2-end',  {
+    scout.styles.put('column-background-effect-gradient2-end', {
       backgroundColor: rgbLevel0
     });
     scout.styles.put('column-background-effect-bar-chart', {

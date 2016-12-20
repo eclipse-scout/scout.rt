@@ -29,31 +29,22 @@ scout.NumberColumn.prototype._init = function(model) {
 };
 
 /**
- * @override Column.js
+ * @override Columns.js
  */
-scout.NumberColumn.prototype._initCell = function(cell) {
-  scout.NumberColumn.parent.prototype._initCell.call(this, cell);
-  // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
-  // Cell.value may be undefined for other column types -> use table.cellValue to access the value.
-  // The only reason is to save some memory (may get obsolete in the future)
-  if (cell.value === undefined && cell.text) { // Number('') would generate 0 -> don't set in that case
-    cell.value = Number(cell.text);
-  }
+scout.NumberColumn.prototype._formatValue = function(value) {
+  return this.decimalFormat.format(value);
 };
 
 /**
- * Override this method to create a cell model object based on the given scalar value.
+ * @override Column.js
  */
-scout.NumberColumn.prototype._createCellModel = function(text) {
-  var formattedNumber = this.decimalFormat.format(text);
-  return {
-    text: formattedNumber,
-    value: text
-  };
+scout.NumberColumn.prototype._parseValue = function(value) {
+  // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
+  return scout.numbers.ensure(value);
 };
 
 scout.NumberColumn.prototype.createAggrValueCell = function(value) {
-  var formattedValue = this.decimalFormat.format(value);
+  var formattedValue = this._formatValue(value);
   return this.initCell({
     text: formattedValue,
     iconId: (formattedValue ? this.aggrSymbol : null),

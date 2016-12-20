@@ -3713,7 +3713,6 @@ scout.Table.prototype.setVirtual = function(virtual) {
 
 scout.Table.prototype.setCellValue = function(column, row, value) {
   column.setCellValue(row, value);
-  this.updateRow(row);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

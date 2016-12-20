@@ -20,9 +20,18 @@ scout.inherits(scout.IconColumn, scout.Column);
  */
 scout.IconColumn.prototype._initCell = function(cell) {
   scout.IconColumn.parent.prototype._initCell.call(this, cell);
-  cell.text = null; // only display icon, no text
+  // only display icon, no text
+  cell.text = null;
   cell.iconId = cell.value || cell.iconId;
   return cell;
+};
+
+/**
+ * @override
+ */
+scout.IconColumn.prototype._formatValue = function(value) {
+  // only display icon, no text
+  return null;
 };
 
 /**

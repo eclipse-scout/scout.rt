@@ -30,13 +30,15 @@ scout.DateColumn.prototype._init = function(model) {
 /**
  * @override Columns.js
  */
-scout.DateColumn.prototype._createCellModel = function(text) {
-  var date = scout.dates.parseJsonDate(text);
-  var formattedDate = scout.dates.format(date, this.session.locale, this._createDatePattern());
-  return {
-    text: formattedDate,
-    value: date
-  };
+scout.DateColumn.prototype._formatValue = function(value) {
+  return scout.dates.format(value, this.session.locale, this._createDatePattern());
+};
+
+/**
+ * @override Columns.js
+ */
+scout.DateColumn.prototype._parseValue = function(text) {
+  return scout.dates.ensure(text);
 };
 
 scout.DateColumn.prototype._createDatePattern = function() {
@@ -47,18 +49,6 @@ scout.DateColumn.prototype._createDatePattern = function() {
     return scout.DateColumn.DATE_PATTERN;
   }
   return scout.DateColumn.TIME_PATTERN;
-};
-
-/**
- * If cell.value is a Date instance or undefined we do nothing. If value is a String, we assume
- * its a JSON date string and convert it to a Date instance.
- * @override Column.js
- */
-scout.DateColumn.prototype._initCell = function(cell) {
-  scout.DateColumn.parent.prototype._initCell.call(this, cell);
-  if (typeof cell.value === 'string') {
-    cell.value = scout.dates.parseJsonDate(cell.value);
-  }
 };
 
 scout.DateColumn.prototype.cellTextForGrouping = function(row) {

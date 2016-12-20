@@ -187,6 +187,21 @@ scout.numbers = {
     // Remove multiple leading zeros to prevent interpretation as octal number
     s = s.replace(/^0*(\d)/g, '$1');
     return Number(s) * sign;
+  },
+
+  /**
+   * Ensures that the given number is really a number.
+   * <p>
+   * If it already is a number, the number will be returned.
+   * Otherwise a Number is created.
+   *
+   * @param number may be of type number or string.
+   */
+  ensure: function(number) {
+    if (scout.objects.isNullOrUndefined(number)) {
+      return number;
+    }
+    return Number(number);
   }
 
 };

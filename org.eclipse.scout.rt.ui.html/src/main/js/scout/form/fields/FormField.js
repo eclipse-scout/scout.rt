@@ -272,10 +272,18 @@ scout.FormField.prototype._removePlaceholder = function($field) {
   }
 };
 
+scout.FormField.prototype.setLabelVisible = function(visible) {
+  this.setProperty('labelVisible', visible);
+};
+
 scout.FormField.prototype._renderLabelVisible = function() {
   var visible = this.labelVisible;
   this._renderChildVisible(this.$label, visible);
   this.$container.toggleClass('label-hidden', !visible);
+};
+
+scout.FormField.prototype.setStatusVisible = function(visible) {
+  this.setProperty('statusVisible', visible);
 };
 
 scout.FormField.prototype._renderStatusVisible = function() {

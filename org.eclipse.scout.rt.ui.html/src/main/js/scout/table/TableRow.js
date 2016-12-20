@@ -18,10 +18,12 @@ scout.TableRow = function() {
   this.height;
   this.hasError = false;
   this.id;
+  this.initialized = false;
 };
 
 scout.TableRow.prototype.init = function(model) {
   this._init(model);
+  this.initialized = true;
 };
 
 scout.TableRow.prototype._init = function(model) {

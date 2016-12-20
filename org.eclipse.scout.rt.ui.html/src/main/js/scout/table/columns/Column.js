@@ -75,29 +75,70 @@ scout.Column.prototype.initCell = function(vararg, row) {
   if (vararg instanceof scout.Cell) {
     return vararg;
   }
-  var cellModel = this._createCellModelInternal(vararg);
-  return scout.create('Cell', cellModel);
+  var cellModel = this._createCellModel(vararg);
+  var cell = scout.create('Cell', cellModel);
+
+  // If a text is provided, use that text instead of using formatValue to generate a text based on the value
+  if (scout.objects.isNullOrUndefined(cell.text)) {
+    this._updateCellText(row, cell);
+  }
+  return cell;
 };
 
-scout.Column.prototype._createCellModelInternal = function(vararg) {
+scout.Column.prototype._createCellModel = function(vararg) {
   var cellModel;
   if (vararg && scout.objects.isPlainObject(vararg)) {
     cellModel = vararg;
+
+    // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
+    cellModel.value = this._parseValue(cellModel.value);
+
+    // If a text but no value is provided, parse the text and set the result as value.
+    // Otherwise, the (null) value would be formatted later and the provided text replaced with ''
+    if (cellModel.text && cellModel.value === undefined) {
+      cellModel.value = this._parseValue(cellModel.text);
+    }
   } else {
     // in this case 'vararg' is only a scalar value, typically a string
-    cellModel = this._createCellModel(vararg);
+    cellModel = {
+      value: this._parseValue(vararg)
+    };
   }
   this._initCell(cellModel);
   return cellModel;
 };
 
 /**
- * Override this method to create a cell model object based on the given scalar value.
+ * Override this method to create a value based on the given scalar value.
  */
-scout.Column.prototype._createCellModel = function(text) {
-  return {
-    text: text
-  };
+scout.Column.prototype._parseValue = function(scalar) {
+  return scalar;
+};
+
+scout.Column.prototype._updateCellText = function(row, cell) {
+  var value = cell.value;
+  if (!row) {
+    // row is omitted when creating aggregate cells
+    return;
+  }
+
+  var returned = this._formatValue(value);
+  if (returned && $.isFunction(returned.promise)) {
+    // Promise is returned -> set display text later
+    returned
+      .then(function(text) {
+        this.setCellText(row, text, cell);
+      }.bind(this), function() {
+        this.setCellText(row, '', cell);
+        $.log.error('Could not resolve cell text.');
+      }.bind(this));
+  } else {
+    this.setCellText(row, returned, cell);
+  }
+};
+
+scout.Column.prototype._formatValue = function(value) {
+  return scout.nvl(value, '');
 };
 
 /**
@@ -273,7 +314,7 @@ scout.Column.prototype.startCellEdit = function(row, field) {
 scout.Column.prototype.cellValueForGrouping = function(row) {
   var cell = this.cell(row);
   if (cell.value !== undefined) {
-    return this._preprocessValueForGrouping(cell.value);
+    return this._preprocessValueForGrouping(cell.value, cell);
   }
   if (!cell.text) {
     return null;
@@ -281,7 +322,11 @@ scout.Column.prototype.cellValueForGrouping = function(row) {
   return this._preprocessTextForValueGrouping(cell.text, cell.htmlEnabled);
 };
 
-scout.Column.prototype._preprocessValueForGrouping = function(value) {
+scout.Column.prototype._preprocessValueForGrouping = function(value, cell) {
+  if (typeof value === 'string') {
+    // In case of string columns, value and text are equal -> use _preprocessTextForValueGrouping to handle html tags and new lines correctly
+    return this._preprocessTextForValueGrouping(value, cell.htmlEnabled);
+  }
   return value;
 };
 
@@ -383,8 +428,25 @@ scout.Column.prototype.setAggregationFunction = function(func) {
 };
 
 scout.Column.prototype.setCellValue = function(row, value) {
-  var cellModel = this._createCellModelInternal(value);
-  this.cell(row).update(cellModel);
+  var cell = this.cell(row);
+
+  // value may have the wrong type (e.g. text instead of date) -> ensure type
+  value = this._parseValue(value);
+
+  cell.setValue(value);
+  this._updateCellText(row, cell);
+};
+
+scout.Column.prototype.setCellText = function(row, text, cell) {
+  if (!cell) {
+    cell = this.cell(row);
+  }
+  cell.setText(text);
+
+  // Don't update row while initializing (it is either added to the table later, or being added / updated right now)
+  if (row.initialized) {
+    this.table.updateRow(row);
+  }
 };
 
 scout.Column.prototype.createAggrGroupCell = function(row) {
@@ -566,12 +628,16 @@ scout.Column.prototype.createFilter = function(model) {
  * @returns a field instance used as editor when a cell of this column is in edit mode.
  */
 scout.Column.prototype.createDefaultEditor = function(row) {
-  var field = scout.create('StringField', {
-    parent: this.table,
-    labelVisible: false
-  });
-  field.setValue(this.cell(row).text);
+  var field = this._createDefaultEditor(row);
+  field.setLabelVisible(false);
+  field.setValue(this.cell(row).value);
   return field;
+};
+
+scout.Column.prototype._createDefaultEditor = function() {
+  return scout.create('StringField', {
+    parent: this.table
+  });
 };
 
 /**
