@@ -192,25 +192,57 @@ describe("scout.models", function() {
     };
 
     var newObjectInTreeRelativeindexWithArray = {
-        type: 'extension',
-        extensions: [{
-          operation: 'insert',
-          target: {
-            id: 'child2',
-            property: 'childs',
-            before: 'child3'
-          },
-          extension: [{
-            id: 'newObj',
-            value: 'relative index insert'
-          },
-          {
-            id: 'newObj2',
-            value: 'relative index insert2'
-          }]
+      type: 'extension',
+      extensions: [{
+        operation: 'insert',
+        target: {
+          id: 'child2',
+          property: 'childs',
+          before: 'child3'
+        },
+        extension: [{
+          id: 'newObj',
+          value: 'relative index insert'
+        }, {
+          id: 'newObj2',
+          value: 'relative index insert2'
+        }]
+      }]
+    };
+
+    var newObjectgroupWithTarget = {
+      type: 'extension',
+      extensions: [{
+        operation: 'insert',
+        target: {
+          id: 'child2',
+          property: 'childs',
+          before: 'child3',
+          groupWithTarget: true
+        },
+        extension: {
+          id: 'newObjBound'
         }
-        ]
-      };
+      }]
+    };
+
+    var newObjectArraygroupWithTarget = {
+      type: 'extension',
+      extensions: [{
+        operation: 'insert',
+        target: {
+          id: 'child2',
+          property: 'childs',
+          before: 'child3',
+          groupWithTarget: true
+        },
+        extension: [{
+          id: 'newObjBound'
+        }, {
+          id: 'newObjBound2'
+        }]
+      }]
+    };
 
     beforeEach(function() {
       parentObj = $.extend(true, {}, originalparent);
@@ -254,11 +286,38 @@ describe("scout.models", function() {
       expect(parentObj.rootContainer.childs[1].childs[1].value).toBe('relative index insert2');
     });
     it('insert object referenced by String', function() {
-      var models ={};
+      var models = {};
       models.newObjectInTreeRelativeindex = newObjectInTreeRelativeindex;
       scout.models.init(models);
       scout.models.extend('newObjectInTreeRelativeindex', parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
+    });
+    it('insert object bound to field', function() {
+      scout.models.extend(newObjectgroupWithTarget, parentObj);
+      expect(parentObj.rootContainer.childs[1].childs[0].groupedWith).toBe('child3');
+
+      scout.models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
+
+      expect(parentObj.rootContainer.childs[1].childs[0].id).toBe('newObj');
+      expect(parentObj.rootContainer.childs[1].childs[1].id).toBe('newObj2');
+      expect(parentObj.rootContainer.childs[1].childs[2].id).toBe('newObjBound');
+      expect(parentObj.rootContainer.childs[1].childs[3].id).toBe('child3');
+
+    });
+
+    it('insert objects array bound to field', function() {
+      scout.models.extend(newObjectArraygroupWithTarget, parentObj);
+      expect(parentObj.rootContainer.childs[1].childs[0].groupedWith).toBe('child3');
+      expect(parentObj.rootContainer.childs[1].childs[1].groupedWith).toBe('child3');
+
+      scout.models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
+
+      expect(parentObj.rootContainer.childs[1].childs[0].id).toBe('newObj');
+      expect(parentObj.rootContainer.childs[1].childs[1].id).toBe('newObj2');
+      expect(parentObj.rootContainer.childs[1].childs[2].id).toBe('newObjBound');
+      expect(parentObj.rootContainer.childs[1].childs[3].id).toBe('newObjBound2');
+      expect(parentObj.rootContainer.childs[1].childs[4].id).toBe('child3');
+
     });
 
   });

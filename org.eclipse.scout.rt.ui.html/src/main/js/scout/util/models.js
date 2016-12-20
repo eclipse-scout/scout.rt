@@ -62,8 +62,8 @@ scout.models = {
         'Check if file .json is listed in your *-module.json ' +
         'and if id matches the filename of the file .json file');
     }
-    if(!json.type || json.type != type) {
-      throw new Error(id + ' is not of type \''+ type + '\'');
+    if (!json.type || json.type != type) {
+      throw new Error(id + ' is not of type \'' + type + '\'');
     }
     return $.extend(true, {}, json);
   },
@@ -93,10 +93,10 @@ scout.models = {
    *  "id": "..."
    *  "type": "extension"
    *  "extensions": [{
-   *      "operation": "insert"
+   *      "operation": "insert",
    *      "target": {
-   *      "id": "someObjectID"
-   *      "property": "collectionOfsomeObject"
+   *      "id": "someObjectID",
+   *      "property": "collectionOfsomeObject",
    *      "before": "somObjectIDInPropertyArray"    //(alternative "index":0)
    *      }
    *      "extension": {
@@ -108,16 +108,27 @@ scout.models = {
    *    ]
    *  }
    *
-   *  to extend the root object directly, target.root: true can be used instead of target.id
+   *  to extend the root object directly, target.root: true can be used instead of target.id.
+   *  to group inserted elements positions with its target use:
+   *  "target": {
+   *      "id": "someObjectID",
+   *      "property": "collectionOfsomeObject",
+   *      "before": "somObjectIDInPropertyArray",
+   *      "groupWithTarget": true
+   *      }
+   *  this will group the properties together. future extensions which use "before": "somObjectIDInPropertyArray"
+   *  will insert new elements before the grouped items.
+   *
+   *
    * @param parentModel object which contains id's as properties
    * @returns parentModel extended by extension
    */
-  extend: function (extension, parentModel) {
+  extend: function(extension, parentModel) {
     if (typeof extension === 'string') {
       extension = scout.models.getExtension(extension);
     }
     scout.assertParameter('extensions', extension.extensions);
-    extension.extensions.forEach(function (extensionConfig) {
+    extension.extensions.forEach(function(extensionConfig) {
       scout.assertParameter('operation', extensionConfig.operation);
       var target = extensionConfig.target;
       scout.assertParameter('target', target);
@@ -135,22 +146,49 @@ scout.models = {
       } else if (extensionConfig.operation === 'insert') {
         targetObject[target.property] = targetObject[target.property] || [];
         var targetArray = targetObject[target.property];
-        var insertAt = targetArray.length;
-        if (target.before) {
-          insertAt = scout.arrays.findIndex(targetArray, function (element) {
-            return element.id === target.before;
-          });
-          if (insertAt === -1) {
-            insertAt = targetArray.length;
-          }
-        }
-        if ($.isNumeric(target.index)) {
-          insertAt = target.index;
-        }
-        scout.arrays.insertArray(targetArray, extensionConfig.extension, insertAt);
+        var extensionArray = scout.arrays.ensure(extensionConfig.extension);
+        scout.models._bindExtensionsToBefore(target, extensionArray);
+        var insertAt = scout.models._findExtensionIndex(target, targetArray);
+        scout.arrays.insertArray(targetArray, extensionArray, insertAt);
       }
     }.bind(this));
     return parentModel;
+  },
+
+  /**
+   * Finds the index in the target array which is given through the target.
+   * @param target target information to search the index (either fixed index or a "before" tag).
+   * @param targetArray array to search the extension index in.
+   * @returns extension index between 0 and targetArry.lenght.
+   * TargetArray.lenght if no index is found.
+   */
+  _findExtensionIndex: function(target, targetArray) {
+    var insertAt = targetArray.length;
+    if (target.before) {
+      insertAt = scout.arrays.findIndex(targetArray, function(element) {
+        return element.id === target.before || element.groupedWith === target.before;
+      });
+      if (insertAt === -1) {
+        insertAt = targetArray.length;
+      }
+    }
+    if ($.isNumeric(target.index)) {
+      insertAt = target.index;
+    }
+    return insertAt;
+  },
+
+  /**
+   * Adds the boundTo tag to all given extensions.
+   * @param target target to bind the extensions to.
+   * @param extensionsArray extensions to bind
+   */
+  _bindExtensionsToBefore: function(target, extensionsArray) {
+    if (target.before && target.groupWithTarget) {
+      extensionsArray.forEach(function(element) {
+        element.groupedWith = target.before;
+      });
+    }
   }
 
 };
