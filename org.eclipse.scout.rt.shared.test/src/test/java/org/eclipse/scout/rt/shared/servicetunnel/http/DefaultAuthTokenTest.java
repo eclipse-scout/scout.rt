@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
+import org.eclipse.scout.rt.platform.security.KeyPairBytes;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;

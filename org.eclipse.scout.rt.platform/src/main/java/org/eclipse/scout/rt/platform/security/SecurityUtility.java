@@ -23,8 +23,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.security.ISecurityProvider.EncryptionKey;
-import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;

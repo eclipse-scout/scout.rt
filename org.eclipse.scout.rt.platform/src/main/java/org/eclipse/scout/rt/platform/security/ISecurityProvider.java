@@ -2,12 +2,7 @@ package org.eclipse.scout.rt.platform.security;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Key;
 import java.security.SecureRandom;
-import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
-
-import javax.crypto.Cipher;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -214,93 +209,4 @@ public interface ISecurityProvider {
    *           if the size is less than 1.
    */
   byte[] createSecureRandomBytes(int numBytes);
-
-  /**
-   * Class describing a symmetric encryption key.
-   */
-  class EncryptionKey {
-    private final Key m_key;
-    private final AlgorithmParameterSpec m_params;
-
-    public EncryptionKey(Key key, AlgorithmParameterSpec params) {
-      m_key = key;
-      m_params = params;
-    }
-
-    /**
-     * @return The {@link Key} instance.
-     */
-    public Key get() {
-      return m_key;
-    }
-
-    /**
-     * @return The {@link AlgorithmParameterSpec} needed to initialize a {@link Cipher} with this key.
-     */
-    public AlgorithmParameterSpec params() {
-      return m_params;
-    }
-  }
-
-  /**
-   * Public and private key bytes.
-   */
-  class KeyPairBytes {
-
-    private final byte[] m_privateKey;
-    private final byte[] m_publicKey;
-
-    public KeyPairBytes(byte[] priv, byte[] pub) {
-      m_privateKey = priv;
-      m_publicKey = pub;
-    }
-
-    /**
-     * Gets the private key bytes in PKCS#8 encoding.
-     *
-     * @return The private key.
-     */
-    public byte[] getPrivateKey() {
-      return Arrays.copyOf(m_privateKey, m_privateKey.length);
-    }
-
-    /**
-     * Gets the public key bytes as defined in the X.509 standard.
-     *
-     * @return The public key.
-     */
-    public byte[] getPublicKey() {
-      return Arrays.copyOf(m_publicKey, m_publicKey.length);
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + Arrays.hashCode(m_privateKey);
-      result = prime * result + Arrays.hashCode(m_publicKey);
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      KeyPairBytes other = (KeyPairBytes) obj;
-      if (!Arrays.equals(m_privateKey, other.m_privateKey)) {
-        return false;
-      }
-      if (!Arrays.equals(m_publicKey, other.m_publicKey)) {
-        return false;
-      }
-      return true;
-    }
-  }
 }
