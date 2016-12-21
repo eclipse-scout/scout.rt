@@ -123,6 +123,7 @@
   __include("scout/popup/PopupLayout.js");
   __include("scout/popup/PopupWithHead.js");
   __include("scout/popup/PopupWithHeadLayout.js");
+  __include("scout/popup/SinglePopupLayout.js");
   __include("scout/popup/MobilePopup.js");
   __include("scout/popup/MobilePopupLayout.js");
   __include("scout/popup/TouchPopup.js");

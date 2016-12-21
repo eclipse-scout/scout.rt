@@ -58,10 +58,14 @@ scout.fields = {
    */
   makeInputOrDiv: function(field, cssClass) {
     if (field.touch) {
-      return field.$container.makeDiv(scout.strings.join(' ', 'input-field', cssClass));
+      return this.makeInputDiv(field.$container, cssClass);
     } else {
       return scout.fields.makeTextField(field.$container, cssClass);
     }
+  },
+
+  makeInputDiv: function($parent, cssClass) {
+    return $parent.makeDiv(scout.strings.join(' ', 'input-field', cssClass));
   },
 
   // note: the INPUT element does not process the click event when the field is disabled

@@ -154,6 +154,32 @@
   @-webkit-keyframes slideout-right { .keyframes-slideout-right(); }
   @keyframes slideout-right { .keyframes-slideout-right(); }
 
+  /*** Grow Down ***
+    Grows the element downwards. Expects the element to be scaled (e.g. scale (1, 0)) when the animation starts. */
+
+  .keyframes-grow-down() {
+    100% {
+      #scout.transform(scale(1, 1));
+    }
+  }
+
+  @-webkit-keyframes grow-down { .keyframes-grow-down(); }
+  @keyframes grow-down { .keyframes-grow-down(); }
+
+
+  /*** Shrink Up ***
+    Shrinks the element upwards */
+
+  .keyframes-shrink-up() {
+    100% {
+      #scout.transform(scale(1, 0));
+    }
+  }
+
+  @-webkit-keyframes shrink-up { .keyframes-shrink-up(); }
+  @keyframes shrink-up { .keyframes-shrink-up(); }
+
+
   /*** Zoom Bounce ***/
 
   .keyframes-zoom-bounce() {

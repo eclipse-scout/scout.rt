@@ -16,4 +16,13 @@ scout.LookupCall.prototype._init = function(model) {
  */
 scout.LookupCall.prototype.textById = function(id) {
   // To be implemented by subclasses
+  return $.resolvedPromise(id);
+};
+
+/**
+ * @returns {Promise}
+ */
+scout.LookupCall.prototype.allTexts = function() {
+  // To be implemented by subclasses
+  return $.resolvedPromise([]);
 };
