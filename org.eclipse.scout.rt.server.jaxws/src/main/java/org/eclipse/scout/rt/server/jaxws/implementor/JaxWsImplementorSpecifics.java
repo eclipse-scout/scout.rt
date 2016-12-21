@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPException;
@@ -24,7 +25,10 @@ import javax.xml.ws.http.HTTPException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.server.jaxws.consumer.InvocationContext;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.WebServiceRequestRejectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.
@@ -42,6 +46,8 @@ public class JaxWsImplementorSpecifics {
   public static final String PROP_HTTP_RESPONSE_CODE = "org.eclipse.scout.jaxws.http.response.code";
   public static final String PROP_SOCKET_CONNECT_TIMEOUT = "org.eclipse.scout.jaxws.timeout.connect";
   public static final String PROP_SOCKET_READ_TIMEOUT = "org.eclipse.scout.jaxws.timeout.read";
+
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsImplementorSpecifics.class);
 
   protected final Map<String, String> m_implementorContextProperties = new HashMap<>();
 
@@ -96,6 +102,13 @@ public class JaxWsImplementorSpecifics {
    */
   public List<String> getHttpResponseHeader(final Map<String, Object> ctx, final String key) {
     return getHttpHeader(valueOf(PROP_HTTP_RESPONSE_HEADERS), ctx, key);
+  }
+
+  /**
+   * Removes the given HTTP request header.
+   */
+  public void removeHttpRequestHeader(final Map<String, Object> ctx, final String key) {
+    removeHttpHeader(valueOf(PROP_HTTP_REQUEST_HEADERS), ctx, key);
   }
 
   /**
@@ -157,6 +170,37 @@ public class JaxWsImplementorSpecifics {
     // NOOP
   }
 
+  /**
+   * Resets the request context of the given port so that it looks like before it was used the first time. <br>
+   * <b>Note:</b> This default implementation removes only generic JAX-WS request parameters and those used by Scout:
+   * <ul>
+   * <li>MessageContext.HTTP_REQUEST_HEADERS</li>
+   * <li>Socket connect timeout</li>
+   * <li>Socket read timeout</li>
+   * <li>InvocationContext.PROP_USERNAME</li>
+   * <li>InvocationContext.PROP_PASSWORD</li>
+   * </ul>
+   */
+  public void resetRequestContext(final Object port) {
+    LOG.info("Using fallback method for resetting JAX-WS port. Check if all request context properties are cleaned-up as expected.");
+    Map<String, Object> ctx = ((BindingProvider) port).getRequestContext();
+    safeRemove(ctx, valueOf(PROP_HTTP_REQUEST_HEADERS));
+    safeRemove(ctx, valueOf(PROP_SOCKET_CONNECT_TIMEOUT));
+    safeRemove(ctx, valueOf(PROP_SOCKET_READ_TIMEOUT));
+    safeRemove(ctx, InvocationContext.PROP_USERNAME);
+    safeRemove(ctx, InvocationContext.PROP_PASSWORD);
+  }
+
+  /**
+   * Safely removes the given key from the map (i.e. only if {@link Map#containsKey(Object)} of the given key returns
+   * <code>true</code>).
+   */
+  protected void safeRemove(Map<String, Object> ctx, String key) {
+    if (ctx.containsKey(key)) {
+      ctx.remove(key);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   protected void setHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key, final String value) {
     final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
@@ -167,6 +211,14 @@ public class JaxWsImplementorSpecifics {
   protected List<String> getHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key) {
     final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
     return CollectionUtility.arrayList(CollectionUtility.getObject(headers, key));
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void removeHttpHeader(final String headerProperty, final Map<String, Object> ctx, final String key) {
+    final Map<String, List<String>> headers = (Map<String, List<String>>) ctx.get(headerProperty);
+    if (headers != null) {
+      headers.remove(key);
+    }
   }
 
   /**

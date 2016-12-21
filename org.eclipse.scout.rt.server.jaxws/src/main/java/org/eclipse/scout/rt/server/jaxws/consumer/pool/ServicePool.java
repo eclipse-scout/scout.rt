@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.jaxws.consumer;
+package org.eclipse.scout.rt.server.jaxws.consumer.pool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.HandlerResolver;
 import javax.xml.ws.handler.MessageContext;
@@ -38,38 +38,35 @@ import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider.IPortInitializer;
 
 /**
- * Factory for new Port objects to interact with a webservice endpoint.
+ * Non-blocking, unlimited pool of JAX-WS service instances (which are used in turn for creating JAX-WS ports). Pooled
+ * entries are discarded 12 hours after they have been created.
  *
- * @since 5.1
+ * @since 6.0.300
  */
-//TODO [6.1] abr: deprecate this port provider strategy
-public class PortProducer<SERVICE extends Service, PORT> implements IPortProvider<PORT> {
+public class ServicePool<SERVICE extends Service> extends AbstractNonBlockingPool<SERVICE> {
 
   protected static final Set<Method> PROXIED_HANDLER_METHODS = CollectionUtility.hashSet(Handler.class.getDeclaredMethods()); // only methods declared directly on the handler are proxied.
 
   protected final Class<SERVICE> m_serviceClazz;
-  protected final Class<PORT> m_portTypeClazz;
   protected final String m_serviceName;
   protected final URL m_wsdlLocation;
   protected final String m_targetNamespace;
   protected final IPortInitializer m_initializer;
 
-  public PortProducer(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final String serviceName, final URL wsdlLocation, final String targetNamespace, final IPortInitializer initializer) {
+  public ServicePool(final Class<SERVICE> serviceClazz, final String serviceName, final URL wsdlLocation, final String targetNamespace, final IPortInitializer initializer) {
+    super(12, TimeUnit.HOURS);
     m_serviceClazz = serviceClazz;
-    m_portTypeClazz = portTypeClazz;
     m_serviceName = serviceName;
     m_wsdlLocation = wsdlLocation;
     m_targetNamespace = targetNamespace;
     m_initializer = initializer;
   }
 
-  /**
-   * Creates a new Port to interact with the webservice endpoint.
-   */
   @Override
-  public PORT provide() {
+  protected SERVICE createElement() {
     try {
       // Create the service
       final Constructor<? extends Service> constructor = m_serviceClazz.getConstructor(URL.class, QName.class);
@@ -94,14 +91,9 @@ public class PortProducer<SERVICE extends Service, PORT> implements IPortProvide
         }
       });
 
-      // Install implementor specific webservice features
-      final List<WebServiceFeature> webServiceFeatures = new ArrayList<>();
-      m_initializer.initWebServiceFeatures(webServiceFeatures);
-
-      // Create the port
-      return service.getPort(m_portTypeClazz, CollectionUtility.toArray(webServiceFeatures, WebServiceFeature.class));
+      return service;
     }
-    catch (final ReflectiveOperationException e) {
+    catch (ReflectiveOperationException e) {
       throw new WebServiceException("Failed to instantiate webservice stub.", e);
     }
   }

@@ -16,32 +16,28 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.ws.Service;
-
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.quartz.SimpleScheduleBuilder;
 
 /**
- * LRU-Cache for webservice Ports to be reused across multiple webservice calls. This cache improves performance because
- * Port creation is an expensive operation due to WSDL/schema validation.<br/>
+ * Cache - actually a stash - for web service Ports. This class improves performance because Port creation is an
+ * expensive operation due to WSDL/schema validation.<br/>
  * This cache is based on a 'corePoolSize', meaning that that number of Ports is created on a preemptively basis. If
  * more Ports than that number are required, they are are created on demand and additionally added to the cache until
  * expired, which is useful at a high load.
- * <p>
- * Important: Ports are not thread-safe and should not be reused because JAX-WS API does not support to reset request
- * and response context.
  * <p>
  * This class is thread-safe.
  *
  * @since 5.1
  */
-public class PortCache<PORT> {
+// TODO [6.1] abr: deprecate this port provider strategy
+public class PortCache<PORT> implements IPortProvider<PORT> {
 
   protected final Deque<PortCacheEntry<PORT>> m_queue;
 
-  protected final PortProducer<? extends Service, PORT> m_portProducer;
+  protected final IPortProvider<PORT> m_portProvider;
 
   protected final int m_corePoolSize;
 
@@ -52,17 +48,17 @@ public class PortCache<PORT> {
    *          number of Ports to have preemptively in the cache.
    * @param timeToLive
    *          time-to-live [ms] for a Port in the cache if the 'corePoolSize' is exceeded.
-   * @param portProducer
+   * @param portProvider
    *          factory to create new Ports.
    */
-  public PortCache(final int corePoolSize, final long timeToLive, final PortProducer<? extends Service, PORT> portProducer) {
-    this(corePoolSize, timeToLive, portProducer, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
+  public PortCache(final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider) {
+    this(corePoolSize, timeToLive, portProvider, new ConcurrentLinkedDeque<PortCacheEntry<PORT>>());
   }
 
-  PortCache(final int corePoolSize, final long timeToLive, final PortProducer<? extends Service, PORT> portProducer, final Deque<PortCacheEntry<PORT>> queue) {
+  PortCache(final int corePoolSize, final long timeToLive, final IPortProvider<PORT> portProvider, final Deque<PortCacheEntry<PORT>> queue) {
     m_corePoolSize = corePoolSize;
     m_timeToLive = timeToLive;
-    m_portProducer = portProducer;
+    m_portProvider = portProvider;
     m_queue = queue;
   }
 
@@ -96,11 +92,8 @@ public class PortCache<PORT> {
     }
   }
 
-  /**
-   * @return a new Port instance from cache. Please note, that a port should not be used concurrently across multiple
-   *         threads because not being thread-safe.
-   */
-  public PORT get() {
+  @Override
+  public PORT provide() {
     // Get oldest Port from queue.
     final PortCacheEntry<PORT> portCacheEntry = m_queue.poll();
 
@@ -110,7 +103,7 @@ public class PortCache<PORT> {
 
       @Override
       public void run() throws Exception {
-        m_queue.offer(new PortCacheEntry<>(m_portProducer.produce(), m_timeToLive));
+        m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
       }
     }, Jobs.newInput()
         .withName("Producing PortType to be put into cache"));
@@ -120,7 +113,7 @@ public class PortCache<PORT> {
       return portCacheEntry.get();
     }
     else {
-      return m_portProducer.produce();
+      return m_portProvider.provide();
     }
   }
 
@@ -145,7 +138,7 @@ public class PortCache<PORT> {
    */
   protected void ensureCorePool() {
     while (m_queue.size() < m_corePoolSize) {
-      m_queue.offer(new PortCacheEntry<>(m_portProducer.produce(), m_timeToLive));
+      m_queue.offer(new PortCacheEntry<>(m_portProvider.provide(), m_timeToLive));
     }
   }
 

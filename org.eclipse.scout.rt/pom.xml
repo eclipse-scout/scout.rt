@@ -213,6 +213,12 @@
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.server.jaxws.test</artifactId>
+        <version>6.0.300-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jdbc</artifactId>
         <version>6.0.300-SNAPSHOT</version>
       </dependency>

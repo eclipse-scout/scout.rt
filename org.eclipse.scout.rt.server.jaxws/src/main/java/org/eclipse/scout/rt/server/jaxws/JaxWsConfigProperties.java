@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.jaxws;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
+import javax.xml.ws.Service;
 
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
@@ -114,6 +115,27 @@ public final class JaxWsConfigProperties {
     @Override
     protected String getDefaultValue() {
       return "JAX-WS";
+    }
+  }
+
+  /**
+   * To indicate whether to pool webservice clients.
+   * <p>
+   * Creating new {@link Service} and Port instances is expensive due to WSDL and schema validation. Using the pool
+   * helps reducing these costs. The pool size is unlimited but its elements are removed after 15 minutes.
+   * <p>
+   * <b>Note:</b> If this property is <code>true</code> the {@link JaxWsPortCacheEnabledProperty} has no effect.
+   */
+  public static class JaxWsPortPoolEnabledProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jaxws.consumer.portPool.enabled";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return Boolean.TRUE;
     }
   }
 

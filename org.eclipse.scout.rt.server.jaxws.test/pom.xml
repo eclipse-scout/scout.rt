@@ -25,6 +25,10 @@
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <jaxws.wsdl.file>JaxWsConsumerTestService.wsdl</jaxws.wsdl.file>
+  </properties>
+
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>

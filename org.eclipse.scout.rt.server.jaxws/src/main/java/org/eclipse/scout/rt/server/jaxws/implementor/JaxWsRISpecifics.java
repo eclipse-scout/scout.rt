@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.jaxws.implementor;
 
 import java.io.Closeable;
 import java.lang.reflect.Proxy;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.xml.ws.handler.MessageContext;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
 
   private static final Logger LOG = LoggerFactory.getLogger(JaxWsRISpecifics.class);
+  private JaxWsClientResetHelper m_resetHelper;
 
   @Override
   @PostConstruct
@@ -36,6 +38,7 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
     super.initConfig();
     m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, "com.sun.xml.internal.ws.connect.timeout"); // com.sun.xml.internal.ws.developer.JAXWSProperties.CONNECT_TIMEOUT
     m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, "com.sun.xml.internal.ws.request.timeout"); // com.sun.xml.internal.ws.developer.JAXWSProperties.REQUEST_TIMEOUT
+    m_resetHelper = new JaxWsClientResetHelper("com.sun.xml.internal.ws.client.sei.SEIStub", "resetRequestContext");
   }
 
   @Override
@@ -56,12 +59,30 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
   }
 
   @Override
+  public void clearHttpResponseCode(Map<String, Object> ctx) {
+    // The response context used by the JAX-WS RI is a read-only view on the received data. Hence clearing any value is not required at all.
+  }
+
+  @Override
   public void closeSocket(final Object port, final String operation) {
     try {
       ((Closeable) Proxy.getInvocationHandler(port)).close();
     }
     catch (final Throwable e) {
       LOG.error("Failed to close Socket for: {}", operation, e);
+    }
+  }
+
+  /**
+   * Uses the <code>resetRequestContext</code> method provided by
+   * <code>com.sun.xml.internal.ws.client.sei.SEIStub</code>. The implementation falls back to the generic reset
+   * strategy provided by the super class (e.g. if JAX-WS RI does not provide the resetRequestContext method because it
+   * is too old).
+   */
+  @Override
+  public void resetRequestContext(final Object port) {
+    if (!m_resetHelper.resetRequestContext(port)) {
+      super.resetRequestContext(port);
     }
   }
 
