@@ -48,6 +48,13 @@ scout.Desktop.DisplayStyle = {
   COMPACT: 'compact'
 };
 
+scout.Desktop.UriAction = {
+  DOWNLOAD: 'download',
+  OPEN: 'open',
+  NEW_WINDOW: 'newWindow',
+  SAME_WINDOW: 'sameWindow'
+};
+
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
   this.formController = new scout.DesktopFormController(this, this.session);
@@ -615,9 +622,9 @@ scout.Desktop.prototype.openUri = function(uri, action) {
   if (!uri) {
     return;
   }
-  action = action || 'open';
+  action = scout.nvl(action, scout.Desktop.UriAction.OPEN);
 
-  if (action === 'download') {
+  if (action === scout.Desktop.UriAction.DOWNLOAD) {
     if (scout.device.isIos()) {
       // The iframe trick does not work for ios
       // Since the file cannot be stored on the file system it will be shown in the browser if possible
@@ -627,7 +634,7 @@ scout.Desktop.prototype.openUri = function(uri, action) {
     } else {
       this._openUriInIFrame(uri);
     }
-  } else if (action === 'open') {
+  } else if (action === scout.Desktop.UriAction.OPEN) {
     if (scout.device.isIos()) {
       // Open in same window.
       // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
@@ -636,9 +643,9 @@ scout.Desktop.prototype.openUri = function(uri, action) {
     } else {
       this._openUriInIFrame(uri);
     }
-  } else if (action === 'newWindow') {
+  } else if (action === scout.Desktop.UriAction.NEW_WINDOW) {
     this._openUriAsNewWindow(uri);
-  } else if (action === 'sameWindow') {
+  } else if (action === scout.Desktop.UriAction.SAME_WINDOW) {
     this._openUriInSameWindow(uri);
   }
 };
