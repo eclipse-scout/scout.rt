@@ -71,13 +71,13 @@ scout.Table = function() {
   this._filterMenusHandler = this._filterMenus.bind(this);
   this.virtual = true;
   this.contextColumn;
-  this.aggregateStyle = scout.Table.AggregateStyle.BOTTOM;
+  this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
 };
 scout.inherits(scout.Table, scout.Widget);
 
 // FIXME CGU [6.1] create StringColumn.js incl. defaultValues from defaultValues.json
 
-scout.Table.AggregateStyle = {
+scout.Table.GroupingStyle = {
   /**
    * Aggregate row is rendered on top of the row-group.
    */
@@ -1643,7 +1643,7 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
 scout.Table.prototype._group = function(animate) {
   var rows, nextRow, newGroup, firstRow, lastRow,
     groupColumns = this._groupedColumns(),
-    aggrStyleTop = this.aggregateStyle === scout.Table.AggregateStyle.TOP,
+    onTop = this.groupingStyle === scout.Table.GroupingStyle.TOP,
     states = [];
 
   this.clearAggregateRows();
@@ -1669,8 +1669,8 @@ scout.Table.prototype._group = function(animate) {
       this._forEachColumn('aggrFinish', states);
       // append sum row
       this._addAggregateRow(states,
-        aggrStyleTop ? lastRow : row,
-        aggrStyleTop ? firstRow : nextRow);
+        onTop ? lastRow : row,
+        onTop ? firstRow : nextRow);
       // reset after group
       this._forEachColumn('aggrStart', states);
       firstRow = null;
@@ -1751,8 +1751,8 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
 
 scout.Table.prototype._renderAggregateRows = function(animate) {
   var c, cell, column, row, contents, $cell, $aggregateRow,
-    aggrStyleTop = this.aggregateStyle === scout.Table.AggregateStyle.TOP,
-    insertFunc = aggrStyleTop ? 'insertBefore' : 'insertAfter';
+    onTop = this.groupingStyle === scout.Table.GroupingStyle.TOP,
+    insertFunc = onTop ? 'insertBefore' : 'insertAfter';
   animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
@@ -1761,7 +1761,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       return;
     }
 
-    if (aggrStyleTop) {
+    if (onTop) {
       row = aggregateRow.nextRow;
     } else {
       row = aggregateRow.prevRow;
@@ -3163,6 +3163,15 @@ scout.Table.prototype._renderCheckable = function() {
 
 scout.Table.prototype._renderRowIconVisible = function() {
   this._redraw();
+};
+
+scout.Table.prototype._setGroupingStyle = function(groupingStyle) {
+  this._setProperty('groupingStyle', groupingStyle);
+  this._group();
+};
+
+scout.Table.prototype._renderGroupingStyle = function() {
+  this._rerenderViewport();
 };
 
 scout.Table.prototype._redraw = function() {

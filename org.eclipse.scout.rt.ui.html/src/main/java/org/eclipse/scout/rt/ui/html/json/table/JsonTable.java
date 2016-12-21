@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.GroupingStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
@@ -315,6 +316,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       @Override
       protected Boolean modelValue() {
         return getModel().isLoading();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_GROUPING_STYLE, model) {
+      @Override
+      protected GroupingStyle modelValue() {
+        return getModel().getGroupingStyle();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return ((GroupingStyle) value).name().toLowerCase();
       }
     });
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getUiSession()) {

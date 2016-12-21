@@ -185,6 +185,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_LOADING = "loading";
 
+  /**
+   * type GroupingStyle
+   *
+   * @since 6.1.0
+   */
+  String PROP_GROUPING_STYLE = "groupingStyle";
+
   void initTable();
 
   void disposeTable();
@@ -1123,5 +1130,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setLoading(boolean loading);
 
   boolean isLoading();
+
+  GroupingStyle getGroupingStyle();
+
+  void setGroupingStyle(GroupingStyle groupingStyle);
 
 }

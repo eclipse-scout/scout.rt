@@ -1567,12 +1567,12 @@ describe("Table", function() {
       expect(table._aggregateRows.length).toBe(2);
     });
 
-    it("considers aggregateStyle -> aggregate rows must be rendered previous to the grouped rows", function() {
+    it("considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
       }
       prepareTable();
-      table.aggregateStyle = scout.Table.AggregateStyle.TOP;
+      table.groupingStyle = scout.Table.GroupingStyle.TOP;
       prepareContent();
       render(table);
       addGrouping(table, column0, false);

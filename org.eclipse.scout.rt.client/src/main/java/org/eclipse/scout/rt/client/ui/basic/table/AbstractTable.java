@@ -566,6 +566,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(240)
+  protected GroupingStyle getConfiguredGroupingStyle() {
+    return GroupingStyle.BOTTOM;
+  }
+
   /**
    * Called after a drag operation was executed on one or several table rows.
    * <p>
@@ -856,6 +862,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
     setLoading(false);
+    setGroupingStyle(getConfiguredGroupingStyle());
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
@@ -4942,4 +4949,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return propertySupport.getPropertyBool(PROP_LOADING);
   }
 
+  @Override
+  public GroupingStyle getGroupingStyle() {
+    return (GroupingStyle) propertySupport.getProperty(PROP_GROUPING_STYLE);
+  }
+
+  @Override
+  public void setGroupingStyle(GroupingStyle groupingStyle) {
+    propertySupport.setProperty(PROP_GROUPING_STYLE, groupingStyle);
+  }
 }
