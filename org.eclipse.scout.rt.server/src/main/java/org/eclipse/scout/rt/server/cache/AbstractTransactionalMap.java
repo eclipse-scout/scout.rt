@@ -399,13 +399,15 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     }
 
     private final class EntryIterator implements Iterator<Map.Entry<K, V>> {
+      private final Map<K, V> m_readSharedMap;
       private final Iterator<Map.Entry<K, V>> m_sharedIterator;
       private final Iterator<Map.Entry<K, V>> m_insertedIterator;
       private Map.Entry<K, V> m_nextEntry;
       private Map.Entry<K, V> m_lastReturned;
 
       public EntryIterator() {
-        m_sharedIterator = getReadSharedMap().entrySet().iterator();
+        m_readSharedMap = getReadSharedMap();
+        m_sharedIterator = m_readSharedMap.entrySet().iterator();
         // we must create a copy of the inserted map at iterator construction else
         // ConcurrentModificationException might be thrown
         m_insertedIterator = new HashMap<K, V>(m_insertedMap).entrySet().iterator();
@@ -431,7 +433,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
           else {
             if (m_insertedIterator.hasNext()) {
               Map.Entry<K, V> entry = m_insertedIterator.next();
-              if (!m_removedMap.containsKey(entry.getKey())) {
+              if (!m_removedMap.containsKey(entry.getKey()) || !m_readSharedMap.containsKey(entry.getKey())) {
                 // else entry already visited
                 m_nextEntry = new TransactionalWriteEntry(entry.getKey(), entry.getValue());
                 break;
