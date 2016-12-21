@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Access controller to always continue filter-chain with a fixed user. By default, the user's name is 'anonymous'.
@@ -42,6 +43,7 @@ public class AnonymousAccessController implements IAccessController {
 
   public AnonymousAccessController init(final AnonymousAuthConfig config) {
     m_config = config;
+    Assertions.assertNotNull(m_config.getPrincipalProducer(), "PrincipalProducer must not be null");
     return this;
   }
 
@@ -53,7 +55,9 @@ public class AnonymousAccessController implements IAccessController {
 
     final Principal principal = m_config.getPrincipalProducer().produce(m_config.getUsername());
     final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
-    helper.putPrincipalOnSession(request, principal);
+    if (m_config.isPutPrincipalOnSession()) {
+      helper.putPrincipalOnSession(request, principal);
+    }
     helper.continueChainAsSubject(principal, request, response, chain);
     return true;
   }
@@ -71,6 +75,7 @@ public class AnonymousAccessController implements IAccessController {
     private boolean m_enabled = CONFIG.getPropertyValue(EnabledProperty.class);
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
     private String m_username = "anonymous";
+    private boolean m_putPrincipalOnSession = true;
 
     public boolean isEnabled() {
       return m_enabled;
@@ -98,12 +103,22 @@ public class AnonymousAccessController implements IAccessController {
       m_username = username;
       return this;
     }
+
+    public boolean isPutPrincipalOnSession() {
+      return m_putPrincipalOnSession;
+    }
+
+    public AnonymousAuthConfig withPutPrincipalOnSession(final boolean putPrincipalOnSession) {
+      m_putPrincipalOnSession = putPrincipalOnSession;
+      return this;
+    }
   }
 
   /**
    * @since 5.2
    */
   public static class EnabledProperty extends AbstractBooleanConfigProperty {
+
     @Override
     public String getKey() {
       return "scout.auth.anonymous.enabled";
@@ -114,5 +129,4 @@ public class AnonymousAccessController implements IAccessController {
       return true;
     }
   }
-
 }
