@@ -141,17 +141,17 @@ public class FormBasedAccessController implements IAccessController {
       return null;
     }
 
+    final String password = request.getParameter("password");
+    if (StringUtility.isNullOrEmpty(password)) {
+      return null;
+    }
+
     // Generally, passwords should be stored as char array, because Strings are immutable and
     // might stay in the memory forever, while char arrays _could_ be overwritten after user:
     // http://stackoverflow.com/questions/8881291/why-is-char-preferred-over-string-for-passwords-in-java
     // However, the password is already a String when using the servlet API, so this technique
     // is basically useless... http://stackoverflow.com/questions/15016250/in-java-how-do-i-extract-a-password-from-a-httpservletrequest-header-without-ge
     // We do it nevertheless to prevent accidental logging of passwords.
-    final String password = request.getParameter("password");
-    if (StringUtility.isNullOrEmpty(password)) {
-      return null;
-    }
-
     return new ImmutablePair<>(user, password.toCharArray());
   }
 
