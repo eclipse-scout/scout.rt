@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleDimension {
+public interface IDataModelEntity extends IPropertyObserver, IOrdered, IVisibleDimension, ITypeWithClassId {
 
   String PROP_VISIBLE = "visible";
 

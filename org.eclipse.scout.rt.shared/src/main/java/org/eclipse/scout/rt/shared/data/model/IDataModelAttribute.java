@@ -15,13 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.IOrdered;
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-public interface IDataModelAttribute extends IPropertyObserver, DataModelConstants, IOrdered, IVisibleDimension {
+public interface IDataModelAttribute extends IPropertyObserver, DataModelConstants, IOrdered, IVisibleDimension, ITypeWithClassId {
 
   void initAttribute();
 
