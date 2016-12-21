@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnConvertValueToKeyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnPrepareLookupChain;
@@ -286,7 +287,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       }
 
     }
-    catch (ThreadInterruptedException | TimedOutException e) {
+    catch (ThreadInterruptedException | TimedOutException | CancellationException e) {
       throw e;
     }
     catch (RuntimeException e) {

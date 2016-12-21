@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
@@ -19,6 +20,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 
 /**
  * Visitor calling {@link IMenu#handleOwnerValueChanged(Object)} on menus, if the menu type allows it.
@@ -39,6 +42,9 @@ public class MenuOwnerChangedVisitor implements IActionVisitor {
       IMenu menu = (IMenu) action;
       try {
         menu.handleOwnerValueChanged(m_ownerValue);
+      }
+      catch (ThreadInterruptedException | TimedOutException | CancellationException e) {
+        throw e;
       }
       catch (RuntimeException ex) {
         BEANS.get(ExceptionHandler.class).handle(ex);
