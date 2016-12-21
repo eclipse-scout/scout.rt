@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -48,7 +49,9 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("350b5965-e92d-4f7e-b7b7-7135a572ff91")
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDataModelAttribute.class);
   private static final long serialVersionUID = 1L;
@@ -111,6 +114,16 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       }
     }
     return viewOrder;
+  }
+
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    IDataModelEntity parentEntity = getParentEntity();
+    if (parentEntity != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + parentEntity.classId();
+    }
+    return simpleClassId;
   }
 
   /*
