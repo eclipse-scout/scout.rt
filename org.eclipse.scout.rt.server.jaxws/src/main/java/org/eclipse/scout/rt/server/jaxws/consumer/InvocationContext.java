@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -318,12 +319,17 @@ public class InvocationContext<PORT> {
     return new P_TxMember();
   }
 
-  protected class P_InvocationHandler implements InvocationHandler {
+  protected class P_InvocationHandler implements InvocationHandler, IPortWrapper<PORT> {
 
     private final PORT m_port;
 
     public P_InvocationHandler(final PORT port) {
       m_port = port;
+    }
+
+    @Override
+    public PORT getPort() {
+      return m_port;
     }
 
     @Override
@@ -349,11 +355,15 @@ public class InvocationContext<PORT> {
       // Reset the HTTP response code.
       final Map<String, Object> responseContext = getResponseContext();
       if (responseContext != null) {
-        m_implementorSpecifics.clearHttpResponseCode(getResponseContext());
+        m_implementorSpecifics.clearHttpResponseCode(responseContext);
       }
 
       // propagate correlationId
-      getRequestContext().put(MessageContexts.PROP_CORRELATION_ID, CorrelationId.CURRENT.get());
+      final String cid = CorrelationId.CURRENT.get();
+      if (StringUtility.hasText(cid)) {
+        // request context of cxf is backed by a ConcurrentMap which does not accept null values
+        getRequestContext().put(MessageContexts.PROP_CORRELATION_ID, cid);
+      }
 
       final String operation = String.format("client=%s, operation=%s.%s", m_name, method.getDeclaringClass().getSimpleName(), method.getName());
 

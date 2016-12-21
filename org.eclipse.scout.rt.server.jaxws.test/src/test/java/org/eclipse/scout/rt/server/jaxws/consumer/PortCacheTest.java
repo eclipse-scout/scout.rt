@@ -17,8 +17,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.ws.Service;
-
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.server.jaxws.consumer.PortCache.PortCacheEntry;
@@ -28,16 +26,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
+@SuppressWarnings("deprecation")
 public class PortCacheTest {
 
-  private PortProducer<Service, Object> m_portProvider;
+  private IPortProvider<Object> m_portProvider;
 
   @Before
   public void before() {
-    m_portProvider = new PortProducer<Service, Object>(null, null, null, null, null, null) {
-
+    m_portProvider = new IPortProvider<Object>() {
       @Override
-      public Object produce() {
+      public Object provide() {
         return new Object();
       }
     };
@@ -52,11 +50,11 @@ public class PortCacheTest {
     cache.ensureCorePool();
     assertEquals(5, queue.size());
 
-    Object port1 = cache.get();
+    Object port1 = cache.provide();
     awaitAndAssertQueueSize(queue, 5);
-    Object port2 = cache.get();
+    Object port2 = cache.provide();
     awaitAndAssertQueueSize(queue, 5);
-    Object port3 = cache.get();
+    Object port3 = cache.provide();
     awaitAndAssertQueueSize(queue, 5);
 
     // assert different ports
@@ -80,11 +78,11 @@ public class PortCacheTest {
     cache.ensureCorePool();
     assertEquals(0, queue.size());
 
-    cache.get();
+    cache.provide();
     awaitAndAssertQueueSize(queue, 1);
-    cache.get();
+    cache.provide();
     awaitAndAssertQueueSize(queue, 1);
-    cache.get();
+    cache.provide();
     awaitAndAssertQueueSize(queue, 1);
 
     cache.discardExpiredPorts();

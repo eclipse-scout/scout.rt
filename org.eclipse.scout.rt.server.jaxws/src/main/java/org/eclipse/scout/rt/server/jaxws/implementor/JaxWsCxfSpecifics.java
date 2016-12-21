@@ -14,6 +14,7 @@ import java.io.Closeable;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.xml.ws.BindingProvider;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.slf4j.Logger;
@@ -61,5 +62,20 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
     catch (final Exception e) {
       LOG.error("Failed to close Socket for: {}", operation, e);
     }
+  }
+
+  /**
+   * The following properties are removed in addition to those handled by the super class:
+   * <ul>
+   * <li>org.apache.cxf.message.Message.PROTOCOL_HEADERS</li>
+   * </ul>
+   *
+   * @see JaxWsImplementorSpecifics#resetRequestContext(Object)
+   */
+  @Override
+  public void resetRequestContext(Object port) {
+    super.resetRequestContext(port);
+    Map<String, Object> ctx = ((BindingProvider) port).getRequestContext();
+    safeRemove(ctx, "org.apache.cxf.message.Message.PROTOCOL_HEADERS");
   }
 }

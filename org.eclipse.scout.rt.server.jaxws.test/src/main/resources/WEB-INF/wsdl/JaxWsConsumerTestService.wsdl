@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the BSI CRM Software License v1.0
+    which accompanies this distribution as bsi-v10.html
+
+    Contributors:
+        BSI Business Systems Integration AG - initial API and implementation
+
+-->
+<definitions targetNamespace="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/"
+    name="JaxWsConsumerTestService"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema targetNamespace="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="echoRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="sleepRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="millis" type="xsd:long"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="sleepResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="getHeaderRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="headerName" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getHeaderResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="headerSet" type="xsd:boolean"/>
+            <xsd:element name="headerValue" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="setHeaderRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="headerName" type="xsd:string"/>
+            <xsd:element name="headerValue" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="setHeaderResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="echoRequest">
+    <part name="parameters" element="tns:echoRequest"/>
+  </message>
+  <message name="echoResponse">
+    <part name="parameters" element="tns:echoResponse"/>
+  </message>
+  <message name="sleepRequest">
+    <part name="parameters" element="tns:sleepRequest"/>
+  </message>
+  <message name="sleepResponse">
+    <part name="parameters" element="tns:sleepResponse"/>
+  </message>
+  <message name="getHeaderRequest">
+    <part name="parameters" element="tns:getHeaderRequest"/>
+  </message>
+  <message name="getHeaderResponse">
+    <part name="parameters" element="tns:getHeaderResponse"/>
+  </message>
+  <message name="setHeaderRequest">
+    <part name="parameters" element="tns:setHeaderRequest"/>
+  </message>
+  <message name="setHeaderResponse">
+    <part name="parameters" element="tns:setHeaderResponse"/>
+  </message>
+
+  <portType name="JaxWsConsumerTestServicePortType">
+    <operation name="echo">
+      <input message="tns:echoRequest"/>
+      <output message="tns:echoResponse"/>
+    </operation>
+    <operation name="sleep">
+      <input message="tns:sleepRequest"/>
+      <output message="tns:sleepResponse"/>
+    </operation>
+    <operation name="getHeader">
+      <input message="tns:getHeaderRequest"/>
+      <output message="tns:getHeaderResponse"/>
+    </operation>
+    <operation name="setHeader">
+      <input message="tns:setHeaderRequest"/>
+      <output message="tns:setHeaderResponse"/>
+    </operation>
+  </portType>
+
+  <binding name="JaxWsConsumerTestServicePortBinding" type="tns:JaxWsConsumerTestServicePortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="echo">
+      <soap:operation soapAction="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/echo"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="sleep">
+      <soap:operation soapAction="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/sleep"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getHeader">
+      <soap:operation soapAction="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/getHeader"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="setHeader">
+      <soap:operation soapAction="http://consumer.jaxws.scout.eclipse.org/JaxWsConsumerTestService/setHeader"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="JaxWsConsumerTestService">
+    <port name="JaxWsConsumerTestServicePort" binding="tns:JaxWsConsumerTestServicePortBinding">
+      <soap:address location="http://localhost:8085/WS/JaxWsConsumerTestService"/>
+    </port>
+  </service>
+</definitions>
