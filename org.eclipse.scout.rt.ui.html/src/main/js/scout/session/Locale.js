@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Locale = function(model) {
+  model = scout.nvl(model, scout.Locale.DEFAULT);
+
   this.languageTag = model.languageTag;
   this.decimalFormatPatternDefault = model.decimalFormatPatternDefault;
   this.decimalFormatSymbols = model.decimalFormatSymbols;
@@ -23,5 +25,67 @@ scout.Locale = function(model) {
 
   if (this.dateFormatPatternDefault && this.dateFormatSymbols) {
     this.dateFormat = new scout.DateFormat(model);
+  }
+};
+
+scout.Locale.DEFAULT = {
+  languageTag: 'en-US',
+  decimalFormatPatternDefault: '#,##0.###',
+  dateFormatPatternDefault: 'dd.MM.yyyy',
+  timeFormatPatternDefault: 'HH:mm',
+  decimalFormatSymbols: {
+    decimalSeparator: '.',
+    groupingSeparator: '\'',
+    minusSign: '-'
+  },
+  dateFormatSymbols: {
+    months: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ],
+    monthsShort: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'June',
+      'July',
+      'Aug',
+      'Sept',
+      'Oct',
+      'Nov',
+      'Dec'
+    ],
+    weekdays: [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ],
+    weekdaysShort: [
+      'Su',
+      'Mo',
+      'Tu',
+      'We',
+      'Th',
+      'Fr',
+      'Sa'
+    ],
+    am: 'AM',
+    pm: 'PM'
   }
 };

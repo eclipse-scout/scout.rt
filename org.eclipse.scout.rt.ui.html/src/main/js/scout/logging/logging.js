@@ -18,38 +18,48 @@ scout.logging = {
   /***
    * Loads log4javascript.min.js if logging is enabled.
    *
-   * @returns {$.Deferred}
+   * @returns {Promise}
    */
-  bootstrap: function() {
+  bootstrap: function(options) {
     var location = new scout.URL(),
-      enabled = location.getParameter('logging'),
+      logging = location.getParameter('logging'),
       logLevel = location.getParameter('logLevel');
+
+    options = scout.nvl(options, {});
+
+    var enabled = !!(options.enabled || logging),
+      showPopup = !!(options.showPopup || logging);
 
     $.log = new scout.NullLogger();
     if (!enabled) {
       return $.resolvedPromise();
     }
     if (window.log4javascript) {
-      this.initLog4Javascript(logLevel);
+      this.initLog4Javascript(logLevel, showPopup);
       return $.resolvedPromise();
     }
 
     // If log4javascript is not yet installed, dynamically load the library
     return $.injectScript('res/log4javascript.js')
-      .done(this.initLog4Javascript.bind(this, logLevel));
+      .done(this.initLog4Javascript.bind(this, logLevel, showPopup));
   },
 
-  initLog4Javascript: function(logLevel) {
+  initLog4Javascript: function(logLevel, showPopup) {
     logLevel = scout.nvl(logLevel, scout.logging.DEFAULT_LEVEL);
     var defaultLogger = log4javascript.getDefaultLogger();
     defaultLogger.setLevel(this.parseLevel(logLevel));
     $.log = defaultLogger;
     this.initialized = true;
 
+    // Remove default PopUpAppender (which is the only appender at this point)
+    if (!showPopup) {
+      defaultLogger.removeAllAppenders();
+    }
+
     // Add appenders later
     this._appendersToAdd.forEach(function(obj) {
       this.addAppender(obj.factoryName, obj.options);
-    });
+    }, this);
     this._appendersToAdd = [];
   },
 
