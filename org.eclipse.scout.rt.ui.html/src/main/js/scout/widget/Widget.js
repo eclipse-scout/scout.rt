@@ -42,7 +42,7 @@ scout.Widget = function() {
   // If set to true, remove won't remove the element immediately but after the animation has been finished
   // This expects a css animation which may be triggered by the class 'removed'
   // If browser does not support css animation, remove will be executed immediately
-  this.animateRemoval;
+  this.animateRemoval = false;
 
   // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
   // ev. dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
@@ -92,7 +92,6 @@ scout.Widget.prototype._init = function(model) {
   if (!this.session) {
     throw new Error('Session expected: ' + this);
   }
-  this.animateRemoval = scout.nvl(model.animateRemoval, false);
 
   this._eachProperty(model, function(propertyName, value, isAdapterProperty) {
     if (value === undefined) {

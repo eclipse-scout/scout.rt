@@ -10,23 +10,15 @@
  ******************************************************************************/
 scout.MobilePopup = function() {
   scout.MobilePopup.parent.call(this);
+  this.boundToAnchor = false;
+  this.windowPaddingX = 0;
+  this.windowPaddingY = 0;
+  this.closable = true;
+  this.animateRemoval = true;
   this.widget;
   this._addAdapterProperties('widget');
 };
 scout.inherits(scout.MobilePopup, scout.Popup);
-
-scout.MobilePopup.prototype._init = function(options) {
-  scout.MobilePopup.parent.prototype._init.call(this, options);
-
-  var defaults = {
-    boundToAnchor: false,
-    windowPaddingX: 0,
-    windowPaddingY: 0,
-    closable: true,
-    animateRemoval: true
-  };
-  $.extend(this, defaults, options);
-};
 
 scout.MobilePopup.prototype._createLayout = function() {
   return new scout.MobilePopupLayout(this);

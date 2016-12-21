@@ -16,22 +16,26 @@ scout.Popup = function() {
   this._popupOpenHandler;
   this.anchorBounds;
   this.$anchor;
-  this.windowPaddingX;
-  this.windowPaddingY;
-  this.withFocusContext;
-  this.initialFocus;
-  this.focusableContainer;
-  this.openingDirectionX;
-  this.openingDirectionY;
+  this.windowPaddingX = 10;
+  this.windowPaddingY = 5;
+  this.withFocusContext = true;
+  this.initialFocus = function() {
+    return scout.focusRule.AUTO;
+  };
+  this.focusableContainer = false;
+  this.openingDirectionX = 'right';
+  this.openingDirectionY = 'down';
+  this.scrollType = 'remove';
   // hints for the layout to control whether the size should be adjusted if the popup does not fit into the window
-  this.trimWidth;
-  this.trimHeight;
+  // Popup is getting moved if it overlaps a border (and not switched as done for y axis) -> do not adjust its size
+  this.trimWidth = false;
+  this.trimHeight = true;
   // If true, anchor is considered when computing the position and size of the popup
-  this.boundToAnchor;
+  this.boundToAnchor = true;
   // If true, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
   // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
   // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
-  this.closeOnAnchorMousedown;
+  this.closeOnAnchorMousedown = true;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -43,26 +47,9 @@ scout.inherits(scout.Popup, scout.Widget);
 scout.Popup.prototype._init = function(options) {
   scout.Popup.parent.prototype._init.call(this, options);
 
-  this.anchorBounds = options.anchorBounds;
   if (options.location) {
     this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
   }
-  this.$anchor = options.$anchor;
-  this.windowPaddingX = scout.nvl(options.windowPaddingX, 10);
-  this.windowPaddingY = scout.nvl(options.windowPaddingY, 5);
-  this.openingDirectionX = options.openingDirectionX || 'right';
-  this.openingDirectionY = options.openingDirectionY || 'down';
-  // Popup is getting moved if it overlaps a border (and not switched as done for y axis) -> do not adjust its size
-  this.trimWidth = scout.nvl(options.trimWidth, false);
-  this.trimHeight = scout.nvl(options.trimHeight, true);
-  this.withFocusContext = scout.nvl(options.installFocusContext, true);
-  this.initialFocus = scout.nvl(options.initialFocus, function() {
-    return scout.focusRule.AUTO;
-  });
-  this.focusableContainer = scout.nvl(options.focusableContainer, false);
-  this.scrollType = options.scrollType || 'remove';
-  this.boundToAnchor = scout.nvl(options.boundToAnchor, true);
-  this.closeOnAnchorMousedown = scout.nvl(options.closeOnAnchorMousedown, true);
 };
 
 /**

@@ -88,6 +88,9 @@
       "expanded": true,
       "fields": []
     },
+    "TabBox": {
+      "tabItems": []
+    },
     "TabItem": {
       "marked": false
     },

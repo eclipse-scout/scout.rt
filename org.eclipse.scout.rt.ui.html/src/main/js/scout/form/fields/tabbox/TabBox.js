@@ -18,6 +18,7 @@ scout.TabBox = function() {
   this.gridDataHints.useUiHeight = true;
   this.gridDataHints.w = scout.FormField.FULL_WIDTH;
   this.selectedTab;
+  this.tabItems = [];
   this._addAdapterProperties(['tabItems', 'selectedTab']);
   this._addPreserveOnPropertyChangeProperties(['selectedTab']); // FIXME [awe] 6.1 - do this in Calendar too, for selectedComponent
   this._$tabArea;
