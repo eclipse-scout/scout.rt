@@ -154,30 +154,31 @@
   @-webkit-keyframes slideout-right { .keyframes-slideout-right(); }
   @keyframes slideout-right { .keyframes-slideout-right(); }
 
-  /*** Grow Down ***
-    Grows the element downwards. Expects the element to be scaled (e.g. scale (1, 0)) when the animation starts. */
+  /*** Grow Y ***
+    Scales the element along the y axis until 1. Expects the element to be scaled (e.g. scaleY(0)) when the animation starts.
+    To create a slide down animation (as known from jQuery) set transform-origin to top. */
 
-  .keyframes-grow-down() {
+  .keyframes-grow-y() {
     100% {
-      #scout.transform(scale(1, 1));
+      #scout.transform(scaleY(1));
     }
   }
 
-  @-webkit-keyframes grow-down { .keyframes-grow-down(); }
-  @keyframes grow-down { .keyframes-grow-down(); }
+  @-webkit-keyframes grow-y { .keyframes-grow-y(); }
+  @keyframes grow-y { .keyframes-grow-y(); }
 
 
-  /*** Shrink Up ***
-    Shrinks the element upwards */
+  /*** Shrink Y ***
+    Shrinks the element along the y axis until 0*/
 
-  .keyframes-shrink-up() {
+  .keyframes-shrink-y() {
     100% {
-      #scout.transform(scale(1, 0));
+      #scout.transform(scaleY(0));
     }
   }
 
-  @-webkit-keyframes shrink-up { .keyframes-shrink-up(); }
-  @keyframes shrink-up { .keyframes-shrink-up(); }
+  @-webkit-keyframes shrink-y { .keyframes-shrink-y(); }
+  @keyframes shrink-y { .keyframes-shrink-y(); }
 
 
   /*** Zoom Bounce ***/
