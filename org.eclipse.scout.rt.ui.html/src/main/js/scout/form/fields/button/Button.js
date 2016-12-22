@@ -315,14 +315,3 @@ scout.Button.prototype.getFocusableElement = function() {
     return scout.Button.parent.prototype.focus.getFocusableElement(this);
   }
 };
-
-/**
- * @override FormField.js
- */
-scout.Button.prototype.getFocusableElement = function() {
-  if (this.adaptedBy) {
-    return this.adaptedBy.getFocusableElement(this);
-  } else {
-    return scout.Button.parent.prototype.focus.getFocusableElement(this);
-  }
-};

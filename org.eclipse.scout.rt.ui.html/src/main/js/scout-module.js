@@ -41,6 +41,7 @@
   __include("scout/logging/logging.js");
   __include("scout/logging/NullLogger.js");
   __include("scout/util/LookupCall.js");
+  __include("scout/util/LookupRow.js");
   __include("scout/util/CodeLookupCall.js"); // requires LookupCall.js
   __include("scout/util/mimeTypes.js");
   __include("scout/util/models.js");
