@@ -24,9 +24,6 @@
   __include("scout/widget/NullWidgetAdapter.js");
   // Basic utilities
   __include("scout/util/arrays.js");
-  __include("scout/util/Code.js");
-  __include("scout/util/CodeType.js");
-  __include("scout/util/codes.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
   __include("scout/util/DetachHelper.js");
@@ -40,9 +37,6 @@
   __include("scout/util/locales.js");
   __include("scout/logging/logging.js");
   __include("scout/logging/NullLogger.js");
-  __include("scout/util/LookupCall.js");
-  __include("scout/util/LookupRow.js");
-  __include("scout/util/CodeLookupCall.js"); // requires LookupCall.js
   __include("scout/util/mimeTypes.js");
   __include("scout/util/models.js");
   __include("scout/util/numbers.js");
@@ -56,6 +50,13 @@
   __include("scout/util/filters.js");
   __include("scout/util/hAlign.js");
   __include("scout/util/aggregation.js");
+  // Code and Lookup
+  __include("scout/code/Code.js");
+  __include("scout/code/CodeType.js");
+  __include("scout/code/codes.js");
+  __include("scout/code/LookupCall.js");
+  __include("scout/code/LookupRow.js");
+  __include("scout/code/CodeLookupCall.js"); // requires LookupCall.js
   // Session related
   __include("scout/session/BackgroundJobPollingSupport.js");
   __include("scout/session/BusyIndicator.js");
