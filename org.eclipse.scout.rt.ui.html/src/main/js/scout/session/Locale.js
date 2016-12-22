@@ -14,7 +14,6 @@ scout.Locale = function(model) {
   this.languageTag = model.languageTag;
   this.decimalFormatPatternDefault = model.decimalFormatPatternDefault;
   this.decimalFormatSymbols = model.decimalFormatSymbols;
-  this.timeFormatPatternDefault = model.timeFormatPatternDefault;
 
   if (this.decimalFormatPatternDefault && this.decimalFormatSymbols) {
     this.decimalFormat = new scout.DecimalFormat(model);
@@ -22,6 +21,7 @@ scout.Locale = function(model) {
 
   this.dateFormatPatternDefault = model.dateFormatPatternDefault;
   this.dateFormatSymbols = model.dateFormatSymbols;
+  this.timeFormatPatternDefault = model.timeFormatPatternDefault;
 
   if (this.dateFormatPatternDefault && this.dateFormatSymbols) {
     this.dateFormat = new scout.DateFormat(model);
@@ -31,11 +31,11 @@ scout.Locale = function(model) {
 scout.Locale.DEFAULT = {
   languageTag: 'en-US',
   decimalFormatPatternDefault: '#,##0.###',
-  dateFormatPatternDefault: 'dd.MM.yyyy',
-  timeFormatPatternDefault: 'HH:mm',
+  dateFormatPatternDefault: 'MM/dd/yyyy',
+  timeFormatPatternDefault: 'h:mm a',
   decimalFormatSymbols: {
     decimalSeparator: '.',
-    groupingSeparator: '\'',
+    groupingSeparator: ',',
     minusSign: '-'
   },
   dateFormatSymbols: {
@@ -59,10 +59,10 @@ scout.Locale.DEFAULT = {
       'Mar',
       'Apr',
       'May',
-      'June',
-      'July',
+      'Jun',
+      'Jul',
       'Aug',
-      'Sept',
+      'Sep',
       'Oct',
       'Nov',
       'Dec'
@@ -77,13 +77,13 @@ scout.Locale.DEFAULT = {
       'Saturday'
     ],
     weekdaysShort: [
-      'Su',
-      'Mo',
-      'Tu',
-      'We',
-      'Th',
-      'Fr',
-      'Sa'
+      'Sun',
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat'
     ],
     am: 'AM',
     pm: 'PM'

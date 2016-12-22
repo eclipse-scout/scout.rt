@@ -1211,3 +1211,13 @@ scout.DateFormat.prototype._createAnalyzeInfo = function(inputText) {
     error: false
   };
 };
+
+scout.DateFormat.ensure = function(locale, format) {
+  if (!format) {
+    return format;
+  }
+  if (format instanceof scout.DateFormat) {
+    return format;
+  }
+  return new scout.DateFormat(locale, format);
+};

@@ -11,8 +11,7 @@
 scout.DateColumn = function() {
   scout.DateColumn.parent.call(this);
   this.format;
-  this.groupFormat;
-  this.groupFormatFormatter;
+  this.groupFormat = 'yyyy';
   this.hasDate = true;
   this.hasTime = false;
   this.filterType = 'DateColumnUserFilter';
@@ -20,18 +19,34 @@ scout.DateColumn = function() {
 };
 scout.inherits(scout.DateColumn, scout.Column);
 
-scout.DateColumn.DATE_PATTERN = 'dd.MM.yyyy';
-scout.DateColumn.TIME_PATTERN = 'HH:mm';
-
 scout.DateColumn.prototype._init = function(model) {
-  this.groupFormatFormatter = new scout.DateFormat(this.session.locale, this.groupFormat);
+  scout.DateColumn.parent.prototype._init.call(this, model);
+
+  this._setFormat(this.format);
+  this._setGroupFormat(this.groupFormat);
+};
+
+scout.DateColumn.prototype._setFormat = function(format) {
+  if (!format) {
+    format = this._getDefaultFormat(this.session.locale);
+  }
+  format = scout.DateFormat.ensure(this.session.locale, format);
+  this.format = format;
+};
+
+scout.DateColumn.prototype._setGroupFormat = function(format) {
+  if (!format) {
+    format = this._getDefaultFormat(this.session.locale);
+  }
+  format = scout.DateFormat.ensure(this.session.locale, format);
+  this.groupFormat = format;
 };
 
 /**
  * @override Columns.js
  */
 scout.DateColumn.prototype._formatValue = function(value) {
-  return scout.dates.format(value, this.session.locale, this._createDatePattern());
+  return this.format.format(value);
 };
 
 /**
@@ -41,22 +56,17 @@ scout.DateColumn.prototype._parseValue = function(text) {
   return scout.dates.ensure(text);
 };
 
-scout.DateColumn.prototype._createDatePattern = function() {
+scout.DateColumn.prototype._getDefaultFormat = function(locale) {
   if (this.hasDate && this.hasTime) {
-    return scout.DateColumn.DATE_PATTERN + ' ' + scout.DateColumn.TIME_PATTERN;
+    return locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault;
   }
   if (this.hasDate) {
-    return scout.DateColumn.DATE_PATTERN;
+    return locale.dateFormatPatternDefault;
   }
-  return scout.DateColumn.TIME_PATTERN;
+  return locale.timeFormatPatternDefault;
 };
 
 scout.DateColumn.prototype.cellTextForGrouping = function(row) {
-  if (this.groupFormat === undefined || this.groupFormat === this.format || !this.groupFormatFormatter) {
-    // fallback/shortcut, if no groupFormat defined or groupFormat equals format use cellText
-    return scout.DateColumn.parent.prototype.cellTextForGrouping.call(this, row);
-  }
-
   var val = this.table.cellValue(this, row);
-  return this.groupFormatFormatter.format(val);
+  return this.groupFormat.format(val);
 };

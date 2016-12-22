@@ -194,6 +194,9 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
 };
 
 scout.DateField.prototype._setDateFormatPattern = function(dateFormatPattern) {
+  if (!dateFormatPattern) {
+    dateFormatPattern = this.session.locale.dateFormatPatternDefault;
+  }
   this._setProperty('dateFormatPattern', dateFormatPattern);
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
 };
@@ -206,6 +209,9 @@ scout.DateField.prototype._renderDateFormatPattern = function() {
 };
 
 scout.DateField.prototype._setTimeFormatPattern = function(timeFormatPattern) {
+  if (!timeFormatPattern) {
+    timeFormatPattern = this.session.locale.timeFormatPatternDefault;
+  }
   this._setProperty('timeFormatPattern', timeFormatPattern);
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
 };

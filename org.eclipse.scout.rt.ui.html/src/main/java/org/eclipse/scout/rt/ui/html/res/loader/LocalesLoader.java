@@ -15,7 +15,7 @@ public class LocalesLoader extends AbstractResourceLoader {
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
-    String[] languageTags = {"de-CH"}; //FIXME CGU where to define this?
+    String[] languageTags = {"en-US", "de-CH"}; //FIXME CGU where to define this?
 
     JSONArray jsonLocales = new JSONArray();
     for (String tag : languageTags) {

@@ -66,6 +66,7 @@ scout.Session = function() {
     id: '1',
     objectType: 'NullWidget'
   }, new scout.NullWidget());
+  this.events = this._createEventSupport();
 };
 
 /**
@@ -351,7 +352,8 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }
 
   // Create the desktop
-  this._putLocaleData(data.startupData.locale, data.startupData.textMap);
+  this.locale = new scout.Locale(data.startupData.locale);
+  this.textMap = new scout.TextMap(data.startupData.textMap);
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
   var clientSessionData = this._getAdapterData(data.startupData.clientSession);
   this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget);
@@ -1253,13 +1255,27 @@ scout.Session.prototype.resetEventFilters = function() {
 };
 
 scout.Session.prototype._onLocaleChanged = function(event) {
-  this._putLocaleData(event.locale, event.textMap);
+  var locale = new scout.Locale(event.locale);
+  var textMap = new scout.TextMap(event.textMap);
+  this.switchLocale(locale, textMap);
 };
 
-scout.Session.prototype._putLocaleData = function(locale, textMap) {
-  this.locale = new scout.Locale(locale);
-  this.textMap = new scout.TextMap(textMap);
+/**
+ * @param {@link scout.Locale} the new locale
+ * @param {@link scout.TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
+ */
+scout.Session.prototype.switchLocale = function(locale, textMap) {
+  scout.assertParameter('locale', locale);
+  if (!textMap) {
+    textMap = scout.texts.get(locale.languageTag);
+  }
+  this.locale = locale;
+  this.textMap = textMap;
   // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
+
+  this.trigger('localeSwitch', {
+    locale: this.locale
+  });
 };
 
 scout.Session.prototype._renderDesktop = function() {
@@ -1369,4 +1385,35 @@ scout.Session.prototype.optText = function(textKey, defaultValue) {
 
 scout.Session.prototype.textExists = function(textKey) {
   return this.textMap.exists(textKey);
+};
+
+//--- Event handling methods ---
+scout.Session.prototype._createEventSupport = function() {
+  return new scout.EventSupport();
+};
+
+scout.Session.prototype.trigger = function(type, event) {
+  event = event || {};
+  event.source = this;
+  this.events.trigger(type, event);
+};
+
+scout.Session.prototype.one = function(type, func) {
+  this.events.one(type, func);
+};
+
+scout.Session.prototype.on = function(type, func) {
+  return this.events.on(type, func);
+};
+
+scout.Session.prototype.off = function(type, func) {
+  this.events.off(type, func);
+};
+
+scout.Session.prototype.addListener = function(listener) {
+  this.events.addListener(listener);
+};
+
+scout.Session.prototype.removeListener = function(listener) {
+  this.events.removeListener(listener);
 };

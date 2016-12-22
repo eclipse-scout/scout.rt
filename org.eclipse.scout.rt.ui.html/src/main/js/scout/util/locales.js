@@ -24,8 +24,52 @@ scout.locales = {
     }, this);
   },
 
-  get: function(languageTag) {
+  _get: function(languageTag) {
     return this.localesMap[languageTag];
+  },
+
+  /**
+   * @returns the {@link scout.Locale} for the given languageTag.
+   * If there is no locale found for the given tag, it tries to load the locale without the country code.
+   * If there is still no locale found, null is returned.
+   */
+  get: function(languageTag) {
+    var locale,
+      tags = scout.texts.splitLanguageTag(languageTag);
+
+    tags.some(function(tag) {
+      locale = this._get(tag);
+      if (locale) {
+        return true;
+      }
+    }, this);
+
+    if (!locale) {
+      return null;
+    }
+
+    return locale;
+  },
+
+  getNavigatorLanguage: function() {
+    return navigator.language || navigator.userLanguage;
+  },
+
+  /**
+   * @returns the {@link scout.Locale} for the language returned by the navigator.
+   * If no locale is found, the default locale {@link scout.Locale.DEFAULT} is returned.
+   */
+  getNavigatorLocale: function() {
+    var languageTag = this.getNavigatorLanguage(),
+      locale = this.get(languageTag);
+
+    if (locale) {
+      return locale;
+    }
+
+    // Use the default locale
+    $.log.info('Locale for languageTag ' + languageTag + ' not found. Using default locale.');
+    return new scout.Locale();
   }
 
 };

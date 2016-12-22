@@ -120,7 +120,7 @@ scout.App.prototype._loadSessions = function(options) {
 };
 
 scout.App.prototype._loadSession = function($entryPoint, options) {
-  options.locale = options.locale || new scout.Locale(scout.locales.get('de-CH')); //FIXME CGU wo soll die locale definiert werden? Initial vom browser auslesen?
+  options.locale = options.locale || this.getDefaultLocale();
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
 
@@ -153,6 +153,13 @@ scout.App.prototype._createDesktop = function(parent) {
   return scout.create('Desktop', {
     parent: parent
   });
+};
+
+/**
+ * @returns the locale to be used when no locale is provided as app option. By default the navigators locale is used.
+ */
+scout.App.prototype.getDefaultLocale = function(options) {
+  return scout.locales.getNavigatorLocale();
 };
 
 scout.App.prototype._initDone = function(options) {

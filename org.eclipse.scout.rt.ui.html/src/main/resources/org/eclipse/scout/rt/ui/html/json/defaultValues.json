@@ -302,6 +302,7 @@
       "width": 60
     },
     "DateColumn": {
+      "groupFormat": "yyyy",
       "hasDate": true,
       "hasTime": false,
       "uiSortPossible": true

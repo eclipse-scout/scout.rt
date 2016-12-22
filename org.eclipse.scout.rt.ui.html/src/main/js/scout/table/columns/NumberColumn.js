@@ -23,9 +23,21 @@ scout.inherits(scout.NumberColumn, scout.Column);
  * @override Column.js
  */
 scout.NumberColumn.prototype._init = function(model) {
-  if (!(this.decimalFormat instanceof scout.DecimalFormat)) {
-    this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
+  scout.NumberColumn.parent.prototype._init.call(this, model);
+
+  this._setDecimalFormat(this.format);
+};
+
+scout.NumberColumn.prototype._setDecimalFormat = function(format) {
+  if (!format) {
+    format = this._getDefaultFormat(this.session.locale);
   }
+  format = scout.DecimalFormat.ensure(this.session.locale, format);
+  this.decimalFormat = format;
+};
+
+scout.NumberColumn.prototype._getDefaultFormat = function(locale) {
+  return locale.decimalFormatPatternDefault;
 };
 
 /**
