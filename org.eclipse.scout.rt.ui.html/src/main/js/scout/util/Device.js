@@ -516,7 +516,7 @@ scout.Device.prototype.toString = function() {
 
 scout.addAppListener('prepare', function() {
   if (scout.device) {
-    // Device seems to be created before the app itself, do not override it
+    // if the device was created before the app itself, use it instead of creating a new one
     return;
   }
   scout.device = scout.create('Device', {
