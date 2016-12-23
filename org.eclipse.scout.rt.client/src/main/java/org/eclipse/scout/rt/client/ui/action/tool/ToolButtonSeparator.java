@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  * @deprecated use {@link MenuSeparator} instead, will be removed in Scout 6.1
  */
 @Deprecated
-@SuppressWarnings({"deprecation", "bsiRulesDefinition:orderMissing"})
+@SuppressWarnings("deprecation")
 @ClassId("3fcbae56-446a-4a03-b668-2c510e91d2c5")
 public class ToolButtonSeparator extends AbstractToolButton {
 

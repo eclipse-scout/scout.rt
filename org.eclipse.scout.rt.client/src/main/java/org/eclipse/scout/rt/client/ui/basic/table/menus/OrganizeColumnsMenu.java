@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("dc8237d6-18b8-4406-91b0-bb4a95bf9fec")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> {
   private final ITable m_table;
 

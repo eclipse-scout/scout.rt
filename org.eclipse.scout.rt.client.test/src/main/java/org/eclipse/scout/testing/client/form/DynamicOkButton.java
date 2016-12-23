@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  * Dynamic field to build an ad-hoc application for testing
  */
 @ClassId("570af8aa-d7da-4165-b73b-a37e7d0873c2")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class DynamicOkButton extends AbstractOkButton {
 
   public DynamicOkButton() {

@@ -13,6 +13,5 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("0006f000-8554-41e7-8d48-ff758a864746")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public final class MenuSeparator extends AbstractMenuSeparator {
 }

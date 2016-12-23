@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  * The invisible root menu node of any calendar. (internal usage only)
  */
 @ClassId("7c6a0c17-90f1-4f1f-bad0-c6d417eaf5b5")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implements ICalendarContextMenu {
   /**
    * @param owner

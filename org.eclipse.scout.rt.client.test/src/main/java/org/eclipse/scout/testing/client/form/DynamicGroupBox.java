@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  * Dynamic group box to build an ad-hoc application for testing
  */
 @ClassId("23b1f701-f076-40a6-85cc-505b1ca27220")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class DynamicGroupBox extends AbstractGroupBox {
   private IFormField[] m_injectedFields;
 

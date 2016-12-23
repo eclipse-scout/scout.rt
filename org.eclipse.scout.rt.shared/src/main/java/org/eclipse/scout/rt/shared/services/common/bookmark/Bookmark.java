@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("bsiRulesDefinition:orderMissing") // bookmark has no static order
 public class Bookmark implements Serializable, IOrdered {
   private static final Logger LOG = LoggerFactory.getLogger(Bookmark.class);
   private static final long serialVersionUID = 1L;

@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * The invisible root menu node of any table. (internal usage only)
  */
 @ClassId("97f17065-0142-4362-9dd4-a34148e20bb3")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class TableContextMenu extends AbstractContextMenu<ITable> implements ITableContextMenu {
   private List<? extends ITableRow> m_currentSelection;
 

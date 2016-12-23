@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * @since 5.1.0
  */
 @ClassId("a5ec6d5d-1d49-4a83-932b-51935769d0c4")
-@SuppressWarnings("bsiRulesDefinition:orderMissing")
 public class SearchFormTableControl extends AbstractFormTableControl {
 
   @Override
