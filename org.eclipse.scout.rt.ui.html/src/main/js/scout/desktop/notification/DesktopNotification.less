@@ -1,3 +1,6 @@
+/* IMPORTANT: YUI replaces 0% with 0 when compressing the css. This breaks the animations (the first keyframe is ignored).
+   Workaround: Don't use 0%, always use 00%. */
+
 .notifications {
   position: fixed;
   right: 10px;
@@ -18,7 +21,7 @@
  * notifications.
  */
 .keyframes-notification-slide-in() {
-  0%   { left: 250px; margin-bottom: 0; }
+  00%  { left: 250px; margin-bottom: 0; } /* see comment on top */
   80%  { left: 15px; }
   100% { left: 0; margin-bottom: 20px; }
 }
@@ -40,7 +43,7 @@
 @keyframes notification-fade-out { .keyframes-notification-fade-out(); }
 
 .keyframes-notification-fade-out() {
-  0%   { opacity: 1.0; margin-bottom: 20px; }
+  00%  { opacity: 1.0; margin-bottom: 20px; } /* see comment on top */
   100% { opacity: 0; margin-bottom: -37px; }
 }
 

@@ -10,7 +10,7 @@
  ******************************************************************************/
 #scout {
 
-  /* Hint: YUI replaces 0% with 0 when compressing the css. This breaks the animations.
+  /* IMPORTANT: YUI replaces 0% with 0 when compressing the css. This breaks the animations (the first keyframe is ignored).
   Workaround: Don't use 0%, always use 00%. */
 
   /* args = keyframeName, timingFunction, iterationCount */
@@ -101,7 +101,7 @@
   /*** Fade with Short Drop ***/
 
   .keyframes-fade-short-drop() {
-    0% {
+    00% { /* see comment on top */
       margin-top: -40px;
       opacity: 0;
     }
@@ -122,7 +122,7 @@
        Moves the element into screen from bottom up */
 
   .keyframes-slidein-bottom() {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(translateY(100%));
     }
   }
@@ -184,7 +184,7 @@
   /*** Zoom Bounce ***/
 
   .keyframes-zoom-bounce() {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(scale(0.75, 0.75));
     }
     25% {
@@ -201,7 +201,7 @@
   /*** Rotation ***/
 
   .keyframes-rotation () {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(rotate(0deg));
     }
     100% {
@@ -215,7 +215,7 @@
   /*** Rotation-Reverse ***/
 
   .keyframes-rotation-reverse () {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(rotate(-0deg));
     }
     100% {
@@ -229,7 +229,7 @@
   /*** Pulse Opacity ***/
 
   .keyframes-pulse-opacity () {
-    0% {
+    00% { /* see comment on top */
       opacity: 1.0;
     }
     50% {
@@ -246,7 +246,7 @@
   /*** Pulsate ***/
 
   .keyframes-pulsate () {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(scale(0.1));
       opacity: 0.0;
     }
@@ -265,7 +265,7 @@
   /*** Attention ***/
 
   .keyframes-attention () {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(scale3d(1, 1, 1));
     }
     10% {
@@ -285,7 +285,7 @@
   /*** Rotate-X ***/
 
   .keyframes-rotate-x () {
-    0% {
+    00% { /* see comment on top */
       #scout.transform(perspective(120px) rotateY(0deg));
     }
     50% {
@@ -302,7 +302,7 @@
   /*** Animate Dot ***/
 
   .keyframes-animate-dot () {
-    0%   { color: @text-color;     bottom:0; }
+    00%  { color: @text-color;     bottom:0; } /* see comment on top */
     25%  { color: @palette-gray-5; bottom:4px; }
     50%  { color: @text-color;     bottom:0; }
     100% { color: @text-color;     bottom:0; }
@@ -322,7 +322,7 @@
   }
 
   .keyframes-shake() {
-    0%   { #scout.transform(translate(2px, 1px) rotate(0deg)); }
+    00%  { #scout.transform(translate(2px, 1px) rotate(0deg)); } /* see comment on top */
     10%  { #scout.transform(translate(-1px, -2px) rotate(-1deg)); }
     20%  { #scout.transform(translate(-3px, 0) rotate(1deg)); }
     30%  { #scout.transform(translate(0, 2px) rotate(0deg)); }
@@ -348,7 +348,7 @@
   }
 
   .keyframes-flash-gray() {
-    0%   { background-color: @palette-white; }
+    00%  { background-color: @palette-white; } /* see comment on top */
     25%  { background-color: @palette-gray-5; }
     50%  { background-color: @palette-white; }
     75%  { background-color: @palette-gray-5; }
