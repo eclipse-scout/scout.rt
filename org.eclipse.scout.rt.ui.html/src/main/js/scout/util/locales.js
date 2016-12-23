@@ -20,12 +20,25 @@ scout.locales = {
 
   init: function(data) {
     data.forEach(function(locale) {
-      this.localesMap[locale.languageTag] = locale;
+      this.localesMap[locale.languageTag] = new scout.Locale(locale);
     }, this);
   },
 
   _get: function(languageTag) {
     return this.localesMap[languageTag];
+  },
+
+  /**
+   * Checks whether there is a locale definition for the given language tag.
+   * @param explicit if true, the country code is considered, meaning if languageTag is 'de-CH'
+   *   and there is a locale for 'de' but not for 'de-CH', true will be returned nonetheless. Default false (consistent to #get).
+   */
+  has: function(languageTag, explicit) {
+    explicit = scout.nvl(explicit, false);
+    if (explicit) {
+      return !!this._get(languageTag);
+    }
+    return !!this.get(languageTag);
   },
 
   /**
@@ -35,7 +48,7 @@ scout.locales = {
    */
   get: function(languageTag) {
     var locale,
-      tags = scout.texts.splitLanguageTag(languageTag);
+      tags = scout.texts.createOrderedLanguageTags(languageTag);
 
     tags.some(function(tag) {
       locale = this._get(tag);
@@ -57,19 +70,66 @@ scout.locales = {
 
   /**
    * @returns the {@link scout.Locale} for the language returned by the navigator.
-   * If no locale is found, the default locale {@link scout.Locale.DEFAULT} is returned.
+   * If no locale is found, the first locale with the language of the navigator is returned.
+   * (e.g. if browser returns 'de' and there is no locale for 'de', check if there is one for 'de-CH', 'de-DE' etc. and take the first.)
+   * If still no locale is found, the default locale {@link scout.Locale.DEFAULT} is returned.
    */
   getNavigatorLocale: function() {
-    var languageTag = this.getNavigatorLanguage(),
-      locale = this.get(languageTag);
+    var languageTag = scout.locales.getNavigatorLanguage();
+    if (!languageTag) {
+      //  No language returned by the browser, using default locale (should not happen with modern browsers, but we never know...)
+      $.log.warn('Browser returned no language. Using default locale.');
+      return new scout.Locale();
+    }
 
+    var locale = scout.locales.get(languageTag);
+    if (locale) {
+      // If a locale was found for the language returned by the navigator, use that one
+      return locale;
+    }
+
+    // Otherwise search a locale with the same language
+    $.log.info('Locale for languageTag ' + languageTag + ' not found. Trying to load best match.');
+    var language = this.splitLanguageTag(languageTag)[0];
+    locale = scout.locales.findFirstForLanguage(language);
     if (locale) {
       return locale;
     }
 
-    // Use the default locale
-    $.log.info('Locale for languageTag ' + languageTag + ' not found. Using default locale.');
+    // If still not found, use the default locale
+    $.log.info('Still no matching locale for languageTag ' + languageTag + ' found. Using default locale.');
     return new scout.Locale();
+  },
+
+  getAll: function() {
+    return Object.values(this.localesMap);
+  },
+
+  getAllLanguageTags: function() {
+    return Object.keys(this.localesMap);
+  },
+
+  /**
+   * Returns the first locale for the given language.
+   * @param language a language without country code (e.g. en or de)
+   */
+  findFirstForLanguage: function(language) {
+    scout.assertParameter('language', language);
+    return scout.arrays.find(this.getAll(), function(locale) {
+      if (locale.language === language) {
+        return locale;
+      }
+    }, this);
+  },
+
+  /**
+   * Splits the language tag and returns an array containing the language and the country.
+   */
+  splitLanguageTag: function(languageTag) {
+    if (!languageTag) {
+      return [];
+    }
+    return languageTag.split('-');
   }
 
 };

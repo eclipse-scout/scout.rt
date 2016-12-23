@@ -31,7 +31,7 @@ scout.texts = {
    * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default)
    */
   link: function(languageTag) {
-    var tags = this.splitLanguageTag(languageTag);
+    var tags = this.createOrderedLanguageTags(languageTag);
     var child;
     tags.forEach(function(tag) {
       var texts = this._get(tag);
@@ -55,7 +55,7 @@ scout.texts = {
    * - 'de' generates the array: ['de', 'default']
    * - 'default' generates the array: ['default']
    */
-  splitLanguageTag: function(languageTag) {
+  createOrderedLanguageTags: function(languageTag) {
     var tags = [],
       i = languageTag.lastIndexOf('-');
 

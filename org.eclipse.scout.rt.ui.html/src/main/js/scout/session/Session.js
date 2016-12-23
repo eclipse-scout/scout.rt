@@ -114,7 +114,7 @@ scout.Session.prototype.init = function(model) {
   this.userAgent = scout.nvl(options.userAgent, this.userAgent);
   this.suppressErrors = scout.nvl(options.suppressErrors, this.suppressErrors);
   if (options.locale) {
-    this.locale = options.locale;
+    this.locale = scout.Locale.ensure(options.locale);
     this.textMap = scout.texts.get(this.locale.languageTag);
   }
   // FIXME CGU [6.1] flag necessary for modeladapter, remove it
@@ -351,9 +351,10 @@ scout.Session.prototype._processStartupResponse = function(data) {
     this._copyAdapterData(data.adapterData);
   }
 
-  // Create the desktop
   this.locale = new scout.Locale(data.startupData.locale);
   this.textMap = new scout.TextMap(data.startupData.textMap);
+
+  // Create the desktop
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
   var clientSessionData = this._getAdapterData(data.startupData.clientSession);
   this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget);
@@ -1265,7 +1266,7 @@ scout.Session.prototype._onLocaleChanged = function(event) {
  * @param {@link scout.TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
  */
 scout.Session.prototype.switchLocale = function(locale, textMap) {
-  scout.assertParameter('locale', locale);
+  scout.assertParameter('locale', locale, scout.Locale);
   if (!textMap) {
     textMap = scout.texts.get(locale.languageTag);
   }

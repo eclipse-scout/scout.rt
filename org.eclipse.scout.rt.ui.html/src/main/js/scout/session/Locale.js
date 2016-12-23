@@ -12,6 +12,12 @@ scout.Locale = function(model) {
   model = scout.nvl(model, scout.Locale.DEFAULT);
 
   this.languageTag = model.languageTag;
+  var tags = scout.locales.splitLanguageTag(this.languageTag);
+  this.language = tags[0];
+  this.country = tags[1];
+  this.displayLanguage = model.displayLanguage;
+  this.displayCountry = model.displayCountry;
+
   this.decimalFormatPatternDefault = model.decimalFormatPatternDefault;
   this.decimalFormatSymbols = model.decimalFormatSymbols;
 
@@ -26,6 +32,16 @@ scout.Locale = function(model) {
   if (this.dateFormatPatternDefault && this.dateFormatSymbols) {
     this.dateFormat = new scout.DateFormat(model);
   }
+};
+
+scout.Locale.ensure = function(locale) {
+  if (!locale) {
+    return locale;
+  }
+  if (locale instanceof scout.Locale) {
+    return locale;
+  }
+  return new scout.Locale(locale);
 };
 
 scout.Locale.DEFAULT = {

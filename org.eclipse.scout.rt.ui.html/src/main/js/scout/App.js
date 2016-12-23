@@ -120,7 +120,7 @@ scout.App.prototype._loadSessions = function(options) {
 };
 
 scout.App.prototype._loadSession = function($entryPoint, options) {
-  options.locale = options.locale || this.getDefaultLocale();
+  options.locale = options.locale || this._loadLocale();
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
 
@@ -158,7 +158,7 @@ scout.App.prototype._createDesktop = function(parent) {
 /**
  * @returns the locale to be used when no locale is provided as app option. By default the navigators locale is used.
  */
-scout.App.prototype.getDefaultLocale = function(options) {
+scout.App.prototype._loadLocale = function() {
   return scout.locales.getNavigatorLocale();
 };
 

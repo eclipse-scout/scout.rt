@@ -1,14 +1,13 @@
 package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
@@ -53,7 +52,7 @@ public class PrebuildFiles implements IPlatformListener {
    */
   protected void buildScripts() {
     LOG.info("Pre-building of web resources enabled");
-    String[] files = readPrebuildFilesConfig();
+    List<String> files = CONFIG.getPropertyValue(UiPrebuildFilesProperty.class);
     IHttpResourceCache httpResourceCache = BEANS.get(GlobalHttpResourceCache.class);
     for (String file : files) {
       LOG.info("Pre-building resource '{}'", file);
@@ -65,17 +64,6 @@ public class PrebuildFiles implements IPlatformListener {
         LOG.error("Failed to load HTML resource", e);
       }
     }
-  }
-
-  private String[] readPrebuildFilesConfig() {
-    String filesString = CONFIG.getPropertyValue(UiPrebuildFilesProperty.class);
-    ArrayList<String> files = new ArrayList<>();
-    if (!StringUtility.isNullOrEmpty(filesString)) {
-      for (String file : filesString.split(",")) {
-        files.add(file);
-      }
-    }
-    return files.toArray(new String[files.size()]);
   }
 
   public HttpCacheObject loadResource(String file) throws IOException {

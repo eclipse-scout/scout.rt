@@ -1,14 +1,22 @@
 package org.eclipse.scout.rt.ui.html;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.res.PrebuildFiles;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlDocumentParser;
+import org.eclipse.scout.rt.ui.html.res.loader.LocalesLoader;
+import org.eclipse.scout.rt.ui.html.res.loader.TextsLoader;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
@@ -69,16 +77,56 @@ public final class UiHtmlConfigProperties {
    * <p>
    * Since CSS and JS files are always referenced by a HTML file, we simply specify the main HTML files in this
    * property.
-   * </p>
    *
-   * @author awe
+   * @return unmodifiable list
    */
-  public static class UiPrebuildFilesProperty extends AbstractStringConfigProperty {
+  public static class UiPrebuildFilesProperty extends AbstractConfigProperty<List<String>, String> {
 
     @Override
     public String getKey() {
       return "scout.ui.prebuild.files";
     }
+
+    @Override
+    protected List<String> parse(String value) {
+      String[] tokens = StringUtility.tokenize(value, ',');
+      // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
+      return Arrays.asList(tokens);
+    }
+
+    @Override
+    protected List<String> getDefaultValue() {
+      return Collections.unmodifiableList(new ArrayList<String>(0));
+    }
+  }
+
+  /**
+   * Contains a comma separated list of supported locales (e.g. en,en-US,de-CH). This is only relevant if locales.json
+   * and texts.json should be sent to the client, which is not the case for remote apps. So this property is only used
+   * for JS only apps.
+   *
+   * @see {@link LocalesLoader}, {@link TextsLoader}
+   * @return unmodifiable list
+   */
+  public static class UiLocalesProperty extends AbstractConfigProperty<List<String>, String> {
+
+    @Override
+    public String getKey() {
+      return "scout.ui.locales";
+    }
+
+    @Override
+    protected List<String> parse(String value) {
+      String[] tokens = StringUtility.tokenize(value, ',');
+      // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
+      return Arrays.asList(tokens);
+    }
+
+    @Override
+    protected List<String> getDefaultValue() {
+      return Collections.unmodifiableList(new ArrayList<String>(0));
+    }
+
   }
 
   /**

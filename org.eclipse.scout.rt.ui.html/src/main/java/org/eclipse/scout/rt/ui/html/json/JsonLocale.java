@@ -72,6 +72,8 @@ public class JsonLocale implements IJsonObject {
     String dateFormatPattern = dateFormatProvider.getDateFormatPattern(DateFormatProvider.PATTERN_STYLE_ISOLATED_DATE, locale);
     String timeFormatPattern = dateFormatProvider.getDateFormatPattern(DateFormatProvider.PATTERN_STYLE_ISOLATED_TIME, locale);
     json.put("languageTag", locale.toLanguageTag());
+    json.put("displayLanguage", locale.getDisplayLanguage(locale));
+    json.put("displayCountry", locale.getDisplayCountry(locale));
     json.put("decimalFormatPatternDefault", defaultDecimalFormat.toPattern());
     json.put("dateFormatPatternDefault", dateFormatPattern);
     json.put("timeFormatPatternDefault", timeFormatPattern);
