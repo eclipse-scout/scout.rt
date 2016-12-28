@@ -1127,11 +1127,7 @@ scout.Session.prototype._onCancelProcessing = function(event) {
 
   // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
   setTimeout(function() {
-    if (busyIndicator.rendered) { // not closed yet
-      busyIndicator.$label.addClass('cancelled');
-      busyIndicator.$buttons.remove();
-      busyIndicator.$content.addClass('no-buttons');
-    }
+    busyIndicator.cancelled();
   }.bind(this), 100);
 
   this._sendCancelRequest();

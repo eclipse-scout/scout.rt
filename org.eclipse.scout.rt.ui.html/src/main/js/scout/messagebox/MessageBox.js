@@ -111,12 +111,12 @@ scout.MessageBox.prototype._render = function($parent) {
   }
 
   // Render properties
-  this._renderIconId(this.iconId);
-  this._renderSeverity(this.severity);
-  this._renderHeader(this.header);
-  this._renderBody(this.body);
-  this._renderHtml(this.html);
-  this._renderHiddenText(this.hiddenText);
+  this._renderIconId();
+  this._renderSeverity();
+  this._renderHeader();
+  this._renderBody();
+  this._renderHtml();
+  this._renderHiddenText();
 
   // FIXME bsh: Somehow let the user copy the 'copyPasteText' - but how?
 
@@ -146,42 +146,42 @@ scout.MessageBox.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.MessageBox.prototype._renderIconId = function(iconId) {
+scout.MessageBox.prototype._renderIconId = function() {
   // FIXME bsh: implement
 };
 
-scout.MessageBox.prototype._renderSeverity = function(severity) {
+scout.MessageBox.prototype._renderSeverity = function() {
   this.$container.removeClass('severity-error');
-  if (severity === scout.MessageBox.SEVERITY.ERROR) {
+  if (this.severity === scout.MessageBox.SEVERITY.ERROR) {
     this.$container.addClass('severity-error');
   }
 };
 
-scout.MessageBox.prototype._renderHeader = function(text) {
-  this.$header.html(scout.strings.nl2br(text));
-  this.$header.setVisible(text);
+scout.MessageBox.prototype._renderHeader = function() {
+  this.$header.html(scout.strings.nl2br(this.header));
+  this.$header.setVisible(this.header);
 };
 
-scout.MessageBox.prototype._renderBody = function(text) {
-  this.$body.html(scout.strings.nl2br(text));
-  this.$body.setVisible(text);
+scout.MessageBox.prototype._renderBody = function() {
+  this.$body.html(scout.strings.nl2br(this.body));
+  this.$body.setVisible(this.body);
 };
 
-scout.MessageBox.prototype._renderHtml = function(text) {
-  this.$html.html(text);
-  this.$html.setVisible(text);
+scout.MessageBox.prototype._renderHtml = function() {
+  this.$html.html(this.html);
+  this.$html.setVisible(this.html);
   // Don't change focus when a link is clicked by mouse
   this.$html.find('a, .app-link')
     .attr('tabindex', '0')
     .unfocusable();
 };
 
-scout.MessageBox.prototype._renderHiddenText = function(text) {
+scout.MessageBox.prototype._renderHiddenText = function() {
   if (this.$hiddenText) {
     this.$hiddenText.remove();
   }
-  if (text) {
-    this.$hiddenText = this.$content.appendElement('<!-- \n' + text.replace(/<!--|-->/g, '') + '\n -->');
+  if (this.hiddenText) {
+    this.$hiddenText = this.$content.appendElement('<!-- \n' + this.hiddenText.replace(/<!--|-->/g, '') + '\n -->');
   }
 };
 

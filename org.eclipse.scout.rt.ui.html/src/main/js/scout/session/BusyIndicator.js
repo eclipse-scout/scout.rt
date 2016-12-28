@@ -10,14 +10,12 @@
  ******************************************************************************/
 scout.BusyIndicator = function() {
   scout.BusyIndicator.parent.call(this);
+  this.cancellable = true;
+  this.showTimeout = 2500;
+  this.label;
+  this.details;
 };
 scout.inherits(scout.BusyIndicator, scout.Widget);
-
-scout.BusyIndicator.prototype._init = function(options) {
-  scout.BusyIndicator.parent.prototype._init.call(this, options);
-
-  this._cancellable = (options.cancellable === undefined ? true : !!options.cancellable);
-};
 
 /**
  * @override
@@ -42,7 +40,15 @@ scout.BusyIndicator.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
+scout.BusyIndicator.prototype._init = function(model) {
+  scout.BusyIndicator.parent.prototype._init.call(this, model);
+  this.label = scout.nvl(model.label, this.session.text('ui.PleaseWait_'));
+};
+
 scout.BusyIndicator.prototype._render = function($parent) {
+  $parent = $parent || this.session.$entryPoint;
+  this.$parent = $parent;
+
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
   this._glassPaneRenderer.renderGlassPanes();
@@ -59,13 +65,14 @@ scout.BusyIndicator.prototype._render = function($parent) {
 
   this.$content = this.$container.appendDiv('busyindicator-content');
   this.$label = this.$content.appendDiv('busyindicator-label');
+  this.$details = this.$content.appendDiv('busyindicator-details');
 
-  if (this._cancellable) {
+  if (this.cancellable) {
     this.$buttons = this.$container.appendDiv('busyindicator-buttons');
     var boxButtons = new scout.BoxButtons(this.$buttons);
     this.$cancelButton = boxButtons.addButton({
       text: this.session.text('Cancel'),
-      onClick: this._onClickCancel.bind(this)
+      onClick: this._onCancelClick.bind(this)
     });
     this.$cancelButton.css('width', '100%');
   } else {
@@ -73,7 +80,8 @@ scout.BusyIndicator.prototype._render = function($parent) {
   }
 
   // Render properties
-  this.$label.text(this.session.text('ui.PleaseWait_'));
+  this._renderLabel();
+  this._renderDetails();
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -82,16 +90,16 @@ scout.BusyIndicator.prototype._render = function($parent) {
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
 
-  // Show busy box with a delay of 2.5 seconds.
+  // Show busy box with a delay of 2.5 seconds (configurable by this.showTimeout).
   this._busyIndicatorTimeoutId = setTimeout(function() {
     this.$container.removeClass('invisible').addClassForAnimation('animate-open');
     // Validate first focusable element
     // FIXME dwi: maybe, this is not required if problem with single-button form is solved!
     this.session.focusManager.validateFocus();
-  }.bind(this), 2500);
+  }.bind(this), this.showTimeout);
 };
 
-scout.BusyIndicator.prototype._onClickCancel = function(event) {
+scout.BusyIndicator.prototype._onCancelClick = function(event) {
   this.trigger('cancel', event);
 };
 
@@ -114,6 +122,15 @@ scout.BusyIndicator.prototype._remove = function() {
   scout.BusyIndicator.parent.prototype._remove.call(this);
 };
 
+scout.BusyIndicator.prototype._renderLabel = function() {
+  this.$label.text(this.label || '');
+};
+
+scout.BusyIndicator.prototype._renderDetails = function() {
+  this.$details.html(scout.strings.nl2br(this.details));
+  this.$details.setVisible(this.details);
+};
+
 scout.BusyIndicator.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
@@ -125,5 +142,16 @@ scout.BusyIndicator.prototype.close = function() {
   if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
     this.$cancelButton.focus();
     this.$cancelButton.click();
+  }
+};
+
+/**
+ * Sets the busy indicator into cancelled state.
+ */
+scout.BusyIndicator.prototype.cancelled = function() {
+  if (this.rendered) { // not closed yet
+    this.$label.addClass('cancelled');
+    this.$buttons.remove();
+    this.$content.addClass('no-buttons');
   }
 };
