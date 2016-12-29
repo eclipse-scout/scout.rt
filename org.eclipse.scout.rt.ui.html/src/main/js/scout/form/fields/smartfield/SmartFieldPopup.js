@@ -16,7 +16,7 @@ scout.inherits(scout.SmartFieldPopup, scout.Popup);
 
 scout.SmartFieldPopup.prototype._init = function(options) {
   options.scrollType = options.scrollType || 'layoutAndPosition';
-  options.installFocusContext = false;
+  options.withFocusContext = false;
   scout.SmartFieldPopup.parent.prototype._init.call(this, options);
   this._field = options.field;
 };
