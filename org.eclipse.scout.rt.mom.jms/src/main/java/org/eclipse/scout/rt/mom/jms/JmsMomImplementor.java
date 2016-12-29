@@ -7,7 +7,6 @@ import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +48,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -61,12 +59,12 @@ import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +78,11 @@ import org.slf4j.LoggerFactory;
 public class JmsMomImplementor implements IMomImplementor {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsMomImplementor.class);
+
+  /**
+   * Key to explicitly set the JMS client ID. If omitted, the client ID is computed automatically.
+   */
+  public static final String JMS_CLIENT_ID = "scout.mom.jms.clientId";
 
   protected final String m_momUid = UUID.randomUUID().toString();
   protected Context m_context;
@@ -310,6 +313,16 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   @Override
+  public void cancelDurableSubscription(String durableSubscriptionName) {
+    try {
+      m_defaultSession.unsubscribe(durableSubscriptionName);
+    }
+    catch (JMSException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
+  }
+
+  @Override
   public void destroy() {
     try {
       m_connection.close();
@@ -451,14 +464,18 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   /**
-   * Returns the identifier to name the {@link Connection}.
+   * @return the identifier to name the {@link Connection}.
    */
   protected String computeClientId(final Map<Object, Object> properties) {
+    final String clientId = ObjectUtility.toString(properties.get(JMS_CLIENT_ID));
+    if (clientId != null) {
+      return clientId;
+    }
+
     final String applicationName = CONFIG.getPropertyValue(ApplicationNameProperty.class);
-    final String applicationVersion = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
+    final String symbolicName = Objects.toString(properties.get(SYMBOLIC_NAME), StringUtility.join(" ", applicationName, "MOM"));
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
-    final String now = DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS");
-    return String.format("%s [application='%s:%s', nodeId='%s', created on=%s]", Objects.toString(properties.get(SYMBOLIC_NAME), "MOM"), applicationName, applicationVersion, nodeId, now);
+    return StringUtility.join(" ", symbolicName, StringUtility.box("(", nodeId, ")"));
   }
 
   @Override

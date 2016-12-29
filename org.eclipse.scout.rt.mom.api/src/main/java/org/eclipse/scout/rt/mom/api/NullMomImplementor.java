@@ -38,6 +38,11 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
+  public void cancelDurableSubscription(String durableSubscriptionName) {
+    // NOOP
+  }
+
+  @Override
   public IRegistrationHandle registerMarshaller(final IDestination<?> destination, final IMarshaller marshaller) {
     return IRegistrationHandle.NULL_HANDLE;
   }
@@ -61,13 +66,13 @@ public class NullMomImplementor implements IMomImplementor {
     }
 
     @Override
-    public void dispose() {
-      // NOOP
+    public IDestination<?> getDestination() {
+      return m_destination;
     }
 
     @Override
-    public IDestination<?> getDestination() {
-      return m_destination;
+    public void dispose() {
+      // NOOP
     }
   }
 }

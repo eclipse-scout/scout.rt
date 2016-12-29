@@ -217,6 +217,26 @@ public final class MOM {
   }
 
   /**
+   * Cancels a <i>durable</i> subscription previously created on the specified MOM. Messages published to the
+   * subscription's destination while the subscriber is inactive will then no longer be kept by the network.
+   * <p>
+   * If the durable subscription has already been established for the MOM instance, make sure to call
+   * {@link ISubscription#dispose()} first. Canceling the durable subscription while the subscriber is still active will
+   * result in an exception. An exception is also thrown if there is no durable subscription for the given name on the
+   * MOM instance.
+   *
+   * @param transport
+   *          specifies the 'transport' or 'network' for which the durable subscription has been made, e.g.
+   *          {@link ClusterMom}.
+   * @param durableSubscriptionName
+   *          The same name that was used to create the durable subscription (see
+   *          {@link SubscribeInput#withDurableSubscription(String)}).
+   */
+  public static void cancelDurableSubscription(final Class<? extends IMomTransport> transport, final String durableSubscriptionName) {
+    BEANS.get(transport).cancelDurableSubscription(durableSubscriptionName);
+  }
+
+  /**
    * Initiates a 'request-reply' communication with a replier, and blocks until the reply is received (synchronous).
    * <p>
    * This method is for convenience to facilitate synchronous communication between a publisher and a subscriber, and is

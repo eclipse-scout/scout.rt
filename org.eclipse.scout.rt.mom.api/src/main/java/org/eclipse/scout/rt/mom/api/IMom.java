@@ -151,6 +151,21 @@ public interface IMom {
   <REQUEST, REPLY> ISubscription reply(IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input);
 
   /**
+   * Cancels a <i>durable</i> subscription previously created on this MOM. Messages published to the subscription's
+   * destination while the subscriber is inactive will then no longer be kept by the network.
+   * <p>
+   * If the durable subscription has already been established for the current MOM instance, make sure to call
+   * {@link ISubscription#dispose()} first. Canceling the durable subscription while the subscriber is still active will
+   * result in an exception. An exception is also thrown if there is no durable subscription for the given name on the
+   * MOM instance.
+   *
+   * @param durableSubscriptionName
+   *          The same name that was used to create the durable subscription (see
+   *          {@link SubscribeInput#withDurableSubscription(String)}).
+   */
+  void cancelDurableSubscription(String durableSubscriptionName);
+
+  /**
    * Registers a marshaller for transfer objects sent to the given destination, or which are received from the given
    * destination.
    * <p>

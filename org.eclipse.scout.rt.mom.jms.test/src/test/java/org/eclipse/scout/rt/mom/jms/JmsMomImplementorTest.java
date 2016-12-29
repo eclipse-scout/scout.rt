@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
+import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
@@ -1104,6 +1105,30 @@ public class JmsMomImplementorTest {
       }
       return m_message;
     }
+
+    public void assertEmpty(int timeout, TimeUnit unit) throws InterruptedException {
+      try {
+        get(timeout, unit);
+        fail("Is not empty");
+      }
+      catch (TimedOutError e) {
+        // is empty -> ok
+      }
+    }
+  }
+
+  private class CapturerListener<DTO> implements IMessageListener<DTO> {
+
+    private final Capturer<DTO> m_capturer;
+
+    public CapturerListener(Capturer<DTO> capturer) {
+      m_capturer = capturer;
+    }
+
+    @Override
+    public void onMessage(IMessage<DTO> message) {
+      m_capturer.set(message.getTransferObject());
+    }
   }
 
   public static class Person implements Serializable {
@@ -1514,6 +1539,66 @@ public class JmsMomImplementorTest {
     for (IDisposable disposable : disposables) {
       disposable.dispose();
     }
+  }
+
+  @Test
+  public void testTopicDurableSubscription() throws InterruptedException {
+    final IDestination<String> topic = MOM.newDestination("test/mom/testTopicPublishSubscribe", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
+    final String durableSubscriptionName = "Durable-Test-Subscription";
+
+    // 1. Subscribe (non-durable)
+    final Capturer<String> capturer1 = new Capturer<>();
+    final ISubscription subscription1 = MOM.subscribe(JmsTestMom.class, topic, new CapturerListener<>(capturer1), MOM.newSubscribeInput());
+    m_disposables.add(subscription1);
+
+    // 2. Disconnect
+    subscription1.dispose();
+
+    // 3. Publish a message
+    MOM.publish(JmsTestMom.class, topic, "lost message");
+    capturer1.assertEmpty(1, TimeUnit.SECONDS); // no one is listening
+
+    // 4. Subscribe again (durable)
+    final Capturer<String> capturer2 = new Capturer<>();
+    final ISubscription subscription2 = MOM.subscribe(JmsTestMom.class, topic, new CapturerListener<>(capturer2), MOM.newSubscribeInput()
+        .withDurableSubscription(durableSubscriptionName));
+    m_disposables.add(subscription2);
+
+    // 5. Assert that message is lost
+    capturer2.assertEmpty(1, TimeUnit.SECONDS);
+
+    // 6. Disconnect
+    subscription2.dispose();
+
+    // 7. Publish an other message
+    MOM.publish(JmsTestMom.class, topic, "hello world");
+    capturer2.assertEmpty(1, TimeUnit.SECONDS); // not yet
+
+    // 8. Subscribe again (durable, same name)
+    final Capturer<String> capturer3 = new Capturer<>();
+    final ISubscription subscription3 = MOM.subscribe(JmsTestMom.class, topic, new CapturerListener<>(capturer3), MOM.newSubscribeInput()
+        .withDurableSubscription(durableSubscriptionName));
+    m_disposables.add(subscription3);
+
+    // 9. Assert that the message is received
+    assertEquals("hello world", capturer3.get(1, TimeUnit.SECONDS));
+
+    // 10. Disconnect and cancel the durable subscription
+    subscription3.dispose();
+    MOM.cancelDurableSubscription(JmsTestMom.class, durableSubscriptionName);
+
+    // 11. Publish another message
+    MOM.publish(JmsTestMom.class, topic, "hello universe");
+    assertEquals("hello world", capturer3.get(1, TimeUnit.SECONDS)); // still the same old message
+
+    // 12. Subscribe again (durable, same name)
+    final Capturer<String> capturer4 = new Capturer<>();
+    final ISubscription subscription4 = MOM.subscribe(JmsTestMom.class, topic, new CapturerListener<>(capturer4), MOM.newSubscribeInput()
+        .withDurableSubscription(durableSubscriptionName));
+    m_disposables.add(subscription4);
+
+    // 13. Assert that message is still lost, even if the same name was used (because the previous subscription was cancelled explicitly)
+    capturer4.assertEmpty(1, TimeUnit.SECONDS);
   }
 
   private static class SomethingWrongException extends RuntimeException {

@@ -1,9 +1,11 @@
 package org.eclipse.scout.rt.mom.jms;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMessage;
@@ -58,7 +60,7 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
     final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
-    final MessageConsumer consumer = session.createConsumer(m_mom.lookupJmsDestination(destination, session), input.getSelector());
+    final MessageConsumer consumer = createConsumer(session, destination, input);
     consumer.setMessageListener(new JmsMessageListener() {
 
       @Override
@@ -95,6 +97,15 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
         }
       }
     });
+  }
+
+  protected <DTO> MessageConsumer createConsumer(final Session session, final IDestination<DTO> destination, final SubscribeInput input) throws JMSException {
+    Destination jmsDestination = m_mom.lookupJmsDestination(destination, session);
+    boolean noLocal = !input.isLocalReceipt();
+    if (jmsDestination instanceof Topic && input.getDurableSubscriptionName() != null) {
+      return session.createDurableSubscriber((Topic) jmsDestination, input.getDurableSubscriptionName(), input.getSelector(), noLocal);
+    }
+    return session.createConsumer(jmsDestination, input.getSelector(), noLocal);
   }
 
   /**

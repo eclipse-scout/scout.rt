@@ -126,6 +126,11 @@ public abstract class AbstractMomTransport implements IMomTransport {
   }
 
   @Override
+  public void cancelDurableSubscription(String durableSubscriptionName) {
+    getDelegate().cancelDurableSubscription(durableSubscriptionName);
+  }
+
+  @Override
   public IRegistrationHandle registerMarshaller(final IDestination<?> destination, final IMarshaller marshaller) {
     return getDelegate().registerMarshaller(destination, marshaller);
   }

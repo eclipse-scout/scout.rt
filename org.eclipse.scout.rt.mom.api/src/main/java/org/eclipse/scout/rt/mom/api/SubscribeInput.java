@@ -42,6 +42,8 @@ public class SubscribeInput {
   private int m_acknowledgementMode = ACKNOWLEDGE_AUTO;
   private RunContext m_runContext;
   private String m_selector;
+  private boolean m_localReceipt = true;
+  private String m_durableSubscriptionName;
 
   public int getAcknowledgementMode() {
     return m_acknowledgementMode;
@@ -85,6 +87,52 @@ public class SubscribeInput {
    */
   public SubscribeInput withRunContext(final RunContext runContext) {
     m_runContext = runContext;
+    return this;
+  }
+
+  public boolean isLocalReceipt() {
+    return m_localReceipt;
+  }
+
+  /**
+   * Specifies if local delivery of messages is active for this subscription. The default is <code>true</code>.
+   * <p>
+   * All messages sent by a MOM instance are 'local' to that MOM instance. If a MOM instance subscribes to a destination
+   * it also publishes messages to, it may receive its own messages. The subscription may be configured to ignore
+   * messages from this instance by setting this flag to <code>false</code>.
+   * <p>
+   * This hint is implementor specific and may not have an effect at all. E.g. in JMS, it is only supported by topic
+   * destinations.
+   */
+  public SubscribeInput withLocalReceipt(boolean localReceipt) {
+    m_localReceipt = localReceipt;
+    return this;
+  }
+
+  /**
+   * @return the name of a <i>durable</i> subscription. A value of <code>null</code> indicates a non-durable
+   *         subscription (this is the default). Any other value indicates a durable subscription.
+   * @see {@link #withDurableSubscription(String)}
+   */
+  public String getDurableSubscriptionName() {
+    return m_durableSubscriptionName;
+  }
+
+  /**
+   * Specifies that the subscription should be <i>durable</i>. Durable subscriptions are kept by the network even if the
+   * subscriber disconnects. After it reconnects, all missed messages (whose individual time-to-live has not expired)
+   * are received.
+   * <p>
+   * A durable subscription is identified by a unique name. If the name is <code>null</code>, the subscription is
+   * considered non-durable (this is the default value). All other values result in a durable subscription. Durable
+   * subscriptions can be explicitly cancelled by calling {@link MOM#cancelDurableSubscription(Class, String)} with the
+   * same name.
+   * <p>
+   * Note that not all destination types support durable subscriptions. For example, in JMS only topic make a difference
+   * between durable and non-durable subscribers (queues are inherently durable).
+   */
+  public SubscribeInput withDurableSubscription(String durableSubscriptionName) {
+    m_durableSubscriptionName = durableSubscriptionName;
     return this;
   }
 }
