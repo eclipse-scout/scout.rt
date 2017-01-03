@@ -46,7 +46,7 @@ scout.scrollbars = {
     } else {
       this._$scrollables[session] = [$container];
     }
-    $.log.debug('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
+    $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
   },
 
   removeScrollable: function(session, $container) {
@@ -54,7 +54,7 @@ scout.scrollbars = {
     if (this._$scrollables[session]) {
       initLength = this._$scrollables[session].length;
       scout.arrays.$remove(this._$scrollables[session], $container);
-      $.log.debug('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
+      $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
       if (initLength === this._$scrollables[session].length) {
         throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
       }
@@ -95,7 +95,7 @@ scout.scrollbars = {
     return $container;
 
     function installNativeScrollbars() {
-      $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
+      $.log.trace('use native scrollbars for container ' + scout.graphics.debugOutput($container));
       if (options.axis === 'x') {
         $container
           .css('overflow-x', 'auto')
@@ -111,7 +111,7 @@ scout.scrollbars = {
     }
 
     function installJsScrollbars() {
-      $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
+      $.log.trace('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
       scrollbars = scout.arrays.ensure($container.data('scrollbars'));
       scrollbars.forEach(function(scrollbar) {
         scrollbar.destroy();
