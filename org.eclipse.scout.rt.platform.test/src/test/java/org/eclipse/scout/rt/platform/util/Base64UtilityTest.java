@@ -13,9 +13,8 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.TuningUtility;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Test;
 
 public class Base64UtilityTest {
@@ -49,9 +48,23 @@ public class Base64UtilityTest {
   }
 
   @Test
+  public void encodeDecodeUrlSafeTestShort() throws Exception {
+    String encode = Base64Utility.encodeUrlSafe(TEST_STRING_SHORT.getBytes());
+    byte[] decode = Base64Utility.decodeUrlSafe(encode);
+    assertArrayEquals(TEST_STRING_SHORT.getBytes(), decode);
+  }
+
+  @Test
   public void encodeDecodeTestMiddle() throws Exception {
     String encode = Base64Utility.encode(TEST_STRING_MIDDLE.getBytes());
     byte[] decode = Base64Utility.decode(encode);
+    assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
+  }
+
+  @Test
+  public void encodeDecodeUrlSafeTestMiddle() throws Exception {
+    String encode = Base64Utility.encodeUrlSafe(TEST_STRING_MIDDLE.getBytes());
+    byte[] decode = Base64Utility.decodeUrlSafe(encode);
     assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
   }
 
@@ -60,6 +73,20 @@ public class Base64UtilityTest {
     String encode = Base64Utility.encode(TEST_STRING_LONG.getBytes());
     byte[] decode = Base64Utility.decode(encode);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
+  }
+
+  @Test
+  public void encodeDecodeUrlSafeTestLong() throws Exception {
+    String encode = Base64Utility.encodeUrlSafe(TEST_STRING_LONG.getBytes());
+    byte[] decode = Base64Utility.decodeUrlSafe(encode);
+    assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
+  }
+
+  @Test
+  public void encodeDecodeTestUrlSafe() throws Exception {
+    String encode = Base64Utility.encodeUrlSafe(TEST_STRING_URL.getBytes(StandardCharsets.UTF_8));
+    byte[] decode = Base64Utility.decodeUrlSafe(encode);
+    assertArrayEquals(TEST_STRING_URL.getBytes(), decode);
   }
 
   @Test
@@ -81,6 +108,20 @@ public class Base64UtilityTest {
     String encode = Base64Utility.encode(TEST_STRING_MIDDLE.getBytes());
     StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
     assertEquals(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
+  }
+
+  @Test
+  public void encodeTestUrlUnsafeAndCheckAgainstBase64String() throws Exception {
+    String encode = Base64Utility.encode(TEST_STRING_URL.getBytes());
+    StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
+    assertEquals(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
+  }
+
+  @Test
+  public void encodeTestUrlSafeAndCheckAgainstBase64String() throws Exception {
+    String encode = Base64Utility.encodeUrlSafe(TEST_STRING_URL.getBytes());
+    StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
+    assertEquals(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
   }
 
   @Test
@@ -120,6 +161,12 @@ public class Base64UtilityTest {
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
+  @Test
+  public void decodeTestUrlSafe() throws Exception {
+    byte[] decoded = Base64Utility.decodeUrlSafe(TEST_BASE64_DATA_OF_STRING_URL_SAFE);
+    assertEquals(TEST_STRING_URL, new String(decoded, StandardCharsets.UTF_8));
+  }
+
   private static final String TEST_STRING_SHORT = "Lo";
 
   private static final String TEST_BASE64_DATA_OF_STRING_SHORT = "TG8=";
@@ -128,6 +175,10 @@ public class Base64UtilityTest {
       + "This is the new line";
 
   private static final String TEST_BASE64_DATA_OF_STRING_MIDDLE = "TmV4dCBpcyBhIGxpbmUgZW5kaW5nClRoaXMgaXMgdGhlIG5ldyBsaW5l";
+
+  private static final String TEST_STRING_URL = "�y:*�";
+  private static final String TEST_BASE64_DATA_OF_STRING_URL_UNSAFE = "77+9eTodKu+/vQ==";
+  private static final String TEST_BASE64_DATA_OF_STRING_URL_SAFE = "77-9eTodKu-_vQ==";
 
   private static final String TEST_STRING_LONG =
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut nisi dignissim leo sagittis tincidunt. Curabitur porttitor, magna ut consequat vestibulum, diam nibh faucibus quam, ac ultrices odio ante hendrerit mauris. Praesent id massa malesuada, mollis tortor eu, sagittis nisi. Sed sagittis orci vel dui gravida, nec euismod neque aliquet. Phasellus mattis augue ut dolor eleifend, a lacinia ligula vestibulum. Pellentesque placerat velit accumsan lorem vestibulum dignissim. Etiam eu egestas ante, quis porta erat. Suspendisse tempus a turpis condimentum elementum. Vestibulum iaculis augue quis mi vulputate fermentum ac vel nisl. Phasellus ac pellentesque velit, id dapibus nibh. Integer vitae ipsum ante. Aenean ultricies, velit placerat facilisis malesuada, lorem tortor convallis mauris, at congue felis tellus at tellus.\n"
