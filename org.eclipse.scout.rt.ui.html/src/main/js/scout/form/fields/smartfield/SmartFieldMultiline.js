@@ -88,3 +88,17 @@ scout.SmartFieldMultiline.prototype._readSearchText = function() {
   // Only read the first line
   return scout.fields.valOrText(this, this.$field);
 };
+
+/**
+ * @override SmartField.js
+ */
+scout.SmartFieldMultiline.prototype._init = function(model) {
+  scout.SmartFieldMultiline.parent.prototype._init.call(this, model);
+  this.on('deleteProposal', this._onDeleteProposal);
+};
+
+scout.SmartFieldMultiline.prototype._onDeleteProposal = function(event) {
+  if (event.source.rendered) {
+    event.source._$multilineField.html('');
+  }
+};

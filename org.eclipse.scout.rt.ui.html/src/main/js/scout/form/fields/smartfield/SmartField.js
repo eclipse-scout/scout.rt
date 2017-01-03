@@ -441,7 +441,8 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     // When proposal chooser is closed, only send accept proposal
     // when search text has changed. Prevents unnecessary requests
     // to the server when the user tabs over the smart-field.
-    if (displayText === this._oldDisplayText) {
+    // send full displayText not potential reduced searchText
+    if (this._readDisplayText() === this._oldDisplayText) {
       return;
     }
     this._sendAcceptProposal(displayText, false, forceClose);
