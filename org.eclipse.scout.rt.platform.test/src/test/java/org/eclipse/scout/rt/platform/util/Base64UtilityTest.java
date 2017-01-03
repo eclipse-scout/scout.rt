@@ -85,7 +85,18 @@ public class Base64UtilityTest {
   @Test
   public void encodeDecodeTestUrlSafe() throws Exception {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_URL.getBytes(StandardCharsets.UTF_8));
+    assertEquals(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
+
     byte[] decode = Base64Utility.decodeUrlSafe(encode);
+    assertArrayEquals(TEST_STRING_URL.getBytes(), decode);
+  }
+
+  @Test
+  public void encodeDecodeTestUrl() throws Exception {
+    String encode = Base64Utility.encode(TEST_STRING_URL.getBytes(StandardCharsets.UTF_8));
+    assertEquals(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
+
+    byte[] decode = Base64Utility.decode(encode);
     assertArrayEquals(TEST_STRING_URL.getBytes(), decode);
   }
 
@@ -106,21 +117,18 @@ public class Base64UtilityTest {
   @Test
   public void encodeTestMiddleAndCheckAgainstBase64String() throws Exception {
     String encode = Base64Utility.encode(TEST_STRING_MIDDLE.getBytes());
-    StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
     assertEquals(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
   }
 
   @Test
   public void encodeTestUrlUnsafeAndCheckAgainstBase64String() throws Exception {
     String encode = Base64Utility.encode(TEST_STRING_URL.getBytes());
-    StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
     assertEquals(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
   }
 
   @Test
   public void encodeTestUrlSafeAndCheckAgainstBase64String() throws Exception {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_URL.getBytes());
-    StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
     assertEquals(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
   }
 
