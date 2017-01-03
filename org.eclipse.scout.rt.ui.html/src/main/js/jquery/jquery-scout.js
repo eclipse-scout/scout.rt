@@ -1353,3 +1353,76 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
     });
   });
 };
+
+/**
+ * jquery.binarytransport.js
+ *
+ * @description. jQuery ajax transport for making binary data type requests.
+ * @version 1.0
+ * @author Henry Algus <henryalgus@gmail.com>
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Henry Algus
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+(function($, undefined) {
+
+  // use this transport for "binary" data type
+  $.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
+    // check for conditions and support for blob / arraybuffer response type
+    if (window.FormData && ((options.dataType && (options.dataType === 'binary')) ||
+       (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) ||
+       (window.Blob && options.data instanceof Blob))))) {
+      return {
+        // create new XMLHttpRequest
+        send: function(headers, callback) {
+          // setup all variables
+          var xhr = new XMLHttpRequest(),
+            url = options.url,
+            type = options.type,
+            async = options.async || true,
+            // blob or arraybuffer. Default is blob
+            dataType = options.responseType || 'blob',
+            data = options.data || null,
+            username = options.username || null,
+            password = options.password || null;
+
+          xhr.addEventListener('load', function() {
+            var data = {};
+            data[options.dataType] = xhr.response;
+            // make callback and send data
+            callback(xhr.status, xhr.statusText, data, xhr.getAllResponseHeaders());
+          });
+
+          xhr.open(type, url, async, username, password);
+
+          // setup custom headers
+          for (var i in headers) { // NOSONAR
+            xhr.setRequestHeader(i, headers[i]);
+          }
+
+          xhr.responseType = dataType;
+          xhr.send(data);
+        },
+        abort: function() {}
+      };
+    }
+  });
+})(window.jQuery);
