@@ -631,6 +631,9 @@ scout.Desktop.prototype.openUri = function(uri, action) {
       // -> create a new window to not replace the existing content.
       // Drawback: Popup-Blocker will show up
       this._openUriAsNewWindow(uri);
+    } else if (scout.device.browser === scout.Device.Browser.CHROME) {
+      // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
+      this._openUriInSameWindow(uri);
     } else {
       this._openUriInIFrame(uri);
     }
@@ -639,6 +642,9 @@ scout.Desktop.prototype.openUri = function(uri, action) {
       // Open in same window.
       // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
       // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
+      this._openUriInSameWindow(uri);
+    } else if (scout.device.browser === scout.Device.Browser.CHROME) {
+      // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
       this._openUriInSameWindow(uri);
     } else {
       this._openUriInIFrame(uri);
@@ -651,7 +657,7 @@ scout.Desktop.prototype.openUri = function(uri, action) {
 };
 
 scout.Desktop.prototype._openUriInSameWindow = function(uri) {
-  window.location.href = uri;
+  window.location.assign(uri);
 };
 
 scout.Desktop.prototype._openUriInIFrame = function(uri) {
