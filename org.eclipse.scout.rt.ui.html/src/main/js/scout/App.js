@@ -13,7 +13,7 @@ scout.App = function() {
 /**
  * Main initialization function.<p>
  *
- * Calls this._prpare, this._bootstrap and this._init.<p>
+ * Calls this._prepare, this._bootstrap and this._init.<p>
  * At the initial phase the essential objects are initialized, those which are required for the next phases like logging and the object factory.<br>
  * During the bootstrap phase additional scripts may get loaded required for a successful session startup.<br>
  * The actual initialization does not get started before these bootstrap scripts are loaded.
