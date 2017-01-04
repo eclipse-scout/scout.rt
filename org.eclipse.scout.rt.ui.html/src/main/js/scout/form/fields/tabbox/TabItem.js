@@ -271,3 +271,14 @@ scout.TabItem.prototype._detach = function() {
   this.$container.detach();
   scout.TabItem.parent.prototype._detach.call(this);
 };
+
+/**
+ * @override FormField.js
+ */
+scout.TabItem.prototype.focus = function() {
+  this.parent._selectTab(this);
+  if (!this.rendered) {
+    return;
+  }
+  this.focusTab();
+};

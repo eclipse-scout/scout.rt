@@ -162,7 +162,6 @@ scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
       if (!selectedTabItem._tabRendered) {
         scout.HtmlComponent.get(this._$tabArea).revalidateLayoutTree();
       }
-      selectedTabItem.focusTab();
 
       if (oldSelectedTabItem) {
         oldSelectedTabItem.detach();
@@ -192,6 +191,7 @@ scout.TabBox.prototype._onKeyDown = function(event) {
     var tabItem = this.tabItems[tabIndex];
     if (tabItem._tabRendered) {
       this._selectTab(tabItem);
+      tabItem.focusTab();
     }
   }
 };
@@ -269,4 +269,16 @@ scout.TabBox.prototype._renderStatusPosition = function() {
  */
 scout.TabBox.prototype.getFields = function() {
   return this.tabItems;
+};
+
+/**
+ * @override FormField.js
+ */
+scout.TabBox.prototype.focus = function() {
+  if (!this.rendered) {
+    return;
+  }
+  if (this.selectedTab >= 0) {
+    this.tabItems[this.selectedTab].focus();
+  }
 };
