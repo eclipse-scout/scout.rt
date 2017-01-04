@@ -40,6 +40,9 @@ scout.TreeLayout.prototype._layout = function($container) {
   }
 
   this._setDataHeight(heightOffset);
+  
+  // recalculate ViewRangeSize before any rendering is done
+  this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
   // Check if width has changed
   if (htmlContainer.size && htmlContainer.size.width !== htmlContainer.getSize().width) {
@@ -53,8 +56,6 @@ scout.TreeLayout.prototype._layout = function($container) {
       this.tree._renderFiller();
     }
   }
-
-  this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
   if (!htmlContainer.layouted) {
     this.tree._renderScrollTop();
