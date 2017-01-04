@@ -102,7 +102,7 @@ scout.locales = {
   },
 
   getAll: function() {
-    return Object.values(this.localesMap);
+    return scout.objects.values(this.localesMap);
   },
 
   getAllLanguageTags: function() {
