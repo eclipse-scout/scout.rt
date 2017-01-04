@@ -48,6 +48,9 @@ scout.TreeLayout.prototype._layout = function($container) {
 
   this._setDataHeight(heightOffset);
 
+  // recalculate ViewRangeSize before any rendering is done
+  this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
+
   // Check if width has changed
   if (htmlContainer.size && htmlContainer.size.width !== htmlContainer.getSize().width) {
     if (this.tree.isHorizontalScrollingEnabled()) {
@@ -61,7 +64,6 @@ scout.TreeLayout.prototype._layout = function($container) {
     }
   }
 
-  this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
   // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
   this.tree._renderViewport();
 };
