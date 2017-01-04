@@ -15,6 +15,13 @@ scout.Widget = function() {
    * The owner is responsible that its children are destroyed when the owner is being destroyed.
    */
   this.owner;
+  /**
+   * The parent is typically the same as the owner.
+   * But the widget may be used by another widget (like a popup), in that case the parent will be changed to the popup but the owner stays the same.
+   * This means the popup is now the temporary parent, when the popup is destroyed its widgets are not because the popup is not the owner.
+   * Example: ViewMenuPopup uses the ViewButtons as menu items. These view buttons are owned by the desktop and must therefore not be destroyed
+   * when the popup closes, otherwise they could not be reused the second time the popup opens.
+   */
   this.parent;
   this.children = [];
   this.initialized = false;

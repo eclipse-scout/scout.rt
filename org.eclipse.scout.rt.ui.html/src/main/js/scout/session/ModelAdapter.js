@@ -89,14 +89,12 @@ scout.ModelAdapter.prototype._initModel = function(model, parent) {
   scout.defaultValues.applyTo(model);
 
   model.parent = parent;
+  model.owner = parent; // Set it explicitly because server sends owner in inspector mode -> ignore the owner sent by server.
   model.modelAdapter = this;
 
-  if (model.owner !== undefined) {
-    // Prefer the owner sent by the server
-    model.owner = this.session.getModelAdapter(model.owner).widget;
-    if (!model.owner) {
-      throw new Error('owner not found.');
-    }
+  if (model.global) {
+    // Use the root adapter as owner if global is set to true
+    model.owner = this.session.getModelAdapter('1').widget;
   }
 
   this._initProperties(model);

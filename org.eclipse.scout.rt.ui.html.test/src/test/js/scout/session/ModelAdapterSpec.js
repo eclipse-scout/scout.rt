@@ -195,7 +195,7 @@ describe('ModelAdapter', function() {
     });
 
     it('does not destroy children, which are globally used', function() {
-      childModel.owner = session.rootAdapter.id;
+      childModel.global = true;
 
       var message = {
         adapterData: mapAdapterData(childModel),

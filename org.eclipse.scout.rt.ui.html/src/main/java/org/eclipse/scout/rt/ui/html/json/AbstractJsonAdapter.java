@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -127,10 +128,13 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     putProperty(json, "objectType", getObjectTypeVariant());
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, getModel());
 
-    // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
-    // Note: The parent adapter is called "owner" in the UI, whereas "parent" refers to the "outer field".
-    // FIXME bsh, cgu: What if owner is different from creator but not the root adapter? How to check???
+    // Mark the global adapters so the UI may use the root adapter as owner
     if (getParent() == getUiSession().getRootJsonAdapter()) {
+      putProperty(json, "global", true);
+    }
+    // The owner is not relevant for the UI, it always uses its creator as owner, or the root adapter if global is true
+    // But other clients (like JMEter) may need this information to easier link the individual adapters
+    if (UrlHints.isInspectorHint(getUiSession().currentHttpRequest())) {
       putProperty(json, "owner", getParent().getId());
     }
     return json;

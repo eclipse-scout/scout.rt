@@ -54,12 +54,11 @@ scout.Session = function() {
   this._deferred;
   this._fatalMessagesOnScreen = {};
 
-  // FIXME [awe] 6.1 - rename in RootAdapter, should also have a widget, see FIXME in Session#_processEvents
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     session: this,
     id: '1',
-    objectType: 'GlobalAdapter'
+    objectType: 'RootAdapter'
   });
   this.rootAdapter.createWidget({
     session: this,
