@@ -214,12 +214,10 @@ scout.TreeAdapter.prototype._onNodesChecked = function(nodes) {
 
   this.widget.checkNodes(checkedNodes, {
     checked: true,
-    checkOnlyEnabled: false,
-    checkChildren: false
+    checkOnlyEnabled: false
   });
   this.widget.uncheckNodes(uncheckedNodes, {
-    checkOnlyEnabled: false,
-    checkChildren: false
+    checkOnlyEnabled: false
   });
 };
 

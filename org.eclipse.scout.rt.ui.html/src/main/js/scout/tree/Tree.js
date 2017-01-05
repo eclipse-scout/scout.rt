@@ -2135,7 +2135,8 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   var opts = {
     checked: true,
     checkOnlyEnabled: true,
-    checkChildren: this.autoCheckChildren
+    checkChildren: this.autoCheckChildren,
+    triggerNodesChecked: true
   };
   $.extend(opts, options);
   var updatedNodes = [];
@@ -2165,11 +2166,14 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
     updatedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, opts.checked, true);
     if (opts.checkChildren) {
-      this.checkNodes(node.childNodes, opts);
+      var childOpts = $.extend({}, opts, {
+        triggerNodesChecked: false
+      });
+      this.checkNodes(node.childNodes, childOpts);
     }
   }, this);
 
-  if (updatedNodes.length > 0) {
+  if (opts.triggerNodesChecked && updatedNodes.length > 0) {
     this.trigger('nodesChecked', {
       nodes: updatedNodes
     });
