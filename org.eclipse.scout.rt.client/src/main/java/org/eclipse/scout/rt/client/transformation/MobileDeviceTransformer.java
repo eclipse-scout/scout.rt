@@ -64,6 +64,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     transformations.add(MobileDeviceTransformation.HIDE_FIELD_STATUS);
     transformations.add(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
     transformations.add(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM);
+    transformations.add(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
 
     for (IDeviceTransformation transformation : transformations) {
       getDeviceTransformationConfig().enableTransformation(transformation);
@@ -218,6 +219,9 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     else if (field instanceof IPlaceholderField) {
       transformPlaceholderField((IPlaceholderField) field);
     }
+    else if (field instanceof ISequenceBox) {
+      transformSequenceBox((ISequenceBox) field);
+    }
   }
 
   /**
@@ -311,6 +315,23 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   protected void transformPlaceholderField(IPlaceholderField field) {
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD, field)) {
       field.setVisible(false);
+    }
+  }
+
+  /**
+   * Make the sequence box use its UI height. This is necessary if the labels of the containing fields are moved to top
+   * because in that case a logical row height of 1 is not sufficient anymore.
+   */
+  protected void transformSequenceBox(ISequenceBox box) {
+    if (!getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT, box)) {
+      return;
+    }
+    GridData gridDataHints = box.getGridDataHints();
+    if (!gridDataHints.useUiHeight) {
+      gridDataHints.useUiHeight = true;
+      box.setGridDataHints(gridDataHints);
+
+      markGridDataDirty(box.getForm());
     }
   }
 
