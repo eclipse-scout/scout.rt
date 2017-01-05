@@ -197,7 +197,7 @@ scout.Tree.prototype._resetTreeNode = function(node, parentNode) {
   node.reset();
 };
 
-scout.Tree.prototype._isSelectedNode = function(node) {
+scout.Tree.prototype.isSelectedNode = function(node) {
   if (this.initialTraversing) {
     return this.selectedNodes.indexOf(node.id) > -1;
   } else {
@@ -207,7 +207,7 @@ scout.Tree.prototype._isSelectedNode = function(node) {
 
 scout.Tree.prototype._updateFlatListAndSelectionPath = function(node, parentNode) {
   // if this node is selected all parent nodes have to be added to selectionPath
-  if (this._isSelectedNode(node) && ((node.parentNode && !this.visibleNodesMap[node.parentNode.id]) || node.level === 0)) {
+  if (this.isSelectedNode(node) && ((node.parentNode && !this.visibleNodesMap[node.parentNode.id]) || node.level === 0)) {
     var p = node;
     while (p) {
       this._inSelectionPathList[p.id] = true;
@@ -229,7 +229,7 @@ scout.Tree.prototype._updateFlatListAndSelectionPath = function(node, parentNode
       }
       p = p.parentNode;
     }
-  } else if (node.parentNode && this._isSelectedNode(node.parentNode)) {
+  } else if (node.parentNode && this.isSelectedNode(node.parentNode)) {
     this._inSelectionPathList[node.id] = true;
   }
 

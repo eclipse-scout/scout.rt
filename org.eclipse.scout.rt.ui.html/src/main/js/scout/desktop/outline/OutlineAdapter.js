@@ -104,6 +104,10 @@ scout.OutlineAdapter.prototype._onDetailTableRowInitialized = function(event) {
       outline._removeFromFlatList(node, false);
     }
   }
+  if (this.widget.isSelectedNode(node) && !this.widget.detailContent) {
+    // Table row detail could not be created because the link from page to row was missing at the time the node got selected -> do it now
+    this.widget.updateDetailContent();
+  }
 };
 
 /**
