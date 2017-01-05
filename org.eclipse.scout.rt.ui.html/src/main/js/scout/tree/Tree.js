@@ -2143,7 +2143,7 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   nodes.forEach(function(node) {
     if ((!node.enabled && opts.checkOnlyEnabled) || node.checked === opts.checked) {
       if (opts.isCheckChildren) {
-        updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
+        this.checkChildren(node, opts.checked);
       }
       return;
     }
@@ -2161,9 +2161,7 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
     }
     updatedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, opts.checked, true);
-    if (opts.notifyServer) {
-      updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
-    }
+    this.checkChildren(node, opts.checked);
   }, this);
 
   if (opts.notifyServer) {

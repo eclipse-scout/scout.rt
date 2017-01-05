@@ -111,6 +111,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private final ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>> m_objectExtensions;
   private List<IMenu> m_currentNodeMenus;
 
+  /**
+   * In autoCheckChildren mode only the effectively checked parent nodes should cause nodesChecked Events (to minimize
+   * network traffic). setNodesChecked is called recursively by the intercepter. The m_currentParentNodes list is used
+   * to avoid firing events inside the recursion.
+   */
+  private List<ITreeNode> m_currentParentNodes;
+
   public AbstractTree() {
     this(true);
   }
@@ -1483,14 +1490,22 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     if (changedNodes.size() > 0) {
       if (isAutoCheckChildNodes() && isMultiCheck()) {
+        if (m_currentParentNodes == null) {
+          m_currentParentNodes = nodes;
+        }
         try {
           interceptAutoCheckChildNodes(nodes);
         }
         catch (RuntimeException ex) {
           BEANS.get(ExceptionHandler.class).handle(ex);
         }
+        if (nodes.equals(m_currentParentNodes)) {
+          m_currentParentNodes = null;
+        }
       }
-      fireNodesChecked(changedNodes);
+      if (m_currentParentNodes == null) {
+        fireNodesChecked(changedNodes);
+      }
     }
   }
 
