@@ -94,6 +94,15 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
             .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever())));
   }
 
+  /**
+   * Discards all pool entries.<br>
+   * <b>Note:<b/> Should be used for testing purposes only.
+   */
+  public void discardAllPoolEntries() {
+    m_portPool.discardAllPoolEntries();
+    m_servicePool.discardAllPoolEntries();
+  }
+
   @Override
   public void addDiagnosticItemToList(List<List<String>> result) {
     DiagnosticFactory.addDiagnosticItemToList(result, "JAX-WS Pool", "", DiagnosticFactory.STATUS_TITLE);

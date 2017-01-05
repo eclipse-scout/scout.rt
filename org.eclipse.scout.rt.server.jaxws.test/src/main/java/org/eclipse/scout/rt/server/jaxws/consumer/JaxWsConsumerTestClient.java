@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.jaxws.consumer;
 
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.JaxWsConsumerTestService;
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.JaxWsConsumerTestServicePortType;
+import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
 
 /**
  * Web service client for the {@link JaxWsConsumerTestServiceProvider} testing service.
@@ -20,4 +21,15 @@ import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.JaxWsConsumerTe
  */
 public class JaxWsConsumerTestClient extends AbstractWebServiceClient<JaxWsConsumerTestService, JaxWsConsumerTestServicePortType> {
 
+  /**
+   * Discards all ports and services pooled by the {@link PooledPortProvider}. Does nothing if a different
+   * {@link IPortProvider} is used.
+   */
+  public void discardAllPoolEntries() {
+    if (!(m_portProvider instanceof PooledPortProvider<?, ?>)) {
+      return;
+    }
+
+    ((PooledPortProvider<?, ?>) m_portProvider).discardAllPoolEntries();
+  }
 }

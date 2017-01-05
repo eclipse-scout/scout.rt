@@ -107,7 +107,24 @@ public abstract class AbstractNonBlockingPool<T> {
   /**
    * Discards expired pool entries.
    */
-  protected void discardExpiredPoolEntries() {
+  public void discardExpiredPoolEntries() {
+    discardPoolEntries(false);
+  }
+
+  /**
+   * Discards all pool entries.
+   */
+  public void discardAllPoolEntries() {
+    discardPoolEntries(true);
+  }
+
+  /**
+   * Discards pool entries.
+   *
+   * @param all
+   *          discards all entries if parameter value is <code>true</code>. Otherwise only expired ones.
+   */
+  protected void discardPoolEntries(boolean all) {
     try {
       for (T idleElement : new HashSet<>(m_idleElements.keySet())) {
         final State state = m_idleElements.remove(idleElement);
@@ -115,7 +132,7 @@ public abstract class AbstractNonBlockingPool<T> {
           // Another thread took the element concurrently.
           continue;
         }
-        if (state.isExpired()) {
+        if (state.isExpired() || all) {
           cleanupInternal(idleElement);
           continue;
         }

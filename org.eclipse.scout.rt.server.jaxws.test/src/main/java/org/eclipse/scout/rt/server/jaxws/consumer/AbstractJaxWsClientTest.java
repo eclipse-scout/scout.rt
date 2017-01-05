@@ -46,10 +46,8 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
 /**
  * Abstract test for web service consumers. <br>
@@ -60,7 +58,6 @@ import org.junit.runners.MethodSorters;
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(JaxWsConsumerTestServerSession.class)
 @RunWithSubject("default")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class AbstractJaxWsClientTest {
 
   private static final String X_SCOUT_JAX_WS_TEST_HEADER = "X-Scout-JaxWsTestHeader";
@@ -500,6 +497,9 @@ public abstract class AbstractJaxWsClientTest {
   public void testAcquirePortInDifferentTransactions() throws InterruptedException {
     final Holder<JaxWsConsumerTestServicePortType> txn1PortHolder = new Holder<>(JaxWsConsumerTestServicePortType.class);
     final Holder<JaxWsConsumerTestServicePortType> txn2PortHolder = new Holder<>(JaxWsConsumerTestServicePortType.class);
+
+    // This test case expects at most one port in the pool. It is guaranteed by discarding all pooled entries.
+    BEANS.get(JaxWsConsumerTestClient.class).discardAllPoolEntries();
 
     ServerRunContexts.copyCurrent().run(
         new IRunnable() {
