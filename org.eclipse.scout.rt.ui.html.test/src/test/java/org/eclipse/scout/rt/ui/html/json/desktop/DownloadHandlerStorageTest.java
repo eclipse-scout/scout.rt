@@ -40,7 +40,12 @@ public class DownloadHandlerStorageTest {
 
   @Test
   public void testRemove() {
-    DownloadHandlerStorage storage = new DownloadHandlerStorage();
+    DownloadHandlerStorage storage = new DownloadHandlerStorage() {
+      @Override
+      protected long getRemovalTimeoutAfterFirstRequest() {
+        return 100L;
+      }
+    };
     BinaryResource res = new BinaryResource("bar.txt", null);
     BinaryResourceHolder holder = new BinaryResourceHolder(res);
     storage.put(KEY, holder, OpenUriAction.DOWNLOAD);
@@ -48,7 +53,10 @@ public class DownloadHandlerStorageTest {
     BinaryResourceHolderWithAction holderWithAction = storage.get(KEY);
     assertEquals(OpenUriAction.DOWNLOAD, holderWithAction.getOpenUriAction());
     assertEquals(res, holderWithAction.getHolder().get());
-    assertEquals("futureMap must be cleared when element is removed", 0, storage.futureMap().size());
+    assertEquals("future should still be in futureMap", 1, storage.futureMap().size());
+    assertEquals(res, holderWithAction.getHolder().get());
+    SleepUtil.sleepElseLog(150, TimeUnit.MILLISECONDS);
+    assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
     assertNull(storage.get(KEY));
   }
 

@@ -73,6 +73,17 @@ public class DownloadHandlerStorage {
   }
 
   /**
+   * Because certain OS/Download-Managers (for example the „Stock Browser“ on Android) send two requests to actually
+   * start the download of a file, we introduce a timeout before the removal of the downloadable resource in order to
+   * allow multiple requests before the actual download.
+   *
+   * @return Removal timeout after first request
+   */
+  protected long getRemovalTimeoutAfterFirstRequest() {
+    return TimeUnit.SECONDS.toMillis(5);
+  }
+
+  /**
    * Put a downloadable item in the storage, after the given TTL has passed the item is removed automatically.
    */
   public void put(String key, BinaryResourceHolder holder, IOpenUriAction opeUriAction) {
@@ -84,7 +95,7 @@ public class DownloadHandlerStorage {
   }
 
   protected void scheduleRemoval(final String key, long ttl) {
-    m_futureMap.put(key, Jobs.schedule(new IRunnable() {
+    final IFuture oldFuture = m_futureMap.put(key, Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         removeOnTimeout(key);
@@ -94,12 +105,19 @@ public class DownloadHandlerStorage {
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(ttl, TimeUnit.MILLISECONDS))));
+
+    if (oldFuture != null && !oldFuture.isCancelled()) {
+      oldFuture.cancel(false);
+    }
   }
 
   protected void removeOnTimeout(String key) {
     synchronized (m_valueMap) {
       m_valueMap.remove(key);
-      m_futureMap.remove(key);
+      IFuture future = m_futureMap.remove(key);
+      if (future != null && !future.isCancelled()) {
+        future.cancel(false);
+      }
     }
   }
 
@@ -115,13 +133,7 @@ public class DownloadHandlerStorage {
     }
     if (resHolderWithAction != null) {
       if (resHolderWithAction.getOpenUriAction() == OpenUriAction.DOWNLOAD) {
-        IFuture future = m_futureMap.remove(key);
-        if (future != null) {
-          future.cancel(false);
-        }
-        synchronized (m_valueMap) {
-          resHolderWithAction = m_valueMap.remove(key);
-        }
+        scheduleRemoval(key, getRemovalTimeoutAfterFirstRequest());
       }
       else {
         if (!containsDownloadInterceptor(resHolderWithAction.getHolder())) {
