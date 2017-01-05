@@ -530,6 +530,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * </tr>
    * </table>
    * <p>
+   * Note that this value is actually the minimum logical height if the field is scalable (see
+   * {@link #getConfiguredGridWeightY()}.
+   * <p>
    * Subclasses can override this method. Default is 1.
    *
    * @return the number of rows to span

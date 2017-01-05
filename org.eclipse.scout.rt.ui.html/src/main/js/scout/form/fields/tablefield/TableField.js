@@ -12,6 +12,7 @@ scout.TableField = function() {
   scout.TableField.parent.call(this);
 
   this.gridDataHints.weightY = 1.0;
+  this.gridDataHints.h = 3;
   this._tableChangedHandler;
   this._deletedRows = [];
   this._insertedRows = [];

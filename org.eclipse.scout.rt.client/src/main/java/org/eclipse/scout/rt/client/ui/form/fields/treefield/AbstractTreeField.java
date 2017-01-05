@@ -77,6 +77,21 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     return false;
   }
 
+  @Override
+  protected double getConfiguredGridWeightY() {
+    return 1;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Default for a tree field is 3.
+   */
+  @Override
+  protected int getConfiguredGridH() {
+    return 3;
+  }
+
   /**
    * called before any lookup is performed
    */

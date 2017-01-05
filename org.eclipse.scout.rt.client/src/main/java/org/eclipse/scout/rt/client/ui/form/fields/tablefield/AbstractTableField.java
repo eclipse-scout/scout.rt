@@ -147,6 +147,16 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     return 1;
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Default for a table field is 3.
+   */
+  @Override
+  protected int getConfiguredGridH() {
+    return 3;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();

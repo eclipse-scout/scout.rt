@@ -162,6 +162,16 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     return 1.0;
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Default for a list box is 2.
+   */
+  @Override
+  protected int getConfiguredGridH() {
+    return 2;
+  }
+
   private List<Class<IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, IFormField.class);

@@ -11,6 +11,7 @@
 scout.ListBox = function() {
   scout.ListBox.parent.call(this);
   this.gridDataHints.weightY = 1.0;
+  this.gridDataHints.h = 2;
   this._addAdapterProperties(['table', 'filterBox']);
 };
 scout.inherits(scout.ListBox, scout.ValueField);

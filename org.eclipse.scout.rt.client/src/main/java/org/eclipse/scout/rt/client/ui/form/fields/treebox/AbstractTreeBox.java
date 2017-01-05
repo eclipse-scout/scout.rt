@@ -215,6 +215,16 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return 1.0;
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Default for a tree box is 2.
+   */
+  @Override
+  protected int getConfiguredGridH() {
+    return 2;
+  }
+
   private List<Class<IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, IFormField.class);
