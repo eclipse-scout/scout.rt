@@ -238,16 +238,18 @@ scout.SmartField.prototype._onKeyDown = function(e) {
   }
 
   // We must prevent default focus handling
-  if (e.which === scout.keys.TAB && this.mode !== scout.FormField.MODE_CELLEDITOR) {
-    if (this._isPreventDefaultTabHandling()) {
-      e.preventDefault();
-      this._tabPrevented = {
-        directionBack: e.shiftKey
-      };
-      this._acceptProposal();
-      this._navigating = false;
-      return;
+  if (e.which === scout.keys.TAB) {
+    if (this.mode === scout.FormField.MODE_DEFAULT) {
+      if (this._isPreventDefaultTabHandling()) {
+        e.preventDefault();
+        this._tabPrevented = {
+          directionBack: e.shiftKey
+        };
+      }
     }
+    this._acceptProposal();
+    this._navigating = false;
+    return;
   }
 
   if (e.which === scout.keys.ENTER) {
