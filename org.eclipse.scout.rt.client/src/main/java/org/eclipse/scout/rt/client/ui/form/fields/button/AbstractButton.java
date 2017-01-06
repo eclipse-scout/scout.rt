@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
@@ -277,16 +278,18 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public void setEnabledGranted(boolean enabled) {
-    if (isIgnoreGrantedFlagChange(enabled)) {
+  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren, final String dimension) {
+    if (isIgnoreEnabledChange(enabled, dimension)) {
+      // no need to do any propagation: no children available and parents are not disabled by propagation. See AbstractFormField#setEnabled()
       return;
     }
-    super.setEnabledGranted(enabled);
+
+    super.setEnabled(enabled, updateParents, updateChildren, dimension);
   }
 
-  protected boolean isIgnoreGrantedFlagChange(boolean newFlagVal) {
+  protected boolean isIgnoreEnabledChange(final boolean enabled, final String dimension) {
     boolean ignoreGrantedFlag = getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
-    return ignoreGrantedFlag && !newFlagVal; // cannot set the flag to false if this is a cancel or close button
+    return ignoreGrantedFlag && !enabled && IDimensions.ENABLED_GRANTED.equals(dimension); // cannot set the enabled_granted to false if this is a cancel or close button
   }
 
   /*

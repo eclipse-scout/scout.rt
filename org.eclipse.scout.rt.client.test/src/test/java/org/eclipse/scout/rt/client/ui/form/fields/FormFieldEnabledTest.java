@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithCancelButton.InnerBox;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithCancelButton.InnerBox.CancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithComposer.ComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithListBox.ListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithTable.TableField;
@@ -35,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_GroupBo
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_InnerForm.MainBox;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_OuterForm.MainBox.Wrapped;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -331,6 +334,32 @@ public class FormFieldEnabledTest {
     Assert.assertTrue(treeBox.getTreeBoxFilterBox().getCheckedStateRadioButtonGroup().getFieldByClass(AllButton.class).isEnabled());
   }
 
+  @Test
+  public void testCancelButtonNotDisabled() {
+    P_BoxWithCancelButton field = new P_BoxWithCancelButton();
+    InnerBox inner = field.getFieldByClass(InnerBox.class);
+    CancelButton button = inner.getFieldByClass(CancelButton.class);
+
+    Assert.assertTrue(field.isEnabled());
+    Assert.assertTrue(inner.isEnabled());
+    Assert.assertTrue(button.isEnabled());
+
+    field.setEnabledGranted(false, false, true);
+    Assert.assertFalse(field.isEnabled());
+    Assert.assertFalse(inner.isEnabled());
+    Assert.assertTrue(button.isEnabled());
+
+    field.setEnabledGranted(true, false, true);
+    Assert.assertTrue(field.isEnabled());
+    Assert.assertTrue(inner.isEnabled());
+    Assert.assertTrue(button.isEnabled());
+
+    button.setEnabledGranted(false, true, false);
+    Assert.assertTrue(field.isEnabled());
+    Assert.assertTrue(inner.isEnabled());
+    Assert.assertTrue(button.isEnabled());
+  }
+
   public static class P_InnerForm extends AbstractForm {
     public class MainBox extends P_GroupBox {
     }
@@ -429,6 +458,13 @@ public class FormFieldEnabledTest {
 
   public static class P_BoxWithComposer extends AbstractGroupBox {
     public class ComposerField extends AbstractComposerField {
+    }
+  }
+
+  public static class P_BoxWithCancelButton extends AbstractGroupBox {
+    public class InnerBox extends AbstractGroupBox {
+      public class CancelButton extends AbstractCancelButton {
+      }
     }
   }
 }
