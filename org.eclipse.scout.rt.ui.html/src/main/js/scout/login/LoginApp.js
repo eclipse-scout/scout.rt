@@ -36,7 +36,7 @@ scout.LoginApp.prototype._prepareEssentials = function(options) {
  * No bootstrapping required
  * @override
  */
-scout.App.prototype._doBootstrap = function(options) {
+scout.LoginApp.prototype._doBootstrap = function(options) {
   return [];
 };
 
