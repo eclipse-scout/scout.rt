@@ -129,10 +129,10 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
           .writeCorrelationId(CorrelationId.CURRENT.get())
           .build();
     }
-    catch (final Exception e) { // NOSONAR
-      BEANS.get(ExceptionHandler.class).handle(e);
+    catch (final Throwable t) { // NOSONAR (Always send a response, even if a PlatformError is thrown. Otherwise the caller might wait forever.)
+      BEANS.get(ExceptionHandler.class).handle(t);
       return JmsMessageWriter.newInstance(m_mom.getDefaultSession(), marshaller)
-          .writeTransferObject(interceptRequestReplyException(e))
+          .writeTransferObject(interceptRequestReplyException(t))
           .writeRequestReplySuccess(false)
           .writeReplyId(replyId)
           .writeCorrelationId(CorrelationId.CURRENT.get())
