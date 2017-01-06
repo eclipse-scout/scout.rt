@@ -24,8 +24,7 @@ scout.inherits(scout.NumberColumn, scout.Column);
  */
 scout.NumberColumn.prototype._init = function(model) {
   scout.NumberColumn.parent.prototype._init.call(this, model);
-
-  this._setDecimalFormat(this.format);
+  this._setDecimalFormat(this.decimalFormat);
 };
 
 scout.NumberColumn.prototype._setDecimalFormat = function(format) {
