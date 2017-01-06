@@ -92,3 +92,7 @@ scout.TextMap.prototype.addAll = function(textMap) {
 scout.TextMap.prototype.setParent = function(parent) {
   this.parent = parent;
 };
+
+scout.TextMap.prototype.remove = function(textKey) {
+  delete this.map[textKey];
+};

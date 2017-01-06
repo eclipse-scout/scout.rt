@@ -101,6 +101,10 @@ scout.codes = {
    */
   registerTexts: function(code, texts) {
     var key = scout.codes.generateTextKey(code);
+
+    // In case of changed defaultLanguage clear the 'default' entry
+    scout.texts.get('default').remove(key);
+
     for (var languageTag in texts) { // NOSONAR
       var text = texts[languageTag];
       // Use defaultLanguage as default, if specified (may be changed or set to null by the app).
