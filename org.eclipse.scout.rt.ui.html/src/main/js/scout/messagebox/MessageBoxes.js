@@ -21,6 +21,7 @@ scout.MessageBoxes = function(parent) {
   this.severity = scout.MessageBox.SEVERITY.INFO;
   this.headerText = null;
   this.closeOnClick = true;
+  this.html = false;
   this.parent = parent;
 };
 
@@ -34,8 +35,14 @@ scout.MessageBoxes.prototype.withHeader = function(headerText) {
   return this;
 };
 
-scout.MessageBoxes.prototype.withBody = function(bodyText) {
+/**
+ * @param bodyText
+ * @param {boolean} [html] Set to true if body must contain HTML, default is false
+ * @returns {scout.MessageBoxes}
+ */
+scout.MessageBoxes.prototype.withBody = function(bodyText, html) {
   this.bodyText = bodyText;
+  this.html = scout.nvl(html, false);
   return this;
 };
 
@@ -74,6 +81,10 @@ scout.MessageBoxes.prototype.build = function() {
   }
   if (scout.strings.hasText(this.cancelText)) {
     options.cancelButtonText = this.cancelText;
+  }
+  if (this.html) { // FIXME [awe] 6.1 - discuss with S.ME - why do we need TWO properties for body?
+    options.html = options.body;
+    delete options.body;
   }
   return scout.create('MessageBox', options);
 };
