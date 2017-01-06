@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  */
 @ClassId("8fa1676b-042d-4d56-b4ba-af620eeee4cb")
 public abstract class AbstractTableControl extends AbstractAction implements ITableControl {
+
   private ITable m_table;
 
   public AbstractTableControl() {
@@ -47,7 +48,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
 
   @Override
   protected void execSelectionChanged(boolean selected) {
-    if (!selected) {
+    if (!selected || m_table == null) {
       return;
     }
     // Deselect other controls
@@ -57,5 +58,4 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
       }
     }
   }
-
 }
