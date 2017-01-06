@@ -1418,6 +1418,13 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
             xhr.setRequestHeader(i, headers[i]);
           }
 
+          // apply custom fields (if provided)
+          if (options.xhrFields) {
+            for (var j in options.xhrFields) {
+              xhr[j] = options.xhrFields[j];
+            }
+          }
+
           xhr.responseType = dataType;
           xhr.send(data);
         },
