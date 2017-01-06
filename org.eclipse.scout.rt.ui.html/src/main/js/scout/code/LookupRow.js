@@ -13,12 +13,14 @@ scout.LookupRow = function() {
   this.text = null;
 };
 
+scout.LookupRow.prototype.init = function(model) {
+  $.extend(this, model);
+};
+
 scout.LookupRow.prototype.setId = function(id) {
   this.id = id;
-  return this;
 };
 
 scout.LookupRow.prototype.setText = function(text) {
   this.text = text;
-  return this;
 };

@@ -345,6 +345,7 @@
   __include("scout/messagebox/MessageBox.js");
   __include("scout/messagebox/MessageBoxAdapter.js");
   __include("scout/messagebox/MessageBoxController.js");
+  __include("scout/messagebox/MessageBoxes.js");
   // Form fields (A-Z)
   __include("scout/form/fields/beanfield/BeanField.js");
   __include("scout/form/fields/beanfield/BeanFieldAdapter.js");

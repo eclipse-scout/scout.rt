@@ -40,7 +40,7 @@ scout.Status.prototype.isError = function() {
 };
 
 /**
- * @return a clone of this Status instance.
+ * @return {scout.Status} a clone of this Status instance.
  */
 scout.Status.prototype.clone = function() {
   var modelClone = $.extend({}, this);
@@ -103,7 +103,7 @@ scout.Status.ensure = function(status) {
 };
 
 /**
- * @returns a Status object with severity OK.
+ * @returns {scout.Status} a Status object with severity OK.
  */
 scout.Status.ok = function(model) {
   model = model || {};
@@ -114,7 +114,7 @@ scout.Status.ok = function(model) {
 };
 
 /**
- * @returns a Status object with severity INFO.
+ * @returns {scout.Status} a Status object with severity INFO.
  */
 scout.Status.info = function(model) {
   model = model || {};
@@ -125,7 +125,7 @@ scout.Status.info = function(model) {
 };
 
 /**
- * @returns a Status object with severity WARN.
+ * @returns {scout.Status} a Status object with severity WARN.
  */
 scout.Status.warn = function(model) {
   model = model || {};
@@ -136,7 +136,7 @@ scout.Status.warn = function(model) {
 };
 
 /**
- * @returns a Status object with severity ERROR.
+ * @returns {scout.Status} a Status object with severity ERROR.
  */
 scout.Status.error = function(model) {
   model = model || {};

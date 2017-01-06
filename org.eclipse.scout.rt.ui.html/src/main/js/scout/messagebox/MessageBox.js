@@ -15,7 +15,6 @@ scout.MessageBox = function() {
   this.severity;
   this.body;
   this.cancelButtonText;
-  this.copyPasteText;
   this.header;
   this.hiddenText;
   this.html;
@@ -31,7 +30,6 @@ scout.MessageBox = function() {
   this.$cancelButton;
   this._$abortButton;
   this.displayParent;
-  this.focusListener;
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
@@ -41,6 +39,12 @@ scout.MessageBox.SEVERITY = {
   INFO: 256,
   WARNING: 65536,
   ERROR: 16777216
+};
+
+scout.MessageBox.Buttons = {
+  YES: 'yes',
+  NO: 'no',
+  CANCEL: 'cancel'
 };
 
 /**
@@ -91,21 +95,21 @@ scout.MessageBox.prototype._render = function($parent) {
   if (this.yesButtonText) {
     this.$yesButton = boxButtons.addButton({
       text: this.yesButtonText,
-      option: 'yes'
+      option: scout.MessageBox.Buttons.YES
     });
     this._$abortButton = this.$yesButton;
   }
   if (this.noButtonText) {
     this.$noButton = boxButtons.addButton({
       text: this.noButtonText,
-      option: 'no'
+      option: scout.MessageBox.Buttons.NO
     });
     this._$abortButton = this.$noButton;
   }
   if (this.cancelButtonText) {
     this.$cancelButton = boxButtons.addButton({
       text: this.cancelButtonText,
-      option: 'cancel'
+      option: scout.MessageBox.Buttons.CANCEL
     });
     this._$abortButton = this.$cancelButton;
   }
@@ -234,3 +238,4 @@ scout.MessageBox.prototype._detach = function() {
   this.$container.detach();
   scout.MessageBox.parent.prototype._detach.call(this);
 };
+
