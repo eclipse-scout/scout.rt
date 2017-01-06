@@ -255,6 +255,22 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(12345.6789)).toBe('M123~456!79');
       expect(decimalFormat.format(-1)).toBe('10!00');
       expect(decimalFormat.format(-1.002)).toBe('10!02');
+
+      // rounding
+      decimalFormat = new scout.DecimalFormat(locale, {
+        pattern: '##0',
+        multiplier: 100
+      });
+      expect(decimalFormat.round(0)).toBe(0);
+      expect(decimalFormat.round(0.000)).toBe(0);
+      expect(decimalFormat.round(0.1234)).toBe(0.12);
+      expect(decimalFormat.round(0.1298)).toBe(0.13);
+      expect(decimalFormat.round(1.0002)).toBe(1);
+      expect(decimalFormat.round(1000.1234)).toBe(1000.12);
+      expect(decimalFormat.round(12345.6789)).toBe(12345.68);
+      expect(decimalFormat.round(-1)).toBe(-1);
+      expect(decimalFormat.round(-1.002)).toBe(-1);
+      expect(decimalFormat.round(-1.008)).toBe(-1.01);
     });
 
     it("can handle rounding mode", function() {

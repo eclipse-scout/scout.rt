@@ -190,8 +190,23 @@ scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
 /**
  * Rounds a number according to the properties of the DecimalFormat.
  */
-scout.DecimalFormat.prototype.round = function(number) {
-  return scout.numbers.round(number, this.roundingMode, this.allAfter);
+scout.DecimalFormat.prototype.round = function(number, applyMultiplier) {
+  applyMultiplier = scout.nvl(applyMultiplier, true);
+  if (number === null || number === undefined) {
+    return null;
+  }
+
+  // apply multiplier
+  if (applyMultiplier && this.multiplier !== 1) {
+    number *= this.multiplier;
+  }
+  // round
+  number = scout.numbers.round(number, this.roundingMode, this.allAfter);
+  // un-apply multiplier
+  if (applyMultiplier && this.multiplier !== 1) {
+    number /= this.multiplier;
+  }
+  return number;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
