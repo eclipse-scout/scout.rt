@@ -11,6 +11,8 @@
 scout.CalendarLayout = function(calendar) {
   scout.CalendarLayout.parent.call(this);
   this.calendar = calendar;
+  this.stacked = false;
+  this.compacted = false;
 };
 scout.inherits(scout.CalendarLayout, scout.AbstractLayout);
 
@@ -23,10 +25,57 @@ scout.CalendarLayout.prototype.layout = function($container) {
   height += $container.cssMarginTop() + $container.cssMarginBottom();
   $container.css('height', 'calc(100% - ' + height + 'px)');
 
+  this.undoCompact();
+  this.undoStack();
+  if ($header[0].scrollWidth > $container.width()) {
+    this.stack();
+  }
+  if ($header[0].scrollWidth > $container.width()) {
+    this.compact();
+  }
+
   headerHeight = $header.outerHeight(true);
   $yearContainer.css('height', 'calc(100% - ' + (headerHeight + $yearContainer.cssMarginY()) + 'px)');
   $grid.css('height', 'calc(100% - ' + (headerHeight + $grid.cssMarginY()) + 'px)');
 
   this.calendar.layoutSize();
   this.calendar.layoutYearPanel();
+};
+
+scout.CalendarLayout.prototype.compact = function() {
+  if (this.compacted) {
+    return;
+  }
+  var $headerRow2 = this.calendar.$headerRow2;
+  this.calendar.$title.appendTo(this.calendar.$headerRow2);
+  $headerRow2.show();
+  this.compacted = true;
+};
+
+scout.CalendarLayout.prototype.undoCompact = function() {
+  if (!this.compacted) {
+    return;
+  }
+  var $headerRow2 = this.calendar.$headerRow2;
+  this.calendar.$title.insertBefore(this.calendar.$commands);
+  $headerRow2.hide();
+  this.compacted = false;
+};
+
+scout.CalendarLayout.prototype.stack = function() {
+  if (this.stacked) {
+    return;
+  }
+  this.calendar.$commands.children('.calendar-mode').hide();
+  this.calendar.modesMenu.setVisible(true);
+  this.stacked = true;
+};
+
+scout.CalendarLayout.prototype.undoStack = function() {
+  if (!this.stacked) {
+    return;
+  }
+  this.calendar.$commands.children('.calendar-mode').show();
+  this.calendar.modesMenu.setVisible(false);
+  this.stacked = false;
 };

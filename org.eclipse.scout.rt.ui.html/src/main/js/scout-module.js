@@ -157,6 +157,8 @@
   __include("scout/calendar/CalendarComponentAdapter.js");
   __include("scout/calendar/CalendarListComponent.js");
   __include("scout/calendar/CalendarLayout.js");
+  __include("scout/calendar/CalendarModeMenu.js");
+  __include("scout/calendar/CalendarModesMenu.js");
   __include("scout/calendar/DateRange.js");
   __include("scout/calendar/YearPanel.js");
   __include("scout/planner/Planner.js");

@@ -32,8 +32,7 @@
 
 .calendar-header {
   position: relative;
-  display: table;
-  width: 100%;
+  display: block;
   white-space: nowrap;
   padding: 8px 3px 12px 0;
 
@@ -44,10 +43,20 @@
   }
 }
 
+.calendar-header-row {
+  display: table;
+  width: 100%;
+
+  &.last {
+    padding-top: 10px;
+  }
+}
+
 .calendar-range {
   display: table-cell;
   vertical-align: middle;
   padding-left: 8px;
+  width: 1%;
 }
 
 .calendar-previous,
@@ -73,6 +82,15 @@
 
 .calendar-today {
   width: 65px;
+}
+
+.calendar-title {
+  display: table-cell;
+  vertical-align: middle;
+
+  .calendar-header-row.last > & {
+    text-align: center;
+  }
 }
 
 .calendar-select {
@@ -143,6 +161,12 @@
   &:hover {
     color: @calendar-mode-active-text-color;
   }
+}
+
+.calendar-mode-menu {
+  padding: 5px 12px;
+  border: 1px solid @border-color;;
+  border-radius: @border-radius;
 }
 
 .calendar-toggle-year,

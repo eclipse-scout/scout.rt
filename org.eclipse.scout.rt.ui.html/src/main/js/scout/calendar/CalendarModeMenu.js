@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/**
- * Enum providing display-modes for calender-like components like calendar and planner.
- */
-scout.CalendarDisplayMode = {
-  DAY: 1,
-  WEEK: 2,
-  MONTH: 3,
-  WORK_WEEK: 4,
-  CALENDAR_WEEK: 5,
-  YEAR: 6
+scout.CalendarModeMenu = function() {
+  scout.CalendarModeMenu.parent.call(this);
+};
+scout.inherits(scout.CalendarModeMenu, scout.Menu);
+
+scout.CalendarModeMenu.prototype.doAction = function() {
+  if (!this.prepareDoAction()) {
+    return false;
+  }
+
+  // unselect is not possible
+  this.setSelected(true);
+
+  // close menu, cannot be done in parent menu itself because selecting an already selected item does not trigger an event
+  this.parentMenu.setSelected(false);
+  return true;
 };
