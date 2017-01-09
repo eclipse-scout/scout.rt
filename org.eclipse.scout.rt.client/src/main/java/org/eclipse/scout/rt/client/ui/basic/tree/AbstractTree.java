@@ -1655,6 +1655,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       setTreeChanging(true);
       //
       parent = resolveNode(parent);
+      if (parent == null) {
+        return; // wrong parent
+      }
       List<ITreeNode> newChildren = new ArrayList<ITreeNode>(children);
       // Fire NODES_INSERTED event before actually inserting the nodes, because during insertion, other events might occur (e.g. NODE_CHANGED in decorateCell())
       fireNodesInserted(parent, newChildren);
@@ -1714,6 +1717,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       setTreeChanging(true);
       //
       parent = resolveNode(parent);
+      if (parent == null) {
+        return; // wrong parent
+      }
       List<ITreeNode> newChildrenResolved = resolveNodes(newChildren);
       if (newChildren.size() > 0 && newChildrenResolved.size() == newChildren.size()) {
         ((AbstractTreeNode) parent).setChildNodeOrderInternal(newChildrenResolved);

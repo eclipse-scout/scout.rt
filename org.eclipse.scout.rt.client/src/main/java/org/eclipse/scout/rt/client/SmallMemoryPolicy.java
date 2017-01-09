@@ -51,6 +51,11 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
+  public void pageTableCreated(IPage<?> p) {
+    //nop
+  }
+
+  @Override
   public String toString() {
     return "Small";
   }

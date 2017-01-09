@@ -111,7 +111,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
 
     @Override
-    protected void execInitPage() {
+    protected void execInitTable() {
       getTable().setTableCustomizer(new AbstractTableCustomizer() {
         private byte seq;
 

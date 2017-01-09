@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -44,9 +45,11 @@ public interface IMemoryPolicy {
   /**
    * This method is called just after a new page was created using {@link IPage#initPage()}.
    * <p>
-   * Do not access the {@link IPageWithTable#getSearchFormInternal()} since it is lazy created.
+   * Do not access the {@link IPageWithTable#getSearchFormInternal()} or {@link IPage#getTable()} since it is lazy
+   * created.
    * <p>
-   * For search form caching use {@link #pageSearchFormStarted(IPageWithTable)} instead.
+   * For search form caching use {@link #pageSearchFormStarted(IPageWithTable)} instead.<br>
+   * For table caching use {@link #pageTableCreated(IPage)} instead.
    */
   void pageCreated(IPage<?> page);
 
@@ -69,5 +72,12 @@ public interface IMemoryPolicy {
    * After data is fetched and loaded this method is called to give the possibility to manipulate the table.
    */
   void afterTablePageLoadData(IPageWithTable<?> page);
+
+  /**
+   * This method is called after the {@link ITable} of the {@link IPage} has been created.
+   * 
+   * @param p
+   */
+  void pageTableCreated(IPage<?> p);
 
 }

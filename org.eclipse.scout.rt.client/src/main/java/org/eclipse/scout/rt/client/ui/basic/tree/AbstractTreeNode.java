@@ -124,7 +124,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public AbstractTreeNode(boolean callInitializer) {
     setFilterAccepted(true);
     m_childNodeListLock = new Object();
-    m_childNodeList = new ArrayList<ITreeNode>(0);
+    m_childNodeList = new ArrayList<ITreeNode>();
     m_filteredChildNodesLock = new Object();
     m_childrenLoadedLock = new OptimisticLock();
     m_cell = new Cell(this);
@@ -137,12 +137,15 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   protected void callInitializer() {
-    boolean isInitialized = FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
-    if (!isInitialized) {
+    if (!isInitialized()) {
       interceptInitConfig();
       initTreeNode();
       m_flags = FLAGS_BIT_HELPER.setBit(INITIALIZED, m_flags);
     }
+  }
+
+  protected boolean isInitialized() {
+    return FLAGS_BIT_HELPER.isBitSet(INITIALIZED, m_flags);
   }
 
   @Override
@@ -217,7 +220,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
       @Override
       public void run() {
         initConfig();
@@ -267,6 +270,15 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public <T extends IExtension<?>> T getExtension(Class<T> c) {
     return m_objectExtensions.getExtension(c);
+  }
+
+  /**
+   * Executes the given runnable in the extension context, in which this tree node object was created.
+   * 
+   * @see ObjectExtensions#runInExtensionContext(Runnable)
+   */
+  public void runInExtensionContext(Runnable runnable) {
+    m_objectExtensions.runInExtensionContext(runnable);
   }
 
   /**

@@ -178,7 +178,10 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     }
     putProperty(json, PROP_DETAIL_TABLE_VISIBLE, page.isTableVisible());
     if (page.isTableVisible()) {
-      putAdapterIdProperty(json, PROP_DETAIL_TABLE, page.getTable());
+      ITable table = page.getTable(false);
+      if (table != null) {
+        putAdapterIdProperty(json, PROP_DETAIL_TABLE, table);
+      }
     }
   }
 
@@ -189,15 +192,18 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     // No need to dispose detail form (it will be disposed automatically when it is closed)
   }
 
-  protected IJsonAdapter<?> attachDetailTable(IPage page) {
-    page.getTable().setProperty(JsonOutlineTable.PROP_PAGE, page);
-    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable());
+  protected void attachDetailTable(IPage page) {
+    ITable table = page.getTable(false);
+    if (table == null) {
+      return;
+    }
+    table.setProperty(JsonOutlineTable.PROP_PAGE, page);
+    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(table);
     m_jsonDetailTables.add(detailTableAdapter);
-    return detailTableAdapter;
   }
 
   protected void detachDetailTable(IPage page) {
-    ITable table = page.getTable();
+    ITable table = page.getTable(false);
     if (table != null) {
       table.setProperty(JsonOutlineTable.PROP_PAGE, null);
       IJsonAdapter<?> jsonTableAdapter = getGlobalAdapter(table);

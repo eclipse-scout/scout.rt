@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitTableChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
@@ -61,4 +63,13 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
     chain.execInitDetailForm();
   }
 
+  @Override
+  public void execInitTable(PageInitTableChain chain) {
+    chain.execInitTable();
+  }
+
+  @Override
+  public void execDetailFormActivated(PageDetailFormActivatedChain chain) {
+    chain.execDetailFormActivated();
+  }
 }

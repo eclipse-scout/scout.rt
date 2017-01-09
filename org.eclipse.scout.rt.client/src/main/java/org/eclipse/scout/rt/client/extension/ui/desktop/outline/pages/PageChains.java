@@ -148,4 +148,37 @@ public final class PageChains {
     }
   }
 
+  public static class PageInitTableChain extends AbstractPageChain {
+
+    public PageInitTableChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public void execInitTable() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
+          next.execInitTable(PageInitTableChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class PageDetailFormActivatedChain extends AbstractPageChain {
+
+    public PageDetailFormActivatedChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public void execDetailFormActivated() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
+          next.execDetailFormActivated(PageDetailFormActivatedChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

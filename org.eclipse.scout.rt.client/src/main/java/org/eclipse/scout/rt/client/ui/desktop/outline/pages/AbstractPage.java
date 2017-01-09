@@ -24,9 +24,11 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitDetailFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitTableChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
@@ -67,20 +69,25 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ClassId("ef0d789e-dfbf-4715-9ab7-eedaefc936f3")
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
+
   private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
+  private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
   static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
   static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
   static final String LIMITED_RESULT = "LIMITED_RESULT";
   static final String ALWAYS_CREATE_CHILD_PAGE = "ALWAYS_CREATE_CHILD_PAGE";
 
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
-      LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED);
+      LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVATED);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {
@@ -102,14 +109,52 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   /**
    * Provides 8 boolean flags.<br>
    * Currently used: {@link #TABLE_VISIBLE}, {@link #DETAIL_FORM_VISIBLE}, {@link #PAGE_MENUS_ADDED},
-   * {@link AbstractPageWithTable#SEARCH_REQUIRED}, {@link AbstractPageWithTable#SEARCH_ACTIVE},
-   * {@link AbstractPageWithTable#LIMITED_RESULT}, {@link AbstractPageWithTable#ALWAYS_CREATE_CHILD_PAGE}
+   * {@link #SEARCH_REQUIRED}, {@link #SEARCH_ACTIVE}, {@link #LIMITED_RESULT}, {@link #ALWAYS_CREATE_CHILD_PAGE},
+   * {@link #PAGE_ACTIVATED}
    */
   byte m_flags;
 
   @Override
   public T getTable() {
+    return getTable(true);
+  }
+
+  @Override
+  public T getTable(boolean create) {
+    if (create && m_table == null) {
+      if (isInitializing()) {
+        LOG.warn(
+            "Table in page {} is created during page init. This is not recommended. The table should be created lazily when the page is activated. "
+                + "Use e.g. the execInitTable() callback to access the table after it has been created.",
+            getClass(), new Exception("origin"));
+      }
+
+      runInExtensionContext(new Runnable() {
+        @Override
+        public void run() {
+          m_table = initTable();
+          if (m_table != null) {
+            firePageChanged(AbstractPage.this);
+            addDefaultTableControls();
+            interceptInitTable();
+            notifyMemoryPolicyOfTableCreated();
+          }
+        }
+      });
+    }
     return m_table;
+  }
+
+  private void notifyMemoryPolicyOfTableCreated() {
+    try {
+      IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
+      if (policy != null) {
+        policy.pageTableCreated(this);
+      }
+    }
+    catch (RuntimeException | PlatformError t) {
+      BEANS.get(ExceptionHandler.class).handle(t);
+    }
   }
 
   protected void linkTableRowWithPage(ITableRow tableRow, IPage<?> page) {
@@ -127,9 +172,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (tableRow == null) {
       return null;
     }
-    else {
-      return m_tableRowToPageMap.get(tableRow);
-    }
+    return m_tableRowToPageMap.get(tableRow);
   }
 
   @Override
@@ -424,15 +467,25 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected void execInitDetailForm() {
   }
 
+  @Order(130)
+  @ConfigOperation
+  protected void execInitTable() {
+  }
+
+  @Order(140)
+  @ConfigOperation
+  protected void execDetailFormActivated() {
+    IForm detailForm = getDetailForm();
+    if (detailForm != null) {
+      detailForm.getUIFacade().fireFormActivatedFromUI();
+    }
+  }
+
   protected abstract T initTable();
 
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_table = initTable();
-    if (m_table != null) {
-      addDefaultTableControls();
-    }
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
   }
@@ -545,8 +598,18 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public void nodeAddedNotify() {
     try {
-      initPage();
-      //notify memory policy
+
+      // do also set initializing even though it is also set in initPage().
+      // This ensures the page is also initializing if initPage has been overwritten.
+      setInitializing(true);
+      try {
+        initPage();
+      }
+      finally {
+        setInitializing(false);
+      }
+
+      // notify memory policy
       IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
       if (policy != null) {
         policy.pageCreated(this);
@@ -586,9 +649,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     try {
       ensureDetailFormCreated();
       ensureDetailFormStarted();
-      execDetailFormActivated();
+      interceptDetailFormActivated();
       enhanceTableWithPageMenus();
       interceptPageActivated();
+      setPageActive(true);
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
@@ -599,10 +663,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void pageDeactivatedNotify() {
     try {
       interceptPageDeactivated();
+      setPageActive(false);
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
     }
+  }
+
+  @Override
+  public boolean isPageActive() {
+    return FLAGS_BIT_HELPER.isBitSet(PAGE_ACTIVATED, m_flags);
+  }
+
+  protected void setPageActive(boolean active) {
+    m_flags = FLAGS_BIT_HELPER.changeBit(PAGE_ACTIVATED, active, m_flags);
   }
 
   private boolean isPageMenusAdded() {
@@ -676,12 +750,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     startDetailForm();
   }
 
-  protected void execDetailFormActivated() {
-    if (getDetailForm() != null) {
-      getDetailForm().getUIFacade().fireFormActivatedFromUI();
-    }
-  }
-
   protected void disposeDetailForm() {
     if (getDetailForm() != null) {
       getDetailForm().doClose();
@@ -690,8 +758,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   protected void disposeTable() {
-    if (getTable() != null) {
-      getTable().disposeTable();
+    T table = getTable(false);
+    if (table != null) {
+      table.disposeTable();
       setTableStatus(null);
     }
   }
@@ -783,14 +852,16 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public final void reloadPage() {
     ITree tree = getTree();
-    if (tree != null) {
-      try {
-        tree.setTreeChanging(true);
-        loadChildren();
-      }
-      finally {
-        tree.setTreeChanging(false);
-      }
+    if (tree == null) {
+      return;
+    }
+
+    try {
+      tree.setTreeChanging(true);
+      loadChildren();
+    }
+    finally {
+      tree.setTreeChanging(false);
     }
   }
 
@@ -845,8 +916,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * during shutdown.
    */
   protected void firePageChanged(IPage page) {
-    if (getOutline() != null) {
-      getOutline().firePageChanged(page);
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.firePageChanged(page);
     }
   }
 
@@ -902,6 +974,18 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     chain.execInitDetailForm();
   }
 
+  protected final void interceptInitTable() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageInitTableChain chain = new PageInitTableChain(extensions);
+    chain.execInitTable();
+  }
+
+  protected final void interceptDetailFormActivated() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageDetailFormActivatedChain chain = new PageDetailFormActivatedChain(extensions);
+    chain.execDetailFormActivated();
+  }
+
   /**
    * Adapter listener that delegates NODE_UPDATED tree events to pageChanged events
    */
@@ -955,11 +1039,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     public void execInitDetailForm(PageInitDetailFormChain chain) {
       getOwner().execInitDetailForm();
     }
+
+    @Override
+    public void execInitTable(PageInitTableChain chain) {
+      getOwner().execInitTable();
+    }
+
+    @Override
+    public void execDetailFormActivated(PageDetailFormActivatedChain chain) {
+      getOwner().execDetailFormActivated();
+    }
   }
 
   @Override
   protected IPageExtension<? extends AbstractPage> createLocalExtension() {
     return new LocalPageExtension<AbstractPage>(this);
   }
-
 }

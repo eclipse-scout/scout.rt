@@ -139,6 +139,7 @@ public class JsonOutlineTest {
   @Test
   public void testTableNotSentIfInvisible() throws JSONException {
     NodePageWithForm nodePage = new NodePageWithForm();
+    nodePage.getTable(true); // trigger table creation
     nodePage.setTableVisible(false);
 
     List<IPage<?>> pages = new ArrayList<IPage<?>>();
@@ -212,9 +213,10 @@ public class JsonOutlineTest {
 
     // Get all events for the outline (ignore table events)
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), null, jsonOutline.getId());
-    // Check that we got only one event (node insertion)
-    assertEquals(1, responseEvents.size());
-    assertEquals(JsonTree.EVENT_NODES_INSERTED, responseEvents.get(0).getType());
+    // Check that we got only two events: page-changed (because the table was created), node insertion
+    assertEquals(2, responseEvents.size());
+    assertEquals("pageChanged", responseEvents.get(0).getType());
+    assertEquals(JsonTree.EVENT_NODES_INSERTED, responseEvents.get(1).getType());
   }
 
   /**

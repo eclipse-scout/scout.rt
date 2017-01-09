@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -173,62 +174,62 @@ public class CsvSqlAdapter {
     if (params.getCsvColumnNames() != null) {
       h.setColumnNames(params.getCsvColumnNames());
     }
-    try {
-      ArrayList<String> cols = new ArrayList<String>();
-      cols.addAll(params.getCsvColumnNames());
-      // prepare select statement
-      String sqlText;
-      Object[] base = null;
-      if (params.getSqlSelect() != null) {
-        sqlText = params.getSqlSelect();
-        base = params.getBindBase();
-      }
-      else {
-        StringBuilder buf = new StringBuilder();
-        buf.append("SELECT ");
-        for (Iterator<String> it = cols.iterator(); it.hasNext();) {
-          String colName = it.next();
-          buf.append(colName);
-          if (it.hasNext()) {
-            buf.append(",");
-          }
-        }
-        buf.append(" FROM ");
-        buf.append(params.getTableName());
-        if (params.getGroupKeyValue() != null) {
-          buf.append(" WHERE ");
-          buf.append(params.getGroupKeyColumnName());
-          buf.append("=:groupKeyColumnValue");
-        }
-        if (params.getLineNumberColumnName() != null) {
-          buf.append(" ORDER BY ");
-          buf.append(params.getLineNumberColumnName());
-        }
-        sqlText = buf.toString();
-        if (params.getGroupKeyValue() != null) {
-          base = new Object[1];
-          base[0] = new NVPair("groupKeyColumnValue", params.getGroupKeyValue());
-        }
-      }
-      try (Writer w = new OutputStreamWriter(new FileOutputStream(params.getFile()), params.getEncoding())) {
-        h.exportHeaderRows(w, params.getWriteColumnNames(), params.getWriteColumnTypes());
-        ISelectStreamHandler handler = new ISelectStreamHandler() {
-          @Override
-          public void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) {
-            Object[] row = new Object[values.size()];
-            for (int i = 0; i < row.length; i++) {
-              row[i] = values.get(i).getValue();
-            }
-            h.exportDataRow(row, w, false);
-          }
 
-          @Override
-          public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) {
-            // do nothing
-          }
-        };
-        m_sqlService.selectStreaming(sqlText, handler, base);
+    Collection<String> cols = new ArrayList<String>();
+    cols.addAll(params.getCsvColumnNames());
+    // prepare select statement
+    String sqlText;
+    Object[] base = null;
+    if (params.getSqlSelect() != null) {
+      sqlText = params.getSqlSelect();
+      base = params.getBindBase();
+    }
+    else {
+      StringBuilder buf = new StringBuilder();
+      buf.append("SELECT ");
+      for (Iterator<String> it = cols.iterator(); it.hasNext();) {
+        String colName = it.next();
+        buf.append(colName);
+        if (it.hasNext()) {
+          buf.append(",");
+        }
       }
+      buf.append(" FROM ");
+      buf.append(params.getTableName());
+      if (params.getGroupKeyValue() != null) {
+        buf.append(" WHERE ");
+        buf.append(params.getGroupKeyColumnName());
+        buf.append("=:groupKeyColumnValue");
+      }
+      if (params.getLineNumberColumnName() != null) {
+        buf.append(" ORDER BY ");
+        buf.append(params.getLineNumberColumnName());
+      }
+      sqlText = buf.toString();
+      if (params.getGroupKeyValue() != null) {
+        base = new Object[1];
+        base[0] = new NVPair("groupKeyColumnValue", params.getGroupKeyValue());
+      }
+    }
+
+    try (FileOutputStream out = new FileOutputStream(params.getFile()); Writer w = new OutputStreamWriter(out, params.getEncoding())) {
+      h.exportHeaderRows(w, params.getWriteColumnNames(), params.getWriteColumnTypes());
+      ISelectStreamHandler handler = new ISelectStreamHandler() {
+        @Override
+        public void handleRow(Connection con, PreparedStatement stm, ResultSet rs, int rowIndex, List<SqlBind> values) {
+          Object[] row = new Object[values.size()];
+          for (int i = 0; i < row.length; i++) {
+            row[i] = values.get(i).getValue();
+          }
+          h.exportDataRow(row, w, false);
+        }
+
+        @Override
+        public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) {
+          // do nothing
+        }
+      };
+      m_sqlService.selectStreaming(sqlText, handler, base);
     }
     catch (IOException e) {
       throw new ProcessingException(e.getMessage(), e);
@@ -270,45 +271,43 @@ public class CsvSqlAdapter {
     if (params.getCsvColumnNames() != null) {
       h.setColumnNames(params.getCsvColumnNames());
     }
-    try {
-      ArrayList<String> cols = new ArrayList<String>();
-      if (params.getGroupKeyValue() != null) {
-        cols.add(params.getGroupKeyColumnName());
+    Collection<String> cols = new ArrayList<String>();
+    if (params.getGroupKeyValue() != null) {
+      cols.add(params.getGroupKeyColumnName());
+    }
+    if (params.getLineNumberColumnName() != null) {
+      cols.add(params.getLineNumberColumnName());
+    }
+    cols.addAll(params.getCsvColumnNames()); //
+    StringBuilder buf = new StringBuilder();
+    buf.append("INSERT INTO ");
+    buf.append(params.getTableName());
+    buf.append("(");
+    for (Iterator<String> it = cols.iterator(); it.hasNext();) {
+      String colName = it.next();
+      if (!CsvHelper.IGNORED_COLUMN_NAME.equals(colName)) {
+        buf.append(colName);
+        buf.append(",");
       }
-      if (params.getLineNumberColumnName() != null) {
-        cols.add(params.getLineNumberColumnName());
+    }
+    buf.deleteCharAt(buf.length() - 1);
+    buf.append(") VALUES (");
+    int i = 0;
+    for (Iterator<String> it = cols.iterator(); it.hasNext();) {
+      String colName = it.next();
+      if (!CsvHelper.IGNORED_COLUMN_NAME.equals(colName)) {
+        buf.append(":v" + i);
+        buf.append(",");
+        i++;
       }
-      cols.addAll(params.getCsvColumnNames()); //
-      StringBuilder buf = new StringBuilder();
-      buf.append("INSERT INTO ");
-      buf.append(params.getTableName());
-      buf.append("(");
-      for (Iterator<String> it = cols.iterator(); it.hasNext();) {
-        String colName = it.next();
-        if (!CsvHelper.IGNORED_COLUMN_NAME.equals(colName)) {
-          buf.append(colName);
-          buf.append(",");
-        }
-      }
-      buf.deleteCharAt(buf.length() - 1);
-      buf.append(") VALUES (");
-      int i = 0;
-      for (Iterator<String> it = cols.iterator(); it.hasNext();) {
-        String colName = it.next();
-        if (!CsvHelper.IGNORED_COLUMN_NAME.equals(colName)) {
-          buf.append(":v" + i);
-          buf.append(",");
-          i++;
-        }
-      }
-      buf.deleteCharAt(buf.length() - 1);
-      buf.append(")");
-      String stm = buf.toString();
+    }
+    buf.deleteCharAt(buf.length() - 1);
+    buf.append(")");
+    String stm = buf.toString();
 
-      try (Reader reader = new BomInputStreamReader(new FileInputStream(params.getFile()), params.getEncoding())) {
-        SqlInsertDataConsumer cons = new SqlInsertDataConsumer(stm, params.getGroupKeyValue(), params.getLineNumberColumnName() != null);
-        h.importData(cons, reader, false, false, params.getHeaderRowCount(), -1, params.getAllowVariableColumnCount());
-      }
+    try (FileInputStream in = new FileInputStream(params.getFile()); Reader reader = new BomInputStreamReader(in, params.getEncoding())) {
+      SqlInsertDataConsumer cons = new SqlInsertDataConsumer(stm, params.getGroupKeyValue(), params.getLineNumberColumnName() != null);
+      h.importData(cons, reader, false, false, params.getHeaderRowCount(), -1, params.getAllowVariableColumnCount());
     }
     catch (IOException e) {
       throw new ProcessingException(e.getMessage(), e);

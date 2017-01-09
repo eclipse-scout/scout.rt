@@ -38,7 +38,21 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  */
 public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
 
+  /**
+   * @return The {@link ITable} of this {@link IPage} or {@code null} if it does not have a table. If this page has a
+   *         table but it is not yet created it will be created and initialized. Same as {@link #getTable(true)}.
+   */
   T getTable();
+
+  /**
+   * Gets the {@link ITable} of this {@link IPage}.
+   *
+   * @param create
+   *          if {@code true} and there is no table yet: the table will be created and initialized.
+   * @return The {@link ITable} or {@code null} if this page has no table (this method call can also return {@code null}
+   *         if {@code true} is passed. This can be the case if this page does not declare a table).
+   */
+  T getTable(boolean create);
 
   void initPage();
 
@@ -169,4 +183,10 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
    * @return A list (non-null) of single selection menus.
    */
   List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage);
+
+  /**
+   * @return {@code true} if this page is active (has been clicked by the user). {@code false} otherwise.
+   */
+  boolean isPageActive();
+
 }

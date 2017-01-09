@@ -110,9 +110,13 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
       return;
     }
+  }
+
+  @Override
+  public void pageTableCreated(IPage<?> p) {
     if (p instanceof IPageWithTable) {
       IPageWithTable<? extends ITable> pt = (IPageWithTable<?>) p;
-      ITable table = pt.getTable();
+      ITable table = pt.getTable(false);
       if (table != null) {
         String pageTableIdentifier = registerPageTable(pt, table);
         if (pageTableIdentifier != null) {
