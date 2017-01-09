@@ -10,18 +10,20 @@
  ******************************************************************************/
 describe("Menu", function() {
 
-  var helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;
+  var helper, session, $sandbox, menu1, menu2;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
     helper = new scout.MenuSpecHelper(session);
-    modelMenu1 = helper.createModel('foo');
-    menu1 = helper.createMenu(modelMenu1);
-    modelMenu2 = helper.createModel('bar');
-    modelMenu2.keyStroke = 'enter';
-    menu2 = helper.createMenu(modelMenu2);
+    menu1 = helper.createMenu({
+      text: 'foo'
+    });
+    menu2 = helper.createMenu({
+      text: 'bar',
+      keyStroke: 'enter'
+    });
   });
 
   describe('defaults', function() {

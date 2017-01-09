@@ -90,6 +90,12 @@ scout.Menu.prototype._renderItem = function($parent) {
 scout.Menu.prototype._renderSelected = function() {
   if (!this._doActionTogglesSubMenu()) {
     scout.Menu.parent.prototype._renderSelected.call(this);
+    // Cannot be done in ContextMenuPopup,
+    // because the property change event is fired before renderSelected is called,
+    // and updateNextToSelected depends on the UI state
+    if (this.parent instanceof scout.ContextMenuPopup) {
+      this.parent.updateNextToSelected();
+    }
   }
   if (this.selected) {
     if (this._doActionTogglesSubMenu()) {

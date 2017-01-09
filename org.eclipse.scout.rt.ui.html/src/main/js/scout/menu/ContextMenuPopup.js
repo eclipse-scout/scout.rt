@@ -48,19 +48,19 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
   this._renderMenuItems();
 };
 
-scout.ContextMenuPopup.prototype._installScrollbars = function() {
-  scout.scrollbars.install(this.$body, {
-    parent: this,
-    axis: 'y'
-  });
-};
-
 /**
  * @override
  */
 scout.ContextMenuPopup.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$body, this.session);
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
+};
+
+scout.ContextMenuPopup.prototype._installScrollbars = function() {
+  scout.scrollbars.install(this.$body, {
+    parent: this,
+    axis: 'y'
+  });
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
@@ -161,7 +161,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   parentMenu.parentMenu.$subMenuBody = this.$body;
 
   var $all = this.$body.find('.' + 'menu-item');
-  $all.toggleClass('next-to-selected', false);
+  $all.removeClass('next-to-selected');
 
   if (!parentMenu.$subMenuBody) {
     var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left'),
@@ -439,9 +439,9 @@ scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, 
   var $all = this.$body.find('.' + menuItemClass);
   $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
 
-  $all.toggleClass('next-to-selected', false);
+  $all.removeClass('next-to-selected');
   if ($selectedItem.hasClass('selected')) {
-    $selectedItem.nextAll(':visible').first().toggleClass('next-to-selected', true);
+    $selectedItem.nextAll(':visible').first().addClass('next-to-selected');
   }
 };
 
