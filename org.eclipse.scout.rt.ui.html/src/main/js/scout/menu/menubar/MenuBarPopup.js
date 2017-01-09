@@ -18,6 +18,7 @@ scout.MenuBarPopup = function() {
   this.$headBlueprint;
   this.ignoreEvent;
   this._headVisible = true;
+  this.parentMenuPropertyChangeHandler = this._onParentMenuPropertyChange.bind(this);
 };
 scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
@@ -25,9 +26,7 @@ scout.MenuBarPopup.prototype._init = function(options) {
   options.$anchor = options.menu.$container;
   scout.MenuBarPopup.parent.prototype._init.call(this, options);
 
-  this.menu = options.menu;
   this.$headBlueprint = this.menu.$container;
-  this.ignoreEvent = options.ignoreEvent;
 };
 
 /**
@@ -46,6 +45,16 @@ scout.MenuBarPopup.prototype.close = function(event) {
   }
 };
 
+scout.MenuBarPopup.prototype._render = function($parent) {
+  scout.MenuBarPopup.parent.prototype._render.call(this, $parent);
+  this.menu.on('propertyChange', this.parentMenuPropertyChangeHandler);
+};
+
+scout.MenuBarPopup.prototype._remove = function() {
+  this.menu.off('propertyChange', this.parentMenuPropertyChangeHandler);
+  scout.MenuBarPopup.parent.prototype._remove.call(this);
+};
+
 /**
  * @override PopupWithHead.js
  */
@@ -62,4 +71,16 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   }
   this._copyCssClassToHead('unfocusable');
   this._copyCssClassToHead('button');
+};
+
+scout.MenuBarPopup.prototype._onParentMenuPropertyChange = function(event) {
+  this.session.layoutValidator.schedulePostValidateFunction(function() {
+    // Because this post layout validation function is executed asynchronously,
+    // we have to check again if the popup is still rendered.
+    if (!this.rendered) {
+      return;
+    }
+    this.rerenderHead();
+    this.position();
+  }.bind(this));
 };
