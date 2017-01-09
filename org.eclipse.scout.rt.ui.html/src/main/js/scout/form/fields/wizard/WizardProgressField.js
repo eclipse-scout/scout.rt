@@ -58,6 +58,12 @@ scout.WizardProgressField.prototype._syncSteps = function(steps) {
 };
 
 scout.WizardProgressField.prototype._renderSteps = function() {
+  this.$wizardStepsBody.children('.wizard-step').each(function() {
+    // Tooltips are only uninstalled if user clicked outside container. However, the steps
+    // may be updated by clicking inside the container. Therefore, manually make sure all
+    // tooltips are uninstalled before destroying the DOM elements.
+    scout.tooltips.uninstall($(this));
+  });
   this.$wizardStepsBody.empty();
 
   this.steps.forEach(function(step, index) {
