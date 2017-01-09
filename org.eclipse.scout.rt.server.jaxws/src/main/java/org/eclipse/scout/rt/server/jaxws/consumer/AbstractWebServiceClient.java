@@ -24,6 +24,7 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -44,6 +45,9 @@ import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider.IPortInitializer
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
+import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents and encapsulates a webservice endpoint port to communicate with, and is based on a preemptive
@@ -98,6 +102,8 @@ import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
 @ApplicationScoped
 @CreateImmediately
 public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractWebServiceClient.class);
 
   protected final WebServiceClient m_webServiceClientAnnotation;
   protected final Class<SERVICE> m_serviceClazz;
@@ -405,7 +411,13 @@ public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
       final IPortInitializer portInitializer) {
 
     if (BooleanUtility.nvl(CONFIG.getPropertyValue(getConfiguredPortPoolEnabledProperty()))) {
-      return new PooledPortProvider<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
+      if (!BEANS.get(JaxWsImplementorSpecifics.class).isPoolingSupported()) {
+        LOG.warn("The current runtime environment does not support pooling of web services. Check your configuration (i.e. either disable '{}' or use a JAX-WS implementor that supports pooling like 'JAX-WS Metro')",
+            BEANS.get(getConfiguredPortPoolEnabledProperty()).getKey());
+      }
+      else {
+        return new PooledPortProvider<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
+      }
     }
 
     PortProducer<SERVICE, PORT> portProducer = new PortProducer<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);

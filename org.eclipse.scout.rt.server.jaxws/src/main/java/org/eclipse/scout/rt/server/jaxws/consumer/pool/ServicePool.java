@@ -98,6 +98,11 @@ public class ServicePool<SERVICE extends Service> extends AbstractNonBlockingPoo
     }
   }
 
+  @Override
+  protected boolean resetElement(SERVICE element) {
+    return true;
+  }
+
   /**
    * Proxies the given {@link Handler} to run on behalf of a {@link RunContext}, if the handler is annotated with
    * {@link RunWithRunContext}.

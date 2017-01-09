@@ -72,7 +72,21 @@ public abstract class AbstractNonBlockingPool<T> {
     return result;
   }
 
-  public void release(T o, boolean recycle) {
+  /**
+   * Releases the given element (i.e. puts it back into the pool).
+   */
+  public void release(T o) {
+    boolean recycle = false;
+    try {
+      recycle = resetElement(o);
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Could not reset pooled element. It is not recyceled.", LOG.isDebugEnabled() ? e : null);
+    }
+    release(o, recycle);
+  }
+
+  protected void release(T o, boolean recycle) {
     final State state = m_busyElements.remove(o);
     if (state == null) {
       // element was not managed by this pool. Hence do not invoke cleanupInternal
@@ -87,6 +101,14 @@ public abstract class AbstractNonBlockingPool<T> {
   }
 
   protected abstract T createElement();
+
+  /**
+   * Resets the given pool element before it is put back. Implementers must return <code>true</code> if the element can
+   * be recycled. If the method returns <code>false</code> or throws a {@link RuntimeException}, the element is
+   * cleaned-up. This method is invoked by {@link #release(Object)} and the return value is used to invoke the protected
+   * method {@link #release(Object, boolean)}.
+   */
+  protected abstract boolean resetElement(T element);
 
   private void cleanupInternal(T o) {
     try {

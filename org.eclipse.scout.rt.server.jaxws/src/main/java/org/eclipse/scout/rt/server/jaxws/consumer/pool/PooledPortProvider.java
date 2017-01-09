@@ -24,11 +24,9 @@ import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
 import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
+import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.quartz.SimpleScheduleBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Port provider that is backed by a pool for {@link Service}s and ports, respectively. Ports returned are attached to
@@ -38,8 +36,6 @@ import org.slf4j.LoggerFactory;
  * @since 6.0.300
  */
 public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortProvider<PORT>, IDiagnostic {
-
-  private static final Logger LOG = LoggerFactory.getLogger(PooledPortProvider.class);
 
   protected final ServicePool<SERVICE> m_servicePool;
   protected final PortPool<SERVICE, PORT> m_portPool;
@@ -126,23 +122,17 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
   public void call(String action, Object[] values) {
   }
 
-  private class P_PooledPortTransactionMember implements ITransactionMember {
+  private class P_PooledPortTransactionMember extends AbstractTransactionMember {
 
     private final PORT m_port;
-    private final String m_memberId;
 
     public P_PooledPortTransactionMember(PORT port, String txnMemberId) {
+      super(txnMemberId);
       m_port = port;
-      m_memberId = txnMemberId;
     }
 
     public PORT getPort() {
       return m_port;
-    }
-
-    @Override
-    public String getMemberId() {
-      return m_memberId;
     }
 
     @Override
@@ -151,33 +141,8 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
     }
 
     @Override
-    public boolean commitPhase1() {
-      return true;
-    }
-
-    @Override
-    public void commitPhase2() {
-    }
-
-    @Override
-    public void rollback() {
-    }
-
-    @Override
     public void release() {
-      boolean recycle = false;
-      try {
-        BEANS.get(JaxWsImplementorSpecifics.class).resetRequestContext(m_port);
-        recycle = true;
-      }
-      catch (Exception e) {
-        LOG.warn("Could not reset JAX-WS request context. Port is not recyceled.");
-      }
-      m_portPool.release(m_port, recycle);
-    }
-
-    @Override
-    public void cancel() {
+      m_portPool.release(m_port);
     }
   }
 }

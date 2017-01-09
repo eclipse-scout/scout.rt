@@ -192,6 +192,18 @@ public class JaxWsImplementorSpecifics {
   }
 
   /**
+   * @return Returns <code>true</code> if the given port is valid and can be reused for another invocation (typically in
+   *         a different transaction).
+   */
+  public boolean isValid(final Object port) {
+    return true;
+  }
+
+  public boolean isPoolingSupported() {
+    return true;
+  }
+
+  /**
    * Safely removes the given key from the map (i.e. only if {@link Map#containsKey(Object)} of the given key returns
    * <code>true</code>).
    */

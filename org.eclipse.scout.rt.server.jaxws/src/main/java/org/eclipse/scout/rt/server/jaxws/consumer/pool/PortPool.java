@@ -17,8 +17,10 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceFeature;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.jaxws.consumer.IPortProvider.IPortInitializer;
+import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 
 /**
  * Non-blocking, unlimited pool of JAX-WS port instances (i.e. the actual web service client). Pooled entries are
@@ -51,7 +53,14 @@ public class PortPool<SERVICE extends Service, PORT> extends AbstractNonBlocking
       return service.getPort(m_portTypeClazz, CollectionUtility.toArray(webServiceFeatures, WebServiceFeature.class));
     }
     finally {
-      m_servicePool.release(service, true);
+      m_servicePool.release(service);
     }
+  }
+
+  @Override
+  protected boolean resetElement(PORT port) {
+    final JaxWsImplementorSpecifics implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
+    implementorSpecifics.resetRequestContext(port);
+    return implementorSpecifics.isValid(port);
   }
 }

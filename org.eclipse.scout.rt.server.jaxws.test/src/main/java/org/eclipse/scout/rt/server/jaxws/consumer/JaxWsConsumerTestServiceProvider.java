@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -110,18 +111,16 @@ public class JaxWsConsumerTestServiceProvider implements JaxWsConsumerTestServic
     final String headerValue = parameters.getHeaderValue();
     LOG.info("set header ['{}'='{}']", headerName, headerValue);
 
-    SetHeaderResponse resp = new SetHeaderResponse();
-
     @SuppressWarnings("unchecked")
     Map<String, List<String>> httpResonseHeaderMap = (Map<String, List<String>>) wsCtx.getMessageContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
-    if (httpResonseHeaderMap != null) {
-      httpResonseHeaderMap.put(headerName, CollectionUtility.arrayList(headerValue));
-      resp.setMessage("ok");
+    if (httpResonseHeaderMap == null) {
+      httpResonseHeaderMap = new HashMap<>();
+      wsCtx.getMessageContext().put(MessageContext.HTTP_RESPONSE_HEADERS, httpResonseHeaderMap);
     }
-    else {
-      resp.setMessage("nok -- response headers not available");
-    }
+    httpResonseHeaderMap.put(headerName, CollectionUtility.arrayList(headerValue));
 
+    SetHeaderResponse resp = new SetHeaderResponse();
+    resp.setMessage("ok");
     return resp;
   }
 }

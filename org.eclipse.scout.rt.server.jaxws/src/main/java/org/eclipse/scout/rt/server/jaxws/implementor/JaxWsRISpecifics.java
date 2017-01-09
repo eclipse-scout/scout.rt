@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
 
   private static final Logger LOG = LoggerFactory.getLogger(JaxWsRISpecifics.class);
-  private JaxWsClientResetHelper m_resetHelper;
+  private JaxWsClientPoolingHelper m_poolingHelper;
 
   @Override
   @PostConstruct
@@ -38,7 +38,7 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
     super.initConfig();
     m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, "com.sun.xml.internal.ws.connect.timeout"); // com.sun.xml.internal.ws.developer.JAXWSProperties.CONNECT_TIMEOUT
     m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, "com.sun.xml.internal.ws.request.timeout"); // com.sun.xml.internal.ws.developer.JAXWSProperties.REQUEST_TIMEOUT
-    m_resetHelper = new JaxWsClientResetHelper("com.sun.xml.internal.ws.client.sei.SEIStub", "resetRequestContext");
+    m_poolingHelper = new JaxWsClientPoolingHelper("com.sun.xml.internal.ws.client.sei.SEIStub");
   }
 
   @Override
@@ -81,9 +81,19 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
    */
   @Override
   public void resetRequestContext(final Object port) {
-    if (!m_resetHelper.resetRequestContext(port)) {
+    if (!m_poolingHelper.resetRequestContext(port)) {
       super.resetRequestContext(port);
     }
+  }
+
+  @Override
+  public boolean isValid(final Object port) {
+    return m_poolingHelper.isValid(port);
+  }
+
+  @Override
+  public boolean isPoolingSupported() {
+    return m_poolingHelper.isPoolingSupported();
   }
 
   @Override

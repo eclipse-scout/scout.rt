@@ -25,14 +25,26 @@ import org.slf4j.LoggerFactory;
  *
  * @since 6.0.300
  */
-public class JaxWsClientResetHelper {
+public class JaxWsClientPoolingHelper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JaxWsClientResetHelper.class);
-  private final Method m_method;
+  private static final Logger LOG = LoggerFactory.getLogger(JaxWsClientPoolingHelper.class);
+  private static final String RESET_METHOD_NAME = "resetRequestContext";
+  private static final String GET_TUBES_METHOD_NAME = "getTubes";
 
-  public JaxWsClientResetHelper(String className, String methodName) {
-    Method method = lookupMethod(className, methodName);
-    m_method = method;
+  private final Method m_resetMethod;
+  private final Method m_getTubesMethod;
+
+  public JaxWsClientPoolingHelper(String className) {
+    m_resetMethod = lookupMethod(className, RESET_METHOD_NAME);
+    m_getTubesMethod = lookupMethod(className, GET_TUBES_METHOD_NAME);
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given JAX-WS runtime environment supports pooling of ports. Otherwise
+   *         <code>false</code>.
+   */
+  public boolean isPoolingSupported() {
+    return m_resetMethod != null && m_getTubesMethod != null;
   }
 
   /**
@@ -40,7 +52,7 @@ public class JaxWsClientResetHelper {
    */
   public boolean resetRequestContext(Object port) {
     Assertions.assertNotNull(port);
-    if (m_method == null) {
+    if (m_resetMethod == null) {
       return false;
     }
     if (!Proxy.isProxyClass(port.getClass())) {
@@ -48,12 +60,34 @@ public class JaxWsClientResetHelper {
     }
     Object seiStub = Proxy.getInvocationHandler(port);
     try {
-      m_method.invoke(seiStub);
+      m_resetMethod.invoke(seiStub);
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
     return true;
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given port is valid and can be used for another invocation. Otherwise
+   *         <code>false</code>.
+   */
+  public boolean isValid(Object port) {
+    Assertions.assertNotNull(port);
+    if (m_getTubesMethod == null) {
+      return false;
+    }
+    if (!Proxy.isProxyClass(port.getClass())) {
+      return false;
+    }
+    Object seiStub = Proxy.getInvocationHandler(port);
+    try {
+      Object pool = m_getTubesMethod.invoke(seiStub);
+      return pool != null;
+    }
+    catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
+    }
   }
 
   /**
