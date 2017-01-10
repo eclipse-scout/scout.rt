@@ -60,10 +60,11 @@ scout.StringField.prototype._render = function($parent) {
         this.$field.off('mousedown', mousedownHandler);
         if (!this.mouseClicked) { // only trigger on tab focus in
           setTimeout(function() {
-            if (this.rendered) {
-              this._renderSelectionStart();
-              this._renderSelectionEnd();
+            if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
+              return;
             }
+            this._renderSelectionStart();
+            this._renderSelectionEnd();
           }.bind(this));
         }
         this.mouseClicked = false;
