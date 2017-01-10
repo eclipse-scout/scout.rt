@@ -101,19 +101,9 @@ scout.SimpleTab.prototype._titlesUpdated = function() {
   if (!this.$container) {
     return;
   }
-
-  // Titles
-  setTitle(this._$title, this.title);
-  setTitle(this._$subTitle, this.subTitle);
-
-  // Icon
+  this._$title.textOrNbsp(this.title);
+  this._$subTitle.textOrNbsp(this.subTitle);
   this.$container.icon(this.view.iconId);
-
-  // ----- Helper functions -----
-
-  function setTitle($titleElement, title) {
-    $titleElement.textOrNbsp(title);
-  }
 };
 
 scout.SimpleTab.prototype.getMenuText = function() {
