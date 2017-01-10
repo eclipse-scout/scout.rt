@@ -274,10 +274,10 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   /**
    * Executes the given runnable in the extension context, in which this tree node object was created.
-   * 
+   *
    * @see ObjectExtensions#runInExtensionContext(Runnable)
    */
-  public void runInExtensionContext(Runnable runnable) {
+  protected void runInExtensionContext(Runnable runnable) {
     m_objectExtensions.runInExtensionContext(runnable);
   }
 
