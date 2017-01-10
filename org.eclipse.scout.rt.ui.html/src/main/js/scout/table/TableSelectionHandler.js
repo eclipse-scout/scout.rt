@@ -48,17 +48,36 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
   this._mouseDown = true;
 
   this._allRows = this.table.filteredRows();
+  this.select = true;
   if (this.table.multiSelect && event.shiftKey) {
     // when a selected row in the middle of a selection-block has
     // been clicked while shift is pressed -> do nothing
     if (this.table.selectedRows.indexOf(row) > -1) {
       return;
     }
+    if (this.table.selectedRows.length === 0) {
+      // Shift-click was pressed without selection -> behave like normal click
+      this.lastActionRow = row;
+    }
+    if (!this.lastActionRow) {
+      // The last action row may have been cleared, e.g. when rows have been replaced. In that case, simply assume
+      // the first or the last of the currently selected rows as being the last action row to make shift-click
+      // behave as expected (depending on which row is nearer from the clicked row).
+      var thisRowIndex = this._allRows.indexOf(row);
+      var firstSelectedRow = this.table.selectedRows[0];
+      var lastSelectedRow = this.table.selectedRows[this.table.selectedRows.length - 1];
+      if (thisRowIndex <= (this._allRows.indexOf(firstSelectedRow) + this._allRows.indexOf(lastSelectedRow)) / 2) {
+        this.lastActionRow = firstSelectedRow;
+      } else {
+        this.lastActionRow = lastSelectedRow;
+      }
+      this._maxSelectedRowIndex = this._allRows.indexOf(lastSelectedRow);
+      this._prevSelectedRowIndex = this._allRows.indexOf(this.lastActionRow);
+    }
     this.fromIndex = this._allRows.indexOf(this.lastActionRow);
   } else if (event.ctrlKey) {
     this.select = !oldSelectedState;
   } else {
-    this.select = true;
     // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
     // Right click on already selected rows must not clear the selection
     if (!oldSelectedState || (this.table.selectedRows.length > 1 && event.which !== 3)) {
