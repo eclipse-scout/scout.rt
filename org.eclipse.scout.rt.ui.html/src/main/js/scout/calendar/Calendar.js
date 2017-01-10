@@ -554,6 +554,15 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       .data('new-width', parseInt((gridW - headerH) / 7, 10));
   }
 
+  // layout components
+  if (this._isMonth()) {
+    $('.component-month', this.$grid).each(function() {
+      var $comp = $(this),
+        $day = $comp.closest('.calendar-day');
+      $comp.toggleClass('compact', $day.data('new-width') < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);
+    });
+  }
+
   // set day-name (based on width of shown column)
   var width = this.$container.width(),
     weekdays;

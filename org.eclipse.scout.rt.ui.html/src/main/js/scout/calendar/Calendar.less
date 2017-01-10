@@ -11,6 +11,7 @@
 @calendar-header-buttons: 30px;
 @calendar-week-name-width: 45px;
 @calendar-title-height: 25px;
+@calendar-component-margin-left: 32px;
 
 .calendar-icon(@icon, @size) {
   #scout.font-icon();
@@ -194,7 +195,7 @@
   padding-left: 4px;
   #scout.overflow-ellipsis();
   min-height: 20px;
-  width: calc(~'100%' - 32px);
+  width: calc(~'100%' - @calendar-component-margin-left);
   border-left: 4px solid;
   text-align: left;
 
@@ -386,13 +387,19 @@
 
   /* helps to center days between 10 and 19 nicer */
   &.selected.center-nice::before {
-      padding-right: 2px;
+    padding-right: 2px;
   }
 
   & > .calendar-component {
-    margin-left: 32px;
+    margin-left: @calendar-component-margin-left;
     margin-bottom: 1px;
     margin-top: 1px;
+
+    &.component-month.compact {
+      top: 30px;
+      margin-left: 0;
+      width: 100%;
+    }
 
     &.component-day,
     &.component-task {

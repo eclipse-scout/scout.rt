@@ -20,6 +20,11 @@ scout.CalendarComponent = function() {
 scout.inherits(scout.CalendarComponent, scout.Widget);
 
 /**
+ * If day of a month is smaller than 100px, the components get the class compact
+ */
+scout.CalendarComponent.MONTH_COMPACT_THRESHOLD = 100;
+
+/**
  * @override ModelAdapter.js
  */
 scout.CalendarComponent.prototype._remove = function() {
@@ -55,7 +60,11 @@ scout.CalendarComponent.prototype._render = function($parent) {
     this.parent._tooltipSupport.install($part);
     this._$parts.push($part);
 
-    if (!this.parent._isMonth()) {
+
+    if (this.parent._isMonth()) {
+      $part.addClass('component-month')
+        .toggleClass('compact', $day.width() < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);
+    } else {
       if (this.fullDay) {
         var count = $('.component-task', $day).length;
         this._arrangeTask(1 + 26 * count);
