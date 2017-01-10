@@ -224,7 +224,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     }
   }
 
-  if (dataTransfer.items) {
+  if (contentCount === 0 && dataTransfer.items) {
     Array.prototype.forEach.call(dataTransfer.items, function(item) {
       if (item.type === scout.mimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
@@ -241,7 +241,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   }
 
   var waitForFileReaderEvents = 0;
-  if (dataTransfer.files && (contentCount === 0 || !dataTransfer.items)) {
+  if (contentCount === 0 && dataTransfer.files) {
     Array.prototype.forEach.call(dataTransfer.files, function(item) {
       var reader = new FileReader();
       // register functions for file reader
