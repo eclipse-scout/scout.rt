@@ -191,10 +191,6 @@ public class PlatformImplementor implements IPlatform {
         LOG.error("Config property with key '{}' does not exist or has an invalid value.", config.getKey());
       }
     }
-    // the validators are not used anymore. Allow to free resources
-    for (IConfigurationValidator validator : validators) {
-      validator.dispose();
-    }
     if (errorCount > 0) {
       throw new PlatformException("Cannot start platform due to " + errorCount + " invalid config properties");
     }

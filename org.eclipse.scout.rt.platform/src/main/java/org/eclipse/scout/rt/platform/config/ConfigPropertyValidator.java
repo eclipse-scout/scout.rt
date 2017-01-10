@@ -56,9 +56,4 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
 
     return true;
   }
-
-  @Override
-  public void dispose() {
-    m_configProperties = null;
-  }
 }

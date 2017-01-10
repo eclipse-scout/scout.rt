@@ -25,10 +25,4 @@ public interface IConfigurationValidator {
    * @return {@code true} if the given pair is accepted. {@code false} if it is invalid or this validator cannot decide.
    */
   boolean isValid(String key, String value);
-
-  /**
-   * After all config properties have been validated allows the validator to free some resources because it is very
-   * likely that the validator will not be used anymore.
-   */
-  void dispose();
 }
