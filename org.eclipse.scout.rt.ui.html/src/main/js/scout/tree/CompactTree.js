@@ -68,7 +68,7 @@ scout.CompactTree.prototype._remove = function() {
  * @override
  */
 scout.CompactTree.prototype._$buildNode = function(node) {
-  if (node.level === 0) {
+  if (this._isSection(node)) {
     //TODO [jgu] sections without child nodes are not visible, never build
     // Sections (only draw if they have child nodes)
     //    if (node.childNodes.length > 0) {
@@ -88,7 +88,6 @@ scout.CompactTree.prototype._$buildNode = function(node) {
       .on('mouseup', this._onNodeMouseUp.bind(this));
 
     node.$node = $sectionNode;
-
   }
 
   return node.$node;
@@ -156,13 +155,13 @@ scout.CompactTree.prototype._decorateNode = function(node) {
 scout.CompactTree.prototype.selectNodes = function(nodes) {
   var selectedSectionNodes = [];
   nodes = scout.arrays.ensure(nodes);
-  // If a section is selected, automatically change selection to first section-node
   nodes.forEach(function(node) {
-    var $node = node.$node;
-    if (!$node.hasClass('section-node')) {
-      node = $node.children('.section-node').first().data('node');
-    }
-    if (node) {
+    // If a section is selected, automatically change selection to first section-node
+    if (this._isSection(node)) {
+      if (node.childNodes.length > 0) {
+        selectedSectionNodes.push(node.childNodes[0]);
+      }
+    } else {
       selectedSectionNodes.push(node);
     }
   }, this);
@@ -183,3 +182,8 @@ scout.CompactTree.prototype._renderExpansion = function(node) {
 scout.CompactTree.prototype._updateItemPath = function() {
   // nop (not supported by CompactTree)
 };
+
+scout.CompactTree.prototype._isSection = function(node) {
+  return node.level === 0;
+};
+
