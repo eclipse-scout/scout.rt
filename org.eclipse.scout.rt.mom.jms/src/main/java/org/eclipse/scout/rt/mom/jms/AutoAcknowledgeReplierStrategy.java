@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -86,6 +87,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
                 .withThreadLocal(IMessage.CURRENT, request)
                 .withTransactionScope(TransactionScope.REQUIRES_NEW)
                 .withDiagnostics(BEANS.all(IJmsRunContextDiagnostics.class))
+                .withRunMonitor(RunMonitor.CURRENT.get()) // associate with the calling monitor to propagate cancellation
                 .run(new IRunnable() {
 
                   @Override

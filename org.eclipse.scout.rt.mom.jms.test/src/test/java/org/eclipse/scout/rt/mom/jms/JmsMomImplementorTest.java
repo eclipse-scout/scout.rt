@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -765,8 +766,7 @@ public class JmsMomImplementorTest {
 
     final AtomicBoolean requestorInterrupted = new AtomicBoolean();
     final AtomicBoolean replierInterrupted = new AtomicBoolean();
-
-    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
+    final AtomicBoolean replierCancelled = new AtomicBoolean();
 
     // Subscribe for the destination
     m_disposables.add(MOM.reply(JmsTestMom.class, destination, new IRequestListener<String, String>() {
@@ -780,6 +780,7 @@ public class JmsMomImplementorTest {
           replierInterrupted.set(true);
         }
         finally {
+          replierCancelled.set(RunMonitor.CURRENT.get().isCancelled());
           verifyLatch.countDown();
         }
         return request.getTransferObject().toUpperCase();
@@ -797,18 +798,9 @@ public class JmsMomImplementorTest {
         assertTrue(setupLatch.await());
 
         // Cancel the publishing thread
-        // Do this as mutex owner to guarantee the 'request-reply' initiator returned form publishing
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-                .andMatchExecutionHint(requestReplyJobId)
-                .toFilter(), true);
-          }
-        }, Jobs.newInput()
-            .withExecutionSemaphore(mutex));
-
+        Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(requestReplyJobId)
+            .toFilter(), true);
       }
     }, Jobs.newInput()
         .withName("canceller")
@@ -834,8 +826,7 @@ public class JmsMomImplementorTest {
     }, Jobs.newInput()
         .withName("initiator")
         .withExecutionHint(requestReplyJobId)
-        .withExecutionHint(m_testJobExecutionHint)
-        .withExecutionSemaphore(mutex));
+        .withExecutionHint(m_testJobExecutionHint));
 
     // Wait until cancelled requestor thread
     cancellationJob.awaitDoneAndGet();
@@ -845,6 +836,7 @@ public class JmsMomImplementorTest {
     // Verify
     assertTrue(requestorInterrupted.get());
     assertTrue(replierInterrupted.get());
+    assertTrue(replierCancelled.get());
     assertFalse(testee.isSet());
   }
 

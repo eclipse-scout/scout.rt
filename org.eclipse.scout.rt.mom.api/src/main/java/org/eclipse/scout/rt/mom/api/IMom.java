@@ -102,6 +102,9 @@ public interface IMom {
    * <p>
    * If the current thread is interrupted while waiting for the reply to receive, this method returns with a
    * {@link ThreadInterruptedError} and the interruption is propagated to the consumer(s) as well.
+   * <p>
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting for the reply.
    *
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}

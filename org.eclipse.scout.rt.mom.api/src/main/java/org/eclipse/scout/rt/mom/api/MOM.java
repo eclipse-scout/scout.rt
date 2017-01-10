@@ -248,6 +248,9 @@ public final class MOM {
    * If the current thread is interrupted while waiting for the reply to receive, this method returns with a
    * {@link ThreadInterruptedError} and the interruption is propagated to the consumer(s) as well.
    * <p>
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting for the reply.
+   * <p>
    * The message is published with default messaging settings, meaning with normal priority, with persistent delivery
    * mode and without expiration.
    *
@@ -289,6 +292,9 @@ public final class MOM {
    * <p>
    * If the current thread is interrupted while waiting for the reply to receive, this method returns with a
    * {@link ThreadInterruptedError} and the interruption is propagated to the consumer(s) as well.
+   * <p>
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting for the reply.
    *
    * @param transport
    *          specifies the 'transport or network' where to initiate a 'request-reply' communication, e.g.
