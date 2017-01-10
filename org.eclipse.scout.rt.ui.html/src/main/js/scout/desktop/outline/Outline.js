@@ -657,6 +657,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
     var rootGroupBox = this.detailContent.rootGroupBox;
     menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
     rootGroupBox.setMenuBarVisible(false);
+    this._attachDetailMenusListener(rootGroupBox);
   } else if (selectedPage) {
     // get empty space menus and table controls from detail table
     if (selectedPage.detailTable) {
@@ -746,7 +747,7 @@ scout.Outline.prototype._attachDetailMenusListener = function(menuContainer) {
         this.menuContainers = [];
       }
     };
-    this.events.addListener(this._detailMenusNodesSelectedHandler);
+    this.addListener(this._detailMenusNodesSelectedHandler);
   }
   this._detailMenusNodesSelectedHandler.addMenuContainer(menuContainer);
 };

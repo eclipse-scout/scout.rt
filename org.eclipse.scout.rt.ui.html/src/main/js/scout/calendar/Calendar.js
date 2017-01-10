@@ -180,7 +180,6 @@ scout.Calendar.prototype._setViewRange = function(viewRange) {
 
 scout.Calendar.prototype._setMenus = function(menus) {
   this._setProperty('menus', menus);
-  // FIXME awe: (calendar) here we should update the menu-bar (see Table.js)
   $.log.debug('(Calendar#_setMenus) impl.');
 };
 
@@ -293,10 +292,6 @@ scout.Calendar.prototype._renderViewRange = function() {
 
 scout.Calendar.prototype._renderSelectedDate = function() {
   $.log.debug('(Calendar#_renderSelectedDate) impl.');
-};
-
-scout.Calendar.prototype._removeMenus = function() {
-  // menubar takes care about removal
 };
 
 /* -- basics, events -------------------------------------------- */
