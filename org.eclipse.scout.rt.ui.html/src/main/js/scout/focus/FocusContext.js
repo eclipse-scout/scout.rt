@@ -190,6 +190,13 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   // Otherwise, the HTML body would be focused which makes global keystrokes (like backspace) not to work anymore.
   elementToFocus = elementToFocus || this.$container.entryPoint(true);
 
+  // If element may not be focused (example SVG element in IE) -> use the entryPoint as fallback
+  // $elementToFocus.focus() would trigger a focus event even the element won't be focused -> loop
+  // In that case the focus function does not exist on the svg element
+  if (!elementToFocus.focus) {
+    elementToFocus = this.$container.entryPoint(true);
+  }
+
   // Only focus element if different to current focused element
   if (scout.focusUtils.isActiveElement(elementToFocus)) {
     return;
