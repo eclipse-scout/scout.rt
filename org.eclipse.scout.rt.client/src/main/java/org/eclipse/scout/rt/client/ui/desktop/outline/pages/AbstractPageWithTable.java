@@ -63,6 +63,7 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -944,9 +945,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             final List<IPage<?>> childPageList = new ArrayList<IPage<?>>(tableRows.size());
             ClientRunContexts.copyCurrent()
                 .withOutline(getOutline(), true)
-                .call(new Callable<Void>() {
+                .run(new IRunnable() {
                   @Override
-                  public Void call() throws Exception {
+                  public void run() {
                     for (ITableRow element : tableRows) {
                       try {
                         IPage<?> childPage = createChildPageInternalInRunContext(element);
@@ -967,7 +968,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                         BEANS.get(ExceptionHandler.class).handle(ex);
                       }
                     }
-                    return null;
                   }
                 });
 
