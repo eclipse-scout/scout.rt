@@ -16,6 +16,42 @@ scout.ClipboardField = function() {
 };
 scout.inherits(scout.ClipboardField, scout.ValueField);
 
+// Keys that don't alter the content of a text field and are therefore always allowed in the clipboard field
+scout.ClipboardField.NON_DESTRUCTIVE_KEYS = [
+  // Default form handling
+  scout.keys.ESC,
+  scout.keys.ENTER,
+  scout.keys.TAB,
+  // Navigate and mark text
+  scout.keys.PAGE_UP,
+  scout.keys.PAGE_DOWN,
+  scout.keys.END,
+  scout.keys.HOME,
+  scout.keys.LEFT,
+  scout.keys.UP,
+  scout.keys.RIGHT,
+  scout.keys.DOWN,
+  // Browser hotkeys (e.g. developer tools)
+  scout.keys.F1,
+  scout.keys.F2,
+  scout.keys.F3,
+  scout.keys.F4,
+  scout.keys.F5,
+  scout.keys.F6,
+  scout.keys.F7,
+  scout.keys.F8,
+  scout.keys.F9,
+  scout.keys.F10,
+  scout.keys.F11,
+  scout.keys.F12
+];
+
+// Keys that always alter the content of a text field, independent from the modifier keys
+scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS = [
+  scout.keys.BACKSPACE,
+  scout.keys.DELETE
+];
+
 /**
  * @override Widget.js
  */
@@ -36,7 +72,7 @@ scout.ClipboardField.prototype._render = function($parent) {
     .disableSpellcheck()
     .attr('contenteditable', true)
     .attr('tabindex', '0')
-    .on('keydown', this._onInput.bind(this))
+    .on('keydown', this._onKeydown.bind(this))
     .on('input', this._onInput.bind(this))
     .on('paste', this._onPaste.bind(this))
     .on('copy', this._onCopy.bind(this))
@@ -122,24 +158,21 @@ scout.ClipboardField.prototype._getSelection = function() {
   return selection;
 };
 
-// do not allow enter something manually some browsers such as IE do not send input events.
-// The 'keydown' event is used in this cases.
-scout.ClipboardField.prototype._onInput = function(event) {
-  if (event.type === 'input') {
-    this._renderDisplayText(this.displayText);
-    return false;
-  } else if (!event['char'] || event['char'] === '') {
-    return;
-  } else if (event.ctrlKey && (event.key === 'c' || event.key === 'x')) {
-    return;
-  } else if (!this.readOnly && event.ctrlKey && event.key === 'v') {
-    return;
-  } else if (event.keyCode === scout.keys.ESC || event.keyCode === scout.keys.ENTER) {
-    return;
-  } else {
-    this._renderDisplayText(this.displayText);
-    return false;
+  scout.ClipboardField.prototype._onKeydown = function(event) {
+  if (scout.isOneOf(event.which, scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
+    return false; // never allowed
   }
+  if (event.ctrlKey || event.altKey || event.metaKey || scout.isOneOf(event.which, scout.ClipboardField.NON_DESTRUCTIVE_KEYS)) {
+    return; // allow bubble to other event handlers
+  }
+  // do not allow to enter something manually
+  return false;
+};
+
+scout.ClipboardField.prototype._onInput = function(event) {
+  // if the user somehow managed to fire to input something (e.g. "delete" menu in FF & IE), just reset the value to the previous content
+  this._renderDisplayText();
+  return false;
 };
 
 scout.ClipboardField.prototype._onCopy = function(event) {
@@ -188,8 +221,8 @@ scout.ClipboardField.prototype._onCopy = function(event) {
 
 scout.ClipboardField.prototype._onPaste = function(event) {
   if (this.readOnly) {
-    this._renderDisplayText(this.displayText);
-    return;
+    // Prevent pasting in "copy" mode
+    return false;
   }
   var dataTransfer, myWindow = this.$container.window(true);
   this.$field.selectAllText();
