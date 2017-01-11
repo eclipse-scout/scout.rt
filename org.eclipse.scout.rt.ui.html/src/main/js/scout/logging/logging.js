@@ -14,6 +14,7 @@ scout.logging = {
   DEFAULT_LEVEL: 'trace',
   initialized: false,
   _appendersToAdd: [],
+  showStackTraces: true,
 
   /***
    * Loads log4javascript.min.js if logging is enabled.
@@ -46,6 +47,7 @@ scout.logging = {
 
   initLog4Javascript: function(logLevel, showPopup) {
     logLevel = scout.nvl(logLevel, scout.logging.DEFAULT_LEVEL);
+    log4javascript.setShowStackTraces(this.showStackTraces);
     var defaultLogger = log4javascript.getDefaultLogger();
     defaultLogger.setLevel(this.parseLevel(logLevel));
     $.log = defaultLogger;

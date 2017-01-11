@@ -128,9 +128,9 @@ scout.Column.prototype._updateCellText = function(row, cell) {
     returned
       .then(function(text) {
         this.setCellText(row, text, cell);
-      }.bind(this), function() {
+      }.bind(this), function(error) {
         this.setCellText(row, '', cell);
-        $.log.error('Could not resolve cell text.');
+        $.log.error('Could not resolve cell text for value ' + value, error);
       }.bind(this));
   } else {
     this.setCellText(row, returned, cell);
