@@ -54,6 +54,15 @@ describe('main', function() {
       foo = 'bar';
       func = scout.assertParameter.bind(scout, 'foo', foo);
       expect(func).not.toThrowError();
+      foo = undefined;
+      func = scout.assertParameter.bind(scout, 'foo', foo);
+      expect(func).toThrowError();
+      foo = false;
+      func = scout.assertParameter.bind(scout, 'foo', foo);
+      expect(func).not.toThrowError();
+      foo = 0;
+      func = scout.assertParameter.bind(scout, 'foo', foo);
+      expect(func).not.toThrowError();
     });
 
     it('throws Error when value has wrong type', function() {

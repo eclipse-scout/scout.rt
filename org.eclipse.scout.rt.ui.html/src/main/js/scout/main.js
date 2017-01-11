@@ -63,7 +63,7 @@ scout.nvl = function() {
  * @param type (optional) if this parameter is set, the given value must be of this type (instanceof check)
  */
 scout.assertParameter = function(parameterName, value, type) {
-  if (!value) {
+  if (scout.objects.isNullOrUndefined(value)) {
     throw new Error('Missing required parameter \'' + parameterName + '\'');
   }
   if (type && !(value instanceof type)) {
