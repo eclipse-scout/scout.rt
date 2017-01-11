@@ -223,6 +223,15 @@ public class BeanManagerImplementor implements IBeanManager {
   }
 
   @Override
+  public <T> IBean<T> uniqueBean(Class<T> beanClazz) {
+    List<IBean<T>> list = querySingle(beanClazz);
+    if (list.size() == 1) {
+      return list.get(0);
+    }
+    return null;
+  }
+
+  @Override
   public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
     return queryAll(beanClazz);
   }

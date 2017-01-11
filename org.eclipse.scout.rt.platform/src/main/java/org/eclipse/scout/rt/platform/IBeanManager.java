@@ -76,6 +76,19 @@ public interface IBeanManager {
   <T> IBean<T> optBean(Class<T> beanClazz);
 
   /**
+   * Gets the most specific {@link IBean} for the given {@link Class} but returns <code>null</code> instead of throwing
+   * an {@link AssertionException} if no {@link IBean} could be found <b>or the found bean is not unique</b>. Therefore
+   * this method can be used if an {@link IBean} may be present or the {@link IBean} may not be unique.<br>
+   * For a definition of the most specific {@link IBean} see {@link #getBean(Class)}.
+   *
+   * @param beanClazz
+   *          The {@link Class} defining the class hierarchy to search the {@link IBean} in.
+   * @return The most specific {@link IBean} or <code>null</code> if no {@link IBean} or no unique {@link IBean} could
+   *         be found.
+   */
+  <T> IBean<T> uniqueBean(Class<T> beanClazz);
+
+  /**
    * Gets all not replaced {@link IBean}s that are part of the given beanClazz hierarchy sorted by {@link Order}
    * annotation value.
    *
