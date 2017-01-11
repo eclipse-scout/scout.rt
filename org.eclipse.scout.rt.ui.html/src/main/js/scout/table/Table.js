@@ -582,6 +582,10 @@ scout.Table.prototype.exportToClipboard = function() {
   this._triggerExportToClipboard();
 };
 
+scout.Table.prototype.setMultiSelect = function(multiSelect) {
+  this.setProperty('multiSelect', multiSelect);
+};
+
 scout.Table.prototype.toggleSelection = function() {
   if (this.selectedRows.length === this.filteredRows().length) {
     this.deselectAll();

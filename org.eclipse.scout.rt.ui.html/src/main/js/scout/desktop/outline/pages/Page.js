@@ -112,6 +112,7 @@ scout.Page.prototype._initTable = function(table) {
   table.on('rowsFiltered', this._onTableRowsFiltered.bind(this));
   if (this.drillDownOnRowClick) {
     table.on('rowClicked', this._onTableRowClicked.bind(this));
+    table.setMultiSelect(false);
   }
 };
 

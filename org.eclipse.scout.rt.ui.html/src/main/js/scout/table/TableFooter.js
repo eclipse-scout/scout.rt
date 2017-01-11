@@ -18,6 +18,7 @@ scout.TableFooter = function() {
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableStatusChangedHandler = this._onTableStatusChanged.bind(this);
   this._tableColumnStructureChangedHandler = this._onColumnStructureChanged.bind(this);
+  this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
 };
 scout.inherits(scout.TableFooter, scout.Widget);
 
@@ -105,6 +106,7 @@ scout.TableFooter.prototype._render = function($parent) {
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('statusChanged', this._tableStatusChangedHandler);
   this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
+  this.table.on('propertyChange', this._tablePropertyChangeHandler);
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
 };
@@ -124,6 +126,7 @@ scout.TableFooter.prototype._remove = function() {
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('statusChanged', this._tableStatusChangedHandler);
   this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
+  this.table.off('propertyChange', this._tablePropertyChangeHandler);
 
   scout.TableFooter.parent.prototype._remove.call(this);
 };
@@ -652,5 +655,10 @@ scout.TableFooter.prototype._onColumnStructureChanged = function(event) {
   } else {
     this._$controls.empty();
   }
+};
 
+scout.TableFooter.prototype._onTablePropertyChange = function(event) {
+  if (event.changedProperties.indexOf('multiSelect') > -1) {
+    this._updateInfoSelectionVisibility();
+  }
 };
