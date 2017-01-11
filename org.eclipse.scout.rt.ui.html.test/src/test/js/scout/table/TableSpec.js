@@ -310,7 +310,6 @@ describe("Table", function() {
     });
   });
 
-
   describe("insertRows", function() {
 
     var model, table, rows, row0, row1,
@@ -1442,10 +1441,10 @@ describe("Table", function() {
   });
 
   describe("column grouping", function() {
-    var model, table, column0, column1, column2, column3, column4, rows, columns;
+    var model, table, column0, column1, column2, column3, column4, rows, columns, adapter;
     var $colHeaders, $header0, $header1;
 
-    function prepareTable() {
+    function prepareTable(withAdapter) {
       columns = [helper.createModelColumn('col0'),
         helper.createModelColumn('col1'),
         helper.createModelColumn('col2'),
@@ -1459,7 +1458,12 @@ describe("Table", function() {
       columns[4].index = 4;
       rows = helper.createModelRows(5, 8);
       model = helper.createModel(columns, rows);
-      table = helper.createTable(model);
+      if (withAdapter) {
+        adapter = helper.createTableAdapter(model);
+        table = adapter.createWidget(model, session.desktop);
+      } else {
+        table = helper.createTable(model);
+      }
       column0 = model.columns[0];
       column1 = model.columns[1];
       column2 = model.columns[2];
@@ -1675,7 +1679,7 @@ describe("Table", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
       }
-      prepareTable();
+      prepareTable(true);
       render(table);
       table.deleteAllRows();
       expect(table.rows.length).toBe(0);
@@ -1687,7 +1691,7 @@ describe("Table", function() {
       var rows = [{
         cells: ['a', 'xyz', 'xyz', 10, 20]
       }];
-      table.insertRows(rows, true);
+      table.insertRows(rows);
 
       expect(find$aggregateRows(table).length).toBe(1);
       assertGroupingProperty(table, 0);
@@ -1699,7 +1703,7 @@ describe("Table", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
       }
-      prepareTable();
+      prepareTable(true);
       prepareContent();
       render(table);
 
@@ -1714,7 +1718,7 @@ describe("Table", function() {
       var rows = [{
         cells: ['a', 'xyz', 'xyz', 10, 20]
       }];
-      table.insertRows(rows, true);
+      table.insertRows(rows);
 
       // Still wrong grouping because group was not executed. There will be a rowOrderChanged event which will do it, see comments in table.insertRows
       expect(find$aggregateRows(table).length).toBe(2);
@@ -2407,7 +2411,6 @@ describe("Table", function() {
     });
 
   });
-
 
   describe("updateRowOrder", function() {
     var model, table, row0, row1, row2;

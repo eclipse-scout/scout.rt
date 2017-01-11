@@ -612,7 +612,6 @@ scout.Table.prototype.updateScrollbars = function() {
   scout.scrollbars.update(this.$data);
 };
 
-
 scout.Table.prototype._sort = function(animateAggregateRows) {
   var sortColumns = this._sortColumns();
 
@@ -1055,8 +1054,8 @@ scout.Table.prototype._removeGroupColumn = function(column) {
 scout.Table.prototype._buildRowDiv = function(row) {
   var rowWidth = this.rowWidth;
   var rowClass = 'table-row';
-  if(row.cssClass){
-    rowClass += ' '+row.cssClass;
+  if (row.cssClass) {
+    rowClass += ' ' + row.cssClass;
   }
   if (!row.enabled) {
     rowClass += ' disabled';
@@ -1893,9 +1892,9 @@ scout.Table.prototype.checkRow = function(row, checked) {
 
 scout.Table.prototype.checkRows = function(rows, options) {
   var opts = $.extend({
-      checked: true,
-      checkOnlyEnabled: true
-    }, options);
+    checked: true,
+    checkOnlyEnabled: true
+  }, options);
   var checkedRows = [];
   if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
     return;
@@ -1931,8 +1930,8 @@ scout.Table.prototype.uncheckRow = function(row) {
 
 scout.Table.prototype.uncheckRows = function(rows, options) {
   var opts = $.extend({
-      checked: false
-    }, options);
+    checked: false
+  }, options);
   this.checkRows(rows, opts);
 };
 
@@ -1959,7 +1958,7 @@ scout.Table.prototype.insertRow = function(row) {
   this.insertRows([row]);
 };
 
-scout.Table.prototype.insertRows = function(rows, fromServer) {
+scout.Table.prototype.insertRows = function(rows) {
   var wasEmpty = this.rows.length === 0;
 
   // Update model
@@ -1974,17 +1973,7 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
 
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
-  fromServer = scout.nvl(fromServer, false);
-  if (!fromServer) {
-    // If event comes from server, there will be a row order changed event as well -> no sorting necessary
-    this._sort();
-  } else {
-    // There will only be a row order changed event if table was not empty.
-    // If it was empty, there will be NO row order changed event (tableEventBuffer) -> inserted rows are already in correct order -> no sort necessary but group is
-    if (wasEmpty) {
-      this._group();
-    }
-  }
+  this._sortAfterInsert(wasEmpty);
   this._rebuildingTable = false;
 
   // Update HTML
@@ -2003,6 +1992,10 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     this._renderViewport();
     this.invalidateLayoutTree();
   }
+};
+
+scout.Table.prototype._sortAfterInsert = function(wasEmpty) {
+  this._sort();
 };
 
 scout.Table.prototype.deleteRow = function(row) {
@@ -2148,8 +2141,12 @@ scout.Table.prototype.updateRows = function(rows) {
       this._rerenderViewport();
     }
   }
-  this._group();
+  this._sortAfterUpdate();
   this._updateBackgroundEffect();
+};
+
+scout.Table.prototype._sortAfterUpdate = function() {
+  this._sort();
 };
 
 scout.Table.prototype.updateRowOrder = function(rows) {
@@ -2272,7 +2269,7 @@ scout.Table.prototype.scrollPageDown = function() {
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   this.setProperty('scrollTop', scrollTop);
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  if(this.rendered){
+  if (this.rendered) {
     this._renderViewport();
   }
 };

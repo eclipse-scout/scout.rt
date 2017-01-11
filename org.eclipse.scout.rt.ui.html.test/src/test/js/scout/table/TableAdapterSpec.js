@@ -226,7 +226,7 @@ describe("TableAdapter", function() {
         var rows = helper.createModelRows(2, 5);
         var event = createRowsInsertedEvent(model, rows);
         adapter.onModelAction(event);
-        expect(table.insertRows).toHaveBeenCalledWith(rows, true);
+        expect(table.insertRows).toHaveBeenCalledWith(rows);
       });
     });
 

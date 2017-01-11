@@ -265,9 +265,12 @@ scout.objects = {
    * Use this method to replace a function on a prototype of an object. It checks if that function exists
    * by calling <code>mandatoryFunction</code>.
    */
-  replacePrototypeFunction: function(obj, funcName, func) {
+  replacePrototypeFunction: function(obj, funcName, func, rememberOrig) {
     var proto = obj.prototype;
     this.mandatoryFunction(proto, funcName);
+    if (rememberOrig) {
+      proto[funcName + 'Orig'] = proto[funcName];
+    }
     proto[funcName] = func;
   },
 

@@ -306,7 +306,7 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
 };
 
 scout.TableAdapter.prototype._onRowsInserted = function(rows) {
-  this.widget.insertRows(rows, true);
+  this.widget.insertRows(rows);
 };
 
 scout.TableAdapter.prototype._onRowsDeleted = function(rowIds) {
@@ -514,26 +514,59 @@ scout.TableAdapter.modifyTablePrototype = function() {
 
   // prepareCellEdit
   scout.objects.replacePrototypeFunction(scout.Table, 'prepareCellEdit', function(column, row, openFieldPopupOnCellEdit) {
-    this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-    this.trigger('prepareCellEdit', {
-      column: column,
-      row: row
-    });
-  });
+    if (this.modelAdapter) {
+      this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
+      this.trigger('prepareCellEdit', {
+        column: column,
+        row: row
+      });
+    } else {
+      this.prepareCellEditOrig();
+    }
+  }, true);
 
   // completeCellEdit
   scout.objects.replacePrototypeFunction(scout.Table, 'completeCellEdit', function(field) {
-    this.trigger('completeCellEdit', {
-      field: field
-    });
-  });
+    if (this.modelAdapter) {
+      this.trigger('completeCellEdit', {
+        field: field
+      });
+    } else {
+      this.completeCellEditOrig();
+    }
+  }, true);
 
   // cancelCellEdit
   scout.objects.replacePrototypeFunction(scout.Table, 'cancelCellEdit', function(field) {
-    this.trigger('cancelCellEdit', {
-      field: field
-    });
-  });
+    if (this.modelAdapter) {
+      this.trigger('cancelCellEdit', {
+        field: field
+      });
+    } else {
+      this.cancelCellEditOrig();
+    }
+  }, true);
+
+  scout.objects.replacePrototypeFunction(scout.Table, '_sortAfterInsert', function(wasEmpty) {
+    if (this.modelAdapter) {
+      // There will only be a row order changed event if table was not empty.
+      // If it was empty, there will be NO row order changed event (tableEventBuffer) -> inserted rows are already in correct order -> no sort necessary but group is
+      if (wasEmpty) {
+        this._group();
+      }
+    } else {
+      this._sortAfterInsertOrig();
+    }
+  }, true);
+
+  // _sortAfterUpdate
+  scout.objects.replacePrototypeFunction(scout.Table, '_sortAfterUpdate', function() {
+    if (this.modelAdapter) {
+      this._group();
+    } else {
+      this._sortAfterUpdateOrig();
+    }
+  }, true);
 };
 
 scout.TableAdapter.modifyBooleanColumnPrototype = function() {
@@ -543,8 +576,12 @@ scout.TableAdapter.modifyBooleanColumnPrototype = function() {
 
   // _toggleCellValue
   scout.objects.replacePrototypeFunction(scout.BooleanColumn, '_toggleCellValue', function(row, cell) {
-    // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
-  });
+    if(this.table.modelAdapter) {
+      // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
+    } else {
+      this._toggleCellValueOrig();
+    }
+  }, true);
 };
 
 scout.addAppListener('bootstrap', scout.TableAdapter.modifyTablePrototype);
