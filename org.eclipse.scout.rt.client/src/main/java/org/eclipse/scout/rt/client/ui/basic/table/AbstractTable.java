@@ -4668,6 +4668,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         pushUIProcessor();
         //
         getColumnSet().removeSortColumn(column);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
         sort();
       }
       finally {
@@ -4681,6 +4682,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         pushUIProcessor();
         //
         getColumnSet().removeGroupColumn(column);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
         sort();
       }
       finally {
