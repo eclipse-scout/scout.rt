@@ -37,6 +37,10 @@ scout.Page = function() {
    */
   this.detailFormType = null;
   this.tableStatusVisible = true;
+  /**
+   * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
+   */
+  this.drillDownOnRowClick = false;
 };
 scout.inherits(scout.Page, scout.TreeNode);
 
@@ -106,10 +110,9 @@ scout.Page.prototype._createTable = function() {
  */
 scout.Page.prototype._initTable = function(table) {
   table.on('rowsFiltered', this._onTableRowsFiltered.bind(this));
-};
-
-scout.Page.prototype._onTableRowsFiltered = function(event) {
-  this.getOutline().mediator.onTableRowsFiltered(event, this);
+  if (this.drillDownOnRowClick) {
+    table.on('rowClicked', this._onTableRowClicked.bind(this));
+  }
 };
 
 scout.Page.prototype._ensureDetailForm = function() {
@@ -229,4 +232,18 @@ scout.Page.linkRowWithPage = function(row, page) {
 scout.Page.unlinkRowWithPage = function(row, page) {
   delete row.page;
   delete page.row;
+};
+
+scout.Page.prototype._onTableRowsFiltered = function(event) {
+  this.getOutline().mediator.onTableRowsFiltered(event, this);
+};
+
+scout.Page.prototype._onTableRowClicked = function(event) {
+  if (!this.drillDownOnRowClick) {
+    return;
+  }
+  var row = event.row;
+  var drillNode = this.pageForTableRow(row);
+  this.getOutline().selectNode(drillNode);
+  this.detailTable.deselectRow(row);
 };

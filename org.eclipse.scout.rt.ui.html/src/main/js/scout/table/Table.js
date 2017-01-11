@@ -2424,6 +2424,10 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   }
 };
 
+scout.Table.prototype.selectRow = function(row, debounceSend) {
+  this.selectRow(row);
+};
+
 scout.Table.prototype.selectRows = function(rows, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
@@ -2452,6 +2456,10 @@ scout.Table.prototype.selectRows = function(rows, debounceSend) {
       this.revealSelection();
     }
   }
+};
+
+scout.Table.prototype.deselectRow = function(row) {
+  this.deselectRows(row);
 };
 
 scout.Table.prototype.deselectRows = function(rows) {
