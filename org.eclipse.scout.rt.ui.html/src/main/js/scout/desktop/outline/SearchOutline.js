@@ -63,8 +63,8 @@ scout.SearchOutline.prototype._remove = function() {
 
 scout.SearchOutline.prototype._renderProperties = function() {
   scout.SearchOutline.parent.prototype._renderProperties.call(this);
-  this._renderSearchQuery(this.searchQuery);
-  this._renderSearchStatus(this.searchStatus);
+  this._renderSearchQuery();
+  this._renderSearchStatus();
   this._renderRequestFocusQueryField();
 };
 
@@ -76,14 +76,14 @@ scout.SearchOutline.prototype._renderTitle = function() {
   }
 };
 
-scout.SearchOutline.prototype._renderSearchQuery = function(searchQuery) {
-  this.$queryField.val(searchQuery);
+scout.SearchOutline.prototype._renderSearchQuery = function() {
+  this.$queryField.val(this.searchQuery);
 };
 
-scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
+scout.SearchOutline.prototype._renderSearchStatus = function() {
   var animate = this.rendered;
 
-  if (searchStatus && !this.$searchStatus.isVisible()) {
+  if (this.searchStatus && !this.$searchStatus.isVisible()) {
     if (animate) {
       this.$searchStatus.slideDown({
         duration: 200,
@@ -92,7 +92,7 @@ scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
     } else {
       this.$searchStatus.show();
     }
-  } else if (!searchStatus && this.$searchStatus.isVisible()) {
+  } else if (!this.searchStatus && this.$searchStatus.isVisible()) {
     if (animate) {
       this.$searchStatus.slideUp({
         duration: 200,
@@ -102,7 +102,7 @@ scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
       this.$searchStatus.hide();
     }
   }
-  this.$searchStatus.textOrNbsp(searchStatus);
+  this.$searchStatus.textOrNbsp(this.searchStatus);
 };
 
 scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
