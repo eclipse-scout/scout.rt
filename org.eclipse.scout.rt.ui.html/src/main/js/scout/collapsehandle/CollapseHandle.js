@@ -10,20 +10,10 @@
  ******************************************************************************/
 scout.CollapseHandle = function() {
   scout.CollapseHandle.parent.call(this);
-  this.leftVisible = false;
-  this.rightVisible = false;
+  this.leftVisible = true;
+  this.rightVisible = true;
 };
 scout.inherits(scout.CollapseHandle, scout.Widget);
-
-scout.CollapseHandle.prototype._init = function(model) {
-  scout.CollapseHandle.parent.prototype._init.call(this, model);
-
-  var defaults = {
-    leftVisible: true,
-    rightVisible: true
-  };
-  $.extend(this, defaults, model);
-};
 
 scout.CollapseHandle.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('collapse-handle');
@@ -39,9 +29,17 @@ scout.CollapseHandle.prototype._renderProperties = function() {
   this._renderRightVisible();
 };
 
+scout.CollapseHandle.prototype.setLeftVisible = function(visible) {
+  this.setProperty('leftVisible', visible);
+};
+
 scout.CollapseHandle.prototype._renderLeftVisible = function() {
   this.$left.setVisible(this.leftVisible);
   this._updateVisibilityClasses();
+};
+
+scout.CollapseHandle.prototype.setRightVisible = function(visible) {
+  this.setProperty('rightVisible', visible);
 };
 
 scout.CollapseHandle.prototype._renderRightVisible = function() {
@@ -55,14 +53,6 @@ scout.CollapseHandle.prototype._updateVisibilityClasses = function() {
   this.$left.toggleClass('both-visible', bothVisible);
   this.$right.toggleClass('both-visible', bothVisible);
   this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
-};
-
-scout.CollapseHandle.prototype.setLeftVisible = function(visible) {
-  this.setProperty('leftVisible', visible);
-};
-
-scout.CollapseHandle.prototype.setRightVisible = function(visible) {
-  this.setProperty('rightVisible', visible);
 };
 
 scout.CollapseHandle.prototype._onLeftMouseDown = function(event) {

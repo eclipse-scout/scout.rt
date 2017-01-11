@@ -192,13 +192,17 @@ scout.DesktopNavigation.prototype._renderHandleVisible = function() {
   }
 };
 
+scout.DesktopNavigation.prototype._createHandle = function() {
+  return scout.create('DesktopNavigationHandle', {
+    parent: this
+  });
+};
+
 scout.DesktopNavigation.prototype._renderHandle = function() {
   if (this.handle) {
     return;
   }
-  this.handle = scout.create('DesktopNavigationHandle', {
-    parent: this
-  });
+  this.handle = this._createHandle();
   this.handle.render(this.$container);
   this.handle.$container.addClass('navigation-open');
   this.handle.on('action', this._onHandleAction.bind(this));
