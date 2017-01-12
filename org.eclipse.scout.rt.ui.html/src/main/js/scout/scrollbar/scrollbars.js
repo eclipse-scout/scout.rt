@@ -174,15 +174,18 @@ scout.scrollbars = {
    *        it will be queued in order to prevent unnecessary updates.
    */
   update: function($scrollable, immediate) {
-    if (!$scrollable) {
+    if (!$scrollable || !$scrollable.data('scrollable')) {
       return;
     }
     var scrollbars = $scrollable.data('scrollbars');
     if (!scrollbars) {
+      if (scout.device.isIos()) {
+        this._handleIosPaintBug($scrollable);
+      }
       return;
     }
     if (immediate) {
-      doUpdate();
+      this._update(scrollbars);
       return;
     }
     if ($scrollable.data('scrollbarUpdatePending')) {
@@ -190,23 +193,55 @@ scout.scrollbars = {
     }
     // Executes the update later to prevent unnecessary updates
     setTimeout(function() {
-      doUpdate();
+      this._update(scrollbars);
       $scrollable.removeData('scrollbarUpdatePending');
     }.bind(this), 0);
     $scrollable.data('scrollbarUpdatePending', true);
+  },
 
-    function doUpdate() {
-      // Reset the scrollbars first to make sure they don't extend the scrollSize
-      scrollbars.forEach(function(scrollbar) {
-        if (scrollbar.rendered) {
-          scrollbar.reset();
-        }
-      });
-      scrollbars.forEach(function(scrollbar) {
-        if (scrollbar.rendered) {
-          scrollbar.update();
-        }
-      });
+  _update: function(scrollbars) {
+    // Reset the scrollbars first to make sure they don't extend the scrollSize
+    scrollbars.forEach(function(scrollbar) {
+      if (scrollbar.rendered) {
+        scrollbar.reset();
+      }
+    });
+    scrollbars.forEach(function(scrollbar) {
+      if (scrollbar.rendered) {
+        scrollbar.update();
+      }
+    });
+  },
+
+  /**
+   * IOS has problems with nested scrollable containers. Sometimes the outer container goes completely white hiding the elements behind.
+   * This happens with the following case: Main box is scrollable but there are no scrollbars because content is smaller than container.
+   * In the main box there is a tab box with a scrollable table. This table has scrollbars.
+   * If the width of the tab box is adjusted (which may happen if the tab item is selected and eventually prefSize called), the main box will go white.
+   * <p>
+   * This happens only if -webkit-overflow-scrolling is set to touch.
+   * To workaround this bug the flag -webkit-overflow-scrolling will be removed if the scrollable component won't display any scrollbars
+   */
+  _handleIosPaintBug: function($scrollable) {
+    if ($scrollable.data('scrollbarUpdatePending')) {
+      return;
+    }
+    setTimeout(function() {
+      workaround();
+      $scrollable.removeData('scrollbarUpdatePending');
+    });
+    $scrollable.data('scrollbarUpdatePending', true);
+
+    function workaround() {
+      var size = scout.graphics.getSize($scrollable).subtract(scout.graphics.getInsets($scrollable, {
+        includePadding: false,
+        includeBorder: true
+      }));
+      if ($scrollable[0].scrollHeight === size.height && $scrollable[0].scrollWidth === size.width) {
+        $scrollable.css('-webkit-overflow-scrolling', '');
+      } else {
+        $scrollable.css('-webkit-overflow-scrolling', 'touch');
+      }
     }
   },
 
