@@ -2017,8 +2017,10 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   }
   if (oldNode.lazyExpandingEnabled !== updatedNode.lazyExpandingEnabled) {
     oldNode.lazyExpandingEnabled = updatedNode.lazyExpandingEnabled;
-    // Also make sure expandedLazy is resetted (same code as in AbstractTreeNode.setLazyExpandingEnabled)
-    oldNode.expandedLazy = updatedNode.lazyExpandingEnabled && this.lazyExpandingEnabled;
+    // Also make sure expandedLazy is reset to false when lazyExpanding is disabled (same code as in AbstractTreeNode.setLazyExpandingEnabled)
+    if (!updatedNode.lazyExpandingEnabled || !this.lazyExpandingEnabled) {
+      oldNode.expandedLazy = false;
+    }
     propertiesChanged = true;
   }
   return propertiesChanged;

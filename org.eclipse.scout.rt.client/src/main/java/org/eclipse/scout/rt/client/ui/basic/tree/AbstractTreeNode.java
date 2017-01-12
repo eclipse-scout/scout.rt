@@ -545,9 +545,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
     m_expanded = EXPANDED_BIT_HELPER.changeBit(LAZY_EXPANDING_ENABLED, lazyExpandingEnabled, m_expanded);
 
-    // Also set state of expandedLazy as well -> if lazy expanding gets disabled, it is not expected that expandedLazy is still set to true
+    // Also reset state of expandedLazy -> if lazy expanding gets disabled, it is not expected that expandedLazy is still set to true
     // See also Tree.js _applyUpdatedNodeProperties
-    setExpandedLazyInternal(lazyExpandingEnabled && getTree() != null && getTree().isLazyExpandingEnabled());
+    if (!lazyExpandingEnabled || (getTree() != null && !getTree().isLazyExpandingEnabled())) {
+      setExpandedLazyInternal(false);
+    }
 
     if (getTree() != null) {
       getTree().fireNodeChanged(this);
