@@ -92,6 +92,12 @@ scout.Tooltip.prototype._render = function($parent) {
 
 scout.Tooltip.prototype._postRender = function() {
   scout.Tooltip.parent.prototype._postRender.call(this);
+
+  // if the anchor to which the tooltip is added isn't attached (i.e. tabItem not being displayed) store the tooltip in the DetachHelper's storage for later retrieval
+  if (this.$anchor && !this.$anchor.isAttached()) {
+    this.session.detachHelper.storeTooltip(this.$anchor.attachParent(), this);
+    return;
+  }
   this.position();
 };
 

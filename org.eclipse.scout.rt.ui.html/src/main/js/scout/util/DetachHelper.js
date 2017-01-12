@@ -55,8 +55,19 @@ scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
 };
 
 scout.DetachHelper.prototype._storeTooltips = function($container) {
-  var tooltips = scout.tooltips.find($container),
-    tooltipDestroyHandler, tooltipRenderHandler;
+  var tooltips = scout.tooltips.find($container);
+
+  tooltips.forEach(function(tooltip) {
+    this.storeTooltip($container, tooltip);
+  }, this);
+};
+
+scout.DetachHelper.prototype.storeTooltip = function($container, tooltip) {
+  var tooltipDestroyHandler, tooltipRenderHandler,
+    tooltips = $container.data('tooltips') || [];
+
+  tooltips.push(tooltip);
+
   tooltipDestroyHandler = function(event) {
     // If tooltip will be destroyed, remove it from the list so that restore won't try to render it
     scout.arrays.remove(tooltips, event.source);
@@ -66,14 +77,13 @@ scout.DetachHelper.prototype._storeTooltips = function($container) {
     // If tooltip will be rendered, destroy listener is obsolete
     event.source.off('destroy', tooltipDestroyHandler);
   };
-  tooltips.forEach(function(tooltip) {
-    if (!tooltip.rendered) {
-      return;
-    }
-    tooltip.remove();
-    tooltip.one('render', tooltipRenderHandler);
-    tooltip.one('destroy', tooltipDestroyHandler);
-  });
+  if (!tooltip.rendered) {
+    return;
+  }
+  tooltip.remove();
+  tooltip.one('render', tooltipRenderHandler);
+  tooltip.one('destroy', tooltipDestroyHandler);
+
   $container.data('tooltips', tooltips);
 };
 

@@ -18,7 +18,7 @@ describe("DetachHelper", function() {
     session = sandboxSession();
   });
 
-  afterEach(function(){
+  afterEach(function() {
     jasmine.Ajax.uninstall();
   });
 
@@ -27,10 +27,10 @@ describe("DetachHelper", function() {
       detachHelper = new scout.DetachHelper(session),
       $div = $('<div>').appendTo($sandbox),
       $anchor = $('<div>').appendTo($div)
-        .cssLeft(50)
-        .cssTop(50)
-        .width(20)
-        .height(20);
+      .cssLeft(50)
+      .cssTop(50)
+      .width(20)
+      .height(20);
 
     var tooltip = scout.create('Tooltip', {
       parent: new scout.NullWidget(),
@@ -54,16 +54,50 @@ describe("DetachHelper", function() {
     expect($tooltip.length).toBe(1);
   });
 
+  it("removes tooltip when achor is detached", function() {
+    var $tooltip,
+      detachHelper = new scout.DetachHelper(session),
+      $div = $('<div>').appendTo($sandbox),
+      $anchor = $('<div>').appendTo($div)
+      .cssLeft(50)
+      .cssTop(50)
+      .width(20)
+      .height(20);
+
+    detachHelper.beforeDetach($div);
+    $div.detach();
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(0);
+
+    var tooltip = scout.create('Tooltip', {
+      parent: new scout.NullWidget(),
+      session: session,
+      text: 'hello',
+      $anchor: $anchor
+    });
+    tooltip.render($sandbox);
+    $tooltip = $('.tooltip');
+    expect($div.data('tooltips').length).toBe(1);
+    expect($tooltip.length).toBe(0);
+
+    $div.appendTo($sandbox);
+    detachHelper.afterAttach($div);
+
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($div.data('tooltips')).toBe(null);
+  });
+
   it("considers the context of $anchor -> only removes tooltips in that context", function() {
     var $tooltip,
       detachHelper = new scout.DetachHelper(session),
       $div = $('<div>').appendTo($sandbox),
       $topLevelAnchor = $('<div>').appendTo($sandbox),
       $anchor = $('<div>').appendTo($div)
-        .cssLeft(50)
-        .cssTop(50)
-        .width(20)
-        .height(20);
+      .cssLeft(50)
+      .cssTop(50)
+      .width(20)
+      .height(20);
 
     var topLevelTooltip = scout.create('Tooltip', {
       parent: new scout.NullWidget(),

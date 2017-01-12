@@ -697,6 +697,18 @@ $.fn.isAttached = function() {
   return $.contains(this.document(true).documentElement, this[0]);
 };
 
+$.fn.attachParent = function() {
+  var $elem = this;
+  while ($elem.length > 0) {
+    if ($elem.parent().length === 0) {
+      return $elem;
+    }
+    $elem = $elem.parent();
+  }
+  return $();
+};
+
+
 /**
  * Returns the first parent which is scrollable
  */
