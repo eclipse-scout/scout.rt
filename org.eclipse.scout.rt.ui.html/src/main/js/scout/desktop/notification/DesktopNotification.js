@@ -2,7 +2,7 @@ scout.DesktopNotification = function() {
   scout.DesktopNotification.parent.call(this);
   this.closable = true;
   this.status = scout.Status.info();
-  this.duration;
+  this.duration = 5000;
   this._removeTimeout;
   this._removing = false;
 };
@@ -15,7 +15,17 @@ scout.DesktopNotification.INFINITE = -1;
 
 scout.DesktopNotification.prototype._init = function(model) {
   scout.DesktopNotification.parent.prototype._init.call(this, model);
-  this.desktop = model.desktop || this.session.desktop;
+  this.desktop = this.session.desktop;
+
+  // this allows to set the properties severity and message directly on the model object
+  // without having a status object. because it's more convenient when you must create
+  // a notification programatically.
+  if (model.severity || model.message) {
+    this.status = new scout.Status({
+      severity: model.severity,
+      message: model.message
+    });
+  }
 };
 
 scout.DesktopNotification.prototype._render = function($parent) {
@@ -146,7 +156,11 @@ scout.DesktopNotification.prototype.fadeOut = function() {
     this.destroy();
   }.bind(this));
 };
-
+/**
+ * @param {number} status
+ * @returns {string}
+ * @static
+ */
 scout.DesktopNotification.cssClassForSeverity = function(status) {
   var cssSeverity,
     severity = scout.Status.Severity;

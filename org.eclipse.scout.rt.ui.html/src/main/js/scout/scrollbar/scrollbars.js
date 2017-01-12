@@ -431,7 +431,7 @@ scout.scrollbars = {
         $scrollable.data('scrollTop', scrollTop);
         scrollLeft = $scrollable.scrollLeft();
         $scrollable.data('scrollLeft', $scrollable.scrollLeft());
-        $.log.debug('Stored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
+        $.log.trace('Stored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
       }
     });
   },
@@ -464,7 +464,7 @@ scout.scrollbars = {
         // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached
         // -> update event never had any effect because it executed after detaching (due to set timeout)
         scout.scrollbars.update($scrollable);
-        $.log.debug('Restored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
+        $.log.trace('Restored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
       }
     });
   }

@@ -225,13 +225,8 @@ scout.StringField.prototype._renderInsertText = function() {
   if (this.insertText.length + text.length > this.maxLength) {
     scout.create('DesktopNotification', {
       parent: this,
-      id: scout.numbers.randomId(),
-      desktop: this.session.desktop,
-      duration: 3000,
-      status: {
-        message: this.session.text('ui.CannotInsertTextTooLong'),
-        severity: scout.Status.Severity.WARNING
-      }
+      severity: scout.Status.Severity.WARNING,
+      message: this.session.text('ui.CannotInsertTextTooLong')
     }).show();
     return;
   }
