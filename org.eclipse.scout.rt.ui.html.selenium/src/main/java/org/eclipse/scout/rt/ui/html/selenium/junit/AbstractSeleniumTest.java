@@ -294,6 +294,14 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(parent, modelClass).findElement(By.tagName("input"));
   }
 
+  protected WebElement waitUntilTextAreaClickable(Class<?> modelClass) {
+    return waitUntilTextAreaClickable(null, modelClass);
+  }
+
+  protected WebElement waitUntilTextAreaClickable(WebElement parent, Class<?> modelClass) {
+    return waitUntilElementClickable(parent, modelClass).findElement(By.tagName("textarea"));
+  }
+
   public WebElement waitUntilCheckBoxClickable(WebElement parent, Class<?> modelClass) {
     return waitUntilElementClickable(parent, modelClass).findElement(By.className("check-box"));
   }
