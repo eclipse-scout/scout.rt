@@ -120,6 +120,7 @@ scout.PageWithTable.prototype.loadChildren = function() {
  */
 scout.PageWithTable.prototype.loadTableData = function() {
   this.detailTable.deleteAllRows();
+  this.detailTable.setLoading(true);
   return this._loadTableData()
     .done(this._onLoadTableDataDone.bind(this))
     .fail(this._onLoadTableDataFail.bind(this))
@@ -168,6 +169,7 @@ scout.PageWithTable.prototype._onLoadTableDataFail = function(error) {
 
 scout.PageWithTable.prototype._onLoadTableDataAlways = function() {
   this.childrenLoaded = true;
+  this.detailTable.setLoading(false);
 };
 
 /**
