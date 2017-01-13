@@ -13,6 +13,7 @@ scout.Code = function() {
   this.id;
   this.parent;
   this.children = [];
+  this.sortCode;
 };
 
 scout.Code.prototype.init = function(model) {
@@ -20,6 +21,7 @@ scout.Code.prototype.init = function(model) {
 
   this.active = model.active;
   this.id = model.id;
+  this.sortCode = model.sortCode;
   this._text = model.text;
   this.modelClass = model.modelClass;
 
