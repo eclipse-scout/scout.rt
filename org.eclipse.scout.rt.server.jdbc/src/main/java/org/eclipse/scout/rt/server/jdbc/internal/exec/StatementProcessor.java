@@ -687,7 +687,7 @@ public class StatementProcessor implements IStatementProcessor {
       }
     }
     if (statementPlainText) {
-      String p = "" + m_currentInputStm;
+      String p = m_currentInputStm != null ? m_currentInputStm : "";
       ArrayList<SqlBind> bindList = new ArrayList<SqlBind>(m_currentInputBindMap.values());
       int pos = findNextBind(p, 0);
       int bindIndex = 0;
