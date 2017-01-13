@@ -79,8 +79,9 @@ scout.TableHeader.prototype.rerenderColumns = function() {
 };
 
 scout.TableHeader.prototype._renderColumns = function() {
-  this.table.columns.forEach(this._renderColumn, this);
-  if (this.table.columns.length === 0) {
+  var visibleColumns = this._visibleColumns();
+  visibleColumns.forEach(this._renderColumn, this);
+  if (visibleColumns.length === 0) {
     // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
     this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
   }
@@ -88,15 +89,12 @@ scout.TableHeader.prototype._renderColumns = function() {
 };
 
 scout.TableHeader.prototype._renderColumn = function(column, index) {
-  if (!column.isVisible()) {
-    return;
-  }
-
   var columnWidth = column.width,
     marginLeft = '',
     marginRight = '',
+    visibleColumns = this._visibleColumns(),
     isFirstColumn = (index === 0),
-    isLastColumn = (index === this.table.columns.length - 1);
+    isLastColumn = (index === visibleColumns.length - 1);
 
   if (isFirstColumn) {
     marginLeft = this.table.rowBorderLeftWidth;
@@ -191,8 +189,9 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     marginLeft = '',
     marginRight = '',
     menuBarWidth = (this.menuBar.visible ? this.$menuBarContainer.outerWidth(true) : 0),
-    isFirstColumn = this.table.columns.indexOf(column) === 0,
-    isLastColumn = this.table.columns.indexOf(column) === this.table.columns.length - 1;
+    visibleColumns = this._visibleColumns(),
+    isFirstColumn = visibleColumns.indexOf(column) === 0,
+    isLastColumn = visibleColumns.indexOf(column) === visibleColumns.length - 1;
 
   if (isFirstColumn) {
     marginLeft = this.table.rowBorderLeftWidth;
@@ -227,8 +226,9 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
 
 scout.TableHeader.prototype._reconcileScrollPos = function() {
   // When scrolling horizontally scroll header as well
-  var scrollLeft = this.table.$data.scrollLeft(),
-    lastColumn = this.table.columns[this.table.columns.length - 1];
+  var
+    scrollLeft = this.table.$data.scrollLeft(),
+    lastColumn = this._lastVisibleColumn();
 
   this.resizeHeaderItem(lastColumn);
   this.$container.scrollLeft(scrollLeft);
@@ -429,7 +429,7 @@ scout.TableHeader.prototype.updateMenuBar = function() {
 
 scout.TableHeader.prototype._onTableColumnResized = function(event) {
   var column = event.column,
-    lastColumn = this.table.columns[this.table.columns.length - 1];
+    lastColumn = this._lastVisibleColumn();
   this.resizeHeaderItem(column);
   if (lastColumn !== column) {
     this.resizeHeaderItem(lastColumn);
@@ -437,21 +437,20 @@ scout.TableHeader.prototype._onTableColumnResized = function(event) {
 };
 
 scout.TableHeader.prototype.onSortingChanged = function() {
-  for (var i = 0; i < this.table.columns.length; i++) {
-    var column = this.table.columns[i];
-    this._renderColumnState(column);
-  }
+  this._visibleColumns().forEach(this._renderColumnState, this);
 };
 
 scout.TableHeader.prototype._onTableColumnMoved = function(event) {
-  var column = event.column,
+  var
+    column = event.column,
     oldPos = event.oldPos,
     newPos = event.newPos,
     $header = column.$header,
     $headers = this.findHeaderItems(),
     $moveHeader = $headers.eq(oldPos),
     $moveResize = $moveHeader.next(),
-    lastColumnPos = this.table.columns.length - 1;
+    visibleColumns = this._visibleColumns(),
+    lastColumnPos = visibleColumns.length - 1;
 
   // store old position of header
   $headers.each(function() {
@@ -472,14 +471,15 @@ scout.TableHeader.prototype._onTableColumnMoved = function(event) {
     $headers.eq(0).removeClass('first');
     $headers.eq($headers.length - 1).removeClass('last');
   }
-  if (this.table.columns.length > 0) {
-    this.table.columns[0].$header.addClass('first');
-    this.table.columns[this.table.columns.length - 1].$header.addClass('last');
+
+  if (visibleColumns.length > 0) {
+    visibleColumns[0].$header.addClass('first');
+    visibleColumns[lastColumnPos].$header.addClass('last');
   }
 
   // Update header size due to header menu items if moved from or to last position
   if (oldPos === lastColumnPos || newPos === lastColumnPos) {
-    this.table.columns.forEach(function(column) {
+    visibleColumns.forEach(function(column) {
       this.resizeHeaderItem(column);
     }.bind(this));
   }
@@ -493,6 +493,14 @@ scout.TableHeader.prototype._onTableColumnMoved = function(event) {
   }
 };
 
+scout.TableHeader.prototype._visibleColumns = function() {
+  return this.table.visibleColumns();
+};
+
+scout.TableHeader.prototype._lastVisibleColumn = function() {
+  return scout.arrays.last(this._visibleColumns());
+};
+
 scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   var column, i, $header, $headerResize;
   var $headers = this.findHeaderItems();
@@ -503,14 +511,13 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   });
 
   // change order in dom of header
-  for (i = 0; i < this.table.columns.length; i++) {
-    column = this.table.columns[i];
+  this._visibleColumns().forEach(function(column) {
     $header = column.$header;
     $headerResize = $header.next('.table-header-resize');
 
     this.$container.append($header);
     this.$container.append($headerResize);
-  }
+  }, this);
 
   this._arrangeHeaderItems($headers);
 };
@@ -544,7 +551,7 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
     startX = Math.floor(event.pageX),
     $header = $(event.currentTarget),
     column = $header.data('column'),
-    oldPos = this.table.columns.indexOf(column),
+    oldPos = this._visibleColumns().indexOf(column),
     newPos = oldPos,
     move = $header.outerWidth(),
     $otherHeaders = $header.siblings('.table-header-item:not(.filler)');
@@ -627,7 +634,7 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
     var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
     h.each(function(i) {
       if ($(this).css('left') !== '0px') {
-        newPos = that.table.columns.indexOf(($(this).data('column')));
+        newPos = that._visibleColumns().indexOf(($(this).data('column')));
         return false;
       }
     });

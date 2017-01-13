@@ -194,7 +194,7 @@ describe("Table", function() {
   });
 
   describe("updateRows", function() {
-    var model, table, row0;
+    var model, table;
 
     beforeEach(function() {
       model = helper.createModelFixture(2, 2);
@@ -312,7 +312,7 @@ describe("Table", function() {
 
   describe("insertRows", function() {
 
-    var model, table, rows, row0, row1,
+    var model, table,
       events = '',
       rowsOnInsert;
 
@@ -434,13 +434,6 @@ describe("Table", function() {
   describe("deleteAllRows", function() {
     var model, table;
 
-    function createAllRowsDeletedEvent(model, rowIds) {
-      return {
-        target: model.id,
-        type: 'allRowsDeleted'
-      };
-    }
-
     beforeEach(function() {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
@@ -553,7 +546,7 @@ describe("Table", function() {
       table.checkRow(rows[0], true, true);
       table.checkRow(rows[4], true, true);
 
-      checkedRows = checkedRows = findCheckedRows(rows);
+      checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
 
       table.checkRow(rows[4], false, true);
@@ -1636,7 +1629,7 @@ describe("Table", function() {
       expect(table._aggregateRows[0].$row).toBeFalsy();
       expect(table._aggregateRows[1].$row).toBeFalsy();
 
-      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
+      spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
       table._renderViewport();
 
       // Last row is rendered -> aggregate row needs to be rendered as well
@@ -2324,7 +2317,6 @@ describe("Table", function() {
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
-      var $row3 = $rows.eq(3);
 
       expect($rows).not.toHaveClass('selected');
 
@@ -2623,11 +2615,9 @@ describe("Table", function() {
     });
 
     it("updates sort indices of the sort columns if a sort column got removed", function() {
-      model.columns[1].id = model.columns[1].id;
       model.columns[1].sortActive = true;
       model.columns[1].sortAscending = true;
       model.columns[1].sortIndex = 1;
-      model.columns[2].id = model.columns[2].id;
       model.columns[2].sortActive = true;
       model.columns[2].sortAscending = true;
       model.columns[2].sortIndex = 0;
@@ -2735,6 +2725,39 @@ describe("Table", function() {
       expect(table.columns[1].isVisible()).toBe(false);
       expect(table.$container.find('.table-header-item:not(.filler)').length).toBe(1);
       expect(table.$container.find('.table-cell').length).toBe(1);
+    });
+
+    it("visibleColumns() only return visible columns", function() {
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+
+      expect(table.columns.length).toBe(2);
+      expect(table.visibleColumns().length).toBe(2);
+
+      table.columns[0].setVisible(false);
+
+      expect(table.columns.length).toBe(2);
+      expect(table.visibleColumns().length).toBe(1);
+    });
+
+
+    it("moveColumn() must deal with different indices for visible and all columns", function() {
+      var model = helper.createModelFixture(3, 1);
+      var table = helper.createTable(model);
+      var colA = table.columns[0];
+      var colB = table.columns[1];
+      var colC = table.columns[2];
+
+      colB.setVisible(false); // column in the middle is invisible
+      expect(table.visibleColumns().length).toBe(2);
+
+      table.moveColumn(colC, 1, 0); // move C to be the first column
+      expect(table.visibleColumns()).toEqual([colC, colA]);
+      expect(table.columns).toEqual([colC, colA, colB]);
+
+      table.moveColumn(colC, 0, 1); // move C to be the last column
+      expect(table.visibleColumns()).toEqual([colA, colC]);
+      expect(table.columns).toEqual([colA, colC, colB]);
     });
 
   });

@@ -87,8 +87,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // only add right column if filter has a filter-table or filter-fields
   if (this.hasFilterTable || this.hasFilterFields) {
     this.$columnFilters = this.$body.appendDiv('table-header-menu-filters');
-    var htmlColumnFiltes = scout.HtmlComponent.install(this.$columnFilters, this.session);
-    htmlColumnFiltes.setLayout(new scout.RowLayout());
+    var htmlColumnFilters = scout.HtmlComponent.install(this.$columnFilters, this.session);
+    htmlColumnFilters.setLayout(new scout.RowLayout());
   }
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
@@ -180,7 +180,7 @@ scout.TableHeaderMenu.prototype._remove = function() {
 scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
   var table = this.table,
     column = this.column,
-    pos = table.columns.indexOf(column);
+    pos = table.visibleColumns().indexOf(column);
 
   var group = scout.create('TableHeaderMenuGroup', {
     parent: this,
@@ -193,7 +193,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     cssClass: 'move move-top',
     clickHandler: function() {
       table.moveColumn(column, pos, 0);
-      pos = table.columns.indexOf(column);
+      pos = table.visibleColumns().indexOf(column);
     }
   });
   scout.create('TableHeaderMenuButton', {
@@ -202,7 +202,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     cssClass: 'move move-up',
     clickHandler: function() {
       table.moveColumn(column, pos, Math.max(pos - 1, 0));
-      pos = table.columns.indexOf(column);
+      pos = table.visibleColumns().indexOf(column);
     }
   });
   scout.create('TableHeaderMenuButton', {
@@ -211,7 +211,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     cssClass: 'move move-down',
     clickHandler: function() {
       table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
-      pos = table.columns.indexOf(column);
+      pos = table.visibleColumns().indexOf(column);
     }
   });
   scout.create('TableHeaderMenuButton', {
@@ -220,7 +220,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     cssClass: 'move move-bottom',
     clickHandler: function() {
       table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
-      pos = table.columns.indexOf(column);
+      pos = table.visibleColumns().indexOf(column);
     }
   });
 
@@ -692,24 +692,18 @@ scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
   return this.rendered && this.belongsTo($headerItem);
 };
 
+scout.TableHeaderMenu.prototype._countColumns = function(propertyName) {
+  return this.table.visibleColumns().reduce(function(sum, column) {
+    return sum + column[propertyName] ? 1 : 0;
+  }, 0);
+};
+
 scout.TableHeaderMenu.prototype._sortColumnCount = function() {
-  var i, sortCount = 0;
-  for (i = 0; i < this.table.columns.length; i++) {
-    if (this.table.columns[i].sortActive) {
-      sortCount++;
-    }
-  }
-  return sortCount;
+  return this._countColumns('sortActive');
 };
 
 scout.TableHeaderMenu.prototype._groupColumnCount = function() {
-  var i, groupCount = 0;
-  for (i = 0; i < this.table.columns.length; i++) {
-    if (this.table.columns[i].grouped) {
-      groupCount++;
-    }
-  }
-  return groupCount;
+  return this._countColumns('grouped');
 };
 
 scout.TableHeaderMenu.prototype._computeWhitherWidth = function() {

@@ -475,7 +475,9 @@ scout.Table.prototype.onContextMenu = function(event) {
 };
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {
-  this._redraw();
+  if (this.rendered) {
+    this._redraw();
+  }
 };
 
 scout.Table.prototype._onDataScroll = function() {
@@ -497,19 +499,13 @@ scout.Table.prototype.setContextColumn = function(contextColumn) {
 
 scout.Table.prototype._hasVisibleTableControls = function() {
   return this.tableControls.some(function(control) {
-    if (control.visible) {
-      return true;
-    }
-    return false;
+    return control.visible;
   });
 };
 
 scout.Table.prototype.hasAggregateTableControl = function() {
   return this.tableControls.some(function(control) {
-    if (control instanceof scout.AggregateTableControl) {
-      return true;
-    }
-    return false;
+    return control instanceof scout.AggregateTableControl;
   });
 };
 
@@ -2834,9 +2830,16 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   }
 };
 
-scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
+scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos, dragged) {
+  // translate position of 'visible columns' array to position in 'all columns' array
+  var visibleColumns = this.visibleColumns(),
+    oldColumn = visibleColumns[visibleOldPos],
+    newColumn = visibleColumns[visibleNewPos],
+    newPos = this.columns.indexOf(newColumn),
+    oldPos = this.columns.indexOf(oldColumn);
+
+  // Don't allow moving a column before the last column with a fixed position (checkbox col, row icon col ...)
   this.columns.forEach(function(iteratingColumn, i) {
-    // Don't allow moving a column before the last column with a fixed position (checkbox col, row icon col ...)
     if (iteratingColumn.fixedPosition && newPos <= i) {
       newPos = i + 1;
     }
@@ -2845,15 +2848,18 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   scout.arrays.remove(this.columns, column);
   scout.arrays.insert(this.columns, column, newPos);
 
-  this._triggerColumnMoved(column, oldPos, newPos, dragged);
+  visibleNewPos = this.visibleColumns().indexOf(column); // we must re-evaluate visible columns
+  this._triggerColumnMoved(column, visibleOldPos, visibleNewPos, dragged);
 
   // move aggregated rows
   this._aggregateRows.forEach(function(aggregateRow) {
-    scout.arrays.move(aggregateRow.contents, oldPos, newPos);
+    scout.arrays.move(aggregateRow.contents, visibleOldPos, visibleNewPos);
   });
 
   // move cells
-  this._rerenderViewport();
+  if (this.rendered) {
+    this._rerenderViewport();
+  }
 };
 
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
@@ -3731,6 +3737,12 @@ scout.Table.prototype.setVirtual = function(virtual) {
 
 scout.Table.prototype.setCellValue = function(column, row, value) {
   column.setCellValue(row, value);
+};
+
+scout.Table.prototype.visibleColumns = function() {
+  return this.columns.filter(function(column) {
+    return column.visible;
+  });
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
