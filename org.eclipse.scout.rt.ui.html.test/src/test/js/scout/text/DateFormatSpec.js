@@ -38,6 +38,10 @@ describe("DateFormat", function() {
       dateFormat = new scout.DateFormat(locale, pattern);
       expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('21.3.14');
       expect(dateFormat.format(scout.dates.create('2004-03-01'))).toBe('1.3.04');
+
+      pattern = 'dd.MM.yy HH:mm';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2017-01-16'))).toBe('16.01.17 00:00');
     });
 
     it("considers E", function() {

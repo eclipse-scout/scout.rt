@@ -252,7 +252,7 @@ scout.DateFormat = function(locale, pattern) { // NOSONAR
       formatFunction: function(formatContext) {
         var year = String(formatContext.inputDate.getFullYear());
         var length = (formatContext.exactLength ? this.acceptedTerm.length : 2);
-        if (this.acceptedTerm.length === 1) {
+        if (length === 1) {
           // Return max. 2 digits, no leading zero
           return year.slice(-length);
         }
