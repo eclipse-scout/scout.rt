@@ -74,7 +74,7 @@ scout.PopupWindow.prototype._onReady = function() {
   // We do the same thing here, as with the $entryPoint of the main window
   this.session.keyStrokeManager.installTopLevelKeyStrokeHandlers(this.$container);
   this.session.focusManager.installTopLevelMouseHandlers(this.$container);
-  scout._installGlobalMouseDownInterceptor(myDocument);
+  scout.installGlobalMouseDownInterceptor(myDocument);
 
   // Attach event handlers on window
   $(this.myWindow)

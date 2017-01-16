@@ -98,16 +98,95 @@ scout.App.prototype._bootstrapDone = function(options) {
  */
 scout.App.prototype._init = function(options) {
   options = options || {};
-  if (!scout._checkBrowserCompability(options)) {
+  if (!this._checkBrowserCompability(options)) {
     return;
   }
 
-  scout.prepareDOM();
-  scout._installGlobalJavascriptErrorHandler();
-  scout._installGlobalMouseDownInterceptor(document);
-  scout._globalAjaxSetup();
-  this.installExtensions();
+  this._prepareDOM();
+  this._installErrorHandler();
+  this._installGlobalMouseDownInterceptor();
+  this._ajaxSetup();
+  this._installExtensions();
   this._loadSessions(options);
+};
+
+scout.App.prototype._checkBrowserCompability = function(options) {
+  var device = scout.device;
+  $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
+  if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
+    // No check requested or browser is supported
+    return true;
+  }
+
+  $('.scout').each(function() {
+    var $entryPoint = $(this),
+      $box = $entryPoint.appendDiv(),
+      newOptions = scout.objects.valueCopy(options);
+
+    newOptions.checkBrowserCompatibility = false;
+    $box.load('unsupported-browser.html', function() {
+      $box.find('button').on('click', function() {
+        $box.remove();
+        scout._init(newOptions);
+      });
+    });
+  });
+  return false;
+};
+
+scout.App.prototype._prepareDOM = function() {
+  scout.prepareDOM(document);
+};
+
+scout.App.prototype._installGlobalMouseDownInterceptor = function() {
+  scout.installGlobalMouseDownInterceptor(document);
+};
+
+/**
+ * Installs a global error handler.
+ * <p>
+ * Note: we do not install an error handler on popup-windows because everything is controlled by the main-window
+ * so exceptions will also occur in that window. This also means, the fatal message-box will be displayed in the
+ * main-window, even when a popup-window is opened and active.
+ * <p>
+ * Caution: The error.stack doesn't look the same in different browsers. Chrome for instance puts the error message
+ * on the first line of the stack. Firefox does only contain the stack lines, without the message, but in return
+ * the stack trace is much longer :)
+ */
+scout.App.prototype._installErrorHandler = function() {
+  var handler = scout.create('ErrorHandler');
+  window.onerror = handler.handle.bind(handler);
+};
+
+/**
+ * Uses the object returned by {@link #ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
+ */
+scout.App.prototype._ajaxSetup = function() {
+  var ajaxDefaults = this._ajaxDefaults();
+  if (ajaxDefaults) {
+    $.ajaxSetup(ajaxDefaults);
+  }
+};
+
+/**
+ * Returns the defaults for every ajax call. You may override it to set custom defaults.
+ * By default _beforeAjaxCall is assigned to the beforeSend method.
+ * <p>
+ * Note: This will affect every ajax call, so use it with care! See also the advice on https://api.jquery.com/jquery.ajaxsetup/.
+ */
+scout.App.prototype._ajaxDefaults = function() {
+  return {
+    beforeSend: this._beforeAjaxCall.bind(this)
+  };
+};
+
+/**
+ * Called before every ajax call. Sets the header X-Scout-Correlation-Id.
+ * <p>
+ * Maybe overridden to set custom headers or to execute other code which should run before an ajax call.
+ */
+scout.App.prototype._beforeAjaxCall = function(request) {
+  request.setRequestHeader('X-Scout-Correlation-Id', scout.numbers.correlationId());
 };
 
 scout.App.prototype._loadSessions = function(options) {
@@ -124,7 +203,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
 
-  // FIXME improve this, start must not be executed because it currently does a server request
+  // FIXME CGU improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
   parent.session = session;
   session.desktop = this._createDesktop(parent);
@@ -176,7 +255,7 @@ scout.App.prototype._initDone = function(options) {
  *
  * The default implementation does nothing.
  */
-scout.App.prototype.installExtensions = function() {
+scout.App.prototype._installExtensions = function() {
   // NOP
 };
 
