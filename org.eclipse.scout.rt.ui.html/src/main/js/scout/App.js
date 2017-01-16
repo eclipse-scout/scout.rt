@@ -154,8 +154,12 @@ scout.App.prototype._installGlobalMouseDownInterceptor = function() {
  * the stack trace is much longer :)
  */
 scout.App.prototype._installErrorHandler = function() {
-  var handler = scout.create('ErrorHandler');
+  var handler = this._createErrorHandler();
   window.onerror = handler.handle.bind(handler);
+};
+
+scout.App.prototype._createErrorHandler = function() {
+  return scout.create('ErrorHandler');
 };
 
 /**

@@ -37,7 +37,7 @@ scout.LogoutApp.prototype._doBootstrap = function(options) {
 scout.LogoutApp.prototype._init = function(options) {
   options = options || {};
   options.texts = $.extend({}, scout.texts.readFromDOM(), options.texts);
-  scout.prepareDOM();
+  this._prepareDOM();
 
   var logoutBox = scout.create('LogoutBox', options);
   logoutBox.render($('body'));

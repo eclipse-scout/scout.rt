@@ -15,6 +15,12 @@ scout.RemoteApp.prototype._doBootstrap = function(options) {
   ];
 };
 
+scout.RemoteApp.prototype._createErrorHandler = function() {
+  return scout.create('ErrorHandler', {
+    sendError: true
+  });
+};
+
 /**
  * @override
  */

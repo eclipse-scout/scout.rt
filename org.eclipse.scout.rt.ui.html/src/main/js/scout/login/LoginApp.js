@@ -43,7 +43,7 @@ scout.LoginApp.prototype._doBootstrap = function(options) {
 scout.LoginApp.prototype._init = function(options) {
   options = options || {};
   options.texts = $.extend({}, scout.texts.readFromDOM(), options.texts);
-  scout.prepareDOM();
+  this._prepareDOM();
 
   var loginBox = scout.create('LoginBox', options);
   loginBox.render($('body'));
