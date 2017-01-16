@@ -204,29 +204,10 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
 
   var $elementToFocus = $(elementToFocus);
 
-  // For each element on the way to the root, remember the current scroll position. When setting
-  // the focus to a new element, the browser will try to scroll this element to the visible range.
-  // To prevent a "jumping" UI, we will restore the old scroll position after the focus() call.
-  var $pathToRoot = [];
-  var oldScrollPositions = [];
-  for (var $el = $elementToFocus; $el.length > 0; $el = $el.parent()) {
-    $pathToRoot.push($el);
-    oldScrollPositions.push({
-      left: $el.scrollLeft(),
-      top: $el.scrollTop()
-    });
-  }
-
   // Focus the requested element
   $elementToFocus.focus();
 
   if ($.log.isDebugEnabled()) {
     $.log.debug('Focus set to ' + scout.graphics.debugOutput(elementToFocus));
-  }
-
-  // Restore scroll positions
-  for (var i = 0; i < $pathToRoot.length; i++) {
-    $pathToRoot[i].scrollLeft(oldScrollPositions[i].left);
-    $pathToRoot[i].scrollTop(oldScrollPositions[i].top);
   }
 };
