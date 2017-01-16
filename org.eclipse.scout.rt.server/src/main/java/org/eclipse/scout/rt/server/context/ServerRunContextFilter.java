@@ -6,7 +6,6 @@ package org.eclipse.scout.rt.server.context;
 
 import java.io.IOException;
 import java.security.AccessController;
-import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.Filter;
@@ -69,7 +68,7 @@ public class ServerRunContextFilter implements Filter {
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
-        .withLocale(Locale.getDefault())
+        .withLocale(req.getLocale())
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
   }
 
