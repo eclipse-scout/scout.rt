@@ -128,8 +128,19 @@
       }
     }
 
-    & > .cell-editor-popup > .check-box-field > .cell-editor-field > .check-box {
-      margin-top: 5px;
+    & > .cell-editor-popup > .check-box-field {
+      border-top: 2px solid @item-selection-border-color;
+      border-bottom: 2px solid @item-selection-border-color;
+
+      & > .field {
+        padding-top: 9px;
+        padding-bottom: 9px;
+      }
+    }
+
+    & > .cell-editor-popup > .cell-editor-form-field > input {
+      border-top: 2px solid @item-selection-border-color;
+      border-bottom: 2px solid @item-selection-border-color;
     }
   }
 }
