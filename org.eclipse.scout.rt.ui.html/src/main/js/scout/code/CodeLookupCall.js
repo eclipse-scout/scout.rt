@@ -5,16 +5,11 @@ scout.CodeLookupCall = function() {
 scout.inherits(scout.CodeLookupCall, scout.LookupCall);
 
 scout.CodeLookupCall.prototype._init = function(model) {
+  scout.assertParameter('session', model.session);
   scout.CodeLookupCall.parent.prototype._init.call(this, model);
-  if (!this.session) {
-    throw new Error('missing property \'session\'');
-  }
 };
 
-scout.CodeLookupCall.prototype.textById = function(id) {
-  if (id === null || id === undefined) {
-    return $.Deferred().resolve(null);
-  }
+scout.CodeLookupCall.prototype._textById = function(id) {
   var code = scout.codes.get(this.codeType, id);
   return $.Deferred().resolve(code.text(this.session.locale));
 };

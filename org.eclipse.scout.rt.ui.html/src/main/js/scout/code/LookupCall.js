@@ -33,9 +33,23 @@ scout.LookupCall.prototype.getById = function() {
 };
 
 /**
+ * You should not override this function. Instead override <code>_textById</code>.
+ *
  * @returns {Promise} which returns a text of the lookup row resolved by #getById
  */
 scout.LookupCall.prototype.textById = function(id) {
+  if (scout.objects.isNullOrUndefined(id)) {
+    return $.resolvedPromise('');
+  }
+  return this._textById(id);
+};
+
+/**
+ * Override this function to provide your own textById implementation.
+ *
+ * @returns {Promise} which returns a text of the lookup row resolved by #getById
+ */
+scout.LookupCall.prototype._textById = function(id) {
   return this.getById(id)
     .then(function(lookupRow) {
       if (!lookupRow) {
