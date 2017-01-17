@@ -20,15 +20,6 @@ scout.DesktopLogo.prototype._init = function(model) {
 
 scout.DesktopLogo.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-logo');
-
-  // in memory of the first one...
-  this.$container.dblclick(function(event) {
-    if (event.altKey && event.ctrlKey) {
-      $(event.target).css('background', 'none');
-      $(event.target).css('font-size', '9px');
-      $(event.target).text('make software not war');
-    }
-  });
 };
 
 scout.DesktopLogo.prototype._renderProperties = function() {
