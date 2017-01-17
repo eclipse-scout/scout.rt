@@ -207,6 +207,7 @@ public class JobManager implements IJobManager {
 
   @Override
   public final void shutdown() {
+    LOG.debug("JobManager shutting down.");
     m_shutdownLock.writeLock().lock();
     try {
       m_shutdown = true;

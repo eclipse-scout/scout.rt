@@ -96,11 +96,16 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
    */
   public void cancel() {
     try {
+      final String sessionId = m_serviceRequest.getSessionId();
+      if (sessionId == null) {
+        return; // cannot cancel an event without session. The IRunMonitorCancelService requires a session.
+      }
+
       final Method serviceMethod = IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class);
       final Object[] serviceArgs = new Object[]{m_serviceRequest.getRequestSequence()};
       ServiceTunnelRequest request = m_tunnel.createRequest(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
       request.setClientNodeId(m_serviceRequest.getClientNodeId());
-      request.setSessionId(m_serviceRequest.getSessionId());
+      request.setSessionId(sessionId);
       request.setUserAgent(m_serviceRequest.getUserAgent());
       m_tunnel.invokeService(request);
     }

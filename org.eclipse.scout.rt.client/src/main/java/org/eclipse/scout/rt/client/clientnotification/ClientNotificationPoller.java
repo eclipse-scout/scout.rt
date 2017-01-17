@@ -19,6 +19,10 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -39,7 +43,9 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 @CreateImmediately
 public class ClientNotificationPoller {
+
   private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationPoller.class);
+
   private IFuture<Void> m_pollerFuture;
 
   @PostConstruct
@@ -47,6 +53,7 @@ public class ClientNotificationPoller {
     // ensure the poller starts only once.
     Assertions.assertNull(m_pollerFuture);
     if (BEANS.get(IServiceTunnel.class).isActive()) {
+
       m_pollerFuture = Jobs.schedule(new P_NotificationPoller(), Jobs.newInput()
           .withRunContext(ClientRunContexts.empty()
               .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
@@ -60,12 +67,16 @@ public class ClientNotificationPoller {
   }
 
   public void stop() {
-    if (m_pollerFuture != null) {
-      m_pollerFuture.cancel(true);
+    if (m_pollerFuture == null) {
+      return;
     }
+
+    LOG.debug("Stopping client notification poller.");
+    m_pollerFuture.cancel(true);
+    m_pollerFuture = null;
   }
 
-  protected void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
+  protected static void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("CLIENT NOTIFICATION returned with {} notifications ({}).", notifications.size(), notifications);
     }
@@ -75,7 +86,7 @@ public class ClientNotificationPoller {
     }
   }
 
-  private class P_NotificationPoller implements IRunnable {
+  private static final class P_NotificationPoller implements IRunnable {
 
     @Override
     public void run() {
@@ -91,7 +102,20 @@ public class ClientNotificationPoller {
           SleepUtil.sleepSafe(10, TimeUnit.SECONDS); // sleep some time before connecting anew
         }
       }
+      LOG.debug("Client notification polling has ended because the job was cancelled.");
     }
   }
 
+  /**
+   * {@link IPlatformListener} to shutdown this {@link ClientNotificationPoller} upon platform shutdown.
+   */
+  @Order(-1000)
+  public static final class ShutdownListener implements IPlatformListener {
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (event.getState() == State.PlatformStopping) {
+        BEANS.get(ClientNotificationPoller.class).stop();
+      }
+    }
+  }
 }
