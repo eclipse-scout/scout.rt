@@ -712,7 +712,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
         replacement = replacement.replace('?', ' ');
         //next
-        p = p.substring(0, pos) + replacement + p.substring(pos + 1);
+        p = p.substring(0, pos) + replacement + p.substring(pos + 1);//NOSONAR squid:S2259
         pos = findNextBind(p, pos);
         bindIndex++;
       }
