@@ -21,7 +21,6 @@ import org.openqa.selenium.WebDriver;
 public final class SeleniumSuiteState {
 
   private static boolean s_suiteStarted = false;
-
   private static WebDriver s_driver;
 
   private SeleniumSuiteState() {
@@ -35,8 +34,10 @@ public final class SeleniumSuiteState {
 
   public static void tearDownAfterClass() {
     s_suiteStarted = false;
-    s_driver.quit();
-    s_driver = null;
+    if (s_driver != null) {
+      s_driver.quit();
+      s_driver = null;
+    }
     System.out.println("Selenium driver terminated by SeleniumTestSuite");
   }
 
@@ -47,5 +48,4 @@ public final class SeleniumSuiteState {
   public static WebDriver getDriver() {
     return s_driver;
   }
-
 }
