@@ -38,3 +38,8 @@ scout.ValueFieldAdapter.prototype.exportAdapterData = function(adapterData) {
   delete adapterData.displayText;
   return adapterData;
 };
+
+scout.ValueFieldAdapter.prototype._syncDisplayText = function(displayText) {
+  this.widget.setDisplayText(displayText);
+  this.widget.parseAndSetValue(displayText);
+};

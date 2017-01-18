@@ -52,19 +52,20 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
 
   // trigger only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
-    if (whileTyping) {
-      // Don't call setDisplayText() to prevent re-rendering of display text (which is unnecessary and
-      // might change the cursor position).
-      this._callSetProperty('displayText', displayText);
-    } else {
-      this._parseAndSetValue(displayText); // this also calls setDisplayText()
+    // Don't call setDisplayText() to prevent re-rendering of display text (which is unnecessary and
+    // might change the cursor position). Don't call _callSetProperty() as well, as this eventually
+    // executes this._setDisplayText(), which updates the value.
+    this._setProperty('displayText', displayText);
+    if (!whileTyping) {
+      this.parseAndSetValue(displayText);
     }
     this._triggerDisplayTextChanged(displayText, whileTyping);
   }
 };
 
-scout.ValueField.prototype._parseAndSetValue = function(displayText) {
-  this.setValue(this._parseValue(displayText));
+scout.ValueField.prototype.parseAndSetValue = function(displayText) {
+  var parsedValue = this._parseValue(displayText);
+  this.setValue(parsedValue);
 };
 
 scout.ValueField.prototype._parseValue = function(displayText) {
@@ -119,7 +120,7 @@ scout.ValueField.prototype._setValue = function(value) {
   this.value = this._validateValue(value);
   this._updateTouched();
   this._updateEmpty();
-  this.triggerPropertyChange('value', oldValue, value);
+  this.triggerPropertyChange('value', oldValue, this.value);
   this._updateDisplayText();
 };
 

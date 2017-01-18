@@ -69,8 +69,8 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('');
     });
 
-    it('sets value when _parseAndSetValue is called', function() {
-      field._parseAndSetValue('Foo');
+    it('sets value when parseAndSetValue is called', function() {
+      field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe('Foo');
     });
