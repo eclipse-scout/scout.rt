@@ -472,6 +472,7 @@ scout.dates = {
    */
   combineDateTime: function(date, time) {
     var newDate = new Date(0);
+    newDate.setHours(0, 0, 0, 0); // set time part to zero in local time!
     if (date) {
       newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
     }
