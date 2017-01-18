@@ -76,18 +76,18 @@ public class DownloadHandlerStorage {
   }
 
   /**
-   * Because certain OS/Download-Managers (for example the „Stock Browser“ on Android) send two requests to actually
+   * Because certain OS/Download-Managers (for example the "Stock Browser" on Android) send two requests to actually
    * start the download of a file, we introduce a timeout before the removal of the downloadable resource in order to
    * allow multiple requests before the actual download.
    *
-   * @return Removal timeout after first request
+   * @return removal timeout after first request (in milliseconds)
    */
   protected long getRemovalTimeoutAfterFirstRequest() {
     return TimeUnit.SECONDS.toMillis(5);
   }
 
   /**
-   * Put a downloadable item in the storage, after the given TTL has passed the item is removed automatically.
+   * Put a downloadable item in the storage. After the TTL has passed the item is removed automatically.
    */
   public void put(String key, BinaryResourceHolder holder, IOpenUriAction opeUriAction) {
     long ttl = getTTLForResource(holder.get());
@@ -97,6 +97,12 @@ public class DownloadHandlerStorage {
     }
   }
 
+  /**
+   * @param key
+   *          key to remove after TTL has expired
+   * @param ttl
+   *          time to live in milliseconds
+   */
   protected void scheduleRemoval(final String key, long ttl) {
     final IFuture oldFuture = m_futureMap.put(key, Jobs.schedule(new IRunnable() {
       @Override
@@ -125,9 +131,10 @@ public class DownloadHandlerStorage {
   }
 
   /**
-   * Remove a downloadble item from the storage.
+   * Retrieve a downloadable item from the storage.
    * <p>
-   * In cases of OpenUriActions not of type DOWNLOAD. Ensure file can be downloaded.
+   * Items with {@link OpenUriAction#DOWNLOAD} are automatically removed after a certain TTL
+   * ({@link #getRemovalTimeoutAfterFirstRequest()}).
    */
   public BinaryResourceHolderWithAction get(String key) {
     BinaryResourceHolderWithAction resHolderWithAction;
