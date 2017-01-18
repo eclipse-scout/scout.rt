@@ -54,6 +54,8 @@ import org.slf4j.LoggerFactory;
 public final class IOUtility {
   private static final Logger LOG = LoggerFactory.getLogger(IOUtility.class);
 
+  public static final int BUFFER_SIZE = 10240;
+
   private IOUtility() {
   }
 
@@ -122,11 +124,7 @@ public final class IOUtility {
     }
     else {
       try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-        byte[] b = new byte[10240];
-        int k;
-        while ((k = in.read(b)) > 0) {
-          buffer.write(b, 0, k);
-        }
+        IOUtility.writeFromToStream(buffer, in);
         return buffer.toByteArray();
       }
       catch (IOException e) {
@@ -225,7 +223,7 @@ public final class IOUtility {
     }
     else {
       try (StringWriter buffer = new StringWriter()) {
-        char[] b = new char[10240];
+        char[] b = new char[BUFFER_SIZE];
         int k;
         while ((k = in.read(b)) > 0) {
           buffer.write(b, 0, k);
@@ -307,6 +305,24 @@ public final class IOUtility {
     catch (IOException e) {
       throw new ProcessingException("output: " + out, e);
     }
+  }
+
+  /**
+   * Writes from one stream into another.
+   *
+   * @return the number of bytes written
+   * @since 6.1
+   */
+  public static long writeFromToStream(OutputStream out, InputStream in) throws IOException {
+    int numRead = 0;
+    long count = 0;
+    byte[] data = new byte[BUFFER_SIZE];
+
+    while ((numRead = in.read(data)) > 0) {
+      out.write(data, 0, numRead);
+      count += numRead;
+    }
+    return count;
   }
 
   /**
