@@ -1,12 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG. All rights
+ * reserved. This program and the accompanying materials are made available
+ * under the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * Contributors: BSI Business Systems Integration AG - initial API and
+ * implementation
  ******************************************************************************/
 /* global removePopups */
 describe("Table", function() {
@@ -62,7 +61,7 @@ describe("Table", function() {
 
       it("accepts rows with cells", function() {
         var model = helper.createModelFixture(3, 1);
-        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0']);
+        model.rows[0] = helper.createModelRowByTexts(1, [ 'cell1', '', '0' ]);
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
@@ -75,7 +74,7 @@ describe("Table", function() {
 
       it("accepts rows with text only", function() {
         var model = helper.createModelFixture(3, 1);
-        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0'], true);
+        model.rows[0] = helper.createModelRowByTexts(1, [ 'cell1', '', '0' ], true);
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
@@ -136,7 +135,7 @@ describe("Table", function() {
       model = helper.createModelFixture(1);
       model.rowIconVisible = true;
       table = helper.createTable(model);
-      row = helper.createModelRow(1, ['Foo']);
+      row = helper.createModelRow(1, [ 'Foo' ]);
       row.rowIcon = scout.icons.HOME;
       table.insertRow(row);
 
@@ -185,7 +184,8 @@ describe("Table", function() {
       expect(table.$rows().length).toBe(1);
       expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
 
-      // 2 rows may get rendered, one row already is. Inserting another 2 rows must only render 1 row
+      // 2 rows may get rendered, one row already is. Inserting another 2 rows
+      // must only render 1 row
       table.insertRows(helper.createModelRows(2, 2));
       expect(table.rows.length).toBe(3);
       expect(table.$rows().length).toBe(2);
@@ -208,10 +208,10 @@ describe("Table", function() {
       expect(table.rows[0].cells[1].text).toBe('cellText1');
 
       var row = {
-        id: table.rows[0].id,
-        cells: ['newCellText0', 'newCellText1']
+        id : table.rows[0].id,
+        cells : [ 'newCellText0', 'newCellText1' ]
       };
-      table.updateRows([row]);
+      table.updateRows([ row ]);
 
       expect(table.rows[0].cells[0].text).toBe('newCellText0');
       expect(table.rows[0].cells[1].text).toBe('newCellText1');
@@ -225,10 +225,10 @@ describe("Table", function() {
       expect($cells0.eq(1).text()).toBe('cellText1');
 
       var row = {
-        id: table.rows[0].id,
-        cells: ['newCellText0', 'newCellText1']
+        id : table.rows[0].id,
+        cells : [ 'newCellText0', 'newCellText1' ]
       };
-      table.updateRows([row]);
+      table.updateRows([ row ]);
 
       $rows = table.$rows();
       $cells0 = table.$cellsForRow($rows.eq(0));
@@ -245,7 +245,7 @@ describe("Table", function() {
 
       table.rows[0].cells[0].setText('newCellText0');
       table.rows[0].cells[1].setText('newCellText1');
-      table.updateRows([table.rows[0]]);
+      table.updateRows([ table.rows[0] ]);
 
       $rows = table.$rows();
       $cells0 = table.$cellsForRow($rows.eq(0));
@@ -266,10 +266,10 @@ describe("Table", function() {
       expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
       expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
       var row = {
-        id: table.rows[0].id,
-        cells: ['newCellText0', 'newCellText1']
+        id : table.rows[0].id,
+        cells : [ 'newCellText0', 'newCellText1' ]
       };
-      table.updateRows([row]);
+      table.updateRows([ row ]);
 
       expect(table.$selectedRows().length).toBe(3);
       expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
@@ -288,14 +288,14 @@ describe("Table", function() {
       expect($cells0.eq(0).text()).toBe('cellText0');
 
       var row0 = {
-        id: table.rows[0].id,
-        cells: ['newRow0Cell0', 'newRow0Cell1']
+        id : table.rows[0].id,
+        cells : [ 'newRow0Cell0', 'newRow0Cell1' ]
       };
       var row1 = {
-        id: table.rows[1].id,
-        cells: ['newRow1Cell0', 'newRow1Cell1']
+        id : table.rows[1].id,
+        cells : [ 'newRow1Cell0', 'newRow1Cell1' ]
       };
-      table.updateRows([row0, row1]);
+      table.updateRows([ row0, row1 ]);
 
       // only row 0 is rendered but both rows need to be updated
       $rows = table.$rows();
@@ -334,15 +334,13 @@ describe("Table", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
       }
-      table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['Z'])
-      ]);
+      table.insertRows([ helper.createModelRow(1, [ 'A' ]), helper.createModelRow(1, [ 'Z' ]) ]);
 
       // we expect exactly this order of events when new rows are inserted
       expect(events).toBe('rowsInserted rowOrderChanged');
 
-      // when rowsInserted event occurs we expect the rows provided by the event in the order they have been inserted (no sorting is done here)
+      // when rowsInserted event occurs we expect the rows provided by the event
+      // in the order they have been inserted (no sorting is done here)
       expect(rowsOnInsert[0].cells[0].text).toBe('A');
       expect(rowsOnInsert[1].cells[0].text).toBe('Z');
 
@@ -369,11 +367,11 @@ describe("Table", function() {
       expect(table.rows.length).toBe(3);
       expect(table.rows[0]).toBe(row0);
 
-      table.deleteRows([table.rows[0]]);
+      table.deleteRows([ table.rows[0] ]);
       expect(table.rows.length).toBe(2);
       expect(table.rows[0]).toBe(row1);
 
-      table.deleteRows([table.rows[0], table.rows[1]]);
+      table.deleteRows([ table.rows[0], table.rows[1] ]);
       expect(table.rows.length).toBe(0);
     });
 
@@ -381,12 +379,12 @@ describe("Table", function() {
       table.render(session.$entryPoint);
       expect(table.$rows().length).toBe(3);
 
-      table.deleteRows([table.rows[0]]);
+      table.deleteRows([ table.rows[0] ]);
       expect(table.$rows().length).toBe(2);
       expect(table.$rows().eq(0).data('row').id).toBe(row1.id);
       expect(table.$rows().eq(1).data('row').id).toBe(row2.id);
 
-      table.deleteRows([table.rows[0], table.rows[1]]);
+      table.deleteRows([ table.rows[0], table.rows[1] ]);
       expect(table.$rows().length).toBe(0);
     });
 
@@ -404,25 +402,25 @@ describe("Table", function() {
       table.viewRangeSize = 3;
 
       // delete first (not rendered)
-      table.deleteRows([table.rows[0]]);
+      table.deleteRows([ table.rows[0] ]);
       expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(5);
 
       // delete first rendered
-      table.deleteRows([table.rows[0]]);
+      table.deleteRows([ table.rows[0] ]);
       expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(4);
 
       // delete last not rendered
-      table.deleteRows([table.rows[3]]);
+      table.deleteRows([ table.rows[3] ]);
       expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(3);
 
       // delete remaining (rendered) rows
-      table.deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
+      table.deleteRows([ table.rows[0], table.rows[1], table.rows[2] ]);
       expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
       expect(table.$rows().length).toBe(0);
       expect(table.rows.length).toBe(0);
@@ -484,7 +482,7 @@ describe("Table", function() {
     });
 
     it("reorders the model rows", function() {
-      table.updateRowOrder([row2, row1, row0]);
+      table.updateRowOrder([ row2, row1, row0 ]);
       expect(table.rows.length).toBe(3);
       expect(table.rows[0]).toBe(row2);
       expect(table.rows[1]).toBe(row1);
@@ -493,7 +491,7 @@ describe("Table", function() {
 
     it("reorders the html nodes", function() {
       table.render(session.$entryPoint);
-      table.updateRowOrder([row2, row1, row0]);
+      table.updateRowOrder([ row2, row1, row0 ]);
       var $rows = table.$rows();
       expect($rows.eq(0).data('row').id).toBe(row2.id);
       expect($rows.eq(1).data('row').id).toBe(row1.id);
@@ -511,7 +509,7 @@ describe("Table", function() {
       expect(table.$rows().length).toBe(2);
       expect(table.rows.length).toBe(3);
 
-      table.updateRowOrder([row2, row1, row0]);
+      table.updateRowOrder([ row2, row1, row0 ]);
       $rows = table.$rows();
       expect($rows.eq(0).data('row').id).toBe(model.rows[2].id);
       expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
@@ -663,7 +661,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rows = [table.rows[0], model.rows[4]];
+      var rows = [ table.rows[0], model.rows[4] ];
       table.selectRows(rows);
 
       expect(table.selectedRows).toEqual(rows);
@@ -677,8 +675,8 @@ describe("Table", function() {
       var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
-      helper.selectRowsAndAssert(table, [model.rows[2]]);
+      helper.selectRowsAndAssert(table, [ model.rows[0], model.rows[4] ]);
+      helper.selectRowsAndAssert(table, [ model.rows[2] ]);
     });
 
     it("considers view range", function() {
@@ -691,7 +689,7 @@ describe("Table", function() {
       expect(table.selectedRows.length).toBe(1);
       expect(table.$selectedRows().length).toBe(0);
 
-      table.selectRows([rows[1], rows[2]]);
+      table.selectRows([ rows[1], rows[2] ]);
       expect(table.selectedRows.length).toBe(2);
       expect(table.$selectedRows().length).toBe(1);
     });
@@ -702,7 +700,7 @@ describe("Table", function() {
       var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
-      var rows = [table.rows[0], table.rows[4]];
+      var rows = [ table.rows[0], table.rows[4] ];
       var eventTriggered = false;
       table.on('rowsSelected', function() {
         eventTriggered = true;
@@ -714,7 +712,7 @@ describe("Table", function() {
     it("selectedRow() returns first selected row or null when table has no selection", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
-      table.selectRows([table.rows[1], table.rows[2]]);
+      table.selectRows([ table.rows[1], table.rows[2] ]);
       expect(table.selectedRow()).toBe(table.rows[1]);
 
       table.selectRows([]);
@@ -800,7 +798,7 @@ describe("Table", function() {
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
-      table.selectedRows = [row0];
+      table.selectedRows = [ row0 ];
       table.render(session.$entryPoint);
       table.doRowAction(row0, column0);
 
@@ -810,8 +808,8 @@ describe("Table", function() {
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
       var event = new scout.Event(table.id, 'rowAction', {
-        columnId: column0.id,
-        rowId: row0.id
+        columnId : column0.id,
+        rowId : row0.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -833,7 +831,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // other row selected
-      table.selectedRows = [table.rows[1]];
+      table.selectedRows = [ table.rows[1] ];
       table.doRowAction(row0, column0);
 
       sendQueuedAjaxCalls();
@@ -841,7 +839,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // correct row selected -> expect event
-      table.selectedRows = [row0];
+      table.selectedRows = [ row0 ];
       table.doRowAction(row0, column0);
 
       sendQueuedAjaxCalls();
@@ -850,8 +848,8 @@ describe("Table", function() {
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
       var event = new scout.Event(table.id, 'rowAction', {
-        columnId: column0.id,
-        rowId: row0.id
+        columnId : column0.id,
+        rowId : row0.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -864,7 +862,7 @@ describe("Table", function() {
       var column0 = table.columns[0];
 
       // no selection at all
-      table.selectedRows = [row0, table.rows[1]];
+      table.selectedRows = [ row0, table.rows[1] ];
       table.render(session.$entryPoint);
       table.doRowAction(row0, column0);
 
@@ -889,9 +887,9 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls('', 1000);
       var event = new scout.Event(table.id, 'columnResized', {
-        columnId: table.columns[0].id,
-        width: 100,
-        showBusyIndicator: false
+        columnId : table.columns[0].id,
+        width : 100,
+        showBusyIndicator : false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -926,9 +924,9 @@ describe("Table", function() {
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
       var event = new scout.Event(table.id, 'columnResized', {
-        columnId: table.columns[0].id,
-        width: 150,
-        showBusyIndicator: false
+        columnId : table.columns[0].id,
+        width : 150,
+        showBusyIndicator : false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -987,8 +985,10 @@ describe("Table", function() {
       // Triggers TableLayout._layoutColumns()
       table.revalidateLayout();
 
-      expect(table.columns[0].width).toBe(100); // would be 80, but does not get smaller than initialSize
-      expect(table.columns[1].width).toBe(200); // would be 160, but does not get smaller than initialSize
+      expect(table.columns[0].width).toBe(100); // would be 80, but does not get
+      // smaller than initialSize
+      expect(table.columns[1].width).toBe(200); // would be 160, but does not
+      // get smaller than initialSize
     });
 
     it("does not make the column smaller than a minimum size", function() {
@@ -1065,7 +1065,8 @@ describe("Table", function() {
         prepareTable();
         render(table);
 
-        // reset logic is only applied on columns used as sort-column, that's why
+        // reset logic is only applied on columns used as sort-column, that's
+        // why
         // we must set the sortActive flag here.
         table.columns[1].sortActive = true;
 
@@ -1088,7 +1089,8 @@ describe("Table", function() {
         prepareTable();
         render(table);
 
-        // reset logic is only applied on columns used as sort-column, that's why
+        // reset logic is only applied on columns used as sort-column, that's
+        // why
         // we must set the sortActive flag here.
         table.columns[1].sortActive = true;
 
@@ -1113,7 +1115,9 @@ describe("Table", function() {
         column2.initialAlwaysIncludeSortAtBegin = true;
         column2.sortActive = true;
         column2.sortIndex = 0;
-        table.updateColumnStructure(table.columns); // (re)initialize columns, have been initialised already during init
+        table.updateColumnStructure(table.columns); // (re)initialize columns,
+        // have been initialised
+        // already during init
         render(table);
 
         table.sort(table.columns[0], 'desc');
@@ -1145,7 +1149,9 @@ describe("Table", function() {
         column2.initialAlwaysIncludeSortAtEnd = true;
         column2.sortActive = true;
         column2.sortIndex = 0;
-        table.updateColumnStructure(table.columns); // (re)initialize columns, have been initialised already during init
+        table.updateColumnStructure(table.columns); // (re)initialize columns,
+        // have been initialised
+        // already during init
         render(table);
 
         table.sort(table.columns[0], 'desc');
@@ -1177,7 +1183,9 @@ describe("Table", function() {
         column2.initialAlwaysIncludeSortAtBegin = true;
         column2.sortActive = true;
         column2.sortIndex = 0;
-        table.updateColumnStructure(table.columns); // (re)initialize columns, have been initialised already during init
+        table.updateColumnStructure(table.columns); // (re)initialize columns,
+        // have been initialised
+        // already during init
         render(table);
 
         table.sort(table.columns[0], 'desc');
@@ -1205,7 +1213,8 @@ describe("Table", function() {
         prepareTable();
         render(table);
 
-        // reset logic is only applied on columns used as sort-column, that's why
+        // reset logic is only applied on columns used as sort-column, that's
+        // why
         // we must set the sortActive flag here.
         table.columns[1].sortActive = true;
 
@@ -1233,7 +1242,8 @@ describe("Table", function() {
     it("sends rowsSorted event when client side sorting is possible", function() {
       prepareTableWithAdapter();
       render(table);
-      // Make sure sorting is not executed because it does not work with phantomJS
+      // Make sure sorting is not executed because it does not work with
+      // phantomJS
       spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
       spyOn(table, "_sort").and.returnValue(true);
 
@@ -1241,8 +1251,8 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var event = new scout.Event(table.id, 'rowsSorted', {
-        columnId: table.columns[0].id,
-        sortAscending: false
+        columnId : table.columns[0].id,
+        sortAscending : false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -1256,8 +1266,8 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var event = new scout.Event(table.id, 'sortRows', {
-        columnId: table.columns[0].id,
-        sortAscending: false
+        columnId : table.columns[0].id,
+        sortAscending : false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -1280,7 +1290,8 @@ describe("Table", function() {
       prepareTable();
       render(table);
 
-      // Make sure sorting is not executed because it does not work with phantomJS
+      // Make sure sorting is not executed because it does not work with
+      // phantomJS
       spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
       spyOn(table, "_sortImpl").and.returnValue(true);
       spyOn(table, '_group');
@@ -1292,10 +1303,7 @@ describe("Table", function() {
     });
 
     it("restores selection after sorting", function() {
-      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
-        table = helper.createTable(model),
-        column0 = model.columns[0],
-        rows = table.rows;
+      var model = helper.createModelSingleColumnByValues([ 5, 2, 1, 3, 4 ], 'NumberColumn'), table = helper.createTable(model), column0 = model.columns[0], rows = table.rows;
       table.render(session.$entryPoint);
 
       var $rows = table.$rows();
@@ -1305,15 +1313,15 @@ describe("Table", function() {
       var $row3 = $rows.eq(3);
       var $row4 = $rows.eq(4);
 
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+      expect([ $row0, $row1, $row2, $row3, $row4 ]).not.anyToHaveClass('selected');
 
-      table.selectRows([rows[1], rows[2], rows[3]]);
+      table.selectRows([ rows[1], rows[2], rows[3] ]);
 
-      expect([$row0, $row4]).not.anyToHaveClass('selected');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+      expect([ $row0, $row4 ]).not.anyToHaveClass('selected');
+      expect([ $row0, $row2, $row3, $row4 ]).not.anyToHaveClass('select-top');
+      expect([ $row0, $row1, $row3, $row4 ]).not.anyToHaveClass('select-middle');
+      expect([ $row0, $row1, $row2, $row4 ]).not.anyToHaveClass('select-bottom');
+      expect([ $row0, $row1, $row2, $row3, $row4 ]).not.anyToHaveClass('select-single');
 
       // sort table (descending)
       table.sort(column0, 'desc');
@@ -1325,16 +1333,16 @@ describe("Table", function() {
       $row2 = $rows.eq(2);
       $row3 = $rows.eq(3);
       $row4 = $rows.eq(4);
-      expect([$row2, $row3, $row4]).allToHaveClass('selected');
+      expect([ $row2, $row3, $row4 ]).allToHaveClass('selected');
       expect($row2).toHaveClass('select-top');
       expect($row3).toHaveClass('select-middle');
       expect($row4).toHaveClass('select-bottom');
 
-      expect([$row0, $row4]).not.allToHaveClass('selected');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row2, $row3]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+      expect([ $row0, $row4 ]).not.allToHaveClass('selected');
+      expect([ $row0, $row1, $row3, $row4 ]).not.anyToHaveClass('select-top');
+      expect([ $row0, $row1, $row2, $row4 ]).not.anyToHaveClass('select-middle');
+      expect([ $row0, $row1, $row2, $row3 ]).not.anyToHaveClass('select-bottom');
+      expect([ $row0, $row1, $row2, $row3, $row4 ]).not.anyToHaveClass('select-single');
     });
 
     describe("sorting", function() {
@@ -1344,53 +1352,54 @@ describe("Table", function() {
           return;
         }
 
-        var model = helper.createModelSingleColumnByTexts(['Österreich', 'Italien', 'Zypern']);
+        var model = helper.createModelSingleColumnByTexts([ 'Österreich', 'Italien', 'Zypern' ]);
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
 
         table.sort(column0, 'desc');
-        helper.assertTextsInCells(table.rows, 0, ['Zypern', 'Österreich', 'Italien']);
+        helper.assertTextsInCells(table.rows, 0, [ 'Zypern', 'Österreich', 'Italien' ]);
 
         table.sort(column0, 'asc');
-        helper.assertTextsInCells(table.rows, 0, ['Italien', 'Österreich', 'Zypern']);
+        helper.assertTextsInCells(table.rows, 0, [ 'Italien', 'Österreich', 'Zypern' ]);
 
-        // In order to change Collator at runtime, we must reset the "static" property
+        // In order to change Collator at runtime, we must reset the "static"
+        // property
         // since it is set only once
         session.locale = new scout.LocaleSpecHelper().createLocale('sv');
         helper.resetIntlCollator();
 
         table.sort(column0, 'desc');
-        helper.assertTextsInCells(table.rows, 0, ['Österreich', 'Zypern', 'Italien']);
+        helper.assertTextsInCells(table.rows, 0, [ 'Österreich', 'Zypern', 'Italien' ]);
 
         table.sort(column0, 'asc');
-        helper.assertTextsInCells(table.rows, 0, ['Italien', 'Zypern', 'Österreich']);
+        helper.assertTextsInCells(table.rows, 0, [ 'Italien', 'Zypern', 'Österreich' ]);
       });
 
       it("sorts number columns", function() {
-        var model = helper.createModelSingleColumnByValues([100, 90, 300], 'NumberColumn');
+        var model = helper.createModelSingleColumnByValues([ 100, 90, 300 ], 'NumberColumn');
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
 
         table.sort(column0, 'desc');
-        helper.assertValuesInCells(table.rows, 0, [300, 100, 90]);
+        helper.assertValuesInCells(table.rows, 0, [ 300, 100, 90 ]);
 
         table.sort(column0, 'asc');
-        helper.assertValuesInCells(table.rows, 0, [90, 100, 300]);
+        helper.assertValuesInCells(table.rows, 0, [ 90, 100, 300 ]);
       });
 
       it("sorts date columns", function() {
-        var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'DateColumn');
+        var model = helper.createModelSingleColumnByValues([ new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10') ], 'DateColumn');
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
 
         table.sort(column0, 'desc');
-        helper.assertDatesInCells(table.rows, 0, [new Date('2014-03-01'), new Date('2012-08-10'), new Date('1999-01-10')]);
+        helper.assertDatesInCells(table.rows, 0, [ new Date('2014-03-01'), new Date('2012-08-10'), new Date('1999-01-10') ]);
 
         table.sort(column0, 'asc');
-        helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
+        helper.assertDatesInCells(table.rows, 0, [ new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01') ]);
       });
 
       it("uses non sort columns as fallback", function() {
@@ -1415,18 +1424,19 @@ describe("Table", function() {
 
         expect(column0.sortAscending).toBe(true);
         table.sort(column1, 'asc');
-        helper.assertValuesInCells(table.rows, 0, ['aaa', 'ccc', 'qqq', 'zzz']);
-        helper.assertValuesInCells(table.rows, 1, ['other', 'other', 'same', 'same']);
+        helper.assertValuesInCells(table.rows, 0, [ 'aaa', 'ccc', 'qqq', 'zzz' ]);
+        helper.assertValuesInCells(table.rows, 1, [ 'other', 'other', 'same', 'same' ]);
 
         table.sort(column1, 'desc');
-        helper.assertValuesInCells(table.rows, 0, ['qqq', 'zzz', 'aaa', 'ccc']);
-        helper.assertValuesInCells(table.rows, 1, ['same', 'same', 'other', 'other']);
+        helper.assertValuesInCells(table.rows, 0, [ 'qqq', 'zzz', 'aaa', 'ccc' ]);
+        helper.assertValuesInCells(table.rows, 1, [ 'same', 'same', 'other', 'other' ]);
 
-        // sortAscending of a column with sortActive = false shouldn't have any effect
+        // sortAscending of a column with sortActive = false shouldn't have any
+        // effect
         column0.sortAscending = false;
         table.sort(column1, 'asc');
-        helper.assertValuesInCells(table.rows, 0, ['aaa', 'ccc', 'qqq', 'zzz']);
-        helper.assertValuesInCells(table.rows, 1, ['other', 'other', 'same', 'same']);
+        helper.assertValuesInCells(table.rows, 0, [ 'aaa', 'ccc', 'qqq', 'zzz' ]);
+        helper.assertValuesInCells(table.rows, 1, [ 'other', 'other', 'same', 'same' ]);
       });
 
     });
@@ -1467,10 +1477,7 @@ describe("Table", function() {
     }
 
     function prepareContent() {
-      var column0Values = ['a', 'b'],
-        column1Values = ['c', 'd'],
-        column2Values = ['e', 'f'],
-        value, text, j;
+      var column0Values = [ 'a', 'b' ], column1Values = [ 'c', 'd' ], column2Values = [ 'e', 'f' ], value, text, j;
 
       for (var i = 0; i < rows.length; i++) {
         value = column0Values[Math.floor(i / 4)];
@@ -1518,7 +1525,8 @@ describe("Table", function() {
       for (i = 0; i < 5; i++) {
         if (expectGrouped[i]) {
           expect(table.columns[i].grouped).toBeTruthy();
-        } else {
+        }
+        else {
           expect(table.columns[i].grouped).toBeFalsy();
         }
       }
@@ -1574,13 +1582,9 @@ describe("Table", function() {
       render(table);
       addGrouping(table, column0, false);
 
-      var // check in the DOM if the aggregate row comes previous to the first row of the group
-        $mixedRows = table.$data.children('.table-row,.table-aggregate-row'),
-        $aggregateRows = table.$data.find('.table-aggregate-row'),
-        aggrRow1Pos = $mixedRows.index($aggregateRows.get(0)),
-        aggrRow2Pos = $mixedRows.index($aggregateRows.get(1)),
-        rowFirstPos = $mixedRows.index(table.$data.find('.table-row.first')),
-        rowLastPos = $mixedRows.index(table.$data.find('.table-row.last'));
+      var // check in the DOM if the aggregate row comes previous to the first
+      // row of the group
+      $mixedRows = table.$data.children('.table-row,.table-aggregate-row'), $aggregateRows = table.$data.find('.table-aggregate-row'), aggrRow1Pos = $mixedRows.index($aggregateRows.get(0)), aggrRow2Pos = $mixedRows.index($aggregateRows.get(1)), rowFirstPos = $mixedRows.index(table.$data.find('.table-row.first')), rowLastPos = $mixedRows.index(table.$data.find('.table-row.last'));
 
       expect(aggrRow1Pos < rowFirstPos).toBe(true);
       expect(aggrRow2Pos < rowLastPos).toBe(true);
@@ -1621,7 +1625,8 @@ describe("Table", function() {
       expect(table._aggregateRows.length).toBe(0);
       addGrouping(table, column0, false); // -> 2 groups with 4 rows each
 
-      // Only 3 rows of the first group are rendered -> don't display aggregate row
+      // Only 3 rows of the first group are rendered -> don't display aggregate
+      // row
       expect(table._aggregateRows.length).toBe(2);
       expect(find$aggregateRows(table).length).toBe(0);
       expect(table.$rows().length).toBe(3);
@@ -1653,19 +1658,19 @@ describe("Table", function() {
       addGrouping(table, column0, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
 
       // add new row for group 1
-      var rows = [{
-        cells: ['a', 'xyz', 'xyz', 10, 20]
-      }];
+      var rows = [ {
+        cells : [ 'a', 'xyz', 'xyz', 10, 20 ]
+      } ];
       table.insertRows(rows);
 
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['20', '26']);
-      assertGroupingValues(table, column4, ['50', '78']);
+      assertGroupingValues(table, column3, [ '20', '26' ]);
+      assertGroupingValues(table, column4, [ '50', '78' ]);
     });
 
     it("regroups if rows get inserted, event is from server and table was empty", function() {
@@ -1688,8 +1693,8 @@ describe("Table", function() {
 
       expect(find$aggregateRows(table).length).toBe(1);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10']);
-      assertGroupingValues(table, column4, ['20']);
+      assertGroupingValues(table, column3, [ '10' ]);
+      assertGroupingValues(table, column4, [ '20' ]);
     });
 
     it("does not regroup if rows get inserted, event is from server and table was not empty", function() {
@@ -1704,8 +1709,8 @@ describe("Table", function() {
       addGrouping(table, column0, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
 
       // add new row for group 1
       var rows = [{
@@ -1716,8 +1721,8 @@ describe("Table", function() {
       // Still wrong grouping because group was not executed. There will be a rowOrderChanged event which will do it, see comments in table.insertRows
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
     });
 
     it("regroups if rows get deleted", function() {
@@ -1732,22 +1737,22 @@ describe("Table", function() {
       addGrouping(table, column0, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
 
       table.deleteRow(table.rows[0]);
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['9', '26']);
-      assertGroupingValues(table, column4, ['27', '78']);
+      assertGroupingValues(table, column3, [ '9', '26' ]);
+      assertGroupingValues(table, column4, [ '27', '78' ]);
 
-      table.deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
+      table.deleteRows([ table.rows[0], table.rows[1], table.rows[2] ]);
       expect(find$aggregateRows(table).length).toBe(1);
       expect(table._aggregateRows.length).toBe(1);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['26']);
-      assertGroupingValues(table, column4, ['78']);
+      assertGroupingValues(table, column3, [ '26' ]);
+      assertGroupingValues(table, column4, [ '78' ]);
     });
 
     it("removes aggregate rows if all rows get deleted", function() {
@@ -1763,8 +1768,8 @@ describe("Table", function() {
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
 
       table.deleteAllRows();
       expect(find$aggregateRows(table).length).toBe(0);
@@ -1784,19 +1789,19 @@ describe("Table", function() {
       addGrouping(table, column0, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
 
       var row = {
-        id: table.rows[1].id,
-        cells: ['a', 'xyz', 'xyz', 10, 20]
+        id : table.rows[1].id,
+        cells : [ 'a', 'xyz', 'xyz', 10, 20 ]
       };
-      table.updateRows([row]);
+      table.updateRows([ row ]);
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['18', '26']);
-      assertGroupingValues(table, column4, ['44', '78']);
+      assertGroupingValues(table, column3, [ '18', '26' ]);
+      assertGroupingValues(table, column4, [ '44', '78' ]);
     });
 
     it("may group column 0 only", function() {
@@ -1811,8 +1816,8 @@ describe("Table", function() {
       addGrouping(table, column0, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
-      assertGroupingValues(table, column3, ['10', '26']);
-      assertGroupingValues(table, column4, ['30', '78']);
+      assertGroupingValues(table, column3, [ '10', '26' ]);
+      assertGroupingValues(table, column4, [ '30', '78' ]);
       removeGrouping(table, column0);
       expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
@@ -1830,8 +1835,8 @@ describe("Table", function() {
       addGrouping(table, column1, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 1);
-      assertGroupingValues(table, column3, ['14', '22']);
-      assertGroupingValues(table, column4, ['42', '66']);
+      assertGroupingValues(table, column3, [ '14', '22' ]);
+      assertGroupingValues(table, column4, [ '42', '66' ]);
       removeGrouping(table, column1);
       expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
@@ -1850,8 +1855,8 @@ describe("Table", function() {
       addGrouping(table, column1, true);
       expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 0, 1);
-      assertGroupingValues(table, column3, ['1.5', '3.5', '5.5', '7.5']);
-      assertGroupingValues(table, column4, ['9', '21', '33', '45']);
+      assertGroupingValues(table, column3, [ '1.5', '3.5', '5.5', '7.5' ]);
+      assertGroupingValues(table, column4, [ '9', '21', '33', '45' ]);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
       expect(find$aggregateRows(table).length).toBe(0);
@@ -1873,8 +1878,8 @@ describe("Table", function() {
       addGrouping(table, column2, true);
       expect(find$aggregateRows(table).length).toBe(8);
       assertGroupingProperty(table, 0, 1, 2);
-      assertGroupingValues(table, column3, ['1', '2', '3', '4', '5', '6', '7', '8']);
-      assertGroupingValues(table, column4, ['3', '6', '9', '12', '15', '18', '21', '24']);
+      assertGroupingValues(table, column3, [ '1', '2', '3', '4', '5', '6', '7', '8' ]);
+      assertGroupingValues(table, column4, [ '3', '6', '9', '12', '15', '18', '21', '24' ]);
       removeGrouping(table, column0);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
@@ -1897,8 +1902,8 @@ describe("Table", function() {
       addGrouping(table, column1, true);
       expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 2, 1);
-      assertGroupingValues(table, column3, ['6', '10', '8', '12']);
-      assertGroupingValues(table, column4, ['18', '30', '24', '36']);
+      assertGroupingValues(table, column3, [ '6', '10', '8', '12' ]);
+      assertGroupingValues(table, column4, [ '18', '30', '24', '36' ]);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
       expect(find$aggregateRows(table).length).toBe(0);
@@ -1920,8 +1925,8 @@ describe("Table", function() {
       addGrouping(table, column1, false);
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 1);
-      assertGroupingValues(table, column3, ['14', '22']);
-      assertGroupingValues(table, column4, ['42', '66']);
+      assertGroupingValues(table, column3, [ '14', '22' ]);
+      assertGroupingValues(table, column4, [ '42', '66' ]);
       removeGrouping(table, column1);
       expect(find$aggregateRows(table).length).toBe(0);
       assertGroupingProperty(table);
@@ -1942,8 +1947,8 @@ describe("Table", function() {
       removeGrouping(table, column0);
       expect(find$aggregateRows(table).length).toBe(4);
       assertGroupingProperty(table, 1, 2);
-      assertGroupingValues(table, column3, ['6', '10', '8', '12']);
-      assertGroupingValues(table, column4, ['18', '30', '24', '36']);
+      assertGroupingValues(table, column3, [ '6', '10', '8', '12' ]);
+      assertGroupingValues(table, column4, [ '18', '30', '24', '36' ]);
       removeGrouping(table, column1);
       removeGrouping(table, column2);
       expect(find$aggregateRows(table).length).toBe(0);
@@ -1979,7 +1984,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
-      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
+      helper.selectRowsAndAssert(table, [ model.rows[0], model.rows[4] ]);
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
@@ -1994,8 +1999,9 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      // clicked has to be after selected otherwise it is not possible to get the selected row in execRowClick
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
+      // clicked has to be after selected otherwise it is not possible to get
+      // the selected row in execRowClick
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
     });
 
     it("sends only click if row already is selected", function() {
@@ -2008,16 +2014,17 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
 
       // Reset internal state because there is no "sleep" in JS
-      table._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
+      table._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5
+      // seconds ago
 
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'rowClicked' ]);
     });
 
     it("sends selection, checked and click events if table is checkable and checkbox has been clicked", function() {
@@ -2032,7 +2039,7 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowsChecked', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowsChecked', 'rowClicked' ]);
     });
 
   });
@@ -2047,12 +2054,11 @@ describe("Table", function() {
     it("opens context menu", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
-      table.selectedRows = [table.rows[0]];
+      table.selectedRows = [ table.rows[0] ];
       table.render(session.$entryPoint);
 
-      var menuModel = helper.createMenuModel('menu'),
-        menu = helper.menuHelper.createMenu(menuModel);
-      table.menus = [menu];
+      var menuModel = helper.createMenuModel('menu'), menu = helper.menuHelper.createMenu(menuModel);
+      table.menus = [ menu ];
       var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
@@ -2065,15 +2071,12 @@ describe("Table", function() {
     it("context menu only shows items without header type also if there is a type singleSelection", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
-      table.selectedRows = [table.rows[0]];
+      table.selectedRows = [ table.rows[0] ];
       table.render(session.$entryPoint);
 
-      var menuModel1 = helper.createMenuModel('menu'),
-        menu1 = helper.menuHelper.createMenu(menuModel1),
-        menuModel2 = helper.createMenuModelWithSingleAndHeader('menu'),
-        menu2 = helper.menuHelper.createMenu(menuModel2);
+      var menuModel1 = helper.createMenuModel('menu'), menu1 = helper.menuHelper.createMenu(menuModel1), menuModel2 = helper.createMenuModelWithSingleAndHeader('menu'), menu2 = helper.menuHelper.createMenu(menuModel2);
 
-      table.menus = [menu1, menu2];
+      table.menus = [ menu1, menu2 ];
       var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
@@ -2089,16 +2092,13 @@ describe("Table", function() {
     it("context menu only shows visible menus", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
-      table.selectedRows = [table.rows[0]];
+      table.selectedRows = [ table.rows[0] ];
       table.render(session.$entryPoint);
 
-      var menuModel1 = helper.createMenuModel('menu'),
-        menu1 = helper.menuHelper.createMenu(menuModel1),
-        menuModel2 = helper.createMenuModel('menu'),
-        menu2 = helper.menuHelper.createMenu(menuModel2);
+      var menuModel1 = helper.createMenuModel('menu'), menu1 = helper.menuHelper.createMenu(menuModel1), menuModel2 = helper.createMenuModel('menu'), menu2 = helper.menuHelper.createMenu(menuModel2);
       menu2.visible = false;
 
-      table.menus = [menu1, menu2];
+      table.menus = [ menu1, menu2 ];
       var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
@@ -2117,19 +2117,19 @@ describe("Table", function() {
     beforeEach(function() {
       var model = helper.createModelFixture(2, 2);
       singleSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection']
+        menuTypes : [ 'Table.SingleSelection' ]
       });
       multiSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.MultiSelection']
+        menuTypes : [ 'Table.MultiSelection' ]
       });
       emptySpaceMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.EmptySpace']
+        menuTypes : [ 'Table.EmptySpace' ]
       });
       headerMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.Header']
+        menuTypes : [ 'Table.Header' ]
       });
       table = helper.createTable(model);
-      table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, headerMenu];
+      table.menus = [ singleSelMenu, multiSelMenu, emptySpaceMenu, headerMenu ];
     });
 
     // context menu
@@ -2142,27 +2142,27 @@ describe("Table", function() {
     it("returns only single selection menus for contextMenu if one row is selected", function() {
       table.selectRows(table.rows[0]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
-      expect(menus).toEqual([singleSelMenu]);
+      expect(menus).toEqual([ singleSelMenu ]);
     });
 
     it("returns only multi selection menus for contextMenu if multiple rows are selected", function() {
-      table.selectRows([table.rows[0], table.rows[1]]);
+      table.selectRows([ table.rows[0], table.rows[1] ]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
-      expect(menus).toEqual([multiSelMenu]);
+      expect(menus).toEqual([ multiSelMenu ]);
     });
 
     it("returns menus with single- and multi selection set for contextMenu if one or more rows are selected", function() {
       bothSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+        menuTypes : [ 'Table.SingleSelection', 'Table.MultiSelection' ]
       });
-      table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
+      table.menus = [ singleSelMenu, multiSelMenu, bothSelMenu ];
       table.selectRows(table.rows[0]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
-      expect(menus).toEqual([singleSelMenu, bothSelMenu]);
+      expect(menus).toEqual([ singleSelMenu, bothSelMenu ]);
 
-      table.selectRows([table.rows[0], table.rows[1]]);
+      table.selectRows([ table.rows[0], table.rows[1] ]);
       menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
-      expect(menus).toEqual([multiSelMenu, bothSelMenu]);
+      expect(menus).toEqual([ multiSelMenu, bothSelMenu ]);
 
       table.selectRows([]);
       menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
@@ -2173,37 +2173,37 @@ describe("Table", function() {
     it("returns only empty space menus if no row is selected", function() {
       table.selectRows([]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
-      expect(menus).toEqual([emptySpaceMenu]);
+      expect(menus).toEqual([ emptySpaceMenu ]);
     });
 
     it("returns empty space and single selection menus if one row is selected", function() {
       table.selectRows(table.rows[0]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
-      expect(menus).toEqual([singleSelMenu, emptySpaceMenu]);
+      expect(menus).toEqual([ singleSelMenu, emptySpaceMenu ]);
     });
 
     it("returns empty space and multi selection menus if multiple rows are selected", function() {
-      table.selectRows([table.rows[0], table.rows[1]]);
+      table.selectRows([ table.rows[0], table.rows[1] ]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
-      expect(menus).toEqual([multiSelMenu, emptySpaceMenu]);
+      expect(menus).toEqual([ multiSelMenu, emptySpaceMenu ]);
     });
 
     it("returns menus with empty space, single- and multi selection set if one or more rows are selected", function() {
       bothSelMenu = helper.menuHelper.createMenu({
-        menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
+        menuTypes : [ 'Table.SingleSelection', 'Table.MultiSelection' ]
       });
-      table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
+      table.menus = [ singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu ];
       table.selectRows(table.rows[0]);
       var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
-      expect(menus).toEqual([singleSelMenu, emptySpaceMenu, bothSelMenu]);
+      expect(menus).toEqual([ singleSelMenu, emptySpaceMenu, bothSelMenu ]);
 
-      table.selectRows([table.rows[0], table.rows[1]]);
+      table.selectRows([ table.rows[0], table.rows[1] ]);
       menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
-      expect(menus).toEqual([multiSelMenu, emptySpaceMenu, bothSelMenu]);
+      expect(menus).toEqual([ multiSelMenu, emptySpaceMenu, bothSelMenu ]);
 
       table.selectRows([]);
       menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
-      expect(menus).toEqual([emptySpaceMenu]);
+      expect(menus).toEqual([ emptySpaceMenu ]);
     });
   });
 
@@ -2221,23 +2221,23 @@ describe("Table", function() {
       var $row3 = $rows.eq(3);
       var $row4 = $rows.eq(4);
 
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+      expect([ $row0, $row1, $row2, $row3, $row4 ]).not.anyToHaveClass('selected');
 
       $row0.triggerMouseDown();
       $row1.trigger('mouseover');
       $row2.trigger('mouseover');
       $row2.triggerMouseUp();
 
-      expect([$row0, $row1, $row2]).allToHaveClass('selected');
+      expect([ $row0, $row1, $row2 ]).allToHaveClass('selected');
       expect($row0).toHaveClass('select-top');
       expect($row1).toHaveClass('select-middle');
       expect($row2).toHaveClass('select-bottom');
 
-      expect([$row3, $row4]).not.allToHaveClass('selected');
-      expect([$row1, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+      expect([ $row3, $row4 ]).not.allToHaveClass('selected');
+      expect([ $row1, $row2, $row3, $row4 ]).not.anyToHaveClass('select-top');
+      expect([ $row0, $row2, $row3, $row4 ]).not.anyToHaveClass('select-middle');
+      expect([ $row0, $row1, $row3, $row4 ]).not.anyToHaveClass('select-bottom');
+      expect([ $row0, $row1, $row2, $row3, $row4 ]).not.anyToHaveClass('select-single');
     });
 
     it("only sends selection event, no click", function() {
@@ -2261,12 +2261,13 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      // first selection event for first row, second selection event for remaining rows (including first row)
-      expect(requestData).toContainEventTypesExactly(['property', 'rowsSelected']);
+      // first selection event for first row, second selection event for
+      // remaining rows (including first row)
+      expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected' ]);
 
-      var event = [new scout.Event(table.id, 'rowsSelected', {
-        rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
-      })];
+      var event = [ new scout.Event(table.id, 'rowsSelected', {
+        rowIds : [ model.rows[0].id, model.rows[1].id, model.rows[2].id ]
+      }) ];
       expect(requestData).toContainEvents(event);
     });
 
@@ -2288,11 +2289,11 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       // exactly only one selection event for first row
-      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
+      expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
 
-      var event = [new scout.Event(table.id, 'rowsSelected', {
-        rowIds: [model.rows[0].id]
-      })];
+      var event = [ new scout.Event(table.id, 'rowsSelected', {
+        rowIds : [ model.rows[0].id ]
+      }) ];
       expect(requestData).toContainEvents(event);
     });
 
@@ -2329,7 +2330,8 @@ describe("Table", function() {
       for (var i = 0; i < $rows.length; i++) {
         if (i === expectedSelectedRowIndex) {
           expect($rows.eq(i)).toHaveClass('selected');
-        } else {
+        }
+        else {
           expect($rows.eq(i)).not.toHaveClass('selected');
         }
       }
@@ -2338,7 +2340,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: [model.rows[expectedSelectedRowIndex].id]
+        rowIds : [ model.rows[expectedSelectedRowIndex].id ]
       });
       expect(requestData).toContainEvents(event);
     }
@@ -2419,27 +2421,26 @@ describe("Table", function() {
       table.render(session.$entryPoint);
       expect(table.rows.length).toBe(3);
 
-      var newRows = [
-        helper.createModelRow(null, helper.createModelCells(2)),
-        helper.createModelRow(null, helper.createModelCells(2))
-      ];
+      var newRows = [ helper.createModelRow(null, helper.createModelCells(2)), helper.createModelRow(null, helper.createModelCells(2)) ];
 
       // Insert new rows and switch rows 0 and 1
       table.insertRows(newRows);
-      table.updateRowOrder([row1, row0, newRows[0], newRows[1], row2]);
+      table.updateRowOrder([ row1, row0, newRows[0], newRows[1], row2 ]);
 
       // Check if rows were inserted
       expect(table.rows.length).toBe(5);
 
       // Check if animation is not done for the inserted rows
-      // The animation should be done for the other rows (row0 and 1 are switched -> visualize)
+      // The animation should be done for the other rows (row0 and 1 are
+      // switched -> visualize)
       var $rows = table.$rows();
       $rows.each(function() {
         var $row = $(this);
         var rowId = $row.data('row').id;
         if (rowId === newRows[0].id || rowId === newRows[1].id) {
           expect($row.is(':animated')).toBe(false);
-        } else {
+        }
+        else {
           expect($row.is(':animated')).toBe(true);
         }
       });
@@ -2459,7 +2460,7 @@ describe("Table", function() {
     });
 
     it("resets the model columns", function() {
-      table.updateColumnStructure([column2, column1]);
+      table.updateColumnStructure([ column2, column1 ]);
 
       expect(table.columns.length).toBe(2);
       expect(table.columns[0].id).toBe(column2.id);
@@ -2476,9 +2477,9 @@ describe("Table", function() {
 
       column0.text = 'newColText0';
       column1.text = 'newColText1';
-      table.updateColumnStructure([column0, column1, column2]);
+      table.updateColumnStructure([ column0, column1, column2 ]);
 
-      //Check column header text
+      // Check column header text
       $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0).text()).toBe(column0.text);
       expect($colHeaders.eq(1).text()).toBe(column1.text);
@@ -2498,7 +2499,7 @@ describe("Table", function() {
     });
 
     it("reorders the model columns", function() {
-      table.updateColumnOrder([column2, column0, column1]);
+      table.updateColumnOrder([ column2, column0, column1 ]);
       expect(table.columns.length).toBe(3);
       expect(table.columns[0]).toBe(column2);
       expect(table.columns[1]).toBe(column0);
@@ -2525,7 +2526,7 @@ describe("Table", function() {
       expect($cells1.eq(1).text()).toBe('1');
       expect($cells1.eq(2).text()).toBe('2');
 
-      table.updateColumnOrder([column2, column0, column1]);
+      table.updateColumnOrder([ column2, column0, column1 ]);
 
       // Check column header order
       $colHeaders = table.header.findHeaderItems();
@@ -2561,7 +2562,7 @@ describe("Table", function() {
       expect($cells0.eq(1).text()).toBe('1');
       expect($cells0.eq(2).text()).toBe('2');
 
-      table.updateColumnOrder([column2, column0, column1]);
+      table.updateColumnOrder([ column2, column0, column1 ]);
 
       // Check column header order
       $colHeaders = table.header.findHeaderItems();
@@ -2603,7 +2604,7 @@ describe("Table", function() {
       column2 = helper.createModelColumn('newText2');
       column2.id = model.columns[2].id;
 
-      table.updateColumnHeaders([column1, column2]);
+      table.updateColumnHeaders([ column1, column2 ]);
       expect(table.columns.length).toBe(3);
       expect(table.columns[0].text).toBe(text0);
       expect(table.columns[1].text).toBe(column1.text);
@@ -2630,10 +2631,10 @@ describe("Table", function() {
       expect(table.columns[2].sortAscending).toBe(true);
       expect(table.columns[2].sortIndex).toBe(0);
 
-      table.updateColumnHeaders([{
-        id: model.columns[2].id,
-        sortActive: false
-      }]);
+      table.updateColumnHeaders([ {
+        id : model.columns[2].id,
+        sortActive : false
+      } ]);
       expect(table.columns[1].sortAscending).toBe(true);
       expect(table.columns[1].sortActive).toBe(true);
       expect(table.columns[1].sortIndex).toBe(0);
@@ -2659,7 +2660,7 @@ describe("Table", function() {
       column2 = helper.createModelColumn('newText2');
       column2.id = model.columns[2].id;
 
-      table.updateColumnHeaders([column1, column2]);
+      table.updateColumnHeaders([ column1, column2 ]);
       $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0).text()).toBe(column0.text);
       expect($colHeaders.eq(1).text()).toBe(column1.text);
@@ -2677,14 +2678,14 @@ describe("Table", function() {
       column1 = helper.createModelColumn();
       column1.id = model.columns[1].id;
       column1.headerCssClass = 'custom-header';
-      table.updateColumnHeaders([column1]);
+      table.updateColumnHeaders([ column1 ]);
       $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
       expect($colHeaders.eq(1)).toHaveClass('custom-header');
 
       column1 = helper.createModelColumn();
       column1.id = model.columns[1].id;
-      table.updateColumnHeaders([column1]);
+      table.updateColumnHeaders([ column1 ]);
       $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
       expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
