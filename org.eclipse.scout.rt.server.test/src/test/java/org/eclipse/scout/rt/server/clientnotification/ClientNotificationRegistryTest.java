@@ -14,17 +14,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link ClientNotificationRegistry}
@@ -144,6 +150,52 @@ public class ClientNotificationRegistryTest {
     reg.putForAllSessions(TEST_NOTIFICATION);
     List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
     assertEquals(1, notificationsNode.size());
+  }
+
+  /**
+   * Empty collection of notifications must not trigger a cluster notification.
+   */
+  @Test
+  public void testEmptyNotificationsAreNotDistributedOverCluster() {
+    final IClusterSynchronizationService mockClusterSyncService = Mockito.mock(IClusterSynchronizationService.class);
+    final IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(IClusterSynchronizationService.class)
+        .withInitialInstance(mockClusterSyncService)
+        .withApplicationScoped(true));
+    try {
+      ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+      reg.registerSession("testNodeId", "testSessionId", TEST_USER);
+      reg.publish(Collections.<ClientNotificationMessage> emptySet());
+      assertEquals(Collections.emptyList(), consumeNoWait(reg, "testNodeId"));
+      Mockito.verifyZeroInteractions(mockClusterSyncService);
+    }
+    finally {
+      TestingUtility.unregisterBean(bean);
+    }
+  }
+
+  /**
+   * Empty collection of notifications must not trigger a cluster notification.
+   */
+  @Test
+  public void testNotificationsWithoutDistributingOverCluster() {
+    final IClusterSynchronizationService mockClusterSyncService = Mockito.mock(IClusterSynchronizationService.class);
+    final IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(IClusterSynchronizationService.class)
+        .withInitialInstance(mockClusterSyncService)
+        .withApplicationScoped(true));
+    try {
+      ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+      reg.registerSession("testNodeId", "testSessionId", TEST_USER);
+      reg.registerSession("testNodeId2", "testSessionId", TEST_USER);
+      reg.putForAllNodes(TEST_NOTIFICATION, false);
+      List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, "testNodeId");
+      List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, "testNodeId2");
+      assertSingleTestNotification(notificationsNode1);
+      assertSingleTestNotification(notificationsNode2);
+      Mockito.verifyZeroInteractions(mockClusterSyncService);
+    }
+    finally {
+      TestingUtility.unregisterBean(bean);
+    }
   }
 
   @Test

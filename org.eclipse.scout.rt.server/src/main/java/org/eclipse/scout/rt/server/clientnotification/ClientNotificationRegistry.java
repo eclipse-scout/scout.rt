@@ -410,6 +410,10 @@ public class ClientNotificationRegistry {
         filteredMessages.add(message);
       }
     }
+    // do not publish empty messages
+    if (filteredMessages.isEmpty()) {
+      return;
+    }
     try {
       IClusterSynchronizationService service = BEANS.get(IClusterSynchronizationService.class);
       service.publish(new ClientNotificationClusterNotification(filteredMessages));
