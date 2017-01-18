@@ -8,8 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 /**
- * JQuery plugin with scout extensions
+ * jQuery plugin with scout extensions
+ */
+
+/**
+ * JS Type definition for jQuery Promise (which is actually a Deferred, but does not exist as type).
+ * @typedef {object} Promise
  */
 
 // === internal methods ===
@@ -268,7 +274,7 @@ $.pxToNumber = function(pixel) {
  * Use this function as shorthand of this:
  * <code>$.Deferred().resolve([arguments]);</code>
  *
- * @param all arguments of this function are passed to the resolve function of the deferred
+ * @param {object[]} [arguments] of this function are passed to the resolve function of the deferred
  * @returns {$.Deferred} a deferred for an already resolved jQuery.Deferred object.
  */
 $.resolvedDeferred = function() {
@@ -281,7 +287,7 @@ $.resolvedDeferred = function() {
  * Use this function as shorthand of this:
  * <code>$.Deferred().resolve([arguments]).promise();</code>
  *
- * @param all arguments of this function are passed to the resolve function of the deferred
+ * @param {object[]} [arguments] of this function are passed to the resolve function of the deferred
  * @returns {Promise} a promise for an already resolved jQuery.Deferred object.
  */
 $.resolvedPromise = function() {

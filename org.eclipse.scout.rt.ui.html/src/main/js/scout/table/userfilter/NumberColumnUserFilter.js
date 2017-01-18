@@ -11,7 +11,7 @@ scout.NumberColumnUserFilter = function() {
 scout.inherits(scout.NumberColumnUserFilter, scout.ColumnUserFilter);
 
 /**
- * @override ColumnUserFilter.js
+ * @override ColumnUserFilter
  */
 scout.NumberColumnUserFilter.prototype.createAddFilterEventData = function() {
   var data = scout.NumberColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
@@ -21,14 +21,14 @@ scout.NumberColumnUserFilter.prototype.createAddFilterEventData = function() {
 };
 
 /**
- * @override ColumnUserFilter.js
+ * @override ColumnUserFilter
  */
 scout.NumberColumnUserFilter.prototype.fieldsFilterActive = function() {
   return scout.objects.isNumber(this.numberFrom) || scout.objects.isNumber(this.numberTo);
 };
 
 /**
- * @override ColumnUserFilter.js
+ * @override ColumnUserFilter
  */
 scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   var
@@ -44,14 +44,14 @@ scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey, r
 };
 
 /**
- * @implements ColumnUserFilter.js
+ * @override ColumnUserFilter
  */
 scout.NumberColumnUserFilter.prototype.filterFieldsTitle = function() {
   return this.session.text('ui.NumberRange');
 };
 
 /**
- * @override ColumnUserFilter.js
+ * @override ColumnUserFilter
  */
 scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from', 0);

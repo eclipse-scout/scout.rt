@@ -1257,8 +1257,8 @@ scout.Session.prototype._onLocaleChanged = function(event) {
 };
 
 /**
- * @param {@link scout.Locale} the new locale
- * @param {@link scout.TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
+ * @param {scout.Locale} the new locale
+ * @param {scout.TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
  */
 scout.Session.prototype.switchLocale = function(locale, textMap) {
   scout.assertParameter('locale', locale, scout.Locale);

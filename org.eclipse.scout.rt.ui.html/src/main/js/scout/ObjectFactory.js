@@ -10,9 +10,6 @@
  ******************************************************************************/
 
 /**
- * @param initialRegistry (optional) map object containing the initial values used as object registry.
- *   All entries of the given initialRegistry will be cloned. Key = objectType, value = createFunc which
- *   returns a new Scout object instance.
  * @singleton
  */
 scout.ObjectFactory = function() {
