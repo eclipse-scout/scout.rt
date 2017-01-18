@@ -48,12 +48,15 @@ public class DownloadHandlerStorage {
     return m_futureMap;
   }
 
+  /**
+   * @return time to live in milliseconds
+   */
   protected long getTTLForResource(BinaryResource res) {
     return TimeUnit.MINUTES.toMillis(1);
   }
 
   /**
-   * Put a downloadable item in the storage, after the given TTL has passed the item is removed automatically.
+   * Put a downloadable item in the storage. After the TTL has passed the item is removed automatically.
    */
   public void put(String key, BinaryResource res) {
     long ttl = getTTLForResource(res);
@@ -63,6 +66,12 @@ public class DownloadHandlerStorage {
     }
   }
 
+  /**
+   * @param key
+   *          key to remove after TTL has expired
+   * @param ttl
+   *          time to live in milliseconds
+   */
   protected void scheduleRemoval(final String key, long ttl) {
     m_futureMap.put(key, Jobs.schedule(new IRunnable() {
       @Override
@@ -84,7 +93,7 @@ public class DownloadHandlerStorage {
   }
 
   /**
-   * Remove a downloadable item from the storage.
+   * Remove a downloadble item from the storage.
    */
   public BinaryResource remove(String key) {
     IFuture future = m_futureMap.remove(key);
