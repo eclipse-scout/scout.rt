@@ -135,7 +135,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   /**
    * Date to be used when setting a value "automatically", e.g. when the date picker is opened initially or when a date
    * or time is entered and the other component has to be filled. If no auto date is set (which is the default), the
-   * current date and time is used.
+   * current date (with time part "00:00:00.000") is used.
    */
   @Order(270)
   protected Date getConfiguredAutoDate() {
