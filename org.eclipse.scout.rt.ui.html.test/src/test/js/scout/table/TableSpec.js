@@ -1881,7 +1881,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       // clicked has to be after selected otherwise it is not possible to get the selected row in execRowClick
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
+       expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
     });
 
     it("sends only click if row already is selected", function() {
@@ -1893,7 +1893,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
 
       // Reset internal state because there is no "sleep" in JS
       table._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
@@ -1916,7 +1916,7 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'property', 'rowsChecked', 'rowClicked']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowsChecked', 'rowClicked' ]);
     });
 
   });
@@ -2212,7 +2212,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       // exactly only one selection event for first row
-      expect(requestData).toContainEventTypesExactly(['rowsSelected', 'property', 'rowClicked']);
+      expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
 
       var event = [new scout.Event(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id]

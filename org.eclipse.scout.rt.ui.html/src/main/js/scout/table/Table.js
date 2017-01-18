@@ -358,13 +358,13 @@ scout.Table.prototype._onRowMouseDown = function(event) {
     this._mouseDownRowId = null;
     this._mouseDownColumn = null;
   }.bind(this));
+  this.setContextColumn(this._columnAtX(event.pageX));
   this.selectionHandler.onMouseDown(event);
 
   if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     var row = this._$mouseDownRow.data('row');
     this.checkRow(row, !row.checked);
   }
-  this.setContextColumn(this._columnAtX(event.pageX));
 };
 
 scout.Table.prototype._onRowMouseUp = function(event) {
