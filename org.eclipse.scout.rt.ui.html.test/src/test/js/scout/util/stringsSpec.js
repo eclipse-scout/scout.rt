@@ -193,6 +193,10 @@ describe("scout.strings", function() {
       expect(scout.strings.join(2, 0, 0, 0)).toBe('02020');
     });
 
+    it("join works with array as second parameter", function() {
+      expect(scout.strings.join('-', ['hello', 'world'])).toBe('hello-world');
+    });
+
   });
 
   describe("box", function() {

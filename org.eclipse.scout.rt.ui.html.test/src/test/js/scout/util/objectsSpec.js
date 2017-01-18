@@ -115,6 +115,15 @@ describe("scout.objects", function() {
     });
   });
 
+  describe('isArray', function() {
+    it('returns true when argument is an array', function() {
+      expect(scout.objects.isArray([])).toBe(true);
+
+      expect(scout.objects.isArray(undefined)).toBe(false);
+      expect(scout.objects.isArray('foo')).toBe(false);
+    });
+  });
+
   describe('isNullOrUndefined', function() {
     it('returns true when argument is null or undefined, but not when 0 or any other value', function() {
       expect(scout.objects.isNullOrUndefined(null)).toBe(true);

@@ -189,14 +189,20 @@ scout.strings = {
    * Joins a list of strings to a single string using the given separator. Elements that are
    * not defined or have zero length are ignored. The default return value is the empty string.
    *
-   * @param separator String to use as separator
-   * @param varargs List of strings to join
+   * @param {string} separator String to use as separator
+   * @param {arguments|array} varargs List of strings to join
    */
-  join: function(separator) {
+  join: function(separator, vararg) {
+    var stringsToJoin;
+    if (vararg && scout.objects.isArray(vararg)) {
+      stringsToJoin = vararg;
+    } else {
+      stringsToJoin = scout.objects.argumentsToArray(arguments).slice(1);
+    }
     separator = this.asString(separator);
     var s = '';
-    for (var i = 1; i < arguments.length; i++) {
-      var arg = this.asString(arguments[i]);
+    for (var i = 0; i < stringsToJoin.length; i++) {
+      var arg = this.asString(stringsToJoin[i]);
       if (arg) {
         if (s && separator) {
           s += separator;

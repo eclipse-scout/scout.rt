@@ -198,6 +198,10 @@ scout.objects = {
     return $.isFunction(obj);
   },
 
+  isArray: function(obj) {
+    return Array.isArray(obj);
+  },
+
   /**
    * Returns values from the given (map) object. By default only values of 'own' properties are returned.
    *
