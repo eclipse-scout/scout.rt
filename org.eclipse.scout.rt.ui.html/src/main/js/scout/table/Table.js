@@ -2425,7 +2425,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
 };
 
 scout.Table.prototype.selectRow = function(row, debounceSend) {
-  this.selectRow(row);
+  this.selectRows(row, debounceSend);
 };
 
 scout.Table.prototype.selectRows = function(rows, debounceSend) {
