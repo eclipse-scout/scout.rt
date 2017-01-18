@@ -68,6 +68,9 @@ public class DownloadHandlerStorage {
     return m_futureMap;
   }
 
+  /**
+   * @return time to live in milliseconds
+   */
   protected long getTTLForResource(BinaryResource res) {
     return TimeUnit.MINUTES.toMillis(1);
   }
