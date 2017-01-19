@@ -14,6 +14,7 @@ scout.NumberColumn = function() {
   this.aggregationFunction = 'sum';
   this.backgroundEffect;
   this.decimalFormat;
+  this.horizontalAlignment = 1;
   this.filterType = 'NumberColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
 };

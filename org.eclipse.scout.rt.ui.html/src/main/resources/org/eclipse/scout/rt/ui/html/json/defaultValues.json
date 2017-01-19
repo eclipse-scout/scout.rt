@@ -193,6 +193,9 @@
       "tableControls": [],
       "tableStatusVisible": false
     },
+    "TableControl": {
+      "toggleAction": true
+    },
     "Desktop": {
       "desktopStyle": "default",
       "benchVisible": true,
@@ -312,7 +315,8 @@
     },
     "NumberColumn": {
       "uiSortPossible": true,
-      "aggregationFunction": "sum"
+      "aggregationFunction": "sum",
+      "horizontalAlignment": 1
     },
     "BooleanColumn": {
       "horizontalAlignment": 0,

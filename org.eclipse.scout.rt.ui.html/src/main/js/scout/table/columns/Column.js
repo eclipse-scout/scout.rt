@@ -25,6 +25,7 @@ scout.Column = function() {
   this.width = 60;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
   this.showSeparator = true; // currently a UI-only property, defaults to true
+  this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
   this.comparator = scout.comparators.TEXT;
   this.displayable = true;

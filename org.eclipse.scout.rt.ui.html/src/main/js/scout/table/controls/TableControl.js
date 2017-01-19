@@ -15,6 +15,7 @@ scout.TableControl = function() {
   this.height = scout.TableControl.CONTAINER_SIZE;
   this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
   this.resizerVisible = true;
+  this.toggleAction = true;
 };
 scout.inherits(scout.TableControl, scout.Action);
 

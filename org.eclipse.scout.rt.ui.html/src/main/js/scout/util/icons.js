@@ -12,6 +12,7 @@ scout.icons = {
 
   ANGLE_DOWN: 'font:\uF107',
   ANGLE_UP: 'font:\uF106',
+  CHART: 'font:\uE022',
   OUTLINE: 'font:\uE043',
   ELLIPSIS_V: 'font:\uE040',
   COLLAPSE: 'font:\uE600',
