@@ -351,9 +351,12 @@ scout.Table.prototype._onImageLoadOrError = function(event) {
 scout.Table.prototype._onRowMouseDown = function(event) {
   this._doubleClickSupport.mousedown(event);
   this._$mouseDownRow = $(event.currentTarget);
+  this._mouseDownRowId = this._$mouseDownRow.data('row').id;
   this._mouseDownColumn = this._columnAtX(event.pageX);
   this._$mouseDownRow.window().one('mouseup', function() {
     this._$mouseDownRow = null;
+    this._mouseDownRowId = null;
+    this._mouseDownColumn = null;
   }.bind(this));
   this.selectionHandler.onMouseDown(event);
 
@@ -376,7 +379,7 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   $mouseUpRow = $(event.currentTarget);
   this.selectionHandler.onMouseUp(event, $mouseUpRow);
 
-  if (!this._$mouseDownRow || this._$mouseDownRow[0] !== $mouseUpRow[0]) {
+  if (!this._$mouseDownRow || this._mouseDownRowId !== $mouseUpRow.data('row').id) {
     // Don't accept if mouse up happens on another row than mouse down, or mousedown didn't happen on a row at all
     return;
   }
