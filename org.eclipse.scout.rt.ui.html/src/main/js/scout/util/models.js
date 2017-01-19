@@ -13,12 +13,11 @@ scout.models = {
   modelMap: {},
 
   /**
-   * @param modelsUrl relative URL points to the *-models.json file. Example: 'myproject-models.json'.
+   * @param {string} url relative URL points to the *-models.json file. Example: 'res/myproject-all.json'.
    */
-  bootstrap: function(modelsUrl) {
-    scout.assertParameter('modelsUrl', modelsUrl);
-    return $.ajaxJson(modelsUrl)
-      .done(this.init.bind(this));
+  bootstrap: function(url) {
+    var promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
+    return promise.done(this.init.bind(this));
   },
 
   init: function(data) {

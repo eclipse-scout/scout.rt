@@ -24,7 +24,8 @@ scout.fonts = {
    */
   bootstrap: function(fonts) {
     if (!fonts || fonts.length === 0) {
-      return;
+      this.loadingComplete = true;
+      return $.resolvedPromise();
     }
 
     // Start preloading
@@ -36,6 +37,8 @@ scout.fonts = {
         this._deferred.resolve();
       }.bind(this)
     });
+
+    return $.resolvedPromise();
   },
 
   /**

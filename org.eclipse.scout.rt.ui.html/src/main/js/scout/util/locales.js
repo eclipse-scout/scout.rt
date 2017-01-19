@@ -13,9 +13,8 @@ scout.locales = {
   localesMap: {},
 
   bootstrap: function(url) {
-    url = scout.nvl(url, 'res/locales.json');
-    return $.ajaxJson(url)
-      .done(this.init.bind(this));
+    var promise = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+    return promise.done(this.init.bind(this));
   },
 
   init: function(data) {
