@@ -10,6 +10,10 @@ scout.CodeLookupCall.prototype._init = function(model) {
 };
 
 scout.CodeLookupCall.prototype._textById = function(id) {
-  var code = scout.codes.get(this.codeType, id);
-  return $.Deferred().resolve(code.text(this.session.locale));
+  var code = scout.codes.optGet(this.codeType, id);
+  return $.resolvedDeferred(code ? code.text(this.session.locale) : this._textCodeUndefined(id));
+};
+
+scout.CodeLookupCall.prototype._textCodeUndefined = function(id) {
+  return this.session.text('ui.CodeUndefined');
 };

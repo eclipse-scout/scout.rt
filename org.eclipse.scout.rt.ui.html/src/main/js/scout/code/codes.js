@@ -46,7 +46,10 @@ scout.codes = {
   },
 
   /**
-   * Returns a code for the given codeId. The codeId is a string in the following format:
+   * Returns a code for the given codeId. When you work with hard-coded codes
+   * you should always use this function and not <code>optGet</code>.
+   *
+   * The codeId is a string in the following format:
    *
    * "[CodeType.id] [Code.id]"
    *
@@ -59,13 +62,35 @@ scout.codes = {
    *
    * You can also call this function with two arguments. In that case the first argument
    * is the codeTypeId and the second is the codeId.
+   *
+   * @param {string} vararg either only "[CodeType.id]" or "[CodeType.id] [Code.id]"
+   * @param {string} [codeId]
+   * @returns {Code} a code for the given codeId
+   * @throw {Error} if code does not exist
    */
   get: function(vararg, codeId) {
-    var codeTypeId;
-    if (arguments.length === 2) {
-      codeTypeId = vararg;
+    return this._get('get', scout.objects.argumentsToArray(arguments));
+  },
+
+  /**
+   * Same as <code>get</code>, but does not throw an error if the code does not exist.
+   * You should always use this function when you work with codes coming from a dynamic data source.
+   *
+   * @param vararg
+   * @param codeId
+   * @returns {Code} code for the given codeId or undefined if code does not exist
+   */
+  optGet: function(vararg, codeId) {
+    return this._get('optGet', scout.objects.argumentsToArray(arguments));
+  },
+
+  _get: function(funcName, funcArgs) {
+    var codeTypeId, codeId;
+    if (funcArgs.length === 2) {
+      codeTypeId = funcArgs[0];
+      codeId = funcArgs[1];
     } else {
-      var tmp = vararg.split(' ');
+      var tmp = funcArgs[0].split(' ');
       if (tmp.length !== 2) {
         throw new Error('Invalid string. Must have format "[CodeType.id] [Code.id]"');
       }
@@ -74,7 +99,7 @@ scout.codes = {
     }
     scout.assertParameter('codeTypeId', codeTypeId);
     scout.assertParameter('codeId', codeId);
-    return this.codeType(codeTypeId).get(codeId);
+    return this.codeType(codeTypeId)[funcName](codeId);
   },
 
   codeType: function(codeTypeId, optional) {

@@ -45,14 +45,33 @@ scout.CodeType.prototype.add = function(code, parent) {
   }
 };
 
+/**
+ * @param codeId
+ * @returns {Code}
+ * @throw {Error) if code does not exist
+ */
 scout.CodeType.prototype.get = function(codeId) {
-  var code = this.codeMap[codeId];
+  var code = this.optGet(codeId);
   if (!code) {
     throw new Error('No code found for id=' + codeId);
   }
   return code;
 };
 
+/**
+ * Same as <code>get</code>, but does not throw an error if the code does not exist.
+ *
+ * @param codeId
+ * @returns {Code} code for the given codeId or undefined if code does not exist
+ */
+scout.CodeType.prototype.optGet = function(codeId) {
+  return this.codeMap[codeId];
+};
+
+/**
+ * @param {boolean} rootOnly
+ * @returns {Array<string>}
+ */
 scout.CodeType.prototype.getCodes = function(rootOnly) {
   if (rootOnly) {
     var rootCodes = [];

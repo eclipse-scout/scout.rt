@@ -66,6 +66,20 @@ describe('scout.codes', function() {
     expect(func).toThrowError();
   });
 
+  describe('optGet', function() {
+
+    it('should work as get if code exists', function() {
+      var code = scout.codes.optGet(CODE_TYPE, CODE);
+      expect(code instanceof scout.Code).toBe(true);
+    });
+
+    it('should return null if code does not exist', function() {
+      var code = scout.codes.optGet(CODE_TYPE, 'DoesNotExist');
+      expect(code).toBe(undefined);
+    });
+
+  });
+
   describe('add', function() {
     it('adds a code type or an array of code types', function() {
       var codeType = {
