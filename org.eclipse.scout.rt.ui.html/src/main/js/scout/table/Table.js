@@ -1847,14 +1847,11 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
 };
 
 /**
- * @returns true if at least one column has grouped=true
+ * @returns {boolean} true if at least one column has grouped=true
  */
 scout.Table.prototype.isGrouped = function() {
   return this.columns.some(function(column) {
-    if (column.grouped) {
-      return true;
-    }
-    return false;
+    return column.grouped;
   });
 };
 

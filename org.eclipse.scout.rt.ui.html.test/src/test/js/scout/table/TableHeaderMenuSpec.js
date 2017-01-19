@@ -206,6 +206,36 @@ describe('TableHeaderMenu', function() {
       });
     });
 
+    describe('grouping / sorting', function() {
+
+      var table, column;
+
+      beforeEach(function() {
+        table = createSingleColumnTableByTexts(['Foo']);
+        column = table.columns[0];
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+      });
+
+      it('count sorted columns', function() {
+        expect(table.header._tableHeaderMenu._sortColumnCount()).toBe(0);
+        table.header.closeTableHeaderMenu();
+
+        table.sort(column, 'asc');
+        table.header.openTableHeaderMenu(column);
+        expect(table.header._tableHeaderMenu._sortColumnCount()).toBe(1);
+      });
+
+      it('count grouped columns', function() {
+        expect(table.header._tableHeaderMenu._groupColumnCount()).toBe(0);
+        table.header.closeTableHeaderMenu();
+
+        table.groupColumn(column, false, 'asc');
+        table.header.openTableHeaderMenu(column);
+        expect(table.header._tableHeaderMenu._groupColumnCount()).toBe(1);
+      });
+
+    });
 
     describe('boolean column', function() {
 

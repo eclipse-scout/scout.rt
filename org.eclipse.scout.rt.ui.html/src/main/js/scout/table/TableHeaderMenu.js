@@ -694,7 +694,7 @@ scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
 
 scout.TableHeaderMenu.prototype._countColumns = function(propertyName) {
   return this.table.visibleColumns().reduce(function(sum, column) {
-    return sum + column[propertyName] ? 1 : 0;
+    return sum + (column[propertyName] ? 1 : 0);
   }, 0);
 };
 
