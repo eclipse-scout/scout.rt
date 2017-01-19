@@ -62,8 +62,9 @@ public class MultiSessionCookieStoreInstallerTest {
     s_installer.uninstall();
   }
 
-  @Test(expected = PlatformException.class)
+  @Test
   public void checkMultiSessionCookieStoreAlreadyInstalled() {
+    // allow to re-install same MultiSessionCookieStore class by same deployment
     s_installer.install();
   }
 

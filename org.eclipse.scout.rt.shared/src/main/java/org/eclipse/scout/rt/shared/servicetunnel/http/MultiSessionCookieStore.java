@@ -20,6 +20,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.shared.session.SessionEvent;
 /**
  * HTTP cookie store implementation that manages different sets of cookies ("cookie jars"), one per {@link ISession}.
  */
+@Bean
 public class MultiSessionCookieStore implements CookieStore {
 
   private final ReadWriteLock m_cookieStoresLock = new ReentrantReadWriteLock();
