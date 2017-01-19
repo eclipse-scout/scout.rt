@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.servicetunnel.http;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -13,7 +14,7 @@ public class MultiSessionCookieStoreInstallListener implements IPlatformListener
   public void stateChanged(PlatformEvent event) {
     if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       // Install cookie handler for HTTP based service tunnels
-      m_multiSessionCookieStoreInstaller = new MultiSessionCookieStoreInstaller();
+      m_multiSessionCookieStoreInstaller = BEANS.get(MultiSessionCookieStoreInstaller.class);
       m_multiSessionCookieStoreInstaller.install();
     }
     else if (event.getState() == IPlatform.State.PlatformStopped) {
