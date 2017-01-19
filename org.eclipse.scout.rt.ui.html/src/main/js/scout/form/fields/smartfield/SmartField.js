@@ -132,10 +132,7 @@ scout.SmartField.prototype._setCodeType = function(codeType) {
 
 scout.SmartField.prototype._formatValue = function(value) {
   if (!this.lookupCall) {
-    return '';
-  }
-  if (value === null || value === undefined) {
-    return '';
+    return scout.strings.nvl(value) + '';
   }
   return this.lookupCall.textById(value);
 };

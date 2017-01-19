@@ -44,6 +44,9 @@ scout.SmartColumn.prototype._setCodeType = function(codeType) {
 };
 
 scout.SmartColumn.prototype._formatValue = function(value) {
+  if (!this.lookupCall) {
+    return scout.strings.nvl(value) + '';
+  }
   return this.lookupCall.textById(value);
 };
 

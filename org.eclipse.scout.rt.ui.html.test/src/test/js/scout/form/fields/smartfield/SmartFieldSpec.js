@@ -1,4 +1,4 @@
- /*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,7 +11,6 @@
 /* global linkWidgetAndAdapter */
 describe('SmartField', function() {
   var session;
-  var smartField;
   var helper;
 
   beforeEach(function() {
@@ -30,14 +29,20 @@ describe('SmartField', function() {
     $('.touch-popup').remove();
   });
 
-  beforeEach(function() {
+  function createSmartFieldWithAdapter() {
     var model = helper.createFieldModel('SmartField');
-    smartField = new scout.SmartField();
+    var smartField = new scout.SmartField();
     smartField.init(model);
     linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
-  });
+    return smartField;
+  }
 
   describe('_onKeyUp', function() {
+    var smartField;
+
+    beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
+    });
 
     it('doesn not call _openProposal() when TAB has been pressed', function() {
       smartField.render(session.$entryPoint);
@@ -65,6 +70,11 @@ describe('SmartField', function() {
   });
 
   describe('_syncProposalChooser', function() {
+    var smartField;
+
+    beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
+    });
 
     it('must reset _requestProposal property', function() {
       smartField.render(session.$entryPoint);
@@ -78,10 +88,11 @@ describe('SmartField', function() {
   }),
 
   describe('_openProposal', function() {
-
     var events = [null];
+    var smartField;
 
     beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
       smartField.render(session.$entryPoint);
       smartField.$field.val('foo');
       smartField.remoteHandler = function(event, delay) {
@@ -95,7 +106,8 @@ describe('SmartField', function() {
       var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: true,
-        selectCurrentValue: true});
+        selectCurrentValue: true
+      });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
@@ -105,7 +117,8 @@ describe('SmartField', function() {
       var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: false,
-        selectCurrentValue: false});
+        selectCurrentValue: false
+      });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
@@ -116,12 +129,18 @@ describe('SmartField', function() {
       var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: true,
-        selectCurrentValue: false});
+        selectCurrentValue: false
+      });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
   });
 
   describe('_acceptProposal', function() {
+    var smartField;
+
+    beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
+    });
 
     it('must set displayText', function() {
       smartField.render(session.$entryPoint);
@@ -161,7 +180,8 @@ describe('SmartField', function() {
         chooser: false,
         displayText: 'bar',
         showBusyIndicator: false,
-        forceClose: false});
+        forceClose: false
+      });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
@@ -180,9 +200,17 @@ describe('SmartField', function() {
   });
 
   describe('touch = true', function() {
+    var smartField;
+
+    beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
+    });
 
     it('opens a touch popup when smart field gets touched', function() {
-      var proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
+      var proposalChooser = scout.create('Table', {
+        parent: new scout.NullWidget(),
+        session: session
+      });
       linkWidgetAndAdapter(proposalChooser, 'ProposalChooserAdapter');
 
       smartField.touch = true;
@@ -217,7 +245,10 @@ describe('SmartField', function() {
     });
 
     it('opens a touch popup if there already is a proposal chooser while rendering', function() {
-      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
+      smartField.proposalChooser = scout.create('Table', {
+        parent: new scout.NullWidget(),
+        session: session
+      });
       smartField.touch = true;
       smartField.render(session.$entryPoint);
       expect(smartField.popup.rendered).toBe(true);
@@ -229,7 +260,10 @@ describe('SmartField', function() {
     });
 
     it('shows smartfield with same text as clicked smartfield', function() {
-      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
+      smartField.proposalChooser = scout.create('Table', {
+        parent: new scout.NullWidget(),
+        session: session
+      });
       smartField.touch = true;
       smartField.displayText = 'row 1';
       smartField.render(session.$entryPoint);
@@ -243,5 +277,61 @@ describe('SmartField', function() {
 
   });
 
+  describe('_formatValue', function() {
+    var lookupCall;
+
+    beforeEach(function() {
+      lookupCall = scout.create('LookupCall', {
+        session: session
+      });
+      lookupCall._textById = function(value) {
+        if (value === 1) {
+          return 'hello';
+        } else {
+          return 'bye';
+        }
+      };
+    });
+
+    it('uses a lookupcall to format the value', function() {
+      var model = helper.createFieldModel('SmartField', session.desktop, {
+        lookupCall: lookupCall
+      });
+      var smartField = scout.create('SmartField', model);
+      expect(smartField.displayText).toBe('');
+      smartField.setValue(1);
+      expect(smartField.value).toBe(1);
+      expect(smartField.displayText).toBe('hello');
+      smartField.setValue(2);
+      expect(smartField.value).toBe(2);
+      expect(smartField.displayText).toBe('bye');
+    });
+
+    it('returns empty string if value is null or undefined', function() {
+      var model = helper.createFieldModel('SmartField', session.desktop, {
+        lookupCall: lookupCall
+      });
+      var smartField = scout.create('SmartField', model);
+      expect(smartField.displayText).toBe('');
+      smartField.setValue(null);
+      expect(smartField.value).toBe(null);
+      expect(smartField.displayText).toBe('');
+      smartField.setValue(undefined);
+      expect(smartField.value).toBe(undefined);
+      expect(smartField.displayText).toBe('');
+    });
+
+    it('returns the value as string if there is no lookup call', function() {
+      // This is important for the remote case when there is no lookup call at all
+      var model = helper.createFieldModel('SmartField');
+      var smartField = scout.create('SmartField', model);
+      smartField.setDisplayText('hello');
+      expect(smartField.displayText).toBe('hello');
+      smartField.parseAndSetValue('hello 2');
+      expect(smartField.value).toBe('hello 2');
+      expect(smartField.displayText).toBe('hello 2');
+    });
+
+  });
 
 });
