@@ -15,6 +15,8 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +31,33 @@ public class MultiSessionCookieStoreInstaller {
 
   public void install() {
     CookieHandler cookieHandler = CookieHandler.getDefault();
+    checkMultiSessionCookieStoreAlreadyInstalled(cookieHandler);
+
     // Install MultiSessionCookieStore
-    if (cookieHandler != null) {
-      LOG.warn("Overriding pre-installed cookie handler: {}", cookieHandlerToString(cookieHandler));
-    }
     m_oldCookieHandler = cookieHandler;
     m_newCookieHandler = new CookieManager(new MultiSessionCookieStore(), CookiePolicy.ACCEPT_ALL);
     CookieHandler.setDefault(m_newCookieHandler);
     LOG.info("Successfully installed {}", cookieHandlerToString(m_newCookieHandler));
+  }
+
+  /**
+   * MultiSessionCookieStore is registered within JRE for all instances of HttpClient, but cannot be shared between
+   * multiple Scout deployments because the session lookup won't work between sessions and thread locals of different
+   * class loaders. Detect if another deployment already installed a {@link MultiSessionCookieStore} and do not allow to
+   * start the platform. Starting the platform without an installed {@link MultiSessionCookieStore} would cause that no
+   * user can login to the application, if the application uses a client-server service tunnel (e.g. client and server
+   * are deployed separately)
+   */
+  protected void checkMultiSessionCookieStoreAlreadyInstalled(CookieHandler cookieHandler) {
+    if (cookieHandler != null) {
+      if (cookieHandler instanceof CookieManager) {
+        CookieStore cookieStore = ((CookieManager) cookieHandler).getCookieStore();
+        if (cookieStore != null && StringUtility.containsStringIgnoreCase(cookieStore.getClass().getSimpleName(), MultiSessionCookieStore.class.getSimpleName())) {
+          throw new PlatformException("Instance of MultiSessionCookieStore already installed by another deployment. Only one Scout application using servlet tunnel is supported within one application server!");
+        }
+      }
+      LOG.warn("Overriding pre-installed cookie handler: {}", cookieHandlerToString(cookieHandler));
+    }
   }
 
   public void uninstall() {
