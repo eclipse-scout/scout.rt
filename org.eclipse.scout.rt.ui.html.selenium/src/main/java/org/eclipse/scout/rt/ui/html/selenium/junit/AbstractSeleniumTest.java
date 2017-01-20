@@ -277,6 +277,10 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(null, by);
   }
 
+  public WebElement waitUntilElementClickable(WebElement element) {
+    return waitUntil(ExpectedConditions.elementToBeClickable(element));
+  }
+
   public WebElement waitUntilElementClickable(WebElement parent, By locator) {
     if (parent == null) {
       return waitUntil(ExpectedConditions.elementToBeClickable(locator));
