@@ -1835,37 +1835,29 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
 };
 
 scout.Table.prototype._renderAggregateRows = function(animate) {
-  var c, cell, column, row, contents, $cell, $aggregateRow;
   animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
+    var refRow, c, $cell, $aggregateRow;
+
     if (aggregateRow.$row) {
-      // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
+      // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (e.g. in insertRows -> renderRows)
       return;
     }
-    row = aggregateRow.prevRow;
-    if (!row || !row.$row) {
+    refRow = aggregateRow.prevRow;
+    if (!refRow || !refRow.$row) {
       return;
     }
 
     $aggregateRow = this.$container.makeDiv('table-aggregate-row')
       .data('aggregateRow', aggregateRow);
-    contents = aggregateRow.contents;
 
     for (c = 0; c < this.columns.length; c++) {
-      column = this.columns[c];
-      if (column.grouped) {
-        cell = column.createAggrGroupCell(row);
-      } else if (column instanceof scout.NumberColumn) {
-        cell = column.createAggrValueCell(contents[c]);
-      } else {
-        cell = column.createAggrEmptyCell(row);
-      }
-      $cell = $(column.buildCell(cell, {}));
+      $cell = $(this.columns[c].buildCellForAggregateRow(aggregateRow));
       $cell.appendTo($aggregateRow);
     }
 
-    $aggregateRow.insertAfter(row.$row).width(this.rowWidth);
+    $aggregateRow.insertAfter(refRow.$row).width(this.rowWidth);
     aggregateRow.height = $aggregateRow.outerHeight(true);
     aggregateRow.$row = $aggregateRow;
     if (animate) {
