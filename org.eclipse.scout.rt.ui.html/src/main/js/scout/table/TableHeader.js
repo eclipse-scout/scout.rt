@@ -148,8 +148,9 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
     if (column.fixedWidth || !this.enabled) {
       $separator.setEnabled(false);
     } else {
-      $separator.on('mousedown', '', this._onSeparatorMousedown.bind(this)).
-      on('dblclick', this._onSeparatorDblclick.bind(this));
+      $separator
+        .on('mousedown', '', this._onSeparatorMousedown.bind(this))
+        .on('dblclick', this._onSeparatorDblclick.bind(this));
     }
     column.$separator = $separator;
   }
@@ -661,9 +662,17 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
 };
 
 scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
-  var $header = $(event.target).prev(),
-    column = $header.data('column');
-  this.table.resizeToFit(column);
+  if (event.shiftKey) {
+    // Optimize all columns
+    this._visibleColumns().forEach(function(column) {
+      this.table.resizeToFit(column);
+    }, this);
+  } else {
+    // Optimize the column left of the separator
+    var $header = $(event.target).prev(),
+      column = $header.data('column');
+    this.table.resizeToFit(column);
+  }
 };
 
 scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
@@ -715,7 +724,9 @@ scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
     that._$window.off('mousemove.tableheader');
     that._$body.removeClass('col-resize');
 
-    that.table.resizeColumn(column, column.width);
+    if (column.width !== headerWidth) {
+      that.table.resizeColumn(column, column.width);
+    }
   }
 };
 

@@ -158,6 +158,18 @@ scout.Column.prototype.buildCellForRow = function(row) {
   return this.buildCell(cell, row);
 };
 
+scout.Column.prototype.buildCellForAggregateRow = function(aggregateRow) {
+  var cell;
+  if (this.grouped) {
+    var refRow = (this.table.groupingStyle === scout.Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
+    cell = this.createAggrGroupCell(refRow);
+  } else {
+    var aggregateValue = aggregateRow.contents[this.index];
+    cell = this.createAggrValueCell(aggregateValue);
+  }
+  return this.buildCell(cell, {});
+};
+
 scout.Column.prototype.buildCell = function(cell, row) {
   scout.assertParameter('cell', cell, scout.Cell);
 
@@ -462,6 +474,10 @@ scout.Column.prototype.createAggrGroupCell = function(row) {
   });
 };
 
+scout.Column.prototype.createAggrValueCell = function(value) {
+  return this.createAggrEmptyCell();
+};
+
 scout.Column.prototype.createAggrEmptyCell = function() {
   return this.initCell({
     empty: true
@@ -542,17 +558,33 @@ scout.Column.prototype._renderBackgroundEffect = function() {
 };
 
 scout.Column.prototype.calculateOptimalWidth = function() {
-  var row, rows = this.table.rows,
-    optimalWidth = this.minWidth;
-  for (var i = 0; i < rows.length; i++) {
-    row = rows[i];
-    var $div = $(this.buildCellForRow(row));
-    $div.removeAttr('style');
-    $div.hide();
-    this.table.$data.append($div);
-    optimalWidth = optimalWidth < $div.outerWidth() ? $div.outerWidth() : optimalWidth;
-    $div.remove();
-  }
+  // Prepare a temporary container that is not (yet) part of the DOM to prevent
+  // expensive "forced reflow" while adding the cell divs. Only after all cells
+  // are rendered, the container is added to the DOM.
+  var $tmp = this.table.$data.makeDiv('invisible');
+  var addDivForMeasurement = function($div) {
+    $div.removeAttr('style').appendTo($tmp);
+  };
+
+  // Create divs for all relevant cells of the column
+  addDivForMeasurement(this.$header.clone()); // header
+  this.table.rows.forEach(function(row) {
+    addDivForMeasurement($(this.buildCellForRow(row))); // model rows
+  }, this);
+  this.table._aggregateRows.forEach(function(row) {
+    addDivForMeasurement($(this.buildCellForAggregateRow(row))); // aggregate rows
+  }, this);
+
+  // Add to DOM and measure optimal width
+  this.table.$data.append($tmp);
+  var optimalWidth = this.minWidth;
+  $tmp.children().each(function() {
+    optimalWidth = Math.max(optimalWidth, scout.graphics.getSize($(this)).width);
+  });
+
+  // Remove
+  $tmp.remove();
+
   return optimalWidth;
 };
 
