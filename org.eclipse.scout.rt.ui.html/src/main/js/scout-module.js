@@ -43,6 +43,7 @@
   __include("scout/util/numbers.js");
   __include("scout/util/objects.js");
   __include("scout/util/polyfills.js");
+  __include("scout/util/promises.js");
   __include("scout/util/Range.js");
   __include("scout/util/Status.js");
   __include("scout/util/strings.js");
