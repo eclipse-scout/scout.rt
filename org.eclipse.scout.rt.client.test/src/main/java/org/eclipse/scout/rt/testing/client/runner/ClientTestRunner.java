@@ -15,14 +15,20 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.TimeoutClientRunContextStatement;
@@ -96,14 +102,15 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s4;
+    final Statement s5;
     if (hasNoTimeout(testMethod)) {
-      s4 = new RunInModelJobStatement(next);
+      s5 = new RunInModelJobStatement(next);
     }
     else {
       // Three different model jobs are scheduled for all @Before methods, the @Test-annotated method and all @After methods.
-      s4 = next;
+      s5 = next;
     }
+    final Statement s4 = new WaitUntilScheduledModelJobsHaveCompletedStatement(s5);
     final Statement s3 = new AddBlockingConditionTimeoutStatement(s4);
     final Statement s2 = new ClientRunContextStatement(s3, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
     final Statement s1 = super.interceptMethodLevelStatement(s2, testClass, testMethod);
@@ -143,6 +150,32 @@ public class ClientTestRunner extends PlatformTestRunner {
   @Override
   protected RunContext createJUnitRunContext() {
     return ClientRunContexts.empty();
+  }
+
+  /**
+   * Wait for pending (scheduled) model jobs to complete. Typically these are jobs like desktop updates, locale switch,
+   * lazy loads etc. Give these jobs some decent timeout, but not more.
+   */
+  protected static class WaitUntilScheduledModelJobsHaveCompletedStatement extends Statement {
+    private final Statement m_statement;
+
+    public WaitUntilScheduledModelJobsHaveCompletedStatement(Statement statement) {
+      m_statement = statement;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      m_statement.evaluate();
+      if (ISession.CURRENT.get() != null) {
+        IFilter<IFuture<?>> filter =
+            ModelJobs
+                .newFutureFilterBuilder()
+                .andAreSingleExecuting()
+                .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+                .toFilter();
+        Jobs.getJobManager().awaitFinished(filter, 1, TimeUnit.MINUTES);
+      }
+    }
   }
 
   protected static class AddBlockingConditionTimeoutStatement extends Statement {
