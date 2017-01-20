@@ -13,6 +13,7 @@
 @table-row-padding-y: 7px;
 /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline cells) */
 @checkable-cell-padding-adjustment: 2px;
+@table-menubar-padding: 8px;
 
 .table {
   height: 100%;
@@ -29,11 +30,9 @@
     }
   }
 
-  & > .menubar {
-    &:not(.main-menubar) {
-      padding-left: @table-cell-padding-left;
-      padding-right: @table-cell-padding-right;
-    }
+  & > .menubar:not(.main-menubar) {
+    padding-left: @table-menubar-padding;
+    padding-right: @table-menubar-padding;
   }
 
   &.checkable {
