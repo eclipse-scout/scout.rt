@@ -270,11 +270,11 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
   }
 
-  private boolean hasInjections() {
+  protected boolean hasInjections() {
     return (m_formDataStatementBuilderInjections != null && !m_formDataStatementBuilderInjections.isEmpty());
   }
 
-  private void injectPreBuildEntity(ComposerEntityNodeData node, EntityStrategy entityStrategy, EntityContribution childContrib) {
+  protected void injectPreBuildEntity(ComposerEntityNodeData node, EntityStrategy entityStrategy, EntityContribution childContrib) {
     if (m_formDataStatementBuilderInjections != null) {
       for (IFormDataStatementBuilderInjection j : m_formDataStatementBuilderInjections) {
         j.preBuildEntity(node, entityStrategy, childContrib);
@@ -282,7 +282,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
   }
 
-  private void injectPostBuildEntity(ComposerEntityNodeData node, EntityStrategy entityStrategy, EntityContribution parentContrib) {
+  protected void injectPostBuildEntity(ComposerEntityNodeData node, EntityStrategy entityStrategy, EntityContribution parentContrib) {
     if (m_formDataStatementBuilderInjections != null) {
       for (IFormDataStatementBuilderInjection j : m_formDataStatementBuilderInjections) {
         j.postBuildEntity(node, entityStrategy, parentContrib);
@@ -290,7 +290,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
   }
 
-  private void injectPostBuildAttribute(ComposerAttributeNodeData node, AttributeStrategy attributeStrategy, EntityContribution contrib) {
+  protected void injectPostBuildAttribute(ComposerAttributeNodeData node, AttributeStrategy attributeStrategy, EntityContribution contrib) {
     if (m_formDataStatementBuilderInjections != null) {
       for (IFormDataStatementBuilderInjection j : m_formDataStatementBuilderInjections) {
         j.postBuildAttribute(node, attributeStrategy, contrib);
@@ -768,7 +768,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
     return contrib;
   }
 
-  private void appendTreeSubContribution(EntityContribution parent, EntityContribution child, EntityStrategy entityStrategy) {
+  protected void appendTreeSubContribution(EntityContribution parent, EntityContribution child, EntityStrategy entityStrategy) {
     switch (entityStrategy) {
       case BuildConstraints: {
         EntityContribution whereConstraints = EntityContributionUtility.createConstraintsContribution(child);
