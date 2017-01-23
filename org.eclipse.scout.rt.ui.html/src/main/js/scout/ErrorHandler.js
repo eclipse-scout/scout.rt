@@ -12,7 +12,11 @@ scout.ErrorHandler.prototype.handle = function(errorMessage, fileName, lineNumbe
     var errorCode = this.getJsErrorCode(error),
       logStr = this.createLogMessage(errorMessage, fileName, lineNumber, columnNumber, error, errorCode);
 
-    $.log.error(logStr);
+    if (error) {
+      $.log.error(logStr, error);
+    } else {
+      $.log.error(logStr);
+    }
     if (window.console) {
       window.console.log(logStr);
     }
