@@ -236,7 +236,7 @@ public abstract class AbstractSeleniumTest {
    * Finds the current form-view (does not match detail-forms!).
    */
   public WebElement waitUntilView() {
-    return waitUntilElementClickable(By.cssSelector(".form.view"));
+    return waitUntilElementClickable(By.cssSelector(".form.view:not(.detail-form)"));
   }
 
   /**
