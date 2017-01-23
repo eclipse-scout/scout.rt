@@ -11,7 +11,7 @@
 scout.MenuBar = function() {
   scout.MenuBar.parent.call(this);
 
-  this.menuSorter;
+  this.menuSorter = null;
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'
   this.tabbable = true;
@@ -23,7 +23,7 @@ scout.MenuBar = function() {
   }; // Object containing "left" and "right" menus
   this.defaultMenu = null;
   this.visible = false;
-  this.ellipsis;
+  this.ellipsis = null; // set by MenuBarLayout
 
   /**
    * This array is === menuItems when menu-bar is not over-sized.
@@ -142,7 +142,7 @@ scout.MenuBar.prototype._destroyMenuSorterSeparators = function() {
 /**
  * Forces the MenuBarLayout to be revalidated, which includes rebuilding the menu items.
  */
-scout.MenuBar.prototype.rebuildItems = function(revalidateLayoutTree) {
+scout.MenuBar.prototype.rebuildItems = function() {
   this.htmlComp.revalidateLayout(); // this will trigger rebuildItemsInternal()
 };
 
@@ -152,6 +152,23 @@ scout.MenuBar.prototype.rebuildItems = function(revalidateLayoutTree) {
  */
 scout.MenuBar.prototype.rebuildItemsInternal = function() {
   this._updateItems();
+};
+
+scout.MenuBar.prototype._removeMenuListeners = function() {
+  this._internalMenuItems.forEach(function(item) {
+    item.off('propertyChange', this._menuItemPropertyChangeListener);
+  }.bind(this));
+};
+
+scout.MenuBar.prototype._updateMenuListeners = function(menuItems) {
+  // Remove listeners from existing items
+  this._removeMenuListeners();
+
+  // Attach a propertyChange listener to the new items, so the menu-bar
+  // can be updated when one of its items changes (e.g. visible, keystroke etc.)
+  menuItems.forEach(function(item) {
+    item.on('propertyChange', this._menuItemPropertyChangeListener);
+  }.bind(this));
 };
 
 scout.MenuBar.prototype.setMenuItems = function(menuItems) {
@@ -167,6 +184,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 
     // The menuSorter may add separators to the list of items -> destroy the old ones first
     this._destroyMenuSorterSeparators();
+    this._updateMenuListeners(menuItems);
     this._internalMenuItems = menuItems;
     this._orderedMenuItems = this.menuSorter.order(menuItems, this);
     this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
@@ -350,17 +368,17 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
       // Mark as right-aligned
       item.rightAligned = true;
     }
-
-    // Attach a propertyChange listener to the item, so the menubar can be updated when one of
-    // its items changes (e.g. visible, keystroke etc.)
-    item.on('propertyChange', this._menuItemPropertyChangeListener);
   }.bind(this));
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
   this.menuItems.forEach(function(item) {
-    item.off('propertyChange', this._menuItemPropertyChangeListener);
     item.overflow = false;
     item.remove();
   }, this);
+};
+
+scout.MenuBar.prototype.destroy = function() {
+  scout.MenuBar.parent.prototype.destroy.call(this);
+  this._removeMenuListeners();
 };

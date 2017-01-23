@@ -120,6 +120,38 @@ describe("MenuBar", function() {
 
   });
 
+  describe('propertyChange', function() {
+    var menu, menuBar;
+
+    beforeEach(function() {
+      menu = helper.createMenu(createModel('foo'));
+      menuBar = createMenuBar();
+    });
+    
+    it('must listen on property changes of its menu items (even when menu bar is not rendered)', function() {
+      menu.visible = false;
+      menuBar.setMenuItems([menu]);
+      expect(menuBar.visible).toBe(false);
+
+      menu.setVisible(true);
+      expect(menuBar.visible).toBe(true);
+
+      menu.setVisible(false);
+      expect(menuBar.visible).toBe(false);
+    });
+
+    // Note: the menu alone has already an event listener
+    it('must remove property change listeners on destroy', function() {
+      expect(menu.events.count()).toBe(1);
+
+      menuBar.setMenuItems([menu]);
+      expect(menu.events.count()).toBe(2);
+
+      menuBar.destroy();
+      expect(menu.events.count()).toBe(1);
+    });
+  });
+
   describe('layout', function() {
     it('gets invalidated if a menu changes its visibility', function() {
       var menu1 = helper.createMenu(createModel('foo')),
