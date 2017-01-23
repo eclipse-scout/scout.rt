@@ -188,8 +188,8 @@ scout.Widget.prototype.destroy = function() {
 
   // Destroy children in reverse order
   this._destroyChildren(this.children.slice().reverse());
-
   this.remove();
+  this._destroy();
 
   // Disconnect from owner and parent
   this.owner.removeChild(this);
@@ -200,6 +200,14 @@ scout.Widget.prototype.destroy = function() {
 
   this.destroyed = true;
   this.trigger('destroy');
+};
+
+/**
+ * Override this function to do clean-up (like removing listeners) when the widget is destroyed.
+ * The default impl. does nothing.
+ */
+scout.Widget.prototype._destroy = function() {
+  // NOP
 };
 
 /**

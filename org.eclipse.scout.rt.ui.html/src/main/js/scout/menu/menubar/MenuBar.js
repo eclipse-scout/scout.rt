@@ -378,7 +378,7 @@ scout.MenuBar.prototype._removeMenuItems = function() {
   }, this);
 };
 
-scout.MenuBar.prototype.destroy = function() {
-  scout.MenuBar.parent.prototype.destroy.call(this);
+scout.MenuBar.prototype._destroy = function() {
+  scout.MenuBar.parent.prototype._destroy.call(this);
   this._removeMenuListeners();
 };

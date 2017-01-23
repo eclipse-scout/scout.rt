@@ -26,11 +26,11 @@ scout.NavigateDownButton.prototype._init = function(options) {
   }
 };
 
-scout.NavigateDownButton.prototype.destroy = function() {
+scout.NavigateDownButton.prototype._destroy = function() {
+  scout.NavigateDownButton.parent.prototype._destroy.call(this);
   if (this.node.detailTable) {
     this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
   }
-  scout.NavigateDownButton.parent.prototype.destroy.call(this);
 };
 
 scout.NavigateDownButton.prototype._render = function($parent) {

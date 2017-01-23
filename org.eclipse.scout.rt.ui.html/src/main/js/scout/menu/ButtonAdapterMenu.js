@@ -31,8 +31,8 @@ scout.ButtonAdapterMenu.prototype._init = function(model) {
   this._installListeners();
 };
 
-scout.ButtonAdapterMenu.prototype.destroy = function() {
-  scout.ButtonAdapterMenu.parent.prototype.destroy.call(this);
+scout.ButtonAdapterMenu.prototype._destroy = function() {
+  scout.ButtonAdapterMenu.parent.prototype._destroy.call(this);
   delete this.button.adaptedBy;
 };
 

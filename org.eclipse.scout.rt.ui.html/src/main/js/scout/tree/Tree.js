@@ -265,8 +265,8 @@ scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
   this._applyNodeDefaultValues(node);
 };
 
-scout.Tree.prototype.destroy = function() {
-  scout.Tree.parent.prototype.destroy.call(this);
+scout.Tree.prototype._destroy = function() {
+  scout.Tree.parent.prototype._destroy.call(this);
   this._visitNodes(this.nodes, this._destroyTreeNode.bind(this));
 };
 

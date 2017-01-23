@@ -38,8 +38,8 @@ scout.AggregateTableControl.prototype._init = function(model) {
   this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 };
 
-scout.AggregateTableControl.prototype.destroy = function() {
-  scout.AggregateTableControl.parent.prototype.destroy.call(this);
+scout.AggregateTableControl.prototype._destroy = function() {
+  scout.AggregateTableControl.parent.prototype._destroy.call(this);
 
   this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
 };
