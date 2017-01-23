@@ -35,10 +35,18 @@ public class HttpProxy {
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxy.class);
 
   private String m_remoteUrl;
-  private List<String> m_headerBlacklist;
+  private List<IHttpHeaderFilter> m_requestHeaderFilters;
+  private List<IHttpHeaderFilter> m_responseHeaderFilters;
 
   public HttpProxy() {
-    m_headerBlacklist = new ArrayList<>();
+    m_requestHeaderFilters = new ArrayList<>();
+    m_responseHeaderFilters = new ArrayList<>();
+
+    // remove null header from response headers
+    m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
+
+    // remove "Transfer-Encoding: chunked" header, server should decide about response on its own
+    m_responseHeaderFilters.add(new HttpHeaderNameValueFilter("Transfer-Encoding", "chunked"));
   }
 
   public void proxyGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -105,12 +113,17 @@ public class HttpProxy {
     Enumeration<String> headerNames = req.getHeaderNames();
     while (headerNames.hasMoreElements()) {
       String name = headerNames.nextElement();
-      if (getHeaderBlacklist().contains(name)) {
-        continue;
-      }
       String value = req.getHeader(name);
-      connection.setRequestProperty(name, value);
-      LOG.trace("Wrote request header: {}: {}", name, value);
+      for (IHttpHeaderFilter filter : getRequestHeaderFilters()) {
+        value = filter.filter(name, value);
+      }
+      if (value != null) {
+        connection.setRequestProperty(name, value);
+        LOG.trace("Wrote request header: {}: {}", name, value);
+      }
+      else {
+        LOG.trace("Removed request header: {} (original value: {})", name, req.getHeader(name));
+      }
     }
   }
 
@@ -187,12 +200,20 @@ public class HttpProxy {
 
   protected void writeResponseHeaders(HttpServletResponse resp, URLConnection connection) {
     for (Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
-      if (entry.getKey() == null) {
-        continue;
-      }
+      String name = entry.getKey();
       String value = CollectionUtility.format(entry.getValue(), ",");
-      resp.setHeader(entry.getKey(), value);
-      LOG.trace("Wrote response header: {}: {}", entry.getKey(), value);
+      String originalValue = value;
+      for (IHttpHeaderFilter filter : getResponseHeaderFilters()) {
+        value = filter.filter(name, value);
+      }
+      if (value != null) {
+        resp.setHeader(entry.getKey(), value);
+        LOG.trace("Wrote response header: {}: {}", entry.getKey(), value);
+      }
+      else {
+        LOG.trace("Removed response header: {} (original value: {})", name, originalValue);
+      }
+
     }
   }
 
@@ -204,13 +225,19 @@ public class HttpProxy {
     m_remoteUrl = remoteUrl;
   }
 
-  public HttpProxy blacklistHeaderName(String header) {
-    m_headerBlacklist.add(header);
-    return this;
+  public List<IHttpHeaderFilter> getRequestHeaderFilters() {
+    return m_requestHeaderFilters;
   }
 
-  public List<String> getHeaderBlacklist() {
-    return m_headerBlacklist;
+  public void addRequestHeaderFilter(IHttpHeaderFilter filter) {
+    m_requestHeaderFilters.add(filter);
   }
 
+  public List<IHttpHeaderFilter> getResponseHeaderFilters() {
+    return m_responseHeaderFilters;
+  }
+
+  public void addResponseHeaderFilter(IHttpHeaderFilter filter) {
+    m_responseHeaderFilters.add(filter);
+  }
 }
