@@ -194,7 +194,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private ClientRunContext m_initialClientRunContext; // ClientRunContext of the calling context during initialization.
   private IFormHandler m_handler; // never null (ensured by setHandler())
   private SearchFilter m_searchFilter;
-  private IValidateContentDescriptor m_currentValidateContentDescriptor;
 
   // current timers
   private IFuture<?> m_closeTimerFuture;
@@ -1683,7 +1682,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void validateForm() {
-    m_currentValidateContentDescriptor = null;
     if (!interceptCheckFields()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
       veto.consume();
@@ -1721,7 +1719,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       if (LOG.isInfoEnabled()) {
         LOG.info("there are fields with errors");
       }
-      m_currentValidateContentDescriptor = firstProblem;
+      if (firstProblem != null) {
+        firstProblem.activateProblemLocation();
+      }
       throw new VetoException().withHtmlMessage(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
     }
     if (!interceptValidate()) {
@@ -1759,14 +1759,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       content.add(HTML.ul(invalidTextElements));
     }
     return HTML.fragment(content);
-  }
-
-  /**
-   * @return the validate content descriptor set by the previous call to {@link #validateForm()} (<code>null</code> when
-   *         no invalid content has been detected).
-   */
-  protected IValidateContentDescriptor getCurrentValidateContentDescriptor() {
-    return m_currentValidateContentDescriptor;
   }
 
   /**
@@ -2854,10 +2846,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           catch (RuntimeException | PlatformError ex) {
             BEANS.get(ExceptionHandler.class).handle(BEANS.get(PlatformExceptionTranslator.class).translate(ex)
                 .withContextInfo("button", e.getButton().getClass().getName()));
-          }
-          if (m_currentValidateContentDescriptor != null) {
-            m_currentValidateContentDescriptor.activateProblemLocation();
-            m_currentValidateContentDescriptor = null;
           }
         }
         break;
