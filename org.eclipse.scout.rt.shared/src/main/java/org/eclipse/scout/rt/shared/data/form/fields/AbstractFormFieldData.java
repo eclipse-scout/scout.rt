@@ -210,4 +210,9 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     return m_fieldMap.values().toArray(new AbstractFormFieldData[m_fieldMap.size()]);
   }
 
+  @Override
+  public String toString() {
+    return FormDataUtility.toString(this, false);
+  }
+
 }

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 
 public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializable {
 
@@ -80,4 +81,8 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
     }
   }
 
+  @Override
+  public String toString() {
+    return FormDataUtility.toString(this, false);
+  }
 }

@@ -402,4 +402,9 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
     }
     return i < 0;
   }
+
+  @Override
+  public String toString() {
+    return FormDataUtility.toString(this, false);
+  }
 }
