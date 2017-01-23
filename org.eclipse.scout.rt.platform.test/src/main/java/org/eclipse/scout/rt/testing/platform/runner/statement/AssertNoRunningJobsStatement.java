@@ -39,7 +39,7 @@ import org.junit.runners.model.Statement;
  */
 public class AssertNoRunningJobsStatement extends Statement {
 
-  private static final long AWAIT_DONE_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(15);
+  private static final long AWAIT_DONE_TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(1);
 
   private final Statement m_next;
   private final String m_context;
