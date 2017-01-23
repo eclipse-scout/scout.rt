@@ -31,11 +31,11 @@ public class DesktopExtension extends AbstractDesktopExtension<AbstractDesktop> 
   @Override
   public void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) {
     super.execPageDetailFormChanged(chain, oldForm, newForm);
-    BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformPageDetailForm(newForm);
+    BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyPageDetailFormChanged(newForm);
   }
 
   @Override
   public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) {
-    BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformPageDetailTable(newTable);
+    BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyPageDetailTableChanged(newTable);
   }
 }

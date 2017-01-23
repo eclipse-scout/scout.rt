@@ -41,9 +41,11 @@ public interface IDeviceTransformer {
 
   void transformPage(IPage<?> page);
 
-  void transformPageDetailForm(IForm form);
+  void transformPageTable(ITable table, IPage<?> page);
 
-  void transformPageDetailTable(ITable table);
+  void notifyPageDetailFormChanged(IForm form);
+
+  void notifyPageDetailTableChanged(ITable table);
 
   void notifyFormDisposed(IForm form);
 

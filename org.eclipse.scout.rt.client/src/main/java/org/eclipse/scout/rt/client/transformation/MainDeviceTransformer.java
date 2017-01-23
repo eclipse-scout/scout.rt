@@ -197,24 +197,35 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void transformPageDetailForm(IForm form) {
+  public void transformPageTable(ITable table, IPage<?> page) {
+    if (!isActive()) {
+      return;
+    }
+
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.transformPageTable(table, page);
+    }
+  }
+
+  @Override
+  public void notifyPageDetailFormChanged(IForm form) {
     if (!isActive() || form == null || isFormExcluded(form)) {
       return;
     }
 
     for (IDeviceTransformer transformer : getTransformers()) {
-      transformer.transformPageDetailForm(form);
+      transformer.notifyPageDetailFormChanged(form);
     }
   }
 
   @Override
-  public void transformPageDetailTable(ITable table) {
+  public void notifyPageDetailTableChanged(ITable table) {
     if (!isActive() || table == null) {
       return;
     }
 
     for (IDeviceTransformer transformer : getTransformers()) {
-      transformer.transformPageDetailTable(table);
+      transformer.notifyPageDetailTableChanged(table);
     }
   }
 
@@ -269,5 +280,4 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   public DeviceTransformationConfig getDeviceTransformationConfig() {
     return null;
   }
-
 }

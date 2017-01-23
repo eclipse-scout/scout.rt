@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-//SONAR:OFF
 public class NullDeviceTransformer implements IDeviceTransformer {
 
   @Override
@@ -18,50 +17,67 @@ public class NullDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void dispose() {
+    // NOP
   }
 
   @Override
   public void setDesktop(IDesktop desktop) {
+    // NOP
   }
 
   @Override
   public void transformDesktop() {
+    // NOP
   }
 
   @Override
   public void transformForm(IForm form) {
+    // NOP
   }
 
   @Override
   public void transformFormField(IFormField field) {
+    // NOP
   }
 
   @Override
   public void transformOutline(IOutline outline) {
+    // NOP
   }
 
   @Override
   public void transformPage(IPage<?> page) {
+    // NOP
   }
 
   @Override
-  public void transformPageDetailForm(IForm form) {
+  public void transformPageTable(ITable table, IPage<?> page) {
+    // NOP
   }
 
   @Override
-  public void transformPageDetailTable(ITable table) {
+  public void notifyPageDetailFormChanged(IForm form) {
+    // NOP
+  }
+
+  @Override
+  public void notifyPageDetailTableChanged(ITable table) {
+    // NOP
   }
 
   @Override
   public void notifyFormDisposed(IForm form) {
+    // NOP
   }
 
   @Override
   public void notifyDesktopClosing() {
+    // NOP
   }
 
   @Override
   public void notifyPageSearchFormInit(IPageWithTable<ITable> page) {
+    // NOP
   }
 
   @Override
@@ -81,11 +97,11 @@ public class NullDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void gridDataRebuilt(IForm form) {
+    // NOP
   }
 
   @Override
   public DeviceTransformationConfig getDeviceTransformationConfig() {
     return null;
   }
-
 }

@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
+
   private IDesktop m_desktop;
   private Set<IForm> m_dirtyGridData = new HashSet<>();
   private DeviceTransformationConfig m_deviceTransformationConfig;
@@ -84,11 +85,15 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void transformPageDetailForm(IForm form) {
+  public void transformPageTable(ITable table, IPage<?> page) {
   }
 
   @Override
-  public void transformPageDetailTable(ITable table) {
+  public void notifyPageDetailFormChanged(IForm form) {
+  }
+
+  @Override
+  public void notifyPageDetailTableChanged(ITable table) {
   }
 
   @Override
@@ -112,5 +117,4 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   protected void markGridDataDirty(IForm form) {
     m_dirtyGridData.add(form);
   }
-
 }

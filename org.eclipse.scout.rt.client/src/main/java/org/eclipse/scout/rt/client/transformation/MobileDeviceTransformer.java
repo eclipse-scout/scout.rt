@@ -113,8 +113,11 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   public void transformPageWithTable(IPageWithTable page) {
     page.setLeaf(false);
     page.setAlwaysCreateChildPage(true);
+  }
 
-    for (ITableControl control : page.getTable().getTableControls()) {
+  @Override
+  public void transformPageTable(ITable table, IPage<?> page) {
+    for (ITableControl control : table.getTableControls()) {
       if (!(control instanceof SearchFormTableControl)) {
         // TODO CGU Maybe some controls could be useful, like group ware or tile preview, how to distinguish?
         control.setVisibleGranted(false);
@@ -123,7 +126,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  public void transformPageDetailForm(IForm form) {
+  public void notifyPageDetailFormChanged(IForm form) {
     // Detail forms will be displayed inside a page (tree node)
     // Make sure these inner forms are not scrollable because the outline already is
     IGroupBox mainBox = form.getRootGroupBox();
@@ -134,8 +137,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  public void transformPageDetailTable(ITable table) {
-    super.transformPageDetailTable(table);
+  public void notifyPageDetailTableChanged(ITable table) {
     IPage<?> activePage = getDesktop().getOutline().getActivePage();
     IPage<?> parentPage = activePage.getParentPage();
     if (parentPage == null) {
