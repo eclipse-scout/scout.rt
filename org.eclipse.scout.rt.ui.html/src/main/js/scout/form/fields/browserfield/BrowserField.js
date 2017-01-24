@@ -96,13 +96,13 @@ scout.BrowserField.prototype._renderScrollBarEnabled = function() {
     this.$field.toggleClass('no-scrolling', !this.scrollBarEnabled);
     // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
     // CSS should be enough. However, if the inner page sets 'overflow' to another value,
-    // scroll bars are shown again. Therefore, we add the legacy 'scrolling=no' attribute,
+    // scroll bars are shown again. Therefore, we add the legacy 'scrolling' attribute,
     // which is deprecated in HTML5, but seems to do the trick.
-    if (this.scrollBarEnabled) {
-      this.$field.removeAttr('scrolling');
-    } else {
-      this.$field.attr('scrolling', 'no');
-    }
+    this.$field.attr('scrolling', (this.scrollBarEnabled ? 'yes' : 'no'));
+
+    // re-render location otherwise the attribute change would have no effect, see
+    // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
+    this._renderLocation();
   }
 };
 
@@ -114,6 +114,9 @@ scout.BrowserField.prototype._renderSandboxEnabled = function() {
       this.$field.removeAttr('sandbox');
       this.$field.removeAttr('security');
     }
+    // re-render location otherwise the attribute change would have no effect, see
+    // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
+    this._renderLocation();
   }
 };
 
@@ -123,6 +126,9 @@ scout.BrowserField.prototype._renderSandboxPermissions = function() {
     if (scout.device.requiresIframeSecurityAttribute()) {
       this.$field.attr('security', 'restricted');
     }
+    // re-render location otherwise the attribute change would have no effect, see
+    // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
+    this._renderLocation();
   }
 };
 
