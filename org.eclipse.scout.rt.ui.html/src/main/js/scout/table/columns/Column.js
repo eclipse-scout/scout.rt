@@ -146,6 +146,8 @@ scout.Column.prototype._formatValue = function(value) {
  * Override this method to impl. type specific init cell behavior.
  */
 scout.Column.prototype._initCell = function(cellModel) {
+  // Apply defaultValues in remote mode (there will be no defaults in JS-only mode)
+  scout.defaultValues.applyTo(cellModel, 'Cell');
   // if cell does not define properties, use column values
   cellModel.cssClass = scout.nvl(cellModel.cssClass, this.cssClass);
   cellModel.editable = scout.nvl(cellModel.editable, this.editable);

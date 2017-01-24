@@ -28,7 +28,6 @@ scout.Cell.prototype.init = function(model) {
 
 scout.Cell.prototype._init = function(model) {
   $.extend(this, model);
-  scout.defaultValues.applyTo(this);
 };
 
 scout.Cell.prototype.update = function(model) {
