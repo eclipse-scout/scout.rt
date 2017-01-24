@@ -34,6 +34,7 @@ scout.Session = function() {
   this.forceNewClientSession = false;
   this.remote = false;
   this.remoteUrl = 'json';
+  this.unloadUrl = 'unload';
   this.modelAdapterRegistry = {};
   this.ajaxRequests = [];
   this.asyncEvents = [];
@@ -455,10 +456,7 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    var msg = new Blob([this._requestToJson(request)], {
-      type: 'application/json; charset=UTF-8'
-    });
-    navigator.sendBeacon(this._decorateUrl(this.remoteUrl, request), msg);
+    navigator.sendBeacon(this.unloadUrl + '/' + this.uiSessionId, '');
     return;
   }
 
