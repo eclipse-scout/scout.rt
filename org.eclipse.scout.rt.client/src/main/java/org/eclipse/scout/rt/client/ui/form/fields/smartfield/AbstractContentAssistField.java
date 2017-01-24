@@ -789,11 +789,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
     m_installingRowContext = true;
     try {
-      String text = row.getText();
-      if (!isMultilineText() && text != null) {
-        text = text.replaceAll("[\\n\\r]+", " ");
-      }
-      setDisplayText(text);
       if (StringUtility.hasText(row.getTooltipText())) {
         setTooltipText(row.getTooltipText());
       }
