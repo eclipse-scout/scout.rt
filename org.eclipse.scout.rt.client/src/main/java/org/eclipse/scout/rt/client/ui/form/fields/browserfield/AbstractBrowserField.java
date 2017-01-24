@@ -344,7 +344,8 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     return (Set<BinaryResource>) propertySupport.getProperty(PROP_ATTACHMENTS);
   }
 
-  protected void setScrollBarEnabled(boolean scrollBarEnabled) {
+  @Override
+  public void setScrollBarEnabled(boolean scrollBarEnabled) {
     propertySupport.setProperty(PROP_SCROLL_BAR_ENABLED, scrollBarEnabled);
   }
 
