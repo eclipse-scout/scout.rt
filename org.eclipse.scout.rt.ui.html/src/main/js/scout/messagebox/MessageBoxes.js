@@ -129,7 +129,7 @@ scout.MessageBoxes.prototype._headerTextForSeverity = function() {
 scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
   return new scout.MessageBoxes(parent)
     .withBody(bodyText)
-    .withYes()
+    .withYes(parent.session.text('Ok'))
     .withSeverity(severity)
     .buildAndOpen();
 };
