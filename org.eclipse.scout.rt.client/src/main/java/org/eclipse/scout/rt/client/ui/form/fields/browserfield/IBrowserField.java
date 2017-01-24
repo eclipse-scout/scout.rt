@@ -111,6 +111,8 @@ public interface IBrowserField extends IFormField {
    */
   Set<BinaryResource> getAttachments();
 
+  void setScrollBarEnabled(boolean scrollBarEnabled);
+
   boolean isScrollBarEnabled();
 
   /**
