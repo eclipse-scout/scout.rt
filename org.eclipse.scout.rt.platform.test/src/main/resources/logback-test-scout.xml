@@ -45,4 +45,5 @@
   </root>
 
   <logger name="org.quartz" level="WARN" />
+  <logger name="org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer" level="DEBUG" />
 </included>

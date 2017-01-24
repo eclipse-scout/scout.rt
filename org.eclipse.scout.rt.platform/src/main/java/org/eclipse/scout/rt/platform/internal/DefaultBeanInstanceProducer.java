@@ -12,20 +12,103 @@ package org.eclipse.scout.rt.platform.internal;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.PostConstruct;
+
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Default strategy for creating bean instances. Objects returned by {@link #produce(IBean)} are completely initialized
+ * (i.e. the constructor invocation as well as the invocation of every {@link PostConstruct} method have been
+ * completed). Further, beans annotated with {@link ApplicationScoped} are instantiated at most once (a bean that throws
+ * an exception during its instantiation is not considered instantiated).
+ * <p>
+ * The strategy keeps track of beans being created by the current thread so that circular dependencies are detected and
+ * reported by throwing a {@link BeanCreationException}.
+ * <p>
+ * This class is thread safe. Concurrent invocations of {@link #produce(IBean)} create multiple instances for
+ * non-application-scoped beans. In case of an application-scoped bean, only one thread creates the bean. Any other
+ * thread requesting the application-scoped instance is suspended until the creator thread completes or after waiting at
+ * most 90 seconds. Potential deadlocks are reported in the log and a {@link BeanCreationException} is thrown. Potential
+ * dead locks are logged after 5 seconds on level <code>WARN</code>, if the class' log level is <code>DEBUG</code>
+ * (speeds up identifying potential deadlocks during development) and another one is logged after waiting 90 seconds if
+ * the log level is <code>WARN</code>.
+ * <p>
+ * <b>Important 1:</b> Beans are discarded without any clean-up operations if the creation process throws any exception.
+ * The implementer of a bean's constructor and its {@link PostConstruct}-annotated methods is responsible for proper
+ * disposal of already bound resources.
+ * <p>
+ * <b>Important 2:</b> If the bean's initialization depends on (external) resources which might not be available at the
+ * time of construction and the initialization process waits until they are available, they should not be initialized in
+ * the constructor or in a {@link PostConstruct} annotated method. Other threads requesting the same bean would run into
+ * the potential deadlock detection and a {@link BeanCreationException} would be thrown. These resources should be
+ * lazily initialized using a synchronized "ensure-initialized" pattern.
+ * <p>
+ * <b>Ensure-initialized example:</b> A possible base implementation of the "ensure-initialized" pattern:
+ *
+ * <pre>
+ * &#64;ApplicationScoped
+ * public abstract class AbstractEnsureInitializedBean&lt;T&gt; {
+ *
+ *   private final FinalValue&lt;T&gt; m_resource = new FinalValue&lt;&gt;();
+ *
+ *   protected abstract T lazyInitResource() throws Exception;
+ *
+ *   protected T getResource() {
+ *     if (!m_resource.isSet()) {
+ *       synchronized (m_resource) {
+ *         m_resource.setIfAbsent(new Callable&lt;T&gt;() {
+ *           &#64;Override
+ *           public T call() throws Exception {
+ *             return lazyInitResource();
+ *           }
+ *         });
+ *       }
+ *     }
+ *     return m_resource.get();
+ *   }
+ * }
+ * </pre>
+ */
 public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultBeanInstanceProducer.class);
+
+  /**
+   * Default max wait time in seconds another thread will wait on the creator thread which is instantiating an
+   * application-scoped bean.
+   */
+  private static final int DEADLOCK_DETECTION_MAX_WAIT_TIME_SECONDS = 90;
+
+  /**
+   * Series of wait times in milliseconds any other thread will wait and check on the creator thread in a loop. The last
+   * entry will be used for any consecutive invocation of {@link Object#wait(long)}. Using short wait times at the
+   * beginning increases the response time.
+   */
+  private static final int[] DEADLOCK_DETECTION_WAIT_TIME_MILLIS = {50, 50, 50, 50, 200, 200, 200, 200, 500};
 
   /** Stack to keep track of beans being created to avoid circular dependencies */
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
 
   private final FinalValue<T> m_applicationScopedInstance = new FinalValue<>();
+  private final AtomicReference<Thread> m_creatorThread = new AtomicReference<>();
 
+  /**
+   * Creates a new instance for the given bean or returns the already created instance, if the bean is
+   * application-scoped.
+   *
+   * @return Returns an instance for the bean, never <code>null</code>.
+   */
   @Override
   public T produce(IBean<T> bean) {
     checkInstanciationInProgress(bean);
@@ -34,9 +117,7 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
       return getApplicationScopedInstance(bean);
     }
 
-    T beanInstance = safeCreateInstance(bean.getBeanClazz());
-    initializeBean(beanInstance);
-    return beanInstance;
+    return safeCreateInstance(bean.getBeanClazz());
   }
 
   /**
@@ -56,24 +137,128 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   }
 
   private T getApplicationScopedInstance(final IBean<T> bean) {
-    boolean created = m_applicationScopedInstance.setIfAbsent(new Callable<T>() {
-      @Override
-      public T call() {
-        return safeCreateInstance(bean.getBeanClazz());
-      }
-    });
-
-    if (created) {
-      initializeBean(m_applicationScopedInstance.get());
+    T instance = m_applicationScopedInstance.get();
+    if (instance != null) {
+      return instance;
     }
-    return m_applicationScopedInstance.get();
+
+    if (m_creatorThread.compareAndSet(null, Thread.currentThread())) {
+      // current thread has to create instance
+      try {
+        instance = safeCreateInstance(bean.getBeanClazz());
+        m_applicationScopedInstance.set(instance);
+        return instance;
+      }
+      finally {
+        // reset creator thread so that another one tries to create the bean again in case the current ran into an exception.
+        m_creatorThread.set(null);
+        // wake up other threads waiting on the application-scoped instance
+        synchronized (this) {
+          this.notifyAll();
+        }
+      }
+    }
+
+    // remember creator thread for logging purposes
+    final Thread creatorThread = m_creatorThread.get();
+    final int maxWaitTimeSeconds = getDeadlockDetectionMaxWaitTimeSeconds();
+    final long maxWaitEndTimeMillis = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(maxWaitTimeSeconds);
+    int retryCount = 0;
+    do {
+      int waitTimeMillis = nextWaitTimeMillis(retryCount);
+      try {
+        synchronized (this) {
+          // wait for the creator to complete, but not too long because the notify signal could have been missed
+          this.wait(waitTimeMillis);
+        }
+      }
+      catch (InterruptedException e) {
+        throw new ThreadInterruptedError("Thread has been interrupted");
+      }
+      if (retryCount == 12 && LOG.isDebugEnabled()) {
+        // log after 5 seconds if log level is DEBUG
+        logWarnPotentialDeadlock(creatorThread);
+      }
+      retryCount++;
+    }
+    while (m_creatorThread.get() != null && System.currentTimeMillis() < maxWaitEndTimeMillis); // try as long as the other thread is still creating the bean and the max wait time has not been elapsed
+
+    // check if bean has been created in the meantime
+    instance = m_applicationScopedInstance.get();
+    if (instance != null) {
+      return instance;
+    }
+
+    // bean has not been created
+    if (System.currentTimeMillis() < maxWaitEndTimeMillis) {
+      throw new BeanCreationException("Thread was waiting on bean instance creator thread which most likely failed (check the log).")
+          .withContextInfo("beanClass", bean == null || bean.getBeanClazz() == null ? "n/a" : bean.getBeanClazz().getName())
+          .withContextInfo("creatorThreadID", creatorThread == null ? "n/a" : creatorThread.getId())
+          .withContextInfo("creatorThreadName", creatorThread == null ? "n/a" : creatorThread.getName());
+    }
+    else {
+      logWarnPotentialDeadlock(creatorThread);
+      throw new BeanCreationException("Potential deadlock detected: bean is being created by another thread. Either the creation takes longer than {}s "
+          + "or the current and the creator threads are blocking each other (check the log).", maxWaitTimeSeconds)
+              .withContextInfo("beanClass", bean == null || bean.getBeanClazz() == null ? "n/a" : bean.getBeanClazz().getName())
+              .withContextInfo("creatorThreadID", creatorThread == null ? "n/a" : creatorThread.getId())
+              .withContextInfo("creatorThreadName", creatorThread == null ? "n/a" : creatorThread.getName());
+    }
   }
 
   /**
-   * Creates a new instance while keeping track of the classes instantiated during this process and ensuring that there
-   * are no circular dependencies. The bean is not initialized yet.
+   * @param retryCount
+   *          retry number (&gt;= 0)
+   * @return returns the wait time in milliseconds for the given retry count.
+   */
+  private int nextWaitTimeMillis(int retryCount) {
+    return retryCount >= DEADLOCK_DETECTION_WAIT_TIME_MILLIS.length
+        ? DEADLOCK_DETECTION_WAIT_TIME_MILLIS[DEADLOCK_DETECTION_WAIT_TIME_MILLIS.length - 1]
+        : DEADLOCK_DETECTION_WAIT_TIME_MILLIS[retryCount];
+  }
+
+  /**
+   * Logs the potential deadlock in which the current and the given creator threads are involved in.
+   */
+  private void logWarnPotentialDeadlock(final Thread creatorThread) {
+    if (!LOG.isWarnEnabled()) {
+      return;
+    }
+
+    final Thread current = Thread.currentThread();
+    StringBuilder threadInfos = new StringBuilder();
+    threadInfos.append("creator Thread: ");
+    if (creatorThread == null) {
+      threadInfos.append(" n/a");
+    }
+    else {
+      threadInfos.append(creatorThread.getId()).append(" - ").append(creatorThread.getName());
+      for (StackTraceElement traceElement : creatorThread.getStackTrace()) {
+        threadInfos.append("\n\tat ");
+        threadInfos.append(traceElement);
+      }
+    }
+    threadInfos.append("\ncurrent Thread: ");
+    threadInfos.append(current.getId()).append(" - ").append(current.getName());
+    int stackElement = -1;
+    for (StackTraceElement traceElement : current.getStackTrace()) {
+      stackElement++;
+      if (stackElement < 2) {
+        // ignore the first two method calls
+        continue;
+      }
+      threadInfos.append("\n\tat ");
+      threadInfos.append(traceElement);
+    }
+
+    LOG.warn("potential deadlock detected\n{}\n", threadInfos);
+  }
+
+  /**
+   * Creates and initializes a new instance while keeping track of the classes instantiated during this process and
+   * ensuring that there are no circular dependencies.
    *
-   * @return a new instance of the bean
+   * @return a new instance of the bean. Never <code>null</code>.
    */
   private T safeCreateInstance(Class<? extends T> beanClass) {
     Deque<String> stack = INSTANTIATION_STACK.get();
@@ -87,7 +272,9 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
 
     try {
       stack.addLast(beanClass.getName());
-      return createInstance(beanClass);
+      T instance = Assertions.assertNotNull(createInstance(beanClass));
+      initializeBean(instance);
+      return instance;
     }
     finally {
       if (removeStack) {
@@ -100,9 +287,19 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   }
 
   /**
+   * Max wait time in seconds another thread will wait on the creator thread which is instantiating an
+   * application-scoped bean. This default implementation returns 90s.
+   *
+   * @return Returns a positive integer value. The value should be grater than 1 second.
+   */
+  protected int getDeadlockDetectionMaxWaitTimeSeconds() {
+    return DEADLOCK_DETECTION_MAX_WAIT_TIME_SECONDS;
+  }
+
+  /**
    * Creates a new instance for a bean. May be called more than once per bean class even for application scoped beans.
    *
-   * @return new instance
+   * @return new instance. Never <code>null</code>.
    */
   protected T createInstance(Class<? extends T> beanClass) {
     return BeanInstanceUtil.createBean(beanClass);
@@ -114,5 +311,4 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   protected void initializeBean(T beanInstance) {
     BeanInstanceUtil.initializeBeanInstance(beanInstance);
   }
-
 }

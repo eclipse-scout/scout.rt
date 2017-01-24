@@ -17,16 +17,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
+
 /**
  * A class annotated with this annotation represents a Bean which is application scoped, meaning that that Bean only
  * exists once per application, or classloader. All classes marked with this annotation (or an annotation that has this
  * annotation) are automatically registered in the {@link IBeanManager}.
  * <p>
- * It does not ensure that the bean is constructed only once. For example multiple instances might be created if the
- * bean is requested at almost the same time by multiple threads. However always the same instance will be used within
- * the application (all other instances are discarded after construction and never used within the application). <br>
- * For initialization code that needs to be run exactly once, create a method annotated with @PostConstruct.
- * </p>
+ * It does not necessarily ensure that the bean is constructed only once. For example multiple instances might be
+ * created if the bean is requested at almost the same time by multiple threads. However always the same instance will
+ * be used within the application (all other instances are discarded after construction and never used within the
+ * application). For initialization code that needs to be run exactly once, create a method annotated
+ * with @PostConstruct. Details are documented on the {@link IBeanInstanceProducer} used when the bean is registered, by
+ * default {@link DefaultBeanInstanceProducer}.
+ *
+ * @see DefaultBeanInstanceProducer
  */
 @Bean
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})

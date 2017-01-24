@@ -10,46 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests for {@link DefaultBeanInstanceProducer} to make sure errors are thrown, if there are circular dependencies.
+ * Tests for {@link DefaultBeanInstanceProducer} to make sure errors are thrown, if there are circular dependencies
+ * (regardless of the circular dependency is created by constructor or {@link PostConstruct} annotated method
+ * invocations).
  */
 @RunWith(PlatformTestRunner.class)
 public class BeansWithCircularDependenciesTest {
 
-  private static Set<IBean<?>> s_beans;
-
-  @BeforeClass
-  public static void registerBeans() {
-    s_beans = new HashSet<IBean<?>>();
-    s_beans.add(Platform.get().getBeanManager().registerClass(ApplicationScopedBeanA.class));
-    s_beans.add(Platform.get().getBeanManager().registerClass(ApplicationScopedBeanB.class));
-    s_beans.add(Platform.get().getBeanManager().registerClass(ApplicationScopedBeanC.class));
-    s_beans.add(Platform.get().getBeanManager().registerClass(ApplicationScopedBeanD.class));
-    s_beans.add(Platform.get().getBeanManager().registerClass(ApplicationScopedBeanE.class));
-    s_beans.add(Platform.get().getBeanManager().registerClass(ApplicationScopedBeanF.class));
-  }
-
-  @AfterClass
-  public static void unregisterBeans() {
-    for (IBean<?> bean : s_beans) {
-      Platform.get().getBeanManager().unregisterBean(bean);
-    }
-  }
-
   @Test(timeout = 500, expected = BeanCreationException.class)
   public void testApplicationScopedWithDirectCircularDependency() {
     BEANS.get(ApplicationScopedBeanA.class);
+  }
+
+  @Test(timeout = 500, expected = BeanCreationException.class)
+  public void testApplicationScopedWithDirectCircularDependencyPostConstructToConstructor() {
+    BEANS.get(ApplicationScopedBeanADash.class);
   }
 
   @Test(timeout = 500, expected = BeanCreationException.class)
@@ -63,8 +47,33 @@ public class BeansWithCircularDependenciesTest {
   }
 
   @Test(timeout = 500, expected = BeanCreationException.class)
+  public void testDirectCircularDependencyPostConstructToConstructor() {
+    BEANS.get(BeanADash.class);
+  }
+
+  @Test(timeout = 500, expected = BeanCreationException.class)
   public void testIndirectCircularDependencyWithFourElements() {
     BEANS.get(BeanC.class);
+  }
+
+  @Test(timeout = 500, expected = BeanCreationException.class)
+  public void testApplicationScopedPostConstructedWithDirectCircularDependency() {
+    BEANS.get(ApplicationScopedBeanWithPostConstructA.class);
+  }
+
+  @Test(timeout = 500, expected = BeanCreationException.class)
+  public void testApplicationScopedPostConstructedWithIndirectCircularDependencyWithFourElements() {
+    BEANS.get(ApplicationScopedBeanWithPostConstructC.class);
+  }
+
+  @Test(timeout = 500, expected = BeanCreationException.class)
+  public void testPostConstructedDirectCircularDependency() {
+    BEANS.get(BeanWithPostConstructA.class);
+  }
+
+  @Test(timeout = 500, expected = BeanCreationException.class)
+  public void testPostConstructedIndirectCircularDependencyWithFourElements() {
+    BEANS.get(BeanWithPostConstructC.class);
   }
 
   @ApplicationScoped
@@ -78,6 +87,21 @@ public class BeansWithCircularDependenciesTest {
   public static class ApplicationScopedBeanB {
     public ApplicationScopedBeanB() {
       BEANS.get(ApplicationScopedBeanA.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanADash {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanBDash.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanBDash {
+    public ApplicationScopedBeanBDash() {
+      BEANS.get(ApplicationScopedBeanADash.class);
     }
   }
 
@@ -109,10 +133,73 @@ public class BeansWithCircularDependenciesTest {
     }
   }
 
+  @ApplicationScoped
+  public static class ApplicationScopedBeanWithPostConstructA {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanWithPostConstructB.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanWithPostConstructB {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanWithPostConstructA.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanWithPostConstructC {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanWithPostConstructD.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanWithPostConstructD {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanWithPostConstructE.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanWithPostConstructE {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanWithPostConstructF.class);
+    }
+  }
+
+  @ApplicationScoped
+  public static class ApplicationScopedBeanWithPostConstructF {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(ApplicationScopedBeanWithPostConstructC.class);
+    }
+  }
+
   @Bean
   public static class BeanA {
     public BeanA() {
       BEANS.get(BeanB.class);
+    }
+  }
+
+  @Bean
+  public static class BeanADash {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanBDash.class);
+    }
+  }
+
+  @Bean
+  public static class BeanBDash {
+    public BeanBDash() {
+      BEANS.get(BeanADash.class);
     }
   }
 
@@ -148,6 +235,54 @@ public class BeansWithCircularDependenciesTest {
   public static class BeanF {
     public BeanF() {
       BEANS.get(BeanC.class);
+    }
+  }
+
+  @Bean
+  public static class BeanWithPostConstructA {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanWithPostConstructB.class);
+    }
+  }
+
+  @Bean
+  public static class BeanWithPostConstructB {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanWithPostConstructA.class);
+    }
+  }
+
+  @Bean
+  public static class BeanWithPostConstructC {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanWithPostConstructD.class);
+    }
+  }
+
+  @Bean
+  public static class BeanWithPostConstructD {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanWithPostConstructE.class);
+    }
+  }
+
+  @Bean
+  public static class BeanWithPostConstructE {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanWithPostConstructF.class);
+    }
+  }
+
+  @Bean
+  public static class BeanWithPostConstructF {
+    @PostConstruct
+    private void postConstruct() {
+      BEANS.get(BeanWithPostConstructC.class);
     }
   }
 }
