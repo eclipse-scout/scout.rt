@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.integerfield;
+package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
