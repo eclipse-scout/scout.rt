@@ -460,8 +460,8 @@ scout.Device.prototype.getUnselectableAttribute = function() {
 };
 
 /**
- * Returns false for modern browsers, that support CSS table-cell properties restricted
- * with a max-width and hidden overflow. Returns true if an additional div level is required.
+ * Returns false for modern browsers, that support CSS table-cell properties restricted with a
+ * max-width and hidden overflow. Returns true if an additional div level is required (e.g. IE 9).
  */
 scout.Device.prototype.isTableAdditionalDivRequired = function() {
   return this.supportsFeature('_tableAdditionalDivRequired', function(property) {
@@ -472,9 +472,12 @@ scout.Device.prototype.isTableAdditionalDivRequired = function() {
       .css('display', 'table-cell')
       .css('max-width', '1px')
       .css('overflow', 'hidden');
-    var result = $test.width() > 1;
+    var w = $test.width();
     $test.remove();
-    return result;
+    // Expected width is 1px, however this value could be larger when the browser zoom level
+    // is not set to 100% (e.g. 1.6px). To be on the safe side, we use a threshold of 5px.
+    // (If max-width is not supported, the width of the test text will be > 30px.)
+    return (w > 5);
   }.bind(this));
 };
 
