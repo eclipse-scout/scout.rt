@@ -85,6 +85,7 @@ scout.PageWithTable.prototype._createChildPageInternal = function(row) {
     childPage = this.createDefaultChildPage(row);
   }
   scout.Page.linkRowWithPage(row, childPage);
+  childPage = childPage.updatePageFromTableRow(row);
   return childPage;
 };
 
