@@ -228,6 +228,7 @@
   __include("scout/desktop/DesktopLogo.js");
   __include("scout/desktop/DesktopKeyStroke.js");
   __include("scout/desktop/PopupWindow.js");
+  __include("scout/desktop/OpenUriHandler.js");
   __include("scout/tabbox/SimpleTabBoxController.js");
   __include("scout/tabbox/SimpleTabBox.js");
   __include("scout/tabbox/SimpleTabBoxLayout.js");

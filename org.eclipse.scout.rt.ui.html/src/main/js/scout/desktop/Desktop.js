@@ -22,6 +22,8 @@ scout.Desktop = function() {
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
+  this.openUriHandler;
+
   this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
@@ -35,6 +37,13 @@ scout.Desktop.DisplayStyle = {
   COMPACT: 'compact'
 };
 
+scout.Desktop.UriAction = {
+    DOWNLOAD: 'download',
+    OPEN: 'open',
+    NEW_WINDOW: 'newWindow',
+    SAME_WINDOW: 'sameWindow'
+  };
+
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
   this.formController = new scout.DesktopFormController(this, this.session);
@@ -45,6 +54,9 @@ scout.Desktop.prototype._init = function(model) {
   this.updateSplitterVisibility();
   this._syncViewButtons(this.viewButtons);
   this._syncMenus(this.menus);
+  this.openUriHandler = scout.create('OpenUriHandler', {
+    session: this.session
+  });
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -634,27 +646,6 @@ scout.Desktop.prototype.removePopupsFor = function(widget) {
   });
 };
 
-scout.Desktop.prototype._openUriInIFrame = function(uri) {
-  // Create a hidden iframe and set the URI as src attribute value
-  var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
-    .attr('tabindex', -1)
-    .attr('src', uri);
-
-  // Remove the iframe again after 10s (should be enough to get the download started)
-  setTimeout(function() {
-    $iframe.remove();
-  }, 10 * 1000);
-};
-
-scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
-    popup = popupBlockerHandler.openWindow(uri);
-
-  if (!popup) {
-    popupBlockerHandler.showNotification(uri);
-  }
-};
-
 scout.Desktop.prototype.bringOutlineToFront = function() {
   if (!this.inBackground || this.displayStyle === scout.Desktop.DisplayStyle.BENCH) {
     return;
@@ -951,40 +942,7 @@ scout.Desktop.prototype._onOpenUri = function(event) {
     this._postRenderActions.push(this._onOpenUri.bind(this, event));
     return;
   }
-
-  $.log.debug('(Desktop#_onOpenUri) uri=' + event.uri + ' action=' + event.action);
-  if (!event.uri) {
-    return;
-  }
-
-  if (event.action === 'download') {
-    if (scout.device.isIos()) {
-      // The iframe trick does not work for ios
-      // Since the file cannot be stored on the file system it will be shown in the browser if possible
-      // -> create a new window to not replace the existing content.
-      // Drawback: Popup-Blocker will show up
-      this._openUriAsNewWindow(event.uri);
-    } else if (scout.device.browser === scout.Device.Browser.CHROME) {
-      // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
-      window.location.assign(event.uri);
-    } else {
-      this._openUriInIFrame(event.uri);
-    }
-  } else if (event.action === 'open') {
-    if (scout.device.isIos()) {
-      // Open in same window.
-      // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
-      // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
-      window.location.href = event.uri;
-    } else if (scout.device.browser === scout.Device.Browser.CHROME) {
-      // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
-      window.location.assign(event.uri);
-    } else {
-      this._openUriInIFrame(event.uri);
-    }
-  } else if (event.action === 'newWindow') {
-    this._openUriAsNewWindow(event.uri);
-  }
+  this.openUriHandler.openUri(event.uri, event.action);
 };
 
 scout.Desktop.prototype._onOutlineChanged = function(event) {
