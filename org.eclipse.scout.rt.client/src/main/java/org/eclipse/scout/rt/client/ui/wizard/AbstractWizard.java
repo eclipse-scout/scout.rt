@@ -342,7 +342,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     interceptDecorateContainerForm();
 
     // Run the initialization on behalf of the container form.
-    ClientRunContexts.copyCurrent().withForm(m_containerForm).run(new IRunnable() {
+    runWithinContainerForm(new IRunnable() {
       @Override
       public void run() throws Exception {
         // steps
@@ -883,8 +883,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     setCloseTypeInternal(CloseType.Unknown);
 
     // Run the initialization on behalf of this Form.
-    ClientRunContexts.copyCurrent().withForm(m_containerForm).run(new IRunnable() {
-
+    runWithinContainerForm(new IRunnable() {
       @Override
       public void run() throws Exception {
         interceptStart();
@@ -972,7 +971,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doNextStep() {
     if (isOpen()) {
-      interceptNextStep();
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptNextStep();
+        }
+      });
     }
   }
 
@@ -982,7 +986,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doPreviousStep() {
     if (isOpen()) {
-      interceptPreviousStep();
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptPreviousStep();
+        }
+      });
     }
   }
 
@@ -992,8 +1001,13 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doFinish() {
     if (isOpen()) {
-      interceptFinish();
-      setCloseTypeInternal(CloseType.Finished);
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptFinish();
+          setCloseTypeInternal(CloseType.Finished);
+        }
+      });
     }
   }
 
@@ -1003,8 +1017,13 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doCancel() {
     if (isOpen()) {
-      interceptCancel();
-      setCloseTypeInternal(CloseType.Cancelled);
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptCancel();
+          setCloseTypeInternal(CloseType.Cancelled);
+        }
+      });
     }
   }
 
@@ -1014,8 +1033,13 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doSuspend() {
     if (isOpen()) {
-      interceptSuspend();
-      setCloseTypeInternal(CloseType.Suspended);
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptSuspend();
+          setCloseTypeInternal(CloseType.Suspended);
+        }
+      });
     }
   }
 
@@ -1024,20 +1048,35 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    */
   @Override
   public void doReset() {
-    interceptReset();
+    runWithinContainerForm(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        interceptReset();
+      }
+    });
   }
 
   @Override
-  public void doAppLinkAction(String ref) {
+  public void doAppLinkAction(final String ref) {
     if (isOpen()) {
-      interceptAppLinkAction(ref);
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptAppLinkAction(ref);
+        }
+      });
     }
   }
 
   @Override
-  public void doStepAction(IWizardStep<? extends IForm> step) {
+  public void doStepAction(final IWizardStep<? extends IForm> step) {
     if (isOpen()) {
-      interceptStepAction(step);
+      runWithinContainerForm(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          interceptStepAction(step);
+        }
+      });
     }
   }
 
@@ -1247,5 +1286,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardFinishChain chain = new WizardFinishChain(extensions);
     chain.execFinish();
+  }
+
+  protected void runWithinContainerForm(final IRunnable runnable) {
+    ClientRunContexts
+        .copyCurrent()
+        .withForm(getContainerForm())
+        .run(runnable);
   }
 }
