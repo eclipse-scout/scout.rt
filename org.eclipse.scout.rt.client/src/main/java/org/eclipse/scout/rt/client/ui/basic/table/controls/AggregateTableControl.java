@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("94a7bf28-8c9a-4b27-8edd-151c5620d987")
+@Order(600)
 public class AggregateTableControl extends AbstractTableControl implements IAggregateTableControl {
 
   public AggregateTableControl() {

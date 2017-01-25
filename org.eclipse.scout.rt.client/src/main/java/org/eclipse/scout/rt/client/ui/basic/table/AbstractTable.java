@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -4168,14 +4169,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     addTableControlInternal(control);
   }
 
-  @Override
-  public void addTableControl(int index, ITableControl control) {
-    m_tableControls.add(index, control);
-    addTableControlInternal(control);
-  }
-
   private void addTableControlInternal(ITableControl control) {
     ((AbstractTableControl) control).setTable(this);
+    Collections.sort(m_tableControls, new OrderedComparator());
     propertySupport.firePropertyChange(PROP_TABLE_CONTROLS, null, getTableControls());
   }
 

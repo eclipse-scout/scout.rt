@@ -1049,11 +1049,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * @since 5.1.0
    */
-  void addTableControl(int index, ITableControl control);
-
-  /**
-   * @since 5.1.0
-   */
   void removeTableControl(ITableControl control);
 
   /**

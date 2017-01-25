@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * @since 5.1.0
  */
 @ClassId("a5ec6d5d-1d49-4a83-932b-51935769d0c4")
+@Order(100)
 public class SearchFormTableControl extends AbstractFormTableControl {
 
   @Override
