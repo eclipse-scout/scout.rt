@@ -34,6 +34,22 @@ public final class CONFIG {
    *           if the property is invalid
    */
   public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) {
-    return BEANS.get(clazz).getValue();
+    return getPropertyValue(clazz, null);
+  }
+
+  /**
+   * Gets the configured value of the given {@link IConfigProperty}. If no value is configured the default of the
+   * property is returned ({@link IConfigProperty#getValue()}).
+   *
+   * @param clazz
+   *          the config class
+   * @param namespace
+   *          The namespace of the property value to get.
+   * @return The value of the given {@link IConfigProperty}.
+   * @throws PlatformException
+   *           if the property is invalid
+   */
+  public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, String namespace) {
+    return BEANS.get(clazz).getValue(namespace);
   }
 }

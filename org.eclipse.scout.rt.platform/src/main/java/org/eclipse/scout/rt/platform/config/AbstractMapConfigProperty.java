@@ -27,8 +27,8 @@ import java.util.Map;
 public abstract class AbstractMapConfigProperty extends AbstractConfigProperty<Map<String, String>, Map<String, String>> {
 
   @Override
-  public Map<String, String> getValue(String namespace) {
-    return parse(ConfigUtility.getPropertyMap(getKey(), getDefaultValue(), namespace));
+  public Map<String, String> readFromSource(String namespace) {
+    return ConfigUtility.getPropertyMap(getKey(), null, namespace);
   }
 
   @Override

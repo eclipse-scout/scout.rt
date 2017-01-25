@@ -80,4 +80,14 @@ public interface IConfigProperty<DATA_TYPE> {
    *          The new value.
    */
   void setValue(DATA_TYPE newValue);
+
+  /**
+   * Sets a new value to this config property.
+   *
+   * @param newValue
+   *          The new value.
+   * @param namespace
+   *          The namespace of the new value.
+   */
+  void setValue(DATA_TYPE newValue, String namespace);
 }
