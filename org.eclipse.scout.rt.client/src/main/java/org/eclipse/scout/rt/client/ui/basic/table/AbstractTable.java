@@ -1100,16 +1100,18 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setCheckableColumn(checkableColumn);
     }
 
-    // add listener to disable ui sort possible property if needed
-    PropertyChangeListener columnListener = new PropertyChangeListener() {
+    PropertyChangeListener columnVisibleListener = new PropertyChangeListener() {
 
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
+        // disable ui sort possible property if needed
         checkIfColumnPreventsUiSortForTable();
+        // prevent invisible context column (because the UI does not know of invisible columns)
+        checkIfContextColumnIsVisible();
       }
     };
     for (IColumn column : m_columnSet.getColumns()) {
-      column.addPropertyChangeListener(IColumn.PROP_VISIBLE, columnListener);
+      column.addPropertyChangeListener(IColumn.PROP_VISIBLE, columnVisibleListener);
     }
   }
 
@@ -4293,6 +4295,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     setUiSortPossible(true);
+  }
+
+  /**
+   * Checks if the context column is visible. If not, the context column is set to <code>null</code>.
+   */
+  protected void checkIfContextColumnIsVisible() {
+    IColumn<?> contextColumn = getContextColumn();
+    if (contextColumn != null && !contextColumn.isVisible()) {
+      setContextColumn(null);
+    }
   }
 
   /*

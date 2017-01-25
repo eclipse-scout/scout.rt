@@ -14,12 +14,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumnTest.TestDecorationTable.C1Column;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -273,6 +275,19 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
     ITableRow row = table.addRow();
     table.getC1Column().setValue(row, "newValue");
     assertEquals("newValue", table.getC1Column().getDisplayText(table.getRow(0)));
+  }
+
+  @Test
+  public void testInvisibleContextColumn() {
+    TestDecorationTable table = new TestDecorationTable();
+    table.addRowsByArray(new String[]{"a", "b"});
+    C1Column c1 = table.getC1Column();
+    assertTrue(c1.isVisible());
+    table.getUIFacade().setContextColumnFromUI(c1);
+    assertSame(c1, table.getContextColumn());
+
+    c1.setVisible(false);
+    assertNull(table.getContextColumn());
   }
 
   public class TestTable extends AbstractTable {
