@@ -22,24 +22,33 @@ scout.FormLifecycle.prototype.init = function(form) {
   this.markAsSaved();
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.doCancel = function() {
   var showMessageBox = this.requiresSave() && this.askSaveChanges;
   if (showMessageBox) {
-    this._showYesNoCancelMessageBox(
+    return this._showYesNoCancelMessageBox(
       this.askSaveChangesText,
       this.doOk.bind(this),
       this.doClose.bind(this));
   } else {
-    this.doFinally();
-    this.disposeForm();
+    return this.doClose();
   }
 };
 
+/**
+ * TODO [awe] 6.1 default impl. sollte form vom desktop entfernen
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.disposeForm = function() {
-  // FIXME [awe] 6.1 default impl. sollte form vom desktop entfernen
   this.events.trigger('disposeForm');
+  return $.resolvedPromise();
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.doReset = function() {
   throw new Error('doReset not implemented yet');
 };
@@ -47,72 +56,87 @@ scout.FormLifecycle.prototype.doReset = function() {
 /**
  * Helper function to deal with functions that return a Status object.
  * Makes it easier to return early when that function returns an invalid status (= less code to write).
+ *
+ * @returns {Promise}
  */
 scout.FormLifecycle.prototype._whenInvalid = function(func) {
-  var status = func.call(this);
-  if (!(status instanceof scout.Status)) {
-    throw new Error('Expected function to return a scout.Status object');
-  }
-  if (status.isValid()) {
-    return false;
-  }
-  this._showStatusMessageBox(status);
-  return true;
+  return func.call(this)
+    .then(function(status) {
+      if (!(status instanceof scout.Status)) {
+        throw new Error('Expected function to return a scout.Status object');
+      }
+      if (status.isValid()) {
+        return false;
+      }
+      return this._showStatusMessageBox(status)
+        .then(function(){
+          return true;
+        });
+    });
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.doOk = function() {
-  if (this._whenInvalid(this._validateForm)) {
-    return;
-  }
+  // 1.) validate form
+  return this._whenInvalid(this._validateForm)
+    .then(function(invalid) {
+      if (invalid) {
+        return;
+      }
 
-  if (this.requiresSave()) {
-    if (this._whenInvalid(this._save)) {
-      return;
-    }
-    this.markAsSaved();
-  }
+      // 2.) check if save is required
+      if (!this.requiresSave()) {
+        return this.doClose();
+      }
 
-  this.doFinally();
-  this.disposeForm();
+      // 3.) perform save operation
+      return this._whenInvalid(this._save)
+        .then(function(invalid) {
+          if (invalid) {
+            return;
+          }
+
+          this.markAsSaved();
+          return this.doClose();
+        }.bind(this))
+    }.bind(this));
 };
 
 scout.FormLifecycle.prototype._showYesNoCancelMessageBox = function(message, yesAction, noAction) {
-  var session = this.session();
-  var model = {
-    parent: this.form,
-    displayParent: this.form,
-    severity: scout.MessageBox.SEVERITY.WARNING,
-    header: message,
-    yesButtonText: session.text('Yes'),
-    noButtonText: session.text('No'),
-    cancelButtonText: session.text('Cancel')
-  };
-  var messageBox = scout.create('MessageBox', model);
-  messageBox.on('action', function(event) {
-    messageBox.close();
-    if (event.option === 'yes') {
-      yesAction();
-    } else if (event.option === 'no') {
-      noAction();
-    }
-  });
-  messageBox.open();
+  return new scout.MessageBoxes(this.form)
+    .withSeverity(scout.MessageBox.SEVERITY.WARNING)
+    .withHeader(message)
+    .withYes()
+    .withNo()
+    .withCancel()
+    .buildAndOpen()
+    .then(function(option) {
+      if (option === scout.MessageBox.Buttons.YES) {
+        return yesAction();
+      } else if (option === scout.MessageBox.Buttons.NO) {
+        return noAction();
+      }
+      return $.resolvedPromise();
+    });
 };
 
+/**
+ * @param status
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype._showStatusMessageBox = function(status) {
-  // FIXME [awe] 6.1 - make MessageBox easier to use in JS only case (like MessageBoxes in Java)
-  var model = {
-    parent: this.form,
-    displayParent: this.form,
-    severity: scout.MessageBox.SEVERITY.ERROR,
-    html: status.message,
-    yesButtonText: this.session().text('Ok')
-  };
-  var messageBox = scout.create('MessageBox', model);
-  messageBox.on('action', messageBox.close.bind(messageBox));
-  messageBox.open();
+  return new scout.MessageBoxes(this.form)
+    .withSeverity(scout.MessageBox.SEVERITY.ERROR)
+    .withBody(status.message, true)
+    .withYes(this.session().text('Ok'))
+    .buildAndOpen();
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype._validateForm = function() {
   var missingFields = [];
   var invalidFields = [];
@@ -122,7 +146,7 @@ scout.FormLifecycle.prototype._validateForm = function() {
     if (result.valid) {
       return;
     }
-    // when mandatory is not fullfilled, do not add to invalid fields
+    // when mandatory is not fulfilled, do not add to invalid fields
     if (!result.validByMandatory) {
       missingFields.push(field);
       return;
@@ -141,7 +165,7 @@ scout.FormLifecycle.prototype._validateForm = function() {
     status.message = this._createInvalidFieldsMessageHtml(missingFields, invalidFields);
   }
 
-  return status;
+  return $.resolvedPromise(status);
 };
 
 /**
@@ -173,27 +197,63 @@ scout.FormLifecycle.prototype._createInvalidFieldsMessageHtml = function(missing
   }
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype._defaultSave = function() {
-  return scout.Status.ok();
+  return $.resolvedPromise(scout.Status.ok());
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype._save = function() {
-  var status = this.handlers.save();
-  this.events.trigger('save');
-  return status;
+  return this.handlers.save()
+    .then(function(status) {
+      this.events.trigger('save');
+      return status;
+    }.bind(this));
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.doSave = function() {
-  throw new Error('doSave not implemented yet');
+  // 1.) validate form
+  return this._whenInvalid(this._validateForm)
+    .then(function(invalid) {
+
+      // 2.) invalid or form does has not been changed
+      if (invalid || !this.requiresSave()) {
+        return;
+      }
+
+      // 3.) perform save operation
+      return this._whenInvalid(this._save)
+        .then(function(invalid) {
+          if (invalid) {
+            return;
+          }
+
+          this.markAsSaved();
+        }.bind(this))
+    }.bind(this));
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.doClose = function() {
-  this.doFinally();
-  this.disposeForm();
+  return this.doFinally()
+    .then(this.disposeForm.bind(this));
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.FormLifecycle.prototype.doFinally = function() {
   this.events.trigger('finally');
+  return $.resolvedPromise();
 };
 
 scout.FormLifecycle.prototype.markAsSaved = function() {

@@ -90,7 +90,8 @@ scout.MessageBoxes.prototype.build = function() {
 };
 
 /**
- * @returns {Promise}
+ * @returns {Promise} resolved to selected button / option
+ * @see scout.MessageBox.Buttons
  */
 scout.MessageBoxes.prototype.buildAndOpen = function() {
   var def = $.Deferred();
