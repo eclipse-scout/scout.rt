@@ -63,7 +63,10 @@ public class ConfigPropertyTest {
     }
   }
 
-  private static final class TestIntegerListProperty extends AbstractConfigProperty<List<Integer>, List<String>> {
+  /**
+   * Property must be public because there are test-properties with that key!
+   */
+  public static final class TestIntegerListProperty extends AbstractConfigProperty<List<Integer>, List<String>> {
 
     @Override
     protected List<String> readFromSource(String namespace) {
