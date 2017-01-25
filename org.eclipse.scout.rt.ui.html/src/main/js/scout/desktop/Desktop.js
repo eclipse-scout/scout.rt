@@ -35,6 +35,8 @@ scout.Desktop = function() {
   this.notifications = [];
   this.inBackground = false;
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
+  this.openUriHandler;
+
   this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
@@ -66,6 +68,9 @@ scout.Desktop.prototype._init = function(model) {
   this.resolveTextKeys(['title']);
   this._setViewButtons(this.viewButtons);
   this._setMenus(this.menus);
+  this.openUriHandler = scout.create('OpenUriHandler', {
+    session: this.session
+  });
 };
 
 /**
@@ -617,68 +622,7 @@ scout.Desktop.prototype.openUri = function(uri, action) {
     this._postRenderActions.push(this.openUri.bind(this, uri, action));
     return;
   }
-
-  $.log.debug('(Desktop#openUri) uri=' + uri + ' action=' + action);
-  if (!uri) {
-    return;
-  }
-  action = scout.nvl(action, scout.Desktop.UriAction.OPEN);
-
-  if (action === scout.Desktop.UriAction.DOWNLOAD) {
-    if (scout.device.isIos()) {
-      // The iframe trick does not work for ios
-      // Since the file cannot be stored on the file system it will be shown in the browser if possible
-      // -> create a new window to not replace the existing content.
-      // Drawback: Popup-Blocker will show up
-      this._openUriAsNewWindow(uri);
-    } else if (scout.device.browser === scout.Device.Browser.CHROME) {
-      // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
-      this._openUriInSameWindow(uri);
-    } else {
-      this._openUriInIFrame(uri);
-    }
-  } else if (action === scout.Desktop.UriAction.OPEN) {
-    if (scout.device.isIos()) {
-      // Open in same window.
-      // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
-      // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
-      this._openUriInSameWindow(uri);
-    } else if (scout.device.browser === scout.Device.Browser.CHROME) {
-      // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
-      this._openUriInSameWindow(uri);
-    } else {
-      this._openUriInIFrame(uri);
-    }
-  } else if (action === scout.Desktop.UriAction.NEW_WINDOW) {
-    this._openUriAsNewWindow(uri);
-  } else if (action === scout.Desktop.UriAction.SAME_WINDOW) {
-    this._openUriInSameWindow(uri);
-  }
-};
-
-scout.Desktop.prototype._openUriInSameWindow = function(uri) {
-  window.location.assign(uri);
-};
-
-scout.Desktop.prototype._openUriInIFrame = function(uri) {
-  // Create a hidden iframe and set the URI as src attribute value
-  var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
-    .attr('tabindex', -1)
-    .attr('src', uri);
-
-  // Remove the iframe again after 10s (should be enough to get the download started)
-  setTimeout(function() {
-    $iframe.remove();
-  }, 10 * 1000);
-};
-
-scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
-    popup = popupBlockerHandler.openWindow(uri);
-
-  if (!popup) {
-    popupBlockerHandler.showNotification(uri);
-  }
+  this.openUriHandler.openUri(uri, action);
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function() {
