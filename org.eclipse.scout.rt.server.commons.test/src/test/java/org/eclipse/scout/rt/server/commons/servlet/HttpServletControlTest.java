@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 /**
@@ -57,7 +58,7 @@ public class HttpServletControlTest {
 
   protected void runTestSetResponseHeader(boolean mshtml, boolean cspEnabled, String method, boolean expectCspHeader) {
     CspEnabledProperty cspProperty = Mockito.mock(CspEnabledProperty.class);
-    Mockito.when(cspProperty.getValue()).thenReturn(cspEnabled);
+    Mockito.when(cspProperty.getValue(Matchers.anyString())).thenReturn(cspEnabled);
     s_beans.add(TestingUtility.registerBean(new BeanMetaData(CspEnabledProperty.class, cspProperty)));
 
     HttpClientInfo httpClientInfo = Mockito.mock(HttpClientInfo.class);

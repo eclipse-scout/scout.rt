@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 /**
@@ -48,7 +49,7 @@ public class BinaryServiceTunnelContentHandlerTest {
       BEANS.getBeanManager().unregisterBean(iBean);
     }
     m_compressProperty = Mockito.mock(IConfigProperty.class);
-    Mockito.when(m_compressProperty.getValue()).thenReturn(true);
+    Mockito.when(m_compressProperty.getValue(Matchers.anyString())).thenReturn(true);
     m_serviceReg = TestingUtility.registerBean(new BeanMetaData(CompressServiceTunnelRequestProperty.class, m_compressProperty));
   }
 
@@ -96,7 +97,7 @@ public class BinaryServiceTunnelContentHandlerTest {
     bos.close();
     int sizeCompressed = bos.size();
 
-    Mockito.when(m_compressProperty.getValue()).thenReturn(Boolean.FALSE);
+    Mockito.when(m_compressProperty.getValue(Matchers.anyString())).thenReturn(Boolean.FALSE);
 
     handler = new BinaryServiceTunnelContentHandler();
     handler.initialize();
@@ -120,7 +121,7 @@ public class BinaryServiceTunnelContentHandlerTest {
     bos.close();
     int sizeCompressed = bos.size();
 
-    Mockito.when(m_compressProperty.getValue()).thenReturn(Boolean.FALSE);
+    Mockito.when(m_compressProperty.getValue(Matchers.anyString())).thenReturn(Boolean.FALSE);
 
     handler = new BinaryServiceTunnelContentHandler();
     handler.initialize();
