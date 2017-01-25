@@ -307,6 +307,9 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
+  /**
+   * Handle "?unload" JSON requests from browsers that don't support the Beacon API. @see {@link UnloadRequestHandler}
+   */
   protected void handleUnloadRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     LOG.info("Unloading UI session with ID {} (requested by UI)", jsonReq.getUiSessionId());
     if (uiSession != null) {

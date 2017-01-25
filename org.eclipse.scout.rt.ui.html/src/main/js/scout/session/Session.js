@@ -73,6 +73,7 @@ scout.Session.prototype.init = function(model) {
   this.unloaded = false; // true after unload event has been received from the window
   this.desktop;
   this.url = 'json';
+  this.unloadUrl = 'unload';
   this._adapterDataCache = {};
   this._texts = new scout.Texts();
   this._requestsPendingCounter = 0;
@@ -407,10 +408,7 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    var msg = new Blob([this._requestToJson(request)], {
-      type: 'application/json; charset=UTF-8'
-    });
-    navigator.sendBeacon(this._decorateUrl(this.url, request), msg);
+    navigator.sendBeacon(this.unloadUrl + '/' + this.uiSessionId, '');
     return;
   }
 
