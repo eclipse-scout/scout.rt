@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
@@ -41,4 +42,6 @@ public interface IPageExtension<OWNER extends AbstractPage> extends ITreeNodeExt
   void execInitTable(PageInitTableChain chain);
 
   void execDetailFormActivated(PageDetailFormActivatedChain chain);
+
+  boolean execCalculateVisible(PageCalculateVisibleChain chain);
 }

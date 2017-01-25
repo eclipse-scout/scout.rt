@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -45,7 +44,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -609,7 +608,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public static void setVisiblePermission(Permission p, ITreeNode node) {
     boolean visible = true;
     if (p != null) {
-      visible = BEANS.get(IAccessControlService.class).checkPermission(p);
+      visible = ACCESS.check(p);
     }
     node.setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
@@ -667,7 +666,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public static void setEnabledPermission(Permission p, ITreeNode node) {
     boolean enabled = true;
     if (p != null) {
-      enabled = BEANS.get(IAccessControlService.class).checkPermission(p);
+      enabled = ACCESS.check(p);
     }
     node.setEnabled(enabled, IDimensions.ENABLED_GRANTED);
   }

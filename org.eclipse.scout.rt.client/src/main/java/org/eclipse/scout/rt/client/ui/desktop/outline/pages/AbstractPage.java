@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
@@ -63,10 +64,12 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
@@ -327,6 +330,21 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
+   * Called during the permission check for this page. The returned value will be used to determine the visibleGranted
+   * Property of this page. Depending on the context this page is used, this method is called on initialization or
+   * before it's data is loaded. Subclasses can change the default behavior (on initialization / early) by overriding
+   * {@link #isCalculateVisibleLate()}.
+   *
+   * @see #calculateVisibleInternal()
+   * @return
+   */
+  @ConfigOperation
+  @Order(100)
+  protected boolean execCalculateVisible() {
+    return true;
+  }
+
+  /**
    * Called after this page has been added to the outline tree. This method may set a detail form or check some
    * parameters.
    * <p>
@@ -505,10 +523,40 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         cell.setIconId(getConfiguredIconId());
       }
       interceptInitPage();
+      // early permission check is done on initialization
+      if (!doCalculateVisibleLate()) {
+        calculateVisibleInternal();
+      }
     }
     finally {
       setInitializing(false);
     }
+  }
+
+  /**
+   * Override this method to control when permission checks for child pages should be executed. Default is {@code false}
+   * to perform permission checks on initialization.
+   *
+   * @return {@code true} for a late (before loading data), {@code false} for an early (on initialization) permission
+   *         check
+   */
+  protected boolean isCalculateVisibleLate() {
+    return false;
+  }
+
+  protected boolean doCalculateVisibleLate() {
+    IPage<?> parentPage = getParentPage();
+    if (parentPage instanceof AbstractPage<?>) {
+      return ((AbstractPage<?>) parentPage).isCalculateVisibleLate();
+    }
+    return false;
+  }
+
+  /**
+   * Do not use this internal method
+   */
+  protected void calculateVisibleInternal() {
+    setVisibleGranted(isVisible() && interceptCalculateVisible());
   }
 
   /**
@@ -867,8 +915,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public void loadChildren() {
+    if (doCalculateVisibleLate()) {
+      // late permission check is done just before loading the data to avoid unnecessary load operations
+      calculateVisibleInternal();
+    }
+    if (!isVisible()) {
+      throw new VetoException(TEXTS.get("ErrorTitleSecurity"));
+    }
     super.loadChildren();
+    loadChildrenImpl();
     interceptPageDataLoaded();
+  }
+
+  protected void loadChildrenImpl() {
   }
 
   @Override
@@ -986,6 +1045,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     chain.execDetailFormActivated();
   }
 
+  protected final boolean interceptCalculateVisible() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageCalculateVisibleChain chain = new PageCalculateVisibleChain(extensions);
+    return chain.execCalculateVisible();
+  }
+
   /**
    * Adapter listener that delegates NODE_UPDATED tree events to pageChanged events
    */
@@ -1048,6 +1113,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     @Override
     public void execDetailFormActivated(PageDetailFormActivatedChain chain) {
       getOwner().execDetailFormActivated();
+    }
+
+    @Override
+    public boolean execCalculateVisible(PageCalculateVisibleChain chain) {
+      return getOwner().execCalculateVisible();
     }
   }
 

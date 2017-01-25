@@ -181,4 +181,22 @@ public final class PageChains {
       callChain(methodInvocation);
     }
   }
+
+  public static class PageCalculateVisibleChain extends AbstractPageChain {
+
+    public PageCalculateVisibleChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public boolean execCalculateVisible() {
+      MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
+        @Override
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
+          setReturnValue(next.execCalculateVisible(PageCalculateVisibleChain.this));
+        }
+      };
+      callChain(methodInvocation);
+      return methodInvocation.getReturnValue();
+    }
+  }
 }

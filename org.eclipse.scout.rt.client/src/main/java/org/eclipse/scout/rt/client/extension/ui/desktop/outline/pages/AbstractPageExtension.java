@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
@@ -71,5 +72,10 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
   @Override
   public void execDetailFormActivated(PageDetailFormActivatedChain chain) {
     chain.execDetailFormActivated();
+  }
+
+  @Override
+  public boolean execCalculateVisible(PageCalculateVisibleChain chain) {
+    return chain.execCalculateVisible();
   }
 }

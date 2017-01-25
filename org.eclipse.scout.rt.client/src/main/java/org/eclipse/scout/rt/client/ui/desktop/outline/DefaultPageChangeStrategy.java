@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 public class DefaultPageChangeStrategy implements IPageChangeStrategy {
 
   @Override
-  public void pageChanged(IOutline outline, IPage<?> deselectedPage, IPage<?> selectedPage) {
+  public void pageChanged(final IOutline outline, final IPage<?> deselectedPage, final IPage<?> selectedPage) {
     if (outline == null) {
       return;
     }
@@ -49,7 +49,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
         IPageWithTable tablePage = (IPageWithTable) activePage;
         detailForm = activePage.getDetailForm();
         if (activePage.isTableVisible()) {
-          detailTable = tablePage.getTable();
+          detailTable = tablePage.getTable(false);
         }
         if (tablePage.isSearchActive()) {
           searchForm = tablePage.getSearchFormInternal();
@@ -61,7 +61,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
           detailForm = activePage.getDetailForm();
         }
         if (activePage.isTableVisible()) {
-          detailTable = nodePage.getTable();
+          detailTable = nodePage.getTable(false);
         }
       }
     }

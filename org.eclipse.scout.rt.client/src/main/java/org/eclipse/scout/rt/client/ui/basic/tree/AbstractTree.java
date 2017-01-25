@@ -1258,18 +1258,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setNodeExpandedInternal(ITreeNode node, boolean b, boolean lazy) {
-    try {
-      if (b) {
-        node.ensureChildrenLoaded();
-        ensureParentExpanded(node.getParentNode());
-      }
-      node.setExpandedInternal(b);
-      node.setExpandedLazyInternal(lazy);
-      fireNodeExpanded(node, b);
+    if (b) {
+      node.ensureChildrenLoaded();
+      ensureParentExpanded(node.getParentNode());
     }
-    catch (RuntimeException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
+    node.setExpandedInternal(b);
+    node.setExpandedLazyInternal(lazy);
+    fireNodeExpanded(node, b);
   }
 
   @Override

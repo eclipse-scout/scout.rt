@@ -180,7 +180,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    * load tree children and fill table
    */
   @Override
-  public void loadChildren() {
+  protected void loadChildrenImpl() {
     List<IPage<?>> pageList = new ArrayList<IPage<?>>();
     createChildPagesInternal(pageList);
     // load tree
@@ -255,8 +255,6 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     finally {
       getTable().setTableChanging(false);
     }
-
-    super.loadChildren();
   }
 
   @Override

@@ -121,6 +121,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     setExpandedInternal(getConfiguredExpanded());
   }
 
+  /**
+   * Every child page of a table page is being initialized when loading the table page. Since a table can contain large
+   * numbers of children, potentially expensive permission checks must be performed late (before loading the data).
+   */
+  @Override
+  protected boolean isCalculateVisibleLate() {
+    return true;
+  }
+
   /*
    * Configuration
    */
@@ -760,7 +769,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * when the table is loaded and this node is not a leaf node then the table rows are mirrored in child nodes
    */
   @Override
-  public final void loadChildren() {
+  protected final void loadChildrenImpl() {
     ITree tree = getTree();
     try {
       if (tree != null) {
@@ -844,7 +853,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (desktop != null) {
       desktop.afterTablePageLoaded(this);
     }
-    super.loadChildren();
   }
 
   @Override
