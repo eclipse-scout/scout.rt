@@ -27,12 +27,12 @@ public class ResourceLoaders {
       return new DynamicResourceLoader(req);
     }
     if (resourcePath.endsWith(".js") || resourcePath.endsWith(".css")) {
-      String theme = UiThemeUtility.getThemeForLookup(req);
+      String theme = UiThemeUtility.getTheme(req);
       boolean minify = UrlHints.isMinifyHint(req);
       return new ScriptFileLoader(theme, minify);
     }
     if (resourcePath.endsWith(".html")) {
-      String theme = UiThemeUtility.getThemeForLookup(req);
+      String theme = UiThemeUtility.getTheme(req);
       boolean minify = UrlHints.isMinifyHint(req);
       boolean cacheEnabled = UrlHints.isCacheHint(req);
       return new HtmlFileLoader(theme, minify, cacheEnabled);
