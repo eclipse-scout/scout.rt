@@ -40,9 +40,10 @@ public final class UiThemeUtility {
   }
 
   /**
-   * Only read configuration for UI theme once.
+   * @return the value of the config property {@link UiThemeProperty}.
    */
   public static String getConfiguredTheme() {
+    // Only read configuration for UI theme once.
     if (s_configThemeRead) {
       return s_configTheme;
     }
@@ -55,9 +56,11 @@ public final class UiThemeUtility {
   }
 
   /**
-   * When theme is set to 'default' we return null instead. This is required because we cannot set the theme to 'null'
-   * with a request-parameter (because when a request-parameter return null it means the parameter is not set). Thus we
-   * send ?theme=default to set the theme to null (which is means Scout loads the default-theme).
+   * Returns the theme for the current request. If neither the session or the theme cookie provide a value, the
+   * configured default theme is returned. Thus, the return value is never <code>null</code>. This is required because
+   * we cannot set the theme to 'null' with a request-parameter (because when a request-parameter return null it means
+   * the parameter is not set). Thus we send ?theme=default to set the theme to null (which is means Scout loads the
+   * default theme).
    */
   public static String getTheme(HttpServletRequest req) {
     String theme = null;
@@ -79,7 +82,9 @@ public final class UiThemeUtility {
     }
 
     // 3rd - use theme configured in config.properties or 'default'
-    theme = defaultIfNull(theme);
+    if (theme == null) {
+      theme = getConfiguredTheme();
+    }
 
     // store theme in session so we must not check 2 and 3 again for the next requests
     if (session != null && ObjectUtility.notEquals(theme, themeFromSession)) {
@@ -90,41 +95,27 @@ public final class UiThemeUtility {
   }
 
   /**
-   * When theme is set to 'default', we want to lookup 'colors.css' and not 'colors-default.css'. That's why this method
-   * returns null in that case.
-   */
-  public static String getThemeForLookup(HttpServletRequest req) {
-    return getThemeName(getTheme(req));
-  }
-
-  /**
-   * @return the given theme name or null if the theme name is null or equal to 'default'.
-   */
-  public static String getThemeName(String theme) {
-    if (UiThemeProperty.DEFAULT_THEME.equals(theme)) {
-      return null;
-    }
-    return theme;
-  }
-
-  /**
    * @param resp
    *          May be null, since this method can be called during a client-job, when no response is available. In that
    *          case no cookie is written.
    * @param session
    *          HTTP session
    * @param theme
-   *          (<code>null</code> will reset the theme to the configured theme)
+   *          <code>null</code> will reset the theme to the configured theme
    */
   public static void storeTheme(HttpServletResponse resp, HttpSession session, String theme) {
-    theme = defaultIfNull(theme);
+    theme = ObjectUtility.nvl(theme, UiThemeUtility.getConfiguredTheme());
     if (resp != null) {
       CookieUtility.addPersistentCookie(resp, THEME_COOKIE_NAME, theme);
     }
     session.setAttribute(THEME_SESSION_ATTRIBUTE, theme);
   }
 
-  public static String defaultIfNull(String theme) {
-    return theme == null ? getConfiguredTheme() : theme;
+  /**
+   * @return <code>true</code> if the given theme is equal to 'default'. Note that this is <b>not</b> the same as
+   *         checking for equality to {@link #getConfiguredTheme()}!
+   */
+  public static boolean isDefaultTheme(String theme) {
+    return ObjectUtility.equals(theme, UiThemeProperty.DEFAULT_THEME);
   }
 }

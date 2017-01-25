@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -140,7 +141,8 @@ public class ScriptFileBuilder {
   }
 
   protected ScriptSource locateFragmentScript(String fragmentPath, FileType fileType) {
-    if (FileType.STYLESHEET == fileType && m_theme != null) {
+    // When the theme is set to something other than 'default', check if a file 'colors-<theme>.less' exists.
+    if (FileType.STYLESHEET == fileType && !UiThemeUtility.isDefaultTheme(m_theme)) {
       String[] parts = FileUtility.getFilenameParts(fragmentPath);
       String themeFragmentPath = parts[0] + "-" + m_theme + (parts[1] == null ? "" : "." + parts[1]);
       URL url = m_resourceLocator.getScriptSource(themeFragmentPath);

@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -356,8 +357,8 @@ public class UiSession implements IUiSession {
    *         has been initialized)
    */
   protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
-    String modelTheme = UiThemeUtility.defaultIfNull(m_clientSession.getDesktop().getTheme());
-    String currentTheme = UiThemeUtility.defaultIfNull(UiThemeUtility.getTheme(req));
+    String modelTheme = ObjectUtility.nvl(m_clientSession.getDesktop().getTheme(), UiThemeUtility.getConfiguredTheme());
+    String currentTheme = UiThemeUtility.getTheme(req);
     boolean reloadPage = !modelTheme.equals(currentTheme);
     UiThemeUtility.storeTheme(resp, httpSession, modelTheme);
     LOG.debug("UI theme model={} current={} reloadPage={}", modelTheme, currentTheme, reloadPage);
