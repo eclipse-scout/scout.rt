@@ -66,7 +66,7 @@ describe('FormLifecycle', function() {
       field.setValue('Foo');
       form.lifecycle.handle('save', function() {
         saved = true;
-        return scout.Status.ok();
+        return $.resolvedPromise(scout.Status.ok());
       });
       form.lifecycle.doOk();
       expectMessageBox(false);

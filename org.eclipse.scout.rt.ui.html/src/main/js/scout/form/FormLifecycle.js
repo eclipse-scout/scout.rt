@@ -72,7 +72,7 @@ scout.FormLifecycle.prototype._whenInvalid = function(func) {
         .then(function(){
           return true;
         });
-    });
+    }.bind(this));
 };
 
 /**
