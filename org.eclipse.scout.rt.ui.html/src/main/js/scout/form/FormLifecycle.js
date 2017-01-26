@@ -1,6 +1,6 @@
 scout.FormLifecycle = function() {
   this.askSaveChanges = true;
-  this.askSaveChangesText; // Java: cancelVerificationText
+  this.askSaveChangesText = null; // Java: cancelVerificationText
   this.events = new scout.EventSupport();
   this.handlers = {
     'save': this._defaultSave.bind(this)
@@ -100,7 +100,7 @@ scout.FormLifecycle.prototype.doOk = function() {
 
           this.markAsSaved();
           return this.doClose();
-        }.bind(this))
+        }.bind(this));
     }.bind(this));
 };
 
@@ -236,7 +236,7 @@ scout.FormLifecycle.prototype.doSave = function() {
           }
 
           this.markAsSaved();
-        }.bind(this))
+        }.bind(this));
     }.bind(this));
 };
 
