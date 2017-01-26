@@ -357,8 +357,12 @@ public class UiSession implements IUiSession {
    *         has been initialized)
    */
   protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
-    String modelTheme = ObjectUtility.nvl(m_clientSession.getDesktop().getTheme(), UiThemeUtility.getConfiguredTheme());
+    String modelTheme = m_clientSession.getDesktop().getTheme();
     String currentTheme = UiThemeUtility.getTheme(req);
+    if (modelTheme == null) {
+      modelTheme = ObjectUtility.nvl(currentTheme, UiThemeUtility.getConfiguredTheme());
+      m_clientSession.getDesktop().setTheme(currentTheme);
+    }
     boolean reloadPage = !modelTheme.equals(currentTheme);
     UiThemeUtility.storeTheme(resp, httpSession, modelTheme);
     LOG.debug("UI theme model={} current={} reloadPage={}", modelTheme, currentTheme, reloadPage);
