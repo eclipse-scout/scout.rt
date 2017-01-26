@@ -163,6 +163,7 @@
   __include("scout/calendar/CalendarModesMenu.js");
   __include("scout/calendar/DateRange.js");
   __include("scout/calendar/YearPanel.js");
+  __include("scout/lifecycle/AbstractLifecycle.js");
   __include("scout/planner/Planner.js");
   __include("scout/planner/PlannerAdapter.js");
   __include("scout/planner/PlannerHeader.js");

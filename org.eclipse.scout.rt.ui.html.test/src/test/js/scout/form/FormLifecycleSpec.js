@@ -22,7 +22,7 @@ describe('FormLifecycle', function() {
     helper = new scout.FormSpecHelper(session);
 
     form = helper.createFormWithOneField();
-    form.lifecycle = scout.create('FormLifecycle', form);
+    form.lifecycle = scout.create('FormLifecycle', {widget: form});
     field = form.rootGroupBox.fields[0];
     form.render(session.$entryPoint);
   });
@@ -40,9 +40,9 @@ describe('FormLifecycle', function() {
       expectMessageBox(true);
     });
 
-    it('triggers disposeForm event after cancel', function() {
+    it('triggers disposeWidget event after cancel', function() {
       var disposed = false;
-      form.lifecycle.on('disposeForm', function() {
+      form.lifecycle.on('disposeWidget', function() {
         disposed = true;
       });
       form.lifecycle.doCancel();
@@ -83,7 +83,7 @@ describe('FormLifecycle', function() {
       var invalidField = helper.createField('StringField', session.desktop);
       invalidField.setLabel('BarField');
       var invalidFields = [invalidField];
-      var html = form.lifecycle._createInvalidFieldsMessageHtml(missingFields, invalidFields);
+      var html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
       expect(html).toContain('FooField');
       expect(html).toContain('BarField');
     });
