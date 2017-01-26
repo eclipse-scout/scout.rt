@@ -252,6 +252,90 @@ public class AbstractTreeTest {
     }
   }
 
+  @Test
+  public void testExpandCollapse() {
+    // A
+    // +-B
+    // | +-C
+    // | | +-D
+    // | +-E
+    // +-F
+    //   +-G
+    ITreeNode a = new P_TreeNode("A");
+    ITreeNode b = new P_TreeNode("B");
+    ITreeNode c = new P_TreeNode("C");
+    ITreeNode d = new P_TreeNode("D");
+    ITreeNode e = new P_TreeNode("E");
+    ITreeNode f = new P_TreeNode("F");
+    ITreeNode g = new P_TreeNode("G");
+    m_tree.addChildNode(m_tree.getRootNode(), a);
+    m_tree.addChildNode(a, b);
+    m_tree.addChildNode(a, f);
+    m_tree.addChildNode(b, c);
+    m_tree.addChildNode(b, e);
+    m_tree.addChildNode(c, d);
+    m_tree.addChildNode(f, g);
+
+    // In the beginning, everything is collapsed
+    assertFalse(a.isExpanded());
+    assertFalse(b.isExpanded());
+    assertFalse(c.isExpanded());
+    assertFalse(d.isExpanded());
+    assertFalse(e.isExpanded());
+    assertFalse(f.isExpanded());
+    assertFalse(g.isExpanded());
+
+    // Expand tree recursively --> all nodes should be expanded
+    m_tree.expandAll(m_tree.getRootNode());
+    assertTrue(a.isExpanded());
+    assertTrue(b.isExpanded());
+    assertTrue(c.isExpanded());
+    assertTrue(d.isExpanded());
+    assertTrue(e.isExpanded());
+    assertTrue(f.isExpanded());
+    assertTrue(g.isExpanded());
+
+    // Collapse B only --> only B should be collapsed, all other nodes remain expanded
+    m_tree.setNodeExpanded(b, false);
+    assertTrue(a.isExpanded());
+    assertFalse(b.isExpanded());
+    assertTrue(c.isExpanded());
+    assertTrue(d.isExpanded());
+    assertTrue(e.isExpanded());
+    assertTrue(f.isExpanded());
+    assertTrue(g.isExpanded());
+
+    // Collapse A and the entire subtree recursively --> B and all its child nodes should be collapsed as well
+    m_tree.collapseAll(a);
+    assertFalse(a.isExpanded());
+    assertFalse(b.isExpanded());
+    assertFalse(c.isExpanded());
+    assertFalse(d.isExpanded());
+    assertFalse(e.isExpanded());
+    assertFalse(f.isExpanded());
+    assertFalse(g.isExpanded());
+
+    // Expand A only --> A is expanded, but all other nodes are still collapsed
+    m_tree.setNodeExpanded(a, true);
+    assertTrue(a.isExpanded());
+    assertFalse(b.isExpanded());
+    assertFalse(c.isExpanded());
+    assertFalse(d.isExpanded());
+    assertFalse(e.isExpanded());
+    assertFalse(f.isExpanded());
+    assertFalse(g.isExpanded());
+
+    // Expand C, an inner node whose parent is not expanded --> path to root should be expanded automatically
+    m_tree.setNodeExpanded(c, true);
+    assertTrue(a.isExpanded());
+    assertTrue(b.isExpanded());
+    assertTrue(c.isExpanded());
+    assertFalse(d.isExpanded());
+    assertFalse(e.isExpanded());
+    assertFalse(f.isExpanded());
+    assertFalse(g.isExpanded());
+  }
+
   public static class P_Tree extends AbstractTree {
     ITreeNode m_currentDropNode;
     int m_execDropTargetChangedTimesCalled;

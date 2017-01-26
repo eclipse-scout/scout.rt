@@ -1596,10 +1596,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     else {
       if (parent.isExpanded()) {
         list.add(parent);
-        List<ITreeNode> children = parent.getChildNodes();
-        for (ITreeNode child : children) {
-          fetchAllCollapsingNodesRec(child, level + 1, list);
-        }
+      }
+      List<ITreeNode> children = parent.getChildNodes();
+      for (ITreeNode child : children) {
+        fetchAllCollapsingNodesRec(child, level + 1, list);
       }
     }
   }
