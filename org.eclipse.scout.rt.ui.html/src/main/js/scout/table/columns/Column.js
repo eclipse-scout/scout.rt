@@ -248,11 +248,12 @@ scout.Column.prototype._cellCssClass = function(cell) {
     cssClass += ' has-error';
   }
   cssClass += ' halign-' + scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
-  var columnPosition = this.table.columns.indexOf(this);
+  var visibleColumns = this.table.visibleColumns();
+  var columnPosition = visibleColumns.indexOf(this);
   if (columnPosition === 0) {
     cssClass += ' first';
   }
-  if (columnPosition === this.table.columns.length - 1) {
+  if (columnPosition === visibleColumns.length - 1) {
     cssClass += ' last';
   }
 

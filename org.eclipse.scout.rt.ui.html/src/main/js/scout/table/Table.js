@@ -479,8 +479,10 @@ scout.Table.prototype.onContextMenu = function(event) {
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {
   if (this.rendered) {
+    this._updateRowWidth();
     this._redraw();
   }
+  this.trigger('columnStructureChanged');
 };
 
 scout.Table.prototype._onDataScroll = function() {
@@ -1088,10 +1090,9 @@ scout.Table.prototype._calculateRowBorderWidth = function() {
 };
 
 scout.Table.prototype._updateRowWidth = function() {
-  this.rowWidth = this.rowBorderWidth;
-  for (var i = 0; i < this.columns.length; i++) {
-    this.rowWidth += this.columns[i].width;
-  }
+  this.rowWidth = this.visibleColumns().reduce(function(sum, column) {
+    return sum + column.width;
+  }, this.rowBorderWidth);
 };
 
 scout.Table.prototype._updateRowHeight = function() {
@@ -3613,7 +3614,6 @@ scout.Table.prototype.updateColumnStructure = function(columns) {
   if (this.rendered) {
     this._updateRowWidth();
     this.$rows(true).css('width', this.rowWidth);
-
     this._rerenderHeaderColumns();
   }
   this.trigger('columnStructureChanged');

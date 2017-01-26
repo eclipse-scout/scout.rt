@@ -13,14 +13,10 @@
 scout.AggregateTableControl = function() {
   scout.AggregateTableControl.parent.call(this);
   this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
-  this._tableRowsChangedHandler = this._onTableRowsChanged.bind(this);
-  this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
-  this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
   this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
-  this._tableAggregationFunctionHandler = this._onTableAggregationFunctionChanged.bind(this);
-  this._tableGroupingHandler = this._onTableGroupingChanged.bind(this);
+  this._tableChangedHandler = this._onTableChanged.bind(this);
   this.cssClass = 'aggregate';
   this.height = scout.AggregateTableControl.CONTAINER_SIZE;
   this.animateDuration = scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION;
@@ -34,58 +30,44 @@ scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION = 200;
 
 scout.AggregateTableControl.prototype._init = function(model) {
   scout.AggregateTableControl.parent.prototype._init.call(this, model);
-
   this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._destroy = function() {
   scout.AggregateTableControl.parent.prototype._destroy.call(this);
-
   this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._render = function($parent) {
   scout.AggregateTableControl.parent.prototype._render.call(this, $parent);
-
   this._updateEnabledAndSelectedState();
 };
 
 scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.$contentContainer = $parent.appendDiv('table-aggregate');
 
-  this._aggregate();
-  this._renderAggregate();
+  this._aggregateAndRender();
   this._reconcileScrollPos();
 
   this.table.$data.on('scroll', this._tableDataScrollHandler);
-  this.table.on('rowsInserted', this._tableRowsChangedHandler);
-  this.table.on('rowsDeleted', this._tableRowsChangedHandler);
-  this.table.on('allRowsDeleted', this._tableRowsChangedHandler);
-  this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
-  this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
-  this.table.on('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
-  this.table.on('groupingChanged', this._tableGroupingHandler);
+  this.table.on('aggregationFunctionChanged groupingChanged rowsSelected rowsInserted rowsDeleted rowsFiltered allRowsDeleted',
+    this._tableChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._removeContent = function() {
   this.$contentContainer.remove();
 
   this.table.$data.off('scroll', this._tableDataScrollHandler);
-  this.table.off('rowsInserted', this._tableRowsChangedHandler);
-  this.table.off('rowsDeleted', this._tableRowsChangedHandler);
-  this.table.off('allRowsDeleted', this._tableRowsChangedHandler);
-  this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
-  this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('columnMoved', this._tableColumnMovedHandler);
-  this.table.off('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
-  this.table.off('groupingChanged', this._tableGroupingHandler);
+  this.table.off('aggregationFunctionChanged groupingChanged rowsSelected rowsInserted rowsDeleted rowsFiltered allRowsDeleted',
+    this._tableChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._renderAggregate = function() {
-  this.table.columns.forEach(function(column, c) {
+  this.table.visibleColumns().forEach(function(column, c) {
     var aggregateValue, cell, $cell;
 
     aggregateValue = this.aggregateRow[c];
@@ -165,22 +147,15 @@ scout.AggregateTableControl.prototype._onTableDataScroll = function() {
   this._reconcileScrollPos();
 };
 
-scout.AggregateTableControl.prototype._onTableRowsChanged = function(event) {
-  this._aggregate();
-  this._rerenderAggregate();
+/**
+ * Generic handler for various events
+ * @private
+ */
+scout.AggregateTableControl.prototype._onTableChanged = function() {
+  this._aggregateAndRender();
 };
 
-scout.AggregateTableControl.prototype._onTableRowsFiltered = function(event) {
-  this._aggregate();
-  this._rerenderAggregate();
-};
-
-scout.AggregateTableControl.prototype._onTableRowsSelected = function(event) {
-  this._aggregate();
-  this._rerenderAggregate();
-};
-
-scout.AggregateTableControl.prototype._onTableColumnResized = function(event) {
+scout.AggregateTableControl.prototype._onTableColumnResized = function() {
   this._rerenderAggregate();
 };
 
@@ -190,20 +165,15 @@ scout.AggregateTableControl.prototype._onTableColumnMoved = function(event) {
   this._rerenderAggregate();
 };
 
-scout.AggregateTableControl.prototype._onTableColumnStructureChanged = function(event) {
+scout.AggregateTableControl.prototype._onTableColumnStructureChanged = function() {
   this._updateEnabledAndSelectedState();
   if (this.selected && this.rendered) {
-    this._aggregate();
-    this._rerenderAggregate();
+    this._aggregateAndRender();
   }
 };
 
-scout.AggregateTableControl.prototype._onTableAggregationFunctionChanged = function(event) {
+scout.AggregateTableControl.prototype._aggregateAndRender = function() {
   this._aggregate();
   this._rerenderAggregate();
 };
 
-scout.AggregateTableControl.prototype._onTableGroupingChanged = function(event) {
-  this._aggregate();
-  this._rerenderAggregate();
-};

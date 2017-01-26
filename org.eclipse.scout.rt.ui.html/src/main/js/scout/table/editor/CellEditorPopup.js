@@ -63,7 +63,7 @@ scout.CellEditorPopup.prototype._open = function($parent, event) {
 scout.CellEditorPopup.prototype._render = function($parent) {
   scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
 
-  var firstCell = this.table.columns.indexOf(this.column) === 0;
+  var firstCell = this.table.visibleColumns().indexOf(this.column) === 0;
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
   if (firstCell) {

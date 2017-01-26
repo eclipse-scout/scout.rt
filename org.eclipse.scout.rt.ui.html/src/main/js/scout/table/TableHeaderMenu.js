@@ -100,7 +100,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   // -- Left column -- //
   // Moving
-  var movableColumns = this.table.columns.filter(function(column) {
+  var movableColumns = this.table.visibleColumns().filter(function(column) {
     return !column.fixedPosition;
   });
   if (movableColumns.length > 1 && !this.column.fixedPosition) {
@@ -111,7 +111,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     leftGroups.push(this._renderSortingGroup());
   }
   // Add/remove/change columns
-  leftGroups.push(this._renderColumnActionsGroup());
+  if (this._isColumnActionsGroupVisible()) {
+    leftGroups.push(this._renderColumnActionsGroup());
+  }
   // Grouping
   // column.grouped check necessary to make ungroup possible, even if grouping is not possible anymore
   if (this.table.isGroupingPossible(this.column) || this.column.grouped) {
@@ -226,6 +228,10 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
 
   group.render(this.$columnActions);
   return group;
+};
+
+scout.TableHeaderMenu.prototype._isColumnActionsGroupVisible = function() {
+  return this.table.columnAddable || this.column.removable || this.column.modifiable;
 };
 
 scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {

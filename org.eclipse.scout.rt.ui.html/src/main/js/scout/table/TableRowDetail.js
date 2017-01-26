@@ -28,7 +28,7 @@ scout.TableRowDetail.prototype._render = function($parent) {
 };
 
 scout.TableRowDetail.prototype._renderRow = function() {
-  this.table.columns.forEach(function(column) {
+  this.table.visibleColumns().forEach(function(column) {
     var name = column.text;
     var value = this.table.cellText(column, this.row);
     if (scout.strings.empty(value)) {

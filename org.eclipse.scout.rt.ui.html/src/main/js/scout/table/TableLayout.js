@@ -20,7 +20,8 @@ scout.TableLayout.prototype.layout = function($container) {
     footer = this.table.footer,
     header = this.table.header,
     $data = this.table.$data,
-    lastColumn = this.table.columns[this.table.columns.length - 1],
+    visibleColumns = this.table.visibleColumns(),
+    lastColumn = visibleColumns[visibleColumns - 1],
     height = 0,
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
@@ -93,7 +94,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
     availableWidth = Math.floor(this.table.$data.width() - this.table.rowBorderWidth);
 
   // Handle fixed columns
-  this.table.columns.forEach(function(column) {
+  this.table.visibleColumns().forEach(function(column) {
     if (column.fixedWidth) {
       availableWidth -= column.width;
     } else {
