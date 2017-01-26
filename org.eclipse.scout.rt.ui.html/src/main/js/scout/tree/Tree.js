@@ -1270,17 +1270,16 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle) {
 scout.Tree.prototype._setDisplayStyle = function(displayStyle) {
   this._setProperty('displayStyle', displayStyle);
 
-  if (displayStyle && this.selectedNodes.length > 0) {
-    var selectedNode = this.selectedNodes[0];
-    if (!selectedNode.expanded) {
-      this.expandNode(selectedNode);
-    }
-  }
-
   if (this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
+    if (this.selectedNodes.length > 0) {
+      var selectedNode = this.selectedNodes[0];
+      if (!selectedNode.expanded) {
+        this.expandNode(selectedNode);
+      }
+    }
     this.addFilter(this.breadcrumbFilter, true, true);
     this.filterVisibleNodes();
-  } else if (this.displayStyle !== scout.Tree.DisplayStyle.BREADCRUMB) {
+  } else {
     this.removeFilter(this.breadcrumbFilter, true);
     this.filter();
   }
