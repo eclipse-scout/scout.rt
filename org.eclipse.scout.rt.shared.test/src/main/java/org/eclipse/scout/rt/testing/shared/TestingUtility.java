@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.junit.Assert;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,6 +256,7 @@ public final class TestingUtility {
   @SuppressWarnings("unchecked")
   public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {
     IConfigProperty<?> mock = Mockito.mock(IConfigProperty.class);
+    Mockito.<T> when((T) mock.getValue(Matchers.anyString())).thenReturn(value);
     Mockito.<T> when((T) mock.getValue()).thenReturn(value);
     return TestingUtility.registerBean(new BeanMetaData(propertyClass, mock));
   }
