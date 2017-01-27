@@ -467,7 +467,7 @@ scout.dates = {
   },
 
   /**
-   * TODO [5.2] nbu: Add jasmine test
+   * TODO [6.2] nbu: Add jasmine test
    * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.
    */
   combineDateTime: function(date, time) {

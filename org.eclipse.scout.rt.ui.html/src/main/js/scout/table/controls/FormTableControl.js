@@ -67,6 +67,6 @@ scout.FormTableControl.prototype._setForm = function(form) {
 };
 
 scout.FormTableControl.prototype.onControlContainerOpened = function() {
-  // TODO [5.2] dwi: temporary solution; set focus to last known position
+  // TODO [6.2] dwi: temporary solution; set focus to last known position
   this.form.renderInitialFocus();
 };

@@ -293,7 +293,7 @@ scout.objects = {
   },
 
   /**
-   * TODO [5.2] bsh: Document
+   * TODO [6.2] bsh: Document
    *
    * How to use:
    *   scout.objects.checkFunctionOverrides().join('\n')

@@ -246,7 +246,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
 
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_FORM_FIELD, formFieldAdapter.getId());
-    // TODO [6.0] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
+    // TODO [6.2] BSH Try to replace PROP_INITIAL_FOCUS by protected EVENT_REQUEST_FOCUS (but check "initialFocusEnabled")
     addActionEvent(EVENT_REQUEST_FOCUS, jsonEvent);
   }
 

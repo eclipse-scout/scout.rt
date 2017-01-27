@@ -952,7 +952,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  // TODO [5.2] dwi: Clarify whether this method is still used.
+  // TODO [6.2] dwi: Clarify whether this method is still used.
   public List<IForm> getSimilarViewForms(final IForm form) {
     if (form == null) {
       return CollectionUtility.emptyArrayList();
@@ -992,7 +992,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void ensureViewStackVisible() { // TODO [5.2] dwi: Clarify whether this method is still used.
+  public void ensureViewStackVisible() { // TODO [6.2] dwi: Clarify whether this method is still used.
     for (IForm view : m_formStore.getViews()) {
       activateForm(view);
     }
@@ -2339,7 +2339,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       attachGui();
     }
 
-    @SuppressWarnings("deprecation") // TODO BSH Remove in P release
+    @SuppressWarnings("deprecation") // TODO [15.4] bsh: Remove in P release
     @Override
     public void fireGuiAttached(String deepLinkPath) {
       fireGuiAttached();

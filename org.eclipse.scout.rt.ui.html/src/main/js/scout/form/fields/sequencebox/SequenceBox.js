@@ -95,7 +95,7 @@ scout.SequenceBox.prototype._updateStatusVisible = function() {
   this._renderStatusVisible();
 };
 
-// TODO [5.2] awe: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5
+// TODO [6.2] awe: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5
 // The new sequence-box sets the label to invisible on the model.
 scout.SequenceBox.prototype._modifyLabel = function(field) {
   if (field instanceof scout.CheckBoxField) {

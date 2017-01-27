@@ -144,7 +144,7 @@ scout.CompactTree.prototype._decorateNode = function(node) {
     $node.attr('title', node.tooltipText);
   }
 
-  // TODO [15.1] bsh: More attributes...
+  // TODO [15.4] bsh: More attributes...
   // iconId
   // tooltipText
 };

@@ -142,7 +142,7 @@ public class UiSessionTest {
     assertNull(uiSession.currentJsonResponse());
     JsonTestUtility.endRequest(uiSession);
 
-    // TODO CGU This does not work, because somehow, the housekeeping job is not executed?
+    // TODO [15.4] CGU: This does not work, because somehow, the housekeeping job is not executed?
     //HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
     //Mockito.verify(httpSession).invalidate();
   }

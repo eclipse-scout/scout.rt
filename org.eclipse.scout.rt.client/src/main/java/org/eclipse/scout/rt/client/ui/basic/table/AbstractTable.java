@@ -3110,7 +3110,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         else {
           fireRowsDeleted(deletedRows);
         }
-        //TODO [5.2] cgu: is this necessary? Deleted rows are deselected above
+        //TODO [6.2] cgu: is this necessary? Deleted rows are deselected above
         selectRows(selectionRows, false);
       }
       finally {
@@ -3523,7 +3523,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void resetColumns(Set<String> options) {
     try {
       setTableChanging(true);
-      // TODO [5.2] asa: move to internal?
+      // TODO [6.2] asa: move to internal?
       if (options.contains(IResetColumnsOption.SORTING)) {
         setSortValid(false);
       }

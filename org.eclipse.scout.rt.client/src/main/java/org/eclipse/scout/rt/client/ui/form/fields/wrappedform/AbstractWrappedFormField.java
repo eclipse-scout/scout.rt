@@ -170,7 +170,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
       return;
     }
 
-    // TODO [5.2] dwi: Add assertion to ensure Form is not started yet; currently, that cannot be done because of AbstractPageField.
+    // TODO [6.2] dwi: Add assertion to ensure Form is not started yet; currently, that cannot be done because of AbstractPageField.
 //    if (form != null) {
 //      Assertions.assertFalse(form.isFormStarted(), "Inner Form must not be started yet [wrappedFormField=%s, innerForm=%s]", this, form);
 //    }
@@ -187,7 +187,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     checkEmpty();
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      if (m_manageInnerFormLifeCycle && m_innerForm.isFormStartable()) { // TODO [5.2] dwi: Remove 'started check' once assertion is in place
+      if (m_manageInnerFormLifeCycle && m_innerForm.isFormStartable()) { // TODO [6.2] dwi: Remove 'started check' once assertion is in place
         m_innerForm.start();
       }
     }

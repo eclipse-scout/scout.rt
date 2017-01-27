@@ -404,7 +404,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     final boolean isRootNode = pathsToSelections.isEmpty() && getTree() != null && getTree().getRootNode() == this;
     if (isActiveOutline && (pathsToSelections.contains(this) || isRootNode)) {
       try {
-        //TODO fko: maybe remove when bookmarks can be done on outline level? (currently only pages)
+        //TODO [15.4] fko: maybe remove when bookmarks can be done on outline level? (currently only pages)
         if (isRootNode) {
           this.reloadPage();
         }
@@ -839,7 +839,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
     }
 
-    form.setModal(false); // TODO [5.2] dwi: do the same as WrappedFormField
+    form.setModal(false); // TODO [6.2] dwi: do the same as WrappedFormField
     form.setShowOnStart(false);
   }
 
