@@ -82,7 +82,7 @@ public final class SeleniumDriver {
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
 
-    // FIXME BSH Remove workaround, when Chrome bug is fixed
+    // TODO [6.2] BSH Remove workaround, when Chrome bug is fixed
     // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
     Map<String, String> env = new HashMap<>();
     env.put("LANG", "en_US.UTF-8");
