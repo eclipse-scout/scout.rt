@@ -571,7 +571,7 @@ scout.Desktop.prototype.addNotification = function(notification) {
     // Bring to front
     this.$notifications.appendTo(this.$container);
   } else {
-    this.$notifications = this.$container.appendDiv('notifications');
+    this.$notifications = this.$container.appendDiv('desktop-notifications');
   }
   notification.fadeIn(this.$notifications);
 };
@@ -687,7 +687,7 @@ scout.Desktop.prototype.glassPaneTargets = function() {
   var glassPaneTargets = $.makeArray(this.$container
     .children()
     .not('.splitter') // exclude splitter to be locked
-    .not('.notifications') // exclude notification box like 'connection interrupted' to be locked
+    .not('.desktop-notifications') // exclude notification box like 'connection interrupted' to be locked
     .not('.overlay-separator') // exclude overlay separator (marker element)
   );
 

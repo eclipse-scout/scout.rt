@@ -46,6 +46,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
   gbBodySize = containerSize.subtract(htmlGbBody.getMargins());
   gbBodySize.height -= this._titleHeight();
+  gbBodySize.height -= this._notificationHeight();
   gbBodySize.height -= menuBarSize.height;
 
   if (statusWidth > 0) {
@@ -124,6 +125,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
   }
   prefSize = prefSize.add(htmlContainer.getInsets());
   prefSize.height += this._titleHeight();
+  prefSize.height += this._notificationHeight();
 
   // predefined height or width in pixel override other values
   if (this._groupBox.gridData && this._groupBox.gridData.widthInPixel) {
@@ -138,6 +140,15 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
   return scout.graphics.prefSize(this._groupBox.$title, {
+    includeMargin: true
+  }).height;
+};
+
+scout.GroupBoxLayout.prototype._notificationHeight = function() {
+  if (!this._groupBox.notification) {
+    return 0;
+  }
+  return this._groupBox.notification.htmlComp.getPreferredSize({
     includeMargin: true
   }).height;
 };

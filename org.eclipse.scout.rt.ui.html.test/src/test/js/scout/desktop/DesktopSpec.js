@@ -51,7 +51,7 @@ describe('Desktop', function() {
       desktop.addNotification(ntfc);
       expect(ntfc.fadeIn).toHaveBeenCalled();
       expect(desktop.notifications.indexOf(ntfc)).toBe(0);
-      expect(desktop.$container.find('.notifications').length).toBe(1);
+      expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
       expect(desktop.$notification).not.toBe(null);
     });
 
@@ -67,12 +67,12 @@ describe('Desktop', function() {
         closable: true
       }).show();
       expect(desktop.notifications.length).toBe(0);
-      expect(desktop.session.$entryPoint.find('.notifications').length).toBe(0);
+      expect(desktop.session.$entryPoint.find('.desktop-notifications').length).toBe(0);
       expect(desktop._postRenderActions.length).toBe(1);
 
       desktop.render(desktop.session.$entryPoint);
       expect(desktop.notifications.length).toBe(1);
-      expect(desktop.$container.find('.notifications').length).toBe(1);
+      expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
       expect(desktop._postRenderActions.length).toBe(0);
     });
 
@@ -94,7 +94,7 @@ describe('Desktop', function() {
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop._onNotificationRemove(ntfc);
       expect(desktop.notifications.length).toBe(0);
-      expect(desktop.$container.find('.notifications').length).toBe(0);
+      expect(desktop.$container.find('.desktop-notifications').length).toBe(0);
       expect(desktop.$notifications).toBe(null);
     });
   });

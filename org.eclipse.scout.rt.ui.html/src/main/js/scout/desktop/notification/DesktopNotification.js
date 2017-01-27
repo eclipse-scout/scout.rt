@@ -1,12 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.DesktopNotification = function() {
   scout.DesktopNotification.parent.call(this);
   this.closable = true;
-  this.status = scout.Status.info();
   this.duration = 5000;
   this._removeTimeout;
   this._removing = false;
 };
-scout.inherits(scout.DesktopNotification, scout.Widget);
+scout.inherits(scout.DesktopNotification, scout.Notification);
 
 /**
  * When duration is set to INFINITE, the notification is not removed automatically.
@@ -16,23 +25,13 @@ scout.DesktopNotification.INFINITE = -1;
 scout.DesktopNotification.prototype._init = function(model) {
   scout.DesktopNotification.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
-
-  // this allows to set the properties severity and message directly on the model object
-  // without having a status object. because it's more convenient when you must create
-  // a notification programatically.
-  if (model.severity || model.message) {
-    this.status = new scout.Status({
-      severity: model.severity,
-      message: model.message
-    });
-  }
 };
 
 scout.DesktopNotification.prototype._render = function($parent) {
-  this.$container = $parent.prependDiv('notification');
-  this.$content = this.$container.appendDiv('notification-content');
-  this.$messageText = this.$content.appendDiv('notification-message');
-  this.$loader = this.$content.appendDiv('notification-loader');
+  this.$container = $parent.prependDiv('desktop-notification');
+  this.$content = this.$container.appendDiv('desktop-notification-content');
+  this.$messageText = this.$content.appendDiv('desktop-notification-message');
+  this.$loader = this.$content.appendDiv('desktop-notification-loader');
 
   if (scout.device.supportsCssAnimation()) {
     this.$loader.addClass('animated');
@@ -46,28 +45,7 @@ scout.DesktopNotification.prototype._remove = function() {
 
 scout.DesktopNotification.prototype._renderProperties = function() {
   scout.DesktopNotification.parent.prototype._renderProperties.call(this);
-  this._renderStatus();
   this._renderClosable();
-};
-
-scout.DesktopNotification.prototype.setStatus = function(status) {
-  this.setProperty('status', status);
-};
-
-scout.DesktopNotification.prototype._setStatus = function(status) {
-  if (this.rendered) {
-    this._removeStatus();
-  }
-  this._setProperty('status', status);
-};
-
-scout.DesktopNotification.prototype._removeStatus = function() {
-  this.$container.removeClass(scout.DesktopNotification.cssClassForSeverity(this.status));
-};
-
-scout.DesktopNotification.prototype._renderStatus = function() {
-  this.$container.addClass(scout.DesktopNotification.cssClassForSeverity(this.status));
-  this._renderMessage();
 };
 
 scout.DesktopNotification.prototype._renderMessage = function() {
@@ -138,7 +116,7 @@ scout.DesktopNotification.prototype.fadeIn = function($parent) {
   if (!scout.device.supportsCssAnimation()) {
     return;
   }
-  this.$container.addClassForAnimation('notification-slide-in');
+  this.$container.addClassForAnimation('desktop-notification-slide-in');
 };
 
 scout.DesktopNotification.prototype.fadeOut = function() {
@@ -151,33 +129,15 @@ scout.DesktopNotification.prototype.fadeOut = function() {
     return;
   }
   this._removing = true;
-  this.$container.addClass('notification-fade-out');
+  this.$container.addClass('desktop-notification-fade-out');
   this.$container.oneAnimationEnd(function() {
     this.destroy();
   }.bind(this));
 };
-/**
- * @param {number} status
- * @returns {string}
- * @static
- */
-scout.DesktopNotification.cssClassForSeverity = function(status) {
-  var cssSeverity,
-    severity = scout.Status.Severity;
 
-  switch (status.severity) {
-    case severity.OK:
-      cssSeverity = 'ok';
-      break;
-    case severity.INFO:
-      cssSeverity = 'info';
-      break;
-    case severity.WARNING:
-      cssSeverity = 'warning';
-      break;
-    case severity.ERROR:
-      cssSeverity = 'error';
-      break;
-  }
-  return cssSeverity;
+/**
+ * @override
+ */
+scout.DesktopNotification.prototype.invalidateLayoutTree = function() {
+  // called by notification.js. Since desktop notification has no htmlComp, no need to invalidate
 };

@@ -10,11 +10,12 @@
  ******************************************************************************/
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
-  this._addAdapterProperties(['fields']);
+  this._addAdapterProperties(['fields', 'notification']);
 
   this.fields = [];
   this.menus = [];
   this.menuBarVisible = true;
+  this.notification;
   this.borderDecoration = 'auto';
   this.borderVisible = true;
   this.mainBox = false;
@@ -143,6 +144,7 @@ scout.GroupBox.prototype._remove = function() {
 scout.GroupBox.prototype._renderProperties = function() {
   scout.GroupBox.parent.prototype._renderProperties.call(this);
 
+  this._renderNotification();
   this._renderBorderVisible();
   this._renderExpandable();
   this._renderExpanded();
@@ -172,6 +174,14 @@ scout.GroupBox.prototype._renderStatusPosition = function() {
     this.$status.appendTo(this.$container);
   }
   this.invalidateLayoutTree();
+};
+
+scout.GroupBox.prototype._renderNotification = function() {
+  if (!this.notification) {
+    return;
+  }
+  this.notification.render(this.$container);
+  this.notification.$container.insertBefore(this.$body);
 };
 
 scout.GroupBox.prototype._prepareFields = function() {

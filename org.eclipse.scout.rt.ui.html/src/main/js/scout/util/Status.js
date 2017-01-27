@@ -12,6 +12,11 @@ scout.Status = function(model) {
   this.message;
   this.severity;
   $.extend(this, model);
+
+  // severity may be a string (e.g. if set in a model json file) -> convert to real severity
+  if (typeof this.severity === 'string') {
+    this.severity = scout.Status.Severity[this.severity.toUpperCase()];
+  }
 };
 
 scout.Status.Severity = {

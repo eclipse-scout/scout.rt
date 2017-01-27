@@ -1,7 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 /* IMPORTANT: YUI replaces 0% with 0 when compressing the css. This breaks the animations (the first keyframe is ignored).
    Workaround: Don't use 0%, always use 00%. */
 
-.notifications {
+.desktop-notifications {
   position: fixed;
   right: 10px;
   top: 0;
@@ -12,53 +22,53 @@
 
 /*** Animation: slide-in ***/
 
-@-webkit-keyframes notification-slide-in { .keyframes-notification-slide-in(); }
-@keyframes notification-slide-in { .keyframes-notification-slide-in(); }
+@-webkit-keyframes desktop-notification-slide-in { .keyframes-desktop-notification-slide-in(); }
+@keyframes desktop-notification-slide-in { .keyframes-desktop-notification-slide-in(); }
 
 /**
  * Slides in the notification from the right end of the screen
  * and increases the size of the bottom margin to move down existing
  * notifications.
  */
-.keyframes-notification-slide-in() {
+.keyframes-desktop-notification-slide-in() {
   00%  { left: 250px; margin-bottom: 0; } /* see comment on top */
   80%  { left: 15px; }
   100% { left: 0; margin-bottom: 20px; }
 }
 
-.animation-notification-slide-in() {
-  #scout.animation-name(notification-slide-in);
+.animation-desktop-notification-slide-in() {
+  #scout.animation-name(desktop-notification-slide-in);
   #scout.animation-duration(0.3s);
   #scout.animation-iteration-count(1);
   #scout.animation-timing-function(ease-out);
 }
 
-.notification-slide-in {
-  .animation-notification-slide-in();
+.desktop-notification-slide-in {
+  .animation-desktop-notification-slide-in();
 }
 
 /*** Animation: fade-out ***/
 
-@-webkit-keyframes notification-fade-out { .keyframes-notification-fade-out(); }
-@keyframes notification-fade-out { .keyframes-notification-fade-out(); }
+@-webkit-keyframes desktop-notification-fade-out { .keyframes-desktop-notification-fade-out(); }
+@keyframes desktop-notification-fade-out { .keyframes-desktop-notification-fade-out(); }
 
-.keyframes-notification-fade-out() {
+.keyframes-desktop-notification-fade-out() {
   00%  { opacity: 1.0; margin-bottom: 20px; } /* see comment on top */
   100% { opacity: 0; margin-bottom: -37px; }
 }
 
-.animation-notification-fade-out() {
-  #scout.animation-name(notification-fade-out);
+.animation-desktop-notification-fade-out() {
+  #scout.animation-name(desktop-notification-fade-out);
   #scout.animation-duration(0.3s);
   #scout.animation-iteration-count(1);
   #scout.animation-timing-function(ease-out);
 }
 
-.notification-fade-out {
-  .animation-notification-fade-out();
+.desktop-notification-fade-out {
+  .animation-desktop-notification-fade-out();
 }
 
-.notification {
+.desktop-notification {
   position: relative;
   width: 250px;
   float: right;
@@ -68,23 +78,23 @@
   #scout.drop-shadow();
 
   &.ok {
-    border-left-color: @palette-green-3;
+    border-left-color: @desktop-notification-ok-border-color;
   }
 
   &.info {
-    border-left-color: @palette-blue-4;
+    border-left-color: @desktop-notification-info-border-color;
   }
 
   &.warning {
-    border-left-color: @palette-orange-3;
+    border-left-color: @desktop-notification-warning-border-color;
   }
 
   &.error {
-    border-left-color: @palette-red-3;
+    border-left-color: @desktop-notification-error-border-color;
   }
 }
 
-.notification-content {
+.desktop-notification-content {
   border: 1px solid @border-color;
   border-left-width: 0;
   padding: 10px;
@@ -101,15 +111,15 @@
   }
 }
 
-.notification-message {
+.desktop-notification-message {
   display: inline-block;
 }
 
-.notification-loader {
+.desktop-notification-loader {
   display: inline-block;
 }
 
-.notification-loader.animated::after {
+.desktop-notification-loader.animated::after {
   #scout.animation(rotation 0.9s linear infinite);
   content: '';
   display: inline-block;
