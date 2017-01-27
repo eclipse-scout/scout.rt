@@ -297,6 +297,19 @@ $.resolvedPromise = function() {
 };
 
 /**
+ * Use this function as shorthand of this:
+ * <code>$.Deferred().reject([arguments]).promise();</code>
+ *
+ * @param {object[]} [arguments] of this function are passed to the reject function of the deferred
+ * @returns {Promise} a promise for an already rejected jQuery.Deferred object.
+ */
+$.rejectedPromise = function() {
+  var deferred = $.Deferred();
+  deferred.reject.apply(deferred, arguments);
+  return deferred.promise();
+};
+
+/**
  * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
  *
  * @param asArray (optional) when set to true, the resolve function will transform the
