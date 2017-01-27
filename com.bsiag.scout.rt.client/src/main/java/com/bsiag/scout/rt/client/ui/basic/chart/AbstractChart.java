@@ -89,7 +89,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  */
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
 public abstract class AbstractChart extends AbstractPropertyObserver implements IChart {
-  // TODO [15.1] bsh: make extensible
+  // TODO [15.4] bsh: make extensible
 
   private IChartUIFacade m_uiFacade;
   private final EventListenerList m_listenerList = new EventListenerList();
