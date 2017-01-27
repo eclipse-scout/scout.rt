@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class HttpProxy {
    * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
    */
   public void proxyGet(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws ServletException, IOException {
-    String url = getRemoteUrl() + req.getPathInfo() + "?" + req.getQueryString();
+    String url = StringUtility.join("", getRemoteUrl(), req.getPathInfo(), StringUtility.box("?", req.getQueryString(), ""));
     URLConnection connection = openConnection(url);
 
     writeRequestHeaders(req, connection);
@@ -82,7 +83,7 @@ public class HttpProxy {
    * Writes the returned response body of the forwarded request, the headers and the status to the response.<b>
    */
   public void proxyPost(HttpServletRequest req, HttpServletResponse resp, HttpProxyOptions options) throws ServletException, IOException {
-    String url = getRemoteUrl() + req.getPathInfo();
+    String url = StringUtility.join("", getRemoteUrl(), req.getPathInfo());
     URLConnection connection = openConnection(url);
     connection.setDoOutput(true);
     connection.setDefaultUseCaches(false);
@@ -213,7 +214,6 @@ public class HttpProxy {
       else {
         LOG.trace("Removed response header: {} (original value: {})", name, originalValue);
       }
-
     }
   }
 
