@@ -124,7 +124,8 @@
       color: @text-field-icon-color;
     }
 
-    &:focus ~ .icon@{className}::before {
+    &:focus ~ .icon@{className}::before,
+      &.focused ~ .icon@{className}::before {
       color: @text-field-icon-focus-color;
     }
 
