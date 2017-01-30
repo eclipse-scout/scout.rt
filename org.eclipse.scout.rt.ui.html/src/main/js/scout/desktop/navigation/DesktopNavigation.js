@@ -102,6 +102,7 @@ scout.DesktopNavigation.prototype._setOutline = function(outline) {
   var currentDisplayStyle;
   if (this.outline) {
     currentDisplayStyle = this.outline.displayStyle;
+    this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
   }
   if (this.rendered) {
     this._removeOutline();
@@ -194,7 +195,9 @@ scout.DesktopNavigation.prototype._renderHandleVisible = function() {
 
 scout.DesktopNavigation.prototype._createHandle = function() {
   return scout.create('DesktopNavigationHandle', {
-    parent: this
+    parent: this,
+    rightVisible: false,
+    horizontalAlignment: scout.CollapseHandle.HorizontalAlignment.RIGHT
   });
 };
 
@@ -204,7 +207,7 @@ scout.DesktopNavigation.prototype._renderHandle = function() {
   }
   this.handle = this._createHandle();
   this.handle.render(this.$container);
-  this.handle.$container.addClass('navigation-open');
+  this.handle.addCssClass('navigation-open');
   this.handle.on('action', this._onHandleAction.bind(this));
   this._updateHandle();
 };

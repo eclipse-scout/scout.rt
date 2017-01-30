@@ -43,6 +43,16 @@
     #scout.animation-name(slideout-right);
     #scout.animation-duration(0.5s);
   }
+
+  /* Make some space for the navigation handle (when the navigation is closed */
+  /* Only do it if detail-table is at the bottom left corner */
+  &.has-navigation-handle > .bench-column.first > .view-tab-box.last > .tab-content > .detail-table > .table-footer > .table-controls {
+    margin-left: 25px;
+
+    & > .table-control.selected {
+      border-left-color: @border-color;
+    }
+  }
 }
 
 .detail-table.table {

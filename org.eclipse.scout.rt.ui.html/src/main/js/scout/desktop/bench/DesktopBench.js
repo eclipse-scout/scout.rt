@@ -104,20 +104,23 @@ scout.DesktopBench.prototype._createLayout = function() {
   return new scout.DesktopBenchLayout(this);
 };
 
-scout.DesktopBench.prototype._renderColumns = function() {
-  this.columns.forEach(function(column) {
-    if (column.viewCount() > 0) {
-      this._renderColumn(column);
+scout.DesktopBench.prototype.visibleColumns = function() {
+  return this.columns.filter(function(column) {
+    return column.hasViews();
+  });
+};
 
-    }
-  }.bind(this));
+scout.DesktopBench.prototype._renderColumns = function() {
+  this.visibleColumns().forEach(function(column) {
+    this._renderColumn(column);
+  }, this);
+  this.updateFirstLastMarker();
 };
 
 scout.DesktopBench.prototype._renderColumn = function(column) {
   if (!column || column.rendered) {
     return;
   }
-
   column.render(this.$container);
 };
 
@@ -127,6 +130,18 @@ scout.DesktopBench.prototype._remove = function() {
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopBench.parent.prototype._remove.call(this);
+};
+
+scout.DesktopBench.prototype.updateFirstLastMarker = function() {
+  this.visibleColumns().forEach(function(column, index, arr) {
+    column.$container.removeClass('first last');
+    if (index === 0) {
+      column.$container.addClass('first');
+    }
+    if (index === arr.length - 1) {
+      column.$container.addClass('last');
+    }
+  }, this);
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {
@@ -156,16 +171,20 @@ scout.DesktopBench.prototype._removeOutlineContent = function() {
   this.removeView(this.outlineContent, false);
 };
 
+scout.DesktopBench.prototype._createNavigationHandle = function() {
+  return scout.create('DesktopNavigationHandle', {
+    parent: this,
+    leftVisible: false
+  });
+};
+
 scout.DesktopBench.prototype._renderNavigationHandle = function() {
   if (this.navigationHandle) {
     return;
   }
-  this.navigationHandle = scout.create('DesktopNavigationHandle', {
-    parent: this,
-    leftVisible: false
-  });
+  this.navigationHandle = this._createNavigationHandle();
   this.navigationHandle.render(this.$container);
-  this.navigationHandle.$container.addClass('navigation-closed');
+  this.navigationHandle.addCssClass('navigation-closed');
   this.navigationHandle.on('action', this._onNavigationHandleAction.bind(this));
 };
 
@@ -183,6 +202,7 @@ scout.DesktopBench.prototype._renderNavigationHandleVisible = function() {
   } else {
     this._removeNavigationHandle();
   }
+  this.$container.toggleClass('has-navigation-handle', this.navigationHandleVisible);
 };
 
 /**
@@ -349,7 +369,7 @@ scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
 };
 
 scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
-  if(scout.arrays.containsAny(event.changedProperties, ['defaultDetailForm', 'outlineOverview'])){
+  if (scout.arrays.containsAny(event.changedProperties, ['defaultDetailForm', 'outlineOverview'])) {
     this.updateOutlineContent();
   }
 };
@@ -394,26 +414,25 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
     });
   }
   var splitterParent = this;
-  this.components = this.columns.filter(function(column) {
-    return column.hasViews();
-  }).reduce(function(arr, col) {
-    if (arr.length > 0) {
-      // add sep
-      var splitter = scout.create('Splitter', {
-        parent: splitterParent,
-        $anchor: arr[arr.length - 1].$container,
-        $root: splitterParent.$container,
-        maxRatio: 1
-      });
-      splitter.render(splitterParent.$container);
-      splitter.$container.addClass('line');
-      splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
-      splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
-      arr.push(splitter);
-    }
-    arr.push(col);
-    return arr;
-  }, []);
+  this.components = this.visibleColumns()
+    .reduce(function(arr, col) {
+      if (arr.length > 0) {
+        // add sep
+        var splitter = scout.create('Splitter', {
+          parent: splitterParent,
+          $anchor: arr[arr.length - 1].$container,
+          $root: splitterParent.$container,
+          maxRatio: 1
+        });
+        splitter.render(splitterParent.$container);
+        splitter.$container.addClass('line');
+        splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
+        splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
+        arr.push(splitter);
+      }
+      arr.push(col);
+      return arr;
+    }, []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
   this.components.filter(function(comp) {
       return comp instanceof scout.BenchColumn;
@@ -505,6 +524,7 @@ scout.DesktopBench.prototype.addView = function(view, activate) {
     if (column.viewCount() === 1) {
       this._renderColumn(column);
       this._revalidateSplitters();
+      this.updateFirstLastMarker();
       this.htmlComp.invalidateLayoutTree();
       // Layout immediate to prevent 'laggy' form visualization,
       // but not initially while desktop gets rendered because it will be done at the end anyway
@@ -552,6 +572,7 @@ scout.DesktopBench.prototype.removeView = function(view, showSiblingView) {
     if (this.rendered && column.viewCount() === 0 && this._removeViewInProgress === 0) {
       column.remove();
       this._revalidateSplitters(true);
+      this.updateFirstLastMarker();
       this.htmlComp.invalidateLayoutTree();
       // Layout immediate to prevent 'laggy' form visualization,
       // but not initially while desktop gets rendered because it will be done at the end anyway

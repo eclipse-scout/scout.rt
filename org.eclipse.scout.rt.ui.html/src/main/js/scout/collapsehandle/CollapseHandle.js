@@ -12,8 +12,14 @@ scout.CollapseHandle = function() {
   scout.CollapseHandle.parent.call(this);
   this.leftVisible = true;
   this.rightVisible = true;
+  this.horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.LEFT;
 };
 scout.inherits(scout.CollapseHandle, scout.Widget);
+
+scout.CollapseHandle.HorizontalAlignment = {
+  LEFT: 'left',
+  RIGHT: 'right'
+};
 
 scout.CollapseHandle.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('collapse-handle');
@@ -27,6 +33,20 @@ scout.CollapseHandle.prototype._renderProperties = function() {
   scout.CollapseHandle.parent.prototype._renderProperties.call(this);
   this._renderLeftVisible();
   this._renderRightVisible();
+  this._renderHorizontalAlignment();
+};
+
+scout.CollapseHandle.prototype.setHorizontalAlignment = function(alignment) {
+  this.setProperty('horizontalAlignment', alignment);
+};
+
+scout.CollapseHandle.prototype._renderHorizontalAlignment = function() {
+  this.$container.removeClass('left-aligned right-aligned');
+  if (this.horizontalAlignment === scout.CollapseHandle.HorizontalAlignment.LEFT) {
+    this.$container.addClass('left-aligned');
+  } else if (this.horizontalAlignment === scout.CollapseHandle.HorizontalAlignment.RIGHT) {
+    this.$container.addClass('right-aligned');
+  }
 };
 
 scout.CollapseHandle.prototype.setLeftVisible = function(visible) {

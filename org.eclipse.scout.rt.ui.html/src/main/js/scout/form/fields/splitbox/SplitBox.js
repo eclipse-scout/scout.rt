@@ -299,8 +299,13 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
   }
   if (this.collapsibleField) {
     if (!this._collapseHandle) {
+      var horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.LEFT;
+      if (this.collapsibleField !== this.firstField) {
+        horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.RIGHT;
+      }
       this._collapseHandle = scout.create('CollapseHandle', {
-        parent: this
+        parent: this,
+        horizontalAlignment: horizontalAlignment
       });
       this._collapseHandle.on('action', this.toggleFieldCollapsed.bind(this));
       if (this.collapseKeyStroke) {

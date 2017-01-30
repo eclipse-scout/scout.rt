@@ -11,7 +11,7 @@
 scout.BenchColumn = function() {
   scout.BenchColumn.parent.call(this);
   this.htmlComp;
-  this.tabBoxs = [];
+  this.tabBoxes = [];
   this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
   this.components;
   this._removeViewInProgress = 0;
@@ -52,18 +52,15 @@ scout.BenchColumn.prototype._render = function($parent) {
 
 scout.BenchColumn.prototype._renderProperties = function() {
   scout.BenchColumn.parent.prototype._renderProperties.call(this);
-  this._renderTabBoxs();
+  this._renderTabBoxes();
   this._revalidateSplitters();
 };
 
-scout.BenchColumn.prototype._renderTabBoxs = function() {
-  this.tabBoxs.forEach(function(tabBox) {
-    if (tabBox.viewCount() > 0) {
-
-      this._renderTabBox(tabBox);
-    }
+scout.BenchColumn.prototype._renderTabBoxes = function() {
+  this.visibleTabBoxes().forEach(function(tabBox) {
+    this._renderTabBox(tabBox);
   }.bind(this));
-
+  this.updateFirstLastMarker();
 };
 
 scout.BenchColumn.prototype._renderTabBox = function(tabBox) {
@@ -81,7 +78,7 @@ scout.BenchColumn.prototype._remove = function() {
 };
 
 scout.BenchColumn.prototype.postRender = function() {
-  this.tabBoxs.forEach(function(tabBox) {
+  this.tabBoxes.forEach(function(tabBox) {
     tabBox.postRender();
   });
 };
@@ -128,7 +125,7 @@ scout.BenchColumn.prototype._createTabBoxes = function() {
     tabBox.on('viewRemoved', this._viewRemovedHandler);
     tabBox.on('viewActivated', this._viewActivatedHandler);
     tabBox.on('viewDeactivated', this._viewDeactivatedHandler);
-    this.tabBoxs.push(tabBox);
+    this.tabBoxes.push(tabBox);
   }
 };
 
@@ -142,27 +139,26 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
     });
   }
   var splitterParent = this;
-  this.components = this.tabBoxs.filter(function(tabBox) {
-    return tabBox.hasViews();
-  }).reduce(function(arr, col) {
-    if (arr.length > 0) {
-      // add sep
-      var splitter = scout.create('Splitter', {
-        parent: splitterParent,
-        $anchor: arr[arr.length - 1].$container,
-        $root: splitterParent.$container,
-        splitHorizontal: false,
-        maxRatio: 1
-      });
-      splitter.render(splitterParent.$container);
-      splitter.$container.addClass('line');
-      splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
-      splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
-      arr.push(splitter);
-    }
-    arr.push(col);
-    return arr;
-  }, []);
+  this.components = this.visibleTabBoxes()
+    .reduce(function(arr, col) {
+      if (arr.length > 0) {
+        // add sep
+        var splitter = scout.create('Splitter', {
+          parent: splitterParent,
+          $anchor: arr[arr.length - 1].$container,
+          $root: splitterParent.$container,
+          splitHorizontal: false,
+          maxRatio: 1
+        });
+        splitter.render(splitterParent.$container);
+        splitter.$container.addClass('line');
+        splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
+        splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
+        arr.push(splitter);
+      }
+      arr.push(col);
+      return arr;
+    }, []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
   this.components.filter(function(comp) {
       return comp instanceof scout.SimpleTabBox;
@@ -207,6 +203,7 @@ scout.BenchColumn.prototype.addView = function(view, bringToFront) {
       tabBox.render(this.$container);
     }
     this._revalidateSplitters(true);
+    this.updateFirstLastMarker();
     this.htmlComp.invalidateLayoutTree();
     // Layout immediate to prevent 'laggy' form visualization,
     // but not initially while desktop gets rendered because it will be done at the end anyway
@@ -220,15 +217,15 @@ scout.BenchColumn.prototype.getTabBox = function(displayViewId) {
     case 'NW':
     case 'N':
     case 'NE':
-      tabBox = this.tabBoxs[scout.BenchColumn.TAB_BOX_INDEX.TOP];
+      tabBox = this.tabBoxes[scout.BenchColumn.TAB_BOX_INDEX.TOP];
       break;
     case 'SW':
     case 'S':
     case 'SE':
-      tabBox = this.tabBoxs[scout.BenchColumn.TAB_BOX_INDEX.BOTTOM];
+      tabBox = this.tabBoxes[scout.BenchColumn.TAB_BOX_INDEX.BOTTOM];
       break;
     default:
-      tabBox = this.tabBoxs[scout.BenchColumn.TAB_BOX_INDEX.CENTER];
+      tabBox = this.tabBoxes[scout.BenchColumn.TAB_BOX_INDEX.CENTER];
       break;
   }
   return tabBox;
@@ -245,6 +242,7 @@ scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
       // remove view area if no view is left.
       tabBox.remove();
       this._revalidateSplitters(true);
+      this.updateFirstLastMarker();
       this.htmlComp.invalidateLayoutTree();
       // Layout immediate to prevent 'laggy' form visualization,
       // but not initially while desktop gets rendered because it will be done at the end anyway
@@ -254,7 +252,7 @@ scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
 };
 
 scout.BenchColumn.prototype.viewCount = function() {
-  return this.tabBoxs.map(function(tabBox) {
+  return this.tabBoxes.map(function(tabBox) {
     return tabBox.viewCount();
   }).reduce(function(c1, c2) {
     return c1 + c2;
@@ -264,8 +262,9 @@ scout.BenchColumn.prototype.viewCount = function() {
 scout.BenchColumn.prototype.hasViews = function() {
   return this.viewCount() > 0;
 };
+
 scout.BenchColumn.prototype.getViews = function(displayViewId) {
-  return this.tabBoxs.reduce(function(arr, tabBox) {
+  return this.tabBoxes.reduce(function(arr, tabBox) {
     scout.arrays.pushAll(arr, tabBox.getViews(displayViewId));
     return arr;
   }, []);
@@ -273,4 +272,22 @@ scout.BenchColumn.prototype.getViews = function(displayViewId) {
 
 scout.BenchColumn.prototype.getComponents = function() {
   return this.components;
+};
+
+scout.BenchColumn.prototype.visibleTabBoxes = function() {
+  return this.tabBoxes.filter(function(tabBox) {
+    return tabBox.hasViews();
+  });
+};
+
+scout.BenchColumn.prototype.updateFirstLastMarker = function() {
+  this.visibleTabBoxes().forEach(function(tab, index, arr) {
+    tab.$container.removeClass('first last');
+    if (index === 0) {
+      tab.$container.addClass('first');
+    }
+    if (index === arr.length - 1) {
+      tab.$container.addClass('last');
+    }
+  }, this);
 };

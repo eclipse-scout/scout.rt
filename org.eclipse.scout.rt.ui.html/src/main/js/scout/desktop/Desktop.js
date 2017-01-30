@@ -119,6 +119,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderSplitterVisible();
   this._renderInBackground();
   this._renderDisplayStyle();
+  this._renderNavigationHandleVisible();
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
   }, this);
@@ -476,6 +477,10 @@ scout.Desktop.prototype.setMenus = function(menus) {
 
 scout.Desktop.prototype.setNavigationHandleVisible = function(visible) {
   this.setProperty('navigationHandleVisible', visible);
+};
+
+scout.Desktop.prototype._renderNavigationHandleVisible = function() {
+  this.$container.toggleClass('has-navigation-handle', this.navigationHandleVisible);
 };
 
 scout.Desktop.prototype.setNavigationVisible = function(visible) {

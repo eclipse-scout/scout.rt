@@ -8,21 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- .desktop-navigation-handle.collapse-handle {
+
+.desktop-navigation-handle.collapse-handle {
   position: absolute;
-
-  &.navigation-open {
-    left: auto;
-    margin-right: 5px;
-    right: 0;
-  }
-
-  &.navigation-closed {
-    left: 0;
-    right: auto;
-    padding-left: 1px;
-    margin-bottom: 36px;
-  }
 
   &:active > .collapse-handle-body {
     background-color: @desktop-navigation-handle-active-background-color;
@@ -33,6 +21,36 @@
     border-color: fade(@desktop-navigation-handle-border-color, 75%);
     color: fade(@desktop-navigation-handle-color, 75%);
   }
+
+  &.navigation-closed > .collapse-handle-body {
+    /* increase border radius a little, otherwise it is barely visible */
+    border-radius: 4px;
+  }
+
+  &.right-aligned {
+    &.both-visible {
+      right: 5px;
+    }
+
+    &:not(.both-visible) > .collapse-handle-body {
+      border-right: 0;
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
+  &.left-aligned {
+    &.both-visible {
+      right: 5px;
+    }
+
+    &:not(.both-visible) > .collapse-handle-body {
+      border-left: 0;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+  }
+
 }
 
 .navigation-handle-key-box {

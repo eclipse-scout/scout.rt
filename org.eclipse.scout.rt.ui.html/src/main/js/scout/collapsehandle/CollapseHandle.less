@@ -1,10 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+
 .collapse-handle {
   position: absolute;
   display: table;
   z-index: 10;
   bottom: 0;
   margin-bottom: 9px;
-  box-shadow: 2px 3px 7px 0 rgba(0, 0, 0, 0.4);
   border-radius: @border-radius;
 
   &.one-visible {
@@ -14,12 +24,20 @@
       background-color: @collapse-handle-active-background-color;
     }
   }
+
+  &.right-aligned {
+    right: 0;
+  }
+
+  &.left-aligned {
+    left: 0;
+  }
 }
 
 .collapse-handle-body {
   position: relative;
   display: table-cell;
-  padding: 8px;
+  padding: 8px 6px;
   background-color: @collapse-handle-background-color;
   color: fade(@collapse-handle-color, 75%);
   border: 1px solid fade(@collapse-handle-border-color, 75%);
@@ -29,7 +47,6 @@
   &::before {
     #scout.font-icon();
     display: block;
-    padding-right: 1px;
   }
 
   &.left {
