@@ -1,3 +1,3 @@
 $(document).ready(function() {
-  scout.login.init();
+  new scout.LoginApp().init();
 });

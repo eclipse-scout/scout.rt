@@ -54,6 +54,8 @@
     <session-timeout>60</session-timeout>
     <cookie-config>
       <http-only>true</http-only>
+      <!-- disable 'secure' flag below if an unencrypted channel (no https) is used -->
+      <secure>true</secure>
     </cookie-config>
   </session-config>
 

@@ -1,3 +1,3 @@
 $(document).ready(function() {
-  scout.logout.init();
+  new scout.LogoutApp().init();
 });

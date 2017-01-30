@@ -23,7 +23,7 @@ public class ServerSession extends AbstractServerSession {
   }
 
   /**
-   * @return The {@link ServerSession} which is associated with the current thread, or <code>null</code> if not found.
+   * @return The {@link ServerSession} which is associated with the current thread, or {@code null} if not found.
    */
   public static ServerSession get() {
     return ServerSessionProvider.currentSession(ServerSession.class);

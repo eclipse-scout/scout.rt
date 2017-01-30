@@ -22,7 +22,7 @@ public class ClientSession extends AbstractClientSession {
   }
 
   /**
-   * @return The {@link IClientSession} which is associated with the current thread, or <code>null</code> if not found.
+   * @return The {@link IClientSession} which is associated with the current thread, or {@code null} if not found.
    */
   public static ClientSession get() {
     return ClientSessionProvider.currentSession(ClientSession.class);
