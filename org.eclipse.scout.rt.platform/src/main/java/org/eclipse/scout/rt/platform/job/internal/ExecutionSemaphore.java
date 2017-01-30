@@ -295,10 +295,16 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
 
   @Override
   public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("permitOwners", m_permitOwners);
-    builder.attr("queue", m_queue);
-    return builder.toString();
+    m_readLock.lock();
+    try {
+      final ToStringBuilder builder = new ToStringBuilder(this);
+      builder.attr("permitOwners", m_permitOwners);
+      builder.attr("queue", m_queue);
+      return builder.toString();
+    }
+    finally {
+      m_readLock.unlock();
+    }
   }
 
   // ==== Helper classes ==== //
