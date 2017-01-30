@@ -84,7 +84,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
   private static final String PAGE_ACTIVE = "PAGE_ACTIVE";
-  private static final String PAGE_ACTIVATED = "PAGE_ACTIVE";
+  private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
   static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
   static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
   static final String LIMITED_RESULT = "LIMITED_RESULT";
