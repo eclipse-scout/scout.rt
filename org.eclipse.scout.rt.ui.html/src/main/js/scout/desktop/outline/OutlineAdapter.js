@@ -37,8 +37,16 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
     page.detailFormVisible = event.detailFormVisible;
     page.detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
 
+    if (page.detailTable) {
+      this._destroyDetailTable(page);
+    }
+
     page.detailTableVisible = event.detailTableVisible;
     page.detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget);
+
+    if (page.detailTable) {
+      this._initDetailTable(page);
+    }
   } else {
     this.widget.defaultDetailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
   }
@@ -70,10 +78,17 @@ scout.OutlineAdapter.prototype._onWidgetInitPage = function(page) {
 };
 
 scout.OutlineAdapter.prototype._initDetailTable = function(page) {
+  this._nodeIdToRowMap = {};
   // link already existing rows now
   page.detailTable.rows.forEach(this._linkNodeWithRow.bind(this));
   // rows which are inserted later are linked by _onDetailTableRowInitialized
   page.detailTable.on('rowInitialized', this._detailTableRowHandler);
+};
+
+scout.OutlineAdapter.prototype._destroyDetailTable = function(page) {
+  this._nodeIdToRowMap = {};
+  page.detailTable.rows.forEach(this._unlinkNodeWithRow.bind(this));
+  page.detailTable.off('rowInitialized', this._detailTableRowHandler);
 };
 
 scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
@@ -86,6 +101,13 @@ scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
     // Prepare for linking later because node has not been inserted yet
     // see: #_linkNodeWithRowLater
     this._nodeIdToRowMap[nodeId] = row;
+  }
+};
+
+scout.OutlineAdapter.prototype._unlinkNodeWithRow = function(row) {
+  var node = this.widget.nodesMap[row.nodeId];
+  if (node) {
+    scout.Page.unlinkRowWithPage(row, node);
   }
 };
 
