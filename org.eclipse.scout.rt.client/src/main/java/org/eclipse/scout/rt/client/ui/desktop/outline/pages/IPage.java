@@ -185,8 +185,18 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage);
 
   /**
-   * @return {@code true} if this page is active (has been clicked by the user). {@code false} otherwise.
+   * @return {@code true} if this page is currently active. {@code false} otherwise.
+   * @see #hasBeenActivated()
    */
   boolean isPageActive();
+
+  /**
+   * @return {@code true} if this page has been activated (at least once clicked by the user). This method also returns
+   *         {@code true} if the page is no longer active (see {@link #isPageActive()}) but was active once before.
+   *         Returns {@code false} if this {@link IPage} has never been activated so far.
+   * @see #isPageActive()
+   * @see #pageActivatedNotify()
+   */
+  boolean hasBeenActivated();
 
 }

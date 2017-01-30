@@ -83,14 +83,16 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
-  private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
+  private static final String PAGE_ACTIVE = "PAGE_ACTIVE";
+  private static final String PAGE_ACTIVATED = "PAGE_ACTIVE";
   static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
   static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
   static final String LIMITED_RESULT = "LIMITED_RESULT";
   static final String ALWAYS_CREATE_CHILD_PAGE = "ALWAYS_CREATE_CHILD_PAGE";
 
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
-      LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVATED);
+      LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
+  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {
@@ -113,9 +115,15 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Provides 8 boolean flags.<br>
    * Currently used: {@link #TABLE_VISIBLE}, {@link #DETAIL_FORM_VISIBLE}, {@link #PAGE_MENUS_ADDED},
    * {@link #SEARCH_REQUIRED}, {@link #SEARCH_ACTIVE}, {@link #LIMITED_RESULT}, {@link #ALWAYS_CREATE_CHILD_PAGE},
-   * {@link #PAGE_ACTIVATED}
+   * {@link #PAGE_ACTIVE}
    */
   byte m_flags;
+
+  /**
+   * Provides 8 boolean flags.<br>
+   * Currently used: {@link #PAGE_ACTIVATED}
+   */
+  byte m_flags2;
 
   @Override
   public T getTable() {
@@ -720,11 +728,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public boolean isPageActive() {
-    return FLAGS_BIT_HELPER.isBitSet(PAGE_ACTIVATED, m_flags);
+    return FLAGS_BIT_HELPER.isBitSet(PAGE_ACTIVE, m_flags);
   }
 
   protected void setPageActive(boolean active) {
-    m_flags = FLAGS_BIT_HELPER.changeBit(PAGE_ACTIVATED, active, m_flags);
+    m_flags = FLAGS_BIT_HELPER.changeBit(PAGE_ACTIVE, active, m_flags);
+    if (active) {
+      m_flags2 = FLAGS2_BIT_HELPER.setBit(PAGE_ACTIVATED, m_flags2);
+    }
+  }
+
+  @Override
+  public boolean hasBeenActivated() {
+    return FLAGS2_BIT_HELPER.isBitSet(PAGE_ACTIVATED, m_flags2);
   }
 
   private boolean isPageMenusAdded() {

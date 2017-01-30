@@ -68,6 +68,21 @@ public class PageTest {
     testPage.pageActivatedNotify();
   }
 
+  @Test
+  public void testPageActivated() {
+    final IPage<?> testPage = new P_Page();
+    assertFalse(testPage.hasBeenActivated());
+    assertFalse(testPage.isPageActive());
+
+    testPage.pageActivatedNotify();
+    assertTrue(testPage.hasBeenActivated());
+    assertTrue(testPage.isPageActive());
+
+    testPage.pageDeactivatedNotify();
+    assertTrue(testPage.hasBeenActivated());
+    assertFalse(testPage.isPageActive());
+  }
+
   /**
    * {@link AbstractPage#execPageDeactivated()}, if a ProcessingExeption is thrown
    */
