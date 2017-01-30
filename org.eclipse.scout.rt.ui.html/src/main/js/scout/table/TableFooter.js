@@ -60,8 +60,7 @@ scout.TableFooter.prototype._render = function($parent) {
   // text filter
   this._$textFilter = scout.fields.makeTextField($parent, 'table-text-filter')
     .appendTo(this._$info)
-    .on('input', '', this._onFilterInput.bind(this))
-    .on('input', '', $.debounce(this._onFilterInputDebounce.bind(this)))
+    .on('input', '', $.debounce(this._onFilterInput.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));
   filter = this.table.getFilter(scout.TableTextUserFilter.Type);
   if (filter) {
@@ -544,16 +543,6 @@ scout.TableFooter.prototype._onStatusMousedown = function(event) {
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
-  var $input = $(event.currentTarget),
-    filterText = $input.val();
-
-  if (!filterText) {
-    return;
-  }
-  $input.val(filterText.toLowerCase());
-};
-
-scout.TableFooter.prototype._onFilterInputDebounce = function(event) {
   var filter,
     $input = $(event.currentTarget),
     filterText = $input.val();
@@ -615,7 +604,12 @@ scout.TableFooter.prototype._onTableAddFilter = function(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
   if (event.filter.filterType === scout.TableTextUserFilter.Type) {
-    this._$textFilter.val(event.filter.text);
+    // Do not update the content when the value does not change. This is the case when typing text in
+    // the UI. If we would call val() unconditionally, the current cursor position will get lost.
+    var currentText = this._$textFilter.val();
+    if (currentText !== event.filter.text) {
+      this._$textFilter.val(event.filter.text);
+    }
   }
 };
 

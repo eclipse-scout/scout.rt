@@ -35,6 +35,10 @@ scout.TableTextUserFilter.prototype.accept = function(row) {
     var column = this.table.columns[i];
     rowText += column.cellTextForTextFilter(row) + ' ';
   }
+  if (this.text !== this._cachedText) {
+    this._cachedText = this.text;
+    this._cachedTextLowerCase = this.text.toLowerCase();
+  }
   rowText = rowText.trim().toLowerCase();
-  return rowText.indexOf(this.text) > -1;
+  return rowText.indexOf(this._cachedTextLowerCase) > -1;
 };

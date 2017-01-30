@@ -75,6 +75,15 @@ describe('TableTextUserFilter', function() {
       expect(table.filteredRows().length).toBe(1);
       expect(table.filteredRows()[0]).toBe(table.rows[1]);
 
+      // Capitalization is not relevant
+      filter.text = 'CeLL';
+      table.addFilter(filter);
+      table.filter();
+
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.filteredRows()[0]).toBe(table.rows[0]);
+      expect(table.filteredRows()[1]).toBe(table.rows[1]);
+
       filter.text = 'asdf';
       table.addFilter(filter);
       table.filter();
