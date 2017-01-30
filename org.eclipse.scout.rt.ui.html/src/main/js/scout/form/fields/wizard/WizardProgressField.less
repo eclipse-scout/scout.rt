@@ -59,7 +59,6 @@
   overflow: hidden;
   margin-left: @mandatory-indicator-width;
   margin-right: 0;
-  padding-bottom: @scrollbar-margin + (2 * @scrollbar-side-margin);
 }
 
 .wizard-steps-body {
@@ -216,11 +215,5 @@
         padding-right: @root-group-box-padding-right;
       }
     }
-  }
-
-  /* TODO [6.2] BSH: Try to find a better solution */
-  & > .group-box-body > .group-box > .group-box-body {
-    padding-top: 0;
-    padding-bottom: @group-margin-bottom;
   }
 }
