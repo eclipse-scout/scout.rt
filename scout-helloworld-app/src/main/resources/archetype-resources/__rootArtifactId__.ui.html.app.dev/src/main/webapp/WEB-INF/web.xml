@@ -13,7 +13,7 @@
   </listener>
 
   <listener>
-    <listener-class>org.eclipse.scout.rt.ui.html.UiHttpSessionListener</listener-class>
+    <listener-class>org.eclipse.scout.rt.server.commons.HttpSessionMutex</listener-class>
   </listener>
 
   <filter>
