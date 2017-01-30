@@ -28,7 +28,7 @@ scout.Session = function() {
   this.focusManager;
   this.keyStrokeManager;
 
-  // TODO [6.1] BSH/CGU/AWE: Split in "RemoteSession" and "???" (maybe move to App)
+  // TODO [6.2] BSH/CGU/AWE: Split in "RemoteSession" and "???" (maybe move to App)
   this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
   this.forceNewClientSession = false;
@@ -1265,7 +1265,7 @@ scout.Session.prototype.switchLocale = function(locale, textMap) {
   }
   this.locale = locale;
   this.textMap = textMap;
-  // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
+  // TODO [6.2] BSH: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 
   this.trigger('localeSwitch', {
     locale: this.locale
@@ -1284,7 +1284,7 @@ scout.Session.prototype._onLogout = function(event) {
 
 scout.Session.prototype.logout = function(logoutUrl) {
   this.loggedOut = true;
-  // TODO [6.1] BSH Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
+  // TODO [6.2] BSH Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
   if (this.forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
@@ -1322,7 +1322,7 @@ scout.Session.prototype._onReloadPage = function(event) {
 
 scout.Session.prototype._onWindowBeforeUnload = function() {
   $.log.info('Session before unloading...');
-  // TODO BSH Cancel pending requests
+  // TODO [6.2] BSH Cancel pending requests
 
   // Set a flag that indicates unloading before _onWindowUnload() is called.
   // See goOffline() why this is necessary.

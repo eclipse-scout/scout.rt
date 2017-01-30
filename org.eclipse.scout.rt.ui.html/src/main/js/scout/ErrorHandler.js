@@ -21,7 +21,9 @@ scout.ErrorHandler.prototype.handle = function(errorMessage, fileName, lineNumbe
       window.console.log(logStr);
     }
 
-    // FIXME bsh: Improve this! Accessing session at index 0 is not a good idea when a window has multiple scout instances (portlet use-case)
+    // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
+    // We simply use the first scout session to display the message box and log the error. This is not ideal in the
+    // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
     if (scout.sessions.length > 0) {
       var session = scout.sessions[0];
       if (this.displayError) {

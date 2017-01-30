@@ -268,10 +268,11 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
       continue;
     }
     // Check if the element (or one of its parents) does not want to be the first focusable element
-    // FIXME awe, bsh: (focus) replace this concept with Form#renderInitialFocusEnabled: currently we cannot set
+    // TODO [6.2 awe, bsh: (focus) replace this concept with Form#renderInitialFocusEnabled: currently we cannot set
     // that property on the model (only by JS). Add a model-property so we can do this on the model.
     // May be useful for ticket-form too, since that form currently focuses a random link in the
     // history table.
+    // [Addendum 2017-01-30 BSH: Is this still an issue? There is getConfiguredPreventInitialFocus() on the model.]
     if ($candidate.is('.prevent-initial-focus') || $candidate.closest('.prevent-initial-focus').length > 0) {
       continue;
     }

@@ -14,7 +14,7 @@ scout.SimpleTabViewContentLayout = function(tabBox) {
 };
 scout.inherits(scout.SimpleTabViewContentLayout, scout.AbstractLayout);
 
-// FIXME [6.1] BSH/CGU Improve this
+// FIXME [6.2] BSH/CGU Improve this
 scout.SimpleTabViewContentLayout.prototype.layout = function($container) {
   var currentView = this.tabBox.currentView;
   if (!currentView || !currentView.rendered || !currentView.htmlComp) {

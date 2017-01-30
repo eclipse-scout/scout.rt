@@ -293,10 +293,12 @@ scout.objects = {
   },
 
   /**
-   * TODO [6.2] bsh: Document
+   * Development utility to check if overrides in JavaScript "classes" are correct.
    *
    * How to use:
-   *   scout.objects.checkFunctionOverrides().join('\n')
+   *   1. Start application in development mode (non-minimized).
+   *   2. Open browser's development console
+   *   3. Type: scout.objects.checkFunctionOverrides().join('\n')
    */
   checkFunctionOverrides: function() {
     var whitelist = [

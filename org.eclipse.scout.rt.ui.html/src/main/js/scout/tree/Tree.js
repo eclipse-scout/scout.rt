@@ -853,7 +853,7 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   scout.styles.legacyStyle(node, $node);
 
-  // TODO [6.1] bsh: More attributes...
+  // TODO [6.2] BSH: More attributes...
   // iconId
 
   // If parent node is marked as 'lazy', check if any visible child nodes remain.

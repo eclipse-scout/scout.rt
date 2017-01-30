@@ -56,7 +56,7 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
   if (!this.displayParent.rendered) {
     return;
   }
-  // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [6.2] BSH: Remove this hack! Fix in on model if possible. See #162954.
   if (messageBox.rendered) {
     return;
   }
