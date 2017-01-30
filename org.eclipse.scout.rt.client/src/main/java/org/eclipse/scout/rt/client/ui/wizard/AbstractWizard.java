@@ -905,8 +905,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
       }
       catch (RuntimeException e) {
-        // TODO [6.2] abr: Check if logging is the correct here
-        LOG.error("Unexpected error while closing form: {}", m_containerForm, e);
+        LOG.error("Unexpected error while closing container form: {}", m_containerForm, e);
       }
       // dispose all steps
       HashSet<IWizardStep<? extends IForm>> set = new HashSet<IWizardStep<? extends IForm>>();
@@ -917,7 +916,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           step.dispose();
         }
         catch (RuntimeException t) {
-          // TODO [6.2] abr: Check if logging is the correct here
           LOG.error("Unexpected error while disposing step: {}", step, t);
         }
       }
