@@ -22,10 +22,11 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
+import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.SessionStore;
+import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -50,11 +51,13 @@ public final class JsonTestUtility {
     HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     final HttpSession httpSession = Mockito.mock(HttpSession.class);
     final ISessionStore sessionStore = new SessionStore(httpSession);
+    final Object sessionMutex = new Object();
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
     Mockito.when(request.getSession()).thenReturn(httpSession);
     Mockito.when(request.getSession(false)).thenReturn(httpSession);
     Mockito.when(httpSession.getAttribute(HttpSessionHelper.SESSION_STORE_ATTRIBUTE_NAME)).thenReturn(sessionStore);
+    Mockito.when(httpSession.getAttribute(HttpSessionMutex.SESSION_MUTEX_ATTRIBUTE_NAME)).thenReturn(sessionMutex);
     Mockito.doAnswer(new Answer<Void>() {
       @Override
       public Void answer(InvocationOnMock invocation) {

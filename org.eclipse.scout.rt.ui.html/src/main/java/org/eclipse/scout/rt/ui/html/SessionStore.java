@@ -424,7 +424,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   @Override
-  public void valueUnbound(HttpSessionBindingEvent event) {
+  public void valueUnbound(final HttpSessionBindingEvent event) {
     if (!m_httpSessionValid) {
       // valueUnbound() has already been executed
       return;
@@ -468,42 +468,37 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       return;
     }
 
-    // After some time, check if everything was cleaned up correctly ("leak detection").
-    // (This is done in a separate job to not block the session invalidation.)
-    Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        if (futures.size() > 0) {
-          LOG.debug("Waiting for {} client sessions to stop...", futures.size());
-          try {
-            Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-                .andMatchFuture(futures)
-                .toFilter(), CONFIG.getPropertyValue(SessionStoreMaxWaitAllShutdownProperty.class), TimeUnit.SECONDS);
-            LOG.info("Session shutdown complete.");
-          }
-          catch (ThreadInterruptedError e) {
-            LOG.warn("Interruption encountered while waiting for all client session to stop. Continuing anyway.", e);
-          }
-          catch (TimedOutError e) {
-            LOG.warn("Timeout encountered while waiting for all client session to stop. Canceling still running client session shutdown jobs.", e);
+    LOG.debug("Waiting for {} client sessions to stop...", futures.size());
+    try {
+      // Wait for all client sessions to stop. This is done in sync to ensure the session is not invalidated before the attached scout session has been stopped.
+      // Otherwise we would have a running scout session on an invalidated http session.
+      // Furthermore: on webapp shutdown we must first stop all sessions (scout and http) before we stop the platform. Therefore the stop must be sync!
+      Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(futures)
+          .toFilter(), CONFIG.getPropertyValue(SessionStoreMaxWaitAllShutdownProperty.class), TimeUnit.SECONDS);
+      LOG.info("Session shutdown complete.");
+    }
+    catch (ThreadInterruptedError e) {
+      LOG.warn("Interruption encountered while waiting for all client session to stop. Continuing anyway.", e);
+    }
+    catch (TimedOutError e) {
+      LOG.warn("Timeout encountered while waiting for all client session to stop. Canceling still running client session shutdown jobs.", e);
 
-            Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-                .andMatchFuture(futures)
-                .andMatchNotState(JobState.DONE)
-                .toFilter(), true);
-          }
-        }
+      // timeout while waiting for the sessions to stop. Force cancel them.
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(futures)
+          .andMatchNotState(JobState.DONE)
+          .toFilter(), true);
+    }
 
-        // Read map sizes outside a lock - dirty reads are acceptable here
-        final int uiSessionMapSize = m_uiSessionMap.size();
-        final int clientSessionMapSize = m_clientSessionMap.size();
-        final int uiSessionsByClientSessionSize = m_uiSessionsByClientSession.size();
-        if (uiSessionMapSize + clientSessionMapSize + uiSessionsByClientSessionSize > 0) {
-          LOG.warn("Leak detection - Session store not empty after HTTP session invalidation: [uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
-              uiSessionMapSize, clientSessionMapSize, uiSessionsByClientSessionSize);
-        }
-      }
-    }, Jobs.newInput()
-        .withName("Waiting for {} client sessions to shut down", futures.size()));
+    // Check if everything was cleaned up correctly ("leak detection").
+    // Read map sizes outside a lock - dirty reads are acceptable here
+    final int uiSessionMapSize = m_uiSessionMap.size();
+    final int clientSessionMapSize = m_clientSessionMap.size();
+    final int uiSessionsByClientSessionSize = m_uiSessionsByClientSession.size();
+    if (uiSessionMapSize + clientSessionMapSize + uiSessionsByClientSessionSize > 0) {
+      LOG.warn("Leak detection - Session store not empty after HTTP session invalidation: [uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
+          uiSessionMapSize, clientSessionMapSize, uiSessionsByClientSessionSize);
+    }
   }
 }

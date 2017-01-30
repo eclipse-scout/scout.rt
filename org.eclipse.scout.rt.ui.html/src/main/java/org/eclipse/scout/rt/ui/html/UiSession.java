@@ -276,7 +276,7 @@ public class UiSession implements IUiSession {
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
     String requestedClientSessionId = jsonStartupReq.getClientSessionId();
-    IClientSession clientSession = m_sessionStore.getClientSessionForUse(requestedClientSessionId);
+    IClientSession clientSession = sessionStore().getClientSessionForUse(requestedClientSessionId);
 
     if (clientSession != null) {
       // Found existing client session
@@ -525,9 +525,7 @@ public class UiSession implements IUiSession {
     }
     m_disposed = true;
 
-    if (m_sessionStore != null) {
-      m_sessionStore.unregisterUiSession(this); // also stops and removes client session if necessary
-    }
+    sessionStore().unregisterUiSession(this); // also stops and removes client session if necessary
 
     uninstallUiDataAvailableListener();
     signalPoller(); // Notify waiting requests - should not delay web-container shutdown
@@ -1125,7 +1123,7 @@ public class UiSession implements IUiSession {
 
   @Override
   public void updateTheme(String theme) {
-    UiThemeUtility.storeTheme(currentHttpResponse(), m_sessionStore.getHttpSession(), theme);
+    UiThemeUtility.storeTheme(currentHttpResponse(), sessionStore().getHttpSession(), theme);
     sendReloadPageEvent();
     LOG.info("UI theme changed to: {}", theme);
   }
@@ -1203,9 +1201,6 @@ public class UiSession implements IUiSession {
       return null;
     }
     ISessionStore sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
-    if (sessionStore == null) {
-      return null;
-    }
     return sessionStore.getUiSession(uiSessionId);
   }
 
