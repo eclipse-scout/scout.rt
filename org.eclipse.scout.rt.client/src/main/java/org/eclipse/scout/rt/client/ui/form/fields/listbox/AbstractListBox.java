@@ -172,9 +172,10 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     return 2;
   }
 
-  private List<Class<IFormField>> getConfiguredFields() {
+  private List<Class<? extends IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IFormField.class);
+    List<Class<IFormField>> fields = ConfigurationUtility.filterClasses(dca, IFormField.class);
+    return ConfigurationUtility.removeReplacedClasses(fields);
   }
 
   /**
@@ -366,7 +367,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       }
     });
     // add fields
-    List<Class<IFormField>> fieldClasses = getConfiguredFields();
+    List<Class<? extends IFormField>> fieldClasses = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
     List<IFormField> fieldList = new ArrayList<IFormField>(fieldClasses.size() + contributedFields.size());
     for (Class<? extends IFormField> fieldClazz : fieldClasses) {

@@ -225,9 +225,10 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return 2;
   }
 
-  private List<Class<IFormField>> getConfiguredFields() {
+  private List<Class<? extends IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IFormField.class);
+    List<Class<IFormField>> fields = ConfigurationUtility.filterClasses(dca, IFormField.class);
+    return ConfigurationUtility.removeReplacedClasses(fields);
   }
 
   /**
@@ -387,7 +388,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     });
 
     // add fields
-    List<Class<IFormField>> configuredFields = getConfiguredFields();
+    List<Class<? extends IFormField>> configuredFields = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
 
     List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
@@ -578,7 +579,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       prepareLookupCall(call, null);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);
-      if (data != null && data.size() > 1000) {
+      if (data.size() > 1000) {
         LOG.warn("TreeBox {} has loadIncremental=false but produced more than 1000 rows; check if this is intended.", getClass().getSimpleName());
       }
       List<ITreeNode> subTree = getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);

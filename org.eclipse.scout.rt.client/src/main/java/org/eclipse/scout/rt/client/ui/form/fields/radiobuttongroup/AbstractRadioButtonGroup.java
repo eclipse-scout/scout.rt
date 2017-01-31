@@ -150,7 +150,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       setLookupCall(call);
     }
     // add fields
-    List<Class<IFormField>> configuredFields = getConfiguredFields();
+    List<Class<? extends IFormField>> configuredFields = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
     OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
@@ -308,9 +308,10 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  protected List<Class<IFormField>> getConfiguredFields() {
+  protected List<Class<? extends IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IFormField.class);
+    List<Class<IFormField>> fca = ConfigurationUtility.filterClasses(dca, IFormField.class);
+    return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
   /*
