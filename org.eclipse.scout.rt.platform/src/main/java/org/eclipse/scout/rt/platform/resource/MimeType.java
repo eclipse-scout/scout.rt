@@ -43,6 +43,7 @@ public enum MimeType {
   LOG("text/x-log", "log"),
   M2V("video/mpeg", "m2v"),
   MIME("message/rfc822", "mime"),
+  MKV("video/x-matroska", "mkv"),
   MOV("video/quicktime", "mov"),
   MP4("video/mp4", "mp4"),
   MPG("video/mpeg", "mpg"),
@@ -131,7 +132,7 @@ public enum MimeType {
    * Common image mime types.
    */
   public static MimeType[] getCommonVideoTypesAsArray() {
-    return new MimeType[]{AVI, M2V, MOV, MP4, MPG};
+    return new MimeType[]{AVI, M2V, MKV, MOV, MP4, MPG};
   }
 
   public static boolean isOneOf(Collection<MimeType> mimeTypes, String input) {
