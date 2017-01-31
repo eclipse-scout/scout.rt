@@ -814,6 +814,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       if (!getTable().isCheckable()) {
         getTable().selectRows(checkedRows, false);
       }
+      getTable().applyRowFilters();
     }
     finally {
       getTable().setTableChanging(false);
@@ -843,16 +844,12 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
           row.setChecked(row.isSelected());
         }
       }
+      getTable().applyRowFilters();
     }
     finally {
       getTable().setTableChanging(false);
       m_valueTableSyncActive = false;
     }
-    // check if row filter needs to change
-    if (!m_table.getUIFacade().isUIProcessing()) {
-      updateActiveRowsFilter();
-    }
-    updateCheckedRowsFilter();
   }
 
 /*

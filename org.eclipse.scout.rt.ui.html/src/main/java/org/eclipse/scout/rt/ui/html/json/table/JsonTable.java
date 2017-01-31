@@ -1093,6 +1093,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
       // Put at the same position as the row_filter_changed event (replace it) to keep the order of multiple insert events
       bufferInternal.set(i, new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, rowsToInsert));
+      if (!rowsToInsert.isEmpty()) {
+        // Generate a "row order changed" event so that the inserted rows are at the correct position
+        bufferInternal.add(i + 1, new TableEvent(getModel(), TableEvent.TYPE_ROW_ORDER_CHANGED, getModel().getRows()));
+      }
 
       // Make sure no previous event contains the newly inserted rows
       for (int j = i - 1; j >= 0; j--) {
