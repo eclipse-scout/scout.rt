@@ -19,9 +19,9 @@
 scout.NavigateButton = function() {
   scout.NavigateButton.parent.call(this);
 
-  this.node;
-  this.outline;
-  this._onClickFunc;
+  this.node = null;
+  this.outline = null;
+  this._onClickFunc = null;
   this.selected = false;
   this.visible = true;
   this.enabled = true;
