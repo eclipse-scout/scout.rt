@@ -26,11 +26,14 @@ scout.TableToggleRowKeyStroke.prototype._accept = function(event) {
 };
 
 scout.TableToggleRowKeyStroke.prototype.handle = function(event) {
-  var table = this.field,
-    selection = table.selectedRows;
-
-  var checked = selection[0].checked;
-  selection.forEach(function(row) {
-    table.checkRow(row, !checked);
+  var selectedRows = this.field.selectedRows.filter(function(row) {
+    return row.enabled;
   });
+  // Toggle checked state to 'true', except if every row is already checked
+  var checked = selectedRows.some(function(row) {
+    return !row.checked;
+  });
+  selectedRows.forEach(function(row) {
+    this.field.checkRow(row, checked);
+  }, this);
 };
