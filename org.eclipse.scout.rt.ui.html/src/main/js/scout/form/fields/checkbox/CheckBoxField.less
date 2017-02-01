@@ -22,11 +22,6 @@
     vertical-align: middle;
   }
 
-  &.disabled > .check-box,
-  &.disabled > .label {
-    cursor: default;
-  }
-
   /* only the label should be clickable, not the whole field */
   & > .label {
     padding-top: 1px;
@@ -34,10 +29,6 @@
     display: inline-block;
     max-width: calc(~'100%' - @check-box-size);
     #scout.overflow-ellipsis-nowrap();
-  }
-
-  &.disabled > .label {
-    color: @control-disabled-color;
   }
 
   &.has-inner-alignment {
@@ -105,5 +96,17 @@
 
   &.halign-center > .cell-editor-field.check-box {
     margin-right: @table-cell-padding-left - 1px;
+  }
+}
+
+.check-box-field.disabled > .field {
+
+  & > .check-box {
+    cursor: default;
+  }
+
+  & > .label {
+    cursor: default;
+    color: @control-disabled-color;
   }
 }
