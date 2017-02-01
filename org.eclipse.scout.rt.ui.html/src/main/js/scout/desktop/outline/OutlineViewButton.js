@@ -20,6 +20,7 @@ scout.inherits(scout.OutlineViewButton, scout.ViewButton);
 scout.OutlineViewButton.prototype._doAction = function() {
   scout.OutlineViewButton.parent.prototype._doAction.call(this);
   if (this.outline) {
+    this.session.desktop.setOutline(this.outline);
     this.session.desktop.bringOutlineToFront(this.outline);
   }
 };

@@ -29,6 +29,7 @@ scout.ModelAdapter = function() {
   this.attached = false;
   this.destroyed = false;
   this.widget;
+  this._enabledBeforeOffline = true;
 
   /**
    * Widget properties which should be sent to server on property change.
@@ -141,17 +142,11 @@ scout.ModelAdapter.prototype._detachWidget = function() {
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {
-  this.widget.children.forEach(function(child) {
-    if (!child.rendered) {
-      // going offline must not modify model state -> only necessary to inform rendered objects
-      return;
+  this.widget.visitDirectChildren(function(child) {
+    if (child.modelAdapter) {
+      child.modelAdapter._goOffline();
     }
-    if (!child.modelAdapter) {
-      return;
-    }
-    child.modelAdapter.goOffline();
-  }, this);
-  this._goOffline();
+  });
 };
 
 scout.ModelAdapter.prototype._goOffline = function() {
@@ -159,17 +154,11 @@ scout.ModelAdapter.prototype._goOffline = function() {
 };
 
 scout.ModelAdapter.prototype.goOnline = function() {
-  this.widget.children.forEach(function(child) {
-    if (!child.rendered) {
-      // going online must not modify model state -> only necessary to inform rendered objects
-      return;
+  this.widget.visitDirectChildren(function(child) {
+    if (child.modelAdapter) {
+      child.modelAdapter._goOnline();
     }
-    if (!child.modelAdapter) {
-      return;
-    }
-    child.modelAdapter.goOnline();
-  }, this);
-  this._goOnline();
+  });
 };
 
 scout.ModelAdapter.prototype._goOnline = function() {

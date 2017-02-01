@@ -24,5 +24,8 @@ scout.OutlineViewButtonAdapter.prototype._goOffline = function() {
 };
 
 scout.OutlineViewButtonAdapter.prototype._goOnline = function() {
+  if (this.widget.outline) {
+    return;
+  }
   this.widget.setEnabled(this._enabledBeforeOffline);
 };

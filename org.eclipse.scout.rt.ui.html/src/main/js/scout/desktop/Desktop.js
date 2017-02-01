@@ -441,6 +441,9 @@ scout.Desktop.prototype._disableContextMenu = function() {
 };
 
 scout.Desktop.prototype.setOutline = function(outline) {
+  if (this.outline === outline) {
+    return;
+  }
   if (this.rendered) {
     this._removeDisplayChildsOfOutline();
   }
