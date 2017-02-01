@@ -142,7 +142,7 @@ scout.ModelAdapter.prototype._detachWidget = function() {
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {
-  this.widget.visitDirectChildren(function(child) {
+  this.widget.visitChildren(function(child) {
     if (child.modelAdapter) {
       child.modelAdapter._goOffline();
     }
@@ -154,7 +154,7 @@ scout.ModelAdapter.prototype._goOffline = function() {
 };
 
 scout.ModelAdapter.prototype.goOnline = function() {
-  this.widget.visitDirectChildren(function(child) {
+  this.widget.visitChildren(function(child) {
     if (child.modelAdapter) {
       child.modelAdapter._goOnline();
     }

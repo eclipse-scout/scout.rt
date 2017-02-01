@@ -1272,14 +1272,18 @@ scout.Widget.prototype.requestFocus = function() {
   this.session.focusManager.requestFocus(this.$container);
 };
 
-scout.Widget.prototype.visitDirectChildren = function(visitor) {
+/**
+ * Visits every child of the widget.
+ * <p>
+ * The children with a different parent are excluded.<br>
+ * This makes sure the child is not visited twice if the owner and the parent are not the same
+ * (in that case the widget would be in the children list of the owner and of the parent).
+ */
+scout.Widget.prototype.visitChildren = function(visitor) {
   this.children.forEach(function(child) {
     if (child.parent === this) {
-      // Visit the children of the widget and exclude the ones with a different parent
-      // This makes sure the child is not visited twice if the owner and the parent are not the same
-      // (in that case the widget would be in the children list of the owner and of the parent)
       visitor(child);
-      child.visitDirectChildren(visitor);
+      child.visitChildren(visitor);
     }
   }, this);
 };

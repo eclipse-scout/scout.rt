@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.CompositeFieldAdapter = function() {
-  scout.FormFieldAdapter.parent.call(this);
+  scout.CompositeFieldAdapter.parent.call(this);
+  this.enabledWhenOffline = true;
 };
 scout.inherits(scout.CompositeFieldAdapter, scout.FormFieldAdapter);
