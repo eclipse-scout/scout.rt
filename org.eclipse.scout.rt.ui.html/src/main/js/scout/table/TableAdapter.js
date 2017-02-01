@@ -569,6 +569,21 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }, true);
 };
 
+scout.TableAdapter.modifyColumnPrototype = function() {
+  if (!scout.app.remote) {
+    return;
+  }
+
+  // _ensureCell
+  scout.objects.replacePrototypeFunction(scout.Column, '_ensureCell', function(vararg) {
+    if (this.table.modelAdapter && scout.objects.isPlainObject(vararg)) {
+      scout.defaultValues.applyTo(vararg, 'Cell');
+      vararg = scout.create('Cell', vararg);
+    }
+    return this._ensureCellOrig(vararg);
+  }, true);
+};
+
 scout.TableAdapter.modifyBooleanColumnPrototype = function() {
   if (!scout.app.remote) {
     return;
@@ -576,7 +591,7 @@ scout.TableAdapter.modifyBooleanColumnPrototype = function() {
 
   // _toggleCellValue
   scout.objects.replacePrototypeFunction(scout.BooleanColumn, '_toggleCellValue', function(row, cell) {
-    if(this.table.modelAdapter) {
+    if (this.table.modelAdapter) {
       // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
     } else {
       this._toggleCellValueOrig();
@@ -585,4 +600,5 @@ scout.TableAdapter.modifyBooleanColumnPrototype = function() {
 };
 
 scout.addAppListener('bootstrap', scout.TableAdapter.modifyTablePrototype);
+scout.addAppListener('bootstrap', scout.TableAdapter.modifyColumnPrototype);
 scout.addAppListener('bootstrap', scout.TableAdapter.modifyBooleanColumnPrototype);

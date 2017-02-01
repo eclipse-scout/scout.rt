@@ -144,13 +144,9 @@ describe('TableTextUserFilter', function() {
         a: 'bean1 text'
       };
       var rows = [{
-        cells: [{
-          value: bean0
-        }]
+        cells: [bean0]
       }, {
-        cells: [{
-          value: bean1
-        }]
+        cells: [bean1]
       }];
       table.insertRows(rows);
 

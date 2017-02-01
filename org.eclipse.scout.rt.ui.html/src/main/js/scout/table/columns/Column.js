@@ -71,13 +71,11 @@ scout.Column.prototype._init = function(model) {
  * 'My Company' --> { text: 'MyCompany'; }
  *
  * @see JsonCell.java
+ * @param {scout.Cell|string|number|object} vararg either a Cell instance or a scalar value
  */
 scout.Column.prototype.initCell = function(vararg, row) {
-  if (vararg instanceof scout.Cell) {
-    return vararg;
-  }
-  var cellModel = this._createCellModel(vararg);
-  var cell = scout.create('Cell', cellModel);
+  var cell = this._ensureCell(vararg);
+  this._initCell(cell);
 
   // If a text is provided, use that text instead of using formatValue to generate a text based on the value
   if (scout.objects.isNullOrUndefined(cell.text)) {
@@ -86,27 +84,36 @@ scout.Column.prototype.initCell = function(vararg, row) {
   return cell;
 };
 
-scout.Column.prototype._createCellModel = function(vararg) {
-  var cellModel;
-  if (vararg && scout.objects.isPlainObject(vararg)) {
-    cellModel = vararg;
+/**
+ * Ensures that a Cell instance is returned. When vararg is a scalar value a new Cell instance is created and
+ * the value is set as cell.value property.
+ *
+ * @param {scout.Cell|string|number|object} vararg either a Cell instance or a scalar value
+ * @returns {*}
+ * @private
+ */
+scout.Column.prototype._ensureCell = function(vararg) {
+  var cell;
+  
+  if (vararg instanceof scout.Cell) {
+    cell = vararg;
 
     // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
-    cellModel.value = this._parseValue(cellModel.value);
+    cell.value = this._parseValue(cell.value);
 
     // If a text but no value is provided, parse the text and set the result as value.
     // Otherwise, the (null) value would be formatted later and the provided text replaced with ''
-    if (cellModel.text && cellModel.value === undefined) {
-      cellModel.value = this._parseValue(cellModel.text);
+    if (cell.text && cell.value === undefined) {
+      cell.value = this._parseValue(cell.text);
     }
   } else {
     // in this case 'vararg' is only a scalar value, typically a string
-    cellModel = {
+    cell = scout.create('Cell', {
       value: this._parseValue(vararg)
-    };
+    });
   }
-  this._initCell(cellModel);
-  return cellModel;
+
+  return cell;
 };
 
 /**
@@ -143,16 +150,17 @@ scout.Column.prototype._formatValue = function(value) {
 };
 
 /**
- * Override this method to impl. type specific init cell behavior.
+ * If cell does not define properties, use column values.
+ * Override this function to impl. type specific init cell behavior.
+ *
+ * @param {scout.Cell} cell
  */
-scout.Column.prototype._initCell = function(cellModel) {
-  // Apply defaultValues in remote mode (there will be no defaults in JS-only mode)
-  scout.defaultValues.applyTo(cellModel, 'Cell');
-  // if cell does not define properties, use column values
-  cellModel.cssClass = scout.nvl(cellModel.cssClass, this.cssClass);
-  cellModel.editable = scout.nvl(cellModel.editable, this.editable);
-  cellModel.horizontalAlignment = scout.nvl(cellModel.horizontalAlignment, this.horizontalAlignment);
-  cellModel.htmlEnabled = scout.nvl(cellModel.htmlEnabled, this.htmlEnabled);
+scout.Column.prototype._initCell = function(cell) {
+  cell.cssClass = scout.nvl(cell.cssClass, this.cssClass);
+  cell.editable = scout.nvl(cell.editable, this.editable);
+  cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
+  cell.htmlEnabled = scout.nvl(cell.htmlEnabled, this.htmlEnabled);
+  return cell;
 };
 
 scout.Column.prototype.buildCellForRow = function(row) {
@@ -467,14 +475,14 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
 
 scout.Column.prototype.createAggrGroupCell = function(row) {
   var cell = this.cell(row);
-  return this.initCell({
+  return this.initCell(scout.create('Cell', {
     // value necessary for value based columns (e.g. checkbox column)
     value: cell.value,
     text: this.cellTextForGrouping(row),
     iconId: cell.iconId,
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
-  });
+  }));
 };
 
 scout.Column.prototype.createAggrValueCell = function(value) {
@@ -482,9 +490,9 @@ scout.Column.prototype.createAggrValueCell = function(value) {
 };
 
 scout.Column.prototype.createAggrEmptyCell = function() {
-  return this.initCell({
+  return this.initCell(scout.create('Cell', {
     empty: true
-  });
+  }));
 };
 
 scout.Column.prototype.setBackgroundEffect = function(effect) {

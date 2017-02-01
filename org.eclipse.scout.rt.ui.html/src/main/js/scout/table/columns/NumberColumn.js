@@ -57,12 +57,12 @@ scout.NumberColumn.prototype._parseValue = function(value) {
 
 scout.NumberColumn.prototype.createAggrValueCell = function(value) {
   var formattedValue = this._formatValue(value);
-  return this.initCell({
+  return this.initCell(scout.create('Cell', {
     text: formattedValue,
     iconId: (formattedValue ? this.aggrSymbol : null),
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
-  });
+  }));
 };
 
 /**

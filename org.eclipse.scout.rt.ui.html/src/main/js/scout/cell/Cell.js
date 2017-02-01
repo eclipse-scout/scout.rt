@@ -8,14 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * Note: this class does intentionally NOT set any default values in the constructor.
+ * This is required because there's a subtle logic in Column.js which checks if a value is set in a Cell instance
+ * and, if not, uses the value from the Column. This class is tightly coupled with Columns.js.
+ *
+ * @class
+ * @constructor
+ */
 scout.Cell = function() {
   this.$cell;
-  this.checked = false;
   this.cssClass;
-  this.editable = false;
+  this.editable;
   this.errorStatus;
-  this.horizontalAlignment = -1;
-  this.htmlEnabled = false;
+  this.horizontalAlignment;
+  this.htmlEnabled;
   this.iconId;
   this._cachedEncodedText;
   this.text;

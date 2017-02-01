@@ -303,10 +303,10 @@ describe('Column', function() {
         return value.toUpperCase();
       };
       table.insertRows([{
-        cells: [{
+        cells: [scout.create('Cell', {
           value: 'cell 1',
           text: 'cell text 1'
-        }]
+        })]
       }]);
       var row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
@@ -318,9 +318,9 @@ describe('Column', function() {
         return value.toUpperCase();
       };
       table.insertRows([{
-        cells: [{
+        cells: [scout.create('Cell', {
           text: 'cell text 1'
-        }]
+        })]
       }]);
       var row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell text 1');

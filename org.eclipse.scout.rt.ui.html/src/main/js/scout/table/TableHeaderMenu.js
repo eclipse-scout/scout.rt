@@ -608,10 +608,11 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   var tableRow, tableRows = [];
   this.filter.availableValues.forEach(function(filterValue) {
     tableRow = {
-      cells: [{
+      cells: [
+        scout.create('Cell', {
           text: filterValue.text,
           iconId: filterValue.iconId
-        },
+        }),
         filterValue.count
       ],
       checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,

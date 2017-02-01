@@ -94,7 +94,7 @@ scout.TableSpecHelper.prototype.createModelCell = function(text, value) {
   if (value !== undefined) {
     cell.value = value;
   }
-  return cell;
+  return scout.create('Cell', cell);
 };
 
 scout.TableSpecHelper.prototype.createMenuModel = function(text, icon) {
