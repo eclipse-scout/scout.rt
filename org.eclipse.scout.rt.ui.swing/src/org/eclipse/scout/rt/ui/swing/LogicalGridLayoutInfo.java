@@ -181,7 +181,7 @@ public class LogicalGridLayoutInfo {
 
   /**
    * Calculates the logical widths and weights of the grid columns.
-   * 
+   *
    * @param compSize
    *          the logical dimensions of the components in the grid.
    */
@@ -298,7 +298,7 @@ public class LogicalGridLayoutInfo {
 
   /**
    * Calculates the logical heights and weights of the grid rows.
-   * 
+   *
    * @param compSize
    *          the logical dimensions of the components in the grid.
    */
@@ -408,7 +408,7 @@ public class LogicalGridLayoutInfo {
   /**
    * Computes the grid with its cells aligned to the parent's dimension. Thereby, gaps are not included in the grid cell
    * bounds. Also, the minimal, maximal and preferred extent of the grid is calculated.
-   * 
+   *
    * @param parentSize
    *          the actual size of the parent container.
    * @param insets
@@ -456,7 +456,6 @@ public class LogicalGridLayoutInfo {
     /*
      * 3. Compute the minimal, maximal and preferred extent of the grid.
      */
-    m_useLogicalPrefSize = true;
     if (initialization || m_useLogicalPrefSize) {
       // Use logical sizes if the root container is not showing on screen to determine the container's initial size.
       int[] logicalColWidths = extractSizes(width, LogicalGridLayout.PREF_SIZE);
@@ -542,7 +541,7 @@ public class LogicalGridLayoutInfo {
 
   /**
    * Calculates the components's sizes in respect to the given size of the container.
-   * 
+   *
    * @param targetSize
    *          the size specified by the container.
    * @param sizes
