@@ -210,7 +210,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
   // FIXME CGU improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
   parent.session = session;
-  session.desktop = this._createDesktop(parent);
+  this._createDesktop(parent);
   this.trigger('desktopcreated');
   session.render(function() {
     session._renderDesktop();
