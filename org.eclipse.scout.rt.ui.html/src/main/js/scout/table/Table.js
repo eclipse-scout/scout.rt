@@ -3718,6 +3718,15 @@ scout.Table.prototype._detach = function() {
   scout.Table.parent.prototype._detach.call(this);
 };
 
+scout.Table.prototype._beforeDetach = function() {
+  // When a cell editor popup is open and table is detached, we close the popup immediately
+  // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
+  // with invalid focus contexts.
+  if (this.cellEditorPopup) {
+    this.cellEditorPopup.remove();
+  }
+};
+
 scout.Table.prototype.setVirtual = function(virtual) {
   this._setProperty('virtual', virtual);
 };
