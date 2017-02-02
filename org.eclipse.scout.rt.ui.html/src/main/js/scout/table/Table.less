@@ -101,6 +101,10 @@
     color: @item-selection-border-color;
   }
 
+  &:active {
+    background-color: @table-row-active-background-color;
+  }
+
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
     border-color: @item-selection-nonfocus-border-color;
@@ -127,10 +131,6 @@
     border-top: 1px solid @item-selection-nonfocus-border-color;
     /* Move the row 1px up to cover the bottom border of the previous row. */
     margin-top: -1px;
-  }
-
-  &:active {
-    background-color: @table-row-active-background-color;
   }
 
   &.disabled:not(.read-only) {

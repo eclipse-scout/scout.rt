@@ -165,19 +165,8 @@
       padding: @outline-breadcrumb-node-padding-v 2px !important;
 
       &.ancestor-of-selected,
-      &.child-of-selected,
-      &.selected {
+      &.child-of-selected {
         background-color: @outline-group-background-color;
-      }
-
-      &:active {
-        background-color: @navigation-background-color;
-      }
-
-      &.selected {
-        background-color: @outline-selection-background-color;
-        color: @outline-selection-color;
-        cursor: default;
       }
 
       &.ancestor-of-selected::before {
@@ -192,14 +181,29 @@
         bottom: -8px;
       }
 
-      &.selected::before {
-        border-top-color: @outline-selection-background-color;
-        border-width: 8px 13px 0 13px;
-        bottom: -8px;
+      &:active {
+        background-color: @navigation-background-color;
+
+        &::after {
+          border-top-color: @navigation-background-color;
+        }
       }
 
-      &.selected::after {
-        border: 0;
+      &.selected {
+        background-color: @outline-selection-background-color;
+        color: @outline-selection-color;
+        cursor: default;
+
+        &::before {
+          border-top-color: @outline-selection-background-color;
+          border-width: 8px 13px 0 13px;
+          bottom: -8px;
+        }
+
+        &::after {
+          border: 0;
+          border-top-color: @outline-selection-background-color;
+        }
       }
     }
 

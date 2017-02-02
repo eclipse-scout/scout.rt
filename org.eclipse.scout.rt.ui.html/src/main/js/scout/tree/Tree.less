@@ -62,15 +62,15 @@
   padding: @tree-node-padding;
   #scout.overflow-ellipsis-nowrap();
 
+  &:active {
+    background-color: @tree-node-active-background-color;
+  }
+
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
     border-color: @item-selection-nonfocus-border-color;
     border-left-color: transparent;
     border-right-color: transparent;
-  }
-
-  &:active {
-    background-color: @tree-node-active-background-color;
   }
 
   &.disabled {
@@ -239,6 +239,10 @@
         border-color: @control-background-color transparent transparent transparent;
         border-width: 6px 12px 0 12px;
         bottom: -6px;
+      }
+
+      &:active::after {
+        border-top-color: @tree-node-active-background-color;
       }
 
       &.selected::after {
