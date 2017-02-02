@@ -628,6 +628,7 @@ describe("TableKeyStrokes", function() {
       expect(rows[2].checked).toBe(true);
       expect(rows[3].checked).toBe(false);
 
+      table.$data.triggerKeyUp(scout.keys.SPACE);
       table.$data.triggerKeyDown(scout.keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(false);
