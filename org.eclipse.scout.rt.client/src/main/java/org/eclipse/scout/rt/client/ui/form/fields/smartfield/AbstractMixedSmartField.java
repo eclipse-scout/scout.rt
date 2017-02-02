@@ -116,17 +116,20 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   protected VALUE handleMissingLookupRow(String text) {
     doSearch(text, false, true);
     IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
-    ILookupRow<LOOKUP_KEY> singleMatchLookupRow = null;
-    if (fetchResult != null && fetchResult.getLookupRows() != null && fetchResult.getLookupRows().size() == 1) {
-      singleMatchLookupRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
+
+    int numResults = 0;
+    if (fetchResult != null && fetchResult.getLookupRows() != null) {
+      numResults = fetchResult.getLookupRows().size();
+      if (numResults == 1) {
+        ILookupRow<LOOKUP_KEY> singleMatchLookupRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
+        setCurrentLookupRow(singleMatchLookupRow);
+        return returnLookupRowAsValue(singleMatchLookupRow);
+      }
     }
-    if (singleMatchLookupRow != null) {
-      setCurrentLookupRow(singleMatchLookupRow);
-      return returnLookupRowAsValue(singleMatchLookupRow);
-    }
-    else {
-      throw new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
-    }
+
+    VetoException veto = new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
+    veto.withCode(numResults > 1 ? NOT_UNIQUE_ERROR_CODE : NO_RESULTS_ERROR_CODE);
+    throw veto;
   }
 
   @Override

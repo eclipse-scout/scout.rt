@@ -30,6 +30,9 @@ public final class ParsingFailedStatus extends ScoutFieldStatus {
 
   public ParsingFailedStatus(ProcessingException exception, String parseInputString) {
     this(exception.getStatus().getMessage(), parseInputString);
+    // it's important to store not only the status message, but also the status code, because
+    // some business logic may depend on a certain code, e.g. the smart-field
+    setCode(exception.getStatus().getCode());
   }
 
   public String getParseInputString() {
