@@ -627,6 +627,12 @@ describe("TableKeyStrokes", function() {
       expect(rows[1].checked).toBe(true);
       expect(rows[2].checked).toBe(true);
       expect(rows[3].checked).toBe(false);
+
+      table.$data.triggerKeyDown(scout.keys.SPACE);
+      expect(rows[0].checked).toBe(false);
+      expect(rows[1].checked).toBe(false);
+      expect(rows[2].checked).toBe(false);
+      expect(rows[3].checked).toBe(false);
     });
 
     it("unchecks the selected rows if first row is checked", function() {
@@ -646,23 +652,6 @@ describe("TableKeyStrokes", function() {
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);
       expect(rows[3].checked).toBe(true);
-    });
-
-    it("does not modify already unchecked rows when unchecking", function() {
-      var model = helper.createModelFixture(2, 4);
-      model.checkable = true;
-      var table = helper.createTable(model);
-      var rows = table.rows;
-      table.render(session.$entryPoint);
-      table.checkRow(rows[1], true);
-      table.checkRow(rows[2], false);
-      helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
-
-      table.$data.triggerKeyDown(scout.keys.SPACE);
-      expect(rows[0].checked).toBe(false);
-      expect(rows[1].checked).toBe(false);
-      expect(rows[2].checked).toBe(false);
-      expect(rows[3].checked).toBe(false);
     });
 
   });
