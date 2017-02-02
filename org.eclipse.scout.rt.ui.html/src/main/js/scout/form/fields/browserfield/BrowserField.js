@@ -22,6 +22,8 @@ scout.BrowserField = function() {
   this._popupWindow;
   this._externalWindowTextField;
   this._externalWindowButton;
+  // Iframe on iOS is always as big as its content. Workaround it by using a wrapper div with overflow: auto
+  this.wrapIframe = scout.device.isIos();
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
@@ -37,7 +39,14 @@ scout.BrowserField.prototype._render = function($parent) {
 
   if (!this.showInExternalWindow) {
     // mode 1: <iframe>
-    this.addField($parent.makeElement('<iframe>'));
+    var $iframe;
+    if (this.wrapIframe) {
+      this.addFieldContainer($parent.makeDiv('iframe-wrapper'));
+      $iframe = this.$fieldContainer.appendElement('<iframe>');
+    } else {
+      $iframe = $parent.makeElement('<iframe>');
+    }
+    this.addField($iframe);
   } else {
     // mode 2: separate window
     this.addField($parent.makeDiv());
@@ -93,7 +102,7 @@ scout.BrowserField.prototype._renderLocation = function() {
 
 scout.BrowserField.prototype._renderScrollBarEnabled = function() {
   if (!this.showInExternalWindow) {
-    this.$field.toggleClass('no-scrolling', !this.scrollBarEnabled);
+    this.$fieldContainer.toggleClass('no-scrolling', !this.scrollBarEnabled);
     // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
     // CSS should be enough. However, if the inner page sets 'overflow' to another value,
     // scroll bars are shown again. Therefore, we add the legacy 'scrolling' attribute,

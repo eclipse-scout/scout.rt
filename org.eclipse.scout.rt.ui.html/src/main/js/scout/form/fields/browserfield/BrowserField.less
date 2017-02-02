@@ -18,12 +18,21 @@
     overflow: hidden;
   }
 
-  > .button {
+  & > .button {
     display: inline-block;
   }
 
-  > .button, > .alt  {
+  & > .button, > .alt  {
     margin-top: @group-margin-top;
     margin-left: @mandatory-indicator-width;
+  }
+}
+
+.iframe-wrapper {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  & > iframe {
+    border: 0;
   }
 }
