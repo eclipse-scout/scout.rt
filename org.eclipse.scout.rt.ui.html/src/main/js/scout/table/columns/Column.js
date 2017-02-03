@@ -48,9 +48,6 @@ scout.Column.prototype.init = function(model) {
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.nvl(this.width, 0);
   }
-  if (this.aggregationFunction) {
-    this.setAggregationFunction(this.aggregationFunction);
-  }
   scout.texts.resolveTextProperty(this);
   this._init(model);
 };
@@ -94,7 +91,7 @@ scout.Column.prototype.initCell = function(vararg, row) {
  */
 scout.Column.prototype._ensureCell = function(vararg) {
   var cell;
-  
+
   if (vararg instanceof scout.Cell) {
     cell = vararg;
 
@@ -281,19 +278,6 @@ scout.Column.prototype._cellStyle = function(cell) {
 
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   style += scout.styles.legacyStyle(cell);
-
-  if (this.backgroundEffect && cell.value !== undefined) {
-    if (!this.backgroundEffectFunc) {
-      this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
-    }
-    var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueForGrouping(cell.value));
-    if (backgroundStyle.backgroundColor) {
-      style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
-    }
-    if (backgroundStyle.backgroundImage) {
-      style += 'background-image: ' + backgroundStyle.backgroundImage + ';';
-    }
-  }
   return style;
 };
 
@@ -426,31 +410,6 @@ scout.Column.prototype._preprocessText = function(text, options) {
   return text;
 };
 
-scout.Column.prototype.setAggregationFunction = function(func) {
-  this.aggregationFunction = func;
-  if (func === 'sum') {
-    this.aggrStart = scout.aggregation.sumStart;
-    this.aggrStep = scout.aggregation.sumStep;
-    this.aggrFinish = scout.aggregation.sumFinish;
-    this.aggrSymbol = scout.aggregation.sumSymbol;
-  } else if (func === 'avg') {
-    this.aggrStart = scout.aggregation.avgStart;
-    this.aggrStep = scout.aggregation.avgStep;
-    this.aggrFinish = scout.aggregation.avgFinish;
-    this.aggrSymbol = scout.aggregation.avgSymbol;
-  } else if (func === 'min') {
-    this.aggrStart = scout.aggregation.minStart;
-    this.aggrStep = scout.aggregation.minStep;
-    this.aggrFinish = scout.aggregation.minFinish;
-    this.aggrSymbol = scout.aggregation.minSymbol;
-  } else if (func === 'max') {
-    this.aggrStart = scout.aggregation.maxStart;
-    this.aggrStep = scout.aggregation.maxStep;
-    this.aggrFinish = scout.aggregation.maxFinish;
-    this.aggrSymbol = scout.aggregation.maxSymbol;
-  }
-};
-
 scout.Column.prototype.setCellValue = function(row, value) {
   var cell = this.cell(row);
 
@@ -495,79 +454,6 @@ scout.Column.prototype.createAggrEmptyCell = function() {
   }));
 };
 
-scout.Column.prototype.setBackgroundEffect = function(effect) {
-  if (this.backgroundEffect === effect) {
-    return;
-  }
-
-  this.backgroundEffect = effect;
-  this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
-
-  this.table.trigger('columnBackgroundEffectChanged', {
-    column: this
-  });
-
-  if (this.backgroundEffect && (this.minValue === undefined || this.maxValue === undefined)) {
-    // No need to calculate the values again when switching background effects
-    // If background effect is turned off and on again values will be recalculated
-    // This is necessary because in the meantime rows may got updated, deleted etc.
-    this.calculateMinMaxValues();
-  }
-  if (!this.backgroundEffect) {
-    // Clear to make sure values are calculated anew the next time a background effect gets set
-    this.minValue = undefined;
-    this.maxValue = undefined;
-  }
-
-  if (this.table.rendered) {
-    this._renderBackgroundEffect();
-  }
-};
-
-/**
- * Recalculates the min / max values and renders the background effect again.
- */
-scout.Column.prototype.updateBackgroundEffect = function() {
-  this.calculateMinMaxValues();
-  if (this.table.rendered) {
-    this._renderBackgroundEffect();
-  }
-};
-
-scout.Column.prototype._resolveBackgroundEffectFunc = function() {
-  var effect = this.backgroundEffect;
-  if (effect === 'colorGradient1') {
-    return this._colorGradient1.bind(this);
-  }
-  if (effect === 'colorGradient2') {
-    return this._colorGradient2.bind(this);
-  }
-  if (effect === 'barChart') {
-    return this._barChart.bind(this);
-  }
-
-  if (effect !== null) {
-    $.log.warn('Unsupported backgroundEffect: ' + effect);
-    return function() {
-      return {};
-    };
-  }
-};
-
-scout.Column.prototype._renderBackgroundEffect = function() {
-  this.table.filteredRows().forEach(function(row) {
-    if (!row.$row) {
-      return;
-    }
-    var cell = this.cell(row),
-      $cell = this.table.$cell(this, row.$row);
-
-    if (cell.value !== undefined) {
-      $cell[0].style.cssText = this._cellStyle(cell);
-    }
-  }, this);
-};
-
 scout.Column.prototype.calculateOptimalWidth = function() {
   // Prepare a temporary container that is not (yet) part of the DOM to prevent
   // expensive "forced reflow" while adding the cell divs. Only after all cells
@@ -597,63 +483,6 @@ scout.Column.prototype.calculateOptimalWidth = function() {
   $tmp.remove();
 
   return optimalWidth;
-};
-
-scout.Column.prototype.calculateMinMaxValues = function() {
-  var row, minValue, maxValue, value,
-    rows = this.table.rows;
-
-  for (var i = 0; i < rows.length; i++) {
-    row = rows[i];
-    value = this.cellValueForGrouping(row);
-
-    if (value < minValue || minValue === undefined) {
-      minValue = value;
-    }
-    if (value > maxValue || maxValue === undefined) {
-      maxValue = value;
-    }
-  }
-  this.minValue = minValue;
-  this.maxValue = maxValue;
-};
-
-scout.Column.prototype._colorGradient1 = function(value) {
-  var startStyle = scout.styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
-    endStyle = scout.styles.get('column-background-effect-gradient1-end', 'backgroundColor'),
-    startColor = scout.styles.rgb(startStyle.backgroundColor),
-    endColor = scout.styles.rgb(endStyle.backgroundColor);
-
-  return this._colorGradient(value, startColor, endColor);
-};
-
-scout.Column.prototype._colorGradient2 = function(value) {
-  var startStyle = scout.styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
-    endStyle = scout.styles.get('column-background-effect-gradient2-end', 'backgroundColor'),
-    startColor = scout.styles.rgb(startStyle.backgroundColor),
-    endColor = scout.styles.rgb(endStyle.backgroundColor);
-
-  return this._colorGradient(value, startColor, endColor);
-};
-
-scout.Column.prototype._colorGradient = function(value, startColor, endColor) {
-  var level = (value - this.minValue) / (this.maxValue - this.minValue);
-
-  var r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
-    g = Math.ceil(startColor.green - level * (startColor.green - endColor.green)),
-    b = Math.ceil(startColor.blue - level * (startColor.blue - endColor.blue));
-
-  return {
-    backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
-  };
-};
-
-scout.Column.prototype._barChart = function(value) {
-  var level = Math.ceil((value - this.minValue) / (this.maxValue - this.minValue) * 100) + '';
-  var color = scout.styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
-  return {
-    backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
-  };
 };
 
 /**
