@@ -232,11 +232,11 @@ public class UiSession implements IUiSession {
       // Register job listener to signal poller once possible UI data to be transported to the UI is available.
       installUiDataAvailableListener(m_clientSession);
 
-      // Create a new JsonAdapter for the client session
-      JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
-
       // Start desktop
       startDesktop(jsonStartupReq.getSessionStartupParams());
+
+      // Create a new JsonAdapter for the client session
+      JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
       // Fill startupData with everything that is needed to start the session on the UI
       putInitializationStartupData(jsonClientSessionAdapter.getId());
