@@ -140,6 +140,62 @@ scout.BrowserField.prototype._renderExternalWindowFieldText = function() {
   }
 };
 
+/**
+ * Note: this function is designed to deliver good results to position a popup over a BrowserField in Internet Explorer.
+ * Other browsers may not perfectly position the popup, since they return different values for screenX/screenY. Also
+ * there's no way to retrieve all required values from the window or screen object, that's why we have to use hard coded
+ * values here. In order to make this function more flexible you could implement it as a strategy which has different
+ * browser dependent implementations.
+ *
+ * This implementation does also deal with a multi screen setup (secondary monitor). An earlier implementation used
+ * screen.availWidth to make sure the popup is within the visible area of the screen. However, screen.availWidth only
+ * returns the size of the primary monitor, so we cannot use it. There's no way to check for a secondary monitor from
+ * a HTML document. So we removed the check entirely, which shouldn't be an issue since the browser itself does prevent
+ * popups from having an invalid position.
+ */
+scout.BrowserField.prototype._calcPopupBounds = function() {
+  var myWindow = this.$container.window(true);
+
+  var POPUP_WINDOW_TOP_HEIGHT = 30;
+  var POPUP_WINDOW_BOTTOM_HEIGHT = 8;
+  var POPUP_WINDOW_CHROME_HEIGHT = POPUP_WINDOW_TOP_HEIGHT + POPUP_WINDOW_BOTTOM_HEIGHT;
+
+  var BROWSER_WINDOW_TOP_HEIGHT = 55;
+  var browserX = Math.max(0, myWindow.screenX);
+  var browserY = Math.max(0, myWindow.screenY);
+
+  var browserBounds = new scout.Rectangle(
+    browserX,
+    browserY,
+    $(myWindow).width(),
+    $(myWindow).height() + BROWSER_WINDOW_TOP_HEIGHT);
+
+  var fieldBounds = new scout.Rectangle(
+    this.$field.offset().left,
+    this.$field.offset().top,
+    this.$field.width(),
+    this.$field.height());
+
+  var popupX = browserBounds.x + fieldBounds.x;
+  var popupY = browserBounds.y + fieldBounds.y + BROWSER_WINDOW_TOP_HEIGHT;
+  var popupWidth = fieldBounds.width;
+  var popupHeight = fieldBounds.height + POPUP_WINDOW_CHROME_HEIGHT;
+
+  // ensure that the lower Y of the new popup is not below the lower Y of the browser window
+  var popupLowerY = popupY + popupHeight;
+  var browserLowerY = browserBounds.y + browserBounds.height;
+  if (popupLowerY > browserLowerY) {
+    popupHeight -= (popupLowerY - browserLowerY) + POPUP_WINDOW_CHROME_HEIGHT;
+  }
+
+  return new scout.Rectangle(
+    scout.numbers.round(popupX),
+    scout.numbers.round(popupY),
+    scout.numbers.round(popupWidth),
+    scout.numbers.round(popupHeight)
+  );
+};
+
 scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
   reopenIfClosed = scout.nvl(reopenIfClosed, true);
   if (!this.showInExternalWindow) {
@@ -148,16 +204,8 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
 
   if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
     var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
-    // (a) positioning and sizing
-    // screenLeft, screenTop might reveal the actual document screen position; screenX, screenY is just the browser window screen position
-    // window should not be positioned outside of the available screen (probably not even possible), subtract 400 pixel of lower right corner of screen
-    var windowLeft = Math.min(scout.nvl(window.screenLeft, window.screenX) + this.$field.offset().left, window.screen.availWidth - 400);
-    // add 50 px (guessing there is a toolbar of 50 px)
-    var windowTop = Math.min(scout.nvl(window.screenTop, window.screenY + 50) + this.$field.offset().top, window.screen.availHeight - 400);
-    // do not taskbar hide window, leave a safety margin of 40 pixel to lower screen bound (suppose a taskbar is shown there)
-    var windowWidth = ((this.$field.width() + windowLeft) > window.screen.availWidth) ? (window.screen.availWidth - windowLeft) : this.$field.width();
-    var windowHeight = ((this.$field.height() + windowTop) > window.screen.availHeight) ? (window.screen.availHeight - windowTop) : this.$field.height();
-    // (b) window specifications
+    var popupBounds = this._calcPopupBounds();
+    // window specifications
     var windowSpecs = scout.strings.join(',',
         'directories=no',
         'location=no',
@@ -167,10 +215,10 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
         'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
         'toolbar=no',
         'dependent=yes',
-        'left=' + windowLeft,
-        'top=' + windowTop,
-        'width=' + windowWidth,
-        'height=' + windowHeight
+        'left=' + popupBounds.x,
+        'top=' + popupBounds.y,
+        'width=' + popupBounds.width,
+        'height=' + popupBounds.height
         );
     var location = this.location || 'about:blank';
     this._popupWindow = popupBlockerHandler.openWindow(location,
