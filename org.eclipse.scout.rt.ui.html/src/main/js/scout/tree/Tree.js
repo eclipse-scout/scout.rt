@@ -2245,6 +2245,11 @@ scout.Tree.prototype._showContextMenu = function(event) {
     if (filteredMenus.length === 0) {
       return; // at least one menu item must be visible
     }
+    // Prevent firing of 'onClose'-handler during contextMenu.open()
+    // (Can lead to null-access when adding a new handler to this.contextMenu)
+    if (this.contextMenu) {
+      this.contextMenu.close();
+    }
     this.contextMenu = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: filteredMenus,

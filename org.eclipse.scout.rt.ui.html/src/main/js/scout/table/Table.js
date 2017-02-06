@@ -423,6 +423,11 @@ scout.Table.prototype.onContextMenu = function(event) {
         event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
       }
       if (menuItems.length > 0) {
+        // Prevent firing of 'onClose'-handler during contextMenu.open()
+        // (Can lead to null-access when adding a new handler to this.popupMenu)
+        if (this.popupMenu) {
+          this.popupMenu.close();
+        }
         this.popupMenu = scout.create('ContextMenuPopup', {
           parent: this,
           menuItems: menuItems,
