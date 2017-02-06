@@ -174,6 +174,14 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
 //    if (form != null) {
 //      Assertions.assertFalse(form.isFormStarted(), "Inner Form must not be started yet [wrappedFormField=%s, innerForm=%s]", this, form);
 //    }
+    // TODO [6.2.] BSH: Check if the above to-do would better be solved using "form.isShowing()". But what about forms that are started and contained in wrapper field 1 and are added to wrapper field 2?
+    // Example:  Would work with "isFormStarted()":                      Would _not_ work with "isFormStarted()", but would work with "isShowing()".
+    //           ----------------------------------                      ---------------------------------------------------------------------------
+    //           TestForm form = new TestForm();                         TestForm form = new TestForm()
+    //           form.setHandler(form.new TestHandler());                form.setHandler(form.new TestHandler())
+    //           form.start();                                           form.setShowOnStart(false) // <--
+    //           getWrappedFormField().setInnerForm(form, false);        form.start()
+    //                                                                   getWrappedFormField().setInnerForm(form, false)
 
     FORM oldInnerForm = m_innerForm;
     uninstallInnerForm();
