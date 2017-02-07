@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -143,11 +144,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       runInExtensionContext(new Runnable() {
         @Override
         public void run() {
-          m_table = initTable();
+          m_table = createTable();
           if (m_table != null) {
+            m_table.initTable(); // calls execInitTable of AbstractTable
             firePageChanged(AbstractPage.this);
             addDefaultTableControls();
-            interceptInitTable();
+            interceptInitTable(); // calls execInitTable of AbstractPage
             notifyMemoryPolicyOfTableCreated();
           }
         }
@@ -493,6 +495,15 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected void execInitDetailForm() {
   }
 
+  /**
+   * Callback executed when the {@link ITable} of this {@link IPage} is created.
+   * <p>
+   * This may be useful if an abstract page itself has no {@link ITable} but the sub-class has and the parent page wants
+   * to be notified when the sub-class creates its table.
+   * <p>
+   * If this page itself already has a table the callback of the {@link ITable} itself
+   * ({@link AbstractTable#execInitTable}) should be used instead.
+   */
   @Order(130)
   @ConfigOperation
   protected void execInitTable() {
@@ -507,7 +518,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
-  protected abstract T initTable();
+  protected abstract T createTable();
 
   @Override
   protected void initConfig() {

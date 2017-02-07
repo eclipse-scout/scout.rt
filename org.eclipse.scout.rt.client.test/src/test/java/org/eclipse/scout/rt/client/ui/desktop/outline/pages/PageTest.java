@@ -125,7 +125,7 @@ public class PageTest {
 
   class P_Page extends AbstractPage<ITable> {
     @Override
-    protected ITable initTable() {
+    protected ITable createTable() {
       return null;
     }
   }

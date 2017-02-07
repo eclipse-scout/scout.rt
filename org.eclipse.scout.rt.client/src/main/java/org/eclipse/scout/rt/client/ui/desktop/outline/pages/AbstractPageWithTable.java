@@ -335,10 +335,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   @SuppressWarnings("unchecked")
-  protected T initTable() {
-    T table = null;
+  protected T createTable() {
     List<ITable> contributedFields = m_contributionHolder.getContributionsByClass(ITable.class);
-    table = (T) CollectionUtility.firstElement(contributedFields);
+    T table = (T) CollectionUtility.firstElement(contributedFields);
     if (table == null) {
       Class<? extends ITable> tableClass = getConfiguredTable();
       if (tableClass != null) {
@@ -348,6 +347,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         LOG.warn("there is no inner class of type ITable in {}", getClass().getName());
       }
     }
+
     if (table != null) {
       if (table instanceof AbstractTable) {
         ((AbstractTable) table).setContainerInternal(this);
@@ -358,7 +358,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       table.setUserPreferenceContext(getUserPreferenceContext());
       table.setTableStatusVisible(getConfiguredTableStatusVisible());
       table.setReloadHandler(new PageReloadHandler(this));
-      table.initTable();
     }
     return table;
   }

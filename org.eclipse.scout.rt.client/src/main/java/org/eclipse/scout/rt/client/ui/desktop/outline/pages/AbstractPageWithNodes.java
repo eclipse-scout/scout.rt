@@ -39,13 +39,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.PlatformError;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -117,19 +113,13 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   @Override
-  protected ITable initTable() {
+  protected ITable createTable() {
     P_Table table = null;
-    try {
-      table = new P_Table();
-      table.setContainerInternal(this);
-      table.addTableListener(new P_TableListener());
-      table.setAutoDiscardOnDelete(true);
-      table.setReloadHandler(new PageReloadHandler(this));
-      table.initTable();
-    }
-    catch (RuntimeException | PlatformError e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
-    }
+    table = new P_Table();
+    table.setContainerInternal(this);
+    table.addTableListener(new P_TableListener());
+    table.setAutoDiscardOnDelete(true);
+    table.setReloadHandler(new PageReloadHandler(this));
     return table;
   }
 

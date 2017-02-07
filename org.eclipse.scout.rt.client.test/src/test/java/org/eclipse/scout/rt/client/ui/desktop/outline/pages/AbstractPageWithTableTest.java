@@ -23,7 +23,7 @@ public class AbstractPageWithTableTest {
     AbstractPageWithTable<ITable> pageWithSearchForm = new AbstractPageWithTable<ITable>() {
 
       @Override
-      protected ITable initTable() {
+      protected ITable createTable() {
         return Mockito.mock(ITable.class);
       }
 
