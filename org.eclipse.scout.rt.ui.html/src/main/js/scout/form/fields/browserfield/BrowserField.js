@@ -161,12 +161,14 @@ scout.BrowserField.prototype._calcPopupBounds = function() {
   var POPUP_WINDOW_CHROME_HEIGHT = POPUP_WINDOW_TOP_HEIGHT + POPUP_WINDOW_BOTTOM_HEIGHT;
 
   var BROWSER_WINDOW_TOP_HEIGHT = 55;
-  var browserX = Math.max(0, myWindow.screenX);
-  var browserY = Math.max(0, myWindow.screenY);
 
+  // Don't limit screenX/Y in any way. Coordinates can be negative (if we have a secondary monitor on the left side
+  // of the primary monitor) or larger then the availSize of the screen (if we have a secondary monitor on the right
+  // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems
+  // to ignore negative X coordinates somehow (but not entirely).
   var browserBounds = new scout.Rectangle(
-    browserX,
-    browserY,
+    myWindow.screenX,
+    myWindow.screenY,
     $(myWindow).width(),
     $(myWindow).height() + BROWSER_WINDOW_TOP_HEIGHT);
 
@@ -210,7 +212,7 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
         'directories=no',
         'location=no',
         'menubar=no',
-        'resizable=yes,',
+        'resizable=yes',
         'status=no',
         'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
         'toolbar=no',
