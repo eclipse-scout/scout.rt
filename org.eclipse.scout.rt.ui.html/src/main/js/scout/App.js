@@ -220,7 +220,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
     session.focusManager.validateFocus();
 
     session.ready = true;
-    this.trigger('sessionready');
+    this.trigger('sessionready', {session: session});
     $.log.info('Session initialized. Detected ' + scout.device);
   }.bind(this));
   return session;
