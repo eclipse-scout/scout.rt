@@ -126,6 +126,13 @@ scout.arrays = {
     return arr;
   },
 
+  empty: function(arr) {
+    if (Array.isArray(arr)) {
+      return arr.length === 0;
+    }
+    return true;
+  },
+
   pushAll: function(arr, arr2) {
     arr.push.apply(arr, arr2);
   },

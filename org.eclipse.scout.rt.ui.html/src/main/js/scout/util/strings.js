@@ -84,6 +84,13 @@ scout.strings = {
     return z.slice(-padding);
   },
 
+  contains: function(string, searchFor) {
+    if (!string) {
+      return false;
+    }
+    return string.indexOf(searchFor) > -1;
+  },
+
   startsWith: function(fullString, startString) {
     if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
       return false;

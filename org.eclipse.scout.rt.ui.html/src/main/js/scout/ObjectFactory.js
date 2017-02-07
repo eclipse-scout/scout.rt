@@ -40,10 +40,12 @@ scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ":";
  *    Examples: ":Offline", ":Horizontal"
  *
  * Full examples:
- *   Object type: Outline                        -> Constructor: scout.Outline
- *   Object type: myNamespace.Outline            -> Constructor: myNamespace.Outline
- *   Object type: Outline:MyVariant              -> Constructor: scout.MyVariantOutline
- *   Object type: myNamespace.Outline:MyVariant  -> Constructor: myNamespace.MyVariantOutline
+ *   Object type: Outline                                      -> Constructor: scout.Outline
+ *   Object type: myNamespace.Outline                          -> Constructor: myNamespace.Outline
+ *   Object type: Outline:MyVariant                            -> Constructor: scout.MyVariantOutline
+ *   Object type: myNamespace.Outline:MyVariant                -> Constructor: myNamespace.MyVariantOutline
+ *   Object type: Outline:myNamespace.MyVariant                -> Constructor: myNamespace.MyVariantOutline
+ *   Object type: myNamespace.Outline:yourNamespace.MyVariant  -> Constructor: yourNamespace.MyVariantOutline
  *
  * RESOLVING THE CONSTRUCTOR:
  *
@@ -67,51 +69,18 @@ scout.ObjectFactory.prototype._createObjectByType = function(objectType, options
   }
   options = options || {};
 
-  var scoutObject,
-    failMsgPrefix = 'Failed to create object for objectType "' + objectType + '": ';
-
   var createFunc = this._registry[objectType];
   if (createFunc) {
-    // 1.
-    // Use factory function registered for the given objectType
-    scoutObject = createFunc(options.model);
+    // 1. - Use factory function registered for the given objectType
+    var scoutObject = createFunc(options.model);
     if (!scoutObject) {
-      throw new Error(failMsgPrefix + 'Factory function did not return a valid object');
+      throw new Error('Failed to create object for objectType "' + objectType + '": Factory function did not return a valid object');
     }
+    return scoutObject;
   } else {
-    // 2.
-    // Resolve class by name
-    var namespaceParts = objectType.split(scout.ObjectFactory.NAMESPACE_SEPARATOR);
-    var namespaces = namespaceParts.slice(0, namespaceParts.length - 1);
-    var objectTypeParts = namespaceParts[namespaceParts.length - 1]
-      .split(scout.ObjectFactory.MODEL_VARIANT_SEPARATOR)
-      // Ensure max. two objectType parts (ignore multiple separators)
-      .slice(0, 2);
-    // Change "Type:Custom" to "CustomType"
-    var scoutClass = objectTypeParts.slice().reverse().join('');
-
-    // Find name space
-    var namespace = scout; // <-- default
-    if (namespaces.length) {
-      namespace = window;
-      for (var i = 0; i < namespaces.length; i++) {
-        namespace = namespace[namespaces[i]];
-        if (!namespace) {
-          throw new Error(failMsgPrefix + 'Could not resolve namespace "' + namespaces[i] + '"');
-        }
-      }
-    }
-    if (!namespace[scoutClass]) {
-      if (options.variantLenient && objectTypeParts.length === 2) {
-        // Try without variant if variantLenient is true
-        return this._createObjectByType(namespaces.concat(objectTypeParts[0]).join(scout.ObjectFactory.NAMESPACE_SEPARATOR), options);
-      }
-      throw new Error(failMsgPrefix + 'Could not find "' + scoutClass + '" in namespace "' + namespaces.join('.') + '"');
-    }
-    scoutObject = new namespace[scoutClass](options.model);
+    // 2. - Resolve class by name
+    return scout.TypeDescriptor.newInstance(objectType, options);
   }
-
-  return scoutObject;
 };
 
 /**
@@ -167,7 +136,7 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
       if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
         model.id = this.createUniqueId();
       }
-      model.objectType = objectType;
+      model.objectType = objectType; // XXX
     }
     // Initialize object
     scoutObject.init(model);

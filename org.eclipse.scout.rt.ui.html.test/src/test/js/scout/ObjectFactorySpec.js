@@ -178,12 +178,29 @@ describe('ObjectFactory', function() {
       delete scout.VariantStringField;
     });
 
-    it('considers variants also within a custom namespace', function() {
+    // in this case namespace from objectType is also used as namespace for variant
+    it('considers variants also within a custom namespace for object type', function() {
       window.my = {};
       var my = window.my;
       my.VariantStringField = function() {};
       var object = scout.objectFactory._createObjectByType('my.StringField:Variant');
-      expect(object instanceof my.VariantStringField).toBe(true);
+      expect(object instanceof my.VariantStringField).toBe(true); // objectType is 'my.StringField'
+    });
+
+    it('considers variants also within a custom namespace for variant', function() {
+      window.my = {};
+      var my = window.my;
+      my.VariantStringField = function() {};
+      var object = scout.objectFactory._createObjectByType('StringField:my.Variant');
+      expect(object instanceof my.VariantStringField).toBe(true); // objectType is '[scout.]StringField'
+    });
+
+    it('considers variants also within a custom namespace for variant and a different variant for objectType', function() {
+      window.your = {};
+      var your = window.your;
+      your.VariantStringField = function() {};
+      var object = scout.objectFactory._createObjectByType('my.StringField:your.Variant');
+      expect(object instanceof your.VariantStringField).toBe(true); // objectType is 'my.StringField'
     });
 
     it('can handle too many variants in objectType', function() {

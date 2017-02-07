@@ -96,7 +96,8 @@ scout.defaultValues = {
     var objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     if (!objectTypeHierarchy) {
       // Remove model variant and try again
-      objectType = objectType.replace(new RegExp(scout.strings.quote(scout.ObjectFactory.MODEL_VARIANT_SEPARATOR) + '.*'), '');
+      var objectInfo = scout.TypeDescriptor.parse(objectType);
+      objectType = objectInfo.objectType.toString();
       objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     }
     if (!objectTypeHierarchy) {

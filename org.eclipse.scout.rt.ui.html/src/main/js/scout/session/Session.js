@@ -200,14 +200,14 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
   var objectType = adapterData.objectType;
   var createOpts = {};
 
-  var objectTypeParts = objectType.split(scout.ObjectFactory.MODEL_VARIANT_SEPARATOR);
-  if (objectTypeParts.length >= 2) {
-    objectType = objectTypeParts[0] + 'Adapter' + scout.ObjectFactory.MODEL_VARIANT_SEPARATOR + objectTypeParts[1];
+  var objectInfo = scout.TypeDescriptor.parse(objectType);
+  if (objectInfo.modelVariant) {
+    objectType = objectInfo.objectType.toString() + 'Adapter' + scout.ObjectFactory.MODEL_VARIANT_SEPARATOR + objectInfo.modelVariant.toString();
     // If no adapter exists for the given variant then create an adapter without variant.
     // Mostly variant is only essential for the widget, not the adapter
     createOpts.variantLenient = true;
   } else {
-    objectType = objectType + 'Adapter';
+    objectType = objectInfo.objectType.toString() + 'Adapter';
   }
 
   // TODO BSH/CGU Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')

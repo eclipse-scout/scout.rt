@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public class ModelVariantTest {
 
-  @ModelVariant("foo")
+  @ModelVariant("Foo")
   static class A {
   }
 
@@ -28,27 +28,24 @@ public class ModelVariantTest {
   static class C {
   }
 
+  @ModelVariant("mynamespace.Bar")
+  static class D {
+  }
+
   /**
    * This test would fail if the ModelVariant isn't annotated with @Inherited.
    */
   @Test
   public void testInheritance() {
-    A a = new A();
-    B b = new B();
-    assertTrue(a.getClass().isAnnotationPresent(ModelVariant.class));
-    assertTrue(b.getClass().isAnnotationPresent(ModelVariant.class));
+    assertTrue(new A().getClass().isAnnotationPresent(ModelVariant.class));
+    assertTrue(new B().getClass().isAnnotationPresent(ModelVariant.class));
   }
 
   @Test
   public void testObjectType() {
-    A a = new A();
-    B b = new B();
-    C c = new C();
-    String objectTypeA = JsonAdapterUtility.getObjectType("Test", a);
-    String objectTypeB = JsonAdapterUtility.getObjectType("Test", b);
-    String objectTypeC = JsonAdapterUtility.getObjectType("Test", c);
-    assertEquals("Test:foo", objectTypeA);
-    assertEquals("Test:foo", objectTypeB);
-    assertEquals("Test", objectTypeC);
+    assertEquals("BeanColumn:Foo", JsonAdapterUtility.getObjectType("BeanColumn", new A()));
+    assertEquals("BeanColumn:Foo", JsonAdapterUtility.getObjectType("BeanColumn", new B()));
+    assertEquals("BeanColumn", JsonAdapterUtility.getObjectType("BeanColumn", new C()));
+    assertEquals("BeanColumn:mynamespace.Bar", JsonAdapterUtility.getObjectType("BeanColumn", new D()));
   }
 }
