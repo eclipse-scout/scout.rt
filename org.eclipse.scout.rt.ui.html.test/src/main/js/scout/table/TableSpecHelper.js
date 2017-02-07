@@ -137,7 +137,7 @@ scout.TableSpecHelper.prototype.createModelCells = function(columns, rowId) {
 
   if (typeof columns === 'number') {
     for (var i = 0; i < columns; i++) {
-      cells[i] = this.createModelCell(i + '', 'cell' + rowId + '_' + i);
+      cells[i] = this.createModelCell(rowId + '_' + i, 'cell' + rowId + '_' + i);
     }
   } else {
     for (var j = 0; j < columns.length; j++) {
@@ -145,7 +145,7 @@ scout.TableSpecHelper.prototype.createModelCells = function(columns, rowId) {
       if (columns[j].objectType === 'NumberColumn') {
         value = rowId + j;
       }
-      cells[j] = this.createModelCell(j + '', value);
+      cells[j] = this.createModelCell(rowId + '_' + j, value);
     }
   }
   return cells;

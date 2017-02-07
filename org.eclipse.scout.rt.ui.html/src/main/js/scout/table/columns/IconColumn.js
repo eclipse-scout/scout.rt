@@ -12,6 +12,7 @@ scout.IconColumn = function() {
   scout.IconColumn.parent.call(this);
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
   this.filterType = 'ColumnUserFilter';
+  this.textBased = false;
 };
 scout.inherits(scout.IconColumn, scout.Column);
 

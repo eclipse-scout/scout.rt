@@ -19,6 +19,7 @@ scout.BooleanColumn = function() {
   this.horizontalAlignment = 0;
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
   this.triStateEnabled = false;
+  this.textBased = false;
 };
 scout.inherits(scout.BooleanColumn, scout.Column);
 

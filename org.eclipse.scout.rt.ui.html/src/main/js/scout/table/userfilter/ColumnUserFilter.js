@@ -133,7 +133,7 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
   var
     acceptByTable = true,
     acceptByFields = true,
-    key = this.column.cellValueForGrouping(row),
+    key = this.column.cellValueOrTextForCalculation(row),
     normKey = this.xAxis.norm(key);
 
   if (this._useTextInsteadOfNormValue(normKey)) {

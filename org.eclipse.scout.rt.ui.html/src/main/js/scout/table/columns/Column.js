@@ -30,6 +30,7 @@ scout.Column = function() {
   this.comparator = scout.comparators.TEXT;
   this.displayable = true;
   this.visible = true;
+  this.textBased = true;
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 50;
@@ -315,45 +316,6 @@ scout.Column.prototype.startCellEdit = function(row, field) {
   return popup;
 };
 
-// TODO [awe, cgu] 6.2 - cleanup these cellValue/TextForXY methods, currently they are very confusing
-/**
- * @returns the cell value to be used for grouping and filtering (chart, column filter).
- */
-scout.Column.prototype.cellValueForGrouping = function(row) {
-  var cell = this.cell(row);
-  if (cell.value !== undefined) {
-    return this._preprocessValueForGrouping(cell.value, cell);
-  }
-  if (!cell.text) {
-    return null;
-  }
-  return this._preprocessTextForValueGrouping(cell.text, cell.htmlEnabled);
-};
-
-scout.Column.prototype._preprocessValueForGrouping = function(value, cell) {
-  if (typeof value === 'string') {
-    // In case of string columns, value and text are equal -> use _preprocessTextForValueGrouping to handle html tags and new lines correctly
-    return this._preprocessTextForValueGrouping(value, cell.htmlEnabled);
-  }
-  return value;
-};
-
-scout.Column.prototype._preprocessTextForValueGrouping = function(text, htmlEnabled) {
-  return this._preprocessText(text, {
-    removeHtmlTags: htmlEnabled,
-    removeNewlines: true,
-    trim: true
-  });
-};
-
-/**
- * @returns the cell text to be used for table grouping
- */
-scout.Column.prototype.cellTextForGrouping = function(row) {
-  var cell = this.cell(row);
-  return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
-};
-
 /**
  * @returns the cell object for this column from the given row.
  */
@@ -367,6 +329,50 @@ scout.Column.prototype.cell = function(row) {
 scout.Column.prototype.selectedCell = function() {
   var selectedRow = this.table.selectedRow();
   return this.table.cell(this, selectedRow);
+};
+
+scout.Column.prototype.cellValueOrText = function(row) {
+  if (this.textBased) {
+    return this.table.cellText(this, row);
+  } else {
+    return this.table.cellValue(this, row);
+  }
+};
+
+/**
+ * @returns the cell value to be used for grouping and filtering (chart, column filter).
+ */
+scout.Column.prototype.cellValueOrTextForCalculation = function(row) {
+  var cell = this.cell(row);
+  var value = this.cellValueOrText(row);
+  if (!value) {
+    return null;
+  }
+  return this._preprocessValueOrTextForCalculation(value, cell);
+};
+
+scout.Column.prototype._preprocessValueOrTextForCalculation = function(value, cell) {
+  if (typeof value === 'string') {
+    // In case of string columns, value and text are equal -> use _preprocessStringForCalculation to handle html tags and new lines correctly
+    return this._preprocessTextForCalculation(value, cell.htmlEnabled);
+  }
+  return value;
+};
+
+scout.Column.prototype._preprocessTextForCalculation = function(text, htmlEnabled) {
+  return this._preprocessText(text, {
+    removeHtmlTags: htmlEnabled,
+    removeNewlines: true,
+    trim: true
+  });
+};
+
+/**
+ * @returns the cell text to be used for table grouping
+ */
+scout.Column.prototype.cellTextForGrouping = function(row) {
+  var cell = this.cell(row);
+  return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
 };
 
 scout.Column.prototype._preprocessTextForGrouping = function(text, htmlEnabled) {
@@ -535,8 +541,8 @@ scout.Column.prototype.isUiSortPossible = function() {
 };
 
 scout.Column.prototype.compare = function(row1, row2) {
-  var valueA = this.table.cellValue(this, row1);
-  var valueB = this.table.cellValue(this, row2);
+  var valueA = this.cellValueOrText(row1);
+  var valueB = this.cellValueOrText(row2);
   return this.comparator.compare(valueA, valueB);
 };
 

@@ -16,6 +16,7 @@ scout.NumberColumn = function() {
   this.horizontalAlignment = 1;
   this.filterType = 'NumberColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
+  this.textBased = false;
 };
 scout.inherits(scout.NumberColumn, scout.Column);
 
@@ -90,14 +91,6 @@ scout.NumberColumn.prototype.createAggrValueCell = function(value) {
   }));
 };
 
-/**
- * @override Column.js
- */
-scout.NumberColumn.prototype.cellValueForGrouping = function(row) {
-  var cell = this.table.cell(this, row);
-  return this._preprocessValueForGrouping(cell.value);
-};
-
 scout.NumberColumn.prototype._cellStyle = function(cell) {
   var style = scout.NumberColumn.parent.prototype._cellStyle.call(this, cell);
 
@@ -105,7 +98,7 @@ scout.NumberColumn.prototype._cellStyle = function(cell) {
     if (!this.backgroundEffectFunc) {
       this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
     }
-    var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueForGrouping(cell.value));
+    var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueOrTextForCalculation(cell.value));
     if (backgroundStyle.backgroundColor) {
       style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
     }
@@ -119,7 +112,7 @@ scout.NumberColumn.prototype._cellStyle = function(cell) {
 /**
  * @override Column.js
  */
-scout.NumberColumn.prototype._preprocessValueForGrouping = function(value) {
+scout.NumberColumn.prototype._preprocessValueOrTextForCalculation = function(value) {
   return this.decimalFormat.round(value);
 };
 
@@ -202,7 +195,7 @@ scout.NumberColumn.prototype.calculateMinMaxValues = function() {
 
   for (var i = 0; i < rows.length; i++) {
     row = rows[i];
-    value = this.cellValueForGrouping(row);
+    value = this.cellValueOrTextForCalculation(row);
 
     if (value < minValue || minValue === undefined) {
       minValue = value;

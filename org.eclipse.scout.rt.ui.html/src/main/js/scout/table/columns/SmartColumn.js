@@ -49,15 +49,3 @@ scout.SmartColumn.prototype._formatValue = function(value) {
   }
   return this.lookupCall.textById(value);
 };
-
-scout.SmartColumn.prototype.cellValueForGrouping = function(row) {
-  return this.cell(row).text;
-};
-
-scout.SmartColumn.prototype.cellTextForGrouping = function(row) {
-  return this.cell(row).text;
-};
-
-scout.SmartColumn.prototype.cellTextForTextFilter = function(row) {
-  return this.cell(row).text;
-};

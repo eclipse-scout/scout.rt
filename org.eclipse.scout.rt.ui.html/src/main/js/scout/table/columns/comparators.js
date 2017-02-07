@@ -24,12 +24,20 @@ scout.comparators = {
       return !!this.collator;
     },
     compare: function(valueA, valueB) {
+      if (!valueA && !valueB) {
+        return 0;
+      }
+      if (!valueA) {
+        return -1;
+      }
+      if (!valueB) {
+        return 1;
+      }
+
       if (!this.collator) {
         // Fallback for browsers that don't support internationalization. This is only necessary
         // for callers that call this method without check for internationalization support
         // first (e.g. TableMatrix).
-        valueA = scout.nvl(valueA, '');
-        valueB = scout.nvl(valueB, '');
         return (valueA < valueB ? -1 : ((valueA > valueB) ? 1 : 0));
       }
       // We don't check the installed flag here. It's a program error when we come here
@@ -48,6 +56,16 @@ scout.comparators = {
       return true;
     },
     compare: function(valueA, valueB) {
+      if (!valueA && !valueB) {
+        return 0;
+      }
+      if (!valueA) {
+        return -1;
+      }
+      if (!valueB) {
+        return 1;
+      }
+
       if (valueA < valueB) {
         return -1;
       } else if (valueA > valueB) {

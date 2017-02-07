@@ -1409,17 +1409,19 @@ describe("Table", function() {
 
         var model = helper.createModelFixture(2, 4);
         var table = helper.createTable(model);
-        model.rows[0].cells[0].value = 'zzz';
-        model.rows[0].cells[1].value = 'same';
-        model.rows[1].cells[0].value = 'aaa';
-        model.rows[1].cells[1].value = 'other';
-        model.rows[2].cells[0].value = 'ccc';
-        model.rows[2].cells[1].value = 'other';
-        model.rows[3].cells[0].value = 'qqq';
-        model.rows[3].cells[1].value = 'same';
 
         column0 = model.columns[0];
         column1 = model.columns[1];
+
+        column0.setCellValue(model.rows[0],'zzz');
+        column1.setCellValue(model.rows[0],'same');
+        column0.setCellValue(model.rows[1],'aaa');
+        column1.setCellValue(model.rows[1],'other');
+        column0.setCellValue(model.rows[2],'ccc');
+        column1.setCellValue(model.rows[2],'other');
+        column0.setCellValue(model.rows[3],'qqq');
+        column1.setCellValue(model.rows[3],'same');
+
         table.render(session.$entryPoint);
 
         expect(column0.sortAscending).toBe(true);
@@ -2389,9 +2391,9 @@ describe("Table", function() {
       expect(table.$rows().length).toBe(1);
       expect(table.rows.length).toBe(2);
       var $cells0 = table.$cellsForRow($rows.eq(0));
-      expect($cells0.eq(0).text()).toBe('0');
-      expect($cells0.eq(1).text()).toBe('1');
-      expect($cells0.eq(2).text()).toBe('2');
+      expect($cells0.eq(0).text()).toBe('0_0');
+      expect($cells0.eq(1).text()).toBe('0_1');
+      expect($cells0.eq(2).text()).toBe('0_2');
 
       table.moveColumn(table.columns[0], 0, 2);
       $rows = table.$rows();
@@ -2399,9 +2401,9 @@ describe("Table", function() {
       expect($rows.length).toBe(1);
       expect(table.rows.length).toBe(2);
       $cells0 = table.$cellsForRow($rows.eq(0));
-      expect($cells0.eq(0).text()).toBe('1');
-      expect($cells0.eq(1).text()).toBe('2');
-      expect($cells0.eq(2).text()).toBe('0');
+      expect($cells0.eq(0).text()).toBe('0_1');
+      expect($cells0.eq(1).text()).toBe('0_2');
+      expect($cells0.eq(2).text()).toBe('0_0');
     });
 
   });
@@ -2519,12 +2521,12 @@ describe("Table", function() {
       var $cells0 = $rows.eq(0).find('.table-cell');
       var $cells1 = $rows.eq(1).find('.table-cell');
 
-      expect($cells0.eq(0).text()).toBe('0');
-      expect($cells0.eq(1).text()).toBe('1');
-      expect($cells0.eq(2).text()).toBe('2');
-      expect($cells1.eq(0).text()).toBe('0');
-      expect($cells1.eq(1).text()).toBe('1');
-      expect($cells1.eq(2).text()).toBe('2');
+      expect($cells0.eq(0).text()).toBe('0_0');
+      expect($cells0.eq(1).text()).toBe('0_1');
+      expect($cells0.eq(2).text()).toBe('0_2');
+      expect($cells1.eq(0).text()).toBe('1_0');
+      expect($cells1.eq(1).text()).toBe('1_1');
+      expect($cells1.eq(2).text()).toBe('1_2');
 
       table.updateColumnOrder([ column2, column0, column1 ]);
 
@@ -2539,12 +2541,12 @@ describe("Table", function() {
       $rows = table.$rows();
       $cells0 = $rows.eq(0).find('.table-cell');
       $cells1 = $rows.eq(1).find('.table-cell');
-      expect($cells0.eq(0).text()).toBe('2');
-      expect($cells0.eq(1).text()).toBe('0');
-      expect($cells0.eq(2).text()).toBe('1');
-      expect($cells1.eq(0).text()).toBe('2');
-      expect($cells1.eq(1).text()).toBe('0');
-      expect($cells1.eq(2).text()).toBe('1');
+      expect($cells0.eq(0).text()).toBe('0_2');
+      expect($cells0.eq(1).text()).toBe('0_0');
+      expect($cells0.eq(2).text()).toBe('0_1');
+      expect($cells1.eq(0).text()).toBe('1_2');
+      expect($cells1.eq(1).text()).toBe('1_0');
+      expect($cells1.eq(2).text()).toBe('1_1');
     });
 
     it("silently moves cells which are not rendered in view range", function() {
@@ -2558,9 +2560,9 @@ describe("Table", function() {
 
       expect($rows.length).toBe(1);
       expect(table.rows.length).toBe(2);
-      expect($cells0.eq(0).text()).toBe('0');
-      expect($cells0.eq(1).text()).toBe('1');
-      expect($cells0.eq(2).text()).toBe('2');
+      expect($cells0.eq(0).text()).toBe('0_0');
+      expect($cells0.eq(1).text()).toBe('0_1');
+      expect($cells0.eq(2).text()).toBe('0_2');
 
       table.updateColumnOrder([ column2, column0, column1 ]);
 
@@ -2576,9 +2578,9 @@ describe("Table", function() {
       expect($rows.length).toBe(1);
       expect(table.rows.length).toBe(2);
       $cells0 = $rows.eq(0).find('.table-cell');
-      expect($cells0.eq(0).text()).toBe('2');
-      expect($cells0.eq(1).text()).toBe('0');
-      expect($cells0.eq(2).text()).toBe('1');
+      expect($cells0.eq(0).text()).toBe('0_2');
+      expect($cells0.eq(1).text()).toBe('0_0');
+      expect($cells0.eq(2).text()).toBe('0_1');
     });
 
   });

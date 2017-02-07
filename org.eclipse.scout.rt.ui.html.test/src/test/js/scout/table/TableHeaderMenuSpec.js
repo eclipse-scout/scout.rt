@@ -128,7 +128,7 @@ describe('TableHeaderMenu', function() {
         table.header.closeTableHeaderMenu();
 
         var newRows = helper.createModelRows(2, 1);
-        newRows[0].cells[0].value = 'NewValue';
+        newRows[0].cells[0].text = 'NewValue';
         table.insertRows(newRows);
 
         table.header.openTableHeaderMenu(column);

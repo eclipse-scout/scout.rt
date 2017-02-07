@@ -56,9 +56,9 @@ scout.BeanColumn.prototype._plainTextForRow = function(row) {
  * Default approach reads the html using buildCellForRow and uses _preprocessTextForGrouping to generate the value. Just using text() does not work because new lines get omitted.
  * If this approach does not work for a specific bean column, just override this method.
  */
-scout.BeanColumn.prototype.cellValueForGrouping = function(row) {
+scout.BeanColumn.prototype.cellValueOrTextForCalculation = function(row) {
   var plainText = this._plainTextForRow(row);
-  return this._preprocessTextForValueGrouping(plainText);
+  return this._preprocessTextForCalculation(plainText);
 };
 
 scout.BeanColumn.prototype.cellTextForGrouping = function(row) {

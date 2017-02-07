@@ -1536,7 +1536,7 @@ scout.Table.prototype.cellValue = function(column, row) {
   if (cell.value !== undefined) {
     return cell.value;
   }
-  return cell.text || '';
+  return '';
 };
 
 scout.Table.prototype.cellText = function(column, row) {
@@ -1641,7 +1641,7 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
   this.columns.forEach(function(column, i) {
     if (column[funcName]) {
       if (row) {
-        value = column.cellValueForGrouping(row);
+        value = column.cellValueOrTextForCalculation(row);
       }
       states[i] = column[funcName](states[i], value);
     }
