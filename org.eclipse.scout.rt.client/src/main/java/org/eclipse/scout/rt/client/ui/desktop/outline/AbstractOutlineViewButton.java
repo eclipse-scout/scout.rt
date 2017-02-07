@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 @ClassId("401907e2-6767-435b-8452-9c819f3af82f")
 public abstract class AbstractOutlineViewButton extends AbstractViewButton implements IOutlineViewButton {
@@ -33,19 +34,27 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
    * call using {@link AbstractDesktop}.this or {@link AbstractDesktopExtension#getDelegatingDesktop()}
    */
   public AbstractOutlineViewButton(IDesktop desktop, Class<? extends IOutline> outlineType) {
-    super(false);
-    m_desktop = Assertions.assertNotNull(desktop);
-    IOutline outline = null;
+    this(desktop, getOutlineOfType(desktop, outlineType));
+  }
+
+  protected static IOutline getOutlineOfType(IDesktop desktop, Class<? extends IOutline> outlineType) {
+    if (desktop == null) {
+      return null;
+    }
+
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o.getClass() == outlineType) {
-        outline = o;
-        break;
+        return o;
       }
     }
-    m_outline = outline;
-    if (m_outline == null) {
-      throw new IllegalArgumentException("the outline type " + outlineType.getName() + " is not registered in the desktop");
-    }
+
+    throw new AssertionException("the outline type {} is not registered in the desktop.", outlineType);
+  }
+
+  public AbstractOutlineViewButton(IDesktop desktop, IOutline outline) {
+    super(false);
+    m_desktop = Assertions.assertNotNull(desktop, "Desktop must not be null");
+    m_outline = Assertions.assertNotNull(outline, "Outline must not be null");
     callInitializer();
   }
 
