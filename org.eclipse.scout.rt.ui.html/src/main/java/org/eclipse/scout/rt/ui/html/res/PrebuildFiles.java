@@ -8,6 +8,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
@@ -35,7 +36,8 @@ public class PrebuildFiles implements IPlatformListener {
   @Override
   public void stateChanged(PlatformEvent event) {
     if (event.getState() == State.PlatformStarted && CONFIG.getPropertyValue(UiPrebuildProperty.class)) {
-      buildScripts();
+      LOG.info("Pre-building of web resources is enabled");
+      buildResources();
     }
   }
 
@@ -50,27 +52,27 @@ public class PrebuildFiles implements IPlatformListener {
    * <li>caching is enabled</li>
    * </ul>
    */
-  protected void buildScripts() {
-    LOG.info("Pre-building of web resources enabled");
+  protected void buildResources() {
+    long t0 = System.nanoTime();
     List<String> files = CONFIG.getPropertyValue(UiPrebuildFilesProperty.class);
     IHttpResourceCache httpResourceCache = BEANS.get(GlobalHttpResourceCache.class);
     for (String file : files) {
-      LOG.info("Pre-building resource '{}'", file);
+      LOG.info("Pre-building resource '{}'...", file);
       try {
         HttpCacheObject cacheObject = loadResource(file);
         httpResourceCache.put(cacheObject);
       }
       catch (IOException e) {
-        LOG.error("Failed to load HTML resource", e);
+        LOG.error("Failed to load resource", e);
       }
     }
+    LOG.info("Finished pre-building of {} web resources {} ms", files.size(), StringUtility.formatNanos(System.nanoTime() - t0));
   }
 
-  public HttpCacheObject loadResource(String file) throws IOException {
+  protected HttpCacheObject loadResource(String file) throws IOException {
     String defaultTheme = UiThemeUtility.getConfiguredTheme();
     HtmlFileLoader loader = new HtmlFileLoader(defaultTheme, true, true);
     HttpCacheKey cacheKey = loader.createCacheKey(file);
     return loader.loadResource(cacheKey);
   }
-
 }

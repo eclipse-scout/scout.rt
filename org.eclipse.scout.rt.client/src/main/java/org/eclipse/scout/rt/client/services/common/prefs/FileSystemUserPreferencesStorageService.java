@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.UserAreaProperty;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -46,6 +47,8 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   public static final String SETTINGS_SUB_DIR = ".settings";
   public static final char NODE_NAME_DELIM = '-';
   public static final String SETTINGS_EXT = ".prefs";
+
+  private final AtomicBoolean m_noUserAreaWarningLogged = new AtomicBoolean(false);
 
   @Override
   public void flush(IPreferences prefs) {
@@ -162,15 +165,9 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     IConfigProperty<String> userAreaProperty = BEANS.get(UserAreaProperty.class);
     String location = userAreaProperty.getValue();
     if (location == null) {
-      // legacy
-      String legacyUserArea = "osgi.user.area";
-      location = ConfigUtility.getProperty(legacyUserArea);
-      if (location == null) {
-        location = new File(ConfigUtility.getProperty(PROP_USER_HOME), "user").getAbsolutePath();
+      location = new File(ConfigUtility.getProperty(PROP_USER_HOME), "user").getAbsolutePath();
+      if (m_noUserAreaWarningLogged.compareAndSet(false, true)) {
         LOG.warn("No user area property found. Using '{}' as fallback. Consider specifying a user area using property '{}'.", location, userAreaProperty.getKey());
-      }
-      else {
-        LOG.warn("Legacy user area property found: '{}'. Consider migrating to the new one: '{}'.", legacyUserArea, userAreaProperty.getKey());
       }
     }
     location = location.trim();
