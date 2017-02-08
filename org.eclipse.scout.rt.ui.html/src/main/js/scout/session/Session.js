@@ -28,7 +28,7 @@ scout.Session = function() {
   this.focusManager;
   this.keyStrokeManager;
 
-  // TODO [6.2] BSH/CGU/AWE: Split in "RemoteSession" and "???" (maybe move to App)
+  // TODO [awe, cgu, bsh] 6.2 - Split in "RemoteSession" and "???" (maybe move to App)
   this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
   this.forceNewClientSession = false;
@@ -1227,7 +1227,7 @@ scout.Session.prototype.start = function() {
   this._sendStartupRequest();
 };
 
-// FIXME [awe] 6.1 : discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
+// TODO [awe] 6.2 - discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
 // guess we need a SessionAdapter.js - I noticed this in a jasmine test where _processEvents is called an the adapter is the Session
 // (event.type=disposeAdapter), also see resetEventFilters method
 scout.Session.prototype.onModelEvent = function(event) {

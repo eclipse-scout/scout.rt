@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
-// TODO [awe, cgu] FSR3 - integrate grid-calculation into logical grid layout
+// TODO [awe, cgu] 6.2 - integrate grid-calculation into logical grid layout
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.

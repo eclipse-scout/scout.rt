@@ -146,7 +146,7 @@ scout.Form.prototype._renderForm = function($parent) {
 };
 
 scout.Form.prototype.close = function() {
-  // FIXME [6.1] cgu/awe: this is confusing, close sends a formClosing? May it be rejected? I would expect the form to be closed in offline mode too.
+  // TODO [awe, cgu] 6.2 - this is confusing, close sends a formClosing? May it be rejected? I would expect the form to be closed in offline mode too.
   // Is it only used for popup windows? Suggestion: Rename close to kill, destroy the form and send a kill event (trigger('kill')).
   this._send('formClosing');
 };

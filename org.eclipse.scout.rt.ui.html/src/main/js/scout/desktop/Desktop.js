@@ -427,7 +427,7 @@ scout.Desktop.prototype.updateSplitterPosition = function() {
   if (!this.splitter) {
     return;
   }
-  // TODO awe: (user-prefs) Use user-preferences instead of sessionStorage
+  // TODO [awe] 6.2 - (user-prefs) Use user-preferences instead of sessionStorage
   var storedSplitterPosition = this.cacheSplitterPosition && sessionStorage.getItem('scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
     // Restore splitter position

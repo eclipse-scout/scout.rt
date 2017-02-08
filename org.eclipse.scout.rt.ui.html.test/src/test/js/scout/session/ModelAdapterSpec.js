@@ -166,7 +166,6 @@ describe('ModelAdapter', function() {
 
   describe('destroy', function() {
 
-    // FIXME [awe] 6.1 tests umbauen sobald klar ist wohin die adapterProperties gehören und wie sie heissen sollen
     var widget, adapter, childModel;
 
     beforeEach(function() {
@@ -306,9 +305,6 @@ describe('ModelAdapter', function() {
         });
 
       });
-
-      // FIXME [awe] 6.1 - make tests where property is an adapter
-      // FIXME [awe] 6.1 - check all occurrences of 'notifyServer' and use filter where applicable
 
       describe('widget events', function() {
 

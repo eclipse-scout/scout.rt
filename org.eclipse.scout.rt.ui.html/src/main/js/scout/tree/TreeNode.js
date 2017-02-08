@@ -13,7 +13,7 @@
  * @class
  */
 scout.TreeNode = function() {
-  this.$node; // FIXME [awe] 6.1 discuss with CGU... properties without assignment do not exist after ctor call
+  this.$node; // TODO [awe, cgu] 6.2 - properties without assignment do not exist after ctor call, use better initial values everywhere?
   this.attached = false;
   this.checked = false;
   this.childNodes = [];
@@ -136,7 +136,7 @@ scout.TreeNode.prototype.ensureLoadChildren = function() {
   }
   var deferred = this.loadChildren();
   var promise = deferred.promise();
-  if (deferred.state() === 'resolved') { // FIXME [awe] 6.1 - better solution as this deferred mess -> create own deferred here?
+  if (deferred.state() === 'resolved') { // TODO [awe] 6.2 - better solution as this deferred mess -> create own deferred here?
     this._loadChildrenPromise = null;
     return promise;
   }

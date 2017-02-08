@@ -157,7 +157,7 @@ describe('Desktop', function() {
       expect(desktop.benchVisible).toBe(false);
       desktop.hideForm(form);
       // Not removed yet and still linked, will be done after animation
-      expect(desktop.bench.rendered).toBe(true); // FIXME [awe, cgu] 6.1 -> see Desktop.js#_removeBench -> this.bench = null
+      expect(desktop.bench.rendered).toBe(true);
       expect(form.rendered).toBe(true);
       expect(form.parent).toBe(tabBox);
 

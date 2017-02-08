@@ -24,7 +24,7 @@
  * </ol>
  */
 scout.ModelAdapter = function() {
-  this._adapterProperties = []; // FIXME [awe, cgu] 6.1 - hier löschen (nur noch auf Widget.js)
+  this._adapterProperties = []; // TODO [awe, cgu] 6.2 - Delete property _adapterProperties here and use property from Widget.js
   this.initialized = false;
   this.attached = false;
   this.destroyed = false;

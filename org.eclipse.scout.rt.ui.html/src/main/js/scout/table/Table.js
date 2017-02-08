@@ -2543,7 +2543,7 @@ scout.Table.prototype.$cell = function(column, $row) {
   return $row.children().eq(columnIndex);
 };
 
-scout.Table.prototype._columnById = function(columnId) { // FIXME [awe] 6.1 make this public
+scout.Table.prototype._columnById = function(columnId) { // TODO [awe] 6.2 - make this function 'public'
   return scout.arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });

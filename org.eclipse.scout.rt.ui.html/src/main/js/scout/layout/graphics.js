@@ -226,7 +226,7 @@ scout.graphics = {
   },
 
   bounds: function($elem, includeSizeMargin, includePosMargin) {
-    //FIXME cgu: merge with getBounds, ask awe why parseCssPosition is used, or rename getBounds to cssBounds
+    //FIXME cgu: merge with getBounds, ask a.we why parseCssPosition is used, or rename getBounds to cssBounds
     return scout.graphics._bounds($elem, $elem.position(), includeSizeMargin, includePosMargin);
   },
 

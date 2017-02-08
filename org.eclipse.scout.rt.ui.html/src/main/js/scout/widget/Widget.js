@@ -51,11 +51,12 @@ scout.Widget = function() {
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval = false;
 
-  // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
-  // ev. dafür sorgen dass die config nur noch pro Klasse und nicht pro Instanz gemacht wird (memory)
+  // TODO [awe, cgu] 6.2 - think about having a PropertConfig object or rename to 'widgetProperties'
+  // probably this PropertyConfig should be the same instance for all instances of the class and not be
+  // created for each instance of the class (saves memory)
   this._adapterProperties = [];
   this._cloneProperties = ['visible', 'enabled', 'cssClass'];
-  this._preserveOnPropertyChangeProperties = []; // FIXME [awe, cgu] 6.1 - migrieren zu propertyConfig und
+  this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
   this.events = this._createEventSupport();

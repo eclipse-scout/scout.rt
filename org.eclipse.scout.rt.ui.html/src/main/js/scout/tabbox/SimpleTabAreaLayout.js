@@ -120,10 +120,6 @@ scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
     overflowMenus = [];
 
   this._overflowTabsIndizes.forEach(function(i) {
-    // FIXME awe: fix bugs in overflow-menu:
-    // - 1. menu schliesst nicht
-    // - 2. manchmal verschwindet ein (noch offener) Tab - wenn nur einer sichtbar ist
-    // - 3. add selenium tests
     tab = this.tabArea.getTabs()[i];
     menu = scout.create('Menu', {
       parent: this.tabArea,

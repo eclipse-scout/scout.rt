@@ -28,27 +28,26 @@ describe('scout.icons', function() {
     expect(icon.font).toBe('scoutIcons');
   });
 
-  // FIXME awe: rename font crmIcons.* to widgetIcons.*
   it('parses font icons (custom font)', function() {
-    icon = scout.icons.parseIconId('font:crmIcons x');
+    icon = scout.icons.parseIconId('font:widgetIcons x');
     expect(icon.isFontIcon()).toBe(true);
     expect(icon.iconUrl).toBe(undefined);
     expect(icon.iconCharacter).toBe('x');
-    expect(icon.font).toBe('crmIcons');
+    expect(icon.font).toBe('widgetIcons');
   });
 
   it('parses returns a CSS class for custom fonts', function() {
     icon = new scout.Icon();
     icon.iconType = scout.Icon.IconType.FONT_ICON;
-    icon.font = 'crmIcons';
-    expect(icon.cssClass()).toBe('font-crmIcons');
+    icon.font = 'widgetIcons';
+    expect(icon.cssClass()).toBe('font-widgetIcons');
   });
 
   it('appends CSS class string with custom fonts', function() {
     icon = new scout.Icon();
     icon.iconType = scout.Icon.IconType.FONT_ICON;
-    icon.font = 'crmIcons';
-    expect(icon.appendCssClass('font-icon')).toBe('font-icon font-crmIcons');
+    icon.font = 'widgetIcons';
+    expect(icon.appendCssClass('font-icon')).toBe('font-icon font-widgetIcons');
   });
 
 });

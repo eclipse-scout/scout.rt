@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME awe: (calendar) check bug reported from Michael: switch month when items are still loading (async)
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
@@ -240,7 +239,6 @@ scout.Calendar.prototype._render = function($parent) {
       } else if (w > 0 && d === 0) {
         $d.addClass('calendar-week-name');
       } else if (w > 0 && d > 0) {
-        // FIXME awe: (calendar) we must also select the clicked day and update the model
         $d.addClass('calendar-day')
           .data('day', d)
           .data('week', w)
@@ -797,7 +795,6 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 
 /* -- components, arrangement------------------------------------ */
 
-// TODO awe, cru: (calendar) arrange methods should work on the model, not on the DOM
 scout.Calendar.prototype._arrangeComponents = function() {
   var k, $day, $children, dayComponents, day,
     $days = $('.calendar-day', this.$grid);

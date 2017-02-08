@@ -42,7 +42,7 @@ scout.codes = {
 
   remove: function(codeTypeId) {
     delete this.registry[codeTypeId];
-    // FIXME [awe] 6.1 - also clean up texts?
+    // TODO [awe] 6.2 - also clean up texts?
   },
 
   /**

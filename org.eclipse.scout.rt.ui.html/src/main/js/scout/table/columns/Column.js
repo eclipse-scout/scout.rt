@@ -315,7 +315,7 @@ scout.Column.prototype.startCellEdit = function(row, field) {
   return popup;
 };
 
-// TODO CGU/AWE cleanup these cellValue/TextForXY methods, currently they are very confusing
+// TODO [awe, cgu] 6.2 - cleanup these cellValue/TextForXY methods, currently they are very confusing
 /**
  * @returns the cell value to be used for grouping and filtering (chart, column filter).
  */

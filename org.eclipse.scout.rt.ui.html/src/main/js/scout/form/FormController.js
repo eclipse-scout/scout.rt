@@ -93,7 +93,7 @@ scout.FormController.prototype.activateForm = function(form) {
   if (!form.rendered) {
     return;
   }
-  // FIXME awe: (2nd screen) handle popupWindow?
+  // TODO [awe] 6.2 - (2nd screen) handle popupWindow?
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._activateView(form);
   } else {

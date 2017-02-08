@@ -96,7 +96,6 @@ scout.CalendarComponent.prototype._render = function($parent) {
   }
 };
 
-// FIXME awe: (calendar) tuning
 scout.CalendarComponent.prototype._getHours = function(date){
   var d = scout.dates.parseJsonDate(date);
   return d.getHours() + d.getMinutes() / 60;

@@ -53,6 +53,6 @@ scout.ButtonAdapter.prototype._onWidgetEvent = function(event) {
  */
 scout.ButtonAdapter.prototype.exportAdapterData = function(adapterData) {
   adapterData = scout.ButtonAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
-  delete adapterData.keyStrokeScope; // FIXME [awe] 6.1 - add log messages about deleted properties to exported json
+  delete adapterData.keyStrokeScope;
   return adapterData;
 };

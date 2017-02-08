@@ -132,7 +132,6 @@ describe("Table Filter", function() {
       expect(table.rows[2].$row).toBeFalsy();
     });
 
-    // FIXME [awe] 6.1 add a test where we don't have a row filter (filterCount=0)
     // and insert rows
 
     it("applies row filter if a row gets updated", function() {

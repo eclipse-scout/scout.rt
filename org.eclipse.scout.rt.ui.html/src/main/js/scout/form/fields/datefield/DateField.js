@@ -1175,7 +1175,7 @@ scout.DateField.prototype.shiftSelectedDate = function(years, months, days) {
   this.getDatePicker().shiftSelectedDate(years, months, days);
 };
 
-// TODO awe, cgu: (value-field): we should refactor this setTimestamp / formatTimestamp
+// TODO [awe, cgu] 6.2 - (value-field): we should refactor this setTimestamp / formatTimestamp
 // as soon as we have implemented parse/format/validation logic on ValueField.js. This
 // should work like the Java client (AbstractValueField) does. Also rename timestamp to value
 scout.DateField.prototype.setTimestamp = function(timestamp) {
