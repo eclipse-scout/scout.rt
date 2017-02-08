@@ -107,6 +107,34 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
+    it("updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text", function() {
+      field.updateDisplayTextOnModify = true;
+      field.render(session.$entryPoint);
+      field.$field.val('Test3');
+      field.$field.trigger('input');
+      jasmine.clock().tick(100); // debounced function has not been executed yet!
+      sendQueuedAjaxCalls();
+      var event = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test3',
+        whileTyping: true,
+        showBusyIndicator: false
+      });
+      expect(mostRecentJsonRequest()).not.toContainEvents(event); // not!
+
+      field.setUpdateDisplayTextOnModify(false); // this should trigger to immediate execution of acceptInput(true)
+      sendQueuedAjaxCalls();
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+
+      field.$field.triggerBlur();
+      sendQueuedAjaxCalls();
+      event = new scout.Event(field.id, 'displayTextChanged', {
+        displayText: 'Test3',
+        whileTyping: false,
+        showBusyIndicator: true
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
     it("updateDisplayTextOnModify = true, then acceptInput(false) is fired. -> send should be done immediately", function() {
       field.updateDisplayTextOnModify = true;
       field.render(session.$entryPoint);
@@ -116,8 +144,8 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test3',
-        whileTyping: true,
-        showBusyIndicator: false
+        whileTyping: false,
+        showBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });

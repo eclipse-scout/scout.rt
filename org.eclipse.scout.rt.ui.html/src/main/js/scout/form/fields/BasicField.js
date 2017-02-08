@@ -25,6 +25,13 @@ scout.BasicField.prototype._renderProperties = function() {
 };
 
 scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplayTextOnModify) {
+  // Execute pending "accept input while typing" function _before_ updating the "updateDisplayTextOnModify" property
+  if (this._displayTextModifiedTimeoutId !== null) {
+    // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
+    clearTimeout(this._displayTextModifiedTimeoutId);
+    this._acceptInputWhileTyping();
+  }
+
   this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
 };
 
@@ -32,7 +39,6 @@ scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
   if (this.updateDisplayTextOnModify) {
     this.$field.on('input', this._onDisplayTextModifiedHandler);
   } else {
-    clearTimeout(this._displayTextModifiedTimeoutId);
     this.$field.off('input', this._onDisplayTextModifiedHandler);
   }
 };
@@ -44,22 +50,22 @@ scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
  */
 scout.BasicField.prototype._onDisplayTextModified = function() {
   clearTimeout(this._displayTextModifiedTimeoutId);
-  this._displayTextModifiedTimeoutId = setTimeout(function() {
-    if (!this.rendered) {
-      // Field may be removed in the meantime -> accepting input is not possible anymore
-      this._displayTextModifiedTimeoutId = null;
-      return;
-    }
+  this._displayTextModifiedTimeoutId = setTimeout(this._acceptInputWhileTyping.bind(this), 250);
+};
+
+scout.BasicField.prototype._acceptInputWhileTyping = function() {
+  this._displayTextModifiedTimeoutId = null;
+  if (this.rendered) { // Check needed because field may have been removed in the meantime
     this.acceptInput(true);
-  }.bind(this), 250);
+  }
 };
 
 scout.BasicField.prototype.acceptInput = function(whileTyping) {
-  if (!whileTyping && this._displayTextModifiedTimeoutId !== null) {
+  if (this._displayTextModifiedTimeoutId !== null) {
+    // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
     clearTimeout(this._displayTextModifiedTimeoutId);
-    this.acceptInput(true);
+    this._displayTextModifiedTimeoutId = null;
   }
-  this._displayTextModifiedTimeoutId = null;
   scout.BasicField.parent.prototype.acceptInput.call(this, whileTyping);
 };
 
@@ -69,27 +75,24 @@ scout.BasicField.prototype.acceptInput = function(whileTyping) {
 scout.BasicField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
   var displayTextChanged = scout.BasicField.parent.prototype._checkDisplayTextChanged.call(this, displayText, whileTyping);
 
-  // OR if updateDisplayTextOnModify is true
-  // 2. check is necessary to make sure the value and not only the display text gets written to the model (IBasicFieldUIFacade.parseAndSetValueFromUI vs setDisplayTextFromUI)
-  if (displayTextChanged || (this.updateDisplayTextOnModify || this._displayTextChangedWhileTyping) && !whileTyping) {
-    // In 'updateDisplayTextOnModify' mode, each change of text is sent to the server with whileTyping=true.
-    // On field blur, the text is sent again with whileTyping=false. The following logic prevents sending
-    // to many events to the server. When whileTyping is false, the text has only to be send to the server
-    // when there have been any whileTyping=true events. When the field looses the focus without any
-    // changes, no request should be sent.
-    if (this.updateDisplayTextOnModify) {
-      if (whileTyping) {
-        // Remember that we sent some events to the server with "whileTyping=true".
-        this._displayTextChangedWhileTyping = true;
-      } else {
-        if (!this._displayTextChangedWhileTyping) {
-          // If there were no "whileTyping=true" events, don't send anything to the server.
-          return false;
-        }
-        this._displayTextChangedWhileTyping = false; // Reset
-      }
+  if (whileTyping) {
+    if (this.updateDisplayTextOnModify && displayTextChanged) {
+      // Remember that we sent some events to the server with "whileTyping=true"
+      this._displayTextChangedWhileTyping = true;
     }
-    return true;
+  } else {
+    // In 'updateDisplayTextOnModify' mode, each change of text is sent to the server with whileTyping=true,
+    // see _onDisplayTextModified (facade: "setDisplayTextFromUI"). On field blur, the text must be sent again
+    // with whileTyping=false to update the model's value as well (facade: "parseAndSetValueFromUI").
+    // Usually, the displayText is only sent if it has changed (to prevent too many server requests). But in
+    // the case 'updateDisplayTextOnModify AND whileTyping=false', it has to be sent if the displayText
+    // was previously sent with whileTyping=true. To do so, we make the acceptInput() method think that the
+    // text has changed (even if it has not).
+    if (this._displayTextChangedWhileTyping) {
+      displayTextChanged = true;
+    }
+    this._displayTextChangedWhileTyping = false;
   }
-  return false;
+
+  return displayTextChanged;
 };
