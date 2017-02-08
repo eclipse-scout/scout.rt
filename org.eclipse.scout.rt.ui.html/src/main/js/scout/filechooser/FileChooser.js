@@ -112,19 +112,20 @@ scout.FileChooser.prototype._render = function($parent) {
 
   // Buttons
   this.$buttons = this.$container.appendDiv('file-chooser-buttons');
-  var boxButons = new scout.BoxButtons(this.$buttons);
+  var boxButtons = new scout.BoxButtons(this.$buttons);
   if (scout.device.supportsFile()) {
-    this.$addFileButton = boxButons.addButton({
+    this.$addFileButton = boxButtons.addButton({
       text: this.session.text('ui.Browse'),
-      onClick: this._onAddFileButtonClicked.bind(this)
+      onClick: this._onAddFileButtonClicked.bind(this),
+      needsClick: true
     });
   }
-  this.$uploadButton = boxButons.addButton({
+  this.$uploadButton = boxButtons.addButton({
     text: this.session.text('ui.Upload'),
     onClick: this._onUploadButtonClicked.bind(this),
     enabled: false
   });
-  this.$cancelButton = boxButons.addButton({
+  this.$cancelButton = boxButtons.addButton({
     text: this.session.text('Cancel'),
     onClick: this._onCancelButtonClicked.bind(this)
   });
@@ -138,7 +139,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$container.addClass('calc-helper');
   this.$container.css('min-width', this.$container.width());
   this.$container.removeClass('calc-helper');
-  boxButons.updateButtonWidths(this.$container.width());
+  boxButtons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
 };
