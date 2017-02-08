@@ -1440,7 +1440,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public boolean isNodeChecked(ITreeNode node) {
     if (node != null) {
-      return getCheckedNodes().contains(node);
+      return m_checkedNodes.contains(node);
     }
     else {
       return false;
