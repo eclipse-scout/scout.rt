@@ -306,6 +306,16 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
+  public int getKeyStrokeFirePolicy() {
+    return m_wrappedMenu.getKeyStrokeFirePolicy();
+  }
+
+  @Override
+  public void setKeyStrokeFirePolicy(int keyStrokeFirePolicy) {
+    m_wrappedMenu.setKeyStrokeFirePolicy(keyStrokeFirePolicy);
+  }
+
+  @Override
   public String getTooltipText() {
     return m_wrappedMenu.getTooltipText();
   }

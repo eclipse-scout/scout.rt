@@ -81,7 +81,7 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) 
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
   this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
-  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
+  this.desktopKeyStrokeContext.$scopeTarget = this.desktop.$container;
   this.desktopKeyStrokeContext.registerKeyStroke(this.desktop.keyStrokes);
 };
 
@@ -358,7 +358,7 @@ scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
 };
 
 scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
-  if(scout.arrays.containsAny(event.changedProperties, ['defaultDetailForm', 'outlineOverview'])){
+  if (scout.arrays.containsAny(event.changedProperties, ['defaultDetailForm', 'outlineOverview'])) {
     this.updateOutlineContent();
   }
 };

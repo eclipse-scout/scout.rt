@@ -53,7 +53,8 @@
       "text": "",
       "cssClass": "",
       "toggleAction": false,
-      "keyStroke": null
+      "keyStroke": null,
+      "keyStrokeFirePolicy": 0
     },
     "Menu": {
       "defaultMenu": false,

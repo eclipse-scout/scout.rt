@@ -17,6 +17,9 @@ scout.KeyStrokeManager = function(session) {
   this.installTopLevelKeyStrokeHandlers($mainEntryPoint);
 };
 
+scout.KeyStrokeManager.KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY = 0;
+scout.KeyStrokeManager.KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
+
 scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($container) {
   var
     myWindow = $container.window(true),
@@ -58,8 +61,18 @@ scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeCon
   }
 
   keyStrokeContext._handler = function(event) {
+    // check if scopeTarget is covered by glass pane
     if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
-      return;
+      // check if any action with 'keyStrokeFirePolicy=IAction.KEYSTROKE_FIRE_POLICY_ALWAYS' is in keyStrokeContext
+      var keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, function(k) { // (will at least return an empty array)
+        return k.field && k.field.keyStrokeFirePolicy === scout.Action.KEYSTROKE_FIRE_POLICY_ALWAYS;
+      });
+      if (keyStrokeFirePolicyAlways.length === 0) {
+        return;
+      }
+      // copy current keyStrokeContext and replace keyStrokes with filtered array 'keyStrokeFirePolicyAlways'
+      keyStrokeContext = $.extend({}, keyStrokeContext);
+      keyStrokeContext.keyStrokes = keyStrokeFirePolicyAlways;
     }
 
     if (this._isHelpKeyStroke(event)) {

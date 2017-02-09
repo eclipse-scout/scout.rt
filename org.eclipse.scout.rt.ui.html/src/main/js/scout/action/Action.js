@@ -25,6 +25,7 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
   this.compact = false;
+  this.keyStrokeFirePolicy = scout.Action.KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY;
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -32,6 +33,9 @@ scout.Action.ActionStyle = {
   DEFAULT: 0,
   BUTTON: 1
 };
+
+scout.Action.KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY = 0;
+scout.Action.KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
 
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
@@ -141,7 +145,6 @@ scout.Action.prototype._renderCssClass = function(cssClass, oldCssClass) {
   this.$container.removeClass(oldCssClass)
     .addClass(cssClass);
 };
-
 
 scout.Action.prototype._renderToggleAction = function() {
   // nop

@@ -18,6 +18,8 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
   this._$glassPanes = [];
   this._$glassPaneTargets = [];
   this._deferredGlassPanes = [];
+  this._resolvedDisplayParent = null;
+  this._registeredDisplayParent = null;
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
@@ -50,6 +52,8 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
 
   // Register 'glassPaneTarget' in focus manager.
   this.session.focusManager.registerGlassPaneTarget(glassPaneTarget);
+  this._registerDisplayParent();
+
 };
 
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
@@ -67,9 +71,10 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
 
   // Unregister glasspane targets from focus manager
   this._$glassPaneTargets.forEach(function($glassPaneTarget) {
-
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }, this);
+  this._unregisterDisplayParent();
+
 
   this._$glassPanes = [];
   this._$glassPaneTargets = [];
@@ -86,16 +91,43 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
     return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
   }
 
-  var parent = this._element.displayParent || this.session.desktop; // use Desktop if no parent set.
-  if (!parent) {
-    return []; // No parent, e.g. during startup to display fatal errors.
-  }
-
-  if (!parent.glassPaneTargets) {
+  var displayParent = this._resolveDisplayParent();
+  if (!displayParent || !displayParent.glassPaneTargets) {
     return []; // Parent is not a valid display parent.
   }
 
-  return parent.glassPaneTargets();
+  return displayParent.glassPaneTargets();
+};
+
+scout.GlassPaneRenderer.prototype._resolveDisplayParent = function() {
+  // Note: This has to be done after rendering, because otherwise session.desktop could be undefined!
+  if (!this._resolvedDisplayParent) {
+    this._resolvedDisplayParent = this._element.displayParent || this.session.desktop;
+  }
+  return this._resolvedDisplayParent;
+};
+
+scout.GlassPaneRenderer.prototype._registerDisplayParent = function() {
+  // if this._resolvedDisplayParent is not yet resolved, do it now
+  if (!this._resolvedDisplayParent) {
+    this._resolveDisplayParent();
+  }
+  // if this._resolvedDisplayParent is resolved, but not yet registered
+  if (this._resolvedDisplayParent) {
+    if (!this._registeredDisplayParent) {
+      // register this._resolvedDisplayParent and remember it as this._registeredDisplayParent
+      this.session.focusManager.registerGlassPaneDisplayParent(this._resolvedDisplayParent);
+      this._registeredDisplayParent = this._resolvedDisplayParent;
+    }
+  }
+};
+
+scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
+  // if this._registeredDisplayParent is defined, unregister it
+  if (this._registeredDisplayParent) {
+    this.session.focusManager.unregisterGlassPaneDisplayParent(this._registeredDisplayParent);
+    this._registeredDisplayParent = null;
+  }
 };
 
 scout.GlassPaneRenderer.prototype._onMousedown = function(event) {

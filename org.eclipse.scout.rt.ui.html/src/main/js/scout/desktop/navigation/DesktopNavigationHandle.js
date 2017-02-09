@@ -20,7 +20,7 @@ scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function(keyStro
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
   this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
-  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
+  this.desktopKeyStrokeContext.$scopeTarget = this.session.desktop.$container;
   this.desktopKeyStrokeContext.registerKeyStroke([
     new scout.ShrinkNavigationKeyStroke(this),
     new scout.EnlargeNavigationKeyStroke(this)

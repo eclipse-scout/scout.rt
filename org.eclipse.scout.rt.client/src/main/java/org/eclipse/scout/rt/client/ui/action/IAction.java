@@ -38,10 +38,24 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   String PROP_VISIBLE = "visible";
   String PROP_MNEMONIC = "mnemonic";
   String PROP_KEY_STROKE = "keyStroke";
+  String PROP_KEYSTROKE_FIRE_POLICY = "keyStrokeFirePolicy";
   String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+
   int HORIZONTAL_ALIGNMENT_LEFT = -1;
   int HORIZONTAL_ALIGNMENT_RIGHT = 1;
+
+  /**
+   * Fire keystroke only when the action is accessible (e.g. not covered by a modal dialog)<br>
+   * see {@link #setKeyStrokeFirePolicy(keyStrokeFirePolicy)} and {@link #getKeyStrokeFirePolicy()}
+   */
+  int KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY = 0;
+
+  /**
+   * Always fire keystroke (even when the action itself is covered by a modal dialog)<br>
+   * see {@link #setKeyStrokeFirePolicy(keyStrokeFirePolicy)} and {@link #getKeyStrokeFirePolicy()}
+   */
+  int KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
 
   void initAction();
 
@@ -95,6 +109,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   String getKeyStroke();
 
   void setKeyStroke(String text);
+
+  int getKeyStrokeFirePolicy();
+
+  void setKeyStrokeFirePolicy(int keyStrokeFirePolicy);
 
   String getTooltipText();
 

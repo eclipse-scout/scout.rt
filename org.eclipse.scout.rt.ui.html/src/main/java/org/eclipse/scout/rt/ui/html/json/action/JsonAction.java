@@ -43,7 +43,6 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
         return getModel().getText();
       }
     });
-
     putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
@@ -95,6 +94,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
       @Override
       protected String modelValue() {
         return getModel().getKeyStroke();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_KEYSTROKE_FIRE_POLICY, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getKeyStrokeFirePolicy();
       }
     });
 
