@@ -93,6 +93,7 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
     return;
   }
   if (this.outline) {
+    this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
     currentDisplayStyle = this.outline.displayStyle;
     if (this.rendered) {
       this.outline.remove();
