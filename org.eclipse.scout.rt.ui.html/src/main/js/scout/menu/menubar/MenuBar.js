@@ -338,6 +338,7 @@ scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
 };
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
+  var $menuBox = right ? this.$right : this.$left;
   var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
   menuItems.forEach(function(item) {
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
@@ -347,7 +348,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
       this.tabbableMenu = undefined;
     }
     item.tooltipPosition = tooltipPosition;
-    item.render(right ? this.$right : this.$left);
+    item.render($menuBox);
     item.$container.addClass('menubar-item');
     if (right) {
       // Mark as right-aligned
@@ -358,6 +359,9 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     // its items changes (e.g. visible, keystroke etc.)
     item.on('propertyChange', this._menuItemPropertyChangeListener);
   }.bind(this));
+
+  // Hide menu box with no menu items because on iOS the width of an empty menu box is 1px which breaks the menubar layout (rightWidth === 0 check)
+  $menuBox.toggleClass('hidden', menuItems.length === 0);
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
