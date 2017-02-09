@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.BackgroundPollingIntervalProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
@@ -54,8 +55,7 @@ import org.slf4j.MDC;
 public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(JsonMessageRequestHandler.class);
 
-  private static final int BACKGROUND_POLLING_INTERVAL_SECONDS = 60;
-
+  private final int m_pollingInterval = CONFIG.getPropertyValue(BackgroundPollingIntervalProperty.class).intValue();
   private final int m_maxUserIdleTime = CONFIG.getPropertyValue(MaxUserIdleTimeProperty.class).intValue();
 
   private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
@@ -272,7 +272,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     int maxIdle = m_maxUserIdleTime;
     // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
     // because that might trigger many very short polling calls until the ui session is really disposed.
-    int pollWait = Math.max(Math.min(maxIdle - curIdle, BACKGROUND_POLLING_INTERVAL_SECONDS), 3);
+    int pollWait = Math.max(Math.min(maxIdle - curIdle, m_pollingInterval), 3);
     LOG.debug("Polling begin for {} seconds", pollWait);
     // Blocks the current thread until:
     // - a model job terminates

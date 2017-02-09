@@ -147,6 +147,26 @@ public final class UiHtmlConfigProperties {
   }
 
   /**
+   * The polling request which waits for a background job to complete stays open until a background job has completed or
+   * this interval elapsed. The unit is seconds.
+   * <p>
+   * The minimum value for this property is 3 seconds, the max value is the max user idle time (see
+   * {@link MaxUserIdleTimeProperty}).
+   */
+  public static class BackgroundPollingIntervalProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    protected Long getDefaultValue() {
+      return Long.valueOf(TimeUnit.SECONDS.toSeconds(60));
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.background.polling.interval";
+    }
+  }
+
+  /**
    * Number of seconds before the housekeeping job starts after a UI session has been unregistered from the store.
    */
   public static class SessionStoreHousekeepingDelayProperty extends AbstractPositiveIntegerConfigProperty {
