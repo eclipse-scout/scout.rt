@@ -918,7 +918,7 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
   });
   menu.on('doAction', function(event) {
     if (field instanceof scout.ValueField) {
-      // FIXME CGU [6.1] offline?
+      // TODO [7.0] cgu offline?
       field.trigger('exportToClipboard');
     }
   });

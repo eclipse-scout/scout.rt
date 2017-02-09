@@ -243,8 +243,6 @@ public class JsonResponse {
     return m_error;
   }
 
-  // FIXME cgu: potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
-
   /**
    * Returns a JSON string representation of this instance. This method is called at the end of a request. The return
    * value of this method is returned to the client-side GUI. There are some noteworthy points:

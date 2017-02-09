@@ -77,6 +77,6 @@ scout.FileChooserField.prototype._onIconClick = function(event) {
 };
 
 scout.FileChooserField.prototype.openFileChooser = function() {
-  // FIXME CGU [6.1] offline case?
+  // TODO [7.0] cgu offline case?
   this.trigger('chooseFile');
 };

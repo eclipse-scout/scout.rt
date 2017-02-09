@@ -1039,7 +1039,7 @@ scout.Widget.prototype.resolveIconIds = function(properties) {
   }, this);
 };
 
-// FIXME CGU [6.1] temporary, rename
+// TODO [7.0] cgu temporary, rename
 scout.Widget.prototype._addAdapterProperties = function(properties) {
   this._addProperties('_adapterProperties', properties);
 };
@@ -1106,7 +1106,7 @@ scout.Widget.prototype._removeAdapterProperties = function(properties) {
   }
 };
 
-// FIXME CGU [6.1] temporary, remove after model adapter separation
+// TODO [7.0] cgu temporary, remove after model adapter separation
 scout.Widget.prototype._send = function(type, data) {
   data = $.extend({}, data); // create a copy, so we don't change the original data unintentionally
   data.sendToServer = true;

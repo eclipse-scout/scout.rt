@@ -40,7 +40,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   }
 
   this._setDataHeight(heightOffset);
-  
+
   // recalculate ViewRangeSize before any rendering is done
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 

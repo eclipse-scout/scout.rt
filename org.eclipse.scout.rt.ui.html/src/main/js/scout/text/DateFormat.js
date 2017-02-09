@@ -51,7 +51,7 @@ scout.DateFormat = function(locale, pattern) { // NOSONAR
   scout.assertParameter('pattern', this.pattern);
 
   this.symbols = locale.dateFormatSymbols;
-  this.symbols.firstDayOfWeek = 1; // monday //FIXME cgu: deliver from server
+  this.symbols.firstDayOfWeek = 1; // monday // TODO [7.0] cgu: deliver from server
   this.symbols.weekdaysOrdered = scout.dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
   this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.symbols.monthsToNumber;

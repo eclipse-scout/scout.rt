@@ -17,7 +17,7 @@
   #scout.vertical-align-helper-after();
 
   /* jquery sets overflow to hidden while animating which makes bench-drop-shadow invisible -> prevent it */
-  overflow: visible !important;
+  overflow: visible !important; // NOSONAR
 
   /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
   /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */

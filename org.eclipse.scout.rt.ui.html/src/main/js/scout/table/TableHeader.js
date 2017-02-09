@@ -503,7 +503,7 @@ scout.TableHeader.prototype._lastVisibleColumn = function() {
 };
 
 scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
-  var column, i, $header, $headerResize;
+  var $header, $headerResize;
   var $headers = this.findHeaderItems();
 
   // store old position of headers

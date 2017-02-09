@@ -181,7 +181,7 @@ scout.FileChooser.prototype._doUpload = function() {
 };
 
 scout.FileChooser.prototype._doCancel = function() {
-  // FIXME CGU [6.1] offline case?
+  // TODO [7.0] cgu offline case?
   this.trigger('cancel');
 };
 

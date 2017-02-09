@@ -294,7 +294,7 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   event.changedProperties.forEach(function(propertyName) {
     var value = event.newProperties[propertyName];
 
-    // FIXME CGU [6.1] This does not work if value will be converted into another object (e.g scout.DateRange.ensure(selectionRange) in Planner.js)
+    // TODO [7.0] cgu This does not work if value will be converted into another object (e.g scout.DateRange.ensure(selectionRange) in Planner.js)
     // -> either do the check in this._send() or extract ensure into separate method and move the call of addFilterForProperties.
     // The advantage of the first one would be simpler filter functions (e.g. this.widget._nodesToIds(this.widget.selectedNodes) in Tree.js)
     if (this._isPropertyChangeEventFiltered(propertyName, value)) {
@@ -339,7 +339,7 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'propertyChange') {
     this._onWidgetPropertyChange(event);
   } else {
-    // FIXME CGU [6.1] temporary, until model adapter separation
+    // TODO [7.0] cgu temporary, until model adapter separation
     if (event.sendToServer) {
       event = $.extend({}, event); // copy
       delete event.source;

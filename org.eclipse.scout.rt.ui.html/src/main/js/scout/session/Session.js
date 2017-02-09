@@ -117,7 +117,7 @@ scout.Session.prototype.init = function(model) {
     this.locale = scout.Locale.ensure(options.locale);
     this.textMap = scout.texts.get(this.locale.languageTag);
   }
-  // FIXME CGU [6.1] flag necessary for modeladapter, remove it
+  // TODO [7.0] cgu flag necessary for modeladapter, remove it
   this.remote = scout.nvl(options.remote, this.remote);
   if (options.backgroundJobPollingEnabled === false) {
     this.backgroundJobPollingSupport.enabled = false;
@@ -344,7 +344,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }
 
   // Register UI session
-  this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+  this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
 
   // Store adapters to adapter data cache
   if (data.adapterData) {

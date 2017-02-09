@@ -207,7 +207,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
 
-  // FIXME CGU improve this, start must not be executed because it currently does a server request
+  // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
   parent.session = session;
   this._createDesktop(parent);

@@ -35,7 +35,7 @@ scout.TableRowDetail.prototype._renderRow = function() {
       return;
     }
     var $field = this.$container.appendDiv('table-row-detail-field');
-    // FIXME CGU handle column without text or with icon, handle icon content, html content, bean content
+    // TODO [7.0] cgu handle column without text or with icon, handle icon content, html content, bean content
     $field.appendSpan('table-row-detail-name').text(name + ': ');
     $field.appendSpan('table-row-detail-value').text(value);
   }, this);

@@ -68,7 +68,6 @@ public class JsonCell implements IJsonObject {
     json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     json.put("tooltipText", m_cell.getTooltipText());
     if (m_cell.getErrorStatus() != null && m_cell.getErrorStatus().getSeverity() == IStatus.ERROR) {
-      //FIXME cgu: ask JGU why is errorStatus set with severity = OK if there is no error?
       json.put("errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
     }
     json.put("cssClass", m_cell.getCssClass());

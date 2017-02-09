@@ -75,7 +75,7 @@ scout.Table = function() {
 };
 scout.inherits(scout.Table, scout.Widget);
 
-// FIXME CGU [6.1] create StringColumn.js incl. defaultValues from defaultValues.json
+// TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
 scout.Table.GroupingStyle = {
   /**
@@ -323,7 +323,7 @@ scout.Table.prototype._renderProperties = function() {
 scout.Table.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallDragAndDropHandler();
-  // FIXME CGU do not delete header, implement according to footer
+  // TODO [7.0] cgu do not delete header, implement according to footer
   this.header = null;
   this._removeAggregateRows();
   this._uninstallImageListeners();
@@ -1967,7 +1967,6 @@ scout.Table.prototype.insertRows = function(rows) {
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
   this._sortAfterInsert(wasEmpty);
-  this._rebuildingTable = false;
 
   // Update HTML
   if (this.rendered) {
@@ -3611,8 +3610,6 @@ scout.Table.prototype.containsNumberColumn = function() {
  * Does not modify the rows, it expects a deleteAll and insert operation to follow which will do the job.
  */
 scout.Table.prototype.updateColumnStructure = function(columns) {
-  this._rebuildingTable = true;
-
   this.columns = columns;
   this._initColumns();
 

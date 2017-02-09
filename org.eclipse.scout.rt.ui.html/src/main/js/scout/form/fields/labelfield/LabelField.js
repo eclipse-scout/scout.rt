@@ -26,7 +26,7 @@ scout.LabelField.prototype._render = function($parent) {
 scout.LabelField.prototype._renderProperties = function() {
   scout.LabelField.parent.prototype._renderProperties.call(this);
   this._renderWrapText(this.wrapText);
-  // FIXME cgu: render selectable
+  // TODO [7.0] cgu: render selectable
 };
 
 /**

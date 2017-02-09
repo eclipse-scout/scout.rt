@@ -262,7 +262,7 @@ scout.TabItem.prototype._setMenusVisible = function() {
   // Always invisible because menus are displayed in menu bar and not with status icon
   // Actually not needed at the moment because only value fields have menus (at least at the java model).
   // But actually we should change this so that menus are possible for every form field
-  // TODO CGU [6.0] remove this comment if java model supports form field menus
+  // TODO CGU [7.0] remove this comment if java model supports form field menus
   this._setProperty('menusVisible', false);
 };
 
@@ -290,7 +290,7 @@ scout.TabItem.prototype._detach = function() {
  * @override FormField.js
  */
 scout.TabItem.prototype.focus = function() {
-  if (this.parent.selectedTab != this) {
+  if (this.parent.selectedTab !== this) {
     this.parent.setSelectedTab(this);
   }
   if (!this.rendered) {

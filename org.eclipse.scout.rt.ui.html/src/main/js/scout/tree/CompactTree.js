@@ -69,16 +69,12 @@ scout.CompactTree.prototype._remove = function() {
  */
 scout.CompactTree.prototype._$buildNode = function(node) {
   if (this._isSection(node)) {
-    //TODO [jgu] sections without child nodes are not visible, never build
-    // Sections (only draw if they have child nodes)
-    //    if (node.childNodes.length > 0) {
     var $section = this.$container.makeDiv('section expanded')
       .data('node', node);
     $section.appendDiv('title')
       .text(node.text);
 
     node.$node = $section;
-    //    }
   } else {
     var $parent = node.parentNode.$node;
     // Sections nodes

@@ -307,6 +307,7 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
 
 scout.TableAdapter.prototype._onRowsInserted = function(rows) {
   this.widget.insertRows(rows);
+  this._rebuildingTable = false;
 };
 
 scout.TableAdapter.prototype._onRowsDeleted = function(rowIds) {
@@ -328,7 +329,7 @@ scout.TableAdapter.prototype._onRowsSelected = function(rowIds) {
   var rows = this.widget._rowsByIds(rowIds);
   this.addFilterForWidgetEventType('rowsSelected');
   this.widget.selectRows(rows);
-  // FIXME [6.1] CGU what is this for? seems wrong here
+  // TODO [7.0] cgu what is this for? seems wrong here
   this.widget.selectionHandler.clearLastSelectedRowMarker();
 };
 
@@ -361,6 +362,7 @@ scout.TableAdapter.prototype._onRowOrderChanged = function(rowIds) {
 };
 
 scout.TableAdapter.prototype._onColumnStructureChanged = function(columns) {
+  this._rebuildingTable = true;
   this.widget.updateColumnStructure(columns);
 };
 
@@ -443,7 +445,7 @@ scout.TableAdapter.prototype._onFiltersChanged = function(filters) {
 
   this.widget.setFilters(filters);
   // do not refilter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)
-  if (!this.widget._rebuildingTable) { //FIXME CGU [6.1] gehört das nicht direkt in filter rein?
+  if (!this._rebuildingTable) {
     this.widget.filter();
   }
 };

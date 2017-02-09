@@ -10,11 +10,6 @@
  ******************************************************************************/
 scout.menus = {
 
-  /**
-   * @memberOf scout.menus
-   */
-  CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu', //FIXME cgu: keydown/keyup is a bad idea -> interferes with ctrl click on table to multi select rows
-
   filterAccordingToSelection: function(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
     var allowedTypes = [];
 

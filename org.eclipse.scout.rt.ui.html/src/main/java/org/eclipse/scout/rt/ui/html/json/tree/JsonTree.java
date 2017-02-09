@@ -481,7 +481,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   protected void handleModelNodesInserted(TreeEvent event) {
     JSONArray jsonNodes = new JSONArray();
-    attachNodes(event.getNodes(), true); // FIXME cgu: why not inside loop? attaching for rejected nodes?
+    attachNodes(event.getNodes(), true); // TODO [7.0] cgu: why not inside loop? attaching for rejected nodes?
     for (ITreeNode node : event.getNodes()) {
       if (isNodeAccepted(node)) {
         jsonNodes.put(treeNodeToJson(node));

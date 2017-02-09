@@ -492,7 +492,7 @@ scout.SmartField.prototype._triggerDeleteProposal = function(displayText) {
 
 scout.SmartField.prototype._sendDeleteProposal = function(displayText) {
   this._setDisplayText(displayText);
-  this._send('deleteProposal'); // FIXME [6.1] cgu move to adapter
+  this._send('deleteProposal'); // TODO [7.0] cgu move to adapter
 };
 
 scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {

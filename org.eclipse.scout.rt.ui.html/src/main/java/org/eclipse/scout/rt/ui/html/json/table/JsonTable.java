@@ -656,7 +656,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IColumn column = extractColumn(data);
     boolean sortingRemoved = data.optBoolean("sortingRemoved");
 
-    // FIXME cgu: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
+    // TODO [7.0] cgu: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
     if (sortingRemoved) {
       getModel().getUIFacade().fireSortColumnRemovedFromUI(column);
     }
@@ -795,7 +795,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     json.put("fieldId", jsonField.getId());
     addActionEvent(EVENT_END_CELL_EDIT, json).protect();
 
-    //FIXME cgu: feld merken, revert bei toJson für page reload
+    // TODO [7.0] cgu: remember field, revert at toJson for page reload
     jsonField.dispose();
   }
 
