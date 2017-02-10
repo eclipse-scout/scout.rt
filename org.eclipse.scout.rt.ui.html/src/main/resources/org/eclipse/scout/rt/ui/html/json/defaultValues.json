@@ -279,7 +279,8 @@
       "horizontalAlignment": -1,
       "htmlEnabled": false,
       "editable": false,
-      "errorStatus": ""
+      "errorStatus": "",
+      "mandatory": false
     },
     "TableRow": {
       "checked": false,

@@ -158,6 +158,7 @@ scout.Column.prototype._initCell = function(cell) {
   cell.editable = scout.nvl(cell.editable, this.editable);
   cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
   cell.htmlEnabled = scout.nvl(cell.htmlEnabled, this.htmlEnabled);
+  cell.mandatory = scout.nvl(cell.mandatory, this.mandatory);
   return cell;
 };
 
@@ -572,4 +573,8 @@ scout.Column.prototype.setDisplayable = function(displayable) {
 scout.Column.prototype._setDisplayable = function(displayable) {
   this.displayable = displayable;
   this.table.onColumnVisibilityChanged(this);
+};
+
+scout.Column.prototype.isContentValid = function(row) {
+  return this.cell(row).isContentValid();
 };

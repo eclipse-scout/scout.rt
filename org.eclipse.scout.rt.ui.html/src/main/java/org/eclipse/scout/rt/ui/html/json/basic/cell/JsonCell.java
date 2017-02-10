@@ -77,6 +77,7 @@ public class JsonCell implements IJsonObject {
     json.put("font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
     json.put("editable", m_cell.isEditable());
     json.put("htmlEnabled", m_cell.isHtmlEnabled());
+    json.put("mandatory", m_cell.isMandatory());
     return json;
   }
 

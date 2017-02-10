@@ -145,3 +145,34 @@ scout.TableField.prototype.markAsSaved = function() {
   this._updatedRows = [];
   this._checkedRows = [];
 };
+
+scout.TableField.prototype.validate = function() {
+  var desc = scout.TableField.parent.prototype.validate.call(this);
+  if (desc && !desc.valid) {
+    return desc;
+  }
+
+  var validByErrorStatus = !this.errorStatus;
+  var validByMandatory = !this.mandatory || !this.empty;
+
+  // check cells
+  var rows = scout.arrays.ensure(this.table.rows);
+  var columns = scout.arrays.ensure(this.table.columns);
+
+  rows.some(function(row) {
+    return columns.some(function(column) {
+      var ret = column.isContentValid(row);
+      if (!ret.valid) {
+        validByErrorStatus = validByErrorStatus && ret.validByErrorStatus;
+        validByMandatory = validByMandatory && ret.validByMandatory;
+        return !(validByErrorStatus || validByMandatory);
+      }
+    }, this);
+  }, this);
+
+  return {
+    valid: validByErrorStatus && validByMandatory,
+    validByErrorStatus: validByErrorStatus,
+    validByMandatory: validByMandatory
+  };
+};
