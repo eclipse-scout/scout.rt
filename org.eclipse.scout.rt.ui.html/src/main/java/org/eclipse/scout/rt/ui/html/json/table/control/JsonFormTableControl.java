@@ -41,7 +41,7 @@ public class JsonFormTableControl<TABLE_CONTROL extends IFormTableControl> exten
 
       @Override
       public boolean accept() {
-        return getModel().isSelected() || getModel().getForm() == null;
+        return getModel().isSelected();
       }
     });
     getJsonProperty(IAction.PROP_SELECTED).addLazyProperty(getJsonProperty(TABLE_CONTROL.PROP_FORM));
@@ -51,4 +51,5 @@ public class JsonFormTableControl<TABLE_CONTROL extends IFormTableControl> exten
   public String getObjectType() {
     return "FormTableControl";
   }
+
 }
