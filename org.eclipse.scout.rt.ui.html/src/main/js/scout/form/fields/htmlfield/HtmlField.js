@@ -39,6 +39,10 @@ scout.HtmlField.prototype._renderProperties = function() {
   this._renderScrollToAnchor(this.scrollToAnchor);
 };
 
+scout.HtmlField.prototype._readDisplayText = function() {
+  return this.$field.html();
+};
+
 /**
  * @override
  */
