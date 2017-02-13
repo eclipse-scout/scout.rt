@@ -754,10 +754,9 @@ public class JsonTableTest {
     JsonTestUtility.processBufferedEvents(m_uiSession);
 
     // Filtering is implemented by Only one deletion event should be emitted (no update event!)
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
     List<JsonEvent> eventList = m_uiSession.currentJsonResponse().getEventList();
-    assertEquals(2, eventList.size());
     assertEquals("rowsInserted", eventList.get(0).getType());
-    assertEquals("rowOrderChanged", eventList.get(1).getType());
     JsonEvent jsonEvent = eventList.get(0);
     assertEquals(1, jsonEvent.getData().getJSONArray("rows").length());
     assertEquals(jsonTable.getTableRowId(row), jsonEvent.getData().getJSONArray("rows").getJSONObject(0).get("id"));

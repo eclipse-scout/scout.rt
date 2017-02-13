@@ -914,7 +914,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       if (!getTree().isCheckable()) {
         getTree().selectNodes(checkedNodes, false);
       }
-      getTree().applyNodeFilters();
     }
     finally {
       getTree().setTreeChanging(false);
@@ -960,7 +959,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
           }
         });
       }
-      getTree().applyNodeFilters();
     }
     finally {
       getTree().setTreeChanging(false);
@@ -972,6 +970,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       // Need to sync.
       syncValueToTree();
     }
+
+    // check if row filter needs to change
+    if (!m_tree.getUIFacade().isUIProcessing()) {
+      updateActiveNodesFilter();
+    }
+    updateCheckedNodesFilter();
   }
 
   @Override
