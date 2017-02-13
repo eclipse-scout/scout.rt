@@ -265,8 +265,11 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           contentCount++;
         });
       } else if (scout.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
-        filesArgument.push(item.getAsFile());
-        contentCount++;
+        var fileContent = item.getAsFile();
+        if (fileContent) {
+          filesArgument.push(item.getAsFile());
+          contentCount++;
+        }
       }
     });
   }
