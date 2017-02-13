@@ -96,10 +96,6 @@ public class JaxWsClientPoolingHelper {
   protected Method lookupMethod(String className, String methodName) {
     try {
       Class<?> clazz = Class.forName(className);
-      if (clazz == null) {
-        LOG.warn("Could not find class [{}]", className);
-        return null;
-      }
       return clazz.getMethod(methodName);
     }
     catch (ReflectiveOperationException | SecurityException e) {

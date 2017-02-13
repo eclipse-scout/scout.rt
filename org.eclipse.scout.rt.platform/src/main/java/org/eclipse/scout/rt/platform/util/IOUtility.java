@@ -538,7 +538,7 @@ public final class IOUtility {
 
   public static boolean deleteDirectory(String dir) {
     File f = toFile(dir);
-    if (f.exists()) {
+    if (f != null && f.exists()) {
       return deleteDirectory(f);
     }
     else {
@@ -550,7 +550,7 @@ public final class IOUtility {
     if (dir != null) {
       dir = dir.replaceAll("[*?\\\"<>|]*", "");
       File f = toFile(dir);
-      return f.mkdirs();
+      return f != null && f.mkdirs();
     }
     return false;
   }

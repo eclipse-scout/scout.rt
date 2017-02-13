@@ -600,7 +600,7 @@ public abstract class AbstractJaxWsClientTest {
     try {
       future.awaitDone();
     }
-    catch (WebServiceRequestCancelledException e) {
+    catch (WebServiceRequestCancelledException e) { // NOSONAR
       // expected
     }
     assertTrue(future.isCancelled());

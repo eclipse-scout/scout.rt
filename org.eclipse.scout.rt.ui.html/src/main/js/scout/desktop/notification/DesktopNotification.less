@@ -35,9 +35,9 @@
  * notifications.
  */
 .keyframes-desktop-notification-slide-in() {
-  00%  { left: 250px; margin-bottom: 0; } /* see comment on top */
-  80%  { left: 15px; }
-  100% { left: 0; margin-bottom: 20px; }
+  00%  { left: 250px; margin-bottom: 0; } /* NOSONAR see comment on top */
+  80%  { left: 15px; }                    /* NOSONAR */
+  100% { left: 0; margin-bottom: 20px; }  /* NOSONAR */
 }
 
 .animation-desktop-notification-slide-in() {
@@ -62,8 +62,8 @@
 }
 
 .keyframes-desktop-notification-fade-out() {
-  00%  { opacity: 1.0; margin-bottom: 20px; } /* see comment on top */
-  100% { opacity: 0; margin-bottom: -37px; }
+  00%  { opacity: 1.0; margin-bottom: 20px; } /* NOSONAR see comment on top */
+  100% { opacity: 0; margin-bottom: -37px; }  /* NOSONAR */
 }
 
 .animation-desktop-notification-fade-out() {

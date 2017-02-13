@@ -502,6 +502,7 @@ public final class StringUtility {
     return replaceTags(text, tagName, false, processor);
   }
 
+  @SuppressWarnings("squid:S2259")
   public static String replaceTags(String text, String tagName, boolean ignoreCase, ITagProcessor processor) {
     if (text == null) {
       return null;
@@ -534,6 +535,7 @@ public final class StringUtility {
     return removeTag(text, tagName, false);
   }
 
+  @SuppressWarnings("squid:S2259")
   public static String removeTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
@@ -579,6 +581,7 @@ public final class StringUtility {
     return removeTagBounds(text, tagName, false);
   }
 
+  @SuppressWarnings("squid:S2259")
   public static String removeTagBounds(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
@@ -1797,6 +1800,7 @@ public final class StringUtility {
    * sign, one or more digits, exactly one dot sign, exactly 6 digits). The method is therefore mostly suitable for
    * technical purposes (e.g. logging).
    */
+  @SuppressWarnings("squid:S2259")
   public static String formatNanos(long nanos) {
     String x = "" + nanos;
     if (nanos < 0) {

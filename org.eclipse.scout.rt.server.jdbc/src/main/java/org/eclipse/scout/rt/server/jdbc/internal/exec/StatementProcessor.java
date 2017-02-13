@@ -141,7 +141,7 @@ public class StatementProcessor implements IStatementProcessor {
         IBindOutput out = null;
         if (t.isInput()) {
           in = createInput(t, m_bindBases);
-          if (in.isJdbcBind(sqlStyle)) {
+          if (in.isJdbcBind(sqlStyle)) { // NOSONAR
             in.setJdbcBindIndex(jdbcBindIndex);
           }
           m_inputList.add(in);
