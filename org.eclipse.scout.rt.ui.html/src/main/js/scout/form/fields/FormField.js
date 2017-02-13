@@ -414,14 +414,7 @@ scout.FormField.prototype._renderPreventInitialFocus = function() {
 };
 
 scout.FormField.prototype._getCurrentMenus = function() {
-  var menuTypes;
-  if (this.currentMenuTypes) {
-    menuTypes = [];
-    this.currentMenuTypes.forEach(function(elem) {
-      menuTypes.push('ValueField.' + elem);
-    }, this);
-  }
-  return menuTypes ? scout.menus.filter(this.menus, menuTypes) : this.menus.filter(function(menu) {
+  return this.menus.filter(function(menu) {
     return menu.visible;
   });
 };
