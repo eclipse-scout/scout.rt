@@ -45,5 +45,4 @@ public class HtmlDocumentParserParameters {
   public String getTheme() {
     return m_theme;
   }
-
 }

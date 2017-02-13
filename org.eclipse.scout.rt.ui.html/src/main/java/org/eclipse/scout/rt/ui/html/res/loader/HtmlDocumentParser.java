@@ -37,6 +37,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
+ * <p>
+ * Note: This is not a &#64;Bean, because the constructor requires an argument. To customize this class, override the
+ * factory method in {@link HtmlFileLoader}.
  */
 public class HtmlDocumentParser {
   private static final Logger LOG = LoggerFactory.getLogger(HtmlDocumentParser.class);
@@ -149,6 +152,9 @@ public class HtmlDocumentParser {
     return new ScriptFileLoader(m_params.getTheme(), m_params.isMinify());
   }
 
+  /**
+   * Returns the external script name including a content-based fingerprint.
+   */
   protected Pair<HttpCacheObject, String> getScriptAndFingerprint(String internalPath) throws IOException {
     ScriptFileLoader scriptLoader = createScriptFileLoader();
     HttpCacheKey cacheKey = scriptLoader.createCacheKey(internalPath);
@@ -167,11 +173,10 @@ public class HtmlDocumentParser {
   }
 
   /**
+   * Returns the external name for the given file name.
+   * <p>
    * When file is a macro or module, remove that suffix. ScriptFileLocator tries to find the macro and module files by
    * adding the suffix again and looking it up in the classpath.
-   *
-   * @param fileName
-   * @return
    */
   protected String getScriptFileName(String fileName) {
     if (fileName.endsWith("-macro")) {
@@ -183,7 +188,10 @@ public class HtmlDocumentParser {
     return fileName;
   }
 
-  private Object getScriptFileExtension(String extension) {
+  /**
+   * Returns the external extension for the given file extension.
+   */
+  protected Object getScriptFileExtension(String extension) {
     if ("less".equals(extension)) {
       return "css";
     }
