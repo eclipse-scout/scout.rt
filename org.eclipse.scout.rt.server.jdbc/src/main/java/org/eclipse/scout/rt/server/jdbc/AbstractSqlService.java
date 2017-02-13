@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -179,6 +181,12 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         list.add(d);
       }
     }
+  }
+
+  @PostConstruct
+  protected void logServiceConfig() {
+    LOG.info("JDBC Mapping: {}", getJdbcMappingName());
+    LOG.info("Schema: {}", getUsername());
   }
 
   protected <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, DATA_TYPE defaultValue) {

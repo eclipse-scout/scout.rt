@@ -37,4 +37,9 @@ public abstract class AbstractDB2SqlService extends AbstractSqlService {
   protected String getConfiguredJdbcMappingName() {
     return "jdbc:db2//[host][:port]/[database]";
   }
+
+  @Override
+  protected String getSequenceNextvalStatement(String sequenceName) {
+    return "SELECT " + sequenceName + ".NEXTVAL FROM SYSIBM.SYSDUMMY1 ";
+  }
 }
