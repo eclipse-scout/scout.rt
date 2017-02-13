@@ -137,6 +137,16 @@ scout.ValueField.prototype._onStatusMousedown = function(event) {
   scout.ValueField.parent.prototype._onStatusMousedown.call(this, event);
 };
 
+scout.ValueField.prototype._getCurrentMenus = function() {
+  if (this.currentMenuTypes) {
+    var menuTypes = this.currentMenuTypes.map(function(elem) {
+      return 'ValueField.' + elem;
+    });
+    return scout.menus.filter(this.menus, menuTypes);
+  }
+  return scout.ValueField.parent.prototype._getCurrentMenus.call(this);
+};
+
 // ==== static helper methods ==== //
 
 /**
