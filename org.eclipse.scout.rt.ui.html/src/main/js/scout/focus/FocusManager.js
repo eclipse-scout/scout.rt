@@ -32,6 +32,7 @@ scout.FocusManager = function(options) {
 
   this._focusContexts = [];
   this._glassPaneTargets = [];
+  this._glassPaneDisplayParents = [];
 
   // Make $entryPoint focusable and install focus context.
   var $mainEntryPoint = this.session.$entryPoint;
@@ -195,11 +196,15 @@ scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
     return false; // no glasspanes active.
   }
 
-  // Checks whether the element is a child of a glasspane target.
-  // If so, the some-iterator returns immediately with true.
-  return this._glassPaneTargets.some(function($glassPaneTarget) {
-    return $(element).closest($glassPaneTarget).length !== 0;
-  });
+  if (this._glassPaneDisplayParents.indexOf(scout.Widget.getWidgetFor($(element))) >= 0) {
+    return true;
+  } else {
+    // Checks whether the element is a child of a glasspane target.
+    // If so, the some-iterator returns immediately with true.
+    return this._glassPaneTargets.some(function($glassPaneTarget) {
+      return $(element).closest($glassPaneTarget).length !== 0;
+    });
+  }
 };
 
 /**
@@ -210,12 +215,20 @@ scout.FocusManager.prototype.registerGlassPaneTarget = function(glassPaneTarget)
   this.validateFocus();
 };
 
+scout.FocusManager.prototype.registerGlassPaneDisplayParent = function(displayParent) {
+  this._glassPaneDisplayParents.push(displayParent);
+};
+
 /**
  * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
  */
 scout.FocusManager.prototype.unregisterGlassPaneTarget = function(glassPaneTarget) {
   scout.arrays.remove(this._glassPaneTargets, glassPaneTarget);
   this.validateFocus();
+};
+
+scout.FocusManager.prototype.unregisterGlassPaneDisplayParent = function(displayParent) {
+  scout.arrays.remove(this._glassPaneDisplayParents, displayParent);
 };
 
 /**

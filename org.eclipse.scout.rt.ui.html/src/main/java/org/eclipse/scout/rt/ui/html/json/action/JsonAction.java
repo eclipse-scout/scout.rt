@@ -100,6 +100,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
       }
     });
 
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_KEYSTROKE_FIRE_POLICY, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getKeyStrokeFirePolicy();
+      }
+    });
+
     putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_HORIZONTAL_ALIGNMENT, model) {
       @Override
       protected Integer modelValue() {

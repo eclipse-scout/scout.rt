@@ -21,6 +21,7 @@ scout.Action = function() {
   this.cssClass = '';
   this.toggleAction = false;
   this.keyStroke = null;
+  this.keyStrokeFirePolicy = scout.Action.KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY;
 
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
@@ -43,6 +44,9 @@ scout.Action.ActionStyle = {
   DEFAULT: 0,
   BUTTON: 1
 };
+
+scout.Action.KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY = 0;
+scout.Action.KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
 
 /**
  * @override

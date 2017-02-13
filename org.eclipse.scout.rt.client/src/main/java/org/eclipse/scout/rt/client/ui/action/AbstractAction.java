@@ -170,6 +170,18 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
+   * Determines if the keystroke should be fired when the action itself is not accessible (e.g. not covered by a modal
+   * dialog). The property is specified as int, see {@link IAction#KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY} and
+   * {@link IAction#KEYSTROKE_FIRE_POLICY_ALWAYS}.<br>
+   * NOTE: This is especially useful for desktop actions that should be triggered on every matching keystroke
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(60)
+  protected int getConfiguredKeyStrokeFirePolicy() {
+    return IAction.KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY;
+  }
+
+  /**
    * Configures whether the action can be selected or not
    *
    * @return <code>true</code> if the action can be selected and <code>false</code> otherwise
@@ -312,6 +324,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setText(getConfiguredText());
     setTooltipText(getConfiguredTooltipText());
     setKeyStroke(getConfiguredKeyStroke());
+    setKeyStrokeFirePolicy(getConfiguredKeyStrokeFirePolicy());
     setInheritAccessibility(getConfiguredInheritAccessibility());
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
@@ -468,6 +481,16 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     else {
       LOG.warn("Could not create keystroke '{}' because it is invalid!", k);
     }
+  }
+
+  @Override
+  public int getKeyStrokeFirePolicy() {
+    return propertySupport.getPropertyInt(PROP_KEYSTROKE_FIRE_POLICY);
+  }
+
+  @Override
+  public void setKeyStrokeFirePolicy(int keyStrokeFirePolicy) {
+    propertySupport.setPropertyInt(PROP_KEYSTROKE_FIRE_POLICY, keyStrokeFirePolicy);
   }
 
   @Override
