@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.mail;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -20,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.IDN;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,7 +46,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.junit.Assert;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Test;
 
 /**
@@ -130,9 +132,9 @@ public class MailUtilityTest {
     List<Part> attachmentCollector = new ArrayList<Part>();
     List<Part> inlineAttachmentCollector = new ArrayList<Part>();
     MailUtility.collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
-    Assert.assertEquals("body parts size is wrong", 2, bodyCollector.size());
-    Assert.assertEquals("attachments parts size is wrong", 3, attachmentCollector.size());
-    Assert.assertEquals("inline attachments parts size is wrong", 0, inlineAttachmentCollector.size());
+    assertEquals("body parts size is wrong", 2, bodyCollector.size());
+    assertEquals("attachments parts size is wrong", 3, attachmentCollector.size());
+    assertEquals("inline attachments parts size is wrong", 0, inlineAttachmentCollector.size());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -143,7 +145,7 @@ public class MailUtilityTest {
   @Test
   public void testCreateMimeMessage() throws Exception {
     // no plain text or html body
-    Assert.assertNull(MailUtility.createMimeMessage(new MailMessage()));
+    assertNull(MailUtility.createMimeMessage(new MailMessage()));
 
     final String plainText = "plain text";
     final String html = "<html><body><p>html</p></body></html>";
@@ -171,20 +173,20 @@ public class MailUtilityTest {
     verifyMimeMessage(msg, plainText, html, "sample1.dat");
     // exactly one, already verified by verify method
     Part attachmentPart = CollectionUtility.firstElement(MailUtility.getAttachmentParts(msg));
-    Assert.assertTrue("Attachment part is of wrong type", attachmentPart instanceof MimeBodyPart);
+    assertTrue("Attachment part is of wrong type", attachmentPart instanceof MimeBodyPart);
     MimeBodyPart bodyPart = (MimeBodyPart) attachmentPart;
-    Assert.assertEquals("Wrong content id", "<" + attachmentContentId + ">", bodyPart.getContentID());
-    Assert.assertEquals("Wrong subject", "Subject", msg.getSubject());
+    assertEquals("Wrong content id", "<" + attachmentContentId + ">", bodyPart.getContentID());
+    assertEquals("Wrong subject", "Subject", msg.getSubject());
     Address[] toRecipients = msg.getRecipients(Message.RecipientType.TO);
     Address[] ccRecipients = msg.getRecipients(Message.RecipientType.CC);
     Address[] bccRecipients = msg.getRecipients(Message.RecipientType.BCC);
-    Assert.assertNotNull("No to recipients", toRecipients);
-    Assert.assertNotNull("No cc recipients", ccRecipients);
-    Assert.assertNotNull("No bcc recipients", bccRecipients);
+    assertNotNull("No to recipients", toRecipients);
+    assertNotNull("No cc recipients", ccRecipients);
+    assertNotNull("No bcc recipients", bccRecipients);
 
-    Assert.assertEquals("Number of to recipients is wrong", 1, toRecipients.length);
-    Assert.assertEquals("Number of cc recipients is wrong", 2, ccRecipients.length);
-    Assert.assertEquals("Number of bcc recipients is wrong", 3, bccRecipients.length);
+    assertEquals("Number of to recipients is wrong", 1, toRecipients.length);
+    assertEquals("Number of cc recipients is wrong", 2, ccRecipients.length);
+    assertEquals("Number of bcc recipients is wrong", 3, bccRecipients.length);
   }
 
   @Test
@@ -209,9 +211,9 @@ public class MailUtilityTest {
     List<Part> attachmentCollector = new ArrayList<Part>();
     List<Part> inlineAttachmentCollector = new ArrayList<Part>();
     MailUtility.collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
-    Assert.assertEquals("body parts size is wrong", 1, bodyCollector.size());
-    Assert.assertEquals("attachments parts size is wrong", 0, attachmentCollector.size());
-    Assert.assertEquals("inline attachments parts size is wrong", 1, inlineAttachmentCollector.size());
+    assertEquals("body parts size is wrong", 1, bodyCollector.size());
+    assertEquals("attachments parts size is wrong", 0, attachmentCollector.size());
+    assertEquals("inline attachments parts size is wrong", 1, inlineAttachmentCollector.size());
   }
 
   @Test
@@ -291,36 +293,36 @@ public class MailUtilityTest {
     definition.addCcRecipient(createMailParticipant("cc@example.org"));
     definition.addBccRecipient(createMailParticipant("bcc@example.org"));
 
-    Assert.assertEquals("Number of TO recipients is wrong", 1, definition.getToRecipients().size());
-    Assert.assertEquals("Number of CC recipients is wrong", 1, definition.getCcRecipients().size());
-    Assert.assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
+    assertEquals("Number of TO recipients is wrong", 1, definition.getToRecipients().size());
+    assertEquals("Number of CC recipients is wrong", 1, definition.getCcRecipients().size());
+    assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
 
-    Assert.assertEquals("TO recipient is wrong", "to@example.org", CollectionUtility.firstElement(definition.getToRecipients()).toString());
-    Assert.assertEquals("CC recipient is wrong", "cc@example.org", CollectionUtility.firstElement(definition.getCcRecipients()).toString());
-    Assert.assertEquals("BCC recipient is wrong", "bcc@example.org", CollectionUtility.firstElement(definition.getBccRecipients()).toString());
+    assertEquals("TO recipient is wrong", "to@example.org", CollectionUtility.firstElement(definition.getToRecipients()).toString());
+    assertEquals("CC recipient is wrong", "cc@example.org", CollectionUtility.firstElement(definition.getCcRecipients()).toString());
+    assertEquals("BCC recipient is wrong", "bcc@example.org", CollectionUtility.firstElement(definition.getBccRecipients()).toString());
 
     definition.clearToRecipients();
-    Assert.assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
-    Assert.assertEquals("Number of CC recipients is wrong", 1, definition.getCcRecipients().size());
-    Assert.assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
+    assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
+    assertEquals("Number of CC recipients is wrong", 1, definition.getCcRecipients().size());
+    assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
 
     definition.clearCcRecipients();
-    Assert.assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
-    Assert.assertEquals("Number of CC recipients is wrong", 0, definition.getCcRecipients().size());
-    Assert.assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
+    assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
+    assertEquals("Number of CC recipients is wrong", 0, definition.getCcRecipients().size());
+    assertEquals("Number of BCC recipients is wrong", 1, definition.getBccRecipients().size());
 
     definition.clearBccRecipients();
-    Assert.assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
-    Assert.assertEquals("Number of CC recipients is wrong", 0, definition.getCcRecipients().size());
-    Assert.assertEquals("Number of BCC recipients is wrong", 0, definition.getBccRecipients().size());
+    assertEquals("Number of TO recipients is wrong", 0, definition.getToRecipients().size());
+    assertEquals("Number of CC recipients is wrong", 0, definition.getCcRecipients().size());
+    assertEquals("Number of BCC recipients is wrong", 0, definition.getBccRecipients().size());
 
     definition.addToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@exapmle.org", "to2@example.org")));
     definition.addCcRecipients(createMailParticipants(CollectionUtility.arrayList("cc1@exapmle.org", "cc2@example.org", "cc3@example.org")));
     definition.addBccRecipients(createMailParticipants(CollectionUtility.arrayList("bcc1@exapmle.org", "bcc2@example.org", "bcc3@example.org", "bcc4@example.org")));
 
-    Assert.assertEquals("Number of TO recipients is wrong", 2, definition.getToRecipients().size());
-    Assert.assertEquals("Number of CC recipients is wrong", 3, definition.getCcRecipients().size());
-    Assert.assertEquals("Number of BCC recipients is wrong", 4, definition.getBccRecipients().size());
+    assertEquals("Number of TO recipients is wrong", 2, definition.getToRecipients().size());
+    assertEquals("Number of CC recipients is wrong", 3, definition.getCcRecipients().size());
+    assertEquals("Number of BCC recipients is wrong", 4, definition.getBccRecipients().size());
   }
 
   @Test
@@ -330,17 +332,17 @@ public class MailUtilityTest {
     MailMessage definition = new MailMessage();
     definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
 
-    Assert.assertEquals("Number of attachments is wrong", 1, definition.getAttachments().size());
+    assertEquals("Number of attachments is wrong", 1, definition.getAttachments().size());
 
     definition.clearAttachments();
 
-    Assert.assertEquals("Number of attachments is wrong", 0, definition.getAttachments().size());
+    assertEquals("Number of attachments is wrong", 0, definition.getAttachments().size());
 
     definition.withAttachments(CollectionUtility.arrayList(
         new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)),
         new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null))));
 
-    Assert.assertEquals("Number of attachments is wrong", 2, definition.getAttachments().size());
+    assertEquals("Number of attachments is wrong", 2, definition.getAttachments().size());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -365,8 +367,8 @@ public class MailUtilityTest {
     msg.addRecipient(RecipientType.TO, address);
 
     InternetAddress address2 = (InternetAddress) msg.getRecipients(RecipientType.TO)[0];
-    Assert.assertEquals(addressToString, address2.toString());
-    Assert.assertEquals(addressPersonal, address2.getPersonal());
+    assertEquals(addressToString, address2.toString());
+    assertEquals(addressPersonal, address2.getPersonal());
   }
 
   @Test
@@ -378,8 +380,76 @@ public class MailUtilityTest {
     msg.addRecipient(RecipientType.TO, address);
 
     InternetAddress address2 = (InternetAddress) msg.getRecipients(RecipientType.TO)[0];
-    Assert.assertEquals(addressToString, address2.toString());
-    Assert.assertEquals(addressPersonal, address2.getPersonal());
+    assertEquals(addressToString, address2.toString());
+    assertEquals(addressPersonal, address2.getPersonal());
+  }
+
+  @Test
+  public void testInternetAddressIDN() throws Exception {
+    final String email = "test@gügüs.com"; // internationalized domain name
+    InternetAddress address = MailUtility.createInternetAddress(email, "André Böller");
+    String addressToString = address.toString();
+    String addressPersonal = address.getPersonal();
+    CharsetSafeMimeMessage msg = new CharsetSafeMimeMessage();
+    msg.addRecipient(RecipientType.TO, address);
+
+    InternetAddress address2 = (InternetAddress) msg.getRecipients(RecipientType.TO)[0];
+    assertEquals(addressToString, address2.toString());
+    assertEquals(addressPersonal, address2.getPersonal());
+
+    assertEquals(IDN.toASCII(email), address2.getAddress());
+    assertEquals(email, IDN.toUnicode(address2.getAddress()));
+
+    assertEquals("xn--peter@mller-zhb.de", MailUtility.createInternetAddress("peter@müller.de").getAddress());
+  }
+
+  @Test
+  public void testInternetAddressEmpty() throws Exception {
+    assertNull(MailUtility.createInternetAddress((String) null));
+    assertNull(MailUtility.createInternetAddress((MailParticipant) null));
+    assertNull(MailUtility.createInternetAddress(""));
+  }
+
+  @Test(expected = ProcessingException.class)
+  public void testInternetAddressInvalid() throws Exception {
+    assertNull(MailUtility.createInternetAddress("foo@bar@foo.de"));
+  }
+
+  @Test
+  public void testParseInternetAddressListEmpty() {
+    InternetAddress[] addresses = MailUtility.parseInternetAddressList(null);
+    assertEquals(0, addresses.length);
+
+    addresses = MailUtility.parseInternetAddressList("");
+    assertEquals(0, addresses.length);
+  }
+
+  @Test
+  public void testParseInternetAddressList() {
+    runTestParseInternetAddressList("foo@bar.de");
+    runTestParseInternetAddressList("foo@bür.de");
+    runTestParseInternetAddressList("abc@abc.com", "abc@def.com", "ghi@abc.com");
+    runTestParseInternetAddressList("abc@äöü.com", "abc@äöü.com", "ghi@äöü.com");
+    runTestParseInternetAddressList("abc@foo.com", "abc@みんな.com", "ghi@äöü.com");
+  }
+
+  protected void runTestParseInternetAddressList(String... inputAddresses) {
+    InternetAddress[] addresses = MailUtility.parseInternetAddressList(StringUtility.join(",", inputAddresses));
+    assertEquals(inputAddresses.length, addresses.length);
+    for (int i = 0; i < inputAddresses.length; i++) {
+      assertEquals(IDN.toASCII(inputAddresses[i]), addresses[i].getAddress());
+      assertEquals(inputAddresses[i], IDN.toUnicode(addresses[i].getAddress()));
+    }
+  }
+
+  @Test(expected = ProcessingException.class)
+  public void testParseInternetAddressListInvalid() {
+    runTestParseInternetAddressList("foo@bar@de.de");
+  }
+
+  @Test(expected = ProcessingException.class)
+  public void testParseInternetAddressListInvalid2() {
+    runTestParseInternetAddressList("foo@bar.de", "foo@bar@de.de");
   }
 
   /**
@@ -404,10 +474,10 @@ public class MailUtilityTest {
    */
   private void verifyMimeMessage(MimeMessage message, String plainText, String htmlText, String... attachmentFilenames) throws IOException, MessagingException {
     if (plainText != null) {
-      Assert.assertEquals("wrong plain text", plainText, MailUtility.getPlainText(message));
+      assertEquals("wrong plain text", plainText, MailUtility.getPlainText(message));
     }
     else {
-      Assert.assertNull("wrong plain text", MailUtility.getPlainText(message));
+      assertNull("wrong plain text", MailUtility.getPlainText(message));
     }
 
     int bodyPartCount = 0;
@@ -415,37 +485,37 @@ public class MailUtilityTest {
     bodyPartCount += htmlText == null ? 0 : 1;
 
     List<Part> bodyParts = MailUtility.getBodyParts(message);
-    Assert.assertEquals("body parts size is wrong", bodyPartCount, bodyParts.size());
+    assertEquals("body parts size is wrong", bodyPartCount, bodyParts.size());
 
     Part plainTextPart = MailUtility.getPlainTextPart(bodyParts);
     if (plainText != null) {
-      Assert.assertNotNull("no plain text part found", plainTextPart);
-      Assert.assertTrue("plain text part content is not string", plainTextPart.getContent() instanceof String);
-      Assert.assertEquals("wrong plain text", plainText, (String) plainTextPart.getContent());
+      assertNotNull("no plain text part found", plainTextPart);
+      assertTrue("plain text part content is not string", plainTextPart.getContent() instanceof String);
+      assertEquals("wrong plain text", plainText, (String) plainTextPart.getContent());
     }
     else {
-      Assert.assertNull("plain text part found", plainTextPart);
+      assertNull("plain text part found", plainTextPart);
     }
 
     Part htmlPart = MailUtility.getHtmlPart(bodyParts);
     if (htmlText != null) {
-      Assert.assertNotNull("no html part found", htmlPart);
-      Assert.assertTrue("html part content is not string", htmlPart.getContent() instanceof String);
-      Assert.assertEquals("wrong html text", htmlText, (String) htmlPart.getContent());
+      assertNotNull("no html part found", htmlPart);
+      assertTrue("html part content is not string", htmlPart.getContent() instanceof String);
+      assertEquals("wrong html text", htmlText, (String) htmlPart.getContent());
     }
     else {
-      Assert.assertNull("html part found", htmlPart);
+      assertNull("html part found", htmlPart);
     }
 
     List<Part> attachmentParts = MailUtility.getAttachmentParts(message);
-    Assert.assertEquals("attachments parts size is wrong", attachmentFilenames.length, attachmentParts.size());
+    assertEquals("attachments parts size is wrong", attachmentFilenames.length, attachmentParts.size());
     Set<String> attachmentFilenamesSet = new HashSet<String>();
     for (Part part : attachmentParts) {
       attachmentFilenamesSet.add(part.getFileName());
     }
-    Assert.assertEquals("attachments filenames size is wrong", attachmentFilenames.length, attachmentFilenamesSet.size());
+    assertEquals("attachments filenames size is wrong", attachmentFilenames.length, attachmentFilenamesSet.size());
     for (String attachmentFilename : attachmentFilenames) {
-      Assert.assertTrue("attachment filename " + attachmentFilename + " is missing", attachmentFilenamesSet.contains(attachmentFilename));
+      assertTrue("attachment filename " + attachmentFilename + " is missing", attachmentFilenamesSet.contains(attachmentFilename));
     }
   }
 

@@ -545,27 +545,63 @@ public final class MailUtility {
   }
 
   /**
-   * Creates an Internet address for the given mail participant.
+   * Creates an Internet address for the given mail participant allowing usage of an internationalized domain name.
    *
-   * @param participant
-   *          Participant
-   * @return Internet address (or {@code null} if not participant is provided)
+   * @return {@link InternetAddress} instance or {@code null} if no participant is provided
    */
   public static InternetAddress createInternetAddress(MailParticipant participant) {
     if (participant == null) {
       return null;
     }
+    return createInternetAddress(participant.getEmail(), participant.getName());
+  }
+
+  /**
+   * Creates an Internet address for the given mail participant allowing usage of an internationalized domain name.
+   *
+   * @return {@link InternetAddress} instance or {@code null} if no or empty email is provided
+   */
+  public static InternetAddress createInternetAddress(String email) {
+    return createInternetAddress(email, null);
+  }
+
+  /**
+   * Creates an Internet address for the given mail participant allowing usage of an internationalized domain name.
+   *
+   * @return {@link InternetAddress} instance or {@code null} if no or empty email is provided
+   */
+  public static InternetAddress createInternetAddress(String email, String name) {
+    if (StringUtility.isNullOrEmpty(email)) {
+      return null;
+    }
 
     try {
-      InternetAddress internetAddress = new InternetAddress(IDN.toASCII(participant.getEmail()));
-      if (StringUtility.hasText(participant.getName())) {
-        internetAddress.setPersonal(participant.getName(), StandardCharsets.UTF_8.name());
+      InternetAddress internetAddress = new InternetAddress(IDN.toASCII(email));
+      if (StringUtility.hasText(name)) {
+        internetAddress.setPersonal(name, StandardCharsets.UTF_8.name());
       }
       return internetAddress;
     }
-    catch (UnsupportedEncodingException | AddressException e) {
-      throw new ProcessingException("Failed to create internet address for " + participant.toString(), e);
+    catch (AddressException e) {
+      throw new ProcessingException("Failed to create internet address for {}", email, e);
     }
+    catch (UnsupportedEncodingException e) {
+      throw new ProcessingException("Failed to set personal name for {}", name, e);
+    }
+  }
+
+  /**
+   * Parse a comma-separated list of email addresses allowing usage of internationalized domain names.
+   *
+   * @return array of parsed {@link InternetAddress} instances
+   */
+  public static InternetAddress[] parseInternetAddressList(String addresslist) {
+    String[] addressListSplitted = StringUtility.split(addresslist, ",");
+    InternetAddress[] result = new InternetAddress[addressListSplitted.length];
+    for (int i = 0; i < addressListSplitted.length; i++) {
+      result[i] = createInternetAddress(addressListSplitted[i]);
+    }
+    return result;
   }
 
   /**
