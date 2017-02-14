@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.mom.jms;
 import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_AUTO;
 import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED;
 import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_TRANSACTED;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
@@ -132,7 +132,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
           @Override
           public void onJmsMessage(final Message message) throws JMSException {
-            final String replyId = message.getStringProperty(PROP_REPLY_ID);
+            final String replyId = message.getStringProperty(JMS_PROP_REPLY_ID);
             final ReplyFuture replyFuture = m_replyFutureMap.remove(replyId);
             if (replyFuture != null) {
               replyFuture.set(message);
@@ -149,7 +149,7 @@ public class JmsMomImplementor implements IMomImplementor {
           @Override
           public void onJmsMessage(final Message message) throws JMSException {
             Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-                .andMatchExecutionHint(message.getStringProperty(PROP_REPLY_ID))
+                .andMatchExecutionHint(message.getStringProperty(JMS_PROP_REPLY_ID))
                 .toFilter(), true);
           }
         });

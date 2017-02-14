@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.mom.jms;
 
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import javax.jms.Destination;
@@ -70,7 +70,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
 
       @Override
       public void onJmsMessage(final Message jmsRequest) throws JMSException {
-        final String replyId = assertNotNull(jmsRequest.getStringProperty(PROP_REPLY_ID), "missing 'replyId' [msg={}]", jmsRequest);
+        final String replyId = assertNotNull(jmsRequest.getStringProperty(JMS_PROP_REPLY_ID), "missing 'replyId' [msg={}]", jmsRequest);
 
         // Read and process the message asynchronously because JMS session is single-threaded. This allows concurrent message processing.
         // Unlike AutoAcknowledgeSubscriptionStrategy, a job is scheduled for 'single-threaded' mode to support cancellation (execution hint).

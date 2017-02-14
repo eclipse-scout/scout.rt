@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Bean
 public class JsonMarshaller implements IMarshaller {
 
-  public static final String PROP_OBJECT_TYPE = "x-scout.mom.json.objecttype";
+  public static final String CTX_PROP_OBJECT_TYPE = "x-scout.mom.json.objecttype";
 
   protected final ObjectMapper m_objectMapper;
 
@@ -34,7 +34,7 @@ public class JsonMarshaller implements IMarshaller {
     }
 
     try {
-      context.put(PROP_OBJECT_TYPE, transferObject.getClass().getName());
+      context.put(CTX_PROP_OBJECT_TYPE, transferObject.getClass().getName());
       return m_objectMapper.writeValueAsString(transferObject);
     }
     catch (final IOException e) {
@@ -50,7 +50,7 @@ public class JsonMarshaller implements IMarshaller {
     }
 
     try {
-      final Class<?> objectType = Class.forName(context.get(PROP_OBJECT_TYPE));
+      final Class<?> objectType = Class.forName(context.get(CTX_PROP_OBJECT_TYPE));
       return m_objectMapper.readValue(jsonText, objectType);
     }
     catch (final IOException | ClassNotFoundException e) {

@@ -2,10 +2,10 @@ package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_BYTES;
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_TEXT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_MARSHALLER_CONTEXT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_NULL_OBJECT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REPLY_ID;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.PROP_REQUEST_REPLY_SUCCESS;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_NULL_OBJECT;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_REQUEST_REPLY_SUCCESS;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_MARSHALLER_CONTEXT;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.util.HashMap;
@@ -72,7 +72,7 @@ public class JmsMessageWriter {
    */
   public JmsMessageWriter writeTransferObject(final Object transferObject) throws JMSException {
     final Object transportObject = m_marshaller.marshall(transferObject, m_marshallerContext);
-    m_marshallerContext.put(PROP_NULL_OBJECT, Boolean.valueOf(transferObject == null).toString());
+    m_marshallerContext.put(CTX_PROP_NULL_OBJECT, Boolean.valueOf(transferObject == null).toString());
 
     switch (m_marshaller.getMessageType()) {
       case MESSAGE_TYPE_TEXT:
@@ -135,7 +135,7 @@ public class JmsMessageWriter {
    * initiated.
    */
   public JmsMessageWriter writeReplyId(final String replyId) throws JMSException {
-    return writeProperty(PROP_REPLY_ID, replyId);
+    return writeProperty(JMS_PROP_REPLY_ID, replyId);
   }
 
   /**
@@ -144,7 +144,7 @@ public class JmsMessageWriter {
    * @see JmsMessageReader#readReplyCode()
    */
   public JmsMessageWriter writeRequestReplySuccess(final boolean success) {
-    m_marshallerContext.put(PROP_REQUEST_REPLY_SUCCESS, Boolean.toString(success));
+    m_marshallerContext.put(CTX_PROP_REQUEST_REPLY_SUCCESS, Boolean.toString(success));
     return this;
   }
 
@@ -182,7 +182,7 @@ public class JmsMessageWriter {
    * Finish writing and get the message.
    */
   public Message build() throws JMSException {
-    writeContext(PROP_MARSHALLER_CONTEXT, m_marshallerContext);
+    writeContext(JMS_PROP_MARSHALLER_CONTEXT, m_marshallerContext);
     return m_message;
   }
 

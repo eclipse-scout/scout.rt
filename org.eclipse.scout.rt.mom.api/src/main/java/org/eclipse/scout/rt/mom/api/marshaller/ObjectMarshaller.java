@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 @Bean
 public class ObjectMarshaller implements IMarshaller {
 
-  protected static final String PROP_OBJECT_TYPE = "x-scout.mom.object.objecttype";
+  protected static final String CTX_PROP_OBJECT_TYPE = "x-scout.mom.object.objecttype";
 
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {
@@ -30,7 +30,7 @@ public class ObjectMarshaller implements IMarshaller {
       final IObjectSerializer serializer = SerializationUtility.createObjectSerializer();
       final byte[] bytes = serializer.serialize(transferObject);
 
-      context.put(PROP_OBJECT_TYPE, transferObject.getClass().getName());
+      context.put(CTX_PROP_OBJECT_TYPE, transferObject.getClass().getName());
       return bytes;
     }
     catch (final IOException e) {
@@ -46,7 +46,7 @@ public class ObjectMarshaller implements IMarshaller {
     }
 
     try {
-      final Class<?> objectType = Class.forName(context.get(PROP_OBJECT_TYPE));
+      final Class<?> objectType = Class.forName(context.get(CTX_PROP_OBJECT_TYPE));
       final IObjectSerializer serializer = SerializationUtility.createObjectSerializer();
       return serializer.deserialize(bytes, objectType);
     }
