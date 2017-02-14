@@ -17,32 +17,36 @@ package org.eclipse.scout.rt.platform.holders;
 /**
  * Holder for table data value access of columns is done by Bean introspection column methods must have a rowIndex
  * argument, see example comment below
+ *
+ * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use
+ *              {@link AbstractTableFieldBeanData} instead. This class will be removed with Oxygen. See Bug 496292.
  */
+@Deprecated
 public interface ITableHolder {
   /**
    * same number as
    *
    * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
-  int STATUS_NON_CHANGED = 0;
+  int STATUS_NON_CHANGED = ITableBeanRowHolder.STATUS_NON_CHANGED;
   /**
    * same number as
    *
    * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
-  int STATUS_INSERTED = 1;
+  int STATUS_INSERTED = ITableBeanRowHolder.STATUS_INSERTED;
   /**
    * same number as
    *
    * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
-  int STATUS_UPDATED = 2;
+  int STATUS_UPDATED = ITableBeanRowHolder.STATUS_UPDATED;
   /**
    * same number as
    *
    * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
-  int STATUS_DELETED = 3;
+  int STATUS_DELETED = ITableBeanRowHolder.STATUS_DELETED;
 
   int/* newIndex */ addRow();
 
