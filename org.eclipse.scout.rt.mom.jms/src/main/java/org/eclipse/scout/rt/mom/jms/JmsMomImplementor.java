@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -140,7 +141,7 @@ public class JmsMomImplementor implements IMomImplementor {
         });
 
     // Register consumer to handle cancellation requests for 'request-reply' communication.
-    m_requestReplyCancellationTopic = m_defaultSession.createTopic(CONFIG.getPropertyValue(RequestReplyCancellationTopicProperty.class));
+    m_requestReplyCancellationTopic = (Topic) resolveJmsDestination(CONFIG.getPropertyValue(RequestReplyCancellationTopicProperty.class), m_defaultSession);
     m_defaultSession
         .createConsumer(m_requestReplyCancellationTopic)
         .setMessageListener(new JmsMessageListener() {
@@ -180,19 +181,19 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <DTO> void publishNonTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException {
-    final IMarshaller marshaller = lookupMarshaller(destination);
+    final IMarshaller marshaller = resolveMarshaller(destination);
 
     final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
         .writeTransferObject(transferObject)
         .writeProperties(input.getProperties())
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
-    send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+    send(m_defaultProducer, resolveJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
   protected <DTO> void publishTransactional(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) throws JMSException {
     final ITransaction currentTransaction = assertNotNull(ITransaction.CURRENT.get(), "Transaction required for transactional messaging");
-    final IMarshaller marshaller = lookupMarshaller(destination);
+    final IMarshaller marshaller = resolveMarshaller(destination);
 
     // Register transaction member for transacted publishing.
     final JmsTransactionMember txMember = currentTransaction.registerMemberIfAbsent(m_momUid, new IFunction<String, JmsTransactionMember>() {
@@ -222,7 +223,7 @@ public class JmsMomImplementor implements IMomImplementor {
         .writeProperties(input.getProperties())
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
-    send(transactedProducer, lookupJmsDestination(destination, transactedSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+    send(transactedProducer, resolveJmsDestination(destination, transactedSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
   }
 
   @Override
@@ -247,7 +248,7 @@ public class JmsMomImplementor implements IMomImplementor {
     assertNotNull(input, "publishInput not specified");
     assertFalse(input.isTransactional(), "transactional mode not supported for 'request-reply' communication");
 
-    final IMarshaller marshaller = lookupMarshaller(destination);
+    final IMarshaller marshaller = resolveMarshaller(destination);
 
     // Prepare to receive the reply message
     final String replyId = String.format("scout.mom.requestreply.uid-%s", UUID.randomUUID()); // JMS message ID not applicable because unknown until sent
@@ -263,7 +264,7 @@ public class JmsMomImplementor implements IMomImplementor {
           .writeCorrelationId(CorrelationId.CURRENT.get())
           .writeTransferObject(requestObject)
           .build();
-      send(m_defaultProducer, lookupJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
+      send(m_defaultProducer, resolveJmsDestination(destination, m_defaultSession), message, toJmsDeliveryMode(input), toJmsPriority(input), toJmsTimeToLive(input));
 
       // Wait until the reply is received
       return waitForReply(replyFuture, input.getRequestReplyTimeout());
@@ -313,11 +314,11 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   @Override
-  public void cancelDurableSubscription(String durableSubscriptionName) {
+  public void cancelDurableSubscription(final String durableSubscriptionName) {
     try {
       m_defaultSession.unsubscribe(durableSubscriptionName);
     }
-    catch (JMSException e) {
+    catch (final JMSException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
@@ -361,7 +362,7 @@ public class JmsMomImplementor implements IMomImplementor {
   /**
    * Returns the {@link IMarshaller} registered for the given destination, and is never <code>null</code>.
    */
-  public IMarshaller lookupMarshaller(final IDestination<?> destination) {
+  public IMarshaller resolveMarshaller(final IDestination<?> destination) {
     final IMarshaller marshaller = m_marshallers.get(destination);
     if (marshaller != null) {
       return marshaller;
@@ -428,27 +429,42 @@ public class JmsMomImplementor implements IMomImplementor {
     return connection;
   }
 
-  public Destination lookupJmsDestination(final IDestination<?> destination, final Session session) {
-    Assertions.assertTrue(ObjectUtility.isOneOf(destination.getResolveMethod(), ResolveMethod.JNDI, ResolveMethod.DEFINE), "Unsupported resolve method [{}]", destination);
-    Assertions.assertTrue(ObjectUtility.isOneOf(destination.getType(), DestinationType.QUEUE, DestinationType.TOPIC), "Unsupported destination type [{}]", destination);
+  public Destination resolveJmsDestination(final IDestination<?> destination, final Session session) {
     try {
-      // Lookup
       if (destination.getResolveMethod() == ResolveMethod.JNDI) {
-        final Object object = Assertions.assertNotNull(m_context.lookup(destination.getName()));
-        final Class<?> expectedType = (destination.getType() == DestinationType.QUEUE ? Queue.class : Topic.class);
-        Assertions.assertInstance(object, expectedType, "The looked up object is of type '{}', but expected type '{}' [{}]", object.getClass().getName(), expectedType.getName(), destination);
-        return (Destination) object;
+        return lookupJmsDestination(destination, session);
       }
-
-      // Define
-      if (destination.getType() == DestinationType.QUEUE) {
-        return session.createQueue(destination.getName());
+      else if (destination.getResolveMethod() == ResolveMethod.DEFINE) {
+        return defineJmsDestination(destination, session);
       }
-      return session.createTopic(destination.getName());
+      throw new AssertionException("Unsupported resolve method [{}]", destination);
     }
     catch (final JMSException | NamingException e) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
+  }
+
+  /**
+   * Looks up a destination via JNDI.
+   */
+  protected Destination lookupJmsDestination(final IDestination<?> destination, final Session session) throws NamingException {
+    final Object object = Assertions.assertNotNull(m_context.lookup(destination.getName()));
+    final Class<?> expectedType = (destination.getType() == DestinationType.QUEUE ? Queue.class : Topic.class);
+    Assertions.assertInstance(object, expectedType, "The looked up destination is of type '{}', but expected type '{}' [{}]", object.getClass().getName(), expectedType.getName(), destination);
+    return (Destination) object;
+  }
+
+  /**
+   * Creates a destination ad-hoc.
+   */
+  protected Destination defineJmsDestination(final IDestination<?> destination, final Session session) throws JMSException {
+    if (destination.getType() == DestinationType.QUEUE) {
+      return session.createQueue(destination.getName());
+    }
+    else if (destination.getType() == DestinationType.TOPIC) {
+      return session.createTopic(destination.getName());
+    }
+    throw new AssertionException("Unsupported destination type [{}]", destination);
   }
 
   public int toJmsPriority(final PublishInput publishInput) {

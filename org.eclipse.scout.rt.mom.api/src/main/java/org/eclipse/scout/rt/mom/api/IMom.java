@@ -6,6 +6,9 @@ package org.eclipse.scout.rt.mom.api;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
+import org.eclipse.scout.rt.mom.api.IDestination.IDestinationType;
+import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
@@ -14,7 +17,6 @@ import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
-import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -212,7 +214,7 @@ public interface IMom {
    * <p>
    * By default, the topic 'scout.mom.requestreply.cancellation' is used.
    */
-  class RequestReplyCancellationTopicProperty extends AbstractStringConfigProperty {
+  class RequestReplyCancellationTopicProperty extends AbstractDestinationConfigProperty<String> {
 
     @Override
     public String getKey() {
@@ -220,8 +222,13 @@ public interface IMom {
     }
 
     @Override
-    protected String getDefaultValue() {
-      return "scout.mom.requestreply.cancellation";
+    protected IDestination<String> getDefaultValue() {
+      return MOM.newDestination("scout.mom.requestreply.cancellation", getType(), ResolveMethod.DEFINE, null);
+    }
+
+    @Override
+    protected IDestinationType getType() {
+      return DestinationType.TOPIC;
     }
   }
 }

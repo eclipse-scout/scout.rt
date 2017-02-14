@@ -54,7 +54,7 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
   }
 
   protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session transactedSession, final SubscribeInput input) throws JMSException {
-    final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
+    final IMarshaller marshaller = m_mom.resolveMarshaller(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
     final MessageConsumer consumer = createConsumer(transactedSession, destination, input);
@@ -89,8 +89,8 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
   }
 
   protected <DTO> MessageConsumer createConsumer(final Session session, final IDestination<DTO> destination, final SubscribeInput input) throws JMSException {
-    Destination jmsDestination = m_mom.lookupJmsDestination(destination, session);
-    boolean noLocal = !input.isLocalReceipt();
+    final Destination jmsDestination = m_mom.resolveJmsDestination(destination, session);
+    final boolean noLocal = !input.isLocalReceipt();
     if (jmsDestination instanceof Topic && input.getDurableSubscriptionName() != null) {
       return session.createDurableSubscriber((Topic) jmsDestination, input.getDurableSubscriptionName(), input.getSelector(), noLocal);
     }

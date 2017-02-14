@@ -62,7 +62,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
   }
 
   protected <REQUEST, REPLY> void installMessageListener(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final Session session, final SubscribeInput input) throws JMSException {
-    final IMarshaller marshaller = m_mom.lookupMarshaller(destination);
+    final IMarshaller marshaller = m_mom.resolveMarshaller(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
     final MessageConsumer consumer = createConsumer(session, destination, input);
@@ -110,8 +110,8 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
   }
 
   protected <REQUEST, REPLY> MessageConsumer createConsumer(final Session session, final IBiDestination<REQUEST, REPLY> destination, final SubscribeInput input) throws JMSException {
-    Destination jmsDestination = m_mom.lookupJmsDestination(destination, session);
-    boolean noLocal = !input.isLocalReceipt();
+    final Destination jmsDestination = m_mom.resolveJmsDestination(destination, session);
+    final boolean noLocal = !input.isLocalReceipt();
     if (jmsDestination instanceof Topic && input.getDurableSubscriptionName() != null) {
       return session.createDurableSubscriber((Topic) jmsDestination, input.getDurableSubscriptionName(), input.getSelector(), noLocal);
     }
