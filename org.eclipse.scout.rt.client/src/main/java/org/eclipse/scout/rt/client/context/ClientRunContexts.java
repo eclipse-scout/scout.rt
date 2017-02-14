@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.context;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -118,7 +118,7 @@ public final class ClientRunContexts {
   /**
    * Factory to create initialized {@link ClientRunContext} objects.
    */
-  @ApplicationScoped
+  @Replace
   public static class ClientRunContextFactory extends RunContextFactory {
 
     @Override

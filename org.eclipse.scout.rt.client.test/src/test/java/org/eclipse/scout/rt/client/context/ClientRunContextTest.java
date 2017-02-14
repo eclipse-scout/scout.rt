@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.context;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -27,6 +28,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -37,6 +39,7 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,6 +72,46 @@ public class ClientRunContextTest {
     assertSame(runContext.getUserAgent(), copy.getUserAgent());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertSame(runContext.getLocale(), copy.getLocale());
+  }
+
+  @Test
+  public void testRunContextsEmpty() {
+    RunContext runContext = RunContexts.empty();
+    assertThat(runContext, CoreMatchers.instanceOf(ClientRunContext.class));
+    ClientRunContext clientCtx = (ClientRunContext) runContext;
+    assertNull(clientCtx.getSubject());
+    assertNull(clientCtx.getSession());
+    assertNull(clientCtx.getUserAgent());
+    assertNull(clientCtx.getLocale());
+    assertEquals(TransactionScope.REQUIRED, clientCtx.getTransactionScope());
+  }
+
+  @Test
+  public void testRunContextsCopyCurrent() {
+    final IClientSession session = mock(IClientSession.class);
+    final UserAgent sessionUserAgent = UserAgents.create().build();
+    final Locale sessionLocale = Locale.CANADA_FRENCH;
+    final Subject sessionSubject = new Subject();
+    final IDesktop sessionDesktop = mock(IDesktop.class);
+
+    when(session.getUserAgent()).thenReturn(sessionUserAgent);
+    when(session.getLocale()).thenReturn(sessionLocale);
+    when(session.getSubject()).thenReturn(sessionSubject);
+    when(session.getDesktopElseVirtualDesktop()).thenReturn(sessionDesktop);
+
+    ClientRunContexts.empty().withSession(session, true).run(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        RunContext runContext = RunContexts.copyCurrent();
+        assertThat(runContext, CoreMatchers.instanceOf(ClientRunContext.class));
+        ClientRunContext clientCtx = (ClientRunContext) runContext;
+
+        assertSame(session, clientCtx.getSession());
+        assertSame(sessionLocale, clientCtx.getLocale());
+        assertSame(sessionUserAgent, clientCtx.getUserAgent());
+        assertSame(sessionDesktop, clientCtx.getDesktop());
+      }
+    });
   }
 
   @Test

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -24,14 +25,17 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -65,6 +69,46 @@ public class ServerRunContextTest {
     assertSame(runContext.getUserAgent(), copy.getUserAgent());
     assertSame(runContext.getLocale(), copy.getLocale());
     assertEquals(TransactionScope.MANDATORY, runContext.getTransactionScope());
+  }
+
+  @Test
+  public void testRunContextsEmpty() {
+    RunContext runContext = RunContexts.empty();
+    assertThat(runContext, CoreMatchers.instanceOf(ServerRunContext.class));
+    ServerRunContext serverCtx = (ServerRunContext) runContext;
+    assertNull(serverCtx.getSubject());
+    assertNull(serverCtx.getSession());
+    assertNull(serverCtx.getUserAgent());
+    assertNull(serverCtx.getLocale());
+    assertEquals(TransactionScope.REQUIRES_NEW, serverCtx.getTransactionScope());
+  }
+
+  @Test
+  public void testRunContextsCopyCurrent() {
+    final IServerSession session = mock(IServerSession.class);
+    final UserAgent userAgent = UserAgents.create().build();
+    final Locale locale = Locale.CANADA_FRENCH;
+    final Subject subject = new Subject();
+
+    ServerRunContexts
+        .empty()
+        .withSession(session)
+        .withUserAgent(userAgent)
+        .withLocale(locale)
+        .withSubject(subject)
+        .run(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            RunContext runContext = RunContexts.copyCurrent();
+            assertThat(runContext, CoreMatchers.instanceOf(ServerRunContext.class));
+            ServerRunContext serverCtx = (ServerRunContext) runContext;
+
+            assertSame(session, serverCtx.getSession());
+            assertSame(userAgent, serverCtx.getUserAgent());
+            assertSame(locale, serverCtx.getLocale());
+            assertSame(subject, serverCtx.getSubject());
+          }
+        });
   }
 
   @Test
