@@ -16,10 +16,11 @@ import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 /**
- * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use
- *              {@link AbstractTableFieldBeanData} instead. This class will be removed with Oxygen. See Bug 496292.
+ * @deprecated 'Array based TableData' are not supported by the Scout SDK in Neon. Use
+ *             {@link AbstractTableFieldBeanData} instead. This class will be removed with Oxygen. See Bug 496292.
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public abstract class AbstractTableFieldData extends AbstractFormFieldData implements ITableHolder {
   private static final long serialVersionUID = 1L;
 

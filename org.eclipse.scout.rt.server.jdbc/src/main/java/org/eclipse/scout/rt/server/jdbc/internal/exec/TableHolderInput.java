@@ -21,6 +21,12 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
+/**
+ * @deprecated 'Array based TableData' are not supported by the Scout SDK in Neon. This class will be removed with
+ *             Oxygen. See Bug 496292.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 class TableHolderInput implements IBindInput {
   private ITableHolder m_table;
   private int[] m_filteredRowIndices;

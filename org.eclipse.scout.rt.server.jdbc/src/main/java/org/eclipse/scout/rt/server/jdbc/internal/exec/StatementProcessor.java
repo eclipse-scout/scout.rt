@@ -66,6 +66,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("deprecation")
 public class StatementProcessor implements IStatementProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(StatementProcessor.class);
 

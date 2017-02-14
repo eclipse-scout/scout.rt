@@ -12,6 +12,12 @@ package org.eclipse.scout.rt.platform.holders;
 
 import java.util.HashSet;
 
+/**
+ * @deprecated 'Array based TableData' are not supported by the Scout SDK in Neon. This class will be removed with
+ *             Oxygen. See Bug 496292.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class TableHolderFilter {
   private ITableHolder m_table;
   private HashSet<Integer> m_rowStates;

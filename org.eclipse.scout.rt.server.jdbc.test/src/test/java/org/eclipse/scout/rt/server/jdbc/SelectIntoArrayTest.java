@@ -49,6 +49,7 @@ import org.junit.runner.RunWith;
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestJdbcServerSession.class)
 @RunWithSubject("default")
+@SuppressWarnings("deprecation")
 public class SelectIntoArrayTest {
 
   private static final Object[][] DATA = new Object[][]{
@@ -181,7 +182,6 @@ public class SelectIntoArrayTest {
     assertContainsData(bean.getTableFieldData());
   }
 
-  @SuppressWarnings("deprecation")
   private static void assertContainsData(TableFieldData tableData) {
     assertNotNull(tableData);
     assertEquals(4, tableData.getRowCount());
