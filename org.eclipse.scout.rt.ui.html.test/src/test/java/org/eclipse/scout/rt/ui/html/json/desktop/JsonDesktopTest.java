@@ -95,7 +95,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormAddedAndRemoved() throws JSONException {
+  public void testFormAddedAndRemoved() throws Exception {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -133,6 +133,7 @@ public class JsonDesktopTest {
     // we could continue to test the reference structure in the JSON response,
     // but for the moment this should be enough...
 
+    JsonTestUtility.endRequest(m_uiSession);
     desktop.hideForm(form);
 
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");

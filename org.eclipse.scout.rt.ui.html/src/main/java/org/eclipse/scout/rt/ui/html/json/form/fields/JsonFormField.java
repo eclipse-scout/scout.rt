@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
+import java.beans.PropertyChangeEvent;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -23,11 +24,16 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("squid:S00118")
 public abstract class JsonFormField<FORM_FIELD extends IFormField> extends AbstractJsonPropertyObserver<FORM_FIELD> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(JsonFormField.class);
 
   private static final String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
 
@@ -212,5 +218,24 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getDisabledStyle();
       }
     });
+  }
+
+  @Override
+  protected void handleModelPropertyChange(PropertyChangeEvent event) {
+    // If a field is set to visibleGranted=false, a PROP_VISIBLE property change event is fired. In most cases,
+    // the JsonAdapter is not yet attached, so this event will not be received here. The adapter will not be
+    // attached because of the DisplayableFormFieldFilter. There are however rare cases, where the adapter
+    // is already attached when visibleGranted is set to false. If the adapter is not yet sent to the UI,
+    // we still have the chance to dispose the adapter and pretend it was never attached in the first place.
+    // [Similar code exist in JsonAction]
+    if (IFormField.PROP_VISIBLE.equals(event.getPropertyName()) && !getModel().isVisibleGranted()) {
+      JsonResponse response = getUiSession().currentJsonResponse();
+      if (response.containsAdapter(this) && response.isWritable()) {
+        dispose();
+        return;
+      }
+      LOG.warn("Setting visibleGranted=false has no effect, because JsonAdapter {} ({}) is already sent to the UI.", getId(), getModel());
+    }
+    super.handleModelPropertyChange(event);
   }
 }

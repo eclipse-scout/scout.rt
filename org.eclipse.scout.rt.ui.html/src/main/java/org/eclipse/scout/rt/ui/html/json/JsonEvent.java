@@ -86,14 +86,14 @@ public class JsonEvent implements IJsonObject {
   }
 
   /**
-   * @return true if the event is "protected", i.e. it will not be removed by {@link JsonResponse#toJson()}.
+   * @return true if the event is "protected", i.e. it will not be ignored by {@link JsonResponse#toJson()}.
    */
   public boolean isProtected() {
     return m_protected;
   }
 
   /**
-   * Marks the event as "protected", i.e. it will not be removed by {@link JsonResponse#toJson()}.
+   * Marks the event as "protected", i.e. it will not be ignored by {@link JsonResponse#toJson()}.
    */
   public void protect() {
     m_protected = true;

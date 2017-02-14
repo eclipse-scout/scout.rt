@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.action;
 
+import java.beans.PropertyChangeEvent;
+
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -17,14 +19,20 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("squid:S00118")
 public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPropertyObserver<ACTION> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(JsonAction.class);
+
   public static final String EVENT_DO_ACTION = "doAction";
 
   public JsonAction(ACTION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -163,4 +171,22 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
     }
   }
 
+  @Override
+  protected void handleModelPropertyChange(PropertyChangeEvent event) {
+    // If a menu is set to visibleGranted=false, a PROP_VISIBLE property change event is fired. In most cases,
+    // the JsonAdapter is not yet attached, so this event will not be received here. The adapter will not be
+    // attached because of the DisplayableFormFieldFilter. There are however rare cases, where the adapter
+    // is already attached when visibleGranted is set to false. If the adapter is not yet sent to the UI,
+    // we still have the chance to dispose the adapter and pretend it was never attached in the first place.
+    // [Similar code exist in JsonFormField]
+    if (IAction.PROP_VISIBLE.equals(event.getPropertyName()) && !getModel().isVisibleGranted()) {
+      JsonResponse response = getUiSession().currentJsonResponse();
+      if (response.containsAdapter(this) && response.isWritable()) {
+        dispose();
+        return;
+      }
+      LOG.warn("Setting visibleGranted=false has no effect, because JsonAdapter {} ({}) is already sent to the UI.", getId(), getModel());
+    }
+    super.handleModelPropertyChange(event);
+  }
 }

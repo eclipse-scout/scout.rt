@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.ui.html.json.menu;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -22,9 +25,12 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild;
+import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild.DisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild.NonDisplayableMenu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,4 +98,60 @@ public class JsonMenuTest {
     assertEquals(jsonDisplayableMenu.getId(), jsonMenus.get(0));
   }
 
+  /**
+   * Special case: Menu is attached, then it is set to visibleGranted=false, then sent to the UI, then a property change
+   * event occurs on that menu. We expect, that the adapter is automatically disposed again when setVisibleGranted=false
+   * is called, because the response is still writable.
+   */
+  @Test
+  public void testDontSendNonDisplayableMenusSpecialCase() throws Exception {
+    IMenu menu = new MenuWithNonDisplayableChild();
+    DisplayableMenu displayableMenu = new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class);
+    NonDisplayableMenu nonDisplayableMenu = new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class);
+
+    JsonMenu<IMenu> jsonMenu = UiSessionTestUtility.newJsonAdapter(m_uiSession, menu, null);
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonMenu.getAdapter(displayableMenu);
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonMenu.getAdapter(nonDisplayableMenu);
+    // Both adapters exist
+    assertNotNull(jsonDisplayableMenu);
+    assertNotNull(jsonNonDisplayableMenu);
+
+    // After attachment of adapter!
+    ActionUtility.initActions(CollectionUtility.arrayList(menu));
+    jsonDisplayableMenu = jsonMenu.getAdapter(displayableMenu);
+    jsonNonDisplayableMenu = jsonMenu.getAdapter(nonDisplayableMenu);
+    // Now only one adapter exists anymore
+    assertNotNull(jsonDisplayableMenu);
+    assertNull(jsonNonDisplayableMenu);
+
+    // Check that no traces of the invisible menu are in JSON
+    JSONObject json = m_uiSession.currentJsonResponse().toJson();
+    assertEquals(1, json.getJSONObject("adapterData").length());
+    assertNotNull(json.getJSONObject("adapterData").getJSONObject(jsonDisplayableMenu.getId()));
+
+    // --------
+    // Property change on invisible menu -> must not trigger anything in the JSON layer
+    JsonTestUtility.endRequest(m_uiSession);
+    nonDisplayableMenu.setTooltipText("Test-Tooltip");
+    json = m_uiSession.currentJsonResponse().toJson();
+    assertFalse(json.has("adapterData"));
+    assertFalse(json.has("events"));
+
+    // Property change on visible menu -> triggers event
+    JsonTestUtility.endRequest(m_uiSession);
+    displayableMenu.setTooltipText("Test-Tooltip");
+    json = m_uiSession.currentJsonResponse().toJson();
+    assertFalse(json.has("adapterData"));
+    assertEquals(1, json.getJSONArray("events").length());
+
+    // --------------------------------
+    // Test case where the menu is already sent to the UI, then setVisibleGranted=false (this is too late, but it will only trigger a warning in the log)
+    JsonTestUtility.endRequest(m_uiSession);
+    displayableMenu.setVisibleGranted(false);
+    IJsonAdapter<?> jsonDisplayableMenu2 = jsonMenu.getAdapter(displayableMenu);
+    assertSame(jsonDisplayableMenu, jsonDisplayableMenu2);
+    json = m_uiSession.currentJsonResponse().toJson();
+    assertFalse(json.has("adapterData"));
+    assertEquals(1, json.getJSONArray("events").length());
+  }
 }

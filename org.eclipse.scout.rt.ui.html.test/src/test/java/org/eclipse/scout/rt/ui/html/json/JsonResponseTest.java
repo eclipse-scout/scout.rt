@@ -38,7 +38,7 @@ public class JsonResponseTest {
   private UiSessionMock m_uiSession = new UiSessionMock();
 
   @Test
-  public void testJsonEventPropertyChangeEvent() throws JSONException {
+  public void testJsonEventPropertyChangeEvent() throws Exception {
     // Check empty response
     JSONObject json = m_uiSession.currentJsonResponse().toJson();
 
@@ -47,6 +47,7 @@ public class JsonResponseTest {
     assertEquals(null, events);
 
     // Check single property change event
+    JsonTestUtility.endRequest(m_uiSession);
     final String testId = "ID007";
     final String testPropName = "a stränge prøpertÿ name";
     final String testValue = "#";
@@ -89,21 +90,26 @@ public class JsonResponseTest {
 
   @Test
   public void testDoAddEvent_PropertyChange() throws Exception {
+    IJsonAdapter<?> mockAdapter = Mockito.mock(IJsonAdapter.class);
+    Mockito.when(mockAdapter.getId()).thenReturn("foo");
+
     // when m_adapterMap does not contain the ID 'foo', property change should be added
     JsonResponse resp = new JsonResponse();
-    resp.addPropertyChangeEvent("foo", "name", "andre");
+    resp.addPropertyChangeEvent(mockAdapter.getId(), "name", "andre");
     JSONObject json = resp.toJson();
     JSONObject propertyChange = JsonTestUtility.getPropertyChange(json, 0);
     assertEquals("andre", propertyChange.getString("name"));
 
     // when m_adapterMap contains the ID 'foo', property change must be removed
-    IJsonAdapter<?> mockAdapter = Mockito.mock(IJsonAdapter.class);
-    Mockito.when(mockAdapter.getId()).thenReturn("foo");
+    resp = new JsonResponse();
     resp.addAdapter(mockAdapter);
+    resp.addPropertyChangeEvent(mockAdapter.getId(), "name", "andre");
     json = resp.toJson();
     assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
 
     // protected action events must be preserved, event when the corresponding adapter is in m_adapterMap
+    resp = new JsonResponse();
+    resp.addAdapter(mockAdapter);
     resp.addActionEvent(mockAdapter.getId(), "normalEvent");
     resp.addActionEvent(mockAdapter.getId(), "protectedEvent").protect();
     json = resp.toJson();
@@ -112,6 +118,10 @@ public class JsonResponseTest {
     assertEquals("protectedEvent", json.optJSONArray(JsonResponse.PROP_EVENTS).getJSONObject(0).getString("type"));
 
     // protected events must be removed when the adapter is removed
+    resp = new JsonResponse();
+    resp.addAdapter(mockAdapter);
+    resp.addActionEvent(mockAdapter.getId(), "normalEvent");
+    resp.addActionEvent(mockAdapter.getId(), "protectedEvent").protect();
     resp.removeJsonAdapter(mockAdapter.getId());
     json = resp.toJson();
     assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));

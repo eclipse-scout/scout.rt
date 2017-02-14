@@ -1316,11 +1316,11 @@ public class JsonTableTest {
     assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, jsonTable.eventBuffer().getBufferInternal().get(0).getType());
 
     // So there should be no events at all in the response
+    JsonTestUtility.processBufferedEvents(m_uiSession);
     JSONObject response = m_uiSession.currentJsonResponse().toJson();
     assertNull(response.optJSONArray("events"));
 
     // end current request
-    JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 
     // try to requestFocusInCell on deleted row

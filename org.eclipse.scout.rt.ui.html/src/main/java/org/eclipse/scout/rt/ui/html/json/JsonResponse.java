@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.json.JSONArray;
@@ -55,7 +57,7 @@ public class JsonResponse {
   private volatile String m_errorMessage;
   private volatile boolean m_combined;
 
-  private volatile boolean m_toJsonInProgress;
+  private volatile boolean m_writable = true;
   private volatile boolean m_processingBufferedEvents;
 
   public JsonResponse() {
@@ -83,9 +85,7 @@ public class JsonResponse {
    * {@link IJsonAdapter#isCreateImmediately()} is set
    */
   public void addAdapter(IJsonAdapter<?> adapter) {
-    if (m_toJsonInProgress) {
-      throw new IllegalStateException("It is not allowed to modify the adapter list while toJson is executed. Adapter: " + adapter);
-    }
+    assertWritable();
 
     if (!m_adapterMap.containsKey(adapter.getId())) {
       m_adapterMap.put(adapter.getId(), adapter);
@@ -101,6 +101,8 @@ public class JsonResponse {
    *          property value
    */
   public JsonEvent addPropertyChangeEvent(String id, String propertyName, Object newValue) {
+    assertWritable();
+
     // coalesce
     JsonEvent event = m_idToPropertyChangeEventMap.get(id);
     if (event == null) {
@@ -120,6 +122,8 @@ public class JsonResponse {
   }
 
   public JsonEvent addActionEvent(String eventTarget, String eventType) {
+    assertWritable();
+
     return addActionEvent(eventTarget, eventType, null);
   }
 
@@ -128,6 +132,8 @@ public class JsonResponse {
    * also {@link #doAddEvent(JsonEvent)}
    */
   public JsonEvent addActionEvent(String eventTarget, String eventType, JSONObject eventData) {
+    assertWritable();
+
     JsonEvent event = new JsonEvent(eventTarget, eventType, eventData);
     m_eventList.add(event);
     return event;
@@ -142,6 +148,8 @@ public class JsonResponse {
    * also {@link #doAddEvent(JsonEvent)}
    */
   public JsonEvent addActionEvent(String eventTarget, String eventType, String eventReference, JSONObject eventData) {
+    assertWritable();
+
     JsonEvent event = new JsonEvent(eventTarget, eventType, eventReference, eventData);
     m_eventList.add(event);
     return event;
@@ -152,6 +160,8 @@ public class JsonResponse {
    * also {@link #doAddEvent(JsonEvent)}
    */
   public JsonEvent replaceActionEvent(String eventTarget, String eventType, JSONObject eventData) {
+    assertWritable();
+
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
       // Same target and same type --> remove existing event
@@ -161,6 +171,10 @@ public class JsonResponse {
       }
     }
     return addActionEvent(eventTarget, eventType, eventData);
+  }
+
+  public boolean containsAdapter(IJsonAdapter<?> adapter) {
+    return m_adapterMap.containsKey(adapter.getId());
   }
 
   public boolean containsPropertyChangeEvent(String id, String propertyName) {
@@ -190,6 +204,8 @@ public class JsonResponse {
    * {@link #fireProcessBufferedEvents()}.)
    */
   public void registerBufferedEventsAdapter(IJsonAdapter<?> adapter) {
+    assertWritable();
+
     if (m_processingBufferedEvents) {
       throw new IllegalStateException("Cannot register an adapter as buffered events provider while processing buffered events [" + adapter + "]");
     }
@@ -199,6 +215,8 @@ public class JsonResponse {
   }
 
   public void unregisterBufferedEventsAdapter(IJsonAdapter<?> adapter) {
+    assertWritable();
+
     if (m_processingBufferedEvents) {
       throw new IllegalStateException("Cannot unregister an adapter as buffered events provider while processing buffered events [" + adapter + "]");
     }
@@ -208,6 +226,8 @@ public class JsonResponse {
   }
 
   public void markAsStartupResponse() {
+    assertWritable();
+
     m_startupData = new JSONObject();
   }
 
@@ -234,6 +254,8 @@ public class JsonResponse {
    *          by the client using the <code>errorCode</code> parameter (see Session.js).
    */
   public void markAsError(int errorCode, String errorMessage) {
+    assertWritable();
+
     m_error = true;
     m_errorCode = errorCode;
     m_errorMessage = errorMessage;
@@ -244,13 +266,34 @@ public class JsonResponse {
   }
 
   /**
-   * Returns a JSON string representation of this instance. This method is called at the end of a request. The return
-   * value of this method is returned to the client-side GUI. There are some noteworthy points:
+   * @return <code>true</code> if this response is still writable (e.g. new adapters and events can be added). After
+   *         {@link #toJson()} was called and the resulting JSON was sent to the UI, this method will return
+   *         <code>false</code> forever.
+   */
+  public boolean isWritable() {
+    return m_writable;
+  }
+
+  protected void assertWritable() {
+    Assertions.assertTrue(m_writable, "This JSON response was already sent to the UI and is no longer writable!");
+  }
+
+  /**
+   * Returns a JSON string representation of this instance. This method is typically called at the end of a request.
+   * <p>
+   * <b>Attention: This method is not free of side effects!</b>
    * <ul>
-   * <li>All new adapters (= adapters not yet transferred to the client), are put as a list in the 'adapterData'
-   * property.</li>
-   * <li>All events are transferred in the 'events' property.</li>
+   * <li>Buffered events are processed. This may lead to the addition of new adapters and events (see implementations of
+   * {@link IJsonAdapter#processBufferedEvents()}).
+   * <li>After that, the request will <b>not be writable anymore</b>! Any attempt to alter the response afterwards
+   * results in an {@link AssertionException} to be thrown. {@link #isWritable()} will always returns
+   * <code>false</code>.
    * </ul>
+   * The return value of this method is returned as a valid JSON object to the client-side GUI. All new adapters (=
+   * adapters not yet transferred to the UI), are put as a list in the <code>"adapterData"</code> property. All events
+   * are transferred in the <code>"events"</code> property. An ascending sequence number is put in the <code>"#"</code>
+   * property.
+   * </p>
    * This method will call the <code>toJson()</code> method on all adapter objects. Note that you can NOT create new
    * adapter instances when the toJson() method runs! All new adapter instances must be created before: either in the
    * <code>attachModel()</code> method or in an event handler method like <code>handleXYZ()</code>. The technical reason
@@ -264,57 +307,57 @@ public class JsonResponse {
     // Ensure all buffered events are handled. This might cause the addition of more events and adapters to this response.
     fireProcessBufferedEvents();
 
-    JSONObject json = new JSONObject();
+    // No more writing operations are allowed from this point on
+    m_writable = false;
+
+    return toJsonInternal();
+  }
+
+  protected JSONObject toJsonInternal() {
+    // Prepare "adapterData"
     JSONObject adapterData = new JSONObject();
-    m_toJsonInProgress = true;
-    try {
-      // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter
-      // in your to toJson() method, which is conceptually wrong. You must create new adapters when the attachModel() method is
-      // called or when an action-event is processed (typically in a handleXYZ() method).
-      // To debug which adapter caused the error, add a syso for entry.getValue() in the following loop.
-      List<String> adapterIds = null;
-      for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
-        JSONObject adapterJson = entry.getValue().toJson();
-        if (adapterJson != null) {
-          JsonObjectUtility.filterDefaultValues(adapterJson);
-          adapterData.put(entry.getKey(), adapterJson);
-          if (LOG.isDebugEnabled()) {
-            if (adapterIds == null) {
-              adapterIds = new LinkedList<String>();
-            }
-            adapterIds.add(entry.getValue().getId());
+    List<String> adapterIds = null;
+    for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
+      JSONObject adapterJson = entry.getValue().toJson();
+      if (adapterJson != null) {
+        JsonObjectUtility.filterDefaultValues(adapterJson);
+        adapterData.put(entry.getKey(), adapterJson);
+        if (LOG.isDebugEnabled()) {
+          if (adapterIds == null) {
+            adapterIds = new LinkedList<String>();
           }
+          adapterIds.add(entry.getValue().getId());
         }
-      }
-      if (adapterIds != null) {
-        LOG.debug("Adapter data created for these adapters: {}", adapterIds);
-      }
-
-      JSONArray eventArray = new JSONArray();
-      for (JsonEvent event : m_eventList) {
-        if (doAddEvent(event)) {
-          eventArray.put(event.toJson());
-        }
-      }
-
-      json.put(PROP_SEQUENCE, m_sequenceNo);
-      json.put(PROP_STARTUP_DATA, m_startupData);
-      if (m_combined) {
-        json.put(PROP_COMBINED, true);
-      }
-      json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
-      json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
-      if (m_error) {
-        // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the hard coded string
-        // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.JSON_SESSION_TIMEOUT_RESPONSE
-        JSONObject jsonError = new JSONObject();
-        jsonError.put(PROP_ERROR_CODE, m_errorCode);
-        jsonError.put(PROP_ERROR_MESSAGE, m_errorMessage);
-        json.put(PROP_ERROR, jsonError);
       }
     }
-    finally {
-      m_toJsonInProgress = false;
+    if (adapterIds != null) {
+      LOG.debug("Adapter data created for these adapters: {}", adapterIds);
+    }
+
+    // Prepare "events"
+    JSONArray eventArray = new JSONArray();
+    for (JsonEvent event : m_eventList) {
+      if (doAddEvent(event)) {
+        eventArray.put(event.toJson());
+      }
+    }
+
+    // Build resulting JSON
+    JSONObject json = new JSONObject();
+    json.put(PROP_SEQUENCE, m_sequenceNo);
+    json.put(PROP_STARTUP_DATA, m_startupData);
+    if (m_combined) {
+      json.put(PROP_COMBINED, true);
+    }
+    json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
+    json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
+    if (m_error) {
+      // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the hard coded string
+      // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.JSON_SESSION_TIMEOUT_RESPONSE
+      JSONObject jsonError = new JSONObject();
+      jsonError.put(PROP_ERROR_CODE, m_errorCode);
+      jsonError.put(PROP_ERROR_MESSAGE, m_errorMessage);
+      json.put(PROP_ERROR, jsonError);
     }
     return json;
   }
@@ -324,6 +367,8 @@ public class JsonResponse {
    * and adapters to this response. This method is called automatically during {@link #toJson()}.
    */
   public void fireProcessBufferedEvents() {
+    assertWritable();
+
     m_processingBufferedEvents = true;
     try {
       // Use a copy of the original m_bufferedEventsAdapters list to prevent ConcurrentModificationExceptions
@@ -365,6 +410,8 @@ public class JsonResponse {
    *          Adapter ID to be removed
    */
   public void removeJsonAdapter(String id) {
+    assertWritable();
+
     // Remove from adapterMap
     IJsonAdapter<?> removedAdapter = m_adapterMap.remove(id);
 
@@ -450,6 +497,8 @@ public class JsonResponse {
   }
 
   public void combine(JsonResponse response) {
+    assertWritable();
+
     m_combined = true;
     m_adapterMap.putAll(response.m_adapterMap);
     m_eventList.addAll(response.m_eventList);

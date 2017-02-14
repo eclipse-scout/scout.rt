@@ -23,11 +23,19 @@ public class FormWithOneField extends AbstractForm {
     super();
   }
 
+  public MainBox getMainBox() {
+    return getFieldByClass(MainBox.class);
+  }
+
+  public StringField getStringField() {
+    return getFieldByClass(StringField.class);
+  }
+
   @Order(10)
   public class MainBox extends AbstractGroupBox {
+
     @Order(10)
     public class StringField extends AbstractStringField {
-
     }
   }
 
@@ -37,15 +45,15 @@ public class FormWithOneField extends AbstractForm {
   }
 
   public class FormHandler extends AbstractFormHandler {
+
     @Override
     protected void execLoad() {
+      // nop
     }
 
     @Override
     protected void execPostLoad() {
-      super.execPostLoad();
       getFieldByClass(StringField.class).requestFocus();
     }
   }
-
 }
