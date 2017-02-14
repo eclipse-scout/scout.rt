@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.basic.table.TableTest.P_Table.FirstColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
@@ -408,6 +410,23 @@ public class TableTest {
     P_Table table = new P_Table();
     table.initConfig();
     assertTrue(table.isEnabled());
+  }
+
+  /**
+   * ResetColumnConfiguration disposes the column set and creates a new one. If there was a context column, it has to be
+   * set to null. Otherwise the UI would throw an error because the column is not known (anymore).
+   */
+  @Test
+  public void testResetContextColumn() {
+    P_Table table = new P_Table();
+    table.initTable();
+    fillTable(table);
+    FirstColumn column = table.getFirstColumn();
+    table.getUIFacade().setContextColumnFromUI(column);
+    assertSame(column, table.getContextColumn());
+
+    table.resetColumnConfiguration();
+    assertNull(table.getContextColumn());
   }
 
   private void assertValidTestTable(P_Table table, int status) {

@@ -3502,6 +3502,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       // re link existing filters to new columns
       linkColumnFilters();
+      // reset context column (disposed column must not be used anymore)
+      setContextColumn(null);
       fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED));
     }
     finally {
