@@ -3692,7 +3692,7 @@ scout.Table.prototype.requestFocusInCell = function(column, row) {
 
   var cell = this.cell(column, row);
   if (this.enabled && row.enabled && cell.editable) {
-    this.prepareCellEdit(column, row, true);
+    this.prepareCellEdit(column, row, false);
   }
 };
 

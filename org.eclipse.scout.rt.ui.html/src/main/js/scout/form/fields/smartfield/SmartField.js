@@ -286,7 +286,7 @@ scout.SmartField.prototype._delegateToProposalChooser = function(event) {
     this._pendingProposalTyped.func();
     this._clearPendingProposalTyped();
   }
-  if (this.proposalChooser) {
+  if (this.proposalChooser && this.proposalChooser.rendered) {
     // in some rare cases proposal chooser has been disposed in the meantime --> do nothing
     this.proposalChooser.delegateEvent(event);
   }
@@ -590,6 +590,7 @@ scout.SmartField.prototype.openPopup = function() {
   this.popup = this.createPopup();
   this.popup.open();
   this.popup.on('remove', function() {
+    this._sendCancelProposal();
     this.popup = null;
   }.bind(this));
   if (this.touch) {
