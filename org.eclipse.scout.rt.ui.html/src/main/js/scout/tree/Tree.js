@@ -1554,52 +1554,9 @@ scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
       // for faster index calculation
       this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
     } else {
-      var insertIndex = this._findIndexToInsertNode(node);
+      var insertIndex = this._findInsertPositionInFlatList(node);
       this._addToVisibleFlatListNoCheck(node, insertIndex, renderingAnimated);
     }
-  }
-};
-
-scout.Tree.prototype._findIndexToInsertNode = function(node) {
-  var findValidSiblingBefore = function(childNodeIndex, siblings) {
-    for (var i = childNodeIndex - 1; i >= 0; i--) {
-      if (this.visibleNodesMap[siblings[i].id]) {
-        return siblings[i];
-      }
-    }
-    // no sibling before
-    return null;
-  }.bind(this);
-  // function to traverse last child nodes to first child nodes of a parent.
-  var findLastVisibleNodeInParent = function(parent) {
-    if (parent.expanded) {
-      for (var i = parent.childNodes.length - 1; i >= 0; i--) {
-        if (this.visibleNodesMap[parent.childNodes[i].id]) {
-          return findLastVisibleNodeInParent(parent.childNodes[i]);
-        }
-      }
-    }
-    return parent;
-  }.bind(this);
-
-  var parentNode = node.parentNode,
-    siblingBefore, nodeBefore;
-  if (!parentNode) {
-    // use toplevel to find index
-    siblingBefore = findValidSiblingBefore(node.childNodeIndex, this.nodes);
-    if (!siblingBefore) {
-      return 0;
-    }
-    nodeBefore = findLastVisibleNodeInParent(siblingBefore);
-    return this.visibleNodesFlat.indexOf(nodeBefore) + 1;
-  } else {
-    siblingBefore = findValidSiblingBefore(node.childNodeIndex, node.parentNode.childNodes);
-    if (!siblingBefore) {
-      nodeBefore = parentNode;
-    } else {
-      nodeBefore = findLastVisibleNodeInParent(siblingBefore);
-    }
-    return this.visibleNodesFlat.indexOf(nodeBefore) + 1;
   }
 };
 
@@ -1608,10 +1565,11 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
 // The update of the flat list is currently implemented quite complicated -> it should be simplified.
 // And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded=
 scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
-  //add nodes recursively
+  // add nodes recursively
   if (!this.visibleNodesMap[parentNode.id]) {
     return 0;
   }
+
   var isSubAdding = !!insertBatch;
   parentIndex = parentIndex ? parentIndex : this.visibleNodesFlat.indexOf(parentNode);
   animatedRendering = animatedRendering && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
@@ -1622,50 +1580,163 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
     // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
     this._$animationWrapper.stop(false, true);
   }
-  insertBatch = insertBatch ? insertBatch : this.setUpInsertBatch(parentIndex + 1);
+
+  if (insertBatch) {
+    insertBatch.setInsertAt(parentIndex);
+  } else {
+    insertBatch = this.newInsertBatch(parentIndex + 1);
+  }
+
   parentNode.childNodes.forEach(function(node, index) {
-    var isAlreadyAdded = this.visibleNodesMap[node.id];
-    if (node.initialized && node.isFilterAccepted(forceFilter) && !isAlreadyAdded) {
+    if (!node.initialized || !node.isFilterAccepted(forceFilter)) {
+      return;
+    }
+
+    var insertIndex, isAlreadyAdded = this.visibleNodesMap[node.id];
+    if (isAlreadyAdded) {
+      this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
+      this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
+      insertBatch = this.newInsertBatch(insertBatch.nextBatchInsertIndex());
+      if (node.expanded) {
+        insertIndex = this._findInsertPositionInFlatList(node) + 1;
+        insertBatch = this._addChildrenToFlatList(node, insertIndex, animatedRendering, insertBatch, forceFilter);
+      }
+      // do not animate following
+      animatedRendering = false;
+    } else {
       insertBatch.insertNodes.push(node);
       this.visibleNodesMap[node.id] = true;
       insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
       if (node.expanded) {
-        insertBatch = this._addChildrenToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
+        insertIndex = this._findInsertPositionInFlatList(node);
+        insertBatch = this._addChildrenToFlatList(node, insertIndex, animatedRendering, insertBatch, forceFilter);
       }
-    } else if (node.initialized && node.isFilterAccepted(forceFilter) && isAlreadyAdded) {
-      this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex(), animatedRendering);
-      this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
-      var updateIndex = insertBatch.insertedAny() ? 2 : 1;
-      insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex() + updateIndex);
-      if (node.expanded) {
-        insertBatch = this._addChildrenToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
-      }
-      //do not animate following
-      animatedRendering = false;
     }
   }.bind(this));
 
   if (!isSubAdding) {
     // animation is not done yet and all added nodes are in visible range
-    this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex(), animatedRendering);
+    this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
     this.invalidateLayoutTree();
   }
 
   return insertBatch;
 };
 
-scout.Tree.prototype.setUpInsertBatch = function(insertIndex) {
+scout.Tree.prototype._showNodes = function(insertBatch) {
+  return this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() &&
+         this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex();
+};
+
+/**
+ * This function tries to find the correct insert position within the flat list for the given node.
+ * The function must consider the order of child nodes in the original tree structure and then check
+ * where in the flat list this position is.
+ */
+scout.Tree.prototype._findInsertPositionInFlatList = function(node) {
+  var childNodes,
+    parentNode = node.parentNode;
+
+  // use root nodes as nodes when no other parent node is available (root case)
+  if (parentNode) {
+    childNodes = parentNode.childNodes;
+  } else {
+    childNodes = this.nodes;
+  }
+
+  // find all visible siblings for our node (incl. our own node, which is probably not yet
+  // in the visible nodes map)
+  var thatNode = node;
+  var siblings = childNodes.filter(function(node) {
+    return !!this.visibleNodesMap[node.id] || node === thatNode;
+  }.bind(this));
+
+  // when there are no visible siblings, insert below the parent node
+  if (siblings.length === 0) {
+    return this._findPositionInFlatList(parentNode) + 1;
+  }
+
+  var nodePos = siblings.indexOf(node);
+
+  // when there are no prev. siblings in the flat list, insert below the parent node
+  if (nodePos === 0) {
+    return this._findPositionInFlatList(parentNode) + 1;
+  }
+
+  var prevSiblingNode = siblings[nodePos - 1];
+  var prevSiblingPos = this._findPositionInFlatList(prevSiblingNode);
+
+  // when the prev. sibling is not in the flat list, insert below the parent node
+  if (prevSiblingPos === -1) {
+    return this._findPositionInFlatList(parentNode) + 1;
+  }
+
+  // find the index of the last child element of our prev. sibling node
+  // that's where we want to insert the new node. We go down the flat list
+  // starting from the prev. sibling node, until we hit a node that does not
+  // belong to the sub tree of the prev. sibling node.
+  var i, checkNode;
+  for (i = prevSiblingPos; i < this.visibleNodesFlat.length; i++) {
+    checkNode =  this.visibleNodesFlat[i];
+    if (!this._isInSameSubTree(prevSiblingNode, checkNode)) {
+      return i;
+    }
+  }
+
+  // insert at the end of the list
+  return this.visibleNodesFlat.length;
+};
+
+scout.Tree.prototype._findPositionInFlatList = function(node) {
+  return this.visibleNodesFlat.indexOf(node);
+};
+
+/**
+ * Checks whether the given checkNode belongs to the same sub tree (or is) the given node.
+ * The function goes up all parentNodes of the checkNode.
+ *
+ * @param {scout.TreeNode} node which is used to for the sub tree comparison
+ * @param {scout.TreeNode} checkNode node which is checked against the given node
+ */
+scout.Tree.prototype._isInSameSubTree = function(node, checkNode) {
+  do {
+    if (checkNode === node || checkNode.parentNode === node) {
+      return true;
+    }
+    checkNode = checkNode.parentNode;
+  } while (checkNode);
+
+  return false;
+};
+
+/**
+ * Info: the object created here is a bit weird: the array 'insertNodes' is used as function arguments to the Array#splice function at some point.
+ * The signature of that function is: array.splice(index, deleteCount[, element1[,  element2 [, ...]]])
+ * So the first two elements are numbers and all the following elements are TreeNodes or Pages.
+ */
+scout.Tree.prototype.newInsertBatch = function(insertIndex) {
   return {
-    insertNodes: [insertIndex, 0],
+    insertNodes: [insertIndex, 0], // second element is always 0 (used as argument for deleteCount in Array#splice)
     $animationWrapper: null,
     lastBatchInsertIndex: function() {
-      if (this.insertNodes.length === 2) {
-        return this.insertNodes[0];
+      if (this.isEmpty()) {
+        return this.insertAt();
+      } else {
+        return this.insertAt() + this.insertNodes.length - 3;
       }
-      return this.insertNodes[0] + this.insertNodes.length - 3;
     },
-    insertedAny: function() {
-      return this.insertNodes.length > 2;
+    nextBatchInsertIndex: function() {
+      // only NBU knows what this means
+      return this.lastBatchInsertIndex() + (this.isEmpty() ? 1 : 2);
+    },
+    isEmpty: function() {
+      return this.insertNodes.length === 2;
+    },
+    insertAt: function() {
+      return this.insertNodes[0];
+    },
+    setInsertAt: function(insertAt) {
+      this.insertNodes[0] = insertAt;
     }
   };
 };
@@ -1707,26 +1778,26 @@ scout.Tree.prototype.checkAndHandleBatch = function(insertBatch, parentNode, ani
   if (this.viewRangeRendered.from - 1 === insertBatch.lastBatchInsertIndex()) {
     //do immediate rendering because list could be longer
     this.insertBatchInVisibleNodes(insertBatch, false, false);
-    insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
+    insertBatch = this.newInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
   }
   this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
 
   if (this.viewRangeRendered.from + this.viewRangeSize - 1 === insertBatch.lastBatchInsertIndex()) {
     //do immediate rendering because list could be longer
     this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering);
-    insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
+    insertBatch = this.newInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
   }
   return insertBatch;
 };
 
 scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes, animate) {
-  if (insertBatch.insertNodes < 3) {
-    //nothing to add
+  if (insertBatch.isEmpty()) {
+    // nothing to add
     return;
   }
   this.visibleNodesFlat.splice.apply(this.visibleNodesFlat, insertBatch.insertNodes);
   if (showNodes) {
-    var indexHint = insertBatch.insertNodes[0];
+    var indexHint = insertBatch.insertAt();
     for (var i = 2; i < insertBatch.insertNodes.length; i++) {
       var node = insertBatch.insertNodes[i];
       this.showNode(node, false, indexHint);
