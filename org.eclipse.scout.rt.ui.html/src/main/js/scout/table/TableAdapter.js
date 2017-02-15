@@ -578,11 +578,31 @@ scout.TableAdapter.modifyColumnPrototype = function() {
 
   // _ensureCell
   scout.objects.replacePrototypeFunction(scout.Column, '_ensureCell', function(vararg) {
-    if (this.table.modelAdapter && scout.objects.isPlainObject(vararg)) {
-      scout.defaultValues.applyTo(vararg, 'Cell');
-      vararg = scout.create('Cell', vararg);
+    if (this.table.modelAdapter) {
+      // Note: we do almost the same thing as in _ensureCellOrig, the difference is that
+      // we treat a plain object always as cell-model and we always must apply defaultValues
+      // to this cell model. In the JS only case a plain-object has no special meaning and
+      // can be used as cell-value in the same way as a scalar value. Also we must not apply
+      // defaultValues in JS only case, because it would destroy the 'undefined' state of the
+      // cell properties, which is required because the Column checks, whether it should apply
+      // defaults from the Column instance to a cell, or use the values from the cell.
+      var model;
+      if (scout.objects.isPlainObject(vararg)) {
+        model = vararg;
+        model.value = this._parseValue(model.value);
+        if (model.text && model.value === undefined) {
+          model.value = this._parseValue(model.text);
+        }
+      } else {
+        model = {
+          value: this._parseValue(vararg)
+        };
+      }
+      scout.defaultValues.applyTo(model, 'Cell');
+      return scout.create('Cell', model);
+    } else {
+      return this._ensureCellOrig(vararg);
     }
-    return this._ensureCellOrig(vararg);
   }, true);
 };
 
