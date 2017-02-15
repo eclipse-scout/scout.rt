@@ -298,11 +298,11 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(parent, modelClass).findElement(By.tagName("input"));
   }
 
-  protected WebElement waitUntilTextAreaClickable(Class<?> modelClass) {
+  public WebElement waitUntilTextAreaClickable(Class<?> modelClass) {
     return waitUntilTextAreaClickable(null, modelClass);
   }
 
-  protected WebElement waitUntilTextAreaClickable(WebElement parent, Class<?> modelClass) {
+  public WebElement waitUntilTextAreaClickable(WebElement parent, Class<?> modelClass) {
     return waitUntilElementClickable(parent, modelClass).findElement(By.tagName("textarea"));
   }
 
@@ -379,5 +379,10 @@ public abstract class AbstractSeleniumTest {
       ctrlKey = Keys.COMMAND;
     }
     return ctrlKey;
+  }
+
+  public void doubleClickOnElement(WebElement element) {
+    Actions actions = new Actions(getDriver());
+    actions.moveToElement(element).doubleClick().perform();
   }
 }
