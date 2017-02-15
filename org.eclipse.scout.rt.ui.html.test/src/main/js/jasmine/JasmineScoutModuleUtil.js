@@ -40,7 +40,7 @@ function loadAndResolveScriptContent(path) {
   });
   //replace includes
   content = content.replace(
-    /(?:\/\/\s*@|__)include\s*\(\s*(?:\"([^\"]+)\"|'([^']+)')\s*\)(?:;)?/g,
+    /^\s*__include\s*\(\s*["'](.*?)["']\s*\).*$/gm,
     function(match, p1, p2, offset, string) {
       var includePrefix = path.replace(/^(.*\/)[^\/]*$/, '$1');
       var includePath = includePrefix + (p1 ? p1 : p2);
@@ -73,7 +73,7 @@ function insertLineNumbers(filename, text) {
     buf += (insideBlockComment ? '//' : '/*');
     buf += filename + ':';
     buf += lineNo;
-    for (var j = (lineNo + '').length + 1; j < (lines.length + '').length; j++) {
+    for (var j = (lineNo + '').length; j < (lines.length + '').length; j++) {
       buf += ' ';
     }
     buf += (insideBlockComment ? '//' : '*/') + ' ';
