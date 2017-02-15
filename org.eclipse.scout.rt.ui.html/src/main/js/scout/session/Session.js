@@ -344,7 +344,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }
 
   // Init request timeout for poller
-  this.requestTimeoutPoll = data.startupData.pollingInterval * 1000 + 15000;
+  this.requestTimeoutPoll = (data.startupData.pollingInterval + 15) * 1000;
 
   // Register UI session
   this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
@@ -1214,9 +1214,22 @@ scout.Session.prototype._processEvents = function(events) {
 
   // If there are still events whose target could not be resolved, throw an error
   if (events.length) {
-    throw new Error('Could not resolve event targets: [' + events.map(function(el) {
-      return '"' + el.target + '"';
-    }).join(', ') + ']');
+    var debugInfo = 'Events:\n- ' + events.map(function(event) {
+      return JSON.stringify(event);
+    }).join('\n- ') + '\nAdapterDataCache:';
+    var ids = Object.keys(this._adapterDataCache);
+    if (ids.length) {
+      debugInfo += '\n- ' + Object.keys(this._adapterDataCache).map(function(id) {
+        return JSON.stringify(this._adapterDataCache[id]);
+      }, this).join('\n- ');
+    } else {
+      debugInfo += ' (empty)';
+    }
+    var error = new Error('Could not resolve event targets: [' + events.map(function(event) {
+      return '"' + event.target + '"';
+    }, this).join(', ') + ']');
+    error.debugInfo = debugInfo;
+    throw error;
   }
 };
 
