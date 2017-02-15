@@ -95,6 +95,11 @@ describe("scout.strings", function() {
       expect(scout.strings.startsWith(456, '4')).toBe(true);
       expect(scout.strings.startsWith('456', 4)).toBe(true);
       expect(scout.strings.startsWith(true, 't')).toBe(true);
+      expect(scout.strings.startsWith({}, {})).toBe(true);
+      expect(scout.strings.startsWith('xyz', {})).toBe(false);
+      expect(scout.strings.startsWith({a: 2}, {a: 3})).toBe(true); // because both objects return the same toString()
+      expect(scout.strings.startsWith(['a', 'b'], 'a')).toBe(true); // because arrays are converted to string
+      expect(scout.strings.startsWith('xyz', [])).toBe(true); // because arrays are converted to string
     });
 
   });

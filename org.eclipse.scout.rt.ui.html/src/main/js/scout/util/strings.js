@@ -95,14 +95,14 @@ scout.strings = {
     if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
       return false;
     }
+    fullString = this.asString(fullString);
+    startString = this.asString(startString);
     if (startString.length === 0) {
       return true; // every string starts with the empty string
     }
     if (fullString.length === 0) {
       return false; // empty string cannot start with non-empty string
     }
-    fullString = this.asString(fullString);
-    startString = this.asString(startString);
     return (fullString.substr(0, startString.length) === startString);
   },
 
@@ -110,14 +110,14 @@ scout.strings = {
     if (fullString === undefined || fullString === null || endString === undefined || endString === null) {
       return false;
     }
+    fullString = this.asString(fullString);
+    endString = this.asString(endString);
     if (endString.length === 0) {
       return true; // every string ends with the empty string
     }
     if (fullString.length === 0) {
       return false; // empty string cannot end with non-empty string
     }
-    fullString = this.asString(fullString);
-    endString = this.asString(endString);
     return (fullString.substr(-endString.length) === endString);
   },
 
