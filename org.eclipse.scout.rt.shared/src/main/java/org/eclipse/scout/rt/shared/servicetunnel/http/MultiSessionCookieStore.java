@@ -21,15 +21,20 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTTP cookie store implementation that manages different sets of cookies ("cookie jars"), one per {@link ISession}.
  */
 @Bean
 public class MultiSessionCookieStore implements CookieStore {
+
+  private static final Logger LOG = LoggerFactory.getLogger(MultiSessionCookieStore.class);
 
   private final ReadWriteLock m_cookieStoresLock = new ReentrantReadWriteLock();
   /**
@@ -41,7 +46,12 @@ public class MultiSessionCookieStore implements CookieStore {
   public MultiSessionCookieStore() {
     // Use a WeakHashMap to ensure that client sessions are not retained when no longer needed.
     m_cookieStores = new WeakHashMap<ISession, CookieStore>();
-    m_defaultCookieStore = createInMemoryCookieStore();
+    m_defaultCookieStore = createDefaultCookieStore();
+  }
+
+  private CookieStore createDefaultCookieStore() {
+    CookieStore cookieStore = createInMemoryCookieStore();
+    return new P_DefaultCookieStoreDecorator(cookieStore);
   }
 
   private CookieStore createInMemoryCookieStore() {
@@ -134,6 +144,51 @@ public class MultiSessionCookieStore implements CookieStore {
         sessionStopped(session);
         session.removeListener(this);
       }
+    }
+  }
+
+  private static class P_DefaultCookieStoreDecorator implements CookieStore {
+
+    private final CookieStore m_cookieStore;
+
+    public P_DefaultCookieStoreDecorator(CookieStore cookieStore) {
+      m_cookieStore = cookieStore;
+    }
+
+    @Override
+    public void add(URI uri, HttpCookie cookie) {
+      Assertions.assertNotNull(cookie);
+      Exception e = null;
+      if (LOG.isDebugEnabled()) {
+        e = new Exception("stack trace for debugging");
+      }
+      LOG.warn("adding cookie to default cookie store which could be used by other users too [uri={}, cookieName={}]", uri, cookie.getName(), e);
+      m_cookieStore.add(uri, cookie);
+    }
+
+    @Override
+    public List<HttpCookie> get(URI uri) {
+      return m_cookieStore.get(uri);
+    }
+
+    @Override
+    public List<HttpCookie> getCookies() {
+      return m_cookieStore.getCookies();
+    }
+
+    @Override
+    public List<URI> getURIs() {
+      return m_cookieStore.getURIs();
+    }
+
+    @Override
+    public boolean remove(URI uri, HttpCookie cookie) {
+      return m_cookieStore.remove(uri, cookie);
+    }
+
+    @Override
+    public boolean removeAll() {
+      return m_cookieStore.removeAll();
     }
   }
 }
