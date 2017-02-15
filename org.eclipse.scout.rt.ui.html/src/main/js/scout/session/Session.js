@@ -42,7 +42,7 @@ scout.Session = function() {
   this.requestsPendingCounter = 0;
   this.suppressErrors = false;
   this.requestTimeoutCancel = 5000; // ms
-  this.requestTimeoutPoll = 75000; // ms
+  this.requestTimeoutPoll = 75000; // ms, depends on polling interval, will therefore be initialized on startup
   this.requestTimeoutPing = 5000; // ms
   this.backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(true);
 
@@ -342,6 +342,9 @@ scout.Session.prototype._processStartupResponse = function(data) {
   if (data.startupData.inspector) {
     this.inspector = true;
   }
+
+  // Init request timeout for poller
+  this.requestTimeoutPoll = data.startupData.pollingInterval * 1000 + 15000;
 
   // Register UI session
   this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
