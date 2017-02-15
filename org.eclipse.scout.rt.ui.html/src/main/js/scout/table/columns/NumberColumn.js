@@ -83,12 +83,12 @@ scout.NumberColumn.prototype.setAggregationFunction = function(func) {
 
 scout.NumberColumn.prototype.createAggrValueCell = function(value) {
   var formattedValue = this._formatValue(value);
-  return this.initCell(scout.create('Cell', {
+  return scout.create('Cell', {
     text: formattedValue,
     iconId: (formattedValue ? this.aggrSymbol : null),
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
-  }));
+  });
 };
 
 scout.NumberColumn.prototype._cellStyle = function(cell) {
