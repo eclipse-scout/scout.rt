@@ -172,7 +172,7 @@ scout.Column.prototype.buildCellForAggregateRow = function(aggregateRow) {
     var refRow = (this.table.groupingStyle === scout.Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
     cell = this.createAggrGroupCell(refRow);
   } else {
-    var aggregateValue = aggregateRow.contents[this.index];
+    var aggregateValue = aggregateRow.contents[this.table.columns.indexOf(this)];
     cell = this.createAggrValueCell(aggregateValue);
   }
   return this.buildCell(cell, {});
