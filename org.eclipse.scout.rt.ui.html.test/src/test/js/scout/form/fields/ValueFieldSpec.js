@@ -54,15 +54,46 @@ describe('ValueField', function() {
 
   });
 
-  describe('value and display-text', function() {
+  describe('value and display text', function() {
 
-    var field;
-
-    beforeEach(function() {
-      field = helper.createField('StringField', session.desktop);
+    it('sets display text when value is set initially', function() {
+      var field = helper.createField('StringField', session.desktop, {
+        value: 'Foo'
+      });
+      expect(field.value).toBe('Foo');
+      expect(field.displayText).toBe('Foo');
+      expect(field.empty).toBe(false);
     });
 
-    it('sets display-text when value is set', function() {
+    it('does not override the display text using formatValue if display text is set initially', function() {
+      var field = helper.createField('StringField', session.desktop, {
+        displayText: 'Bar'
+      });
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('Bar');
+      expect(field.empty).toBe(true);
+    });
+
+    it('calls validate and format when value is set initially', function() {
+      var field = new scout.StringField();
+      field._validateValue = function(value) {
+        return (value === 'gelb' ? 'rot' : value);
+      };
+      field._formatValue = function(value) {
+        return (value === 'rot' ? 'lila' : value);
+      };
+      field.init({
+        parent: session.desktop,
+        value: 'gelb'
+      });
+      // 'gelb' -> (validate) 'rot'
+      expect(field.value).toBe('rot');
+      // 'gelb' -> (validate) 'rot' -> (format) 'lila'
+      expect(field.displayText).toBe('lila');
+    });
+
+    it('sets display text when value is set', function() {
+      var field = helper.createField('StringField', session.desktop);
       field.setValue('Foo');
       expect(field.displayText).toBe('Foo');
       field.setValue(null);
@@ -70,12 +101,14 @@ describe('ValueField', function() {
     });
 
     it('sets value when parseAndSetValue is called', function() {
+      var field = helper.createField('StringField', session.desktop);
       field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe('Foo');
     });
 
     it('sets value and display text when accept input is called', function() {
+      var field = helper.createField('StringField', session.desktop);
       field._parseValue = function(displayText) {
         return (displayText === 'blau' ? 'gelb' : displayText);
       };
@@ -105,11 +138,11 @@ describe('ValueField', function() {
       field = helper.createField('StringField', session.desktop);
     });
 
-    it('sets _initialValue when markAsSaved is called', function() {
+    it('sets initialValue when markAsSaved is called', function() {
       field.setValue('Foo');
-      expect(field._initialValue).toBeFalsy();
+      expect(field.initialValue).toBeFalsy();
       field.markAsSaved();
-      expect(field._initialValue).toBe('Foo');
+      expect(field.initialValue).toBe('Foo');
       expect(field.touched).toBe(false);
     });
 
@@ -141,7 +174,9 @@ describe('ValueField', function() {
     });
 
     it('validate returns not valid when errorStatus is set or field is mandatory and empty', function() {
-      var errorStatus = new scout.Status({severity: scout.Status.Severity.ERROR});
+      var errorStatus = new scout.Status({
+        severity: scout.Status.Severity.ERROR
+      });
       field.setErrorStatus(errorStatus);
       var status = field.validate();
       expect(status.valid).toBe(false);
@@ -242,7 +277,8 @@ describe('ValueField', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var event = new scout.RemoteEvent(formField.id, 'displayTextChanged', {
-        displayText: 'abc123contextmenu', whileTyping: false
+        displayText: 'abc123contextmenu',
+        whileTyping: false
       });
       event.showBusyIndicator = true;
       expect(mostRecentJsonRequest()).toContainEvents(event);

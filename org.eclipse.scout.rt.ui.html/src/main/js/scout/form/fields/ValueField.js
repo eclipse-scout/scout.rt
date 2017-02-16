@@ -14,10 +14,16 @@
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
-  this._initialValue = null;
-  this.displayText = '';
+  this.displayText = null;
+  this.initialValue = null;
+  this.value = null;
 };
 scout.inherits(scout.ValueField, scout.FormField);
+
+scout.ValueField.prototype._init = function(model) {
+  scout.ValueField.parent.prototype._init.call(this, model);
+  this._setValue(this.value);
+};
 
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
@@ -121,7 +127,11 @@ scout.ValueField.prototype._setValue = function(value) {
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
-  this._updateDisplayText();
+
+  // If a displayText is provided initially, use that text instead of using formatValue to generate a text based on the value
+  if (this.initialized || scout.objects.isNullOrUndefined(this.displayText)) {
+    this._updateDisplayText();
+  }
 };
 
 scout.ValueField.prototype._updateDisplayText = function() {
@@ -154,7 +164,7 @@ scout.ValueField.prototype._formatValue = function(value) {
 };
 
 scout.ValueField.prototype._updateTouched = function() {
-  this.touched = !scout.objects.equals(this.value, this._initialValue);
+  this.touched = !scout.objects.equals(this.value, this.initialValue);
 };
 
 scout.ValueField.prototype.addField = function($field) {
@@ -228,7 +238,7 @@ scout.ValueField._getActiveValueField = function(target) {
 
 scout.ValueField.prototype.markAsSaved = function() {
   scout.ValueField.parent.prototype.markAsSaved.call(this);
-  this._initialValue = this.value;
+  this.initialValue = this.value;
 };
 
 /**
