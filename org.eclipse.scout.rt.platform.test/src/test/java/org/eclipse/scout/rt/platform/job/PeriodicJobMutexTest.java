@@ -58,7 +58,17 @@ public class PeriodicJobMutexTest {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final AtomicInteger rounds = new AtomicInteger(0);
-    final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
+
+    // Schedule other job
+    Jobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        protocol.add("other job");
+        latch.countDown();
+      }
+    }, Jobs.newInput()
+        .withExecutionSemaphore(executionSemaphore));
 
     Jobs.schedule(new IRunnable() {
 
@@ -128,16 +138,6 @@ public class PeriodicJobMutexTest {
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(200, TimeUnit.MILLISECONDS) // execute with a delay
             .withSchedule(periodicScheduleBuilder))); // periodic schedule plan
-
-    // Schedule other job
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("other job");
-      }
-    }, Jobs.newInput()
-        .withExecutionSemaphore(executionSemaphore));
 
     latch.countDown();
 
