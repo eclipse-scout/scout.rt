@@ -240,7 +240,7 @@ public class HtmlDocumentParser {
         // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
         replacement = "\n" + replacement.trim() + "\n";
         m.appendReplacement(sb, replacement);
-        LOG.debug("Resolved include '{}'", includeName);
+        LOG.trace("Resolved include '{}'", includeName);
       }
     }
     m.appendTail(sb);
