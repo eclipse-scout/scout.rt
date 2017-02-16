@@ -131,6 +131,7 @@ public class PropertiesHelper {
   protected PropertiesHelper(URL propertiesFileUrl, Set<String> importsToIgnore /* for loop detection */) {
     m_configProperties = new HashMap<>();
     if (propertiesFileUrl != null) {
+      LOG.info("Reading properties from {}", propertiesFileUrl);
       parse(propertiesFileUrl);
       Pattern pat = Pattern.compile(PLACEHOLDER_PATTERN);
       importAll(importsToIgnore, pat);
