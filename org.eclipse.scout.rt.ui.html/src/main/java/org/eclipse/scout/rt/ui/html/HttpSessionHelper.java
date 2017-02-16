@@ -45,7 +45,7 @@ public class HttpSessionHelper {
 
       sessionStore = createSessionStore(httpSession);
       httpSession.setAttribute(SESSION_STORE_ATTRIBUTE_NAME, sessionStore);
-      LOG.debug("Created new session store for session {}", httpSession.getId());
+      LOG.debug("Created new session store for HTTP session with ID {}", httpSession.getId());
 
       return sessionStore;
     }

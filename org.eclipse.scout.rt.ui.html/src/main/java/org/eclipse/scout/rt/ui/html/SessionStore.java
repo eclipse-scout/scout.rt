@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * It serves also as a listener for HTTP session invalidation. If it detects an invalid HTTP session, it tries to clean
  * up all associated client and UI sessions. See {@link #valueUnbound(HttpSessionBindingEvent)}.
+ * <p>
+ * Instances can be obtained using the bean {@link HttpSessionHelper#getSessionStore(HttpSession)}.
  *
  * @since 5.2
  */
@@ -75,7 +77,12 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   protected final ReadLock m_readLock;
   protected final WriteLock m_writeLock;
 
-  public SessionStore(HttpSession httpSession) {
+  /**
+   * New instances can be obtained using {@link HttpSessionHelper#getSessionStore(HttpSession)}.
+   *
+   * @param httpSession
+   */
+  protected SessionStore(HttpSession httpSession) {
     Assertions.assertNotNull(httpSession);
     m_httpSession = httpSession;
     m_httpSessionId = httpSession.getId();
@@ -83,8 +90,6 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
-
-    LOG.debug("Created new session store for HTTP session with ID {}", m_httpSessionId);
   }
 
   @Override
