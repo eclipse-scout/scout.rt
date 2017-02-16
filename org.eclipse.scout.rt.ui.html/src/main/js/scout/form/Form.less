@@ -76,3 +76,31 @@
     padding: @form-title-margin-top;
   }
 }
+
+@media (max-width: @iphone6-width) {
+  .dialog {
+    /* no need to have a margin on small screens */
+    /* otherwise on iphone5, cancel button on a dialog would always be stacked in ellipsis if there is another menu item */
+    margin: 0;
+
+    /* remove border in full screen mode */
+    &.full-width {
+      border-right: 0;
+      border-left: 0;
+
+      &.full-height {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+    }
+
+    & > .ui-resizable-e,
+    & > .ui-resizable-se,
+    & > .ui-resizable-s {
+      /* Remove handle, it is not useful anymore
+         and it increases the dialog size which has the effect that the body may be scrolled (on iphone).
+         Important is necessary because jquery ui sets it to display: block using inline style */
+      display: none !important; // NOSONAR
+    }
+  }
+}

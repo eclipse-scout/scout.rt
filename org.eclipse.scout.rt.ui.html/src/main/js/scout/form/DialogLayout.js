@@ -44,6 +44,10 @@ scout.DialogLayout.prototype.layout = function($container) {
   dialogSize.width = Math.min(maxWidth, prefSize.width);
   dialogSize.height = Math.min(maxHeight, prefSize.height);
 
+  // Add markers to be able to style the dialog in a different way when it uses the full width or height
+  htmlComp.$comp.toggleClass('full-width', (currentBounds.x === 0 && dialogMargins.horizontal() === 0 && windowSize.width === dialogSize.width));
+  htmlComp.$comp.toggleClass('full-height', (currentBounds.y === 0 && dialogMargins.vertical() === 0 && windowSize.height === dialogSize.height));
+
   // 2. Ensure the dialog can only get larger, not smaller.
   //    This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but
   //    the user previously enlarged the dialog.
