@@ -135,6 +135,9 @@ scout.Tooltip.prototype._remove = function() {
 scout.Tooltip.prototype.setText = function(text) {
   this.text = text;
   if (this.rendered) {
+    this.$container
+      .cssLeft(0)
+      .cssTop(0);
     this._renderText();
     this.position();
   }
