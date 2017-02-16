@@ -36,6 +36,7 @@ public class DesktopExtension extends AbstractDesktopExtension<AbstractDesktop> 
 
   @Override
   public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) {
+    super.execPageDetailTableChanged(chain, oldTable, newTable);
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformPageDetailTable(newTable);
   }
 }
