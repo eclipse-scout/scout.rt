@@ -60,7 +60,7 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateWidget(event.form, this.widget);
+    form = this.session.getOrCreateWidget(event.form, displayParent.widget);
     this.addFilterForWidgetEvent(function(widgetEvent) {
       return (widgetEvent.type === 'formActivated' &&
           widgetEvent.form === form);
@@ -84,7 +84,7 @@ scout.DesktopAdapter.prototype._onFormActivate = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateWidget(event.form, this.widget);
+    form = this.session.getOrCreateWidget(event.form, displayParent.widget);
     this.widget.activateForm(form, false);
   }
 };
@@ -94,7 +94,7 @@ scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    messageBox = this.session.getOrCreateWidget(event.messageBox, this.widget);
+    messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent.widget);
     displayParent.widget.messageBoxController.registerAndRender(messageBox);
   }
 };
@@ -114,7 +114,7 @@ scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    fileChooser = this.session.getOrCreateWidget(event.fileChooser, this.widget);
+    fileChooser = this.session.getOrCreateWidget(event.fileChooser, displayParent.widget);
     displayParent.widget.fileChooserController.registerAndRender(fileChooser);
   }
 };
