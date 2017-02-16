@@ -160,7 +160,7 @@ public class CompletionPromiseTest {
 
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .toFilter(), 1, TimeUnit.SECONDS);
+        .toFilter(), 10, TimeUnit.SECONDS);
     assertTrue(future.isDone()); // ensure to be 'done' after being released
   }
 
