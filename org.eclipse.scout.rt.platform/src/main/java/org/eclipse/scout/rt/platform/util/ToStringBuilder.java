@@ -26,8 +26,12 @@ public class ToStringBuilder {
   private final List<Object> m_builder;
 
   public ToStringBuilder(final Object instance) {
+    this(instance, true);
+  }
+
+  public ToStringBuilder(final Object instance, final boolean includeHashCode) {
     m_builder = new ArrayList<>();
-    m_identifier = createIdentifier(instance);
+    m_identifier = createIdentifier(instance, includeHashCode);
   }
 
   /**
@@ -199,7 +203,7 @@ public class ToStringBuilder {
    * @return <code>this</code> supporting the fluent API
    */
   public ToStringBuilder ref(final String name, final Object obj) {
-    attr(name, createIdentifier(obj));
+    attr(name, createIdentifier(obj, true));
     return this;
   }
 
@@ -209,14 +213,18 @@ public class ToStringBuilder {
   }
 
   /**
-   * Creates the identifier for the given {@link Object} consisting of classname and hashcode.
+   * Creates the identifier for the given {@link Object} consisting of the simple class name and (if "includeHashCode"
+   * is <code>true</code>) the hash code.
    */
-  private static String createIdentifier(final Object object) {
+  private static String createIdentifier(final Object object, boolean includeHashCode) {
     if (object == null) {
       return "null";
     }
     else {
       final Class<?> clazz = resolveClass(object);
+      if (!includeHashCode) {
+        return clazz.getSimpleName();
+      }
       return String.format("%s@%s", clazz.getSimpleName(), Integer.toHexString(object.hashCode()));
     }
   }

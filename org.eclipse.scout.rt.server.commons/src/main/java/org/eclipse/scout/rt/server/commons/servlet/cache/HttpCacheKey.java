@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
  * Cache key is a composite of 'resourcePath' and 'locale'. When a resource is not dependent on a Locale, it should use
@@ -72,15 +73,9 @@ public final class HttpCacheKey implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("HttpCacheKey[");
-    if (m_resourcePath != null) {
-      buf.append(" resourcePath=" + m_resourcePath);
-    }
-    if (m_attributes != null) {
-      buf.append(" attributes=" + m_attributes);
-    }
-    buf.append(" ]");
-    return buf.toString();
+    return new ToStringBuilder(this, false)
+        .attr("resourcePath", m_resourcePath)
+        .attr("attributes", m_attributes)
+        .toString();
   }
 }

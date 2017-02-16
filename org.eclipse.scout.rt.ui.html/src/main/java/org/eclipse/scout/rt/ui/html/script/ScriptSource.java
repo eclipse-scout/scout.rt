@@ -154,7 +154,7 @@ public class ScriptSource {
 
   @Override
   public String toString() {
-    return new ToStringBuilder(this)
+    return new ToStringBuilder(this, false)
         .attr("requestPath", m_requestPath)
         .attr("url", m_url)
         .attr("fileType", m_fileType)

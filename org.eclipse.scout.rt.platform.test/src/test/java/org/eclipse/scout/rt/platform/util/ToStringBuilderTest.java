@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.junit.Test;
 
 public class ToStringBuilderTest {
@@ -37,6 +36,23 @@ public class ToStringBuilderTest {
     builder.attr("obj", REF);
 
     assertEquals("Instance@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", builder.toString());
+  }
+
+  @Test
+  public void testInstanceClassWithoutHashCode() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance, false);
+    builder.attr("string", "blubber");
+    builder.attr("int", 1);
+    builder.attr("long", 2L);
+    builder.attr("short", (short) 3);
+    builder.attr("float", (float) 4);
+    builder.attr("double", (double) 5.0);
+    builder.ref("ref", REF);
+    builder.attr("obj", REF);
+
+    assertEquals("Instance[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", builder.toString());
   }
 
   @Test

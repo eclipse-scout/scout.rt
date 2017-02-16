@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,13 +53,15 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
   @Override
   public HttpCacheKey createCacheKey(String pathInfo) {
-    HashMap<String, String> atts = new HashMap<>();
+    Map<String, String> attrs = new HashMap<>();
+    // Cache key for HTML files include locale and theme, because "<scout:message>" tags are
+    // locale-dependent, while CSS files (and therefore their fingerprint) are theme-dependent.
     Locale locale = NlsLocale.getOrElse(null);
     if (locale != null) {
-      atts.put(LOCALE_KEY, locale.toString());
+      attrs.put(LOCALE_KEY, locale.toString());
     }
-    atts.put(THEME_KEY, m_theme);
-    return new HttpCacheKey(pathInfo, atts);
+    attrs.put(THEME_KEY, m_theme);
+    return new HttpCacheKey(pathInfo, attrs);
   }
 
   @Override
