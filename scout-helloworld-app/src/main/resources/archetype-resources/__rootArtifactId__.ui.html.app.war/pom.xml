@@ -13,10 +13,29 @@
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
   <packaging>war</packaging>
 
-  <name>${displayName} HTML UI WAR</name>
+  <name>${displayName} HTML UI Application</name>
 
   <build>
-      <finalName>${groupId}.${rootArtifactId}.ui.html</finalName>
+    <finalName>${groupId}.${rootArtifactId}.ui.html</finalName>
+
+    <!-- configure maven-resources-plugin to replace placeholders in resources -->
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <!-- configure maven-resources-plugin to use '\' as escape character  -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <escapeString>\</escapeString>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
   <dependencies>

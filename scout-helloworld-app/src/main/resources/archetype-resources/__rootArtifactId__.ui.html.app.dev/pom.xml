@@ -13,7 +13,7 @@
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
   <packaging>war</packaging>
 
-  <name>${displayName} HTML UI Server Development</name>
+  <name>${displayName} HTML UI Application (Development)</name>
 
   <dependencies>
     <dependency>

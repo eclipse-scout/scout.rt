@@ -13,10 +13,18 @@
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
   <packaging>war</packaging>
 
-  <name>${displayName} Server WAR</name>
+  <name>${displayName} Server Application</name>
 
   <build>
-      <finalName>${groupId}.${rootArtifactId}.server</finalName>
+    <finalName>${groupId}.${rootArtifactId}.server</finalName>
+
+    <!-- configure maven-resources-plugin to replace placeholders in resources -->
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 
   <dependencies>
