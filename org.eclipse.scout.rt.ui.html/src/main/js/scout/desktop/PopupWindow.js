@@ -111,18 +111,12 @@ scout.PopupWindow.prototype._onResize = function() {
 
 scout.PopupWindow.storeWindowBounds = function(form, bounds) {
   var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(bounds));
-  }
-  catch (err) {
-    // ignore errors (e.g. this can happen in "private mode" on Safari)
-    $.log.error('Error while storing "' + storageKey + '" in localStorage: ' + err);
-  }
+  scout.webstorage.setItem(localStorage, storageKey, JSON.stringify(bounds));
 };
 
 scout.PopupWindow.readWindowBounds = function(form) {
   var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
-  var bounds = localStorage.getItem(storageKey);
+  var bounds = scout.webstorage.getItem(localStorage, storageKey);
   if (!bounds) {
     return null;
   }

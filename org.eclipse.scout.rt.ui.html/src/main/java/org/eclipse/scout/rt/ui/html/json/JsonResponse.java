@@ -36,6 +36,7 @@ public class JsonResponse {
   public static final int ERR_SESSION_TIMEOUT = 10;
   public static final int ERR_UI_PROCESSING = 20;
   public static final int ERR_UNSAFE_UPLOAD = 30;
+  public static final int ERR_VERSION_MISMATCH = 40;
 
   public static final String PROP_SEQUENCE = "#";
   public static final String PROP_COMBINED = "combined";

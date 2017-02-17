@@ -102,6 +102,7 @@ scout.App.prototype._init = function(options) {
     return;
   }
 
+  this._initVersion(options);
   this._prepareDOM();
   this._installErrorHandler();
   this._installGlobalMouseDownInterceptor();
@@ -133,6 +134,14 @@ scout.App.prototype._checkBrowserCompability = function(options) {
   });
   return false;
 };
+
+scout.App.prototype._initVersion = function(options) {
+  this.version = scout.nvl(
+    this.version,
+    options.version,
+    $('scout-version').data('value'));
+};
+
 
 scout.App.prototype._prepareDOM = function() {
   scout.prepareDOM(document);

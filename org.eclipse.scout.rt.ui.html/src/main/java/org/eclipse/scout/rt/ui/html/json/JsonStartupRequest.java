@@ -38,6 +38,7 @@ public class JsonStartupRequest extends JsonRequest {
   public static final String PROP_CLIENT_SESSION_ID = "clientSessionId";
   public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_SESSION_STARTUP_PARAMS = "sessionStartupParams";
+  public static final String PROP_VERSION = "version";
 
   private final Map<String, String> m_sessionStartupParams;
 
@@ -65,6 +66,13 @@ public class JsonStartupRequest extends JsonRequest {
    */
   public JSONObject getUserAgent() {
     return getRequestObject().optJSONObject(PROP_USER_AGENT);
+  }
+
+  /**
+   * @return version or <code>null</code> (optional attribute)
+   */
+  public String getVersion() {
+    return getRequestObject().optString(PROP_VERSION, null);
   }
 
   /**

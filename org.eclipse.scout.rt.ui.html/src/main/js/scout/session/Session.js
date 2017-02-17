@@ -30,7 +30,7 @@ scout.Session = function() {
 
   // TODO [awe, cgu, bsh] 6.2 - Split in "RemoteSession" and "???" (maybe move to App)
   this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
-  this.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+  this.clientSessionId = scout.webstorage.getItem(sessionStorage, 'scout:clientSessionId');
   this.forceNewClientSession = false;
   this.remote = false;
   this.remoteUrl = 'json';
@@ -67,6 +67,15 @@ scout.Session = function() {
     objectType: 'NullWidget'
   }, new scout.NullWidget());
   this.events = this._createEventSupport();
+};
+
+// Corresponds to constants in JsonResponse
+scout.Session.JsonResponseError = {
+  STARTUP_FAILED: 5,
+  SESSION_TIMEOUT: 10,
+  UI_PROCESSING: 20,
+  UNSAFE_UPLOAD: 30,
+  VERSION_MISMATCH: 40
 };
 
 /**
@@ -258,6 +267,9 @@ scout.Session.prototype._sendStartupRequest = function() {
   if (this.clientSessionId) {
     request.clientSessionId = this.clientSessionId;
   }
+  if (scout.app.version) {
+    request.version = scout.app.version;
+  }
   request.userAgent = this.userAgent;
   request.sessionStartupParams = this._createSessionStartupParams();
 
@@ -312,17 +324,14 @@ scout.Session.prototype._processStartupResponse = function(data) {
     return;
   }
 
+  scout.webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+
   if (!data.startupData) {
     throw new Error('Missing startupData');
   }
 
   // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
-  try {
-    sessionStorage.setItem('scout:clientSessionId', data.startupData.clientSessionId);
-  } catch (err) {
-    // ignore errors (e.g. this can happen in "private mode" on Safari)
-    $.log.error('Error while storing "scout:clientSessionId" in sessionStorage: ' + err);
-  }
+  scout.webstorage.setItem(sessionStorage, 'scout:clientSessionId', data.startupData.clientSessionId);
 
   // Assign server generated uiSessionId. It must be sent along with all further requests.
   this.uiSessionId = data.startupData.uiSessionId;
@@ -828,6 +837,17 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
 };
 
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
+  if (jsonError.code === scout.Session.JsonResponseError.VERSION_MISMATCH) {
+    var loopDetection = scout.webstorage.getItem(sessionStorage, 'scout:versionMismatch');
+    if (!loopDetection) {
+      scout.webstorage.setItem(sessionStorage, 'scout:versionMismatch', 'yes');
+      // Reload page -> everything should then be up to date
+      scout.reloadPage();
+      return;
+    }
+    scout.webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+  }
+
   // Default values for fatal message boxes
   var boxOptions = {
     header: this.optText('ui.ServerError', 'Server error') + ' (' + this.optText('ui.ErrorCodeX', 'Code ' + jsonError.code, jsonError.code) + ')',
@@ -839,21 +859,21 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   };
 
   // Customize for specific error codes
-  if (jsonError.code === 5) { // JsonResponse.ERR_STARTUP_FAILED
+  if (jsonError.code === scout.Session.JsonResponseError.STARTUP_FAILED) {
     // there are no texts yet if session startup failed
     boxOptions.header = jsonError.message;
     boxOptions.body = null;
     boxOptions.yesButtonText = 'Retry';
-  } else if (jsonError.code === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
+  } else if (jsonError.code === scout.Session.JsonResponseError.SESSION_TIMEOUT) {
     boxOptions.header = this.optText('ui.SessionTimeout', boxOptions.header);
     boxOptions.body = this.optText('ui.SessionExpiredMsg', boxOptions.body);
-  } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
+  } else if (jsonError.code === scout.Session.JsonResponseError.UI_PROCESSING) {
     boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
     boxOptions.body = scout.strings.join('\n\n',
       this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
       this.optText('ui.UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
-  } else if (jsonError.code === 30) { // JsonResponse.ERR_UNSAFE_UPLOAD
+  } else if (jsonError.code === scout.Session.JsonResponseError.UNSAFE_UPLOAD) {
     boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
     boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
     boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
@@ -1305,12 +1325,7 @@ scout.Session.prototype.logout = function(logoutUrl) {
     this.desktop.$container.window(true).close();
   } else {
     // remember current url to not lose query parameters
-    try {
-      sessionStorage.setItem('scout:loginUrl', window.location.href);
-    } catch (err) {
-      // ignore errors (e.g. this can happen in "private mode" on Safari)
-      $.log.error('Error while storing "scout:loginUrl" in sessionStorage: ' + err);
-    }
+    scout.webstorage.setItem(sessionStorage, 'scout:loginUrl', window.location.href);
     // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
     setTimeout(function() {
       scout.reloadPage({

@@ -428,7 +428,7 @@ scout.Desktop.prototype.updateSplitterPosition = function() {
     return;
   }
   // TODO [awe] 6.2 - (user-prefs) Use user-preferences instead of sessionStorage
-  var storedSplitterPosition = this.cacheSplitterPosition && sessionStorage.getItem('scout:desktopSplitterPosition');
+  var storedSplitterPosition = this.cacheSplitterPosition && scout.webstorage.getItem(sessionStorage, 'scout:desktopSplitterPosition');
   if (storedSplitterPosition) {
     // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
@@ -868,12 +868,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   // ----- Helper functions -----
 
   function storeSplitterPosition(splitterPosition) {
-    try {
-      sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
-    } catch (err) {
-      // ignore errors (e.g. this can happen in "private mode" on Safari)
-      $.log.error('Error while storing "scout:desktopSplitterPosition" in sessionStorage: ' + err);
-    }
+    scout.webstorage.setItem(sessionStorage, 'scout:desktopSplitterPosition', splitterPosition);
   }
 };
 

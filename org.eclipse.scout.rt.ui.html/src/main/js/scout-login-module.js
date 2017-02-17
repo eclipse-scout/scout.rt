@@ -25,6 +25,7 @@
   __include("scout/util/arrays.js");
   __include("scout/util/URL.js");
   __include("scout/util/EventSupport.js");
+  __include("scout/util/webstorage.js");
   __include("scout/login/LoginApp.js");
   __include("scout/login/LoginBox.js");
   __include("scout/login/LogoutApp.js");

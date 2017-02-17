@@ -53,6 +53,7 @@
   __include("scout/util/filters.js");
   __include("scout/util/hAlign.js");
   __include("scout/util/aggregation.js");
+  __include("scout/util/webstorage.js");
   // Code and Lookup
   __include("scout/code/Code.js");
   __include("scout/code/CodeType.js");

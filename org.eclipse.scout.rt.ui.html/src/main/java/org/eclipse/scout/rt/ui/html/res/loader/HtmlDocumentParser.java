@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -49,6 +51,7 @@ public class HtmlDocumentParser {
   protected static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout:stylesheet\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout:script\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL);
 
   protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
 
@@ -71,6 +74,7 @@ public class HtmlDocumentParser {
   protected void replaceAllTags() throws IOException {
     replaceIncludeTags();
     replaceBaseTags();
+    replaceVersionTags();
     replaceMessageTags();
     replaceStylesheetTags();
     replaceScriptTags();
@@ -221,6 +225,13 @@ public class HtmlDocumentParser {
     }
     String baseTag = "<base href=\"" + basePath + "\">";
     m_workingContent = PATTERN_BASE_TAG.matcher(m_workingContent).replaceAll(baseTag);
+  }
+
+  protected void replaceVersionTags() {
+    // <scout:version />
+    String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
+    String versionTag = "<scout-version data-value=\"" + version + "\">";
+    m_workingContent = PATTERN_VERSION_TAG.matcher(m_workingContent).replaceAll(versionTag);
   }
 
   @SuppressWarnings("squid:S1149")

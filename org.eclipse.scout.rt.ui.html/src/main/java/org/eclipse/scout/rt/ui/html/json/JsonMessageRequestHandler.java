@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.resource.MimeType;
@@ -100,8 +101,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
       // Resolve UI session
       if (jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
+        JsonStartupRequest jsonStartupRequest = new JsonStartupRequest(jsonRequest);
+        if (!validateVersion(jsonStartupRequest, resp)) {
+          return true;
+        }
         // Always create a new UI Session on startup
-        uiSession = createUiSession(req, resp, jsonRequest);
+        uiSession = createUiSession(req, resp, jsonStartupRequest);
       }
       else {
         // Get and validate existing UI session
@@ -345,7 +350,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
+  protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) throws ServletException, IOException {
     HttpSession httpSession = req.getSession();
     ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
 
@@ -355,7 +360,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
     LOG.debug("Creating new UI session....");
     IUiSession uiSession = BEANS.get(IUiSession.class);
-    uiSession.init(req, resp, new JsonStartupRequest(jsonReq));
+    uiSession.init(req, resp, jsonStartupReq);
     sessionStore.registerUiSession(uiSession);
 
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
@@ -383,6 +388,17 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
     // valid
     return true;
+  }
+
+  protected boolean validateVersion(JsonStartupRequest jsonStartupRequest, HttpServletResponse resp) throws IOException {
+    String requestVersion = jsonStartupRequest.getVersion();
+    String applicationVersion = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
+    if (requestVersion != null && !requestVersion.equals(applicationVersion)) {
+      LOG.info("Requested UI version '{}' does not match the actual version '{}'", requestVersion, applicationVersion);
+      writeJsonResponse(resp, m_jsonRequestHelper.createVersionMismatchResponse());
+      return false;
+    }
+    return true; // valid
   }
 
   /**

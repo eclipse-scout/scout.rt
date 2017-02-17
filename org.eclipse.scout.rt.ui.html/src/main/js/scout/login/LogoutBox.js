@@ -15,7 +15,7 @@ scout.inherits(scout.LogoutBox, scout.Box);
 
 scout.LogoutBox.prototype.init = function(opts) {
   var defaultOpts = {
-    loginUrl: sessionStorage.getItem('scout:loginUrl') || './',
+    loginUrl: scout.webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
     logoUrl: 'res/logo.png'
   };
   this.options = $.extend({}, defaultOpts, opts);

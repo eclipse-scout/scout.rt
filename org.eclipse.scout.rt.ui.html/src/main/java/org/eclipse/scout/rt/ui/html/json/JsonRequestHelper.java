@@ -90,6 +90,16 @@ public class JsonRequestHelper {
   }
 
   /**
+   * @return {@link JSONObject} to indicate that the UI is running with an older version of the code and the page has to
+   *         be reloaded.
+   */
+  public JSONObject createVersionMismatchResponse() {
+    final JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_VERSION_MISMATCH, "Version mismatch");
+    return response.toJson();
+  }
+
+  /**
    * @return {@link JSONObject} to respond to a ping request.
    */
   public JSONObject createPingResponse() {
