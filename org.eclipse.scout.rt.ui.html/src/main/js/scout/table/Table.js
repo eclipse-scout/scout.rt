@@ -572,7 +572,7 @@ scout.Table.prototype._cellTooltipText = function($cell) {
  * Show cell tooltip only if it is not possible to resize the column
  */
 scout.Table.prototype._isTruncatedCellTooltipEnabled = function(column) {
-  return !this.headerVisible || column.fixedWidth;
+  return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
 };
 
 scout.Table.prototype.reload = function() {
