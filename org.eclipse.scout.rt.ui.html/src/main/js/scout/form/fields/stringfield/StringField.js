@@ -215,6 +215,16 @@ scout.StringField.prototype._renderDisplayText = function() {
   }
 };
 
+/**
+ * Overridden to enable inserting the same text multiple times (removed equals check as compared to setProperty)
+ */
+scout.StringField.prototype.setInsertText = function(insertText) {
+  this._setProperty('insertText', insertText);
+  if (this.rendered) {
+    this._renderInsertText();
+  }
+};
+
 // Not called in _renderProperties() because this is not really a property (more like an event)
 scout.StringField.prototype._renderInsertText = function() {
   if (!this.insertText) {
