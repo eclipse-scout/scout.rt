@@ -219,7 +219,7 @@ public final class MailUtility {
     return text;
   }
 
-  public static Part getHtmlPart(List<Part> bodyParts) {
+  public static Part getHtmlPart(List<? extends Part> bodyParts) {
     for (Part p : bodyParts) {
       try {
         if (p != null && p.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
