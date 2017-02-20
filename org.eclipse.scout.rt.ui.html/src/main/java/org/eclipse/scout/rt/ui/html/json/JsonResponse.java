@@ -53,7 +53,6 @@ public class JsonResponse {
   private volatile boolean m_error;
   private volatile int m_errorCode;
   private volatile String m_errorMessage;
-  private volatile boolean m_combined;
 
   private volatile boolean m_toJsonInProgress;
   private volatile boolean m_processingBufferedEvents;
@@ -301,11 +300,8 @@ public class JsonResponse {
 
       json.put(PROP_SEQUENCE, m_sequenceNo);
       json.put(PROP_STARTUP_DATA, m_startupData);
-      if (m_combined) {
-        json.put(PROP_COMBINED, true);
-      }
-      json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
+      json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       if (m_error) {
         // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the hard coded string
         // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.JSON_SESSION_TIMEOUT_RESPONSE
@@ -449,11 +445,5 @@ public class JsonResponse {
     }
     sb.append("]");
     return sb.toString();
-  }
-
-  public void combine(JsonResponse response) {
-    m_combined = true;
-    m_adapterMap.putAll(response.m_adapterMap);
-    m_eventList.addAll(response.m_eventList);
   }
 }
