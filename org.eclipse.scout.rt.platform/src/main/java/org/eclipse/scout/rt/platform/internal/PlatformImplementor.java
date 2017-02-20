@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -182,17 +183,18 @@ public class PlatformImplementor implements IPlatform {
   protected void validateConfiguration() {
     if (!ConfigUtility.isInitialized()) {
       LOG.info("No {} found. Running with empty configuration.", ConfigUtility.CONFIG_FILE_NAME);
+      return;
     }
-    int errorCount = 0;
-    List<IConfigurationValidator> validators = BEANS.all(IConfigurationValidator.class);
+    final List<IConfigurationValidator> validators = BEANS.all(IConfigurationValidator.class);
+    final List<String> invalidProperties = new ArrayList<>();
     for (Entry<String, String> config : ConfigUtility.getAllEntries().entrySet()) {
       if (!isConfigEntryValid(validators, config)) {
-        errorCount++;
+        invalidProperties.add(config.getKey());
         LOG.error("Config property with key '{}' does not exist or has an invalid value.", config.getKey());
       }
     }
-    if (errorCount > 0) {
-      throw new PlatformException("Cannot start platform due to " + errorCount + " invalid config properties");
+    if (!invalidProperties.isEmpty()) {
+      throw new PlatformException("Cannot start platform due to {} invalid config properties: {}", invalidProperties.size(), invalidProperties);
     }
   }
 
