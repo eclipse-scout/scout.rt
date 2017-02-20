@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.awt.GraphicsEnvironment;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -187,18 +188,18 @@ public class PlatformImplementor implements IPlatform {
       LOG.info("No {} found. Running with empty configuration.", ConfigUtility.CONFIG_FILE_NAME);
     }
 
-    int errorCount = 0;
+    final List<String> invalidProperties = new ArrayList<>();
     for (IConfigProperty prop : BEANS.all(IConfigProperty.class)) {
       try {
         prop.getValue();
       }
       catch (Exception ex) {
-        errorCount++;
+        invalidProperties.add(prop.getKey());
         LOG.error("Failed reading config property '{}'", prop.getKey(), ex);
       }
     }
-    if (errorCount > 0) {
-      throw new PlatformException("Cannot start platform due to " + errorCount + " invalid config properties");
+    if (!invalidProperties.isEmpty()) {
+      throw new PlatformException("Cannot start platform due to {} invalid config properties: {}", invalidProperties.size(), invalidProperties);
     }
   }
 
