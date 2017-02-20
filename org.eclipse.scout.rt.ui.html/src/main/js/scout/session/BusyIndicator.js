@@ -46,8 +46,7 @@ scout.BusyIndicator.prototype._init = function(model) {
 };
 
 scout.BusyIndicator.prototype._render = function($parent) {
-  $parent = $parent || this.session.$entryPoint;
-  this.$parent = $parent;
+  this.$parent = this.$parent || $parent || this.entryPoint();
 
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);

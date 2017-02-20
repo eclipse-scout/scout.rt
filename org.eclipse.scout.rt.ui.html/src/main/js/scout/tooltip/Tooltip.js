@@ -41,7 +41,7 @@ scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  this.$parent = this.$parent || (this.$anchor && this.session.$entryPoint);
+  this.$parent = this.$parent || this.entryPoint(this.$anchor);
 
   this.$container = this.$parent
     .appendDiv('tooltip')
@@ -95,7 +95,7 @@ scout.Tooltip.prototype._postRender = function() {
 
   // if the anchor to which the tooltip is added isn't attached (i.e. tabItem not being displayed) store the tooltip in the DetachHelper's storage for later retrieval
   if (this.$anchor && !this.$anchor.isAttached()) {
-    this.session.detachHelper.storeTooltip(this.$anchor.attachParent(), this);
+    this.session.detachHelper.storeTooltip(this.$anchor.getDetachRoot(), this);
     return;
   }
   this.position();

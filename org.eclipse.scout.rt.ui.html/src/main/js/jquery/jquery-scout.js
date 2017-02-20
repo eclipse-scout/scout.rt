@@ -716,17 +716,14 @@ $.fn.isAttached = function() {
   return $.contains(this.document(true).documentElement, this[0]);
 };
 
-$.fn.attachParent = function() {
-  var $elem = this;
-  while ($elem.length > 0) {
-    if ($elem.parent().length === 0) {
-      return $elem;
-    }
-    $elem = $elem.parent();
-  }
-  return $();
+/**
+ * Returns the last element of the list from this element to the root.
+ * Normally, this is the documents "html" element, but if the element is
+ * currently not attached, the root of the detached subtree is returned.
+ */
+$.fn.getDetachRoot = function() {
+  return this.parents().last();
 };
-
 
 /**
  * Returns the first parent which is scrollable
