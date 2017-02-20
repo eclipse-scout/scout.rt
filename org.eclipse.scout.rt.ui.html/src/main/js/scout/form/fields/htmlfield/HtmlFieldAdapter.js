@@ -13,6 +13,17 @@ scout.HtmlFieldAdapter = function() {
 };
 scout.inherits(scout.HtmlFieldAdapter, scout.ValueFieldAdapter);
 
+scout.HtmlFieldAdapter.prototype._initProperties = function(model) {
+  if (model.scrollToEnd !== undefined) {
+    // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)
+    delete model.scrollToEnd;
+  }
+};
+
+scout.HtmlFieldAdapter.prototype._syncScrollToEnd = function() {
+  this.widget.scrollToEnd();
+};
+
 scout.HtmlFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {
   this._send('appLinkAction', {
     ref: event.ref

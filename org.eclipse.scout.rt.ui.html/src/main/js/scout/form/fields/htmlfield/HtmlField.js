@@ -36,7 +36,12 @@ scout.HtmlField.prototype._renderProperties = function() {
   scout.HtmlField.parent.prototype._renderProperties.call(this);
 
   this._renderScrollBarEnabled();
-  this._renderScrollToAnchor(this.scrollToAnchor);
+  this._renderScrollToAnchor();
+};
+
+scout.HtmlField.prototype._remove = function() {
+  scout.scrollbars.uninstall(this.$field, this.session);
+  scout.HtmlField.parent.prototype._remove.call(this);
 };
 
 scout.HtmlField.prototype._readDisplayText = function() {
@@ -75,9 +80,8 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   this.invalidateLayoutTree();
 };
 
-scout.HtmlField.prototype._remove = function() {
-  scout.scrollbars.uninstall(this.$field, this.session);
-  scout.HtmlField.parent.prototype._remove.call(this);
+scout.HtmlField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
+  this.setProperty('scrollBarEnabled', scrollBarEnabled);
 };
 
 scout.HtmlField.prototype._renderScrollBarEnabled = function() {
@@ -90,14 +94,22 @@ scout.HtmlField.prototype._renderScrollBarEnabled = function() {
   }
 };
 
-// Not called in _renderProperties() because this is not really a property (more like an event)
-scout.HtmlField.prototype._renderScrollToEnd = function() {
+scout.HtmlField.prototype.scrollToEnd = function() {
+  if (!this.rendered) {
+    this.session.layoutValidator.schedulePostValidateFunction(this.scrollToEnd.bind(this));
+    return;
+  }
   if (this.scrollBarEnabled) {
     scout.scrollbars.scrollToBottom(this.$fieldContainer);
   }
 };
 
-scout.HtmlField.prototype._renderScrollToAnchor = function(anchor) {
+scout.HtmlField.prototype._renderScrollToAnchor = function() {
+  if (!this.rendered) {
+    this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollToAnchor.bind(this));
+    return;
+  }
+  var anchor = this.scrollToAnchor;
   if (this.scrollBarEnabled && anchor && this.$field.find(anchor)) {
     var anchorElem = this.$field.find('#'.concat(anchor));
     if (anchorElem && anchorElem.length > 0) {
