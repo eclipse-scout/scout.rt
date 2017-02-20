@@ -87,6 +87,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +124,7 @@ public class UiSession implements IUiSession {
   /**
    * Synchronized map. When iterating over the map, synchronize on the map object
    */
-  private final SortedMap<Long, JsonResponse> m_responseHistory = Collections.synchronizedSortedMap(new TreeMap<Long, JsonResponse>());
+  private final SortedMap<Long, JSONObject> m_responseHistory = Collections.synchronizedSortedMap(new TreeMap<Long, JSONObject>());
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private final HttpContext m_httpContext = new HttpContext();
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
@@ -703,6 +704,9 @@ public class UiSession implements IUiSession {
    * cleaned up later) and is run as a model job.
    */
   protected JSONObject responseToJsonInternal() {
+    // Convert response to JSON (must be done in model thread due to potential model access inside the toJson() method).
+    final JSONObject json = m_currentJsonResponse.toJson();
+
     // Remember response in history
     if (m_currentJsonResponse.getSequenceNo() != null) {
       synchronized (m_responseHistory) {
@@ -712,13 +716,11 @@ public class UiSession implements IUiSession {
           LOG.warn("Max. response history size exceeded for UI session {}, dropping oldest response #{}", m_uiSessionId, oldestSeqNo);
           m_responseHistory.remove(oldestSeqNo);
         }
-        m_responseHistory.put(m_currentJsonResponse.getSequenceNo(), m_currentJsonResponse);
+        m_responseHistory.put(m_currentJsonResponse.getSequenceNo(), json);
         LOG.debug("Added response #{} to history {} for UI session {}", m_currentJsonResponse.getSequenceNo(), m_responseHistory.keySet(), m_uiSessionId);
       }
     }
-
-    // Convert response to JSON (must be done in model thread due to potential model access inside the toJson() method).
-    return m_currentJsonResponse.toJson();
+    return json;
   }
 
   /**
@@ -818,12 +820,34 @@ public class UiSession implements IUiSession {
       if (m_responseHistory.isEmpty()) {
         return null;
       }
+
       Long lastSentSequenceNo = m_responseHistory.lastKey();
-      JsonResponse combinedResponse = new JsonResponse(lastSentSequenceNo);
-      for (JsonResponse response : m_responseHistory.values()) {
-        combinedResponse.combine(response);
+      JSONObject combinedAdapterData = new JSONObject();
+      JSONArray combinedEvents = new JSONArray();
+      for (JSONObject response : m_responseHistory.values()) {
+        // combine adapterData
+        JSONObject adapterData = response.optJSONObject(JsonResponse.PROP_ADAPTER_DATA);
+        if (adapterData != null) {
+          for (String key : adapterData.keySet()) {
+            combinedAdapterData.put(key, adapterData.get(key));
+          }
+        }
+
+        // combine events
+        JSONArray events = response.optJSONArray(JsonResponse.PROP_EVENTS);
+        if (events != null) {
+          for (int i = 0; i < events.length(); i++) {
+            combinedEvents.put(events.get(i));
+          }
+        }
       }
-      return combinedResponse.toJson();
+
+      JSONObject combinedResponse = new JSONObject();
+      combinedResponse.put(JsonResponse.PROP_SEQUENCE, lastSentSequenceNo);
+      combinedResponse.put(JsonResponse.PROP_COMBINED, true);
+      combinedResponse.put(JsonResponse.PROP_ADAPTER_DATA, (combinedAdapterData.length() == 0 ? null : combinedAdapterData));
+      combinedResponse.put(JsonResponse.PROP_EVENTS, (combinedEvents.length() == 0 ? null : combinedEvents));
+      return combinedResponse;
     }
   }
 
