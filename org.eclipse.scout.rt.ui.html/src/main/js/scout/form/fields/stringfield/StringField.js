@@ -215,25 +215,25 @@ scout.StringField.prototype._renderDisplayText = function() {
   }
 };
 
-/**
- * Overridden to enable inserting the same text multiple times (removed equals check as compared to setProperty)
- */
-scout.StringField.prototype.setInsertText = function(insertText) {
-  this._setProperty('insertText', insertText);
-  if (this.rendered) {
-    this._renderInsertText();
+scout.StringField.prototype.insertText = function(text) {
+  if (!this.rendered) {
+    this._postRenderActions.push(this.insertText.bind(this, text));
+    return;
   }
+  this.trigger('insertText', {
+    text: text
+  });
+  this._insertText(text);
 };
 
-// Not called in _renderProperties() because this is not really a property (more like an event)
-scout.StringField.prototype._renderInsertText = function() {
-  if (!this.insertText) {
+scout.StringField.prototype._insertText = function(textToInsert) {
+  if (!textToInsert) {
     return;
   }
   var text = this.$field.val();
 
   // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
-  if (this.insertText.length + text.length > this.maxLength) {
+  if (textToInsert.length + text.length > this.maxLength) {
     scout.create('DesktopNotification', {
       parent: this,
       severity: scout.Status.Severity.WARNING,
@@ -243,10 +243,10 @@ scout.StringField.prototype._renderInsertText = function() {
   }
 
   var selection = this._getSelection();
-  text = text.slice(0, selection.start) + this.insertText + text.slice(selection.end);
+  text = text.slice(0, selection.start) + textToInsert + text.slice(selection.end);
   this.$field.val(text);
 
-  this._setSelection(selection.start + this.insertText.length);
+  this._setSelection(selection.start + textToInsert.length);
 
   // Make sure display text gets sent (necessary if field does not have the focus)
   if (this.updateDisplayTextOnModify) {

@@ -59,46 +59,46 @@ describe("StringField", function() {
 
     it("inserts text into an empty field", function() {
       field.render(session.$entryPoint);
-      field.setProperty('insertText', 'Test1');
+      field.insertText('Test1');
       expect(field.$field[0].value).toBe('Test1');
     });
 
     it("appends text to the previous value (if no text is selected)", function() {
       field.render(session.$entryPoint);
-      field.setProperty('insertText', 'Test1');
-      field.setProperty('insertText', 'ABC2');
+      field.insertText('Test1');
+      field.insertText('ABC2');
       expect(field.$field[0].value).toBe('Test1ABC2');
     });
 
     it("replaces selection #1 (if part of the text is selected, selection does not start at the beginning)", function() {
       field.render(session.$entryPoint);
-      field.setProperty('insertText', 'Test1');
+      field.insertText('Test1');
       field.$field[0].selectionStart = 2;
       field.$field[0].selectionEnd = 4;
-      field.setProperty('insertText', 'sten2');
+      field.insertText('sten2');
       expect(field.$field[0].value).toBe('Testen21');
     });
 
     it("replaces selection #2 (if part of the text is selected, start at the beginning)", function() {
       field.render(session.$entryPoint);
-      field.setProperty('insertText', 'Test1');
+      field.insertText('Test1');
       field.$field[0].selectionStart = 0;
       field.$field[0].selectionEnd = 4;
-      field.setProperty('insertText', 'ABC2');
+      field.insertText('ABC2');
       expect(field.$field[0].value).toBe('ABC21');
     });
 
     it("replaces selection #3 (if whole content is selected)", function() {
       field.render(session.$entryPoint);
-      field.setProperty('insertText', 'Test1');
+      field.insertText('Test1');
       field.$field[0].select();
-      field.setProperty('insertText', 'ABC2');
+      field.insertText('ABC2');
       expect(field.$field[0].value).toBe('ABC2');
     });
 
     it("sends display text changed to server using accept text", function() {
       field.render(session.$entryPoint);
-      field.setProperty('insertText', 'Test1');
+      field.insertText('Test1');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
       var event = new scout.Event(field.id, 'displayTextChanged', {
@@ -108,7 +108,7 @@ describe("StringField", function() {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
-      field.setProperty('insertText', 'ABC2');
+      field.insertText('ABC2');
       expect(field.$field[0].value).toBe('Test1ABC2');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);

@@ -13,6 +13,17 @@ scout.StringFieldAdapter = function() {
 };
 scout.inherits(scout.StringFieldAdapter, scout.BasicFieldAdapter);
 
+scout.StringFieldAdapter.prototype._initProperties = function(model) {
+  if (model.insertText !== undefined) {
+    // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
+    delete model.insertText;
+  }
+};
+
+scout.StringFieldAdapter.prototype._syncInsertText = function(insertText) {
+  this.widget.insertText(insertText);
+};
+
 scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
   // send delayed to avoid a lot of requests while selecting
   // coalesce: only send the latest selection changed event for a field
