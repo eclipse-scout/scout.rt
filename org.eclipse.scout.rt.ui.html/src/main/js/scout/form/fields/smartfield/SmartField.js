@@ -590,7 +590,7 @@ scout.SmartField.prototype.openPopup = function() {
   this.popup = this.createPopup();
   this.popup.open();
   this.popup.on('remove', function() {
-    this._sendCancelProposal();
+    this._acceptProposal(true);
     this.popup = null;
   }.bind(this));
   if (this.touch) {
