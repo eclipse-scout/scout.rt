@@ -385,4 +385,13 @@ public abstract class AbstractSeleniumTest {
     Actions actions = new Actions(getDriver());
     actions.moveToElement(element).doubleClick().perform();
   }
+
+  /**
+   * @param element
+   * @return the parent element of the given element (by using findElement and xpath '..')
+   */
+  public WebElement findParentElement(WebElement element) {
+    return element.findElement(By.xpath(".."));
+  }
+
 }

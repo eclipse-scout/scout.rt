@@ -98,6 +98,17 @@ public final class SeleniumUtil {
     return By.xpath(element);
   }
 
+  /**
+   * Returns an XPath selector that matches a tree node element has exactly the given text. Since the XPath query
+   * matches the SPAN element, you should request the parent element to get to the tree node.
+   *
+   * @param text
+   * @return The SPAN element which contains the given text.
+   */
+  public static By byTreeNodeWithText(String text) {
+    return By.xpath("//div[contains(@class, 'tree-node')]/span[text()='" + text + "']");
+  }
+
   public static WebElement getParent(WebElement e) {
     return e.findElement(By.xpath(".."));
   }
