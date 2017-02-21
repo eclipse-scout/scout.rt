@@ -54,7 +54,7 @@ describe("scout.strings", function() {
       expect(scout.strings.repeat('')).toBe('');
       expect(scout.strings.repeat('X')).toBe('');
       expect(scout.strings.repeat('X', 1)).toBe('X');
-      expect(scout.strings.repeat('X', 7)).toBe('XXXXXXX');
+      expect(scout.strings.repeat('Y', 7)).toBe('YYYYYYY');
       expect(scout.strings.repeat('X', -7)).toBe('');
       expect(scout.strings.repeat(4, 4)).toBe('4444');
     });

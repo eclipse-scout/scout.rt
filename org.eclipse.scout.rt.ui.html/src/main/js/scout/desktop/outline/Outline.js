@@ -325,7 +325,7 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
     }
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, debounceSend);
-  // FIXME XXX hier wurde früher noch updateDetailContent (nochmals) aufgerufen, das ist aber unnötig
+  // FIXME awe hier wurde früher noch updateDetailContent (nochmals) aufgerufen, das ist aber unnötig
   // da dies schon als folge vom nodesSelectedInternal passiert. Allerdings hatte es auch den neben
   // effekt dass attachDetailsMenuListener nochmals ausgeführt wurde und so das "versehentliche" entfernen
   // vom changeListener behoben hat

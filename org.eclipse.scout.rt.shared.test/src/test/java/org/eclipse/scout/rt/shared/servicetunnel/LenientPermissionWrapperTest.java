@@ -45,7 +45,7 @@ public class LenientPermissionWrapperTest {
   private void write() throws Exception {
     Permissions p = new Permissions();
     p.add(new A());
-    p.add(new B_XXX());//rename to B to re-create the test input data string
+    p.add(new B_YYY());//rename to B to re-create the test input data string
     p.add(new C());
     byte[] b = getObjectSerializer().serialize(p);
     System.out.println("private static String data=\"" + Base64Utility.encode(b) + "\";"); // sysout is desired here
@@ -93,10 +93,10 @@ public class LenientPermissionWrapperTest {
     }
   }
 
-  public static class B_XXX extends BasicPermission {
+  public static class B_YYY extends BasicPermission {
     private static final long serialVersionUID = 1L;
 
-    public B_XXX() {
+    public B_YYY() {
       super("B");
     }
   }

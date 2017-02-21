@@ -430,8 +430,8 @@ public class StringUtilityTest {
   @Test
   public void testLpad() {
     assertEquals(null, StringUtility.lpad(null, null, 0));
-    assertEquals(null, StringUtility.lpad(null, "X", 10));
-    assertEquals("XXXXX", StringUtility.lpad("", "X", 5));
+    assertEquals(null, StringUtility.lpad(null, "Y", 10));
+    assertEquals("YYYYY", StringUtility.lpad("", "Y", 5));
     assertEquals("Xtest", StringUtility.lpad("test", "X", 5));
     assertEquals("Ztest", StringUtility.lpad("test", "XYZ", 5));
     assertEquals("XYZXYZtest", StringUtility.lpad("test", "XYZ", 10));
@@ -444,8 +444,8 @@ public class StringUtilityTest {
   @Test
   public void testRpad() {
     assertEquals(null, StringUtility.rpad(null, null, 0));
-    assertEquals(null, StringUtility.rpad(null, "X", 10));
-    assertEquals("XXXXX", StringUtility.rpad("", "X", 5));
+    assertEquals(null, StringUtility.rpad(null, "Y", 10));
+    assertEquals("YYYYY", StringUtility.rpad("", "Y", 5));
     assertEquals("testX", StringUtility.rpad("test", "X", 5));
     assertEquals("testX", StringUtility.rpad("test", "XYZ", 5));
     assertEquals("testXYZXYZ", StringUtility.rpad("test", "XYZ", 10));

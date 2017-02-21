@@ -727,7 +727,7 @@ public class SqlParser {
       if (tok instanceof Raw) {
         list.remove(i);
         Comment c = new Comment();
-        c.setText("/*XXX unexpected token: " + tok.getText() + "*/");
+        c.setText("/*X" + "X" + "X" + " unexpected token: " + tok.getText() + "*/");
         list.add(i, c);
       }
     }

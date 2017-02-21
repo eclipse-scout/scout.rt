@@ -899,8 +899,6 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
   }
 
-  //XXXXXXXXXXXXXXXXXXXXXXX
-
   @Order(10)
   @ClassId("83ead684-0cb1-43b3-8545-7815db2facb3")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
