@@ -10,16 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.util.Collections;
-import java.util.Enumeration;
-
 /**
  * <h3>{@link PlatformOverrideClassLoader}</h3>
  * <p>
@@ -33,9 +23,7 @@ import java.util.Enumeration;
  *
  * @author imo
  */
-public class PlatformOverrideClassLoader extends ClassLoader {
-  private static final String PLATFORM_SERVICE_NAME = "META-INF/services/" + IPlatform.class.getName();
-  private final Class<?> m_platformOverrideClass;
+public class PlatformOverrideClassLoader extends ServiceLoaderClassLoaderMock {
 
   /**
    * @param parent
@@ -43,44 +31,7 @@ public class PlatformOverrideClassLoader extends ClassLoader {
    * @param platformOverrideClass
    *          the {@link IPlatform} class to be used in {@link Platform#get()}
    */
-  public PlatformOverrideClassLoader(ClassLoader parent, Class<?> platformOverrideClass) {
-    super(parent);
-    m_platformOverrideClass = platformOverrideClass;
+  public PlatformOverrideClassLoader(ClassLoader parent, Class<? extends IPlatform> platformOverrideClass) {
+    super(parent, IPlatform.class, platformOverrideClass);
   }
-
-  @Override
-  public Enumeration<URL> getResources(String name) throws IOException {
-    if (PLATFORM_SERVICE_NAME.equals(name)) {
-      try {
-        return Collections.enumeration(Collections.singleton(new URL(null, "mock:///" + name, new MockHandler())));
-      }
-      catch (MalformedURLException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return super.getResources(name);
-  }
-
-  private class MockHandler extends URLStreamHandler {
-    @Override
-    protected URLConnection openConnection(URL u) throws IOException {
-      return new MockUrlConnection(u);
-    }
-  }
-
-  private class MockUrlConnection extends URLConnection {
-    public MockUrlConnection(URL url) {
-      super(url);
-    }
-
-    @Override
-    public void connect() throws IOException {
-    }
-
-    @Override
-    public InputStream getInputStream() throws IOException {
-      return new ByteArrayInputStream(m_platformOverrideClass.getName().getBytes());
-    }
-  }
-
 }

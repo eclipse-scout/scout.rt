@@ -10,22 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +43,10 @@ import org.slf4j.LoggerFactory;
  * It can also be specified by setting a system property that contains an {@link URL} pointing to the actual properties
  * file.
  * <p>
- * The following formats are supported:
+ * Support for encoding/decoding, encryption/decryption of the content or parts of the content of these config files is
+ * provided using a {@link ServiceLoader} of type {@link IConfigFileLoader}.
+ * <p>
+ * The following property formats are supported:
  * <ul>
  * <li>Simple Key-Value pairs:<br>
  * <code>scout.sample.mykey=sample-value</code><br>
@@ -131,7 +133,6 @@ public class PropertiesHelper {
   protected PropertiesHelper(URL propertiesFileUrl, Set<String> importsToIgnore /* for loop detection */) {
     m_configProperties = new HashMap<>();
     if (propertiesFileUrl != null) {
-      LOG.info("Reading properties from {}", propertiesFileUrl);
       parse(propertiesFileUrl);
       Pattern pat = Pattern.compile(PLACEHOLDER_PATTERN);
       importAll(importsToIgnore, pat);
@@ -947,6 +948,18 @@ public class PropertiesHelper {
   }
 
   protected void parse(URL propertiesFileUrl) {
+    ServiceLoader<IConfigFileLoader> services = ServiceLoader.load(IConfigFileLoader.class);
+    IConfigFileLoader loader = null;
+    for (Iterator<IConfigFileLoader> it = services.iterator(); it.hasNext();) {
+      loader = it.next();
+      if (loader != null) {
+        break;
+      }
+    }
+    if (loader == null) {
+      loader = new DefaultConfigFileLoader();
+    }
+
     Properties props = new Properties() {
       private static final long serialVersionUID = 1L;
 
@@ -960,12 +973,8 @@ public class PropertiesHelper {
       }
     };
 
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(propertiesFileUrl.openStream(), StandardCharsets.ISO_8859_1 /* according to .properties file spec */))) {
-      props.load(in);
-    }
-    catch (Exception t) {
-      throw new IllegalArgumentException("Unable to parse properties file from url '" + propertiesFileUrl.toExternalForm() + "'.", t);
-    }
+    LOG.info("Reading properties from {} using {}", propertiesFileUrl, loader.getClass().getName());
+    loader.load(propertiesFileUrl, props);
 
     for (Entry<Object, Object> entry : props.entrySet()) {
       String key = (String) entry.getKey();
