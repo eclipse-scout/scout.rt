@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
@@ -128,7 +129,9 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> {
     if (!(parent instanceof IJsonContextMenuOwner)) {
       throw new IllegalStateException("Parent is not a context menu owner, context menu changed event cannot be handled. Parent: " + parent);
     }
-    ((IJsonContextMenuOwner) parent).handleModelContextMenuChanged(menuAdapters);
+    @SuppressWarnings("unchecked")
+    FilteredJsonAdapterIds<?> filteredAdapters = new FilteredJsonAdapterIds(menuAdapters, getFilter());
+    ((IJsonContextMenuOwner) parent).handleModelContextMenuChanged(filteredAdapters);
   }
 
   protected class P_ContextMenuListener implements ContextMenuListener {

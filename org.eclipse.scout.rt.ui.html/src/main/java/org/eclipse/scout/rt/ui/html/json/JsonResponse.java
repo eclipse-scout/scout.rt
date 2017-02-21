@@ -50,7 +50,7 @@ public class JsonResponse {
   private final Long m_sequenceNo;
   private final Map<String/*adapterId*/, IJsonAdapter<?>> m_adapterMap;
   private final List<JsonEvent> m_eventList;
-  private final Map<String/*adapterId*/, JsonEvent> m_idToPropertyChangeEventMap; // helper map to ensure max. 1 event per adapter
+  private final Map<String/*adapterId*/, JsonPropertyChangeEvent> m_idToPropertyChangeEventMap; // helper map to ensure max. 1 event per adapter
   private final Set<IJsonAdapter<?>> m_bufferedEventsAdapters;
   private volatile JSONObject m_startupData = null;
   private volatile boolean m_error;
@@ -104,20 +104,15 @@ public class JsonResponse {
     assertWritable();
 
     // coalesce
-    JsonEvent event = m_idToPropertyChangeEventMap.get(id);
+    JsonPropertyChangeEvent event = m_idToPropertyChangeEventMap.get(id);
     if (event == null) {
-      event = new JsonEvent(id, JsonEventType.PROPERTY.getEventType(), null);
+      event = new JsonPropertyChangeEvent(id);
       m_eventList.add(event);
       m_idToPropertyChangeEventMap.put(id, event);
     }
 
-    JSONObject props = event.getData().optJSONObject("properties");
-    if (props == null) {
-      props = new JSONObject();
-      event.getData().put("properties", props);
-    }
-    // Add special NULL object for null values to preserve them in the resulting JSON string
-    props.put(propertyName, (newValue == null ? JSONObject.NULL : newValue));
+    // put property
+    event.getProperties().put(propertyName, newValue);
     return event;
   }
 
@@ -180,22 +175,12 @@ public class JsonResponse {
   public boolean containsPropertyChangeEvent(String id, String propertyName) {
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
-      if (JsonEventType.PROPERTY.getEventType().matches(event.getType()) &&
-          event.getTarget().equals(id) &&
-          containsPropertyName(event, propertyName)) {
+      if (event.getTarget().equals(id) && event instanceof JsonPropertyChangeEvent &&
+          ((JsonPropertyChangeEvent) event).getProperties().containsKey(propertyName)) {
         return true;
       }
     }
     return false;
-  }
-
-  protected boolean containsPropertyName(JsonEvent event, String propertyName) {
-    JSONObject data = event.getData();
-    JSONObject properties = data.getJSONObject("properties");
-    if (properties == null) {
-      return false;
-    }
-    return properties.has(propertyName);
   }
 
   /**
@@ -346,7 +331,7 @@ public class JsonResponse {
     JSONObject json = new JSONObject();
     json.put(PROP_SEQUENCE, m_sequenceNo);
     json.put(PROP_STARTUP_DATA, m_startupData);
-      json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
+    json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
     json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
     if (m_error) {
       // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the hard coded string

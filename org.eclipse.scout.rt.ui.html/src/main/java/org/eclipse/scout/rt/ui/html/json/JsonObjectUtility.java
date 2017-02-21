@@ -116,15 +116,12 @@ public final class JsonObjectUtility {
     }
   }
 
-  public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
-    if (adapters == null) {
-      return null;
-    }
-    JSONArray array = new JSONArray();
-    for (IJsonAdapter<?> adapter : adapters) {
-      array.put(adapter.getId());
-    }
-    return array;
+  /**
+   * @deprecated use {@link JsonAdapterUtility#adapterIdsToJson(Collection)} instead. Will be removed in P-release.
+   */
+  @Deprecated
+  public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters) {
+    return JsonAdapterUtility.adapterIdsToJson(adapters);
   }
 
   /**

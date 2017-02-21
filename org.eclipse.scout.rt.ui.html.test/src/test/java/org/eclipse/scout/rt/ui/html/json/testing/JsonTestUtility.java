@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.testing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,14 +24,16 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonPropertyChangeEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
@@ -98,33 +101,56 @@ public final class JsonTestUtility {
     response.fireProcessBufferedEvents();
     List<JsonEvent> list = new ArrayList<>();
     for (JsonEvent event : response.getEventList()) {
-      if ((eventType == null || event.getType().equals(eventType))
-          && (adapterId == null || adapterId.equals(event.getTarget()))) {
+      if ((eventType == null || event.getType().equals(eventType)) &&
+          (adapterId == null || event.getTarget().equals(adapterId))) {
         list.add(event);
       }
     }
     return list;
   }
 
+  /**
+   * @param eventType
+   *          Optional. If set only events with the given type will be returned.
+   */
   public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
     return extractEventsFromResponse(response, eventType, null);
   }
 
-  public static List<JsonEvent> extractPropertyChangeEvents(JsonResponse response, String adapterId) throws JSONException {
-    return extractEventsFromResponse(response, JsonEventType.PROPERTY.getEventType(), adapterId);
+  /**
+   * @param adapterId
+   *          Optional. If set only events for the given id will be returned.
+   */
+  public static List<JsonPropertyChangeEvent> extractPropertyChangeEvents(JsonResponse response, String adapterId) throws JSONException {
+    List<JsonPropertyChangeEvent> result = new ArrayList<>();
+    for (JsonEvent event : extractEventsFromResponse(response, null, adapterId)) {
+      if (event instanceof JsonPropertyChangeEvent) {
+        result.add((JsonPropertyChangeEvent) event);
+      }
+    }
+    return result;
   }
 
   public static <T> T extractProperty(JsonResponse response, String adapterId, String propertyName) throws JSONException {
-    List<JsonEvent> properties = JsonTestUtility.extractPropertyChangeEvents(response, adapterId);
-    if (properties.size() > 0) {
-      return extractProperty(properties.get(0).getData(), propertyName);
+    JsonPropertyChangeEvent event = CollectionUtility.firstElement(extractPropertyChangeEvents(response, adapterId));
+    if (event == null) {
+      return null;
     }
-    return null;
+    return extractProperty(event.getProperties(), propertyName);
   }
 
   @SuppressWarnings("unchecked")
   public static <T> T extractProperty(JSONObject data, String propertyName) throws JSONException {
     return (T) data.getJSONObject("properties").get(propertyName);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T extractProperty(Map<String, Object> properties, String propertyName) throws JSONException {
+    Object value = properties.get(propertyName);
+    if (value instanceof IJsonObject) {
+      return (T) ((IJsonObject) value).toJson();
+    }
+    return (T) value;
   }
 
   public static JSONObject getAdapterData(JSONObject json, String id) throws JSONException {

@@ -19,14 +19,18 @@ import static org.junit.Assert.assertSame;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonResponseTestUtility;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
+import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild.DisplayableMenu;
@@ -153,5 +157,59 @@ public class JsonMenuTest {
     json = m_uiSession.currentJsonResponse().toJson();
     assertFalse(json.has("adapterData"));
     assertEquals(1, json.getJSONArray("events").length());
+  }
+
+  /**
+   * Even more special case: Menus that are set to visibleGranted=false may already be referred in an event for another
+   * (still available) adapter.
+   */
+  @Test
+  public void testDontSendNonDisplayableMenusSpecialCaseWithEvent() throws Exception {
+    JsonTestUtility.endRequest(m_uiSession); // skip startup response
+
+    IForm form = new FormWithOneField();
+    IMenu menu = new AbstractMenu() {
+      @Override
+      protected void execInitAction() {
+        setVisibleGranted(false);
+      }
+    };
+    IJsonAdapter<?> jsonForm = m_uiSession.createJsonAdapter(form, null);
+    IJsonAdapter<?> jsonRootGroupBox = jsonForm.getAdapter(form.getRootGroupBox());
+    // Test:
+    // 3 adapters in response: Form, MainBox, StringField
+    // 0 events in response
+    assertEquals(3, JsonResponseTestUtility.adapterMap(m_uiSession.currentJsonResponse()).size());
+    assertEquals(0, JsonResponseTestUtility.eventList(m_uiSession.currentJsonResponse()).size());
+
+    // ------------------
+    // End request and simulate context menu change event on form
+    JsonTestUtility.endRequest(m_uiSession);
+    form.getRootGroupBox().getContextMenu().addChildAction(menu);
+
+    // Test:
+    // 1 adapters in response: Menu
+    // 1 events in response: PROP_MENU
+    assertEquals(1, JsonResponseTestUtility.adapterMap(m_uiSession.currentJsonResponse()).size());
+    assertEquals(1, JsonResponseTestUtility.eventList(m_uiSession.currentJsonResponse()).size());
+
+    // ------------------
+    // After attachment of adapter!
+    ActionUtility.initActions(CollectionUtility.arrayList(menu));
+
+    // Test:
+    // - 0 adapters in response (-1 menu)
+    // - 1 events in response: PROP_MENU <-- this would be wrong! But when the JSON string is generated, the adapter is removed from the list
+    assertEquals(0, JsonResponseTestUtility.adapterMap(m_uiSession.currentJsonResponse()).size());
+    assertEquals(1, JsonResponseTestUtility.eventList(m_uiSession.currentJsonResponse()).size());
+
+    // Check that the event's properties are empty after toJson()
+    JSONObject json = m_uiSession.currentJsonResponse().toJson();
+    assertFalse(json.has("adapterData"));
+    JSONArray events = json.getJSONArray("events");
+    assertEquals(1, events.length());
+    assertEquals(jsonRootGroupBox.getId(), events.getJSONObject(0).get("target"));
+    assertEquals("property", events.getJSONObject(0).get("type"));
+    assertEquals(0, events.getJSONObject(0).getJSONObject("properties").getJSONArray("menus").length());
   }
 }

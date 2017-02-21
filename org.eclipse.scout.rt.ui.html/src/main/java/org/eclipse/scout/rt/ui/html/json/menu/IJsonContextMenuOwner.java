@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.menu;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 
 public interface IJsonContextMenuOwner {
 
@@ -20,5 +18,5 @@ public interface IJsonContextMenuOwner {
   String PROP_MENUS_VISIBLE = "menusVisible";
   String PROP_CURRENT_MENU_TYPES = "currentMenuTypes";
 
-  void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters);
+  void handleModelContextMenuChanged(FilteredJsonAdapterIds<?> filteredAdapters);
 }

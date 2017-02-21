@@ -99,12 +99,36 @@ public final class JsonAdapterUtility {
    * <p>
    * Example: StringField -> [ GroupBox, GroupBox, TabBox, GroupBox, SequenceBox, StringField ].
    */
-  static List<IFormField> getFieldHierarchy(IFormField formField) {
+  private static List<IFormField> getFieldHierarchy(IFormField formField) {
     List<IFormField> fieldHierarchy = new ArrayList<IFormField>();
     while (formField != null) {
       fieldHierarchy.add(0, formField);
       formField = formField.getParentField();
     }
     return fieldHierarchy;
+  }
+
+  /**
+   * @return a {@link JSONArray} with the IDs of the given adapters.
+   */
+  public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters) {
+    return adapterIdsToJson(adapters, null);
+  }
+
+  /**
+   * @return a {@link JSONArray} with the IDs of the given adapters that accept the given filter (or all adapters of the
+   *         filter is <code>null</code>).
+   */
+  public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters, IFilter<T> filter) {
+    if (adapters == null) {
+      return null;
+    }
+    JSONArray array = new JSONArray();
+    for (IJsonAdapter<T> adapter : adapters) {
+      if (filter == null || filter.accept(adapter.getModel())) {
+        array.put(adapter.getId());
+      }
+    }
+    return array;
   }
 }
