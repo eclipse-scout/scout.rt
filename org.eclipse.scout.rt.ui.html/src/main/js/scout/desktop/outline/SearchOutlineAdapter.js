@@ -13,6 +13,17 @@ scout.SearchOutlineAdapter = function() {
 };
 scout.inherits(scout.SearchOutlineAdapter, scout.OutlineAdapter);
 
+scout.SearchOutlineAdapter.prototype._initProperties = function(model) {
+  if (model.requestFocusQueryField !== undefined) {
+    // ignore pseudo property initially (to prevent the function SearchOutlineAdapter#requestFocusQueryField() to be replaced)
+    delete model.requestFocusQueryField;
+  }
+};
+
+scout.SearchOutlineAdapter.prototype._syncRequestFocusQueryField = function() {
+  this.widget.requestFocusQueryField();
+};
+
 scout.SearchOutlineAdapter.prototype._onWidgetSearch = function(event) {
   this._send('search', {
     query: event.query

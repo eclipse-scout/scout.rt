@@ -65,7 +65,6 @@ scout.SearchOutline.prototype._renderProperties = function() {
   scout.SearchOutline.parent.prototype._renderProperties.call(this);
   this._renderSearchQuery();
   this._renderSearchStatus();
-  this._renderRequestFocusQueryField();
 };
 
 scout.SearchOutline.prototype._renderTitle = function() {
@@ -105,7 +104,7 @@ scout.SearchOutline.prototype._renderSearchStatus = function() {
   this.$searchStatus.textOrNbsp(this.searchStatus);
 };
 
-scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
+scout.SearchOutline.prototype.requestFocusQueryField = function() {
   this.validateFocus();
 };
 
