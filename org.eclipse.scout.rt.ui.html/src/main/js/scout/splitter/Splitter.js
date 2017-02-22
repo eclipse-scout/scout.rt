@@ -109,6 +109,7 @@ scout.Splitter.prototype._onMouseDown = function(event) {
     .one('mouseup', this._onMouseUp.bind(this));
   // Ensure the correct cursor is always shown while moving
   this._$body.addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+  $('iframe').addClass('dragging-in-progress');
   this._cursorOffset = {
     left: splitterCenter.x - event.pageX,
     top: splitterCenter.y - event.pageY
@@ -153,6 +154,7 @@ scout.Splitter.prototype._onMouseUp = function(event) {
   // Remove listeners and reset cursor
   this._$window.off('mousemove.splitter');
   this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
+  $('iframe').removeClass('dragging-in-progress');
   this.trigger('moveEnd', {
     position: this.position
   });
