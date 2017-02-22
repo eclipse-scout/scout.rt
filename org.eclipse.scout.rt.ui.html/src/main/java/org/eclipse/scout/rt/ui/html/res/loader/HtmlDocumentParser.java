@@ -53,6 +53,8 @@ public class HtmlDocumentParser {
   protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL);
 
+  protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL);
+
   protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
 
   protected final HtmlDocumentParserParameters m_params;
@@ -78,6 +80,8 @@ public class HtmlDocumentParser {
     replaceMessageTags();
     replaceStylesheetTags();
     replaceScriptTags();
+
+    stripUnknownTags();
   }
 
   @SuppressWarnings("squid:S1149")
@@ -325,5 +329,17 @@ public class HtmlDocumentParser {
     // escape new-lines
     text = text.replaceAll("(\r\n|\n)", "\\\\n");
     return "'" + text + "'";
+  }
+
+  @SuppressWarnings("squid:S1149")
+  protected void stripUnknownTags() {
+    Matcher m = PATTERN_UNKNOWN_TAG.matcher(m_workingContent);
+    StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+      LOG.warn("Removing unknown or improperly formatted scout tag from '{}': {}", m_params.getHtmlPath(), m.group());
+      m.appendReplacement(sb, "");
+    }
+    m.appendTail(sb);
+    m_workingContent = sb.toString();
   }
 }

@@ -9,10 +9,11 @@
     <scout:stylesheet src="res/myapp-all-macro.css">
     <scout:script src="res/jquery-all-macro.js"          />
     <scout:script src="res/myapp-all-macro.js" />
-    <scout:script src="res/index.js" />
+    <scout:script src="res/index.js">
   </head>
   <body>
-    <scout:include template="no-script.html" />
+    <scout:invalid
+      info="this tag is not recognized by HtmlDocumentParser and should be removed"><scout:did-you-know that="1 > 0?"        ><scout:include template="no-script.html" />
     <div class="scout" data-partid="1"></div>
     <scout:message style="plain" key="one" key="two">
     <scout:message style="javascript" key="three" />
