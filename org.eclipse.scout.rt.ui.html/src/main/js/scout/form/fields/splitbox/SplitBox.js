@@ -81,6 +81,7 @@ scout.SplitBox.prototype._render = function($parent) {
         .on('mouseup.splitbox', resizeEnd.bind(this));
       // Ensure the correct cursor is always shown while moving
       this._$body.addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+      $('iframe').addClass('dragging-in-progress');
 
       // Get initial area and splitter bounds
       var splitAreaPosition = this._$splitArea.offset();
@@ -172,6 +173,7 @@ scout.SplitBox.prototype._render = function($parent) {
         .off('mouseup.splitbox');
       if ($tempSplitter) { // instead of check for this.splitterEnabled, if splitter is currently moving it must be finished correctly
         this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
+        $('iframe').removeClass('dragging-in-progress');
 
         // Remove temporary splitter
         $tempSplitter.remove();
