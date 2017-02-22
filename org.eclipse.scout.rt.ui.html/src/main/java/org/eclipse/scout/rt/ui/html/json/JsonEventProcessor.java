@@ -41,7 +41,7 @@ public class JsonEventProcessor {
   protected void processEvent(JsonEvent event, JsonResponse response) {
     final IJsonAdapter jsonAdapter = m_uiSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
-      LOG.warn("No adapter found for ID {}", event.getTarget());
+      LOG.warn("No adapter found for event. {}", event.toSafeString());
       return;
     }
     try {

@@ -126,4 +126,16 @@ public class JsonEvent implements IJsonObject {
   public String toString() {
     return "Target: " + m_target + ". Type: " + m_type + (m_reference == null ? "" : ". Reference: " + m_reference) + ". Data: " + m_data;
   }
+
+  /**
+   * Creates a string similar to {@link #toString()} but instead of using the whole data object only the keys of that
+   * data object are used to create the string. This makes sure the string does not contain any sensitive data.
+   */
+  public String toSafeString() {
+    String dataKeys = "";
+    if (m_data != null) {
+      dataKeys = m_data.keySet().toString();
+    }
+    return "Target: " + m_target + ". Type: " + m_type + (m_reference == null ? "" : ". Reference: " + m_reference) + ". Data-Keys: " + dataKeys;
+  }
 }
