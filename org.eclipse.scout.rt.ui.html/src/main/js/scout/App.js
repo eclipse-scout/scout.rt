@@ -108,7 +108,7 @@ scout.App.prototype._init = function(options) {
   this._installGlobalMouseDownInterceptor();
   this._ajaxSetup();
   this._installExtensions();
-  this._loadSessions(options);
+  this._loadSessions(options.session);
 };
 
 scout.App.prototype._checkBrowserCompability = function(options) {
@@ -203,6 +203,7 @@ scout.App.prototype._beforeAjaxCall = function(request) {
 };
 
 scout.App.prototype._loadSessions = function(options) {
+  options = options || {};
   $('.scout').each(function(i, elem) {
     var $entryPoint = $(elem);
     options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
