@@ -589,13 +589,18 @@ scout.SmartField.prototype.openPopup = function() {
 
   this.popup = this.createPopup();
   this.popup.open();
-  this.popup.on('remove', function() {
-    this._acceptProposal(true);
-    this.popup = null;
-  }.bind(this));
+  this.popup.on('remove', this._onPopupRemove.bind(this));
   if (this.touch) {
     // Error message is shown on touch popup as well, don't show twice
     this._hideStatusMessage();
+  }
+};
+
+
+scout.SmartField.prototype._onPopupRemove = function(event) {
+  this.popup = null;
+  if (this.mode === scout.FormField.MODE_CELLEDITOR && this.proposalChooser) {
+    this._sendCancelProposal();
   }
 };
 
