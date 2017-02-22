@@ -474,6 +474,38 @@ public class IOUtilityTest {
     assertEquals(expected, actual);
   }
 
+  @Test
+  public void testReadStringSmallReader() {
+    String data = "0123";
+    String expected = data;
+    String actual = IOUtility.readString(newReader(data), 10);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadStringEmptyString() {
+    String data = "";
+    String expected = "";
+    String actual = IOUtility.readString(newReader(data), 10);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadStringZeroLength() {
+    String data = "0123";
+    String expected = "";
+    String actual = IOUtility.readString(newReader(data), 0);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadStringSameLength() {
+    String data = "0123";
+    String expected = data;
+    String actual = IOUtility.readString(newReader(data), 4);
+    assertEquals(expected, actual);
+  }
+
   private InputStream newInputStream(byte[] bytes) {
     return new ByteArrayInputStream(bytes);
   }

@@ -203,19 +203,21 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
-   * @param len
-   *          optional known length in bytes or -1 if unknown
+   * @param maxLen
+   *          max number of characters to read or -1 if the whole stream should be read.
    * @return the content string
    */
-  public static String readString(Reader in, int len) {
-    if (len >= 0) {
+  public static String readString(Reader in, int maxLen) {
+    if (maxLen >= 0) {
       try {
-        char[] buf = new char[len];
+        char[] buf = new char[maxLen];
         int count = 0;
-        while (count < len) {
-          count += in.read(buf, count, len - count);
+        int nRead = in.read(buf, 0, maxLen);
+        while (nRead != -1 && count < maxLen) {
+          count += nRead;
+          nRead = in.read(buf, count, maxLen - count);
         }
-        return new String(buf);
+        return new String(buf, 0, count);
       }
       catch (IOException e) {
         throw new ProcessingException("input: " + in, e);

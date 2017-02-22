@@ -42,6 +42,8 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
 
   private static final String HANDLER_PATH = "/" + HttpServletControl.CSP_REPORT_URL;
 
+  private static final int MAX_CSP_REPORT_DATALENGTH = 4 * 1024;
+
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     // serve only if path is ending with /csp-report
@@ -50,12 +52,16 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
       return false;
     }
 
-    final String jsonData;
+    String cspReportData;
     try (Reader in = req.getReader()) {
-      jsonData = IOUtility.readString(in);
+      cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATALENGTH);
+      if (in.read() != -1) {
+        cspReportData += "... [only first " + MAX_CSP_REPORT_DATALENGTH + " bytes shown]";
+      }
     }
 
-    LOG.warn("CSP-REPORT: {}", jsonData);
+    LOG.warn("CSP-REPORT: {}", cspReportData);
     return true;
   }
+
 }
