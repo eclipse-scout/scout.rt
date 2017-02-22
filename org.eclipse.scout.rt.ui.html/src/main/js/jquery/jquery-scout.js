@@ -1092,6 +1092,7 @@ $.fn.makeDraggable = function($handle, callback) {
   var $draggable = this;
   $handle = $handle || $draggable;
   return $handle.on('mousedown.draggable', function(event) {
+    $('iframe').addClass('dragging-in-progress');
     var orig_offset = $draggable.offset();
     var orig_event = event;
     var handleWidth = $handle.width();
@@ -1115,6 +1116,7 @@ $.fn.makeDraggable = function($handle, callback) {
       })
       .on('mouseup.dragging', function(e) {
         $handle.parents().off('.dragging');
+        $('iframe').removeClass('dragging-in-progress');
       });
     event.preventDefault();
   });
