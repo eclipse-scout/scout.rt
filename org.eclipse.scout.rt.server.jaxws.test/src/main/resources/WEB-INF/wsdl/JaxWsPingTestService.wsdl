@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the BSI CRM Software License v1.0
+    which accompanies this distribution as bsi-v10.html
+
+    Contributors:
+        BSI Business Systems Integration AG - initial API and implementation
+
+-->
+<definitions targetNamespace="http://consumer.jaxws.scout.eclipse.org/JaxWsPingTestService/"
+    name="JaxWsPingTestService"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://consumer.jaxws.scout.eclipse.org/JaxWsPingTestService/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema targetNamespace="http://consumer.jaxws.scout.eclipse.org/JaxWsPingTestService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="pingRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="pingResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="pingRequest">
+    <part name="parameters" element="tns:pingRequest"/>
+  </message>
+  <message name="pingResponse">
+    <part name="parameters" element="tns:pingResponse"/>
+  </message>
+
+  <portType name="JaxWsPingTestServicePortType">
+    <operation name="ping">
+      <input message="tns:pingRequest"/>
+      <output message="tns:pingResponse"/>
+    </operation>
+  </portType>
+
+  <binding name="JaxWsPingTestServicePortBinding" type="tns:JaxWsPingTestServicePortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="ping">
+      <soap:operation soapAction="http://consumer.jaxws.scout.eclipse.org/JaxWsPingTestService/ping"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="JaxWsPingTestService">
+    <port name="JaxWsPingTestServicePort" binding="tns:JaxWsPingTestServicePortBinding">
+      <soap:address location="http://localhost:8085/WS/JaxWsPingTestService"/>
+    </port>
+  </service>
+</definitions>

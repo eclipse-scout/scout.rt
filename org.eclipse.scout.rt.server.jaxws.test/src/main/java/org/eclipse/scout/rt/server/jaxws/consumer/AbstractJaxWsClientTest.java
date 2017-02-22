@@ -37,6 +37,9 @@ import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.JaxWsConsumerTe
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.SetHeaderRequest;
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.SetHeaderResponse;
 import org.eclipse.scout.jaxws.consumer.jaxwsconsumertestservice.SleepRequest;
+import org.eclipse.scout.jaxws.consumer.jaxwspingtestservice.JaxWsPingTestServicePortType;
+import org.eclipse.scout.jaxws.consumer.jaxwspingtestservice.PingRequest;
+import org.eclipse.scout.jaxws.consumer.jaxwspingtestservice.PingResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -619,6 +622,33 @@ public abstract class AbstractJaxWsClientTest {
         });
 
     assertDifferentPort(txn1PortHolder.getValue(), txn2PortHolder.getValue());
+  }
+
+  /*
+   * ************************************************************
+   * Test invoke different web services in same transaction
+   * ************************************************************/
+  @Test
+  public void testDifferentPortsInSameTransaction() {
+    JaxWsConsumerTestServicePortType echoPort = BEANS
+        .get(JaxWsConsumerTestClient.class)
+        .newInvocationContext()
+        .getPort();
+
+    assertSendEcho(echoPort, 0);
+
+    JaxWsPingTestServicePortType pingPort = BEANS
+        .get(JaxWsPingTestClient.class)
+        .newInvocationContext()
+        .getPort();
+
+    assertNotSame(echoPort, pingPort);
+
+    PingRequest pingRequest = new PingRequest();
+    pingRequest.setMessage("ping");
+    PingResponse pingResponse = pingPort.ping(pingRequest);
+    assertNotNull(pingResponse);
+    assertEquals("ping", pingResponse.getMessage());
   }
 
   /*

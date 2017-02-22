@@ -37,10 +37,12 @@ import org.quartz.SimpleScheduleBuilder;
  */
 public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortProvider<PORT>, IDiagnostic {
 
+  protected final Class<PORT> m_portTypeClazz;
   protected final ServicePool<SERVICE> m_servicePool;
   protected final PortPool<SERVICE, PORT> m_portPool;
 
   public PooledPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final String serviceName, final URL wsdlLocation, final String targetNamespace, final IPortInitializer initializer) {
+    m_portTypeClazz = portTypeClazz;
     m_servicePool = new ServicePool<>(serviceClazz, serviceName, wsdlLocation, targetNamespace, initializer);
     m_portPool = new PortPool<>(m_servicePool, portTypeClazz, initializer);
     installCleanupWorker();
@@ -54,7 +56,7 @@ public class PooledPortProvider<SERVICE extends Service, PORT> implements IPortP
   @Override
   public PORT provide() {
     final ITransaction txn = Assertions.assertNotNull(ITransaction.CURRENT.get());
-    final String txnMemberId = getClass().getSimpleName() + ".transaction";
+    final String txnMemberId = m_portTypeClazz.getName() + ".transaction";
 
     @SuppressWarnings("unchecked")
     P_PooledPortTransactionMember member = (P_PooledPortTransactionMember) txn.getMember(txnMemberId);

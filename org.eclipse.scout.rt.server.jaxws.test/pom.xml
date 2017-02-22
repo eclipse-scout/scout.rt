@@ -25,9 +25,40 @@
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <properties>
-    <jaxws.wsdl.file>JaxWsConsumerTestService.wsdl</jaxws.wsdl.file>
-  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>wsimport-1</id>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+            <configuration>
+              <wsdlLocation>WEB-INF/wsdl/JaxWsConsumerTestService.wsdl</wsdlLocation>
+              <wsdlFiles>
+                <wsdlFile>JaxWsConsumerTestService.wsdl</wsdlFile>
+              </wsdlFiles>
+            </configuration>
+          </execution>
+          <execution>
+            <id>wsimport-2</id>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+            <configuration>
+              <wsdlLocation>WEB-INF/wsdl/JaxWsPingTestService.wsdl</wsdlLocation>
+              <wsdlFiles>
+                <wsdlFile>JaxWsPingTestService.wsdl</wsdlFile>
+              </wsdlFiles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
     <!-- Build Dependencies -->
