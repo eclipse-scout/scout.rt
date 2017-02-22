@@ -590,7 +590,9 @@ scout.TableAdapter.modifyColumnPrototype = function() {
       if (scout.objects.isPlainObject(vararg)) {
         model = vararg;
         model.value = this._parseValue(model.value);
-        if (model.text && model.value === undefined) {
+        // Parse the value if a text but no value is provided. Do not parse the value if there is an error status.
+        // If editing fails, the display text will be the user input, the value unchanged, and the server will set the error status.
+        if (model.text && model.value === undefined  && !model.errorStatus) {
           model.value = this._parseValue(model.text);
         }
       } else {
