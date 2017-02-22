@@ -211,26 +211,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
-    if (CollectionUtility.hasElements(childMenusToRemove)) {
-      IActionVisitor visitor = new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            try {
-              menu.handleOwnerValueChanged(null);
-            }
-            catch (RuntimeException e) {
-              LOG.error("error during handle owner value changed.", e);
-            }
-          }
-          return CONTINUE;
-        }
-      };
-      for (IMenu m : childMenusToRemove) {
-        m.acceptVisitor(visitor);
-      }
-    }
+    // no default action
   }
 
   @SuppressWarnings("unchecked")
