@@ -59,8 +59,10 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     for (IColumn<?> c : table.getColumns()) {
       c.parseValueAndSet(this, c.getValue(row));
     }
-    // reset status
+    // copy status and properties
     setStatus(row.getStatus());
+    setCssClass(row.getCssClass());
+    setIconId(row.getIconId());
     // set table at end to avoid events before the row is even attached
     m_table = table;
   }

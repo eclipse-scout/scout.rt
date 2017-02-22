@@ -2867,8 +2867,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       addCellObserver(newIRows);
       // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
-      for (ITableRow newIRow : newIRows) {
+      for (int i = 0; i < newIRows.size(); i++) {
+        ITableRow newIRow = newIRows.get(i);
         addInternalRow((InternalTableRow) newIRow);
+        // copy check status of rows after adding them to the table since InternalTableRow maintains this on the table, not on the row
+        checkRow(newIRow, newRows.get(i).isChecked());
       }
 
       if (getColumnSet().getSortColumnCount() > 0) {
@@ -2949,6 +2952,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private List<InternalTableRow> createInternalRows(List<? extends ITableRow> newRows) {
+    // make sure rows InternalTableRows are in the same order as the given ITableRows, addRows(...) relies on this
     List<InternalTableRow> newIRows = new ArrayList<>(newRows.size());
     for (ITableRow newRow : newRows) {
       newIRows.add(new InternalTableRow(this, newRow));
