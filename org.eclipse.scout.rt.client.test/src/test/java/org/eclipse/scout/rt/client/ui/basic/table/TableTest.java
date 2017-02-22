@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableTest.P_Table.FirstColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -69,6 +70,39 @@ public class TableTest {
     P_Table table = new P_Table();
     final ITableRow row = table.addRow();
     assertEquals(ITableRow.STATUS_INSERTED, row.getStatus());
+  }
+
+  @Test
+  public void testAddRowPreservesProperties() {
+    P_Table table = new P_Table();
+
+    ColumnSet cols = table.getColumnSet();
+    ITableRow row = new TableRow(cols);
+
+    final ITableRow insertedRow = table.addRow(row, true);
+
+    assertEquals(false, insertedRow.isChecked());
+    assertEquals(null, insertedRow.getCssClass());
+    assertEquals(null, insertedRow.getIconId());
+
+    row = new TableRow(cols);
+
+    row.setChecked(true);
+    row.setCssClass("abc");
+    FontSpec fontSpec = new FontSpec("Arial", 0, 24);
+    row.setFont(fontSpec);
+    row.setIconId("iconId");
+    row.setBackgroundColor("AAAAAA");
+    row.setForegroundColor("000000");
+
+    final ITableRow insertedRow2 = table.addRow(row, true);
+
+    assertEquals(true, insertedRow2.isChecked());
+    assertEquals("abc", insertedRow2.getCssClass());
+    assertEquals(fontSpec, insertedRow2.getCell(0).getFont());
+    assertEquals("iconId", insertedRow2.getIconId());
+    assertEquals("AAAAAA", insertedRow2.getCell(0).getBackgroundColor());
+    assertEquals("000000", insertedRow2.getCell(0).getForegroundColor());
   }
 
   /**
