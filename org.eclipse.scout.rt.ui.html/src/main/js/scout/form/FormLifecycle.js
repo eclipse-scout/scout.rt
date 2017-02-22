@@ -6,7 +6,7 @@ scout.FormLifecycle = function() {
 };
 scout.inherits(scout.FormLifecycle, scout.AbstractLifecycle);
 
-// TODO [awe] 6.1 default impl. von disposeWidget sollte form vom desktop entfernen
+// TODO [awe] 6.2 default impl. for disposeWidget should remove Form from Desktop
 
 scout.FormLifecycle.prototype.init = function(model) {
   scout.assertParameter('widget', model.widget, scout.Form);

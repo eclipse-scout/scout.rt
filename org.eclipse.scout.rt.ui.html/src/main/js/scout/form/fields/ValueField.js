@@ -69,10 +69,10 @@ scout.ValueField.prototype.parseAndSetValue = function(displayText) {
 };
 
 scout.ValueField.prototype._parseValue = function(displayText) {
-  // FIXME [awe] 6.1 - this impl. is wrong and far too simple. Check how it is done in Java Scout first, also discuss with J.GU
-  // FIXME [awe] 6.1 - durchdenken: was passiert, wenn der server ein execFormatValue macht? abc -> ABC
-  // wahrscheinlich kann es keinen cycle geben, wegen unseren filters und weil der remote adapter den value nicht kennt
-  // kann es endlos-cycles geben? beispiel von beat: collator AE - Ä oder so
+  // TODO [awe] 6.2 - this impl. is far too simple. Check how it is done in Java Scout, also discuss with A.SA
+  // TODO [awe] 6.2 - check what happens when server does execFormatValue: abc -> ABC. Could this possibly
+  //                  lead to cycles? Probably it's not possible because our filters and because the adapter
+  //                  does not yet know the value. Example from BSH: collator AE - Ä
   return displayText;
 };
 
@@ -110,7 +110,7 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
 };
 
-// FIXME [awe] 6.1 - check fields like DateField where setTimestamp is used instead of setValue
+// TODO [awe] 6.2 - check fields like DateField where setTimestamp is used instead of setValue
 scout.ValueField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
@@ -150,7 +150,7 @@ scout.ValueField.prototype._validateValue = function(value) {
  * @returns the formatted string or a promise
  */
 scout.ValueField.prototype._formatValue = function(value) {
-  return scout.nvl(value, ''); // FIXME [awe] 6.1 - check impl. for fields other than StringField
+  return scout.nvl(value, ''); // TODO [awe] 6.2 - check impl. for fields other than StringField
 };
 
 scout.ValueField.prototype._updateTouched = function() {
