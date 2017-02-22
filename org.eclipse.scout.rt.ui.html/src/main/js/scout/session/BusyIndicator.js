@@ -94,7 +94,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this._busyIndicatorTimeoutId = setTimeout(function() {
     this.$container.removeClass('invisible').addClassForAnimation('animate-open');
     // Validate first focusable element
-    // FIXME dwi: maybe, this is not required if problem with single-button form is solved!
+    // Maybe, this is not required if problem with single-button form is solved (see FormController.js)
     this.session.focusManager.validateFocus();
   }.bind(this), this.showTimeout);
 };

@@ -102,7 +102,7 @@ public class JsonTreeTest {
   /**
    * If the selection event triggers the selection of another node, the selection event must not be ignored.
    */
-  //FIXME cgu: Test fails due to scout model bug: selectNode puts first selection event AFTER this new selection event -> gets filtered in processEventBuffers. With table it works though.
+  //TODO [7.0] cgu: Test fails due to scout model bug: selectNode puts first selection event AFTER this new selection event -> gets filtered in processEventBuffers. With table it works though.
 //  @Test
 //  public void testIgnorableSelectionEvent2() throws JSONException {
 //    List<ITreeNode> nodes = new LinkedList<>();
@@ -111,7 +111,7 @@ public class JsonTreeTest {
 //
 //    nodes.add(firstNode);
 //    nodes.add(secondNode);
-//    ITree tree = createTree(nodes) {
+//    ITree tree = new Tree(nodes) {
 //
 //      @Override
 //      protected void execNodesSelected(TreeEvent e) {
@@ -120,6 +120,7 @@ public class JsonTreeTest {
 //        }
 //      }
 //    };
+//    tree.initTree();
 //
 //    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 //    JsonEvent event = createJsonSelectedEvent(jsonTree.getOrCreateNodeId(secondNode));
@@ -127,7 +128,7 @@ public class JsonTreeTest {
 //    assertFalse(firstNode.isSelectedNode());
 //    assertFalse(secondNode.isSelectedNode());
 //
-//    jsonTree.handleUiEvent(event, new JsonResponse());
+//    jsonTree.handleUiEvent(event);
 //
 //    assertTrue(firstNode.isSelectedNode());
 //    assertFalse(secondNode.isSelectedNode());

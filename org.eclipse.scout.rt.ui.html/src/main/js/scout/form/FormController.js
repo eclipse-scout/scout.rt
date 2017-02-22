@@ -273,7 +273,7 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
     left: left
   });
 
-  // FIXME dwi: If not validated anew, focus on single-button forms is not gained.
-  //                 Maybe, this is the same problem as in BusyIndicator.js
+  // If not validated anew, focus on single-button forms is not gained.
+  // Maybe, this is the same problem as in BusyIndicator.js
   this.session.focusManager.validateFocus();
 };
