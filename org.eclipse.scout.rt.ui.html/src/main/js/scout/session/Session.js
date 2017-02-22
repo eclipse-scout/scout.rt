@@ -219,7 +219,7 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
     objectType = objectInfo.objectType.toString() + 'Adapter';
   }
 
-  // TODO BSH/CGU Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
+  // TODO [6.2] BSH/CGU Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
   var adapterModel = {
     id: adapterData.id,
     session: this

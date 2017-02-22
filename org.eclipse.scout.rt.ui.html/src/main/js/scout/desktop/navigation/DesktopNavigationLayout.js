@@ -50,7 +50,6 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
   htmlBody.$comp.cssTop(viewButtonBoxHeight);
 };
 
-// TODO [6.2] BSH Add "options" argument
 scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($container) {
   var htmlContainer = this.navigation.htmlComp,
     htmlBody = this.navigation.htmlCompBody,
