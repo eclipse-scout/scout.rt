@@ -303,8 +303,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Overwrite to set the display hint for this {@link IForm}. By default, {@link #DISPLAY_HINT_DIALOG} is configured.
    * <ul>
    * <li>{@link #DISPLAY_HINT_VIEW}</li>
-   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
-   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
+   * <li>{@link #DISPLAY_HINT_DIALOG}</li>
    * <li>{@link #DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
    */
