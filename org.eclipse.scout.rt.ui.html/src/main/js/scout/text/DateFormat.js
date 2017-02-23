@@ -572,7 +572,7 @@ scout.DateFormat = function(locale, pattern) {
     }),
     new DateFormatPatternDefinition({
       type: scout.DateFormatPatternType.HOUR_24,
-      terms: ['H', 'h'],
+      terms: ['H'],
       formatFunction: function(formatContext) {
         return String(formatContext.inputDate.getHours());
       },
@@ -585,25 +585,43 @@ scout.DateFormat = function(locale, pattern) {
     // --- Hour (12h) ---
     new DateFormatPatternDefinition({
       type: scout.DateFormatPatternType.HOUR_12,
-      terms: 'KK',
+      terms: ['hh'],
       formatFunction: function(formatContext) {
-        return scout.strings.padZeroLeft((formatContext.inputDate.getHours() + 11) % 12 + 1, 2);
+        if (formatContext.inputDate.getHours() % 12 === 0) {
+          return '12'; // there is no hour '0' in 12-hour format
+        }
+        return scout.strings.padZeroLeft(formatContext.inputDate.getHours() % 12, 2);
       },
-      parseRegExp: /^(\d{2})(.*)$/,
+      parseRegExp: /^(10|11|12|0[1-9])(.*)$/,
       applyMatchFunction: function(parseContext, match) {
-        parseContext.dateInfo.hours = Number(match);
+        parseContext.dateInfo.hours = Number(match) + (parseContext.hints.pm ? 12 : 0);
         parseContext.matchInfo.hours = match;
+      },
+      parseFunction: function(parseContext) {
+        // Special case! When regexp did not match and input is a single '0', predict '01'
+        if (parseContext.analyze) {
+          if (parseContext.inputString === '0') {
+            parseContext.dateInfo.hours = 1;
+            parseContext.matchInfo.hours = '01';
+            parseContext.inputString = '';
+            return parseContext.inputString;
+          }
+        }
+        return null; // no match found
       }
     }),
     new DateFormatPatternDefinition({
       type: scout.DateFormatPatternType.HOUR_12,
-      terms: 'K',
+      terms: ['h'],
       formatFunction: function(formatContext) {
-        return String((formatContext.inputDate) % 12 + 1);
+        if (formatContext.inputDate.getHours() % 12 === 0) {
+          return '12'; // there is no hour '0' in 12-hour format
+        }
+        return String(formatContext.inputDate.getHours() % 12);
       },
-      parseRegExp: /^(\d{1,2})(.*)$/,
+      parseRegExp: /^(10|11|12|0?[1-9])(.*)$/,
       applyMatchFunction: function(parseContext, match) {
-        parseContext.dateInfo.hours = Number(match);
+        parseContext.dateInfo.hours = Number(match) + (parseContext.hints.pm ? 12 : 0);
         parseContext.matchInfo.hours = match;
       }
     }),
@@ -618,32 +636,47 @@ scout.DateFormat = function(locale, pattern) {
         return this.dateFormat.symbols.pm;
       },
       parseFunction: function(parseContext) {
-        var am = false,
-          pm = false,
-          re, m;
-
-        re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
-        m = re.exec(parseContext.inputString);
+        var re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
+        var m = re.exec(parseContext.inputString);
+        parseContext.matchInfo.ampm = null;
         if (m) { // match found
-          am = true;
           parseContext.matchInfo.ampm = m[1];
           parseContext.inputString = m[2];
+          parseContext.hints.am = true;
+          parseContext.dateInfo.hours = parseContext.dateInfo.hours % 12;
+          return m[1];
         } else {
           re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
           m = re.exec(parseContext.inputString);
           if (m) { // match found
-            pm = true;
             parseContext.matchInfo.ampm = m[1];
             parseContext.inputString = m[2];
+            parseContext.hints.pm = true;
+            parseContext.dateInfo.hours = (parseContext.dateInfo.hours % 12) + 12;
+            return m[1];
           }
         }
-
-        if (!am && !pm) {
-          return null; // no match found
+        // No match found so far. In analyze mode, check prefixes.
+        if (parseContext.analyze) {
+          re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+          m = re.exec(this.dateFormat.symbols.am);
+          if (m) {
+            parseContext.matchInfo.ampm = this.dateFormat.symbols.am;
+            parseContext.inputString = '';
+            parseContext.hints.am = true;
+            parseContext.dateInfo.hours = parseContext.dateInfo.hours % 12;
+            return m[1];
+          }
+          m = re.exec(this.dateFormat.symbols.pm);
+          if (m) {
+            parseContext.matchInfo.ampm = this.dateFormat.symbols.pm;
+            parseContext.inputString = '';
+            parseContext.hints.pm = true;
+            parseContext.dateInfo.hours = (parseContext.dateInfo.hours % 12) + 12;
+            return m[1];
+          }
         }
-        parseContext.hints.am = am;
-        parseContext.hints.pm = pm;
-        return m[1];
+        return null; // no match found
       }
     }),
     // --- Minute ---
@@ -986,16 +1019,6 @@ scout.DateFormat.prototype.parse = function(text, startDate) {
   }
 
   // Handle hints
-  if ((parseContext.hints.am || parseContext.hints.pm)) {
-    var hours = date.getHours();
-    if (hours === 12) {
-      hours = 0;
-    }
-    if (parseContext.hints.pm) {
-      hours += 12;
-    }
-    date.setHours(hours);
-  }
   if (parseContext.hints.weekday !== undefined) {
     if (date.getDay() !== parseContext.hints.weekday) {
       return null; // Date and weekday don't match -> parsing failed
@@ -1040,16 +1063,16 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
     }
   }
   result.setFullYear(
-      validYear,
-      validMonth,
-      scout.nvl(dateInfo.day, startDate.getDate())
+    validYear,
+    validMonth,
+    scout.nvl(dateInfo.day, startDate.getDate())
   );
 
   result.setHours(
-      scout.nvl(dateInfo.hours, startDate.getHours()),
-      scout.nvl(dateInfo.minutes, startDate.getMinutes()),
-      scout.nvl(dateInfo.seconds, startDate.getSeconds()),
-      scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
+    scout.nvl(dateInfo.hours, startDate.getHours()),
+    scout.nvl(dateInfo.minutes, startDate.getMinutes()),
+    scout.nvl(dateInfo.seconds, startDate.getSeconds()),
+    scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
   );
 
   // Validate. A date is considered valid if the value from the dateInfo did
@@ -1103,42 +1126,21 @@ scout.DateFormat.prototype._prepareStartDate = function(startDate) {
  * passed through the various formatting functions. As the formatting progresses, the format context object
  * is updated accordingly. At the end of the process, the object contains the result.
  *
- * The parse context contains the following properties:
+ * The format context contains the following properties:
  *
- * inputString:
- *   The original input for the parsing. This string will be consumed during the parse process,
- *   and will be empty at the end.
+ * inputDate:
+ *   The date to be formatted.
  *
- * dateInfo:
- *   An object with all numeric date parts that could be parsed from the input string. Unrecognized
- *   parts are undefined, all others are converted to numbers.
- *   Valid properties:
- *   - year, month, day, hours, minutes, seconds, milliseconds
+ * formattedString:
+ *   The result of the formatting. The string is initially empty. During the format process, the
+ *   formatted parts will be appended to the string until the final string is complete.
  *
- * matchInfo:
- *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
- *   While dateInfo may contain the year 1995, the matchInfo may contain "95".
- *   Valid properties:
- *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds
- *
- * hints:
- *   An object that contains further recognized date parts that are not needed to define the exact time.
- *   Valid properties:
- *   - am [true / false]
- *   - pm [true / false]
- *   - weekday [number 0-6; 0=sun, 1=mon, etc.]
- *   - weekInYear [number 1-53]
- *
- * analyze:
- *   A flag that indicates if the "analyze mode" is on. This is true when analyze() was called, and
- *   false when parse() was called. It may alter the behavior of the parse functions, i.e. they will
- *   not fail in analyze mode when the pattern does not match exactly.
- *
- * startDate:
- *   A date to be used as reference for date calculations. Is used for example when mapping a 2-digit
- *   year to a 4-digit year.
+ * exactLength:
+ *   Flag to force the format functions to use the exact length of the accepted term. The default
+ *   is false, which will use the canonical length. For example, the year pattern 'yyy' will
+ *   format the year using 2 digits by default. If the parameter is true, 3 are used. This is mainly
+ *   useful, when an "analyzed" date should be formatted again using the "parsedPattern".
  */
-
 scout.DateFormat.prototype._createFormatContext = function(inputDate) {
   return {
     inputDate: inputDate,

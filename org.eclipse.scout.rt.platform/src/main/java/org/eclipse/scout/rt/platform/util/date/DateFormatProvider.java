@@ -81,21 +81,21 @@ public class DateFormatProvider {
    * <pre>
    * en-gb    "dd/MM/yyyy"
    * nl-be    "dd/MM/yyyy"
-   * 
+   *
    * fr-ch    "dd.MM.yyyy"
    * it-ch    "dd.MM.yyyy"
-   * 
+   *
    * cs       "d.M.yyyy"
    * fi       "d.M.yyyy"
-   * 
+   *
    * el       "d/M/yyyy"
-   * 
+   *
    * fa       "yyyy/MM/dd"
-   * 
+   *
    * hu       "yyyy.MM.dd"
-   * 
+   *
    * zh       "yyyy-MM-dd"
-   * 
+   *
    * ca       "dd/MM/yyyy"
    * es       "dd/MM/yyyy"
    * fr       "dd/MM/yyyy"
@@ -103,7 +103,7 @@ public class DateFormatProvider {
    * it       "dd/MM/yyyy"
    * nl       "dd-MM-yyyy"
    * vi       "dd/MM/yyyy"
-   * 
+   *
    * bs       "dd.MM.yyyy"
    * de       "dd.MM.yyyy"
    * et       "dd.MM.yyyy"
@@ -116,7 +116,7 @@ public class DateFormatProvider {
    * sr       "dd.MM.yyyy"
    * tr       "dd.MM.yyyy"
    * uk       "dd.MM.yyyy"
-   * 
+   *
    * default  "MM/dd/yyyy"
    * </pre>
    */
@@ -183,8 +183,8 @@ public class DateFormatProvider {
   /**
    * <pre>
    * en       "h:mm a"
-   * 
-   * default  "hh:mm"
+   *
+   * default  "HH:mm"
    * </pre>
    */
   protected String getIsolatedTimeFormatPattern(Locale locale) {
