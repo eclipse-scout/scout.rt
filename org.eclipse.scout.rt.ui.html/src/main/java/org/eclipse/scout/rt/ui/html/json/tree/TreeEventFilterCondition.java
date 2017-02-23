@@ -10,27 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.tree;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TreeEventFilterCondition {
 
   private int m_type;
   private List<ITreeNode> m_nodes;
+  private List<ITreeNode> m_checkedNodes;
+  private List<ITreeNode> m_uncheckedNodes;
+
   private boolean m_checkNodes;
+  private boolean m_checkCheckedNodes;
 
+  /**
+   * @param type
+   *          event type (see {@link TreeEvent})
+   */
   public TreeEventFilterCondition(int type) {
-    this(type, new ArrayList<ITreeNode>());
-    m_checkNodes = false;
-  }
-
-  public TreeEventFilterCondition(int type, List<? extends ITreeNode> nodes) {
-    m_nodes = CollectionUtility.arrayList(nodes);
     m_type = type;
-    m_checkNodes = true;
   }
 
   public int getType() {
@@ -41,7 +42,30 @@ public class TreeEventFilterCondition {
     return CollectionUtility.arrayList(m_nodes);
   }
 
+  public void setNodes(List<ITreeNode> nodes) {
+    m_nodes = CollectionUtility.arrayList(nodes);
+    m_checkNodes = true;
+  }
+
+  public List<ITreeNode> getCheckedNodes() {
+    return CollectionUtility.arrayList(m_checkedNodes);
+  }
+
+  public List<ITreeNode> getUncheckedNodes() {
+    return CollectionUtility.arrayList(m_uncheckedNodes);
+  }
+
+  public void setCheckedNodes(List<ITreeNode> checkedNodes, List<ITreeNode> uncheckedNodes) {
+    m_checkedNodes = CollectionUtility.arrayList(checkedNodes);
+    m_uncheckedNodes = CollectionUtility.arrayList(uncheckedNodes);
+    m_checkCheckedNodes = true;
+  }
+
   public boolean checkNodes() {
     return m_checkNodes;
+  }
+
+  public boolean checkCheckedNodes() {
+    return m_checkCheckedNodes;
   }
 }

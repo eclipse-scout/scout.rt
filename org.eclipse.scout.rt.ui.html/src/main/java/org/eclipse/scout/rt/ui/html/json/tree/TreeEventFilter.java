@@ -12,18 +12,20 @@ package org.eclipse.scout.rt.ui.html.json.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFilterCondition> {
 
-  private ITree m_source;
+  private JsonTree<? extends ITree> m_jsonTree;
 
-  public TreeEventFilter(ITree source) {
-    m_source = source;
+  public TreeEventFilter(JsonTree<? extends ITree> jsonTree) {
+    m_jsonTree = jsonTree;
   }
 
   /**
@@ -41,18 +43,42 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFil
   public TreeEvent filter(TreeEvent event) {
     for (TreeEventFilterCondition condition : getConditions()) {
       if (condition.getType() == event.getType()) {
-        if (!condition.checkNodes()) {
-          return null;
+
+        if (condition.checkNodes()) {
+          Collection<ITreeNode> nodes = new ArrayList<>(event.getNodes());
+          nodes.removeAll(condition.getNodes());
+          if (nodes.size() == 0) {
+            // Ignore event if no nodes remain (or if the event contained no nodes at all)
+            return null;
+          }
+          return new TreeEvent(m_jsonTree.getModel(), event.getType(), event.getCommonParentNode(), nodes);
         }
 
-        Collection<ITreeNode> nodes = new ArrayList<>(event.getNodes());
-        nodes.removeAll(condition.getNodes());
-        if (nodes.size() == 0) {
-          // Event should be ignored if no nodes remain or if the event contained no nodes at all
-          return null;
+        if (condition.checkCheckedNodes()) {
+          List<ITreeNode> nodes = new ArrayList<>(event.getNodes());
+          List<ITreeNode> checkedNodes = new ArrayList<>();
+          List<ITreeNode> uncheckedNodes = new ArrayList<>();
+          for (ITreeNode node : nodes) {
+            if (node.isChecked()) {
+              checkedNodes.add(node);
+            }
+            else {
+              uncheckedNodes.add(node);
+            }
+          }
+          if (CollectionUtility.equalsCollection(checkedNodes, condition.getCheckedNodes()) &&
+              CollectionUtility.equalsCollection(uncheckedNodes, condition.getUncheckedNodes())) {
+            // Ignore event if the checked and the unchecked nodes have not changes
+            return null;
+          }
+          // Otherwise, send nodes that have a different checked state than before
+          checkedNodes.removeAll(condition.getCheckedNodes());
+          uncheckedNodes.removeAll(condition.getUncheckedNodes());
+          nodes = CollectionUtility.combine(checkedNodes, uncheckedNodes);
+          TreeEvent newEvent = new TreeEvent(m_jsonTree.getModel(), event.getType(), event.getCommonParentNode(), nodes);
+          return newEvent;
         }
 
-        return new TreeEvent(m_source, event.getType(), event.getCommonParentNode(), nodes);
       }
     }
     return event;

@@ -27,17 +27,17 @@ public class DesktopEventFilter extends AbstractEventFilter<DesktopEvent, Deskto
     for (DesktopEventFilterCondition condition : getConditions()) {
       if (condition.getType() == event.getType()) {
         if (CompareUtility.equals(event.getForm(), condition.getForm())) {
-          return null;
+          return null; // Ignore event
         }
         if (condition.isCheckDisplayParents() && checkIfEventOnParent(condition.getForm(), event)) {
-          return null;
+          return null; // Ignore event
         }
       }
     }
     return event;
   }
 
-  private boolean checkIfEventOnParent(IForm form, DesktopEvent event) {
+  protected boolean checkIfEventOnParent(IForm form, DesktopEvent event) {
     if (CompareUtility.equals(event.getForm(), form)) {
       return true;
     }

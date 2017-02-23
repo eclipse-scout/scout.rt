@@ -31,34 +31,60 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEvent
   public TableEvent filter(TableEvent event) {
     for (TableEventFilterCondition condition : getConditions()) {
       if (condition.getType() == event.getType()) {
+
         if (condition.checkRows()) {
           List<ITableRow> rows = new ArrayList<>(event.getRows());
           rows.removeAll(condition.getRows());
           if (rows.size() == 0) {
-            //Event should be ignored if no nodes remain or if the event contained no nodes at all
+            // Ignore event if no nodes remain (or if the event contained no nodes at all)
             return null;
           }
-
-          TableEvent newEvent = new TableEvent((ITable) m_jsonTable.getModel(), event.getType(), rows);
+          TableEvent newEvent = new TableEvent(m_jsonTable.getModel(), event.getType(), rows);
           return newEvent;
         }
-        else if (condition.checkColumns()) {
-          //Columns are not delivered by the event itself (at least not with COLUMN_ORDER_CHANGED) -> grab from table
+
+        if (condition.checkCheckedRows()) {
+          List<ITableRow> rows = new ArrayList<>(event.getRows());
+          List<ITableRow> checkedRows = new ArrayList<>();
+          List<ITableRow> uncheckedRows = new ArrayList<>();
+          for (ITableRow row : rows) {
+            if (row.isChecked()) {
+              checkedRows.add(row);
+            }
+            else {
+              uncheckedRows.add(row);
+            }
+          }
+          if (CollectionUtility.equalsCollection(checkedRows, condition.getCheckedRows()) &&
+              CollectionUtility.equalsCollection(uncheckedRows, condition.getUncheckedRows())) {
+            // Ignore event if the checked and the unchecked rows have not changes
+            return null;
+          }
+          // Otherwise, send rows that a different checked state than before
+          checkedRows.removeAll(condition.getCheckedRows());
+          uncheckedRows.removeAll(condition.getUncheckedRows());
+          rows = CollectionUtility.combine(checkedRows, uncheckedRows);
+          TableEvent newEvent = new TableEvent(m_jsonTable.getModel(), event.getType(), rows);
+          return newEvent;
+        }
+
+        if (condition.checkColumns()) {
+          // Columns are not delivered by the event itself (at least not with COLUMN_ORDER_CHANGED) -> grab from table
           if (CollectionUtility.equalsCollection(m_jsonTable.getColumnsInViewOrder(), condition.getColumns())) {
             return null;
           }
-          //Don't ignore if columns are different
-          return event;
-        }
-        else if (condition.checkUserFilter()) {
-          if (condition.getUserFilter().equals(event.getUserFilter())) {
-            return null;
-          }
-          //Don't ignore if filters are different
+          // Don't ignore if columns are different
           return event;
         }
 
-        return null;
+        if (condition.checkUserFilter()) {
+          if (condition.getUserFilter().equals(event.getUserFilter())) {
+            return null;
+          }
+          // Don't ignore if filters are different
+          return event;
+        }
+
       }
     }
     return event;
