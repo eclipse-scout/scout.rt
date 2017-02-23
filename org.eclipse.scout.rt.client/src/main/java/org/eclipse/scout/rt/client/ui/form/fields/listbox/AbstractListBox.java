@@ -837,6 +837,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     if (m_valueTableSyncActive) {
       return;
     }
+    boolean resync = false;
     try {
       m_valueTableSyncActive = true;
       m_table.setTableChanging(true);
@@ -848,7 +849,14 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       else {
         checkedRows = getTable().getSelectedRows();
       }
-      checkKeys(getKeyColumnInternal().getValues(checkedRows));
+      List<KEY> checkedKeys = getKeyColumnInternal().getValues(checkedRows);
+      checkKeys(checkedKeys);
+      // Due to validate logic, the actual value
+      // may differ now, making a resync of the value is necessary
+      Set<KEY> validatedCheckedKeys = getCheckedKeys();
+      if (!CollectionUtility.equalsCollection(checkedKeys, validatedCheckedKeys)) {
+        resync = true;
+      }
       if (!getTable().isCheckable()) {
         //checks follow selection
         for (ITableRow row : m_table.getRows()) {
@@ -860,6 +868,12 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     finally {
       getTable().setTableChanging(false);
       m_valueTableSyncActive = false;
+    }
+    if (resync) {
+      // The value of the treeBox is different
+      // from the one represented in the tree.
+      // Need to sync.
+      syncValueToTable();
     }
   }
 
