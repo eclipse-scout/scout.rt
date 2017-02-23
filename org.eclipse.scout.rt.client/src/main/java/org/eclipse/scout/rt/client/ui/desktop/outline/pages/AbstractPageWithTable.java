@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.PageData;
@@ -413,7 +412,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (m_searchForm != null && m_searchForm.isFormStartable()) {
       try {
         m_searchForm.start();
-        notifyMemoryPolicyOfSearchFormStart();
         fireAfterSearchFormStart();
         ensureSearchControlSelected();
       }
@@ -550,19 +548,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (m_searchForm != null) {
       m_searchForm.doClose();
       setSearchForm(null);
-    }
-  }
-
-  private void notifyMemoryPolicyOfSearchFormStart() {
-    //use memory policy to handle content caching
-    try {
-      IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
-      if (policy != null) {
-        policy.pageSearchFormStarted(this);
-      }
-    }
-    catch (RuntimeException | PlatformError t) {
-      LOG.error("pageCreated {}", getClass().getName(), t);
     }
   }
 
@@ -800,7 +785,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       //
       setChildrenLoaded(false);
       fireBeforeDataLoaded();
-      ClientSessionProvider.currentSession().getMemoryPolicy().beforeTablePageLoadData(this);
       try {
         loadTableDataImpl();
       }
@@ -808,7 +792,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         // NOOP
       }
       finally {
-        ClientSessionProvider.currentSession().getMemoryPolicy().afterTablePageLoadData(this);
         fireAfterDataLoaded();
       }
       setChildrenLoaded(true);

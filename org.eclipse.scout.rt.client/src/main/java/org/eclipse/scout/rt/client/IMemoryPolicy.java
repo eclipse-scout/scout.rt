@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -75,9 +76,28 @@ public interface IMemoryPolicy {
 
   /**
    * This method is called after the {@link ITable} of the {@link IPage} has been created.
-   * 
+   *
    * @param p
    */
   void pageTableCreated(IPage<?> p);
 
+  /**
+   * Attach the internal listener of this memory policy to the given outline.
+   */
+  void registerOutline(IOutline outline);
+
+  /**
+   * Remove the internal listener of this memory policy from the given outline.
+   */
+  void deregisterOutline(IOutline outline);
+
+  /**
+   * Attach the internal listener of this memory policy to the given desktop
+   */
+  void registerDesktop(IDesktop desktop);
+
+  /**
+   * Remove the internal listener of this memory policy from the given desktop.
+   */
+  void deregisterDesktop(IDesktop desktop);
 }

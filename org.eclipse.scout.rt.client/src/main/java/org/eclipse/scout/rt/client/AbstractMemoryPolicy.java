@@ -14,17 +14,27 @@ import java.util.Date;
 import java.util.WeakHashMap;
 import java.util.zip.CRC32;
 
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
 import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -47,6 +57,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   private boolean m_active;
   private final WeakHashMap<IForm, String> m_formToIdentifierMap;
   private final WeakHashMap<ITable, String> m_tableToIdentifierMap;
+  private final MemoryPolicyListener m_memoryPolicyListener;
 
   private final FormListener m_formListener = new FormListener() {
     @Override
@@ -90,6 +101,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   public AbstractMemoryPolicy() {
     m_formToIdentifierMap = new WeakHashMap<IForm, String>();
     m_tableToIdentifierMap = new WeakHashMap<ITable, String>();
+    m_memoryPolicyListener = new MemoryPolicyListener();
   }
 
   @Override
@@ -102,14 +114,9 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     m_active = false;
   }
 
-  /**
-   * Attaches listener on page contents
-   */
   @Override
   public void pageCreated(IPage<?> p) {
-    if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
-      return;
-    }
+    //nop
   }
 
   @Override
@@ -269,5 +276,87 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   @Override
   public String toString() {
     return getClass().getSimpleName();
+  }
+
+  @Override
+  public void registerOutline(IOutline outline) {
+    outline.addTreeListener(m_memoryPolicyListener);
+  }
+
+  @Override
+  public void deregisterOutline(IOutline outline) {
+    outline.removeTreeListener(m_memoryPolicyListener);
+  }
+
+  @Override
+  public void registerDesktop(IDesktop desktop) {
+    desktop.addDesktopListener(m_memoryPolicyListener);
+  }
+
+  @Override
+  public void deregisterDesktop(IDesktop desktop) {
+    desktop.removeDesktopListener(m_memoryPolicyListener);
+  }
+
+  protected class MemoryPolicyListener extends TreeAdapter implements DesktopListener {
+
+    IOutline m_activeOutline;
+
+    @Override
+    public void desktopChanged(DesktopEvent e) {
+      switch (e.getType()) {
+        case DesktopEvent.TYPE_OUTLINE_CHANGED: {
+          m_activeOutline = e.getOutline();
+          break;
+        }
+        case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+          if (e.getSource() instanceof IDesktop) {
+            deregisterDesktop((IDesktop) e.getSource());
+          }
+        }
+      }
+    }
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      try {
+        if (e.getType() == TreeEvent.TYPE_NODES_SELECTED && e.getSource() == m_activeOutline) {
+          afterOutlineSelectionChanged(ClientSessionProvider.currentSession().getDesktop());
+        }
+        if (e.getNode() instanceof IPage) {
+          IPage<?> p = (IPage<?>) e.getNode();
+          switch (e.getType()) {
+            case OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT: {
+              pageCreated(p);
+              break;
+            }
+            case OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT: {
+              pageTableCreated(p);
+              break;
+            }
+          }
+        }
+        if (e.getNode() instanceof IPageWithTable) {
+          IPageWithTable<?> p = (IPageWithTable<?>) e.getNode();
+          switch (e.getType()) {
+            case OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED: {
+              beforeTablePageLoadData(p);
+              break;
+            }
+            case OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED: {
+              afterTablePageLoadData(p);
+              break;
+            }
+            case OutlineEvent.TYPE_PAGE_AFTER_SEARCH_FORM_START: {
+              pageSearchFormStarted(p);
+              break;
+            }
+          }
+        }
+      }
+      catch (RuntimeException | PlatformError t) {
+        BEANS.get(ExceptionHandler.class).handle(t);
+      }
+    }
   }
 }

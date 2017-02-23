@@ -37,6 +37,8 @@ public class OutlineEvent extends TreeEvent {
 
   public static final int TYPE_PAGE_AFTER_DISPOSE = 1007;
 
+  public static final int TYPE_PAGE_ACTIVATED = 1008;
+
   private static final long serialVersionUID = 1L;
 
   private boolean m_buffered;

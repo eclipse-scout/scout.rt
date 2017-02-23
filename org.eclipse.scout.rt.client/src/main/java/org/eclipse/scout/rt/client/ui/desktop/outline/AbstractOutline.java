@@ -993,6 +993,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_AFTER_DISPOSE, page, true));
   }
 
+  @Override
+  public void firePageActivated(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_ACTIVATED, page, false));
+  }
+
   protected void fireTreeEventInternal(OutlineEvent e) {
     if (e.isBuffered()) {
       super.fireTreeEventInternal(e);

@@ -195,4 +195,6 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   void fireAfterSearchFormStart(IPage<?> page);
 
   void fireAfterPageDispose(IPage<?> page);
+
+  void firePageActivated(IPage<?> page);
 }

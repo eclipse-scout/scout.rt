@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
@@ -150,25 +149,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
             firePageChanged();
             addDefaultTableControls();
             interceptInitTable(); // calls execInitTable of AbstractPage
-            notifyMemoryPolicyOfTableCreated();
             fireAfterTableInit();
           }
         }
       });
     }
     return m_table;
-  }
-
-  private void notifyMemoryPolicyOfTableCreated() {
-    try {
-      IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
-      if (policy != null) {
-        policy.pageTableCreated(this);
-      }
-    }
-    catch (RuntimeException | PlatformError t) {
-      BEANS.get(ExceptionHandler.class).handle(t);
-    }
   }
 
   protected void linkTableRowWithPage(ITableRow tableRow, IPage<?> page) {
@@ -677,12 +663,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       finally {
         setInitializing(false);
       }
-
-      // notify memory policy
-      IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
-      if (policy != null) {
-        policy.pageCreated(this);
-      }
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
@@ -723,6 +703,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       enhanceTableWithPageMenus();
       interceptPageActivated();
       setPageActive(true);
+      firePageActivated();
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
@@ -1043,6 +1024,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     IOutline outline = getOutline();
     if (outline != null) {
       outline.fireAfterPageDispose(this);
+    }
+  }
+
+  protected void firePageActivated() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.firePageActivated(this);
     }
   }
 

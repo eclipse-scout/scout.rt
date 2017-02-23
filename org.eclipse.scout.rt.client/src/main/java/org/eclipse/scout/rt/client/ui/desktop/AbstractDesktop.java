@@ -63,8 +63,6 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -589,6 +587,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     });
 
+    ClientSessionProvider.currentSession().getMemoryPolicy().registerDesktop(this);
     BEANS.get(IDeviceTransformationService.class).install(this);
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
@@ -617,7 +616,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     // move outlines
     ExtensionUtility.moveModelObjects(outlines);
-    m_availableOutlines = outlines.getOrderedList();
+    setAvailableOutlines(outlines.getOrderedList());
 
     // actions (keyStroke, menu, viewButton, toolButton)
     List<IAction> actionList = new ArrayList<IAction>();
@@ -1022,11 +1021,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void activateOutline(IOutline outline) {
-    activateOutlineInternal(outline);
-    fireOutlineContentActivate();
-  }
-
-  protected void activateOutlineInternal(IOutline outline) {
     final IOutline newOutline = resolveOutline(outline);
     if (m_outline == newOutline || m_outlineChanging) {
       return;
@@ -1047,6 +1041,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             }
           }
         });
+    fireOutlineContentActivate();
   }
 
   protected void setOutlineInternal(IOutline newOutline) {
@@ -1056,7 +1051,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     //
     IOutline oldOutline = m_outline;
     if (m_activeOutlineListener != null && oldOutline != null) {
-      oldOutline.removeTreeListener(m_activeOutlineListener);
       oldOutline.removePropertyChangeListener(m_activeOutlineListener);
       m_activeOutlineListener = null;
     }
@@ -1069,7 +1063,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     //
     if (m_outline != null) {
       m_activeOutlineListener = new P_ActiveOutlineListener();
-      m_outline.addTreeListener(m_activeOutlineListener);
       m_outline.addPropertyChangeListener(m_activeOutlineListener);
       setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
     }
@@ -1223,7 +1216,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setAvailableOutlines(List<? extends IOutline> availableOutlines) {
     activateOutline((IOutline) null);
+    if (m_availableOutlines != null) {
+      for (IOutline o : m_availableOutlines) {
+        ClientSessionProvider.currentSession().getMemoryPolicy().deregisterOutline(o);
+      }
+    }
     m_availableOutlines = CollectionUtility.arrayList(availableOutlines);
+    for (IOutline o : m_availableOutlines) {
+      ClientSessionProvider.currentSession().getMemoryPolicy().registerOutline(o);
+    }
   }
 
   @Override
@@ -2425,21 +2426,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  private class P_ActiveOutlineListener extends TreeAdapter implements PropertyChangeListener {
-    @Override
-    public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODES_SELECTED: {
-          try {
-            ClientSessionProvider.currentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
-          }
-          catch (Exception t) {
-            LOG.warn("MemoryPolicy.afterOutlineSelectionChanged", t);
-          }
-          break;
-        }
-      }
-    }
+  private class P_ActiveOutlineListener implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent e) {
