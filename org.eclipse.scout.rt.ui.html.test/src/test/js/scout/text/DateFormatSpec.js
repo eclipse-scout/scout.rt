@@ -44,6 +44,41 @@ describe("DateFormat", function() {
       expect(dateFormat.format(scout.dates.create('2017-01-16'))).toBe('16.01.17 00:00');
     });
 
+    it("considers h H m a", function() {
+      var pattern = 'HH:mm';
+      var dateFormat = new scout.DateFormat(locale, pattern);
+
+      expect(dateFormat.format(scout.dates.create('2017-01-01 13:01'))).toBe('13:01');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 05:01'))).toBe('05:01');
+
+      pattern = 'H:mm';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2017-01-01 13:01'))).toBe('13:01');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 05:01'))).toBe('5:01');
+
+      pattern = 'hh:mm';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2017-01-01 13:01'))).toBe('01:01');
+
+      pattern = 'h:mm';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2017-01-01 13:01'))).toBe('1:01');
+
+      pattern = 'h:mm a';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2017-01-01 13:01'))).toBe('1:01 PM');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 01:01'))).toBe('1:01 AM');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 00:00'))).toBe('12:00 AM');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 00:01'))).toBe('12:01 AM');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 12:00'))).toBe('12:00 PM');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 12:01'))).toBe('12:01 PM');
+
+      pattern = 'hh:mm a';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2017-01-01 13:01'))).toBe('01:01 PM');
+      expect(dateFormat.format(scout.dates.create('2017-01-01 01:01'))).toBe('01:01 AM');
+    });
+
     it("considers E", function() {
       var pattern = 'E, dd.MM.yy';
       var dateFormat = new scout.DateFormat(locale, pattern);
@@ -81,6 +116,40 @@ describe("DateFormat", function() {
       dateFormat = new scout.DateFormat(locale, pattern);
       expect(dateFormat.parse('21.3.14').getTime()).toBe(scout.dates.create('2014-03-21').getTime());
       expect(dateFormat.parse('1.3.04').getTime()).toBe(scout.dates.create('2004-03-01').getTime());
+    });
+
+    it("considers h H m a", function() {
+      var pattern = 'yyyy-MM-dd HH:mm';
+      var dateFormat = new scout.DateFormat(locale, pattern);
+
+      expect(dateFormat.parse('2017-01-01 12:00').getTime()).toBe(scout.dates.create('2017-01-01 12:00').getTime());
+      expect(dateFormat.parse('2017-01-01 13:00').getTime()).toBe(scout.dates.create('2017-01-01 13:00').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
+
+      pattern = 'yyyy-MM-dd H:mm';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.parse('2017-01-01 12:00').getTime()).toBe(scout.dates.create('2017-01-01 12:00').getTime());
+      expect(dateFormat.parse('2017-01-01 13:00').getTime()).toBe(scout.dates.create('2017-01-01 13:00').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
+      expect(dateFormat.parse('2017-01-01 1:00').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
+
+      pattern = 'yyyy-MM-dd hh:mm a';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.parse('2017-01-01 1:00 PM')).toBe(null);
+      expect(dateFormat.parse('2017-01-01 1:00 AM')).toBe(null);
+      expect(dateFormat.parse('2017-01-01 01:00 PM').getTime()).toBe(scout.dates.create('2017-01-01 13:00').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
+      expect(dateFormat.parse('2017-01-01 12:00 PM').getTime()).toBe(scout.dates.create('2017-01-01 12:00').getTime());
+      expect(dateFormat.parse('2017-01-01 12:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 00:00').getTime());
+
+      pattern = 'yyyy-MM-dd h:mm a';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.parse('2017-01-01 1:00 PM').getTime()).toBe(scout.dates.create('2017-01-01 13:00').getTime());
+      expect(dateFormat.parse('2017-01-01 1:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00 PM').getTime()).toBe(scout.dates.create('2017-01-01 13:00').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
+      expect(dateFormat.parse('2017-01-01 12:00 PM').getTime()).toBe(scout.dates.create('2017-01-01 12:00').getTime());
+      expect(dateFormat.parse('2017-01-01 12:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 00:00').getTime());
     });
   });
 
@@ -123,6 +192,23 @@ describe("DateFormat", function() {
         expect(result.matchInfo.year).toBe('1999');
       });
 
+      it('checks correct handling of am/pm', function() {
+        var pattern = 'yyyy-MM-dd h:mm a';
+        var dateFormat = new scout.DateFormat(locale, pattern);
+
+        var result = dateFormat.analyze('2017-01-01 12:00 AM');
+        expect(result.dateInfo.hours).toBe(0);
+        expect(result.dateInfo.minutes).toBe(0);
+
+        result = dateFormat.analyze('2017-01-01 12:00 PM');
+        expect(result.dateInfo.hours).toBe(12);
+        expect(result.dateInfo.minutes).toBe(0);
+
+        result = dateFormat.analyze('2017-01-01 1:01 PM');
+        expect(result.dateInfo.hours).toBe(13);
+        expect(result.dateInfo.minutes).toBe(1);
+      });
+
       it('proposes valid dates', function() {
         var pattern = 'dd.MM.yyyy';
         var dateFormat = new scout.DateFormat(locale, pattern);
@@ -153,6 +239,44 @@ describe("DateFormat", function() {
 
         result = dateFormat.analyze('32', scout.dates.create('2016-04-01'));
         expect(result.predictedDate).toBe(null);
+      });
+
+      it('proposes valid times', function() {
+        var pattern = 'HH:mm';
+        var dateFormat = new scout.DateFormat(locale, pattern);
+
+        var result = dateFormat.analyze('2', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('02:00');
+
+        result = dateFormat.analyze('20', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('20:00');
+
+        pattern = 'h:mm a';
+        dateFormat = new scout.DateFormat(locale, pattern);
+
+        result = dateFormat.analyze('2', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2:00 AM');
+
+        result = dateFormat.analyze('20', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2:00 AM');
+
+        result = dateFormat.analyze('0', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('1:00 AM');
+
+        result = dateFormat.analyze('1', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('1:00 AM');
+
+        result = dateFormat.analyze('11:59', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('11:59 AM');
+
+        result = dateFormat.analyze('11:59 p', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('11:59 PM');
+
+        result = dateFormat.analyze('11:59 pm', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('11:59 PM');
+
+        result = dateFormat.analyze('11:59 a', scout.dates.create('2016-02-01'));
+        expect(dateFormat.format(result.predictedDate)).toBe('11:59 AM');
       });
     });
   });

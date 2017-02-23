@@ -184,7 +184,7 @@ public class DateFormatProvider {
    * <pre>
    * en       "h:mm a"
    *
-   * default  "hh:mm"
+   * default  "HH:mm"
    * </pre>
    */
   protected String getIsolatedTimeFormatPattern(Locale locale) {
