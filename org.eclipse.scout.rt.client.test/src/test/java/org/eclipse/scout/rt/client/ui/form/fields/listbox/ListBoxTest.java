@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -239,7 +239,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
       @SuppressWarnings("unchecked")
       IColumn<String> keyColumn = table.getColumnSet().getColumn(0);
       for (ITableRow row : table.getRows()) {
-        if (CompareUtility.equals(keyColumn.getValue(row), key)) {
+        if (ObjectUtility.equals(keyColumn.getValue(row), key)) {
           return row;
         }
       }

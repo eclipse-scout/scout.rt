@@ -615,14 +615,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiRowChecked(JsonEvent event) {
-    CheckedInfo tableRowsChecked = jsonToCheckedInfo(event.getData());
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.getAllRows());
-
-    if (tableRowsChecked.getCheckedRows().size() > 0) {
-      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.getCheckedRows(), true);
+    CheckedInfo checkedInfo = jsonToCheckedInfo(event.getData());
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setCheckedRows(checkedInfo.getCheckedRows(), checkedInfo.getUncheckedRows());
+    if (checkedInfo.getCheckedRows().size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(checkedInfo.getCheckedRows(), true);
     }
-    if (tableRowsChecked.getUncheckedRows().size() > 0) {
-      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.getUncheckedRows(), false);
+    if (checkedInfo.getUncheckedRows().size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(checkedInfo.getUncheckedRows(), false);
     }
   }
 

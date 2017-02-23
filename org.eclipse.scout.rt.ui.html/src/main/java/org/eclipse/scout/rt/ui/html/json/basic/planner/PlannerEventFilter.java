@@ -34,15 +34,12 @@ public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, Planne
           List<Resource> resources = new ArrayList<>(event.getResources());
           resources.removeAll(condition.getResources());
           if (resources.size() == 0) {
-            //Event should be ignored if no nodes remain or if the event contained no nodes at all
+            // Ignore event if no resources remain or if the event contained no resources at all
             return null;
           }
-
           PlannerEvent newEvent = new PlannerEvent((IPlanner) m_jsonPlanner.getModel(), event.getType(), resources);
           return newEvent;
         }
-
-        return null;
       }
     }
     return event;

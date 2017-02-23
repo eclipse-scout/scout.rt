@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -22,12 +23,20 @@ public class TableEventFilterCondition {
 
   private int m_type;
   private List<ITableRow> m_rows;
+  private List<ITableRow> m_checkedRows;
+  private List<ITableRow> m_uncheckedRows;
   private List<IColumn<?>> m_columns;
   private IUserFilterState m_userFilter;
+
   private boolean m_checkRows;
+  private boolean m_checkCheckedRows;
   private boolean m_checkColumns;
   private boolean m_checkUserFilter;
 
+  /**
+   * @param type
+   *          event type (see {@link TableEvent})
+   */
   public TableEventFilterCondition(int type) {
     m_type = type;
     m_rows = new ArrayList<ITableRow>();
@@ -45,6 +54,20 @@ public class TableEventFilterCondition {
   public void setRows(List<? extends ITableRow> rows) {
     m_rows = CollectionUtility.arrayList(rows);
     m_checkRows = true;
+  }
+
+  public List<ITableRow> getCheckedRows() {
+    return CollectionUtility.arrayList(m_checkedRows);
+  }
+
+  public List<ITableRow> getUncheckedRows() {
+    return CollectionUtility.arrayList(m_uncheckedRows);
+  }
+
+  public void setCheckedRows(List<? extends ITableRow> checkedRows, List<? extends ITableRow> uncheckedRows) {
+    m_checkedRows = CollectionUtility.arrayList(checkedRows);
+    m_uncheckedRows = CollectionUtility.arrayList(uncheckedRows);
+    m_checkCheckedRows = true;
   }
 
   public List<IColumn<?>> getColumns() {
@@ -67,6 +90,10 @@ public class TableEventFilterCondition {
 
   public boolean checkRows() {
     return m_checkRows;
+  }
+
+  public boolean checkCheckedRows() {
+    return m_checkCheckedRows;
   }
 
   public boolean checkColumns() {

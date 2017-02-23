@@ -94,7 +94,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     super(model, uiSession, id, parent);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
-    m_treeEventFilter = new TreeEventFilter(getModel());
+    m_treeEventFilter = new TreeEventFilter(this);
     m_eventBuffer = model.createEventBuffer();
   }
 
@@ -867,13 +867,13 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleUiNodesChecked(JsonEvent event) {
-    CheckedInfo treeNodesChecked = jsonToCheckedInfo(event.getData());
-    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.getAllNodes());
-    if (treeNodesChecked.getCheckedNodes().size() > 0) {
-      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.getCheckedNodes(), true);
+    CheckedInfo checkedInfo = jsonToCheckedInfo(event.getData());
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED).setCheckedNodes(checkedInfo.getCheckedNodes(), checkedInfo.getUncheckedNodes());
+    if (checkedInfo.getCheckedNodes().size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(checkedInfo.getCheckedNodes(), true);
     }
-    if (treeNodesChecked.getUncheckedNodes().size() > 0) {
-      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.getUncheckedNodes(), false);
+    if (checkedInfo.getUncheckedNodes().size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(checkedInfo.getUncheckedNodes(), false);
     }
   }
 
@@ -899,7 +899,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   protected void handleUiNodesSelected(JsonEvent event) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getData());
-    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED, nodes);
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED).setNodes(nodes);
     getModel().getUIFacade().setNodesSelectedFromUI(nodes);
   }
 
@@ -913,7 +913,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     boolean expanded = event.getData().getBoolean(PROP_EXPANDED);
     boolean lazy = event.getData().getBoolean(PROP_EXPANDED_LAZY);
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
-    addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
+    addTreeEventFilterCondition(eventType).setNodes(CollectionUtility.arrayList(node));
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded, lazy);
   }
 
@@ -964,8 +964,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     return m_treeEventFilter;
   }
 
-  protected void addTreeEventFilterCondition(int type, List<ITreeNode> nodes) {
-    m_treeEventFilter.addCondition(new TreeEventFilterCondition(type, nodes));
+  protected TreeEventFilterCondition addTreeEventFilterCondition(int treeEventType) {
+    TreeEventFilterCondition condition = new TreeEventFilterCondition(treeEventType);
+    m_treeEventFilter.addCondition(condition);
+    return condition;
   }
 
   @Override
