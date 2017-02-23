@@ -19,6 +19,13 @@ import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
 
 /**
  * Marker for unit tests that should not be executed if {@link SeleniumUtil#isMacOS()} returns <code>true</code>.
+ * <p>
+ * Currently you should use this marker for tests on a Mac that make use of the COMMAND key (like CTRL key for PCs) It
+ * seems that webdriver on Mac doesn't support 'native' key combinations like COMMAND+C/V for copy and paste. There's no
+ * easy workaround (we could run a bit of JS code on the mac to do copy/paste but currently that's not worth the
+ * effort).
+ *
+ * @see: https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
