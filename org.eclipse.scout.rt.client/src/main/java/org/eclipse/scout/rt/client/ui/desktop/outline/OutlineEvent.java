@@ -21,14 +21,42 @@ public class OutlineEvent extends TreeEvent {
    */
   public static final int TYPE_PAGE_CHANGED = 1001;
 
+  public static final int TYPE_PAGE_BEFORE_DATA_LOADED = 1002;
+
+  /**
+   * Fired after the page's child data is loaded. Note that this event is also fired when the loading fails with an
+   * exception. Event consumers can't rely on a valid state of the loaded data.
+   */
+  public static final int TYPE_PAGE_AFTER_DATA_LOADED = 1003;
+
+  public static final int TYPE_PAGE_AFTER_TABLE_INIT = 1004;
+
+  public static final int TYPE_PAGE_AFTER_PAGE_INIT = 1005;
+
+  public static final int TYPE_PAGE_AFTER_SEARCH_FORM_START = 1006;
+
+  public static final int TYPE_PAGE_AFTER_DISPOSE = 1007;
+
   private static final long serialVersionUID = 1L;
 
-  public OutlineEvent(ITree source, int type) {
+  private boolean m_buffered;
+
+  public OutlineEvent(ITree source, int type, boolean buffered) {
     super(source, type);
+    m_buffered = buffered;
   }
 
-  public OutlineEvent(ITree source, int type, ITreeNode node) {
+  public OutlineEvent(ITree source, int type, ITreeNode node, boolean buffered) {
     super(source, type, node);
+    m_buffered = buffered;
+  }
+
+  public boolean isBuffered() {
+    return m_buffered;
+  }
+
+  public void setBuffered(boolean buffered) {
+    m_buffered = buffered;
   }
 
 }

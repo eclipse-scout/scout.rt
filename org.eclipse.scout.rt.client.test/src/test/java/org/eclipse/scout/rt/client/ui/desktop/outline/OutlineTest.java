@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.Stack;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
@@ -48,9 +49,13 @@ public class OutlineTest {
     final SavingTreeListener listener = new SavingTreeListener();
     o.addTreeListener(listener);
     o.setTreeChanging(true);
+    o.fireBeforeDataLoaded(mock(IPage.class)); // unbuffered
+    o.fireAfterDataLoaded(mock(IPage.class)); // unbuffered
     o.firePageChanged(mock(IPage.class));
     o.firePageChanged(mock(IPage.class));
+    o.fireAfterTableInit(mock(IPage.class)); // unbuffered
     o.setTreeChanging(false);
+    o.disposeTree(); // fires afterDispose event, is sent as buffered event but since tree isn't changing anymore no buffering is applied
     List<? extends TreeEvent> batch = listener.getBatch();
     assertEquals(2, batch.size());
     TreeEvent e1 = batch.get(0);
@@ -58,10 +63,18 @@ public class OutlineTest {
     TreeEvent e2 = batch.get(1);
     assertEquals(OutlineEvent.TYPE_PAGE_CHANGED, e2.getType());
     assertNotEquals(e1.getNode(), e2.getNode());
+
+    // check number and order of unbuffered events fired during the treeChanging period
+    assertEquals(4, listener.getUnbufferedEvents().size());
+    assertEquals(OutlineEvent.TYPE_PAGE_AFTER_DISPOSE, listener.getUnbufferedEvents().pop().getType());
+    assertEquals(OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT, listener.getUnbufferedEvents().pop().getType());
+    assertEquals(OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED, listener.getUnbufferedEvents().pop().getType());
+    assertEquals(OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED, listener.getUnbufferedEvents().pop().getType());
   }
 
   private static class SavingTreeListener extends TreeAdapter {
     private List<? extends TreeEvent> m_batch = null;
+    private Stack<TreeEvent> m_unbuffered = new Stack<>();
 
     @Override
     public void treeChangedBatch(List<? extends TreeEvent> batch) {
@@ -70,6 +83,16 @@ public class OutlineTest {
 
     public List<? extends TreeEvent> getBatch() {
       return m_batch;
+    }
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      // keep track of all unbuffered events.
+      m_unbuffered.push(e);
+    }
+
+    public Stack<TreeEvent> getUnbufferedEvents() {
+      return m_unbuffered;
     }
   }
 

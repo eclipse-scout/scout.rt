@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -413,6 +414,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         m_searchForm.start();
         notifyMemoryPolicyOfSearchFormStart();
+        fireAfterSearchFormStart();
         ensureSearchControlSelected();
       }
       catch (Exception e) {
@@ -797,6 +799,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
       //
       setChildrenLoaded(false);
+      fireBeforeDataLoaded();
       ClientSessionProvider.currentSession().getMemoryPolicy().beforeTablePageLoadData(this);
       try {
         loadTableDataImpl();
@@ -806,6 +809,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
       finally {
         ClientSessionProvider.currentSession().getMemoryPolicy().afterTablePageLoadData(this);
+        fireAfterDataLoaded();
       }
       setChildrenLoaded(true);
       setChildrenDirty(false);
@@ -1016,6 +1020,13 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }// end switch
     }
 
+  }
+
+  protected void fireAfterSearchFormStart() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.fireAfterSearchFormStart(this);
+    }
   }
 
   protected final void interceptLoadData(SearchFilter filter) {

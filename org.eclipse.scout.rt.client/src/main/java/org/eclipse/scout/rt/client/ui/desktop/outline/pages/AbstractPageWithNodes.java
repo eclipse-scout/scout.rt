@@ -200,14 +200,17 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
           t = t.getParentNode();
         }
       }
-      //
       setChildrenLoaded(false);
-      //
-      if (tree != null) {
-        tree.removeAllChildNodes(this);
-        tree.addChildNodes(this, pageList);
+      fireBeforeDataLoaded();
+      try {
+        if (tree != null) {
+          tree.removeAllChildNodes(this);
+          tree.addChildNodes(this, pageList);
+        }
       }
-      //
+      finally {
+        fireAfterDataLoaded();
+      }
       setChildrenLoaded(true);
       setChildrenDirty(false);
       // table events will handle automatic tree changes in case table is mirrored in tree.

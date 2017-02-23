@@ -147,10 +147,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           m_table = createTable();
           if (m_table != null) {
             m_table.initTable(); // calls execInitTable of AbstractTable
-            firePageChanged(AbstractPage.this);
+            firePageChanged();
             addDefaultTableControls();
             interceptInitTable(); // calls execInitTable of AbstractPage
             notifyMemoryPolicyOfTableCreated();
+            fireAfterTableInit();
           }
         }
       });
@@ -546,6 +547,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       if (!doCalculateVisibleLate()) {
         calculateVisibleInternal();
       }
+      fireAfterPageInit();
     }
     finally {
       setInitializing(false);
@@ -694,6 +696,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       interceptDisposePage();
       disposeDetailForm();
       disposeTable();
+      fireAfterPageDispose();
     }
     catch (RuntimeException | PlatformError e) {
       BEANS.get(ExceptionHandler.class).handle(e);
@@ -851,7 +854,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (m_detailForm != null) {
       decorateDetailForm();
     }
-    firePageChanged(this);
+    firePageChanged();
     if (isSelectedNode()) {
       getOutline().setDetailForm(m_detailForm);
     }
@@ -980,7 +983,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return; // no change
     }
     m_flags = FLAGS_BIT_HELPER.changeBit(TABLE_VISIBLE, tableVisible, m_flags);
-    firePageChanged(this);
+    firePageChanged();
   }
 
   @Override
@@ -994,17 +997,52 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return; // no change
     }
     m_flags = FLAGS_BIT_HELPER.changeBit(DETAIL_FORM_VISIBLE, detailFormVisible, m_flags);
-    firePageChanged(this);
+    firePageChanged();
   }
 
   /**
    * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null. Tree can also be null
    * during shutdown.
    */
-  protected void firePageChanged(IPage page) {
+  protected void firePageChanged() {
     IOutline outline = getOutline();
     if (outline != null) {
-      outline.firePageChanged(page);
+      outline.firePageChanged(this);
+    }
+  }
+
+  protected void fireBeforeDataLoaded() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.fireBeforeDataLoaded(this);
+    }
+  }
+
+  protected void fireAfterDataLoaded() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.fireAfterDataLoaded(this);
+    }
+  }
+
+  protected void fireAfterTableInit() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.fireAfterTableInit(this);
+    }
+  }
+
+  protected void fireAfterPageInit() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.fireAfterPageInit(this);
+    }
+  }
+
+  protected void fireAfterPageDispose() {
+    IOutline outline = getOutline();
+    if (outline != null) {
+      outline.fireAfterPageDispose(this);
     }
   }
 
@@ -1086,7 +1124,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     public void treeChanged(TreeEvent e) {
       AbstractPage<T> page = AbstractPage.this;
       if (TreeEvent.TYPE_NODES_UPDATED == e.getType() && e.getChildNodes().contains(page)) {
-        firePageChanged(page);
+        AbstractPage.this.firePageChanged();
       }
     }
   }

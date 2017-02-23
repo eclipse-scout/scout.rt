@@ -183,4 +183,16 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   List<IMenu> getMenusForPage(IPage<?> page);
 
   void firePageChanged(IPage<?> page);
+
+  void fireBeforeDataLoaded(IPage<?> page);
+
+  void fireAfterDataLoaded(IPage<?> page);
+
+  void fireAfterTableInit(IPage<?> page);
+
+  void fireAfterPageInit(IPage<?> page);
+
+  void fireAfterSearchFormStart(IPage<?> page);
+
+  void fireAfterPageDispose(IPage<?> page);
 }

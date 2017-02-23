@@ -2586,10 +2586,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       getEventBuffer().add(e);
     }
     else {
-      EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
-      for (EventListener l : listeners) {
-        ((TreeListener) l).treeChanged(e);
-      }
+      doFireTreeEvent(e);
+    }
+  }
+
+  protected void doFireTreeEvent(TreeEvent e) {
+    EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
+    for (EventListener l : listeners) {
+      ((TreeListener) l).treeChanged(e);
     }
   }
 

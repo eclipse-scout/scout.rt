@@ -960,7 +960,46 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     if (page != null && page.isInitializing()) {
       return;
     }
-    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_CHANGED, page));
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_CHANGED, page, true));
+  }
+
+  @Override
+  public void fireBeforeDataLoaded(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED, page, false));
+  }
+
+  @Override
+  public void fireAfterDataLoaded(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED, page, false));
+  }
+
+  @Override
+  public void fireAfterTableInit(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT, page, false));
+  }
+
+  @Override
+  public void fireAfterPageInit(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT, page, false));
+  }
+
+  @Override
+  public void fireAfterSearchFormStart(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_AFTER_SEARCH_FORM_START, page, false));
+  }
+
+  @Override
+  public void fireAfterPageDispose(IPage<?> page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_AFTER_DISPOSE, page, true));
+  }
+
+  protected void fireTreeEventInternal(OutlineEvent e) {
+    if (e.isBuffered()) {
+      super.fireTreeEventInternal(e);
+    }
+    else {
+      doFireTreeEvent(e);
+    }
   }
 
   @Override

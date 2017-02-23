@@ -130,8 +130,8 @@ public class PageWithNodesTest {
     }
 
     @Override
-    protected void firePageChanged(IPage page) {
-      super.firePageChanged(page);
+    protected void firePageChanged() {
+      super.firePageChanged();
       m_firePageChanged++;
     }
 
