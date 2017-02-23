@@ -350,6 +350,11 @@ textarea {
   cursor: row-resize !important;
 }
 
+/* Used to temporarily disable pointer events on iframes while dragging elements */
+.dragging-in-progress {
+  pointer-events: none;
+}
+
 /* remove the dotted border in firefox */
 button::-moz-focus-inner {
   border: 0;
@@ -504,10 +509,6 @@ noscript {
  */
 iframe {
   -ms-user-select: element;
-}
-/* Used to temporarily disable pointer events on iframes while dragging elements */
-iframe.dragging-in-progress {
-  pointer-events: none;
 }
 
 .error-popup-correlation-id {
