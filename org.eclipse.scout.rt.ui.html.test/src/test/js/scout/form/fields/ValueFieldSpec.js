@@ -127,7 +127,7 @@ describe("ValueField", function() {
       jasmine.clock().tick(0);
       sendQueuedAjaxCalls();
       // Simulate request response was processed...
-      session._requestsPendingCounter--;
+      session._setRequestPending(false);
       session._fireRequestFinished(mostRecentJsonRequest());
 
       $menu = $('body').find('.popup-body');

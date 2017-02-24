@@ -542,7 +542,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   if (busyHandling) {
     this.setBusy(true);
   }
-  this._requestsPendingCounter++;
+  this._setRequestPending(true);
 
   var jsError = null,
     success = false;
@@ -581,7 +581,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.unregisterAjaxRequest(xhr);
-    this._requestsPendingCounter--;
+    this._setRequestPending(false);
     this.layoutValidator.validate();
 
     // "success" is false when either
@@ -1057,6 +1057,26 @@ scout.Session.prototype.areResponsesQueued = function() {
 scout.Session.prototype.areRequestsPending = function() {
   return this._requestsPendingCounter > 0;
 };
+
+scout.Session.prototype._setRequestPending = function(pending) {
+  if (pending) {
+    this._requestsPendingCounter++;
+  } else {
+    this._requestsPendingCounter--;
+  }
+
+  // In "inspector" mode, add/remove a marker div that can be used to detect pending
+  // server calls by UI testing tools, e.g. Selenium
+  if (this.desktop.modelClass) {
+    if (pending && !this._$requestPending) {
+      this._$requestPending = this.$entryPoint.appendDiv('request-pending');
+    } else if (!pending && this._$requestPending) {
+      this._$requestPending.remove();
+      this._$requestPending = null;
+    }
+  }
+};
+
 
 scout.Session.prototype.setBusy = function(busy) {
   if (busy) {
