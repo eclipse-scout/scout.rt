@@ -130,11 +130,6 @@ scout.WizardProgressField.prototype._renderActiveStepIndex = function() {
     this._updateStepClasses(step);
   }.bind(this));
 
-  // update background color for this.$wizardStepsBody, use same as for last step (otherwise there might be white space after last step)
-  if (this.steps.length > 0) {
-    this.$wizardStepsBody.css('background-color', this.steps[this.steps.length - 1].$step.css('background-color'));
-  }
-
   this.invalidateLayoutTree(false);
 };
 
@@ -169,6 +164,11 @@ scout.WizardProgressField.prototype._updateStepClasses = function(step) {
     if (stepIndex === this.steps.length - 1) {
       $step.addClass('last');
     }
+  }
+
+  // update background color for this.$wizardStepsBody, use same as for last step (otherwise there might be white space after last step)
+  if (stepIndex === this.steps.length - 1) {
+    this.$wizardStepsBody.css('background-color', $step.css('background-color'));
   }
 };
 
