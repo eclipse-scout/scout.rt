@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.naming.Context;
+import javax.naming.NamingException;
 
 import org.apache.activemq.jndi.ActiveMQInitialContextFactory;
 import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
@@ -117,6 +119,26 @@ public class JmsMomImplementorTest {
     JmsMomImplementor mom1 = BEANS.get(JmsMomImplementor.class);
     JmsMomImplementor mom2 = BEANS.get(JmsMomImplementor.class);
     assertNotSame(mom1, mom2);
+  }
+
+  @Test
+  public void testCreateContextNullMap() throws NamingException {
+    new JmsMomImplementor().createContext(null);
+  }
+
+  @Test
+  public void testCreateContextEmptyMap() throws NamingException {
+    new JmsMomImplementor().createContext(Collections.emptyMap());
+  }
+
+  @Test
+  public void testCreateContextOrdinaryMap() throws NamingException {
+    new JmsMomImplementor().createContext(Collections.<Object, Object> singletonMap("key", "value"));
+  }
+
+  @Test
+  public void testCreateContextMapWithNullEntries() throws NamingException {
+    new JmsMomImplementor().createContext(Collections.<Object, Object> singletonMap("key", null));
   }
 
   @Test

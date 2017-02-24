@@ -9,6 +9,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -410,8 +411,20 @@ public class JmsMomImplementor implements IMomImplementor {
     }
   }
 
+  @SuppressWarnings("squid:S1149")
   protected Context createContext(final Map<Object, Object> properties) throws NamingException {
-    return new InitialContext(new Hashtable<>(properties));
+    Hashtable<Object, Object> env = new Hashtable<>();
+    if (properties != null) {
+      for (Entry<Object, Object> entry : properties.entrySet()) {
+        if (entry.getKey() == null || entry.getValue() == null) {
+          LOG.info("ignoring property having null key or value [key={}, value={}]", entry.getKey(), entry.getValue());
+        }
+        else {
+          env.put(entry.getKey(), entry.getValue());
+        }
+      }
+    }
+    return new InitialContext(env);
   }
 
   protected Connection createConnection(final Context context, final Map<Object, Object> properties) throws NamingException, JMSException {
