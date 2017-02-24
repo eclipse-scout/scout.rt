@@ -33,6 +33,7 @@ scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 //Minimum field with to normal state, for smaller widths the "compact" style is applied.
 scout.FormFieldLayout.MIN_FIELD_WIDTH = 50;
 
+scout.FormFieldLayout.LABEL_WIDTH_UI = -1;
 scout.FormFieldLayout.LABEL_WIDTH_DEFAULT = 0;
 
 scout.FormFieldLayout.prototype.layout = function($container) {
@@ -53,7 +54,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
-    if (formField.labelUseUiWidth) {
+    if (labelWidth === scout.FormFieldLayout.LABEL_WIDTH_UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
