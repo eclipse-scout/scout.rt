@@ -64,26 +64,31 @@ scout.Scrollbar.prototype._render = function($parent) {
   this._scrollDir = this.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
   // Install listeners
+  var scrollbars = $parent.data('scrollbars');
+  if (!scrollbars) {
+    throw new Error('Data "scrollbars" missing in ' + scout.graphics.debugOutput($parent) + '\nAncestors: ' + this.ancestorsToString(1));
+  }
   $parent
     .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
-    .on('scroll', this._onScrollHandler)
-    .data('scrollbars').forEach(function(scrollbar) {
-      scrollbar.on('scrollstart', this._fixScrollbarHandler);
-      scrollbar.on('scrollend', this._unfixScrollbarHandler);
-    }.bind(this));
+    .on('scroll', this._onScrollHandler);
+  scrollbars.forEach(function(scrollbar) {
+    scrollbar.on('scrollstart', this._fixScrollbarHandler);
+    scrollbar.on('scrollend', this._unfixScrollbarHandler);
+  }.bind(this));
   this.$container.on('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.on('mousedown', this._onThumbMousedownHandler);
 };
 
 scout.Scrollbar.prototype._remove = function() {
   // Uninstall listeners
+  var scrollbars = this.$parent.data('scrollbars');
   this.$parent
     .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
-    .off('scroll', this._onScrollHandler)
-    .data('scrollbars').forEach(function(scrollbar) {
-      scrollbar.off('scrollstart', this._fixScrollbarHandler);
-      scrollbar.off('scrollend', this._unfixScrollbarHandler);
-    }.bind(this));
+    .off('scroll', this._onScrollHandler);
+  scrollbars.forEach(function(scrollbar) {
+    scrollbar.off('scrollstart', this._fixScrollbarHandler);
+    scrollbar.off('scrollend', this._unfixScrollbarHandler);
+  }.bind(this));
   this.$container.off('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.off('mousedown', '', this._onThumbMousedownHandler);
 

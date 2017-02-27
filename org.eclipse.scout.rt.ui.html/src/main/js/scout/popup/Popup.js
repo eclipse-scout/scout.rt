@@ -92,7 +92,6 @@ scout.Popup.prototype.open = function($parent) {
   if (this.withFocusContext) {
     this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
   }
-
 };
 
 scout.Popup.prototype._open = function($parent) {

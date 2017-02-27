@@ -69,14 +69,6 @@ scout.BenchColumn.prototype._renderTabBox = function(tabBox) {
   }
 };
 
-scout.BenchColumn.prototype._remove = function() {
-  scout.SimpleTabBox.parent.prototype._remove.call(this);
-  if (this.scrollable) {
-    scout.scrollbars.uninstall(this.$body);
-  }
-  this.htmlComp = null;
-};
-
 scout.BenchColumn.prototype.postRender = function() {
   this.tabBoxes.forEach(function(tabBox) {
     tabBox.postRender();

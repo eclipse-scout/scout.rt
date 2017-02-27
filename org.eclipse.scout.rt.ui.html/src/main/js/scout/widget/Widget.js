@@ -464,6 +464,19 @@ scout.Widget.prototype.removeChild = function(child) {
 };
 
 /**
+ * @returns a list of all ancestors
+ */
+scout.Widget.prototype.ancestors = function() {
+  var ancestors = [];
+  var parent = this.parent;
+  while (parent) {
+    ancestors.push(parent);
+    parent = parent.parent;
+  }
+  return ancestors;
+};
+
+/**
  * @returns true if the given widget is the same as this or a descendant
  */
 scout.Widget.prototype.isOrHas = function(widget) {
@@ -1023,8 +1036,35 @@ scout.Widget.prototype._glassPaneTargets = function() {
 };
 
 scout.Widget.prototype.toString = function() {
-  return 'Widget[rendered=' + this.rendered +
-    (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
+  var attrs = '';
+  attrs += 'id=' + this.id;
+  attrs += ' objectType=' + this.objectType;
+  attrs += ' rendered=' + this.rendered;
+  if (this.$container) {
+    attrs += ' $container=' + scout.graphics.debugOutput(this.$container);
+  }
+  return 'Widget[' + attrs.trim() + ']';
+};
+
+/**
+ * Returns the ancestors as string delimited by '\n'.
+ * @param [count] the number of ancestors to be processed. Default is -1 which means all.
+ */
+scout.Widget.prototype.ancestorsToString = function(count) {
+  var str = '',
+    ancestors = this.ancestors();
+
+  count = scout.nvl(count, -1);
+  ancestors.some(function(ancestor, i) {
+    if (count > -1 && i >= count) {
+      return true;
+    }
+    if (i > 0 && i < ancestors.length - 1) {
+      str += '\n';
+    }
+    str += ancestor.toString();
+  });
+  return str;
 };
 
 scout.Widget.prototype.resolveTextKeys = function(properties) {

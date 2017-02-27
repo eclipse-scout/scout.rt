@@ -270,6 +270,9 @@ scout.graphics = {
       }
       attrs = html;
     }
+    if (!$comp.isAttached()) {
+      attrs += ' attached=false';
+    }
     return 'Element[' + attrs.trim() + ']';
   }
 };

@@ -85,13 +85,6 @@ scout.SimpleTabBox.prototype.postRender = function() {
   }
 };
 
-scout.SimpleTabBox.prototype._remove = function() {
-  scout.SimpleTabBox.parent.prototype._remove.call(this);
-  if (this.scrollable) {
-    scout.scrollbars.uninstall(this.$body);
-  }
-};
-
 scout.SimpleTabBox.prototype.activateView = function(view) {
   if (view === this.currentView) {
     return;
