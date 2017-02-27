@@ -135,10 +135,10 @@ scout.GroupBox.prototype._render = function($parent) {
 };
 
 scout.GroupBox.prototype._remove = function() {
-  scout.GroupBox.parent.prototype._remove.call(this);
   if (this.scrollable) {
-    scout.scrollbars.uninstall(this.$body);
+    scout.scrollbars.uninstall(this.$body, this.session);
   }
+  scout.GroupBox.parent.prototype._remove.call(this);
 };
 
 scout.GroupBox.prototype._renderProperties = function() {
