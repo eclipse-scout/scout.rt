@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.IDN;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -65,6 +67,8 @@ public final class MailUtility {
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
   public static final String CONTENT_TYPE_IMAGE_PREFIX = "image/";
   public static final String CONTENT_TYPE_MULTIPART_PREFIX = "multipart/";
+
+  private static final Pattern PATTERN_MIME_CONTENT_TYPE_CHARSET = Pattern.compile(".*charset=(\")([^\1\\s;]+)\\1", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
   private MailUtility() {
   }
@@ -123,6 +127,8 @@ public final class MailUtility {
       else {
         Object content = null;
         try { // NOSONAR
+          checkValidCharset(part);
+
           // getContent might throw a MessagingException for legitimate parts (e.g. some images end up in a javax.imageio.IIOException for example).
           content = part.getContent();
         }
@@ -187,6 +193,51 @@ public final class MailUtility {
   }
 
   /**
+   * <p>
+   * Quick check if character set seems to be valid. If character set seems to be not valid a more detailed check is
+   * started.
+   * </p>
+   * <p>
+   * As java.io.InputStreamReader.InputStreamReader(InputStream, String) might throw up with a
+   * {@link NullPointerException} in case of an unknown character set, if such an exception occurs, the character set is
+   * replaced with {@link StandardCharsets#UTF_8} even though this may lead to display errors.
+   * </p>
+   */
+  private static void checkValidCharset(Part part) throws MessagingException {
+    String contentType = part.getContentType();
+    if (contentType == null) {
+      return;
+    }
+
+    Matcher matcher = PATTERN_MIME_CONTENT_TYPE_CHARSET.matcher(contentType);
+    if (!matcher.find()) {
+      return;
+    }
+
+    String charset = matcher.group(2);
+    try {
+      Charset.forName(charset);
+      return;
+    }
+    catch (UnsupportedCharsetException e) {
+      // ignore exception itself (use trace log)
+      LOG.trace("checkValidCharset: UnsupportedCharsetException has occured.", e);
+    }
+
+    try {
+      part.getContent();
+    }
+    catch (NullPointerException e1) {
+      LOG.info("Mail part seems to use an unsupported character set {}, use UTF-8 as fallback.", charset, e1);
+      part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
+    }
+    catch (IOException e1) {
+      // ignore exception itself (use trace log)
+      LOG.trace("checkValidCharset: IOException has occured.", e1);
+    }
+  }
+
+  /**
    * @param part
    * @return the plainText part encoded with the encoding given in the MIME header or UTF-8 encoded or null if the
    *         plainText Part is not given
@@ -206,7 +257,7 @@ public final class MailUtility {
               text = new String(content, getCharacterEncodingOfMimePart(mimePart));
             }
             catch (UnsupportedEncodingException e) {
-              LOG.warn("unsupporeted encoding", e);
+              LOG.warn("unsupported encoding", e);
               text = new String(content);
             }
           }
@@ -632,9 +683,9 @@ public final class MailUtility {
       }
     }
     else {
-      final String chartsetEquals = "charset=";
-      if (part.getContentType().contains(chartsetEquals)) {
-        String[] contentTypeParts = part.getContentType().split(chartsetEquals);
+      final String charsetEquals = "charset=";
+      if (part.getContentType().contains(charsetEquals)) {
+        String[] contentTypeParts = part.getContentType().split(charsetEquals);
         if (contentTypeParts.length == 2) {
           characterEncoding = contentTypeParts[1];
         }

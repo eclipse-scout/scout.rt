@@ -21,8 +21,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.IDN;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +37,7 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -47,12 +51,18 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * JUnit tests for {@link MailUtility}
  */
 public class MailUtilityTest {
+
+  /**
+   * Very rare, unknown character set. Currently UTF-7, by default Oracle JDK does not support it.
+   */
+  private static final String RARE_UNKNOWN_CHARSET = "unicode-1-1-utf-7";
 
   /**
    * Message without sender can be created
@@ -450,6 +460,43 @@ public class MailUtilityTest {
   @Test(expected = ProcessingException.class)
   public void testParseInternetAddressListInvalid2() {
     runTestParseInternetAddressList("foo@bar.de", "foo@bar@de.de");
+  }
+
+  @Test(expected = UnsupportedCharsetException.class)
+  public void testUnknownCharsetIsStillUnknown() {
+    // pre-condition, charset is really (still) unknown
+    Assert.assertEquals(null, Charset.forName(RARE_UNKNOWN_CHARSET));
+  }
+
+  protected MimeMessage createMimeMessageUsingUnknownEncoding() throws IOException, MessagingException {
+    MailMessage definition = new MailMessage().withBodyPlainText("a");
+    MimeMessage mimeMessage = MailUtility.createMimeMessage(definition);
+    Object multipart0 = mimeMessage.getContent();
+    Assert.assertTrue(multipart0 instanceof Multipart);
+    Multipart multipart = (Multipart) multipart0;
+    BodyPart plaintextPart = multipart.getBodyPart(0);
+    plaintextPart.setHeader(MailUtility.CONTENT_TYPE_ID, "text/plain; charset=\"" + RARE_UNKNOWN_CHARSET + "\"");
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+    mimeMessage.writeTo(bos);
+    mimeMessage = new MimeMessage(null, new ByteArrayInputStream(bos.toByteArray()));
+    return mimeMessage;
+  }
+
+  @Test(expected = UnsupportedEncodingException.class)
+  public void testReadingContentWithUnknownCharsetFails() throws IOException, MessagingException {
+    MimeMessage mimeMessage = createMimeMessageUsingUnknownEncoding();
+    Object multipart0 = mimeMessage.getContent();
+    Assert.assertTrue(multipart0 instanceof Multipart);
+    Multipart multipart = (Multipart) multipart0;
+    BodyPart plaintextPart = multipart.getBodyPart(0);
+    plaintextPart.getContent();
+  }
+
+  @Test
+  public void testFallbackForUnknownEncoding() throws IOException, MessagingException {
+    MimeMessage mimeMessage = createMimeMessageUsingUnknownEncoding();
+    Assert.assertEquals("a", MailUtility.getPlainText(mimeMessage));
   }
 
   /**
