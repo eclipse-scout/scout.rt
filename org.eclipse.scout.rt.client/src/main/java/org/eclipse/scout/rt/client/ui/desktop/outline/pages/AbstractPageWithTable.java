@@ -908,8 +908,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   private class P_TableListener extends TableAdapter {
     @Override
-    public void tableChanged(TableEvent e) {
-      OutlineMediator outlineMediator = getOutlineMediator();
+    public void tableChanged(final TableEvent e) {
+      final OutlineMediator outlineMediator = getOutlineMediator();
 
       switch (e.getType()) {
         case TableEvent.TYPE_ROW_ACTION: {
@@ -935,13 +935,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         }
         case TableEvent.TYPE_ROWS_INSERTED: {
           if (!isLeaf()) {
-            final List<ITableRow> tableRows = e.getRows();
-            final List<IPage<?>> childPageList = new ArrayList<IPage<?>>(tableRows.size());
             ClientRunContexts.copyCurrent()
                 .withOutline(getOutline(), true)
                 .run(new IRunnable() {
                   @Override
                   public void run() {
+                    final List<ITableRow> tableRows = e.getRows();
+                    final List<IPage<?>> childPageList = new ArrayList<IPage<?>>(tableRows.size());
+
                     for (ITableRow element : tableRows) {
                       try {
                         IPage<?> childPage = createChildPageInternalInRunContext(element);
@@ -962,20 +963,19 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                         BEANS.get(ExceptionHandler.class).handle(ex);
                       }
                     }
+                    if (outlineMediator != null) {
+                      outlineMediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this);
+                    }
+
+                    // check if a page was revoked
+                    for (ITableRow tableRow : tableRows) {
+                      IPage<?> page = getPageFor(tableRow);
+                      if (page != null && page.getParentNode() == null) {
+                        unlinkTableRowWithPage(tableRow);
+                      }
+                    }
                   }
                 });
-
-            if (outlineMediator != null) {
-              outlineMediator.mediateTableRowsInserted(tableRows, childPageList, AbstractPageWithTable.this);
-            }
-
-            // check if a page was revoked
-            for (ITableRow tableRow : tableRows) {
-              IPage<?> page = getPageFor(tableRow);
-              if (page != null && page.getParentNode() == null) {
-                unlinkTableRowWithPage(tableRow);
-              }
-            }
           }
           break;
         }

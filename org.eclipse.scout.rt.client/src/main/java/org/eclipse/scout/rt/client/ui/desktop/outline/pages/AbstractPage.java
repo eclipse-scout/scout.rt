@@ -140,19 +140,28 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
             getClass(), new Exception("origin"));
       }
 
-      runInExtensionContext(new Runnable() {
-        @Override
-        public void run() {
-          m_table = createTable();
-          if (m_table != null) {
-            m_table.initTable(); // calls execInitTable of AbstractTable
-            firePageChanged();
-            addDefaultTableControls();
-            interceptInitTable(); // calls execInitTable of AbstractPage
-            fireAfterTableInit();
-          }
-        }
-      });
+      ClientRunContexts
+          .copyCurrent()
+          .withOutline(getOutline(), true)
+          .run(
+              new IRunnable() {
+                @Override
+                public void run() throws Exception {
+                  runInExtensionContext(new Runnable() {
+                    @Override
+                    public void run() {
+                      m_table = createTable();
+                      if (m_table != null) {
+                        m_table.initTable(); // calls execInitTable of AbstractTable
+                        firePageChanged();
+                        addDefaultTableControls();
+                        interceptInitTable(); // calls execInitTable of AbstractPage
+                        fireAfterTableInit();
+                      }
+                    }
+                  });
+                }
+              });
     }
     return m_table;
   }
