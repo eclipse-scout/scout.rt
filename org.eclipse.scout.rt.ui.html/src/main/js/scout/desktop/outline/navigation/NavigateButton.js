@@ -22,24 +22,14 @@ scout.NavigateButton = function() {
   this.node = null;
   this.outline = null;
   this._onClickFunc = null;
-  this.selected = false;
-  this.visible = true;
-  this.enabled = true;
-  this.mandatory = false;
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
   /**
    * Additional CSS class to be applied in _render method.
    */
   this._additionalCssClass = '';
+  this._addCloneProperties(['node', 'outline']);
 };
 scout.inherits(scout.NavigateButton, scout.Menu);
-
-scout.NavigateButton.prototype._init = function(options) {
-  scout.NavigateButton.parent.prototype._init.call(this, options);
-
-  this.node = options.node;
-  this.outline = options.outline;
-};
 
 /**
  * @override

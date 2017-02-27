@@ -11,8 +11,6 @@
 scout.Action = function() {
   scout.Action.parent.call(this);
 
-  this.enabled = true;
-  this.visible = true;
   this.selected = false;
   this.horizontalAlignment = -1;
   this.iconId = '';
