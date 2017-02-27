@@ -90,12 +90,8 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
    */
   private static final int DEADLOCK_DETECTION_MAX_WAIT_TIME_SECONDS = 90;
 
-  /**
-   * Series of wait times in milliseconds any other thread will wait and check on the creator thread in a loop. The last
-   * entry will be used for any consecutive invocation of {@link Object#wait(long)}. Using short wait times at the
-   * beginning increases the response time.
-   */
-  private static final int[] DEADLOCK_DETECTION_WAIT_TIME_MILLIS = {50, 50, 50, 50, 200, 200, 200, 200, 500};
+  /** Time in seconds another thread will wait before a log entry is created with level DEBUG. */
+  private static final int DEADLOCK_DETECTION_DEBUG_WAIT_TIME_SECONDS = 5;
 
   /** Stack to keep track of beans being created to avoid circular dependencies */
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
@@ -150,10 +146,10 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
         return instance;
       }
       finally {
-        // reset creator thread so that another one tries to create the bean again in case the current ran into an exception.
-        m_creatorThread.set(null);
-        // wake up other threads waiting on the application-scoped instance
         synchronized (this) {
+          // reset creator thread so that another one tries to create the bean again in case the current ran into an exception.
+          m_creatorThread.set(null);
+          // wake up other threads waiting on the application-scoped instance
           this.notifyAll();
         }
       }
@@ -163,25 +159,31 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     final Thread creatorThread = m_creatorThread.get();
     final int maxWaitTimeSeconds = getDeadlockDetectionMaxWaitTimeSeconds();
     final long maxWaitEndTimeMillis = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(maxWaitTimeSeconds);
-    int retryCount = 0;
+    boolean logDebug = LOG.isDebugEnabled();
     do {
-      int waitTimeMillis = nextWaitTimeMillis(retryCount);
       try {
         synchronized (this) {
-          // wait for the creator to complete, but not too long because the notify signal could have been missed
-          this.wait(waitTimeMillis);
+          if (m_creatorThread.get() == null) {
+            break;
+          }
+          long waitTimeMillis = logDebug
+              ? TimeUnit.SECONDS.toMillis(Math.min(maxWaitTimeSeconds, DEADLOCK_DETECTION_DEBUG_WAIT_TIME_SECONDS))
+              : maxWaitEndTimeMillis - System.currentTimeMillis();
+          if (waitTimeMillis > 0) {
+            // wait for the creator to complete, but not too long because the notify signal could have been missed
+            this.wait(waitTimeMillis);
+          }
         }
       }
       catch (InterruptedException e) {
         throw new ThreadInterruptedError("Thread has been interrupted");
       }
-      if (retryCount == 12 && LOG.isDebugEnabled()) {
-        // log after 5 seconds if log level is DEBUG
+      if (logDebug) {
         logWarnPotentialDeadlock(creatorThread);
+        logDebug = false;
       }
-      retryCount++;
     }
-    while (m_creatorThread.get() != null && System.currentTimeMillis() < maxWaitEndTimeMillis); // try as long as the other thread is still creating the bean and the max wait time has not been elapsed
+    while (System.currentTimeMillis() < maxWaitEndTimeMillis); // try as long as the other thread is still creating the bean and the max wait time has not been elapsed
 
     // check if bean has been created in the meantime
     instance = m_applicationScopedInstance.get();
@@ -204,17 +206,6 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
               .withContextInfo("creatorThreadID", creatorThread == null ? "n/a" : creatorThread.getId())
               .withContextInfo("creatorThreadName", creatorThread == null ? "n/a" : creatorThread.getName());
     }
-  }
-
-  /**
-   * @param retryCount
-   *          retry number (&gt;= 0)
-   * @return returns the wait time in milliseconds for the given retry count.
-   */
-  private int nextWaitTimeMillis(int retryCount) {
-    return retryCount >= DEADLOCK_DETECTION_WAIT_TIME_MILLIS.length
-        ? DEADLOCK_DETECTION_WAIT_TIME_MILLIS[DEADLOCK_DETECTION_WAIT_TIME_MILLIS.length - 1]
-        : DEADLOCK_DETECTION_WAIT_TIME_MILLIS[retryCount];
   }
 
   /**
