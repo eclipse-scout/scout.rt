@@ -178,6 +178,9 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
       catch (InterruptedException e) {
         throw new ThreadInterruptedError("Thread has been interrupted");
       }
+      if (m_creatorThread.get() == null) {
+        break;
+      }
       if (logDebug) {
         logWarnPotentialDeadlock(creatorThread);
         logDebug = false;
