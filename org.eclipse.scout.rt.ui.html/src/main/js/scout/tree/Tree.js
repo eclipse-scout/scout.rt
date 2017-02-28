@@ -1586,20 +1586,14 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
       this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
       this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
       insertBatch = this.newInsertBatch(insertBatch.nextBatchInsertIndex());
-      if (node.expanded) {
-        insertIndex = this._findInsertPositionInFlatList(node) + 1;
-        insertBatch = this._addChildrenToFlatList(node, insertIndex, animatedRendering, insertBatch, forceFilter);
-      }
+      insertBatch = this._addChildrenToFlatListIfExpanded(1, node, insertIndex, animatedRendering, insertBatch, forceFilter);
       // do not animate following
       animatedRendering = false;
     } else {
       insertBatch.insertNodes.push(node);
       this.visibleNodesMap[node.id] = true;
       insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
-      if (node.expanded) {
-        insertIndex = this._findInsertPositionInFlatList(node);
-        insertBatch = this._addChildrenToFlatList(node, insertIndex, animatedRendering, insertBatch, forceFilter);
-      }
+      insertBatch = this._addChildrenToFlatListIfExpanded(0, node, insertIndex, animatedRendering, insertBatch, forceFilter);
     }
   }.bind(this));
 
@@ -1607,6 +1601,27 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
     // animation is not done yet and all added nodes are in visible range
     this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
     this.invalidateLayoutTree();
+  }
+
+  return insertBatch;
+};
+
+/**
+ * Checks if the given node is expanded, and if that's the case determine the insert index of the node and add its children to the flat list.
+ *
+ * @param {number} indexOffset either 0 or 1, offset is added to the insert index
+ */
+scout.Tree.prototype._addChildrenToFlatListIfExpanded = function(indexOffset, node, insertIndex, animatedRendering, insertBatch, forceFilter) {
+  if (node.expanded) {
+    if (insertBatch.containsNode(node.parentNode)) {
+      // if parent node is already in the batch, do not change the insertIndex,
+      // only append child nodes below that parent node
+      insertIndex = insertBatch.insertAt();
+    } else {
+      insertIndex = this._findInsertPositionInFlatList(node);
+    }
+    insertIndex += indexOffset;
+    insertBatch = this._addChildrenToFlatList(node, insertIndex, animatedRendering, insertBatch, forceFilter);
   }
 
   return insertBatch;
@@ -1726,6 +1741,9 @@ scout.Tree.prototype.newInsertBatch = function(insertIndex) {
     },
     setInsertAt: function(insertAt) {
       this.insertNodes[0] = insertAt;
+    },
+    containsNode: function(node) {
+      return this.insertNodes.indexOf(node) !== -1;
     }
   };
 };
