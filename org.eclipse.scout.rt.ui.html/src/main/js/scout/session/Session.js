@@ -38,6 +38,9 @@ scout.Session = function() { //
  *   [focusManagerActive]
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
+ *   [formTabClosable]
+ *     Optional, default is false. True to show a close button in the view tabs on
+ *     the desktop if the form is closable (has a close or cancel button).
  */
 scout.Session.prototype.init = function(model) {
   var options = model || {};
@@ -99,6 +102,7 @@ scout.Session.prototype.init = function(model) {
     active: options.focusManagerActive
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
+  this.formTabClosable = options.formTabClosable;
 };
 
 scout.Session.prototype._throwError = function(message) {
