@@ -53,7 +53,7 @@ import org.junit.runner.RunWith;
 @RunWithSubject("anna")
 @Times(20)
 @Ignore
-//FIXME dwi: fix
+//TODO bsh, abr
 public class ClientJobCancelTest {
 
   private List<IBean<?>> m_serviceReg;

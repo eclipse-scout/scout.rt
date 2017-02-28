@@ -137,8 +137,8 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
 
   protected void decorateForm(FORM form) {
     form.setShowOnStart(false);
-    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW); // FIXME dwi: set in UI instead
-    form.setDisplayViewId(IForm.VIEW_ID_E); // FIXME dwi: set in UI instead
+    form.setDisplayHint(IForm.DISPLAY_HINT_VIEW); // TODO bsh: set in UI instead
+    form.setDisplayViewId(IForm.VIEW_ID_E); // TODO bsh: set in UI instead
   }
 
   protected final void interceptInitForm(FORM form) {

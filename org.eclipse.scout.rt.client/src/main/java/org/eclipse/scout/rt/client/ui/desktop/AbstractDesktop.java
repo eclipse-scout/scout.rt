@@ -951,7 +951,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  // TODO [6.2] dwi: Clarify whether this method is still used.
   public List<IForm> getSimilarViewForms(final IForm form) {
     if (form == null) {
       return CollectionUtility.emptyArrayList();
@@ -991,7 +990,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void ensureViewStackVisible() { // TODO [6.2] dwi: Clarify whether this method is still used.
+  public void ensureViewStackVisible() {
     for (IForm view : m_formStore.getViews()) {
       activateForm(view);
     }

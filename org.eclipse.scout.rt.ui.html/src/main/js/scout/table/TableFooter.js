@@ -27,7 +27,6 @@ scout.TableFooter.prototype._init = function(options) {
   this.table = options.table;
 
   // Keystroke context for the search field.
-  // TODO [6.2] dwi: migrate search-field to widget, so that this keystroke code is not in table footer class anymore.
   this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
   this.searchFieldKeyStrokeContext.$bindTarget = function() {
     return this._$textFilter;
