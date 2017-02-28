@@ -35,6 +35,7 @@ scout.DesktopTab.prototype._init = function(options) {
   options.title = this.view.title;
   options.subTitle = this.view.subTitle;
   options.iconId = this.view.iconId;
+  options.closable = this.view.closable;
 
   scout.DesktopTab.parent.prototype._init.call(this, options);
   this._installListeners();
@@ -56,6 +57,10 @@ scout.DesktopTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
   }
   this.$container.removeClass(oldCssClass);
   this.$container.addClass(cssClass);
+};
+
+scout.DesktopTab.prototype._onClose = function() {
+   this.view.close();
 };
 
 /**

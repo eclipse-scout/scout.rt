@@ -45,7 +45,23 @@
     /* full size of header to draw over the border-bottom */
     height: 100%;
 
-
+  }
+  &.closable{
+    > .closer {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: 5px;
+      margin-right: 5px;
+      margin-top: 5px;
+    }
+    &.selected {
+      > .closer{
+        display: block;
+      }
+      padding-right: 30px;
+    }
   }
 
   &.animate-modality-highlight {

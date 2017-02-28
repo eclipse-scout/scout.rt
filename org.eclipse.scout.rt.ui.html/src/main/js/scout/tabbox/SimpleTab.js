@@ -28,6 +28,7 @@ scout.SimpleTab.prototype._init = function(options) {
   this.title = options.title;
   this.subTitle = options.subTitle;
   this.iconId = options.iconId;
+  this.closable = options.closable;
   this.selected = false;
 };
 
@@ -44,9 +45,29 @@ scout.SimpleTab.prototype._render = function($parent) {
   this.$container.on('mousedown', this._mouseListener);
   this._$title = this.$container.appendDiv('title');
   this._$subTitle = this.$container.appendDiv('sub-title');
+
   this._titlesUpdated();
   this._renderSelection();
+  this._renderClosable();
   this._cssClassUpdated(this.view.cssClass, null);
+};
+
+scout.SimpleTab.prototype._renderClosable = function() {
+  this.$container.toggleClass('closable');
+  if (this.closable && this.session.formTabClosable) {
+    if (this.$close) {
+      return;
+    }
+    this.$close = this._$subTitle
+      .afterDiv('closer')
+      .on('click', this._onClose.bind(this));
+  } else {
+    if (!this.$close) {
+      return;
+    }
+    this.$close.remove();
+    this.$close = null;
+  }
 };
 
 scout.SimpleTab.prototype._renderSelection = function() {
@@ -70,6 +91,9 @@ scout.SimpleTab.prototype.deselect = function() {
 
 scout.SimpleTab.prototype._onMouseDown = function(event) {
   this.trigger('tabClicked');
+};
+
+scout.SimpleTab.prototype._onClose = function() {
 };
 
 scout.SimpleTab.prototype.setTitle = function(title) {
