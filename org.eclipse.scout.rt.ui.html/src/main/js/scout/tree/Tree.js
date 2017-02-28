@@ -26,8 +26,8 @@ scout.Tree = function() {
   this.filterEnabled = false;
   this.lazyExpandingEnabled = true;
   this.menus = [];
-  this.contextMenu;
-  this.menuBar;
+  this.contextMenu = null;
+  this.menuBar = null;
   this.keyStrokes = [];
   this.multiCheck = true;
   this.nodes = []; // top-level nodes
@@ -46,7 +46,7 @@ scout.Tree = function() {
   this._treeItemPaddingLevel = 15;
   this._filters = [];
   this._doubleClickSupport = new scout.DoubleClickSupport();
-  this._$animationWrapper; // used by _renderExpansion()
+  this._$animationWrapper = null; // used by _renderExpansion()
   this._$expandAnimationWrappers = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
 
@@ -72,7 +72,7 @@ scout.Tree = function() {
   this.nodeWidth = 0;
   this.maxNodeWidth = 0;
   this.nodeWidthDirty = false;
-  this.$data;
+  this.$data = null;
   this._scrolldirections = 'both';
 };
 scout.inherits(scout.Tree, scout.Widget);
@@ -128,6 +128,7 @@ scout.Tree.prototype._ensureTreeNodes = function(nodes) {
 };
 
 scout.Tree.prototype._createTreeNode = function(nodeModel) {
+  nodeModel = scout.nvl(nodeModel, {});
   nodeModel.parent = this;
   return scout.create('TreeNode', nodeModel);
 };
@@ -727,20 +728,17 @@ scout.Tree.prototype.setViewRangeSize = function(viewRangeSize) {
 };
 
 scout.Tree.prototype._updateNodeDimensions = function() {
-  var node = {
-    level: 0
-  };
-  var $emptyNode = this._$buildNode(node).appendTo(this.$data);
-  this._renderNodeText(node);
-  this.nodeHeight = $emptyNode.outerHeight(true);
+  var emptyNode = this._createTreeNode();
+  var $node = this._renderNode(emptyNode).appendTo(this.$data);
+  this.nodeHeight = $node.outerHeight(true);
   if (this.isHorizontalScrollingEnabled()) {
     var oldNodeWidth = this.nodeWidth;
-    this.nodeWidth = $emptyNode.outerWidth(true);
+    this.nodeWidth = $node.outerWidth(true);
     if (oldNodeWidth !== this.nodeWidth) {
       this.viewRangeDirty = true;
     }
   }
-  $emptyNode.remove();
+  emptyNode.reset();
 };
 
 /**
@@ -793,127 +791,10 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
   }
 };
 
-scout.Tree.prototype._$buildNode = function(node) {
-  var $node = this.$container.makeDiv('tree-node')
-    .data('node', node)
-    .attr('data-nodeid', node.id)
-    .attr('data-level', node.level)
-    .css('padding-left', this._computeTreeItemPaddingLeft(node.level));
-  node.$node = $node;
-  $node.appendSpan('text');
-
-  this._renderTreeItemControl(node);
-
-  if (this.checkable) {
-    this._renderTreeItemCheckbox(node);
-  }
-
-  return $node;
-};
-
-scout.Tree.prototype._decorateNode = function(node) {
-  var formerClasses,
-    $node = node.$node;
-  if (!$node) {
-    // This node is not yet rendered, nothing to do
-    return;
-  }
-
-  formerClasses = 'tree-node';
-  if ($node.isSelected()) {
-    formerClasses += ' selected';
-  }
-  if ($node.hasClass('ancestor-of-selected')) {
-    formerClasses += ' ancestor-of-selected';
-  }
-  if ($node.hasClass('parent-of-selected')) {
-    formerClasses += ' parent-of-selected';
-  }
-  $node.removeClass();
-  $node.addClass(formerClasses);
-  $node.addClass(node.cssClass);
-  $node.toggleClass('leaf', !!node.leaf);
-  $node.toggleClass('expanded', (!!node.expanded && node.childNodes.length > 0));
-  $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
-  $node.toggleClass('group', !!this.groupedNodes[node.id]);
-  $node.setEnabled(!!node.enabled);
-  $node.children('.tree-node-control').setVisible(!node.leaf);
-  $node.children('.tree-node-checkbox')
-    .children('.check-box')
-    .toggleClass('disabled', !(this.enabled && node.enabled));
-
-  if (!node.parentNode && this.selectedNodes.length === 0) {
-    // Root nodes have class child-of-selected if no node is selected
-    $node.addClass('child-of-selected');
-  } else if (node.parentNode && this.selectedNodes.indexOf(node.parentNode) > -1) {
-    $node.addClass('child-of-selected');
-  }
-
-  this._renderNodeText(node);
-
-  scout.styles.legacyStyle(node, $node);
-
-  // TODO [6.2] BSH: More attributes...
-  // iconId
-
-  // If parent node is marked as 'lazy', check if any visible child nodes remain.
-  if (node.parentNode && node.parentNode.expandedLazy) {
-    var hasVisibleNodes = node.parentNode.childNodes.some(function(childNode) {
-      if (this.visibleNodesMap[childNode.id]) {
-        return true;
-      }
-    }.bind(this));
-    if (!hasVisibleNodes && node.parentNode.$node) {
-      // Remove 'lazy' from parent
-      node.parentNode.$node.removeClass('lazy');
-    }
-  }
-};
-
-scout.Tree.prototype._renderTreeItemControl = function(node) {
-  var $node = node.$node;
-  var $control = $node.prependDiv('tree-node-control');
-  if (this.checkable) {
-    $control.addClass('checkable');
-  }
-  $control.setVisible(!node.leaf);
-};
-
-scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
-  var $node = node.$node,
-    $controlItem = $node.prependDiv('tree-node-checkbox');
-  var $checkboxDiv = $controlItem
-    .appendDiv('check-box')
-    .toggleClass('checked', node.checked)
-    .toggleClass('disabled', !(this.enabled && node.enabled));
-
-  if (node.childrenChecked) {
-    $checkboxDiv.toggleClass('children-checked', true);
-  } else {
-    $checkboxDiv.toggleClass('children-checked', false);
-  }
-};
-
-scout.Tree.prototype._renderNodeText = function(node) {
-  var $node = node.$node,
-    $text = $node.children('.text');
-  if (node.htmlEnabled) {
-    $text.html(node.text);
-  } else {
-    $text.textOrNbsp(node.text);
-  }
-};
-
-scout.Tree.prototype._renderNodeChecked = function(node) {
-  if (!node.$node) {
-    // if node is not rendered, do nothing
-    return;
-  }
-
-  node.$node
-    .children('.tree-node-checkbox')
-    .children('.check-box')
-    .toggleClass('checked', node.checked);
+scout.Tree.prototype._renderNode = function(node) {
+  var paddingLeft = this._computeTreeItemPaddingLeft(node.level);
+  node.render(this.$container, paddingLeft, this.checkable, this.enabled);
+  return node.$node;
 };
 
 scout.Tree.prototype._removeMenus = function() {
@@ -958,7 +839,7 @@ scout.Tree.prototype._renderCheckable = function() {
     if (this.checkable) {
       $control.addClass('checkable');
       if ($checkbox.length === 0) {
-        this._renderTreeItemCheckbox(node);
+        node._renderCheckbox();
       }
     } else {
       $control.removeClass('checkable');
@@ -1243,11 +1124,10 @@ scout.Tree.prototype._uninstallNodeTooltipSupport = function() {
 
 scout.Tree.prototype._nodeTooltipText = function($node) {
   var node = $node.data('node');
-
   if (node.tooltipText) {
     return node.tooltipText;
   } else if (this._isTruncatedNodeTooltipEnabled() && $node.isContentTruncated()) {
-    return $node.children('.text').text();
+    return node.$text.text();
   }
 };
 
@@ -1937,7 +1817,7 @@ scout.Tree.prototype.isNodeSelected = function(node) {
   return this.selectedNodes.indexOf(node) > -1;
 };
 
-scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
+scout.Tree.prototype._computeTreeItemPaddingLeft = function(level) {
   if (this.checkable) {
     return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft + this._treeItemCheckBoxPaddingLeft;
   }
@@ -2068,7 +1948,7 @@ scout.Tree.prototype.updateNodes = function(nodes) {
       }
       this._updateItemPath(false, oldNode.parentNode);
       if (this.rendered) {
-        this._decorateNode(oldNode);
+        oldNode._decorate();
       }
     }
   }, this);
@@ -2270,8 +2150,8 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   }
   if (this.rendered) {
     updatedNodes.forEach(function(node) {
-      this._renderNodeChecked(node);
-    }, this);
+      node._renderChecked();
+    });
   }
 };
 
@@ -2442,7 +2322,7 @@ scout.Tree.prototype._updateItemPath = function(selectionChanged, ultimate) {
   function addToGroup(nodes) {
     nodes.forEach(function(node) {
       this.groupedNodes[node.id] = true;
-      this._decorateNode(node);
+      node._decorate();
       if (node.expanded && node.isFilterAccepted()) {
         addToGroup.call(this, node.childNodes);
       }
@@ -2601,10 +2481,10 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
     //node is not visible
     return;
   }
-  if (!node.$node) {
-    this._$buildNode(node);
+  if (!node.rendered) {
+    this._renderNode(node);
   }
-  this._decorateNode(node);
+  node._decorate();
 
   this._insertNodeInDOMAtPlace(node, index);
 
@@ -2858,7 +2738,7 @@ scout.Tree.prototype.changeNode = function(node) {
     }
   }
   if (this.rendered) {
-    this._decorateNode(node);
+    node._decorate();
   }
   this.trigger('nodeChanged', {
     node: node

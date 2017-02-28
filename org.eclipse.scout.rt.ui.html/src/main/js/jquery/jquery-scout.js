@@ -646,17 +646,23 @@ $.fn.setTabbable = function(tabbable) {
   return this.attr('tabIndex', tabbable ? 0 : null);
 };
 
-$.fn.icon = function(iconId) {
+/**
+ * @param {string} iconId
+ * @param {function} [addToDomFunc] optional function which is used to add the new icon element to the DOM
+ *     When not set, this.prepend($icon) is called.
+ * @returns {$}
+ */
+$.fn.icon = function(iconId, addToDomFunc) {
   var icon, $icon = this.data('$icon');
   if (iconId) {
     icon = scout.icons.parseIconId(iconId);
     if (icon.isFontIcon()) {
-      getOrCreateIconElement.call(this, $icon, '<span>')
+      getOrCreateIconElement.call(this, $icon, '<span>', addToDomFunc)
         .addClass(icon.appendCssClass('font-icon'))
         .addClass('icon')
         .text(icon.iconCharacter);
     } else {
-      getOrCreateIconElement.call(this, $icon, '<img>')
+      getOrCreateIconElement.call(this, $icon, '<img>', addToDomFunc)
         .attr('src', icon.iconUrl)
         .addClass('icon');
     }
@@ -667,7 +673,7 @@ $.fn.icon = function(iconId) {
 
   // ----- Helper functions -----
 
-  function getOrCreateIconElement($icon, newElement) {
+  function getOrCreateIconElement($icon, newElement, addToDomFunc) {
     // If element type does not match existing element, remove the existing element (e.g. when changing from font-icon to picture icon)
     if ($icon && !$icon.is(newElement.replace(/[<>]/g, ''))) {
       removeIconElement.call(this, $icon);
@@ -677,7 +683,11 @@ $.fn.icon = function(iconId) {
     if (!$icon) {
       $icon = $(newElement);
       this.data('$icon', $icon);
-      this.prepend($icon);
+      if (!addToDomFunc) {
+        this.prepend($icon);
+      } else {
+        addToDomFunc.call(this, $icon);
+      }
     }
     return $icon;
   }

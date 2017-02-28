@@ -87,6 +87,7 @@ scout.Outline.prototype._createMediator = function() {
  * @override Tree.js
  */
 scout.Outline.prototype._createTreeNode = function(nodeModel) {
+  nodeModel = scout.nvl(nodeModel, {});
   nodeModel.parent = this;
   return scout.create('Page', nodeModel);
 };
@@ -814,7 +815,7 @@ scout.Outline.prototype._renderNodeMenuBar = function() {
     return;
   }
 
-  var $text = node.$node.children('.text');
+  var $text = node.$text;
   this.nodeMenuBar.render(node.$node);
   this.nodeMenuBar.$container.addClass('node-menubar');
   this.nodeMenuBar.$container.insertAfter($text);

@@ -18,7 +18,8 @@ scout.inherits(scout.PageLayout, scout.AbstractLayout);
 scout.PageLayout.prototype.layout = function($container) {
   var containerSize, detailMenuBarSize,
     htmlContainer = this.page.htmlComp,
-    $text = this.page.$node.children('.text'),
+    $text = this.page.$text,
+    $icon = this.page.$icon(),
     titleHeight = 0,
     nodeMenuBar = this.outline.nodeMenuBar,
     nodeMenuBarWidth = 0,
@@ -41,16 +42,17 @@ scout.PageLayout.prototype.layout = function($container) {
   }
 
   if (this.outline.detailContent) {
-    titleHeight = $text.outerHeight(true);
+    titleHeight = Math.max($text.outerHeight(true), $icon.outerHeight(true));
     this.outline.detailContent.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight));
   }
 };
 
 scout.PageLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize, containerSize,
+  var prefSize, containerSize, textHeight, iconHeight,
     htmlContainer = this.page.htmlComp,
     detailContentPrefSize = new scout.Dimension(),
-    $text = this.page.$node.children('.text'),
+    $text = this.page.$text,
+    $icon = this.page.$icon(),
     titlePrefHeight = 0,
     detailMenuBar = this.outline.detailMenuBar,
     detailMenuBarPrefSize = new scout.Dimension(),
@@ -65,10 +67,12 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   }
 
   // needs a width to be able to calculate the pref height -> container width needs to be correct already
-  titlePrefHeight = scout.graphics.prefSize($text, {
+  textHeight = scout.graphics.prefSize($text, {
     includeMargin: true,
     widthHint: containerSize.width - nodeMenuBarWidth
   }).height;
+  iconHeight = $icon.outerHeight(true);
+  titlePrefHeight = Math.max(textHeight, iconHeight);
 
   if (detailMenuBar.visible) {
     detailMenuBarPrefSize = detailMenuBar.htmlComp.getPreferredSize();

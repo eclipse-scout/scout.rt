@@ -67,7 +67,7 @@ scout.CompactTree.prototype._remove = function() {
 /**
  * @override
  */
-scout.CompactTree.prototype._$buildNode = function(node) {
+scout.CompactTree.prototype._renderNode = function(node) {
   if (this._isSection(node)) {
     var $section = this.$container.makeDiv('section expanded')
       .data('node', node);

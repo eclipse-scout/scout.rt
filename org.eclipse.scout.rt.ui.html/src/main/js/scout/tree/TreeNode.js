@@ -12,7 +12,7 @@
 /**
  * @class
  */
-scout.TreeNode = function() {
+scout.TreeNode = function(tree) {
   this.$node; // TODO [awe, cgu] 6.2 - properties without assignment do not exist after ctor call, use better initial values everywhere?
   this.attached = false;
   this.checked = false;
@@ -152,4 +152,133 @@ scout.TreeNode.prototype._onLoadChildrenDone = function() {
 
 scout.TreeNode.prototype.setText = function(text) {
   this.text = text;
+};
+
+/**
+ * This functions renders sets the $node and $text properties.
+ *
+ * @param {jQuery} $parent the tree DOM
+ * @param {number} paddingLeft calculated by tree
+ */
+scout.TreeNode.prototype.render = function($parent, paddingLeft) {
+  this.$node = $parent.makeDiv('tree-node')
+    .data('node', this)
+    .attr('data-nodeid', this.id)
+    .attr('data-level', this.level)
+    .css('padding-left', paddingLeft);
+  this.$text = this.$node.appendSpan('text');
+
+  this._renderControl();
+  if (this.getTree().checkable) {
+    this._renderCheckbox();
+  }
+  this._renderText();
+  this._renderIcon();
+};
+
+scout.TreeNode.prototype._renderText = function() {
+  if (this.htmlEnabled) {
+    this.$text.html(this.text);
+  } else {
+    this.$text.textOrNbsp(this.text);
+  }
+};
+
+scout.TreeNode.prototype._renderChecked = function() {
+  // if node is not rendered, do nothing
+  if (!this.rendered) {
+    return;
+  }
+
+  this.$node
+    .children('.tree-node-checkbox')
+    .children('.check-box')
+    .toggleClass('checked', this.checked);
+};
+
+scout.TreeNode.prototype._renderIcon = function() {
+  this.$node.icon(this.iconId, function($icon) {
+    $icon.insertBefore(this.$text);
+  }.bind(this));
+};
+
+scout.TreeNode.prototype.$icon = function() {
+  return this.$node.children('.icon');
+};
+
+scout.TreeNode.prototype._renderControl = function() {
+  var $control = this.$node.prependDiv('tree-node-control');
+  if (this.getTree().checkable) {
+    $control.addClass('checkable');
+  }
+  $control.css('visibility', this.leaf ? 'hidden' : 'visible');
+};
+
+scout.TreeNode.prototype._renderCheckbox = function() {
+  var $checkboxContainer = this.$node.prependDiv('tree-node-checkbox');
+  var $checkbox = $checkboxContainer
+    .appendDiv('check-box')
+    .toggleClass('checked', this.checked)
+    .toggleClass('disabled', !(this.getTree().enabled && this.enabled));
+
+  if (this.childrenChecked) {
+    $checkbox.toggleClass('children-checked', true);
+  } else {
+    $checkbox.toggleClass('children-checked', false);
+  }
+};
+
+scout.TreeNode.prototype._decorate = function() {
+  // This node is not yet rendered, nothing to do
+  if (!this.rendered) {
+    return;
+  }
+
+  var $node = this.$node,
+    formerClasses = 'tree-node',
+    tree = this.getTree();
+
+  if ($node.isSelected()) {
+    formerClasses += ' selected';
+  }
+  if ($node.hasClass('ancestor-of-selected')) {
+    formerClasses += ' ancestor-of-selected';
+  }
+  if ($node.hasClass('parent-of-selected')) {
+    formerClasses += ' parent-of-selected';
+  }
+  $node.removeClass();
+  $node.addClass(formerClasses);
+  $node.addClass(this.cssClass);
+  $node.toggleClass('leaf', !!this.leaf);
+  $node.toggleClass('expanded', (!!this.expanded && this.childNodes.length > 0));
+  $node.toggleClass('lazy', $node.hasClass('expanded') && this.expandedLazy);
+  $node.toggleClass('group', !!tree.groupedNodes[this.id]);
+  $node.setEnabled(!!this.enabled);
+  $node.children('.tree-node-control').css('visibility', this.leaf ? 'hidden' : 'visible');
+  $node.children('.tree-node-checkbox')
+    .children('.check-box')
+    .toggleClass('disabled', !(tree.enabled && this.enabled));
+
+  if (!this.parentNode && tree.selectedNodes.length === 0) {
+    // Root nodes have class child-of-selected if no node is selected
+    $node.addClass('child-of-selected');
+  } else if (this.parentNode && tree.selectedNodes.indexOf(this.parentNode) > -1) {
+    $node.addClass('child-of-selected');
+  }
+
+  scout.styles.legacyStyle(this, $node);
+
+  // If parent node is marked as 'lazy', check if any visible child nodes remain.
+  if (this.parentNode && this.parentNode.expandedLazy) {
+    var hasVisibleNodes = this.parentNode.childNodes.some(function(childNode) {
+      if (tree.visibleNodesMap[childNode.id]) {
+        return true;
+      }
+    }.bind(this));
+    if (!hasVisibleNodes && this.parentNode.$node) {
+      // Remove 'lazy' from parent
+      this.parentNode.$node.removeClass('lazy');
+    }
+  }
 };

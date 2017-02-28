@@ -67,6 +67,10 @@
         font-size: @font-size-plus;
       }
 
+      & > .icon {
+        margin-top: auto;
+      }
+
       & > .menubar {
         border: 0;
         background-color: inherit;
@@ -257,6 +261,14 @@
       & > .text {
         display: inline-block;
         padding: @compact-outline-node-padding-v @compact-outline-node-padding-h;
+      }
+
+      & > .icon {
+        padding: @compact-outline-node-padding-v 0 @compact-outline-node-padding-v @compact-outline-node-padding-h;
+
+        &.font-icon {
+          padding-top: @compact-outline-node-padding-v + 2;
+        }
       }
 
       & > .node-menubar {

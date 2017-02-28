@@ -42,7 +42,7 @@
   overflow: hidden;
   width: 100%; /* expand to outer container, needed for breadcrumb */
 
-  &.scrollable-tree >.tree-node{
+  &.scrollable-tree >.tree-node {
     overflow: visible;
     text-overflow: initial;
     white-space: normal;
@@ -83,8 +83,23 @@
   }
 
   & > .text {
-    width: 100%;
+    display: inline-block;
     #scout.overflow-ellipsis-nowrap();
+  }
+
+  & > .icon {
+    vertical-align: top;
+    padding-right: 7px;
+    display: inline-block;
+
+    &:not(.font-icon) {
+      margin-top: -2px;
+    }
+
+    &.font-icon {
+      /* add a bit of extra space so font icon is better aligned with text */
+      padding-top: 1px;
+    }
   }
 }
 
@@ -262,6 +277,7 @@
 
       & > .text {
         white-space: normal;
+        width: auto;
       }
     }
   }
