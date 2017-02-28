@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -62,10 +63,20 @@ public class DownloadHandlerStorageTest {
 
   @Test
   public void testGet() {
+    final CountDownLatch secondGet = new CountDownLatch(1);
+    final CountDownLatch elementRemoved = new CountDownLatch(1);
+
     DownloadHandlerStorage storage = new DownloadHandlerStorage() {
       @Override
       protected long getTTLForResource(BinaryResource res) {
         return 50L;
+      }
+
+      @Override
+      protected void removeOnTimeout(String key) {
+        waitFor(secondGet);
+        super.removeOnTimeout(key);
+        elementRemoved.countDown();
       }
     };
     BinaryResource res = new BinaryResource("bar.txt", null);
@@ -79,10 +90,20 @@ public class DownloadHandlerStorageTest {
     holderWithAction = storage.get(KEY);
     assertEquals(res, holderWithAction.getHolder().get());
     assertTrue("Must contain download interceptor.", containsDownloadInterceptor(holderWithAction.getHolder()));
+    secondGet.countDown();
+    waitFor(elementRemoved);
 
-    SleepUtil.sleepElseLog(100, TimeUnit.MILLISECONDS);
     assertNull(storage.get(KEY));
     assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
+  }
+
+  private static void waitFor(CountDownLatch latch) {
+    try {
+      latch.await(1, TimeUnit.MINUTES);
+    }
+    catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private boolean containsDownloadInterceptor(BinaryResourceHolder holder) {
