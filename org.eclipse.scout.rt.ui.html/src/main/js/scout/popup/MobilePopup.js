@@ -16,6 +16,7 @@ scout.MobilePopup = function() {
   this.closable = true;
   this.animateRemoval = true;
   this.widget;
+  this.title;
   this._addAdapterProperties('widget');
 };
 scout.inherits(scout.MobilePopup, scout.Popup);
@@ -42,10 +43,27 @@ scout.MobilePopup.prototype._render = function($parent) {
 
   this.$header = this.$container.appendDiv('mobile-popup-header');
   this.$title = this.$header.appendDiv('title');
-  this.widget.render(this.$container);
-  this.widget.htmlComp.pixelBasedSizing = true;
+};
+
+scout.MobilePopup.prototype._renderProperties = function() {
+  scout.MobilePopup.parent.prototype._renderProperties.call(this);
+  this._renderWidget();
   this._renderTitle();
   this._renderClosable();
+};
+
+scout.MobilePopup.prototype.setWidget = function(widget) {
+  this.setProperty('widget', widget);
+};
+
+scout.MobilePopup.prototype._renderWidget = function() {
+  if (!this.widget) {
+    return;
+  }
+  this.widget.render(this.$container);
+  this.widget.htmlComp.pixelBasedSizing = true;
+  this.widget.$container.addClass('mobile-popup-widget');
+  this.invalidateLayoutTree();
 };
 
 scout.MobilePopup.prototype._renderClosable = function() {
