@@ -38,7 +38,13 @@ scout.OpenUriHandler.prototype.handleUriActionDownload = function(uri) {
     // Since the file cannot be stored on the file system it will be shown in the browser if possible
     // -> create a new window to not replace the existing content.
     // Drawback: Popup-Blocker will show up
-    this.openUriAsNewWindow(uri);
+    // Opening in new window does not work in standalone mode because the window will be opened in safari which creates a new http session.
+    // Because the downloads are linked to the http session they cannot be downloaded using safari
+    if (scout.device.isStandalone()) {
+      this.openUriInSameWindow(uri);
+    } else {
+      this.openUriAsNewWindow(uri);
+    }
   } else if (scout.device.browser === scout.Device.Browser.CHROME) {
     // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
     this.openUriInSameWindow(uri);
