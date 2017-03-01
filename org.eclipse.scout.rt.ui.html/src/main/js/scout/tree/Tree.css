@@ -42,10 +42,10 @@
   overflow: hidden;
   width: 100%; /* expand to outer container, needed for breadcrumb */
 
-  &.scrollable-tree >.tree-node{
+  &.scrollable-tree > .tree-node {
     overflow: visible;
     text-overflow: initial;
-    whitespace: normal;
+    white-space: normal;
   }
 }
 
