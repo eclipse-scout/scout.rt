@@ -113,6 +113,7 @@
   __include("scout/focus/focusRule.js");
   __include("scout/glasspane/DeferredGlassPaneTarget.js");
   __include("scout/glasspane/GlassPaneRenderer.js");
+  __include("scout/iframe/IFrame.js");
   __include("scout/scrollbar/Scrollbar.js");
   __include("scout/scrollbar/scrollbars.js");
   __include("scout/splitter/Splitter.js");

@@ -14,23 +14,33 @@ scout.BrowserField = function() {
   this.autoCloseExternalWindow = false;
   this.externalWindowButtonText;
   this.externalWindowFieldText;
-  this.location;
+  this.location = null;
   this.sandboxEnabled = true;
+  this.sandboxPermissions = null;
   this.scrollBarEnabled = false;
   this.showInExternalWindow = false;
   this._messageListener;
   this._popupWindow;
   this._externalWindowTextField;
   this._externalWindowButton;
-  // Iframe on iOS is always as big as its content. Workaround it by using a wrapper div with overflow: auto
-  // Don't wrap it when running in the chrome emulator (in that case isIosPlatform returns false)
-  this.wrapIframe = scout.device.isIosPlatform();
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
 scout.BrowserField.windowStates = {
   WINDOW_OPEN: "true",
   WINDOW_CLOSED: "false"
+};
+
+scout.BrowserField.prototype._init = function(model) {
+  scout.BrowserField.parent.prototype._init.call(this, model);
+
+  this.iframe = scout.create('IFrame', {
+    parent: this,
+    location: model.location,
+    sandboxEnabled: model.sandboxEnabled,
+    sandboxPermissions: model.sandboxPermissions,
+    scrollBarEnabled: model.scrollBarEnabled
+  });
 };
 
 scout.BrowserField.prototype._render = function($parent) {
@@ -40,14 +50,9 @@ scout.BrowserField.prototype._render = function($parent) {
 
   if (!this.showInExternalWindow) {
     // mode 1: <iframe>
-    var $iframe;
-    if (this.wrapIframe) {
-      this.addFieldContainer($parent.makeDiv('iframe-wrapper'));
-      $iframe = this.$fieldContainer.appendElement('<iframe>');
-    } else {
-      $iframe = $parent.makeElement('<iframe>');
-    }
-    this.addField($iframe);
+    this.iframe.render(this.$container);
+    this.addFieldContainer(this.iframe.$container);
+    this.addField(this.iframe.$iframe);
   } else {
     // mode 2: separate window
     this.addField($parent.makeDiv());
@@ -74,71 +79,41 @@ scout.BrowserField.prototype._render = function($parent) {
  */
 scout.BrowserField.prototype._renderProperties = function() {
   scout.BrowserField.parent.prototype._renderProperties.call(this);
-  this._renderIframeProperties();
-  // external window properties
   this._renderExternalWindowButtonText();
   this._renderExternalWindowFieldText();
 };
 
-scout.BrowserField.prototype._renderIframeProperties = function() {
-  this._renderLocation();
-  this._renderScrollBarEnabled();
-  this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
+/**
+ * @override FormField.js
+ */
+scout.BrowserField.prototype._remove = function() {
+  scout.BrowserField.parent.prototype._remove.call(this);
+  this.myWindow.removeEventListener('message', this._messageListener);
+  this._messageListener = null;
+
+  // if content is shown in an external window and auto close is set to true
+  if (this.showInExternalWindow && this.autoCloseExternalWindow) {
+    // try to close popup window (if it is not already closed)
+    if (this._popupWindow && !this._popupWindow.closed) {
+      this._popupWindow.close();
+    }
+  }
+};
+
+scout.BrowserField.prototype.setLocation = function(location) {
+  this.setProperty('location', location);
+  this.iframe.setLocation(location);
 };
 
 scout.BrowserField.prototype._renderLocation = function() {
   // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
   // empty locations simply remove the src attribute but don't remove the old content.
   var location = this.location || 'about:blank';
-  if (!this.showInExternalWindow) {
-    // <iframe>
-    this.$field.attr('src', location);
-  } else {
+  if (this.showInExternalWindow) {
     // fallback: separate window
     if (this._popupWindow && !this._popupWindow.closed) {
       this._popupWindow.location = location;
     }
-  }
-};
-
-scout.BrowserField.prototype._renderScrollBarEnabled = function() {
-  if (!this.showInExternalWindow) {
-    this.$fieldContainer.toggleClass('no-scrolling', !this.scrollBarEnabled);
-    // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
-    // CSS should be enough. However, if the inner page sets 'overflow' to another value,
-    // scroll bars are shown again. Therefore, we add the legacy 'scrolling' attribute,
-    // which is deprecated in HTML5, but seems to do the trick.
-    this.$field.attr('scrolling', (this.scrollBarEnabled ? 'yes' : 'no'));
-
-    // re-render location otherwise the attribute change would have no effect, see
-    // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
-    this._renderLocation();
-  }
-};
-
-scout.BrowserField.prototype._renderSandboxEnabled = function() {
-  if (!this.showInExternalWindow) {
-    if (this.sandboxEnabled) {
-      this._renderSandboxPermissions();
-    } else {
-      this.$field.removeAttr('sandbox');
-      this.$field.removeAttr('security');
-    }
-    // re-render location otherwise the attribute change would have no effect, see
-    // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
-    this._renderLocation();
-  }
-};
-
-scout.BrowserField.prototype._renderSandboxPermissions = function() {
-  if (!this.showInExternalWindow && this.sandboxEnabled) {
-    this.$field.attr('sandbox', scout.nvl(this.sandboxPermissions, ''));
-    if (scout.device.requiresIframeSecurityAttribute()) {
-      this.$field.attr('security', 'restricted');
-    }
-    // re-render location otherwise the attribute change would have no effect, see
-    // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
-    this._renderLocation();
   }
 };
 
@@ -288,21 +263,19 @@ scout.BrowserField.prototype._onMessage = function(event) {
   });
 };
 
-/**
- * @override FormField.js
- */
-scout.BrowserField.prototype._remove = function() {
-  scout.BrowserField.parent.prototype._remove.call(this);
-  this.myWindow.removeEventListener('message', this._messageListener);
-  this._messageListener = null;
+scout.BrowserField.prototype.setSandboxEnabled = function(sandboxEnabled) {
+  this.setProperty('sandboxEnabled', sandboxEnabled);
+  this.iframe.setSandboxEnabled(sandboxEnabled);
+};
 
-  // if content is shown in an external window and auto close is set to true
-  if (this.showInExternalWindow && this.autoCloseExternalWindow) {
-    // try to close popup window (if it is not already closed)
-    if (this._popupWindow && !this._popupWindow.closed) {
-      this._popupWindow.close();
-    }
-  }
+scout.BrowserField.prototype.setSandboxPermissions = function(sandboxPermissions) {
+  this.setProperty('sandboxPermissions', sandboxPermissions);
+  this.iframe.setSandboxPermissions(sandboxPermissions);
+};
+
+scout.BrowserField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
+  this.setProperty('scrollBarEnabled', scrollBarEnabled);
+  this.iframe.setScrollBarEnabled(scrollBarEnabled);
 };
 
 /**
@@ -313,10 +286,11 @@ scout.BrowserField.prototype._afterAttach = function(parent) {
   // sending any cookies a second time
   // as a workaround for IFRAMEs to work, we have to recreate the whole field in that case
   if (!this.showInExternalWindow && scout.device.requiresIframeSecurityAttribute()) {
-    this.$field.remove();
+    this.iframe.remove();
     this._removeField();
-    this.addField(parent.$container.makeElement('<iframe>'));
-    this._renderIframeProperties();
+    this.iframe.render(this.$container);
+    this.addFieldContainer(this.iframe.$container);
+    this.addField(this.iframe.$iframe);
     this.htmlComp.revalidateLayout();
   }
 };

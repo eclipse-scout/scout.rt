@@ -8,18 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.browser-field > .field {
-  margin-left: @mandatory-indicator-width;
-  background-color: @control-background-color;
-  border: 1px solid @border-color;
-  border-radius: @border-radius;
-
-  & > .button {
-    display: inline-block;
+.iframe {
+  &.no-scrolling {
+    overflow: hidden;
   }
+}
 
-  & > .button, > .alt  {
-    margin-top: @group-margin-top;
-    margin-left: @mandatory-indicator-width;
+.iframe-wrapper {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  & > iframe {
+    display: block;
+    width: 100%;
+    border: 0;
   }
 }
