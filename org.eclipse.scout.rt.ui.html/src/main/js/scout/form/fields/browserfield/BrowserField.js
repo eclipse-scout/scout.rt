@@ -23,7 +23,8 @@ scout.BrowserField = function() {
   this._externalWindowTextField;
   this._externalWindowButton;
   // Iframe on iOS is always as big as its content. Workaround it by using a wrapper div with overflow: auto
-  this.wrapIframe = scout.device.isIos();
+  // Don't wrap it when running in the chrome emulator (in that case isIosPlatform returns false)
+  this.wrapIframe = scout.device.isIosPlatform();
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
@@ -177,7 +178,7 @@ scout.BrowserField.prototype._calcPopupBounds = function() {
 
   // Don't limit screenX/Y in any way. Coordinates can be negative (if we have a secondary monitor on the left side
   // of the primary monitor) or larger then the availSize of the screen (if we have a secondary monitor on the right
-  // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems 
+  // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems
   // to ignore negative X coordinates somehow (but not entirely).
   var browserBounds = new scout.Rectangle(
     myWindow.screenX,

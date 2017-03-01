@@ -170,6 +170,16 @@ scout.Device.prototype.isIos = function() {
   return scout.Device.System.IOS === this.system;
 };
 
+/**
+ * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
+ * Most of the time isIos() is the way to go.
+ * This function was mainly introduced to detect whether it is a real iOS or an emulated one (e.g. using chrome emulator).
+ * @returns true if the platform is iOS, false if not (e.g. if chrome emulator is running)
+ */
+scout.Device.prototype.isIosPlatform = function() {
+  return /iPad|iPhone|iPod/.test(navigator.platform);
+};
+
 scout.Device.prototype.isAndroid = function() {
   return scout.Device.System.ANDROID === this.system;
 };
