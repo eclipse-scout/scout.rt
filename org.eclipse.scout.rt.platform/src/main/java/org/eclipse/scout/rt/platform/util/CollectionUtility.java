@@ -206,8 +206,58 @@ public final class CollectionUtility {
   }
 
   /**
-   * @param c
-   * @param values
+   * Null-safe variant of {@link Collection#contains(Object)}.
+   * <p>
+   * Note that this method may still throw {@link ClassCastException} or {@link NullPointerException} if the specified
+   * collection does not support the given object's type.
+   */
+  public static <T> boolean contains(Collection<T> c, T value) {
+    if (c == null) {
+      return false;
+    }
+    return c.contains(value);
+  }
+
+  /**
+   * Null-safe variant of {@link Collection#containsAll(Collection)}.
+   * <p>
+   * Note that this method may still throw {@link ClassCastException} or {@link NullPointerException} if the specified
+   * collection does not support the given objects' types.
+   */
+  public static <T> boolean containsAll(Collection<T> c, Collection<? extends T> values) {
+    if (c == null) {
+      return false;
+    }
+    if (values == null) {
+      return true;
+    }
+    return c.containsAll(values);
+  }
+
+  /**
+   * This method is similar to {@link #containsAll(Collection, Collection)}, but allows passing a variable number of
+   * arguments.
+   *
+   * @return <code>true</code> if the collection contains all of the values.
+   */
+  @SafeVarargs
+  public static <T> boolean containsAll(Collection<T> c, T... values) {
+    if (c == null) {
+      return false;
+    }
+    if (values == null) {
+      return true;
+    }
+    HashSet<T> set = hashSet(c);
+    for (T value : values) {
+      if (!set.contains(value)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * @return <code>true</code> if the collection contains one of the values.
    */
   public static <T> boolean containsAny(Collection<T> c, Collection<? extends T> values) {
@@ -224,8 +274,6 @@ public final class CollectionUtility {
   }
 
   /**
-   * @param c
-   * @param values
    * @return <code>true</code> if the collection contains one of the values.
    */
   @SafeVarargs
