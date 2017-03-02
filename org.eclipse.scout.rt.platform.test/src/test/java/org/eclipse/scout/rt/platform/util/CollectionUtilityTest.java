@@ -269,6 +269,38 @@ public class CollectionUtilityTest {
   }
 
   @Test
+  public void testContains() {
+    // Test for single valued list
+    assertTrue(CollectionUtility.contains(createList(2L, 1L), 1L));
+    assertFalse(CollectionUtility.contains(createList(2L, 3L), 1L));
+    // Test for null collections
+    assertFalse(CollectionUtility.contains(createList(2L, 3L), null));
+    assertFalse(CollectionUtility.contains(null, 2L));
+    // Test for null elements
+    assertTrue(CollectionUtility.contains(createList(null, 1L), null));
+  }
+
+  @Test
+  public void testContainsAll() {
+    // Test for single valued list
+    assertTrue(CollectionUtility.containsAll(createList(2L, 1L), 1L));
+    assertTrue(CollectionUtility.containsAll(createList(1L), 1L));
+    assertTrue(CollectionUtility.containsAll(createList(2L, 1L), createList(1L)));
+    assertTrue(CollectionUtility.containsAll(createList(1L), createList(1L)));
+    // Test for null collections
+    assertTrue(CollectionUtility.containsAll(createList(2L, 3L), (Collection<?>) null));
+    assertTrue(CollectionUtility.containsAll(createList(2L, 3L)));
+    assertFalse(CollectionUtility.containsAll(null, 2L));
+    assertTrue(CollectionUtility.containsAll(createList(2L, 3L), Collections.emptyList()));
+    // Test for null elements
+    assertFalse(CollectionUtility.containsAll(createList(1L), createList(1L, null)));
+    assertTrue(CollectionUtility.containsAll(createList(null, 1L), createList(1L, null)));
+    // Test for contained elements
+    assertTrue(CollectionUtility.containsAll(createList(1L, 2L, 3L, 4L), createList(3L, 2L, 1L)));
+    assertFalse(CollectionUtility.containsAll(createList(2L, 1L), createList(1L, 3L)));
+  }
+
+  @Test
   public void testContainsAny() {
     // Test for single valued list
     assertTrue(CollectionUtility.containsAny(createList(2L, 1L), createList(1L)));
