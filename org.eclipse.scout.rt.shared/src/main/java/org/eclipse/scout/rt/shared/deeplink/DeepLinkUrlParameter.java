@@ -13,6 +13,11 @@ public final class DeepLinkUrlParameter {
    */
   public final static String INFO = "i";
 
+  /**
+   * Name of the parameter used to enable/disable deep link handling
+   */
+  public static final String HANDLE_DEEP_LINK = "handleDeepLink";
+
   private DeepLinkUrlParameter() {
   }
 

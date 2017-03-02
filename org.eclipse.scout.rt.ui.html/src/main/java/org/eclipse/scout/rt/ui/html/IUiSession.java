@@ -57,6 +57,17 @@ public interface IUiSession {
    */
   boolean isInitialized();
 
+  /**
+   * Used to mark the session as persistent which means a persistent session cookie is used and the client session will
+   * be restored after a browser restart.
+   * <p>
+   * This was mainly introduced for the iOS home screen mode. If the app is running in that mode the HTTP session will
+   * be lost whenever the user leaves the app (e.g. switches to another app or just downloads a file). If persistent is
+   * set to true the client session id will be put in the local storage instead of the session storage so that it can be
+   * reused the next time the app is activated.
+   */
+  boolean isPersistent();
+
   String getUiSessionId();
 
   String getClientSessionId();

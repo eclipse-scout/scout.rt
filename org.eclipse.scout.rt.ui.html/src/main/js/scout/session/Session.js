@@ -46,7 +46,7 @@ scout.Session.prototype.init = function(model) {
   var options = model || {};
 
   // Prepare clientSessionId
-  var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
+  var clientSessionId = options.clientSessionId || this._getClientSessionIdFromStorage();
 
   this.scoutUrl = new scout.URL();
   if (this.scoutUrl.getParameter('forceNewClientSession') || options.forceNewClientSession) {
@@ -59,11 +59,16 @@ scout.Session.prototype.init = function(model) {
   this.uiSessionId; // assigned by server on session init (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.partId = scout.nvl(options.portletPartId, 0);
   this.clientSessionId = clientSessionId;
-  this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
+  this.userAgent = options.userAgent || new scout.UserAgent({
+    deviceType: scout.device.type,
+    touch: scout.device.supportsTouch(),
+    standalone: scout.device.isStandalone()
+  });
   this.suppressErrors = scout.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
+  this.persistent = false;
   this.ajaxRequests = [];
   this._asyncEvents = [];
   this.responseQueue = new scout.ResponseQueue(this);
@@ -282,13 +287,11 @@ scout.Session.prototype._processStartupResponse = function(data) {
     throw new Error('Missing startupData');
   }
 
+  // Mark session as persistent (means a persistent session cookie is used and the client session will be restored after a browser restart)
+  this.persistent = data.startupData.persistent;
+
   // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
-  try {
-    sessionStorage.setItem('scout:clientSessionId', data.startupData.clientSessionId);
-  } catch (err) {
-    // ignore errors (e.g. this can happen in "private mode" on Safari)
-    $.log.error('Error while storing "scout:clientSessionId" in sessionStorage: ' + err);
-  }
+  this._storeClientSessionIdInStorage(data.startupData.clientSessionId);
 
   // Assign server generated uiSessionId. It must be sent along with all further requests.
   this.uiSessionId = data.startupData.uiSessionId;
@@ -353,6 +356,30 @@ scout.Session.prototype._processStartupResponse = function(data) {
   } else {
     scout.fonts.preloader().then(renderDesktopImpl());
   }
+};
+
+scout.Session.prototype._storeClientSessionIdInStorage = function(clientSessionId) {
+  try {
+    sessionStorage.removeItem('scout:clientSessionId');
+    localStorage.removeItem('scout:clientSessionId');
+    var storage = sessionStorage;
+    if (this.persistent) {
+      storage = localStorage;
+    }
+    storage.setItem('scout:clientSessionId', clientSessionId);
+  } catch (err) {
+    // ignore errors (e.g. this can happen in "private mode" on Safari)
+    $.log.error('Error while storing "scout:clientSessionId" in storage: ' + err);
+  }
+};
+
+scout.Session.prototype._getClientSessionIdFromStorage = function() {
+  var id = sessionStorage.getItem('scout:clientSessionId');
+  if (!id) {
+    // If the session is persistent it was stored in the local storage (cannot check for this.persistent here because it is not known yet)
+    id = localStorage.getItem('scout:clientSessionId');
+  }
+  return id;
 };
 
 scout.Session.prototype._sendUnloadRequest = function() {
@@ -1286,6 +1313,14 @@ scout.Session.prototype._onWindowUnload = function() {
   // otherwise the UI session would already be dispoed)
   if (!this._loggedOut) {
     this._sendUnloadRequest();
+  }
+  if (this.loggedOut && this.persistent) {
+    try {
+      localStorage.removeItem('scout:clientSessionId');
+    } catch (err) {
+      // ignore errors (e.g. this can happen in "private mode" on Safari)
+      $.log.error('Error while removing "scout:clientSessionId" from localStorage: ' + err);
+    }
   }
 };
 

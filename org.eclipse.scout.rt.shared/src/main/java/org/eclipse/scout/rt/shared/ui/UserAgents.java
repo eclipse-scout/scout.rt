@@ -20,6 +20,7 @@ public final class UserAgents {
   private IUiSystem m_uiSystem = UiSystem.UNKNOWN;
   private String m_uiDeviceId = "n/a";
   private boolean m_touch = false;
+  private boolean m_standalone = false;
 
   private UserAgents() {
   }
@@ -58,6 +59,11 @@ public final class UserAgents {
     return this;
   }
 
+  public UserAgents withStandalone(boolean standalone) {
+    m_standalone = standalone;
+    return this;
+  }
+
   public static UserAgents create() {
     return new UserAgents();
   }
@@ -69,11 +75,12 @@ public final class UserAgents {
         .withUiLayer(other.getUiLayer())
         .withUiSystem(other.getUiSystem())
         .withDeviceId(other.getUiDeviceId())
-        .withTouch(other.isTouch());
+        .withTouch(other.isTouch())
+        .withStandalone(other.isStandalone());
   }
 
   public UserAgent build() {
-    return new UserAgent(m_uiLayer, m_uiDeviceType, m_uiEngineType, m_uiSystem, m_uiDeviceId, m_touch);
+    return new UserAgent(m_uiLayer, m_uiDeviceType, m_uiEngineType, m_uiSystem, m_uiDeviceId, m_touch, m_standalone);
   }
 
   public static UserAgent createDefault() {
