@@ -145,7 +145,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       // Check if a property-event-filter prevents the property change to be added to the JSON response
       PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
       if (filteredEvent != null) {
-        // TODO [6.2] cgu: we should add a logic to prevent sending a non changed state. Example: Property changes from A to B and back to A -> No property change event necessary
+        // TODO [7.0] cgu: we should add a logic to prevent sending a non changed state. Example: Property changes from A to B and back to A -> No property change event necessary
         // We could do this by remembering the old value and if an event occurs with the same value as the stored old one -> removePropertyChangeEvent
         // But: This may not be done for every property! If the property event was fired using setPropertyAlwaysFire it must be always. We should probably mark those events, but how?
         // Maybe we should better generate a global event buffer concept -> buffer every event not just table or tree events. This would solve event race conditions too -> we should guarantee that events fired by the model are sent to the gui in the same order

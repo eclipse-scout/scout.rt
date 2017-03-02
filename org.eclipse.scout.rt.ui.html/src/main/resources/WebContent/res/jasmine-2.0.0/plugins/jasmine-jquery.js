@@ -644,7 +644,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                   "Expected event " + actual + " to have been triggered with " + jasmine.pp(expectedArgs) + "  but it was triggered with " + jasmine.pp(actualArgs)
 
               } else {
-                // todo check on this
+                // TODO [7.0] cgu: check on this
                 result.message = result.pass ?
                   "Expected event " + actual + " not to have been triggered on " + selector :
                   "Expected event " + actual + " to have been triggered on " + selector

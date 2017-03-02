@@ -51,7 +51,7 @@ scout.Widget = function() {
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval = false;
 
-  // TODO [awe, cgu] 6.2 - think about having a PropertConfig object or rename to 'widgetProperties'
+  // TODO [7.0] awe, cgu: think about having a PropertConfig object or rename to 'widgetProperties'
   // probably this PropertyConfig should be the same instance for all instances of the class and not be
   // created for each instance of the class (saves memory)
   this._adapterProperties = [];

@@ -55,7 +55,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   // Set explicit height, necessary if there is no filter table
   $filterColumn.cssHeight(filterColumnSize.height);
 
-  // TODO [6.1] cgu this code could be written a lot easier -> replace following code (filter fields, filter table) with scout.HtmlComponent.get($filterColumn).setSize(filterColumnSize);
+  // TODO [7.0] cgu this code could be written a lot easier -> replace following code (filter fields, filter table) with scout.HtmlComponent.get($filterColumn).setSize(filterColumnSize);
   // Same for pref size. To implement max height of table, the RowLayout could read css max-height
   // Filter fields
   if (this.popup.hasFilterFields) {

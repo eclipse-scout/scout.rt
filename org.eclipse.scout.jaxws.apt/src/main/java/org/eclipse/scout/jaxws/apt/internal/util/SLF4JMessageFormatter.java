@@ -3,7 +3,7 @@ package org.eclipse.scout.jaxws.apt.internal.util;
 /**
  * Formatter according to SLF4J MessageFormatter.
  *
- * @TODO [6.1] dwi: Remove this class when building with Maven newer than 3.3.3. In older Maven versions, there is a
+ * @TODO [7.0] abr: Remove this class when building with Maven newer than 3.3.3. In older Maven versions, there is a
  *       bug, that SLF4J classes are not found. See https://issues.apache.org/jira/browse/MNG-5842.
  */
 public final class SLF4JMessageFormatter {

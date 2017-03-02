@@ -49,7 +49,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
   this.filter.calculate();
-  this.filter.on('filterFieldsChanged', this._updateFilterTable.bind(this)); // TODO [awe] 6.2 - (filter) off handler?
+  this.filter.on('filterFieldsChanged', this._updateFilterTable.bind(this)); // TODO [7.0] awe: (filter) off handler?
   this._updateFilterTableCheckedMode();
 
   this.hasFilterTable = this.filter.availableValues.length > 0;

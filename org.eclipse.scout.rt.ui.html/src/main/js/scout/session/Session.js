@@ -28,7 +28,7 @@ scout.Session = function() {
   this.focusManager;
   this.keyStrokeManager;
 
-  // TODO [awe, cgu, bsh] 6.2 - Split in "RemoteSession" and "???" (maybe move to App)
+  // TODO [7.0] awe, cgu, bsh: Split in "RemoteSession" and "???" (maybe move to App)
   this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.clientSessionId = scout.webstorage.getItem(sessionStorage, 'scout:clientSessionId');
   this.forceNewClientSession = false;
@@ -231,7 +231,7 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
     objectType = objectInfo.objectType.toString() + 'Adapter';
   }
 
-  // TODO [6.2] BSH/CGU Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
+  // TODO [7.0] BSH/CGU Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
   var adapterModel = {
     id: adapterData.id,
     session: this
@@ -1275,7 +1275,7 @@ scout.Session.prototype.start = function() {
   this._sendStartupRequest();
 };
 
-// TODO [awe] 6.2 - discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
+// TODO [7.0] awe: discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
 // guess we need a SessionAdapter.js - I noticed this in a jasmine test where _processEvents is called an the adapter is the Session
 // (event.type=disposeAdapter), also see resetEventFilters method
 scout.Session.prototype.onModelEvent = function(event) {
@@ -1313,7 +1313,7 @@ scout.Session.prototype.switchLocale = function(locale, textMap) {
   }
   this.locale = locale;
   this.textMap = textMap;
-  // TODO [6.2] BSH: inform components to reformat display text? also check Collator in scout.comparators.TEXT
+  // TODO [7.0] BSH: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 
   this.trigger('localeSwitch', {
     locale: this.locale
@@ -1332,7 +1332,7 @@ scout.Session.prototype._onLogout = function(event) {
 
 scout.Session.prototype.logout = function(logoutUrl) {
   this.loggedOut = true;
-  // TODO [6.2] BSH Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
+  // TODO [7.0] BSH Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
   if (this.forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
@@ -1365,7 +1365,7 @@ scout.Session.prototype._onReloadPage = function(event) {
 
 scout.Session.prototype._onWindowBeforeUnload = function() {
   $.log.info('Session before unloading...');
-  // TODO [6.2] BSH Cancel pending requests
+  // TODO [7.0] BSH Cancel pending requests
 
   // Set a flag that indicates unloading before _onWindowUnload() is called.
   // See goOffline() why this is necessary.

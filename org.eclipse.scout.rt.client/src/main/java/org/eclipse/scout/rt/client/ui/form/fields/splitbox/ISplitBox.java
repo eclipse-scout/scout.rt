@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  *
  * @since 1.0.9 16.07.2008
  */
-// TODO [6.2] BSH, AWE: Support caching of splitter position or remove from model
+// TODO [7.0] BSH, AWE: Support caching of splitter position or remove from model
 public interface ISplitBox extends ICompositeField {
 
   String PROP_SPLITTER_ENABLED = "splitterEnabled";

@@ -269,7 +269,7 @@ scout.DateField.prototype._setDisplayText = function(displayText) {
 };
 
 scout.DateField.prototype._setTimestamp = function(timestamp) {
-  // TODO CGU [6.1] no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
+  // TODO [7.0] cgu: no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
   timestamp = scout.dates.ensure(timestamp);
   this.timestampAsDate = timestamp;
 };
@@ -1175,7 +1175,7 @@ scout.DateField.prototype.shiftSelectedDate = function(years, months, days) {
   this.getDatePicker().shiftSelectedDate(years, months, days);
 };
 
-// TODO [awe, cgu] 6.2 - (value-field): we should refactor this setTimestamp / formatTimestamp
+// TODO [7.0] awe, cgu: (value-field): we should refactor this setTimestamp / formatTimestamp
 // as soon as we have implemented parse/format/validation logic on ValueField.js. This
 // should work like the Java client (AbstractValueField) does. Also rename timestamp to value
 scout.DateField.prototype.setTimestamp = function(timestamp) {
@@ -1219,6 +1219,6 @@ scout.DateField.prototype._renderDisabledStyle = function() {
  * @override
  */
 scout.DateField.prototype._updateEmpty = function() {
-  // TODO [6.1] CGU remove this method as soon as timestamp is renamed to value. Then the default implementation of value field may be used
+  // TODO [7.0] CGU remove this method as soon as timestamp is renamed to value. Then the default implementation of value field may be used
   this.empty = this.timestamp === null || this.timestamp === undefined;
 };

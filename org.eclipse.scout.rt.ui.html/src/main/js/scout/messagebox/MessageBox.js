@@ -33,7 +33,7 @@ scout.MessageBox = function() {
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
-// TODO [awe] 6.2 - same as scout.Status.Severity!? merge
+// TODO [7.0] awe: same as scout.Status.Severity!? merge
 // represents severity codes from IStatus
 scout.MessageBox.SEVERITY = {
   OK: 1,
@@ -123,7 +123,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderHtml();
   this._renderHiddenText();
 
-  // TODO [6.2] bsh: Somehow let the user copy the 'copyPasteText' - but how?
+  // TODO [7.0] bsh: Somehow let the user copy the 'copyPasteText' - but how?
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -152,7 +152,7 @@ scout.MessageBox.prototype._position = function() {
 };
 
 scout.MessageBox.prototype._renderIconId = function() {
-  // TODO [6.2] bsh: implement
+  // TODO [7.0] bsh: implement
 };
 
 scout.MessageBox.prototype._renderSeverity = function() {

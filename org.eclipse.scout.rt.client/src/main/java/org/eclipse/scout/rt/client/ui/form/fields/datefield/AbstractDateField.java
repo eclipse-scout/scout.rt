@@ -243,7 +243,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   protected String checkFormatPatternSupported(String formatPattern) {
-    // TODO [6.2] bsh: How to implement?
+    // TODO [7.0] bsh: How to implement?
     return formatPattern;
   }
 

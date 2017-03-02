@@ -51,7 +51,7 @@ scout.SmartFieldPopup.prototype._renderProposalChooser = function() {
  * should stay open when the SmartField popup is closed. It also prevents the focus blur
  * event on the SmartField input-field.
  */
-// TODO [awe, cgu] 6.2 - this is not required by the cell editor anymore, but we cannot remove it either because mouse down on a row would immediately close the popup, why?
+// TODO [7.0] awe, cgu: this is not required by the cell editor anymore, but we cannot remove it either because mouse down on a row would immediately close the popup, why?
 scout.SmartFieldPopup.prototype._onContainerMouseDown = function(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the

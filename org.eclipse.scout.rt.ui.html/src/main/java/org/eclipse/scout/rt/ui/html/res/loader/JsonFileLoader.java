@@ -34,7 +34,7 @@ public class JsonFileLoader extends AbstractResourceLoader {
       // not handled here
       return null;
     }
-    // TODO [6.2] bsh: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
+    // TODO [7.0] bsh: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
     String json = new String(IOUtility.readFromUrl(url), StandardCharsets.UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
     return BinaryResources.create()

@@ -53,7 +53,7 @@ import org.junit.runner.RunWith;
 @RunWithSubject("anna")
 @Times(20)
 @Ignore
-//TODO bsh, abr
+//TODO [7.0] bsh,abr
 public class ClientJobCancelTest {
 
   private List<IBean<?>> m_serviceReg;

@@ -1156,7 +1156,7 @@ $.fn.hide = function() {
   var returnValue = _oldhide.apply(this, arguments);
   return returnValue;
 };
-//TODO [6.1] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
+//TODO [7.0] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
 
 /**
  * Sets the given 'text' as text to the jQuery element, using the text() function (i.e. HTML is encoded automatically).
@@ -1366,7 +1366,7 @@ $.fn.isContentTruncated = function() {
   return scrollWidth > clientWidth;
 };
 
-// TODO [awe] 6.2 - (graph) consider moving this function to DoubleClickHandler.js
+// TODO [7.0] awe: (graph) consider moving this function to DoubleClickHandler.js
 /**
  * This function is used to distinct between single and double clicks.
  * Instead of executing a handler immediately when the first click occurs,

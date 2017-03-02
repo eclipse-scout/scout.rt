@@ -1429,7 +1429,7 @@ scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
   }
 };
 
-// TODO [6.1] CGU applies to all the add/remove to/from flat list methods:
+// TODO [7.0] CGU applies to all the add/remove to/from flat list methods:
 // Is it really necessary to update dom on every operation? why not just update the list and renderViewport at the end?
 // The update of the flat list is currently implemented quite complicated -> it should be simplified.
 // And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded=
@@ -2234,7 +2234,7 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   this.selectNodes(node);
 
   if (this.checkable && node.enabled && this._isCheckboxClicked(event)) {
-    // TODO [awe] 6.2 - (check-box) check if we can remove call to supportsFocus* (analog CheckBox.js)
+    // TODO [7.0] awe: (check-box) check if we can remove call to supportsFocus* (analog CheckBox.js)
     // shouldn't be required since the refactoring of the ::before Element in CheckBox.js
     if (!scout.device.supportsFocusEmptyBeforeDiv()) {
       this.session.focusManager.requestFocus(this.$container);

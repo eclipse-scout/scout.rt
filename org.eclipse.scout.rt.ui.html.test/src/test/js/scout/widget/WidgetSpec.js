@@ -127,7 +127,7 @@ describe('Widget', function() {
       expect(propertyChangeEvent.changedProperties[0]).toBe('selected');
     });
 
-    // TODO [awe] 6.2 - discuss with B.SH - when a property has _not_ changed, should it be
+    // TODO [7.0] awe: discuss with B.SH - when a property has _not_ changed, should it be
     // fired as new/old property anyway? When no property has changed, should the propertyChange
     // event be fired anyway?
     it('changedProperties is only set when new and old value are not equals', function() {

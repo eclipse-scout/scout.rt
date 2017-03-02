@@ -69,8 +69,8 @@ scout.ValueField.prototype.parseAndSetValue = function(displayText) {
 };
 
 scout.ValueField.prototype._parseValue = function(displayText) {
-  // TODO [awe] 6.2 - this impl. is far too simple. Check how it is done in Java Scout, also discuss with A.SA
-  // TODO [awe] 6.2 - check what happens when server does execFormatValue: abc -> ABC. Could this possibly
+  // TODO [7.0] awe: this impl. is far too simple. Check how it is done in Java Scout, also discuss with A.SA
+  // TODO [7.0] awe: check what happens when server does execFormatValue: abc -> ABC. Could this possibly
   //                  lead to cycles? Probably it's not possible because our filters and because the adapter
   //                  does not yet know the value. Example from BSH: collator AE - Ä
   return displayText;
@@ -110,7 +110,7 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
 };
 
-// TODO [awe] 6.2 - check fields like DateField where setTimestamp is used instead of setValue
+// TODO [7.0] awe: check fields like DateField where setTimestamp is used instead of setValue
 scout.ValueField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
@@ -150,7 +150,7 @@ scout.ValueField.prototype._validateValue = function(value) {
  * @returns the formatted string or a promise
  */
 scout.ValueField.prototype._formatValue = function(value) {
-  return scout.nvl(value, ''); // TODO [awe] 6.2 - check impl. for fields other than StringField
+  return scout.nvl(value, ''); // [6.2] awe: check impl. for fields other than StringField
 };
 
 scout.ValueField.prototype._updateTouched = function() {

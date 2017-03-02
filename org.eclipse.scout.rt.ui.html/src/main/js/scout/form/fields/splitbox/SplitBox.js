@@ -188,7 +188,7 @@ scout.SplitBox.prototype._render = function($parent) {
         // Update split box
         this.newSplitterPosition(newSplitterPosition);
         if (this.rendered) {
-          // TODO CGU [7.0] remove this, should not be necessary anymore with 6.0
+          // TODO [7.0] cgu: remove this, should not be necessary anymore with 6.0
           this.htmlSplitArea.validateLayout(); // validate layout immediately (was invalidated by newSplitterPosition())
         }
       }

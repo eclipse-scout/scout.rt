@@ -287,7 +287,7 @@ getJasmineRequireObj().Spec = function(j$) {
           done();
         };
 
-        fn.call(this, callDone); //TODO do we care about more than 1 arg?
+        fn.call(this, callDone); //TODO [7.0] cgu: do we care about more than 1 arg?
       };
     }
 
@@ -474,7 +474,7 @@ getJasmineRequireObj().Env = function(j$) {
       return suite.getFullName() + ' ' + spec.description;
     };
 
-    // TODO we may just be able to pass in the fn instead of wrapping here
+    // TODO [7.0] cgu: we may just be able to pass in the fn instead of wrapping here
     var buildExpectationResult = j$.buildExpectationResult,
         exceptionFormatter = new j$.ExceptionFormatter(),
         expectationResultFactory = function(attrs) {
@@ -484,7 +484,7 @@ getJasmineRequireObj().Env = function(j$) {
           return buildExpectationResult(attrs);
         };
 
-    // TODO fix this naming, and here's where the value comes in
+    // TODO [7.0] cgu: fix this naming, and here's where the value comes in
     this.catchExceptions = function(value) {
       catchExceptions = !!value;
       return catchExceptions;
@@ -523,7 +523,7 @@ getJasmineRequireObj().Env = function(j$) {
       id: getNextSuiteId(),
       description: 'Jasmine__TopLevel__Suite',
       queueRunner: queueRunnerFactory,
-      resultCallback: function() {} // TODO - hook this up
+      resultCallback: function() {} // TODO [7.0] cgu: - hook this up
     });
     runnableLookupTable[topSuite.id] = topSuite;
     currentSuite = topSuite;
@@ -566,7 +566,7 @@ getJasmineRequireObj().Env = function(j$) {
       }
 
       if (obj[methodName] && j$.isSpy(obj[methodName])) {
-        //TODO?: should this return the current spy? Downside: may cause user confusion about spy state
+        //TODO [7.0] cgu: should this return the current spy? Downside: may cause user confusion about spy state
         throw new Error(methodName + ' has already been spied upon');
       }
 
@@ -810,7 +810,7 @@ getJasmineRequireObj().Any = function() {
     if (this.expectedObject == Object) {
       return typeof other == 'object';
     }
-    
+
     if (this.expectedObject == Boolean) {
       return typeof other == 'boolean';
     }
@@ -1205,7 +1205,7 @@ getJasmineRequireObj().Expectation = function() {
         expected = expected[0];
       }
 
-      // TODO how many of these params are needed?
+      // TODO [7.0] cgu: how many of these params are needed?
       this.addExpectationResult(
         result.pass,
         {
@@ -1213,7 +1213,7 @@ getJasmineRequireObj().Expectation = function() {
           passed: result.pass,
           message: message,
           actual: this.actual,
-          expected: expected // TODO this may need to be arrayified/sliced
+          expected: expected // TODO [7.0] cgu: this may need to be arrayified/sliced
         }
       );
     };
@@ -1245,8 +1245,8 @@ getJasmineRequireObj().Expectation = function() {
 
     var expect = new Expectation(options);
 
-    // TODO this would be nice as its own Object - NegativeExpectation
-    // TODO copy instead of mutate options
+    // TODO [7.0] cgu: this would be nice as its own Object - NegativeExpectation
+    // TODO [7.0] cgu: copy instead of mutate options
     options.isNot = true;
     expect.not = new Expectation(options);
 
@@ -1256,7 +1256,7 @@ getJasmineRequireObj().Expectation = function() {
   return Expectation;
 };
 
-//TODO expectation result may make more sense as a presentation of an expectation.
+//TODO [7.0] cgu: expectation result may make more sense as a presentation of an expectation.
 getJasmineRequireObj().buildExpectationResult = function() {
   function buildExpectationResult(options) {
     var messageFormatter = options.messageFormatter || function() {},
@@ -1527,7 +1527,7 @@ getJasmineRequireObj().QueueRunner = function() {
     function handleException(e) {
       self.onException(e);
       if (!self.catchException(e)) {
-        //TODO set a var when we catch an exception and
+        //TODO [7.0] cgu: set a var when we catch an exception and
         //use a finally block to close the loop in a nice way..
         throw e;
       }
@@ -1736,7 +1736,7 @@ getJasmineRequireObj().Timer = function() {
 };
 
 getJasmineRequireObj().matchersUtil = function(j$) {
-  // TODO what to do about jasmine.pp not being inject? move to JSON.stringify? gut PrettyPrinter?
+  // TODO [7.0] cgu: what to do about jasmine.pp not being inject? move to JSON.stringify? gut PrettyPrinter?
 
   return {
     equals: function(a, b, customTesters) {

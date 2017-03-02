@@ -119,7 +119,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   public void transformPageTable(ITable table, IPage<?> page) {
     for (ITableControl control : table.getTableControls()) {
       if (!(control instanceof SearchFormTableControl)) {
-        // TODO [15.4] CGU: Maybe some controls could be useful, like group ware or tile preview, how to distinguish?
+        // TODO [7.0] CGU: Maybe some controls could be useful, like group ware or tile preview, how to distinguish?
         control.setVisibleGranted(false);
       }
     }

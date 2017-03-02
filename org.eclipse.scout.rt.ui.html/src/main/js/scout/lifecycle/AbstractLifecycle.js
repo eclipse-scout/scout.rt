@@ -20,7 +20,7 @@ scout.AbstractLifecycle = function() {
     'save': this._defaultSave.bind(this)
   };
 
-  // TODO [awe, cgu] 6.2 - various FormLifecycle issues:
+  // TODO [7.0] awe,cgu: various FormLifecycle issues:
   // - why not always add lifecycle? remove case may remove it or empty method
   // - on ui we should use destroy, not dispose. Event name should not contain 'form'.
   // - Form lifecycle methods should be available on form delegating to lifecycle

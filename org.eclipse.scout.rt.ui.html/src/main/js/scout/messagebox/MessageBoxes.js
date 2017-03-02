@@ -82,7 +82,7 @@ scout.MessageBoxes.prototype.build = function() {
   if (scout.strings.hasText(this.cancelText)) {
     options.cancelButtonText = this.cancelText;
   }
-  if (this.html) { // TODO [awe] 6.2 - discuss with S.ME - why do we need TWO properties for body?
+  if (this.html) { // TODO [7.0] awe: discuss with S.ME - why do we need TWO properties for body?
     options.html = options.body;
     delete options.body;
   }

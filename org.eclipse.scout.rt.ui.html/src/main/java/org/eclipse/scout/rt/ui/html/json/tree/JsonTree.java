@@ -448,7 +448,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         handleModelOtherTreeEvent(event);
         break;
     }
-    // TODO [6.2] bsh: Tree | Events not yet implemented:
+    // TODO [7.0] bsh: Tree | Events not yet implemented:
     // - TYPE_NODE_REQUEST_FOCUS
     // - TYPE_NODE_ENSURE_VISIBLE what is the difference to scroll_to_selection? delete in treeevent
     // - TYPE_NODES_DRAG_REQUEST

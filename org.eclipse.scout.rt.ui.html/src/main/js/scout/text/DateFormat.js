@@ -1020,7 +1020,7 @@ scout.DateFormat.prototype.parse = function(text, startDate) {
       return null; // Date and weekday don't match -> parsing failed
     }
   }
-  // TODO [6.2] bsh: Handle week of year
+  // TODO [7.0] bsh: Handle week of year
 
   // Return valid date
   return date;

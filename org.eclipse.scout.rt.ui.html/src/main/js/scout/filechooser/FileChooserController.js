@@ -56,7 +56,7 @@ scout.FileChooserController.prototype._render = function(fileChooser) {
   if (!this.displayParent.rendered) {
     return;
   }
-  // Prevent "Already rendered" errors --> TODO [6.2] BSH: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [7.0] BSH: Remove this hack! Fix in on model if possible. See #162954.
   if (fileChooser.rendered) {
     return;
   }

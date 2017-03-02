@@ -93,7 +93,7 @@ scout.FormController.prototype.activateForm = function(form) {
   if (!form.rendered) {
     return;
   }
-  // TODO [awe] 6.2 - (2nd screen) handle popupWindow?
+  // TODO [7.0] awe: (2nd screen) handle popupWindow?
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._activateView(form);
   } else {
@@ -128,7 +128,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     return;
   }
 
-  // Prevent "Already rendered" errors --> TODO [6.2] BSH: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [7.0] BSH: Remove this hack! Fix in on model if possible. See #162954.
   if (view.rendered) {
     return false;
   }
@@ -163,7 +163,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return;
   }
 
-  // Prevent "Already rendered" errors --> TODO [6.2] BSH: Remove this hack! Fix in on model if possible. See #162954.
+  // Prevent "Already rendered" errors --> TODO [7.0] BSH: Remove this hack! Fix in on model if possible. See #162954.
   if (dialog.rendered) {
     return false;
   }

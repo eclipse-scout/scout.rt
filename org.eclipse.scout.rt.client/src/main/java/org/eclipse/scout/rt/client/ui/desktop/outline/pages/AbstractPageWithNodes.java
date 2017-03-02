@@ -317,7 +317,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     IFormFieldContextMenu mainBoxContextMenu = form.getRootGroupBox().getContextMenu();
     List<IMenu> menus = mainBoxContextMenu.getChildActions();
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
-      // TODO [6.2] hmu, bsh: menues im ui sammeln anstelle in forms injecten
+      // TODO [7.0] hmu, bsh: menues im ui sammeln anstelle in forms injecten
       if (menu.getMenuTypes().contains(TreeMenuType.Header) && menu.getMenuTypes().size() == 1) {
         // Don't show TreeMenuType.Header. These menus should only be shown on outline title
         continue;

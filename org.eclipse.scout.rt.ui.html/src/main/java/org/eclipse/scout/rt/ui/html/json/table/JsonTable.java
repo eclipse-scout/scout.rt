@@ -791,7 +791,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     // Confirm end cell edit so that gui can dispose the adapter.
     // It is not possible to dispose the adapter on the gui before sending complete or cancelCellEdit, because the field may send property change events back)
     // It would be possible if we added a filter mechanism so that events for disposed adapters won't be sent to client
-    // TODO [6.2] cgu: maybe optimize by adding a filter for disposed adapters
+    // TODO [7.0] cgu: maybe optimize by adding a filter for disposed adapters
     JSONObject json = new JSONObject();
     json.put("fieldId", jsonField.getId());
     addActionEvent(EVENT_END_CELL_EDIT, json).protect();

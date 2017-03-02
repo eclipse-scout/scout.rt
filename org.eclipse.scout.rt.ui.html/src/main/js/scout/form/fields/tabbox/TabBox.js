@@ -20,7 +20,7 @@ scout.TabBox = function() {
   this.selectedTab;
   this.tabItems = [];
   this._addAdapterProperties(['tabItems', 'selectedTab']);
-  this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [awe] 6.2 - do this in Calendar too, for selectedComponent
+  this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [7.0] awe: do this in Calendar too, for selectedComponent
   this._$tabArea;
   this._$tabContent;
 
@@ -108,7 +108,7 @@ scout.TabBox.prototype._removeTabContent = function() {
 };
 
 scout.TabBox.prototype.rebuildTabs = function() {
-  // TODO [awe] 6.2 - (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
+  // TODO [7.0] awe: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
   // DOM element which currently has the focus - the focus is lost. An other solution would be, to render the
   // tab at the correct position but probably that's not so easy because the render impl. does always append.
   // Temporary focus fix
@@ -168,7 +168,7 @@ scout.TabBox.prototype._setSelectedTab = function(tab, notifyServer) {
 };
 
 // keyboard navigation in tab-box button area
-// TODO [awe] 6.2 - (tab-box) overflow menu should be accessible by keyboard navigation
+// TODO [7.0] awe: (tab-box) overflow menu should be accessible by keyboard navigation
 scout.TabBox.prototype._onKeyDown = function(event) {
   var navigationKey =
     event.which === scout.keys.LEFT ||

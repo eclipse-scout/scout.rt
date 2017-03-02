@@ -48,7 +48,7 @@ public class JsonRecurrencePattern implements IJsonObject {
     json.put("dayOfWeekBits", m_recurrencePattern.getDayOfWeek());
     json.put("dayOfMonth", m_recurrencePattern.getDayOfMonth());
     json.put("monthOfYear", m_recurrencePattern.getMonthOfYear());
-    // TODO [6.2] bsh: Add RecurrenceException?
+    // TODO [7.0] bsh: Add RecurrenceException?
     return json;
   }
 }

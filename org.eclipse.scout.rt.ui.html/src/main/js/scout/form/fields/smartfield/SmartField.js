@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// TODO [awe] 6.2 - (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
+// TODO [7.0] awe: (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
 
 /**
  * Three smart-field modes:
@@ -508,7 +508,7 @@ scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
  */
 scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
   this._setDisplayText(displayText);
-  this._send('acceptProposal', { // TODO [cgu] 6.2 - (smartfield) move to adapter
+  this._send('acceptProposal', { // TODO [7.0] cgu: (smartfield) move to adapter
     displayText: displayText,
     chooser: chooser,
     forceClose: forceClose,
@@ -519,7 +519,7 @@ scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, 
   });
 };
 
-// TODO [awe] 6.2 - (focus) check if we can find next tabbable in the current focus-context (FocusManager)
+// TODO [7.0] awe: (focus) check if we can find next tabbable in the current focus-context (FocusManager)
 scout.SmartField.prototype._focusNextTabbable = function() {
   var $tabElements = this.entryPoint().find(':tabbable');
   var direction = this._tabPrevented.directionBack ? -1 : 1;

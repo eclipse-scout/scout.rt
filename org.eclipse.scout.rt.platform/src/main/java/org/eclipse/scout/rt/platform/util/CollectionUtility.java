@@ -776,7 +776,7 @@ public final class CollectionUtility {
     return Arrays.hashCode(c.toArray());
   }
 
-  // TODO [6.2] abr: ???
+  // TODO [7.0] abr: ???
   public static List<Object> parse(String text) {
     List<Object> list = null;
     if (StringUtility.hasText(text)) {

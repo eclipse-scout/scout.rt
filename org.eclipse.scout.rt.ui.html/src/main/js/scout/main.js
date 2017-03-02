@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// TODO [awe, cgu] 6.2 - think about refactoring this code to a Scout.js class and use an
+// TODO [7.0] awe, cgu: think about refactoring this code to a Scout.js class and use an
 // instance of that new class in scout-module.js for the last line of code:
 // }(window.scout = window.scout || {}, jQuery));
 
