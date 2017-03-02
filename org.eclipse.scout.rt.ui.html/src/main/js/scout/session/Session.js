@@ -164,7 +164,7 @@ scout.Session.prototype.init = function(model) {
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
   this.formTabClosable = scout.nvl(options.formTabClosable, false);
-  this.showTreeIcons = scout.nvl(options.showTreeIcons, false);
+  this.showTreeIcons = scout.nvl(options.showTreeIcons, false); // TODO [awe] 6.2: set to true by default
 };
 
 scout.Session.prototype._throwError = function(message) {
