@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.index.AbstractSingleValueIndex;
 import org.eclipse.scout.rt.platform.index.IndexedStore;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
  * Registry that contains the {@link RunMonitor}s of operations which are currently executing, and which are subject for
@@ -41,6 +42,7 @@ public class RunMonitorCancelRegistry {
 
   private boolean m_destroyed;
   protected final IndexedStore<RegistryEntry> m_registry;
+  private final Object m_registryLock = new Object();
 
   /** Index by {@link RunMonitor} object */
   protected final P_RunMonitorIndex m_runMonitorIndex = new P_RunMonitorIndex();
@@ -83,7 +85,7 @@ public class RunMonitorCancelRegistry {
   public IRegistrationHandle register(final RunMonitor runMonitor, final String sessionId, final Long requestId) {
     final RegistryEntry entry = new RegistryEntry(runMonitor, sessionId, requestId);
 
-    synchronized (this) {
+    synchronized (m_registryLock) {
       Assertions.assertFalse(m_destroyed, "{} not available because the platform has been shut down.", getClass().getSimpleName());
       m_registry.add(entry);
     }
@@ -92,7 +94,9 @@ public class RunMonitorCancelRegistry {
 
       @Override
       public void unregister() {
-        m_registry.remove(entry);
+        synchronized (m_registryLock) {
+          m_registry.remove(entry);
+        }
       }
     };
   }
@@ -106,7 +110,7 @@ public class RunMonitorCancelRegistry {
   public boolean cancelAll() {
     final List<RegistryEntry> registryEntries;
 
-    synchronized (this) {
+    synchronized (m_registryLock) {
       registryEntries = m_runMonitorIndex.values();
       m_registry.remove(registryEntries);
     }
@@ -125,7 +129,7 @@ public class RunMonitorCancelRegistry {
     final List<RegistryEntry> registryEntries;
 
     final RunMonitor currentRunMonitor = RunMonitor.CURRENT.get();
-    synchronized (this) {
+    synchronized (m_registryLock) {
       registryEntries = m_sessionIdIndex.get(sessionId);
       for (Iterator<RegistryEntry> it = registryEntries.iterator(); it.hasNext();) {
         RegistryEntry next = it.next();
@@ -149,7 +153,7 @@ public class RunMonitorCancelRegistry {
   public boolean cancelAllBySessionIdAndRequestId(final String sessionId, final long requestId) {
     final List<RegistryEntry> entries;
 
-    synchronized (this) {
+    synchronized (m_registryLock) {
       entries = m_sessionIdRequestIdIndex.get(new CompositeObject(sessionId, requestId));
       m_registry.remove(entries);
     }
@@ -185,7 +189,7 @@ public class RunMonitorCancelRegistry {
    * Method invoked to destroy this registry.
    */
   protected void destroy() {
-    synchronized (this) {
+    synchronized (m_registryLock) {
       m_destroyed = true;
     }
     cancelAll();
@@ -239,6 +243,15 @@ public class RunMonitorCancelRegistry {
 
     public Long getRequestId() {
       return m_requestId;
+    }
+
+    @Override
+    public String toString() {
+      return new ToStringBuilder(this)
+          .attr("runMonitor", m_runMonitor)
+          .attr("sessionId", m_sessionId)
+          .attr("requestId", m_requestId)
+          .toString();
     }
   }
 
