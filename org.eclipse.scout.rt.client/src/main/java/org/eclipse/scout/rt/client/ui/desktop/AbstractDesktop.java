@@ -2021,12 +2021,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
-    final String geolocationServiceAvailableStr = PropertyMap.CURRENT.get().get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+    PropertyMap propertyMap = PropertyMap.CURRENT.get();
+    final String geolocationServiceAvailableStr = propertyMap.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
     final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
     setGeolocationServiceAvailable(geolocationServiceAvailable);
 
-    final String deepLinkPath = PropertyMap.CURRENT.get().get(DeepLinkUrlParameter.DEEP_LINK);
-    activateDefaultView(deepLinkPath);
+    boolean handleDeepLink = propertyMap.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
+    if (handleDeepLink) {
+      final String deepLinkPath = propertyMap.get(DeepLinkUrlParameter.DEEP_LINK);
+      activateDefaultView(deepLinkPath);
+    }
   }
 
   /**

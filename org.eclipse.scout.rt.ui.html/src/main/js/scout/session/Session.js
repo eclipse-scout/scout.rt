@@ -13,7 +13,11 @@ scout.Session = function() {
   this.partId = 0;
 
   this.url = new scout.URL();
-  this.userAgent = new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
+  this.userAgent = new scout.UserAgent({
+    deviceType: scout.device.type,
+    touch: scout.device.supportsTouch(),
+    standalone: scout.device.isStandalone()
+  });
   this.locale;
   this.textMap = new scout.TextMap();
 
@@ -22,6 +26,7 @@ scout.Session = function() {
   this.unloaded = false; // true after unload event has been received from the window
   this.loggedOut = false;
   this.inspector = false;
+  this.persistent = false;
   this.desktop;
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper(this);
@@ -30,7 +35,7 @@ scout.Session = function() {
 
   // TODO [7.0] awe, cgu, bsh: Split in "RemoteSession" and "???" (maybe move to App)
   this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
-  this.clientSessionId = scout.webstorage.getItem(sessionStorage, 'scout:clientSessionId');
+  this.clientSessionId = this._getClientSessionIdFromStorage();
   this.forceNewClientSession = false;
   this.remote = false;
   this.remoteUrl = 'json';
@@ -342,8 +347,11 @@ scout.Session.prototype._processStartupResponse = function(data) {
     throw new Error('Missing startupData');
   }
 
+  // Mark session as persistent (means a persistent session cookie is used and the client session will be restored after a browser restart)
+  this.persistent = data.startupData.persistent;
+
   // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
-  scout.webstorage.setItem(sessionStorage, 'scout:clientSessionId', data.startupData.clientSessionId);
+  this._storeClientSessionIdInStorage(data.startupData.clientSessionId);
 
   // Assign server generated uiSessionId. It must be sent along with all further requests.
   this.uiSessionId = data.startupData.uiSessionId;
@@ -412,6 +420,25 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }.bind(this);
 
   this.render(renderDesktopImpl);
+};
+
+scout.Session.prototype._storeClientSessionIdInStorage = function(clientSessionId) {
+  scout.webstorage.removeItem(sessionStorage, 'scout:clientSessionId');
+  scout.webstorage.removeItem(localStorage, 'scout:clientSessionId');
+  var storage = sessionStorage;
+  if (this.persistent) {
+    storage = localStorage;
+  }
+  scout.webstorage.setItem(storage, 'scout:clientSessionId', clientSessionId);
+};
+
+scout.Session.prototype._getClientSessionIdFromStorage = function() {
+  var id = scout.webstorage.getItem(sessionStorage, 'scout:clientSessionId');
+  if (!id) {
+    // If the session is persistent it was stored in the local storage (cannot check for this.persistent here because it is not known yet)
+    id = scout.webstorage.getItem(localStorage, 'scout:clientSessionId');
+  }
+  return id;
 };
 
 scout.Session.prototype.render = function(renderFunc) {
@@ -1390,6 +1417,9 @@ scout.Session.prototype._onWindowUnload = function() {
   // otherwise the UI session would already be disposed)
   if (!this.loggedOut) {
     this._sendUnloadRequest();
+  }
+  if (this.loggedOut && this.persistent) {
+    scout.webstorage.removeItem(localStorage, 'scout:clientSessionId');
   }
 };
 

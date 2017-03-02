@@ -8,10 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.UserAgent = function(deviceType, touch) {
-  if (!deviceType) {
+scout.UserAgent = function(model) {
+  model = model || {};
+  if (!model.deviceType) {
     throw new Error('deviceType needs to be defined');
   }
-  this.deviceType = deviceType;
-  this.touch = scout.nvl(touch, false);
+  this.deviceType = model.deviceType;
+  this.touch = scout.nvl(model.touch, false);
+  this.standalone = scout.nvl(model.standalone, false);
 };

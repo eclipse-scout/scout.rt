@@ -30,6 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -45,6 +47,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -67,10 +70,12 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UiSystem;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.BackgroundPollingIntervalProperty;
@@ -144,6 +149,7 @@ public class UiSession implements IUiSession {
   private volatile IRegistrationHandle m_uiDataAvailableListener;
   private volatile long m_lastAccessedTime;
   private volatile RunMonitor m_pollerMonitor;
+  private volatile boolean m_persistent;
 
   public UiSession() {
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
@@ -229,6 +235,9 @@ public class UiSession implements IUiSession {
 
       // Add a cookie with the preferred user-language
       storePreferredLocaleInCookie(resp, m_clientSession.getLocale());
+
+      // Add a cookie with the jsessionid (depends on the user agent)
+      storeHttpSessionIdInCookie(resp, httpSession, m_clientSession.getUserAgent());
 
       // Apply theme from model to HTTP session and cookie
       boolean reloadPage = initUiTheme(req, resp, httpSession);
@@ -324,6 +333,8 @@ public class UiSession implements IUiSession {
       }
       boolean touch = userAgent.optBoolean("touch", false);
       userAgentBuilder.withTouch(touch);
+      boolean standalone = userAgent.optBoolean("standalone", false);
+      userAgentBuilder.withStandalone(standalone);
     }
     return userAgentBuilder.build();
   }
@@ -337,6 +348,43 @@ public class UiSession implements IUiSession {
 
   protected void storePreferredLocaleInCookie(HttpServletResponse resp, Locale locale) {
     CookieUtility.addPersistentCookie(resp, PREFERRED_LOCALE_COOKIE_NAME, locale.toLanguageTag());
+  }
+
+  protected void storeHttpSessionIdInCookie(HttpServletResponse resp, HttpSession httpSession, UserAgent userAgent) {
+    if (!userAgent.getUiSystem().equals(UiSystem.IOS) && !userAgent.isStandalone()) {
+      // The session cookie shall only be created in standalone mode (=home screen mode of iOS)
+      return;
+    }
+    SessionCookieConfig config = httpSession.getServletContext().getSessionCookieConfig();
+    if (config.getMaxAge() > 0) {
+      // Container will create the cookie, no need to do it by ourselves
+      // do not return to mark session as persistent, see below
+      LOG.info("Using persistent session cookie from container, maxAge is {}", config.getMaxAge());
+    }
+    else {
+      Cookie cookie = createSessionCookie(config, httpSession);
+      resp.addCookie(cookie);
+      LOG.info("Created persistent session cookie, maxAge is {}", cookie.getMaxAge());
+    }
+
+    // Mark session as persistent so that client session won't be disposed on an unload request
+    m_persistent = true;
+  }
+
+  protected Cookie createSessionCookie(SessionCookieConfig config, HttpSession httpSession) {
+    // Cookie must not expire too early so that it does not break the heart beat
+    // -> use a big max age. If the session expires or the user logs out the session will be invalidated normally
+    int maxAge = 3600 * 24 * 365; // 1 year
+    Cookie cookie = new Cookie(config.getName(), httpSession.getId());
+    cookie.setMaxAge(maxAge);
+    cookie.setComment(config.getComment());
+    if (config.getDomain() != null) {
+      cookie.setDomain(config.getDomain());
+    }
+    cookie.setHttpOnly(config.isHttpOnly());
+    cookie.setPath(config.getPath());
+    cookie.setSecure(config.isSecure());
+    return cookie;
   }
 
   /**
@@ -395,9 +443,13 @@ public class UiSession implements IUiSession {
       public void run() throws Exception {
         IDesktop desktop = m_clientSession.getDesktop();
         IDesktopUIFacade uiFacade = desktop.getUIFacade();
-        if (!desktop.isOpened()) {
+        boolean desktopOpen = desktop.isOpened();
+        if (!desktopOpen) {
           uiFacade.openFromUI();
         }
+        // Don't handle deep links for persistent sessions,
+        // in that case the client state shall be recovered rather than following the deep link
+        PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
         uiFacade.fireGuiAttached();
       }
     }, ModelJobs.newInput(
@@ -431,6 +483,7 @@ public class UiSession implements IUiSession {
     startupData.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
     startupData.put("clientSession", clientSessionAdapterId);
     startupData.put("pollingInterval", CONFIG.getPropertyValue(BackgroundPollingIntervalProperty.class));
+    startupData.put("persistent", isPersistent());
     putLocaleData(startupData, BEANS.get(UiJobs.class).awaitAndGet(future));
   }
 
@@ -444,6 +497,11 @@ public class UiSession implements IUiSession {
   @Override
   public final boolean isInitialized() {
     return m_initialized;
+  }
+
+  @Override
+  public boolean isPersistent() {
+    return m_persistent;
   }
 
   protected final ISessionStore sessionStore() {

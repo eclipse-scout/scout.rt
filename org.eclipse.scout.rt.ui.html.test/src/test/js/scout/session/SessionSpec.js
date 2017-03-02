@@ -23,9 +23,11 @@ describe('Session', function() {
 
   function createSession(userAgent) {
     setFixtures(sandbox());
-    var session = sandboxSession({'userAgent':userAgent});
+    var session = sandboxSession({
+      'userAgent': userAgent
+    });
     // test request only, don't test response (would require valid session, desktop etc.)
-    session._processStartupResponse = function(){};
+    session._processStartupResponse = function() {};
     return session;
   }
 
@@ -147,7 +149,9 @@ describe('Session', function() {
         return this.target === previous.target && this.type === previous.type && this.column === previous.column;
       };
 
-      var event0 = new scout.Event(1, 'columnResized', {column: 'a'});
+      var event0 = new scout.Event(1, 'columnResized', {
+        column: 'a'
+      });
       event0.coalesce = coalesce;
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -157,23 +161,31 @@ describe('Session', function() {
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new scout.Event(1, 'columnResized', {column: 'a'});
+      var event2 = new scout.Event(1, 'columnResized', {
+        column: 'a'
+      });
       event2.coalesce = coalesce;
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event3 = new scout.Event(1, 'columnResized', {column: 'z'});
+      var event3 = new scout.Event(1, 'columnResized', {
+        column: 'z'
+      });
       event3.coalesce = coalesce;
       session.sendEvent(event3);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // event for another target
-      var event4 = new scout.Event(2, 'columnResized', {column: 'a'});
+      var event4 = new scout.Event(2, 'columnResized', {
+        column: 'a'
+      });
       event4.coalesce = coalesce;
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event5 = new scout.Event(1, 'columnResized', {column: 'a'});
+      var event5 = new scout.Event(1, 'columnResized', {
+        column: 'a'
+      });
       event5.coalesce = coalesce;
       session.sendEvent(event5);
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -336,7 +348,9 @@ describe('Session', function() {
     });
 
     it('sends user agent on startup', function() {
-      var session = createSession(new scout.UserAgent(scout.Device.Type.MOBILE));
+      var session = createSession(new scout.UserAgent({
+        deviceType: scout.Device.Type.MOBILE
+      }));
       session.start();
 
       uninstallUnloadHandlers(session);

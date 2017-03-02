@@ -248,6 +248,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       LOG.debug("{} UI sessions remaining for client session {}", (map == null ? 0 : map.size()), clientSession.getId());
       if (map == null || map.isEmpty()) {
         m_uiSessionsByClientSession.remove(clientSession);
+        if (uiSession.isPersistent()) {
+          // don't start housekeeping for persistent sessions to give the users more time on app switches in ios home screen mode
+          return;
+        }
         startHousekeeping(clientSession);
       }
     }

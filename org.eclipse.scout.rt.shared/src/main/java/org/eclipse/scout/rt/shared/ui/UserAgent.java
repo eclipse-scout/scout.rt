@@ -41,14 +41,16 @@ public final class UserAgent implements Serializable {
   private final IUiSystem m_uiSystem;
   private final String m_uiDeviceId;
   private final boolean m_touch;
+  private final boolean m_standalone;
 
-  UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, IUiEngineType uiEngineType, IUiSystem uiSystem, String uiDeviceId, boolean touch) {
+  UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, IUiEngineType uiEngineType, IUiSystem uiSystem, String uiDeviceId, boolean touch, boolean standalone) {
     m_uiLayer = Assertions.assertNotNull(uiLayer, "UI Layer must not be null");
     m_uiDeviceType = Assertions.assertNotNull(uiDeviceType, "UI device type must not be null");
     m_uiDeviceId = Assertions.assertNotNull(uiDeviceId, "UI device id must not be null");
     m_uiEngineType = Assertions.assertNotNull(uiEngineType, "UI engineType must not be null");
     m_uiSystem = Assertions.assertNotNull(uiSystem, "UI system must not be null");
     m_touch = touch;
+    m_standalone = standalone;
   }
 
   public IUiDeviceType getUiDeviceType() {
@@ -73,6 +75,13 @@ public final class UserAgent implements Serializable {
 
   public boolean isTouch() {
     return m_touch;
+  }
+
+  /**
+   * @return true if the user agent is running in standalone mode (equivalent to navigator.standalone in JS)
+   */
+  public boolean isStandalone() {
+    return m_standalone;
   }
 
   @Override
