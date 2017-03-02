@@ -267,6 +267,7 @@
   __include("scout/tree/keystrokes/TreeExpandOrDrillDownKeyStroke.js");
   // Compact Tree
   __include("scout/tree/CompactTree.js");
+  __include("scout/tree/CompactTreeNode.js");
   __include("scout/tree/keystrokes/AbstractCompactTreeControlKeyStroke.js");
   __include("scout/tree/keystrokes/CompactTreeUpKeyStroke.js");
   __include("scout/tree/keystrokes/CompactTreeDownKeyStroke.js");

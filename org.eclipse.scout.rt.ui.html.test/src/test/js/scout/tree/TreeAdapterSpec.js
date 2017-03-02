@@ -423,8 +423,7 @@ describe("TreeAdapter", function() {
         };
         session._processSuccessResponse(message);
         expect(node0.text).toBe(event.text);
-        var $node0 = node0.$node;
-        expect($node0.text()).toBe('new Text');
+        expect(node0.$text.text()).toBe('new Text');
       });
 
     });

@@ -14,6 +14,7 @@
  */
 scout.TreeNode = function(tree) {
   this.$node; // TODO [awe, cgu] 6.2 - properties without assignment do not exist after ctor call, use better initial values everywhere?
+  this.$text = null;
   this.attached = false;
   this.checked = false;
   this.childNodes = [];
@@ -230,7 +231,7 @@ scout.TreeNode.prototype._renderCheckbox = function() {
 
 scout.TreeNode.prototype._decorate = function() {
   // This node is not yet rendered, nothing to do
-  if (!this.rendered) {
+  if (!this.$node) {
     return;
   }
 
@@ -267,6 +268,8 @@ scout.TreeNode.prototype._decorate = function() {
     $node.addClass('child-of-selected');
   }
 
+  this._renderText();
+  this._renderIcon();
   scout.styles.legacyStyle(this, $node);
 
   // If parent node is marked as 'lazy', check if any visible child nodes remain.

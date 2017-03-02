@@ -17,6 +17,12 @@ scout.CompactTree.prototype._initTreeKeyStrokeContext = function() {
   ]);
 };
 
+scout.CompactTree.prototype._createTreeNode = function(nodeModel) {
+  nodeModel = scout.nvl(nodeModel, {});
+  nodeModel.parent = this;
+  return scout.create('CompactTreeNode', nodeModel);
+};
+
 scout.CompactTree.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('compact-tree');
 
@@ -64,30 +70,6 @@ scout.CompactTree.prototype._remove = function() {
   scout.CompactTree.parent.prototype._remove.call(this);
 };
 
-/**
- * @override
- */
-scout.CompactTree.prototype._renderNode = function(node) {
-  if (this._isSection(node)) {
-    var $section = this.$container.makeDiv('section expanded')
-      .data('node', node);
-    $section.appendDiv('title')
-      .text(node.text);
-
-    node.$node = $section;
-  } else {
-    var $parent = node.parentNode.$node;
-    // Sections nodes
-    var $sectionNode = $parent.makeDiv('section-node')
-      .data('node', node)
-      .on('mousedown', this._onNodeMouseDown.bind(this))
-      .on('mouseup', this._onNodeMouseUp.bind(this));
-
-    node.$node = $sectionNode;
-  }
-
-  return node.$node;
-};
 
 /**
  * @override
@@ -112,48 +94,12 @@ scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
 /**
  * @override
  */
-scout.CompactTree.prototype._decorateNode = function(node) {
-  var formerClasses,
-    $node = node.$node;
-  if (!$node) {
-    // This node is not yet rendered, nothing to do
-    return;
-  }
-
-  if ($node.hasClass('section')) {
-    $node = $node.children('title');
-    formerClasses = 'title';
-  } else {
-    formerClasses = 'section-node';
-    if ($node.isSelected()) {
-      formerClasses += ' selected';
-    }
-  }
-  $node.removeClass();
-  $node.addClass(formerClasses);
-  $node.addClass(node.cssClass);
-  $node.text(node.text);
-
-  scout.styles.legacyStyle(node, $node);
-
-  if (scout.strings.hasText(node.tooltipText)) {
-    $node.attr('title', node.tooltipText);
-  }
-
-  // TODO [6.2] BSH: More attributes...
-  // iconId
-  // tooltipText
-};
-
-/**
- * @override
- */
 scout.CompactTree.prototype.selectNodes = function(nodes) {
   var selectedSectionNodes = [];
   nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(node) {
     // If a section is selected, automatically change selection to first section-node
-    if (this._isSection(node)) {
+    if (node.isSection()) {
       if (node.childNodes.length > 0) {
         selectedSectionNodes.push(node.childNodes[0]);
       }
@@ -177,9 +123,5 @@ scout.CompactTree.prototype._renderExpansion = function(node) {
  */
 scout.CompactTree.prototype._updateItemPath = function() {
   // nop (not supported by CompactTree)
-};
-
-scout.CompactTree.prototype._isSection = function(node) {
-  return node.level === 0;
 };
 
