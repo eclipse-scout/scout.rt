@@ -108,6 +108,13 @@ scout.Session.JsonResponseError = {
  *   [formTabClosable]
  *     Optional, default is false. True to show a close button in the view tabs on
  *     the desktop if the form is closable (has a close or cancel button).
+ *   [showTreeIcons]
+ *     Optional, default is false. Whether or not tree and outline show the icon
+ *     which is defined by the iconId property. Until Scout 6.1 trees did not have
+ *     icons. With Scout 6.1 and later trees can have icons and this init property
+ *     has been added to support the old behavior (no icons at all) without changing
+ *     existing code. From Scout 6.2 showTreeIcons will be true by default, which
+ *     means projects have to (potentially) migrate existing code.
  */
 scout.Session.prototype.init = function(model) {
   var options = model || {};
@@ -151,7 +158,8 @@ scout.Session.prototype.init = function(model) {
     active: options.focusManagerActive
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
-  this.formTabClosable = options.formTabClosable;
+  this.formTabClosable = scout.nvl(options.formTabClosable, false);
+  this.showTreeIcons = scout.nvl(options.showTreeIcons, false);
 };
 
 scout.Session.prototype._throwError = function(message) {

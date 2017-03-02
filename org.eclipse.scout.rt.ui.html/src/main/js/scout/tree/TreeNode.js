@@ -198,9 +198,11 @@ scout.TreeNode.prototype._renderChecked = function() {
 };
 
 scout.TreeNode.prototype._renderIcon = function() {
-  this.$node.icon(this.iconId, function($icon) {
-    $icon.insertBefore(this.$text);
-  }.bind(this));
+  if (this.getTree().session.showTreeIcons) {
+    this.$node.icon(this.iconId, function($icon) {
+      $icon.insertBefore(this.$text);
+    }.bind(this));
+  }
 };
 
 scout.TreeNode.prototype.$icon = function() {
@@ -212,7 +214,7 @@ scout.TreeNode.prototype._renderControl = function() {
   if (this.getTree().checkable) {
     $control.addClass('checkable');
   }
-  $control.css('visibility', this.leaf ? 'hidden' : 'visible');
+  $control.setVisible(!this.leaf);
 };
 
 scout.TreeNode.prototype._renderCheckbox = function() {
@@ -256,7 +258,7 @@ scout.TreeNode.prototype._decorate = function() {
   $node.toggleClass('lazy', $node.hasClass('expanded') && this.expandedLazy);
   $node.toggleClass('group', !!tree.groupedNodes[this.id]);
   $node.setEnabled(!!this.enabled);
-  $node.children('.tree-node-control').css('visibility', this.leaf ? 'hidden' : 'visible');
+  $node.children('.tree-node-control').setVisible(!this.leaf);
   $node.children('.tree-node-checkbox')
     .children('.check-box')
     .toggleClass('disabled', !(tree.enabled && this.enabled));
