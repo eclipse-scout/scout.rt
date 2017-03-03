@@ -70,10 +70,16 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
 
   /**
    * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set. The
-   * default implementation does nothing.
+   * default implementation calls {@link AbstractProposalChooser#initModel()}.
    */
   protected void init() {
+    initModel();
   }
+
+  /**
+   * Init the model (tree or table).
+   */
+  protected abstract void initModel();
 
   @Override
   public ILookupRow<LOOKUP_KEY> getAcceptedProposal() {

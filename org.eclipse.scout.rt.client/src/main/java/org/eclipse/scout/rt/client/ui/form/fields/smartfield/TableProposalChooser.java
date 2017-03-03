@@ -62,6 +62,11 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   }
 
   @Override
+  protected void initModel() {
+    getModel().initTable();
+  }
+
+  @Override
   protected IContentAssistFieldTable<LOOKUP_KEY> createDefaultModel() {
     return new P_DefaultProposalTable<>();
   }
