@@ -122,7 +122,7 @@ scout.DesktopNavigation.prototype._setOutline = function(outline) {
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
-  if(this.viewButtonBox){
+  if (this.viewButtonBox) {
     this.viewButtonBox.sendToBack();
   }
   if (this.outline) {
@@ -131,7 +131,7 @@ scout.DesktopNavigation.prototype.sendToBack = function() {
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
-  if(this.viewButtonBox){
+  if (this.viewButtonBox) {
     this.viewButtonBox.bringToFront();
   }
   if (this.outline) {

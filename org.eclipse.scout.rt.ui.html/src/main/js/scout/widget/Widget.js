@@ -802,11 +802,6 @@ scout.Widget.prototype.detach = function() {
  * will call this.$container.detach() here and use the DetachHelper to store
  * additional state (focus, scrollbars) for the detached element. The default
  * implementation sets this.attached to false.
- *
- * @param the event.target property is used to decide if a Widget must detach
- *   its $container. When the parent of the Widget already detaches, the Widget
- *   itself must _not_ detach its own $container. That's why we should only
- *   detach when event.target is === this.
  */
 scout.Widget.prototype._detach = function() {
   this.attached = false;

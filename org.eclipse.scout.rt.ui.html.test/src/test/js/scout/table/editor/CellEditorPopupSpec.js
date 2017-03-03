@@ -385,6 +385,24 @@ describe("CellEditor", function() {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
+    it("closes popup (before) table is detached", function() {
+      row0.cells[0].editable = true;
+      table.render(session.$entryPoint);
+      startAndAssertCellEdit(table, table.columns[0], row0);
+      expect(table.cellEditorPopup).toBeTruthy();
+      table._beforeDetach(); // called by parent.detach();
+      expect(table.cellEditorPopup).toBe(null);
+    });
+
+    it("closes popup when table is removed", function() {
+      row0.cells[0].editable = true;
+      table.render(session.$entryPoint);
+      startAndAssertCellEdit(table, table.columns[0], row0);
+      expect(table.cellEditorPopup).toBeTruthy();
+      table.remove();
+      expect(table.cellEditorPopup).toBe(null);
+    });
+
   });
 
   describe("tooltip recovery", function() {

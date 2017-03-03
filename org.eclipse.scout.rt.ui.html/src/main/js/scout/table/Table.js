@@ -325,6 +325,7 @@ scout.Table.prototype._remove = function() {
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
   this.header = null;
+  this._destroyCellEditorPopup();
   this._removeAggregateRows();
   this._uninstallImageListeners();
   this._uninstallCellTooltipSupport();
@@ -2209,8 +2210,7 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
     // uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
     // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can
     // be avoided if removing the popup first.
-    this.cellEditorPopup.destroy();
-    this.cellEditorPopup = null;
+    this._destroyCellEditorPopup();
 
     // Must store context in a local variable and call setCellValue _after_ cellEditorPopup is set to null
     // because in updateRows we check if the popup is still there and start cell editing mode again.
@@ -3716,17 +3716,22 @@ scout.Table.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
   // Detach helper stores the current scroll pos and restores in attach.
-  // To make it work scrollTop needs to be reseted here otherwise viewport won't be rendered by _onDataScroll
+  // To make it work scrollTop needs to be reset here otherwise viewport won't be rendered by _onDataScroll
   scout.Table.parent.prototype._detach.call(this);
 };
 
-scout.Table.prototype._beforeDetach = function() {
+scout.Table.prototype._destroyCellEditorPopup = function() {
   // When a cell editor popup is open and table is detached, we close the popup immediately
   // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
   // with invalid focus contexts.
   if (this.cellEditorPopup) {
-    this.cellEditorPopup.remove();
+    this.cellEditorPopup.destroy();
+    this.cellEditorPopup = null;
   }
+};
+
+scout.Table.prototype._beforeDetach = function() {
+  this._destroyCellEditorPopup();
 };
 
 scout.Table.prototype.setVirtual = function(virtual) {
