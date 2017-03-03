@@ -2178,7 +2178,7 @@ scout.Table.prototype._removeCellEditorForRow = function(row) {
 };
 
 scout.Table.prototype.startCellEdit = function(column, row, field) {
-  if (!this.rendered) {
+  if (!this.rendered || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.startCellEdit.bind(this, column, row, field));
     return;
   }
@@ -2197,7 +2197,7 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
  * @see RemoteApp.js
  */
 scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
-  if (!this.rendered) {
+  if (!this.rendered || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.endCellEdit.bind(this, field, saveEditorValue));
     return;
   }
@@ -3685,7 +3685,7 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
 };
 
 scout.Table.prototype.requestFocusInCell = function(column, row) {
-  if (!this.rendered) {
+  if (!this.rendered || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.requestFocusInCell.bind(this, column, row));
     return;
   }

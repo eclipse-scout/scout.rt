@@ -195,6 +195,11 @@ scout.TableSpecHelper.prototype.createTableWithOneColumn = function() {
 scout.TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table();
   table.init(model);
+  // these two lines are required in Specs where the NullWidget is used as a parent for the table
+  // since that widget is never attached or rendered we could not test code properly that assumes
+  // the parent of the table is attached and rendered (e.g. startCellEdit)
+  table.parent.attached = true;
+  table.parent.rendered = true;
   return table;
 };
 

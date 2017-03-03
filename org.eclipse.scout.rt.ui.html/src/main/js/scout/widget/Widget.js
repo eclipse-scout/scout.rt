@@ -1324,6 +1324,22 @@ scout.Widget.prototype.visitChildren = function(visitor) {
   }, this);
 };
 
+/**
+ * Checks if the widget and all of its parents (up to scout.Desktop) is still attached and rendered.
+ * @returns {boolean} whether or not the widget is still attached and rendered
+ */
+scout.Widget.prototype.isAttachedAndRendered = function() {
+  var widget = this;
+  while (widget && !(widget instanceof scout.Desktop)) {
+    // if widget is rendering -> don't check attached or rendered
+    if (!widget.rendering && (!widget.attached || !widget.rendered)) {
+      return false;
+    }
+    widget = widget.parent;
+  }
+  return true;
+};
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 scout.Widget.getWidgetFor = function($elem) {

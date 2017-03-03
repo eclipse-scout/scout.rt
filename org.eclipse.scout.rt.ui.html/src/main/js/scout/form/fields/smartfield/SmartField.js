@@ -174,13 +174,18 @@ scout.SmartField.prototype._setProposalChooser = function(proposalChooser) {
 };
 
 /**
- * When popup is not rendered at this point, we render the popup.
+ * When popup is not rendered at this point, we render the popup. We use _isAttachedAndRendered
+ * to check if field (and all of its parents are still attached and rendered. This prevents
+ * cases where a proposal chooser is requested but the form with the smart field is not active
+ * anymore (e.g. when the user has clicked on the outline and the previously active form is
+ * in the background).
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
   $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser + ' touch=' + this.touch);
-  if (!this.proposalChooser) {
+  if (!this.proposalChooser || !this.isAttachedAndRendered()) {
     return;
   }
+
   this.openPopup();
   this.popup.setProposalChooser(this.proposalChooser);
 };
