@@ -1081,9 +1081,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     onOutlineChangedInternal();
   }
 
-  // FIXME awe: review with C.GU - is it sufficient to set the active form to null?
-  // or do we have to find another suitable active form? I guess the UI will send
-  // the new active form later...
   protected void updateActiveFormOnOutlineChanged() {
     // If active form is not set or parent of active form is desktop
     // we must do nothing

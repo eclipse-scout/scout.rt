@@ -32,8 +32,6 @@ public interface ICalendarUIFacade {
 
   void setSelectionFromUI(Date date, CalendarComponent comp);
 
-  // FIXME awe: (calendar) talk about selection in new Html UI, currently we can only select an entire day, but not a single item (= component)
-  // depending on the outcome we must remove/refactor either this method or setSelectionFromUI
   void setSelectedDateFromUI(Date date);
 
 }

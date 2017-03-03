@@ -259,8 +259,6 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     getModel().getUIFacade().fireReloadFromUI();
   }
 
-  // FIXME awe: (calendar) replace selectedDate with selectionRange(from/to)
-
   protected void handleUiSelectionChanged(JsonEvent event) {
     JSONObject data = event.getData();
     Date selectedDate = toJavaDate(data, "date");

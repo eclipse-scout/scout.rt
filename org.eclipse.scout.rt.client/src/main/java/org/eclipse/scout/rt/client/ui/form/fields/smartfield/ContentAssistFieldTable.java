@@ -91,8 +91,9 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     List<ITableRow> rows = new ArrayList<ITableRow>();
     for (ILookupRow<LOOKUP_KEY> lookupRow : lookupRows) {
       ITableRow row = createRow();
-      row.getCellForUpdate(getKeyColumn()).setValue(lookupRow); // FIXME AWE: we should use a ComparableLookupRow here 
-      // because restoreSelection does not work as LookupRow does not implement equals/hashCode
+      // Note: we should use a ComparableLookupRow here because restoreSelection does not work
+      // since LookupRow does not implement equals/hashCode [awe]
+      row.getCellForUpdate(getKeyColumn()).setValue(lookupRow);
       rows.add(row);
       row.setEnabled(lookupRow.isEnabled());
       AbstractTableRowData tableRowBean = lookupRow.getAdditionalTableRowData();

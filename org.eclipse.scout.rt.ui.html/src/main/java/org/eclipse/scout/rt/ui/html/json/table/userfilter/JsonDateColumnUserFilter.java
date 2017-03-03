@@ -30,7 +30,8 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
     return "DateColumnUserFilter";
   }
 
-  // FIXME AWE: (filter) user JsonDate (see DateField)
+  // TODO [awe] 6.2: (filter) use JsonDate in place of this poor-mans solution.
+  // also for this.toDate() method (see DateField)
   protected String dateToJson(Date date) {
     if (date == null) {
       return null;
@@ -38,7 +39,6 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
     return DateUtility.format(date, "yyyy-MM-dd");
   }
 
-  // FIXME AWE: (filter) fix this poor-mans solution and use JsonDate, property date-format
   protected Date toDate(String dateString) {
     if (StringUtility.isNullOrEmpty(dateString)) {
       return null;

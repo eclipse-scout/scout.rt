@@ -136,7 +136,7 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
       if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
         model.id = this.createUniqueId();
       }
-      model.objectType = objectType; //FIXME awe
+      model.objectType = objectType;
     }
     // Initialize object
     scoutObject.init(model);
