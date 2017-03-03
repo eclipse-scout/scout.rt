@@ -68,6 +68,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   }
 
   @Override
+  protected void initModel() {
+    getModel().initTree();
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public ILookupRow<LOOKUP_KEY> getSelectedLookupRow() {
     ILookupRow<LOOKUP_KEY> row = null;
