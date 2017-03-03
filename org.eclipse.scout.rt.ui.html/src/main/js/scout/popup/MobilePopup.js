@@ -50,8 +50,8 @@ scout.MobilePopup.prototype._render = function($parent) {
 
   this.$header = this.$container.appendDiv('mobile-popup-header');
   this.$title = this.$header.appendDiv('title');
-  this.widget.render(this.$container);
   this.widget.setParent(this);
+  this.widget.render(this.$container);
   this.widget.htmlComp.pixelBasedSizing = true;
   this._renderTitle();
   this._renderClosable();

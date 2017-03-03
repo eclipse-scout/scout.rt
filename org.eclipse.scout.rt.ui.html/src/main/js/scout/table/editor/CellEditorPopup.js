@@ -65,11 +65,11 @@ scout.CellEditorPopup.prototype._render = function($parent) {
 
   var field = this.cell.field;
   field.mode = scout.FormField.MODE_CELLEDITOR; // hint that this field is used within a cell-editor
+  field.setParent(this);
   field.render(this.$container);
   field.prepareForCellEdit({
     firstCell: firstCell
   });
-  field.setParent(this);
 
   // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
   this.$anchor.css('visibility', 'hidden');

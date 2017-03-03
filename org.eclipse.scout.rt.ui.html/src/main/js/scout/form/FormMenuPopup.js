@@ -32,10 +32,10 @@ scout.FormMenuPopup.prototype._render = function($parent) {
   scout.FormMenuPopup.parent.prototype._render.call(this, $parent);
   this.$container.addClass('form-menu-popup');
 
+  this.form.setParent(this);
   this.form.renderInitialFocusEnabled = false;
   this.form.render(this.$body);
   this.form.htmlComp.pixelBasedSizing = true;
-  this.form.setParent(this);
 
   // We add this here for symmetry reasons (because _removeHead is not called on remove())
   if (this._headVisible) {

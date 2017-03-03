@@ -236,6 +236,10 @@ scout.Widget.prototype._remove = function() {
 };
 
 scout.Widget.prototype.setParent = function(parent) {
+  if (this.rendered) {
+    // Cannot re-link a widget while it is rendered
+    throw new Error('Cannot re-link widget while it is rendered: ' + this.toString());
+  }
   if (this.parent) {
     // Remove from old parent if getting relinked
     this.parent.removeChild(this);

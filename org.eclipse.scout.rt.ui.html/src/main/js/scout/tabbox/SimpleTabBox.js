@@ -79,8 +79,8 @@ scout.SimpleTabBox.prototype._renderView = function(view) {
   if (view.rendered) {
     return;
   }
-  view.render(this.$viewContent);
   view.setParent(this);
+  view.render(this.$viewContent);
   view.$container.addClass('view');
   view.validateRoot = true;
 };

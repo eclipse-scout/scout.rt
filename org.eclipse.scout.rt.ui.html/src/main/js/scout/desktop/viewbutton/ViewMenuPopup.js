@@ -50,9 +50,9 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
   scout.ViewMenuPopup.parent.prototype._render.call(this, $parent);
 
   this.viewMenus.forEach(function(viewMenu) {
+    viewMenu.setParent(this);
     viewMenu.render(this.$body);
     viewMenu.afterSendDoAction = this.close.bind(this);
-    viewMenu.setParent(this);
   }, this);
 
   // Add last marker to last visible item
