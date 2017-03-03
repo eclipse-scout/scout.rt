@@ -8,8 +8,6 @@
  *   removed all other code.
  * - Replaced all 'TOD0's from JQuery's original source code with 'TO.DO'.
  * - Changed class name for resize-grip icon in resizable
- *
- * Create minified version manually with http://jscompress.com/
  */
 
 (function( factory ) {
