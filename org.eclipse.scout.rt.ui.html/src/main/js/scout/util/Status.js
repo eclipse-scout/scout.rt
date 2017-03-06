@@ -37,7 +37,7 @@ scout.Status.prototype.cssClass = function() {
  */
 scout.Status.prototype.isValid = function() {
   return this.severity === scout.Status.Severity.OK ||
-         this.severity === scout.Status.Severity.INFO;
+    this.severity === scout.Status.Severity.INFO;
 };
 
 scout.Status.prototype.isError = function() {
@@ -56,8 +56,7 @@ scout.Status.prototype.equals = function(o) {
   if (!(o instanceof scout.Status)) {
     return false;
   }
-  return scout.objects.propertiesEquals(this, o,
-      ['severity', 'message', 'invalidDate', 'invalidTime']);
+  return scout.objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
 };
 
 /**
@@ -86,12 +85,12 @@ scout.Status.cssClassForSeverity = function(severity) {
 
 scout.Status.animateStatusMessage = function($status, message) {
   if (scout.strings.endsWith(message, '...')) {
-    var $elipsis = $status.makeSpan('elipsis');
+    var $ellipsis = $status.makeSpan('ellipsis');
     for (var i = 0; i < 3; i++) {
-      $elipsis.append($status.makeSpan('animate-dot delay-' + i, '.'));
+      $ellipsis.append($status.makeSpan('animate-dot delay-' + i, '.'));
     }
     message = message.substring(0, message.length - 3);
-    $status.empty().text(message).append($elipsis);
+    $status.empty().text(message).append($ellipsis);
   } else {
     $status.text(message);
   }
