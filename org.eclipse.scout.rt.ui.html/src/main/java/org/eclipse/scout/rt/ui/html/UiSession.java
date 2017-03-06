@@ -351,7 +351,7 @@ public class UiSession implements IUiSession {
   }
 
   protected void storeHttpSessionIdInCookie(HttpServletResponse resp, HttpSession httpSession, UserAgent userAgent) {
-    if (!userAgent.getUiSystem().equals(UiSystem.IOS) && !userAgent.isStandalone()) {
+    if (!(userAgent.getUiSystem().equals(UiSystem.IOS) && userAgent.isStandalone())) {
       // The session cookie shall only be created in standalone mode (=home screen mode of iOS)
       return;
     }
