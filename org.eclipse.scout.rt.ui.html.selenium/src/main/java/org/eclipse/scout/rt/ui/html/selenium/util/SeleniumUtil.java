@@ -159,6 +159,13 @@ public final class SeleniumUtil {
   }
 
   /**
+   * Sleep for the given time.
+   */
+  public static void pause(long duration, TimeUnit timeUnit) {
+    SleepUtil.sleepSafe(duration, timeUnit);
+  }
+
+  /**
    * Same as pause(TimeUnit, int), but waits longer on CI-server.
    */
   public static void variablePause(TimeUnit timeUnit, int duration) {

@@ -15,9 +15,11 @@ import static org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil.variablePa
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.selenium.SeleniumSuiteState;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumDriver;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
@@ -55,6 +57,8 @@ public abstract class AbstractSeleniumTest {
   public final TestRule m_mainRule = RuleChain.outerRule(m_ignoreTestOnMacOSRule)
       .around(m_sessionRule)
       .around(m_screenshotRule);
+
+  private WebElement m_previousClickTarget;
 
   /**
    * When we're running in a suite, the suite deals with starting the Driver, When the test runs alone, it must start
@@ -336,8 +340,12 @@ public abstract class AbstractSeleniumTest {
     return waitUntilCheckBoxChecked(checkBoxField, true);
   }
 
-  public <V> V waitUntil(Function<WebDriver, V> isTrue) {
-    return new WebDriverWait(s_driver, 10).until(isTrue);
+  protected <V> V waitUntil(Function<WebDriver, V> condition) {
+    return waitUntil(condition, 10);
+  }
+
+  protected <V> V waitUntil(Function<WebDriver, V> condition, int timeoutInSeconds) {
+    return new WebDriverWait(s_driver, timeoutInSeconds).until(condition);
   }
 
   public WebElement waitForFirstTableRow() {
@@ -394,4 +402,31 @@ public abstract class AbstractSeleniumTest {
     return element.findElement(By.xpath(".."));
   }
 
+  /**
+   * Sends a "click" event to the given element. If the same element is clicked twice in a row, a short delay is applied
+   * to prevent generation of a "double click" event.
+   * <p>
+   * If the click caused a server call, the methods waits until the request has finished. It also waits for UI
+   * animations using a .animation-wrapper to complete.
+   */
+  protected void clickAndWait(WebElement element) {
+    // If the same element is clicked twice in a row, add a small pause to prevent a double click
+    if (m_previousClickTarget == element) {
+      SeleniumUtil.pause(500, TimeUnit.MILLISECONDS);
+    }
+    m_previousClickTarget = element;
+
+    element.click();
+
+    // Wait for pending server calls to finish
+    WebElement pending = CollectionUtility.firstElement(findElements(By.cssSelector(".request-pending")));
+    if (pending != null) {
+      waitUntilElementStaleness(pending);
+    }
+    // Wait for animations to finish
+    WebElement animation = CollectionUtility.firstElement(findElements(By.cssSelector(".animation-wrapper")));
+    if (animation != null) {
+      waitUntilElementStaleness(animation);
+    }
+  }
 }
