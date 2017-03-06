@@ -2729,6 +2729,7 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
           $node.removeData('oldStyle');
           $node.attrOrRemove('style', oldStyle);
         }
+        $node.removeClass('showing');
       }
     });
   }
