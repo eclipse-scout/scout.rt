@@ -140,11 +140,12 @@ public class PropertiesHelperTest {
     System.setProperty(thirdKey, "changed");
     try {
       Map<String, String> map1 = h.getPropertyMap(MAP_KEY);
-      assertEquals(5, map1.size());
+      assertEquals(6, map1.size());
       assertEquals("one", map1.get("first"));
       assertEquals("two", map1.get("second"));
       assertEquals("changed", map1.get("third"));
       assertEquals("four", map1.get("fourth"));
+      assertNull(map1.get("empty"));
       assertEquals("last", map1.get("last"));
 
       try {
@@ -293,7 +294,7 @@ public class PropertiesHelperTest {
   public void testImportWithPlaceholder() {
     PropertiesHelper h = new PropertiesHelper(PLACEHOLDER_IMPORT_PROPS);
     assertTrue(h.isInitialized());
-    assertEquals(4, h.getPropertyMap(MAP_KEY).size());
+    assertEquals(5, h.getPropertyMap(MAP_KEY).size());
     try {
       h.getPropertyMap(MAP_KEY, "namespace");
       Assert.fail();
