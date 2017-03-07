@@ -41,7 +41,8 @@ public class JsonRequest {
   public static final String PROP_EVENTS = "events";
   public static final String PROP_EVENT = "event";
   public static final String PROP_MESSAGE = "message";
-  public static final String PROP_ACK_SEQUENCE_NO = "#ACK";
+  public static final String PROP_ACK_RESPONSE_SEQUENCE_NO = "#ACK";
+  public static final String PROP_REQUEST_SEQUENCE_NO = "#";
 
   private final JSONObject m_request;
   private final RequestType m_requestType;
@@ -120,9 +121,30 @@ public class JsonRequest {
     return m_request.optString(PROP_MESSAGE, null);
   }
 
-  public Long getAckSequenceNo() {
-    long val = m_request.optLong(PROP_ACK_SEQUENCE_NO, -1);
-    return (val == -1 ? null : val); // because optLong() cannot only return primitives and opt() does not parse the number correctly
+  /**
+   * Use this method in place of {@link JSONObject#getLong(String)} because optLong() cannot only return primitives and
+   * opt() does not parse the number correctly.
+   *
+   * @param propertyName
+   * @return
+   */
+  protected Long getLong(String propertyName) {
+    long value = m_request.optLong(propertyName, -1);
+    return value == -1 ? null : value;
+  }
+
+  /**
+   * @return The acknowledged response sequence number
+   */
+  public Long getAckResponseSequenceNo() {
+    return this.getLong(PROP_ACK_RESPONSE_SEQUENCE_NO);
+  }
+
+  /**
+   * @return The sequence number of this request
+   */
+  public Long getRequestSequenceNo() {
+    return this.getLong(PROP_REQUEST_SEQUENCE_NO);
   }
 
   @Override

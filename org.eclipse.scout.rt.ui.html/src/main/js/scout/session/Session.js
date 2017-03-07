@@ -60,6 +60,9 @@ scout.Session = function() {
   this._$requestPending;
   this._deferred;
   this._fatalMessagesOnScreen = {};
+  this._retryRequest;
+  this._queuedRequest;
+  this.requestSequenceNo = 0;
 
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
@@ -276,9 +279,9 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
 scout.Session.prototype._sendStartupRequest = function() {
   // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
-  var request = {
+  var request = this._newRequest({
     startup: true
-  };
+  });
   if (this.partId) {
     request.partId = this.partId;
   }
@@ -452,11 +455,10 @@ scout.Session.prototype.render = function(renderFunc) {
 };
 
 scout.Session.prototype._sendUnloadRequest = function() {
-  var request = {
-    uiSessionId: this.uiSessionId,
+  var request = this._newRequest({
     unload: true,
     showBusyIndicator: false
-  };
+  });
   // Send request
   this._sendRequest(request);
 };
@@ -466,10 +468,9 @@ scout.Session.prototype._sendNow = function() {
     // Nothing to send -> return
     return;
   }
-  var request = {
-    uiSessionId: this.uiSessionId,
+  var request = this._newRequest({
     events: this.asyncEvents
-  };
+  });
   // Busy indicator required when at least one event requests it
   request.showBusyIndicator = request.events.some(function(event) {
     return scout.nvl(event.showBusyIndicator, true);
@@ -546,7 +547,7 @@ scout.Session.prototype._handleSendWhenOffline = function(request) {
 };
 
 scout.Session.prototype.defaultAjaxOptions = function(request) {
-  request = request || {};
+  request = request || this._newRequest();
   var url = this._decorateUrl(this.remoteUrl, request);
 
   var ajaxOptions = {
@@ -662,9 +663,14 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
       this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
 
-      // Send events that happened while begin offline
-      var queuedRequest = this._queuedRequest;
-      if (queuedRequest) {
+      if (this._retryRequest) {
+        // Send retry request first
+        var retryRequest = this._retryRequest;
+        this._retryRequest = null;
+        this._sendRequest(retryRequest);
+      } else if (this._queuedRequest) {
+        // Send events that happened while being offline
+        var queuedRequest = this._queuedRequest;
         this._queuedRequest = null;
         this.responseQueue.prepareRequest(queuedRequest);
         this._sendRequest(queuedRequest);
@@ -714,10 +720,9 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  * a model job is done and no request initiated by a user is running.
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
-  var request = {
-    uiSessionId: this.uiSessionId,
+  var request = this._newRequest({
     pollForBackgroundJobs: true
-  };
+  });
   this.responseQueue.prepareRequest(request);
 
   this.backgroundJobPollingSupport.setRunning();
@@ -861,7 +866,8 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     if (this.ready) {
       this.goOffline();
       if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
-        this._queuedRequest = request;
+        this._queuedRequest = this._newRequest();
+        this._retryRequest = request;
       }
       return;
     }
@@ -1080,10 +1086,9 @@ scout.Session.prototype.goOffline = function() {
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
 
-  var request = {
-    uiSessionId: this.uiSessionId,
+  var request = this._newRequest({
     syncResponseQueue: true
-  };
+  });
   this._sendRequest(request); // implies "_resumeBackgroundJobPolling", and also sends queued request
 
   this.rootAdapter.goOnline();
@@ -1226,11 +1231,10 @@ scout.Session.prototype._sendCancelRequest = function() {
  * The request is sent immediately (does not await pending requests)
  */
 scout.Session.prototype.sendLogRequest = function(message) {
-  var request = {
-    uiSessionId: this.uiSessionId,
+  var request = this._newRequest({
     log: true,
     message: message
-  };
+  });
   if (this.currentEvent) {
     request.event = {
       target: this.currentEvent.target,
@@ -1253,6 +1257,20 @@ scout.Session.prototype.sendLogRequest = function(message) {
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.unregisterAjaxRequest(xhr);
   }
+};
+
+scout.Session.prototype._newRequest = function(requestData) {
+  var request = {
+    uiSessionId: this.uiSessionId
+  };
+
+  // Poll and log requests do not require a sequence number
+  var requiresSequenceNo = !(requestData && (requestData.pollForBackgroundJobs || requestData.log));
+  if (requiresSequenceNo) {
+    request['#'] = this.requestSequenceNo++;
+  }
+
+  return $.extend(request, requestData);
 };
 
 scout.Session.prototype._setApplicationLoading = function(applicationLoading) {

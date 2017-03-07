@@ -156,7 +156,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void handleJsonRequest(IUiSession uiSession, JsonRequest jsonRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
     // If client sent ACK#, cleanup response history accordingly
-    uiSession.confirmResponseProcessed(jsonRequest.getAckSequenceNo());
+    uiSession.confirmResponseProcessed(jsonRequest.getAckResponseSequenceNo());
 
     switch (jsonRequest.getRequestType()) {
       case LOG_REQUEST:

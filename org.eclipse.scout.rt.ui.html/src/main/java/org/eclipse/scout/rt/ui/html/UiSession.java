@@ -126,6 +126,7 @@ public class UiSession implements IUiSession {
   private final P_RootAdapter m_rootJsonAdapter;
   private final AtomicLong m_jsonAdapterSeq = new AtomicLong(ROOT_ID);
   private final AtomicLong m_responseSequenceNo = new AtomicLong(1);
+  private final AtomicLong m_requestSequenceNo = new AtomicLong(-1);
   /**
    * Synchronized map. When iterating over the map, synchronize on the map object
    */
@@ -670,8 +671,36 @@ public class UiSession implements IUiSession {
     LOG.debug("Cleaned up response history (-{}). New content: {} [#ACK={}, uiSessionId={}]", removeCount, m_responseHistory.keySet(), sequenceNo, m_uiSessionId);
   }
 
+  /**
+   * @param jsonRequest
+   */
+  protected void requestProcessed(JsonRequest jsonRequest) {
+    Long requestSequenceNo = jsonRequest.getRequestSequenceNo();
+    if (requestSequenceNo != null) {
+      m_requestSequenceNo.set(requestSequenceNo);
+    }
+  }
+
+  /**
+   * @param jsonRequest
+   * @return true if given request has already been processed. The check is based on the sequence no. of the given
+   *         request. If the request has no sequence number the method returns false
+   */
+  protected boolean isAlreadyProcessed(JsonRequest jsonRequest) {
+    Long requestSequenceNo = jsonRequest.getRequestSequenceNo();
+    if (requestSequenceNo == null) {
+      return false;
+    }
+    return requestSequenceNo <= m_requestSequenceNo.get();
+  }
+
   @Override
   public JSONObject processJsonRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse, final JsonRequest jsonRequest) {
+    if (isAlreadyProcessed(jsonRequest)) {
+      LOG.debug("Request #" + jsonRequest.getRequestSequenceNo() + " already processed. Ignore request and all of its events");
+      return null;
+    }
+
     final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
 
     m_httpContext.set(servletRequest, servletResponse);
@@ -720,6 +749,7 @@ public class UiSession implements IUiSession {
       }
     }
     finally {
+      requestProcessed(jsonRequest);
       m_httpContext.clear();
       m_currentJsonRequest = null;
       if (m_disposing) {

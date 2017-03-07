@@ -53,6 +53,6 @@ public class JsonRequestTest {
     json.put("uiSessionId", "123");
     json.put("#ACK", "777");
     JsonRequest req = new JsonRequest(json);
-    assertEquals(Long.valueOf(777), req.getAckSequenceNo());
+    assertEquals(Long.valueOf(777), req.getAckResponseSequenceNo());
   }
 }

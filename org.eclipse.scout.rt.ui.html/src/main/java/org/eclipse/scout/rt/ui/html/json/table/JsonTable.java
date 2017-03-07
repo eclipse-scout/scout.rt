@@ -784,7 +784,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void endCellEdit(String fieldId) {
     IJsonAdapter<?> jsonField = getUiSession().getJsonAdapter(fieldId);
     if (jsonField == null) {
-      throw new IllegalStateException("No field adapter found for id " + fieldId);
+      throw new IllegalStateException("No field adapter found for cell-editor with id " + fieldId);
     }
 
     // Confirm end cell edit so that gui can dispose the adapter.
