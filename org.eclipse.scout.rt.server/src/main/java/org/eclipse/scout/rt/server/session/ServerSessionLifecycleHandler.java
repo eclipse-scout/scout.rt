@@ -37,10 +37,13 @@ public class ServerSessionLifecycleHandler implements IServerSessionLifecycleHan
   @Override
   public void destroy(IServerSession session) {
     LOG.debug("Destroying scout server id={}", m_sessionId);
-    session.stop();
-    if (m_clientNodeId != null) {
-      BEANS.get(IClientNotificationService.class).unregisterSession(m_clientNodeId, m_sessionId, session.getUserId());
+    try {
+      session.stop();
+    }
+    finally {
+      if (m_clientNodeId != null) {
+        BEANS.get(IClientNotificationService.class).unregisterSession(m_clientNodeId, m_sessionId, session.getUserId());
+      }
     }
   }
-
 }

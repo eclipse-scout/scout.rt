@@ -17,16 +17,18 @@ public class BridgeToServerLogoutService implements ILogoutService {
 
   @Override
   public void logout() {
-    try {
-      BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
+    BEANS.get(IAccessControlService.class).clearCacheOfCurrentUser();
 
-      // Manually stop session, because we don't have a HTTP session in "bridge" mode (see org.eclipse.scout.rt.server.ServiceTunnelServlet.ScoutSessionBindingListener)
-      IServerSession session = ServerSessionProvider.currentSession();
+    // Manually stop session, because we don't have a HTTP session in "bridge" mode (see org.eclipse.scout.rt.server.ServiceTunnelServlet.ScoutSessionBindingListener)
+    IServerSession session = ServerSessionProvider.currentSession();
+    try {
       session.stop();
-      BEANS.get(IClientNotificationService.class).unregisterSession(IClientNodeId.CURRENT.get(), session.getId(), session.getUserId());
     }
     catch (Exception e) {
       LOG.warn("Failed to stop session.", e);
+    }
+    finally {
+      BEANS.get(IClientNotificationService.class).unregisterSession(IClientNodeId.CURRENT.get(), session.getId(), session.getUserId());
     }
   }
 }

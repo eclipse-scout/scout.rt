@@ -84,26 +84,27 @@ public class ServerSessionCache {
     ServerSessionEntry scoutSessionContext = m_sessionContexts.get(scoutSessionId);
     if (scoutSessionContext == null) {
       LOG.error("Unknown sessionContext, id={}", scoutSessionId);
-
+      return;
     }
-    else {
-      synchronized (scoutSessionContext) {
-        scoutSessionContext.removeHttpSession(httpSessionId);
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Scout ServerSession removed from HttpSession [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSessionId);
-        }
 
-        //destroy scout session, if there is no httpsession with this scout session
-        if (scoutSessionContext.hasNoMoreHttpSessions()) {
+    synchronized (scoutSessionContext) {
+      scoutSessionContext.removeHttpSession(httpSessionId);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Scout ServerSession removed from HttpSession [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSessionId);
+      }
+
+      //destroy scout session, if there is no httpsession with this scout session
+      if (scoutSessionContext.hasNoMoreHttpSessions()) {
+        try {
           scoutSessionContext.destroy();
+        }
+        finally {
           m_sessionContexts.remove(scoutSessionId);
           if (LOG.isDebugEnabled()) {
             LOG.debug("Removed scout session from cache [id={}]", scoutSessionId);
           }
         }
-
       }
     }
   }
-
 }
