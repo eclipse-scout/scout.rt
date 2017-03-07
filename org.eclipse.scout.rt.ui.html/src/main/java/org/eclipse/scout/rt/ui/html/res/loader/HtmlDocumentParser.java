@@ -234,7 +234,7 @@ public class HtmlDocumentParser {
   protected void replaceVersionTags() {
     // <scout:version />
     String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
-    String versionTag = "<scout-version data-value=\"" + version + "\">";
+    String versionTag = "<scout-version data-value=\"" + version + "\"></scout-version>";
     m_workingContent = PATTERN_VERSION_TAG.matcher(m_workingContent).replaceAll(versionTag);
   }
 
@@ -307,7 +307,7 @@ public class HtmlDocumentParser {
             StringBuilder tags = new StringBuilder();
             for (String key : keys) {
               tags.append("<scout-text data-key=\"").append(htmlHelper.escape(key)).append("\" ");
-              tags.append("data-value=\"").append(htmlHelper.escape(TEXTS.get(key))).append("\" />");
+              tags.append("data-value=\"").append(htmlHelper.escape(TEXTS.get(key))).append("\"></scout-text>");
             }
             text = tags.toString();
             break;

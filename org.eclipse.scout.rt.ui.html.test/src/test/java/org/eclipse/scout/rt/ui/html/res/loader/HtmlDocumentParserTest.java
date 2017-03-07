@@ -10,7 +10,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
@@ -55,7 +60,13 @@ public class HtmlDocumentParserTest {
 
   @Test
   public void testHtmlDocumentParser_01() throws IOException {
-    testParser("test01_input.html", "test01_output.html");
+    IBean<TestApplicationVersionProperty> bean = BEANS.getBeanManager().registerBean(new BeanMetaData(TestApplicationVersionProperty.class).withReplace(true));
+    try {
+      testParser("test01_input.html", "test01_output.html");
+    }
+    finally {
+      BEANS.getBeanManager().unregisterBean(bean);
+    }
   }
 
   @Test
@@ -92,6 +103,16 @@ public class HtmlDocumentParserTest {
     @Override
     public Map<String, String> getTextMap(Locale locale) {
       return new HashMap<>();
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class TestApplicationVersionProperty extends ApplicationVersionProperty {
+
+    @Override
+    public synchronized String getValue(String namespace) {
+      return "1.2.3.unit_test";
     }
   }
 }
