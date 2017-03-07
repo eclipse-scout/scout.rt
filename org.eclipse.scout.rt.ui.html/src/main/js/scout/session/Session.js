@@ -1379,8 +1379,11 @@ scout.Session.prototype.logout = function(logoutUrl) {
   if (this.forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
-    // remember current url to not lose query parameters
-    scout.webstorage.setItem(sessionStorage, 'scout:loginUrl', window.location.href);
+    // remember current url to not lose query parameters (such as debug; however, ignore deeplinks)
+    var url = new scout.URL();
+    url.removeParameter('dl'); //deeplink
+    url.removeParameter('i'); //deeplink info
+    scout.webstorage.setItem(sessionStorage, 'scout:loginUrl', url.toString());
     // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
     setTimeout(function() {
       scout.reloadPage({
