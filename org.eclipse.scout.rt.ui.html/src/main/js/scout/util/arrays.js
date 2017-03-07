@@ -83,17 +83,31 @@ scout.arrays = {
     return index;
   },
 
+  /**
+   * This function uses scout.arrays.insertArray() which relies on Array.prototype.splice(). Check its js-doc for details.
+   */
   insert: function(arr, element, index) {
-    scout.arrays.insertArray(arr, element, index);
+    scout.arrays.insertArray(arr, [element], index);
   },
 
+  /**
+   * This function is based on Array.prototype.splice().
+   * Thus, if the 'index' is greater than the length of the array, 'elements' will be added to the end of the array 'arr'.
+   * This may cause unexpected behavior on accessing arr[index] after insertion.
+   *
+   * The caller must ensure the size of the array.
+   */
   insertArray: function(arr, elements, index) {
     elements = scout.arrays.ensure(elements);
     Array.prototype.splice.apply(arr, [index, 0].concat(elements));
   },
 
+  /**
+   * This function uses scout.arrays.insert() which relies on Array.prototype.splice(). Check its js-doc for details.
+   */
   move: function(arr, fromIndex, toIndex) {
-    arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
+    var element = arr.splice(fromIndex, 1)[0];
+    this.insert(arr, element, toIndex);
   },
 
   containsAny: function(haystack, needles) {
@@ -236,7 +250,7 @@ scout.arrays = {
    * Alternative implementation of Array.findIndex(callback [, thisArg]), which is supported by most browsers.
    * See Array.findIndex for a detailed description.
    */
-  findIndex: function(arr, predicate, thisArg){
+  findIndex: function(arr, predicate, thisArg) {
     if (!arr || !predicate) {
       return -1;
     }
@@ -250,7 +264,7 @@ scout.arrays = {
 
   find: function(arr, predicate, thisArg) {
     var index = scout.arrays.findIndex(arr, predicate, thisArg);
-    if(index === -1) {
+    if (index === -1) {
       return null;
     }
     return arr[index];

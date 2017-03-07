@@ -1645,6 +1645,8 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
         value = column.cellValueOrTextForCalculation(row);
       }
       states[i] = column[funcName](states[i], value);
+    } else {
+      states[i] = undefined;
     }
   });
 };
@@ -1962,11 +1964,12 @@ scout.Table.prototype.insertRows = function(rows) {
     // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
     this.rows.push(row);
   }, this);
-  // this event should be triggered before the rowOrderChanged event (triggered by the _sort function).
-  this._triggerRowsInserted(rows);
 
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
+
+  // this event should be triggered before the rowOrderChanged event (triggered by the _sort function).
+  this._triggerRowsInserted(rows);
   this._sortAfterInsert(wasEmpty);
 
   // Update HTML
