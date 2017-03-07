@@ -298,8 +298,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
         listener.sessionChanged(event);
       }
       catch (RuntimeException e) {
-        // catch errors of a single listener.
-        // this is important e.g. while stopping so that all listeners have a chance to do their cleanup tasks.
+        if (event.getType() != SessionEvent.TYPE_STOPPED && event.getType() != SessionEvent.TYPE_STOPPING) {
+          throw e; // throw if not stopping
+        }
+        // stopping: give all listeners a chance to do their cleanup
         LOG.warn("Error in session listener {}.", listener.getClass(), e);
       }
     }

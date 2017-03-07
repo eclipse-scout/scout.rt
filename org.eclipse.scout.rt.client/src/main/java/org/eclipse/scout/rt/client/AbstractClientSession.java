@@ -81,7 +81,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private static final Logger LOG = LoggerFactory.getLogger(AbstractClientSession.class);
 
   private final EventListenerList m_eventListeners;
-
   private final IExecutionSemaphore m_modelJobSemaphore = Jobs.newExecutionSemaphore(1).seal();
 
   // state
@@ -90,13 +89,13 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private volatile boolean m_stopping;
   private final Semaphore m_permitToStop = new Semaphore(1);
   private int m_exitCode = 0;
+
   // model
   private String m_id;
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
   private Subject m_subject;
 
-  /* locked by m_sharedVarLock*/
   private final SharedVariableMap m_sharedVariableMap;
 
   private IMemoryPolicy m_memoryPolicy;
@@ -639,8 +638,10 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
         listener.sessionChanged(event);
       }
       catch (RuntimeException e) {
-        // catch errors of a single listener.
-        // this is important e.g. while stopping so that all listeners have a chance to do their cleanup tasks.
+        if (event.getType() != SessionEvent.TYPE_STOPPED && event.getType() != SessionEvent.TYPE_STOPPING) {
+          throw e; // throw if not stopping
+        }
+        // stopping: give all listeners a chance to do their cleanup
         LOG.warn("Error in session listener {}.", listener.getClass(), e);
       }
     }
