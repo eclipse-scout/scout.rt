@@ -1724,7 +1724,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
  * Executes the aggregate function with the given funcName for each column, but only if the Column
  * has that function, which is currently only the case for NumberColumns.
  *
- * @param states is a reference to an Array containig the results for each column.
+ * @param states is a reference to an Array containing the results for each column.
  * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
  */
 scout.Table.prototype._forEachColumn = function(funcName, states, row) {
@@ -1735,6 +1735,8 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
         value = column.cellValueForGrouping(row);
       }
       states[i] = column[funcName](states[i], value);
+    } else {
+      states[i] = undefined;
     }
   });
 };

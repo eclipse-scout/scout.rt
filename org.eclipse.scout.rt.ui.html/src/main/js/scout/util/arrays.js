@@ -83,12 +83,23 @@ scout.arrays = {
     return index;
   },
 
+  /**
+   * This function is based on Array.prototype.splice().
+   * Thus, if the 'index' is greater than the length of the array, 'element' will be added to the end of the array 'arr'.
+   * This may cause unexpected behavior on accessing arr[index] after insertion.
+   *
+   * The caller must ensure the size of the array.
+   */
   insert: function(arr, element, index) {
     arr.splice(index, 0, element);
   },
 
+  /**
+   * This function uses scout.arrays.insert() which relies on Array.prototype.splice(). Check its js-doc for details.
+   */
   move: function(arr, fromIndex, toIndex) {
-    arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
+    var element = arr.splice(fromIndex, 1)[0];
+    this.insert(arr, element, toIndex);
   },
 
   containsAny: function(haystack, needles) {
