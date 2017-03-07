@@ -1269,9 +1269,12 @@ scout.Session.prototype.logout = function(logoutUrl) {
   if (this._forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
-    // remember current url to not lose query parameters
     try {
-      sessionStorage.setItem('scout:loginUrl', window.location.href);
+      // remember current url to not lose query parameters (such as debug; however, ignore deeplinks)
+      var url = new scout.URL();
+      url.removeParameter('dl'); //deeplink
+      url.removeParameter('i'); //deeplink info
+      sessionStorage.setItem('scout:loginUrl', url.toString());
     } catch (err) {
       // ignore errors (e.g. this can happen in "private mode" on Safari)
       $.log.error('Error while storing "scout:loginUrl" in sessionStorage: ' + err);
