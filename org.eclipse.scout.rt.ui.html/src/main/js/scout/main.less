@@ -97,15 +97,15 @@ body {
 /* !important is used to override any specific "display" values (because this */
 /* call would in most cases be less specific than the element's rules). */
 .hidden {
-  display: none !important;
+  display: none !important; /* NOSONAR (!important is okay here) */
 }
 
 /* Add this class to temporary hide (but not remove from flow) an element. Similar to "hidden". */
 .invisible {
-  visibility: hidden !important;
+  visibility: hidden !important; /* NOSONAR (!important is okay here) */
 }
 
-*, *::before, *::after {
+*, *::before, *::after { /* NOSONAR (universal selector is okay here) */
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -342,12 +342,12 @@ textarea {
 /* any cursor an underlying component defines while moving the mouse. */
 
 .col-resize,
-.col-resize * {
-  cursor: col-resize !important;
+.col-resize * { /* NOSONAR (universal selector is okay here) */
+  cursor: col-resize !important; /* NOSONAR (!important is okay here) */
 }
 .row-resize,
-.row-resize * {
-  cursor: row-resize !important;
+.row-resize * { /* NOSONAR (universal selector is okay here) */
+  cursor: row-resize !important; /* NOSONAR (!important is okay here) */
 }
 
 /* Used to temporarily disable pointer events on iframes while dragging elements */
