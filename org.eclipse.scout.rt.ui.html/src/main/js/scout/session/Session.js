@@ -1135,10 +1135,10 @@ scout.Session.prototype.setRequestPending = function(pending) {
     this.requestsPendingCounter--;
   }
 
-  // In "inspector" mode, add/remove an attribute to the Scout DIV
-  // that can be used to detect pending server calls by UI testing tools, e.g. Selenium
+  // In "inspector" mode, add/remove a marker attribute to the $entryPoint that
+  // can be used to detect pending server calls by UI testing tools, e.g. Selenium
   if (this.inspector) {
-    this.$entryPoint.toggleAttr('request-pending', pending, 'true');
+    this.$entryPoint.toggleAttr('data-request-pending', pending, 'true');
   }
 };
 

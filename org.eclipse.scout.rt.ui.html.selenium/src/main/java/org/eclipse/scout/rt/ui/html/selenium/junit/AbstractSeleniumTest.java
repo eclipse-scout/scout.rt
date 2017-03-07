@@ -420,7 +420,7 @@ public abstract class AbstractSeleniumTest {
 
     // Wait for pending server calls to finish
     WebElement entryPoint = findElement(By.className("scout"));
-    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "request-pending", "true")));
+    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
 
     // Wait for animations to finish
     WebElement animation = CollectionUtility.firstElement(findElements(By.className("animation-wrapper")));
