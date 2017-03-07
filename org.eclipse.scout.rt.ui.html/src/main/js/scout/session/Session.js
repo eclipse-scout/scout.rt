@@ -1135,15 +1135,10 @@ scout.Session.prototype.setRequestPending = function(pending) {
     this.requestsPendingCounter--;
   }
 
-  // In "inspector" mode, add/remove a marker div that can be used to detect pending
-  // server calls by UI testing tools, e.g. Selenium
+  // In "inspector" mode, add/remove an attribute to the Scout DIV
+  // that can be used to detect pending server calls by UI testing tools, e.g. Selenium
   if (this.inspector) {
-    if (pending && !this._$requestPending) {
-      this._$requestPending = this.$entryPoint.appendDiv('request-pending');
-    } else if (!pending && this._$requestPending) {
-      this._$requestPending.remove();
-      this._$requestPending = null;
-    }
+    this.$entryPoint.toggleAttr('request-pending', pending, 'true');
   }
 };
 

@@ -419,12 +419,11 @@ public abstract class AbstractSeleniumTest {
     element.click();
 
     // Wait for pending server calls to finish
-    WebElement pending = CollectionUtility.firstElement(findElements(By.cssSelector(".request-pending")));
-    if (pending != null) {
-      waitUntilElementStaleness(pending);
-    }
+    WebElement entryPoint = findElement(By.className("scout"));
+    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "request-pending", "true")));
+
     // Wait for animations to finish
-    WebElement animation = CollectionUtility.firstElement(findElements(By.cssSelector(".animation-wrapper")));
+    WebElement animation = CollectionUtility.firstElement(findElements(By.className("animation-wrapper")));
     if (animation != null) {
       waitUntilElementStaleness(animation);
     }
