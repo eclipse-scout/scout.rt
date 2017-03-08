@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
@@ -40,10 +41,8 @@ public class ClusterMom extends AbstractMomTransport {
   }
 
   @Override
-  protected IMomImplementor initDelegate() throws Exception {
-    IMomImplementor implementor = super.initDelegate();
-    implementor.setDefaultMarshaller(BEANS.get(ObjectMarshaller.class));
-    return implementor;
+  protected IMarshaller getConfiguredDefaultMarshaller() {
+    return BEANS.get(ObjectMarshaller.class);
   }
 
   /**

@@ -39,6 +39,15 @@ public abstract class AbstractMomTransport implements IMomTransport {
   protected abstract Map<String, String> getConfiguredEnvironment();
 
   /**
+   * @return the default {@link IMarshaller} to be used if no specific marshaller is configured for this MOM or is
+   *         registered for a {@link IDestination}. The default value is <code>null</code>, which means that the default
+   *         marshaller is chosen by the the implementor.
+   */
+  protected IMarshaller getConfiguredDefaultMarshaller() {
+    return null;
+  }
+
+  /**
    * Returns <code>true</code> if no {@link IMomImplementor} is configured for this MOM or the configured implementor is
    * of type {@link NullMomImplementor}.
    * <p>
@@ -77,12 +86,20 @@ public abstract class AbstractMomTransport implements IMomTransport {
    * @return the environment required to initialize the MOM implementor.
    */
   protected Map<Object, Object> lookupEnvironment() {
-    final Map<String, String> env = Assertions.assertNotNull(getConfiguredEnvironment(), "Environment for {} not specified", getClass().getSimpleName());
+    final Map<String, String> configuredEnv = Assertions.assertNotNull(getConfiguredEnvironment(), "Environment for {} not specified", getClass().getSimpleName());
+    final Map<Object, Object> env = new HashMap<Object, Object>(configuredEnv);
     // Use the class name as default symbolic name
     if (!env.containsKey(IMomImplementor.SYMBOLIC_NAME)) {
       env.put(IMomImplementor.SYMBOLIC_NAME, getClass().getSimpleName());
     }
-    return new HashMap<Object, Object>(env);
+    // Use MOM-specific default marshaller
+    if (!env.containsKey(IMomImplementor.MARSHALLER)) {
+      IMarshaller defaultMarshaller = getConfiguredDefaultMarshaller();
+      if (defaultMarshaller != null) {
+        env.put(IMomImplementor.MARSHALLER, defaultMarshaller);
+      }
+    }
+    return env;
   }
 
   // --- Delegated methods ---

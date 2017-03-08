@@ -192,11 +192,11 @@ public interface IMom {
   void destroy();
 
   /**
-   * Specifies the default {@link IMarshaller} to use if no marshaller is specified for a destination.
+   * Specifies the default {@link IMarshaller} to use if no marshaller is specified for a MOM or a destination.
    * <p>
    * By default, {@link JsonMarshaller} is used.
    */
-  class MarshallerProperty extends AbstractClassConfigProperty<IMarshaller> {
+  class DefaultMarshallerProperty extends AbstractClassConfigProperty<IMarshaller> {
 
     @Override
     public String getKey() {
@@ -210,9 +210,9 @@ public interface IMom {
   }
 
   /**
-   * Specifies the topic to receive cancellation request for request-reply communication.
+   * Specifies the default topic to receive cancellation request for 'request-reply' communication.
    * <p>
-   * By default, the topic 'scout.mom.requestreply.cancellation' is used.
+   * By default, a defined topic with the name <code>scout.mom.requestreply.cancellation</code> is used.
    */
   class RequestReplyCancellationTopicProperty extends AbstractDestinationConfigProperty<String> {
 

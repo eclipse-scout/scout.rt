@@ -48,11 +48,6 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
-  public void setDefaultMarshaller(final IMarshaller marshaller) {
-    // NOOP
-  }
-
-  @Override
   public void destroy() {
     // NOOP
   }

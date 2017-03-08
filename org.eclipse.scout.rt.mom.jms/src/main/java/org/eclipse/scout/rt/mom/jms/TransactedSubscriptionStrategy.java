@@ -44,7 +44,7 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
   public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) throws JMSException {
     final Session transactedSession = m_mom.getConnection().createSession(true, Session.SESSION_TRANSACTED);
     try {
-      installMessageListener(destination, listener, transactedSession, input);
+      installMessageConsumer(destination, listener, transactedSession, input);
       return new JmsSubscription(transactedSession, destination);
     }
     catch (JMSException | RuntimeException e) {
@@ -53,7 +53,7 @@ public class TransactedSubscriptionStrategy implements ISubscriptionStrategy {
     }
   }
 
-  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session transactedSession, final SubscribeInput input) throws JMSException {
+  protected <DTO> void installMessageConsumer(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session transactedSession, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.resolveMarshaller(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 

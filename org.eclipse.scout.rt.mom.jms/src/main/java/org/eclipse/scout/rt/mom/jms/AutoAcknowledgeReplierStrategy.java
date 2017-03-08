@@ -52,7 +52,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
   public <REQUEST, REPLY> ISubscription subscribe(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) throws JMSException {
     final Session session = m_mom.getConnection().createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
     try {
-      installMessageListener(destination, listener, session, input);
+      installMessageConsumer(destination, listener, session, input);
       return new JmsSubscription(session, destination);
     }
     catch (JMSException | RuntimeException e) {
@@ -61,7 +61,7 @@ public class AutoAcknowledgeReplierStrategy implements IReplierStrategy {
     }
   }
 
-  protected <REQUEST, REPLY> void installMessageListener(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final Session session, final SubscribeInput input) throws JMSException {
+  protected <REQUEST, REPLY> void installMessageConsumer(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final Session session, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.resolveMarshaller(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 

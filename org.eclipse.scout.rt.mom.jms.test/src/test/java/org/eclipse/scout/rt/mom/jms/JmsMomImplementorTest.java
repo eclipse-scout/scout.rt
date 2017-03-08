@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -39,7 +40,9 @@ import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
+import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
+import org.eclipse.scout.rt.mom.api.IMomTransport;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.MOM;
@@ -52,16 +55,21 @@ import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IDisposable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -85,17 +93,29 @@ public class JmsMomImplementorTest {
 
   private String m_testJobExecutionHint;
 
-  private static IBean<JmsTestMom> s_momBean;
+  private static IBean<? extends IMomTransport> s_momBean;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    s_momBean = BEANS.getBeanManager().registerClass(JmsTestMom.class);
+    installTestMom(JmsTestMom.class);
   }
 
   @AfterClass
   public static void afterClass() {
-    BEANS.get(JmsTestMom.class).destroy();
+    uninstallTestMom();
+  }
+
+  protected static void installTestMom(Class<? extends IMomTransport> transportType) {
+    if (s_momBean != null) {
+      uninstallTestMom();
+    }
+    s_momBean = BEANS.getBeanManager().registerClass(transportType);
+  }
+
+  protected static void uninstallTestMom() {
+    s_momBean.getInstance().destroy();
     BEANS.getBeanManager().unregisterBean(s_momBean);
+    s_momBean = null;
   }
 
   @Before
@@ -1122,8 +1142,8 @@ public class JmsMomImplementorTest {
 
     public void assertEmpty(int timeout, TimeUnit unit) throws InterruptedException {
       try {
-        get(timeout, unit);
-        fail("Is not empty");
+        TYPE result = get(timeout, unit);
+        fail("Found unexpected captured value: " + result);
       }
       catch (TimedOutError e) {
         // is empty -> ok
@@ -1615,6 +1635,150 @@ public class JmsMomImplementorTest {
     capturer4.assertEmpty(1, TimeUnit.SECONDS);
   }
 
+  @Test
+  public void testMomEnvironmentWithCustomDefaultMarshaller() throws InterruptedException {
+    installTestMom(JmsTestMomWithTextMarshaller.class);
+    try {
+      final Capturer<String> capturer1 = new Capturer<>();
+      final Capturer<Object> capturer2 = new Capturer<>();
+
+      IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+      IDestination<Object> queueObject = MOM.newDestination("test/mom/testPublishObjectData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+      m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queueObject, BEANS.get(ObjectMarshaller.class)));
+
+      MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
+      MOM.publish(JmsTestMom.class, queueObject, new StringHolder("Hello MOM! (holder)"));
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, queueString, new IMessageListener<String>() {
+        @Override
+        public void onMessage(IMessage<String> message) {
+          capturer1.set(message.getTransferObject());
+        }
+      }));
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, queueObject, new IMessageListener<Object>() {
+        @Override
+        public void onMessage(IMessage<Object> message) {
+          capturer2.set(message.getTransferObject());
+        }
+      }));
+
+      // Verify
+      String received1 = capturer1.get();
+      Object received2 = capturer2.get();
+      assertEquals("Hello MOM!", received1);
+      assertEquals("Hello MOM! (holder)", Objects.toString(received2));
+    }
+    finally {
+      installTestMom(JmsTestMom.class);
+    }
+  }
+
+  @Test
+  public void testMomEnvironmentWithConfiguredDefaultMarshaller() throws InterruptedException {
+    installTestMom(JmsTestMomWithConfiguredTextMarshaller.class);
+    try {
+      final Capturer<String> capturer = new Capturer<>();
+
+      IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+
+      MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, queueString, new IMessageListener<String>() {
+        @Override
+        public void onMessage(IMessage<String> message) {
+          capturer.set(message.getTransferObject());
+        }
+      }));
+
+      // Verify
+      String received = capturer.get();
+      assertEquals("!MOM olleH", received);
+    }
+    finally {
+      installTestMom(JmsTestMom.class);
+    }
+  }
+
+  @Test(expected = PlatformException.class)
+  public void testMomEnvironmentWithInvalidMarshaller() throws InterruptedException {
+    installTestMom(JmsTestMomWithInvalidMarshaller.class);
+    try {
+      IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+      MOM.publish(JmsTestMom.class, queueString, "Hello MOM!");
+    }
+    finally {
+      installTestMom(JmsTestMom.class);
+    }
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testMomEnvironmentWithoutRequestReply() throws InterruptedException {
+    installTestMom(JmsTestMomWithoutRequestReply.class);
+    try {
+      testRequestReplyInternal("Hello World", null);
+    }
+    finally {
+      installTestMom(JmsTestMom.class);
+    }
+  }
+
+  @Test(timeout = 200_000)
+  public void testMomEnvironmentWithCustomCancellationTopicAsString() throws InterruptedException {
+    installTestMom(JmsTestMomWithCustomRequestReplyCancellationTopicAsString.class);
+    try {
+      IDestination<String> defaultTopic = CONFIG.getPropertyValue(IMom.RequestReplyCancellationTopicProperty.class);
+      IDestination<String> differentTopic = MOM.newDestination("differentTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.DEFINE, null);
+      final Capturer<String> capturer1 = new Capturer<>();
+      final Capturer<String> capturer2 = new Capturer<>();
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, defaultTopic, new IMessageListener<String>() {
+        @Override
+        public void onMessage(IMessage<String> message) {
+          capturer1.set("cancelled!"); // should not be called
+        }
+      }));
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, differentTopic, new IMessageListener<String>() {
+        @Override
+        public void onMessage(IMessage<String> message) {
+          capturer2.set("cancelled!"); // should be called
+        }
+      }));
+
+      // Run test
+      final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+      testRequestReplyCancellationInternal(queue);
+
+      // Verify
+      capturer1.assertEmpty(1, TimeUnit.SECONDS);
+      assertNotNull(capturer2.get(1, TimeUnit.SECONDS));
+    }
+    finally {
+      installTestMom(JmsTestMom.class);
+    }
+  }
+
+  @Test(timeout = 200_000)
+  public void testMomEnvironmentWithCustomCancellationTopic() throws InterruptedException {
+    installTestMom(JmsTestMomWithCustomRequestReplyCancellationTopic.class);
+    try {
+      IDestination<String> differentTopic = MOM.newDestination("UnitTestTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.JNDI, null);
+      final Capturer<String> capturer = new Capturer<>();
+      m_disposables.add(MOM.subscribe(JmsTestMom.class, differentTopic, new IMessageListener<String>() {
+        @Override
+        public void onMessage(IMessage<String> message) {
+          capturer.set("cancelled!"); // should be called
+        }
+      }));
+
+      // Run test
+      final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCancellation", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+      testRequestReplyCancellationInternal(queue);
+
+      // Verify
+      assertNotNull(capturer.get(1, TimeUnit.SECONDS));
+    }
+    finally {
+      installTestMom(JmsTestMom.class);
+    }
+  }
+
   private static class SomethingWrongException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -1647,6 +1811,84 @@ public class JmsMomImplementorTest {
       env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
       env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
       env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
+      return env;
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithTextMarshaller extends JmsTestMom {
+
+    @Override
+    protected Map<String, String> getConfiguredEnvironment() {
+      final Map<String, String> env = super.getConfiguredEnvironment();
+      env.put(IMomImplementor.MARSHALLER, TextMarshaller.class.getName());
+      env.put(JmsMomImplementor.JMS_CLIENT_ID, "junit_mom_client");
+      return env;
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithConfiguredTextMarshaller extends JmsTestMom {
+
+    @Override
+    protected IMarshaller getConfiguredDefaultMarshaller() {
+      return new TextMarshaller() {
+        @Override
+        public Object unmarshall(Object data, Map<String, String> context) {
+          return new StringBuilder((String) data).reverse().toString();
+        }
+      };
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithInvalidMarshaller extends JmsTestMom {
+
+    @Override
+    protected Map<String, String> getConfiguredEnvironment() {
+      final Map<String, String> env = super.getConfiguredEnvironment();
+      env.put(IMomImplementor.MARSHALLER, "Invalid Class Name");
+      return env;
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithoutRequestReply extends JmsTestMom {
+
+    @Override
+    protected Map<String, String> getConfiguredEnvironment() {
+      final Map<String, String> env = super.getConfiguredEnvironment();
+      env.put(IMomImplementor.REQUEST_REPLY_ENABLED, "false");
+      return env;
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithCustomRequestReplyCancellationTopicAsString extends JmsTestMom {
+
+    @Override
+    protected Map<String, String> getConfiguredEnvironment() {
+      final Map<String, String> env = super.getConfiguredEnvironment();
+      env.put(IMomImplementor.REQUEST_REPLY_ENABLED, null); // should yield "true"
+      env.put(IMomImplementor.REQUEST_REPLY_CANCELLATION_TOPIC, "define:///differentTopic");
+      return env;
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithCustomRequestReplyCancellationTopic extends JmsTestMom {
+
+    @Override
+    protected Map<Object, Object> lookupEnvironment() {
+      Map<Object, Object> env = super.lookupEnvironment();
+      env.put("topic.UnitTestTopic", "scout.physical.UnitTestTopic");
+      env.put(IMomImplementor.REQUEST_REPLY_CANCELLATION_TOPIC, MOM.newDestination("UnitTestTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.JNDI, null));
       return env;
     }
   }

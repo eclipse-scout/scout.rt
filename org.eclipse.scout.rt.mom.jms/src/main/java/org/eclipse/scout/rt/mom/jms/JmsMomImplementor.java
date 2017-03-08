@@ -6,6 +6,7 @@ import static org.eclipse.scout.rt.mom.api.SubscribeInput.ACKNOWLEDGE_TRANSACTED
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -23,6 +24,7 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
@@ -32,6 +34,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.eclipse.scout.rt.mom.api.DestinationConfigPropertyParser;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
@@ -41,6 +44,7 @@ import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.ISubscription;
+import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.PublishInput;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -53,15 +57,18 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
@@ -87,12 +94,14 @@ public class JmsMomImplementor implements IMomImplementor {
   public static final String JMS_CLIENT_ID = "scout.mom.jms.clientId";
 
   protected final String m_momUid = UUID.randomUUID().toString();
+  protected String m_symbolicName;
   protected Context m_context;
   protected Connection m_connection;
 
   protected Session m_defaultSession; // single-threaded
   protected MessageProducer m_defaultProducer;
 
+  protected boolean m_requestReplyEnabled;
   protected TemporaryQueue m_replyQueue;
   protected Topic m_requestReplyCancellationTopic;
   protected final Map<String, ReplyFuture> m_replyFutureMap = new ConcurrentHashMap<>();
@@ -106,61 +115,126 @@ public class JmsMomImplementor implements IMomImplementor {
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
-    final String symbolicName = Objects.toString(properties.get(SYMBOLIC_NAME), "MOM");
+    m_symbolicName = Objects.toString(properties.get(SYMBOLIC_NAME), StringUtility.join(" ", CONFIG.getPropertyValue(ApplicationNameProperty.class), "MOM"));
     if (Platform.get().inDevelopmentMode()) {
-      LOG.info("{} configuration: {}", symbolicName, properties);
+      LOG.info("{} configuration: {}", m_symbolicName, properties);
     }
+    try {
+      m_context = createContext(properties);
+      m_connection = createConnection(m_context, properties);
+      m_defaultSession = m_connection.createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
+      m_defaultProducer = m_defaultSession.createProducer(null /* all destinations */);
 
-    m_context = createContext(properties);
-    m_connection = createConnection(m_context, properties);
-    m_defaultSession = m_connection.createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
-    m_defaultProducer = m_defaultSession.createProducer(null /* all destinations */);
+      initStrategies();
+      initRequestReplyMessaging(properties);
+      initDefaultMarshaller(properties);
 
+      // Start the connection
+      m_connection.start();
+      LOG.info("{} initialized: {}", m_symbolicName, m_connection);
+    }
+    catch (Exception e) {
+      // Ensure allocated resources are again
+      try {
+        destroy();
+      }
+      catch (RuntimeException re) {
+        e.addSuppressed(re);
+      }
+      throw e;
+    }
+  }
+
+  protected void initStrategies() {
     // Install subscription strategies (fire-and-forget messaging)
-    m_subscriptionStrategies.put(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeSubscriptionStrategy.class).init(this, false));
-    m_subscriptionStrategies.put(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeSubscriptionStrategy.class).init(this, true));
-    m_subscriptionStrategies.put(ACKNOWLEDGE_TRANSACTED, BEANS.get(TransactedSubscriptionStrategy.class).init(this));
+    registerSubscriptionStrategy(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeSubscriptionStrategy.class).init(this, false));
+    registerSubscriptionStrategy(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeSubscriptionStrategy.class).init(this, true));
+    registerSubscriptionStrategy(ACKNOWLEDGE_TRANSACTED, BEANS.get(TransactedSubscriptionStrategy.class).init(this));
 
     // Install replier strategies (request-reply messaging)
-    m_replierStrategies.put(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeReplierStrategy.class).init(this, false));
-    m_replierStrategies.put(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeReplierStrategy.class).init(this, true));
+    registerReplierStrategy(ACKNOWLEDGE_AUTO, BEANS.get(AutoAcknowledgeReplierStrategy.class).init(this, false));
+    registerReplierStrategy(ACKNOWLEDGE_AUTO_SINGLE_THREADED, BEANS.get(AutoAcknowledgeReplierStrategy.class).init(this, true));
+  }
+
+  protected void initRequestReplyMessaging(final Map<Object, Object> properties) throws JMSException {
+    m_requestReplyEnabled = BooleanUtility.nvl(TypeCastUtility.castValue(properties.get(REQUEST_REPLY_ENABLED), Boolean.class), true);
+    if (!m_requestReplyEnabled) {
+      LOG.info("{}: 'request-reply' messaging is disabled", m_symbolicName);
+      return;
+    }
 
     // Register consumer to dispatch replies of 'request-reply' messaging to the requester.
     m_replyQueue = m_defaultSession.createTemporaryQueue();
-    m_defaultSession
-        .createConsumer(m_replyQueue)
-        .setMessageListener(new JmsMessageListener() {
-
-          @Override
-          public void onJmsMessage(final Message message) throws JMSException {
-            final String replyId = message.getStringProperty(JMS_PROP_REPLY_ID);
-            final ReplyFuture replyFuture = m_replyFutureMap.remove(replyId);
-            if (replyFuture != null) {
-              replyFuture.set(message);
-            }
-          }
-        });
+    installReplyConsumer();
 
     // Register consumer to handle cancellation requests for 'request-reply' communication.
-    m_requestReplyCancellationTopic = (Topic) resolveJmsDestination(CONFIG.getPropertyValue(RequestReplyCancellationTopicProperty.class), m_defaultSession);
-    m_defaultSession
-        .createConsumer(m_requestReplyCancellationTopic)
-        .setMessageListener(new JmsMessageListener() {
+    IDestination<?> cancellationTopic;
+    Object prop = properties.get(REQUEST_REPLY_CANCELLATION_TOPIC);
+    if (prop instanceof IDestination) {
+      cancellationTopic = (IDestination<?>) prop;
+    }
+    else {
+      final String cancellationTopicName = ObjectUtility.toString(prop);
+      if (cancellationTopicName != null) {
+        final DestinationConfigPropertyParser p = BEANS.get(DestinationConfigPropertyParser.class).parse(cancellationTopicName);
+        cancellationTopic = MOM.newDestination(p.getDestinationName(), DestinationType.TOPIC, p.getResolveMethod(), p.getParameters());
+      }
+      else {
+        cancellationTopic = CONFIG.getPropertyValue(RequestReplyCancellationTopicProperty.class);
+      }
+    }
+    m_requestReplyCancellationTopic = (Topic) resolveJmsDestination(cancellationTopic, m_defaultSession);
+    installRequestCancellationConsumer();
+  }
 
-          @Override
-          public void onJmsMessage(final Message message) throws JMSException {
-            Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-                .andMatchExecutionHint(message.getStringProperty(JMS_PROP_REPLY_ID))
-                .toFilter(), true);
-          }
-        });
+  protected void installReplyConsumer() throws JMSException {
+    final MessageConsumer consumer = m_defaultSession.createConsumer(m_replyQueue);
+    consumer.setMessageListener(new JmsMessageListener() {
+      @Override
+      public void onJmsMessage(final Message message) throws JMSException {
+        final String replyId = message.getStringProperty(JMS_PROP_REPLY_ID);
+        final ReplyFuture replyFuture = m_replyFutureMap.remove(replyId);
+        if (replyFuture != null) {
+          replyFuture.set(message);
+        }
+      }
+    });
+  }
 
-    // Set default marshaller
-    m_defaultMarshaller = BEANS.get(CONFIG.getPropertyValue(MarshallerProperty.class));
+  protected void installRequestCancellationConsumer() throws JMSException {
+    final MessageConsumer consumer = m_defaultSession.createConsumer(m_requestReplyCancellationTopic);
+    consumer.setMessageListener(new JmsMessageListener() {
+      @Override
+      public void onJmsMessage(final Message message) throws JMSException {
+        Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(message.getStringProperty(JMS_PROP_REPLY_ID))
+            .toFilter(), true);
+      }
+    });
+  }
 
-    // Start the connection
-    m_connection.start();
-    LOG.info("{} initialized: {}", symbolicName, m_connection);
+  @SuppressWarnings("unchecked")
+  protected void initDefaultMarshaller(final Map<Object, Object> properties) {
+    Object prop = properties.get(MARSHALLER);
+    if (prop instanceof IMarshaller) {
+      m_defaultMarshaller = (IMarshaller) prop;
+    }
+    else {
+      Class<? extends IMarshaller> marshallerClass;
+      String marshallerClassName = ObjectUtility.toString(prop);
+      if (marshallerClassName != null) {
+        try {
+          marshallerClass = (Class<? extends IMarshaller>) Class.forName(marshallerClassName);
+        }
+        catch (final ClassNotFoundException | ClassCastException e) {
+          throw new PlatformException("Failed to load class specified by environment property '{}' [value={}]", MARSHALLER, marshallerClassName, e);
+        }
+      }
+      else {
+        marshallerClass = CONFIG.getPropertyValue(DefaultMarshallerProperty.class);
+      }
+      m_defaultMarshaller = BEANS.get(marshallerClass);
+    }
   }
 
   @Override
@@ -245,6 +319,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
   @Override
   public <REQUEST, REPLY> REPLY request(final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject, final PublishInput input) {
+    assertTrue(m_requestReplyEnabled, "'request-reply' messaging is not enabled for this MOM");
     assertNotNull(destination, "destination not specified");
     assertNotNull(input, "publishInput not specified");
     assertFalse(input.isTransactional(), "transactional mode not supported for 'request-reply' communication");
@@ -300,10 +375,10 @@ public class JmsMomImplementor implements IMomImplementor {
 
   @Override
   public <REQUEST, REPLY> ISubscription reply(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) {
+    assertTrue(m_requestReplyEnabled, "'request-reply' messaging is not enabled for this MOM");
     assertNotNull(destination, "destination not specified");
     assertNotNull(listener, "messageListener not specified");
     assertNotNull(input, "input not specified");
-
     try {
       final int acknowledgementMode = input.getAcknowledgementMode();
       final IReplierStrategy strategy = assertNotNull(m_replierStrategies.get(acknowledgementMode), "Acknowledgement mode not supported [mode={}]", acknowledgementMode);
@@ -327,10 +402,12 @@ public class JmsMomImplementor implements IMomImplementor {
   @Override
   public void destroy() {
     try {
-      m_connection.close();
+      if (m_connection != null) {
+        m_connection.close();
+      }
     }
     catch (final JMSException e) {
-      LOG.error("Failed to destory MOM", e);
+      LOG.error("Failed to destroy MOM", e);
     }
   }
 
@@ -338,7 +415,6 @@ public class JmsMomImplementor implements IMomImplementor {
   public IRegistrationHandle registerMarshaller(final IDestination<?> destination, final IMarshaller marshaller) {
     m_marshallers.put(destination, marshaller);
     return new IRegistrationHandle() {
-
       @Override
       public void dispose() {
         m_marshallers.remove(destination);
@@ -411,8 +487,12 @@ public class JmsMomImplementor implements IMomImplementor {
     }
   }
 
-  @SuppressWarnings("squid:S1149")
   protected Context createContext(final Map<Object, Object> properties) throws NamingException {
+    return new InitialContext(prepareContextEnvironment(properties));
+  }
+
+  @SuppressWarnings("squid:S1149")
+  protected Hashtable<?, ?> prepareContextEnvironment(final Map<Object, Object> properties) throws NamingException {
     Hashtable<Object, Object> env = new Hashtable<>();
     if (properties != null) {
       for (Entry<Object, Object> entry : properties.entrySet()) {
@@ -424,7 +504,7 @@ public class JmsMomImplementor implements IMomImplementor {
         }
       }
     }
-    return new InitialContext(env);
+    return env;
   }
 
   protected Connection createConnection(final Context context, final Map<Object, Object> properties) throws NamingException, JMSException {
@@ -433,7 +513,6 @@ public class JmsMomImplementor implements IMomImplementor {
     final Connection connection = connectionFactory.createConnection();
     connection.setClientID(computeClientId(properties));
     connection.setExceptionListener(new ExceptionListener() {
-
       @Override
       public void onException(final JMSException exception) {
         BEANS.get(MomExceptionHandler.class).handle(exception);
@@ -500,16 +579,8 @@ public class JmsMomImplementor implements IMomImplementor {
     if (clientId != null) {
       return clientId;
     }
-
-    final String applicationName = CONFIG.getPropertyValue(ApplicationNameProperty.class);
-    final String symbolicName = Objects.toString(properties.get(SYMBOLIC_NAME), StringUtility.join(" ", applicationName, "MOM"));
     final String nodeId = BEANS.get(NodeIdentifier.class).get();
-    return StringUtility.join(" ", symbolicName, StringUtility.box("(", nodeId, ")"));
-  }
-
-  @Override
-  public void setDefaultMarshaller(final IMarshaller marshaller) {
-    m_defaultMarshaller = marshaller;
+    return StringUtility.join(" ", m_symbolicName, StringUtility.box("(", nodeId, ")"));
   }
 
   /**

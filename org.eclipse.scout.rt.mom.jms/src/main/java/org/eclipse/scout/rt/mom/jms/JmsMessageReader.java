@@ -2,9 +2,9 @@ package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_BYTES;
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_TEXT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_MARSHALLER_CONTEXT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_NULL_OBJECT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_REQUEST_REPLY_SUCCESS;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_MARSHALLER_CONTEXT;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.util.Collections;
@@ -165,7 +165,11 @@ public class JmsMessageReader<DTO> {
   @SuppressWarnings("unchecked")
   protected Map<String, String> readContext(final String property) throws JMSException {
     final String json = readProperty(property);
-    return (Map<String, String>) BEANS.get(JsonMarshaller.class).unmarshall(json, Collections.singletonMap(JsonMarshaller.CTX_PROP_OBJECT_TYPE, HashMap.class.getName()));
+    final Map<String, String> context = (Map<String, String>) BEANS.get(JsonMarshaller.class).unmarshall(json, Collections.singletonMap(JsonMarshaller.CTX_PROP_OBJECT_TYPE, HashMap.class.getName()));
+    if (context == null) {
+      return Collections.emptyMap();
+    }
+    return context;
   }
 
   /**

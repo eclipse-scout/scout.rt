@@ -47,7 +47,7 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
   public <DTO> ISubscription subscribe(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) throws JMSException {
     final Session session = m_mom.getConnection().createSession(false /* non-transacted */, Session.AUTO_ACKNOWLEDGE);
     try {
-      installMessageListener(destination, listener, session, input);
+      installMessageConsumer(destination, listener, session, input);
       return new JmsSubscription(session, destination);
     }
     catch (JMSException | RuntimeException e) {
@@ -56,7 +56,7 @@ public class AutoAcknowledgeSubscriptionStrategy implements ISubscriptionStrateg
     }
   }
 
-  protected <DTO> void installMessageListener(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session session, final SubscribeInput input) throws JMSException {
+  protected <DTO> void installMessageConsumer(final IDestination<DTO> destination, final IMessageListener<DTO> listener, final Session session, final SubscribeInput input) throws JMSException {
     final IMarshaller marshaller = m_mom.resolveMarshaller(destination);
     final RunContext runContext = (input.getRunContext() != null ? input.getRunContext() : RunContexts.empty());
 
