@@ -30,6 +30,9 @@ scout.SmartField = function() {
 
   this._addAdapterProperties(['proposalChooser']);
   this.options;
+
+  this._additionalLines;
+
   /**
    * This property is used to prevent unnecessary requests to the server.
    */
@@ -146,12 +149,31 @@ scout.SmartField.prototype._setDisplayText = function(displayText) {
  * @override ValueField.js
  */
 scout.SmartField.prototype._renderDisplayText = function() {
-  scout.fields.valOrText(this, this.$field, this.displayText);
+  if (this.displayText) {
+    var multilineText = this.displayText.split('\n');
+    if (multilineText) {
+      var firstLine = multilineText.shift();
+      this._additionalLines = multilineText;
+      scout.fields.valOrText(this, this.$field, firstLine);
+    } else {
+      this._additionalLines = null;
+      scout.fields.valOrText(this, this.$field, this.displayText);
+    }
+  } else {
+    this._additionalLines = null;
+  }
 };
 
 scout.SmartField.prototype._readDisplayText = function() {
-  // in case of touch mode a 'div' is rendered and not an 'input' -> use text not val
-  return scout.fields.valOrText(this, this.$field);
+  var firstLine = scout.fields.valOrText(this, this.$field);
+  if (firstLine && this._additionalLines) {
+    var newDisplayText = [firstLine].concat(this._additionalLines).join('\n');
+    if (newDisplayText === this._oldDisplayText) {
+      return newDisplayText;
+    }
+  }
+  this._additionalLines = null;
+  return firstLine;
 };
 
 scout.SmartField.prototype._readSearchText = function() {

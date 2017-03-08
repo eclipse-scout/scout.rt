@@ -68,4 +68,8 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
   String getWildcard();
 
   void setWildcard(String wildcard);
+
+  void setMultilineText(boolean b);
+
+  boolean isMultilineText();
 }

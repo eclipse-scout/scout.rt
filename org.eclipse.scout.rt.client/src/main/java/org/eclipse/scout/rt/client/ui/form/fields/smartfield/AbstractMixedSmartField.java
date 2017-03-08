@@ -281,7 +281,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
    */
   private String lookupRowAsText(ILookupRow<LOOKUP_KEY> currentLookupRow) {
     String text = currentLookupRow.getText();
-    if (!isMultilineText() && text != null) {
+    if (text != null && (!isMultilineText() && (getLookupCall() == null || !getLookupCall().isMultilineText()))) {
       text = text.replaceAll("[\\n\\r]+", " ");
     }
     return text;

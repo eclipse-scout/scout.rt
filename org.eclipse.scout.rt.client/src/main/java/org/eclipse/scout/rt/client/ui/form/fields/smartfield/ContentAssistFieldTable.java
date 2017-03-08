@@ -34,6 +34,14 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 @FormData(value = AbstractTableRowData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
 public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implements IContentAssistFieldTable<LOOKUP_KEY> {
 
+  /**
+   * "Multiline"-Handling will be done by the ContentAssistField itself
+   */
+  @Override
+  protected boolean getConfiguredMultilineText() {
+    return true;
+  }
+
   @Override
   protected boolean getConfiguredAutoResizeColumns() {
     return true;

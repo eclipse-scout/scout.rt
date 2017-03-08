@@ -70,13 +70,14 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   private Object m_master;
   private TriState m_active;
   private int m_maxRowCount;
-  private transient ILookupService<KEY_TYPE> m_serviceCached;
-
   private String m_wildcard = "*";
+  private boolean m_multilineText;
+  private transient ILookupService<KEY_TYPE> m_serviceCached;
 
   public LookupCall() {
     m_serviceCached = createLookupService();
     m_active = TriState.UNDEFINED;
+    m_multilineText = getConfiguredMultilineText();
   }
 
   /**
@@ -98,6 +99,16 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredMasterRequired() {
+    return false;
+  }
+
+  /**
+   * @return true if the lookup results should be displayed multiline for non-multiline IContentAssistFields <br />
+   *         (Note: This property has no effect if the IContentAssistField itself is configured multiline)
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(30)
+  protected boolean getConfiguredMultilineText() {
     return false;
   }
 
@@ -299,6 +310,16 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   @Override
   public String getWildcard() {
     return m_wildcard;
+  }
+
+  @Override
+  public void setMultilineText(boolean b) {
+    m_multilineText = b;
+  }
+
+  @Override
+  public boolean isMultilineText() {
+    return m_multilineText;
   }
 
   @Override

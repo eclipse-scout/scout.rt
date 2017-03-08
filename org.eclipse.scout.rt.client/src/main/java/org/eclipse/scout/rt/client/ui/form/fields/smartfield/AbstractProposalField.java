@@ -178,7 +178,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       String validValueText = StringUtility.emptyIfNull(rawValue);
       String lookupRowText = StringUtility.emptyIfNull(currentLookupRow.getText());
       if (!lookupRowText.equals(validValueText)) {
-        if (isMultilineText()) {
+        if (isMultilineText() || (getLookupCall() != null && getLookupCall().isMultilineText())) {
           validValue = lookupRowText;
         }
         else {
