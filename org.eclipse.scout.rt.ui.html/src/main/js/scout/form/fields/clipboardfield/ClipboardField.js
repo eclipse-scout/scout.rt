@@ -202,7 +202,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   if (selection.toString().length === this._fullSelectionLength) {
     text = this.displayText;
   } else {
-    text = scout.strings.plainText(selection.toString());
+    text = selection.toString();
   }
 
   try {
