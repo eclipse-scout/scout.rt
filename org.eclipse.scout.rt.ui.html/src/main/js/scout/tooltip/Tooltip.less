@@ -11,6 +11,9 @@
 @tooltip-arrow-size: 14px;
 @tooltip-border-size: 1px;
 @tooltip-border: @tooltip-border-size solid @tooltip-border-color;
+@tooltip-padding-y: 8px;
+@tooltip-padding-x: 12px;
+@tooltip-menu-padding-y: 5px;
 
 .tooltip {
   position: absolute;
@@ -24,7 +27,7 @@
 
 .tooltip-content {
   background-color: @tooltip-background-color;
-  padding: 8px 12px;
+  padding: @tooltip-padding-y @tooltip-padding-x;
   position: relative;
   min-width: 60px; /* Prevents tooltips with very short text from looking "strange" */
   #scout.overflow-ellipsis();
@@ -36,6 +39,37 @@
   & .small {
     font-size: 11px;
     color: @palette-gray-7;
+  }
+}
+
+.tooltip-menus {
+  background-color: @tooltip-background-color;
+  padding: 0 @tooltip-padding-x 5px @tooltip-padding-x;
+  position: relative;
+
+  .tooltip.no-text > & {
+    padding-top: 3px;
+  }
+
+  & > .menu-item {
+    display: block;
+    padding-top: @tooltip-menu-padding-y;
+    padding-bottom: @tooltip-menu-padding-y;
+
+    & > .text {
+      text-decoration: underline;
+    }
+
+    & > .submenu-icon {
+      padding-left: 5px;
+
+      &::before {
+        /* make sub menu icon a little smaller */
+        font-size: 16px;
+        height: auto;
+        line-height: normal;
+      }
+    }
   }
 }
 
@@ -63,12 +97,13 @@
   background-color: @tooltip-error-background-color;
   border-color: @tooltip-error-color;
 
-  & .tooltip-arrow {
+  & > .tooltip-arrow {
     background-color: @tooltip-error-background-color;
     border-color: @tooltip-error-border-color;
   }
 
-  & .tooltip-content {
+  & > .tooltip-content,
+  & > .tooltip-menus {
     background-color: @tooltip-error-background-color;
   }
 }
@@ -78,12 +113,13 @@
   border-color: @tooltip-warning-border-color;
   color: @tooltip-warning-color;
 
-  & .tooltip-arrow {
+  & > .tooltip-arrow {
     background-color: @tooltip-warning-background-color;
     border-color: @tooltip-warning-border-color;
   }
 
-  & .tooltip-content {
+  & > .tooltip-content,
+  & > .tooltip-menus {
     background-color: @tooltip-warning-background-color;
   }
 }
@@ -93,12 +129,13 @@
   border-color: @tooltip-info-border-color;
   color: @tooltip-info-color;
 
-  & .tooltip-arrow {
+  & > .tooltip-arrow {
     background-color: @tooltip-info-background-color;
     border-color: @tooltip-info-border-color;
   }
 
-  & .tooltip-content {
+  & > .tooltip-content,
+  & > .tooltip-menus {
     background-color: @tooltip-info-background-color;
   }
 }

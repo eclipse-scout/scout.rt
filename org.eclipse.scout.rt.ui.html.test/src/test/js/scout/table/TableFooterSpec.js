@@ -100,7 +100,7 @@ describe("TableFooterSpec", function() {
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
 
       // Check that tooltip is hidden after mouse click on status
-      table.footer._$infoTableStatusIcon.trigger('mousedown');
+      table.footer._$infoTableStatusIcon.triggerMouseDownCapture();
       expect(table.footer._tableStatusTooltip).toBe(null);
       expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
@@ -115,7 +115,7 @@ describe("TableFooterSpec", function() {
       expect(table.tableStatus.uiState).toBe('user-hidden');
 
       // Check that tooltip is shown after second mouse click on status
-      table.footer._$infoTableStatusIcon.trigger('mousedown');
+      table.footer._$infoTableStatusIcon.triggerMouseDownCapture();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
@@ -165,7 +165,7 @@ describe("TableFooterSpec", function() {
       expect(table.tableStatus.uiState).toBe('auto-hidden');
 
       // Check that tooltip is shown again with a mouse click and _not_ hidden automatically again after 5s
-      table.footer._$infoTableStatusIcon.trigger('mousedown');
+      table.footer._$infoTableStatusIcon.triggerMouseDownCapture();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
@@ -203,7 +203,7 @@ describe("TableFooterSpec", function() {
       expect(table.tableStatus.uiState).toBe('auto-hidden'); // because auto-removal is already scheduled at INFO level
 
       // Click "outside" (first row)
-      table.$rows().eq(0).trigger('mousedown');
+      table.$rows().eq(0).triggerMouseDownCapture();
 
       // Check invisible
       expect(table.footer._tableStatusTooltip).toBe(null);
@@ -226,7 +226,7 @@ describe("TableFooterSpec", function() {
       expect(table.tableStatus.uiState).toBe(undefined);
 
       // Click "outside" (first row)
-      table.$rows().eq(0).trigger('mousedown');
+      table.$rows().eq(0).triggerMouseDownCapture();
 
       // Check invisible
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);

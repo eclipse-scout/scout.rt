@@ -18,6 +18,10 @@ describe("MenuBarPopup", function() {
     helper = new scout.MenuSpecHelper(session);
   });
 
+  afterEach(function() {
+    removePopups(session);
+  });
+
   it('is opened on doAction if the menu has child actions', function() {
     var childMenu = helper.createMenu({text: 'child menu'});
     var menu = helper.createMenu({

@@ -527,6 +527,19 @@ $.fn.triggerMouseDown = function(opts) {
   return this.triggerMouseAction('mousedown', opts);
 };
 
+/**
+ * Does not use jQuery to create the event to make sure capture phase listeners are notified as well.
+ */
+$.fn.triggerMouseDownCapture = function(opts) {
+  var event = new MouseEvent('mousedown', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+  this[0].dispatchEvent (event);
+  return this;
+};
+
 $.fn.triggerMouseUp = function(opts) {
   return this.triggerMouseAction('mouseup', opts);
 };

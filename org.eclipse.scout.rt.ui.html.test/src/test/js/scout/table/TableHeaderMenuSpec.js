@@ -21,7 +21,6 @@ describe('TableHeaderMenu', function() {
   });
 
   afterEach(function() {
-    session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
@@ -224,6 +223,7 @@ describe('TableHeaderMenu', function() {
         table.sort(column, 'asc');
         table.header.openTableHeaderMenu(column);
         expect(table.header._tableHeaderMenu._sortColumnCount()).toBe(1);
+        table.header.closeTableHeaderMenu();
       });
 
       it('count grouped columns', function() {
@@ -233,6 +233,7 @@ describe('TableHeaderMenu', function() {
         table.groupColumn(column, false, 'asc');
         table.header.openTableHeaderMenu(column);
         expect(table.header._tableHeaderMenu._groupColumnCount()).toBe(1);
+        table.header.closeTableHeaderMenu();
       });
 
     });

@@ -62,8 +62,20 @@
     #scout.status();
   }
 
-  &.has-menus > .status {
-    #scout.menu-status();
+  &.has-menus {
+
+    &.has-tooltip,
+    &.has-info,
+    &.has-warning,
+    &.has-error {
+      & > .status::before {
+        content: @icon-ellipsis-circle;
+      }
+    }
+
+    & > .status {
+      #scout.menu-status();
+    }
   }
 
   &.has-tooltip > .status {

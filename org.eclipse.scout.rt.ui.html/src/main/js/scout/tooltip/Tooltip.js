@@ -36,6 +36,8 @@ scout.Tooltip = function() {
   this.scrollType = 'position';
   this.htmlEnabled = false;
   this.$content;
+  this.menus = [];
+  this._addAdapterProperties(['menus']);
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 
@@ -45,7 +47,6 @@ scout.Tooltip.prototype._render = function($parent) {
 
   this.$container = this.$parent
     .appendDiv('tooltip')
-    .hide()
     .data('tooltip', this);
 
   if (this.cssClass) {
@@ -56,14 +57,16 @@ scout.Tooltip.prototype._render = function($parent) {
   this.$content = this.$container.appendDiv('tooltip-content');
   this._renderText();
   this._renderSeverity();
-  this.$container.show();
+  this._renderMenus();
 
   if (this.autoRemove) {
     // Every user action will remove the tooltip
     this._mousedownHandler = this._onDocumentMousedown.bind(this);
+    // The listener needs to be executed in the capturing phase -> Allows for having context menus inside the tooltip, otherwise click on context menu header would close the tooltip
+    this.$container.document(true).addEventListener('mousedown', this._mousedownHandler, true); // true=the event handler is executed in the capturing phase
+
     this._keydownHandler = this._onDocumentKeydown.bind(this);
     this.$container.document()
-      .on('mousedown', this._mousedownHandler)
       .on('keydown', this._keydownHandler);
   }
 
@@ -103,7 +106,7 @@ scout.Tooltip.prototype._postRender = function() {
 
 scout.Tooltip.prototype._remove = function() {
   if (this._mousedownHandler) {
-    this.$container.document().off('mousedown', this._mousedownHandler);
+    this.$container.document(true).removeEventListener('mousedown', this._mousedownHandler, true);
     this._mousedownHandler = null;
   }
   if (this._keydownHandler) {
@@ -125,14 +128,7 @@ scout.Tooltip.prototype._remove = function() {
 };
 
 scout.Tooltip.prototype.setText = function(text) {
-  if (this.text === text) {
-    return;
-  }
-  this._setProperty('text', text);
-  if (this.rendered) {
-    this._renderText();
-    this.position();
-  }
+  this.setProperty('text', text);
 };
 
 scout.Tooltip.prototype.setSeverity = function(severity) {
@@ -146,6 +142,11 @@ scout.Tooltip.prototype._renderText = function() {
   } else {
     // use nl2br to allow tooltips with line breaks
     this.$content.html(scout.strings.nl2br(text));
+  }
+  this.$content.toggleClass('hidden', !text);
+  this.$container.toggleClass('no-text', !text);
+  if (!this.rendering) {
+    this.position();
   }
 };
 
@@ -169,6 +170,27 @@ scout.Tooltip.prototype._cssClassForSeverity = function() {
     return 'tooltip-info';
   }
   return '';
+};
+
+scout.Tooltip.prototype.setMenus = function(menus) {
+  menus = scout.arrays.ensure(menus);
+  this.setProperty('menus', menus);
+};
+
+scout.Tooltip.prototype._renderMenus = function() {
+  if (this.menus.length > 0 && !this.$menus) {
+    this.$menus = this.$container.appendDiv('tooltip-menus');
+  } else if (this.menus.length === 0 && this.$menus) {
+    this.$menus.remove();
+    this.$menus = null;
+  }
+  this.menus.forEach(function(menu) {
+    menu.render(this.$menus);
+  }, this);
+
+  if (!this.rendering) {
+    this.position();
+  }
 };
 
 scout.Tooltip.prototype.position = function() {
@@ -237,6 +259,13 @@ scout.Tooltip.prototype.position = function() {
   this.$container
     .cssLeft(left)
     .cssTop(top);
+
+  // If there are menu popups make sure they are positioned correctly
+  this.menus.forEach(function(menu) {
+    if (menu.popup) {
+      menu.popup.position();
+    }
+  }, this);
 };
 
 scout.Tooltip.prototype._onAnchorScroll = function(event) {

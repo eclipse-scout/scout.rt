@@ -521,8 +521,19 @@ scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
 };
 
 scout.FormField.prototype._onStatusMousedown = function(event) {
-  // showing menus is more important than showing tooltips
-  if (this.menusVisible && this._hasMenus()) {
+  var hasStatus = !!this.errorStatus,
+    hasTooltip = !!this.tooltipText;
+
+  // Either show the tooltip or a context menu
+  // If the field has both, a tooltip and menus, the tooltip will be shown and the menus rendered into the tooltip
+  if (hasStatus || hasTooltip) {
+    // Toggle tooltip
+    if (this.tooltip) {
+      this._hideStatusMessage();
+    } else {
+      this._showStatusMessage();
+    }
+  } else if (this.menusVisible && this._hasMenus()) {
     var func = function func(event) {
       var menus = this._getCurrentMenus();
       // Toggle menu
@@ -530,10 +541,9 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
         this.contextPopup.close();
         this.contextPopup = null;
       } else {
-        if (!menus.some(function(menuItem) {
-            return menuItem.visible;
-          })) {
-          return; // at least one menu item must be visible
+        if (menus.length === 0) {
+          // at least one menu item must be visible
+          return;
         }
         this.contextPopup = scout.create('ContextMenuPopup', {
           parent: this,
@@ -547,13 +557,6 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     }.bind(this);
 
     scout.menus.showContextMenuWithWait(this.session, func, event);
-  } else {
-    // Toggle tooltip
-    if (this.tooltip) {
-      this._hideStatusMessage();
-    } else {
-      this._showStatusMessage();
-    }
   }
 };
 
@@ -566,7 +569,8 @@ scout.FormField.prototype._showStatusMessage = function() {
   var opts,
     text = this.tooltipText,
     severity = scout.Status.OK,
-    autoRemove = true;
+    autoRemove = true,
+    menus = [];
 
   if (this.errorStatus) {
     text = this.errorStatus.message;
@@ -584,7 +588,11 @@ scout.FormField.prototype._showStatusMessage = function() {
     }
   }
 
-  if (scout.strings.empty(text)) {
+  if (this.menusVisible && this._hasMenus()) {
+    menus = this._getCurrentMenus();
+  }
+
+  if (scout.strings.empty(text) && menus.length === 0) {
     // Refuse to show empty tooltip
     return;
   }
@@ -593,6 +601,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     // update existing tooltip
     this.tooltip.setText(text);
     this.tooltip.setSeverity(severity);
+    this.tooltip.setMenus(menus);
   } else {
     // create new tooltip
     opts = {
@@ -600,7 +609,8 @@ scout.FormField.prototype._showStatusMessage = function() {
       text: text,
       severity: severity,
       autoRemove: autoRemove,
-      $anchor: this.$status
+      $anchor: this.$status,
+      menus: menus
     };
     this.tooltip = scout.create('Tooltip', opts);
     this.tooltip.one('destroy', function() {

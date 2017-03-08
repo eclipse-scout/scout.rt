@@ -184,6 +184,13 @@ scout.ValueField.prototype._getCurrentMenus = function() {
   return scout.ValueField.parent.prototype._getCurrentMenus.call(this);
 };
 
+scout.ValueField.prototype._renderCurrentMenuTypes = function() {
+  // If a tooltip is shown, update it with the new menus
+  if (this.tooltip) {
+    this._showStatusMessage();
+  }
+};
+
 // ==== static helper methods ==== //
 
 /**
