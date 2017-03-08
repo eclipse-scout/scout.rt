@@ -33,7 +33,7 @@
   background-color: @background-color;
 
   /* jquery sets overflow to hidden while animating which makes bench-drop-shadow invisible -> prevent it */
-  overflow: visible !important;
+  overflow: visible !important; /* NOSONAR */
 
   &.drop-shadow::before {
     .desktop-bench-drop-shadow();

@@ -35,26 +35,61 @@
     padding-right: @table-menubar-padding;
   }
 
+  /* Used for scout.Table.CheckableStyle.TABLE_ROW */
   &.checkable {
 
     & > .table-data > .table-row {
       cursor: pointer;
-      &.selected > .table-cell {
-        color: @text-color;
+
+      & > .table-cell.first {
+        /* Increase padding of first cell to make room for "selection" marker */
+        padding-left: 14px;
+      }
+
+      &.selected {
+        /* Don't draw selection */
+        background-color: transparent;
+        border-color: @table-row-border-color;
+
+        & > .table-cell {
+          color: @text-color;
+        }
+      }
+      &.checked,
+      &.checked.selected {
+        /* Mark checked rows with a background color */
+        background-color: @table-row-checked-background-color;
+
+        & > .table-cell {
+          color: @text-selection-color;
+        }
       }
     }
-    & > .table-data > .table-row.selected.checked {
-      background-color: @table-row-checked-selected-background-color;
-      & > .table-cell {
-        color: @text-selection-color;
+
+    &:focus,
+    &.focused {
+      & > .table-data > .table-row {
+        &.selected {
+          /* "Selection" marker */
+          &::before {
+            #scout.font-icon();
+            content: @icon-angle-right;
+            position: absolute;
+            top: 7px;
+            left: 5px;
+            color: @text-color;
+          }
+
+          &.checked::before {
+            color: @text-selection-color;
+          }
+        }
       }
     }
-    &:focus > .table-data > .table-row.selected.checked {
-      background-color: @table-row-checked-selected-focus-background-color;
-      & > .table-cell {
-        color: @text-selection-color;
-      }
-    }
+  }
+
+  &.checkable.header-invisible > .table-data > .table-row.selected.first  {
+    border-top-color: @control-background-color;
   }
 
   &.loading {

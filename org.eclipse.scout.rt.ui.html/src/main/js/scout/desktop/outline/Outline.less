@@ -15,7 +15,7 @@
 @compact-outline-node-padding-h: 16px;
 @compact-outline-node-padding-v: @outline-breadcrumb-node-padding-v;
 
-.outline {
+.outline.tree {
 
   &.in-background > .tree-data > .tree-node.selected {
     background-color: @outline-in-background-selection-background-color;
@@ -39,7 +39,7 @@
     }
 
     & > .key-box {
-      top: 7px !important;
+      top: 7px;
     }
 
     & > .tree-node,
@@ -166,7 +166,7 @@
       border-bottom: 1px solid @outline-breadcrumb-border-color;
 
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: @outline-breadcrumb-node-padding-v 2px !important; // NOSONAR
+      padding: @outline-breadcrumb-node-padding-v 2px !important; /* NOSONAR (see comment above) */
 
       &.ancestor-of-selected,
       &.child-of-selected {
@@ -256,7 +256,7 @@
 
     & > .tree-node  {
       text-align: left;
-      padding: 0 !important;
+      padding: 0 !important; /* NOSONAR (necessary because this overrides another !important rule, see above) */
 
       & > .text {
         display: inline-block;

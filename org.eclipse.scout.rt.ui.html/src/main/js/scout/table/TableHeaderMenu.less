@@ -61,43 +61,6 @@
     position: relative;
   }
 
-  & .table > .table-data > .table-row > .table-cell.first {
-    padding-left: 14px;
-  }
-
-  & .table > .table-data > .table-row.selected {
-    border-color: @table-row-border-color;
-
-    &:before{
-      #scout.font-icon();
-      content: @icon-angle-right;
-      position: absolute;
-      top: 7px;
-      left: 5px;
-      color: @table-row-checked-background-color;
-    }
-
-  }
-
-  & .table > .table-data > .table-row.selected.checked {
-    &:before{
-      color: @table-header-menu-background-color;
-    }
-  }
-
-  & .table > .table-data > .table-row.selected {
-    background-color: @table-header-menu-background-color !important;
-  }
-
-  & .table > .table-data > .table-row.selected.checked {
-    background-color: @table-row-checked-background-color !important;
-  }
-
-  & .table:not(:focus) > .table-data > .table-row.selected {
-    &:before {
-      visibility: hidden;
-    }
-  }
 }
 
 .table-header-menu-whiter {

@@ -214,7 +214,7 @@
       border-bottom: 1px solid @border-color;
 
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: 10px @tree-node-padding 8px @tree-node-padding !important; // NOSONAR
+      padding: 10px @tree-node-padding 8px @tree-node-padding !important; /* NOSONAR (see comment above) */
 
       &.ancestor-of-selected,
       &.child-of-selected,
@@ -318,5 +318,5 @@
 
 .tree > .tree-data > .key-box {
   top: 6px;
-  left: 4px !important;
+  left: 4px;
 }

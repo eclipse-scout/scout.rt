@@ -260,7 +260,6 @@
   vertical-align: top;
   width: 0;
   padding: 0;
-  background-color: @palette-white;
   overflow: hidden;
 }
 
@@ -270,9 +269,10 @@
   height: 100%;
 
   & > .calendar-component {
+    cursor: pointer;
     height: auto;
     width: calc(~'100%' - 10px);
-    background-color: @palette-white !important;
+    background-color: transparent !important; /* NOSONAR (required to override original component background color) */
     margin-top: 12px;
   }
 }
@@ -413,7 +413,7 @@
     }
 
     &.component-open-top {
-      overflow: visible !important;
+      overflow: visible;
       padding-top: 10px;
 
       &::before {
@@ -425,12 +425,12 @@
         left: calc(~'50%' - 8px);
         top: -8px;
         transform: rotate(45deg);
-        background-color: @palette-white;
+        background-color: @background-color;
       }
     }
 
     &.component-open-bottom {
-      overflow: visible !important;
+      overflow: visible;
 
       &::after {
         position: absolute;

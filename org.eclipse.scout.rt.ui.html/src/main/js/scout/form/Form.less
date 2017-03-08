@@ -24,7 +24,7 @@
 }
 
 .dialog {
-  position: absolute !important; /* ignore positioning of 'ui-resizable' */
+  position: absolute !important; /* NOSONAR (ignore positioning of 'ui-resizable') */
   background-color: @background-color;
   border: solid 1px @border-color;
   border-top: 5px solid @active-color;
@@ -100,7 +100,7 @@
       /* Remove handle, it is not useful anymore
          and it increases the dialog size which has the effect that the body may be scrolled (on iphone).
          Important is necessary because jquery ui sets it to display: block using inline style */
-      display: none !important; // NOSONAR
+      display: none !important; /* NOSONAR (see comment above)*/
     }
   }
 }
