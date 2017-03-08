@@ -208,10 +208,9 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
         var remainder = (distWidth + spanWidth) % hSpan;
         var last = -1;
         for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
-          if (fixedWidths[j]) {
-            prefWidths[last = j] = prefWidths[j];
-          } else {
-            prefWidths[last = j] = Math.max(equalWidth, prefWidths[j]);
+          last = j;
+          if (!fixedWidths[j]) {
+            prefWidths[j] = Math.max(equalWidth, prefWidths[j]);
           }
           if (cons.weightx === 0) {
             fixedWidths[j] = true;
@@ -316,10 +315,9 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
         var remainder = (distHeight + spanHeight) % vSpan;
         var last = -1;
         for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
-          if (fixedHeights[j]) {
-            prefHeights[last = j] = prefHeights[j];
-          } else {
-            prefHeights[last = j] = Math.max(equalHeight, prefHeights[j]);
+          last = j;
+          if (!fixedHeights[j]) {
+            prefHeights[j] = Math.max(equalHeight, prefHeights[j]);
           }
           if (cons.weighty === 0) {
             fixedHeights[j] = true;

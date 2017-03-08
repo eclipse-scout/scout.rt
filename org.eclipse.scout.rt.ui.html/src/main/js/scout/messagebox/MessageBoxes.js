@@ -10,7 +10,7 @@
  ******************************************************************************/
 
 /**
- * This class is a convenient builder for creating message boxes. Use the static functions to 
+ * This class is a convenient builder for creating message boxes. Use the static functions to
  * create and open simple and often used message boxes.
  */
 scout.MessageBoxes = function(parent) {

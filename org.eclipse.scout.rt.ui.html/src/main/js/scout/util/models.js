@@ -61,7 +61,7 @@ scout.models = {
         'Check if file .json is listed in your *-module.json ' +
         'and if id matches the filename of the file .json file');
     }
-    if (!json.type || json.type != type) {
+    if (!json.type || json.type !== type) {
       throw new Error(id + ' is not of type \'' + type + '\'');
     }
     return $.extend(true, {}, json);

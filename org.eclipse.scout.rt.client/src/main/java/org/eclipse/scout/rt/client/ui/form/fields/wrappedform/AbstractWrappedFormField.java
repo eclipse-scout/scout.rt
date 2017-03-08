@@ -171,9 +171,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     }
 
     // TODO [7.0] BSH: Add assertion to ensure Form is not started yet; currently, that cannot be done because of AbstractPageField.
-//    if (form != null) {
-//      Assertions.assertFalse(form.isFormStarted(), "Inner Form must not be started yet [wrappedFormField=%s, innerForm=%s]", this, form);
-//    }
+    // --> Assertions.assertFalse(form != null && form.isFormStarted(), "Inner Form must not be started yet [wrappedFormField=%s, innerForm=%s]", this, form)
     // TODO [7.0] BSH: Check if the above to-do would better be solved using "form.isShowing()". But what about forms that are started and contained in wrapper field 1 and are added to wrapper field 2?
     // Example:  Would work with "isFormStarted()":                      Would _not_ work with "isFormStarted()", but would work with "isShowing()".
     //           ----------------------------------                      ---------------------------------------------------------------------------

@@ -29,17 +29,15 @@ public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, Planne
   @Override
   public PlannerEvent filter(PlannerEvent event) {
     for (PlannerEventFilterCondition condition : getConditions()) {
-      if (condition.getType() == event.getType()) {
-        if (condition.checkResources()) {
-          List<Resource> resources = new ArrayList<>(event.getResources());
-          resources.removeAll(condition.getResources());
-          if (resources.size() == 0) {
-            // Ignore event if no resources remain or if the event contained no resources at all
-            return null;
-          }
-          PlannerEvent newEvent = new PlannerEvent((IPlanner) m_jsonPlanner.getModel(), event.getType(), resources);
-          return newEvent;
+      if (condition.getType() == event.getType() && condition.checkResources()) {
+        List<Resource> resources = new ArrayList<>(event.getResources());
+        resources.removeAll(condition.getResources());
+        if (resources.size() == 0) {
+          // Ignore event if no resources remain or if the event contained no resources at all
+          return null;
         }
+        PlannerEvent newEvent = new PlannerEvent((IPlanner) m_jsonPlanner.getModel(), event.getType(), resources);
+        return newEvent;
       }
     }
     return event;

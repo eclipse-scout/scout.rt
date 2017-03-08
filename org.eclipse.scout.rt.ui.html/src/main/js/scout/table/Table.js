@@ -2828,10 +2828,8 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos, dragged) {
   // translate position of 'visible columns' array to position in 'all columns' array
   var visibleColumns = this.visibleColumns(),
-    oldColumn = visibleColumns[visibleOldPos],
     newColumn = visibleColumns[visibleNewPos],
-    newPos = this.columns.indexOf(newColumn),
-    oldPos = this.columns.indexOf(oldColumn);
+    newPos = this.columns.indexOf(newColumn);
 
   // Don't allow moving a column before the last column with a fixed position (checkbox col, row icon col ...)
   this.columns.forEach(function(iteratingColumn, i) {
