@@ -647,6 +647,9 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
     }
   }
 
+  // Variable arguments:
+  // "done" --> data, textStatus, jqXHR
+  // "fail" --> jqXHR, textStatus, errorThrown
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.unregisterAjaxRequest(xhr);
     this.setRequestPending(false);
@@ -768,6 +771,9 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
 
+  // Variable arguments:
+  // "done" --> data, textStatus, jqXHR
+  // "fail" --> jqXHR, textStatus, errorThrown
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.unregisterAjaxRequest(xhr);
   }
@@ -1241,6 +1247,9 @@ scout.Session.prototype.sendLogRequest = function(message) {
 
   // ----- Helper methods -----
 
+  // Variable arguments:
+  // "done" --> data, textStatus, jqXHR
+  // "fail" --> jqXHR, textStatus, errorThrown
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.unregisterAjaxRequest(xhr);
   }
