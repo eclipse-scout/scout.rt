@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormResetSearchF
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormStoredChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.IsSaveNeededFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -75,6 +76,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -113,7 +116,9 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -457,6 +462,31 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
+   * Override this method to mark a form as closable. In case of closable the close button [X] is displayed either in
+   * the form or the view header. The default implementations says a form displayed as a dialog containing a
+   * {@link AbstractCloseButton} or a {@link AbstractCancelButton} is closable.
+   *
+   * @return
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(190)
+  protected boolean getConfiguredClosable() {
+    // legacy support if not overwritten
+    return getDisplayHint() == DISPLAY_HINT_DIALOG && hasCloseOrCancelButton();
+  }
+
+  /**
+   * Whether or not a changed form should display the save needed state (dirty) in the dialog or view header.
+   *
+   * @return true to display the save needed state, false otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  protected boolean getConfiguredSaveNeededVisible() {
+    return false;
+  }
+
+  /**
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
@@ -533,6 +563,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   protected void execStored() {
   }
 
+  @ConfigOperation
+  @Order(50)
+  protected boolean execIsSaveNeeded() {
+    return getRootGroupBox().isSaveNeeded();
+  }
+
   /**
    * @throws ProcessingException
    *           / {@link VetoException} if the exception should produce further info messages (default)
@@ -556,14 +592,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (enabledButtonSystemTypes.contains(IButton.SYSTEM_TYPE_CLOSE)) {
       doClose();
     }
-    else if (enabledButtonSystemTypes.contains(IButton.SYSTEM_TYPE_CANCEL)) {
-      doCancel();
-    }
-    else if (!isAskIfNeedSave()) {
-      doClose();
-    }
     else {
-      LOG.info("Trying to close a form ({} - {}) with no enabled close button! override getConfiguredAskIfNeedSave() to false to make this form is unsaveable.", getClass().getName(), getTitle());
+      doCancel();
     }
   }
 
@@ -596,6 +626,20 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(50)
   protected void execAddSearchTerms(SearchFilter search) {
+  }
+
+  protected boolean hasCloseOrCancelButton() {
+    for (IFormField f : getAllFields()) {
+      if (f.isEnabled() && f.isVisible() && (f instanceof IButton)) {
+        switch (((IButton) f).getSystemType()) {
+          case IButton.SYSTEM_TYPE_CLOSE:
+          case IButton.SYSTEM_TYPE_CANCEL: {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   private Class<? extends IGroupBox> getConfiguredMainBox() {
@@ -725,6 +769,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     setDisplayHint(getConfiguredDisplayHint());
     setDisplayViewId(getConfiguredDisplayViewId());
+    setClosable(getConfiguredClosable());
+    setSaveNeededVisible(getConfiguredSaveNeededVisible());
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
@@ -823,6 +869,92 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setCssClass(String cssClass) {
     propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
+  }
+
+  @Override
+  public boolean isClosable() {
+    return propertySupport.getPropertyBool(PROP_CLOSABLE);
+  }
+
+  @Override
+  public void setClosable(boolean closable) {
+    propertySupport.setPropertyBool(PROP_CLOSABLE, closable);
+  }
+
+  @Override
+  public boolean isSaveNeededVisible() {
+    return propertySupport.getPropertyBool(PROP_SAVE_NEEDED_VISIBLE);
+  }
+
+  @Override
+  public void setSaveNeededVisible(boolean saveNeededVisible) {
+    propertySupport.setPropertyBool(PROP_SAVE_NEEDED_VISIBLE, saveNeededVisible);
+  }
+
+  @Override
+  public IMultiStatus getStatus() {
+    final IMultiStatus ms = getStatusInternal();
+    return (ms == null) ? null : new MultiStatus(ms);
+  }
+
+  /**
+   * @return the live error status
+   */
+  protected MultiStatus getStatusInternal() {
+    return (MultiStatus) propertySupport.getProperty(PROP_STATUS);
+  }
+
+  @Override
+  public void setStatus(IMultiStatus status) {
+    setStatusInternal(new MultiStatus(status));
+  }
+
+  protected void setStatusInternal(MultiStatus status) {
+    propertySupport.setProperty(PROP_STATUS, status);
+  }
+
+  @Override
+  public void clearStatus() {
+    propertySupport.setProperty(PROP_STATUS, null);
+  }
+
+  /**
+   * Adds an error status
+   */
+  @Override
+  public void addStatus(IStatus newStatus) {
+    final MultiStatus status = ensureMultiStatus(getStatusInternal());
+    // Create a copy, otherwise no PropertyChange event is fired
+    final MultiStatus copy = new MultiStatus(status);
+    copy.add(newStatus);
+    setStatus(copy);
+  }
+
+  @Override
+  public void removeStatus(IStatus status) {
+    final MultiStatus ms = getStatusInternal();
+    if (ms != null && ms.containsStatus(status)) {
+      // Create a copy, otherwise no PropertyChange event is fired
+      final MultiStatus copy = new MultiStatus(ms);
+      copy.removeAll(status);
+      if (copy.getChildren().isEmpty()) {
+        clearStatus();
+      }
+      else {
+        setStatusInternal(copy);
+      }
+    }
+  }
+
+  private MultiStatus ensureMultiStatus(IStatus s) {
+    if (s instanceof MultiStatus) {
+      return (MultiStatus) s;
+    }
+    final MultiStatus ms = new MultiStatus();
+    if (s != null) {
+      ms.add(s);
+    }
+    return ms;
   }
 
   /**
@@ -1555,6 +1687,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   protected void initFormInternal() {
+    calculateSaveNeeded();
   }
 
   @Override
@@ -2025,6 +2158,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
     };
     visitFields(v);
+    calculateSaveNeeded();
   }
 
   private boolean/* ok */ checkForVerifyingFields() {
@@ -2088,9 +2222,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     getRootGroupBox().touch();
   }
 
+  protected void calculateSaveNeeded() {
+    propertySupport.setPropertyBool(PROP_SAVE_NEEDED, interceptIsSaveNeeded());
+  }
+
   @Override
   public boolean isSaveNeeded() {
-    return getRootGroupBox().isSaveNeeded();
+    return propertySupport.getPropertyBool(PROP_SAVE_NEEDED);
   }
 
   @Override
@@ -2881,7 +3019,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (IFormField.PROP_SAVE_NEEDED.equals(e.getPropertyName())) {
-        propertySupport.firePropertyChange(PROP_SAVE_NEEDED, e.getOldValue(), e.getNewValue());
+        calculateSaveNeeded();
+//        propertySupport.firePropertyChange(PROP_SAVE_NEEDED, e.getOldValue(), e.getNewValue());
       }
       else if (IFormField.PROP_EMPTY.equals(e.getPropertyName())) {
         propertySupport.firePropertyChange(PROP_EMPTY, e.getOldValue(), e.getNewValue());
@@ -3020,6 +3159,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     @Override
+    public boolean execIsSaveNeeded(IsSaveNeededFieldsChain chain) {
+      return getOwner().execIsSaveNeeded();
+    }
+
+    @Override
     public boolean execCheckFields(FormCheckFieldsChain chain) {
       return getOwner().execCheckFields();
     }
@@ -3096,6 +3240,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
     FormStoredChain chain = new FormStoredChain(extensions);
     chain.execStored();
+  }
+
+  protected final boolean interceptIsSaveNeeded() {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    IsSaveNeededFieldsChain chain = new IsSaveNeededFieldsChain(extensions);
+    return chain.execIsSaveNeeded();
   }
 
   protected final boolean interceptCheckFields() {

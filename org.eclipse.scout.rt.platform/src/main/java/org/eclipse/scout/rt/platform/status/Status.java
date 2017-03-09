@@ -31,6 +31,8 @@ public class Status implements IStatus, Serializable {
   private int m_severity;
   private final String m_message;
   private int m_code;
+  private String m_iconId;
+  private double m_order;
 
   /**
    * @param severity
@@ -71,6 +73,13 @@ public class Status implements IStatus, Serializable {
     m_severity = severity;
     m_message = message;
     m_code = code;
+    // parse order
+    Class<?> clazz = getClass();
+    while (clazz.getAnnotation(Order.class) == null) {
+      clazz = clazz.getSuperclass();
+    }
+    m_order = clazz.getAnnotation(Order.class).value();
+
   }
 
   /**
@@ -97,6 +106,34 @@ public class Status implements IStatus, Serializable {
   @Override
   public String getMessage() {
     return StringUtility.emptyIfNull(m_message);
+  }
+
+  @Override
+  public String getIconId() {
+    return m_iconId;
+  }
+
+  public void setIconId(String iconId) {
+    m_iconId = iconId;
+  }
+
+  @Override
+  public int getCode() {
+    return m_code;
+  }
+
+  public void setCode(int code) {
+    m_code = code;
+  }
+
+  @Override
+  public boolean isOK() {
+    return getSeverity() == OK;
+  }
+
+  @Override
+  public double getOrder() {
+    return m_order;
   }
 
   @Override
@@ -152,7 +189,12 @@ public class Status implements IStatus, Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + m_code;
+    result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
     result = prime * result + ((m_message == null) ? 0 : m_message.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(m_order);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
     result = prime * result + m_severity;
     return result;
   }
@@ -169,6 +211,17 @@ public class Status implements IStatus, Serializable {
       return false;
     }
     Status other = (Status) obj;
+    if (m_code != other.m_code) {
+      return false;
+    }
+    if (m_iconId == null) {
+      if (other.m_iconId != null) {
+        return false;
+      }
+    }
+    else if (!m_iconId.equals(other.m_iconId)) {
+      return false;
+    }
     if (m_message == null) {
       if (other.m_message != null) {
         return false;
@@ -177,36 +230,13 @@ public class Status implements IStatus, Serializable {
     else if (!m_message.equals(other.m_message)) {
       return false;
     }
+    if (Double.doubleToLongBits(m_order) != Double.doubleToLongBits(other.m_order)) {
+      return false;
+    }
     if (m_severity != other.m_severity) {
       return false;
     }
-    if (getOrder() != other.getOrder()) {
-      return false;
-    }
     return true;
-  }
-
-  @Override
-  public int getCode() {
-    return m_code;
-  }
-
-  public void setCode(int code) {
-    m_code = code;
-  }
-
-  @Override
-  public boolean isOK() {
-    return getSeverity() == OK;
-  }
-
-  @Override
-  public double getOrder() {
-    Class<?> clazz = getClass();
-    while (clazz.getAnnotation(Order.class) == null) {
-      clazz = clazz.getSuperclass();
-    }
-    return clazz.getAnnotation(Order.class).value();
   }
 
 }

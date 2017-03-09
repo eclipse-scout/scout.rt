@@ -115,9 +115,6 @@ scout.Session.JsonResponseError = {
  *   [focusManagerActive]
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
- *   [formTabClosable]
- *     Optional, default is false. True to show a close button in the view tabs on
- *     the desktop if the form is closable (has a close or cancel button).
  *   [showTreeIcons]
  *     Optional, default is false. Whether or not tree and outline show the icon
  *     which is defined by the iconId property. Until Scout 6.1 trees did not have
@@ -168,7 +165,6 @@ scout.Session.prototype.init = function(model) {
     active: options.focusManagerActive
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
-
   this.formTabClosable = scout.nvl(options.formTabClosable, false);
   this.showTreeIcons = scout.nvl(options.showTreeIcons, false); // TODO [awe] 6.2: set to true by default
 };

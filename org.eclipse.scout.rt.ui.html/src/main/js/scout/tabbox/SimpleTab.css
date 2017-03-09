@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.desktop-view-tab {
+.simple-tab {
   position: relative;
   display: inline-block;
   /* 1px smaller than the header because of the bottom border (see .selected rule below) */
@@ -46,45 +46,36 @@
     height: 100%;
 
   }
-  &.dirty{
-    >.dirtyer {
-      display: block;
-      position: absolute;
-      right: 0px;
-      top: 0;
-      padding: 5px;
-      margin-right: 5px;
-      margin-top: 5px;
+  .status-container {
+   float:right;
 
-    }
-    &.closable{
-      &.selected{
-        >.dirtyer{
-          right: 20px;
-        }
-         padding-right: 50px;
-      }
+   >.status{
+     vertical-align: middle;
+     display: inline-block;
+     margin-left: 5px;
 
-    }
-    padding-right: 30px;
+     &.closer{
+       margin-left: 7px;
+     }
+   }
+
+  }
+  > .title{
+   overflow: hidden;
+   width: auto
   }
   &.closable{
-    > .closer {
+     .closer {
       display: none;
-      position: absolute;
-      right: 0;
-      top: 0;
-      padding: 5px;
-      margin-right: 5px;
-      margin-top: 5px;
+
     }
     &.selected {
-      > .closer{
-        display: block;
+      .closer{
+        display: inline-block;
       }
-      padding-right: 30px;
     }
   }
+
 
   &.animate-modality-highlight {
     #scout.animation-flash-gray();
@@ -93,7 +84,6 @@
   & > .icon {
     float: right;
     margin-left: 5px;
-    margin-right: -5px;
   }
 
   & > .title {
@@ -109,7 +99,7 @@
 
 /* key boxes */
 
-.desktop-view-tab .key-box {
+.simple-tab .key-box {
   bottom: 4px;
 
   &.disabled {

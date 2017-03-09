@@ -490,6 +490,38 @@ $.fn.appendTextNode = function(text) {
   return $(this.document(true).createTextNode(text)).appendTo(this);
 };
 
+$.fn.appendIcon = function(iconId, cssClass) {
+  if (!iconId) {
+    return this.appendImg(undefined, cssClass);
+  }
+  var icon, $icon;
+  icon = scout.icons.parseIconId(iconId);
+  if (icon.isFontIcon()) {
+    $icon = this.makeSpan(cssClass, icon.iconCharacter)
+      .addClass(icon.appendCssClass('font-icon'))
+      .addClass('icon')
+      .appendTo(this);
+    return $icon;
+  } else {
+    $icon = this.appendImg( icon.iconUrl, cssClass)
+      .addClass('icon');
+    return $icon;
+  }
+};
+
+$.fn.appendImg = function(iconUrl, cssClass) {
+    var $icon = this.append('<img>');
+    if(iconUrl){
+      $icon.attr('src', iconUrl);
+    }
+    if(cssClass){
+      $icon.addClass(cssClass);
+    }
+    return $icon;
+};
+
+
+
 $.fn.makeSVG = function(type, cssClass, text, id) {
   var myDocument = this.document(true);
   if (myDocument === undefined || type === undefined) {
