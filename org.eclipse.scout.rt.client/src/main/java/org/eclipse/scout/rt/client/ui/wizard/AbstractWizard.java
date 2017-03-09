@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -191,7 +192,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   protected void execStart() {
     List<IWizardStep<? extends IForm>> steps = getAvailableSteps();
     setSteps(steps);
-    if (steps.size() > 0) {
+    if (!steps.isEmpty()) {
       activateStep(steps.get(0));
     }
   }
@@ -646,43 +647,68 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void activateStep(IWizardStep<? extends IForm> step, boolean jumpForward, boolean jumpBackward) {
-    if (m_activeStep != step) {
+  public void activateStep(IWizardStep<? extends IForm> targetStep, boolean jumpForward, boolean jumpBackward) {
+    if (m_activeStep == targetStep) {
+      return;
+    }
+
+    List<IWizardStep<? extends IForm>> steps;
+    int kind = getStepKind(m_activeStep, targetStep);
+    boolean skipIntermediateSteps = (kind == IWizardStep.STEP_NEXT && jumpForward) || (kind == IWizardStep.STEP_PREVIOUS && jumpBackward);
+    if (!skipIntermediateSteps) {
+      // gather intermediate steps; returned list contains at least target step that may be null
+      steps = getStepSpan(m_activeStep, false, targetStep, true);
+    }
+    else {
+      steps = Collections.<IWizardStep<? extends IForm>> singletonList(targetStep);
+    }
+
+    try {
+      for (IWizardStep<? extends IForm> step : steps) {
+        activateStepInternal(step, kind);
+      }
+    }
+    finally {
+      refreshButtonPolicy();
+      fireStateChanged();
+    }
+  }
+
+  protected void activateStepInternal(IWizardStep<? extends IForm> step, int kind) {
+    // deactivate
+    if (m_activeStep != null) {
+      // if this call veto, m_activeStep is still set with an active valid step
+      m_activeStep.deactivate(kind);
+    }
+    // activate
+    IWizardStep<? extends IForm> lastStep = m_activeStep;
+    m_activeStep = step;
+    if (m_activeStep != null) {
+      // if this call veto, m_activeStep is invalid and we have to go to the last step and reactivate it
       try {
-        int kind = getStepKind(m_activeStep, step);
-        // old target
-        if (m_activeStep != null) {
-          // this call may veto
-          m_activeStep.deactivate(kind);
-        }
-        // in-between targets
-        List<IWizardStep<? extends IForm>> intermediateSteps = getStepSpan(m_activeStep, false, step, false);
-        if (!intermediateSteps.isEmpty()
-            && ((kind == IWizardStep.STEP_NEXT && !jumpForward) || (kind == IWizardStep.STEP_PREVIOUS && !jumpBackward))) {
-          for (IWizardStep<? extends IForm> intermediateStep : intermediateSteps) {
-            // these calls may veto
-            intermediateStep.activate(kind);
-            intermediateStep.deactivate(kind);
+        m_activeStep.activate(kind);
+      }
+      catch (RuntimeException e) {
+        m_activeStep = lastStep;
+        if (lastStep != null) {
+          try {
+            // if this activate throws again an exception, then m_activeStep is not active but has least a step that was active during activation process
+            int stepKindInverted = kind == IWizardStep.STEP_NEXT ? IWizardStep.STEP_PREVIOUS : IWizardStep.STEP_NEXT;
+            lastStep.activate(stepKindInverted);
+          }
+          catch (RuntimeException innerException) {
+            BEANS.get(ExceptionHandler.class).handle(innerException);
           }
         }
-        // new target
-        m_activeStep = step;
-        if (m_activeStep != null) {
-          // this call may veto
-          m_activeStep.activate(kind);
-        }
-        // notify callback
-        try {
-          interceptActiveStepChanged();
-        }
-        catch (RuntimeException | PlatformError e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
-        }
+        throw e;
       }
-      finally {
-        refreshButtonPolicy();
-        fireStateChanged();
-      }
+    }
+    // notify callback for each step changed
+    try {
+      interceptActiveStepChanged();
+    }
+    catch (RuntimeException | PlatformError e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -721,80 +747,24 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public List<IWizardStep<? extends IForm>> getStepSpan(IWizardStep<? extends IForm> from, boolean includeFrom, IWizardStep<? extends IForm> to, boolean includeTo) {
     ArrayList<IWizardStep<? extends IForm>> list = new ArrayList<IWizardStep<? extends IForm>>();
-    //
-    if (from == null && to == null) {
-      return list;
-    }
-    if (from == null) {
-      if (includeTo) {
-        list.add(to);
-      }
-      return list;
-    }
-    if (to == null) {
-      if (includeFrom) {
-        list.add(from);
-      }
-      return list;
-    }
-    int fromIndex = getStepIndex(from);
-    int toIndex = getStepIndex(to);
-    if (fromIndex == toIndex) {
-      if (includeFrom) {
-        list.add(from);
-      }
-      else if (includeTo) {
-        list.add(to);
-      }
-      return list;
-    }
-    if (fromIndex == toIndex - 1) {
-      if (includeFrom) {
-        list.add(from);
-      }
-      if (includeTo) {
-        list.add(to);
-      }
-      return list;
-    }
-    if (fromIndex < toIndex - 1) {
-      if (includeFrom) {
-        list.add(from);
-      }
-      int n = toIndex - fromIndex - 1;
-      for (int i = 0; i < n; i++) {
-        list.add(m_stepList.get(fromIndex + 1 + i));
-      }
-      if (includeTo) {
-        list.add(to);
-      }
-      return list;
-    }
-    if (fromIndex == toIndex + 1) {
-      if (includeFrom) {
-        list.add(from);
-      }
-      if (includeTo) {
-        list.add(to);
-      }
-      return list;
-    }
-    if (fromIndex > toIndex + 1) {
-      if (includeFrom) {
-        list.add(from);
-      }
-      int n = fromIndex - toIndex - 1;
-      for (int i = 0; i < n; i++) {
-        list.add(m_stepList.get(fromIndex - 1 - i));
-      }
-      if (includeTo) {
-        list.add(to);
-      }
-      return list;
-    }
-    // default
     if (includeFrom) {
       list.add(from);
+    }
+    if (from != null && to != null) {
+      int fromIndex = getStepIndex(from);
+      int toIndex = getStepIndex(to);
+      if (fromIndex < toIndex - 1) {
+        int n = toIndex - fromIndex - 1;
+        for (int i = 0; i < n; i++) {
+          list.add(m_stepList.get(fromIndex + 1 + i));
+        }
+      }
+      if (fromIndex > toIndex + 1) {
+        int n = fromIndex - toIndex - 1;
+        for (int i = 0; i < n; i++) {
+          list.add(m_stepList.get(fromIndex - 1 - i));
+        }
+      }
     }
     if (includeTo) {
       list.add(to);

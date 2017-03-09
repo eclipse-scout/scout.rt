@@ -187,7 +187,17 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   /**
    * Convenience method
    *
-   * @return an array of all steps between from and to
+   * @param from
+   *          step
+   * @param includeFrom
+   *          if and only if this is true, the list begins with the <tt>from</tt> step, regardless <tt>from</tt> is null
+   *          or not
+   * @param to
+   *          step
+   * @param includeTo
+   *          if and only if this is true, the list ends with the <tt>to</tt> step, regardless <tt>to</tt> is null or
+   *          not
+   * @return a new non null list of all steps between <tt>from</tt> and <tt>to</tt> step.
    */
   List<IWizardStep<? extends IForm>> getStepSpan(IWizardStep<? extends IForm> from, boolean includeFrom, IWizardStep<? extends IForm> to, boolean includeTo);
 
