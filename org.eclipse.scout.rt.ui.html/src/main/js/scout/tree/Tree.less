@@ -42,10 +42,10 @@
   overflow: hidden;
   width: 100%; /* expand to outer container, needed for breadcrumb */
 
-  &.scrollable-tree > .tree-node {
+  /* required because text shouldn't go into ellipsis mode when scrollbars are enabled */
+  &.scrollable-tree > .tree-node > .text {
     overflow: visible;
     text-overflow: initial;
-    white-space: normal;
   }
 }
 
@@ -84,6 +84,7 @@
 
   & > .text {
     display: inline-block;
+    width: 100%; /* required for ellipsis */
     #scout.overflow-ellipsis-nowrap();
   }
 
@@ -94,11 +95,15 @@
 
     &:not(.font-icon) {
       margin-top: -2px;
+      /* required to reserve space for bitmap icons in the tree when image resource is not yet loaded */
+      min-width: @tree-node-bitmap-icon-size;
+      min-height: @tree-node-bitmap-icon-size;
     }
 
     &.font-icon {
       /* add a bit of extra space so font icon is better aligned with text */
       padding-top: 1px;
+      padding-right: 10px;
     }
   }
 }
@@ -231,7 +236,7 @@
       &.ancestor-of-selected::before,
       &.ancestor-of-selected::after,
       &.selected::before,
-      &.selected::after{
+      &.selected::after {
         position: absolute;
         left: 50%;
         margin-left: -13px;

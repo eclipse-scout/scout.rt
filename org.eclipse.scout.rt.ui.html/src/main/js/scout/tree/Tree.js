@@ -412,6 +412,7 @@ scout.Tree.prototype._rerenderViewport = function() {
   this._removeRenderedNodes();
   this._renderFiller();
   this._updateDomNodeWidth();
+  this._updateDomNodeIconWidth();
   this._renderViewport();
 };
 
@@ -615,7 +616,36 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
 scout.Tree.prototype._postRenderViewRange = function() {
   this._renderFiller();
   this._updateDomNodeWidth();
+  this._updateDomNodeIconWidth();
   this._renderSelection();
+};
+
+/**
+ * The handling of the icon-size here depends on two assumptions:
+ *
+ * 1. font icons are always pre-loaded on application startup. This means outerWidth() will always return the correct
+ *    size of the icon at any time.
+ *
+ * 2. bitmap icons are not pre-loaded. This means, when the icon is shown, the size can be unknown because the
+ *    browser has not yet loaded the image resource. Because of that outerWidth() could not return the correct size
+ *    and also layout would have trouble. Because in a tree all icons should have the same size, we simply define
+ *    the min-width and min-height of bitmap icons by CSS. So we always have a proper value when we read the icon
+ *    size. We don't support the case where the same tree has bitmap icons in different sizes. When someone needs
+ *    larger icons, one could simple change the global constant @tree-node-bitmap-icon-size to change the icon size
+ *    for all trees, or set a CSS rule/class when only a single tree must have a different icon size.
+ */
+scout.Tree.prototype._updateDomNodeIconWidth = function($nodes) {
+  if (!this.rendered) {
+    return;
+  }
+  var i, node, cssWidth = '';
+  for (i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+    node = this.visibleNodesFlat[i];
+    if (node.iconId) {
+      cssWidth = 'calc(100% - '+ node.$icon().outerWidth() + 'px)';
+    }
+    node.$text.css('width', cssWidth);
+  }
 };
 
 scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
