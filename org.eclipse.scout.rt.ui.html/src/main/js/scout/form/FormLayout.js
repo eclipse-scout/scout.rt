@@ -50,6 +50,6 @@ scout.FormLayout.prototype._htmlRootGroupBox = function() {
 };
 
 scout.FormLayout.prototype._titleHeight = function() {
-  var $titleBox = this._form.$container.children('.title-box');
+  var $titleBox = this._form.$container.children('.header');
   return scout.graphics.prefSize($titleBox, true).height;
 };
