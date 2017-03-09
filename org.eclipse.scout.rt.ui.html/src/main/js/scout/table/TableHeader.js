@@ -209,7 +209,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
       }
 
       var origColumnWidth = columnWidth;
-      columnWidth = Math.max(columnWidth - adjustment, column.minWidth - adjustment);
+      columnWidth = Math.max(columnWidth - adjustment, column.minWidth);
       this.$filler.cssWidth(origColumnWidth - columnWidth);
     }
   }

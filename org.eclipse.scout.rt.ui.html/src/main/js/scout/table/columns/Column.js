@@ -33,7 +33,7 @@ scout.Column = function() {
   this.textBased = true;
 };
 
-scout.Column.DEFAULT_MIN_WIDTH = 50;
+scout.Column.DEFAULT_MIN_WIDTH = 60;
 scout.Column.NARROW_MIN_WIDTH = 32; // for columns without text (icon, check box)
 
 scout.Column.prototype.init = function(model) {
