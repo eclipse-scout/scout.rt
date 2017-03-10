@@ -91,7 +91,7 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
    * Compares the two strings {@code s1} and {@code s2} as {@link Long}s if possible. If not, a string comparison is
    * done.
    */
-  private int compareAsLongs(String s1, String s2) {
+  protected int compareAsLongs(String s1, String s2) {
     int result = 0;
     try {
       Long n1 = Long.parseLong(s1);
@@ -108,14 +108,14 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
   /**
    * Compares the two strings {@code s1} and {@code s2}.
    */
-  private int compareAsStrings(String s1, String s2) {
-    return (isIgnoreCase() ? s1.compareToIgnoreCase(s2) : s1.compareTo(s2));
+  protected int compareAsStrings(String s1, String s2) {
+    return (isIgnoreCase() ? StringUtility.compareIgnoreCase(s1, s2) : StringUtility.compare(s1, s2));
   }
 
   /**
    * Compares the {@link Matcher}s {@code m1} and {@code m2} by checking if ends have been hit.
    */
-  private int compareFound(boolean f1, boolean f2) {
+  protected int compareFound(boolean f1, boolean f2) {
     if (!f1 && f2) {
       // s1 has more parts
       return -1;
