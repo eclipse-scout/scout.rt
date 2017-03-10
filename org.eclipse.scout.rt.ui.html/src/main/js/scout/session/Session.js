@@ -865,8 +865,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
   if (offline) {
     if (this.ready) {
       this.goOffline();
-      if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
-        this._queuedRequest = this._newRequest();
+      if (request && !request.pollForBackgroundJobs && !this._retryRequest) {
         this._retryRequest = request;
       }
       return;
@@ -1220,10 +1219,10 @@ scout.Session.prototype._onCancelProcessing = function(event) {
 };
 
 scout.Session.prototype._sendCancelRequest = function() {
-  this._sendRequest({
-    uiSessionId: this.uiSessionId,
+  var request = this._newRequest({
     cancel: true
   });
+  this._sendRequest(request);
 };
 
 /**
@@ -1260,17 +1259,15 @@ scout.Session.prototype.sendLogRequest = function(message) {
 };
 
 scout.Session.prototype._newRequest = function(requestData) {
-  var request = {
+  var request = $.extend({
     uiSessionId: this.uiSessionId
-  };
+  }, requestData);
 
   // Poll and log requests do not require a sequence number
-  var requiresSequenceNo = !(requestData && (requestData.pollForBackgroundJobs || requestData.log));
-  if (requiresSequenceNo) {
+  if (!request.pollForBackgroundJobs && !request.log && !request.cancel) {
     request['#'] = this.requestSequenceNo++;
   }
-
-  return $.extend(request, requestData);
+  return request;
 };
 
 scout.Session.prototype._setApplicationLoading = function(applicationLoading) {

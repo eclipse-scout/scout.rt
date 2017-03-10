@@ -98,6 +98,25 @@ public final class JsonObjectUtility {
   }
 
   /**
+   * Like {@link JSONObject#optLong(String)}, but returns <code>null</code> if the property does not exist (the other
+   * method can only return primitives).
+   */
+  public static Long optLong(JSONObject json, String propertyName) {
+    if (json == null || propertyName == null) {
+      return null;
+    }
+    long value = json.optLong(propertyName, -1);
+    if (value == -1) {
+      // Check if the value is really -1
+      long value2 = json.optLong(propertyName, -2);
+      if (value2 == -2) {
+        return null;
+      }
+    }
+    return value;
+  }
+
+  /**
    * Returns the given JSON object as formatted string with indent 2. <code>null</code> is returned as
    * <code>"null"</code>.
    */

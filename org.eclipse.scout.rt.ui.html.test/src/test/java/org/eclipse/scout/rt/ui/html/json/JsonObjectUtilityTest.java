@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -59,5 +60,29 @@ public class JsonObjectUtilityTest {
     assertEquals(12345, b.opt("value"));
     assertEquals(Boolean.TRUE, b.opt("existing"));
     assertEquals(null, b.opt("undefined"));
+  }
+
+  @Test
+  public void testOptLong() {
+    JSONObject json = new JSONObject();
+    json.put("test", "Test-String");
+    json.put("value", 12345);
+    json.put("zero", 0);
+    json.put("neg", -1);
+    json.put("fracValue", 1.9);
+    json.put("existing", true);
+
+    // should not throw exception
+    assertNull(JsonObjectUtility.optLong(null, null));
+    assertNull(JsonObjectUtility.optLong(json, null));
+    assertNull(JsonObjectUtility.optLong(null, "test"));
+
+    assertNull(JsonObjectUtility.optLong(json, "test"));
+    assertNull(JsonObjectUtility.optLong(json, "xyz"));
+    assertNull(JsonObjectUtility.optLong(json, "existing"));
+    assertEquals((Long) 12345L, JsonObjectUtility.optLong(json, "value"));
+    assertEquals((Long) 0L, JsonObjectUtility.optLong(json, "zero"));
+    assertEquals((Long) (-1L), JsonObjectUtility.optLong(json, "neg"));
+    assertEquals((Long) 1L, JsonObjectUtility.optLong(json, "fracValue")); // cut off by cast
   }
 }

@@ -122,29 +122,17 @@ public class JsonRequest {
   }
 
   /**
-   * Use this method in place of {@link JSONObject#getLong(String)} because optLong() cannot only return primitives and
-   * opt() does not parse the number correctly.
-   *
-   * @param propertyName
-   * @return
-   */
-  protected Long getLong(String propertyName) {
-    long value = m_request.optLong(propertyName, -1);
-    return value == -1 ? null : value;
-  }
-
-  /**
    * @return The acknowledged response sequence number
    */
   public Long getAckResponseSequenceNo() {
-    return this.getLong(PROP_ACK_RESPONSE_SEQUENCE_NO);
+    return JsonObjectUtility.optLong(m_request, PROP_ACK_RESPONSE_SEQUENCE_NO);
   }
 
   /**
    * @return The sequence number of this request
    */
   public Long getRequestSequenceNo() {
-    return this.getLong(PROP_REQUEST_SEQUENCE_NO);
+    return JsonObjectUtility.optLong(m_request, PROP_REQUEST_SEQUENCE_NO);
   }
 
   @Override
