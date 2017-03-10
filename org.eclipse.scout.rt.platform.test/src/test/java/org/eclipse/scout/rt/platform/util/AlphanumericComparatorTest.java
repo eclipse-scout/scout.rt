@@ -94,7 +94,7 @@ public class AlphanumericComparatorTest {
     String s2 = "doc9.txt";
     assertTrue("'doc9.doc' < 'doc9.txt'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
   }
-  
+
   @Test
   public void testCompareFoundSecondLower() {
     String s1 = "doc10";
@@ -121,6 +121,21 @@ public class AlphanumericComparatorTest {
     String s1 = "doc9.txt";
     String s2 = "myfile.txt";
     assertTrue("'doc9.txt' < 'myfile.txt'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
+  }
+
+  @Test
+  public void testCompareUmlaute() {
+    String s1 = "a";
+    String s2 = "b";
+    assertTrue("'a' < 'b'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
+
+    s1 = "ä";
+    s2 = "b";
+    assertTrue("'ä' < 'b'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
+
+    s1 = "Bärtschi";
+    s2 = "Bucher";
+    assertTrue("'Bärtschi' < 'Bucher'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
   }
 
   private void assertConsistentWithEquals(String s1, String s2) {

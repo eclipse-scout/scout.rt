@@ -1751,20 +1751,33 @@ public final class StringUtility {
   }
 
   /**
-   * compare two strings using a locale-dependent {@link Collator}
-   *
-   * @see CollatorProvider
+   * @see #compare(int, Locale, String, String)
    */
   public static int compareIgnoreCase(String a, String b) {
     return compareIgnoreCase(NlsLocale.get(), a, b);
   }
 
   /**
-   * compare two strings using a locale-dependent {@link Collator}
-   *
-   * @see CollatorProvider
+   * @see #compare(int, Locale, String, String)
    */
   public static int compareIgnoreCase(Locale locale, String a, String b) {
+    return compare(Collator.SECONDARY, locale, a, b);
+  }
+
+  /**
+   * @see #compare(int, Locale, String, String)
+   */
+  public static int compare(String a, String b) {
+    return compare(Collator.TERTIARY, NlsLocale.get(), a, b);
+  }
+
+  /**
+   * compare two strings using a locale-dependent {@link Collator} with the provided strength.
+   *
+   * @see CollatorProvider
+   * @see Collator#setStrength(int)
+   */
+  public static int compare(int strength, Locale locale, String a, String b) {
     if (a != null && a.length() == 0) {
       a = null;
     }
@@ -1782,7 +1795,7 @@ public final class StringUtility {
       return 1;
     }
     Collator collator = BEANS.get(CollatorProvider.class).getInstance(locale);
-    collator.setStrength(Collator.SECONDARY);
+    collator.setStrength(strength);
     return collator.compare(a, b);
   }
 
@@ -1804,9 +1817,7 @@ public final class StringUtility {
    * </p>
    * <p>
    * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
-   * </small>
-   * </p>
-   *
+   * </small> </p
    */
   public static boolean contains(String s, String regex) {
     if (s == null || regex == null) {
