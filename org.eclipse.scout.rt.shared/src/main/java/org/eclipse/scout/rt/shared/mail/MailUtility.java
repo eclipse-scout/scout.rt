@@ -227,13 +227,13 @@ public final class MailUtility {
     try {
       part.getContent();
     }
-    catch (NullPointerException e1) {
-      LOG.info("Mail part seems to use an unsupported character set {}, use UTF-8 as fallback.", charset, e1);
+    catch (NullPointerException e) { // NOSONAR
+      LOG.info("Mail part seems to use an unsupported character set {}, use UTF-8 as fallback.", charset, e);
       part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
     }
-    catch (IOException e1) {
+    catch (IOException e) {
       // ignore exception itself (use trace log)
-      LOG.trace("checkValidCharset: IOException has occured.", e1);
+      LOG.trace("checkValidCharset: IOException has occured.", e);
     }
   }
 
