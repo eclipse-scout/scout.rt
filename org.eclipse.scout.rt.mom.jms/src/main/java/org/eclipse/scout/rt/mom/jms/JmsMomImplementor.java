@@ -157,7 +157,9 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected void initRequestReplyMessaging(final Map<Object, Object> properties) throws JMSException {
-    m_requestReplyEnabled = BooleanUtility.nvl(TypeCastUtility.castValue(properties.get(REQUEST_REPLY_ENABLED), Boolean.class), true);
+    m_requestReplyEnabled = BooleanUtility.nvl(
+        TypeCastUtility.castValue(properties.get(REQUEST_REPLY_ENABLED), Boolean.class),
+        CONFIG.getPropertyValue(RequestReplyEnabledProperty.class));
     if (!m_requestReplyEnabled) {
       LOG.info("{}: 'request-reply' messaging is disabled", m_symbolicName);
       return;

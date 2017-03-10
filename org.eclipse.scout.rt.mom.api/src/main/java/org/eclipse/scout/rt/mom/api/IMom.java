@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -206,6 +207,25 @@ public interface IMom {
     @Override
     protected Class<? extends IMarshaller> getDefaultValue() {
       return JsonMarshaller.class;
+    }
+  }
+
+  /**
+   * Specifies if 'request-reply' messaging is enabled by default. This value can also be configured individually per
+   * MOM (see {@link IMomImplementor#REQUEST_REPLY_ENABLED}).
+   * <p>
+   * The default value is <code>true</code>.
+   */
+  class RequestReplyEnabledProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.mom.requestreply.enabled";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return Boolean.TRUE;
     }
   }
 
