@@ -713,4 +713,17 @@ public class StringUtilityTest {
     assertTrue(StringUtility.matches("a\nbc", ".*b.*", Pattern.DOTALL));
     assertTrue(StringUtility.matches("Der weisse Hai", ".*AI", Pattern.CASE_INSENSITIVE));
   }
+
+  @Test
+  public void testCompareIgnoreCase() {
+    assertTrue(StringUtility.compareIgnoreCase("a", "a") == 0);
+    assertTrue(StringUtility.compareIgnoreCase("a", "A") == 0);
+    assertFalse(StringUtility.compareIgnoreCase("a", "ä") == 0);
+    assertFalse(StringUtility.compareIgnoreCase("a", "b") == 0);
+
+    assertTrue(StringUtility.compare("a", "a") == 0);
+    assertFalse(StringUtility.compare("a", "A") == 0);
+    assertFalse(StringUtility.compare("a", "ä") == 0);
+    assertFalse(StringUtility.compare("a", "b") == 0);
+  }
 }
