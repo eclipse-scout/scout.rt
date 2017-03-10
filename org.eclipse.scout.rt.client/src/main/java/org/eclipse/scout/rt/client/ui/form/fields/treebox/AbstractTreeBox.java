@@ -1131,11 +1131,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   public class DefaultTreeBoxTree extends AbstractTree {
 
     @Override
-    protected boolean getConfiguredMultiSelect() {
-      return false;
-    }
-
-    @Override
     protected boolean getConfiguredCheckable() {
       return true;
     }

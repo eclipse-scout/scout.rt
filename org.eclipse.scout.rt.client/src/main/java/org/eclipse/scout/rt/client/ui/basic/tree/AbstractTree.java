@@ -225,8 +225,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * TODO [7.0] rmu: make final
+   *
+   * @deprecated Multiselection in trees is not supported by the UI.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(40)
+  @Deprecated
   protected boolean getConfiguredMultiSelect() {
     return false;
   }

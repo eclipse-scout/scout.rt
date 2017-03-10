@@ -313,11 +313,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   public class Tree extends AbstractTree {
 
     @Override
-    protected boolean getConfiguredMultiSelect() {
-      return true;
-    }
-
-    @Override
     protected boolean getConfiguredDragEnabled() {
       return true;
     }
@@ -586,11 +581,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TreeMenuType.SingleSelection, TreeMenuType.MultiSelection);
-      }
-
-      @Override
       protected void execInitAction() {
         setVisiblePermission(getDeletePermission());
         setEnabled(!isProtected());
@@ -841,11 +831,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       @Override
       protected String getConfiguredKeyStroke() {
         return "delete";
-      }
-
-      @Override
-      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TreeMenuType.SingleSelection, TreeMenuType.MultiSelection);
       }
 
       @Override
