@@ -510,12 +510,9 @@ $.fn.appendIcon = function(iconId, cssClass) {
 };
 
 $.fn.appendImg = function(iconUrl, cssClass) {
-    var $icon = this.append('<img>');
+    var $icon = this.appendElement('<img>', cssClass);
     if(iconUrl){
       $icon.attr('src', iconUrl);
-    }
-    if(cssClass){
-      $icon.addClass(cssClass);
     }
     return $icon;
 };
