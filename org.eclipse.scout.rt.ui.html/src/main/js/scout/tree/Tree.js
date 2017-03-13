@@ -371,8 +371,8 @@ scout.Tree.prototype._onDataScroll = function() {
 
 scout.Tree.prototype.setScrollTop = function(scrollTop) {
   this.setProperty('scrollTop', scrollTop);
-//call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  if(this.rendered){
+  // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+  if (this.rendered) {
     this._renderViewport();
   }
 };
@@ -383,7 +383,7 @@ scout.Tree.prototype._renderScrollTop = function() {
 
 scout.Tree.prototype._renderViewport = function() {
   if (this.runningAnimations > 0 || this._renderViewportBlocked) {
-    //animation pending do not render view port because finishing should rerenderViewport
+    // animation pending do not render view port because finishing should rerenderViewport
     return;
   }
   var viewRange = this._calculateCurrentViewRange();
@@ -635,17 +635,22 @@ scout.Tree.prototype._postRenderViewRange = function() {
  *    for all trees, or set a CSS rule/class when only a single tree must have a different icon size.
  */
 scout.Tree.prototype._updateDomNodeIconWidth = function($nodes) {
-  if (!this.rendered) {
+  if (!this.rendered && !this.rendering) {
     return;
   }
-  var i, node, cssWidth = '';
-  for (i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
-    node = this.visibleNodesFlat[i];
+  this._visibleNodesInViewRange().forEach(function(node) {
+    var cssWidth = '';
     if (node.iconId) {
-      cssWidth = 'calc(100% - '+ node.$icon().outerWidth() + 'px)';
+      // always add 1 pixel to the result of outer-width to prevent rendering errors in IE, where
+      // the complete text is replaced by an ellipsis, when the .text element is a bit too large
+      cssWidth = 'calc(100% - '+ (node.$icon().outerWidth() + 1) + 'px)';
     }
     node.$text.css('width', cssWidth);
-  }
+  });
+};
+
+scout.Tree.prototype._visibleNodesInViewRange = function() {
+  return this.visibleNodesFlat.slice(this.viewRangeRendered.from, this.viewRangeRendered.to);
 };
 
 scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
@@ -653,10 +658,16 @@ scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
     return;
   }
   if (this.rendered && this.nodeWidthDirty) {
-    for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
-      this.maxNodeWidth = Math.max(this.visibleNodesFlat[i].width, this.maxNodeWidth);
-    }
-    this.$data.find('.tree-node').css('width', this.maxNodeWidth);
+    var nodes = this._visibleNodesInViewRange(),
+      maxNodeWidth = this.maxNodeWidth;
+    // find max-width
+    maxNodeWidth = nodes.reduce(function(aggr, node) {
+      return Math.max(node.width, aggr);
+    }, scout.nvl(maxNodeWidth, 0));
+    // set max width on all nodes
+    nodes.forEach(function(node) {
+      node.$node.cssWidth(maxNodeWidth);
+    });
     this.nodeWidthDirty = false;
   }
 };
