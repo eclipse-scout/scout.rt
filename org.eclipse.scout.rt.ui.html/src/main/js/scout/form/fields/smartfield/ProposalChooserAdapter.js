@@ -37,7 +37,18 @@ scout.ProposalChooserAdapter.prototype._modelAdapter = function() {
  * event would still win).
  */
 scout.ProposalChooserAdapter.prototype._onModelProposalSelected = function(event) {
+  this.widget.setBusy(true);
   this.widget.owner.proposalSelected();
+  this.session.listen().done(this._onProposalSelectionDone.bind(this));
+};
+
+/**
+ * Signal the proposal chooser to allow selecting proposals again.
+ */
+scout.ProposalChooserAdapter.prototype._onProposalSelectionDone = function() {
+  if (!this.destroyed) {
+    this.widget.setBusy(false);
+  }
 };
 
 /**

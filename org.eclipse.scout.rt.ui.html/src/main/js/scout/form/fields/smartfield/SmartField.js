@@ -435,7 +435,6 @@ scout.SmartField.prototype._abortAcceptProposal = function(displayText) {
   var abort = this.proposalSelectedInProgress && displayText === this._oldDisplayText;
   if (abort) {
     $.log.debug('(SmartField#_abortAcceptProposal) aborted _acceptProposal because displayText has not changed since proposal has been selected');
-    this.proposalSelectedInProgress = false;
   }
   return abort;
 };
@@ -500,11 +499,11 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     this._triggerAcceptProposal(displayText);
   }
 
-  this.session.listen().done(this._onSessionDone.bind(this));
+  this.session.listen().done(this._onProposalSelectionDone.bind(this));
 };
 
-scout.SmartField.prototype._onSessionDone = function(event) {
-  $.log.debug('(SmartField#_onSessionDone) request done proposalChooser=' + this.proposalChooser);
+scout.SmartField.prototype._onProposalSelectionDone = function(event) {
+  $.log.debug('(SmartField#_onProposalSelectionDone) request done proposalChooser=' + this.proposalChooser);
   this.proposalSelectedInProgress = false;
   if (this._tabPrevented && !this.proposalChooser) {
     this._focusNextTabbable();
