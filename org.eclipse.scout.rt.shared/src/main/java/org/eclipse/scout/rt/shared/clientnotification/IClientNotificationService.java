@@ -14,12 +14,14 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 
 /**
  * Service to consume notifications. Accessible from the client.
  */
 @ApplicationScoped
 @TunnelToServer
+@RemoteServiceWithoutAuthorization
 public interface IClientNotificationService {
 
   /**

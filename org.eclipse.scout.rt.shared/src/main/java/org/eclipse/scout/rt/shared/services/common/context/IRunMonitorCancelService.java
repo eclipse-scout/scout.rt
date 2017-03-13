@@ -15,11 +15,13 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 
 /**
  * Provides cancellation support for operations initiated by the client.
  */
 @TunnelToServer
+@RemoteServiceWithoutAuthorization
 public interface IRunMonitorCancelService extends IService {
 
   /**

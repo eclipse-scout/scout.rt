@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.junit.Test;
 
-public class RemoteServiceAccessTest {
+public class RemoteServiceAccessDeniedTest {
 
   @Test
   public void testAnnotations() throws Exception {

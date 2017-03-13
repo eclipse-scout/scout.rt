@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
+import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceUtility;
@@ -140,7 +141,9 @@ public class ServiceOperationInvoker {
     checkServiceAvailable(serviceInterfaceClass, service);
     checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, args);
     checkRemoteServiceAccessByAnnotations(serviceInterfaceClass, service.getClass(), serviceOp, args);
-    checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, args);
+    if (mustAuthorize(serviceInterfaceClass, service.getClass(), serviceOp, args)) {
+      checkRemoteServiceAccessByPermission(serviceInterfaceClass, service.getClass(), serviceOp, args);
+    }
     return service; // if we come there, the service is available and valid to call
   }
 
@@ -180,6 +183,8 @@ public class ServiceOperationInvoker {
 
   /**
    * Check pass 2 on instance
+   * <p>
+   * Using blacklist {@link RemoteServiceAccessDenied}
    */
   protected void checkRemoteServiceAccessByAnnotations(Class<?> interfaceClass, Class<?> implClass, Method interfaceMethod, Object[] args) {
     //check: grant/deny annotation (type level is base, method level is finegrained)
@@ -221,13 +226,56 @@ public class ServiceOperationInvoker {
    * <p>
    * Deny access by default.
    * <p>
-   * Accepts when a {@link RemoteServiceAccessPermission} was implied.
+   * Accepts when a {@link RemoteServiceAccessPermission} was implied or authorization was waved using whitelist
+   * {@link RemoteServiceWithoutAuthorization} in {@link #mustAuthorize(Class, Class, Method, Object[])}
    */
   protected void checkRemoteServiceAccessByPermission(Class<?> interfaceClass, Class<?> implClass, Method interfaceMethod, Object[] args) {
     if (ACCESS.check(new RemoteServiceAccessPermission(interfaceClass.getName(), interfaceMethod.getName()))) {
+      //granted
       return;
     }
     throw new SecurityException("access denied (code 3a).");
+  }
+
+  /**
+   * @return true unless there is a {@link RemoteServiceWithoutAuthorization} on the called method or interface in the
+   *         class tree
+   * @since 6.1
+   */
+  protected boolean mustAuthorize(Class<?> interfaceClass, Class<?> implClass, Method interfaceMethod, Object[] args) {
+    //check: authorize/no-authorize annotation (type level is base, method level is finegrained)
+    Class<?> c = implClass;
+    while (c != null) {
+      //method level
+      Method m = null;
+      try {
+        m = c.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
+      }
+      catch (NoSuchMethodException | RuntimeException t) {
+        LOG.debug("Could not lookup service method", t);
+      }
+      if (m != null && m.isAnnotationPresent(RemoteServiceWithoutAuthorization.class)) {
+        //granted
+        return false;
+      }
+
+      //type level
+      if (c.isAnnotationPresent(RemoteServiceWithoutAuthorization.class)) {
+        //granted
+        return false;
+      }
+
+      //next
+      if (c == interfaceClass) {
+        break;
+      }
+      c = c.getSuperclass();
+      if (c == Object.class) {
+        //use interface at last
+        c = interfaceClass;
+      }
+    }
+    return true;
   }
 
   private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
