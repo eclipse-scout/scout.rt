@@ -43,9 +43,16 @@
   width: 100%; /* expand to outer container, needed for breadcrumb */
 
   /* required because text shouldn't go into ellipsis mode when scrollbars are enabled */
-  &.scrollable-tree > .tree-node > .text {
-    overflow: visible;
-    text-overflow: initial;
+  &.scrollable-tree {
+    & > .tree-node,
+    & > .animation-wrapper > .tree-node {
+      overflow: visible;
+    }
+
+    & > .tree-node > .text,
+    & > .animation-wrapper > .tree-node > .text {
+      text-overflow: initial;
+    }
   }
 }
 
