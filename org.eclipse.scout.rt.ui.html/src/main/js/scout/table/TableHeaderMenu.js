@@ -465,36 +465,14 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
     group = scout.create('TableHeaderMenuGroup', {
       parent: this,
       textKey: 'ui.Aggregation'
-    });
+    }),
+    allowedAggregationFunctions = scout.arrays.ensure(column.allowedAggregationFunctions),
+    isAggregationNoneAllowed = allowedAggregationFunctions.indexOf('none') !== -1;
 
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
-    textKey: 'ui.Sum',
-    cssClass: 'aggregation-function sum',
-    aggregation: 'sum',
-    clickHandler: onClick
-  });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
-    textKey: 'ui.Average',
-    cssClass: 'aggregation-function avg',
-    aggregation: 'avg',
-    clickHandler: onClick
-  });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
-    textKey: 'ui.Minimum',
-    cssClass: 'aggregation-function min',
-    aggregation: 'min',
-    clickHandler: onClick
-  });
-  scout.create('TableHeaderMenuButton', {
-    parent: group,
-    textKey: 'ui.Maximum',
-    cssClass: 'aggregation-function max',
-    aggregation: 'max',
-    clickHandler: onClick
-  });
+  createHeaderMenuButtonForAggregationFunction('ui.Sum', 'sum');
+  createHeaderMenuButtonForAggregationFunction('ui.Average', 'avg');
+  createHeaderMenuButtonForAggregationFunction('ui.Minimum', 'min');
+  createHeaderMenuButtonForAggregationFunction('ui.Maximum', 'max');
 
   group.children.forEach(function(button) {
     button.setSelected(button.aggregation === aggregation);
@@ -502,9 +480,22 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   group.render(this.$columnActions);
   return group;
 
+  function createHeaderMenuButtonForAggregationFunction(textKey, aggregation) {
+    if (allowedAggregationFunctions.indexOf(aggregation) !== -1) {
+      scout.create('TableHeaderMenuButton', {
+        parent: group,
+        textKey: textKey,
+        cssClass: 'aggregation-function ' + aggregation,
+        aggregation: aggregation,
+        clickHandler: onClick,
+        togglable: isAggregationNoneAllowed
+      });
+    }
+  }
+
   function onClick() {
     menuPopup.close();
-    table.changeAggregation(column, this.aggregation);
+    table.changeAggregation(column, this.aggregation === aggregation ? 'none' : this.aggregation);
   }
 };
 

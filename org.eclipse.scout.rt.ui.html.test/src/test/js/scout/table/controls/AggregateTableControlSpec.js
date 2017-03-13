@@ -117,6 +117,20 @@ describe("AggregateTableControl", function() {
       expect($aggrCells.eq(1).text()).toBe('6');
     });
 
+    it("aggregation type none does not aggregate", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      table.changeAggregation(table.columns[1], 'none');
+      table.render(session.$entryPoint);
+
+      var $aggrRow = $aggregateRow(tableControl);
+      var $aggrCells = $aggrRow.children('.table-cell');
+      expect($aggrCells.eq(0).text()).toBe(' ');
+      expect($aggrCells.eq(1).text()).toBe(' ');
+    });
+
     it("sums up numbers in a number column but only on filtered rows", function() {
       prepareTable();
       rows[0].cells[1].value = 1;

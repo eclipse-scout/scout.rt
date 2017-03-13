@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -116,6 +118,20 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   /**
+   * Configure the allowed aggregation functions for this column
+   *
+   * @return constant values defined in {@link INumberColumn#AggregationFunction}
+   * @since 5.2
+   */
+  protected Set<String> getConfiguredAllowedAggregationFunctions() {
+    return CollectionUtility.hashSet(INumberColumn.AggregationFunction.SUM,
+        INumberColumn.AggregationFunction.MIN,
+        INumberColumn.AggregationFunction.MAX,
+        INumberColumn.AggregationFunction.AVG,
+        INumberColumn.AggregationFunction.NONE);
+  }
+
+  /**
    * Configure the aggregation function for this column
    *
    * @return one of the constant values in {@link INumberColumn#AggregationFunction}
@@ -153,6 +169,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     setMaxValue(getConfiguredMaxValue());
     setMinValue(getConfiguredMinValue());
     setInitialAggregationFunction(getConfiguredAggregationFunction());
+    setAllowedAggregationFunctions(getConfiguredAllowedAggregationFunctions());
     setAggregationFunction(getConfiguredAggregationFunction());
     setInitialBackgroundEffect(getConfiguredBackgroundEffect());
     setBackgroundEffect(getConfiguredBackgroundEffect());
@@ -286,6 +303,16 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   @Override
   public void setInitialAggregationFunction(String f) {
     m_initialAggregationFunction = f;
+  }
+
+  @Override
+  public Set<String> getAllowedAggregationFunctions() {
+    return propertySupport.getPropertySet(PROP_ALLOWED_AGGREGATION_FUNCTIONS);
+  }
+
+  @Override
+  public void setAllowedAggregationFunctions(Set<String> functions) {
+    propertySupport.setPropertySet(PROP_ALLOWED_AGGREGATION_FUNCTIONS, functions);
   }
 
   @Override

@@ -78,6 +78,14 @@ scout.NumberColumn.prototype.setAggregationFunction = function(func) {
     this.aggrStep = scout.aggregation.maxStep;
     this.aggrFinish = scout.aggregation.maxFinish;
     this.aggrSymbol = scout.aggregation.maxSymbol;
+  } else if (func === 'none') {
+    var undefinedFunc = function() {
+      return undefined;
+    };
+    this.aggrStart = undefinedFunc;
+    this.aggrStep = undefinedFunc;
+    this.aggrFinish = undefinedFunc;
+    this.aggrSymbol = undefined;
   }
 };
 

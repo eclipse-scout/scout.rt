@@ -930,6 +930,11 @@ scout.Table.prototype.isAggregationPossible = function(column) {
     return false;
   }
 
+  if (!column.allowedAggregationFunctions || column.allowedAggregationFunctions.length <= 1) {
+    // Aggregation is not possible if no aggregation functions are allowed or only exactly one aggregation is pre-defined.
+    return false;
+  }
+
   // Aggregation is possible if it is grouped by another column or aggregation control is available
   return this.isGrouped() || this.hasAggregateTableControl();
 };

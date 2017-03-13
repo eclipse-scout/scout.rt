@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
 public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, INumberValueContainer<NUMBER> {
@@ -22,6 +24,7 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
    */
   interface AggregationFunction {
 
+    String NONE = "none";
     String SUM = "sum";
     String AVG = "avg";
     String MIN = "min";
@@ -45,6 +48,7 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
    * type String
    */
   String PROP_AGGREGATION_FUNCTION = "aggregationFunction";
+  String PROP_ALLOWED_AGGREGATION_FUNCTIONS = "allowedAggregationFunctions";
   String PROP_BACKGROUND_EFFECT = "backgroundEffect";
 
   void setValidateOnAnyKey(boolean b);
@@ -65,6 +69,17 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
    * @since 5.2
    */
   void setAggregationFunction(String f);
+
+  Set<String> getAllowedAggregationFunctions();
+
+  /**
+   * Set the possible aggregation functions for this column.
+   *
+   * @param functions
+   *          functions defined in {@link AggregationFunction}
+   * @since 6.1
+   */
+  void setAllowedAggregationFunctions(Set<String> functions);
 
   /**
    * Set the background effect for this column

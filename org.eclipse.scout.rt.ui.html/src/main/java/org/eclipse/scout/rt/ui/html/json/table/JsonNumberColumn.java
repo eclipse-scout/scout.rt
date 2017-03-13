@@ -37,6 +37,7 @@ public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> 
     JSONObject json = super.toJson();
     json.put("decimalFormat", MainJsonObjectFactory.get().createJsonObject(getColumn().getFormat()).toJson());
     json.put("aggregationFunction", getColumn().getAggregationFunction());
+    json.put("allowedAggregationFunctions", MainJsonObjectFactory.get().createJsonObject(getColumn().getAllowedAggregationFunctions()).toJson());
     json.put("backgroundEffect", getColumn().getBackgroundEffect());
     return json;
   }
