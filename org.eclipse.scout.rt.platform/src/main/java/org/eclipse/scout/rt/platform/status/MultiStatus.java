@@ -118,18 +118,6 @@ public class MultiStatus extends Status implements IMultiStatus {
     m_children.remove(Assertions.assertNotNull(status));
   }
 
-  @Override
-  public void removeAll(IStatus status) {
-    for (IStatus child : getChildren()) {
-      if (Assertions.assertNotNull(status).equals(child)) {
-        m_children.remove(Assertions.assertNotNull(child));
-      }
-      else if (child instanceof IMultiStatus) {
-        ((IMultiStatus) child).removeAll(status);
-      }
-    }
-  }
-
   /**
    * Remove all children with the given class
    */
@@ -150,18 +138,6 @@ public class MultiStatus extends Status implements IMultiStatus {
   @Override
   public List<IStatus> getChildren() {
     return CollectionUtility.arrayList(m_children);
-  }
-
-  @Override
-  public boolean containsStatus(IStatus status) {
-    Assertions.assertNotNull(status);
-    for (IStatus child : getChildren()) {
-      if (status.equals(child)
-          || child instanceof IMultiStatus && ((IMultiStatus) child).containsStatus(status)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override

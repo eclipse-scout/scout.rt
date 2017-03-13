@@ -17,27 +17,12 @@ scout.DesktopTab = function() {
   this._propertyChangeListener = function(event) {
     if (scout.arrays.containsAny(event.changedProperties, ['title'])) {
       this.setTitle(this.view.title);
-    }
-    if (scout.arrays.containsAny(event.changedProperties, ['subTitle'])) {
+    } else if (scout.arrays.containsAny(event.changedProperties, ['subTitle'])) {
       this.setSubTitle(this.view.subTitle);
-    }
-    if (scout.arrays.containsAny(event.changedProperties, ['iconId'])) {
+    } else if (scout.arrays.containsAny(event.changedProperties, ['iconId'])) {
       this.setIconId(this.view.iconId);
-    }
-    if (scout.arrays.containsAny(event.changedProperties, ['cssClass'])) {
+    } else if (scout.arrays.containsAny(event.changedProperties, ['cssClass'])) {
       this._cssClassUpdated(event.newProperties.cssClass, event.oldProperties.cssClass);
-    }
-    if (scout.arrays.containsAny(event.changedProperties, ['saveNeeded'])) {
-      this.setSaveNeeded(event.newProperties.saveNeeded);
-    }
-    if (scout.arrays.containsAny(event.changedProperties, ['saveNeededVisible'])) {
-      this.setSaveNeededVisible(event.newProperties.saveNeededVisible);
-    }
-    if (scout.arrays.containsAny(event.changedProperties, ['closable'])) {
-      this.setClosable(event.newProperties.closable);
-    }
-    if(scout.arrays.containsAny(event.changedProperties, ['status'])) {
-      this.setStatus(event.newProperties.status);
     }
   }.bind(this);
   this._removeListener = this._onViewRemoved.bind(this);
@@ -51,9 +36,6 @@ scout.DesktopTab.prototype._init = function(options) {
   options.subTitle = this.view.subTitle;
   options.iconId = this.view.iconId;
   options.closable = this.view.closable;
-  options.saveNeeded = this.view.saveNeeded;
-  options.saveNeededVisible = this.view.saveNeededVisible;
-  options.status = this.view.status;
 
   scout.DesktopTab.parent.prototype._init.call(this, options);
   this._installListeners();
@@ -78,7 +60,7 @@ scout.DesktopTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
 };
 
 scout.DesktopTab.prototype._onClose = function() {
-  this.view.close();
+   this.view.close();
 };
 
 /**
