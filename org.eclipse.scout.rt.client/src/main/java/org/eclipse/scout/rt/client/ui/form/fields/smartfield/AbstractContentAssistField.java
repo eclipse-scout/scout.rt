@@ -992,7 +992,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   protected abstract VALUE handleMissingLookupRow(String text);
 
   /**
-   * TODO [awe] 6.2: check difference between handleMissingLookupRow and handleAcceptByDisplayText. Can we use the same
+   * TODO [7.0] awe: check difference between handleMissingLookupRow and handleAcceptByDisplayText. Can we use the same
    * method for both cases?
    */
   protected abstract boolean handleAcceptByDisplayText(String text);

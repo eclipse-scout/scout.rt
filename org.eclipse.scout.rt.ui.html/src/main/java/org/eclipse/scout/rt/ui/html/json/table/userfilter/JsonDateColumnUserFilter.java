@@ -30,7 +30,7 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
     return "DateColumnUserFilter";
   }
 
-  // TODO [awe] 6.2: (filter) use JsonDate in place of this poor-mans solution.
+  // TODO [7.0] awe: (filter) use JsonDate in place of this poor-mans solution.
   // also for this.toDate() method (see DateField)
   protected String dateToJson(Date date) {
     if (date == null) {
