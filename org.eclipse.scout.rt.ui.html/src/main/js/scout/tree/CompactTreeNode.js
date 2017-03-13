@@ -82,3 +82,7 @@ scout.CompactTreeNode.prototype._decorate = function() {
 scout.CompactTreeNode.prototype.isSection = function() {
   return this.level === 0;
 };
+
+scout.CompactTreeNode.prototype._updateIconWidth = function() {
+  // NOP
+};

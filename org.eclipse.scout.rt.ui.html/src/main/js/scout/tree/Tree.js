@@ -639,13 +639,7 @@ scout.Tree.prototype._updateDomNodeIconWidth = function($nodes) {
     return;
   }
   this._visibleNodesInViewRange().forEach(function(node) {
-    var cssWidth = '';
-    if (node.iconId) {
-      // always add 1 pixel to the result of outer-width to prevent rendering errors in IE, where
-      // the complete text is replaced by an ellipsis, when the .text element is a bit too large
-      cssWidth = 'calc(100% - '+ (node.$icon().outerWidth() + 1) + 'px)';
-    }
-    node.$text.css('width', cssWidth);
+    node._updateIconWidth();
   });
 };
 
@@ -1405,7 +1399,7 @@ scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animated
         }, {
           start: this.startAnimationFunc,
           complete: onAnimationComplete.bind(this, removedNodes),
-          duration: 200,
+          duration: 2000,
           queue: false
         });
       } else if (this._$animationWrapper) {
@@ -1743,7 +1737,7 @@ scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes
         }, {
           start: this.startAnimationFunc,
           complete: insertBatch.animationCompleteFunc.bind(this),
-          duration: 200,
+          duration: 20000,
           queue: false
         });
     }

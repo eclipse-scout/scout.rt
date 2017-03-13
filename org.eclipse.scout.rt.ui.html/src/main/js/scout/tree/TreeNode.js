@@ -287,3 +287,13 @@ scout.TreeNode.prototype._decorate = function() {
     }
   }
 };
+
+scout.TreeNode.prototype._updateIconWidth = function() {
+  var cssWidth = '';
+  if (this.iconId) {
+    // always add 1 pixel to the result of outer-width to prevent rendering errors in IE, where
+    // the complete text is replaced by an ellipsis, when the .text element is a bit too large
+    cssWidth = 'calc(100% - '+ (this.$icon().outerWidth() + 1) + 'px)';
+  }
+  this.$text.css('width', cssWidth);
+};
