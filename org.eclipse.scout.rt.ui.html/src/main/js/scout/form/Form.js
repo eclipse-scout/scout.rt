@@ -36,7 +36,6 @@ scout.Form.prototype._init = function(model) {
   if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
     this.rootGroupBox.menuBar.bottom();
   }
-  //  this._syncStatus(this.status);
 
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
@@ -56,10 +55,6 @@ scout.Form.prototype._init = function(model) {
     this.off('propertyChange', glasspaneRendererHandler);
   }.bind(this));
 };
-
-//scout.Form.prototype._setStatus = function(status) {
-//  console.log('setstatus');
-//};
 
 /**
  * @override Widget.js
@@ -221,9 +216,9 @@ scout.Form.prototype._renderStatus = function() {
     var $prevIcon;
     flatenStatus.forEach(function(sts) {
       $prevIcon = this._renderSingleStatus(sts, $prevIcon);
-      if($prevIcon){
-      this.$statusIcons.push($prevIcon);
-    }
+      if ($prevIcon) {
+        this.$statusIcons.push($prevIcon);
+      }
     }.bind(this));
   }
   // Layout could have been changed, e.g. if subtitle becomes visible
@@ -501,7 +496,7 @@ scout.Form.prototype.onModelAction = function(event) {
 scout.Form.flatenStatus = function(status) {
   if (status) {
     var flatStatus = [];
-    _collectLeafStatus.call(this,status, flatStatus);
+    _collectLeafStatus.call(this, status, flatStatus);
     return flatStatus;
   }
   return null;
@@ -520,5 +515,3 @@ scout.Form.flatenStatus = function(status) {
   }
 
 };
-
-

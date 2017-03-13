@@ -36,7 +36,7 @@ scout.DesktopTab = function() {
     if (scout.arrays.containsAny(event.changedProperties, ['closable'])) {
       this.setClosable(event.newProperties.closable);
     }
-    if(scout.arrays.containsAny(event.changedProperties, ['status'])) {
+    if (scout.arrays.containsAny(event.changedProperties, ['status'])) {
       this.setStatus(event.newProperties.status);
     }
   }.bind(this);

@@ -168,7 +168,6 @@ scout.SimpleTab.prototype._renderSingleStatus = function(status, $sibling) {
     var $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
     if ($sibling) {
       $sibling.after($statusIcon);
-      //      $statusIcon.after($sibling);
     } else {
       $statusIcon.prependTo(this.$statusContainer);
     }
