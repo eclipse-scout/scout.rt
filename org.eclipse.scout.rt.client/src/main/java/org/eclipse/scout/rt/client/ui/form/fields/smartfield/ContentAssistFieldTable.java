@@ -16,6 +16,8 @@ import java.util.List;
 import org.eclipse.scout.rt.client.dto.ColumnData;
 import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.rt.client.dto.FormData;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -65,6 +67,29 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
   @Override
   protected boolean getConfiguredScrollToSelection() {
     return true;
+  }
+
+  /**
+   * Menus are not supported.
+   */
+  @Override
+  final protected void initMenus() {
+    // init TableContextMenu without Child menus
+    setContextMenu(new TableContextMenu(this, null));
+  }
+  
+  /**
+   * Menus are not supported.
+   */
+  @Override
+  final public void setMenus(List<? extends IMenu> menus) {
+  }
+
+  /**
+   * Menus are not supported.
+   */
+  @Override
+  final public void addMenu(IMenu menu) {
   }
 
   @SuppressWarnings("unchecked")

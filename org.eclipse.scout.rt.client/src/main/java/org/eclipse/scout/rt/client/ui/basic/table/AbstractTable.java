@@ -892,30 +892,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     // table controls
     createTableControlsInternal();
     // menus
-    List<Class<? extends IMenu>> ma = getDeclaredMenus();
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
-    Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
-    if (!replacements.isEmpty()) {
-      m_menuReplacementMapping = replacements;
-    }
-    for (Class<? extends IMenu> clazz : ma) {
-      IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
-      menus.addOrdered(menu);
-    }
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    menus.addAllOrdered(contributedMenus);
-    injectMenusInternal(menus);
-
-    addHeaderMenus(menus);
-    //set container on menus
-    for (IMenu menu : menus) {
-      menu.setContainerInternal(this);
-    }
-
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
-    ITableContextMenu contextMenu = new TableContextMenu(this, menus.getOrderedList());
-    setContextMenu(contextMenu);
-
+    initMenus();
     // key strokes
     List<Class<? extends IKeyStroke>> ksClasses = getConfiguredKeyStrokes();
     List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
@@ -1016,6 +993,32 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
     });
+  }
+
+  protected void initMenus() {
+    List<Class<? extends IMenu>> ma = getDeclaredMenus();
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
+    if (!replacements.isEmpty()) {
+      m_menuReplacementMapping = replacements;
+    }
+    for (Class<? extends IMenu> clazz : ma) {
+      IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
+      menus.addOrdered(menu);
+    }
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    menus.addAllOrdered(contributedMenus);
+    injectMenusInternal(menus);
+
+    addHeaderMenus(menus);
+    //set container on menus
+    for (IMenu menu : menus) {
+      menu.setContainerInternal(this);
+    }
+
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    ITableContextMenu contextMenu = new TableContextMenu(this, menus.getOrderedList());
+    setContextMenu(contextMenu);
   }
 
   @Override
