@@ -134,6 +134,7 @@ public final class BlockingTestUtility {
 
           }//end JobListener.changed
         });
+
     try {
       runnableGettingBlocked.run(); // this action will enter a blocking condition which causes the 'runnableOnceBlocked' to be executed.
     }
@@ -142,12 +143,13 @@ public final class BlockingTestUtility {
     }
     finally {
       listenerRegistration.dispose();
-      // we need to wait until the runnableOnceBlocked is completed.
-      // runnableOnceBlocked may, during its execution,  set the original blocking condition to non-blocking but still execute
-      // important code afterwards. Therefore, the original blocking condition that starts runnableOnceBlocked is only used
-      // to indicate the start of the runnableOnceBlocked, but this method returns only AFTER runnableOnceBlocked completes execution.
-      onceBlockedDoneCondition.waitForUninterruptibly(120, TimeUnit.SECONDS);
     }
+
+    // we need to wait until the runnableOnceBlocked is completed.
+    // runnableOnceBlocked may, during its execution,  set the original blocking condition to non-blocking but still execute
+    // important code afterwards. Therefore, the original blocking condition that starts runnableOnceBlocked is only used
+    // to indicate the start of the runnableOnceBlocked, but this method returns only AFTER runnableOnceBlocked completes execution.
+    onceBlockedDoneCondition.waitForUninterruptibly(120, TimeUnit.SECONDS);
   }
 
   /**
