@@ -1399,7 +1399,7 @@ scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animated
         }, {
           start: this.startAnimationFunc,
           complete: onAnimationComplete.bind(this, removedNodes),
-          duration: 2000,
+          duration: 200,
           queue: false
         });
       } else if (this._$animationWrapper) {
@@ -1737,7 +1737,7 @@ scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes
         }, {
           start: this.startAnimationFunc,
           complete: insertBatch.animationCompleteFunc.bind(this),
-          duration: 20000,
+          duration: 200,
           queue: false
         });
     }
