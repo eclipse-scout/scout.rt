@@ -13,70 +13,72 @@ scout.FileChooserField = function() {
 };
 scout.inherits(scout.FileChooserField, scout.ValueField);
 
-/**
- * @override Widget.js
- */
-scout.FileChooserField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
+scout.FileChooserField.prototype._init = function(model) {
+  scout.FileChooserField.parent.prototype._init.call(this, model);
+
+  this.fileInput = scout.create('FileInput', {
+    parent: this,
+    acceptTypes: this.acceptTypes,
+    text: this.displayText,
+    enabled: this.enabled,
+    maximumUploadSize: this.maximumUploadSize
+  });
+  this.fileInput.on('change', this._onFileChange.bind(this));
+};
+
+scout.FileChooserField.prototype._initKeyStrokeContext = function() {
+  scout.FileChooserField.parent.prototype._initKeyStrokeContext.call(this);
+  this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldBrowseKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldDeleteKeyStroke(this));
 };
 
 scout.FileChooserField.prototype._render = function($parent) {
   this.addContainer($parent, 'file-chooser-field');
   this.addLabel();
   this.addMandatoryIndicator();
-
-  this.addField(scout.fields.makeTextField($parent)
-    .on('blur', this._onFieldBlur.bind(this))
-    .on('dragenter', this._onDragEnterOrOver.bind(this))
-    .on('dragover', this._onDragEnterOrOver.bind(this))
-    .on('drop', this._onDrop.bind(this))
-    .on('keydown', this._onKeydown.bind(this))
-  );
-
+  this._renderFileInput();
   this.addIcon();
   this.addStatus();
 };
 
-scout.FileChooserField.prototype._remove = function() {
-  scout.FileChooserField.parent.prototype._remove.call(this);
-  if (this.$fileInputField) {
-    this.$fileInputField.remove();
-    this.$fileInputField = null;
-  }
+scout.FileChooserField.prototype._renderFileInput = function() {
+  this.fileInput.render(this.$container);
+  this.addField(this.fileInput.$container);
 };
 
-scout.FileChooserField.prototype._onDragEnterOrOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
+scout.FileChooserField.prototype.setDisplayText = function(text) {
+  scout.FileChooserField.parent.prototype.setDisplayText.call(this, text);
+  this.fileInput.setText(text);
 };
 
-scout.FileChooserField.prototype._onDrop = function(event) {
-  if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    var files = event.originalEvent.dataTransfer.files;
-    if (files.length >= 1) {
-      this.session.uploadFiles(this, [files[0]], undefined, this.maximumUploadSize);
-    }
-  }
+/**
+ * @override
+ */
+scout.FileChooserField.prototype._readDisplayText = function() {
+  return this.fileInput.text;
 };
 
-scout.FileChooserField.prototype._onKeydown = function(event) {
-  if (event.which === scout.keys.DOWN) {
-    this.openFileChooser();
-    return false;
-  }
-  return true;
+scout.FileChooserField.prototype.setAcceptTypes = function(acceptTypes) {
+  this.setProperty('acceptTypes', acceptTypes);
+  this.fileInput.setAcceptTypes(acceptTypes);
 };
 
-scout.FileChooserField.prototype._onClick = function(event) {};
+scout.FileChooserField.prototype.setEnabled = function(enabled) {
+  scout.FileChooserField.parent.prototype.setEnabled.call(this, enabled);
+  this.fileInput.setEnabled(enabled);
+};
+
+scout.FileChooserField.prototype.setMaximumUploadSize = function(maximumUploadSize) {
+  this.setProperty('maximumUploadSize', maximumUploadSize);
+  this.fileInput.setMaximumUploadSize(maximumUploadSize);
+};
 
 scout.FileChooserField.prototype._onIconClick = function(event) {
   scout.FileChooserField.parent.prototype._onIconClick.call(this, event);
-  this.openFileChooser();
+  this.fileInput.browse();
 };
 
-scout.FileChooserField.prototype.openFileChooser = function() {
-  // TODO [7.0] cgu offline case?
-  this.trigger('chooseFile');
+scout.FileChooserField.prototype._onFileChange = function() {
+  this.acceptInput();
+  this.fileInput.upload();
 };

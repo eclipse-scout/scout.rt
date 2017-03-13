@@ -118,6 +118,11 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     return propertySupport.getPropertyInt(PROP_MAXIMUM_UPLOAD_SIZE);
   }
 
+  /**
+   * @deprecated The UI will display the native file chooser dialog on click. There is no {@link FileChooser} created on
+   *             java side anymore. Will be removed with 7.0
+   */
+  @Deprecated
   @Override
   public IFileChooser getFileChooser() {
     FileChooser fileChooser = new FileChooser(getFileExtensions(), false);
@@ -180,6 +185,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
       parseAndSetValue(value);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void startFileChooserFromUI() {
       if (!isEnabled() || !isVisible()) {

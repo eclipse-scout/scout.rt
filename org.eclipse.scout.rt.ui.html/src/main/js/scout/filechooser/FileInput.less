@@ -8,25 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.file-chooser-field {
+.file-input {
+  cursor: pointer;
 
-  & > .file-input {
-    #scout.text-field-with-icon(@icon-file);
+  &:active {
+    background-color: @palette-gray-2;
+  }
 
-    & > input {
+  &.has-error:active {
+    background-color: @palette-red-1;
+  }
+
+  &.disabled {
+    cursor: default;
+  }
+}
+
+.legacy-upload-form {
+  & > .legacy-upload-file-input {
+    width: 100%;
+
+    & > iframe {
       display: none;
     }
-
-    & ~ .icon {
-      cursor: pointer;
-    }
   }
-
-  & > .legacy-upload-form {
-    & > .legacy-upload-file-input {
-      padding: 3px;
-      height: 100%;
-    }
-  }
-
 }

@@ -10,9 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
+import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
+
 public interface IFileChooserFieldUIFacade {
 
   void parseAndSetValueFromUI(String value);
 
+  /**
+   * @deprecated The UI will display the native file chooser dialog on click. There is no {@link FileChooser} created on
+   *             java side anymore. Will be removed with 7.0
+   */
+  @Deprecated
   void startFileChooserFromUI();
 }

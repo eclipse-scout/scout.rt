@@ -175,6 +175,7 @@
   __include("scout/filechooser/FileChooser.js");
   __include("scout/filechooser/FileChooserAdapter.js");
   __include("scout/filechooser/FileChooserController.js");
+  __include("scout/filechooser/FileInput.js");
   __include("scout/slider/Slider.js");
   __include("scout/slider/SliderAdapter.js");
   __include("scout/slider/SliderLayout.js");
@@ -381,6 +382,8 @@
   __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
   __include("scout/form/fields/filechooserfield/FileChooserField.js");
   __include("scout/form/fields/filechooserfield/FileChooserFieldAdapter.js");
+  __include("scout/form/fields/filechooserfield/FileChooserFieldBrowseKeyStroke.js");
+  __include("scout/form/fields/filechooserfield/FileChooserFieldDeleteKeyStroke.js");
   __include("scout/form/fields/groupbox/GroupBox.js");
   __include("scout/form/fields/groupbox/GroupBoxAdapter.js");
   __include("scout/form/fields/groupbox/GroupBoxLayout.js");

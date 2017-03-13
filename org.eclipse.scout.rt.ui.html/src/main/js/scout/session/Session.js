@@ -1021,9 +1021,8 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
     }
   }.bind(this));
 
-  if (!maxTotalSize) {
-    maxTotalSize = 5 * 1024 * 1024; // 5 MB as default maximum size
-  }
+  // 5 MB as default maximum size
+  maxTotalSize = scout.nvl(maxTotalSize, 5 * 1024 * 1024);
 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
   if (totalSize > maxTotalSize) {
@@ -1034,7 +1033,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
     };
 
     this.showFatalMessage(boxOptions);
-    return;
+    return false;
   }
 
   var uploadAjaxOptions = {
@@ -1056,6 +1055,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
 
   var busyHandling = !this.areRequestsPending();
   this._performUserAjaxRequest(uploadAjaxOptions, busyHandling);
+  return true;
 };
 
 scout.Session.prototype.goOffline = function() {
