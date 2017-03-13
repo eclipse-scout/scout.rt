@@ -185,8 +185,27 @@ scout.ProposalChooser.prototype.setVirtual = function(virtual) {
  * event would still win).
  */
 scout.ProposalChooser.prototype._onModelProposalSelected = function(event) {
+  this._setLoading(true);
   this.owner.proposalSelected();
+  this.session.listen().done(this._onProposalSelectionDone.bind(this));
 };
+
+/**
+ * Signal the proposal chooser to allow selecting proposals again.
+ */
+scout.ProposalChooser.prototype._onProposalSelectionDone = function() {
+  this._setLoading(false);
+};
+
+scout.ProposalChooser.prototype._setLoading = function(loading) {
+  this.model._setProperty('loading', loading);
+  this.model._setProperty('enabled', !loading);
+  if (this.model.rendered) {
+    this.model._renderEnabled();
+    this.model._renderLoading();
+  }
+};
+
 
 /**
  * We wrap the original _send method of the ProposalChooser.
