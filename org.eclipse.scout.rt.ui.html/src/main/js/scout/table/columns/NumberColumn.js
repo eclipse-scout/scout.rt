@@ -17,6 +17,7 @@ scout.NumberColumn = function() {
   this.filterType = 'NumberColumnUserFilter';
   this.comparator = scout.comparators.NUMERIC;
   this.textBased = false;
+  this.allowedAggregationFunctions = ['sum', 'avg', 'min', 'max', 'none'];
 };
 scout.inherits(scout.NumberColumn, scout.Column);
 
