@@ -71,4 +71,41 @@ describe('Form', function() {
 
   });
 
+  describe('cacheBounds', function() {
+
+    var form;
+
+    beforeEach(function() {
+      form = helper.createFormWithOneField();
+      form.cacheBounds = true;
+      form.cacheBoundsKey = 'FOO';
+      form.render(session.$entryPoint);
+
+      scout.webstorage.removeItem(localStorage, 'scout:formBounds:FOO');
+    });
+
+    it('read and store bounds', function() {
+      // should return null when local storage not contains the requested key
+      expect(form.readCacheBounds()).toBe(null);
+
+      // should return the stored Rectangle
+      var storeBounds = new scout.Rectangle(0, 1, 2, 3);
+      form.storeCacheBounds(storeBounds);
+      var readBounds = form.readCacheBounds();
+      expect(readBounds).toEqual(storeBounds);
+    });
+
+    it('update bounds - if cacheBounds is true', function() {
+      form.updateCacheBounds();
+      expect(form.readCacheBounds() instanceof scout.Rectangle).toBe(true);
+    });
+
+    it('update bounds - if cacheBounds is false', function() {
+      form.cacheBounds = false;
+      form.updateCacheBounds();
+      expect(form.readCacheBounds()).toBe(null);
+    });
+
+  });
+
 });

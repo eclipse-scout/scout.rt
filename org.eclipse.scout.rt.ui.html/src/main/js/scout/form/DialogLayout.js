@@ -20,18 +20,26 @@ scout.DialogLayout.prototype.layout = function($container) {
     return;
   }
 
-  var htmlComp = this._form.htmlComp,
+  var currentBounds,
+    htmlComp = this._form.htmlComp,
     $window = this._form.$container.window(),
     dialogMargins = htmlComp.getMargins(),
     windowSize = new scout.Dimension($window.width(), $window.height()),
     dialogSize = new scout.Dimension(),
-    currentBounds = htmlComp.getBounds(),
-    prefSize = this.preferredLayoutSize($container);
+    cacheBounds = this._form.readCacheBounds();
 
-  // Because prefSize does not include the dialog margins, we have to subtract them from the current size as well.
-  // Because currentBounds.subtract() would also alter the x/y values, we subtract the dimensions manually.
-  currentBounds.width -= dialogMargins.horizontal();
-  currentBounds.height -= dialogMargins.vertical();
+  if (cacheBounds) {
+    dialogSize = new scout.Dimension(cacheBounds.width, cacheBounds.height);
+    currentBounds = cacheBounds;
+  } else {
+    dialogSize = this.preferredLayoutSize($container);
+    currentBounds = htmlComp.getBounds();
+
+    // Because prefSize does not include the dialog margins, we have to subtract them from the current size as well.
+    // Because currentBounds.subtract() would also alter the x/y values, we subtract the dimensions manually.
+    currentBounds.width -= dialogMargins.horizontal();
+    currentBounds.height -= dialogMargins.vertical();
+  }
 
   // class .dialog may specify a margin
   // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0
@@ -41,8 +49,8 @@ scout.DialogLayout.prototype.layout = function($container) {
 
   // Calculate new dialog size:
   // 1. Ensure the dialog is not larger than viewport
-  dialogSize.width = Math.min(maxWidth, prefSize.width);
-  dialogSize.height = Math.min(maxHeight, prefSize.height);
+  dialogSize.width = Math.min(maxWidth, dialogSize.width);
+  dialogSize.height = Math.min(maxHeight, dialogSize.height);
 
   // Add markers to be able to style the dialog in a different way when it uses the full width or height
   htmlComp.$comp.toggleClass('full-width', (currentBounds.x === 0 && dialogMargins.horizontal() === 0 && windowSize.width === dialogSize.width));

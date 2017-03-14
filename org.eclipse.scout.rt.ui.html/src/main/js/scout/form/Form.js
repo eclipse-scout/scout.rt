@@ -105,28 +105,14 @@ scout.Form.prototype._renderForm = function($parent) {
     layout = new scout.DialogLayout(this);
     this.htmlComp.validateRoot = true;
     $handle = this.$container.appendDiv('drag-handle');
-    this.$container.makeDraggable($handle, $.throttle(this.onMove.bind(this), 1000 / 60)); // 60fps
-
+    this.$container.makeDraggable($handle, $.throttle(this._onMove.bind(this), 1000 / 60)); // 60fps
     if (this.closable) {
       this.$container
         .appendDiv('closer')
         .on('click', this.close.bind(this));
     }
     if (this.resizable) {
-      var $myWindow = this.$container.window();
-      this.$container.resizable({
-        start: function(event, ui) {
-          this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
-          this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
-        }.bind(this)
-      });
-      this.$container.on('resize', function(e) {
-        var autoSizeOld = this.htmlComp.layout.autoSize;
-        this.htmlComp.layout.autoSize = false;
-        this.htmlComp.revalidateLayout();
-        this.htmlComp.layout.autoSize = autoSizeOld;
-        return false;
-      }.bind(this));
+      this._initResizable();
     }
     this._updateTitle();
   } else {
@@ -143,6 +129,26 @@ scout.Form.prototype._renderForm = function($parent) {
   if (this.isDialog()) {
     this.$container.addClassForAnimation('animate-open');
   }
+};
+
+scout.Form.prototype._initResizable = function() {
+  var $myWindow = this.$container.window();
+  this.$container.resizable({
+    start: function(event) {
+      this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
+      this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
+    }.bind(this)
+  });
+  this.$container.on('resize', this._onResize.bind(this));
+};
+
+scout.Form.prototype._onResize = function(event) {
+  var autoSizeOld = this.htmlComp.layout.autoSize;
+  this.htmlComp.layout.autoSize = false;
+  this.htmlComp.revalidateLayout();
+  this.htmlComp.layout.autoSize = autoSizeOld;
+  this.updateCacheBounds();
+  return false;
 };
 
 scout.Form.prototype.close = function() {
@@ -249,8 +255,19 @@ scout.Form.prototype._isClosable = function() {
   return false;
 };
 
-scout.Form.prototype.onMove = function(newOffset) {
+scout.Form.prototype._onMove = function(newOffset) {
   this.trigger('move', newOffset);
+  this.updateCacheBounds();
+};
+
+scout.Form.prototype.updateCacheBounds = function() {
+  if (this.cacheBounds) {
+    var bounds = scout.graphics.offsetBounds(this.$container, false, false);
+    var margins = scout.graphics.getMargins(this.$container);
+    bounds.x -= margins.left;
+    bounds.y -= margins.top;
+    this.storeCacheBounds(bounds);
+  }
 };
 
 scout.Form.prototype.appendTo = function($parent) {
@@ -403,4 +420,25 @@ scout.Form.prototype.requestFocus = function(formField) {
 
 scout.Form.prototype.visitFields = function(visitor) {
   this.rootGroupBox.visit(visitor);
+};
+
+scout.Form.prototype.storeCacheBounds = function(bounds) {
+  if (this.cacheBounds) {
+    var storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
+    scout.webstorage.setItem(localStorage, storageKey, JSON.stringify(bounds));
+  }
+};
+
+scout.Form.prototype.readCacheBounds = function() {
+  if (!this.cacheBounds) {
+    return null;
+  }
+
+  var storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
+  var bounds = scout.webstorage.getItem(localStorage, storageKey);
+  if (!bounds) {
+    return null;
+  }
+  bounds = JSON.parse(bounds);
+  return new scout.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
 };

@@ -257,12 +257,18 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   dialog.htmlComp.validateLayout();
 
   dialogSize = dialog.htmlComp.getSize(true);
-  left = (windowSize.width - dialogSize.width) / 2;
-  top = (windowSize.height - dialogSize.height) / 2;
+  var cacheBounds = dialog.readCacheBounds();
+  if (cacheBounds) {
+    left = cacheBounds.x;
+    top = cacheBounds.y;
+  } else {
+    left = (windowSize.width - dialogSize.width) / 2;
+    top = (windowSize.height - dialogSize.height) / 2;
 
-  // optical middle
-  opticalMiddleOffset = Math.min(top / 5, 10);
-  top -= opticalMiddleOffset;
+    // optical middle
+    opticalMiddleOffset = Math.min(top / 5, 10);
+    top -= opticalMiddleOffset;
+  }
 
   dialog.$container
     .cssLeft(left)
@@ -272,6 +278,8 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
     top: top,
     left: left
   });
+
+  dialog.updateCacheBounds();
 
   // If not validated anew, focus on single-button forms is not gained.
   // Maybe, this is the same problem as in BusyIndicator.js

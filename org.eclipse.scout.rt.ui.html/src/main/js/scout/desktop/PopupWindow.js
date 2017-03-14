@@ -100,28 +100,9 @@ scout.PopupWindow.prototype._onResize = function() {
     top = this.myWindow.screenY;
   $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
 
-  // store window bounds by class ID
-  if (this.form.cacheBounds) {
-    scout.PopupWindow.storeWindowBounds(this.form, new scout.Rectangle(left, top, width, height));
-  }
-
+  this.form.storeCacheBounds(new scout.Rectangle(left, top, width, height));
   var windowSize = new scout.Dimension($myWindow.width(), $myWindow.height());
   this.htmlComp.setSize(windowSize);
-};
-
-scout.PopupWindow.storeWindowBounds = function(form, bounds) {
-  var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
-  scout.webstorage.setItem(localStorage, storageKey, JSON.stringify(bounds));
-};
-
-scout.PopupWindow.readWindowBounds = function(form) {
-  var storageKey = 'scout:formBounds:' + form.cacheBoundsKey;
-  var bounds = scout.webstorage.getItem(localStorage, storageKey);
-  if (!bounds) {
-    return null;
-  }
-  bounds = JSON.parse(bounds);
-  return new scout.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
 };
 
 scout.PopupWindow.prototype.isClosed = function() {
