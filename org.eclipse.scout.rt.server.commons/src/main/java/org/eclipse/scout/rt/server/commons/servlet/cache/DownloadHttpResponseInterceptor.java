@@ -42,13 +42,17 @@ public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor
   }
 
   protected String calculateHeaderValue(String originalFilename) {
-    String isoFilename = getIsoFilename(originalFilename);
     if (StringUtility.isNullOrEmpty(originalFilename)) {
       originalFilename = DEFAULT_FILENAME;
     }
-    if (StringUtility.isNullOrEmpty(isoFilename)) { // in case no valid character remaines
+
+    String isoFilename = getIsoFilename(originalFilename);
+    //remove ", because it is used to encapsulate the file name
+    isoFilename = StringUtility.replace(isoFilename, "\"", "");
+    if (StringUtility.isNullOrEmpty(isoFilename)) { // in case no valid character remains
       isoFilename = DEFAULT_FILENAME;
     }
+
     return "attachment; filename=\"" + isoFilename + "\"; filename*=utf-8''" + IOUtility.urlEncode(originalFilename);
   }
 
