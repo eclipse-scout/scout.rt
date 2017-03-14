@@ -334,4 +334,47 @@ describe('SmartField', function() {
 
   });
 
+  describe('multiline', function() {
+    var lookupCall;
+    beforeEach(function() {
+      lookupCall = scout.create('LookupCall', {
+        session: session
+      });
+      lookupCall._textById = function(value) {
+        if (value === 1) {
+          return 'A Line1\nA Line2';
+        } else {
+          return 'B Line1\nB Line2';
+        }
+      };
+    });
+    it('multi-line lookupcall on single-line field', function() {
+      // will be displayed multi-line in proposal, but single-line as display text
+      var model = helper.createFieldModel('SmartField', session.desktop, {
+        lookupCall: lookupCall
+      });
+      var smartField = scout.create('SmartField', model);
+      smartField.render(session.$entryPoint);
+      expect(smartField.displayText).toBe('');
+      smartField.setValue(1);
+      expect(smartField.value).toBe(1);
+      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('A Line1');
+      expect(smartField._additionalLines).toEqual(['A Line2']);
+    });
+    it('multi-line lookupcall on multi-line field', function() {
+      // _additionalLines will be rendered to _$multilineField
+      var model = helper.createFieldModel('SmartFieldMultiline', session.desktop, {
+        lookupCall: lookupCall
+      });
+      var smartFieldMultiline = scout.create('SmartFieldMultiline', model);
+      smartFieldMultiline.render(session.$entryPoint);
+      expect(smartFieldMultiline.displayText).toBe('');
+      smartFieldMultiline.setValue(1);
+      expect(smartFieldMultiline.value).toBe(1);
+      expect(scout.fields.valOrText(smartFieldMultiline, smartFieldMultiline.$field)).toBe('A Line1');
+      expect(smartFieldMultiline._additionalLines).toEqual(['A Line2']);
+      expect(smartFieldMultiline._$multilineField.html()).toEqual('A Line2');
+    });
+  });
+
 });

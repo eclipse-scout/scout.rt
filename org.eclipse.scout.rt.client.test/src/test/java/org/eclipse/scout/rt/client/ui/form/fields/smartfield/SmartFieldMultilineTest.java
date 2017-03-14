@@ -36,14 +36,11 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class SmartFieldMultilineTest {
-
   private static List<IBean<?>> m_beans;
-
-  private SmartField m_smartField = new SmartField();
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(P_LookupCall.class));
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(P_SingleLookupCall.class), new BeanMetaData(P_MultiLookupCall.class));
   }
 
   @AfterClass
@@ -51,23 +48,31 @@ public class SmartFieldMultilineTest {
     TestingUtility.unregisterBeans(m_beans);
   }
 
+  private SingleCallSingleField m_singleCallSingleField = new SingleCallSingleField();
+  private SingleCallMultiField m_singleCallMultiField = new SingleCallMultiField();
+  private MultiCallSingleField m_multiCallSingleField = new MultiCallSingleField();
+  private MultiCallMultiField m_multiCallMultiField = new MultiCallMultiField();
+
   /**
    * Tests whether new lines get replaced, if multilineText is set to false
    */
   @Test
   public void testSingleLine() {
-    m_smartField.setValue(1L);
-    assertEquals("Line1 Line2", m_smartField.getDisplayText());
+    m_singleCallSingleField.setValue(1L);
+    assertSingleLine(m_singleCallSingleField.getDisplayText());
   }
 
   /**
-   * Tests whether new lines don't get replaced, if multilineText is set to true
+   * Tests whether field with a multiline lookupcall or multiline field gets a multiline lookup row
    */
   @Test
   public void testMultiLine() {
-    m_smartField.setMultilineText(true);
-    m_smartField.setValue(1L);
-    assertEquals("Line1\nLine2", m_smartField.getDisplayText());
+    m_singleCallMultiField.setValue(1L);
+    assertMultiLine(m_singleCallMultiField.getDisplayText());
+    m_multiCallSingleField.setValue(1L);
+    assertMultiLine(m_multiCallSingleField.getDisplayText());
+    m_multiCallMultiField.setValue(1L);
+    assertMultiLine(m_multiCallMultiField.getDisplayText());
   }
 
   /**
@@ -77,34 +82,97 @@ public class SmartFieldMultilineTest {
    */
   @Test
   public void testMultiLine_DisplayTextMatchesCurrentLookupRow() {
-    m_smartField.setMultilineText(true);
-    m_smartField.setValue(1L);
-    assertEquals("Line1\nLine2", m_smartField.getDisplayText());
+    m_singleCallMultiField.setValue(1L);
+    assertMultiLine(m_singleCallMultiField.getDisplayText());
 
-    m_smartField.getUIFacade().acceptProposalFromUI("Line1 Line2", false, false);
+    m_singleCallMultiField.getUIFacade().acceptProposalFromUI("Line1 Line2", false, false);
     // if multi line texts are not handled correctly the currentLookupRow would be
     // set to null in AbstractContentAssistField#parseValueInternal()
-    assertNotNull(m_smartField.getCurrentLookupRow());
-    assertEquals(4L, m_smartField.getCurrentLookupRow().getKey().longValue());
+    assertNotNull(m_singleCallMultiField.getCurrentLookupRow());
+    assertEquals(4L, m_singleCallMultiField.getCurrentLookupRow().getKey().longValue());
   }
 
-  private static class SmartField extends AbstractSmartField<Long> {
+  protected void assertSingleLine(String displayText) {
+    assertEquals("Line1 Line2", displayText);
+  }
+
+  protected void assertMultiLine(String displayText) {
+    assertEquals("Line1\nLine2", displayText);
+  }
+
+  // single-line lookupcall in single-line field
+  @ClassId("69d13d93-2f92-45a4-9892-094bd5f3b3ce")
+  private static class SingleCallSingleField extends AbstractSmartField<Long> {
+
     @Override
     protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
-      return P_LookupCall.class;
+      return P_SingleLookupCall.class;
+    }
+  }
+
+  // single-line lookupcall in multi-line field
+  @ClassId("a530d728-36aa-4ac1-82be-a118976aa65a")
+  private static class SingleCallMultiField extends AbstractSmartField<Long> {
+
+    @Override
+    protected boolean getConfiguredMultilineText() {
+      return true;
+    }
+
+    @Override
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+      return P_SingleLookupCall.class;
+    }
+  }
+
+  // multi-line lookupcall in single-line field
+  @ClassId("8f8379be-acac-4f6f-9e16-118305157ab0")
+  private static class MultiCallSingleField extends AbstractSmartField<Long> {
+
+    @Override
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+      return P_MultiLookupCall.class;
+    }
+  }
+
+  // multi-line lookupcall in multi-line field
+  @ClassId("d8064454-87ff-4afd-8f11-52eef4ade7dd")
+  private static class MultiCallMultiField extends AbstractSmartField<Long> {
+
+    @Override
+    protected boolean getConfiguredMultilineText() {
+      return true;
+    }
+
+    @Override
+    protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+      return P_MultiLookupCall.class;
     }
   }
 
   @ClassId("43949094-ddb9-47f2-9bdf-4f208e1ed499")
-  public static class P_LookupCall extends LookupCall<Long> {
-
+  public static class P_SingleLookupCall extends LookupCall<Long> {
     private static final long serialVersionUID = -7536271824820806283L;
 
     @Override
     protected ILookupService<Long> createLookupService() {
       return new P_LookupService();
     }
+  }
 
+  @ClassId("93091218-02e3-4cfa-996d-2b2a1fa97495")
+  public static class P_MultiLookupCall extends LookupCall<Long> {
+    private static final long serialVersionUID = -7536271824820806283L;
+
+    @Override
+    protected boolean getConfiguredMultilineText() {
+      return true;
+    }
+
+    @Override
+    protected ILookupService<Long> createLookupService() {
+      return new P_LookupService();
+    }
   }
 
   public static class P_LookupService implements ILookupService<Long> {
@@ -128,6 +196,5 @@ public class SmartFieldMultilineTest {
     public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
       return null;
     }
-
   }
 }
