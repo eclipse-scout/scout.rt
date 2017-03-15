@@ -44,14 +44,28 @@ describe('SmartField', function() {
       smartField = createSmartFieldWithAdapter();
     });
 
-    it('doesn not call _openProposal() when TAB has been pressed', function() {
+    it('does not call _openProposal() when TAB, CTRL or ALT has been pressed', function() {
       smartField.render(session.$entryPoint);
       smartField._openProposal = function(displayText, selectCurrentValue) {};
-      var event = {
-        which: scout.keys.TAB
-      };
+
+      var keyEvents = [
+        {
+          which: scout.keys.TAB
+        },
+        {
+          ctrlKey: true,
+          which: scout.keys.A
+        },
+        {
+          altKey: true,
+          which: scout.keys.A
+        }
+      ];
+
       spyOn(smartField, '_openProposal');
-      smartField._onKeyUp(event);
+      keyEvents.forEach(function(event) {
+        smartField._onKeyUp(event);
+      });
       expect(smartField._openProposal).not.toHaveBeenCalled();
     });
 
