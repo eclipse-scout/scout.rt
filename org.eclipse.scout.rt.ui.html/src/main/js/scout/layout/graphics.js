@@ -383,6 +383,20 @@ scout.Rectangle.prototype.subtract = function(insets) {
     this.height - insets.bottom);
 };
 
+/**
+ * @returns {scout.Point} property x and y of this instance as new Point instance
+ */
+scout.Rectangle.prototype.point = function() {
+  return new scout.Point(this.x, this.y);
+};
+
+/**
+ * @returns {scout.Dimension} property width and height of this instance as new Dimension instance
+ */
+scout.Rectangle.prototype.dimension = function() {
+  return new scout.Dimension(this.width, this.height);
+};
+
 scout.Rectangle.prototype.union = function(r) {
   var tx2 = this.width;
   var ty2 = this.height;

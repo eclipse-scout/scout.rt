@@ -262,11 +262,7 @@ scout.Form.prototype._onMove = function(newOffset) {
 
 scout.Form.prototype.updateCacheBounds = function() {
   if (this.cacheBounds) {
-    var bounds = scout.graphics.offsetBounds(this.$container, false, false);
-    var margins = scout.graphics.getMargins(this.$container);
-    bounds.x -= margins.left;
-    bounds.y -= margins.top;
-    this.storeCacheBounds(bounds);
+    this.storeCacheBounds(scout.graphics.offsetBounds(this.$container, false, false));
   }
 };
 

@@ -12,8 +12,7 @@
 
 .messagebox {
   position: absolute;
-  top: 25%;
-  left: 50%;
+  min-width: 200px;
   max-width: 330px;
   #scout.drop-shadow-large();
   border-top: 5px solid @active-color;
@@ -40,10 +39,17 @@
 }
 
 .messagebox-content {
+  min-height: 30px;
   border-left: 1px solid @boxbutton-border-color;
   border-right: 1px solid @boxbutton-border-color;
   background-color: @control-background-color;
   padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
+
+  /* add a bit of extra space to the scrollbar on the right */
+  & > .scrollbar.y-axis {
+    margin-right: 5px;
+  }
+
 }
 
 .messagebox-label {

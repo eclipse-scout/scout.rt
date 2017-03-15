@@ -406,7 +406,7 @@ $.fn.makeSpan = function(cssClass, text) {
 };
 
 /**
- * @return HTML document reference (ownerDocument) of the HTML element.
+ * @returns HTML document reference (ownerDocument) of the HTML element.
  * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
  */
 $.fn.document = function(domElement) {
@@ -415,13 +415,21 @@ $.fn.document = function(domElement) {
 };
 
 /**
- * @return HTML window reference (defaultView) of the HTML element
+ * @returns HTML window reference (defaultView) of the HTML element
  * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
  */
 $.fn.window = function(domElement) {
   var myDocument = this.document(true),
     myWindow = myDocument ? myDocument.defaultView : null;
   return domElement ? myWindow : $(myWindow);
+};
+
+/**
+ * @returns {scout.Dimension} size of the window (width and height)
+ */
+$.fn.windowSize = function() {
+  var $window = this.window();
+  return new scout.Dimension($window.width(), $window.height());
 };
 
 /**
@@ -933,6 +941,15 @@ $.fn.cssLeft = function(position) {
 
 $.fn.cssTop = function(position) {
   return this.cssPxValue('top', position);
+};
+
+/**
+ * Sets the CSS properties 'left' and 'top' based on the x and y properties of the given point instance.
+ *
+ * @param {scout.Point} point
+ */
+$.fn.cssPosition = function(point) {
+  return this.cssLeft(point.x).cssTop(point.y);
 };
 
 $.fn.cssBottom = function(position) {

@@ -249,34 +249,21 @@ scout.FormController.prototype.detachDialogs = function() {
 };
 
 scout.FormController.prototype._layoutDialog = function(dialog) {
-  var left, top, opticalMiddleOffset, dialogSize,
-    $window = dialog.$container.window(),
-    windowSize = new scout.Dimension($window.width(), $window.height());
-
+  var cacheBounds, position;
   dialog.htmlComp.pixelBasedSizing = true;
   dialog.htmlComp.validateLayout();
 
-  dialogSize = dialog.htmlComp.getSize(true);
-  var cacheBounds = dialog.readCacheBounds();
+  cacheBounds = dialog.readCacheBounds();
   if (cacheBounds) {
-    left = cacheBounds.x;
-    top = cacheBounds.y;
+    position = cacheBounds.point();
   } else {
-    left = (windowSize.width - dialogSize.width) / 2;
-    top = (windowSize.height - dialogSize.height) / 2;
-
-    // optical middle
-    opticalMiddleOffset = Math.min(top / 5, 10);
-    top -= opticalMiddleOffset;
+    position = scout.DialogLayout.positionContainerInWindow(dialog.$container);
   }
 
-  dialog.$container
-    .cssLeft(left)
-    .cssTop(top);
-
+  dialog.$container.cssPosition(position);
   dialog.trigger('move', {
-    top: top,
-    left: left
+    left: position.x,
+    top: position.y
   });
 
   dialog.updateCacheBounds();

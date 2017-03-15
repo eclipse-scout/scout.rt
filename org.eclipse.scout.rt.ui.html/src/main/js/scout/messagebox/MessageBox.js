@@ -115,6 +115,11 @@ scout.MessageBox.prototype._render = function($parent) {
     this._$abortButton = this.$cancelButton;
   }
 
+  scout.scrollbars.install(this.$content, {
+    parent: this,
+    axis: 'y'
+  });
+
   // Render properties
   this._renderIconId();
   this._renderSeverity();
@@ -131,8 +136,12 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$container.removeClass('calc-helper');
   this.$container.css('min-width', Math.max(naturalWidth, boxButtons.buttonCount() * 100));
   boxButtons.updateButtonWidths(this.$container.width());
-  // Now that all texts, paddings, widths etc. are set, we can calculate the position
-  this._position();
+
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.MessageBoxLayout(this));
+  this.htmlComp.pixelBasedSizing = true;
+  this.htmlComp.validateLayout();
+
   this.$container.addClassForAnimation('animate-open');
 };
 
@@ -142,13 +151,10 @@ scout.MessageBox.prototype._postRender = function() {
 };
 
 scout.MessageBox.prototype._remove = function() {
+  scout.scrollbars.uninstall(this.$content, this.session);
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);
   scout.MessageBox.parent.prototype._remove.call(this);
-};
-
-scout.MessageBox.prototype._position = function() {
-  this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
 scout.MessageBox.prototype._renderIconId = function() {
