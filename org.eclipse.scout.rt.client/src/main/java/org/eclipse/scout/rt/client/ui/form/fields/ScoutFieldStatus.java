@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.platform.status.Status;
 /**
  * Status type for form fields with additional property "iconId"
  */
+// TODO [6.2] aho: deprecation use {@link Status} instead.
 public class ScoutFieldStatus extends Status implements IFieldStatus {
   private static final long serialVersionUID = 1L;
-  private final String m_iconId;
 
   public ScoutFieldStatus(String message, int severity) {
     this(message, null, severity);
@@ -34,43 +34,7 @@ public class ScoutFieldStatus extends Status implements IFieldStatus {
 
   public ScoutFieldStatus(String message, String iconId, int severity, int code) {
     super(message, severity, code);
-    m_iconId = iconId;
-  }
-
-  @Override
-  public String getIconId() {
-    return null;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    ScoutFieldStatus other = (ScoutFieldStatus) obj;
-    if (m_iconId == null) {
-      if (other.m_iconId != null) {
-        return false;
-      }
-    }
-    else if (!m_iconId.equals(other.m_iconId)) {
-      return false;
-    }
-    return true;
+    withIconId(iconId);
   }
 
 }

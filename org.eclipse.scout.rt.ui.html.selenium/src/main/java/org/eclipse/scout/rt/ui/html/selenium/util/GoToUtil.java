@@ -54,7 +54,7 @@ public final class GoToUtil {
    * Activates the view at the given index (1-based), and returns the activated view.
    */
   public static WebElement goToView(AbstractSeleniumTest test, int viewTabIndex) {
-    WebElement viewTab = test.waitUntilElementClickable(By.cssSelector(String.format(".desktop-view-tab:nth-child(%s)", viewTabIndex)));
+    WebElement viewTab = test.waitUntilElementClickable(By.cssSelector(String.format(".simple-tab:nth-child(%s)", viewTabIndex)));
     test.clickAtOffset(viewTab, 15, 5); // cannot click in the middle of the view-tab because its sometimes overlaid with a dialog
     return test.waitUntilView();
   }

@@ -27,7 +27,7 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   var tabWidth,
     htmlContainer = this.tabArea.htmlComp,
     containerSize = htmlContainer.getSize(),
-    $tabs = htmlContainer.$comp.find('.desktop-view-tab'),
+    $tabs = htmlContainer.$comp.find('.simple-tab'),
     numTabs = this.tabArea.getTabs().length,
     smallPrefSize = this.smallPrefSize();
 

@@ -32,6 +32,8 @@ import org.eclipse.scout.rt.platform.classid.ITypeWithSettableClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.w3c.dom.Document;
@@ -63,6 +65,9 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, ISty
   String PROP_EMPTY = "empty";
   String PROP_SAVE_NEEDED = "saveNeeded";
   String PROP_ICON_ID = "iconId";
+  String PROP_CLOSABLE = "closable";
+  String PROP_SAVE_NEEDED_VISIBLE = "saveNeededVisible";
+  String PROP_STATUS = "status";
 
   /**
    * Hint to render an {@link IForm} as dialog in a separate window. A dialog can be modal or non-modal.
@@ -170,6 +175,40 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, ISty
   String getIconId();
 
   void setIconId(String s);
+
+  /**
+   * A closable form is thought to display a close button either in the header of a dialog or a view.
+   *
+   * @return whether or not the form is closable.
+   */
+  boolean isClosable();
+
+  void setClosable(boolean closable);
+
+  /**
+   * Whether or not a form should display the save needed (dirty) state in the dialog or view header.
+   *
+   * @return true to display the save needed state, false otherwise.
+   */
+  boolean isSaveNeededVisible();
+
+  void setSaveNeededVisible(boolean saveNeededVisible);
+
+  IMultiStatus getStatus();
+
+  /**
+   * @param status
+   * @return true if the status is present recursive in all children.
+   */
+  boolean hasStatus(IStatus status);
+
+  void setStatus(IMultiStatus status);
+
+  void clearStatus();
+
+  void addStatus(IStatus newStatus);
+
+  void removeStatus(IStatus status);
 
   /**
    * @return the {@link IWizard} that contains the step that started this form using startWizardStep
