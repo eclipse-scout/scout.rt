@@ -325,6 +325,9 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
       if (e.getType() == FormEvent.TYPE_CLOSED && m_manageInnerFormLifeCycle) {
         setInnerForm(null, true);
       }
+      else if (e.getType() == FormEvent.TYPE_LOAD_COMPLETE && !m_manageInnerFormLifeCycle) {
+        propertySupport.setPropertyAlwaysFire(PROP_INNER_FORM, m_innerForm);
+      }
     }
   }// end private class
 
