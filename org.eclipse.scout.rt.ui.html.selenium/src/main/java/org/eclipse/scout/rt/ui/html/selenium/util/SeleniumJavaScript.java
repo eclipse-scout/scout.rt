@@ -37,8 +37,6 @@ public final class SeleniumJavaScript {
    * Injects the source of the <code>selenium.js</code> JavaScript file into the HTML document. After that you may call
    * the helper functions from selenium.js in your Selenium test-code by using the executeScript() function or by
    * calling the static methods of this class.
-   *
-   * @param test
    */
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static void injectSeleniumScript(AbstractSeleniumTest test) {
@@ -65,11 +63,9 @@ public final class SeleniumJavaScript {
   /**
    * Scrolls the given (scrollable) group-box to the bottom by setting scrollTop. This method uses the injected
    * JavaScript method <code>scout.selenium.scrollTopBottom()</code>.
-   *
-   * @param test
-   * @param groupBoxClass
    */
   public static void scrollGroupBoxToBottom(AbstractSeleniumTest test, Class<? extends AbstractGroupBox> groupBoxClass) {
+    test.waitUntilElementClickable(groupBoxClass);
     String modelClassSelector = SeleniumUtil.getModelClassCssSelector(groupBoxClass);
     String jQuerySelector = "$('div[" + modelClassSelector + "] > .group-box-body')";
     executeScript(test, "scout.selenium.scrollToBottom(" + jQuerySelector + ")");
@@ -77,16 +73,12 @@ public final class SeleniumJavaScript {
 
   /**
    * Simulates we have a touch device by calling <code>scout.selenium.setSupportsTouch(boolean)</code>.
-   *
-   * @param test
-   * @param supportsTouch
    */
   public static void setSupportsTouch(AbstractSeleniumTest test, boolean supportsTouch) {
     executeScript(test, "scout.selenium.setSupportsTouch(" + Boolean.toString(supportsTouch) + ")");
   }
 
   /**
-   * @param test
    * @return <code>window.scrollY</code>
    */
   public static Object getWindowScrollY(AbstractSeleniumTest test) {

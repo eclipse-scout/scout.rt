@@ -243,17 +243,6 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(By.cssSelector(".form.view:not(.detail-form)"));
   }
 
-  public WebElement scrollToElement(Class<?> modelClass) {
-    return scrollToElement(SeleniumUtil.byModelClass(modelClass));
-  }
-
-  public WebElement scrollToElement(By by) {
-    WebElement element = findElement(null, by);
-    Actions actions = new Actions(getDriver());
-    actions.moveToElement(element).perform();
-    return element;
-  }
-
   /**
    * Finds the message box button at the given index position (1-based, or last() to get the last button).
    */
