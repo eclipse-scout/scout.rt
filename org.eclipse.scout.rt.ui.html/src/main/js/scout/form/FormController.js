@@ -259,9 +259,13 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   left = (windowSize.width - dialogSize.width) / 2;
   top = (windowSize.height - dialogSize.height) / 2;
 
-  // optical middle
-  opticalMiddleOffset = Math.min(top / 5, 10);
+  // optical middle (move up 20% of distance between window and dialog)
+  opticalMiddleOffset = (top / 5);
   top -= opticalMiddleOffset;
+
+  // Ensure integer numbers
+  left = Math.floor(left);
+  top = Math.floor(top);
 
   dialog.$container
     .cssLeft(left)
