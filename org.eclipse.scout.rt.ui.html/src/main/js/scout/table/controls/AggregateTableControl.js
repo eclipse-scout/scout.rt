@@ -109,11 +109,11 @@ scout.AggregateTableControl.prototype._aggregate = function() {
     rows = this.table.filteredRows();
   }
 
-  this.table._forEachColumn('aggrStart', aggregateRow);
+  this.table._forEachVisibleColumn('aggrStart', aggregateRow);
   rows.forEach(function(row) {
-    this.table._forEachColumn('aggrStep', aggregateRow, row);
+    this.table._forEachVisibleColumn('aggrStep', aggregateRow, row);
   }, this);
-  this.table._forEachColumn('aggrFinish', aggregateRow);
+  this.table._forEachVisibleColumn('aggrFinish', aggregateRow);
 
   this.aggregateRow = aggregateRow;
 };

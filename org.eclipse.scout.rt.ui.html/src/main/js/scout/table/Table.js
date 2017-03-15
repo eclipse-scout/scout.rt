@@ -1636,15 +1636,15 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
 };
 
 /**
- * Executes the aggregate function with the given funcName for each column, but only if the Column
+ * Executes the aggregate function with the given funcName for each visible column, but only if the Column
  * has that function, which is currently only the case for NumberColumns.
  *
  * @param states is a reference to an Array containing the results for each column.
  * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
  */
-scout.Table.prototype._forEachColumn = function(funcName, states, row) {
+scout.Table.prototype._forEachVisibleColumn = function(funcName, states, row) {
   var value;
-  this.columns.forEach(function(column, i) {
+  this.visibleColumns().forEach(function(column, i) {
     if (column[funcName]) {
       if (row) {
         value = column.cellValueOrTextForCalculation(row);
@@ -1668,13 +1668,13 @@ scout.Table.prototype._group = function(animate) {
   }
 
   rows = this.filteredRows();
-  this._forEachColumn('aggrStart', states);
+  this._forEachVisibleColumn('aggrStart', states);
 
   rows.forEach(function(row, r) {
     if (!firstRow) {
       firstRow = row;
     }
-    this._forEachColumn('aggrStep', states, row);
+    this._forEachVisibleColumn('aggrStep', states, row);
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
     // test if group is finished
@@ -1682,13 +1682,13 @@ scout.Table.prototype._group = function(animate) {
     // if group is finished: add group row
     if (newGroup) {
       // finish aggregation
-      this._forEachColumn('aggrFinish', states);
+      this._forEachVisibleColumn('aggrFinish', states);
       // append sum row
       this._addAggregateRow(states,
         onTop ? lastRow : row,
         onTop ? firstRow : nextRow);
       // reset after group
-      this._forEachColumn('aggrStart', states);
+      this._forEachVisibleColumn('aggrStart', states);
       firstRow = null;
       lastRow = row;
     }
@@ -1786,10 +1786,10 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
     $aggregateRow = this.$container.makeDiv('table-aggregate-row')
       .data('aggregateRow', aggregateRow);
 
-    for (c = 0; c < this.columns.length; c++) {
-      $cell = $(this.columns[c].buildCellForAggregateRow(aggregateRow));
+    this.visibleColumns().forEach(function (column) {
+      $cell = $(column.buildCellForAggregateRow(aggregateRow));
       $cell.appendTo($aggregateRow);
-    }
+    });
 
     $aggregateRow[insertFunc](refRow.$row).width(this.rowWidth);
     aggregateRow.height = $aggregateRow.outerHeight(true);

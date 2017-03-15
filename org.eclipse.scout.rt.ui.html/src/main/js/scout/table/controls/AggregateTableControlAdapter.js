@@ -12,3 +12,20 @@ scout.AggregateTableControlAdapter = function() {
   scout.AggregateTableControlAdapter.parent.call(this);
 };
 scout.inherits(scout.AggregateTableControlAdapter, scout.TableControlAdapter);
+
+scout.AggregateTableControlAdapter.modifyAggregateTableControlPrototype = function() {
+  if (!scout.app.remote) {
+    return;
+  }
+
+  // _onTableColumnStructureChanged
+  scout.objects.replacePrototypeFunction(scout.AggregateTableControl, '_onTableColumnStructureChanged', function(vararg) {
+    if (this.modelAdapter) {
+      this._updateEnabledAndSelectedState();
+    } else {
+      this._onTableColumnStructureChangedOrig();
+    }
+  }, true);
+};
+
+scout.addAppListener('bootstrap', scout.AggregateTableControlAdapter.modifyAggregateTableControlPrototype);
