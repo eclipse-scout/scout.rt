@@ -9,14 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 @messagebox-label-padding: 20px;
+@messagebox-max-width: 330px;
 
 .messagebox {
   position: absolute;
   min-width: 200px;
-  max-width: 330px;
+  max-width: @messagebox-max-width;
   #scout.drop-shadow-large();
   border-top: 5px solid @active-color;
   border-radius: @border-radius;
+  margin: 10px; /* minimum padding to desktop */
+  margin-bottom: 15px;
 
   &.severity-error {
     border-top-color: @error-border-color;
@@ -36,6 +39,25 @@
   &.animate-modality-highlight {
     #scout.animation-shake();
   }
+
+  /* remove border and rounded corners in full screen mode */
+  &.full-width,
+  &.full-height {
+    border-radius: 0;
+
+    & > .box-buttons > .box-button {
+      border-radius: 0;
+    }
+  }
+  &.full-width {
+    border-right: 0;
+    border-left: 0;
+  }
+  &.full-height {
+    & > .box-buttons > .box-button {
+      border-bottom: 0;
+    }
+  }
 }
 
 .messagebox-content {
@@ -49,7 +71,6 @@
   & > .scrollbar.y-axis {
     margin-right: 5px;
   }
-
 }
 
 .messagebox-label {
@@ -59,4 +80,11 @@
 
 .messagebox-header {
   font-weight: bold;
+}
+
+@media (max-width: @messagebox-max-width) {
+  .messagebox {
+    /* no need to have a margin on small screens */
+    margin: 0;
+  }
 }

@@ -15,11 +15,19 @@ scout.MessageBoxLayout = function(messageBox) {
 scout.inherits(scout.MessageBoxLayout, scout.AbstractLayout);
 
 scout.MessageBoxLayout.prototype.layout = function($container) {
-  var messageBoxSize,
-    htmlComp = scout.HtmlComponent.get($container),
-    bounds = htmlComp.getBounds();
+  var htmlComp = scout.HtmlComponent.get($container),
+    windowSize = $container.windowSize(),
+    currentBounds = htmlComp.getBounds(),
+    messageBoxSize = htmlComp.getSize(),
+    messageBoxMargins = htmlComp.getMargins();
 
-  messageBoxSize = scout.DialogLayout.fitContainerInWindow($container.windowSize(), bounds, bounds.dimension(), htmlComp.getMargins());
+  messageBoxSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), messageBoxSize, messageBoxMargins);
+
+  // Add markers to be able to style the dialog in a different way when it uses the full width or height
+  $container
+    .toggleClass('full-width', (currentBounds.x === 0 && messageBoxMargins.horizontal() === 0 && windowSize.width === messageBoxSize.width))
+    .toggleClass('full-height', (currentBounds.y === 0 && messageBoxMargins.vertical() === 0 && windowSize.height === messageBoxSize.height));
+
   scout.graphics.setSize($container, messageBoxSize);
 
   var buttonsSize = scout.graphics.getSize(this.messageBox.$buttons);
