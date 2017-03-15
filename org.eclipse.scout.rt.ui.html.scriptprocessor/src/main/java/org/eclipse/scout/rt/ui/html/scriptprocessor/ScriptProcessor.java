@@ -41,8 +41,10 @@ public class ScriptProcessor implements AutoCloseable {
             "org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui$1")
         .build(null);
     m_lessLoader = new SandboxClassLoaderBuilder()
-        .addLocalJar("private-libs/slf4j-api.jar")
-        .addLocalJar("private-libs/jcl-over-slf4j.jar")
+        // Add commons-logging.jar which logs to java.util.logger because there is no other log implementation available
+        // within the sandbox. Using slf4j and Scout's AutoRegisteringJulLevelChangePropagator will propagate log messages
+        // to the actual logger and log levels can be defined in one place.
+        .addLocalJar("private-libs/commons-logging.jar")
         .addLocalJar("private-libs/rhino.jar")
         .addLocalJar("private-libs/lesscss-engine.jar")
         .addClasses("less-calls.jar",
