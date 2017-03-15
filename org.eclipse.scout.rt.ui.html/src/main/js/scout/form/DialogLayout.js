@@ -93,12 +93,17 @@ scout.DialogLayout.fitContainerInWindow = function(windowSize, currentBounds, co
 scout.DialogLayout.positionContainerInWindow = function($container) {
   var
     windowSize = $container.windowSize(),
-    containerSize = scout.HtmlComponent.get($container).getSize(),
+    containerSize = scout.HtmlComponent.get($container).getSize(true),
     left = (windowSize.width - containerSize.width) / 2,
-    top = (windowSize.height - containerSize.height) / 2,
-    opticalMiddleOffset = Math.min(top / 5, 10);
+    top = (windowSize.height - containerSize.height) / 2;
 
+  // optical middle (move up 20% of distance between window and dialog)
+  var opticalMiddleOffset = (top / 5);
   top -= opticalMiddleOffset;
+
+  // Ensure integer numbers
+  left = Math.floor(left);
+  top = Math.floor(top);
 
   return new scout.Point(left, top);
 };
