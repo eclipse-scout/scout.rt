@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormResetSearchF
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormStoredChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
-import org.eclipse.scout.rt.client.extension.ui.form.FormChains.IsSaveNeededFieldsChain;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -53,11 +52,6 @@ public abstract class AbstractFormExtension<FORM extends AbstractForm> extends A
   @Override
   public void execStored(FormStoredChain chain) {
     chain.execStored();
-  }
-
-  @Override
-  public boolean execIsSaveNeeded(IsSaveNeededFieldsChain chain) {
-    return chain.execIsSaveNeeded();
   }
 
   @Override

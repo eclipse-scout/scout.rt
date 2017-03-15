@@ -49,11 +49,6 @@ public class CustomProcessingStatus implements IProcessingStatus {
   }
 
   @Override
-  public String getIconId() {
-    return null;
-  }
-
-  @Override
   public boolean isMultiStatus() {
     return false;
   }

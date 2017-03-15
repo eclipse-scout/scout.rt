@@ -105,16 +105,8 @@ public interface IStatus extends Comparable<IStatus> {
   boolean isOK();
 
   /**
-   * @return Returns the object's order. Status are ordered first by severity then by priority.
+   * @return Returns the object's order. Statuses are ordered first by severity then by priority.
    */
   double getOrder();
-
-  /**
-   * The icon id is used if a status gets represented to the user. If no icon id is set the status will be displayed
-   * with the severity matching icon.
-   *
-   * @return The icon id of the status.
-   */
-  String getIconId();
 
 }

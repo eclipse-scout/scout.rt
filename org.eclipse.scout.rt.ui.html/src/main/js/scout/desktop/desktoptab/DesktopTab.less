@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.simple-tab {
+.desktop-view-tab {
   position: relative;
   display: inline-block;
   /* 1px smaller than the header because of the bottom border (see .selected rule below) */
@@ -46,45 +46,23 @@
     height: 100%;
 
   }
-  .status-container {
-   float:right;
-
-   >.status{
-     vertical-align: middle;
-     display: inline-block;
-     margin-left: 5px;
-
-     &.closer{
-       margin-left: 7px;
-     }
-   }
-
-  }
-  > .icon-container {
-    float:left;
-    & > .icon{
-      margin-right: 5px;
-      &.font-icon {
-        font-size: 14px;
-      }
-    }
-  }
-  > .title{
-   overflow: hidden;
-   width: auto
-  }
   &.closable{
-     .closer {
+    > .closer {
       display: none;
-
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: 5px;
+      margin-right: 5px;
+      margin-top: 5px;
     }
     &.selected {
-      .closer{
-        display: inline-block;
+      > .closer{
+        display: block;
       }
+      padding-right: 30px;
     }
   }
-
 
   &.animate-modality-highlight {
     #scout.animation-flash-gray();
@@ -93,6 +71,7 @@
   & > .icon {
     float: right;
     margin-left: 5px;
+    margin-right: -5px;
   }
 
   & > .title {
@@ -108,7 +87,7 @@
 
 /* key boxes */
 
-.simple-tab .key-box {
+.desktop-view-tab .key-box {
   bottom: 4px;
 
   &.disabled {

@@ -15,7 +15,8 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 /**
  * Status used in client model
  */
-// TODO [7.0] aho: deprecation use {@link IStatus} instead.
 public interface IFieldStatus extends IStatus {
+
+  String getIconId();
 
 }

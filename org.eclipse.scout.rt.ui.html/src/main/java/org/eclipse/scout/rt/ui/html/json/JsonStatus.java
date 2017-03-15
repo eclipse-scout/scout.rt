@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.json.JSONObject;
 
@@ -31,12 +30,6 @@ public class JsonStatus implements IJsonObject {
     JSONObject json = new JSONObject();
     json.put("message", m_status.getMessage());
     json.put("severity", m_status.getSeverity());
-    json.put("iconId", m_status.getIconId());
-    if (m_status.isMultiStatus()) {
-      for (IStatus cs : ((IMultiStatus) m_status).getChildren()) {
-        json.append("children", new JsonStatus(cs).toJson());
-      }
-    }
     return json;
   }
 

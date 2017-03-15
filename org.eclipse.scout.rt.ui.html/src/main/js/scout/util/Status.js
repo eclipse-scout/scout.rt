@@ -17,12 +17,6 @@ scout.Status = function(model) {
   if (typeof this.severity === 'string') {
     this.severity = scout.Status.Severity[this.severity.toUpperCase()];
   }
-  // children
-  if (model.children && Array.isArray(model.children)) {
-    this.children = model.children.map(function(child) {
-      return scout.Status.ensure(child);
-    }.bind(this));
-  }
 };
 
 scout.Status.Severity = {
@@ -48,30 +42,6 @@ scout.Status.prototype.isValid = function() {
 
 scout.Status.prototype.isError = function() {
   return this.severity === scout.Status.Severity.ERROR;
-};
-
-/**
- * @returns all leaf status collected dept first.
- */
-scout.Status.prototype.getAllLeafStatus = function() {
-
-  var flatStatus = [];
-  _collectLeafStatus.call(this, this, flatStatus);
-  return flatStatus;
-  // helper function
-  function _collectLeafStatus(status, collector) {
-    if (!status) {
-      return;
-    }
-    if (status.children) {
-      status.children.forEach(function(cs) {
-        _collectLeafStatus(cs, collector);
-      }.bind(this));
-    } else {
-      collector.push(status);
-    }
-  }
-
 };
 
 /**

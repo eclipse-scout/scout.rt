@@ -38,25 +38,9 @@ public interface IMultiStatus extends IStatus {
   List<IStatus> getChildren();
 
   /**
-   * Removes all equal status in its direct or indirect children. Using {@link Object#equals(Object)}
-   *
-   * @param status
-   *          the status to remove
-   */
-  void removeAll(IStatus status);
-
-  /**
    * Remove all children with the given class
    */
   void removeAll(Class<? extends IStatus> clazz);
-
-  /**
-   * @param status
-   *          not <code>null<code>
-   * @return <code>true</code>, if any of the direct or indirect children is equals the the given status,
-   *         <code>false</code> otherwise.
-   */
-  boolean containsStatus(IStatus status);
 
   /**
    * @param clazz

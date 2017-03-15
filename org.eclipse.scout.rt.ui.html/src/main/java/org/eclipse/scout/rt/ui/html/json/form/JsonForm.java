@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -38,14 +37,11 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_TITLE = IForm.PROP_TITLE;
   public static final String PROP_SUB_TITLE = IForm.PROP_SUB_TITLE;
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
-  public static final String PROP_CLOSABLE = IForm.PROP_CLOSABLE;
-  public static final String PROP_SAVE_NEEDED_VISIBLE = IForm.PROP_SAVE_NEEDED_VISIBLE;
   public static final String PROP_CSS_CLASS = IForm.PROP_CSS_CLASS;
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
-  public static final String PROP_ASK_IF_NEED_SAVE = "askIfNeedSave";
-  public static final String PROP_SAVE_NEEDED = IForm.PROP_SAVE_NEEDED;
+  public static final String PROP_CLOSABLE = "closable";
   public static final String PROP_CACHE_BOUNDS = "cacheBounds";
   public static final String PROP_CACHE_BOUNDS_KEY = "cacheBoundsKey";
   public static final String PROP_FORM_FIELD = "formField";
@@ -107,41 +103,10 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
         return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
-    putJsonProperty(new JsonProperty<IForm>(PROP_CLOSABLE, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isClosable();
-      }
-
-    });
-    putJsonProperty(new JsonProperty<IForm>(PROP_SAVE_NEEDED_VISIBLE, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isSaveNeededVisible();
-      }
-
-    });
     putJsonProperty(new JsonProperty<IForm>(PROP_CSS_CLASS, model) {
       @Override
       protected String modelValue() {
         return getModel().getCssClass();
-      }
-    });
-    putJsonProperty(new JsonProperty<IForm>(PROP_SAVE_NEEDED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isSaveNeeded();
-      }
-    });
-    putJsonProperty(new JsonProperty<IForm>(IForm.PROP_STATUS, model) {
-      @Override
-      protected IStatus modelValue() {
-        return getModel().getStatus();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return JsonStatus.toJson((IStatus) value);
       }
     });
   }
@@ -182,7 +147,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, PROP_ASK_IF_NEED_SAVE, model.isAskIfNeedSave());
+    putProperty(json, PROP_CLOSABLE, isClosable());
     putProperty(json, PROP_CACHE_BOUNDS, model.isCacheBounds());
     if (model.isCacheBounds()) {
       putProperty(json, PROP_CACHE_BOUNDS_KEY, model.computeCacheBoundsKey());
@@ -212,6 +177,20 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
         }
       }
     }
+  }
+
+  protected boolean isClosable() {
+    for (IFormField f : getModel().getAllFields()) {
+      if (f.isEnabled() && f.isVisible() && (f instanceof IButton)) {
+        switch (((IButton) f).getSystemType()) {
+          case IButton.SYSTEM_TYPE_CLOSE:
+          case IButton.SYSTEM_TYPE_CANCEL: {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   protected String displayHintToJson(int displayHint) {
