@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform;
 
+import java.beans.PropertyChangeEvent;
+
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -21,6 +25,13 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBu
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
 public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<? extends IForm>> extends JsonFormField<WRAPPED_FORM_FIELD> {
+
+  private FormListener m_innerFormListener = new FormListener() {
+    @Override
+    public void formChanged(FormEvent e) {
+      handleInnerFormEvent(e);
+    }
+  };
 
   public JsonWrappedFormField(WRAPPED_FORM_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -51,5 +62,27 @@ public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<?
         return getModel().isInitialFocusEnabled();
       }
     });
+  }
+
+  @Override
+  protected void handleModelPropertyChange(PropertyChangeEvent event) {
+    super.handleModelPropertyChange(event);
+    if (IWrappedFormField.PROP_INNER_FORM.equals(event.getPropertyName())) {
+      if (event.getOldValue() instanceof IForm) {
+        ((IForm) event.getOldValue()).removeFormListener(m_innerFormListener);
+      }
+      if (event.getNewValue() instanceof IForm) {
+        ((IForm) event.getNewValue()).addFormListener(m_innerFormListener);
+      }
+    }
+  }
+
+  protected void handleInnerFormEvent(FormEvent e) {
+    if (e.getType() == FormEvent.TYPE_CLOSED) {
+      // If the inner form is closed, it is disposed automatically. Therefore, from the UI's perspective, the JsonWrappedFormField
+      // has behave as if the inner form was removed, although the actual reference might still be present (if the inner form's
+      // life-cycle is externally managed). To do so, we generate a artificial event with PROP_INNER_FORM=null.
+      handleModelPropertyChange(new PropertyChangeEvent(getModel(), IWrappedFormField.PROP_INNER_FORM, e.getForm(), null));
+    }
   }
 }
