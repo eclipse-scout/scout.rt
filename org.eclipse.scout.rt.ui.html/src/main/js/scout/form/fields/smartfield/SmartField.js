@@ -334,8 +334,11 @@ scout.SmartField.prototype._onKeyUp = function(e) {
   }
 
   // Pop-ups shouldn't open when one of the following keys is pressed
-  if (e.which === scout.keys.TAB ||
+  if (
+    e.ctrlKey || e.altKey ||
+    e.which === scout.keys.TAB ||
     e.which === scout.keys.SHIFT ||
+    e.which === scout.keys.CTRL ||
     e.which === scout.keys.HOME ||
     e.which === scout.keys.END ||
     e.which === scout.keys.LEFT ||
