@@ -946,9 +946,10 @@ scout.Table.prototype.changeAggregation = function(column, func) {
 scout.Table.prototype.changeAggregations = function(columns, functions) {
   columns.forEach(function(column, i) {
     var func = functions[i];
-    column.setAggregationFunction(func);
-
-    this._triggerAggregationFunctionChanged(column);
+    if (column.aggregationFunction !== func) {
+      column.setAggregationFunction(func);
+      this._triggerAggregationFunctionChanged(column);
+    }
   }, this);
 
   this._group();
@@ -1786,7 +1787,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
     $aggregateRow = this.$container.makeDiv('table-aggregate-row')
       .data('aggregateRow', aggregateRow);
 
-    this.visibleColumns().forEach(function (column) {
+    this.visibleColumns().forEach(function(column) {
       $cell = $(column.buildCellForAggregateRow(aggregateRow));
       $cell.appendTo($aggregateRow);
     });
@@ -3605,9 +3606,9 @@ scout.Table.prototype._calculateFillerHeight = function(range) {
   return totalHeight;
 };
 
-scout.Table.prototype.containsNumberColumn = function() {
+scout.Table.prototype.containsAggregatedNumberColumn = function() {
   return this.columns.some(function(column) {
-    return column instanceof scout.NumberColumn;
+    return column instanceof scout.NumberColumn && column.aggregationFunction !== 'none';
   });
 };
 

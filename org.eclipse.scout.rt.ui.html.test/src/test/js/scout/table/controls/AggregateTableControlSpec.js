@@ -122,8 +122,8 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
-      table.changeAggregation(table.columns[1], 'none');
       table.render(session.$entryPoint);
+      table.changeAggregation(table.columns[1], 'none');
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
