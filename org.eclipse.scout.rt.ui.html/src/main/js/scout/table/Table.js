@@ -1771,7 +1771,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
   animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
-    var refRow, c, $cell, $aggregateRow;
+    var refRow, $cell, $aggregateRow;
 
     if (aggregateRow.$row) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (e.g. in insertRows -> renderRows)
