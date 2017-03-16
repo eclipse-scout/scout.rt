@@ -32,7 +32,7 @@ describe('FileChooser', function() {
 
   describe('addFiles', function() {
     it('adds the files if multiSelect is true', function() {
-      if (!scout.device.supportsFile()) {
+      if (!scout.device.supportsFileConstructor()) {
         return;
       }
       var fileChooser = scout.create('FileChooser', {
@@ -53,7 +53,7 @@ describe('FileChooser', function() {
     });
 
     it('does only add one file if multiSelect is false', function() {
-      if (!scout.device.supportsFile()) {
+      if (!scout.device.supportsFileConstructor()) {
         return;
       }
       var fileChooser = scout.create('FileChooser', {
@@ -79,7 +79,7 @@ describe('FileChooser', function() {
 
   describe('removeFile', function() {
     it('removes the file', function() {
-      if (!scout.device.supportsFile()) {
+      if (!scout.device.supportsFileConstructor()) {
         return;
       }
       var file1 = new File([''], 'file 1');

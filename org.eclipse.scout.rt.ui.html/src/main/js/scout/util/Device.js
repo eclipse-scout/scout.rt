@@ -350,6 +350,13 @@ scout.Device.prototype.supportsFile = function() {
   return (window.File ? true : false);
 };
 
+/**
+ * Some browsers support the file API but don't support the File constructor (new File()).
+ */
+scout.Device.prototype.supportsFileConstructor = function() {
+  return typeof File === 'function';
+};
+
 scout.Device.prototype.supportsCssAnimation = function() {
   return this.supportsCssProperty('animation');
 };
