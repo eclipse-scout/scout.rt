@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- @form-title-margin-top: 10px;
+@form-title-margin-top: 10px;
 
 .form {
   height: 100%;
@@ -57,7 +57,7 @@
     border-bottom: 0;
   }
 
-  & > .header{
+  & > .header {
     overflow: auto; /* clearfix */
     zoom: 1; /* clearfix */
     margin-top: @form-title-margin-top;
@@ -65,8 +65,8 @@
     margin-right: 14px;
 
     & > .icon-container {
-      float:left;
-      & > .icon{
+      float: left;
+      & > .icon {
         margin-right: 5px;
         &.font-icon {
           font-size: 14px;
@@ -84,17 +84,19 @@
       #scout.font-text-normal();
       color: @active-color;
     }
-   & > .status-container {
-     float:right;
+    & > .status-container {
+      float: right;
 
-     >.status{
-       vertical-align: middle;
-       display: inline-block;
-       margin-left: 5px;
+      > .status {
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 5px;
 
-       &.closer {
-         margin-left: 7px;
-   }
+        &.closer {
+          margin-left: 7px;
+        }
 
+      }
+    }
   }
 }
