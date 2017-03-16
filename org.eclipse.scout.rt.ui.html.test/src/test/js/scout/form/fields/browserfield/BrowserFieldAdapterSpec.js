@@ -32,7 +32,7 @@ describe('BrowserFieldAdapter', function() {
 
     sendQueuedAjaxCalls();
 
-    var event = new scout.Event(browserField.id, 'postMessage', {
+    var event = new scout.RemoteEvent(browserField.id, 'postMessage', {
       data: 'hello world',
       origin: 'foo'
     });

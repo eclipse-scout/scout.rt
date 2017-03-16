@@ -123,10 +123,10 @@ describe("TableControl", function() {
       action2.setSelected(true);
       sendQueuedAjaxCalls();
       var events = [
-        new scout.Event(action.id, 'property', {
+        new scout.RemoteEvent(action.id, 'property', {
           selected: false
         }),
-        new scout.Event(action2.id, 'property', {
+        new scout.RemoteEvent(action2.id, 'property', {
           selected: true
         })
       ];

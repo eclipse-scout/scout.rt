@@ -158,9 +158,42 @@ scout.FileChooser.prototype.upload = function() {
   }
 };
 
+/**
+ * Renders the file chooser and links it with the display parent.
+ */
+scout.FileChooser.prototype.open = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.displayParent.fileChooserController.registerAndRender(this);
+};
+
+/**
+ * Destroys the file chooser and unlinks it from the display parent.
+ */
+scout.FileChooser.prototype.close = function() {
+  if (!this.rendered) {
+    this.cancel();
+    return;
+  }
+  if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
+    this.$cancelButton.click();
+  }
+};
+
 scout.FileChooser.prototype.cancel = function() {
-  // TODO [7.0] cgu offline case?
-  this.trigger('cancel');
+  var event = new scout.Event();
+  this.trigger('cancel', event);
+  if (!event.defaultPrevented) {
+    this._close();
+  }
+};
+
+/**
+ * Destroys the file chooser and unlinks it from the display parent.
+ */
+scout.FileChooser.prototype._close = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.displayParent.fileChooserController.unregisterAndRemove(this);
+  this.destroy();
 };
 
 scout.FileChooser.prototype.browse = function() {
@@ -276,13 +309,4 @@ scout.FileChooser.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
   scout.FileChooser.parent.prototype._detach.call(this);
-};
-
-/**
- * Used by CloseKeyStroke.js
- */
-scout.FileChooser.prototype.close = function() {
-  if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
-    this.$cancelButton.click();
-  }
 };

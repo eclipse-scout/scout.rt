@@ -41,7 +41,7 @@ describe("CompactTreeAdapter", function() {
       expect(tree.selectedNodes[0]).toBe(tree.nodes[0].childNodes[0]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(tree.id, 'nodesSelected', {
+      var event = new scout.RemoteEvent(tree.id, 'nodesSelected', {
         nodeIds: [tree.nodes[0].childNodes[0].id]
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);

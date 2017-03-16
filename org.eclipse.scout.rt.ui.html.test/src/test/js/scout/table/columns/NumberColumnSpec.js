@@ -237,7 +237,7 @@ describe('NumberColumn', function() {
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
-        var event = new scout.Event(table.id, 'columnBackgroundEffectChanged', {
+        var event = new scout.RemoteEvent(table.id, 'columnBackgroundEffectChanged', {
           columnId: column0.id,
           backgroundEffect: 'barChart'
         });

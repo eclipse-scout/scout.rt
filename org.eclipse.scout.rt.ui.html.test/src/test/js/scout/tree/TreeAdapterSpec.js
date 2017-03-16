@@ -184,12 +184,12 @@ describe("TreeAdapter", function() {
 
       sendQueuedAjaxCalls();
 
-      var event0 = new scout.Event(tree.id, 'nodeExpanded', {
+      var event0 = new scout.RemoteEvent(tree.id, 'nodeExpanded', {
         nodeId: node0.id,
         expanded: true,
         expandedLazy: false
       });
-      var event1 = new scout.Event(tree.id, 'nodeExpanded', {
+      var event1 = new scout.RemoteEvent(tree.id, 'nodeExpanded', {
         nodeId: child0.id,
         expanded: true,
         expandedLazy: false

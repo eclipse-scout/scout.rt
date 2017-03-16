@@ -227,7 +227,7 @@ describe("CellEditor", function() {
       popup.completeEdit();
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event(popup.table.id, 'completeCellEdit', {
+      var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
         fieldId: popup.cell.field.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -241,7 +241,7 @@ describe("CellEditor", function() {
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
-      var event = new scout.Event(popup.table.id, 'completeCellEdit', {
+      var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
         fieldId: popup.cell.field.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -267,7 +267,7 @@ describe("CellEditor", function() {
       popup.cancelEdit();
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event(popup.table.id, 'cancelCellEdit', {
+      var event = new scout.RemoteEvent(popup.table.id, 'cancelCellEdit', {
         fieldId: popup.cell.field.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);

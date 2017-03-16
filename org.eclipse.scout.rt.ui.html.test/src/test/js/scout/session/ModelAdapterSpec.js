@@ -73,7 +73,7 @@ describe('ModelAdapter', function() {
     var widget = createWidget({id: '2'});
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
-    var event = new scout.Event('2', 'property', {
+    var event = new scout.RemoteEvent('2', 'property', {
       properties: {
         x1: 'val1',
         x2: 'val2',
@@ -97,7 +97,7 @@ describe('ModelAdapter', function() {
     expect(widget.o2.id).toBe('3');
 
     // Now send a second event, but now send the id-only ref first (in o1).
-    event = new scout.Event('2', 'property', {
+    event = new scout.RemoteEvent('2', 'property', {
       properties: {
         x2: 'val20',
         x1: 'val10',
@@ -287,7 +287,7 @@ describe('ModelAdapter', function() {
           sendQueuedAjaxCalls();
           expect(jasmine.Ajax.requests.count()).toBe(1);
 
-          var event = new scout.Event(widget.id, 'property', {
+          var event = new scout.RemoteEvent(widget.id, 'property', {
             foo: 'bar'
           });
           expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -295,7 +295,7 @@ describe('ModelAdapter', function() {
         });
 
         it('should not send event when property is triggered by server', function() {
-          var propertyChangeEvent = new scout.Event('123', 'propertyChange', {
+          var propertyChangeEvent = new scout.RemoteEvent('123', 'propertyChange', {
             properties: {foo: 'bar'}
           });
           adapter.onModelPropertyChange(propertyChangeEvent);

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.Event = function(target, type, data) {
+scout.RemoteEvent = function(target, type, data) {
   scout.assertParameter('target', target);
   scout.assertParameter('type', type);
   $.extend(this, data);

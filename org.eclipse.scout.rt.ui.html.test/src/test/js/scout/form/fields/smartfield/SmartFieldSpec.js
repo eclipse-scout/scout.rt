@@ -117,7 +117,7 @@ describe('SmartField', function() {
     it('must "browse all" when field is valid and browseAll parameter is true', function() {
       smartField._openProposal(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: true,
         selectCurrentValue: true
@@ -128,7 +128,7 @@ describe('SmartField', function() {
     it('must search by display-text when field is valid and browseAll parameter is false', function() {
       smartField._openProposal(false);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: false,
         selectCurrentValue: false
@@ -140,7 +140,7 @@ describe('SmartField', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: true,
         selectCurrentValue: false
@@ -190,7 +190,7 @@ describe('SmartField', function() {
       smartField._acceptProposal();
 
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'acceptProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'acceptProposal', {
         chooser: false,
         displayText: 'bar',
         showBusyIndicator: false,

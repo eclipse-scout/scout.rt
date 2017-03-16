@@ -42,7 +42,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowsSelected', {
+      var event = new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds: helper.getRowIds(rows)
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -75,7 +75,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowsChecked', {
+      var event = new scout.RemoteEvent(table.id, 'rowsChecked', {
         rows: [{
           rowId: rows[0].id,
           checked: true

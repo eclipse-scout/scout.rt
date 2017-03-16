@@ -28,8 +28,10 @@ scout.FileChooserField.prototype._init = function(model) {
 
 scout.FileChooserField.prototype._initKeyStrokeContext = function() {
   scout.FileChooserField.parent.prototype._initKeyStrokeContext.call(this);
-  this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldBrowseKeyStroke(this));
-  this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldDeleteKeyStroke(this));
+  if (!this.fileInput.legacy) {
+    this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldBrowseKeyStroke(this));
+    this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldDeleteKeyStroke(this));
+  }
 };
 
 scout.FileChooserField.prototype._render = function($parent) {
@@ -49,6 +51,9 @@ scout.FileChooserField.prototype._renderFileInput = function() {
 scout.FileChooserField.prototype.setDisplayText = function(text) {
   scout.FileChooserField.parent.prototype.setDisplayText.call(this, text);
   this.fileInput.setText(text);
+  if (!text) {
+    this.fileInput.clear();
+  }
 };
 
 /**
@@ -80,5 +85,8 @@ scout.FileChooserField.prototype._onIconClick = function(event) {
 
 scout.FileChooserField.prototype._onFileChange = function() {
   this.acceptInput();
-  this.fileInput.upload();
+  var success = this.fileInput.upload();
+  if (!success) {
+    this.fileInput.clear();
+  }
 };

@@ -604,7 +604,7 @@ scout.Session.prototype._requestToJson = function(request) {
     // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
     var ignore =
       (this === request && key === 'showBusyIndicator') ||
-      (this instanceof scout.Event && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
+      (this instanceof scout.RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
     return (ignore ? undefined : value);
   });
 };

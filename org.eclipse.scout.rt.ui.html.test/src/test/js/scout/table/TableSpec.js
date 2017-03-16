@@ -807,7 +807,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowAction', {
+      var event = new scout.RemoteEvent(table.id, 'rowAction', {
         columnId : column0.id,
         rowId : row0.id
       });
@@ -847,7 +847,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowAction', {
+      var event = new scout.RemoteEvent(table.id, 'rowAction', {
         columnId : column0.id,
         rowId : row0.id
       });
@@ -886,7 +886,7 @@ describe("Table", function() {
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls('', 1000);
-      var event = new scout.Event(table.id, 'columnResized', {
+      var event = new scout.RemoteEvent(table.id, 'columnResized', {
         columnId : table.columns[0].id,
         width : 100,
         showBusyIndicator : false
@@ -923,7 +923,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event(table.id, 'columnResized', {
+      var event = new scout.RemoteEvent(table.id, 'columnResized', {
         columnId : table.columns[0].id,
         width : 150,
         showBusyIndicator : false
@@ -1250,7 +1250,7 @@ describe("Table", function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event(table.id, 'rowsSorted', {
+      var event = new scout.RemoteEvent(table.id, 'rowsSorted', {
         columnId : table.columns[0].id,
         sortAscending : false
       });
@@ -1265,7 +1265,7 @@ describe("Table", function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event(table.id, 'sortRows', {
+      var event = new scout.RemoteEvent(table.id, 'sortRows', {
         columnId : table.columns[0].id,
         sortAscending : false
       });
@@ -2267,7 +2267,7 @@ describe("Table", function() {
       // remaining rows (including first row)
       expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected' ]);
 
-      var event = [ new scout.Event(table.id, 'rowsSelected', {
+      var event = [ new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[0].id, model.rows[1].id, model.rows[2].id ]
       }) ];
       expect(requestData).toContainEvents(event);
@@ -2293,7 +2293,7 @@ describe("Table", function() {
       // exactly only one selection event for first row
       expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
 
-      var event = [ new scout.Event(table.id, 'rowsSelected', {
+      var event = [ new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[0].id ]
       }) ];
       expect(requestData).toContainEvents(event);
@@ -2341,7 +2341,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(table.id, 'rowsSelected', {
+      var event = new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[expectedSelectedRowIndex].id ]
       });
       expect(requestData).toContainEvents(event);

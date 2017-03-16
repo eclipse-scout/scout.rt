@@ -245,7 +245,7 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
   options = opts;
   // (End legacy fallback)
 
-  var event = new scout.Event(this.id, type, data);
+  var event = new scout.RemoteEvent(this.id, type, data);
   // The following properties will not be sent to the server, see Session._requestToJson().
   if (options.coalesce !== undefined) {
     event.coalesce = options.coalesce;

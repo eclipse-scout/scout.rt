@@ -14,6 +14,9 @@ scout.FileChooserAdapter = function() {
 scout.inherits(scout.FileChooserAdapter, scout.ModelAdapter);
 
 scout.FileChooserAdapter.prototype._onWidgetCancel = function(event) {
+  // Do not close the form immediately, server will send the close event
+  event.preventDefault();
+
   this._send('cancel');
 };
 

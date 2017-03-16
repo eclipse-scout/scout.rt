@@ -279,7 +279,7 @@ describe('Desktop', function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var expectedEvent = new scout.Event(session.desktop.id, 'geolocationDetermined', {
+      var expectedEvent = new scout.RemoteEvent(session.desktop.id, 'geolocationDetermined', {
         latitude: 1,
         longitude: 1
       });

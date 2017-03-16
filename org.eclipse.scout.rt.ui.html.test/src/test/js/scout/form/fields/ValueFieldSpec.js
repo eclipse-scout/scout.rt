@@ -243,7 +243,7 @@ describe('ValueField', function() {
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(formField.id, 'displayTextChanged', {
+      var event = new scout.RemoteEvent(formField.id, 'displayTextChanged', {
         displayText: 'abc123contextmenu', whileTyping: false
       });
       event.showBusyIndicator = true;

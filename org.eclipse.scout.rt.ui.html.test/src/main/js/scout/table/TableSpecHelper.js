@@ -293,7 +293,7 @@ scout.TableSpecHelper.prototype.assertDatesInCells = function(rows, colIndex, da
 };
 
 scout.TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
-  var event = new scout.Event(id, 'rowsSelected', {
+  var event = new scout.RemoteEvent(id, 'rowsSelected', {
     rowIds: rowIds
   });
   expect(mostRecentJsonRequest()).toContainEvents(event);
