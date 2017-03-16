@@ -1015,6 +1015,18 @@ $.fn.cssPaddingTop = function(value) {
   return this.cssPxValue('padding-top', value);
 };
 
+$.fn.cssPaddingRight = function(value) {
+  return this.cssPxValue('padding-right', value);
+};
+
+$.fn.cssPaddingBottom = function(value) {
+  return this.cssPxValue('padding-bottom', value);
+};
+
+$.fn.cssPaddingLeft = function(value) {
+  return this.cssPxValue('padding-left', value);
+};
+
 $.fn.cssBorderBottomWidth = function(value) {
   return this.cssPxValue('border-bottom-width', value);
 };
