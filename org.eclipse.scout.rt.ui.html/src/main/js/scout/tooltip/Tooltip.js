@@ -124,6 +124,7 @@ scout.Tooltip.prototype._remove = function() {
     this._moveHandler = null;
   }
   this.dialog = null;
+  this.$menus = null;
   scout.Tooltip.parent.prototype._remove.call(this);
 };
 

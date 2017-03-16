@@ -535,24 +535,11 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     }
   } else if (this.menusVisible && this._hasMenus()) {
     var func = function func(event) {
-      var menus = this._getCurrentMenus();
       // Toggle menu
       if (this.contextPopup && this.contextPopup.rendered) {
-        this.contextPopup.close();
-        this.contextPopup = null;
+        this._hideContextMenu();
       } else {
-        if (menus.length === 0) {
-          // at least one menu item must be visible
-          return;
-        }
-        this.contextPopup = scout.create('ContextMenuPopup', {
-          parent: this,
-          $anchor: this.$status,
-          menuItems: menus,
-          cloneMenuItems: false,
-          closeOnAnchorMousedown: false
-        });
-        this.contextPopup.open();
+        this._showContextMenu();
       }
     }.bind(this);
 
@@ -597,6 +584,9 @@ scout.FormField.prototype._showStatusMessage = function() {
     return;
   }
 
+  // If a context menu is open, close it first
+  this._hideContextMenu();
+
   if (this.tooltip) {
     // update existing tooltip
     this.tooltip.setText(text);
@@ -623,6 +613,33 @@ scout.FormField.prototype._showStatusMessage = function() {
 scout.FormField.prototype._hideStatusMessage = function() {
   if (this.tooltip) {
     this.tooltip.destroy();
+  }
+};
+
+scout.FormField.prototype._showContextMenu = function() {
+  var menus = this._getCurrentMenus();
+  if (menus.length === 0) {
+    // at least one menu item must be visible
+    return;
+  }
+
+  // Make sure tooltip is closed first
+  this._hideStatusMessage();
+
+  this.contextPopup = scout.create('ContextMenuPopup', {
+    parent: this,
+    $anchor: this.$status,
+    menuItems: menus,
+    cloneMenuItems: false,
+    closeOnAnchorMousedown: false
+  });
+  this.contextPopup.open();
+};
+
+scout.FormField.prototype._hideContextMenu = function() {
+  if (this.contextPopup) {
+    this.contextPopup.close();
+    this.contextPopup = null;
   }
 };
 
