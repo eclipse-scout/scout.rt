@@ -273,8 +273,10 @@ scout.scrollbars = {
       scrollableH = $scrollable.height(),
       elementBounds = scout.graphics.offsetBounds($element, false, false),
       scrollableBounds = scout.graphics.offsetBounds($scrollable, false, false),
-      elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp,
-      elementH = elementBounds.height + scrollOffsetDown;
+      elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp, // relative to scrollable y
+      elementTopNew = 0,
+      elementH = elementBounds.height + scrollOffsetDown,
+      elementBottom = elementTop + elementH;
 
     //There are some elements which has a height of 0 (Checkboxes / Radiobuttons) -> try to get field and figure out its height and offset
     // TODO [7.0] cgu: remove this hack, fix checkbox and radio buttons
@@ -286,10 +288,21 @@ scout.scrollbars = {
     }
 
     if (elementTop < 0) {
-      scout.scrollbars.scrollTop($scrollable, $scrollable.scrollTop() + elementTop);
-    } else if (elementTop + elementH > scrollableH) {
+      // Element is on the top of the view port -> scroll up
+      scrollTo = $scrollable.scrollTop() + elementTop;
+    } else if (elementBottom > scrollableH) {
+      // Element is on the Bottom of the view port -> scroll down
       // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
-      scrollTo = Math.ceil($scrollable.scrollTop() + elementTop + elementH - scrollableH);
+      scrollTo = Math.ceil($scrollable.scrollTop() + elementBottom - scrollableH);
+
+      // If the viewport is very small, make sure the element is not moved outside on top
+      // Otherwise when calling this function again, since the element is on the top of the view port, the scroll pane would scroll down which results in flickering
+      elementTopNew = elementTop - (scrollTo - $scrollable.scrollTop());
+      if (elementTopNew < 0) {
+        scrollTo = scrollTo + elementTopNew;
+      }
+    }
+    if (scrollTo) {
       scout.scrollbars.scrollTop($scrollable, scrollTo);
     }
   },

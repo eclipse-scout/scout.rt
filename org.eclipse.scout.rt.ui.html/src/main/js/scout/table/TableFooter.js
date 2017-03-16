@@ -11,6 +11,10 @@
 scout.TableFooter = function() {
   scout.TableFooter.parent.call(this);
 
+  this.animating = false;
+  this.open = false;
+  this.resizing = false;
+  this.table = null;
   this._tableRowsChangedHandler = this._onTableRowsChanged.bind(this);
   this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
   this._tableAddFilterHandler = this._onTableAddFilter.bind(this);
@@ -23,7 +27,6 @@ scout.inherits(scout.TableFooter, scout.Widget);
 
 scout.TableFooter.prototype._init = function(options) {
   scout.TableFooter.parent.prototype._init.call(this, options);
-  this.table = options.table;
 
   // Keystroke context for the search field.
   this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
@@ -152,6 +155,7 @@ scout.TableFooter.prototype._renderResizer = function() {
       .on('mousemove.tablefooter', resizeMove.bind(this))
       .one('mouseup', resizeEnd.bind(this));
     this._$body.addClass('row-resize');
+    this.resizing = true;
 
     function resizeMove(event) {
       if (!this.rendered) {
@@ -165,9 +169,9 @@ scout.TableFooter.prototype._renderResizer = function() {
       var maxHeight = this.table.$container.height() - this.table.footer.$container.height();
       // Calculate new height of table control container
       var newHeight = Math.min(startHeight - dx, maxHeight);
-
       this.$controlContainer.height(newHeight);
-      this.$controlContent.outerHeight(newHeight);
+      var controlContainerInsets = scout.graphics.getInsets(this.$controlContainer);
+      this.$controlContent.outerHeight(newHeight - controlContainerInsets.vertical());
       this._revalidateTableLayout();
     }
 
@@ -178,6 +182,7 @@ scout.TableFooter.prototype._renderResizer = function() {
 
       this._$window.off('mousemove.tablefooter');
       this._$body.removeClass('row-resize');
+      this.resizing = false;
     }
 
     return false;
@@ -412,20 +417,20 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   if (this.open) {
     // Calling open again may resize the container -> don't return
   }
-  this.opening = true;
+  this.animating = true;
   this.open = true;
 
-  var insets = scout.graphics.getInsets(this.$controlContainer),
-    contentHeight = control.height - insets.top - insets.bottom;
+  var allowedControlHeight = this.computeControlContainerHeight(this.table, control);
 
-  this.$controlContent.outerHeight(contentHeight);
+  var insets = scout.graphics.getInsets(this.$controlContainer);
+  this.$controlContent.outerHeight(allowedControlHeight - insets.vertical());
 
   // If container is opened the first time, set the height to 0 to make animation work
   if (this.$controlContainer[0].style.height === '') {
     this.$controlContainer.outerHeight(0);
   }
 
-  if (this.$controlContainer.outerHeight() > control.height) {
+  if (this.$controlContainer.outerHeight() > allowedControlHeight) {
     // Container gets smaller -> layout first to prevent having a white area
     this.table.invalidateLayoutTree();
   }
@@ -433,11 +438,11 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   // open container, stop existing (close) animations before
   // use delay to make sure form is rendered and layouted with new size
   this.$controlContainer.stop(true).show().delay(1).animate({
-    height: control.height
+    height: allowedControlHeight
   }, {
     duration: this.rendered ? control.animateDuration : 0,
     complete: function() {
-      this.opening = false;
+      this.animating = false;
       control.onControlContainerOpened();
       this.table.invalidateLayoutTree();
     }.bind(this)
@@ -449,7 +454,7 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
     return;
   }
   this.open = false;
-  this.opening = false;
+  this.animating = true;
   this.table.invalidateLayoutTree();
 
   this.$controlContainer.stop(true).show().animate({
@@ -457,10 +462,58 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
   }, {
     duration: control.animateDuration,
     done: function() {
+      this.animating = false;
       this.$controlContainer.hide();
       control.onControlContainerClosed();
     }.bind(this)
   });
+};
+
+scout.TableFooter.prototype.computeControlContainerHeight = function(table, control, growControl) {
+  var menuBarHeight = 0,
+    footerHeight = 0,
+    containerHeight = scout.graphics.getSize(table.$container).height,
+    maxControlHeight,
+    controlContainerHeight = 0,
+    dataMargins = scout.graphics.getMargins(table.$data),
+    dataMarginsHeight = dataMargins.top + dataMargins.bottom,
+    menuBar = table.menuBar,
+    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    footer = table.footer,
+    header = table.header,
+    htmlContainer = table.htmlComp,
+    containerSize = htmlContainer.getAvailableSize()
+    .subtract(htmlContainer.getInsets());
+
+  if (!footer) {
+    return;
+  }
+
+  if (menuBar.visible) {
+    menuBarHeight = scout.MenuBarLayout.size(htmlMenuBar, containerSize).height;
+  }
+  // Layout table footer and add size of footer (including the control content) to 'height'
+  footerHeight = scout.graphics.getSize(footer.$container).height;
+  if (footer.open) {
+    if (footer.animating) {
+      // Layout may be called when container stays open but changes its size using an animation.
+      // At that time the controlContainer has not yet the final size, therefore measuring is not possible, but not necessary anyway.
+      controlContainerHeight = control.height;
+    } else {
+      // Measure the real height
+      controlContainerHeight = scout.graphics.getSize(footer.$controlContainer).height;
+      // Expand control height? (but only if not resizing)
+      if (!footer.resizing && growControl) {
+        controlContainerHeight = Math.max(control.height, controlContainerHeight);
+      }
+    }
+  }
+  // Crop control height (don't do it if table does not have the correct size yet)
+  if (this.table.htmlComp.layouted) {
+    maxControlHeight = containerHeight - (dataMarginsHeight + menuBarHeight + footerHeight);
+    controlContainerHeight = Math.min(controlContainerHeight, maxControlHeight);
+  }
+  return controlContainerHeight;
 };
 
 scout.TableFooter.prototype._hideTableStatusTooltip = function() {

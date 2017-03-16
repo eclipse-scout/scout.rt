@@ -20,11 +20,22 @@ scout.FormTableControlLayout.prototype.layout = function($container) {
   }
 
   var formSize,
+    form = this.control.form,
     controlContentSize = scout.graphics.getSize(this.control.tableFooter.$controlContent);
 
   if (this.control.form) {
-    var htmlForm = this.control.form.htmlComp;
+    var htmlForm = form.htmlComp;
     formSize = controlContentSize.subtract(htmlForm.getMargins());
     htmlForm.setSize(formSize);
+
+    // special case: when the control is opened/resized and there is not enough space, ensure that the active element is
+    // visible by scrolling to it
+    if (form.rootGroupBox.fields[0] instanceof scout.TabBox) {
+      var tabBox = form.rootGroupBox.fields[0];
+      var tab = tabBox.selectedTab;
+      if (tab && tab.scrollable && tab.$body.has(document.activeElement)) {
+        scout.scrollbars.scrollTo(tab.$body, $(document.activeElement));
+      }
+    }
   }
 };
