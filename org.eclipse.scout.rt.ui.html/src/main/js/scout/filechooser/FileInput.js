@@ -21,8 +21,19 @@ scout.inherits(scout.FileInput, scout.Widget);
 scout.FileInput.prototype._init = function(model) {
   scout.FileInput.parent.prototype._init.call(this, model);
   this.uploadController = model.uploadController || model.parent;
-  this.legacyFileUploadUrl = model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id;
+  var url = new scout.URL(model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id);
+  url.setParameter('legacy', true);
+  this.legacyFileUploadUrl = url.toString();
   this.legacy = !scout.device.supportsFile();
+};
+
+/**
+ * @override
+ */
+scout.FileInput.prototype._initKeyStrokeContext = function() {
+  // Need to create keystroke context here because this.legacy is not set at the time the constructor is executed
+  this.keyStrokeContext = this._createKeyStrokeContext();
+  scout.Widget.prototype._initKeyStrokeContext.call(this);
 };
 
 scout.FileInput.prototype._createKeyStrokeContext = function() {
@@ -82,9 +93,6 @@ scout.FileInput.prototype._renderLegacyMode = function() {
     .attr('method', 'post')
     .attr('target', 'legacyFileUpload' + this.uploadController.id)
     .append(this.$fileInput);
-  this.$legacyForm.appendElement('<input>')
-    .attr('name', 'legacyFormTextPlainAnswer')
-    .attr('type', 'hidden');
   this.$container = this.$legacyForm;
 };
 
@@ -155,7 +163,11 @@ scout.FileInput.prototype._setFiles = function(files) {
   }
   var name = '';
   if (files.length > 0) {
-    name = files[0].name;
+    if (this.legacy) {
+      name = files[0];
+    } else {
+      name = files[0].name;
+    }
   }
   this.files = files;
   this.setText(name);

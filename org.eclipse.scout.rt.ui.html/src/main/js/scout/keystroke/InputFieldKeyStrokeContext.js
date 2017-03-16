@@ -94,7 +94,7 @@ scout.InputFieldKeyStrokeContext.prototype._applyPropagationFlags = function(eve
     return;
   }
 
-  var inputField = $(event.target).is('input:text') || $(event.target).is('textarea');
+  var inputField = $(event.target).is('input:text') || $(event.target).is('input:file') || $(event.target).is('textarea');
   if (inputField && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
     event.stopPropagation();
   }
