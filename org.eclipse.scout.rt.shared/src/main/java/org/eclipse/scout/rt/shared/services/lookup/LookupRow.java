@@ -151,7 +151,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withKey(ID_TYPE key) {
+  public LookupRow<ID_TYPE> withKey(ID_TYPE key) {
     setValueInternal(KEY_BIT, key);
     return this;
   }
@@ -163,7 +163,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withParentKey(ID_TYPE parentKey) {
+  public LookupRow<ID_TYPE> withParentKey(ID_TYPE parentKey) {
     setValueInternal(PARENT_KEY_BIT, parentKey);
     return this;
   }
@@ -175,7 +175,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withText(String text) {
+  public LookupRow<ID_TYPE> withText(String text) {
     setValueInternal(TEXT_BIT, text != null ? text.toCharArray() : null);
     return this;
   }
@@ -186,7 +186,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withIconId(String iconId) {
+  public LookupRow<ID_TYPE> withIconId(String iconId) {
     setValueInternal(ICON_ID_BIT, StringUtility.intern(iconId));
     return this;
   }
@@ -198,7 +198,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withTooltipText(String tooltipText) {
+  public LookupRow<ID_TYPE> withTooltipText(String tooltipText) {
     setValueInternal(TOOLTIP_BIT, tooltipText != null ? tooltipText.toCharArray() : null);
     return this;
   }
@@ -209,7 +209,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withForegroundColor(String foregroundColor) {
+  public LookupRow<ID_TYPE> withForegroundColor(String foregroundColor) {
     setValueInternal(FOREGROUD_COLOR_BIT, StringUtility.intern(foregroundColor));
     return this;
   }
@@ -220,7 +220,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withCssClass(String cssClass) {
+  public LookupRow<ID_TYPE> withCssClass(String cssClass) {
     setValueInternal(CSS_CLASS_BIT, StringUtility.intern(cssClass));
     return this;
   }
@@ -231,7 +231,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withBackgroundColor(String backgroundColor) {
+  public LookupRow<ID_TYPE> withBackgroundColor(String backgroundColor) {
     setValueInternal(BACKGROUD_COLOR_BIT, StringUtility.intern(backgroundColor));
     return this;
   }
@@ -242,12 +242,12 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return s != null ? FontSpec.parse(s) : null;
   }
 
-  public ILookupRow<ID_TYPE> withFont(String font) {
+  public LookupRow<ID_TYPE> withFont(String font) {
     return withFont(FontSpec.parse(font));
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withFont(FontSpec font) {
+  public LookupRow<ID_TYPE> withFont(FontSpec font) {
     setValueInternal(FONT_BIT, font != null ? StringUtility.intern(font.toPattern()) : null);
     return this;
   }
@@ -258,7 +258,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withEnabled(boolean enabled) {
+  public LookupRow<ID_TYPE> withEnabled(boolean enabled) {
     setIfNotDefault(ENABLED_BIT, enabled, Boolean.TRUE);
     return this;
   }
@@ -269,7 +269,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withActive(boolean active) {
+  public LookupRow<ID_TYPE> withActive(boolean active) {
     setIfNotDefault(ACTIVE_BIT, active, Boolean.TRUE);
     return this;
   }
@@ -280,7 +280,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   }
 
   @Override
-  public ILookupRow<ID_TYPE> withAdditionalTableRowData(AbstractTableRowData bean) {
+  public LookupRow<ID_TYPE> withAdditionalTableRowData(AbstractTableRowData bean) {
     setValueInternal(ADDITIONAL_TABLE_ROW_DATA, bean);
     return this;
   }

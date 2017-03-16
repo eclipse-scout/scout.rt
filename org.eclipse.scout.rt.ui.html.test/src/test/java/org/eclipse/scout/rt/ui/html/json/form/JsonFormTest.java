@@ -188,7 +188,7 @@ public class JsonFormTest {
     form.getStringField().setValue("test");
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
-    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size()); // event not sent to UI
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size()); // event not sent to UI
 
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -198,7 +198,7 @@ public class JsonFormTest {
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
     assertTrue(JsonResponseTest.getAdapterData(m_uiSession.currentJsonResponse()).isEmpty());
-    assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size()); // no event for invisible field
+    assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size()); // no event for invisible field
 
     // --- 4 ---
 

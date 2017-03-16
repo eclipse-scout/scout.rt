@@ -82,6 +82,24 @@ public final class FormChains {
     }
   }
 
+  public static class IsSaveNeededFieldsChain extends AbstractFormChain {
+
+    public IsSaveNeededFieldsChain(List<? extends IFormExtension<? extends AbstractForm>> extensions) {
+      super(extensions);
+    }
+
+    public boolean execIsSaveNeeded() {
+      MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
+        @Override
+        protected void callMethod(IFormExtension<? extends AbstractForm> next) {
+          setReturnValue(next.execIsSaveNeeded(IsSaveNeededFieldsChain.this));
+        }
+      };
+      callChain(methodInvocation);
+      return methodInvocation.getReturnValue();
+    }
+  }
+
   public static class FormCheckFieldsChain extends AbstractFormChain {
 
     public FormCheckFieldsChain(List<? extends IFormExtension<? extends AbstractForm>> extensions) {

@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormResetSearchF
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormStoredChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.IsSaveNeededFieldsChain;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -40,6 +41,8 @@ public interface IFormExtension<OWNER_FORM extends AbstractForm> extends IExtens
   void execInactivityTimer(FormInactivityTimerChain chain);
 
   void execStored(FormStoredChain chain);
+
+  boolean execIsSaveNeeded(IsSaveNeededFieldsChain chain);
 
   boolean execCheckFields(FormCheckFieldsChain chain);
 

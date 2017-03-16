@@ -32,7 +32,7 @@
   & > .simple-tab-area {
     height: @desktop-header-height;
 
-    & > .desktop-view-tab.selected {
+    & > .simple-tab.selected {
       &::before {
         .desktop-bench-drop-shadow();
         top: 0;
@@ -56,7 +56,7 @@
   height: 100%;
 
   & > .view-button-tab {
-    /* 1px smaller than the header because of the bottom border (see .selected rule for .desktop-view-tab) */
+    /* 1px smaller than the header because of the bottom border (see .selected rule for .simple-tab) */
     height: calc(~'100% - 1px');
     vertical-align: top;
     background-color: @header-view-button-tab-background-color;
