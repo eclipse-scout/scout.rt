@@ -383,6 +383,7 @@ scout.DateField.prototype._onDateFieldClick = function() {
 scout.DateField.prototype._onDateIconClick = function(event) {
   if (scout.fields.handleOnClick(this)) {
     this.$dateField.focus();
+    event.preventDefault();
     this.openPopupAndSelect(this.timestampAsDate);
   }
 };
@@ -396,6 +397,7 @@ scout.DateField.prototype._onTimeFieldClick = function(event) {
 scout.DateField.prototype._onTimeIconClick = function(event) {
   if (scout.fields.handleOnClick(this)) {
     this.$timeField.focus();
+    event.preventDefault();
     if (this.touch) {
       this.openPopupAndSelect(this.timestampAsDate);
     }
