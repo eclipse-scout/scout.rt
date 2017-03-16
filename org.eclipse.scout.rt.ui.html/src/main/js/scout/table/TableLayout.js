@@ -11,47 +11,49 @@
 scout.TableLayout = function(table) {
   scout.TableLayout.parent.call(this);
   this.table = table;
+  this._dataHeightPositive = false;
 };
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
 scout.TableLayout.prototype.layout = function($container) {
-  var menuBarSize,
+  var menuBarHeight = 0,
+    footerHeight = 0,
+    headerHeight = 0,
+    controlContainerHeight = 0,
+    controlContainerInsets,
+    $data = this.table.$data,
+    dataMargins = scout.graphics.getMargins($data),
+    dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
-    $data = this.table.$data,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
-    height = 0,
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
-    containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+    containerSize = htmlContainer.getAvailableSize().subtract(htmlContainer.getInsets()),
+    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
 
   if (menuBar.visible) {
-    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
-    height += menuBarSize.height;
+    menuBarHeight = menuBarSize.height;
+  }
+  if (header) {
+    headerHeight = scout.graphics.getSize(header.$container).height;
   }
   if (footer) {
     // Layout table footer and add size of footer (including the control content) to 'height'
-    footer.revalidateLayout();
-    height += scout.graphics.getSize(footer.$container).height;
-    if (footer.opening) {
-      // Layout may be called when container stays open but changes its size using an animation.
-      // At that time the controlContainer has not yet the final size, therefore measuring is not possible, but not necessary anyway.
-      height += footer.selectedControl.height;
-    } else if (footer.open) {
-      // Measure the real height
-      height += scout.graphics.getSize(footer.$controlContainer).height;
+    footerHeight = scout.graphics.getSize(footer.$container).height;
+    controlContainerHeight = footer.computeControlContainerHeight(this.table, footer.selectedControl, !this._dataHeightPositive);
+    controlContainerInsets = scout.graphics.getInsets(footer.$controlContainer);
+    if (!footer.animating) { // closing or opening: height is about to be changed
+      footer.$controlContainer.height(controlContainerHeight);
+      footer.$controlContent.outerHeight(controlContainerHeight - controlContainerInsets.vertical());
+      footer.revalidateLayout();
     }
   }
-  if (header) {
-    height += scout.graphics.getSize(header.$container).height;
-  }
-  var dataMargins = scout.graphics.getMargins($data);
-  height += dataMargins.top + dataMargins.bottom;
-  $data.css('height', 'calc(100% - ' + height + 'px)');
+  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
+  this._dataHeightPositive = $data.height() > 0;
 
   if (this.table.autoResizeColumns) {
     this._layoutColumns();
