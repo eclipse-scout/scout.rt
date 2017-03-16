@@ -391,4 +391,22 @@ describe('SmartField', function() {
     });
   });
 
+  describe('display text', function() {
+    var smartField;
+
+    beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
+    });
+    it('is also rendered if it is empty', function() {
+      smartField.render(session.$entryPoint);
+      expect(smartField.displayText).toBe('');
+      smartField.setValue(1);
+      expect(smartField.value).toBe(1);
+      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('1');
+      smartField.setValue(null);
+      expect(smartField.value).toBe(null);
+      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('');
+    });
+  });
+
 });

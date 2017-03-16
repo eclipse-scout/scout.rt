@@ -149,18 +149,15 @@ scout.SmartField.prototype._setDisplayText = function(displayText) {
  * @override ValueField.js
  */
 scout.SmartField.prototype._renderDisplayText = function() {
-  if (this.displayText) {
-    var multilineText = this.displayText.split('\n');
-    if (multilineText) {
-      var firstLine = multilineText.shift();
-      this._additionalLines = multilineText;
-      scout.fields.valOrText(this, this.$field, firstLine);
-    } else {
-      this._additionalLines = null;
-      scout.fields.valOrText(this, this.$field, this.displayText);
-    }
+  var displayText = scout.nvl(this.displayText, '');
+  var multilineText = displayText.split('\n');
+  if (multilineText) {
+    var firstLine = multilineText.shift();
+    this._additionalLines = multilineText;
+    scout.fields.valOrText(this, this.$field, firstLine);
   } else {
     this._additionalLines = null;
+    scout.fields.valOrText(this, this.$field, displayText);
   }
 };
 
@@ -625,7 +622,6 @@ scout.SmartField.prototype.openPopup = function() {
     this._hideStatusMessage();
   }
 };
-
 
 scout.SmartField.prototype._onPopupRemove = function(event) {
   this.popup = null;
