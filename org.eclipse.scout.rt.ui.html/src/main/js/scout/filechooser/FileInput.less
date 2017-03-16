@@ -10,17 +10,23 @@
  ******************************************************************************/
 .file-input {
   cursor: pointer;
+  /* Don't allow text selection because mouse down opens the chooser.
+   * Reason: The browser would still be in selecting mode after the chooser closes,
+   * every click outside of the field would immediately open the chooser again (at least in FF).
+   */
+  #scout.user-select(none);
 
-  &:active {
+  &:not(.disabled):active {
     background-color: @palette-gray-2;
   }
 
-  &.has-error:active {
+  &.has-error:not(.disabled):active {
     background-color: @palette-red-1;
   }
 
   &.disabled {
     cursor: default;
+    #scout.user-select(text);
   }
 }
 

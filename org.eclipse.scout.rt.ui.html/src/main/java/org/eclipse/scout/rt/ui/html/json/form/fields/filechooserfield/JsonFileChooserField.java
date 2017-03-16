@@ -80,6 +80,7 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 
+  @SuppressWarnings("deprecation")
   protected void handleUiChooseFile() {
     getModel().getUIFacade().startFileChooserFromUI();
   }
