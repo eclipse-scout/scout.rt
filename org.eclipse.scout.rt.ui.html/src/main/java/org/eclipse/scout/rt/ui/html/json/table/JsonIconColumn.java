@@ -25,6 +25,11 @@ public class JsonIconColumn<T extends IIconColumn> extends JsonColumn<T> {
   }
 
   @Override
+  public boolean isValueRequired() {
+    return true;
+  }
+
+  @Override
   public Object cellValueToJson(Object value) {
     return MainJsonObjectFactory.get().createJsonObject(value).toJson();
   }

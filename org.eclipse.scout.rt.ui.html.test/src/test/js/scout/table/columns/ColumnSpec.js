@@ -295,6 +295,20 @@ describe('Column', function() {
       expect(row.cells[0].text).toEqual('CELL 1');
     });
 
+    it('calls formatValue to format the text, also for cell objects', function() {
+      table.columns[0]._formatValue = function(value) {
+        return value.toUpperCase();
+      };
+      table.insertRows([{
+        cells: [scout.create('Cell', {
+          value: 'cell 1'
+        })]
+      }]);
+      var row = table.rows[0];
+      expect(row.cells[0].value).toEqual('cell 1');
+      expect(row.cells[0].text).toEqual('CELL 1');
+    });
+
     it('does not format the value if a text is provided', function() {
       table.columns[0]._formatValue = function(value) {
         return value.toUpperCase();
@@ -310,7 +324,7 @@ describe('Column', function() {
       expect(row.cells[0].text).toEqual('cell text 1');
     });
 
-    it('sets the value if only text is provided', function() {
+    it('sets the value to null if only text is provided', function() {
       table.columns[0]._formatValue = function(value) {
         return value.toUpperCase();
       };
@@ -320,7 +334,7 @@ describe('Column', function() {
         })]
       }]);
       var row = table.rows[0];
-      expect(row.cells[0].value).toEqual('cell text 1');
+      expect(row.cells[0].value).toEqual(null);
       expect(row.cells[0].text).toEqual('cell text 1');
     });
 

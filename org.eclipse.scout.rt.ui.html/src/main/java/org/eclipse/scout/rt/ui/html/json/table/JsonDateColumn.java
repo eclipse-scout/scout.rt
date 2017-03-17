@@ -69,6 +69,11 @@ public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
   }
 
   @Override
+  public boolean isValueRequired() {
+    return true;
+  }
+
+  @Override
   public Object cellValueToJson(Object value) {
     Date date = (Date) value;
     if (date != null) {

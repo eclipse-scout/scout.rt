@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -90,6 +91,55 @@ public class JsonCellToJsonTest {
 
     Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
     assertTrue(jsonObj instanceof String);
+  }
+
+  /**
+   * Send {@link JSONObject#NULL} if value is null if value is required.
+   */
+  @Test
+  public void testNullValue() throws JSONException {
+    TableWithLongColumn table = new TableWithLongColumn();
+    table.initTable();
+    ITableRow row = table.addRow(table.createRow());
+    table.getColumn().setValue(row, null);
+    row.getCellForUpdate(table.getColumn()).setText("-empty-");
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
+    assertEquals("-empty-", jsonObj.get("text"));
+    assertEquals(JSONObject.NULL, jsonObj.get("value"));
+  }
+
+  /**
+   * Send only empty text if both are empty
+   */
+  @Test
+  public void testNullValueAndEmptyText() throws JSONException {
+    TableWithLongColumn table = new TableWithLongColumn();
+    table.initTable();
+    ITableRow row = table.addRow(table.createRow());
+    table.getColumn().setValue(row, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
+    assertEquals("", jsonObj.get("text"));
+    assertNull(jsonObj.opt("value"));
+  }
+
+  /**
+   * Send only empty text if both are empty
+   */
+  @Test
+  public void testNullValueAndEmptyText_leftAlignment() throws JSONException {
+    TableWithLongColumn table = new TableWithLongColumn();
+    table.getColumn().setHorizontalAlignment(-1);
+    table.initTable();
+    ITableRow row = table.addRow(table.createRow());
+    table.getColumn().setValue(row, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+
+    Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
+    assertEquals("", jsonObj);
   }
 
   @Test

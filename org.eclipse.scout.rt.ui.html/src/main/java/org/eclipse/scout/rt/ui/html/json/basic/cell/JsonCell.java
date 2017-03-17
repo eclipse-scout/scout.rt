@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -88,8 +89,14 @@ public class JsonCell implements IJsonObject {
   public Object toJsonOrString() {
     JSONObject json = toJson();
     JsonObjectUtility.filterDefaultValues(json, "Cell");
+    String text = json.optString("text");
+    Object value = json.opt("value");
+    // If value is null and text too, no need to send both -> remove value
+    if (JSONObject.NULL.equals(value) && StringUtility.isNullOrEmpty(text)) {
+      json.remove("value");
+    }
     if (json.length() == 1 && json.has("text")) {
-      return json.opt("text");
+      return text;
     }
     return json;
   }

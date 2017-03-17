@@ -99,10 +99,9 @@ scout.Column.prototype._ensureCell = function(vararg) {
     // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
     cell.value = this._parseValue(cell.value);
 
-    // If a text but no value is provided, parse the text and set the result as value.
-    // Otherwise, the (null) value would be formatted later and the provided text replaced with ''
-    if (cell.text && cell.value === undefined) {
-      cell.value = this._parseValue(cell.text);
+    // use null instead of undefined
+    if (cell.value === undefined) {
+      cell.value = null;
     }
   } else {
     // in this case 'vararg' is only a scalar value, typically a string

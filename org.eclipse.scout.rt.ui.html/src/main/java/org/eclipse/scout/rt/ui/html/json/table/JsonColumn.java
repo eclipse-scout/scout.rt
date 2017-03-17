@@ -51,6 +51,13 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     m_indexOffset = indexOffset;
   }
 
+  /**
+   * @return true, if the value should be sent to client, false if not
+   */
+  public boolean isValueRequired() {
+    return false;
+  }
+
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
@@ -105,7 +112,9 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   }
 
   public Object cellValueToJson(Object value) {
-    // In most cases it is not necessary to send the value to the client because text is sufficient
+    if (isValueRequired()) {
+      return value;
+    }
     return null;
   }
 
