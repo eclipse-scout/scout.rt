@@ -208,7 +208,9 @@ scout.FileInput.prototype._onFileChange = function(event) {
       files.push(this.$fileInput[0].value);
     }
   }
-  this._setFiles(files);
+  if (files.length) {
+    this._setFiles(files);
+  }
 };
 
 scout.FileInput.prototype._onMousedown = function() {
