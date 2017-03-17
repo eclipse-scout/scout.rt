@@ -522,7 +522,8 @@ scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
 
 scout.FormField.prototype._onStatusMousedown = function(event) {
   var hasStatus = !!this.errorStatus,
-    hasTooltip = !!this.tooltipText;
+    hasTooltip = !!this.tooltipText,
+    hasMenus = this.menusVisible && this._hasMenus();
 
   // Either show the tooltip or a context menu
   // If the field has both, a tooltip and menus, the tooltip will be shown and the menus rendered into the tooltip
@@ -533,7 +534,7 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     } else {
       this._showStatusMessage();
     }
-  } else if (this.menusVisible && this._hasMenus()) {
+  } else if (hasMenus) {
     var func = function func(event) {
       // Toggle menu
       if (this.contextPopup && this.contextPopup.rendered) {
@@ -575,7 +576,9 @@ scout.FormField.prototype._showStatusMessage = function() {
     }
   }
 
-  if (this.menusVisible && this._hasMenus()) {
+  // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
+  // Menus make most likely no sense if an error status is displayed
+  if (!this.errorStatus && this.menusVisible && this._hasMenus()) {
     menus = this._getCurrentMenus();
   }
 

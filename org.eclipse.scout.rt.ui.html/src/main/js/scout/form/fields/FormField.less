@@ -64,10 +64,7 @@
 
   &.has-menus {
 
-    &.has-tooltip,
-    &.has-info,
-    &.has-warning,
-    &.has-error {
+    &.has-tooltip:not(.has-info):not(.has-warning):not(.has-error) {
       & > .status::before {
         content: @icon-ellipsis-circle;
       }
