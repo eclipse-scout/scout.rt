@@ -44,6 +44,8 @@
 
   /* required because text shouldn't go into ellipsis mode when scrollbars are enabled */
   &.scrollable-tree {
+    overflow-anchor: none;
+
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
       overflow: visible;
