@@ -3607,7 +3607,7 @@ scout.Table.prototype._calculateFillerHeight = function(range) {
 };
 
 scout.Table.prototype.containsAggregatedNumberColumn = function() {
-  return this.columns.some(function(column) {
+  return this.visibleColumns().some(function(column) {
     return column instanceof scout.NumberColumn && column.aggregationFunction !== 'none';
   });
 };
