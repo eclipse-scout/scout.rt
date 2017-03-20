@@ -74,12 +74,13 @@ describe("AggregateTableControl", function() {
   }
 
   describe("aggregate", function() {
-    var model, table, column0, column1, rows, columns, tableControl;
+    var model, table, column0, column1, column2, rows, columns, tableControl;
     var $colHeaders, $header0, $header1;
 
     function prepareTable() {
       columns = [helper.createModelColumn('col1'),
-        helper.createModelColumn('col2', 'NumberColumn')
+        helper.createModelColumn('col2', 'NumberColumn'),
+        helper.createModelColumn('col3', 'NumberColumn')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -94,6 +95,8 @@ describe("AggregateTableControl", function() {
       column0 = model.columns[0];
       column1 = model.columns[1];
       column1.setAggregationFunction('sum');
+      column2 = model.columns[2];
+      column2.setAggregationFunction('sum');
     }
 
     it("creates an aggregate row", function() {
@@ -233,6 +236,30 @@ describe("AggregateTableControl", function() {
       expect(tableControl.enabled).toBe(true);
       expect(tableControl.selected).toBe(true);
     });
+
+    it("is false if there is a number column but without an aggregate function", function() {
+      columns = [
+        helper.createModelColumn('col1'),
+        helper.createModelColumn('col2', 'NumberColumn')
+      ];
+      columns[0].index = 0;
+      columns[1].index = 1;
+      rows = helper.createModelRows(columns, 3);
+      model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+      table.columns[1].setAggregationFunction('none');
+
+      var tcModel = createModel(table);
+      tcModel.enabled = false;
+      tcModel.selected = false;
+      tableControl = createAggregateTC(tcModel);
+      table._setTableControls([tableControl]);
+      table.render(session.$entryPoint);
+
+      expect(tableControl.enabled).toBe(false);
+      expect(tableControl.selected).toBe(false);
+    });
+
   });
 
 });
