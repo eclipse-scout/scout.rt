@@ -95,6 +95,7 @@ scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
 
   // Override layout
+  //this.htmlComp.validateRoot = true; // XXX if this is activated, menubar is ok, but desktop splitter NOK
   this.htmlComp.setLayout(new scout.OutlineLayout(this));
   this._renderCompact();
   this._renderEmbedDetailContent();
@@ -120,6 +121,10 @@ scout.Outline.prototype._remove = function() {
 scout.Outline.prototype._renderTitle = function() {
   if (!this.$title) {
     this.$title = this.$container.prependDiv('outline-title');
+
+    // Create htmlComp for $$title to complete the  htmlComp hierarchy between outline and menubar
+    var titleHtmlComp = new scout.HtmlComponent(this.$title, this.session);
+    titleHtmlComp.setLayout(new scout.NullLayout());
 
     // Listener is added to the text instead of the title to not get the clicks on the title menubar
     this.$titleText = this.$title.prependDiv('outline-title-text')
@@ -857,6 +862,7 @@ scout.Outline.prototype._renderNodeMenuBar = function() {
   this.nodeMenuBar.render(node.$node);
   this.nodeMenuBar.$container.addClass('node-menubar');
   this.nodeMenuBar.$container.insertAfter($text);
+  this._ensurePageLayout(node);
   this.invalidateLayoutTree();
 };
 

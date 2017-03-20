@@ -46,6 +46,7 @@ scout.TableHeader.prototype._render = function($parent) {
   // Required to make "height: 100%" rule work
   this.$menuBarContainer = this.$container.appendDiv('menubar-container');
   this.menuBar.render(this.$menuBarContainer);
+
   this._$window = this.$container.window();
   this._$body = this.$container.body();
 

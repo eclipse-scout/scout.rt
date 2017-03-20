@@ -115,7 +115,7 @@
     border: none;
     color: @navigation-color;
 
-    & > .menubox > .menu-item:not(.disabled) {
+    & > .menu-box > .menu-item:not(.disabled) {
       color: @navigation-color;
 
       &:hover,
@@ -134,7 +134,7 @@
       }
     }
 
-    & > .menubox > .menu-item:not(.menu-textandicon):focus::after  {
+    & > .menu-box > .menu-item:not(.menu-textandicon):focus::after  {
       #scout.focus-border-inverted();
     }
   }

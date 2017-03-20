@@ -40,21 +40,20 @@
   position: relative;
   width: 100%;
   background-color: @menubar-background-color;
-  display: table;
   padding-top: 2px;
   padding-bottom: 2px;
   /* default style is 'top' */
   border-bottom: 1px solid @border-color;
+  white-space: nowrap;
 
   &.bottom {
     border-bottom: 0;
     border-top: 1px solid @border-color;
   }
 
-  /* menubox is either .left or .right */
-  & > .menubox {
-    display: table-cell;
-    vertical-align: middle;
+  /* menu-box is either .left or .right */
+  & > .menu-box {
+    display: inline-block;
     white-space: nowrap;
     #scout.vertical-align-helper-before();
 
@@ -219,6 +218,7 @@
           margin-right: 6px;
         }
 
+        &.menu-icononly,
         &.small {
           min-width: 53px;
 
@@ -237,7 +237,7 @@
   height: 50px;
   background-color: @main-menubar-background-color;
 
-  & > .menubox {
+  & > .menu-box {
 
     & > .menu-item {
       height: @logical-grid-height;

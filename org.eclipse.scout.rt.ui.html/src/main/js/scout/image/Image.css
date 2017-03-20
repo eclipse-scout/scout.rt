@@ -8,20 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.navigate-button {
+.image {
+  /* vertical-align-bottom is necessary to remove the bottom margin of the image */
+  vertical-align: bottom;
 
-  &.up {
-    color: @navigate-up-button-color;
-    border-color: @navigate-up-button-border-color;
-
-    & > .font-icon {
-      color: @navigate-up-button-color;
-    }
+  &.autofit {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
   }
 
-  .menubar > .menu-box > &.menu-item.down.menu-button:not(.last) {
-    /* Right and left margin of the navigate buttons should be equal.
-    Setting this margin-right is especially necessary if on the right side of these buttons is another button. */
-    margin-right: @bench-padding-x;
+  &.empty {
+    visibility: hidden;
   }
 }

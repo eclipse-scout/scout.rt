@@ -17,24 +17,26 @@ scout.inherits(scout.PopupWithHeadLayout, scout.PopupLayout);
 scout.PopupWithHeadLayout.prototype.layout = function($container) {
   scout.PopupWithHeadLayout.parent.prototype.layout.call(this, $container);
 
-  var htmlComp = this.popup.htmlComp,
-    popupSize = htmlComp.getSize();
-
-  //while animating the body animation sets the size.
-  if (!this.popup.bodyAnimating) {
-    // Set size of body
-    popupSize = popupSize.subtract(htmlComp.getInsets());
-    if (this._headVisible) {
-      var headSize = scout.graphics.getSize(this.popup.$head, true);
-      //adjust popupsize if head changed size
-      if (popupSize.width < headSize.width) {
-        popupSize.width = headSize.width;
-        scout.graphics.setSize(htmlComp.$comp, popupSize);
-      }
-    }
-
-    scout.graphics.setSize(this.popup.$body, popupSize);
+  if (this.popup.bodyAnimating) {
+    // while animating the body animation sets the size.
+    return;
   }
+
+  // Set size of body
+  var htmlComp = this.popup.htmlComp;
+  var popupSize = htmlComp.getSize()
+    .subtract(htmlComp.getInsets());
+
+  if (this._headVisible) {
+    var headSize = scout.graphics.getSize(this.popup.$head, true);
+    // adjust popupsize if head changed size
+    if (popupSize.width < headSize.width) {
+      popupSize.width = headSize.width;
+      scout.graphics.setSize(htmlComp.$comp, popupSize);
+    }
+  }
+
+  scout.graphics.setSize(this.popup.$body, popupSize);
 };
 
 /**
@@ -72,7 +74,9 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
   var htmlComp = this.popup.htmlComp,
     prefSize;
 
-  if (!this.popup.bodyAnimating) {
+  if (this.popup.bodyAnimating) {
+    prefSize = scout.graphics.getSize(this.popup.$body, true);
+  } else {
     var popupStyleBackup = this.popup.$container.attr('style');
     this.popup.$container.css({
       width: 'auto',
@@ -81,8 +85,6 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
     prefSize = scout.graphics.prefSize(this.popup.$body, true)
       .add(htmlComp.getInsets());
     this.popup.$container.attr('style', popupStyleBackup);
-  } else {
-    prefSize = scout.graphics.getSize(this.popup.$body, true);
   }
 
   if (this.popup._headVisible) {

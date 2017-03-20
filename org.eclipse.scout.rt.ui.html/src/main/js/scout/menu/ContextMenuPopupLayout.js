@@ -15,6 +15,16 @@ scout.inherits(scout.ContextMenuPopupLayout, scout.PopupWithHeadLayout);
 
 scout.ContextMenuPopupLayout.prototype.layout = function($container) {
   var $menuItems = this.popup.$menuItems();
+
+  var iconOffset = 0;
+  $menuItems.each(function(index, menuItem) {
+    var menu = $(menuItem).data('widget');
+    if (!menu || menu.separator) {
+      return;
+    }
+    iconOffset = this.popup._updateIconAndText(menu, iconOffset);
+  }.bind(this));
+
   this._resetMaxWidthFor($menuItems);
   scout.ContextMenuPopupLayout.parent.prototype.layout.call(this, $container);
   this._setMaxWidthFor($menuItems);

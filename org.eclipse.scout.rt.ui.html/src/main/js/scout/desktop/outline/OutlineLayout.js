@@ -15,13 +15,23 @@ scout.OutlineLayout = function(outline) {
 scout.inherits(scout.OutlineLayout, scout.TreeLayout);
 
 scout.OutlineLayout.prototype._layout = function($container) {
-  var containerSize,
-    htmlContainer = this.outline.htmlComp;
-
   scout.OutlineLayout.parent.prototype._layout.call(this, $container);
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  var htmlContainer = this.outline.htmlComp,
+    containerSize = htmlContainer.getAvailableSize()
+      .subtract(htmlContainer.getInsets()),
+    titleWidth = this.outline.$title.outerWidth(false), // excluding margins
+    titleMenuBar = this.outline.titleMenuBar,
+    titleMenuBarSize = new scout.Dimension(),
+    titleMenuBarMarginH = 0;
+
+  if (titleMenuBar.rendered && titleMenuBar.visible) {
+    titleMenuBarMarginH = titleMenuBar.htmlComp.getMargins().horizontal();
+    titleMenuBarSize = titleMenuBar.htmlComp.getPreferredSize();
+    titleMenuBarSize.width = Math.min(titleMenuBarSize.width, Math.round(titleWidth / 2) - titleMenuBarMarginH); // keep at least 50% for the $titleText
+    titleMenuBar.htmlComp.setSize(titleMenuBarSize);
+  }
+  this.outline.$titleText.cssWidth(titleWidth - titleMenuBarSize.width - titleMenuBarMarginH);
 
   if (this.outline.embedDetailContent) {
     var selectedNode = this.outline.selectedNodes[0];

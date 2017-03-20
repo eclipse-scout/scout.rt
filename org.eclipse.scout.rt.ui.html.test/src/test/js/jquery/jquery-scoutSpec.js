@@ -107,6 +107,8 @@ describe('jquery-scout', function() {
       expect($e.data('$icon')).toBeUndefined();
       $e.icon('font:X');
       expect($e.children().length).toBe(1);
+      expect($e.data('iconImage')).toBeUndefined();
+      expect($e.data('$legacyIconImage')).toBeUndefined();
       expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
       expect($e.data('$icon').hasClass('font-icon')).toBe(true);
       expect($e.data('$icon').hasClass('icon')).toBe(true);
@@ -117,12 +119,14 @@ describe('jquery-scout', function() {
       // Set and remove picture icon
       $e.icon('hello');
       expect($e.children().length).toBe(1);
-      expect($e.data('$icon')[0]).toBe($e.children('img')[0]);
-      expect($e.data('$icon').hasClass('font-icon')).toBe(false);
-      expect($e.data('$icon').hasClass('icon')).toBe(true);
+      expect($e.data('$icon')).toBeUndefined();
+      expect($e.data('iconImage')).toBeUndefined();
+      expect($e.data('$legacyIconImage')[0]).toBe($e.children('img')[0]);
+      expect($e.data('$legacyIconImage').hasClass('font-icon')).toBe(false);
+      expect($e.data('$legacyIconImage').hasClass('icon')).toBe(true);
       $e.icon(null);
       expect($e.children().length).toBe(0);
-      expect($e.data('$icon')).toBeUndefined();
+      expect($e.data('$legacyIconImage')).toBeUndefined();
 
       // Set font icon, then change to picture icon, then back to font icon
       $e.icon('font:X');
@@ -132,9 +136,9 @@ describe('jquery-scout', function() {
       expect($e.data('$icon').hasClass('icon')).toBe(true);
       $e.icon('hello');
       expect($e.children().length).toBe(1);
-      expect($e.data('$icon')[0]).toBe($e.children('img')[0]);
-      expect($e.data('$icon').hasClass('font-icon')).toBe(false);
-      expect($e.data('$icon').hasClass('icon')).toBe(true);
+      expect($e.data('$legacyIconImage')[0]).toBe($e.children('img')[0]);
+      expect($e.data('$legacyIconImage').hasClass('font-icon')).toBe(false);
+      expect($e.data('$legacyIconImage').hasClass('icon')).toBe(true);
       $e.icon('font:X');
       expect($e.children().length).toBe(1);
       expect($e.data('$icon')[0]).toBe($e.children('span')[0]);

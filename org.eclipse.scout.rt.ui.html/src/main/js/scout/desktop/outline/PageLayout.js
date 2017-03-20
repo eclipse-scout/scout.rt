@@ -21,19 +21,23 @@ scout.PageLayout.prototype.layout = function($container) {
     $text = this.page.$node.children('.text'),
     titleHeight = 0,
     nodeMenuBar = this.outline.nodeMenuBar,
-    nodeMenuBarWidth = 0,
+    nodeMenuBarSize = new scout.Dimension(),
+    nodeMenuBarMarginH = 0,
     detailMenuBar = this.outline.detailMenuBar,
     detailMenuBarHeight = 0;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (nodeMenuBar.visible) {
-    nodeMenuBarWidth = nodeMenuBar.htmlComp.getPreferredSize().width;
-    $text.cssWidth(containerSize.width - nodeMenuBarWidth);
+  if (nodeMenuBar.rendered && nodeMenuBar.visible) {
+    nodeMenuBarMarginH = nodeMenuBar.htmlComp.getMargins().horizontal();
+    nodeMenuBarSize = nodeMenuBar.htmlComp.getPreferredSize();
+    nodeMenuBarSize.width = Math.min(nodeMenuBarSize.width, Math.round(containerSize.width / 2) - nodeMenuBarMarginH); // keep at least 50% for the $text
+    nodeMenuBar.htmlComp.setSize(nodeMenuBarSize);
   }
+  $text.cssWidth(containerSize.width - nodeMenuBarSize.width - nodeMenuBarMarginH);
 
-  if (detailMenuBar.visible) {
+  if (detailMenuBar.rendered && detailMenuBar.visible) {
     detailMenuBarHeight = detailMenuBar.htmlComp.getPreferredSize().height;
     detailMenuBarSize = new scout.Dimension(containerSize.width, detailMenuBarHeight)
       .subtract(detailMenuBar.htmlComp.getMargins());
@@ -60,8 +64,8 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   containerSize = htmlContainer.getSize()
     .subtract(htmlContainer.getInsets());
 
-  if (nodeMenuBar.visible) {
-    nodeMenuBarWidth = nodeMenuBar.htmlComp.getPreferredSize().width;
+  if (nodeMenuBar.rendered && nodeMenuBar.visible) {
+    nodeMenuBarWidth = nodeMenuBar.htmlComp.getPreferredSize().width + nodeMenuBar.htmlComp.getMargins().horizontal();
   }
 
   // needs a width to be able to calculate the pref height -> container width needs to be correct already
@@ -69,7 +73,7 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
     widthHint: containerSize.width - nodeMenuBarWidth
   }).height;
 
-  if (detailMenuBar.visible) {
+  if (detailMenuBar.rendered && detailMenuBar.visible) {
     detailMenuBarPrefSize = detailMenuBar.htmlComp.getPreferredSize();
   }
   if (this.outline.detailContent) {

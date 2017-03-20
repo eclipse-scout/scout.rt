@@ -28,6 +28,8 @@ scout.Menu = function() {
    * to true, button style menus must be displayed as regular menus.
    */
   this.overflow = false;
+
+  this.defaultMenu = false;
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -48,6 +50,11 @@ scout.Menu.prototype._render = function($parent) {
   }
   this.$container.unfocusable();
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+};
+
+scout.Menu.prototype._renderProperties = function() {
+  scout.Menu.parent.prototype._renderProperties.call(this);
+  this._renderDefaultMenu();
 };
 
 scout.Menu.prototype._remove = function() {
@@ -195,7 +202,7 @@ scout.Menu.prototype._renderVisible = function() {
 };
 
 scout.Menu.prototype.isTabTarget = function() {
-  return this.enabled && this.visible && (this.isButton() || !this.separator);
+  return this.rendered && this.enabled && this.visible && !this.separator;
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
@@ -282,4 +289,22 @@ scout.Menu.prototype._handleSelectedInEllipsis = function() {
   if (this.selected) {
     this.overflowMenu.setSelected(true);
   }
+};
+
+scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
+  if (this.defaultMenu === defaultMenu) {
+    return;
+  }
+  this._setDefaultMenu(defaultMenu);
+  if (this.rendered) {
+    this._renderDefaultMenu();
+  }
+};
+
+scout.Menu.prototype._setDefaultMenu = function(defaultMenu) {
+  this.defaultMenu = defaultMenu;
+};
+
+scout.Menu.prototype._renderDefaultMenu = function() {
+  this.$container.toggleClass('default-menu', this.defaultMenu);
 };

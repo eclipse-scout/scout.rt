@@ -163,6 +163,42 @@ scout.menus = {
     if (!menu.rendered) {
       menu.render($parent);
     }
+  },
+
+  updateTabbableMenu: function(menus, preferredMenus) {
+    preferredMenus = scout.arrays.ensure(preferredMenus);
+
+    // Find the current tabbable menu (and remove the marker)
+    var currentTabbableMenu = null;
+    menus.forEach(function(menu) {
+      if (!currentTabbableMenu && menu.tabbable) {
+        currentTabbableMenu = menu;
+      }
+      menu.setTabbable(false);
+    });
+
+    // Mark one of the menus as tabbable, so it can be focused by keystroke.
+    // - First choice is the currently marked menu
+    // - Second choice is one of the "preferred menus" passed to this function
+    // - Otherwise, use the first of all menus that is a tab target
+    var tabbableMenu = isTabTargetFunc(currentTabbableMenu) ? currentTabbableMenu : null;
+    if (!tabbableMenu) {
+      tabbableMenu = scout.arrays.find(preferredMenus, isTabTargetFunc);
+    }
+    if (!tabbableMenu) {
+      tabbableMenu = scout.arrays.find(menus, isTabTargetFunc);
+    }
+
+    // Mark it
+    if (tabbableMenu) {
+      tabbableMenu.setTabbable(true);
+    }
+
+    // ----- Helper functions -----
+
+    function isTabTargetFunc(menu) {
+      return menu && menu.isTabTarget();
+    }
   }
 };
 

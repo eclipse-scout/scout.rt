@@ -46,7 +46,7 @@
     #scout.menubar-background-color-inherit();
     padding-bottom: @tabbox-border-width;
 
-    & > .menubox {
+    & > .menu-box {
 
       & > .menu-item {
         height: 18px;

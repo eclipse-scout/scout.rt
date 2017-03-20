@@ -85,8 +85,14 @@ scout.Action.prototype._removeText = function() {
 };
 
 scout.Action.prototype._renderIconId = function() {
-  var iconId = this.iconId || '';
-  this.$container.icon(iconId);
+  if (this.iconId !== this._cachedIconId) {
+    this._cachedIconId = this.iconId;
+    this._cachedIcon = scout.icons.parseIconId(this.iconId);
+  }
+  this.$container.icon(this._cachedIcon, {
+    parent: this,
+    prepend: true
+  });
 };
 
 scout.Action.prototype._renderEnabled = function(enabled) {

@@ -1456,7 +1456,11 @@ scout.Table.prototype._find$AppLink = function(event) {
 };
 
 scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+  var selectionMenus = scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+  // Ignore menus that have been "stolen" by another widget (e.g. Outline.js in "embedDetailContent" mode)
+  return selectionMenus.filter(function(menu) {
+    return scout.isOneOf(menu.parent, this, this.menuBar.menuBoxLeft, this.menuBar.menuBoxRight, null);
+  }, this);
 };
 
 scout.Table.prototype.setStaticMenus = function(staticMenus) {

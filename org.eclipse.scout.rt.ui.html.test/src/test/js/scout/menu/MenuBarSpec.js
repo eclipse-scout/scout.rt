@@ -118,6 +118,16 @@ describe("MenuBar", function() {
   });
 
   describe('layout', function() {
+    beforeEach(function() {
+      $(document.head)
+        .appendElement('<style type="text/css">', 'jasmine-test-support')
+        .text('.menu-item { display: inline-block; }');
+    });
+
+    afterEach(function() {
+      $('.jasmine-test-support').remove();
+    });
+
     it('gets invalidated if a menu changes its visibility', function() {
       var menu1 = helper.createMenu(helper.createModel('foo')),
         menu2 = helper.createMenu(helper.createModel('bar')),
@@ -128,7 +138,6 @@ describe("MenuBar", function() {
       menu2.visible = true;
       menuBar.setMenuItems(menus);
       menuBar.render(session.$entryPoint);
-      menuBar.$right.setVisible(false); // Right box should not influence the layout (due to missing css)
       menuBar.htmlComp.setSize(new scout.Dimension(500, 50));
 
       expect(menu1.$container.isVisible()).toBe(true);

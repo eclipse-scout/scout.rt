@@ -25,8 +25,10 @@ scout.icons = {
    * Returns an Icon object with structured info contained in the iconId string.
    */
   parseIconId: function(iconId) {
+    if (!iconId) {
+      return null;
+    }
     var icon = new scout.Icon();
-
     if (scout.strings.startsWith(iconId, 'font:')) {
       icon.iconType = scout.Icon.IconType.FONT_ICON;
       iconId = iconId.substr(5);
@@ -43,7 +45,6 @@ scout.icons = {
       icon.iconType = scout.Icon.IconType.BITMAP;
       icon.iconUrl = iconId;
     }
-
     return icon;
   }
 };
@@ -77,12 +78,7 @@ scout.Icon.prototype.cssClass = function() {
  * Returns a CSS class string to be used with JQuery.add/removeClass().
  */
 scout.Icon.prototype.appendCssClass = function(cssClass) {
-  var additionalCssClass = this.cssClass();
-  if (additionalCssClass.length > 0) {
-    return cssClass + ' ' + additionalCssClass;
-  } else {
-    return cssClass;
-  }
+  return scout.strings.join(' ', cssClass, this.cssClass());
 };
 
 scout.Icon.prototype.isFontIcon = function() {

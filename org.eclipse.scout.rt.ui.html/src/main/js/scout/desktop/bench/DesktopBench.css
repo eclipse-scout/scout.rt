@@ -61,7 +61,7 @@
       padding-left: 6px;
       padding-right: @detail-table-header-menubar-padding-right;
 
-      & > .menubar > .menubox > .menu-item {
+      & > .menubar > .menu-box > .menu-item {
         margin-right: 12px;
       }
     }

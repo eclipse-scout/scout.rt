@@ -25,7 +25,7 @@ scout.MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
 
 scout.MenuSpecHelper.prototype.createMenu = function(model) {
   model.objectType = model.objectType || 'Menu';
-  model.session = this.session;
-  model.parent = this.session.desktop;
+  model.session = model.session || this.session;
+  model.parent = model.parent || this.session.desktop;
   return scout.create('Menu', model);
 };

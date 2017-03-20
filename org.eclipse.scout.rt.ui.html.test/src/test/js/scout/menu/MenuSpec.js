@@ -98,6 +98,7 @@ describe("Menu", function() {
   describe('isTabTarget', function() {
 
     it('should return true when menu can be a target of TAB action', function() {
+      menu1.rendered = true;
       menu1.enabled = true;
       menu1.visible = true;
       menu1.actionStyle = scout.Action.ActionStyle.BUTTON;

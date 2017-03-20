@@ -86,6 +86,7 @@
   __include("scout/focus/focusRule.js");
   __include("scout/glasspane/DeferredGlassPaneTarget.js");
   __include("scout/glasspane/GlassPaneRenderer.js");
+  __include("scout/image/Image.js");
   __include("scout/scrollbar/Scrollbar.js");
   __include("scout/scrollbar/scrollbars.js");
   __include("scout/splitter/Splitter.js");
@@ -120,10 +121,10 @@
   __include("scout/menu/ButtonAdapterMenu.js");
   __include("scout/menu/menubox/MenuBox.js");
   __include("scout/menu/menubox/MenuBoxLayout.js");
+  __include("scout/menu/menubox/MenuBoxLeftKeyStroke.js");
+  __include("scout/menu/menubox/MenuBoxRightKeyStroke.js");
   __include("scout/menu/menubar/MenuBar.js");
   __include("scout/menu/menubar/MenuBarLayout.js");
-  __include("scout/menu/menubar/MenuBarLeftKeyStroke.js");
-  __include("scout/menu/menubar/MenuBarRightKeyStroke.js");
   __include("scout/menu/menubar/MenuBarPopup.js");
   __include("scout/calendar/Calendar.js");
   __include("scout/calendar/CalendarComponent.js");

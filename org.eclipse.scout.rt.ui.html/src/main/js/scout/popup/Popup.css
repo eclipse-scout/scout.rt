@@ -154,6 +154,10 @@
     display: inline-block;
   }
 
+  & > .icon {
+    max-height: 16px;
+  }
+
   &.menu-textandicon > .icon {
     padding-right: 10px;
   }

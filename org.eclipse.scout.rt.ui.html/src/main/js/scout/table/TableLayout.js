@@ -25,7 +25,8 @@ scout.TableLayout.prototype.layout = function($container) {
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
     containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+      .subtract(htmlContainer.getInsets()),
+    headerHeight = 0;
 
   //FIXME CGU/AWE remove this check as soon as HtmlComp.validateLayout checks for invisible components
   if (!htmlContainer.isAttachedAndVisible() || !htmlContainer.$comp.isEveryParentVisible()) {
@@ -51,7 +52,8 @@ scout.TableLayout.prototype.layout = function($container) {
     }
   }
   if (header) {
-    height += scout.graphics.getSize(header.$container).height;
+    headerHeight = scout.graphics.getSize(header.$container).height;
+    height += headerHeight;
   }
   var dataMargins = scout.graphics.getMargins($data);
   height += dataMargins.top + dataMargins.bottom;
@@ -63,6 +65,10 @@ scout.TableLayout.prototype.layout = function($container) {
 
   // Size of last column may have to be adjusted due to the header menu items
   if (header) {
+    var headerMenuBarSize = header.menuBar.htmlComp.getPreferredSize();
+    headerMenuBarSize.height = headerHeight;
+    header.menuBar.htmlComp.setSize(headerMenuBarSize);
+
     header.resizeHeaderItem(lastColumn);
   }
 

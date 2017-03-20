@@ -520,48 +520,113 @@ $.fn.setTabbable = function(tabbable) {
   return this.attr('tabIndex', tabbable ? 0 : null);
 };
 
-$.fn.icon = function(iconId) {
-  var icon, $icon = this.data('$icon');
-  if (iconId) {
-    icon = scout.icons.parseIconId(iconId);
-    if (icon.isFontIcon()) {
-      getOrCreateIconElement.call(this, $icon, '<span>')
-        .addClass(icon.appendCssClass('font-icon'))
-        .addClass('icon')
-        .text(icon.iconCharacter);
-    } else {
-      getOrCreateIconElement.call(this, $icon, '<img>')
-        .attr('src', icon.iconUrl)
-        .addClass('icon');
-    }
+$.fn.icon = function(iconOrIconId, options) {
+  var icon = (iconOrIconId instanceof scout.Icon ? iconOrIconId : scout.icons.parseIconId(iconOrIconId));
+  if (icon && icon.isBitmap()) {
+    this.fontIcon(null);
+    this.imageIcon(icon, options);
   } else {
-    removeIconElement.call(this, $icon);
+    this.imageIcon(null);
+    this.fontIcon(icon, options);
   }
   return this;
+};
 
-  // ----- Helper functions -----
+$.fn.fontIcon = function(iconOrIconId, options) {
+  var icon = (iconOrIconId instanceof scout.Icon ? iconOrIconId : scout.icons.parseIconId(iconOrIconId));
+  var $icon = this.data('$icon');
 
-  function getOrCreateIconElement($icon, newElement) {
-    // If element type does not match existing element, remove the existing element (e.g. when changing from font-icon to picture icon)
-    if ($icon && !$icon.is(newElement.replace(/[<>]/g, ''))) {
-      removeIconElement.call(this, $icon);
-      $icon = null;
-    }
-    // Create new element if necessary
-    if (!$icon) {
-      $icon = $(newElement);
-      this.data('$icon', $icon);
-      this.prepend($icon);
-    }
-    return $icon;
+  options = options || {};
+  if (options instanceof scout.Widget) {
+    options = {
+      parent: options
+    };
   }
 
-  function removeIconElement($icon) {
+  // remove
+  if (!icon || !icon.isFontIcon()) {
     if ($icon) {
       $icon.remove();
+      this.removeData('$icon');
     }
-    this.removeData('$icon');
+    return this;
   }
+
+  // create/update
+  if (!$icon) {
+    $icon = $('<span>');
+    this.data('$icon', $icon);
+    if (scout.nvl(options.prepend, true)) {
+      this.prepend($icon);
+    } else {
+      this.append($icon);
+    }
+  }
+  $icon
+    .attr('class', icon.appendCssClass(scout.strings.join(' ', 'icon font-icon', options.cssClass)))
+    .text(icon.iconCharacter);
+  return this;
+};
+
+$.fn.imageIcon = function(iconOrIconId, options) {
+  var icon = (iconOrIconId instanceof scout.Icon ? iconOrIconId : scout.icons.parseIconId(iconOrIconId));
+  var iconImage = this.data('iconImage') || (icon && icon.image);
+  var $legacyIconImage = this.data('$legacyIconImage');
+
+  options = options || {};
+  if (options instanceof scout.Widget) {
+    options = {
+      parent: options
+    };
+  }
+
+  // remove
+  if (!icon || !icon.isBitmap()) {
+    if (iconImage) {
+      iconImage.remove();
+      this.removeData('iconImage');
+    }
+    if ($legacyIconImage) {
+      $legacyIconImage.remove();
+      this.removeData('$legacyIconImage');
+    }
+    return this;
+  }
+
+  // create/update
+  var cssClass = icon.appendCssClass(scout.strings.join(' ', 'icon', options.cssClass));
+  if (options.parent) {
+    if (!iconImage) {
+      var model = $.extend(options, {
+        imageUrl: icon.iconUrl,
+        cssClass: cssClass
+      });
+      iconImage = scout.create('Image', model);
+      this.data('iconImage', iconImage);
+      icon.image = iconImage;
+      iconImage.render(this);
+    } else {
+      iconImage.setCssClass(cssClass);
+      iconImage.setImageUrl(icon.iconUrl);
+      if (!iconImage.rendered) {
+        iconImage.render(this);
+      }
+    }
+  } else {
+    if (!$legacyIconImage) {
+      $legacyIconImage = $('<img>');
+      this.data('$legacyIconImage', $legacyIconImage);
+      if (scout.nvl(options.prepend, true)) {
+        this.prepend($legacyIconImage);
+      } else {
+        this.append($legacyIconImage);
+      }
+    }
+    $legacyIconImage
+      .attr('class', cssClass)
+      .attr('src', icon.iconUrl);
+  }
+  return this;
 };
 
 $.fn.placeholder = function(placeholder) {
