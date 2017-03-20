@@ -8,8 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
 scout.AggregateTableControl = function() {
   scout.AggregateTableControl.parent.call(this);
   this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
@@ -49,7 +47,8 @@ scout.AggregateTableControl.prototype._render = function($parent) {
 scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.$contentContainer = $parent.appendDiv('table-aggregate');
 
-  this._aggregateAndRender();
+  this._aggregate();
+  this._renderAggregate();
   this._reconcileScrollPos();
 
   this.table.$data.on('scroll', this._tableDataScrollHandler);
@@ -119,6 +118,9 @@ scout.AggregateTableControl.prototype._aggregate = function() {
   this.table._forEachVisibleColumn('aggrFinish', aggregateRow);
 
   this.aggregateRow = aggregateRow;
+  if (this.rendered && this.selected) {
+    this._rerenderAggregate();
+  }
 };
 
 scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
@@ -161,12 +163,14 @@ scout.AggregateTableControl.prototype._onTableDataScroll = function() {
  * @private
  */
 scout.AggregateTableControl.prototype._onTableChanged = function() {
-  this._aggregateAndRender();
+  this._aggregate();
 };
 
 scout.AggregateTableControl.prototype._onAggregationFunctionChanged = function() {
   this._updateEnabledAndSelectedState(true);
-  this._aggregateAndRender();
+  if (this.selected && this.rendered) {
+    this._aggregate();
+  }
 };
 
 scout.AggregateTableControl.prototype._onTableColumnResized = function() {
@@ -182,11 +186,6 @@ scout.AggregateTableControl.prototype._onTableColumnMoved = function(event) {
 scout.AggregateTableControl.prototype._onTableColumnStructureChanged = function() {
   this._updateEnabledAndSelectedState();
   if (this.selected && this.rendered) {
-    this._aggregateAndRender();
+    this._aggregate();
   }
-};
-
-scout.AggregateTableControl.prototype._aggregateAndRender = function() {
-  this._aggregate();
-  this._rerenderAggregate();
 };
