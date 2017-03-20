@@ -78,8 +78,8 @@ scout.FileChooserField.prototype.setMaximumUploadSize = function(maximumUploadSi
   this.fileInput.setMaximumUploadSize(maximumUploadSize);
 };
 
-scout.FileChooserField.prototype._onIconClick = function(event) {
-  scout.FileChooserField.parent.prototype._onIconClick.call(this, event);
+scout.FileChooserField.prototype._onIconMousedown = function(event) {
+  scout.FileChooserField.parent.prototype._onIconMousedown.call(this, event);
   this.fileInput.browse();
 };
 

@@ -778,10 +778,13 @@ scout.FormField.prototype.addIcon = function($parent) {
     $parent = this.$container;
   }
   this.$icon = scout.fields.appendIcon($parent)
-    .click(this._onIconClick.bind(this));
+    .on('mousedown', this._onIconMousedown.bind(this));
 };
 
-scout.FormField.prototype._onIconClick = function(event) {
+scout.FormField.prototype._onIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
   this.$field.focus();
 };
 

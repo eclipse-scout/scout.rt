@@ -87,7 +87,7 @@ scout.SmartField.prototype._render = function($parent) {
   this.addLabel();
 
   var $field = scout.fields.makeInputOrDiv(this)
-    .click(this._onClick.bind(this));
+    .on('mousedown', this._onMousedown.bind(this));
   if (!this.touch) {
     $field
       .blur(this._onFieldBlur.bind(this))
@@ -230,15 +230,18 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
   return e.which >= scout.keys.F1 && e.which < scout.keys.F12;
 };
 
-scout.SmartField.prototype._onClick = function(event) {
+scout.SmartField.prototype._onMousedown = function(event) {
   if (scout.fields.handleOnClick(this)) {
     this._openProposal(true);
   }
 };
 
-scout.SmartField.prototype._onIconClick = function(event) {
+scout.SmartField.prototype._onIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.$field.focus();
   if (scout.fields.handleOnClick(this)) {
-    scout.SmartField.parent.prototype._onIconClick.call(this, event);
     this._openProposal(true);
   }
 };
@@ -666,6 +669,6 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
  */
 scout.SmartField.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {
-    this._onClick();
+    this._onMousedown();
   }
 };

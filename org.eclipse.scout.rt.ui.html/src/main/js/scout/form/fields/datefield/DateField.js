@@ -112,7 +112,7 @@ scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
     this.$dateField = scout.fields.makeInputOrDiv(this, 'date')
-      .on('mousedown', this._onDateFieldClickMousedown.bind(this))
+      .on('mousedown', this._onDateFieldMousedown.bind(this))
       .appendTo(this.$field);
     if (!this.touch) {
       this.$dateField
@@ -359,21 +359,18 @@ scout.DateField.prototype._renderBackgroundColor = function() {
   this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
 };
 
-scout.DateField.prototype._onDateFieldClickMousedown = function() {
+scout.DateField.prototype._onDateFieldMousedown = function() {
   if (scout.fields.handleOnClick(this)) {
     this.openPopupAndSelect(this.timestampAsDate);
   }
 };
 
-/**
- * Note: preventDefault is required because when this function is called the browser is in the middle of setting
- * a new focus target, so we cannot simply change the focus target, because at the end the wrong target would be
- * focused and the popup would be closed immediately.
- */
 scout.DateField.prototype._onDateIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.$dateField.focus();
   if (scout.fields.handleOnClick(this)) {
-    this.$dateField.focus();
-    event.preventDefault();
     this.openPopupAndSelect(this.timestampAsDate);
   }
 };
@@ -384,18 +381,13 @@ scout.DateField.prototype._onTimeFieldMousedown = function(event) {
   }
 };
 
-/**
- * Note: preventDefault is required because when this function is called the browser is in the middle of setting
- * a new focus target, so we cannot simply change the focus target, because at the end the wrong target would be
- * focused and the popup would be closed immediately.
- */
 scout.DateField.prototype._onTimeIconMousedown = function(event) {
-  if (scout.fields.handleOnClick(this)) {
-    this.$timeField.focus();
-    event.preventDefault();
-    if (this.touch) {
-      this.openPopupAndSelect(this.timestampAsDate);
-    }
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.$timeField.focus();
+  if (scout.fields.handleOnClick(this) && this.touch) {
+    this.openPopupAndSelect(this.timestampAsDate);
   }
 };
 
