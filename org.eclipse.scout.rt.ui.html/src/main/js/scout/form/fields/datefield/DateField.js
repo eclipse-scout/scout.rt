@@ -153,15 +153,11 @@ scout.DateField.prototype._renderHasDate = function() {
 scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
-    this.$timeField = scout.fields.makeInputOrDiv(this, 'time')
-      .on('mousedown', this._onTimeFieldClick.bind(this))
+    this.$timeField = scout.fields.makeTextField(this.$container, 'time')
+      .on('keydown', this._onTimeFieldKeydown.bind(this))
+      .on('input', this._onTimeFieldInput.bind(this))
+      .on('blur', this._onTimeFieldBlur.bind(this))
       .appendTo(this.$field);
-    if (!this.touch) {
-      this.$timeField
-        .on('keydown', this._onTimeFieldKeydown.bind(this))
-        .on('input', this._onTimeFieldInput.bind(this))
-        .on('blur', this._onTimeFieldBlur.bind(this));
-    }
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
       .on('mousedown', this._onTimeIconClick.bind(this));
     new scout.HtmlComponent(this.$timeField, this.session);
@@ -257,7 +253,7 @@ scout.DateField.prototype._renderDateDisplayText = function() {
 };
 
 scout.DateField.prototype._renderTimeDisplayText = function() {
-  scout.fields.valOrText(this, this.$timeField, this.timeDisplayText);
+  this.$timeField.val(this.timeDisplayText);
 };
 
 scout.DateField.prototype._syncDisplayText = function(displayText) {
@@ -388,19 +384,10 @@ scout.DateField.prototype._onDateIconClick = function(event) {
   }
 };
 
-scout.DateField.prototype._onTimeFieldClick = function(event) {
-  if (scout.fields.handleOnClick(this) && this.touch) {
-    this.openPopupAndSelect(this.timestampAsDate);
-  }
-};
-
 scout.DateField.prototype._onTimeIconClick = function(event) {
   if (scout.fields.handleOnClick(this)) {
     this.$timeField.focus();
     event.preventDefault();
-    if (this.touch) {
-      this.openPopupAndSelect(this.timestampAsDate);
-    }
   }
 };
 
@@ -428,8 +415,8 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     diffMonths = 0,
     diffDays = 0,
     cursorPos = this.$dateField[0].selectionStart,
-    displayText = this.$dateField.val(),
-    prediction = this._$predictDateField && this._$predictDateField.val(),
+    displayText = scout.fields.valOrText(this, this.$dateField),
+    prediction = this._$predictDateField && scout.fields.valOrText(this, this._$predictDateField),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
     pickerStartDate = this.timestampAsDate || this._referenceDate(),
     shiftDate = true;
@@ -546,7 +533,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
  * in _onDateFieldKeydown().
  */
 scout.DateField.prototype._onDateFieldInput = function(event) {
-  var displayText = this.$dateField.val();
+  var displayText = scout.fields.valOrText(this, this.$dateField);
 
   // If the focus has changed to another field in the meantime, don't predict anything and
   // don't show the picker. Just validate the input.
@@ -562,7 +549,7 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
   // Predict date
   var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
   if (datePrediction) {
-    this._$predictDateField.val(datePrediction.text);
+    scout.fields.valOrText(this, this._$predictDateField, datePrediction.text);
     this.openPopupAndSelect(datePrediction.date);
   } else {
     // No valid prediction!
@@ -779,7 +766,8 @@ scout.DateField.prototype._updateDisplayTextProperty = function() {
   var dateText = this.dateDisplayText || '',
     timeText = this.timeDisplayText || '';
 
-  this.displayText = scout.strings.join('\n', dateText, timeText);
+  // do not use scout.strings.join which ignores empty components
+  this.displayText = dateText + '\n' + timeText;
 };
 
 /**
@@ -930,7 +918,7 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
 
   var success = true;
   if (acceptDate) {
-    dateText = (this._$predictDateField ? this._$predictDateField.val() : this.$dateField.val());
+    dateText = (this._$predictDateField ? scout.fields.valOrText(this, this._$predictDateField) : scout.fields.valOrText(this, this.$dateField));
     datePrediction = this._predictDate(dateText); // this also updates the errorStatus
     if (!datePrediction) {
       success = false;
