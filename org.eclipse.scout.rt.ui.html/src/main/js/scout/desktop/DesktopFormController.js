@@ -37,7 +37,7 @@ scout.DesktopFormController.prototype.render = function() {
   }
   if (!selectable) {
     this.desktop.bringOutlineToFront();
-  } else {
+  } else if (this.desktop.bench) {
     this.desktop.bench.activateView(selectable);
   }
   // ensure in all view stacks the last view is activated
