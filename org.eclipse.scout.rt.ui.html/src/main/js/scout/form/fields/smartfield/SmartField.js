@@ -29,6 +29,7 @@ scout.SmartField = function() {
   this.DEBOUNCE_DELAY = 200;
 
   this._addAdapterProperties(['proposalChooser']);
+  this._addCloneProperties(['proposal', 'codeType', 'lookupCall']);
   this.options;
 
   this._additionalLines;
@@ -47,6 +48,7 @@ scout.SmartField = function() {
   this._navigating = false;
   this.lookupCall;
   this.codeType;
+  this.proposal = false;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
