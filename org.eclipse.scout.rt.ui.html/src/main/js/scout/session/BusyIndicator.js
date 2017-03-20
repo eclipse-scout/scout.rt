@@ -46,7 +46,7 @@ scout.BusyIndicator.prototype._init = function(model) {
 };
 
 scout.BusyIndicator.prototype._render = function($parent) {
-  this.$parent = this.$parent || $parent || this.entryPoint();
+  this.$parent = this.$parent || this.entryPoint();
 
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
@@ -57,7 +57,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
 
   // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
   // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
-  this.$container = $parent.appendDiv('busyindicator invisible');
+  this.$container = this.$parent.appendDiv('busyindicator invisible');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);

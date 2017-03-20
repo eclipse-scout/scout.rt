@@ -43,7 +43,7 @@ scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  this.$parent = this.$parent || this.entryPoint(this.$anchor);
+  this.$parent = this.$parent || this.entryPoint();
 
   this.$container = this.$parent
     .appendDiv('tooltip')
