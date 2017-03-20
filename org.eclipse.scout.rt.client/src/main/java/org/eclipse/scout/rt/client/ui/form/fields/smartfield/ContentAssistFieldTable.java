@@ -73,23 +73,25 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
    * Menus are not supported.
    */
   @Override
-  final protected void initMenus() {
+  protected final void initMenus() {
     // init TableContextMenu without Child menus
     setContextMenu(new TableContextMenu(this, null));
-  }
-  
-  /**
-   * Menus are not supported.
-   */
-  @Override
-  final public void setMenus(List<? extends IMenu> menus) {
   }
 
   /**
    * Menus are not supported.
    */
   @Override
-  final public void addMenu(IMenu menu) {
+  public final void setMenus(List<? extends IMenu> menus) {
+    // menus are not supported (method marked final)
+  }
+
+  /**
+   * Menus are not supported.
+   */
+  @Override
+  public final void addMenu(IMenu menu) {
+    // menus are not supported (method marked final)
   }
 
   @SuppressWarnings("unchecked")
