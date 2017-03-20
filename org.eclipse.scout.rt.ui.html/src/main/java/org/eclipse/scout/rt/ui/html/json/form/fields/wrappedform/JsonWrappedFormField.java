@@ -65,6 +65,24 @@ public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<?
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    final IForm innerForm = getModel().getInnerForm();
+    if (innerForm != null) {
+      innerForm.addFormListener(m_innerFormListener);
+    }
+  }
+
+  @Override
+  protected void detachModel() {
+    final IForm innerForm = getModel().getInnerForm();
+    if (innerForm != null) {
+      innerForm.removeFormListener(m_innerFormListener);
+    }
+    super.detachModel();
+  }
+
+  @Override
   protected void handleModelPropertyChange(PropertyChangeEvent event) {
     super.handleModelPropertyChange(event);
     if (IWrappedFormField.PROP_INNER_FORM.equals(event.getPropertyName())) {
