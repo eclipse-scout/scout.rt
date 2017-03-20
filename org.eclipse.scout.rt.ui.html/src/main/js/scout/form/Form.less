@@ -49,10 +49,12 @@
   &.full-height {
     border-radius: 0;
   }
+
   &.full-width {
     border-right: 0;
     border-left: 0;
   }
+
   &.full-height {
     border-bottom: 0;
   }
@@ -73,6 +75,7 @@
         }
       }
     }
+
     & > .title {
       #scout.overflow-ellipsis-nowrap();
       #scout.font-text-large();
@@ -84,10 +87,11 @@
       #scout.font-text-normal();
       color: @active-color;
     }
+
     & > .status-container {
       float: right;
 
-      > .status {
+      & > .status {
         vertical-align: middle;
         display: inline-block;
         margin-left: 5px;
@@ -95,8 +99,24 @@
         &.closer {
           margin-left: 7px;
         }
-
       }
+    }
+  }
+}
+
+@media (max-width: @iphone6-width) {
+  .dialog {
+    /* no need to have a margin on small screens */
+    /* otherwise on iphone5, cancel button on a dialog would always be stacked in ellipsis if there is another menu item */
+    margin: 0;
+
+    & > .ui-resizable-e,
+    & > .ui-resizable-se,
+    & > .ui-resizable-s {
+      /* Remove handle, it is not useful anymore
+         and it increases the dialog size which has the effect that the body may be scrolled (on iphone).
+         Important is necessary because jquery ui sets it to display: block using inline style */
+      display: none !important; /* NOSONAR (see comment above)*/
     }
   }
 }
