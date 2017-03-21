@@ -197,7 +197,6 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     height = scout.HtmlEnvironment.formRowHeight,
     labelWidth = this.labelWidth,
     topLabelHeight = 0, // only set when label is on top
-    statusWidth = this.statusWidth,
     formField = this.formField;
 
   if (this._isLabelVisible()) {
@@ -218,10 +217,10 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     }
   }
   if (formField.$mandatory) {
-    width += formField.$mandatory.outerWidth(true);
+    width += this.mandatoryIndicatorWidth + formField.$mandatory.cssMarginX();
   }
   if (this._isStatusVisible()) {
-    width += statusWidth + formField.$status.cssMarginX();
+    width += this.statusWidth + formField.$status.cssMarginX();
   }
 
   if (formField.$fieldContainer) {
