@@ -99,8 +99,15 @@ public class PlatformStartTest {
   public void testStartStop() throws Exception {
     Platform.set(new FixturePlatformWithMinimalBeanManager());
     IPlatform p = Platform.get();
-    p.start(new PlatformStateLatch());
+    p.start();
     p.awaitPlatformStarted();
+
+    p.stop();
+    assertEquals(IPlatform.State.PlatformStopped, p.getState());
+
+    p.start();
+    p.awaitPlatformStarted();
+    assertEquals(IPlatform.State.PlatformStarted, p.getState());
 
     p.stop();
     assertEquals(IPlatform.State.PlatformStopped, p.getState());
@@ -126,7 +133,6 @@ public class PlatformStartTest {
   }
 
   public static class FixturePlatformWithMinimalBeanManager extends DefaultPlatform {
-    static IPlatform reentrantPlatform;
 
     @Override
     protected BeanManagerImplementor createBeanManager() {

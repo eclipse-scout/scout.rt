@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
@@ -54,7 +53,7 @@ public class ClientSessionDisposeTest {
   @Test
   public void testDispose() throws Exception {
     Platform.set(new DefaultPlatform());
-    Platform.get().start(new PlatformStateLatch());
+    Platform.get().start();
     Platform.get().awaitPlatformStarted();
 
     TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));

@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.platform;
 import java.util.ServiceLoader;
 
 import org.eclipse.scout.rt.platform.internal.PlatformStarter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is the main scout platform, automatically started on first access to this class.
@@ -28,9 +26,7 @@ import org.slf4j.LoggerFactory;
  * Tests use a PlatformTestRunner.
  */
 public final class Platform {
-  private static final Logger LOG = LoggerFactory.getLogger(Platform.class);
 
-  //Note: synchronized (360ns) is 3000 times slower than volatile (0.12ns)
   private static volatile IPlatform platform;
 
   private Platform() {
@@ -90,15 +86,9 @@ public final class Platform {
     if (tmpPlatform == null) {
       tmpPlatform = new DefaultPlatform();
     }
-    PlatformStateLatch platformStateLatch = new PlatformStateLatch();
     // Start platform initialization in separate thread to let class initialization complete
-    new PlatformStarter(tmpPlatform, platformStateLatch).start();
-    try {
-      platformStateLatch.await();
-    }
-    catch (InterruptedException e) {
-      LOG.error("Interrupted while waiting for platform state latch", e);
-    }
+    new PlatformStarter(tmpPlatform).start();
+    tmpPlatform.awaitPlatformStarting();
     platform = tmpPlatform;
   }
 

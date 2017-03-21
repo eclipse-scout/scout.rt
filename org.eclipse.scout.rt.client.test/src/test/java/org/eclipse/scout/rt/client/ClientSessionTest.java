@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -73,7 +72,7 @@ public class ClientSessionTest {
   @Before
   public void before() {
     Platform.set(new DefaultPlatform());
-    Platform.get().start(new PlatformStateLatch());
+    Platform.get().start();
     Platform.get().awaitPlatformStarted();
   }
 

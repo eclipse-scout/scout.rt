@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -26,7 +27,6 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
-import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.ConfigUtility;
@@ -49,7 +49,8 @@ public class PlatformImplementor implements IPlatform {
   private static final String AWT_HEADLESS_PROPERTY = "java.awt.headless";
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
-  private final Object m_platformStartedLock = new Object();
+  private volatile CountDownLatch m_platformStarted = new CountDownLatch(1);
+  private volatile CountDownLatch m_platformStarting = new CountDownLatch(1);
   private final AtomicReference<State> m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanManager;
 
@@ -67,9 +68,7 @@ public class PlatformImplementor implements IPlatform {
     // use lock to ensure the caller waits until the platform has been started completely
     m_platformLock.readLock().lock();
     try {
-      if (getState() == State.PlatformInvalid) {
-        throw new PlatformException("The platform is in an invalid state.");
-      }
+      throwOnPlatformInvalid();
       return m_beanManager;
     }
     finally {
@@ -79,52 +78,50 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public void awaitPlatformStarted() {
-    if (isPlatformStarted()) {
-      return;
-    }
-    synchronized (m_platformStartedLock) {
-      while (!isPlatformStarted()) {
-        try {
-          m_platformStartedLock.wait();
-        }
-        catch (InterruptedException e) {
-          // nop
-        }
-      }
-    }
-  }
-
-  protected boolean isPlatformStarted() {
-    final State state = getState();
-    if (state == null || state == State.PlatformInvalid) {
-      throw new PlatformException("The platform is in an invalid state.");
-    }
-    if (state == State.PlatformStopping) {
-      throw new PlatformException("The platform is stopping.");
-    }
-    return state == State.PlatformStarted;
-  }
-
-  protected void notifyPlatformStarted() {
-    synchronized (m_platformStartedLock) {
-      m_platformStartedLock.notifyAll();
-    }
+    awaitLatchSafe(m_platformStarted);
+    throwOnPlatformInvalid();
   }
 
   @Override
-  public void start() {
-    start(null);
+  public void awaitPlatformStarting() {
+    awaitLatchSafe(m_platformStarting);
+  }
+
+  protected void throwOnPlatformInvalid() {
+    if (getState() == State.PlatformInvalid) {
+      throw new PlatformException("The platform is in an invalid state.");
+    }
+  }
+
+  protected static void awaitLatchSafe(CountDownLatch latch) {
+    boolean interrupted;
+    do {
+      interrupted = false;
+      try {
+        latch.await();
+      }
+      catch (InterruptedException e) {
+        interrupted = true;
+      }
+    }
+    while (interrupted);
+  }
+
+  protected void notifyPlatformStarted() {
+    m_platformStarted.countDown();
+  }
+
+  protected void notifyPlatformStarting() {
+    m_platformStarting.countDown();
   }
 
   @Override
   @SuppressWarnings("squid:S1181")
-  public void start(PlatformStateLatch stateLatch) {
+  public void start() {
     try {
       m_platformLock.writeLock().lock();
       try {
-        if (stateLatch != null) {
-          stateLatch.release();
-        }
+        notifyPlatformStarting();
         if (m_state.get() != State.PlatformStopped) {
           throw new PlatformException("Platform is not stopped [m_state=" + m_state.get() + "]");
         }
@@ -240,6 +237,8 @@ public class PlatformImplementor implements IPlatform {
     m_platformLock.writeLock().lock();
     try {
       changeState(State.PlatformStopped, false);
+      m_platformStarted = new CountDownLatch(1);
+      m_platformStarting = new CountDownLatch(1);
       destroyBeanManager();
     }
     finally {

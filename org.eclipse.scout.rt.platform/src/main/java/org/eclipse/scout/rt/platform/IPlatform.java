@@ -80,11 +80,16 @@ public interface IPlatform {
   IBeanManager getBeanManager();
 
   /**
-   * Suspends the calling thread until the platform has reached {@link State#PlatformStarted} and all intersted
-   * {@link IPlatformListener}s have been notified. If the platform is already in this state, the method returns
-   * directly.
+   * Suspends the calling thread until the platform has reached {@link State#PlatformStarted} and all interested
+   * {@link IPlatformListener}s have been notified. If the platform is already started, the method returns immediately.
    */
   void awaitPlatformStarted();
+
+  /**
+   * Suspends the calling thread until the platform initialized the start sequence. If the platform has already
+   * initialized the start sequence or if the platform is already started, the method returns immediately.
+   */
+  void awaitPlatformStarting();
 
   /**
    * Starts the platform.
@@ -93,20 +98,6 @@ public interface IPlatform {
    *           When the platform is already started or there is an error during startup.
    */
   void start();
-
-  /**
-   * Starts the platform.
-   *
-   * @param stateLatch
-   *          an optional object that can be used to wait for the internal platform lock to be acquired. Consumers of
-   *          this method may call {@link PlatformStateLatch#await()} to be blocked until the {@link IPlatform}
-   *          implementor has acquired it's internal lock.
-   *          <p>
-   *          If no such synchronization is required, use {@link #start()}.
-   * @throws PlatformException
-   *           When the platform is already started or there is an error during startup.
-   */
-  void start(PlatformStateLatch stateLatch);
 
   /**
    * Stops the platform and releases all resources.
@@ -122,4 +113,5 @@ public interface IPlatform {
    * @return <code>true</code> if the platform is running in development mode. <code>false</code> otherwise.
    */
   boolean inDevelopmentMode();
+
 }

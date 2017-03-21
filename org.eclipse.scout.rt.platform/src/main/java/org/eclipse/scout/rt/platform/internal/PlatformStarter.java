@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.PlatformStateLatch;
 
 /**
  * Starts the main platform
@@ -20,15 +19,13 @@ import org.eclipse.scout.rt.platform.PlatformStateLatch;
  */
 public class PlatformStarter extends Thread {
   private final IPlatform m_platform;
-  private final PlatformStateLatch m_platformStateLatch;
 
-  public PlatformStarter(IPlatform platform, PlatformStateLatch platformStateLatch) {
+  public PlatformStarter(IPlatform platform) {
     m_platform = platform;
-    m_platformStateLatch = platformStateLatch;
   }
 
   @Override
   public void run() {
-    m_platform.start(m_platformStateLatch);
+    m_platform.start();
   }
 }
