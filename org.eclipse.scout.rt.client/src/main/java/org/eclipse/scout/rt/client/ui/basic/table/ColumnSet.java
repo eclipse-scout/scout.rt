@@ -414,7 +414,8 @@ public class ColumnSet {
     int counter = 0;
     TreeMap<CompositeObject, IColumn<?>> sortMap = new TreeMap<CompositeObject, IColumn<?>>();
     for (IColumn col : visibleCols) {
-      sortMap.put(new CompositeObject(col.getVisibleColumnIndexHint(), counter++), col);
+      counter++;
+      sortMap.put(new CompositeObject(col.getVisibleColumnIndexHint(), counter), col);
     }
 
     for (IColumn<?> column : getColumns()) {
@@ -422,7 +423,8 @@ public class ColumnSet {
         //already in map
       }
       else {
-        sortMap.put(new CompositeObject(column.getVisibleColumnIndexHint(), counter++), column);
+        counter++;
+        sortMap.put(new CompositeObject(column.getVisibleColumnIndexHint(), counter), column);
       }
     }
     return CollectionUtility.arrayList(sortMap.values());
