@@ -94,7 +94,7 @@ scout.fonts = {
     }
 
     // these fonts are compared to the custom fonts, strings separated by comma
-    var testFonts = 'monospace';
+    var testFonts = 'sans-serif';
 
     // Create a DIV for each font
     var divs = [];
@@ -119,10 +119,7 @@ scout.fonts = {
       // Create DIV with default font
       // (Hide explicitly with inline style to prevent visible text when, for some reason, the CSS file cannot be loaded)
       var $body = $('body'),
-        $div = $body.appendDiv('font-preloader')
-          .text('ABC abc 123 .,_')
-          .css('visibility', 'hidden')
-          .css('font-family', testFonts);
+        $div = appendPreloaderDiv($body, testFonts);
 
       // Remember size, set new font, and then measure again
       var originalWidth = $div.outerWidth();
@@ -167,6 +164,27 @@ scout.fonts = {
     watchWidthChange(50, onFinished);
 
     // ----- Helper functions -----
+
+    // Because preloader functionality should not depend on a CSS stylesheet
+    // we set the required properties programmatically.
+    function appendPreloaderDiv($body) {
+      return $body.appendDiv('font-preloader')
+        .text('ABC abc 123 .,_')
+        .css('position', 'absolute')
+        .css('top', '-999px')
+        .css('left', '-999px')
+        .css('visibility', 'hidden')
+        .css('display', 'block')
+        .css('width', 'auto')
+        .css('height', 'auto')
+        .css('white-space', 'nowrap')
+        .css('line-height', 'normal')
+        .css('margin', 0)
+        .css('padding', 0)
+        .css('font-variant', 'normal')
+        .css('font-size', '20em')
+        .css('font-family', testFonts);
+    }
 
     function watchWidthChange(delay, onFinished) {
       // Check each DIV
