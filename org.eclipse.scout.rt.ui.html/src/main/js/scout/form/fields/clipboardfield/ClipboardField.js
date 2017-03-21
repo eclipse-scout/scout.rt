@@ -117,16 +117,19 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
       img = elem;
     }
   });
+
   if (scout.strings.hasText(displayText)) {
     this.$field.html(scout.strings.nl2br(displayText, true));
     scout.scrollbars.install(this.$field, {
       parent: this
     });
 
-    this.$field.selectAllText();
-    // store length of full selection, in order to determine if the whole text is selected in "onCopy"
-    var selection = this._getSelection();
-    this._fullSelectionLength = (selection) ? selection.toString().length : 0;
+    setTimeout(function() {
+      this.$field.selectAllText();
+      // store length of full selection, in order to determine if the whole text is selected in "onCopy"
+      var selection = this._getSelection();
+      this._fullSelectionLength = (selection) ? selection.toString().length : 0;
+    }.bind(this));
   } else {
     this.$field.empty();
   }
@@ -179,13 +182,21 @@ scout.ClipboardField.prototype._onInput = function(event) {
 
 scout.ClipboardField.prototype._onCopy = function(event) {
   var selection, text, dataTransfer, myWindow = this.$container.window(true);
-  if (event.originalEvent.clipboardData) {
-    dataTransfer = event.originalEvent.clipboardData;
-  } else if (myWindow.clipboardData) {
-    dataTransfer = myWindow.clipboardData;
-  } else {
-    // unable to obtain data transfer object
-    throw new Error('Unable to access clipboard data.');
+  try {
+    if (event.originalEvent.clipboardData) {
+      dataTransfer = event.originalEvent.clipboardData;
+    } else if (myWindow.clipboardData) {
+      dataTransfer = myWindow.clipboardData;
+    }
+  } catch (e) {
+    // Because windows forbids concurrent access to the clipboard, a possible exception is thrown on 'myWindow.clipboardData'
+    // (see Remarks on https://msdn.microsoft.com/en-us/library/windows/desktop/ms649048(v=vs.85).aspx)
+    // Because of this behavior a failed access will just be logged but not presented to the user.
+    $.log.error('Error while reading "clipboardData"', e);
+  }
+  if (!dataTransfer) {
+    $.log.error('Unable to access clipboard data.');
+    return false;
   }
 
   // scroll bar must not be in field when copying
