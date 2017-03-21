@@ -124,6 +124,8 @@ scout.CheckBoxField.prototype._renderLabel = function() {
  */
 scout.CheckBoxField.prototype._renderFont = function() {
   scout.styles.legacyStyle(this, this.$fieldContainer);
+  // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
+  this.invalidateLayoutTree();
 };
 
 /**
