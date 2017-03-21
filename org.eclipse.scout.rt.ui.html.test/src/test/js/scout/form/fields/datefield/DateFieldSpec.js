@@ -184,12 +184,12 @@ describe("DateField", function() {
       // Order is important, displayText needs to be before timestamp
       // Otherwise server would generate a display text as soon as timestamp changes and send it back even if it is the same as the ui is sending
       var events = [
-        new scout.Event(dateField.id, 'displayTextChanged', {
+        new scout.RemoteEvent(dateField.id, 'displayTextChanged', {
           displayText: '11.02.2015',
           whileTyping: false,
           showBusyIndicator: true
         }),
-        new scout.Event(dateField.id, 'timestampChanged', {
+        new scout.RemoteEvent(dateField.id, 'timestampChanged', {
           timestamp: '2015-02-11'
         })
       ];
@@ -258,12 +258,12 @@ describe("DateField", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var events = [
-        new scout.Event(dateField.id, 'displayTextChanged', {
+        new scout.RemoteEvent(dateField.id, 'displayTextChanged', {
           displayText: '01.02.2016',
           whileTyping: false,
           showBusyIndicator: true
         }),
-        new scout.Event(dateField.id, 'timestampChanged', {
+        new scout.RemoteEvent(dateField.id, 'timestampChanged', {
           timestamp: '2016-02-01'
         })
       ];

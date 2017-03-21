@@ -115,9 +115,6 @@ scout.Session.JsonResponseError = {
  *   [focusManagerActive]
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
- *   [formTabClosable]
- *     Optional, default is false. True to show a close button in the view tabs on
- *     the desktop if the form is closable (has a close or cancel button).
  *   [showTreeIcons]
  *     Optional, default is false. Whether or not tree and outline show the icon
  *     which is defined by the iconId property. Until Scout 6.1 trees did not have
@@ -169,7 +166,6 @@ scout.Session.prototype.init = function(model) {
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
 
-  this.formTabClosable = scout.nvl(options.formTabClosable, false);
   this.showTreeIcons = scout.nvl(options.showTreeIcons, false); // TODO [awe] 6.2: set to true by default
 };
 
@@ -604,7 +600,7 @@ scout.Session.prototype._requestToJson = function(request) {
     // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
     var ignore =
       (this === request && key === 'showBusyIndicator') ||
-      (this instanceof scout.Event && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
+      (this instanceof scout.RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
     return (ignore ? undefined : value);
   });
 };
@@ -1021,9 +1017,8 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
     }
   }.bind(this));
 
-  if (!maxTotalSize) {
-    maxTotalSize = 5 * 1024 * 1024; // 5 MB as default maximum size
-  }
+  // 5 MB as default maximum size
+  maxTotalSize = scout.nvl(maxTotalSize, 5 * 1024 * 1024);
 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
   if (totalSize > maxTotalSize) {
@@ -1034,7 +1029,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
     };
 
     this.showFatalMessage(boxOptions);
-    return;
+    return false;
   }
 
   var uploadAjaxOptions = {
@@ -1056,6 +1051,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
 
   var busyHandling = !this.areRequestsPending();
   this._performUserAjaxRequest(uploadAjaxOptions, busyHandling);
+  return true;
 };
 
 scout.Session.prototype.goOffline = function() {

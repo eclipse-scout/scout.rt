@@ -31,10 +31,10 @@ scout.DialogLayout.prototype.layout = function($container) {
     currentBounds = cacheBounds;
   } else {
     dialogSize = this.preferredLayoutSize($container);
-    currentBounds = htmlComp.getBounds();
+    currentBounds = htmlComp.getBounds(); // includes margins
   }
 
-  dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds, dialogSize, dialogMargins);
+  dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
 
   // Add markers to be able to style the dialog in a different way when it uses the full width or height
   $container
@@ -42,12 +42,11 @@ scout.DialogLayout.prototype.layout = function($container) {
     .toggleClass('full-height', (currentBounds.y === 0 && dialogMargins.vertical() === 0 && windowSize.height === dialogSize.height));
 
   // Ensure the dialog can only get larger, not smaller.
-  //  This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but
-  //  the user previously enlarged the dialog.
-  //  This must not happen when the dialog is laid out the first time (-> when it is opened, because it has not the right size yet and may get too big)
+  // This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but the user previously enlarged the dialog.
+  // This must not happen when the dialog is laid out the first time (-> when it is opened, because it has not the right size yet and may get too big)
   if (htmlComp.layouted) {
-    dialogSize.width = Math.max(dialogSize.width, currentBounds.width);
-    dialogSize.height = Math.max(dialogSize.height, currentBounds.height);
+    dialogSize.width = Math.max(dialogSize.width, currentBounds.width - dialogMargins.horizontal());
+    dialogSize.height = Math.max(dialogSize.height, currentBounds.height - dialogMargins.vertical());
   }
 
   scout.graphics.setSize($container, dialogSize);
@@ -55,32 +54,28 @@ scout.DialogLayout.prototype.layout = function($container) {
 };
 
 /**
- * Returns the new container size, if the given containerSize is larger then the windowSize, the size will be adjusted.
- * This function has a side effect, as it modifies the given currentBounds by subtracting the container margins.
+ * Calculates the new container size and position. If the given containerSize is larger then the windowSize, the size will be adjusted.
  *
- * @param $container
- * @returns {scout.Dimension} new, adjusted container size
+ * @param windowSize total size of the window
+ * @param containerPosition {scout.Point} current position of the container
+ * @param containerSize {scout.Dimension} preferred size of container (excluding margins)
+ * @param containerMargins {scout.Insets} margins of the container
+ * @returns {scout.Dimension} the new, adjusted container size (excluding margins)
  * @static
  */
-scout.DialogLayout.fitContainerInWindow = function(windowSize, currentBounds, containerSize, containerMargins) {
-
-  // Because prefSize does not include the dialog margins, we have to subtract them from the current size as well.
-  // Because currentBounds.subtract() would also alter the x/y values, we subtract the dimensions manually.
-  currentBounds.width -= containerMargins.horizontal();
-  currentBounds.height -= containerMargins.vertical();
-
+scout.DialogLayout.fitContainerInWindow = function(windowSize, containerPosition, containerSize, containerMargins) {
   // class .dialog may specify a margin
   // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0
   // This guarantees the dialog size may not exceed the document size
-  var maxWidth = (windowSize.width - containerMargins.horizontal() - currentBounds.x);
-  var maxHeight = (windowSize.height - containerMargins.vertical() - currentBounds.y);
+  var maxWidth = (windowSize.width - containerMargins.horizontal() - containerPosition.x);
+  var maxHeight = (windowSize.height - containerMargins.vertical() - containerPosition.y);
 
-  // Calculate new dialog size:
-  // 1. Ensure the dialog is not larger than viewport
-  containerSize.width = Math.min(maxWidth, containerSize.width);
-  containerSize.height = Math.min(maxHeight, containerSize.height);
+  // Calculate new dialog size, ensuring that the dialog is not larger than container
+  var size = new scout.Dimension();
+  size.width = Math.min(maxWidth, containerSize.width);
+  size.height = Math.min(maxHeight, containerSize.height);
 
-  return containerSize;
+  return size;
 };
 
 /**
@@ -93,12 +88,17 @@ scout.DialogLayout.fitContainerInWindow = function(windowSize, currentBounds, co
 scout.DialogLayout.positionContainerInWindow = function($container) {
   var
     windowSize = $container.windowSize(),
-    containerSize = scout.HtmlComponent.get($container).getSize(),
+    containerSize = scout.HtmlComponent.get($container).getSize(true),
     left = (windowSize.width - containerSize.width) / 2,
-    top = (windowSize.height - containerSize.height) / 2,
-    opticalMiddleOffset = Math.min(top / 5, 10);
+    top = (windowSize.height - containerSize.height) / 2;
 
+  // optical middle (move up 20% of distance between window and dialog)
+  var opticalMiddleOffset = (top / 5);
   top -= opticalMiddleOffset;
+
+  // Ensure integer numbers
+  left = Math.floor(left);
+  top = Math.floor(top);
 
   return new scout.Point(left, top);
 };

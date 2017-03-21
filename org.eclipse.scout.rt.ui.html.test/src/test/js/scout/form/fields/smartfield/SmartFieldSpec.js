@@ -117,7 +117,7 @@ describe('SmartField', function() {
     it('must "browse all" when field is valid and browseAll parameter is true', function() {
       smartField._openProposal(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: true,
         selectCurrentValue: true
@@ -128,7 +128,7 @@ describe('SmartField', function() {
     it('must search by display-text when field is valid and browseAll parameter is false', function() {
       smartField._openProposal(false);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: false,
         selectCurrentValue: false
@@ -140,7 +140,7 @@ describe('SmartField', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'openProposal', {
         displayText: 'foo',
         browseAll: true,
         selectCurrentValue: false
@@ -190,7 +190,7 @@ describe('SmartField', function() {
       smartField._acceptProposal();
 
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.Event(smartField.id, 'acceptProposal', {
+      var expectedEvent = new scout.RemoteEvent(smartField.id, 'acceptProposal', {
         chooser: false,
         displayText: 'bar',
         showBusyIndicator: false,
@@ -388,6 +388,24 @@ describe('SmartField', function() {
       expect(scout.fields.valOrText(smartFieldMultiline, smartFieldMultiline.$field)).toBe('A Line1');
       expect(smartFieldMultiline._additionalLines).toEqual(['A Line2']);
       expect(smartFieldMultiline._$multilineField.html()).toEqual('A Line2');
+    });
+  });
+
+  describe('display text', function() {
+    var smartField;
+
+    beforeEach(function() {
+      smartField = createSmartFieldWithAdapter();
+    });
+    it('is also rendered if it is empty', function() {
+      smartField.render(session.$entryPoint);
+      expect(smartField.displayText).toBe('');
+      smartField.setValue(1);
+      expect(smartField.value).toBe(1);
+      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('1');
+      smartField.setValue(null);
+      expect(smartField.value).toBe(null);
+      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('');
     });
   });
 

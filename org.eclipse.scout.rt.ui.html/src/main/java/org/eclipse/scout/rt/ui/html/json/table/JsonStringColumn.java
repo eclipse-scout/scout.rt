@@ -28,6 +28,11 @@ public class JsonStringColumn<T extends IStringColumn> extends JsonColumn<T> {
   }
 
   @Override
+  public boolean isValueRequired() {
+    return true;
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put("textWrap", getColumn().isTextWrap());

@@ -32,7 +32,7 @@ describe('Session', function() {
   }
 
   function send(session, target, type, data, delay) {
-    session.sendEvent(new scout.Event(target, type, data), delay);
+    session.sendEvent(new scout.RemoteEvent(target, type, data), delay);
   }
 
   describe('send', function() {
@@ -149,26 +149,26 @@ describe('Session', function() {
         return this.target === previous.target && this.type === previous.type && this.column === previous.column;
       };
 
-      var event0 = new scout.Event(1, 'columnResized', {
+      var event0 = new scout.RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event0.coalesce = coalesce;
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new scout.Event(1, 'rowSelected');
+      var event1 = new scout.RemoteEvent(1, 'rowSelected');
       event1.coalesce = coalesce;
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new scout.Event(1, 'columnResized', {
+      var event2 = new scout.RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event2.coalesce = coalesce;
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event3 = new scout.Event(1, 'columnResized', {
+      var event3 = new scout.RemoteEvent(1, 'columnResized', {
         column: 'z'
       });
       event3.coalesce = coalesce;
@@ -176,14 +176,14 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // event for another target
-      var event4 = new scout.Event(2, 'columnResized', {
+      var event4 = new scout.RemoteEvent(2, 'columnResized', {
         column: 'a'
       });
       event4.coalesce = coalesce;
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event5 = new scout.Event(1, 'columnResized', {
+      var event5 = new scout.RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event5.coalesce = coalesce;

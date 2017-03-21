@@ -63,8 +63,13 @@ scout.Button.prototype._initKeyStrokeContext = function() {
     if (this.keyStrokeScope) {
       return this.keyStrokeScope.$container;
     }
-    // use form as default scope
-    return this.getForm().$container;
+    // use form if available
+    var form = this.getForm();
+    if (form) {
+      return form.$container;
+    }
+    // use desktop otherwise
+    return this.session.desktop.$container;
   }.bind(this);
 };
 
@@ -250,6 +255,13 @@ scout.Button.prototype._renderLabel = function() {
   if (this.iconId) {
     // If there is an icon, we don't need to ensure &nbsp; for empty strings
     this.$buttonLabel.text(this.label);
+
+    // Toggle with-label class on icon
+    var $iconTarget = this.$link || this.$field;
+    var $icon = $iconTarget.data('$icon');
+    if ($icon) {
+      $icon.toggleClass('with-label', !!this.label);
+    }
   } else {
     this.$buttonLabel.textOrNbsp(this.label);
   }

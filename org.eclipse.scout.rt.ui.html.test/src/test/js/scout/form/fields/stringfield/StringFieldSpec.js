@@ -101,7 +101,7 @@ describe("StringField", function() {
       field.insertText('Test1');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      var event = new scout.Event(field.id, 'displayTextChanged', {
+      var event = new scout.RemoteEvent(field.id, 'displayTextChanged', {
         displayText: 'Test1',
         whileTyping: false,
         showBusyIndicator: true
@@ -112,7 +112,7 @@ describe("StringField", function() {
       expect(field.$field[0].value).toBe('Test1ABC2');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);
-      event = new scout.Event(field.id, 'displayTextChanged', {
+      event = new scout.RemoteEvent(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
         whileTyping: false,
         showBusyIndicator: true
@@ -133,12 +133,12 @@ describe("StringField", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       var events = [];
       // displayTextChanged needs to be sent twice, with whileTyping = true and = false
-      events[0] = new scout.Event(field.id, 'displayTextChanged', {
+      events[0] = new scout.RemoteEvent(field.id, 'displayTextChanged', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
       });
-      events[1] = new scout.Event(field.id, 'displayTextChanged', {
+      events[1] = new scout.RemoteEvent(field.id, 'displayTextChanged', {
         displayText: 'Test1',
         whileTyping: false,
         showBusyIndicator: true
@@ -155,12 +155,12 @@ describe("StringField", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       events = [];
-      events[0] = new scout.Event(field.id, 'displayTextChanged', {
+      events[0] = new scout.RemoteEvent(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
         whileTyping: true,
         showBusyIndicator: false
       });
-      events[1] = new scout.Event(field.id, 'displayTextChanged', {
+      events[1] = new scout.RemoteEvent(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
         whileTyping: false,
         showBusyIndicator: true

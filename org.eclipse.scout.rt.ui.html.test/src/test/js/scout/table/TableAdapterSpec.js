@@ -42,7 +42,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowsSelected', {
+      var event = new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds: helper.getRowIds(rows)
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -75,7 +75,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowsChecked', {
+      var event = new scout.RemoteEvent(table.id, 'rowsChecked', {
         rows: [{
           rowId: rows[0].id,
           checked: true
@@ -227,6 +227,74 @@ describe("TableAdapter", function() {
         var event = createRowsInsertedEvent(model, rows);
         adapter.onModelAction(event);
         expect(table.insertRows).toHaveBeenCalledWith(rows);
+      });
+
+      it("may contain cells as objects", function() {
+        var row = {
+          cells: [{
+            value: 'a value 0',
+            text: 'a text 0'
+          }, {
+            value: 'a value 1',
+            text: 'a text 1'
+          }]
+        };
+        var event = createRowsInsertedEvent(model, [row]);
+        adapter.onModelAction(event);
+        expect(table.rows[0].cells[0].value).toBe('a value 0');
+        expect(table.rows[0].cells[0].text).toBe('a text 0');
+        expect(table.rows[0].cells[1].value).toBe('a value 1');
+        expect(table.rows[0].cells[1].text).toBe('a text 1');
+      });
+
+      it("may contain cells as scalars", function() {
+        var row = {
+          cells: ['a text 0', 'a text 1']
+        };
+        var event = createRowsInsertedEvent(model, [row]);
+        adapter.onModelAction(event);
+        expect(table.rows[0].cells[0].value).toBe('a text 0');
+        expect(table.rows[0].cells[0].text).toBe('a text 0');
+        expect(table.rows[0].cells[1].value).toBe('a text 1');
+        expect(table.rows[0].cells[1].text).toBe('a text 1');
+      });
+
+      it("respects null values", function() {
+        var row = {
+          cells: [{
+            value: null,
+            text: 'empty 0'
+          }, {
+            value: null,
+            text: 'empty 1'
+          }]
+        };
+        var event = createRowsInsertedEvent(model, [row]);
+        adapter.onModelAction(event);
+        expect(table.rows[0].cells[0].value).toBe(null);
+        expect(table.rows[0].cells[0].text).toBe('empty 0');
+        expect(table.rows[0].cells[1].value).toBe(null);
+        expect(table.rows[0].cells[1].text).toBe('empty 1');
+      });
+
+      it("uses text as value if value is not provided", function() {
+        // This case is relevant for custom columns, where no JS representation exists.
+        // They have values on server but they are not sent to client. Since we expect every cell to have a value use the text as value.
+        var row = {
+          cells: [{
+            cssClass: 'abc',
+            text: 'text 0'
+          }, {
+            cssClass: 'abc',
+            text: 'text 1'
+          }]
+        };
+        var event = createRowsInsertedEvent(model, [row]);
+        adapter.onModelAction(event);
+        expect(table.rows[0].cells[0].value).toBe('text 0');
+        expect(table.rows[0].cells[0].text).toBe('text 0');
+        expect(table.rows[0].cells[1].value).toBe('text 1');
+        expect(table.rows[0].cells[1].text).toBe('text 1');
       });
     });
 

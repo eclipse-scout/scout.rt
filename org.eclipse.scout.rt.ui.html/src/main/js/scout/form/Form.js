@@ -31,6 +31,7 @@ scout.Form = function() {
   this.messageBoxController;
   this.fileChooserController;
   this._glassPaneRenderer;
+  this.$statusIcons = [];
   /**
    * Whether this form should render its initial focus
    */
@@ -52,6 +53,7 @@ scout.Form.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, this.session);
 
   this._setRootGroupBox(this.rootGroupBox);
+  this._setStatus(this.status);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
@@ -81,7 +83,13 @@ scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
  */
 scout.Form.prototype._renderProperties = function() {
   scout.Form.parent.prototype._renderProperties.call(this);
-  this._updateTitle();
+  this._renderTitle();
+  this._renderSubTitle();
+  this._renderIconId();
+  this._renderClosable();
+  this._renderSaveNeedAndSaveNeedVisible();
+  this._renderCssClass();
+  this._renderStatus();
 };
 
 scout.Form.prototype._render = function($parent) {
@@ -106,15 +114,10 @@ scout.Form.prototype._renderForm = function($parent) {
     this.htmlComp.validateRoot = true;
     $handle = this.$container.appendDiv('drag-handle');
     this.$container.makeDraggable($handle, $.throttle(this._onMove.bind(this), 1000 / 60)); // 60fps
-    if (this.closable) {
-      this.$container
-        .appendDiv('closer')
-        .on('click', this.close.bind(this));
-    }
     if (this.resizable) {
       this._initResizable();
     }
-    this._updateTitle();
+    this._renderHeader();
   } else {
     layout = new scout.FormLayout(this);
   }
@@ -156,6 +159,15 @@ scout.Form.prototype.close = function() {
   // Is it only used for popup windows? Suggestion: Rename close to kill, destroy the form and send a kill event (trigger('kill')).
   this._send('formClosing');
 };
+scout.Form.prototype._renderHeader = function() {
+  if (this.isDialog()) {
+    this.$header = this.$container.appendDiv('header');
+    this.$statusContainer = this.$header.appendDiv('status-container');
+    this.$icon = this.$header.appendDiv('icon-container');
+    this.$title = this.$header.appendDiv('title');
+    this.$subTitle = this.$header.appendDiv('sub-title');
+  }
+};
 
 scout.Form.prototype._postRender = function() {
   scout.Form.parent.prototype._postRender.call(this);
@@ -171,11 +183,91 @@ scout.Form.prototype._postRender = function() {
   this.fileChooserController.render();
 };
 
-scout.Form.prototype._updateTitle = function() {
-  if (this.isPopupWindow()) {
-    this._updateTitleForWindow();
-  } else if (this.isDialog()) {
-    this._updateTitleForDom();
+scout.Form.prototype._renderSaveNeeded = function() {
+  this._renderSaveNeedAndSaveNeedVisible();
+};
+
+scout.Form.prototype._renderSaveNeededVisible = function() {
+  this._renderSaveNeedAndSaveNeedVisible();
+};
+
+scout.Form.prototype._renderSaveNeedAndSaveNeedVisible = function() {
+  if (!this.isDialog()) {
+    return;
+  }
+  if (this.saveNeeded && this.saveNeededVisible) {
+    this.$container.addClass('save-needed');
+    if (this.$saveNeeded) {
+      return;
+    }
+    if (this.$close) {
+      this.$saveNeeded = this.$close.beforeDiv('status save-needer');
+    } else {
+      this.$saveNeeded = this.$statusContainer
+        .appendDiv('status save-needer');
+    }
+  } else {
+    this.$container.removeClass('save-needed');
+    if (!this.$saveNeeded) {
+      return;
+    }
+    this.$saveNeeded.remove();
+    this.$saveNeeded = null;
+  }
+  // Layout could have been changed, e.g. if subtitle becomes visible
+  this.invalidateLayoutTree();
+};
+
+scout.Form.prototype._renderAskIfNeedSave = function() {};
+
+scout.Form.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  cssClass = cssClass || this.cssClass;
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
+  // Layout could have been changed, e.g. if subtitle becomes visible
+  this.invalidateLayoutTree();
+};
+
+scout.Form.prototype._setStatus = function(status) {
+  status = scout.Status.ensure(status);
+  this._setProperty('status', status);
+};
+
+scout.Form.prototype._renderStatus = function() {
+  if (!this.isDialog()) {
+    return;
+  }
+
+  this.$statusIcons.forEach(function($icn) {
+    $icn.remove();
+  });
+
+  this.$statusIcons = [];
+
+  if (this.status) {
+    var flatenStatus = this.status.getAllLeafStatus();
+    var $prevIcon;
+    flatenStatus.forEach(function(sts) {
+      $prevIcon = this._renderSingleStatus(sts, $prevIcon);
+      if ($prevIcon) {
+        this.$statusIcons.push($prevIcon);
+      }
+    }.bind(this));
+  }
+  // Layout could have been changed, e.g. if subtitle becomes visible
+  this.invalidateLayoutTree();
+};
+
+scout.Form.prototype._renderSingleStatus = function(status, $prevIcon) {
+  if (status && status.iconId) {
+    var $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
+    if(status.cssClass()){
+      $statusIcon.addClass(status.cssClass());
+    }
+    $statusIcon.prependTo(this.$statusContainer);
+    return $statusIcon;
+  } else {
+    return $prevIcon;
   }
 };
 
@@ -210,9 +302,6 @@ scout.Form.prototype._updateTitleForDom = function() {
   } else {
     removeChildDiv(this.$container, 'title-box');
   }
-
-  // Layout could have been changed, e.g. if subtitle becomes visible
-  this.invalidateLayoutTree();
 
   // ----- Helper functions -----
 
@@ -280,15 +369,51 @@ scout.Form.prototype._remove = function() {
 };
 
 scout.Form.prototype._renderTitle = function() {
-  this._updateTitle();
+  if (this.isDialog()) {
+    this.$title.text(this.title);
+  } else if (this.isPopupWindow()) {
+    this._updateTitleForWindow();
+  }
+  // Layout could have been changed, e.g. if subtitle becomes visible
+  this.invalidateLayoutTree();
 };
 
 scout.Form.prototype._renderSubTitle = function() {
-  this._updateTitle();
+  if (this.isDialog()) {
+    this.$subTitle.text(this.subTitle);
+  } else if (this.isPopupWindow()) {
+    this._updateTitleForWindow();
+  }
+  // Layout could have been changed, e.g. if subtitle becomes visible
+  this.invalidateLayoutTree();
 };
 
 scout.Form.prototype._renderIconId = function() {
-  this._updateTitle();
+  if (this.isDialog()) {
+    this.$icon.icon(this.iconId);
+    // Layout could have been changed, e.g. if subtitle becomes visible
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.Form.prototype._renderClosable = function() {
+  if (!this.isDialog()) {
+    return;
+  }
+  this.$container.toggleClass('closable');
+  if (this.closable) {
+    if (this.$close) {
+      return;
+    }
+    this.$close = this.$statusContainer.appendDiv('status closer')
+      .on('click', this.close.bind(this));
+  } else {
+    if (!this.$close) {
+      return;
+    }
+    this.$close.remove();
+    this.$close = null;
+  }
 };
 
 /**

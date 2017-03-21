@@ -522,7 +522,8 @@ scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
 
 scout.FormField.prototype._onStatusMousedown = function(event) {
   var hasStatus = !!this.errorStatus,
-    hasTooltip = !!this.tooltipText;
+    hasTooltip = !!this.tooltipText,
+    hasMenus = this.menusVisible && this._hasMenus();
 
   // Either show the tooltip or a context menu
   // If the field has both, a tooltip and menus, the tooltip will be shown and the menus rendered into the tooltip
@@ -533,26 +534,13 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     } else {
       this._showStatusMessage();
     }
-  } else if (this.menusVisible && this._hasMenus()) {
+  } else if (hasMenus) {
     var func = function func(event) {
-      var menus = this._getCurrentMenus();
       // Toggle menu
       if (this.contextPopup && this.contextPopup.rendered) {
-        this.contextPopup.close();
-        this.contextPopup = null;
+        this._hideContextMenu();
       } else {
-        if (menus.length === 0) {
-          // at least one menu item must be visible
-          return;
-        }
-        this.contextPopup = scout.create('ContextMenuPopup', {
-          parent: this,
-          $anchor: this.$status,
-          menuItems: menus,
-          cloneMenuItems: false,
-          closeOnAnchorMousedown: false
-        });
-        this.contextPopup.open();
+        this._showContextMenu();
       }
     }.bind(this);
 
@@ -588,7 +576,9 @@ scout.FormField.prototype._showStatusMessage = function() {
     }
   }
 
-  if (this.menusVisible && this._hasMenus()) {
+  // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
+  // Menus make most likely no sense if an error status is displayed
+  if (!this.errorStatus && this.menusVisible && this._hasMenus()) {
     menus = this._getCurrentMenus();
   }
 
@@ -596,6 +586,9 @@ scout.FormField.prototype._showStatusMessage = function() {
     // Refuse to show empty tooltip
     return;
   }
+
+  // If a context menu is open, close it first
+  this._hideContextMenu();
 
   if (this.tooltip) {
     // update existing tooltip
@@ -623,6 +616,33 @@ scout.FormField.prototype._showStatusMessage = function() {
 scout.FormField.prototype._hideStatusMessage = function() {
   if (this.tooltip) {
     this.tooltip.destroy();
+  }
+};
+
+scout.FormField.prototype._showContextMenu = function() {
+  var menus = this._getCurrentMenus();
+  if (menus.length === 0) {
+    // at least one menu item must be visible
+    return;
+  }
+
+  // Make sure tooltip is closed first
+  this._hideStatusMessage();
+
+  this.contextPopup = scout.create('ContextMenuPopup', {
+    parent: this,
+    $anchor: this.$status,
+    menuItems: menus,
+    cloneMenuItems: false,
+    closeOnAnchorMousedown: false
+  });
+  this.contextPopup.open();
+};
+
+scout.FormField.prototype._hideContextMenu = function() {
+  if (this.contextPopup) {
+    this.contextPopup.close();
+    this.contextPopup = null;
   }
 };
 
@@ -758,10 +778,13 @@ scout.FormField.prototype.addIcon = function($parent) {
     $parent = this.$container;
   }
   this.$icon = scout.fields.appendIcon($parent)
-    .click(this._onIconClick.bind(this));
+    .on('mousedown', this._onIconMousedown.bind(this));
 };
 
-scout.FormField.prototype._onIconClick = function(event) {
+scout.FormField.prototype._onIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
   this.$field.focus();
 };
 

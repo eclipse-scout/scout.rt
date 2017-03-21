@@ -43,8 +43,8 @@ public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> 
   }
 
   @Override
-  public Object cellValueToJson(Object value) {
-    return value;
+  public boolean isValueRequired() {
+    return true;
   }
 
 }

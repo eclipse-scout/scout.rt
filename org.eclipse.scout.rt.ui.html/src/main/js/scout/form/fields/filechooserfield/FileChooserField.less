@@ -10,15 +10,23 @@
  ******************************************************************************/
 .file-chooser-field {
 
-  & > input[type=text] {
+  & > .file-input {
     #scout.text-field-with-icon(@icon-file);
 
-      ~ .icon {
-        cursor: pointer;
-      }
+    & > input {
+      display: none;
+    }
+
+    & ~ .icon {
+      cursor: pointer;
+    }
   }
 
-  & > input[type=file] {
-    display: none;
+  & > .legacy-upload-form {
+    & > .legacy-upload-file-input {
+      padding: 3px;
+      height: 100%;
+    }
   }
+
 }

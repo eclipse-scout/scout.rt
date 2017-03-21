@@ -101,7 +101,7 @@ scout.Popup.prototype._open = function($parent) {
 };
 
 scout.Popup.prototype.render = function($parent) {
-  var $popupParent = $parent || this.entryPoint(this.parent.$container);
+  var $popupParent = $parent || this.entryPoint();
   scout.Popup.parent.prototype.render.call(this, $popupParent);
 };
 

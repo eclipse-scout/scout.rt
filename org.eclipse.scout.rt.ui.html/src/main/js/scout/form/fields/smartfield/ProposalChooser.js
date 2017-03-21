@@ -13,7 +13,7 @@ scout.ProposalChooser = function() {
   this._addAdapterProperties(['model']);
   this.$container;
   this.$status;
-  this.activeFilter;
+  this.$activeFilter;
   this.htmlComp;
 
   this._updateStatusTimeout;
@@ -166,4 +166,9 @@ scout.ProposalChooser.prototype.setVirtual = function(virtual) {
   if (this.model instanceof scout.Table) {
     this.model.setVirtual(virtual);
   }
+};
+
+scout.ProposalChooser.prototype.setBusy = function(busy) {
+  this.model.setProperty('loading', busy);
+  this.model.setProperty('enabled', !busy);
 };

@@ -43,7 +43,7 @@ scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  this.$parent = this.$parent || this.entryPoint(this.$anchor);
+  this.$parent = this.$parent || this.entryPoint();
 
   this.$container = this.$parent
     .appendDiv('tooltip')
@@ -124,6 +124,7 @@ scout.Tooltip.prototype._remove = function() {
     this._moveHandler = null;
   }
   this.dialog = null;
+  this.$menus = null;
   scout.Tooltip.parent.prototype._remove.call(this);
 };
 
@@ -178,15 +179,36 @@ scout.Tooltip.prototype.setMenus = function(menus) {
 };
 
 scout.Tooltip.prototype._renderMenus = function() {
-  if (this.menus.length > 0 && !this.$menus) {
+  var maxIconWidth = 0,
+    menus = this.menus;
+
+  if (menus.length > 0 && !this.$menus) {
     this.$menus = this.$container.appendDiv('tooltip-menus');
-  } else if (this.menus.length === 0 && this.$menus) {
+  } else if (menus.length === 0 && this.$menus) {
     this.$menus.remove();
     this.$menus = null;
   }
-  this.menus.forEach(function(menu) {
+
+  // Render menus
+  menus.forEach(function(menu) {
+    var iconWidth = 0;
     menu.render(this.$menus);
+    if (menu.iconId) {
+      iconWidth = menu.$container.data('$icon').outerWidth(true);
+      maxIconWidth = Math.max(iconWidth, maxIconWidth);
+    }
   }, this);
+
+  // Align menus if there is one with an icon
+  if (maxIconWidth > 0) {
+    menus.forEach(function(menu) {
+      if (!menu.iconId) {
+        menu.$text.cssPaddingLeft(maxIconWidth);
+      } else {
+        menu.$text.cssPaddingLeft(maxIconWidth - menu.$container.data('$icon').outerWidth(true));
+      }
+    }, this);
+  }
 
   if (!this.rendering) {
     this.position();

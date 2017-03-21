@@ -191,6 +191,39 @@ describe("Table", function() {
       expect(table.$rows().length).toBe(2);
       expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
     });
+
+    it("rowsInserted event must be triggered before rowOrderChanged event", function() {
+      var events = '',
+        rowsOnInsert;
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
+      // we sort 1st column desc which means Z is before A
+      model = helper.createModelFixture(1, 0);
+      table = helper.createTable(model);
+      table.sort(table.columns[0], 'desc');
+      table.on('rowsInserted', function(event) {
+        events += 'rowsInserted ';
+        rowsOnInsert = event.rows;
+      });
+      table.on('rowOrderChanged', function() {
+        events += 'rowOrderChanged';
+      });
+      table.insertRows([ helper.createModelRow(1, [ 'A' ]), helper.createModelRow(1, [ 'Z' ]) ]);
+
+      // we expect exactly this order of events when new rows are inserted
+      expect(events).toBe('rowsInserted rowOrderChanged');
+
+      // when rowsInserted event occurs we expect the rows provided by the event
+      // in the order they have been inserted (no sorting is done here)
+      expect(rowsOnInsert[0].cells[0].text).toBe('A');
+      expect(rowsOnInsert[1].cells[0].text).toBe('Z');
+
+      // expect the rows in the table to be sorted as defined by the sort-column
+      expect(table.rows[0].cells[0].text).toBe('Z');
+      expect(table.rows[1].cells[0].text).toBe('A');
+    });
+
   });
 
   describe("updateRows", function() {
@@ -308,47 +341,6 @@ describe("Table", function() {
       expect(table.rows[1].cells[0].text).toBe('newRow1Cell0');
       expect(table.rows[1].cells[1].text).toBe('newRow1Cell1');
     });
-  });
-
-  describe("insertRows", function() {
-
-    var model, table,
-      events = '',
-      rowsOnInsert;
-
-    // we sort 1st column desc which means Z is before A
-    beforeEach(function() {
-      model = helper.createModelFixture(1, 0);
-      table = helper.createTable(model);
-      table.sort(table.columns[0], 'desc');
-      table.on('rowsInserted', function(event) {
-        events += 'rowsInserted ';
-        rowsOnInsert = event.rows;
-      });
-      table.on('rowOrderChanged', function() {
-        events += 'rowOrderChanged';
-      });
-    });
-
-    it("rowsInserted event must be triggered before rowOrderChanged event", function() {
-      if (!scout.device.supportsInternationalization()) {
-        return;
-      }
-      table.insertRows([ helper.createModelRow(1, [ 'A' ]), helper.createModelRow(1, [ 'Z' ]) ]);
-
-      // we expect exactly this order of events when new rows are inserted
-      expect(events).toBe('rowsInserted rowOrderChanged');
-
-      // when rowsInserted event occurs we expect the rows provided by the event
-      // in the order they have been inserted (no sorting is done here)
-      expect(rowsOnInsert[0].cells[0].text).toBe('A');
-      expect(rowsOnInsert[1].cells[0].text).toBe('Z');
-
-      // expect the rows in the table to be sorted as defined by the sort-column
-      expect(table.rows[0].cells[0].text).toBe('Z');
-      expect(table.rows[1].cells[0].text).toBe('A');
-    });
-
   });
 
   describe("deleteRows", function() {
@@ -807,7 +799,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowAction', {
+      var event = new scout.RemoteEvent(table.id, 'rowAction', {
         columnId : column0.id,
         rowId : row0.id
       });
@@ -847,7 +839,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event(table.id, 'rowAction', {
+      var event = new scout.RemoteEvent(table.id, 'rowAction', {
         columnId : column0.id,
         rowId : row0.id
       });
@@ -886,7 +878,7 @@ describe("Table", function() {
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls('', 1000);
-      var event = new scout.Event(table.id, 'columnResized', {
+      var event = new scout.RemoteEvent(table.id, 'columnResized', {
         columnId : table.columns[0].id,
         width : 100,
         showBusyIndicator : false
@@ -923,7 +915,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event(table.id, 'columnResized', {
+      var event = new scout.RemoteEvent(table.id, 'columnResized', {
         columnId : table.columns[0].id,
         width : 150,
         showBusyIndicator : false
@@ -1250,7 +1242,7 @@ describe("Table", function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event(table.id, 'rowsSorted', {
+      var event = new scout.RemoteEvent(table.id, 'rowsSorted', {
         columnId : table.columns[0].id,
         sortAscending : false
       });
@@ -1265,7 +1257,7 @@ describe("Table", function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event(table.id, 'sortRows', {
+      var event = new scout.RemoteEvent(table.id, 'sortRows', {
         columnId : table.columns[0].id,
         sortAscending : false
       });
@@ -2267,7 +2259,7 @@ describe("Table", function() {
       // remaining rows (including first row)
       expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected' ]);
 
-      var event = [ new scout.Event(table.id, 'rowsSelected', {
+      var event = [ new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[0].id, model.rows[1].id, model.rows[2].id ]
       }) ];
       expect(requestData).toContainEvents(event);
@@ -2293,7 +2285,7 @@ describe("Table", function() {
       // exactly only one selection event for first row
       expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
 
-      var event = [ new scout.Event(table.id, 'rowsSelected', {
+      var event = [ new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[0].id ]
       }) ];
       expect(requestData).toContainEvents(event);
@@ -2341,7 +2333,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(table.id, 'rowsSelected', {
+      var event = new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[expectedSelectedRowIndex].id ]
       });
       expect(requestData).toContainEvents(event);

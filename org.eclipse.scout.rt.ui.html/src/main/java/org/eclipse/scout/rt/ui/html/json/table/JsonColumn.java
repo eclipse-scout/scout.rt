@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
@@ -49,6 +50,13 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   public void setColumnIndexOffset(int indexOffset) {
     m_indexOffset = indexOffset;
+  }
+
+  /**
+   * @return true, if the value should be sent to client, false if not
+   */
+  public boolean isValueRequired() {
+    return false;
   }
 
   @Override
@@ -83,7 +91,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put("headerForegroundColor", getColumn().getHeaderCell().getForegroundColor());
     json.put("headerFont", getColumn().getHeaderCell().getFont() != null ? getColumn().getHeaderCell().getFont().toPattern() : null);
     json.put("headerTooltipText", getColumn().getHeaderCell().getTooltipText());
-    json.put("headerIconId", getColumn().getHeaderCell().getIconId());
+    json.put("headerIconId", BinaryResourceUrlUtility.createIconUrl(getColumn().getHeaderCell().getIconId()));
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, getColumn());
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());
@@ -105,7 +113,9 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   }
 
   public Object cellValueToJson(Object value) {
-    // In most cases it is not necessary to send the value to the client because text is sufficient
+    if (isValueRequired()) {
+      return value;
+    }
     return null;
   }
 

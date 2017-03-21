@@ -102,15 +102,15 @@
 
   .keyframes-fade-short-drop() {
     00% { /* see comment on top */
-      margin-top: -40px;
+      #scout.transform(translateY(-40px));
       opacity: 0;
     }
     40% {
-      margin-top: 7px;
+      #scout.transform(translateY(7px));
       opacity: 0.9;
     }
     100% {
-      margin-top: 0;
+      #scout.transform(translateY(0));
       opacity: 1;
     }
   }

@@ -651,7 +651,7 @@ describe("Table Filter", function() {
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
-        var event = new scout.Event(table.id, 'rowsFiltered', {
+        var event = new scout.RemoteEvent(table.id, 'rowsFiltered', {
           rowIds: [table.rows[1].id],
           showBusyIndicator: false
         });

@@ -58,7 +58,7 @@ describe('DesktopAdapter', function() {
       expect(desktop.activeForm).toBe(form);
 
       sendQueuedAjaxCalls();
-      var event = new scout.Event(desktopAdapter.id, 'formActivated', {
+      var event = new scout.RemoteEvent(desktopAdapter.id, 'formActivated', {
         formId: form.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -67,7 +67,7 @@ describe('DesktopAdapter', function() {
       expect(desktop.activeForm).toBe(form2);
 
       sendQueuedAjaxCalls();
-      event = new scout.Event(desktopAdapter.id, 'formActivated', {
+      event = new scout.RemoteEvent(desktopAdapter.id, 'formActivated', {
         formId: form2.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -82,7 +82,7 @@ describe('DesktopAdapter', function() {
       session._renderDesktop();
       var formModel = createAndRegisterFormModel();
 
-      var formShowEvent = new scout.Event(desktopAdapter.id, 'formShow', {
+      var formShowEvent = new scout.RemoteEvent(desktopAdapter.id, 'formShow', {
         form: formModel.id,
         displayParent: desktopAdapter.id
       });

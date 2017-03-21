@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
-  this._files = [];
+  this.files = [];
   this._glassPaneRenderer;
 };
 scout.inherits(scout.FileChooser, scout.Widget);
@@ -18,6 +18,13 @@ scout.inherits(scout.FileChooser, scout.Widget);
 scout.FileChooser.prototype._init = function(model) {
   scout.FileChooser.parent.prototype._init.call(this, model);
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
+  this.fileInput = scout.create('FileInput', {
+    parent: this,
+    acceptTypes: this.acceptTypes,
+    multiSelect: this.multiSelect,
+    visible: !scout.device.supportsFile()
+  });
+  this.fileInput.on('change', this._onFileChange.bind(this));
 };
 
 /**
@@ -53,21 +60,17 @@ scout.FileChooser.prototype._render = function($parent) {
 
   this.$container.appendDiv('closable')
     .on('click', function() {
-      this._doCancel();
+      this.cancel();
     }.bind(this));
 
   this.$content = this.$container.appendDiv('file-chooser-content');
   this.$title = this.$content.appendDiv('file-chooser-title')
     .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'));
 
-  this.$fileInputField = $parent.makeElement('<input>')
-    .attr('type', 'file')
-    .prop('multiple', this.multiSelect)
-    .attr('accept', this.acceptTypes)
-    .on('change', this._onFileChange.bind(this));
+  this.fileInput.render(this.$content);
 
-  if (scout.device.supportsFile()) {
-    this.$fileInputField.appendTo(this.$container);
+  // DnD and Multiple files are only supported with the new file api
+  if (!this.fileInput.legacy) {
 
     // Install DnD support
     this.$container.on('dragenter', this._onDragEnterOrOver.bind(this))
@@ -83,44 +86,12 @@ scout.FileChooser.prototype._render = function($parent) {
     scout.scrollbars.install(this.$files, {
       parent: this
     });
-
-  } else {
-    // legacy iframe code
-    this.$legacyFormTarget = this.$fileInputField.appendElement('<iframe>')
-      .attr('name', 'legacyFileUpload' + this.id)
-      .on('load', function() {
-        // Manually handle JSON response from iframe
-        try {
-          // "onAjaxDone"
-          var text = this.$legacyFormTarget.contents().text();
-          if (scout.strings.hasText(text)) {
-            // Manually handle JSON response
-            var json = $.parseJSON(text);
-            this.session.responseQueue.process(json);
-          }
-        } finally {
-          // "onAjaxAlways"
-          this.session.setBusy(false);
-        }
-      }.bind(this));
-    this.$fileInputField
-      .attr('name', 'file')
-      .addClass('legacy-upload-file-input');
-    this.$legacyForm = this.$content.appendElement('<form>', 'legacy-upload-form')
-      .attr('action', 'upload/' + this.session.uiSessionId + '/' + this.id)
-      .attr('enctype', 'multipart/form-data')
-      .attr('method', 'post')
-      .attr('target', 'legacyFileUpload' + this.id)
-      .append(this.$fileInputField);
-    this.$legacyForm.appendElement('<input>')
-      .attr('name', 'legacyFormTextPlainAnswer')
-      .attr('type', 'hidden');
   }
 
   // Buttons
   this.$buttons = this.$container.appendDiv('file-chooser-buttons');
   var boxButtons = new scout.BoxButtons(this.$buttons);
-  if (scout.device.supportsFile()) {
+  if (!this.fileInput.legacy) {
     this.$addFileButton = boxButtons.addButton({
       text: this.session.text('ui.Browse'),
       onClick: this._onAddFileButtonClicked.bind(this),
@@ -151,6 +122,15 @@ scout.FileChooser.prototype._render = function($parent) {
   this._position();
 };
 
+scout.FileChooser.prototype._renderProperties = function() {
+  scout.FileChooser.parent.prototype._renderProperties.call(this);
+  if (this.fileInput.legacy) {
+    // Files may not be set into native control -> clear list in order to be sync again
+    this.setFiles([]);
+  }
+  this._renderFiles();
+};
+
 scout.FileChooser.prototype._postRender = function() {
   scout.FileChooser.parent.prototype._postRender.call(this);
   this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
@@ -166,92 +146,120 @@ scout.FileChooser.prototype._position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.FileChooser.prototype._doUpload = function() {
-  if (scout.device.supportsFile()) {
-    if (this._files.length === 0) {
-      this._doCancel();
-      return;
-    }
-    this.session.uploadFiles(this, this._files, undefined, this.maximumUploadSize);
-  } else if (this.$fileInputField[0].value) {
-    // legacy iframe code
-    this.session.setBusy(true);
-    this.$legacyForm[0].submit();
+scout.FileChooser.prototype.upload = function() {
+  if (this.files.length === 0) {
+    return;
   }
-};
 
-scout.FileChooser.prototype._doCancel = function() {
-  // TODO [7.0] cgu offline case?
-  this.trigger('cancel');
-};
-
-scout.FileChooser.prototype._doAddFile = function() {
-  // Trigger browser's file chooser
-  this.$fileInputField.click();
-};
-
-scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
-  this.$uploadButton.setEnabled(false);
-  this._doUpload();
-  this.session.listen().done(function() {
-    this.$uploadButton.setEnabled(true);
-  }.bind(this));
-
-};
-
-scout.FileChooser.prototype._onCancelButtonClicked = function(event) {
-  this._doCancel();
-};
-
-scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
-  this._doAddFile();
-};
-
-scout.FileChooser.prototype._onFileChange = function(event) {
-  if (scout.device.supportsFile()) {
-    this.addFiles(this.$fileInputField[0].files);
+  if (this.fileInput.legacy) {
+    this.fileInput.upload();
   } else {
-    this.$uploadButton.setEnabled(this.$fileInputField[0].value);
+    this.session.uploadFiles(this, this.files, undefined, this.maximumUploadSize);
   }
 };
 
 /**
- * Add files using java script files api.
+ * Renders the file chooser and links it with the display parent.
  */
-scout.FileChooser.prototype.addFiles = function(files) {
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    if (this.multiSelect) {
-      this._files.push(file);
-    } else {
-      this._files = [file];
-      this.$files.empty();
-    }
-    var $file = this.$files.appendElement('<li>', 'file', file.name);
-    // Append a space to allow the browser to break the line here when it gets too long
-    $file.append(" ");
-    var $remove = $file
-      .appendSpan('remove menu-item')
-      .on('click', this.removeFile.bind(this, file, $file));
-    var $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
-    $remove.appendTextNode('(');
-    $remove.append($removeLink);
-    $remove.appendTextNode(')');
-  }
-  this.$uploadButton.setEnabled(this._files.length > 0);
-  scout.scrollbars.update(this.$files);
+scout.FileChooser.prototype.open = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.displayParent.fileChooserController.registerAndRender(this);
 };
 
-scout.FileChooser.prototype.removeFile = function(file, $file) {
-  var index = this._files.indexOf(file);
-  if (index > -1) {
-    this._files.splice(index, 1);
+/**
+ * Destroys the file chooser and unlinks it from the display parent.
+ */
+scout.FileChooser.prototype.close = function() {
+  if (!this.rendered) {
+    this.cancel();
+    return;
   }
-  if ($file) {
-    $file.remove();
+  if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
+    this.$cancelButton.click();
   }
-  this.$uploadButton.setEnabled(this._files.length > 0);
-  scout.scrollbars.update(this.$files);
+};
+
+scout.FileChooser.prototype.cancel = function() {
+  var event = new scout.Event();
+  this.trigger('cancel', event);
+  if (!event.defaultPrevented) {
+    this._close();
+  }
+};
+
+/**
+ * Destroys the file chooser and unlinks it from the display parent.
+ */
+scout.FileChooser.prototype._close = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.displayParent.fileChooserController.unregisterAndRemove(this);
+  this.destroy();
+};
+
+scout.FileChooser.prototype.browse = function() {
+  this.fileInput.browse();
+};
+
+scout.FileChooser.prototype.setAcceptTypes = function(acceptTypes) {
+  this.setProperty('acceptTypes', acceptTypes);
+  this.fileInput.setAcceptTypes(acceptTypes);
+};
+
+scout.FileChooser.prototype.setMultiSelect = function(multiSelect) {
+  this.setProperty('multiSelect', multiSelect);
+  this.fileInput.setMultiSelect(multiSelect);
+};
+
+scout.FileChooser.prototype.addFiles = function(files) {
+  files = scout.arrays.ensure(files);
+  if (files.length === 0) {
+    return;
+  }
+  if (!this.multiSelect || this.fileInput.legacy) {
+    files = [files[0]];
+    this.setFiles([files[0]]);
+  } else {
+    // copy so that parameter stays untouched
+    files = files.slice();
+    // append new files to existing ones
+    scout.arrays.insertArray(files, this.files, 0);
+    this.setFiles(files);
+  }
+};
+
+scout.FileChooser.prototype.removeFile = function(file) {
+  var files = this.files.slice();
+  scout.arrays.remove(files, file);
+  this.setFiles(files);
+  // Clear the input, otherwise user could not choose the file which he has removed previously
+  this.fileInput.clear();
+};
+
+scout.FileChooser.prototype.setFiles = function(files) {
+  files = scout.arrays.ensure(files);
+  this.setProperty('files', files);
+};
+
+scout.FileChooser.prototype._renderFiles = function() {
+  var files = this.files;
+
+  if (!this.fileInput.legacy) {
+    this.$files.empty();
+    files.forEach(function(file) {
+      var $file = this.$files.appendElement('<li>', 'file', file.name);
+      // Append a space to allow the browser to break the line here when it gets too long
+      $file.append(" ");
+      var $remove = $file
+        .appendSpan('remove menu-item')
+        .on('click', this.removeFile.bind(this, file));
+      var $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
+      $remove.appendTextNode('(');
+      $remove.append($removeLink);
+      $remove.appendTextNode(')');
+    }, this);
+    scout.scrollbars.update(this.$files);
+  }
+  this.$uploadButton.setEnabled(files.length > 0);
 };
 
 scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
@@ -263,6 +271,26 @@ scout.FileChooser.prototype._onDrop = function(event) {
     $.suppressEvent(event);
     this.addFiles(event.originalEvent.dataTransfer.files);
   }
+};
+
+scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
+  this.$uploadButton.setEnabled(false);
+  this.upload();
+  this.session.listen().done(function() {
+    this.$uploadButton.setEnabled(true);
+  }.bind(this));
+};
+
+scout.FileChooser.prototype._onCancelButtonClicked = function(event) {
+  this.cancel();
+};
+
+scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
+  this.browse();
+};
+
+scout.FileChooser.prototype._onFileChange = function(event) {
+  this.addFiles(event.files);
 };
 
 /**
@@ -281,13 +309,4 @@ scout.FileChooser.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
   scout.FileChooser.parent.prototype._detach.call(this);
-};
-
-/**
- * Used by CloseKeyStroke.js
- */
-scout.FileChooser.prototype.close = function() {
-  if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
-    this.$cancelButton.click();
-  }
 };

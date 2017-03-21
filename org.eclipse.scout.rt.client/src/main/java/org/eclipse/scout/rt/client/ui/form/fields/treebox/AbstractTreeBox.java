@@ -565,9 +565,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       filterNewNodesRec(subTree, parentNode != null ? parentNode.getTreeLevel() + 1 : 0);
       return subTree;
     }
-    else {
-      return CollectionUtility.emptyArrayList();
-    }
+    return CollectionUtility.emptyArrayList();
   }
 
   @Override
@@ -579,16 +577,11 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       prepareLookupCall(call, null);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);
-      if (data.size() > 1000) {
-        LOG.warn("TreeBox {} has loadIncremental=false but produced more than 1000 rows; check if this is intended.", getClass().getSimpleName());
-      }
       List<ITreeNode> subTree = getTreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, true);
       filterNewNodesRec(subTree, 0);
       return subTree;
     }
-    else {
-      return CollectionUtility.emptyArrayList();
-    }
+    return CollectionUtility.emptyArrayList();
   }
 
   private List<? extends ILookupRow<T>> filterLookupResult(ILookupCall<T> call, List<? extends ILookupRow<T>> data) {

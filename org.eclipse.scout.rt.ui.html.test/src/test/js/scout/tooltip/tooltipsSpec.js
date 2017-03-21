@@ -39,7 +39,7 @@ describe("scout.tooltips", function() {
 
   it("can be installed and uninstalled for a form field", function() {
     scout.tooltips.install(formField.$container, {
-      parent: new scout.NullWidget(),
+      parent: session.desktop,
       session: session,
       text: 'Test1'
     });
@@ -50,7 +50,7 @@ describe("scout.tooltips", function() {
 
   it("creates a tooltip on mouseenter and removes it on mouseleave", function() {
     scout.tooltips.install(formField.$container, {
-      parent: new scout.NullWidget(),
+      parent: session.desktop,
       session: session,
       text: 'Test2',
       delay: 0
@@ -79,7 +79,7 @@ describe("scout.tooltips", function() {
 
     it("is empty no tooltip will be shown", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         text: '',
         delay: 0
@@ -98,7 +98,7 @@ describe("scout.tooltips", function() {
 
     it("is a function, it will be called for tooltip text", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         text: function() {
           return 'Test3';
@@ -121,7 +121,7 @@ describe("scout.tooltips", function() {
 
     it("is undefined no tooltip will be shown", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         text: function() {
           return undefined;
@@ -142,7 +142,7 @@ describe("scout.tooltips", function() {
 
     it("is provided by component, it will be used as tooltip text", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         delay: 0
       });
@@ -163,7 +163,7 @@ describe("scout.tooltips", function() {
 
     it("is provided as function by component, it will be called and used as tooltip text", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         delay: 0
       });
@@ -186,7 +186,7 @@ describe("scout.tooltips", function() {
 
     it("is provided using options and by component, text provided using options will be used", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         text: 'Test6',
         delay: 0
@@ -208,7 +208,7 @@ describe("scout.tooltips", function() {
 
     it("is a function, component is passed as first and only argument", function() {
       scout.tooltips.install(formField.$container, {
-        parent: new scout.NullWidget(),
+        parent: session.desktop,
         session: session,
         text: function() {
           return (formField.$container.is(arguments[0]) && arguments.length == 1) ? 'Test8' : 'InvalidArguments';

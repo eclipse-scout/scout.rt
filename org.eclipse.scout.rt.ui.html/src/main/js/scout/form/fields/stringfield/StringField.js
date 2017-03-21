@@ -92,7 +92,6 @@ scout.StringField.prototype._render = function($parent) {
 
   this.addField($field);
   this.addStatus();
-
 };
 
 scout.StringField.prototype._onFieldBlur = function() {
@@ -116,6 +115,15 @@ scout.StringField.prototype._renderProperties = function() {
   // be set to <textarea>s in IE. Instead, the selection is rendered when the focus has entered
   // the field, see _render(). #168648
   this._renderDropType();
+};
+
+/**
+ * Adds a click handler instead of a mouse down handler because it executes an action.
+ * @override
+ */
+scout.StringField.prototype.addIcon = function() {
+  this.$icon = scout.fields.appendIcon(this.$container)
+    .on('click', this._onIconClick.bind(this));
 };
 
 scout.StringField.prototype._renderMaxLength = function() {
@@ -273,7 +281,7 @@ scout.StringField.prototype._renderGridData = function() {
 
 scout.StringField.prototype._onIconClick = function(event) {
   this.acceptInput();
-  scout.StringField.parent.prototype._onIconClick.call(this, event);
+  this.$field.focus();
   this.trigger('action');
 };
 

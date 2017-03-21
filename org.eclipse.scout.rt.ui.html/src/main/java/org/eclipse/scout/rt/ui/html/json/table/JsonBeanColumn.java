@@ -27,6 +27,11 @@ public class JsonBeanColumn<T extends IColumn<?>> extends JsonColumn<T> {
   }
 
   @Override
+  public boolean isValueRequired() {
+    return true;
+  }
+
+  @Override
   public Object cellValueToJson(Object value) {
     IJsonObject jsonObject = MainJsonObjectFactory.get().createJsonObject(value);
     JsonBean jsonBean = (JsonBean) jsonObject;

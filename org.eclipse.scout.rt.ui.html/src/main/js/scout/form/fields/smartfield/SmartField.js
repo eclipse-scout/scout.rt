@@ -29,6 +29,7 @@ scout.SmartField = function() {
   this.DEBOUNCE_DELAY = 200;
 
   this._addAdapterProperties(['proposalChooser']);
+  this._addCloneProperties(['proposal', 'codeType', 'lookupCall']);
   this.options;
 
   this._additionalLines;
@@ -47,6 +48,7 @@ scout.SmartField = function() {
   this._navigating = false;
   this.lookupCall;
   this.codeType;
+  this.proposal = false;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -75,6 +77,7 @@ scout.SmartField.prototype.createPopup = function() {
     $anchor: this.$field,
     boundToAnchor: !this.touch,
     closeOnAnchorMousedown: false,
+    cssClass: this.cssClass,
     field: this
   });
 };
@@ -85,7 +88,7 @@ scout.SmartField.prototype._render = function($parent) {
   this.addLabel();
 
   var $field = scout.fields.makeInputOrDiv(this)
-    .click(this._onClick.bind(this));
+    .on('mousedown', this._onMousedown.bind(this));
   if (!this.touch) {
     $field
       .blur(this._onFieldBlur.bind(this))
@@ -149,18 +152,15 @@ scout.SmartField.prototype._setDisplayText = function(displayText) {
  * @override ValueField.js
  */
 scout.SmartField.prototype._renderDisplayText = function() {
-  if (this.displayText) {
-    var multilineText = this.displayText.split('\n');
-    if (multilineText) {
-      var firstLine = multilineText.shift();
-      this._additionalLines = multilineText;
-      scout.fields.valOrText(this, this.$field, firstLine);
-    } else {
-      this._additionalLines = null;
-      scout.fields.valOrText(this, this.$field, this.displayText);
-    }
+  var displayText = scout.nvl(this.displayText, '');
+  var multilineText = displayText.split('\n');
+  if (multilineText) {
+    var firstLine = multilineText.shift();
+    this._additionalLines = multilineText;
+    scout.fields.valOrText(this, this.$field, firstLine);
   } else {
     this._additionalLines = null;
+    scout.fields.valOrText(this, this.$field, displayText);
   }
 };
 
@@ -231,15 +231,18 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
   return e.which >= scout.keys.F1 && e.which < scout.keys.F12;
 };
 
-scout.SmartField.prototype._onClick = function(event) {
+scout.SmartField.prototype._onMousedown = function(event) {
   if (scout.fields.handleOnClick(this)) {
     this._openProposal(true);
   }
 };
 
-scout.SmartField.prototype._onIconClick = function(event) {
+scout.SmartField.prototype._onIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.$field.focus();
   if (scout.fields.handleOnClick(this)) {
-    scout.SmartField.parent.prototype._onIconClick.call(this, event);
     this._openProposal(true);
   }
 };
@@ -438,7 +441,6 @@ scout.SmartField.prototype._abortAcceptProposal = function(displayText) {
   var abort = this.proposalSelectedInProgress && displayText === this._oldDisplayText;
   if (abort) {
     $.log.debug('(SmartField#_abortAcceptProposal) aborted _acceptProposal because displayText has not changed since proposal has been selected');
-    this.proposalSelectedInProgress = false;
   }
   return abort;
 };
@@ -503,11 +505,11 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     this._triggerAcceptProposal(displayText);
   }
 
-  this.session.listen().done(this._onSessionDone.bind(this));
+  this.session.listen().done(this._onProposalSelectionDone.bind(this));
 };
 
-scout.SmartField.prototype._onSessionDone = function(event) {
-  $.log.debug('(SmartField#_onSessionDone) request done proposalChooser=' + this.proposalChooser);
+scout.SmartField.prototype._onProposalSelectionDone = function(event) {
+  $.log.debug('(SmartField#_onProposalSelectionDone) request done proposalChooser=' + this.proposalChooser);
   this.proposalSelectedInProgress = false;
   if (this._tabPrevented && !this.proposalChooser) {
     this._focusNextTabbable();
@@ -626,7 +628,6 @@ scout.SmartField.prototype.openPopup = function() {
   }
 };
 
-
 scout.SmartField.prototype._onPopupRemove = function(event) {
   this.popup = null;
   if (this.mode === scout.FormField.MODE_CELLEDITOR && this.proposalChooser) {
@@ -669,6 +670,6 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
  */
 scout.SmartField.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {
-    this._onClick();
+    this._onMousedown();
   }
 };

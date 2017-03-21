@@ -131,7 +131,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       //Request was already processed and adapter does not exist anymore
       return;
     }
-
+    if (httpServletRequest.getParameter("legacy") != null) {
+      httpServletResponse.setContentType("text/plain");
+    }
     // Read uploaded data
     Map<String, String> uploadProperties = new HashMap<String, String>();
     List<BinaryResource> uploadResources = new ArrayList<>();
@@ -141,10 +143,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     catch (PlatformException ex) { // NOSONAR
       writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
       return;
-    }
-
-    if (uploadProperties.containsKey("legacyFormTextPlainAnswer")) {
-      httpServletResponse.setContentType("text/plain");
     }
 
     // GUI requests for the same session must be processed consecutively

@@ -112,7 +112,7 @@ scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
     this.$dateField = scout.fields.makeInputOrDiv(this, 'date')
-      .on('mousedown', this._onDateFieldClick.bind(this))
+      .on('mousedown', this._onDateFieldMousedown.bind(this))
       .appendTo(this.$field);
     if (!this.touch) {
       this.$dateField
@@ -124,7 +124,7 @@ scout.DateField.prototype._renderHasDate = function() {
     scout.HtmlComponent.install(this.$dateField, this.session);
 
     this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
-      .on('mousedown', this._onDateIconClick.bind(this));
+      .on('mousedown', this._onDateIconMousedown.bind(this));
 
     this.invalidateLayout();
 
@@ -143,7 +143,7 @@ scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
     this.$timeField = scout.fields.makeInputOrDiv(this, 'time')
-      .on('mousedown', this._onTimeFieldClick.bind(this))
+      .on('mousedown', this._onTimeFieldMousedown.bind(this))
       .appendTo(this.$field);
     if (!this.touch) {
       this.$timeField
@@ -152,7 +152,7 @@ scout.DateField.prototype._renderHasTime = function() {
         .on('blur', this._onTimeFieldBlur.bind(this));
     }
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
-      .on('mousedown', this._onTimeIconClick.bind(this));
+      .on('mousedown', this._onTimeIconMousedown.bind(this));
     scout.HtmlComponent.install(this.$timeField, this.session);
 
     this.invalidateLayout();
@@ -359,31 +359,35 @@ scout.DateField.prototype._renderBackgroundColor = function() {
   this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
 };
 
-scout.DateField.prototype._onDateFieldClick = function() {
+scout.DateField.prototype._onDateFieldMousedown = function() {
   if (scout.fields.handleOnClick(this)) {
     this.openPopupAndSelect(this.timestampAsDate);
   }
 };
 
-scout.DateField.prototype._onDateIconClick = function(event) {
+scout.DateField.prototype._onDateIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.$dateField.focus();
   if (scout.fields.handleOnClick(this)) {
-    this.$dateField.focus();
     this.openPopupAndSelect(this.timestampAsDate);
   }
 };
 
-scout.DateField.prototype._onTimeFieldClick = function(event) {
+scout.DateField.prototype._onTimeFieldMousedown = function(event) {
   if (scout.fields.handleOnClick(this) && this.touch) {
     this.openPopupAndSelect(this.timestampAsDate);
   }
 };
 
-scout.DateField.prototype._onTimeIconClick = function(event) {
-  if (scout.fields.handleOnClick(this)) {
-    this.$timeField.focus();
-    if (this.touch) {
-      this.openPopupAndSelect(this.timestampAsDate);
-    }
+scout.DateField.prototype._onTimeIconMousedown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.$timeField.focus();
+  if (scout.fields.handleOnClick(this) && this.touch) {
+    this.openPopupAndSelect(this.timestampAsDate);
   }
 };
 

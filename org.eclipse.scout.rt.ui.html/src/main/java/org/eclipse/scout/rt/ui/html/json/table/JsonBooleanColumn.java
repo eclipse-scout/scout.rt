@@ -25,8 +25,8 @@ public class JsonBooleanColumn<T extends IBooleanColumn> extends JsonColumn<T> {
   }
 
   @Override
-  public Object cellValueToJson(Object value) {
-    return value;
+  public boolean isValueRequired() {
+    return true;
   }
 
   @Override

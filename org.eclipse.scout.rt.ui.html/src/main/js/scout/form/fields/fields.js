@@ -22,7 +22,13 @@ scout.fields = {
   },
 
   appendIcon: function($field, cssClass) {
-    var $icon = $field.appendSpan('icon');
+    /*
+     * Note: the field usually does $field.focus() when the icon is clicked.
+     * Unfocusable is required because when the icon is clicked the browser is in the middle of setting
+     * a new focus target, so we cannot simply change the focus target, because at the end the wrong target would be
+     * focused and the popup would be closed immediately. With 'unfocusable' the focus manager will prevent the default focus (and does not execute _handleIEEvent either)
+     */
+    var $icon = $field.appendSpan('icon unfocusable');
     if (cssClass) {
       $icon.addClass(cssClass);
     }

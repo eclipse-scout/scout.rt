@@ -22,6 +22,9 @@ describe('FormField', function() {
     var formField = new scout.FormField();
     formField._render = function($parent) {
       this.addContainer($parent, 'form-field');
+      this.addLabel();
+      this.addMandatoryIndicator();
+      this.addField($parent.makeDiv());
       this.addStatus();
     };
     formField.init(model);
@@ -154,6 +157,65 @@ describe('FormField', function() {
 
   });
 
+  describe('property tooltipText', function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = createFormField(model);
+    });
+
+    it('adds class has-tooltip if there is a tooltip text', function() {
+      formField.tooltipText = 'hello';
+      formField.render(session.$entryPoint);
+      expect(formField.$container).toHaveClass('has-tooltip');
+
+      formField.setTooltipText(null);
+      expect(formField.$container).not.toHaveClass('has-tooltip');
+    });
+
+  });
+
+  describe('property menus', function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = createFormField(model);
+    });
+
+    it('adds class has-menus if there are menus', function() {
+      var menu = scout.create('Menu', {
+        parent: formField
+      });
+      formField.setMenusVisible(true);
+      formField.setMenus([menu]);
+      formField.render(session.$entryPoint);
+      expect(formField.$container).toHaveClass('has-menus');
+
+      formField.setMenus([]);
+      expect(formField.$container).not.toHaveClass('has-menus');
+    });
+
+    it('adds class has-menus has-tooltip if there are menus and a tooltip', function() {
+      var menu = scout.create('Menu', {
+        parent: formField
+      });
+      formField.setMenusVisible(true);
+      formField.setMenus([menu]);
+      formField.setTooltipText('hello');
+      formField.render(session.$entryPoint);
+      expect(formField.$container).toHaveClass('has-menus');
+      expect(formField.$container).toHaveClass('has-tooltip');
+
+      formField.setMenus([]);
+      formField.setTooltipText(null);
+      expect(formField.$container).not.toHaveClass('has-menus');
+      expect(formField.$container).not.toHaveClass('has-tooltip');
+    });
+
+  });
+
   describe('property status visible', function() {
     var formField, model;
 
@@ -188,7 +250,10 @@ describe('FormField', function() {
 
     it('shows a status even though status visible is false but errorStatus is set', function() {
       formField.statusVisible = false;
-      formField.errorStatus = new scout.Status({message: 'error', severity: scout.Status.Severity.ERROR});
+      formField.errorStatus = new scout.Status({
+        message: 'error',
+        severity: scout.Status.Severity.ERROR
+      });
       formField.render(session.$entryPoint);
 
       expect(formField.$status.isVisible()).toBe(true);

@@ -32,6 +32,7 @@
   __include("scout/util/Device.js");
   __include("scout/util/DoubleClickSupport.js");
   __include("scout/util/dragAndDrop.js");
+  __include("scout/util/Event.js");
   __include("scout/util/EventSupport.js");
   __include("scout/util/fonts.js");
   __include("scout/util/icons.js");
@@ -64,7 +65,7 @@
   // Session related
   __include("scout/session/BackgroundJobPollingSupport.js");
   __include("scout/session/BusyIndicator.js");
-  __include("scout/session/Event.js");
+  __include("scout/session/RemoteEvent.js");
   __include("scout/session/Locale.js");
   __include("scout/session/PropertyChangeEventFilter.js");
   __include("scout/session/Reconnector.js");
@@ -175,6 +176,7 @@
   __include("scout/filechooser/FileChooser.js");
   __include("scout/filechooser/FileChooserAdapter.js");
   __include("scout/filechooser/FileChooserController.js");
+  __include("scout/filechooser/FileInput.js");
   __include("scout/slider/Slider.js");
   __include("scout/slider/SliderAdapter.js");
   __include("scout/slider/SliderLayout.js");
@@ -381,6 +383,8 @@
   __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
   __include("scout/form/fields/filechooserfield/FileChooserField.js");
   __include("scout/form/fields/filechooserfield/FileChooserFieldAdapter.js");
+  __include("scout/form/fields/filechooserfield/FileChooserFieldBrowseKeyStroke.js");
+  __include("scout/form/fields/filechooserfield/FileChooserFieldDeleteKeyStroke.js");
   __include("scout/form/fields/groupbox/GroupBox.js");
   __include("scout/form/fields/groupbox/GroupBoxAdapter.js");
   __include("scout/form/fields/groupbox/GroupBoxLayout.js");
