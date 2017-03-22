@@ -301,13 +301,19 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     if (validValue == null) {
       return "";
     }
-    DateFormat dateFormat;
     StringBuilder sb = new StringBuilder();
-    dateFormat = getIsolatedDateFormat();
-    sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
-    sb.append("\n");
-    dateFormat = getIsolatedTimeFormat();
-    sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
+    if (isHasDate()) {
+      DateFormat dateFormat;
+      dateFormat = getIsolatedDateFormat();
+      sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
+      if (isHasTime()) {
+        sb.append("\n");
+      }
+    }
+    if (isHasTime()) {
+      DateFormat dateFormat = getIsolatedTimeFormat();
+      sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
+    }
     return sb.toString();
   }
 

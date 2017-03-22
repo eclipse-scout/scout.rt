@@ -134,12 +134,12 @@ public class SequenceBoxTest {
 
     f.resetSearchFilter();
     String searchFilterText = f.getSearchFilter().getDisplayTextsPlain();
-    assertEquals("baseLabel from = \n" + DateUtility.formatTime(cal.getTime()), searchFilterText);
+    assertEquals("baseLabel from = " + DateUtility.formatTime(cal.getTime()), searchFilterText);
 
     f.getStartField().setLabel(null);
     f.resetSearchFilter();
     searchFilterText = f.getSearchFilter().getDisplayTextsPlain();
-    assertEquals("baseLabel = \n" + DateUtility.formatTime(cal.getTime()), searchFilterText);
+    assertEquals("baseLabel = " + DateUtility.formatTime(cal.getTime()), searchFilterText);
   }
 
   @Test
