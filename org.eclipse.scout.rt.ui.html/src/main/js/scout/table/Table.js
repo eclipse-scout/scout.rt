@@ -1425,13 +1425,14 @@ scout.Table.prototype._columnAtX = function(x) {
     columnOffsetLeft = this.$data.offset().left + this.rowBorderLeftWidth,
     scrollLeft = this.$data.scrollLeft();
 
+  var visibleColumns = this.visibleColumns();
   if (x < columnOffsetLeft) {
     // Clicked left of first column (on selection border) --> return first column
-    return this.columns[0];
+    return visibleColumns[0];
   }
 
   columnOffsetLeft -= scrollLeft;
-  var column = scout.arrays.find(this.columns, function(column) {
+  var column = scout.arrays.find(visibleColumns, function(column) {
     columnOffsetRight = columnOffsetLeft + column.width;
     if (x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
@@ -1440,7 +1441,7 @@ scout.Table.prototype._columnAtX = function(x) {
   });
   if (!column) {
     // No column found (clicked right of last column, on selection border) --> return last column
-    column = this.columns[this.columns.length - 1];
+    column = scout.arrays.last(visibleColumns);
   }
   return column;
 };
