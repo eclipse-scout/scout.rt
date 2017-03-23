@@ -43,7 +43,7 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
     String parsedKey = parseKey(key);
     IConfigProperty<?> property = getAllConfigProperties().get(parsedKey);
     if (property == null) {
-      return false; // not found
+      return PropertiesHelper.IMPORT_KEY.equals(parsedKey); // 'import' key should be accepted although there is no IConfigProperty class for this key.
     }
 
     try {
