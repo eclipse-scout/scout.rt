@@ -770,16 +770,16 @@ scout.Desktop.prototype._setOutlineActivated = function() {
 };
 
 scout.Desktop.prototype._setFormActivated = function(form) {
-  // If desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
+  // If desktop is in rendering process the can not set a new active form. instead the active form from the model is set selected.
   if (!this.rendered || this.initialFormRendering) {
     return;
   }
-
   if (this.activeForm === form) {
     return;
   }
 
   this.activeForm = form;
+
   this.triggerFormActivated(form);
 };
 
