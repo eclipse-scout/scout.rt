@@ -534,6 +534,10 @@ scout.DesktopBench.prototype.addView = function(view, activate) {
 };
 
 scout.DesktopBench.prototype.activateView = function(view) {
+  // activate views is only for existing views allowed.
+  if (!this.hasView(view)) {
+    return;
+  }
   var column = this._getColumn(view.displayViewId);
   if (column) {
     column.activateView(view);
@@ -591,6 +595,12 @@ scout.DesktopBench.prototype.getTabBox = function(displayViewId) {
     return;
   }
   return viewColumn.getTabBox(displayViewId);
+};
+
+scout.DesktopBench.prototype.hasView = function(view) {
+  return this.columns.filter(function(column) {
+    return column.hasView(view);
+  }).length > 0;
 };
 
 scout.DesktopBench.prototype.getViews = function(displayViewId) {

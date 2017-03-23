@@ -251,6 +251,12 @@ scout.BenchColumn.prototype.viewCount = function() {
   }, 0);
 };
 
+scout.BenchColumn.prototype.hasView = function(view) {
+  return this.tabBoxes.filter(function(tabBox) {
+    return tabBox.hasView(view);
+  }).length > 0;
+};
+
 scout.BenchColumn.prototype.hasViews = function() {
   return this.viewCount() > 0;
 };

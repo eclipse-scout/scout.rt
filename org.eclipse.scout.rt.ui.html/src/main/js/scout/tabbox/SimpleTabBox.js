@@ -252,6 +252,11 @@ scout.SimpleTabBox.prototype.hasViews = function() {
   return this.viewStack.length > 0;
 };
 
+scout.SimpleTabBox.prototype.hasView = function(view) {
+  return this.viewStack.filter(function(v) {
+    return v === view;
+  }).length > 0;
+};
 scout.SimpleTabBox.prototype.getViews = function(displayViewId) {
   return this.viewStack.filter(function(view) {
     if (!displayViewId) {
