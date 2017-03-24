@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +34,13 @@ import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BeanManagerImplementor implements IBeanManager {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BeanManagerImplementor.class);
+
   private final ReentrantReadWriteLock m_lock;
   private final Map<Class<?>, BeanHierarchy> m_beanHierarchies;
   private IBeanDecorationFactory m_beanDecorationFactory;
@@ -234,6 +241,53 @@ public class BeanManagerImplementor implements IBeanManager {
   @Override
   public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
     return queryAll(beanClazz);
+  }
+
+  protected Set<IBean<?>> getAllBeans() {
+    Set<IBean<?>> all = new HashSet<>();
+    for (BeanHierarchy<?> h : m_beanHierarchies.values()) {
+      for (IBean<?> bean : h.getBeans()) {
+        all.add(bean);
+      }
+    }
+    return all;
+  }
+
+  protected void callPreDestroyOnBeans() {
+    for (IBean<?> bean : getAllBeans()) {
+      destroyBean(bean);
+    }
+  }
+
+  protected static void destroyBean(IBean<?> bean) {
+    if (!bean.isInstanceAvailable()) {
+      // do not create instances just to destroy them. Only destroy if the instance has been created.
+      return;
+    }
+
+    final Collection<Method> preDestroyMethods = BeanInstanceUtil.collectPreDestroyMethods(bean.getBeanClazz());
+    if (preDestroyMethods.isEmpty()) {
+      return;
+    }
+
+    if (!isApplicationScoped(bean)) {
+      LOG.warn("The bean {} declares @PreDestroy methods but is not @ApplicationScoped. These methods will not be called.", bean);
+      return;
+    }
+
+    final Object instance = bean.getInstance();
+    for (final Method method : preDestroyMethods) {
+      LOG.debug("invoking pre-destroy method {}", method);
+      try {
+        method.setAccessible(true);
+        method.invoke(instance);
+      }
+      catch (Exception e) {
+        // log error but try to continue to allow other cleanup tasks
+        RuntimeException re = BeanInstanceUtil.translateException("Exception while invoking @PreDestroy method.", e);
+        LOG.error("Error invoking @PreDestroy method {} on bean {}.", method, bean, re);
+      }
+    }
   }
 
   protected void setBeanDecorationFactory(IBeanDecorationFactory f) {

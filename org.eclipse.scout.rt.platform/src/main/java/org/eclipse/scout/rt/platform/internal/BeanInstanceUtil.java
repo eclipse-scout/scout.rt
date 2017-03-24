@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,8 +18,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
@@ -55,8 +58,8 @@ public final class BeanInstanceUtil {
    * Invokes all {@link PostConstruct} annotated methods of the given instance.
    */
   public static void initializeBeanInstance(Object instance) {
-    Collection<Method> postCosntructMethods = collectPostConstructMethods(instance.getClass());
-    for (Method method : postCosntructMethods) {
+    Collection<Method> postConstructMethods = collectPostConstructMethods(instance.getClass());
+    for (Method method : postConstructMethods) {
       LOG.debug("invoking post-construct method {}", method);
       try {
         method.setAccessible(true);
@@ -69,7 +72,7 @@ public final class BeanInstanceUtil {
   }
 
   /**
-   * Crates and initializes a new bean instance.
+   * Creates and initializes a new bean instance.
    *
    * @param beanClazz
    * @return
@@ -94,7 +97,7 @@ public final class BeanInstanceUtil {
    * <b>Note:</b> This utility must not use any features of the bean manager. Hence the usage of an
    * {@link IExceptionTranslator} is not suitable.
    */
-  private static RuntimeException translateException(String message, Exception e) {
+  static RuntimeException translateException(String message, Exception e) {
     Throwable t = e;
     while ((t instanceof UndeclaredThrowableException || t instanceof InvocationTargetException) && t.getCause() != null) {
       t = t.getCause();
@@ -121,22 +124,37 @@ public final class BeanInstanceUtil {
    *           If unsupported methods are annotated with {@link PostConstruct} (i.e. those with parameters)
    */
   static Collection<Method> collectPostConstructMethods(Class<?> clazz) {
-    LinkedHashMap<String /*method name*/, Method> collector = new LinkedHashMap<>();
+    return collectMethodsWithAnnotation(clazz, PostConstruct.class, true);
+  }
+
+  static Collection<Method> collectPreDestroyMethods(Class<?> clazz) {
+    return collectMethodsWithAnnotation(clazz, PreDestroy.class, false);
+  }
+
+  private static Collection<Method> collectMethodsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation, boolean throwOnError) {
+    final Map<String /*method name*/, Method> collector = new LinkedHashMap<>();
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
       for (Method m : currentClass.getDeclaredMethods()) {
-        if (!m.isAnnotationPresent(PostConstruct.class)) {
+        if (!m.isAnnotationPresent(annotation)) {
           continue;
         }
 
+        final int methodModifiers = m.getModifiers();
+        // check static
+        if (Modifier.isStatic(methodModifiers)) {
+          handleError(throwOnError, "Methods annotated with @{} must not be static [method={}]", annotation.getSimpleName(), m);
+          continue;
+        }
         // check number of parameters
         if (m.getParameterTypes().length != 0) {
-          throw new BeanCreationException("Methods annotated with @PostConstruct must have no arguments [method={}]", m);
+          handleError(throwOnError, "Methods annotated with @{} must have no arguments [method={}]", annotation.getSimpleName(), m);
+          continue;
         }
 
         // compute method name (special handling for private methods)
         String name = m.getName();
-        if (Modifier.isPrivate(m.getModifiers())) {
+        if (Modifier.isPrivate(methodModifiers)) {
           name = m.getDeclaringClass().getName() + ":" + name;
         }
 
@@ -147,5 +165,12 @@ public final class BeanInstanceUtil {
       currentClass = currentClass.getSuperclass();
     }
     return collector.values();
+  }
+
+  private static void handleError(boolean throwOnError, String msg, Object... args) {
+    if (throwOnError) {
+      throw new BeanCreationException(msg, args);
+    }
+    LOG.error(msg, args);
   }
 }

@@ -73,4 +73,9 @@ public interface IBean<T> {
    */
   IBeanInstanceProducer<T> getBeanInstanceProducer();
 
+  /**
+   * @return {@code true} if there is at least one instance available for this {@link IBean}.
+   */
+  boolean isInstanceAvailable();
+
 }

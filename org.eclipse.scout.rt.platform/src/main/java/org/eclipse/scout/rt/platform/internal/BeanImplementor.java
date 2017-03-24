@@ -24,6 +24,7 @@ public class BeanImplementor<T> implements IBean<T> {
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private final T m_initialInstance;
+  private boolean m_instanceAvailable;
   private IBeanInstanceProducer<T> m_producer;
 
   /**
@@ -38,6 +39,7 @@ public class BeanImplementor<T> implements IBean<T> {
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
+    m_instanceAvailable = m_initialInstance != null;
     if (m_initialInstance != null && getBeanAnnotation(ApplicationScoped.class) == null) {
       throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", getBeanClazz().getName(), ApplicationScoped.class.getName()));
     }
@@ -71,12 +73,19 @@ public class BeanImplementor<T> implements IBean<T> {
   }
 
   @Override
+  public boolean isInstanceAvailable() {
+    return m_instanceAvailable;
+  }
+
+  @Override
   public T getInstance() {
     if (m_initialInstance == null) {
       if (m_producer == null) {
         return null;
       }
-      return m_producer.produce(this);
+      T instance = m_producer.produce(this);
+      m_instanceAvailable = instance != null;
+      return instance;
     }
     return m_initialInstance;
   }
