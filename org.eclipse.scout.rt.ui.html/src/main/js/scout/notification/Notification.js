@@ -10,7 +10,9 @@
  ******************************************************************************/
 scout.Notification = function() {
   scout.Notification.parent.call(this);
+
   this.status = scout.Status.info();
+  this.htmlEnabled = false;
 };
 scout.inherits(scout.Notification, scout.Widget);
 
@@ -61,7 +63,10 @@ scout.Notification.prototype._renderStatus = function() {
 };
 
 scout.Notification.prototype._renderMessage = function() {
-  var message = scout.nvl(scout.strings.nl2br(this.status.message), '');
+  var message = scout.nvl(this.status.message, '');
+  if (!this.htmlEnabled) {
+    message = scout.strings.nl2br(message);
+  }
   this.$container.html(message);
   this.invalidateLayoutTree();
 };
