@@ -16,8 +16,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,6 +34,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -1057,9 +1056,10 @@ public class TreeEventBufferTest {
       @Override
       @SuppressWarnings("unchecked")
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        Set collector = invocation.getArgumentAt(0, Set.class);
+        Set collector = invocation.getArgument(0);
         collector.addAll(childNodeList);
-        boolean recursive = Boolean.valueOf(invocation.getArgumentAt(1, Boolean.class));
+        Boolean argument = invocation.getArgument(1);
+        boolean recursive = Boolean.valueOf(argument);
         if (recursive) {
           for (ITreeNode childNode : childNodeList) {
             childNode.collectChildNodes(collector, recursive);
@@ -1067,7 +1067,7 @@ public class TreeEventBufferTest {
         }
         return null;
       }
-    }).when(node).collectChildNodes(anySetOf(ITreeNode.class), anyBoolean());
+    }).when(node).collectChildNodes(ArgumentMatchers.<ITreeNode> anySet(), ArgumentMatchers.anyBoolean());
     for (ITreeNode childNode : childNodeList) {
       when(childNode.getParentNode()).thenReturn(node);
     }

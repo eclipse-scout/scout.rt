@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 
 /**
  * <b>abstract</b> Test class for {@link AbstractHttpSessionCacheService}
@@ -41,7 +41,7 @@ public abstract class AbstractHttpSessionCacheServiceTest {
     m_requestMock = mock(HttpServletRequest.class);
     m_responseMock = mock(HttpServletResponse.class);
     m_testSession = new TestHttpSession();
-    when(m_requestMock.getSession(Matchers.anyBoolean())).thenReturn(m_testSession);
+    when(m_requestMock.getSession(ArgumentMatchers.anyBoolean())).thenReturn(m_testSession);
     m_cacheService = createCacheService();
   }
 

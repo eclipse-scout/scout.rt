@@ -14,10 +14,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -68,6 +64,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -169,10 +166,10 @@ public class ServiceTunnelServletTest {
     when(cacheEntryMock.getValue()).thenReturn(testServerSession);
     when(cacheEntryMock.isActive()).thenReturn(true);
 
-    doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(eq(IServerSession.class.getName()), anyObject());
+    doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(ArgumentMatchers.eq(IServerSession.class.getName()), ArgumentMatchers.any());
     when(testHttpSession.getAttribute(IServerSession.class.getName())).thenAnswer(getCachedValue(cache));
 
-    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(anyString(), any(ServerRunContext.class));
+    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(ArgumentMatchers.anyString(), ArgumentMatchers.any(ServerRunContext.class));
     List<HttpSessionLookupCallable> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       jobs.add(new HttpSessionLookupCallable(m_testServiceTunnelServlet, requestMock, m_responseMock));
@@ -187,7 +184,7 @@ public class ServiceTunnelServletTest {
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
 
-    verify(m_serverSessionProviderSpy, times(1)).provide(anyString(), any(ServerRunContext.class));
+    verify(m_serverSessionProviderSpy, times(1)).provide(ArgumentMatchers.anyString(), ArgumentMatchers.any(ServerRunContext.class));
   }
 
   @Test

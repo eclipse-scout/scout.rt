@@ -976,9 +976,9 @@ public class HttpClientInfoTest {
 
     Mockito.verify(session).setAttribute(Mockito.matches(HttpClientInfo.HTTP_CLIENT_INFO_ATTRIBUTE_NAME), Mockito.argThat(new ArgumentMatcher<HttpClientInfo>() {
       @Override
-      public boolean matches(Object argument) {
-        assertHttpClientInfo((HttpClientInfo) argument);
-        return argument instanceof HttpClientInfo;
+      public boolean matches(HttpClientInfo argument) {
+        assertHttpClientInfo(argument);
+        return true;
       }
     }));
   }

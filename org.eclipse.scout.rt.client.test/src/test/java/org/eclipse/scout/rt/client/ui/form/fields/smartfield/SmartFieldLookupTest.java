@@ -2,8 +2,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -287,12 +287,12 @@ public class SmartFieldLookupTest {
     return new ArgumentMatcher<ILookupCall<Long>>() {
 
       @Override
-      public boolean matches(Object argument) {
-        if (argument instanceof ILookupCall) {
-          Object parent = ((ILookupCall) argument).getRec();
-          return parent instanceof Long && rec.equals(parent);
+      public boolean matches(ILookupCall<Long> argument) {
+        if (argument == null) {
+          return false;
         }
-        return false;
+        Object parent = argument.getRec();
+        return parent instanceof Long && rec.equals(parent);
       }
     };
   }
@@ -308,12 +308,12 @@ public class SmartFieldLookupTest {
     return new ArgumentMatcher<ILookupCall<Long>>() {
 
       @Override
-      public boolean matches(Object argument) {
-        if (argument instanceof ILookupCall) {
-          TriState active = ((ILookupCall) argument).getActive();
-          return active.isFalse();
+      public boolean matches(ILookupCall<Long> argument) {
+        if (argument == null) {
+          return false;
         }
-        return false;
+        TriState active = argument.getActive();
+        return active.isFalse();
       }
     };
   }
@@ -322,11 +322,11 @@ public class SmartFieldLookupTest {
     return new ArgumentMatcher<ILookupCall<Long>>() {
 
       @Override
-      public boolean matches(Object argument) {
-        if (argument instanceof ILookupCall) {
-          return ((ILookupCall) argument).getMaxRowCount() == maxRowCount;
+      public boolean matches(ILookupCall<Long> argument) {
+        if (argument == null) {
+          return false;
         }
-        return false;
+        return argument.getMaxRowCount() == maxRowCount;
       }
     };
   }
@@ -335,11 +335,11 @@ public class SmartFieldLookupTest {
     return new ArgumentMatcher<ILookupCall<Long>>() {
 
       @Override
-      public boolean matches(Object argument) {
-        if (argument instanceof ILookupCall) {
-          return masterValue.equals(((ILookupCall) argument).getMaster());
+      public boolean matches(ILookupCall<Long> argument) {
+        if (argument == null) {
+          return false;
         }
-        return false;
+        return masterValue.equals(argument.getMaster());
       }
     };
   }

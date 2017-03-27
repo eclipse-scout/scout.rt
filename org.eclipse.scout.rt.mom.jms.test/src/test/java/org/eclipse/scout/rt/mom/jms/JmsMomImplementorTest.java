@@ -527,7 +527,7 @@ public class JmsMomImplementorTest {
     }));
 
     // Verify
-    assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
+    assertTrue(latch.await(1, TimeUnit.SECONDS));
   }
 
   @Test

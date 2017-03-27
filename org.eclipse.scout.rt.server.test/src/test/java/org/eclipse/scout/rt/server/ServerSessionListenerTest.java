@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.server;
 
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,9 +55,8 @@ public class ServerSessionListenerTest {
     return new ArgumentMatcher<SessionEvent>() {
 
       @Override
-      public boolean matches(Object argument) {
-        return argument instanceof SessionEvent
-            && ((SessionEvent) argument).getType() == sessionType;
+      public boolean matches(SessionEvent argument) {
+        return argument.getType() == sessionType;
       }
     };
   }

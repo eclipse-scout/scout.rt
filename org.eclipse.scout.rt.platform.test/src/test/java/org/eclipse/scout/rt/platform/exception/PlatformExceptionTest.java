@@ -87,10 +87,6 @@ public class PlatformExceptionTest {
     e = new PlatformException("{hello {}}", "world", cause);
     assertEquals("{hello world}", e.getMessage());
     assertSame(cause, e.getCause());
-
-    e = new PlatformException("hello {} {}", "world", cause);
-    assertEquals("hello world " + cause.toString(), e.getMessage());
-    assertNull(e.getCause());
   }
 
   @Test

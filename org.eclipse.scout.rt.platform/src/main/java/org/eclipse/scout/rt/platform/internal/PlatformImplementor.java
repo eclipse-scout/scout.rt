@@ -298,6 +298,9 @@ public class PlatformImplementor implements IPlatform {
 
   @SuppressWarnings("squid:S1181")
   protected void fireStateEvent(State newState) {
+    if (m_beanManager == null) {
+      return; // can happen if there is an error creating the bean manager. cannot move to status invalid. just do nothing.
+    }
     PlatformEvent event = new PlatformEvent(this, newState);
     try {
       for (IBean<IPlatformListener> bean : m_beanManager.getBeans(IPlatformListener.class)) {

@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import org.junit.Test;
  */
 public class PreDestroyTest {
 
-  private static List<String> events = new ArrayList<>();
+  private static Set<String> events = new HashSet<>();
 
   @AfterClass
   public static void cleanup() {
@@ -60,7 +60,7 @@ public class PreDestroyTest {
     P_FixtureWithSingleValidPreDestroy instance = platform.getBeanManager().getBean(P_FixtureWithSingleValidPreDestroy.class).getInstance();
     assertNotNull(instance);
     platform.stop();
-    assertEquals(Arrays.asList("cleanup"), events);
+    assertEquals(CollectionUtility.hashSet("cleanup"), events);
   }
 
   @Test
@@ -69,7 +69,7 @@ public class PreDestroyTest {
     assertNotNull(platform.getBeanManager().getBean(P_FixtureWithPreDestroyThrowingException.class).getInstance());
     platform.stop();
 
-    assertEquals(Arrays.asList("cleanupOne", "cleanupTwo"), events);
+    assertEquals(CollectionUtility.hashSet("cleanupOne", "cleanupTwo"), events);
   }
 
   @Test
@@ -78,7 +78,7 @@ public class PreDestroyTest {
     assertNotNull(platform.getBeanManager().getBean(P_FixtureWithInherited.class).getInstance());
     platform.stop();
 
-    assertEquals(Arrays.asList("cleanupOne", "cleanupTwoInherited"), events);
+    assertEquals(CollectionUtility.hashSet("cleanupOne", "cleanupTwoInherited"), events);
   }
 
   @Test
@@ -87,7 +87,7 @@ public class PreDestroyTest {
     assertNotNull(platform.getBeanManager().getBean(P_FixtureWithInheritedPrivate.class).getInstance()); // create the instance
     platform.stop();
 
-    assertEquals(Arrays.asList("cleanupChild", "cleanup"), events);
+    assertEquals(CollectionUtility.hashSet("cleanupChild", "cleanup"), events);
   }
 
   private static class P_FixtureWithSingleValidPreDestroy {

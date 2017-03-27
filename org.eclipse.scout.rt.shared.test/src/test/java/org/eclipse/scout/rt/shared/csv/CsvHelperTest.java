@@ -21,8 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -53,6 +52,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.mockito.ArgumentMatchers;
 
 /**
  * JUnit tests for {@link CsvHelper}
@@ -88,7 +88,7 @@ public class CsvHelperTest {
 
     IDataConsumer dataConsumer = mock(IDataConsumer.class);
     ProcessingException pe = new ProcessingException();
-    doThrow(pe).when(dataConsumer).processRow(eq(2), anyListOf(Object.class)); //Throw an exception in the 2nd line
+    doThrow(pe).when(dataConsumer).processRow(eq(2), ArgumentMatchers.anyList()); //Throw an exception in the 2nd line
     try (Reader reader = new FileReader(m_testFile)) {
       m_csvHelper.importData(dataConsumer, reader, true, true, 1);
       fail("No exception was thrown! Expected ProcessingException");
