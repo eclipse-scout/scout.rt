@@ -146,7 +146,7 @@ scout.PopupWithHead.prototype._position = function($container, switchIfNecessary
   var openingDirectionX, openingDirectionY, overlap, pos;
   if (!this._headVisible) {
     // If head is not visible, use default implementation and adjust $body to $container
-    scout.PopupWithHead.parent.prototype._position.call(this, $container);
+    scout.PopupWithHead.parent.prototype._position.call(this, $container, switchIfNecessary);
     this.$body.removeClass('up down left right');
     openingDirectionY = 'up';
     if ($container.hasClass('down')) {
