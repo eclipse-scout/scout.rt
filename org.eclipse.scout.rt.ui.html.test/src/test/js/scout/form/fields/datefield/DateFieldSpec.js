@@ -107,6 +107,7 @@ describe("DateField", function() {
       dateField.timeDisplayText = '12:28';
       expect(dateField.$dateField.val()).toBe('14.04.2016');
       expect(dateField.$timeField.val()).toBe('12:28');
+      expect(dateField.displayText).toBe('14.04.2016\n12:28');
     });
 
     it("is removed properly when setting to ''", function() {
@@ -496,6 +497,44 @@ describe("DateField", function() {
   describe('Touch = true', function() {
 
     describe('touch popup', function() {
+
+      it("updates display text and is not used for time fields", function() {
+        var model = createModel();
+        model.autoTimestamp = '1999-10-03';
+        model.touch = true;
+        model.hasDate = true;
+        model.hasTime = true;
+
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$timeField.triggerMouseDown();
+        expect(findPicker().length).toBe(0);
+
+        dateField.$dateField.triggerMouseDown();
+        expect(findPicker().length).toBe(1);
+
+        selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+
+        dateField.$timeField.val('0442');
+        dateField._onTimeFieldBlur();
+
+        // selected date in picker (first day) must be 09/27/1999
+        expect(dateField.$dateField.text()).toBe('27.09.1999');
+        expect(dateField.$timeField.val()).toBe('04:42');
+        expect(dateField.displayText).toBe('27.09.1999\n04:42');
+
+        dateField.$dateField.triggerMouseDown();
+        expect(findPicker().length).toBe(1);
+
+        dateField.popup._field.$timeField.val('10:24');
+        dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
+
+        // only time should have changed
+        expect(dateField.$dateField.text()).toBe('27.09.1999');
+        expect(dateField.$timeField.val()).toBe('10:24');
+        expect(dateField.displayText).toBe('27.09.1999\n10:24');
+      });
 
       it('is opened if datefield is touched', function() {
         var model = createModel();
