@@ -102,7 +102,6 @@ scout.FormController.prototype.acceptView = function(view, register, position, s
   if (!this.displayParent.rendered) {
     return false;
   }
-
   return true;
 };
 
