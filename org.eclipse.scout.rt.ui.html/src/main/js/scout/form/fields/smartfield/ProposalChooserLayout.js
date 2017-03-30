@@ -187,7 +187,8 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     htmlComp = this._proposalChooser.htmlComp,
     $status = this._proposalChooser.$status,
     filter = this._proposalChooser.activeFilterGroup,
-    detachHelper = this._proposalChooser.session.detachHelper;
+    detachHelper = this._proposalChooser.session.detachHelper,
+    $parent = $container.parent();
 
   this._typeHandler.prepare($container, this);
   modelSize = this._proposalChooser.model.htmlComp.getPreferredSize();
@@ -198,21 +199,24 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   pcWidth = $container.css('width');
   pcHeight = $container.css('height');
 
+  $container.detach();
   this._typeHandler.modifyDom($container);
   $container
     .css('display', 'inline-block')
     .css('width', 'auto')
     .css('height', 'auto');
+  $parent.append($container);
   modelSize.width = scout.graphics.prefSize($container, {
     restoreScrollPositions: false
   }).width;
 
+  $container.detach();
   this._typeHandler.restoreDom($container);
   $container
     .css('display', 'block')
     .css('width', pcWidth)
     .css('height', pcHeight);
-
+  $parent.append($container);
   detachHelper._restoreScrollPositions($container);
 
   if ($status && $status.isVisible()) {
