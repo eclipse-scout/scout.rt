@@ -864,6 +864,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void setActiveForm(IForm form) {
+    if (form != null) {
+      form.getUIFacade().fireFormActivatedFromUI();
+    }
     propertySupport.setProperty(PROP_ACTIVE_FORM, form);
   }
 
