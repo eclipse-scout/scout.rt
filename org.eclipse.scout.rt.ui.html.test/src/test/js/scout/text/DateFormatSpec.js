@@ -205,7 +205,7 @@ describe("DateFormat", function() {
         expect(result.dateInfo.minutes).toBe(1);
       });
 
-      it('proposes valid dates', function() {
+      it('proposes valid dates for pattern dd.MM.yyyy', function() {
         var pattern = 'dd.MM.yyyy';
         var dateFormat = new scout.DateFormat(locale, pattern);
 
@@ -235,6 +235,31 @@ describe("DateFormat", function() {
 
         result = dateFormat.analyze('32', scout.dates.create('2016-04-01'));
         expect(result.predictedDate).toBe(null);
+      });
+
+      it('proposes valid dates for pattern MM.yyyy', function() {
+        var pattern = 'MM.yyyy';
+        var dateFormat = new scout.DateFormat(locale, pattern);
+
+        var result = dateFormat.analyze('02.2017', scout.dates.create('2017-03-31'));
+        expect(dateFormat.format(result.predictedDate)).toBe('02.2017');
+
+        result = dateFormat.analyze('04.2017', scout.dates.create('2017-03-31'));
+        expect(dateFormat.format(result.predictedDate)).toBe('04.2017');
+
+        result = dateFormat.analyze('05.2017', scout.dates.create('2017-03-31'));
+        expect(dateFormat.format(result.predictedDate)).toBe('05.2017');
+
+        result = dateFormat.analyze('05.2017', scout.dates.create('2017-03-10'));
+        expect(dateFormat.format(result.predictedDate)).toBe('05.2017');
+      });
+
+      it('proposes valid dates for pattern yyyy', function() {
+        var pattern = 'yyyy';
+        var dateFormat = new scout.DateFormat(locale, pattern);
+
+        var result = dateFormat.analyze('2017', scout.dates.create('2016-02-29'));
+        expect(dateFormat.format(result.predictedDate)).toBe('2017');
       });
 
       it('proposes valid times', function() {
