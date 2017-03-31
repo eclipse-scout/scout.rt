@@ -1040,6 +1040,7 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   // 2015 does not have 29 days and is "corrected" to March.)
   var result = new Date(1970, 0, 1);
 
+  var validDay = scout.nvl(dateInfo.day, startDate.getDate());
   var validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
   var validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
   // When user entered the day but not (yet) the month, adjust month if possible to propose a valid date
@@ -1058,10 +1059,17 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
       }
     }
   }
+
+  // ensure valid day for selected month for dateInfo without day
+  if (!dateInfo.day && dateInfo.month) {
+    var lastOfMonth = scout.dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
+    validDay = Math.min(lastOfMonth.getDate(), startDate.getDate());
+  }
+
   result.setFullYear(
     validYear,
     validMonth,
-    scout.nvl(dateInfo.day, startDate.getDate())
+    validDay
   );
 
   result.setHours(
