@@ -103,7 +103,7 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
   this._send('displayTextChanged', event, {
     showBusyIndicator: !whileTyping,
     coalesce: function(previous) {
-      return this.target === previous.target && this.type === previous.type;
+      return this.target === previous.target && this.type === previous.type && this.whileTyping === previous.whileTyping;
     }
   });
   this.trigger('displayTextChanged', event);
