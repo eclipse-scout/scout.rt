@@ -51,6 +51,10 @@ scout.fonts = {
     return this._deferred.promise();
   },
 
+  DEFAULT_TEST_FONTS: 'monospace',
+
+  DEFAULT_TEST_STRING: 'ABC abc 123 .,_ LlIi1 oO0 !#@',
+
   /**
    * Loads the specified fonts in a hidden div, forcing the browser to load them.
    *
@@ -61,6 +65,9 @@ scout.fonts = {
    *     too, an object with the properties 'font-family' and 'style' should be provided.
    *     Alternatively, the style can be specified in the string after the font name,
    *     separated by a pipe character ('|').
+   *     The property 'testString' (or a third component in a '|' separated string) may
+   *     be specified to set the characters to measure for this specific font (can be
+   *     useful for icon fonts).
    *   [onComplete]
    *     Mandatory function to be called when all of the specified fonts have been
    *     loaded or if a timeout occurs. An argument 'success' is given to indicate
@@ -70,14 +77,24 @@ scout.fonts = {
    *     Optional timeout in milliseconds. If fonts could not be loaded within this time,
    *     loading is stopped and the onComplete method is called with argument 'false'.
    *     Default is 30 seconds.
+   *   [testFonts]
+   *     Optional. Test fonts (string separated by commas) to used as baseline when checking
+   *     if the specified fonts have been loaded. Defaults to scout.fonts.DEFAULT_TEST_FONTS.
+   *   [testString]
+   *     Optional. The test string to use when checking if the specified fonts have been
+   *     loaded. Should not be empty, because the empty string has always the width 0.
+   *     The default is scout.fonts.DEFAULT_TEST_STRING. The test string may also be
+   *     specified individually per font
+   *
    *
    * Examples:
    *   preload({fonts: 'Sauna Pro'});
    *   preload({fonts: 'Sauna Pro|font-style:italic'});
+   *   preload({fonts: 'Sauna Pro|font-style:italic|The quick brown fox jumps over the lazy dog'});
    *   preload({fonts: 'Sauna Pro | font-style: italic; font-weight: 700'});
    *   preload({fonts: 'Sauna Pro', onComplete: handleLoadFinished});
    *   preload({fonts: ['Sauna Pro', 'Dolly Pro']});
-   *   preload({fonts: {family:'Sauna', style: 'font-style:italic; font-weight:700'}, timeout: 999});
+   *   preload({fonts: {family:'Sauna', style: 'font-style:italic; font-weight:700', testString: 'MyString012345'}, timeout: 999});
    *   preload({fonts: ['Fakir-Black', {family:'Fakir-Italic', style:'font-style:italic'}], timeout: 2500, onComplete: function() { setCookie('fakir','loaded') }});
    *
    * Inspired by Zenfonts (https://github.com/zengabor/zenfonts, public domain).
@@ -94,32 +111,44 @@ scout.fonts = {
     }
 
     // these fonts are compared to the custom fonts, strings separated by comma
-    var testFonts = 'sans-serif';
+    var testFonts = options.testFonts || scout.fonts.DEFAULT_TEST_FONTS;
 
     // Create a DIV for each font
     var divs = [];
     fonts.forEach(function(font) {
       // Convert to object
       if (typeof font === 'string') {
-        var m = font.match(/^(.*?)\s*\|\s*(.*)$/);
-        if (m) {
-          font = {
-            family: m[1],
-            style: m[2]
-          };
-        } else {
-          font = {
-            family: font
-          };
-        }
+        var fontParts = scout.strings.splitMax(font, '|', 3).map(function(s) {
+          return s.trim();
+        });
+        font = {
+          family: fontParts[0],
+          style: fontParts[1],
+          testString: fontParts[2]
+        };
       }
       font.family = font.family || '';
       font.style = font.style || '';
+      font.testString = font.testString || options.testString || scout.fonts.DEFAULT_TEST_STRING;
 
-      // Create DIV with default font
-      // (Hide explicitly with inline style to prevent visible text when, for some reason, the CSS file cannot be loaded)
-      var $body = $('body'),
-        $div = appendPreloaderDiv($body, testFonts);
+      // Create DIV with default fonts
+      // (Because preloader functionality should not depend on a CSS stylesheet we set the required properties programmatically.)
+      var $div = $('body').appendDiv('font-preloader')
+          .text(font.testString)
+          .css('display', 'block')
+          .css('visibility', 'hidden')
+          .css('position', 'absolute')
+          .css('top', 0)
+          .css('left', 0)
+          .css('width', 'auto')
+          .css('height', 'auto')
+          .css('margin', 0)
+          .css('padding', 0)
+          .css('white-space', 'nowrap')
+          .css('line-height', 'normal')
+          .css('font-variant', 'normal')
+          .css('font-size', '20em')
+          .css('font-family', testFonts);
 
       // Remember size, set new font, and then measure again
       var originalWidth = $div.outerWidth();
@@ -164,27 +193,6 @@ scout.fonts = {
     watchWidthChange(50, onFinished);
 
     // ----- Helper functions -----
-
-    // Because preloader functionality should not depend on a CSS stylesheet
-    // we set the required properties programmatically.
-    function appendPreloaderDiv($body) {
-      return $body.appendDiv('font-preloader')
-        .text('ABC abc 123 .,_')
-        .css('position', 'absolute')
-        .css('top', '-999px')
-        .css('left', '-999px')
-        .css('visibility', 'hidden')
-        .css('display', 'block')
-        .css('width', 'auto')
-        .css('height', 'auto')
-        .css('white-space', 'nowrap')
-        .css('line-height', 'normal')
-        .css('margin', 0)
-        .css('padding', 0)
-        .css('font-variant', 'normal')
-        .css('font-size', '20em')
-        .css('font-family', testFonts);
-    }
 
     function watchWidthChange(delay, onFinished) {
       // Check each DIV

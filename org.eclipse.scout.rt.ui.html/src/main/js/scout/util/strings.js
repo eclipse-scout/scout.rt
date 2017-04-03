@@ -309,6 +309,34 @@ scout.strings = {
       .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_')
       // and then get the length.
       .length;
+  },
+
+  /**
+   * Splits the given 'string' at 'separator' while returning at most 'limit' elements.
+   * Unlike String.prototype.split(), this function does not discard elements if more than
+   * 'limit' elements are found. Instead, the surplus elements are joined with the last element.
+   *
+   * Example:
+   *   'a-b-c'.split('-', 2)                     ==>   ['a', 'b']
+   *   scout.strings.splitMax('a-b-c', '-', 2)   ==>   ['a', 'b-c']
+   */
+  splitMax: function(string, separator, limit) {
+    if (string === null || string === undefined) {
+      return [];
+    }
+    string = this.asString(string);
+    separator = this.asString(separator);
+    limit = Number(limit);
+
+    var array = string.split(separator);
+    if (isNaN(limit) || limit <= 0 || limit >= array.length) {
+      return array;
+    }
+
+    var arrayShort = array.slice(0, limit - 1);
+    var last = array.slice(limit - 1).join(separator); // combine the rest
+    arrayShort.push(last);
+    return arrayShort;
   }
 
 };
