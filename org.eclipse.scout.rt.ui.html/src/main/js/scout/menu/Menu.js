@@ -211,6 +211,10 @@ scout.Menu.prototype.isTabTarget = function() {
   return this.enabled && this.visible && (this.isButton() || !this.separator);
 };
 
+scout.Menu.prototype.isFocused = function() {
+  return this.rendered && scout.focusUtils.isActiveElement(this.$container[0]);
+};
+
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   var hasText = scout.strings.hasText(this.text) && this.textVisible;
   var hasTextAndIcon = !!(hasText && this.iconId);

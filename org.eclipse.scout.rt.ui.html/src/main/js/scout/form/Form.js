@@ -507,7 +507,12 @@ scout.Form.prototype._detach = function() {
 
 scout.Form.prototype.renderInitialFocus = function() {
   if (this.rendered) {
-    this.session.focusManager.requestFocus(this._initialFocusElement());
+    if (!this.initialFocus) {
+      this.session.focusManager.requestFocus(this.session.focusManager.findFirstFocusableElement(this.$container));
+    }
+    else if (this.initialFocus instanceof scout.FormField) {
+      this.initialFocus.focus();
+    }
   }
 };
 
@@ -520,11 +525,9 @@ scout.Form.prototype.renderInitialFocus = function() {
  * the getFocusableElement() method.
  */
 scout.Form.prototype._initialFocusElement = function() {
-  var focusElement,
-    initialFocusField = this.initialFocus;
-
-  if (initialFocusField) {
-    focusElement = initialFocusField.getFocusableElement();
+  var focusElement;
+  if (this.initialFocus) {
+    focusElement = this.initialFocus.getFocusableElement();
   }
   if (!focusElement) {
     focusElement = this.session.focusManager.findFirstFocusableElement(this.$container);
