@@ -48,7 +48,11 @@ scout.Form.DisplayHint = {
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
 
-  this.formController = new scout.FormController(this, this.session);
+  this.formController = scout.create('FormController', {
+    displayParent: this,
+    session: this.session
+  });
+
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
 

@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopFormController = function(displayParent, session) {
-  scout.DesktopFormController.parent.call(this, displayParent, session);
-  this.desktop = displayParent;
+scout.DesktopFormController = function(model) {
+  scout.DesktopFormController.parent.call(this, model);
+  this.desktop = model.displayParent;
   this._popupWindows = [];
   this._documentPopupWindowReadyHandler = this._onDocumentPopupWindowReady.bind(this);
 

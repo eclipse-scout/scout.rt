@@ -43,7 +43,11 @@ describe('DesktopFormController', function() {
     // which is currently hard to make :-(
     $(document).off('popupWindowReady');
 
-    ctrl = new scout.DesktopFormController(displayParent, session);
+    ctrl = new scout.DesktopFormController({
+      displayParent: displayParent,
+      session: session
+    });
+
   });
 
   afterEach(function() {
@@ -52,17 +56,20 @@ describe('DesktopFormController', function() {
 
   it('Listens to popupWindowReady event and calls _onReady - having a popupWindow instance', function() {
     spyOn(popupWindow, '_onReady');
-    $(document).trigger('popupWindowReady', {popupWindow: popupWindow});
+    $(document).trigger('popupWindowReady', {
+      popupWindow: popupWindow
+    });
     expect(popupWindow._onReady).toHaveBeenCalled();
   });
 
   it('Listens to popupWindowReady event and calls _onReady - having only a form ID (reload case)', function() {
     ctrl._popupWindows.push(popupWindow);
     spyOn(popupWindow, '_onReady');
-    $(document).trigger('popupWindowReady', {formId: 'foo'});
+    $(document).trigger('popupWindowReady', {
+      formId: 'foo'
+    });
     expect(popupWindow._onReady).toHaveBeenCalled();
   });
-
 
   it('_addPopupWindow registers listeners and adds to array with popup-windows', function() {
     expect(ctrl._popupWindows.length).toBe(0);
