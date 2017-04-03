@@ -18,7 +18,10 @@ scout.ValueFieldAdapter.prototype._onWidgetDisplayTextChanged = function(event) 
     displayText: event.displayText,
     whileTyping: event.whileTyping
   }, {
-    showBusyIndicator: !event.whileTyping
+    showBusyIndicator: !event.whileTyping,
+    coalesce: function(previous) {
+      return this.target === previous.target && this.type === previous.type && this.whileTyping === previous.whileTyping;
+    }
   });
 };
 
