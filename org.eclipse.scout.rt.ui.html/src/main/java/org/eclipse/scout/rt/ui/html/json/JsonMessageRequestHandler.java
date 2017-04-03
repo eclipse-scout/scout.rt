@@ -156,7 +156,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void handleJsonRequest(IUiSession uiSession, JsonRequest jsonRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
     // If client sent ACK#, cleanup response history accordingly
-    uiSession.confirmResponseProcessed(jsonRequest.getAckResponseSequenceNo());
+    uiSession.confirmResponseProcessed(jsonRequest.getAckSequenceNo());
 
     switch (jsonRequest.getRequestType()) {
       case LOG_REQUEST:
@@ -168,12 +168,10 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       case UNLOAD_REQUEST:
         handleUnloadRequest(httpServletResponse, uiSession, jsonRequest);
         return;
-      case SYNC_RESPONSE_QUEUE:
-        handleSyncResponseQueueRequest(httpServletResponse, uiSession, jsonRequest);
-        return;
       case REQUEST:
       case STARTUP_REQUEST:
       case POLL_REQUEST:
+      case SYNC_RESPONSE_QUEUE:
         break; // <-- !
       default:
         throw new IllegalStateException("Unexpected request type: " + jsonRequest.getRequestType());
@@ -214,6 +212,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void handleEvents(HttpServletRequest req, HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     JSONObject jsonResp = uiSession.processJsonRequest(req, resp, jsonReq);
+    // ?sync request was routed to processJsonRequest() as well to make it block in case a model job is still executing.
+    // When everything is done, combine the responses. TODO BSH Comment
+    if (jsonReq.getRequestType() == RequestType.SYNC_RESPONSE_QUEUE) {
+      LOG.info("Sync response queue for UI session {}", uiSession.getUiSessionId());
+      jsonResp = uiSession.processSyncResponseQueueRequest(jsonReq);
+    }
     if (jsonResp == null) {
       jsonResp = m_jsonRequestHelper.createEmptyResponse();
     }
@@ -331,23 +335,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
     }
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
-  }
-
-  protected void handleSyncResponseQueueRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
-    LOG.info("Sync response queue for UI session {}", uiSession.getUiSessionId());
-    // Without lock we might miss the response of a running UI request that was started before going offline.
-    final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
-    uiSessionLock.lock();
-    try {
-      JSONObject response = uiSession.processSyncResponseQueueRequest(jsonReq);
-      if (response == null) {
-        response = m_jsonRequestHelper.createEmptyResponse();
-      }
-      writeJsonResponse(resp, response);
-    }
-    finally {
-      uiSessionLock.unlock();
-    }
   }
 
   protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) throws ServletException, IOException {

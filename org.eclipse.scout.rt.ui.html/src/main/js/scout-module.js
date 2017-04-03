@@ -63,6 +63,7 @@
   __include("scout/code/LookupRow.js");
   __include("scout/code/CodeLookupCall.js"); // requires LookupCall.js
   // Session related
+  __include("scout/session/AjaxCall.js");
   __include("scout/session/BackgroundJobPollingSupport.js");
   __include("scout/session/BusyIndicator.js");
   __include("scout/session/RemoteEvent.js");
