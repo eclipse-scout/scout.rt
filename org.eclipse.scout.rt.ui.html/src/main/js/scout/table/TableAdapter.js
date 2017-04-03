@@ -25,7 +25,7 @@ scout.TableAdapter.prototype._sendRowsSelected = function(rowIds, debounceSend) 
   this._send('rowsSelected', eventData, {
     delay: debounceSend ? 250 : 0,
     coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type;
+      return this.target === previous.target && this.type === previous.type;
     }
   });
 };
@@ -86,7 +86,7 @@ scout.TableAdapter.prototype._sendColumnResized = function(column) {
   this._send('columnResized', eventData, {
     delay: 750,
     coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
+      return this.target === previous.target && this.type === previous.type && this.columnId === previous.columnId;
     },
     showBusyIndicator: false
   });
@@ -213,7 +213,7 @@ scout.TableAdapter.prototype._sendRowsFiltered = function(rowIds) {
   this._send('rowsFiltered', eventData, {
     delay: 250,
     coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
+      return this.target === previous.target && this.type === previous.type && this.remove === previous.remove;
     },
     showBusyIndicator: false
   });

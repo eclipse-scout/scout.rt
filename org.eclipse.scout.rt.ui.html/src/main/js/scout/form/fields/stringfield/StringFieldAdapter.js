@@ -33,7 +33,7 @@ scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
   }, {
     delay: 500,
     coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type;
+      return this.target === previous.target && this.type === previous.type;
     }
   });
 };
