@@ -81,6 +81,7 @@ public final class SeleniumDriver {
     }
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
+    options.addArguments("--disable-infobars");
 
     // TODO [7.0] BSH Remove workaround, when Chrome bug is fixed
     // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
