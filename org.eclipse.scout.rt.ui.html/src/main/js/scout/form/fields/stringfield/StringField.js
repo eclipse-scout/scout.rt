@@ -325,7 +325,7 @@ scout.StringField.prototype._sendSelectionChanged = function() {
   this._send('selectionChanged', eventData, {
     delay: 500,
     coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type;
+      return this.target === previous.target && this.type === previous.type;
     }
   });
 };

@@ -2299,7 +2299,7 @@ scout.Tree.prototype._sendNodesSelected = function(nodes, debounceSend) {
   this._send('nodesSelected', eventData, {
     delay: (debounceSend ? 250 : 0),
     coalesce: function(previous) {
-      return this.id === previous.id && this.type === previous.type;
+      return this.target === previous.target && this.type === previous.type;
     }
   });
 };

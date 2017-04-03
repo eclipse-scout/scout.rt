@@ -492,7 +492,7 @@ scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, 
     forceClose: forceClose,
     showBusyIndicator: false,
     coalesce: function(previous) {
-      return this.type === previous.type;
+      return this.target === previous.target && this.type === previous.type;
     }
   });
 };
