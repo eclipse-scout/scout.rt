@@ -314,6 +314,14 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(parent, modelClass).findElement(By.className("check-box"));
   }
 
+  public WebElement waitUntilButtonClickable(WebElement parent, Class<?> modelClass) {
+    return waitUntilElementClickable(parent, modelClass).findElement(By.className("button"));
+  }
+
+  public WebElement waitUntilLinkButtonClickable(WebElement parent, Class<?> modelClass) {
+    return waitUntilElementClickable(parent, modelClass).findElement(By.className("link-button"));
+  }
+
   public void clickCheckBox(WebElement parent, Class<?> modelClass) {
     clickCheckBox(parent.findElement(SeleniumUtil.byModelClass(modelClass)));
   }
@@ -427,5 +435,20 @@ public abstract class AbstractSeleniumTest {
     if (animation != null) {
       waitUntilElementStaleness(animation);
     }
+  }
+
+  public void waitUntilWindowsCount(final int expectedWindowsCount) {
+    waitUntil(new Function<WebDriver, Integer>() {
+      @Override
+      public Integer apply(WebDriver webDriver) {
+        int numWindows = webDriver.getWindowHandles().size();
+        if (numWindows == expectedWindowsCount) {
+          return numWindows;
+        }
+        else {
+          return null;
+        }
+      }
+    });
   }
 }

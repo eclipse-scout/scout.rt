@@ -96,6 +96,18 @@ scout.ButtonAdapterMenu.prototype.getFocusableElement = function() {
   return null;
 };
 
+/**
+ * Sets the focus on this field if the field is rendered.
+ */
+scout.ButtonAdapterMenu.prototype.focus = function() {
+  if (!this.rendered) {
+    return;
+  }
+  this.parent.setTabbableMenu(this);
+  this.session.focusManager.requestFocus(this.$container[0]);
+};
+
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**

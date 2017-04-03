@@ -198,8 +198,13 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 };
 
 scout.MenuBar.prototype._updateItems = function() {
-  this._removeMenuItems();
+  // Figure out if an item is focused. If so, reset the focus after items have been removed and rendered again.
+  // This is required because focus is lost when an element is removed from DOM.
+  var focusedMenuItem = scout.arrays.find(this.menuItems, function(menuItem) {
+    return menuItem.isFocused();
+  });
 
+  this._removeMenuItems();
   this.visibleMenuItems = this.menuItems;
 
   // Make sure menubar is visible before the items get rendered
@@ -223,6 +228,11 @@ scout.MenuBar.prototype._updateItems = function() {
         return false;
       }
     }.bind(this));
+  }
+
+  // restore focus on previously focused item
+  if (focusedMenuItem) {
+    focusedMenuItem.focus();
   }
 };
 

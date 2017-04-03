@@ -322,8 +322,19 @@ scout.Button.prototype._onClick = function(event) {
  */
 scout.Button.prototype.getFocusableElement = function() {
   if (this.adaptedBy) {
-    return this.adaptedBy.getFocusableElement(this);
+    return this.adaptedBy.getFocusableElement();
   } else {
-    return scout.Button.parent.prototype.focus.getFocusableElement(this);
+    return scout.Button.parent.prototype.getFocusableElement.call(this);
+  }
+};
+
+/**
+ * @override FormField.js
+ */
+scout.Button.prototype.focus = function() {
+  if (this.adaptedBy) {
+    return this.adaptedBy.focus();
+  } else {
+    return scout.Button.parent.prototype.focus.call(this);
   }
 };
