@@ -59,7 +59,11 @@ scout.Desktop.UriAction = {
 
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
-  this.formController = new scout.DesktopFormController(this, this.session);
+  this.formController = scout.create('DesktopFormController', {
+    displayParent: this,
+    session: this.session
+  });
+
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._resizeHandler = this.onResize.bind(this);

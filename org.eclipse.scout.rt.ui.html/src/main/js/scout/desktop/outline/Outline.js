@@ -46,7 +46,10 @@ scout.Outline.prototype._init = function(model) {
   scout.Outline.parent.prototype._init.call(this, model);
 
   this.mediator = this._createMediator();
-  this.formController = new scout.FormController(this, this.session);
+  this.formController = scout.create('FormController', {
+    displayParent: this,
+    session: this.session
+  });
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this.resolveTextKeys(['title']);
@@ -157,10 +160,10 @@ scout.Outline.prototype._remove = function() {
 scout.Outline.prototype._renderTitle = function() {
   if (this.titleVisible) {
     if (!this.$title) {
-    this.$title = this.$container.prependDiv('outline-title');
+      this.$title = this.$container.prependDiv('outline-title');
 
-    // Listener is added to the text instead of the title to not get the clicks on the title menubar
-    this.$titleText = this.$title.prependDiv('outline-title-text')
+      // Listener is added to the text instead of the title to not get the clicks on the title menubar
+      this.$titleText = this.$title.prependDiv('outline-title-text')
         .on('click', this._onTitleClick.bind(this));
     }
     this.$titleText.text(this.title);
@@ -195,7 +198,9 @@ scout.Outline.prototype._renderEnabled = function() {
 scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   this._initDetailTableAndForm(node);
-  this.trigger('initPage', {page: node});
+  this.trigger('initPage', {
+    page: node
+  });
 };
 
 scout.Outline.prototype._initDetailTableAndForm = function(node) {

@@ -13,9 +13,9 @@
  *
  * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
-scout.FormController = function(displayParent, session) {
-  this.displayParent = displayParent;
-  this.session = session;
+scout.FormController = function(model) {
+  this.displayParent = model.displayParent;
+  this.session = model.session;
 };
 
 /**
