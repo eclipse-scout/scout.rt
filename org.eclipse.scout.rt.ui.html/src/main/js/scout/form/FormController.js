@@ -63,16 +63,24 @@ scout.FormController.prototype._removePopupWindow = function(form) {
  * Renders all dialogs and views registered with this controller.
  */
 scout.FormController.prototype.render = function() {
-  this.displayParent.dialogs.forEach(function(dialog) {
-    dialog._setProperty('displayParent', this.displayParent);
-    this._renderDialog(dialog, false);
-  }.bind(this));
+  this._renderViews();
+
+  this._renderDialogs();
+};
+
+scout.FormController.prototype._renderViews = function() {
   this.displayParent.views.forEach(function(view, position) {
     view._setProperty('displayParent', this.displayParent);
     this._renderView(view, false, position, false);
   }.bind(this));
 };
 
+scout.FormController.prototype._renderDialogs = function() {
+  this.displayParent.dialogs.forEach(function(dialog) {
+    dialog._setProperty('displayParent', this.displayParent);
+    this._renderDialog(dialog, false);
+  }.bind(this));
+};
 /**
  * Removes all dialogs and views registered with this controller.
  */

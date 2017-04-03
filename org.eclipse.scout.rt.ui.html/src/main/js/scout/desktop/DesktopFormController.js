@@ -40,10 +40,18 @@ scout.DesktopFormController.prototype.render = function() {
   } else if (this.desktop.bench) {
     this.desktop.bench.activateView(selectable);
   }
-  // ensure in all view stacks the last view is activated
+
+};
+
+scout.DesktopFormController.prototype._renderViews = function() {
+  scout.DesktopFormController.parent.prototype._renderViews.call(this);
+    // ensure in all view stacks the last view is activated
   if (this.desktop.bench) {
     this.desktop.bench.postRender();
+    // ensure layout is done before continuing rendering dialogs.
+    this.desktop.bench.htmlComp.validateLayoutTree();
   }
+
 };
 
 /**
