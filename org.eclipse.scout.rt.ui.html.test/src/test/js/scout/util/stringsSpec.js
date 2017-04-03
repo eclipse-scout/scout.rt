@@ -392,4 +392,23 @@ describe("scout.strings", function() {
 
   });
 
+  describe("splitMax", function() {
+
+    it("returns not more than limit elements", function() {
+      expect(scout.strings.splitMax()).toEqual([]);
+      expect(scout.strings.splitMax('')).toEqual(['']);
+      expect(scout.strings.splitMax('abc')).toEqual(['abc']);
+      expect(scout.strings.splitMax('abc', '')).toEqual(['a', 'b', 'c']);
+      expect(scout.strings.splitMax('abc', '', 1)).toEqual(['abc']);
+      expect(scout.strings.splitMax('abc', '', 0)).toEqual(['a', 'b', 'c']);
+      expect(scout.strings.splitMax('abc', '', -10)).toEqual(['a', 'b', 'c']);
+      expect(scout.strings.splitMax('abc', '', 2)).toEqual(['a', 'bc']);
+      expect(scout.strings.splitMax('abc', '', 33)).toEqual(['a', 'b', 'c']);
+      expect(scout.strings.splitMax('a-b-c', 'x', 2)).toEqual(['a-b-c']);
+      expect(scout.strings.splitMax('a-b-c', 'b', 2)).toEqual(['a-', '-c']);
+      expect(scout.strings.splitMax('a-b-c', '-', 2)).toEqual(['a', 'b-c']);
+    });
+
+  });
+
 });
