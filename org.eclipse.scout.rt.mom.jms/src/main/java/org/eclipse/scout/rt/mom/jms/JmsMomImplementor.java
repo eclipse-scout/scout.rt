@@ -501,6 +501,10 @@ public class JmsMomImplementor implements IMomImplementor {
         if (entry.getKey() == null || entry.getValue() == null) {
           LOG.info("ignoring property having null key or value [key={}, value={}]", entry.getKey(), entry.getValue());
         }
+        else if (ObjectUtility.isOneOf(entry.getKey(), CONNECTION_FACTORY, SYMBOLIC_NAME, MARSHALLER, REQUEST_REPLY_ENABLED, REQUEST_REPLY_CANCELLATION_TOPIC, JMS_CLIENT_ID)) {
+          // Don't pass MOM-specific properties to the initial context to prevent problems with non-standard values.
+          // For example, some containers throw an error if it finds an unserializable value.
+        }
         else {
           env.put(entry.getKey(), entry.getValue());
         }
