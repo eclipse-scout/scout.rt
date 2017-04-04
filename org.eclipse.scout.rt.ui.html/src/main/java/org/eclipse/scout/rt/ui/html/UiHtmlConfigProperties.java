@@ -131,7 +131,7 @@ public final class UiHtmlConfigProperties {
 
   /**
    * After expiration of this idle time in seconds without any user activity the user is logged out automatically. The
-   * default is 4 hours.
+   * default is 4 hours (14400 seconds).
    */
   public static class MaxUserIdleTimeProperty extends AbstractPositiveLongConfigProperty {
 
