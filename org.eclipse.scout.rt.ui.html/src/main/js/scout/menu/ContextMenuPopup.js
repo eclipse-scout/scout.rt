@@ -118,6 +118,8 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
           this._installScrollbars();
           this.$body.css('box-shadow', "");
           this.bodyAnimating = false;
+          // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
+          this._invalidateLayoutTreeAndRepositionPopup();
         }
       }.bind(this)
     });
@@ -154,18 +156,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   $all.toggleClass('next-to-selected', false);
 
   if (!parentMenu.$subMenuBody) {
-    var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left'),
-      iconOffset = 0;
-    if (parentMenu.iconId && parentMenu.$container.data('$icon').cssWidth() > iconOffset) {
-      iconOffset = parentMenu.$container.data('$icon').cssWidth();
-    }
-    if (textPaddingLeft) {
-      textPaddingLeft = textPaddingLeft.replace('px', '');
-      textPaddingLeft = Number(textPaddingLeft);
-    }
-    this.$body = this._$createNewBody();
+    this._$createBody();
     parentMenu.$subMenuBody = this.$body;
-    this._renderMenuItems(menus, initialSubMenuRendering, Math.max(textPaddingLeft, iconOffset));
+    this._renderMenuItems(menus, initialSubMenuRendering);
   } else {
     // append $body
     this.$body = parentMenu.$subMenuBody;
@@ -205,6 +198,8 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       progress: this.revalidateLayout.bind(this),
       complete: function() {
         this.bodyAnimating = false;
+        // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
+        this._invalidateLayoutTreeAndRepositionPopup();
       }.bind(this),
       queue: false
     });
@@ -269,7 +264,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   }
 };
 
-scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering, iconOffset) {
+scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
   menus = menus ? menus : this._getMenuItems();
   if (this.menuFilter) {
     menus = this.menuFilter(menus, scout.MenuDestinations.CONTEXT_MENU);
@@ -279,7 +274,6 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     return;
   }
 
-  iconOffset = iconOffset ? iconOffset : 0;
   menus.forEach(function(menu) {
      // Invisible menus are rendered as well because their visibility might change dynamically
     if (menu.separator) {
@@ -306,7 +300,12 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     menu.render(this.$body);
     menu.afterSendDoAction = this.close.bind(this);
     menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
-    iconOffset = this._updateIconAndText(menu, iconOffset);
+
+    // TEMPORARY FIX: Invalidate popup layout after images icons have been loaded, because the
+    // correct size might not be known yet. If the layout would not be revalidated, the popup
+    // size will be wrong (text is cut off after image has been loaded).
+    // TODO [7.0] bsh: Remove this code, use Image.js instead
+    menu.$container.find('img').on('load error', this._invalidateLayoutTreeAndRepositionPopup.bind(this));
   }, this);
 
   this._handleInitialSubMenus(initialSubMenuRendering);
@@ -320,27 +319,6 @@ scout.ContextMenuPopup.prototype._handleInitialSubMenus = function(initialSubMen
     this.initialSubMenusToRender = undefined;
     this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);
   }
-};
-
-scout.ContextMenuPopup.prototype._updateIconAndText = function(menu, iconOffset) {
-  if (menu.iconId && menu.$container.data('$icon').cssWidth() > iconOffset) {
-    iconOffset = menu.$container.data('$icon').cssWidth();
-    // update already rendered menu-items
-    this.$body.children().each(function(index, element) {
-      var $element = $(element);
-      var $icon = $element.data('$icon');
-      if ($icon && $icon.cssWidth() < iconOffset) {
-        $element.find('.text').css('padding-left', iconOffset - $icon.cssWidth());
-      } else if (element !== menu.$container[0]) {
-        $element.find('.text').css('padding-left', iconOffset);
-      }
-    });
-  } else if (iconOffset && !menu.iconId) {
-    menu.$container.find('.text').css('padding-left', iconOffset);
-  } else if (menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset) {
-    menu.$container.find('.text').css('padding-left', iconOffset - menu.$container.data('$icon').cssWidth());
-  }
-  return iconOffset;
 };
 
 scout.ContextMenuPopup.prototype._onMenuPropertyChange = function(event) {
@@ -467,4 +445,14 @@ scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
   }
   // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)
   this.position();
+};
+
+scout.ContextMenuPopup.prototype._invalidateLayoutTreeAndRepositionPopup = function() {
+  this.invalidateLayoutTree();
+  this.session.layoutValidator.schedulePostValidateFunction(function() {
+    if (!this.rendered) { // check needed because this is an async callback
+      return;
+    }
+    this.position();
+  }.bind(this));
 };

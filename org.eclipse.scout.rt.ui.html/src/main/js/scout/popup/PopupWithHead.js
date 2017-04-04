@@ -36,10 +36,16 @@ scout.PopupWithHead.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$parent.window().on('resize', this.resizeHandler);
 
-  this.$body = this._$createNewBody();
+  this._$createBody();
+
   if (this._headVisible) {
     this._renderHead();
   }
+};
+
+scout.PopupWithHead.prototype._postRender = function() {
+  scout.PopupWithHead.parent.prototype._postRender.call(this);
+  scout.scrollbars.update(this.$body);
 };
 
 scout.PopupWithHead.prototype.onResize = function() {
@@ -52,10 +58,12 @@ scout.PopupWithHead.prototype._remove = function($parent) {
   this.$parent.window().off('resize', this.resizeHandler);
 };
 
-scout.PopupWithHead.prototype._$createNewBody = function() {
+scout.PopupWithHead.prototype._$createBody = function() {
   this.$body = this.$container.appendDiv('popup-body');
+  // Complete the layout hierarchy between the popup and the menu items
+  new scout.HtmlComponent(this.$body, this.session);
+
   this._modifyBody();
-  return this.$body;
 };
 
 scout.PopupWithHead.prototype.rerenderHead = function() {
@@ -201,12 +209,13 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   //this.$head.copyCss(this.$headBlueprint, 'line-height');
   this.$head.copyCssIfGreater(this.$headBlueprint, 'padding');
   this.$head.height(this.$headBlueprint.height());
+  this.$head.width(this.$headBlueprint.width());
 
   $blueprintChildren = this.$headBlueprint.children();
   this.$head.children().each(function(i) {
     var $headChild = $(this);
     var $blueprintChild = $blueprintChildren.eq(i);
-    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display');
+    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
   });
 
   headSize = scout.graphics.getSize(this.$head, true);

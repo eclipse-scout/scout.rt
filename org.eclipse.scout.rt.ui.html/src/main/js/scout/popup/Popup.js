@@ -118,7 +118,6 @@ scout.Popup.prototype._postRender = function() {
 
   this.size();
   this._attachCloseHandler();
-  scout.scrollbars.update(this.$body);
 };
 
 scout.Popup.prototype._remove = function() {
