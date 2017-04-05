@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -64,14 +65,17 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IDisposable;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -83,17 +87,26 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(PlatformTestRunner.class)
 public class JmsMomImplementorTest {
 
-  private List<IDisposable> m_disposables;
-
-  private String m_testJobExecutionHint;
+  private static final Logger LOG = LoggerFactory.getLogger(JmsMomImplementorTest.class);
 
   private static IBean<? extends IMomTransport> s_momBean;
+
+  private List<IDisposable> m_disposables;
+  private String m_testJobExecutionHint;
+
+  @Rule
+  public TestName m_testName = new TestName();
+  public long m_t0;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -120,18 +133,36 @@ public class JmsMomImplementorTest {
 
   @Before
   public void before() {
+    LOG.info("---------------------------------------------------");
+    LOG.info("<{}>", m_testName.getMethodName());
+    m_t0 = System.nanoTime();
     m_testJobExecutionHint = UUID.randomUUID().toString();
     m_disposables = new ArrayList<>();
   }
 
   @After
   public void after() {
-    for (IDisposable disposable : m_disposables) {
-      disposable.dispose();
+    if (m_disposables.size() > 0) {
+      LOG.info("Disposing {} objects: {}", m_disposables.size(), m_disposables);
+      for (IDisposable disposable : m_disposables) {
+        disposable.dispose();
+      }
     }
-    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+
+    IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(m_testJobExecutionHint)
-        .toFilter(), true);
+        .toFilter();
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(filter);
+    if (futures.size() > 0) {
+      LOG.info("Cancelling {} jobs: {}", futures.size(), futures);
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(futures)
+          .andMatchNotState(JobState.DONE)
+          .toFilter(), true);
+    }
+
+    LOG.info("Finished test in {} ms", StringUtility.formatNanos(System.nanoTime() - m_t0));
+    LOG.info("</{}>", m_testName.getMethodName());
   }
 
   @Test
@@ -714,6 +745,7 @@ public class JmsMomImplementorTest {
         return MOM.request(JmsTestMom.class, queue, "hello world");
       }
     }, Jobs.newInput()
+        .withName("requester (Q)")
         .withExecutionHint(m_testJobExecutionHint)
         .withExecutionSemaphore(mutex));
 
@@ -732,6 +764,7 @@ public class JmsMomImplementorTest {
         }));
       }
     }, Jobs.newInput()
+        .withName("replier (Q)")
         .withExecutionHint(m_testJobExecutionHint)
         .withExecutionSemaphore(mutex));
 
@@ -757,6 +790,7 @@ public class JmsMomImplementorTest {
         return MOM.request(JmsTestMom.class, topic, "hello world");
       }
     }, Jobs.newInput()
+        .withName("requester (T)")
         .withExecutionHint(m_testJobExecutionHint)
         .withExceptionHandling(null, false)
         .withExecutionSemaphore(mutex));
@@ -776,6 +810,7 @@ public class JmsMomImplementorTest {
         }));
       }
     }, Jobs.newInput()
+        .withName("replier (T)")
         .withExecutionHint(m_testJobExecutionHint)
         .withExecutionSemaphore(mutex));
 
