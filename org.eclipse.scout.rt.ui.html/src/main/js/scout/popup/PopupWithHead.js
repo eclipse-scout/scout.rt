@@ -35,11 +35,16 @@ scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);
   this.$parent.window().on('resize', this.resizeHandler);
 
-  this.$body = this._$createNewBody();
-  scout.HtmlComponent.install(this.$body, this.session);
+  this._$createBody();
+
   if (this._headVisible) {
     this._renderHead();
   }
+};
+
+scout.PopupWithHead.prototype._postRender = function() {
+  scout.PopupWithHead.parent.prototype._postRender.call(this);
+  scout.scrollbars.update(this.$body);
 };
 
 scout.PopupWithHead.prototype.onResize = function() {
@@ -56,10 +61,12 @@ scout.PopupWithHead.prototype._remove = function() {
   scout.PopupWithHead.parent.prototype._remove.call(this);
 };
 
-scout.PopupWithHead.prototype._$createNewBody = function() {
+scout.PopupWithHead.prototype._$createBody = function() {
   this.$body = this.$container.appendDiv('popup-body');
+  // Complete the layout hierarchy between the popup and the menu items
+  scout.HtmlComponent.install(this.$body, this.session);
+
   this._modifyBody();
-  return this.$body;
 };
 
 scout.PopupWithHead.prototype.rerenderHead = function() {
@@ -208,12 +215,13 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint
   this.$head.copyCssIfGreater(this.$headBlueprint, 'padding');
   this.$head.height(this.$headBlueprint.height());
+  this.$head.width(this.$headBlueprint.width());
 
   $blueprintChildren = this.$headBlueprint.children();
   this.$head.children().each(function(i) {
     var $headChild = $(this);
     var $blueprintChild = $blueprintChildren.eq(i);
-    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display');
+    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
   });
 
   headSize = scout.graphics.getSize(this.$head, true);
