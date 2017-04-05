@@ -174,7 +174,7 @@ scout.Desktop.prototype._postRender = function() {
 
 scout.Desktop.prototype._renderNotifications = function() {
   this.notifications.forEach(function(notification) {
-    this.addNotification(notification);
+    this._renderNotification(notification);
   }.bind(this));
 };
 
@@ -587,15 +587,18 @@ scout.Desktop.prototype._removeOfflineNotification = function() {
 };
 
 scout.Desktop.prototype.addNotification = function(notification) {
-  if (!this.rendered) {
-    this._postRenderActions.push(this.addNotification.bind(this, notification));
-    return;
-  }
-
   if (!notification) {
     return;
   }
   this.notifications.push(notification);
+  this._renderNotification(notification);
+};
+
+scout.Desktop.prototype._renderNotification = function(notification) {
+  if (!this.rendered) {
+    return;
+  }
+
   if (this.$notifications) {
     // Bring to front
     this.$notifications.appendTo(this.$container);
@@ -608,15 +611,12 @@ scout.Desktop.prototype.addNotification = function(notification) {
   }
 };
 
+
 /**
  * Removes the given notification.
  * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
  */
 scout.Desktop.prototype.removeNotification = function(notification) {
-  if (!this.rendered) {
-    this._postRenderActions.push(this.removeNotification.bind(this, notification));
-    return;
-  }
 
   if (typeof notification === 'string') {
     var notificationId = notification;
@@ -627,11 +627,13 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   if (!notification) {
     return;
   }
+  scout.arrays.remove(this.notifications, notification);
+  if (!this.rendered) {
+    return;
+  }
   if (this.$notifications) {
     notification.fadeOut();
     notification.one('remove', this._onNotificationRemove.bind(this, notification));
-  } else {
-    scout.arrays.remove(this.notifications, notification);
   }
   if (notification._removeTimeout) {
     clearTimeout(notification._removeTimeout);
@@ -890,7 +892,6 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
 };
 
 scout.Desktop.prototype._onNotificationRemove = function(notification) {
-  scout.arrays.remove(this.notifications, notification);
   if (this.notifications.length === 0 && this.$notifications) {
     this.$notifications.remove();
     this.$notifications = null;
