@@ -15,9 +15,33 @@ scout.inherits(scout.ContextMenuPopupLayout, scout.PopupWithHeadLayout);
 
 scout.ContextMenuPopupLayout.prototype.layout = function($container) {
   var $menuItems = this.popup.$menuItems();
+  this._adjustTextAlignment($menuItems);
   this._resetMaxWidthFor($menuItems);
   scout.ContextMenuPopupLayout.parent.prototype.layout.call(this, $container);
   this._setMaxWidthFor($menuItems);
+};
+
+scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItems) {
+  // Calculate the text offset (= max icon width)
+  var textOffset = 0;
+  $menuItems.each(function(index, menuItem) {
+    var $menuItem = $(menuItem);
+    var $icon = $menuItem.children('.icon');
+
+    var iconWidth = $icon.outerWidth(true);
+    textOffset = Math.max(textOffset, iconWidth);
+  });
+
+  // Update the padding of each text such that the sum of icon width and the padding
+  // are the same for all items. This ensures that the texts are all aligned.
+  $menuItems.each(function(index, menuItem) {
+    var $menuItem = $(menuItem);
+    var $icon = $menuItem.children('.icon');
+    var $text = $menuItem.children('.text');
+
+    var iconWidth = $icon.outerWidth(true);
+    $text.css('padding-left', textOffset - iconWidth);
+  });
 };
 
 scout.ContextMenuPopupLayout.prototype._resetMaxWidthFor = function($menuItems) {
