@@ -7,21 +7,38 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  * Various tests for JSON marshalling and unmarshalling of polymorphic types using {@link JandexTypeNameIdResolver}.
  */
 public class JandexTypeNameIdResolverTest {
 
-  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+  private static final String JSON_TYPE_PROPERTY = "type";
+
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = JSON_TYPE_PROPERTY)
   @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
   @JsonTypeName("Base")
   static class BaseClass {
@@ -38,6 +55,10 @@ public class JandexTypeNameIdResolverTest {
     public String s;
   }
 
+  static class Impl3 extends BaseClass {
+    public String s;
+  }
+
   static class BaseClassWrapper {
     public BaseClass baseClass;
   }
@@ -46,14 +67,14 @@ public class JandexTypeNameIdResolverTest {
     public long l;
   }
 
-  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = JSON_TYPE_PROPERTY)
   @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
   static abstract class AbstractBaseClass {
     public boolean b;
   }
 
-  @JsonTypeName("Impl3")
-  static class Impl3 extends AbstractBaseClass {
+  @JsonTypeName("Impl4")
+  static class Impl4 extends AbstractBaseClass {
     public float f;
   }
 
@@ -62,6 +83,82 @@ public class JandexTypeNameIdResolverTest {
     public MyNotAnnotatedType mnat;
     public BaseClass b;
     public AbstractBaseClass abc;
+  }
+
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = JSON_TYPE_PROPERTY)
+  @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
+  @JsonTypeName("CoreBean")
+  static class CoreBean {
+    public boolean b;
+  }
+
+  static class ProjectTemplateBean extends CoreBean {
+    public int i;
+  }
+
+  static class ProjectBean extends ProjectTemplateBean {
+    public float f;
+  }
+
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = JSON_TYPE_PROPERTY)
+  @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
+  static class BaseClassWithoutJsonTypeName {
+    public boolean b;
+  }
+
+  private static final List<IBean<?>> s_beans = new ArrayList<>();
+
+  @BeforeClass
+  public static void beforeClass() {
+    s_beans.add(TestingUtility.registerBean(new BeanMetaData(CoreBean.class)));
+    s_beans.add(TestingUtility.registerBean(new BeanMetaData(ProjectTemplateBean.class).withReplace(true)));
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    TestingUtility.unregisterBeans(s_beans);
+  }
+
+  @Test
+  public void testGetMechanism() {
+    assertEquals(Id.NAME, new JandexTypeNameIdResolver().getMechanism());
+  }
+
+  @Test
+  public void testIdFromBaseType() {
+    JandexTypeNameIdResolver resolver = new JandexTypeNameIdResolver();
+    resolver.init(TypeFactory.defaultInstance().constructType(CoreBean.class));
+    assertEquals("CoreBean", resolver.idFromBaseType());
+  }
+
+  @Test
+  public void idFromValueAndType() {
+    JandexTypeNameIdResolver resolver = new JandexTypeNameIdResolver();
+    resolver.init(TypeFactory.defaultInstance().constructType(CoreBean.class));
+
+    assertEquals("CoreBean", resolver.idFromValueAndType(null, CoreBean.class));
+    assertEquals("CoreBean", resolver.idFromValueAndType(new CoreBean(), CoreBean.class));
+    assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectTemplateBean(), CoreBean.class));
+
+    IBean registeredProjectBean = TestingUtility.registerBean(new BeanMetaData(ProjectBean.class).withReplace(true));
+    try {
+      assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectBean(), CoreBean.class));
+      assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectBean(), ProjectTemplateBean.class));
+
+      resolver.init(TypeFactory.defaultInstance().constructType(ProjectTemplateBean.class));
+      assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectBean(), CoreBean.class));
+      assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectBean(), ProjectTemplateBean.class));
+    }
+    finally {
+      TestingUtility.unregisterBean(registeredProjectBean);
+    }
+  }
+
+  @Test
+  public void testMarshallUnmarshallBaseClassWithoutJsonTypeName() {
+    BaseClassWithoutJsonTypeName b = new BaseClassWithoutJsonTypeName();
+    b.b = true;
+    marshallUnmarshall(b, true, false);
   }
 
   @Test
@@ -88,6 +185,21 @@ public class JandexTypeNameIdResolverTest {
     Impl2 i2Marshalled = marshallUnmarshall(i2);
     assertEquals(true, i2Marshalled.b);
     assertEquals("foo", i2Marshalled.s);
+  }
+
+  /**
+   * Deserialize instance of subclass Impl3 which does not have a JSON type name. This case normally is covered by using
+   * {@link JandexJacksonAnnotationIntrospector} which adds default implementation behavior to serialization.
+   */
+  @Test(expected = InvalidTypeIdException.class)
+  public void testMarshallUnmarshallSubClasses_invalidType() throws Exception {
+    Impl3 i3 = new Impl3();
+    i3.b = true;
+    i3.s = "foo";
+    ObjectMapper om = new ObjectMapper();
+    String json = om.writeValueAsString(i3);
+    json = json.replace("}", ",\"" + JSON_TYPE_PROPERTY + "\":\"foo\"}");
+    om.readValue(json, Impl3.class);
   }
 
   @Test
@@ -140,7 +252,7 @@ public class JandexTypeNameIdResolverTest {
     i2.b = true;
     i2.s = "foo";
     ct.b = i2;
-    Impl3 i3 = new Impl3();
+    Impl4 i3 = new Impl4();
     i3.b = true;
     i3.f = 99;
     ct.abc = i3;
@@ -152,14 +264,258 @@ public class JandexTypeNameIdResolverTest {
     assertEquals(true, ctMarshalled.b.b);
     assertEquals("foo", ((Impl2) ctMarshalled.b).s);
     assertEquals(true, ctMarshalled.abc.b);
-    assertEquals(99, ((Impl3) ctMarshalled.abc).f, 0);
+    assertEquals(99, ((Impl4) ctMarshalled.abc).f, 0);
+  }
+
+  @Test
+  public void testMarshallUnmarshallCoreBean() {
+    CoreBean bean = new CoreBean();
+    bean.b = true;
+    CoreBean beanMarshalled = marshallUnmarshall(bean);
+    assertTrue(beanMarshalled.b);
+    assertEquals(ProjectTemplateBean.class, beanMarshalled.getClass());
+  }
+
+  @Test
+  public void testMarshallUnmarshallProjectTemplateBean() {
+    ProjectTemplateBean bean = new ProjectTemplateBean();
+    bean.b = true;
+    bean.i = 100;
+    ProjectTemplateBean beanMarshalled = marshallUnmarshall(bean);
+    assertEquals(true, beanMarshalled.b);
+    assertEquals(100, beanMarshalled.i);
+    assertEquals(ProjectTemplateBean.class, beanMarshalled.getClass());
+  }
+
+  @Test
+  public void testMarshallUnmarshallProjectBean() {
+    IBean registeredProjectBean = TestingUtility.registerBean(new BeanMetaData(ProjectBean.class).withReplace(true));
+    try {
+      ProjectBean bean = new ProjectBean();
+      bean.b = true;
+      bean.i = 100;
+      bean.f = 3.14f;
+      ProjectBean beanMarshalled = marshallUnmarshall(bean);
+      assertEquals(true, beanMarshalled.b);
+      assertEquals(100, beanMarshalled.i);
+      assertEquals(3.14f, beanMarshalled.f, 0);
+      assertEquals(ProjectBean.class, beanMarshalled.getClass());
+    }
+    finally {
+      TestingUtility.unregisterBean(registeredProjectBean);
+    }
+  }
+
+  /* ------ Test case with an ICustomer interface, multiple implementations, which are then replaced by project classes
+  
+               +--------------------+      +-----------------+
+               |    IDataObject     |      |    ICustomer    |
+               +---------^----------+      +---------^-------+
+                         |                           |
+               +---------+----------+                |
+               | AbstractDataObject |                |
+               +---------^----------+                |
+                         |                           |
+            +------------+--------------+            |
+            |                           |            |
+    +--------------------+   +--------------------+  |
+    |      Person        |   |       Company      |  |
+    +--------^-----------+   +----------^---------+  |
+             |                          |            |
+             +-----------+--------------^------------+
+             |                          |
+    +--------+-----------+   +----------+---------+
+    |   ProjectPerson    |   |   ProjectCompany   |
+    +--------------------+   +--------------------+
+  
+  */
+
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = JSON_TYPE_PROPERTY)
+  @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
+  static interface IDataObject extends Serializable {
+    String getId();
+
+    void setId(String id);
+  }
+
+  static interface ICustomer extends IDataObject {
+  }
+
+  static abstract class AbstractDataObject implements IDataObject {
+    private static final long serialVersionUID = 1L;
+    private String m_id;
+
+    @Override
+    public String getId() {
+      return m_id;
+    }
+
+    @Override
+    public void setId(String id) {
+      m_id = id;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((m_id == null) ? 0 : m_id.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      AbstractDataObject other = (AbstractDataObject) obj;
+      if (m_id == null) {
+        if (other.m_id != null) {
+          return false;
+        }
+      }
+      else if (!m_id.equals(other.m_id)) {
+        return false;
+      }
+      return true;
+    }
+  }
+
+  @JsonTypeName("Person")
+  static class Person extends AbstractDataObject {
+    private static final long serialVersionUID = 1L;
+  }
+
+  static class ProjectCompany extends Company implements ICustomer {
+    private static final long serialVersionUID = 1L;
+  }
+
+  @JsonTypeName("Company")
+  static class Company extends AbstractDataObject {
+    private static final long serialVersionUID = 1L;
+  }
+
+  static class ProjectPerson extends Person implements ICustomer {
+    private static final long serialVersionUID = 1L;
+  }
+
+  @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
+  static class PersonResponse {
+    List<Person> persons;
+
+    public List<Person> getPersons() {
+      return persons;
+    }
+
+    public void setPersons(List<Person> persons) {
+      this.persons = persons;
+    }
+  }
+
+  @JsonTypeIdResolver(JandexTypeNameIdResolver.class)
+  static class CustomerResponse {
+    List<ICustomer> customers;
+
+    public List<ICustomer> getCustomers() {
+      return customers;
+    }
+
+    public void setCustomers(List<ICustomer> customers) {
+      this.customers = customers;
+    }
+  }
+
+  @Test(expected = PlatformException.class)
+  public void testPoJoInterfaceWithMultipleImplementation() {
+    try {
+      ProjectPerson person = new ProjectPerson();
+      marshallUnmarshall(person, false, false);
+    }
+    catch (PlatformException e) {
+      assertTrue(e.getCause() instanceof JsonMappingException);
+      throw e;
+    }
+  }
+
+  @Test
+  public void testPoJoListInterfaceWithMultipleImplementation() {
+    List<ICustomer> customers = new ArrayList<>();
+    ProjectPerson person = new ProjectPerson();
+    person.setId("personId");
+    customers.add(person);
+    ProjectCompany company = new ProjectCompany();
+    company.setId("companyId");
+    customers.add(company);
+    List<ICustomer> marshalled = marshallUnmarshall(customers, false, false); // note since List<> is not annotated with @JandexTypeNameIdResolver, no typeId is generated
+    assertEquals(2, marshalled.size());
+    CollectionUtility.contains(marshalled, person);
+    CollectionUtility.contains(marshalled, company);
+  }
+
+  @Test
+  public void testBeanInterfaceWithMultipleImplementation() {
+    List<IBean<?>> registeredBeans = new ArrayList<>();
+    try {
+      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(Person.class)));
+      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(ProjectPerson.class).withReplace(true)));
+
+      runTestBeanInterfaceWithMultipleImplementation();
+
+      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(Company.class)));
+      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(ProjectCompany.class).withReplace(true)));
+
+      runTestBeanInterfaceWithMultipleImplementation();
+
+      CustomerResponse customerResponse = new CustomerResponse();
+      ICustomer customer1 = BEANS.get(ProjectPerson.class);
+      ICustomer customer2 = BEANS.get(ProjectCompany.class);
+      customerResponse.customers = new ArrayList<>();
+      customerResponse.customers.add(customer1);
+      customerResponse.customers.add(customer2);
+      marshallUnmarshall(customerResponse);
+    }
+    finally {
+      TestingUtility.unregisterBeans(registeredBeans);
+    }
+  }
+
+  protected void runTestBeanInterfaceWithMultipleImplementation() {
+    ProjectPerson person = BEANS.get(ProjectPerson.class);
+    marshallUnmarshall(person);
+
+    PersonResponse personResponse = new PersonResponse();
+    personResponse.persons = new ArrayList<>();
+    personResponse.persons.add(person);
+    marshallUnmarshall(personResponse);
+
+    ICustomer customer = BEANS.get(ProjectPerson.class);
+    marshallUnmarshall(customer);
+
+    CustomerResponse customerResponse = new CustomerResponse();
+    customerResponse.customers = new ArrayList<>();
+    customerResponse.customers.add(customer);
+    marshallUnmarshall(customerResponse);
+  }
+
+  protected static <T> T marshallUnmarshall(T object) {
+    return marshallUnmarshall(object, false, true);
   }
 
   @SuppressWarnings("unchecked")
-  protected static <T> T marshallUnmarshall(T object) {
+  protected static <T> T marshallUnmarshall(T object, boolean useAnnotationIntrospector, boolean expectJsonTypeProperty) {
     HashMap<String, String> emptyContext = new HashMap<>();
     JsonMarshaller marshaller = BEANS.get(JsonMarshaller.class);
+    if (useAnnotationIntrospector) {
+      marshaller.m_objectMapper.setAnnotationIntrospector(BEANS.get(JandexJacksonAnnotationIntrospector.class));
+    }
     Object json = marshaller.marshall(object, emptyContext);
+    assertEquals(expectJsonTypeProperty, String.class.cast(json).contains(JSON_TYPE_PROPERTY));
     return (T) marshaller.unmarshall(json, emptyContext);
   }
 }

@@ -3,6 +3,10 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 import java.io.IOException;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -23,15 +27,18 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  *
  * @see https://github.com/FasterXML/jackson-docs/wiki/JacksonPolymorphicDeserialization
  */
+//TODO [7.0] pbz: Move class to own scout json/jackson module
 public class JandexTypeNameIdResolver implements TypeIdResolver {
 
   private static final Logger LOG = LoggerFactory.getLogger(JandexTypeNameIdResolver.class);
 
   private JavaType m_baseType;
+  private BeanManagerUtility m_beanManagerUtility;
 
   @Override
   public void init(JavaType baseType) {
     m_baseType = baseType;
+    m_beanManagerUtility = BEANS.get(BeanManagerUtility.class);
   }
 
   @Override
@@ -67,6 +74,13 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
       return clazz.getAnnotation(JsonTypeName.class).value();
     }
     else {
+      IBean<?> bean = m_beanManagerUtility.lookupRegisteredBean(clazz);
+      while (m_beanManagerUtility.hasAnnotation(bean, Replace.class)) {
+        bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
+        if (m_beanManagerUtility.hasAnnotation(bean, JsonTypeName.class)) {
+          return bean.getBeanAnnotation(JsonTypeName.class).value();
+        }
+      }
       LOG.warn("Class {} misses annotation {}, cannot add class id information to serialized JSON.", clazz, JsonTypeName.class);
       return null;
     }
@@ -74,21 +88,84 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
 
   @Override
   public JavaType typeFromId(DatabindContext context, String id) throws IOException {
-    if (hasMatchingJsonTypeAnnotation(m_baseType.getRawClass(), id)) {
-      return m_baseType;
+    // STEP 1: Check if base type class has a matching type identifier
+    JavaType javaType = typeFromId(id, m_baseType.getRawClass());
+    if (javaType != null) {
+      return javaType;
     }
-    else {
-      Set<IClassInfo> subClasses = ClassInventory.get().getAllKnownSubClasses(m_baseType.getRawClass());
-      for (IClassInfo subClass : subClasses) {
-        if (subClass.hasAnnotation(JsonTypeName.class)) {
-          Class<?> clazz = subClass.resolveClass();
-          if (hasMatchingJsonTypeAnnotation(clazz, id)) {
-            return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, clazz);
-          }
+
+    // STEP 2: Check if base type is a Scout bean and for each available bean, check if the bean is replacing other bean(s) and check if their type identifier matches.
+    for (IBean<?> bean : Platform.get().getBeanManager().getBeans(m_baseType.getRawClass())) {
+      javaType = typeFromReplacedSuperClassId(id, bean);
+      if (javaType != null) {
+        return javaType;
+      }
+    }
+
+    // STEP 3: Check if a subclass of the base type class has a matching type identifier
+    javaType = typeFromSubclassId(id, m_baseType.getRawClass());
+    if (javaType != null) {
+      return javaType;
+    }
+
+    LOG.warn("Could not find suitable class for id {}, base type {}", id, m_baseType);
+    return null;
+  }
+
+  /**
+   * Method called to resolve type from given type identifier {@code id} and class {@code lookupClazz}
+   * <p>
+   * This custom implementation resolves the matching class against the bean manager to get the most specific bean.
+   */
+  protected JavaType typeFromId(String id, Class<?> lookupClazz) {
+    if (hasMatchingJsonTypeAnnotation(lookupClazz, id)) {
+      if (m_beanManagerUtility.isBeanClass(lookupClazz)) {
+        // CASE 1: lookupClass has matching JSON type annotation and is a Scout bean, lookup most specific bean using bean manager
+        Class<?> beanClazz = m_beanManagerUtility.lookupClass(lookupClazz);
+        return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, beanClazz);
+      }
+      else {
+        // CASE 2: lookupClass has matching JSON type annotation and is not a Scout bean, use lookupClass as resolved type
+        return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, lookupClazz);
+
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Method called to resolve type from given type identifier {@code id} starting from {@code bean} class and checking
+   * type annotation of replaced super classes.
+   */
+  protected JavaType typeFromReplacedSuperClassId(String id, IBean<?> bean) {
+    Class<?> baseLookupClazz = bean.getBeanClazz();
+    while (m_beanManagerUtility.hasAnnotation(bean, Replace.class)) {
+      bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
+      if (hasMatchingJsonTypeAnnotation(bean.getBeanClazz(), id)) {
+        return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, baseLookupClazz);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Method called to resolve type from given type identifier {@code id} and all subclasses of class {@code lookupClazz}
+   * <p>
+   * This custom implementation resolves the matching sub class against the bean manager to get the most specific bean.
+   */
+  protected JavaType typeFromSubclassId(String id, Class<?> lookupClazz) {
+    Set<IClassInfo> subClasses = ClassInventory.get().getAllKnownSubClasses(lookupClazz);
+    for (IClassInfo subClassInfo : subClasses) {
+      if (subClassInfo.hasAnnotation(JsonTypeName.class)) {
+        Class<?> subClazz = subClassInfo.resolveClass();
+
+        // Check if subClazz has matching type identifier (Note: subclass could be a Scout bean or a POJO java class)
+        JavaType subClassJavaType = typeFromId(id, subClazz);
+        if (subClassJavaType != null) {
+          return subClassJavaType;
         }
       }
     }
-    LOG.warn("Could not find suitable class for id {}, base type {}", id, m_baseType);
     return null;
   }
 
