@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilter
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
@@ -94,6 +95,7 @@ import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktopNotification;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormMenu;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
@@ -286,6 +288,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IMessageBox) {
       return new JsonMessageBox<IMessageBox>((IMessageBox) model, session, id, parent);
+    }
+    if (model instanceof IDesktopNotification) {
+      return new JsonDesktopNotification<IDesktopNotification>((IDesktopNotification) model, session, id, parent);
     }
     if (model instanceof IOutlineViewButton) {
       return new JsonOutlineViewButton<IOutlineViewButton>((IOutlineViewButton) model, session, id, parent);

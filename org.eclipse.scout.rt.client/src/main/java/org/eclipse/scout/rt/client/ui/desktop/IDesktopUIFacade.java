@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 
@@ -85,4 +86,9 @@ public interface IDesktopUIFacade {
   void fireGeolocationDetermined(String latitude, String longitude);
 
   void fireGeolocationFailed(String errorCode, String errorMessage);
+
+  /**
+   * Called after DesktopNotification was removed from UI
+   */
+  void removedNotificationFromUI(IDesktopNotification desktopNotification);
 }
