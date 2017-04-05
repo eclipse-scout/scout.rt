@@ -84,7 +84,7 @@ scout.BenchColumn.prototype._renderTabBox = function(tabBox) {
 };
 
 scout.BenchColumn.prototype._remove = function() {
-  scout.SimpleTabBox.parent.prototype._remove.call(this);
+  scout.BenchColumn.parent.prototype._remove.call(this);
   if (this.scrollable) {
     scout.scrollbars.uninstall(this.$body);
   }
