@@ -21,6 +21,10 @@ import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
  */
 public class JaxWsConsumerTestClient extends AbstractWebServiceClient<JaxWsConsumerTestService, JaxWsConsumerTestServicePortType> {
 
+  public void setEndpointUrl(String endpointUrl) {
+    m_endpointUrl = endpointUrl;
+  }
+
   /**
    * Discards all ports and services pooled by the {@link PooledPortProvider}. Does nothing if a different
    * {@link IPortProvider} is used.
