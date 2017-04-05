@@ -51,6 +51,8 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -66,6 +68,16 @@ import org.junit.runner.RunWith;
 public abstract class AbstractJaxWsClientTest {
 
   private static final String X_SCOUT_JAX_WS_TEST_HEADER = "X-Scout-JaxWsTestHeader";
+
+  @BeforeClass
+  public static void startupWsProvider() {
+    BEANS.get(JaxWsTestProviderInstaller.class).install();
+  }
+
+  @AfterClass
+  public static void stopWsProvider() {
+    BEANS.get(JaxWsTestProviderInstaller.class).uninstall();
+  }
 
   /*
    * ************************************************************
