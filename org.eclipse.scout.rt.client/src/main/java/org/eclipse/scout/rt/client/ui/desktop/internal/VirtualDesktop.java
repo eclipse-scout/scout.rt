@@ -418,6 +418,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public List<IDesktopNotification> getNotifications() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public List<IMessageBox> getMessageBoxes(IDisplayParent displayParent) {
     throw createUnsupportedOperationException();
   }

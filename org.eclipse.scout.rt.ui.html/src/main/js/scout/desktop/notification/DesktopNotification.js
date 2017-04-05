@@ -41,6 +41,7 @@ scout.DesktopNotification.prototype._render = function($parent) {
 scout.DesktopNotification.prototype._remove = function() {
   scout.DesktopNotification.parent.prototype._remove.call(this);
   this._removeCloser();
+  this._send('closed');
 };
 
 scout.DesktopNotification.prototype._renderProperties = function() {
@@ -92,23 +93,10 @@ scout.DesktopNotification.prototype._renderCloser = function() {
 };
 
 scout.DesktopNotification.prototype._onCloseIconClick = function() {
-  this.hide();
-};
-
-scout.DesktopNotification.prototype.show = function() {
-  var desktop = this.desktop;
-  desktop.addNotification(this);
-  if (this.duration > 0) {
-    this._removeTimeout = setTimeout(desktop.removeNotification.bind(desktop, this), this.duration);
-  }
-};
-
-scout.DesktopNotification.prototype.hide = function() {
   if (this._removing) {
     return;
   }
-  clearTimeout(this._removeTimeout);
-  this.desktop.removeNotification(this);
+  this.session.desktop.removeNotification(this);
 };
 
 scout.DesktopNotification.prototype.fadeIn = function($parent) {

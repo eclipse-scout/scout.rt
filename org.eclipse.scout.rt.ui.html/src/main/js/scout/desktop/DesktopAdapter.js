@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
-  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
   this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible', 'geolocationServiceAvailable']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
@@ -139,17 +139,12 @@ scout.DesktopAdapter.prototype._onOutlineChanged = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onAddNotification = function(event) {
-  scout.create('DesktopNotification', {
-    parent: this.widget,
-    id: event.id,
-    duration: event.duration,
-    status: event.status,
-    closable: event.closable
-  }).show();
+  var notification = this.session.getOrCreateWidget(event.notification, this.widget);
+  this.widget.addNotification(notification);
 };
 
 scout.DesktopAdapter.prototype._onRemoveNotification = function(event) {
-  this.widget.removeNotification(event.id);
+  this.widget.removeNotification(event.notification);
 };
 
 scout.DesktopAdapter.prototype._onOutlineContentActivate = function(event) {

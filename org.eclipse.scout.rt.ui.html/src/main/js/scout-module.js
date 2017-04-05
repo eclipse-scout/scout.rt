@@ -302,6 +302,7 @@
   __include("scout/desktop/navigation/ShrinkNavigationKeyStroke.js");
   __include("scout/desktop/navigation/EnlargeNavigationKeyStroke.js");
   __include("scout/desktop/notification/DesktopNotification.js");
+  __include("scout/desktop/notification/DesktopNotificationAdapter.js");
   __include("scout/desktop/notification/OfflineDesktopNotification.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");

@@ -37,7 +37,7 @@ scout.Desktop = function() {
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
   this.openUriHandler;
 
-  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
@@ -167,8 +167,15 @@ scout.Desktop.prototype._postRender = function() {
   this.messageBoxController.render();
   this.fileChooserController.render();
   this._renderDisplayChildsOfOutline();
+  this._renderNotifications();
 
   this.initialFormRendering = false;
+};
+
+scout.Desktop.prototype._renderNotifications = function() {
+  this.notifications.forEach(function(notification) {
+    this._renderNotification(notification);
+  }.bind(this));
 };
 
 scout.Desktop.prototype._renderDisplayStyle = function() {
@@ -580,15 +587,18 @@ scout.Desktop.prototype._removeOfflineNotification = function() {
 };
 
 scout.Desktop.prototype.addNotification = function(notification) {
-  if (!this.rendered) {
-    this._postRenderActions.push(this.addNotification.bind(this, notification));
-    return;
-  }
-
   if (!notification) {
     return;
   }
   this.notifications.push(notification);
+  this._renderNotification(notification);
+};
+
+scout.Desktop.prototype._renderNotification = function(notification) {
+  if (!this.rendered) {
+    return;
+  }
+
   if (this.$notifications) {
     // Bring to front
     this.$notifications.appendTo(this.$container);
@@ -596,17 +606,17 @@ scout.Desktop.prototype.addNotification = function(notification) {
     this.$notifications = this.$container.appendDiv('desktop-notifications');
   }
   notification.fadeIn(this.$notifications);
+  if (notification.duration > 0) {
+    notification._removeTimeout = setTimeout(this.removeNotification.bind(this, notification), notification.duration);
+  }
 };
+
 
 /**
  * Removes the given notification.
  * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
  */
 scout.Desktop.prototype.removeNotification = function(notification) {
-  if (!this.rendered) {
-    this._postRenderActions.push(this.removeNotification.bind(this, notification));
-    return;
-  }
 
   if (typeof notification === 'string') {
     var notificationId = notification;
@@ -617,11 +627,16 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   if (!notification) {
     return;
   }
+  scout.arrays.remove(this.notifications, notification);
+  if (!this.rendered) {
+    return;
+  }
   if (this.$notifications) {
     notification.fadeOut();
     notification.one('remove', this._onNotificationRemove.bind(this, notification));
-  } else {
-    scout.arrays.remove(this.notifications, notification);
+  }
+  if (notification._removeTimeout) {
+    clearTimeout(notification._removeTimeout);
   }
 };
 
@@ -877,8 +892,7 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
 };
 
 scout.Desktop.prototype._onNotificationRemove = function(notification) {
-  scout.arrays.remove(this.notifications, notification);
-  if (this.notifications.length === 0) {
+  if (this.notifications.length === 0 && this.$notifications) {
     this.$notifications.remove();
     this.$notifications = null;
   }

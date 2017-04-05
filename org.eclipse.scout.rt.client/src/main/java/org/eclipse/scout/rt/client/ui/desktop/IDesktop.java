@@ -331,6 +331,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
   List<IMessageBox> getMessageBoxes();
 
   /**
+   * Returns all displayed notifications in the same order as registered.
+   */
+  List<IDesktopNotification> getNotifications();
+
+  /**
    * Returns all message boxes which are attached to the given {@link IDisplayParent} in the order as registered.
    */
   List<IMessageBox> getMessageBoxes(IDisplayParent displayParent);
@@ -657,7 +662,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
 
   /**
    * Triggers a reload of the current UI.
-   * 
+   *
    * @since 6.1
    */
   void reloadGui();

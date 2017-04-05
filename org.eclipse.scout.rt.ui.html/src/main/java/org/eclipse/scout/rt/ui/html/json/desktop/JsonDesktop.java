@@ -70,6 +70,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   public static final String PROP_POSITION = "position";
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
+  public static final String PROP_NOTIFICATION = "notification";
   public static final String PROP_FILE_CHOOSER = "fileChooser";
   public static final String PROP_ACTIVE_FORM = "activeForm";
 
@@ -98,6 +99,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     attachGlobalAdapters(getModel().getDialogs(getModel(), false));
     attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
     attachGlobalAdapters(getModel().getFileChoosers(getModel()));
+    attachAdapters(getModel().getNotifications());
     attachAdapters(getModel().getMenus(), new DisplayableActionFilter<IMenu>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
@@ -329,6 +331,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     putAdapterIdsProperty(json, "views", getModel().getViews(getModel()));
     putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
+    putAdapterIdsProperty(json, "notifications", getModel().getNotifications());
     putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChoosers(getModel()));
     putAdapterIdsProperty(json, "menus", getModel().getMenus(), new DisplayableActionFilter<IMenu>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
@@ -405,12 +408,18 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   protected void handleModelNotificationAdded(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
-    addActionEvent(EVENT_ADD_NOTIFICATION, JsonDesktopNotification.toJson(notification)).protect();
+    IJsonAdapter<?> jsonAdapter = attachAdapter(notification);
+    JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put(PROP_NOTIFICATION, jsonAdapter.getId());
+    addActionEvent(EVENT_ADD_NOTIFICATION, jsonAdapter, jsonEvent).protect();
   }
 
   protected void handleModelNotificationRemoved(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
-    addActionEvent(EVENT_REMOVE_NOTIFICATION, JsonDesktopNotification.toNotificationIdJson(notification)).protect();
+    IJsonAdapter<?> jsonAdapter = getAdapter(notification);
+    JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put(PROP_NOTIFICATION, jsonAdapter.getId());
+    addActionEvent(EVENT_REMOVE_NOTIFICATION, jsonAdapter, jsonEvent).protect();
   }
 
   @Override

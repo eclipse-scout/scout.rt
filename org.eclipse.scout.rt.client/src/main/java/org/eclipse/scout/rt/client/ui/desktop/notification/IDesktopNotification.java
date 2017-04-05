@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.ui.desktop.notification;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
@@ -10,7 +11,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  *
  * @since 5.2
  */
-public interface IDesktopNotification {
+public interface IDesktopNotification extends IPropertyObserver {
 
   /**
    * Default duration a notification is displayed is 5 seconds.
@@ -25,7 +26,7 @@ public interface IDesktopNotification {
   IStatus getStatus();
 
   /**
-   * Duration while the notification is displayed.
+   * Duration in milliseconds while the notification is displayed.
    */
   long getDuration();
 
@@ -33,5 +34,7 @@ public interface IDesktopNotification {
    * Whether or not the notification can be closed by the user.
    */
   boolean isClosable();
+
+  IDesktopNotificationUIFacade getUIFacade();
 
 }

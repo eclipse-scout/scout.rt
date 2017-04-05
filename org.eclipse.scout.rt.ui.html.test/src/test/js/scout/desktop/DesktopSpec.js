@@ -66,14 +66,12 @@ describe('Desktop', function() {
         duration: 3000,
         closable: true
       }).show();
-      expect(desktop.notifications.length).toBe(0);
+      expect(desktop.notifications.length).toBe(1);
       expect(desktop.session.$entryPoint.find('.desktop-notifications').length).toBe(0);
-      expect(desktop._postRenderActions.length).toBe(1);
 
       desktop.render(desktop.session.$entryPoint);
       expect(desktop.notifications.length).toBe(1);
       expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
-      expect(desktop._postRenderActions.length).toBe(0);
     });
 
     it('removeNotification with object', function() {
@@ -92,8 +90,9 @@ describe('Desktop', function() {
 
     it('_onNotificationRemove - last notifications removes $notifications DIV', function() {
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
-      desktop._onNotificationRemove(ntfc);
+      desktop.removeNotification(ntfc);
       expect(desktop.notifications.length).toBe(0);
+      desktop._onNotificationRemove(ntfc); // this method is usually called after fade-out animation asynchronously
       expect(desktop.$container.find('.desktop-notifications').length).toBe(0);
       expect(desktop.$notifications).toBe(null);
     });

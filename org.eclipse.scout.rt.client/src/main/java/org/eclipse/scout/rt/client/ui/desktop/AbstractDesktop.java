@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -46,6 +47,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPag
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -87,6 +89,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -149,6 +152,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final FormStore m_formStore;
   private final MessageBoxStore m_messageBoxStore;
   private final FileChooserStore m_fileChooserStore;
+  private final Set<IDesktopNotification> m_notifications = new LinkedHashSet<>(); // LinkedHashSet to preserve insertion order
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
   private boolean m_autoPrefixWildcardForTextSearch;
@@ -949,6 +953,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public List<IDesktopNotification> getNotifications() {
+    return new ArrayList<IDesktopNotification>(m_notifications); // ordered as inserted because LinkedHashSet is used
+  }
+
+  @Override
   public List<IMessageBox> getMessageBoxes(IDisplayParent displayParent) {
     return m_messageBoxStore.getByDisplayParent(displayParent);
   }
@@ -1465,13 +1474,32 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void addNotification(IDesktopNotification notification) {
-    fireNotification(DesktopEvent.TYPE_NOTIFICATION_ADDED, notification);
+  public void addNotification(final IDesktopNotification notification) {
+    if (notification != null && m_notifications.add(notification)) {
+      fireNotification(DesktopEvent.TYPE_NOTIFICATION_ADDED, notification);
+      if (notification.getDuration() > 0) {
+        ModelJobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            removeNotification(notification);
+          }
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withStartIn(notification.getDuration(), TimeUnit.MILLISECONDS)));
+      }
+    }
   }
 
   @Override
   public void removeNotification(IDesktopNotification notification) {
-    fireNotification(DesktopEvent.TYPE_NOTIFICATION_REMOVED, notification);
+    removeNotificationInternal(notification, true);
+  }
+
+  protected void removeNotificationInternal(IDesktopNotification notification, boolean notifyUI) {
+    if (m_notifications.remove(notification) && notifyUI) {
+      fireNotification(DesktopEvent.TYPE_NOTIFICATION_REMOVED, notification);
+    }
   }
 
   @Override
@@ -2426,6 +2454,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       for (ClientCallback<Coordinates> callback : pendingCallbacks) {
         callback.failed(pe);
       }
+    }
+
+    @Override
+    public void removedNotificationFromUI(IDesktopNotification notification) {
+      AbstractDesktop.this.removeNotificationInternal(notification, false);
     }
   }
 
