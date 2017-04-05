@@ -13,16 +13,28 @@ scout.ImageField = function() {
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
+scout.ImageField.prototype._init = function(model) {
+  scout.ImageField.parent.prototype._init.call(this, model);
+
+  this.image = scout.create('Image', {
+    parent: this
+  });
+  this.image.on('load', this._onImageLoad.bind(this));
+  this.image.on('error', this._onImageError.bind(this));
+};
+
 scout.ImageField.prototype._render = function($parent) {
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
   this.addFieldContainer($parent.makeDiv());
 
-  var $field = this.$fieldContainer.appendElement('<img>', 'image')
-    .on('load', this._onImageLoad.bind(this))
-    .on('error', this._onImageError.bind(this));
+  // Complete the layout hierarchy between the image field and the image
+  var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
+  htmlComp.setLayout(new scout.SingleLayout());
+
+  this.image.render(this.$fieldContainer);
 
   this.addLabel();
-  this.addField($field);
+  this.addField(this.image.$container);
   this.addStatus();
 };
 
@@ -49,13 +61,11 @@ scout.ImageField.prototype._installDragAndDropHandler = function(event) {
 };
 
 scout.ImageField.prototype._renderImageUrl = function() {
-  this.$field.attr('src', this.imageUrl);
-  // Hide <img> when it has no content to suppress the browser's 'broken image' icon
-  this.$field.toggleClass('empty', !this.imageUrl);
+  this.image.setImageUrl(this.imageUrl);
 };
 
 scout.ImageField.prototype._renderAutoFit = function() {
-  this.$field.toggleClass('autofit', this.autoFit);
+  this.image.setAutoFit(this.autoFit);
   scout.scrollbars.update(this.$fieldContainer);
 };
 
@@ -87,13 +97,9 @@ scout.ImageField.prototype._updateInnerAlignment = function() {
 };
 
 scout.ImageField.prototype._onImageLoad = function(event) {
-  this.$field.removeClass('broken');
   scout.scrollbars.update(this.$fieldContainer);
-  this.invalidateLayoutTree();
 };
 
 scout.ImageField.prototype._onImageError = function(event) {
-  this.$field.addClass('empty broken');
   scout.scrollbars.update(this.$fieldContainer);
-  this.invalidateLayoutTree();
 };

@@ -19,9 +19,9 @@ scout.ImageFieldLayout.prototype.layout = function($container) {
 };
 
 scout.ImageFieldLayout.prototype.naturalSize = function(formField) {
-  var img = formField.$field[0];
-  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
-    return new scout.Dimension(img.naturalWidth, img.naturalHeight);
+  if (formField.image && formField.image.htmlComp) {
+    return formField.image.htmlComp.getPreferredSize()
+      .add(formField.image.htmlComp.getMargins());
   }
-  return scout.ImageFieldLayout.parent.prototype.naturalSize.call(this, formField);
+  scout.ImageFieldLayout.parent.prototype.naturalSize.call(this, formField);
 };

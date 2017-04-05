@@ -109,6 +109,8 @@
   __include("scout/datepicker/DatePickerLayout.js");
   __include("scout/datepicker/DatePickerPopup.js");
   __include("scout/datepicker/DatePickerTouchPopup.js");
+  __include("scout/image/Image.js");
+  __include("scout/image/ImageLayout.js");
   __include("scout/menu/menus.js");
   __include("scout/menu/Menu.js");
   __include("scout/menu/MenuKeyStroke.js");
