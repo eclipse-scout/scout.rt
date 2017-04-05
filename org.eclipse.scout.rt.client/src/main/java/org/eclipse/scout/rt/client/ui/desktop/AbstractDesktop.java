@@ -2108,6 +2108,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (deepLinks.canHandleDeepLink(deepLinkPath)) {
       handled = deepLinks.handleDeepLink(deepLinkPath);
     }
+    else {
+      // non empty deepLinkPath provided but no handler found, throw exception to let user know
+      throw new DeepLinkException("No deep-link handler found. deepLinkPath={" + deepLinkPath + " }");
+    }
     return handled;
   }
 
