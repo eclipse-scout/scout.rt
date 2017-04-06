@@ -291,15 +291,15 @@ public class AbstractDesktopTest {
 
   @Test
   public void testDeepLinkHandling() throws Throwable {
-    IBean<P_TestDeepLinkHandler> reg = BEANS.getBeanManager().registerClass(P_TestDeepLinkHandler.class);
+    IBean<TestDeepLinkHandler> reg = BEANS.getBeanManager().registerClass(TestDeepLinkHandler.class);
     try {
       TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
       assertFalse(desktop.handleDeepLink(null));
       assertTrue(desktop.handleDeepLink("junittest-ok"));
-      assertDeepLinkException(desktop, "doesnotexist");
-      assertDeepLinkException(desktop, "doesnotexist-123");
       assertDeepLinkException(desktop, "junittest");
       assertDeepLinkException(desktop, "junittest-123");
+      assertDeepLinkException(desktop, "doesnotexist");
+      assertDeepLinkException(desktop, "doesnotexist-123");
     }
     finally {
       BEANS.getBeanManager().unregisterBean(reg);
@@ -379,11 +379,11 @@ public class AbstractDesktopTest {
   }
 
   @IgnoreBean
-  protected static class P_TestDeepLinkHandler extends AbstractDeepLinkHandler {
+  public static class TestDeepLinkHandler extends AbstractDeepLinkHandler {
 
     private static final String HANDLER_NAME = "junittest";
 
-    public P_TestDeepLinkHandler() {
+    public TestDeepLinkHandler() {
       super(defaultPattern(HANDLER_NAME, "[A-Za-z0-9_]+"));
     }
 
