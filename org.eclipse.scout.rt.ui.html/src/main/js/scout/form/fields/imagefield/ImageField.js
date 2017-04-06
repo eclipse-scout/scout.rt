@@ -15,23 +15,35 @@ scout.ImageField = function() {
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
+scout.ImageField.prototype._init = function(model) {
+  scout.ImageField.parent.prototype._init.call(this, model);
+
+  this.image = scout.create('Image', {
+    parent: this,
+    imageUrl: model.imageUrl,
+    autoFit: model.autoFit
+  });
+  this.image.on('load', this._onImageLoad.bind(this));
+  this.image.on('error', this._onImageError.bind(this));
+};
+
 scout.ImageField.prototype._render = function($parent) {
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
   this.addFieldContainer($parent.makeDiv());
 
-  var $field = this.$fieldContainer.appendElement('<img>', 'image')
-    .on('load', this._onImageLoad.bind(this))
-    .on('error', this._onImageError.bind(this));
+  // Complete the layout hierarchy between the image field and the image
+  var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
+  htmlComp.setLayout(new scout.SingleLayout());
+
+  this.image.render(this.$fieldContainer);
 
   this.addLabel();
-  this.addField($field);
+  this.addField(this.image.$container);
   this.addStatus();
 };
 
 scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
-  this._renderImageUrl();
-  this._renderAutoFit();
   this._renderScrollBarEnabled();
   this._renderDropType();
 };
@@ -50,14 +62,25 @@ scout.ImageField.prototype._installDragAndDropHandler = function(event) {
   this.dragAndDropHandler.install(this.$fieldContainer);
 };
 
-scout.ImageField.prototype._renderImageUrl = function() {
-  this.$field.attr('src', this.imageUrl);
-  // Hide <img> when it has no content to suppress the browser's 'broken image' icon
-  this.$field.toggleClass('empty', !this.imageUrl);
+scout.ImageField.prototype.setImageUrl = function(imageUrl) {
+  this.setProperty('imageUrl', imageUrl);
+};
+
+scout.ImageField.prototype._setImageUrl = function(imageUrl) {
+  this._setProperty('imageUrl', imageUrl);
+  this.image.setImageUrl(imageUrl);
+};
+
+scout.ImageField.prototype.setAutoFit = function(autoFit) {
+  this.setProperty('autoFit', autoFit);
+};
+
+scout.ImageField.prototype._setAutoFit = function(autoFit) {
+  this._setProperty('autoFit', autoFit);
+  this.image.setAutoFit(autoFit);
 };
 
 scout.ImageField.prototype._renderAutoFit = function() {
-  this.$field.toggleClass('autofit', this.autoFit);
   scout.scrollbars.update(this.$fieldContainer);
 };
 
@@ -89,17 +112,9 @@ scout.ImageField.prototype._updateInnerAlignment = function() {
 };
 
 scout.ImageField.prototype._onImageLoad = function(event) {
-  this.$field.removeClass('broken');
   scout.scrollbars.update(this.$fieldContainer);
-  this.invalidateLayoutTree();
 };
 
 scout.ImageField.prototype._onImageError = function(event) {
-  this.$field.addClass('empty broken');
   scout.scrollbars.update(this.$fieldContainer);
-  this.invalidateLayoutTree();
-};
-
-scout.ImageField.prototype.setImageUrl = function(imageUrl) {
-  this.setProperty('imageUrl', imageUrl);
 };
