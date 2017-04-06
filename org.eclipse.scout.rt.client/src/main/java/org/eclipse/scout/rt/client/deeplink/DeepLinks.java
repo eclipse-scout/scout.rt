@@ -10,16 +10,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides access to registered deep-link handlers.
- * 
+ *
  * @see IDeepLinkHandler
  */
 public class DeepLinks implements IDeepLinks {
+
   private static final Logger LOG = LoggerFactory.getLogger(DeepLinks.class);
 
-  private List<IDeepLinkHandler> m_handlers;
+  protected final List<IDeepLinkHandler> m_handlers;
 
   public DeepLinks() {
-    m_handlers = new ArrayList<>(BEANS.all(IDeepLinkHandler.class));
+    m_handlers = new ArrayList<>(findDeepLinkHandlers());
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
       for (IDeepLinkHandler handler : m_handlers) {
@@ -27,6 +28,10 @@ public class DeepLinks implements IDeepLinks {
       }
       LOG.info("Registered {} deep-link handlers:{}", m_handlers.size(), sb.toString());
     }
+  }
+
+  protected List<? extends IDeepLinkHandler> findDeepLinkHandlers() {
+    return BEANS.all(IDeepLinkHandler.class);
   }
 
   @Override
@@ -51,5 +56,4 @@ public class DeepLinks implements IDeepLinks {
     }
     return false;
   }
-
 }
