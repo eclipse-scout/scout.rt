@@ -13,12 +13,18 @@ package org.eclipse.scout.rt.client.ui.desktop;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
 
+import org.eclipse.scout.rt.client.deeplink.AbstractDeepLinkHandler;
+import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
+import org.eclipse.scout.rt.client.deeplink.DeepLinks;
+import org.eclipse.scout.rt.client.deeplink.IDeepLinkHandler;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
@@ -34,11 +40,16 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -51,6 +62,7 @@ import org.mockito.Mockito;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractDesktopTest {
+
   private static final Object TEST_DATA_TYPE_1 = new Object();
   private static final Object TEST_DATA_TYPE_2 = new Object();
 
@@ -424,8 +436,35 @@ public class AbstractDesktopTest {
         || result[0] == TEST_DATA_TYPE_2 && result[1] == TEST_DATA_TYPE_1);
   }
 
+  @Test
+  public void testDeepLinkHandling() throws Throwable {
+    IBean<P_TestDeepLinks> reg = BEANS.getBeanManager().registerClass(P_TestDeepLinks.class);
+    try {
+      TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+      assertFalse(desktop.handleDeepLink(null));
+      assertTrue(desktop.handleDeepLink("junittest-ok"));
+      assertDeepLinkException(desktop, "junittest");
+      assertDeepLinkException(desktop, "junittest-123");
+      assertDeepLinkException(desktop, "doesnotexist");
+      assertDeepLinkException(desktop, "doesnotexist-123");
+    }
+    finally {
+      BEANS.getBeanManager().unregisterBean(reg);
+    }
+  }
+
+  protected static void assertDeepLinkException(AbstractDesktop desktop, String deepLinkPath) {
+    try {
+      boolean handled = desktop.handleDeepLink(deepLinkPath);
+      fail("Expected DeepLinkException, but '" + deepLinkPath + "' was " + (handled ? "" : "not ") + "handled");
+    }
+    catch (DeepLinkException e) { // NOSONAR
+      // expected
+    }
+  }
+
   @ClassId("d090cc19-ba7a-4f79-b147-e58765a837fb")
-  class P_CheckSaveTestForm extends AbstractForm {
+  protected class P_CheckSaveTestForm extends AbstractForm {
 
     public P_CheckSaveTestForm() {
       super();
@@ -466,10 +505,9 @@ public class AbstractDesktopTest {
 
     public class NewHandler extends AbstractFormHandler {
     }
-
   }
 
-  private class P_Form extends AbstractForm {
+  protected class P_Form extends AbstractForm {
 
     private String m_identifier;
 
@@ -484,6 +522,40 @@ public class AbstractDesktopTest {
     @Override
     public String toString() {
       return m_identifier;
+    }
+  }
+
+  @IgnoreBean
+  @Replace
+  protected static class P_TestDeepLinks extends DeepLinks {
+
+    @Override
+    protected List<? extends IDeepLinkHandler> findDeepLinkHandlers() {
+      return Collections.singletonList(new P_TestDeepLinkHandler());
+    }
+  }
+
+  @IgnoreBean
+  protected static class P_TestDeepLinkHandler extends AbstractDeepLinkHandler {
+
+    private static final String HANDLER_NAME = "junittest";
+
+    public P_TestDeepLinkHandler() {
+      super(defaultPattern(HANDLER_NAME, "[A-Za-z0-9_]+"));
+    }
+
+    @Override
+    public String getName() {
+      return HANDLER_NAME;
+    }
+
+    @Override
+    protected void handleImpl(Matcher matcher) throws DeepLinkException {
+      String target = matcher.group(1);
+      if (StringUtility.equalsIgnoreCase(target, "ok")) {
+        return; // ok, simulate "handled"
+      }
+      throw new DeepLinkException("Unsupported target: " + target);
     }
   }
 }
