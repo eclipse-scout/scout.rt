@@ -142,6 +142,7 @@ public class JmsMomImplementorTest {
 
   @After
   public void after() {
+    // Dispose resources
     if (m_disposables.size() > 0) {
       LOG.info("Disposing {} objects: {}", m_disposables.size(), m_disposables);
       for (IDisposable disposable : m_disposables) {
@@ -149,16 +150,25 @@ public class JmsMomImplementorTest {
       }
     }
 
-    IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
+    // Cancel jobs
+    IFilter<IFuture<?>> testJobsFilter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(m_testJobExecutionHint)
         .toFilter();
-    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(filter);
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(testJobsFilter);
     if (futures.size() > 0) {
       LOG.info("Cancelling {} jobs: {}", futures.size(), futures);
       Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
           .andMatchFuture(futures)
           .andMatchNotState(JobState.DONE)
           .toFilter(), true);
+      long t0 = System.nanoTime();
+      try {
+        Jobs.getJobManager().awaitDone(testJobsFilter, 10, TimeUnit.SECONDS);
+        LOG.info("All jobs have finished after {} ms", StringUtility.formatNanos(System.nanoTime() - t0));
+      }
+      catch (TimedOutError e) {
+        LOG.warn("Some cancelled jobs are still running after {} ms! Please check their implementation.", StringUtility.formatNanos(System.nanoTime() - t0));
+      }
     }
 
     LOG.info("Finished test in {} ms", StringUtility.formatNanos(System.nanoTime() - m_t0));
@@ -1833,6 +1843,8 @@ public class JmsMomImplementorTest {
   @IgnoreBean
   public static class JmsTestMom extends AbstractMomTransport {
 
+    private static final AtomicInteger MOM_COUNTER = new AtomicInteger(0);
+
     @Override
     protected Class<? extends IMomImplementor> getConfiguredImplementor() {
       return JmsMomImplementor.class;
@@ -1842,10 +1854,10 @@ public class JmsMomImplementorTest {
     protected Map<String, String> getConfiguredEnvironment() {
       final Map<String, String> env = new HashMap<>();
       env.put(Context.INITIAL_CONTEXT_FACTORY, ActiveMQInitialContextFactory.class.getName());
-      env.put(Context.PROVIDER_URL, "vm://mom/junit?broker.persistent=false");
+      env.put(Context.PROVIDER_URL, "vm://mom" + MOM_COUNTER.incrementAndGet() + "/junit?broker.persistent=false");
       env.put("connectionFactoryNames", "JUnitConnectionFactory"); // Active MQ specific
       env.put(IMomImplementor.CONNECTION_FACTORY, "JUnitConnectionFactory");
-      env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM");
+      env.put(IMomImplementor.SYMBOLIC_NAME, "Scout JUnit MOM #" + MOM_COUNTER.get());
       return env;
     }
   }
