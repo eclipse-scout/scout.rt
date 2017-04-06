@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.client.deeplink.AbstractDeepLinkHandler;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
+import org.eclipse.scout.rt.client.deeplink.DeepLinks;
+import org.eclipse.scout.rt.client.deeplink.IDeepLinkHandler;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
@@ -39,6 +41,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -291,7 +294,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testDeepLinkHandling() throws Throwable {
-    IBean<TestDeepLinkHandler> reg = BEANS.getBeanManager().registerClass(TestDeepLinkHandler.class);
+    IBean<P_TestDeepLinks> reg = BEANS.getBeanManager().registerClass(P_TestDeepLinks.class);
     try {
       TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
       assertFalse(desktop.handleDeepLink(null));
@@ -379,11 +382,21 @@ public class AbstractDesktopTest {
   }
 
   @IgnoreBean
-  public static class TestDeepLinkHandler extends AbstractDeepLinkHandler {
+  @Replace
+  protected static class P_TestDeepLinks extends DeepLinks {
+
+    @Override
+    protected List<? extends IDeepLinkHandler> findDeepLinkHandlers() {
+      return Collections.singletonList(new P_TestDeepLinkHandler());
+    }
+  }
+
+  @IgnoreBean
+  protected static class P_TestDeepLinkHandler extends AbstractDeepLinkHandler {
 
     private static final String HANDLER_NAME = "junittest";
 
-    public TestDeepLinkHandler() {
+    public P_TestDeepLinkHandler() {
       super(defaultPattern(HANDLER_NAME, "[A-Za-z0-9_]+"));
     }
 
