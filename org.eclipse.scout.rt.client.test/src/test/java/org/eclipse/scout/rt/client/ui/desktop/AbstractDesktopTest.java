@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.deeplink.AbstractDeepLinkHandler;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.DeepLinks;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinkHandler;
-import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
@@ -54,15 +53,11 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractDesktopTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktopTest.class);
 
   private static final Object TEST_DATA_TYPE_1 = new Object();
   private static final Object TEST_DATA_TYPE_2 = new Object();
@@ -300,8 +295,8 @@ public class AbstractDesktopTest {
   public void testDeepLinkHandling() throws Throwable {
     IBean<P_TestDeepLinks> reg = BEANS.getBeanManager().registerClass(P_TestDeepLinks.class);
     try {
-      TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
-      LOG.info("Testing deep links with {}", BEANS.get(IDeepLinks.class));
+      // Create a new desktop, because the IDesktop.CURRENT might be in a state where deep links are not handled (e.g. form open)
+      final TestEnvironmentDesktop desktop = new TestEnvironmentDesktop();
       assertFalse(desktop.handleDeepLink(null));
       assertTrue(desktop.handleDeepLink("junittest-ok"));
       assertDeepLinkException(desktop, "junittest");

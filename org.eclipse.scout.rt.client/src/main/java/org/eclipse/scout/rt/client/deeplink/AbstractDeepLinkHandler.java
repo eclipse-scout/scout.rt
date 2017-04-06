@@ -13,7 +13,7 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDeepLinkHandler.class);
 
-  private final Pattern m_pattern;
+  protected final Pattern m_pattern;
 
   protected AbstractDeepLinkHandler(Pattern pattern) {
     m_pattern = pattern;
