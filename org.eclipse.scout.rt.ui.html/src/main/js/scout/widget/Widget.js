@@ -288,7 +288,9 @@ scout.Widget.prototype.has = function(widget) {
  * method if you want to hide something else for a special field.
  */
 scout.Widget.prototype.addLoadingSupport = function() {
-  this.loadingSupport = new scout.LoadingSupport({widget: this});
+  this.loadingSupport = new scout.LoadingSupport({
+    widget: this
+  });
 };
 
 //--- Layouting / HtmlComponent methods ---
@@ -595,6 +597,22 @@ scout.Widget.prototype._glassPaneTargets = function() {
 scout.Widget.prototype.toString = function() {
   return 'Widget[rendered=' + this.rendered +
     (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
+};
+
+/**
+ * Checks if the widget and all of its parents (up to scout.Desktop) is still attached and rendered.
+ * @returns {boolean} whether or not the widget is still attached and rendered
+ */
+scout.Widget.prototype.isAttachedAndRendered = function() {
+  var widget = this;
+  while (widget && !(widget instanceof scout.Desktop)) {
+    // if widget is rendering -> don't check attached or rendered
+    if (!widget.rendering && (!widget.attached || !widget.rendered)) {
+      return false;
+    }
+    widget = widget.parent;
+  }
+  return true;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

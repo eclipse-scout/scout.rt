@@ -53,6 +53,7 @@ scout.Table = function(model) {
   this._filterMenusHandler = this._filterMenus.bind(this);
   this.virtual = true;
   this.contextColumn;
+  this._rerenderViewPortAfterAttach = false;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -3523,6 +3524,11 @@ scout.Table.prototype._renderViewport = function() {
 };
 
 scout.Table.prototype._rerenderViewport = function() {
+  if (!this.isAttachedAndRendered()) {
+    // if table is not attached the correct viewPort can not be evaluated. Mark for rerender after attach.
+    this._rerenderViewPortAfterAttach = true;
+    return;
+  }
   this._removeRows();
   this._removeAggregateRows();
   this._renderFiller();
@@ -3944,6 +3950,16 @@ scout.Table.prototype._detach = function() {
 
 scout.Table.prototype.setVirtual = function(virtual) {
   this.virtual = virtual;
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Table.prototype._afterAttach = function(parent) {
+  if (this._rerenderViewPortAfterAttach) {
+    this._rerenderViewport();
+    this._rerenderViewPortAfterAttach = false;
+  }
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
