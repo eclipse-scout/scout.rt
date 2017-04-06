@@ -20,7 +20,9 @@ public class DeepLinks implements IDeepLinks {
   protected final List<IDeepLinkHandler> m_handlers;
 
   public DeepLinks() {
-    m_handlers = new ArrayList<>(findDeepLinkHandlers());
+    List<IDeepLinkHandler> handlers = new ArrayList<>();
+    collectDeepLinkHandlers(handlers);
+    m_handlers = handlers;
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
       for (IDeepLinkHandler handler : m_handlers) {
@@ -30,8 +32,8 @@ public class DeepLinks implements IDeepLinks {
     }
   }
 
-  protected List<? extends IDeepLinkHandler> findDeepLinkHandlers() {
-    return BEANS.all(IDeepLinkHandler.class);
+  protected void collectDeepLinkHandlers(List<IDeepLinkHandler> handlers) {
+    handlers.addAll(BEANS.all(IDeepLinkHandler.class));
   }
 
   @Override
