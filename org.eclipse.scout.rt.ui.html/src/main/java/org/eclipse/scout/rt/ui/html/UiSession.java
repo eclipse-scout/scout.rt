@@ -13,10 +13,14 @@ package org.eclipse.scout.rt.ui.html;
 import java.math.BigInteger;
 import java.security.AccessController;
 import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -88,6 +92,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +109,7 @@ public class UiSession implements IUiSession {
    * in milliseconds
    */
   private static final long ADDITIONAL_POLLING_DELAY = 100;
+  private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
   // Because static fields are initialized before the bean manager is ready (class is initialized by Jandex scan),
   // the following beans must be set lazily. See the corresponding static getters.
   private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
@@ -121,7 +127,10 @@ public class UiSession implements IUiSession {
   private final AtomicLong m_jsonAdapterSeq = new AtomicLong(ROOT_ID);
   private final AtomicLong m_responseSequenceNo = new AtomicLong(1);
   private final AtomicLong m_requestSequenceNo = new AtomicLong(-1);
-  private final ResponseHistory m_responseHistory = BEANS.get(ResponseHistory.class).withUiSession(this);
+  /**
+   * Synchronized map. When iterating over the map, synchronize on the map object
+   */
+  private final SortedMap<Long, JSONObject> m_responseHistory = Collections.synchronizedSortedMap(new TreeMap<Long, JSONObject>());
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private final HttpContext m_httpContext = new HttpContext();
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
@@ -647,11 +656,23 @@ public class UiSession implements IUiSession {
     if (sequenceNo == null) {
       return;
     }
-    m_responseHistory.confirmResponseProcessed(sequenceNo);
+    // Update response history
+    int removeCount = 0;
+    // Synchronize for iteration over Collections.synchronizedList
+    synchronized (m_responseHistory) {
+      for (Iterator<Long> it = m_responseHistory.keySet().iterator(); it.hasNext();) {
+        Long key = it.next();
+        if (key <= sequenceNo) {
+          it.remove();
+          removeCount++;
+        }
+      }
+    }
+    LOG.debug("Cleaned up response history (-{}). New content: {} [#ACK={}, uiSessionId={}]", removeCount, m_responseHistory.keySet(), sequenceNo, m_uiSessionId);
   }
 
   protected void setRequestProcessed(JsonRequest jsonRequest) {
-    Long requestSequenceNo = jsonRequest.getSequenceNo();
+    Long requestSequenceNo = jsonRequest.getRequestSequenceNo();
     if (requestSequenceNo != null) {
       m_requestSequenceNo.set(requestSequenceNo);
     }
@@ -662,7 +683,7 @@ public class UiSession implements IUiSession {
    *         number of the given request. If the request has no sequence number the method returns <code>false</code>.
    */
   protected boolean isAlreadyProcessed(JsonRequest jsonRequest) {
-    Long requestSequenceNo = jsonRequest.getSequenceNo();
+    Long requestSequenceNo = jsonRequest.getRequestSequenceNo();
     if (requestSequenceNo == null) {
       return false;
     }
@@ -672,7 +693,7 @@ public class UiSession implements IUiSession {
   @Override
   public JSONObject processJsonRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse, final JsonRequest jsonRequest) {
     if (isAlreadyProcessed(jsonRequest)) {
-      LOG.debug("Request #{} was already processed. Ignoring request.", jsonRequest.getSequenceNo());
+      LOG.debug("Request #{} was already processed. Ignoring request and all of its events.", jsonRequest.getRequestSequenceNo());
       return null;
     }
 
@@ -772,7 +793,16 @@ public class UiSession implements IUiSession {
 
     // Remember response in history
     if (m_currentJsonResponse.getSequenceNo() != null) {
-      m_responseHistory.registerResponse(json, m_currentJsonResponse.getSequenceNo());
+      synchronized (m_responseHistory) {
+        if (m_responseHistory.size() > MAX_RESPONSE_HISTORY_SIZE) {
+          // Remove oldest entry to free up memory (protection against malicious clients that send no or wrong #ACKs)
+          Long oldestSeqNo = m_responseHistory.firstKey();
+          LOG.warn("Max. response history size exceeded for UI session {}, dropping oldest response #{}", m_uiSessionId, oldestSeqNo);
+          m_responseHistory.remove(oldestSeqNo);
+        }
+        m_responseHistory.put(m_currentJsonResponse.getSequenceNo(), json);
+        LOG.debug("Added response #{} to history {} for UI session {}", m_currentJsonResponse.getSequenceNo(), m_responseHistory.keySet(), m_uiSessionId);
+      }
     }
     return json;
   }
@@ -869,7 +899,40 @@ public class UiSession implements IUiSession {
 
   @Override
   public JSONObject processSyncResponseQueueRequest(JsonRequest jsonRequest) {
-    return m_responseHistory.toSyncResponse();
+    LOG.debug("Synchronize response queue {} for UI session {}", m_responseHistory.keySet(), m_uiSessionId);
+    synchronized (m_responseHistory) {
+      if (m_responseHistory.isEmpty()) {
+        return null;
+      }
+
+      Long lastSentSequenceNo = m_responseHistory.lastKey();
+      JSONObject combinedAdapterData = new JSONObject();
+      JSONArray combinedEvents = new JSONArray();
+      for (JSONObject response : m_responseHistory.values()) {
+        // combine adapterData
+        JSONObject adapterData = response.optJSONObject(JsonResponse.PROP_ADAPTER_DATA);
+        if (adapterData != null) {
+          for (String key : adapterData.keySet()) {
+            combinedAdapterData.put(key, adapterData.get(key));
+          }
+        }
+
+        // combine events
+        JSONArray events = response.optJSONArray(JsonResponse.PROP_EVENTS);
+        if (events != null) {
+          for (int i = 0; i < events.length(); i++) {
+            combinedEvents.put(events.get(i));
+          }
+        }
+      }
+
+      JSONObject combinedResponse = new JSONObject();
+      combinedResponse.put(JsonResponse.PROP_SEQUENCE, lastSentSequenceNo);
+      combinedResponse.put(JsonResponse.PROP_COMBINED, true);
+      combinedResponse.put(JsonResponse.PROP_ADAPTER_DATA, (combinedAdapterData.length() == 0 ? null : combinedAdapterData));
+      combinedResponse.put(JsonResponse.PROP_EVENTS, (combinedEvents.length() == 0 ? null : combinedEvents));
+      return combinedResponse;
+    }
   }
 
   @Override

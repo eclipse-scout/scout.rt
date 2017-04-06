@@ -55,7 +55,7 @@ scout.Session = function() {
   // This property is enabled by URL parameter &adapterExportEnabled=1. Default is false
   this.adapterExportEnabled = false;
   this._adapterDataCache = {};
-  this._busy = false;
+  this._busyCounter = 0; // >0 = busy
   this._busyIndicator;
   this._busyIndicatorTimeoutId;
   this._$requestPending;
@@ -560,7 +560,6 @@ scout.Session.prototype.defaultAjaxOptions = function(request) {
   // Ensure that certain request don't run forever. When a timeout occurs, the session
   // is put into offline mode. Note that normal requests should NOT be limited, because
   // the server processing might take very long (e.g. long running database query).
-  ajaxOptions.timeout = 0; // "infinite"
   if (request.cancel) {
     ajaxOptions.timeout = this.requestTimeoutCancel;
   }
@@ -615,23 +614,19 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   var jsError = null,
     success = false;
 
-  new scout.AjaxCall(this).call({
-      ajaxOptions: ajaxOptions,
-      request: request
-    })
+  var xhr = $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
+  this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----
 
   function onAjaxDone(data) {
     try {
-      // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
+      // Note: remove busy handling _before_ processing the response, otherwise the focus cannot be set
       // correctly, because the glasspane of the busy indicator is still visible.
-      // The second check prevents flickering of the busy indicator if there is a scheduled request
-      // that will be sent immediately afterwards (see onAjaxAlways).
-      if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
+      if (busyHandling) {
         this.setBusy(false);
       }
       success = this.responseQueue.process(data);
@@ -655,6 +650,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   // "done" --> data, textStatus, jqXHR
   // "fail" --> jqXHR, textStatus, errorThrown
   function onAjaxAlways(data, textStatus, errorThrown) {
+    this.unregisterAjaxRequest(xhr);
     this.setRequestPending(false);
     this.layoutValidator.validate();
 
@@ -669,7 +665,6 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
         // Send retry request first
         var retryRequest = this._retryRequest;
         this._retryRequest = null;
-        this.responseQueue.prepareRequest(retryRequest);
         this._sendRequest(retryRequest);
       } else if (this._queuedRequest) {
         // Send events that happened while being offline
@@ -723,21 +718,20 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  * a model job is done and no request initiated by a user is running.
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
-  this.backgroundJobPollingSupport.setRunning();
-
   var request = this._newRequest({
     pollForBackgroundJobs: true
   });
   this.responseQueue.prepareRequest(request);
 
+  this.backgroundJobPollingSupport.setRunning();
+
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  new scout.AjaxCall(this).call({
-      ajaxOptions: ajaxOptions,
-      request: request
-    })
+  var xhr = $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this));
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
+  this.registerAjaxRequest(xhr);
 
   // --- Helper methods ---
 
@@ -778,6 +772,13 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     this.backgroundJobPollingSupport.setFailed();
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
+  }
+
+  // Variable arguments:
+  // "done" --> data, textStatus, jqXHR
+  // "fail" --> jqXHR, textStatus, errorThrown
+  function onAjaxAlways(data, textStatus, errorThrown) {
+    this.unregisterAjaxRequest(xhr);
   }
 };
 
@@ -840,8 +841,8 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
 scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown, request) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-  var offlineError = this._isOfflineError(jqXHR, textStatus, errorThrown, request);
-  if (offlineError) {
+  var offline = this._isOfflineError(jqXHR, textStatus, errorThrown, request);
+  if (offline) {
     if (this.ready) {
       this.goOffline();
       if (request && !request.pollForBackgroundJobs && !this._retryRequest) {
@@ -1152,15 +1153,16 @@ scout.Session.prototype.setRequestPending = function(pending) {
 
 scout.Session.prototype.setBusy = function(busy) {
   if (busy) {
-    if (!this._busy) {
+    if (this._busyCounter === 0) {
       this._renderBusy();
     }
-    this._busy = true;
+    this._busyCounter++;
   } else {
-    if (this._busy) {
+    this._busyCounter--;
+    // Do not remove busy indicators if there is a scheduled request which will run immediately to prevent busy cursor flickering
+    if (this._busyCounter === 0 && (!this.areBusyIndicatedEventsQueued() || this.offline)) {
       this._removeBusy();
     }
-    this._busy = false;
   }
 };
 
@@ -1259,8 +1261,8 @@ scout.Session.prototype._newRequest = function(requestData) {
     uiSessionId: this.uiSessionId
   }, requestData);
 
-  // Certain requests do not require a sequence number
-  if (!request.pollForBackgroundJobs && !request.log && !request.cancel && !request.syncResponseQueue) {
+  // Poll and log requests do not require a sequence number
+  if (!request.pollForBackgroundJobs && !request.log && !request.cancel) {
     request['#'] = this.requestSequenceNo++;
   }
   return request;

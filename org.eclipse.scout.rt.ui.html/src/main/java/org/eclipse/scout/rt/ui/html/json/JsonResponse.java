@@ -38,7 +38,7 @@ public class JsonResponse {
   public static final int ERR_UNSAFE_UPLOAD = 30;
   public static final int ERR_VERSION_MISMATCH = 40;
 
-  public static final String PROP_SEQUENCE_NO = "#";
+  public static final String PROP_SEQUENCE = "#";
   public static final String PROP_COMBINED = "combined";
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
@@ -329,7 +329,7 @@ public class JsonResponse {
 
     // Build resulting JSON
     JSONObject json = new JSONObject();
-    json.put(PROP_SEQUENCE_NO, m_sequenceNo);
+    json.put(PROP_SEQUENCE, m_sequenceNo);
     json.put(PROP_STARTUP_DATA, m_startupData);
     json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
     json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
