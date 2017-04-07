@@ -68,10 +68,13 @@ function createSimpleModel(objectType, session, id) {
   if (id === undefined) {
     id = scout.objectFactory.createUniqueId();
   }
+  var parent = new scout.NullWidget();
+  parent.rendered = true;
+  parent.attached = true;
   return {
     id: id,
     objectType: objectType,
-    parent: new scout.NullWidget(),
+    parent: parent,
     session: session
   };
 }
