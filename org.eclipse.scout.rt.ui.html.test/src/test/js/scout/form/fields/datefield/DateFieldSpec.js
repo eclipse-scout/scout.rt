@@ -62,13 +62,17 @@ describe("DateField", function() {
   // Used to expect a date.
   // Deals with the akward 0=january behavior of the Date#getMonth() method,
   // which means month=1 is january
-  function expectDate(date, year, month, day) {
+  function expectDate(date, year, month, day, hour, minute) {
     if (month === 0) {
       throw new Error('invalid month 0. Months start at 1=january');
     }
     expect(date.getFullYear()).toBe(year);
     expect(date.getMonth()).toBe(month - 1);
     expect(date.getDate()).toBe(day);
+    if (hour !== undefined && minute !== undefined) {
+      expect(date.getHours()).toBe(hour);
+      expect(date.getMinutes()).toBe(minute);
+    }
   }
 
   function selectFirstDayInPicker($picker) {
@@ -512,9 +516,6 @@ describe("DateField", function() {
         var dateField = createField(model);
         dateField.render(session.$entryPoint);
 
-        dateField.$timeField.triggerMouseDown();
-        expect(findPicker().length).toBe(0);
-
         dateField.$dateField.triggerMouseDown();
         expect(findPicker().length).toBe(1);
 
@@ -530,14 +531,6 @@ describe("DateField", function() {
 
         dateField.$dateField.triggerMouseDown();
         expect(findPicker().length).toBe(1);
-
-        dateField.popup._field.$timeField.val('10:24');
-        dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
-
-        // only time should have changed
-        expect(dateField.$dateField.text()).toBe('27.09.1999');
-        expect(dateField.$timeField.val()).toBe('10:24');
-        expect(dateField.displayText).toBe('27.09.1999\n10:24');
       });
 
       it('is opened if datefield is touched', function() {
@@ -551,6 +544,19 @@ describe("DateField", function() {
         expect($('.touch-popup').length).toBe(1);
         expect($('.date-picker-popup').length).toBe(0);
         dateField.popup.close();
+      });
+
+      it('is not opened if timefield is touched', function() {
+        var model = createModel();
+        model.touch = true;
+        model.hasTime = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$timeField.triggerClick();
+        expect(dateField.popup).toBe(undefined);
+        expect($('.touch-popup').length).toBe(0);
+        expect($('.date-picker-popup').length).toBe(0);
       });
 
       it('is closed when date in picker is selected', function() {
@@ -613,6 +619,34 @@ describe("DateField", function() {
         expectDate(dateField.timestampAsDate, 2015, 02, 11);
         expect(dateField.displayText).toBe('11.02.2015');
         expect(dateField.$dateField.text()).toBe(dateField.displayText);
+      });
+
+      it('updates displayText and timestamp of datefield if date and time in picker are entered', function() {
+        var model = createModel();
+        model.touch = true;
+        model.hasTime = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        dateField.popup._field.$dateField.val('29.02.2016');
+        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+
+        expect(dateField.popup).toBe(null);
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        
+        dateField.popup._field.$timeField.val('10:42');
+        dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
+                
+        expect(dateField.popup).toBe(null);
+        
+        expectDate(dateField.timestampAsDate, 2016, 02, 29, 10, 42);
+        expect(dateField.displayText).toBe('29.02.2016\n10:42');
+        expect(dateField.$dateField.text()).toBe('29.02.2016');
+        expect(dateField.$timeField.val()).toBe('10:42');
       });
 
       it('shows datefield with same date as clicked datefield', function() {
