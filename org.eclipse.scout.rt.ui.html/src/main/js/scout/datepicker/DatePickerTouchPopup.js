@@ -38,13 +38,10 @@ scout.DatePickerTouchPopup.prototype.getDatePicker = function() {
 
 scout.DatePickerTouchPopup.prototype._onFieldDisplayTextChanged = function(event) {
   // Delegate to original field
-  this._touchField.dateDisplayText = this._field.dateDisplayText;
-  this._touchField.timeDisplayText = this._field.timeDisplayText;
   this._touchField.setDisplayText(event.displayText);
 };
 
 scout.DatePickerTouchPopup.prototype._onFieldTimestampChanged = function(event) {
   // Delegate to original field
-  this._touchField.timestamp = this._field.timestamp;
-  this._touchField.timestampAsDate = this._field.timestampAsDate;
+  this._touchField.updateTimestamp(scout.dates.ensure(event.timestamp));
 };
