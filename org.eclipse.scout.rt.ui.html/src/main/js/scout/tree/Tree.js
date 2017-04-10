@@ -1399,6 +1399,7 @@ scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animated
         }, {
           start: this.startAnimationFunc,
           complete: onAnimationComplete.bind(this, removedNodes),
+          step: this.revalidateLayoutTree.bind(this),
           duration: 200,
           queue: false
         });
@@ -1737,6 +1738,7 @@ scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes
         }, {
           start: this.startAnimationFunc,
           complete: insertBatch.animationCompleteFunc.bind(this),
+          step: this.revalidateLayoutTree.bind(this),
           duration: 200,
           queue: false
         });
