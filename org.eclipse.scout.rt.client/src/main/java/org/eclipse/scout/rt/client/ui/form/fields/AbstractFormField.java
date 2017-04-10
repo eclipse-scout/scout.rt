@@ -1117,14 +1117,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * <p>
    * If the class is annotated with {@link ClassId}, the annotation value is used. If the field is defined in a template
    * (outside of its form class), the ids of the enclosing fields are appended, if necessary, to make the id unique.
-   * </p>
    * <p>
    * If the class is not annotated with {@link ClassId}, a unique id is computed using the simple class name.
-   * </p>
    * <p>
-   * For dynamically injected fields this method (or {@link getSimpleClassId}) needs to be overridden to make sure it is
-   * unique.
-   * </p>
+   * For dynamically injected fields this method needs to be overridden to make sure it is unique.
    */
   @Override
   public String classId() {
@@ -1148,7 +1144,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Computes a class id by considering the enclosing field list.
    * <p>
    * Does not consider the complete path for lenient support. For dynamically injected fields {@link #classid()} needs
-   * to be overriden.
+   * to be overridden.
    * </p>
    */
   private String computeClassId() {
