@@ -754,6 +754,11 @@ scout.DateField.prototype._updateDisplayTextProperty = function() {
 
   // do not use scout.strings.join which ignores empty components
   this.displayText = (this.hasDate ? dateText : '') + (this.hasDate && this.hasTime ? '\n' : '') + (this.hasTime ? timeText : '');
+
+  // empty display text should always be just an empty string
+  if (this.displayText === '\n') {
+    this.displayText = '';
+  }
 };
 
 /**
