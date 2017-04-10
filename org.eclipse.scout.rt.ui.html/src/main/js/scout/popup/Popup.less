@@ -73,96 +73,10 @@
   border: 1px solid @border-color;
   background-color: @palette-white;
 
-  & > .menu-item.context-menu-item-first {
-    border-top: 1px solid transparent;
-  }
-
-  & > .menu-item.context-menu-item-last {
-    border-bottom: 1px solid transparent;
-  }
-
-  & > .menu-item.expanded > .submenu-icon::before {
-    display: inline-block;
-    #scout.transform(rotate(180deg));
-  }
-
-  & > .menu-item > .key-box {
-    bottom: auto;
-    top: 7px;
-  }
-
   &.down  {
     #scout.drop-shadow();
-
-    .popup-head ~ & > .menu-item.context-menu-item-first {
-
-      &.selected {
-        border-color: @item-selection-border-color;
-      }
-    }
   }
-
   &.up {
     #scout.drop-shadow(@y: -6px;);
-
-    .popup-head ~ & > .menu-item.context-menu-item-last {
-
-      &.selected {
-        border-color: @item-selection-border-color;
-      }
-    }
-  }
-
-  & > .menu-item {
-    border-top: solid 1px @border-color;
-    display: block;
-    width: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
-
-    &.selected {
-      border-top: 1px solid @item-selection-border-color;
-      border-color: @item-selection-border-color;
-      background-color: @item-selection-background-color;
-    }
-
-    &.next-to-selected{
-      border-top-color: @item-selection-border-color;
-    }
-
-    &.selected.context-menu-item-first {
-      border-top: 1px solid @item-selection-border-color;
-    }
-
-    &.selected.context-menu-item-last {
-      border-color: @item-selection-border-color;
-    }
-
-    &:focus {
-      text-decoration: none;
-    }
-  }
-}
-
-.context-menu > .menu-item {
-  height: @menu-item-height;
-
-  & > .text {
-    #scout.overflow-ellipsis();
-    /* default is inline, inline-block is necessary so that max-width set by JS is respected */
-    display: inline-block;
-  }
-
-  & > .icon {
-    /* Prevent large image icons from overlapping the menu item */
-    max-height: 16px;
-    /* Default image icon size is 16x16, ensure this space is taken from the beginning, */
-    /* so that the text does not "jump" after the image has been loaded. Only for larger */
-    /* icons, the width will be increased aftwards. */
-    min-width: 16px;
-  }
-
-  &.menu-textandicon > .icon {
-    margin-right: 10px;
   }
 }
