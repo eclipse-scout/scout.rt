@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- .context-menu {
+.context-menu {
 
   & > .menu-item {
     border-top: solid 1px @border-color;
