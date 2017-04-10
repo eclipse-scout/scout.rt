@@ -314,7 +314,8 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       DateFormat dateFormat = getIsolatedTimeFormat();
       sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
     }
-    return sb.toString();
+    // empty value is always just empty (also for date/time field if date and time are empty)
+    return sb.length() == 1 && sb.charAt(0) == '\n' ? "" : sb.toString();
   }
 
   @Override
