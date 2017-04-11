@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.IBean;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
@@ -48,9 +49,9 @@ public class JandexJacksonAnnotationIntrospector extends JacksonAnnotationIntros
 
       // CASE 1: base type is a Scout bean, lookup most specific class to use
       if (m_beanManagerUtility.isBeanClass(baseType.getRawClass())) {
-        Class<?> beanClazz = m_beanManagerUtility.lookupClass(baseType.getRawClass());
-        if (beanClazz != null) {
-          builder.defaultImpl(beanClazz);
+        IBean<?> uniqueBean = BEANS.getBeanManager().uniqueBean(baseType.getRawClass());
+        if (uniqueBean != null) {
+          builder.defaultImpl(uniqueBean.getBeanClazz());
         }
         // Note: if beanClazz is null, no unique bean implementation could be found, do not set a default implementation is this case!
       }

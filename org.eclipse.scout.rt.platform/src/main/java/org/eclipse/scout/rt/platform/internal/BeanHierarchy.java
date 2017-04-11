@@ -128,7 +128,7 @@ public class BeanHierarchy<T> {
         }
 
         //manage replaced beans
-        Map<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value
+        Map<Class<?>, IBean<?>> extendsMap = new HashMap<>();//key is replaced by value
         for (IBean<T> bean : list) {
           if (bean.getBeanAnnotation(Replace.class) != null) {
             Class<?> superClazz = null;
@@ -147,16 +147,23 @@ public class BeanHierarchy<T> {
                 }
               }
             }
-            if (superClazz != null && !extendsMap.containsKey(superClazz)) {
-              //only add if first to override, respects @Order annotation
-              extendsMap.put(superClazz, bean.getBeanClazz());
+            if (superClazz != null) {
+              IBean<?> existingBean = extendsMap.get(superClazz);
+              if (existingBean == null) {
+                //only add if first to override, respects @Order annotation
+                extendsMap.put(superClazz, bean);
+              }
+              else if (orderOf(existingBean) == orderOf(bean)) {
+                throw new IllegalArgumentException("Bean '" + existingBean.getBeanClazz().getName() + "' and '" + bean.getBeanClazz().getName()
+                    + "' replace the same super class and have identical orders. No unique result possible.");
+              }
             }
           }
         }
         //find most specific version of @Replaced class
         Class<T> refClazz = m_clazz;
         while (extendsMap.containsKey(refClazz)) {
-          refClazz = (Class<T>) extendsMap.get(refClazz);
+          refClazz = (Class<T>) extendsMap.get(refClazz).getBeanClazz();
         }
         //remove replaced beans
         for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {

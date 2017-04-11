@@ -328,15 +328,13 @@ public class JandexTypeNameIdResolverTest {
     }
   }
 
-  @Test
+  @Test(expected = IllegalArgumentException.class)
   public void testMarshallUnmarshallProjectBeanNotUnique() {
     IBean registeredProjectBean1 = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
     IBean registeredProjectBean2 = TestingUtility.registerBean(new BeanMetaData(ProjectBean2.class).withReplace(true));
     try {
       CoreBean bean = new CoreBean();
-      CoreBean beanMarshalled = marshallUnmarshall(bean);
-      // TODO [7.0] pbz: this is wrong, bean is not unique, should throw exception! Check with mvi after solving bean manager bug; then adapt this assertion
-      assertEquals(ProjectBean1.class, beanMarshalled.getClass());
+      marshallUnmarshall(bean);
     }
     finally {
       TestingUtility.unregisterBean(registeredProjectBean1);

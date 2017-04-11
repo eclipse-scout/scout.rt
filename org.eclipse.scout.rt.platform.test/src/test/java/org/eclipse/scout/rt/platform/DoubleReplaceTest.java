@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -21,37 +19,63 @@ import org.junit.Test;
  */
 public class DoubleReplaceTest {
 
-  private static BeanManagerImplementor context;
-
-  @BeforeClass
-  public static void registerBeans() {
-    context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
-    context.registerClass(BaseClass.class);
-    context.registerClass(ChildClassB.class);
-    context.registerClass(ChildClassA.class);
-  }
-
-  @AfterClass
-  public static void unregisterBeans() {
-    context = null;
+  @Test
+  public void testLeafA() {
+    BeanManagerImplementor bm = createBeanManager(FixtureBase.class, FixtureA.class, FixtureB.class);
+    Assert.assertEquals(FixtureA.class, bm.uniqueBean(FixtureA.class).getInstance().getClass());
   }
 
   @Test
-  public void testBothPresent() {
-    IBean<BaseClass> bean = context.getBean(BaseClass.class);
-    Assert.assertEquals(ChildClassA.class, bean.getBeanClazz());
+  public void testLeafB() {
+    BeanManagerImplementor bm = createBeanManager(FixtureBase.class, FixtureA.class, FixtureB.class);
+    Assert.assertEquals(FixtureB.class, bm.uniqueBean(FixtureB.class).getInstance().getClass());
   }
 
-  @ApplicationScoped
-  private static class BaseClass {
+  @Test(expected = IllegalArgumentException.class)
+  public void testBase() {
+    BeanManagerImplementor bm = createBeanManager(FixtureBase.class, FixtureA.class, FixtureB.class);
+    bm.uniqueBean(FixtureBase.class);
+    Assert.fail();
+  }
 
+  @Test
+  public void testLeafC() {
+    BeanManagerImplementor bm = createBeanManager(FixtureBase.class, FixtureA.class, FixtureC.class);
+    Assert.assertEquals(FixtureC.class, bm.uniqueBean(FixtureBase.class).getInstance().getClass());
+  }
+
+  @Test
+  public void testLeafD() {
+    BeanManagerImplementor bm = createBeanManager(FixtureBase.class, FixtureC.class, FixtureD.class);
+    Assert.assertEquals(FixtureD.class, bm.uniqueBean(FixtureBase.class).getInstance().getClass());
+  }
+
+  private BeanManagerImplementor createBeanManager(Class... beans) {
+    BeanManagerImplementor bm = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
+    for (Class<?> c : beans) {
+      bm.registerClass(c);
+    }
+    return bm;
+  }
+
+  private static class FixtureBase {
   }
 
   @Replace
-  private static class ChildClassB extends BaseClass {
+  private static class FixtureA extends FixtureBase {
   }
 
   @Replace
-  private static class ChildClassA extends BaseClass {
+  private static class FixtureB extends FixtureBase {
+  }
+
+  @Replace
+  @Order(100)
+  private static class FixtureC extends FixtureBase {
+  }
+
+  @Replace
+  @Order(10)
+  private static class FixtureD extends FixtureBase {
   }
 }

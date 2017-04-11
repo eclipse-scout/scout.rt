@@ -70,26 +70,6 @@ public class BeanManagerUtilityTest {
   }
 
   @Test
-  public void testLookupClass_noScoutBean() {
-    assertNull(s_utility.lookupClass(String.class));
-  }
-
-  @Test
-  public void testLookupClass_oneScoutBean() {
-    assertEquals(SubClassA.class, s_utility.lookupClass(SubClassA.class));
-  }
-
-  @Test
-  public void testLookupClass_uniqueScoutBean() {
-    assertEquals(SubClassB1.class, s_utility.lookupClass(SubClassB.class));
-  }
-
-  @Test
-  public void testLookupClass_multipleScoutBeans() {
-    assertNull(s_utility.lookupClass(AbstractBaseClass.class));
-  }
-
-  @Test
   public void testLookupRegisteredBean() {
     assertEquals(SubClassA.class, s_utility.lookupRegisteredBean(SubClassA.class).getBeanClazz());
     assertEquals(SubClassB.class, s_utility.lookupRegisteredBean(SubClassB.class).getBeanClazz());

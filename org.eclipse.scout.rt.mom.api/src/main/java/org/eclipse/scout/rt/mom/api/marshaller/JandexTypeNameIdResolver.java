@@ -91,7 +91,8 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
    * The algorithm works using the following steps:
    * <ul>
    * <li>Check if {@link #m_baseType} has a {@link JsonTypeName} matching the specified identifier.
-   * <li>Check if {@link #m_baseType} is replacing a super class having a {@link JsonTypeName} matching the specified identifier.
+   * <li>Check if {@link #m_baseType} is replacing a super class having a {@link JsonTypeName} matching the specified
+   * identifier.
    * <li>Check if {@link #m_baseType} has a sub class with a {@link JsonTypeName} matching the specified identifier.
    * </ul>
    * <p>
@@ -151,9 +152,9 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
     if (hasMatchingJsonTypeAnnotation(lookupClazz, id)) {
       if (m_beanManagerUtility.isBeanClass(lookupClazz)) {
         // CASE 1a: lookupClass has a matching JSON type annotation and is a Scout bean, lookup most specific bean using bean manager
-        Class<?> beanClazz = m_beanManagerUtility.lookupClass(lookupClazz);
-        if (beanClazz != null) {
-          return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, beanClazz);
+        IBean<?> uniqueBean = BEANS.getBeanManager().uniqueBean(lookupClazz);
+        if (uniqueBean != null) {
+          return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, uniqueBean.getBeanClazz());
         }
       }
       else {

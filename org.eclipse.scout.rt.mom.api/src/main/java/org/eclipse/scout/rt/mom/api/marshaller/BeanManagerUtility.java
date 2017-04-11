@@ -1,16 +1,13 @@
 package org.eclipse.scout.rt.mom.api.marshaller;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.Replace;
 
 /**
  * Utility dealing with {@link IBeanManager}
@@ -31,37 +28,6 @@ public class BeanManagerUtility {
    */
   public boolean isBeanClass(Class<?> lookupClazz) {
     return !m_beanManager.getBeans(lookupClazz).isEmpty();
-  }
-
-  /**
-   * Lookup {@code lookupClazz} in bean manager and tries to find the correct {@link Class} to instantiate considering
-   * {@link Replace} and {@link Order} annotation.
-   *
-   * @param lookupClazz
-   *          Class to lookup
-   * @return Correct {@link Class} to instantiate or {@code null} if {@code lookupClazz} is not a Scout bean or not
-   *         uniquely defined.
-   */
-  public Class<?> lookupClass(Class<?> lookupClazz) {
-    List<? extends IBean<?>> beans = m_beanManager.getBeans(lookupClazz);
-    if (beans.isEmpty()) {
-      // CASE 1: lookupClazz is not a Scout bean, return null
-      return null;
-    }
-    else if (beans.size() == 1) {
-      // CASE 2: lookupClazz is a Scout bean and is registered once (uniquely) in bean manager, return bean class
-      return beans.get(0).getBeanClazz();
-    }
-    else {
-      IBean<?> defaultImplBean = m_beanManager.uniqueBean(lookupClazz);
-      if (defaultImplBean != null) {
-        // CASE 3: lookupClazz is a Scout bean and is registered more than once in bean manager, but the runtime class instance is uniquely defined (clazz could be replaced or defined using order annotation)
-        return defaultImplBean.getBeanClazz();
-      }
-      // CASE 4: lookupClazz is a Scout bean and is registered more than once in bean manager and the runtime class instance is not uniquely defined (e.g. abstract class with two same-order implementations),
-      //         Cannot lookup correct bean class to instantiate!
-      return null;
-    }
   }
 
   /**
