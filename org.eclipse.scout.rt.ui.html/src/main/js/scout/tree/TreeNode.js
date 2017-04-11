@@ -223,12 +223,7 @@ scout.TreeNode.prototype._renderCheckbox = function() {
     .appendDiv('check-box')
     .toggleClass('checked', this.checked)
     .toggleClass('disabled', !(this.getTree().enabled && this.enabled));
-
-  if (this.childrenChecked) {
-    $checkbox.toggleClass('children-checked', true);
-  } else {
-    $checkbox.toggleClass('children-checked', false);
-  }
+  $checkbox.toggleClass('children-checked', !!this.childrenChecked);
 };
 
 scout.TreeNode.prototype._decorate = function() {
@@ -238,20 +233,9 @@ scout.TreeNode.prototype._decorate = function() {
   }
 
   var $node = this.$node,
-    formerClasses = 'tree-node',
     tree = this.getTree();
 
-  if ($node.isSelected()) {
-    formerClasses += ' selected';
-  }
-  if ($node.hasClass('ancestor-of-selected')) {
-    formerClasses += ' ancestor-of-selected';
-  }
-  if ($node.hasClass('parent-of-selected')) {
-    formerClasses += ' parent-of-selected';
-  }
-  $node.removeClass();
-  $node.addClass(formerClasses);
+  $node.attr('class', this._preserveCssClasses($node));
   $node.addClass(this.cssClass);
   $node.toggleClass('leaf', !!this.leaf);
   $node.toggleClass('expanded', (!!this.expanded && this.childNodes.length > 0));
@@ -259,14 +243,13 @@ scout.TreeNode.prototype._decorate = function() {
   $node.toggleClass('group', !!tree.groupedNodes[this.id]);
   $node.setEnabled(!!this.enabled);
   $node.children('.tree-node-control').setVisible(!this.leaf);
-  $node.children('.tree-node-checkbox')
+  $node
+    .children('.tree-node-checkbox')
     .children('.check-box')
     .toggleClass('disabled', !(tree.enabled && this.enabled));
 
-  if (!this.parentNode && tree.selectedNodes.length === 0) {
-    // Root nodes have class child-of-selected if no node is selected
-    $node.addClass('child-of-selected');
-  } else if (this.parentNode && tree.selectedNodes.indexOf(this.parentNode) > -1) {
+  if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
+    tree._isChildOfSelectedNodes(this)) {
     $node.addClass('child-of-selected');
   }
 
@@ -286,6 +269,25 @@ scout.TreeNode.prototype._decorate = function() {
       this.parentNode.$node.removeClass('lazy');
     }
   }
+};
+
+/**
+ * This function extracts all CSS classes that are set externally by the tree.
+ * The classes depend on the tree hierarchy or the selection and thus cannot determined
+ * by the node itself.
+ */
+scout.TreeNode.prototype._preserveCssClasses = function($node) {
+  var cssClass = 'tree-node';
+  if ($node.isSelected()) {
+    cssClass += ' selected';
+  }
+  if ($node.hasClass('ancestor-of-selected')) {
+    cssClass += ' ancestor-of-selected';
+  }
+  if ($node.hasClass('parent-of-selected')) {
+    cssClass += ' parent-of-selected';
+  }
+  return cssClass;
 };
 
 scout.TreeNode.prototype._updateIconWidth = function() {
