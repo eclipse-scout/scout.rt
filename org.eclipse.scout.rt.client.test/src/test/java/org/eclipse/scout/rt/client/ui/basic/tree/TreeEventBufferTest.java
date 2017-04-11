@@ -49,8 +49,8 @@ public class TreeEventBufferTest {
    * of the system, they might need substantially more time to complete. therefore this timout value is extracted to
    * constant and can be changed to a lower value when running locally / within ide.
    */
-
   private static final int TIMEOUT_VALUE = 20000; //ms
+
   private TreeEventBuffer m_testBuffer;
   private Map<String, ITreeNode> m_mockNodes;
 

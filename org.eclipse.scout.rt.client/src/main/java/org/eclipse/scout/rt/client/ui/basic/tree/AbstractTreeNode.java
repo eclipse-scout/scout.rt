@@ -1071,7 +1071,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[" + getCell() + "]";
+    return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) + "[" + getCell() + "]";
   }
 
   /*
