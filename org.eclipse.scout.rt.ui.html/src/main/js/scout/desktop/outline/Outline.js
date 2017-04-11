@@ -74,6 +74,7 @@ scout.Outline.prototype._init = function(model) {
 
   this._setDefaultDetailForm(this.defaultDetailForm);
   this._setOutlineOverviewVisible(this.outlineOverviewVisible);
+
   this._setMenus(this.menus);
   this.updateDetailContent();
 };
@@ -391,6 +392,8 @@ scout.Outline.prototype._setNavigateButtonsVisibleForNode = function(node, paren
     }
   }
 };
+
+
 
 scout.Outline.prototype._appendNavigateButtonsForDetailForm = function(node) {
   var menus = this._createNavigateButtons(node, node.detailForm.staticMenus);

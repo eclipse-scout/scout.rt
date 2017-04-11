@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.desktop.DownloadHandlerStorage.BinaryResourceHolderWithAction;
+import org.eclipse.scout.rt.ui.html.json.desktop.bench.layout.JsonBenchLayoutData;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
@@ -73,6 +75,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   public static final String PROP_NOTIFICATION = "notification";
   public static final String PROP_FILE_CHOOSER = "fileChooser";
   public static final String PROP_ACTIVE_FORM = "activeForm";
+  public static final String PROP_BENCH_LAYOUT_DATA = IDesktop.PROP_BENCH_LAYOUT_DATA;
 
   private static final AtomicLong RESOURCE_COUNTER = new AtomicLong();
 
@@ -320,6 +323,18 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       protected Boolean modelValue() {
         return getModel().isGeolocationServiceAvailable();
       }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(PROP_BENCH_LAYOUT_DATA, model) {
+      @Override
+      protected BenchLayoutData modelValue() {
+        return getModel().getBenchLayoutData();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return JsonBenchLayoutData.toJson((BenchLayoutData) value);
+      }
+
     });
   }
 

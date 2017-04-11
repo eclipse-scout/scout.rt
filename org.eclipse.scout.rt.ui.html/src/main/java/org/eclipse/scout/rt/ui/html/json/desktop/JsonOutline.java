@@ -86,6 +86,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return getModel().isOutlineOverviewVisible();
       }
     });
+
   }
 
   @Override

@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -700,6 +701,16 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public boolean isBenchVisible() {
     return false;
+  }
+
+  @Override
+  public BenchLayoutData getBenchLayoutData() {
+    return null;
+  }
+
+  @Override
+  public void setBenchLayoutData(BenchLayoutData layoutData) {
+    // NOP
   }
 
   @Override

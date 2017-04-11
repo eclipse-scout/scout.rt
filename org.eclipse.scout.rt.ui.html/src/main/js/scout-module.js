@@ -85,6 +85,8 @@
   __include("scout/layout/NullLayout.js");
   __include("scout/layout/RowLayout.js");
   __include("scout/layout/SingleLayout.js");
+  __include("scout/layout/flexbox/FlexboxLayout.js");
+  __include("scout/layout/flexbox/FlexboxLayoutData.js");
   // Keystroke handling
   __include("scout/keystroke/keys.js");
   __include("scout/keystroke/Key.js");
@@ -290,9 +292,9 @@
   __include("scout/tabbox/SimpleTabBoxLayout.js");
   __include("scout/tabbox/SimpleTabViewContentLayout.js");
   __include("scout/desktop/bench/DesktopBench.js");
-  __include("scout/desktop/bench/DesktopBenchLayout.js");
   __include("scout/desktop/bench/BenchColumn.js");
-  __include("scout/desktop/bench/BenchColumnLayout.js");
+  __include("scout/desktop/bench/layout/BenchRowLayoutData.js");
+  __include("scout/desktop/bench/layout/BenchColumnLayoutData.js");
   __include("scout/desktop/bench/DesktopTabSelectKeyStroke.js");
   __include("scout/desktop/desktoptab/DisableBrowserTabSwitchingKeyStroke.js");
   __include("scout/desktop/header/DesktopHeader.js");

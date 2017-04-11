@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
@@ -127,6 +128,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
 
   String PROP_BENCH_VISIBLE = "benchVisible";
 
+  String PROP_BENCH_LAYOUT_DATA = "benchLayoutData";
   /**
    * Default style with header, navigation (tree) and bench (forms).
    * <p>
@@ -789,6 +791,10 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
    * @since 6.0
    */
   boolean isBenchVisible();
+
+  BenchLayoutData getBenchLayoutData();
+
+  void setBenchLayoutData(BenchLayoutData data);
 
   /**
    * @since 6.0

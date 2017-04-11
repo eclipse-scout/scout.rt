@@ -45,6 +45,7 @@ scout.SimpleTabBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-tab-box');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SimpleTabBoxLayout(this));
+  this.htmlComp.layoutData = this.layoutData;
 
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
@@ -111,6 +112,16 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   });
 
   this.revalidateLayout();
+};
+
+
+scout.SimpleTabBox.prototype.setLayoutData = function(layoutData) {
+  scout.SimpleTabBox.parent.prototype.setLayoutData.call(this, layoutData);
+  this.layoutData = layoutData;
+};
+
+scout.SimpleTabBox.prototype.getLayoutData = function() {
+  return this.layoutData;
 };
 
 scout.SimpleTabBox.prototype.revalidateLayout = function() {

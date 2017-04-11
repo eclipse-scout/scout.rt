@@ -65,6 +65,7 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -2236,6 +2237,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public boolean isBenchVisible() {
     return (boolean) propertySupport.getProperty(PROP_BENCH_VISIBLE);
+  }
+
+  @Override
+  public BenchLayoutData getBenchLayoutData() {
+    return (BenchLayoutData) propertySupport.getProperty(PROP_BENCH_LAYOUT_DATA);
+  }
+
+  @Override
+  public void setBenchLayoutData(BenchLayoutData layoutData) {
+    propertySupport.setProperty(PROP_BENCH_LAYOUT_DATA, layoutData);
   }
 
   @Override

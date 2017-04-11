@@ -16,6 +16,7 @@ scout.Splitter = function() {
   this.ratio;
   this.position; // current splitter position in pixels, updated by updatePosition()
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
+  this._handleMouseDown;
 };
 scout.inherits(scout.Splitter, scout.Widget);
 
@@ -28,10 +29,34 @@ scout.Splitter.prototype._init = function(options) {
 
 scout.Splitter.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('splitter')
-    .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
-    .on('mousedown', this._onMouseDown.bind(this));
+    .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this._$window = $parent.window();
   this._$body = $parent.body();
+};
+
+scout.Splitter.prototype._renderEnabled = function() {
+  scout.Splitter.parent.prototype._renderEnabled.call(this);
+  if(this.enabled){
+    if(!this._handleMouseDown){
+      this._handleMouseDown = this._onMouseDown.bind(this);
+      this.$container.on('mousedown', this._handleMouseDown);
+    }
+  }else{
+    if(this._handleMouseDown){
+      this.$container.off('mousedown', this._handleMouseDown);
+      this._handleMouseDown = null;
+    }
+  }
+};
+
+scout.Splitter.prototype.setLayoutData = function(layoutData) {
+  scout.Splitter.parent.prototype.setLayoutData.call(this, layoutData);
+  this.layoutData = layoutData;
+};
+
+scout.Splitter.prototype.getLayoutData = function() {
+  return this.layoutData;
 };
 
 scout.Splitter.prototype.getPosition = function() {
@@ -101,6 +126,7 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
   }
 };
 scout.Splitter.prototype._onMouseDown = function(event) {
+//  console.log('splitter1 '+new Date().getTime());
   var splitterCenter = scout.graphics.offsetBounds(this.$container, true).center();
 
   // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
@@ -114,9 +140,11 @@ scout.Splitter.prototype._onMouseDown = function(event) {
     left: splitterCenter.x - event.pageX,
     top: splitterCenter.y - event.pageY
   };
+//  console.log('splitter2 '+new Date().getTime());
   this.trigger('moveStart', {
     position: this._getSplitterPosition(event)
   });
+//  console.log('splitter3 '+new Date().getTime());
   // Prevent text selection in a form
   event.preventDefault();
 };
