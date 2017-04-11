@@ -20,6 +20,9 @@
     height: 100%;
     width: @splitter-size;
     cursor: col-resize;
+    &.disabled{
+      cursor: initial;
+    }
 
     &.line {
     padding-right: floor((@splitter-size - @splitter-line-size) / 2);
@@ -31,14 +34,22 @@
     width: 100%;
     height: @splitter-size;
     cursor: row-resize;
+    &.disabled{
+      cursor: initial;
+    }
     &.line {
-        padding-top: floor((@splitter-size - @splitter-line-size) / 2);
-    padding-bottom: ceil((@splitter-size - @splitter-line-size) / 2);
+      padding-top: floor((@splitter-size - @splitter-line-size) / 2);
+      padding-bottom: ceil((@splitter-size - @splitter-line-size) / 2);
     }
   }
   &.line{
     background-clip: content-box;
     background-color: @border-color;
+     &.disabled{
+      &:hover {
+        background-color: @border-color;
+      }
+    }
     &:hover {
       background-color: @hover-color;
     }

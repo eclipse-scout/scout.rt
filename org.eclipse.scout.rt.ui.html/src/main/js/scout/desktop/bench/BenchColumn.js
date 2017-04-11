@@ -15,6 +15,7 @@ scout.BenchColumn = function() {
   this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
   this.components;
   this._removeViewInProgress = 0;
+  this.layoutData;
 
   // event listener functions
   this._viewAddedHandler = this._onViewAdded.bind(this);
@@ -32,6 +33,7 @@ scout.BenchColumn.TAB_BOX_INDEX = {
 
 scout.BenchColumn.prototype._init = function(model) {
   scout.BenchColumn.parent.prototype._init.call(this, model);
+  this.layoutData = model.layoutData;
   this._createTabBoxes();
 };
 
@@ -48,6 +50,8 @@ scout.BenchColumn.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('bench-column');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
+
+  this.htmlComp.layoutData = this.getLayoutData();
 };
 
 scout.BenchColumn.prototype._renderProperties = function() {
@@ -76,7 +80,30 @@ scout.BenchColumn.prototype.postRender = function() {
 };
 
 scout.BenchColumn.prototype._createLayout = function() {
-  return new scout.BenchColumnLayout(this);
+  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.COLUMN);
+};
+
+scout.BenchColumn.prototype.updateLayoutData = function(layoutData) {
+  if (this.getLayoutData() === layoutData) {
+    return;
+  }
+  this.setLayoutData(layoutData);
+
+  // update columns
+  var rowDatas = this.layoutData.getRows();
+  this.tabBoxes.forEach(function(tb, i) {
+    tb.setLayoutData(rowDatas[i]);
+  });
+  this._updateSplitterMovable();
+};
+
+scout.BenchColumn.prototype.setLayoutData = function(layoutData) {
+  scout.BenchColumn.parent.prototype.setLayoutData.call(this, layoutData);
+  this.layoutData = layoutData;
+};
+
+scout.BenchColumn.prototype.getLayoutData = function() {
+  return this.layoutData;
 };
 
 scout.BenchColumn.prototype._onViewAdded = function(event) {
@@ -108,11 +135,17 @@ scout.BenchColumn.prototype.activateView = function(view) {
   tabBox.activateView(view);
 };
 
+
 scout.BenchColumn.prototype._createTabBoxes = function() {
+  var rowLayoutDatas = [];
+  if (this.layoutData) {
+    rowLayoutDatas = this.layoutData.getRows();
+  }
   for (var i = 0; i < 3; i++) {
     var tabBox = scout.create('SimpleTabBox', {
       parent: this
     });
+    tabBox.setLayoutData(rowLayoutDatas[i]);
     tabBox.on('viewAdded', this._viewAddedHandler);
     tabBox.on('viewRemoved', this._viewRemovedHandler);
     tabBox.on('viewActivated', this._viewActivatedHandler);
@@ -130,27 +163,25 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
       }
     });
   }
-  var splitterParent = this;
   this.components = this.visibleTabBoxes()
     .reduce(function(arr, col) {
       if (arr.length > 0) {
         // add sep
         var splitter = scout.create('Splitter', {
-          parent: splitterParent,
+          parent: this,
           $anchor: arr[arr.length - 1].$container,
-          $root: splitterParent.$container,
+          $root: this.$container,
           splitHorizontal: false,
           maxRatio: 1
         });
-        splitter.render(splitterParent.$container);
+        splitter.render(this.$container);
+        splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
         splitter.$container.addClass('line');
-        splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
-        splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
         arr.push(splitter);
       }
       arr.push(col);
       return arr;
-    }, []);
+    }.bind(this), []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
   this.components.filter(function(comp) {
       return comp instanceof scout.SimpleTabBox;
@@ -161,27 +192,60 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
       }
       return c2;
     }, undefined);
+  this._updateSplitterMovable();
+};
+
+scout.BenchColumn.prototype._updateSplitterMovable = function() {
+  if(!this.components){
+    return;
+  }
+  this.components.forEach(function(c, i) {
+    if (c instanceof scout.Splitter) {
+      var componentsBefore = this.components.slice(0, i).reverse();
+      var componentsAfter = this.components.slice(i + 1);
+      // shrink
+      if (
+        componentsBefore.filter(function(c) {
+          return c.getLayoutData().shrink > 0;
+        }).length > 0 &&
+        componentsAfter.filter(function(c) {
+          return c.getLayoutData().grow > 0;
+        }).length > 0
+      ) {
+        c.setEnabled(true);
+        c.on('move', this._onSplitterMove.bind(this));
+        return;
+      }
+      // grow
+      if (
+        componentsBefore.filter(function(c) {
+          return c.getLayoutData().grow > 0;
+        }).length > 0 &&
+        componentsAfter.filter(function(c) {
+          return c.getLayoutData().shrink > 0;
+        }).length > 0
+      ) {
+        c.setEnabled(true);
+        c.on('move', this._onSplitterMove.bind(this));
+        return;
+      }
+      c.setEnabled(false);
+
+    }
+  }.bind(this));
 };
 
 scout.BenchColumn.prototype._onSplitterMove = function(event) {
   var splitterIndex = this.components.indexOf(event.source);
-  if (splitterIndex > 0 /*cannot be 0 since first element is a SimpleTabBox*/ ) {
-    var $before = this.components[splitterIndex - 1].$container,
-      $after = this.components[splitterIndex + 1].$container,
-      diff = event.position - event.source.position;
-
-    if (($before.outerHeight(true) + diff) < scout.DesktopBench.VIEW_MIN_HEIGHT) {
-      // set to min
-      event.setPosition($before.position().top + scout.DesktopBench.VIEW_MIN_HEIGHT);
-    }
-    if (($after.position().top + $after.outerHeight(true) - event.position) < scout.DesktopBench.VIEW_MIN_HEIGHT) {
-      event.setPosition($after.position().top + $after.outerHeight(true) - scout.DesktopBench.VIEW_MIN_HEIGHT);
-    }
+  if (splitterIndex > 0 /*cannot be 0 since first element is a BenchColumn*/ ) {
+    var diff = event.position - event.source.htmlComp.getBounds().y - event.source.htmlComp.getMargins().top;
+    event.source.getLayoutData().diff = diff;
+    this.revalidateLayout();
+    event.source.getLayoutData().diff = null;
+    event.preventDefault();
   }
 };
-scout.BenchColumn.prototype._onSplitterPositionChanged = function() {
-  this.revalidateLayout();
-};
+
 
 scout.BenchColumn.prototype.addView = function(view, bringToFront) {
   var tabBox = this.getTabBox(view.displayViewId);
@@ -196,6 +260,7 @@ scout.BenchColumn.prototype.addView = function(view, bringToFront) {
     }
     this._revalidateSplitters(true);
     this.updateFirstLastMarker();
+    this.htmlComp.layout.reset();
     this.htmlComp.invalidateLayoutTree();
     // Layout immediate to prevent 'laggy' form visualization,
     // but not initially while desktop gets rendered because it will be done at the end anyway
@@ -235,6 +300,7 @@ scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
       tabBox.remove();
       this._revalidateSplitters(true);
       this.updateFirstLastMarker();
+      this.htmlComp.layout.reset();
       this.htmlComp.invalidateLayoutTree();
       // Layout immediate to prevent 'laggy' form visualization,
       // but not initially while desktop gets rendered because it will be done at the end anyway

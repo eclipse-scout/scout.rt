@@ -72,6 +72,7 @@ scout.Desktop.prototype._init = function(model) {
   this.resolveTextKeys(['title']);
   this._setViewButtons(this.viewButtons);
   this._setMenus(this.menus);
+  this._setBenchLayoutData(this.benchLayoutData);
   this.openUriHandler = scout.create('OpenUriHandler', {
     session: this.session
   });
@@ -465,21 +466,26 @@ scout.Desktop.prototype.setOutline = function(outline) {
   if (this.outline === outline) {
     return;
   }
-  if (this.rendered) {
-    this._removeDisplayChildsOfOutline();
-  }
+  try {
+    this.bench.setChanging(true);
+    if (this.rendered) {
+      this._removeDisplayChildsOfOutline();
+    }
 
-  this.outline = outline;
-  this._setOutlineActivated();
-  if (this.navigation) {
-    this.navigation.setOutline(this.outline);
-  }
-  // call render after triggering event so glasspane rendering taking place can refer to the current outline content
-  this.trigger('outlineChanged');
+    this.outline = outline;
+    this._setOutlineActivated();
+    if (this.navigation) {
+      this.navigation.setOutline(this.outline);
+    }
+    // call render after triggering event so glasspane rendering taking place can refer to the current outline content
+    this.trigger('outlineChanged');
 
-  if (this.rendered) {
-    this._renderDisplayChildsOfOutline();
-    this._renderDisplayStyle();
+    if (this.rendered) {
+      this._renderDisplayChildsOfOutline();
+      this._renderDisplayStyle();
+    }
+  } finally {
+    this.bench.setChanging(false);
   }
 };
 
@@ -519,6 +525,11 @@ scout.Desktop.prototype.setBenchVisible = function(visible) {
 
 scout.Desktop.prototype.setHeaderVisible = function(visible) {
   this.setProperty('headerVisible', visible);
+};
+
+scout.Desktop.prototype._setBenchLayoutData = function(layoutData) {
+  layoutData = scout.BenchColumnLayoutData.ensure(layoutData);
+  this._setProperty('benchLayoutData', layoutData);
 };
 
 scout.Desktop.prototype.outlineDisplayStyle = function() {
@@ -610,7 +621,6 @@ scout.Desktop.prototype._renderNotification = function(notification) {
     notification._removeTimeout = setTimeout(this.removeNotification.bind(this, notification), notification.duration);
   }
 };
-
 
 /**
  * Removes the given notification.
