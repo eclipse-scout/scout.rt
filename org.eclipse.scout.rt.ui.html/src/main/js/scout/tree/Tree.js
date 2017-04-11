@@ -1284,9 +1284,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     renderExpansionOpts.expandLazyChanged = node.expandedLazy !== lazy;
     node.expanded = expanded;
     node.expandedLazy = lazy;
-    if (this.groupedNodes[node.id]) {
-      this._updateItemPath(false, node);
-    }
+
     var filterStateChanged = this._applyFiltersForNode(node);
     if (filterStateChanged && renderExpansionOpts.expansionChanged) {
       this._rebuildParent(node.parentNode, opts);
@@ -1294,6 +1292,10 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
       node.childNodes.forEach(function(child) {
         this._applyFiltersForNode(child);
       }.bind(this));
+    }
+
+    if (this.groupedNodes[node.id]) {
+      this._updateItemPath(false, node);
     }
 
     if (node.expanded) {
@@ -1617,6 +1619,7 @@ scout.Tree.prototype._findPositionInFlatList = function(node) {
  *
  * @param {scout.TreeNode} node which is used to for the sub tree comparison
  * @param {scout.TreeNode} checkNode node which is checked against the given node
+ * @returns {boolean}
  */
 scout.Tree.prototype._isInSameSubTree = function(node, checkNode) {
   do {
@@ -1626,6 +1629,23 @@ scout.Tree.prototype._isInSameSubTree = function(node, checkNode) {
     checkNode = checkNode.parentNode;
   } while (checkNode);
 
+  return false;
+};
+
+/**
+ * Returns true if the given node is a child of one of the selected nodes.
+ * The functions goes up the parent node hierarchy.
+ *
+ * @param {scout.TreeNode} node to check
+ * @returns {boolean}
+ */
+scout.Tree.prototype._isChildOfSelectedNodes = function(node) {
+  while (node) {
+    if (this.selectedNodes.indexOf(node.parentNode) > -1) {
+      return true;
+    }
+    node = node.parentNode;
+  }
   return false;
 };
 
