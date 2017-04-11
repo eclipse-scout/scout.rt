@@ -16,7 +16,12 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 public class Tree extends AbstractTree {
+
   private List<ITreeNode> m_nodes;
+
+  public Tree() {
+    super();
+  }
 
   public Tree(List<ITreeNode> nodes) {
     super(false);
