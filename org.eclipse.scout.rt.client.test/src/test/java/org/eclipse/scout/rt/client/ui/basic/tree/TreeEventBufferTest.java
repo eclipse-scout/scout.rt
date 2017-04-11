@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,6 +36,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -276,6 +278,46 @@ public class TreeEventBufferTest {
 
     List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, coalesced.size()); // e1, e2
+  }
+
+  /**
+   * Insert a tree of nodes, and then remove them again (from inner to outer node)
+   */
+  @Test
+  @Ignore // TODO [6.1+] bsh, mru, abr: Enable this test once TreeEventBuffer is fixed and this test will be green (207681)
+  public void testInsertAndRemoveInSameRequest() {
+    // Note: A similar test but with a real tree can be found here:
+    // org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest.testInsertAndDeleteInSameRequest()
+
+    // A      <-- InvisibleRootNode
+    // +-B
+    //   +-C
+    //     +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    installChildNodes(nodeA, nodeB);
+    installChildNodes(nodeB, nodeC);
+    installChildNodes(nodeC, nodeD);
+
+    TreeEvent e1 = mockEvent(nodeA, TreeEvent.TYPE_NODES_INSERTED, nodeB);
+    m_testBuffer.add(e1);
+
+    // Simulate nodes deleted from inner to outer node
+    installChildNodes(nodeC, new ITreeNode[0]);
+    installChildNodes(nodeB, new ITreeNode[0]);
+    installChildNodes(nodeA, new ITreeNode[0]);
+    TreeEvent e2 = mockEvent(nodeC, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeD);
+    TreeEvent e3 = mockEvent(nodeB, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeC);
+    TreeEvent e4 = mockEvent(nodeA, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeB);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+    m_testBuffer.add(e4);
+
+    // We expect that all events are removed, because the same nodes that have been inserted have been deleted afterwards
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(Collections.emptyList(), coalesced);
   }
 
   /**

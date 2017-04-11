@@ -14,4 +14,13 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 
 public class TreeNode extends AbstractTreeNode {
 
+  public TreeNode() {
+    super();
+  }
+
+  public TreeNode(String text) {
+    super(false);
+    getCellForUpdate().setText(text);
+    callInitializer();
+  }
 }
