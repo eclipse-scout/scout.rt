@@ -80,7 +80,41 @@ function explodeShorthandProperties(properties) {
 
 // === $ extensions ===
 
-// used by some animate functions
+/*!
+ * jQuery UI Widget 1.11.2
+ * http://jqueryui.com
+ *
+ * Copyright 2014 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/jQuery.widget/
+ */
+
+/**
+ * This function is copied from jQuery UI. It is used to fire a 'remove' event
+ * when we call the .remove() function on a jQuery object.
+ */
+$.cleanData = (function(orig) {
+  return function(elems) {
+    var events, elem, i;
+    for (i = 0; (elem = elems[i]); i++) {
+      try {
+        // Only trigger remove when necessary to save time
+        events = $._data(elem, 'events');
+        if (events && events.remove) {
+          $(elem).triggerHandler('remove');
+        }
+        // http://bugs.jquery.com/ticket/8235
+      } catch (e) {}
+    }
+    orig(elems);
+  };
+})($.cleanData);
+
+/**
+ * Used by some animate functions.
+ */
 $.removeThis = function() {
   $(this).remove();
 };
