@@ -117,7 +117,7 @@ scout.Form.prototype._renderForm = function($parent) {
     layout = new scout.DialogLayout(this);
     this.htmlComp.validateRoot = true;
     $handle = this.$container.appendDiv('drag-handle');
-    this.$container.makeDraggable($handle, $.throttle(this._onMove.bind(this), 1000 / 60)); // 60fps
+    this.$container.draggable($handle, $.throttle(this._onMove.bind(this), 1000 / 60)); // 60fps
     if (this.resizable) {
       this._initResizable();
     }
@@ -140,13 +140,9 @@ scout.Form.prototype._renderForm = function($parent) {
 
 scout.Form.prototype._initResizable = function() {
   var $myWindow = this.$container.window();
-  this.$container.resizable({
-    start: function(event) {
-      this.$container.resizable('option', 'maxHeight', $myWindow.height() - event.target.offsetTop);
-      this.$container.resizable('option', 'maxWidth', $myWindow.width() - event.target.offsetLeft);
-    }.bind(this)
-  });
-  this.$container.on('resize', this._onResize.bind(this));
+  this.$container
+    .resizable()
+    .on('resize', this._onResize.bind(this));
 };
 
 scout.Form.prototype._onResize = function(event) {

@@ -56,7 +56,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this._glassPaneRenderer.renderGlassPanes();
   this.$container = $parent.appendDiv('file-chooser');
   var $handle = this.$container.appendDiv('drag-handle');
-  this.$container.makeDraggable($handle);
+  this.$container.draggable($handle);
 
   this.$container.appendDiv('closable')
     .on('click', function() {

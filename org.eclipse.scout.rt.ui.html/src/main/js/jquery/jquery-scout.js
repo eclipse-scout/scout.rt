@@ -1149,6 +1149,15 @@ $.fn.isOrHas = function(elem) {
 };
 
 /**
+ * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
+ * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
+ */
+$.fn.resizable = function() {
+  scout.create('Resizable', $(this));
+  return this;
+};
+
+/**
  * Makes any element movable with the mouse. If the argument '$handle' is missing, the entire
  * element can be used as a handle.
  *
@@ -1156,7 +1165,7 @@ $.fn.isOrHas = function(elem) {
  * every change of the draggable's position with an object as argument:
  * { top: (top pixels), left: (left pixels) }
  */
-$.fn.makeDraggable = function($handle, callback) {
+$.fn.draggable = function($handle, callback) {
   var $draggable = this;
   $handle = $handle || $draggable;
   return $handle.on('mousedown.draggable', function(event) {

@@ -1,0 +1,60 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.resizable {
+  position: relative;
+}
+
+.resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+  -ms-touch-action: none;
+  touch-action: none;
+  z-index: 10;
+}
+
+.resizable-s {
+  cursor: s-resize;
+  height: 10px;
+  width: 100%;
+  bottom: -5px;
+  left: 0;
+}
+
+.resizable-e {
+  cursor: e-resize;
+  width: 10px;
+  right: -5px;
+  top: 0;
+  height: 100%;
+}
+
+.resizable-se {
+  cursor: se-resize;
+  width: 20px;
+  height: 20px;
+  right: -5px;
+  bottom: -5px;
+}
+
+.resizable-gripsmall-se::before {
+  #scout.font-icon();
+  color: @icon-light-color;
+  font-size: 16px;
+  #scout.transform(rotate(45deg));
+  content: @icon-caret-right;
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 2px;
+  top: 4px;
+}

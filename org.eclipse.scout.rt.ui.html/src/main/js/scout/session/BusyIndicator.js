@@ -60,7 +60,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
   this.$container = this.$parent.appendDiv('busyindicator invisible');
 
   var $handle = this.$container.appendDiv('drag-handle');
-  this.$container.makeDraggable($handle);
+  this.$container.draggable($handle);
 
   this.$content = this.$container.appendDiv('busyindicator-content');
   this.$label = this.$content.appendDiv('busyindicator-label');

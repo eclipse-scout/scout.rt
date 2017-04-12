@@ -10,6 +10,7 @@
 (function(scout, $, undefined) {
   // TODO [7.0] cgu maybe extract remote/modeladapter files into remotescout-module.js
   __include("jquery/jquery-scout.js");
+  __include("jquery/jquery-scout-selectors.js");
   __include("scout/main.js");
   __include("scout/App.js");
   __include("scout/ErrorHandler.js");
@@ -470,4 +471,5 @@
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
-}(window.scout = window.scout || {}, jQuery)); //NOSONAR
+  __include("scout/resizable/Resizable.js");
+} (window.scout = window.scout || {}, jQuery)); //NOSONAR

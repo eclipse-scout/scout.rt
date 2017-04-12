@@ -33,6 +33,11 @@
   #scout.drop-shadow-large();
   margin: 10px; /* minimum padding to desktop */
   margin-bottom: 15px;
+  /* min-width and min-height are read by Resizable.js to prevent a dialog from becoming too small
+     You can overrule these values with a specific CSS class on a dialog/form when you require a
+     larger or smaller min-size. */
+  min-width: 250px;
+  min-height: 100px;
   top: 0; /* must be specified otherwise dialogs will be positioned at end of document and increase document size */
 
   &.animate-open {

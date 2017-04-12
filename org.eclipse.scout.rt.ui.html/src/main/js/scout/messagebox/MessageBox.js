@@ -83,7 +83,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('messagebox');
 
   var $handle = this.$container.appendDiv('drag-handle');
-  this.$container.makeDraggable($handle);
+  this.$container.draggable($handle);
 
   this.$content = this.$container.appendDiv('messagebox-content');
   this.$header = this.$content.appendDiv('messagebox-label messagebox-header');
