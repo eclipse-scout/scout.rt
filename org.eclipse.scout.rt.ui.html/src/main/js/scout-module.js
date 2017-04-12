@@ -143,6 +143,7 @@
   __include("scout/datepicker/DatePickerLayout.js");
   __include("scout/datepicker/DatePickerPopup.js");
   __include("scout/datepicker/DatePickerTouchPopup.js");
+  __include("scout/datepicker/DatePickerTouchPopupLayout.js");
   __include("scout/image/Image.js");
   __include("scout/image/ImageLayout.js");
   __include("scout/notification/Notification.js");

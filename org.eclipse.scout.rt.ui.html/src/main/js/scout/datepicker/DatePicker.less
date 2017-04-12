@@ -13,7 +13,7 @@
 }
 
 .date-picker {
-  height: 233px;
+  height: 237px;
   width: 252px;
   position: absolute;
   background-color: @control-background-color;
@@ -29,39 +29,83 @@
 .date-picker-scrollable {
   position: relative;
   padding: 0 6px;
+  width: 100%;
+}
+
+.date-picker-month-box {
+  position: relative;
+  display: inline-block;
+  width: 100%;
 }
 
 /* necessary for animation */
 .date-picker-month {
-  display: inline-block;
+  display: table;
+  width: 100%;
+}
+
+.date-picker-weekdays {
+  display: table-row;
+  width: 100%;
 }
 
 /* weekday header */
 .date-picker-weekday {
+  display: table-cell;
   padding: 8px 0;
-  float: left;
   text-align: center;
+  vertical-align: middle;
+}
+
+.date-picker-week {
+  display: table-row;
+  width: 100%;
 }
 
 .date-picker-day {
-  float: left;
+  display: table-cell;
+  position: relative;
   text-align: center;
-  border-radius: 50%;
-  border: 1px solid transparent;
+  vertical-align: middle;
+  padding: 7px;
+
+  .date-picker.touch & {
+    padding: 14px;
+  }
+
+  &::before {
+    position: absolute;
+    display: none;
+    width: 25px;
+    height: 25px;
+    top: calc(~'50%' - 12.5px);
+    left: calc(~'50%' - 12.5px);
+
+    content: '';
+    z-index: -1;
+
+    border-radius: 50%;
+    border: 1px solid transparent;
+  }
 
   &:hover:not(.date-picker-disabled) {
-    border-color: @item-selection-border-color;
-    background-color: @palette-blue-0;
+    &::before {
+      display: block;
+      border-color: @item-selection-border-color;
+      background-color: @palette-blue-0;
+    }
 
-    &.date-picker-now {
+    &.date-picker-now::before {
       border-color: @highlight-color;
       background-color: @palette-orange-0;
     }
 
     &.date-picker-selected {
-      background-color: @palette-blue-4;
+      &::before {
+        background-color: @palette-blue-4;
+      }
 
-      &.date-picker-now {
+      &.date-picker-now::before {
         background-color: @palette-orange-3;
       }
     }
@@ -85,21 +129,31 @@
   }
 
   &.date-picker-preselected {
-    border-color: @item-selection-border-color;
-    border-style: dashed;
+    &::before {
+      display: block;
+      border-color: @item-selection-border-color;
+      border-style: dashed;
+    }
 
-    &.date-picker-now {
+    &.date-picker-now::before {
       border-color: @highlight-color;
     }
   }
 
   &.date-picker-selected {
-    background-color: @item-selection-border-color;
     color: @palette-white;
 
+    &::before {
+      display: block;
+      background-color: @item-selection-border-color;
+    }
+
     &.date-picker-now {
-      background-color: @highlight-color;
       color: @palette-white;
+
+      &::before {
+        background-color: @highlight-color;
+      }
     }
   }
 
@@ -112,12 +166,15 @@
 .date-picker-header {
   line-height: 30px;
   height: 30px;
-  padding: 0 18px;
+  padding: 0 10px;
   background-color: @panel-background-color;
   border-bottom: 1px solid @border-color;
 
   /* Additional space between navigation buttons on touch devices */
   &.touch {
+    padding-left: 14px;
+    padding-right: 14px;
+
     & > .date-picker-left-m {
       margin-left: 26px;
     }

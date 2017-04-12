@@ -36,6 +36,7 @@ scout.DatePicker.prototype._init = function(options) {
 scout.DatePicker.prototype._render = function($parent) {
   this.$container = $parent
     .appendDiv('date-picker')
+    .toggleClass('touch', scout.device.supportsTouch())
     .on('swipe', this._onSwipe.bind(this));
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -84,7 +85,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
 
   this._updateHeader(viewDate);
 
-  var $box = this._build$DateBox();
+  var $box = this.$parent.makeDiv('date-picker-month-box');
+  this._build$DateBox().appendTo($box);
   $box[0].addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
 
   if (animated && this.$currentBox && viewDateDiff) {
@@ -105,11 +107,9 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var $currentBox = this.$currentBox;
   var newLeft = 0,
     that = this;
-  var monthBoxCount = this.$scrollable.find('.date-picker-month').length + 1;
+  var monthBoxCount = this.$scrollable.find('.date-picker-month-box').length + 1;
 
-  this.htmlComp.layout._layoutMonth($box);
-
-  this._boxWidth = $box.width();
+  this._boxWidth = $currentBox.width();
   var scrollableWidth = monthBoxCount * this._boxWidth;
 
   // Fix the size of the boxes
@@ -134,21 +134,21 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
 
   // Animate
   // At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
-  this.$scrollable.
-  stop(true).
-  animate({
-    left: newLeft
-  }, 300, function() {
-    // Remove every month box beside the new one
-    // Its important to use that.$currentBox because $box may already be removed
-    // if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
-    that.$currentBox.siblings('.date-picker-month').remove();
+  this.$scrollable
+    .stop(true)
+    .animate({
+      left: newLeft
+    }, 300, function() {
+      // Remove every month box beside the new one
+      // Its important to use that.$currentBox because $box may already be removed
+      // if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
+      that.$currentBox.siblings('.date-picker-month-box').remove();
 
-    // Reset scrollable settings
-    that.$scrollable
-      .cssLeft(that._scrollableLeft)
-      .width(that._boxWidth);
-  });
+      // Reset scrollable settings
+      that.$scrollable
+        .cssLeft(that._scrollableLeft)
+        .width(that._boxWidth);
+    });
 };
 
 scout.DatePicker.prototype._onNavigationMouseDown = function(event) {
@@ -251,11 +251,13 @@ scout.DatePicker.prototype._build$DateBox = function() {
     .data('viewDate', this.viewDate);
 
   // Create weekday header
+  var $weekdays = $box.appendDiv('date-picker-weekdays');
   weekdays.forEach(function(weekday) {
-    $box.appendDiv('date-picker-weekday', weekday);
+    $weekdays.appendDiv('date-picker-weekday', weekday);
   });
 
   // Find start date (-1)
+  var $week;
   for (var offset = 0; offset < 42; offset++) {
     start.setDate(start.getDate() - 1);
     var diff = new Date(start.getYear(), this.viewDate.getMonth(), 0).getDate() - start.getDate();
@@ -266,6 +268,10 @@ scout.DatePicker.prototype._build$DateBox = function() {
 
   // Create days
   for (i = 0; i < 42; i++) {
+    if (i % 7 === 0) {
+      $week = $box.appendDiv('date-picker-week');
+    }
+
     start.setDate(start.getDate() + 1);
     dayInMonth = start.getDate();
 
@@ -291,7 +297,7 @@ scout.DatePicker.prototype._build$DateBox = function() {
     }
 
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
-    $day = $box
+    $day = $week
       .appendDiv('date-picker-day' + cl, day)
       .data('dayInMonth', dayInMonth)
       .data('date', new Date(start));

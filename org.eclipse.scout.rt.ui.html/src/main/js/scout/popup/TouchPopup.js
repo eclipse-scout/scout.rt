@@ -22,8 +22,6 @@ scout.TouchPopup = function() {
 };
 scout.inherits(scout.TouchPopup, scout.Popup);
 
-scout.TouchPopup.TOP_MARGIN = 45;
-
 scout.TouchPopup.prototype._init = function(options) {
   scout.TouchPopup.parent.prototype._init.call(this, options);
   this._touchField = options.field;
@@ -60,7 +58,7 @@ scout.TouchPopup.prototype.prefLocation = function($container, openingDirectionY
   var popupSize = this.htmlComp.getPreferredSize(),
     windowWidth = $container.window().width(),
     x = Math.max(this.windowPaddingX, (windowWidth - popupSize.width) / 2);
-  return new scout.Point(x, scout.TouchPopup.TOP_MARGIN);
+  return new scout.Point(x, 0);
 };
 
 scout.TouchPopup.prototype._render = function($parent) {

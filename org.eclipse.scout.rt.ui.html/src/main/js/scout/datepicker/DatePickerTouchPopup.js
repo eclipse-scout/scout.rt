@@ -36,6 +36,13 @@ scout.DatePickerTouchPopup.prototype.getDatePicker = function() {
   return this._widget;
 };
 
+/**
+ * @override
+ */
+scout.DatePickerTouchPopup.prototype._createLayout = function() {
+  return new scout.DatePickerTouchPopupLayout(this);
+};
+
 scout.DatePickerTouchPopup.prototype._onFieldDisplayTextChanged = function(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
