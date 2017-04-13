@@ -130,7 +130,7 @@ function receiveResponseForAjaxCall(request, response) {
     request = jasmine.Ajax.requests.mostRecent();
   }
   if (request && request.onload) {
-    request.response(response);
+    request.respondWith(response);
   }
 }
 
@@ -478,37 +478,34 @@ beforeEach(function() {
   jasmine.addMatchers(jasmineScoutMatchers);
 });
 
-//JQuery extensions for testing purpose
+// JQuery extensions for testing purpose
 $.fn.triggerBlur = function() {
-  var event = new jQuery.Event("blur");
-  event.originalEvent = {}; // create dummy object
+  var event = jQuery.Event('blur', {
+    originalEvent: jQuery.Event('dummy') // create dummy object
+  });
   this.trigger(event);
 };
 
 $.fn.triggerRightClick = function() {
-  this.trigger({
-    type: 'mousedown',
-    which: 3
-  });
-  this.trigger({
-    type: 'mouseup',
-    which: 3
-  });
+  this.trigger(jQuery.Event('mousedown', {which: 3}));
+  this.trigger(jQuery.Event('mouseup', {which: 3}));
   return this;
 };
 
 $.fn.triggerKeyUp = function(key, modifier) {
-  var event = new jQuery.Event("keyup");
-  event.originalEvent = {}; // create dummy object
-  event.which = key;
+  var event = jQuery.Event('keyup', {
+    originalEvent: jQuery.Event('dummy'), // create dummy object
+    which: key
+  });
   extendEventWithModifier(event, modifier);
   this.trigger(event);
 };
 
 $.fn.triggerKeyDown = function(key, modifier) {
-  var event = new jQuery.Event("keydown");
-  event.originalEvent = {}; // create dummy object
-  event.which = key;
+  var event = jQuery.Event('keydown', {
+    originalEvent: jQuery.Event('dummy'), // create dummy object
+    which: key
+  });
   extendEventWithModifier(event, modifier);
   this.trigger(event);
 };
@@ -575,15 +572,14 @@ $.fn.triggerMouseAction = function(eventType, opts) {
   if (!opts.which) {
     opts.which = 1;
   }
-  event = {
-    type: eventType,
+  event = jQuery.Event(eventType, {
     which: opts.which,
-    originalEvent: {
+    originalEvent: jQuery.Event(eventType, {
       detail: opts.clicks
-    },
+    }),
     pageX: opts.position.left,
     pageY: opts.position.top
-  };
+  });
   if (opts.modifier) {
     extendEventWithModifier(event, opts.modifier);
   }
@@ -613,23 +609,23 @@ $.fn.triggerContextMenu = function() {
 
   this.triggerMouseDown(opts);
   this.triggerMouseUp(opts);
-  this.trigger({
-    type: 'contextmenu',
+  this.trigger(jQuery.Event('contextmenu', {
     pageX: opts.position.left,
     pageY: opts.position.top
-  });
+  }));
   return this;
 };
 
 /**
  * Triggers mouse down, mouse up and click events. <br>
  * Also sets the detail property of the originalEvent which contains the numbers of clicks.
- * @param clicks the number of clicks. If not set 1 is used.
+ * @param opts options object passed to triggerMouse* functions
  */
 $.fn.triggerClick = function(opts) {
-  opts = opts || {};
-  if (!opts.clicks) {
-    opts.clicks = 1;
+  opts = scout.nvl(opts, {});
+
+  if (!opts.click) {
+    opts.click = 1;
   }
 
   this.triggerMouseDown(opts);
@@ -640,17 +636,12 @@ $.fn.triggerClick = function(opts) {
 };
 
 $.fn.triggerDoubleClick = function() {
-  var clicks = 2;
-
   this.triggerClick();
-  this.triggerClick({
-    clicks: 2
-  });
-  this.trigger({
-    type: 'dblclick',
-    originalEvent: {
-      detail: clicks
-    }
-  });
+  this.triggerClick({click: 2});
+  this.trigger(jQuery.Event('dblclick', {
+    originalEvent: jQuery.Event('dummy', {
+      detail: 2
+    })
+  }));
   return this;
 };

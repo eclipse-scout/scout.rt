@@ -461,7 +461,7 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
     height: 0
   }, {
     duration: control.animateDuration,
-    done: function() {
+    complete: function() {
       this.animating = false;
       this.$controlContainer.hide();
       control.onControlContainerClosed();
@@ -480,7 +480,6 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
     menuBar = table.menuBar,
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     footer = table.footer,
-    header = table.header,
     htmlContainer = table.htmlComp,
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());

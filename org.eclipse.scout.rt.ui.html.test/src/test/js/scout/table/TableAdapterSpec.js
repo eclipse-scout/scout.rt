@@ -10,14 +10,14 @@
  ******************************************************************************/
 /* global removePopups */
 describe("TableAdapter", function() {
-  var session;
-  var helper;
+  var session, helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
     helper = new scout.TableSpecHelper(session);
+    $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -27,6 +27,7 @@ describe("TableAdapter", function() {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     helper.resetIntlCollator();
+    $.fx.off = false;
   });
 
   describe("selectRows", function() {
@@ -326,7 +327,7 @@ describe("TableAdapter", function() {
         expect(table.updateRowOrder).toHaveBeenCalledWith([row2, row1, row0]);
       });
 
-      it("does not animate ordering for newly inserted rows", function() {
+      it("correct DOM order for newly inserted rows", function() {
         table.render(session.$entryPoint);
         expect(table.rows.length).toBe(3);
 
@@ -336,10 +337,11 @@ describe("TableAdapter", function() {
         ];
 
         // Insert new rows and switch rows 0 and 1
+        var orderedRowIds = [row1.id, row0.id, newRows[0].id, newRows[1].id, row2.id];
         var message = {
           events: [
             createRowsInsertedEvent(model, newRows),
-            createRowOrderChangedEvent(model, [row1.id, row0.id, newRows[0].id, newRows[1].id, row2.id])
+            createRowOrderChangedEvent(model, orderedRowIds)
           ]
         };
         session._processSuccessResponse(message);
@@ -347,17 +349,14 @@ describe("TableAdapter", function() {
         // Check if rows were inserted
         expect(table.rows.length).toBe(5);
 
-        // Check if animation is not done for the inserted rows
-        // The animation should be done for the other rows (row0 and 1 are switched -> visualize)
-        var $rows = table.$rows();
+        // Check if order in the DOM is correct
+        var $row, rowId, expectedRowId,
+          i = 0, $rows = table.$rows();
         $rows.each(function() {
-          var $row = $(this);
-          var rowId = $row.data('row').id;
-          if (rowId === newRows[0].id || rowId === newRows[1].id) {
-            expect($row.is(':animated')).toBe(false);
-          } else {
-            expect($row.is(':animated')).toBe(true);
-          }
+          $row = $(this),
+          rowId = $row.data('row').id;
+          expectedRowId = orderedRowIds[i++];
+          expect(rowId).toBe(expectedRowId);
         });
       });
 

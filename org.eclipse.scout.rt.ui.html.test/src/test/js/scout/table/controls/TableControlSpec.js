@@ -17,6 +17,7 @@ describe("TableControl", function() {
     session = sandboxSession();
     tableHelper = new scout.TableSpecHelper(session);
 
+    $.fx.off = true; // Open and closing of the container is animated -> disable animation in order to be able to test it
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -25,22 +26,15 @@ describe("TableControl", function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    $.fx.off = false;
   });
 
   function createModel() {
-    var model = createSimpleModel('TableControl', session);
-    $.extend({
-      "enabled": true,
-      "visible": true
-    });
-
-    return model;
+    return createSimpleModel('TableControl', session);
   }
 
   function createAction(model) {
-    var action = new scout.TableControl();
-    action.init(model);
-    return action;
+    return scout.create('TableControl', model);
   }
 
   function createTableControlAdapter(model) {
@@ -58,13 +52,7 @@ describe("TableControl", function() {
     var table;
 
     beforeEach(function() {
-      // Open and closing of the container is animated -> disable animation in order to be able to test it
-      $.fx.off = true;
       table = createTable();
-    });
-
-    afterEach(function() {
-      $.fx.off = false;
     });
 
     it("opens and closes the control container", function() {
@@ -72,7 +60,6 @@ describe("TableControl", function() {
       table._setTableControls([action]);
       table.render(session.$entryPoint);
       var $controlContainer = table.footer.$controlContainer;
-
       expect($controlContainer).toBeHidden();
 
       action.setSelected(true);

@@ -18,6 +18,7 @@ describe("AggregateTableControl", function() {
     session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
     helper = new scout.TableSpecHelper(session);
 
+    $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -26,14 +27,11 @@ describe("AggregateTableControl", function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    $.fx.off = false;
   });
 
   function createModel(table) {
     var model = createSimpleModel('TableControl', session);
-    $.extend({
-      "enabled": true,
-      "visible": true
-    });
     model.table = table;
     return model;
   }

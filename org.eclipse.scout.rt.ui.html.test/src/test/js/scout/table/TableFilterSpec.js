@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("Table Filter", function() {
+describe("TableFilter", function() {
   var session;
   var helper;
 
@@ -16,14 +16,17 @@ describe("Table Filter", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.TableSpecHelper(session);
+    $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
+
   });
 
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    $.fx.off = false;
   });
 
   function createColumnFilterModel(columnId, selectedValues) {
@@ -44,14 +47,6 @@ describe("Table Filter", function() {
   }
 
   describe("row filtering", function() {
-
-    beforeEach(function() {
-      $.fx.off = true;
-    });
-
-    afterEach(function() {
-      $.fx.off = false;
-    });
 
     it("applies row filter when table gets initialized", function() {
       var model = helper.createModelFixture(2, 2);
@@ -431,16 +426,6 @@ describe("Table Filter", function() {
   });
 
   describe("events", function() {
-
-    beforeEach(function() {
-      // filter animates -> disable
-      $.fx.off = true;
-    });
-
-    afterEach(function() {
-      $.fx.off = false;
-    });
-
 
     describe("rowsFiltered", function() {
       var listener = {

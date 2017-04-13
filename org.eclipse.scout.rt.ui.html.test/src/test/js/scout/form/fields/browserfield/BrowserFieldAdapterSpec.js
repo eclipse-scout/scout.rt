@@ -19,6 +19,11 @@ describe('BrowserFieldAdapter', function() {
     jasmine.clock().install();
   });
 
+  afterEach(function() {
+    jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
+  });
+
   it('sends postMessage on message', function() {
     var model = createSimpleModel('BrowserField', session, 'foo');
     var adapter = scout.create('BrowserFieldAdapter', createAdapterModel(model));

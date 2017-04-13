@@ -35,3 +35,6 @@ var jasmineMavenReporter = new JasmineMavenReporter({
 });
 jasmine.getEnv().addReporter(jasmineMavenReporter);
 window.reporter = jasmineMavenReporter;
+
+
+$.fx.off = true;

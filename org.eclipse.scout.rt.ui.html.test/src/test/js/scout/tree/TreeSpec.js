@@ -17,9 +17,11 @@ describe("Tree", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.TreeSpecHelper(session);
+    // Tree node expansion happens with an animation (async).
+    // Disabling it makes it possible to test the expansion state after the expansion
+    $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
-    $.fx.off = true;
   });
 
   afterEach(function() {
@@ -1047,17 +1049,6 @@ describe("Tree", function() {
   });
 
   describe("node double click", function() {
-
-    beforeEach(function() {
-      //Expansion happens with an animation (async).
-      //Disabling it makes it possible to test the expansion state after the expansion
-      $.fx.off = true;
-    });
-
-    afterEach(function() {
-      $.fx.off = false;
-    });
-
     it("expands/collapses the node", function() {
       var model = helper.createModelFixture(1, 1, false);
       var tree = helper.createTree(model);
@@ -1075,17 +1066,6 @@ describe("Tree", function() {
   });
 
   describe("node control double click", function() {
-
-    beforeEach(function() {
-      //Expansion happens with an animation (async).
-      //Disabling it makes it possible to test the expansion state after the expansion
-      $.fx.off = true;
-    });
-
-    afterEach(function() {
-      $.fx.off = false;
-    });
-
     it("does the same as control single click (does NOT expand and immediately collapse again)", function() {
       var model = helper.createModelFixture(1, 1, false);
       var tree = helper.createTree(model);

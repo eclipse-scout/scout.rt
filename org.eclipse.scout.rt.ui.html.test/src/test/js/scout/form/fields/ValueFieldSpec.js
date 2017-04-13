@@ -160,8 +160,6 @@ describe('ValueField', function() {
     var formField, model;
 
     beforeEach(function() {
-      jasmine.Ajax.install();
-      jasmine.clock().install();
       model = helper.createFieldModel();
       formField = new scout.ValueField();
       formField._render = function($parent) {

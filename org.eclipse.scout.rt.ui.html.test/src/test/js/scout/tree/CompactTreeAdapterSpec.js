@@ -16,15 +16,16 @@ describe("CompactTreeAdapter", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.TreeSpecHelper(session);
+    $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
-    $.fx.off = true;
   });
 
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    $.fx.off = false;
   });
 
   describe("selectNodes", function() {

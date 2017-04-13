@@ -25,6 +25,11 @@ describe('FormLifecycle', function() {
     form.lifecycle = scout.create('FormLifecycle', {widget: form});
     field = form.rootGroupBox.fields[0];
     form.render(session.$entryPoint);
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   describe('doCancel', function() {
@@ -46,6 +51,7 @@ describe('FormLifecycle', function() {
         disposed = true;
       });
       form.lifecycle.doCancel();
+      jasmine.clock().tick();
       expect(disposed).toBe(true);
     });
 
@@ -57,6 +63,7 @@ describe('FormLifecycle', function() {
       field.setMandatory(true);
       field.setValue(null);
       form.lifecycle.doOk();
+      jasmine.clock().tick();
       expectMessageBox(true);
     });
 
@@ -69,6 +76,7 @@ describe('FormLifecycle', function() {
         return $.resolvedPromise(scout.Status.ok());
       });
       form.lifecycle.doOk();
+      jasmine.clock().tick(1000);
       expectMessageBox(false);
       expect(saved).toBe(true);
     });
