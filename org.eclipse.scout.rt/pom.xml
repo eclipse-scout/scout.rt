@@ -592,7 +592,15 @@
 
   <build>
     <pluginManagement>
-      <plugins>
+     <plugins>
+        <plugin>
+          <!-- TODO [awe, pbn] 7.0 - Update in config master. How to? -->
+          <groupId>com.github.klieber</groupId>
+          <artifactId>phantomjs-maven-plugin</artifactId>
+          <configuration>
+            <version>2.1.1</version>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.eclipse.scout</groupId>
           <artifactId>eclipse-settings-maven-plugin</artifactId>
