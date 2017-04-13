@@ -31,9 +31,17 @@ scout.BenchColumn.TAB_BOX_INDEX = {
   BOTTOM: 2
 };
 
+scout.DesktopBench.TAB_BOX_CLASSES = [
+  'north',
+  'center',
+  'south'
+];
+
 scout.BenchColumn.prototype._init = function(model) {
   scout.BenchColumn.parent.prototype._init.call(this, model);
   this.layoutData = model.layoutData;
+  this.layoutCacheKey = model.cacheKey;
+  this.cssClass = model.cssClass;
   this._createTabBoxes();
 };
 
@@ -48,6 +56,9 @@ scout.BenchColumn.prototype._keyStrokeBindTarget = function() {
 
 scout.BenchColumn.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('bench-column');
+  if (this.cssClass) {
+    this.$container.addClass(this.cssClass);
+  }
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 
@@ -80,13 +91,14 @@ scout.BenchColumn.prototype.postRender = function() {
 };
 
 scout.BenchColumn.prototype._createLayout = function() {
-  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.COLUMN);
+  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.COLUMN, this.layoutCacheKey);
 };
 
-scout.BenchColumn.prototype.updateLayoutData = function(layoutData) {
+scout.BenchColumn.prototype.updateLayoutData = function(layoutData, cacheKey) {
   if (this.getLayoutData() === layoutData) {
     return;
   }
+  this.layoutCacheKey = cacheKey;
   this.setLayoutData(layoutData);
 
   // update columns
@@ -95,6 +107,11 @@ scout.BenchColumn.prototype.updateLayoutData = function(layoutData) {
     tb.setLayoutData(rowDatas[i]);
   });
   this._updateSplitterMovable();
+  if (this.rendered) {
+    this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
+    this.htmlComp.layout.reset();
+    this.htmlComp.invalidateLayoutTree();
+  }
 };
 
 scout.BenchColumn.prototype.setLayoutData = function(layoutData) {
@@ -135,7 +152,6 @@ scout.BenchColumn.prototype.activateView = function(view) {
   tabBox.activateView(view);
 };
 
-
 scout.BenchColumn.prototype._createTabBoxes = function() {
   var rowLayoutDatas = [];
   if (this.layoutData) {
@@ -143,7 +159,8 @@ scout.BenchColumn.prototype._createTabBoxes = function() {
   }
   for (var i = 0; i < 3; i++) {
     var tabBox = scout.create('SimpleTabBox', {
-      parent: this
+      parent: this,
+      cssClass: scout.DesktopBench.TAB_BOX_CLASSES[i]
     });
     tabBox.setLayoutData(rowLayoutDatas[i]);
     tabBox.on('viewAdded', this._viewAddedHandler);
@@ -196,7 +213,7 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
 };
 
 scout.BenchColumn.prototype._updateSplitterMovable = function() {
-  if(!this.components){
+  if (!this.components) {
     return;
   }
   this.components.forEach(function(c, i) {
@@ -245,7 +262,6 @@ scout.BenchColumn.prototype._onSplitterMove = function(event) {
     event.preventDefault();
   }
 };
-
 
 scout.BenchColumn.prototype.addView = function(view, bringToFront) {
   var tabBox = this.getTabBox(view.displayViewId);

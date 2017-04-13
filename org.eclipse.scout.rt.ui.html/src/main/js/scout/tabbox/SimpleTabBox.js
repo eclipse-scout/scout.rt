@@ -21,6 +21,7 @@ scout.inherits(scout.SimpleTabBox, scout.Widget);
 
 scout.SimpleTabBox.prototype._init = function(model) {
   scout.SimpleTabBox.parent.prototype._init.call(this, model);
+  this.cssClass = model.cssClass;
 
   // create view tabs
   this.tabArea = scout.create('SimpleTabArea', {
@@ -43,6 +44,9 @@ scout.SimpleTabBox.prototype._keyStrokeBindTarget = function() {
 
 scout.SimpleTabBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-tab-box');
+  if (this.cssClass) {
+    this.$container.addClass(this.cssClass);
+  }
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SimpleTabBoxLayout(this));
   this.htmlComp.layoutData = this.layoutData;
@@ -113,7 +117,6 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
 
   this.revalidateLayout();
 };
-
 
 scout.SimpleTabBox.prototype.setLayoutData = function(layoutData) {
   scout.SimpleTabBox.parent.prototype.setLayoutData.call(this, layoutData);
