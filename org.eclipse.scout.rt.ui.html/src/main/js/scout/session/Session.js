@@ -1033,7 +1033,6 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   }
 
   var uploadAjaxOptions = {
-    async: true,
     type: 'POST',
     url: 'upload/' + this.uiSessionId + '/' + target.id,
     cache: false,
