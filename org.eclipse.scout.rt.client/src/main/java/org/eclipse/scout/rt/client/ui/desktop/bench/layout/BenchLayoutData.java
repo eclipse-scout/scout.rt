@@ -12,11 +12,21 @@ public class BenchLayoutData {
   public static final int CENTER = 1;
   public static final int EAST = 2;
 
+  private String m_cacheKey;
   private BenchColumnData[] m_columns = {
       new BenchColumnData(),
       new BenchColumnData(),
       new BenchColumnData(),
   };
+
+  public BenchLayoutData withCacheKey(String cacheKey) {
+    m_cacheKey = cacheKey;
+    return this;
+  }
+
+  public String getCacheKey() {
+    return m_cacheKey;
+  }
 
   public BenchColumnData[] getColumns() {
     return m_columns;
@@ -54,6 +64,7 @@ public class BenchLayoutData {
   }
 
   protected BenchLayoutData copyValues(BenchLayoutData copy) {
+    copy.withCacheKey(getCacheKey());
     if (getCenter() != null) {
       copy.withCenter(getCenter().copy());
     }
@@ -70,6 +81,7 @@ public class BenchLayoutData {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((m_cacheKey == null) ? 0 : m_cacheKey.hashCode());
     result = prime * result + Arrays.hashCode(m_columns);
     return result;
   }
@@ -86,6 +98,14 @@ public class BenchLayoutData {
       return false;
     }
     BenchLayoutData other = (BenchLayoutData) obj;
+    if (m_cacheKey == null) {
+      if (other.m_cacheKey != null) {
+        return false;
+      }
+    }
+    else if (!m_cacheKey.equals(other.m_cacheKey)) {
+      return false;
+    }
     if (!Arrays.equals(m_columns, other.m_columns)) {
       return false;
     }

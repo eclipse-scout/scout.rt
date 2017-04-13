@@ -27,7 +27,6 @@ scout.FlexboxLayoutData.prototype.withOrder = function(order) {
   return this;
 };
 
-
 scout.FlexboxLayoutData.prototype.acceptDelta = function(delta, apply) {
   if (delta > 0) {
     return this._grow(delta, apply);
@@ -36,42 +35,51 @@ scout.FlexboxLayoutData.prototype.acceptDelta = function(delta, apply) {
   }
 };
 
+scout.FlexboxLayoutData.prototype.validate = function(size) {
+  if (this.grow === 0) {
+    size = Math.min(this.initialPx, size);
+  }
+  if (this.shrink === 0) {
+    size = Math.max(this.initialPx, size);
+  }
+  return size;
+};
+
 scout.FlexboxLayoutData.prototype._grow = function(delta, apply) {
   var maxDelta = 0,
-  consumedDelta = 0;
-  if(this.grow > 0){
+    consumedDelta = 0;
+  if (this.grow > 0) {
     maxDelta = delta;
-  }else if(this.initialPx > this.sizePx ){
+  } else if (this.initialPx > this.sizePx) {
     maxDelta = this.initialPx - this.sizePx;
   }
   consumedDelta = Math.min(delta, maxDelta);
-  if(apply){
+  if (apply) {
     this.sizePx = this.sizePx + consumedDelta;
   }
-  return delta- consumedDelta;
+  return delta - consumedDelta;
 };
-
 
 scout.FlexboxLayoutData.prototype._shrink = function(delta, apply) {
   var maxDelta = 0,
-  consumedDelta=0;
-  if(this.shrink > 0){
+    consumedDelta = 0;
+  if (this.shrink > 0) {
     maxDelta = -this.sizePx + 20;
 
-  }else if(this.initialPx < this.sizePx ){
+  } else if (this.initialPx < this.sizePx) {
     maxDelta = this.initialPx - this.sizePx;
   }
   consumedDelta = Math.max(delta, maxDelta);
-  if(apply){
+  if (apply) {
     this.sizePx = this.sizePx + consumedDelta;
   }
-  return delta-consumedDelta;
+  return delta - consumedDelta;
 };
 
 /*Static functions*/
-scout.FlexboxLayoutData.fixed = function(size){
+scout.FlexboxLayoutData.fixed = function(size) {
   var layoutData = new scout.FlexboxLayoutData();
-  layoutData.relative=false;
+  layoutData.relative = false;
   layoutData.initial = size || -1;
   layoutData.grow = 0;
   layoutData.shrink = 0;

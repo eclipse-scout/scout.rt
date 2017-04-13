@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.FlexboxLayout = function(direction) {
+scout.FlexboxLayout = function(direction, cacheKey) {
   scout.FlexboxLayout.parent.call(this);
-  this.layoutDatasToReset = [];
+  this.childrenLayoutDatas = [];
+  this.cacheKey;
+  this.setCacheKey(cacheKey);
   if (direction === scout.FlexboxLayout.Direction.ROW) {
     this.preferredLayoutSize = this.preferredLayoutSizeRow;
     this._getDimensionValue = this._getWidth;
@@ -29,8 +31,65 @@ scout.FlexboxLayout.Direction = {
   ROW: 1
 };
 
-scout.FlexboxLayout.prototype.invalidate = function() { //
-  //  console.log('invalidate bench layout');
+scout.FlexboxLayout.prototype.setCacheKey = function(cacheKey) {
+  this.cacheKey = cacheKey;
+  if (this.cacheKey && this.cacheKey.length > 0) {
+    this.cacheKey.unshift('scout.flexboxLayout');
+  }
+};
+
+scout.FlexboxLayout.prototype._readCache = function(childCount) {
+  if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
+    return;
+  }
+  var keySequence = this.cacheKey.slice(),
+    cacheValue = scout.webstorage.getItem(localStorage, keySequence[0]),
+    i = 1,
+    cacheObj;
+  keySequence.push('' + childCount);
+  if (cacheValue) {
+    cacheObj = JSON.parse(cacheValue);
+  }
+  while (cacheObj && i < keySequence.length) {
+    cacheObj = cacheObj[keySequence[i]];
+    i++;
+  }
+  return cacheObj;
+};
+
+scout.FlexboxLayout.prototype._writeCache = function(childCount, sizes) {
+  if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
+    return;
+  }
+  var keySequence = this.cacheKey.slice(),
+    cacheValue = scout.webstorage.getItem(localStorage, keySequence[0]),
+    i = 1,
+    cacheObj,
+    cachedSizes;
+  keySequence.push('' + childCount);
+  if (cacheValue) {
+    cacheObj = JSON.parse(cacheValue);
+  } else {
+    cacheObj = {};
+  }
+  cachedSizes = cacheObj;
+  while (i < keySequence.length - 1) {
+    if (!cachedSizes[keySequence[i]]) {
+      cachedSizes[keySequence[i]] = {};
+    }
+    cachedSizes = cachedSizes[keySequence[i]];
+    i++;
+  }
+  cachedSizes[keySequence[i]] = sizes;
+  scout.webstorage.setItem(localStorage, keySequence[0], JSON.stringify(cacheObj));
+};
+
+scout.FlexboxLayout.prototype._computeCacheKey = function(childCount) {
+  // no need to cache bounds of a single child
+  if (!this.cacheKey || childCount < 2) {
+    return;
+  }
+  return this.cacheKey + '-' + childCount;
 };
 
 // layout functions
@@ -59,7 +118,7 @@ scout.FlexboxLayout.prototype._getChildren = function($container) {
   var children = [];
   $container.children().each(function() {
     var htmlChild = scout.HtmlComponent.optGet($(this));
-    if(htmlChild){
+    if (htmlChild) {
       children.push(htmlChild);
     }
   });
@@ -70,12 +129,12 @@ scout.FlexboxLayout.prototype._getChildren = function($container) {
 };
 
 scout.FlexboxLayout.prototype.reset = function() {
-  this.layoutDatasToReset.forEach(function(ld) {
+  this.childrenLayoutDatas.forEach(function(ld) {
     ld.sizePx = 0;
     ld.initialPx = 0;
     ld.diff = null;
   });
-  this.layoutDatasToReset = [];
+  this.childrenLayoutDatas = [];
 };
 
 scout.FlexboxLayout.prototype._layoutDelta = function(children, deltaComp, containerSize) {
@@ -99,7 +158,7 @@ scout.FlexboxLayout.prototype._layoutDelta = function(children, deltaComp, conta
     _distributeDelta(componentsAfter, -delta, true);
   }
 
-  this._layoutFromLayoutData(children, containerSize);
+  this._layoutFromLayoutDataWithCache(children, containerSize);
 
   /*private functions*/
   function _distributeDelta(components, delta, applyDelta) {
@@ -123,7 +182,7 @@ scout.FlexboxLayout.prototype._layoutComponents = function(children, containerSi
       return ld.grow;
     });
   }
-  this._layoutFromLayoutData(children, containerSize);
+  this._layoutFromLayoutDataWithCache(children, containerSize);
 };
 
 scout.FlexboxLayout.prototype._adjust = function(children, delta, getWeightFunction) {
@@ -160,7 +219,6 @@ scout.FlexboxLayout.prototype._getPreferredSize = function(htmlComp) {
   prefSize = htmlComp.getPreferredSize({
       useCssSize: true
     })
-    //    .add(htmlComp.getInsets())
     .add(htmlComp.getMargins());
   return prefSize;
 };
@@ -171,38 +229,64 @@ scout.FlexboxLayout.prototype.ensureInitialValues = function(children, container
     sumOfRelatives = 0,
     colLayoutDatas = children.map(function(c) {
       return c.layoutData;
-    });
+    }),
+    cachedSizes = this._readCache(children.length) || [];
 
-  children.forEach(function(comp) {
+  // setup initial values
+  children.forEach(function(comp, i) {
     var ld = comp.layoutData;
+
     if (ld.sizePx) {
       sumOfAbsolutePx += ld.sizePx;
     } else if (ld.initial < 0) {
       // use ui height
       ld.initialPx = this._getDimensionValue(this._getPreferredSize(comp));
-      ld.sizePx = ld.initialPx;
-      sumOfAbsolutePx += ld.sizePx;
+      sumOfAbsolutePx += ld.initialPx;
 
     } else if (ld.relative) {
       sumOfRelatives += ld.initial;
     } else {
       ld.initialPx = ld.initial;
-      ld.sizePx = ld.initialPx;
-      sumOfAbsolutePx += ld.sizePx;
+      sumOfAbsolutePx += ld.initialPx;
     }
-    this.layoutDatasToReset.push(ld);
+
   }.bind(this));
-  totalPx -= sumOfAbsolutePx;
 
   var relativeFactor = totalPx / sumOfRelatives;
-  return colLayoutDatas.filter(function(ld) {
-    return ld.relative && !ld.sizePx;
+  colLayoutDatas.filter(function(ld) {
+    return ld.relative && ld.initial > -1 && !ld.sizePx;
   }).reduce(function(restWidth, ld) {
     ld.initialPx = Math.max(30, relativeFactor * ld.initial);
-    ld.sizePx = ld.initialPx;
-    return restWidth - ld.sizePx;
-  }, totalPx);
+    return restWidth - ld.initialPx;
+  }, (totalPx - sumOfAbsolutePx));
 
+  // set px values
+  return colLayoutDatas
+    .reduce(function(restWidth, ld, i) {
+      if (!ld.sizePx) {
+        if (cachedSizes[i]) {
+          ld.sizePx = ld.validate(Math.round(totalPx * cachedSizes[i]));
+        } else {
+          ld.sizePx = ld.initialPx;
+        }
+      }
+      this.childrenLayoutDatas.push(ld);
+      return restWidth - ld.sizePx;
+    }.bind(this), totalPx);
+
+};
+scout.FlexboxLayout.prototype._layoutFromLayoutDataWithCache = function(children, containerSize) {
+  this._cacheSizes(children, containerSize);
+  this._layoutFromLayoutData(children, containerSize);
+};
+
+scout.FlexboxLayout.prototype._cacheSizes = function(children, containerSize) {
+  var totalPx = this._getDimensionValue(containerSize),
+    value;
+  value = children.map(function(c) {
+    return c.layoutData.sizePx / totalPx;
+  });
+  this._writeCache(children.length, value);
 };
 
 //functions differ from row to column mode
@@ -248,7 +332,7 @@ scout.FlexboxLayout.prototype._layoutFromLayoutDataColumn = function(children, c
     var margins = comp.getMargins();
     var insets = comp.getInsets();
     var h = comp.layoutData.sizePx;
-    var bounds = new scout.Rectangle(0, y - insets.top- margins.top, containerSize.width, h+ insets.top + insets.bottom);
+    var bounds = new scout.Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
     comp.setBounds(bounds);
     return y + h;
   }, 0);

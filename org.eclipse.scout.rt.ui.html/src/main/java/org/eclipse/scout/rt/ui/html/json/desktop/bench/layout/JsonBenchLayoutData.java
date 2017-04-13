@@ -29,6 +29,7 @@ public class JsonBenchLayoutData implements IJsonObject {
       return null;
     }
     JSONObject json = new JSONObject();
+    json.put("cacheKey", m_layoutData.getCacheKey());
     for (BenchColumnData col : m_layoutData.getColumns()) {
       json.append("columns", JsonColumnData.toJson(col));
     }

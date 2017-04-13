@@ -17,6 +17,7 @@ scout.DesktopBench = function() {
   this._removeViewInProgress = 0;
   this.changingCounter = 0;
   this.changed = false;
+  this.layoutCacheKey = [];
 
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
@@ -43,6 +44,12 @@ scout.DesktopBench.VIEW_AREA_COLUMN_INDEX = {
   RIGHT: 2
 };
 
+scout.DesktopBench.VIEW_AREA_COLUMN_CLASSES = [
+  'west',
+  'center',
+  'east'
+];
+
 scout.DesktopBench.prototype._init = function(model) {
   scout.DesktopBench.parent.prototype._init.call(this, model);
 
@@ -64,14 +71,22 @@ scout.DesktopBench.prototype._init = function(model) {
 };
 
 scout.DesktopBench.prototype._createColumns = function() {
-  var columnLayoutData = [];
-  if (this.getLayoutData()) {
+  var layoutData = this.getLayoutData(),
+    columnLayoutData = [];
+
+  if (layoutData) {
     columnLayoutData = this.getLayoutData().getColumns();
   }
   for (var i = 0; i < 3; i++) {
+    var cacheKey = this.layoutCacheKey.slice();
+    if (cacheKey.length > 0) {
+      cacheKey.push('column' + i);
+    }
     var column = scout.create('BenchColumn', {
       parent: this,
-      layoutData: columnLayoutData[i]
+      layoutData: columnLayoutData[i],
+      cacheKey: cacheKey,
+      cssClass: scout.DesktopBench.VIEW_AREA_COLUMN_CLASSES[i]
     });
     column.on('viewAdded', this._viewAddedHandler);
     column.on('viewRemoved', this._viewRemovedHandler);
@@ -111,7 +126,7 @@ scout.DesktopBench.prototype._render = function($parent) {
 };
 
 scout.DesktopBench.prototype._createLayout = function() {
-  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.ROW);
+  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.ROW, this.layoutCacheKey);
 };
 
 scout.DesktopBench.prototype.visibleColumns = function() {
@@ -248,10 +263,17 @@ scout.DesktopBench.prototype.updateLayoutData = function(layoutData) {
 
   // update columns
   var columnDatas = layoutData.getColumns();
+
   this.columns.forEach(function(c, i) {
-    c.updateLayoutData(columnDatas[i]);
-  });
+    var cacheKey;
+    if (this.layoutCacheKey && this.layoutCacheKey.length > 0) {
+      cacheKey = this.layoutCacheKey.slice();
+      cacheKey.push('column' + i);
+    }
+    c.updateLayoutData(columnDatas[i], cacheKey);
+  }.bind(this));
   if (this.rendered) {
+    this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
     this.htmlComp.layout.reset();
     this.htmlComp.invalidateLayoutTree();
     this.htmlComp.validateLayoutTree();
@@ -265,6 +287,10 @@ scout.DesktopBench.prototype.setLayoutData = function(layoutData) {
   }
   scout.DesktopBench.parent.prototype.setLayoutData.call(this, layoutData);
   this.layoutData = layoutData;
+  this.layoutCacheKey = [];
+  if (layoutData.cacheKey) {
+    this.layoutCacheKey.push(layoutData.cacheKey);
+  }
 };
 
 scout.DesktopBench.prototype.getLayoutData = function() {
@@ -487,7 +513,7 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
           maxRatio: 1
         });
         splitter.render(this.$container);
-        splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order -1));
+        splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
         splitter.$container.addClass('line');
 
         arr.push(splitter);
@@ -509,7 +535,7 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
 };
 
 scout.DesktopBench.prototype._updateSplitterMovable = function() {
-  if(!this.components){
+  if (!this.components) {
     return;
   }
   this.components.forEach(function(c, i) {
@@ -558,7 +584,6 @@ scout.DesktopBench.prototype._onSplitterMove = function(event) {
     event.preventDefault();
   }
 };
-
 
 scout.DesktopBench.prototype._onViewAdded = function(event) {
   this.trigger('viewAdded', {
