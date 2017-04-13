@@ -963,7 +963,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     };
   }
 
-  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this._referenceDate());
+  var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this.timestampAsDate || this._referenceDate());
   if (analyzeInfo.error) {
     this._setDateValid(false);
     return null;
