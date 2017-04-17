@@ -467,7 +467,9 @@ scout.Desktop.prototype.setOutline = function(outline) {
     return;
   }
   try {
-    this.bench.setChanging(true);
+    if(this.bench){
+      this.bench.setChanging(true);
+    }
     if (this.rendered) {
       this._removeDisplayChildsOfOutline();
     }
@@ -485,7 +487,9 @@ scout.Desktop.prototype.setOutline = function(outline) {
       this._renderDisplayStyle();
     }
   } finally {
-    this.bench.setChanging(false);
+    if(this.bench){
+      this.bench.setChanging(false);
+    }
   }
 };
 
