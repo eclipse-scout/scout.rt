@@ -466,6 +466,20 @@ describe("DateField", function() {
 
   });
 
+  it("can predict partial years", function() {
+    var model = createModel();
+    model.timestamp = '2017-11-11';
+    var dateField = createFieldAndFocusAndOpenPicker(model);
+
+    dateField.$dateField.val('11.11.68');
+    dateField._onDateFieldBlur();
+    expect(dateField.$dateField.val()).toBe('11.11.1968');
+
+    dateField.$dateField.val('11.11.68');
+    dateField._onDateFieldBlur();
+    expect(dateField.$dateField.val()).toBe('11.11.1968');
+  });
+
   describe("Allowed dates", function() {
 
     it("_referenceDate returns only allowed date - only one date", function() {
