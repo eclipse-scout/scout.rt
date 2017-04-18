@@ -67,6 +67,7 @@ public class JsonMarshaller implements IMarshaller {
    * Create new {@link ObjectMapper} instance.<br/>
    * Override or extend this method to create a custom configured {@link ObjectMapper} instance.
    */
+  // TODO [15.4] pbz,bsh: check if we can use org.eclipse.scout.rt.jackson.databind.ObjectMapperFactory, remove jackson dependency
   protected ObjectMapper createObjectMapper() {
     return new ObjectMapper();
   }

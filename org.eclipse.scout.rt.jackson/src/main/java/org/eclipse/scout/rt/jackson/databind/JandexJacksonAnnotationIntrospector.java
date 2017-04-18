@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.mom.api.marshaller;
+package org.eclipse.scout.rt.jackson.databind;
 
 import javax.annotation.PostConstruct;
 
@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 /**
  * Default {@link JacksonAnnotationIntrospector} implementation for BSI applications.
  */
-//TODO [7.0] pbz: Move class to own scout json/jackson module
 @Bean
 public class JandexJacksonAnnotationIntrospector extends JacksonAnnotationIntrospector {
   private static final long serialVersionUID = 1L;

@@ -1,6 +1,7 @@
-package org.eclipse.scout.rt.mom.api.marshaller;
+package org.eclipse.scout.rt.jackson.databind;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -26,7 +27,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  *
  * @see https://github.com/FasterXML/jackson-docs/wiki/JacksonPolymorphicDeserialization
  */
-//TODO [7.0] pbz: Move class to own scout json/jackson module
+// TODO [7.0] pbz: change to wrapper internally using a bean
 public class JandexTypeNameIdResolver implements TypeIdResolver {
 
   private static final Logger LOG = LoggerFactory.getLogger(JandexTypeNameIdResolver.class);
@@ -74,9 +75,9 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
     }
     else {
       IBean<?> bean = m_beanManagerUtility.lookupRegisteredBean(clazz);
-      while (bean != null && bean.hasAnnotation(Replace.class)) {
+      while (hasAnnotation(bean, Replace.class)) {
         bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
-        if (bean.hasAnnotation(JsonTypeName.class)) {
+        if (hasAnnotation(bean, JsonTypeName.class)) {
           return bean.getBeanAnnotation(JsonTypeName.class).value();
         }
       }
@@ -180,7 +181,7 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
    */
   protected JavaType typeFromReplacedSuperClass(String id, IBean<?> bean) {
     Class<?> baseLookupClazz = bean.getBeanClazz();
-    while (bean.hasAnnotation(Replace.class)) {
+    while (hasAnnotation(bean, Replace.class)) {
       bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
       if (hasMatchingJsonTypeAnnotation(bean.getBeanClazz(), id)) {
         return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, baseLookupClazz);
@@ -212,6 +213,14 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
    */
   protected boolean hasMatchingJsonTypeAnnotation(Class<?> clazz, String id) {
     return clazz.isAnnotationPresent(JsonTypeName.class) && ObjectUtility.equals(clazz.getAnnotation(JsonTypeName.class).value(), id);
+  }
+
+  /**
+   * @return {@code true} if the specified {@code bean} is not {@code null} and is annotated by the specified
+   *         {@code annotation}, else {@code false}.
+   */
+  protected <ANNOTATION extends Annotation> boolean hasAnnotation(IBean<?> bean, Class<ANNOTATION> annotation) {
+    return bean != null && bean.hasAnnotation(annotation);
   }
 
   @Override

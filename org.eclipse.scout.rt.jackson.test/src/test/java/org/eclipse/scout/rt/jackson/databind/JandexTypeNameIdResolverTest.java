@@ -2,19 +2,20 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.mom.api.marshaller;
+package org.eclipse.scout.rt.jackson.databind;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -88,16 +89,16 @@ public class JandexTypeNameIdResolverTest {
 
 /* ------ Test case CoreBean as base, a project template bean and two concrete project bean implementations
 
-        +---------------------+
-        |      CoreBean       |
-        +----------^----------+
-                   |
-        +----------+----------+
-        | ProjectTemplateBean |
-        +----------^----------+
-                   |
-      +------------+--------------+
-      |                           |
+      +---------------------+
+      |      CoreBean       |
+      +----------^----------+
+                 |
+      +----------+----------+
+      | ProjectTemplateBean |
+      +----------^----------+
+                 |
+    +------------+--------------+
+    |                           |
  +--------------------+   +--------------------+
  |  ProjectBean1      |   |    ProjectBean2    |
  +--------------------+   +--------------------+
@@ -163,7 +164,7 @@ public class JandexTypeNameIdResolverTest {
     assertEquals("CoreBean", resolver.idFromValueAndType(new CoreBean(), CoreBean.class));
     assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectTemplateBean(), CoreBean.class));
 
-    IBean registeredProjectBean = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
+    IBean<?> registeredProjectBean = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
     try {
       assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectBean1(), CoreBean.class));
       assertEquals("CoreBean", resolver.idFromValueAndType(new ProjectBean1(), ProjectTemplateBean.class));
@@ -312,7 +313,7 @@ public class JandexTypeNameIdResolverTest {
 
   @Test
   public void testMarshallUnmarshallProjectBean() {
-    IBean registeredProjectBean = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
+    IBean<?> registeredProjectBean = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
     try {
       ProjectBean1 bean = new ProjectBean1();
       bean.b = true;
@@ -331,8 +332,8 @@ public class JandexTypeNameIdResolverTest {
 
   @Test(expected = AssertionException.class)
   public void testMarshallUnmarshallProjectBeanNotUnique() {
-    IBean registeredProjectBean1 = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
-    IBean registeredProjectBean2 = TestingUtility.registerBean(new BeanMetaData(ProjectBean2.class).withReplace(true));
+    IBean<?> registeredProjectBean1 = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
+    IBean<?> registeredProjectBean2 = TestingUtility.registerBean(new BeanMetaData(ProjectBean2.class).withReplace(true));
     try {
       CoreBean bean = new CoreBean();
       marshallUnmarshall(bean);
@@ -618,13 +619,17 @@ public class JandexTypeNameIdResolverTest {
 
   @SuppressWarnings("unchecked")
   protected static <T> T marshallUnmarshall(T object, boolean useAnnotationIntrospector, boolean expectJsonTypeProperty) {
-    HashMap<String, String> emptyContext = new HashMap<>();
-    JsonMarshaller marshaller = BEANS.get(JsonMarshaller.class);
+    ObjectMapper mapper = new ObjectMapper();
     if (useAnnotationIntrospector) {
-      marshaller.m_objectMapper.setAnnotationIntrospector(BEANS.get(JandexJacksonAnnotationIntrospector.class));
+      mapper.setAnnotationIntrospector(BEANS.get(JandexJacksonAnnotationIntrospector.class));
     }
-    Object json = marshaller.marshall(object, emptyContext);
-    assertEquals("Expected \"" + JSON_TYPE_PROPERTY + "\" property in JSON string " + json, expectJsonTypeProperty, String.class.cast(json).contains(JSON_TYPE_PROPERTY));
-    return (T) marshaller.unmarshall(json, emptyContext);
+    try {
+      String json = mapper.writeValueAsString(object);
+      assertEquals("Expected \"" + JSON_TYPE_PROPERTY + "\" property in JSON string " + json, expectJsonTypeProperty, String.class.cast(json).contains(JSON_TYPE_PROPERTY));
+      return (T) mapper.readValue(json, (Class<T>) object.getClass());
+    }
+    catch (IOException e) {
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+    }
   }
 }

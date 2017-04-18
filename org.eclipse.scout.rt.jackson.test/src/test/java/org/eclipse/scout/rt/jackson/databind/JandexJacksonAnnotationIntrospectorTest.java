@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.mom.api.marshaller;
+package org.eclipse.scout.rt.jackson.databind;
 
 import static org.junit.Assert.assertEquals;
 
@@ -210,7 +210,7 @@ public class JandexJacksonAnnotationIntrospectorTest {
 
   @Test
   public void testDeserializeReplacedBaseClassWithTypeInfo() throws Exception {
-    IBean registeredReplacedBean = TestingUtility.registerBean(new BeanMetaData(BeanChildClassD.class).withReplace(true));
+    IBean<?> registeredReplacedBean = TestingUtility.registerBean(new BeanMetaData(BeanChildClassD.class).withReplace(true));
     try {
       runTestDeserialize(BeanBaseClass.class, BeanChildClassD.class, null);
       runTestDeserialize(BeanBaseClass.class, BeanChildClassD.class, "Foo");

@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.mom.api.marshaller;
+package org.eclipse.scout.rt.jackson.databind;
 
 import javax.annotation.PostConstruct;
 
@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.platform.Platform;
 /**
  * Utility dealing with {@link IBeanManager}
  */
-// TODO [7.0] pbz: Consider merge/move utility functions to IBean / IBeanManager
+// TODO [7.0] pbz: Consider merge/move utility functions to IBeanManager
 @ApplicationScoped
 public class BeanManagerUtility {
 

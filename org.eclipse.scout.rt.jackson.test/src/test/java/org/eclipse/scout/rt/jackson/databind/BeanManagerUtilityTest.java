@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.mom.api.marshaller;
+package org.eclipse.scout.rt.jackson.databind;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

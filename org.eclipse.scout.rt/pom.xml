@@ -54,6 +54,11 @@
     <module>../org.eclipse.scout.rt.mom.jms</module>
     <module>../org.eclipse.scout.rt.mom.jms.test</module>
 
+    <module>../org.eclipse.scout.rt.rest</module>
+    <module>../org.eclipse.scout.rt.rest.test</module>
+    <module>../org.eclipse.scout.rt.jackson</module>
+    <module>../org.eclipse.scout.rt.jackson.test</module>
+
     <module>../org.eclipse.scout.jaxws.apt</module>
 
     <module>../org.eclipse.scout.rt.client</module>
@@ -246,6 +251,28 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.jms.test</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.rest</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.rest.test</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.jackson</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.jackson.test</artifactId>
         <version>7.0.0-SNAPSHOT</version>
       </dependency>
 
