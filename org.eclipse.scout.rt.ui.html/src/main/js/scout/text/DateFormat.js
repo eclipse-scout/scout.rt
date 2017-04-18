@@ -266,15 +266,18 @@ scout.DateFormat = function(locale, pattern) { // NOSONAR
           parseContext.matchInfo.year = match;
           return;
         }
-        var shortInputYear = Number(match);
-        var startDate = parseContext.startDate || new Date();
-        var shortStartYear = Number(String(startDate.getFullYear()).slice(-2));
-        var rangeMin = (shortStartYear - 50 < 0 ? shortStartYear + 50 : shortStartYear - 50);
-        var yearPrefix = String(scout.strings.padZeroLeft(startDate.getFullYear(), 4)).substr(0, 2);
-        if (shortInputYear > rangeMin) {
-          yearPrefix = Number(yearPrefix) - 1;
+        var startYear = (parseContext.startDate || new Date()).getFullYear();
+        // Construct a new year using the startYear's century and the entered 'short year'
+        var year = Number(
+            scout.strings.padZeroLeft(startYear, 4).substr(0, 2) +
+            scout.strings.padZeroLeft(match, 2));
+        // Ensure max. 50 years distance between 'startYear' and 'year'
+        var distance = year - startYear;
+        if (distance <= -50) {
+          year += 100;
+        } else if (distance > 50) {
+          year -= 100;
         }
-        var year = Number(String(yearPrefix) + scout.strings.padZeroLeft(shortInputYear, 2));
         parseContext.dateInfo.year = year;
         parseContext.matchInfo.year = match;
       }

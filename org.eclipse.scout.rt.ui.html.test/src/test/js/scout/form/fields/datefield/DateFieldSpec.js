@@ -165,7 +165,9 @@ describe("DateField", function() {
     });
 
     it("updates the model with the selected value", function() {
-      var dateField = createFieldAndFocusAndOpenPicker({timestamp: '2014-10-01'});
+      var dateField = createFieldAndFocusAndOpenPicker({
+        timestamp: '2014-10-01'
+      });
       var dateBefore = dateField.timestampAsDate;
       expectDate(dateBefore, 2014, 10, 1);
 
@@ -179,7 +181,9 @@ describe("DateField", function() {
     });
 
     it("sends timestamp and displayText", function() {
-      var dateField = createFieldAndFocusAndOpenPicker({timestamp: '2014-10-01'});
+      var dateField = createFieldAndFocusAndOpenPicker({
+        timestamp: '2014-10-01'
+      });
 
       dateField.$dateField.val('11.02.2015');
       dateField._onDateFieldBlur();
@@ -202,7 +206,9 @@ describe("DateField", function() {
     });
 
     it("does not send timestamp and displayText again if not changed", function() {
-      var dateField = createFieldAndFocusAndOpenPicker({timestamp: '2014-10-01'});
+      var dateField = createFieldAndFocusAndOpenPicker({
+        timestamp: '2014-10-01'
+      });
 
       dateField.$dateField.val('11.02.2015');
       dateField._onDateFieldBlur();
@@ -462,6 +468,20 @@ describe("DateField", function() {
 
   });
 
+  it("can predict partial years", function() {
+    var model = createModel();
+    model.timestamp = '2017-11-11';
+    var dateField = createFieldAndFocusAndOpenPicker(model);
+
+    dateField.$dateField.val('11.11.68');
+    dateField._onDateFieldBlur();
+    expect(dateField.$dateField.val()).toBe('11.11.1968');
+
+    dateField.$dateField.val('11.11.68');
+    dateField._onDateFieldBlur();
+    expect(dateField.$dateField.val()).toBe('11.11.1968');
+  });
+
   describe("Allowed dates", function() {
 
     it("_referenceDate returns only allowed date - only one date", function() {
@@ -663,7 +683,9 @@ describe("DateField", function() {
       });
 
       it('shows datefield with same date as clicked datefield, if field empty initially', function() {
-        var dateField = createField({touch: true});
+        var dateField = createField({
+          touch: true
+        });
         dateField.render(session.$entryPoint);
 
         // Open
