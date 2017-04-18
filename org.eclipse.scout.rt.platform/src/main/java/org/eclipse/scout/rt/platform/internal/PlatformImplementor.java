@@ -232,8 +232,8 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public void stop() {
-    changeState(State.PlatformStopping, true);
     m_beanManager.callPreDestroyOnBeans();
+    changeState(State.PlatformStopping, true);
 
     m_platformLock.writeLock().lock();
     try {
