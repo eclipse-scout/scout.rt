@@ -74,9 +74,9 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
     }
     else {
       IBean<?> bean = m_beanManagerUtility.lookupRegisteredBean(clazz);
-      while (m_beanManagerUtility.hasAnnotation(bean, Replace.class)) {
+      while (bean != null && bean.hasAnnotation(Replace.class)) {
         bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
-        if (m_beanManagerUtility.hasAnnotation(bean, JsonTypeName.class)) {
+        if (bean.hasAnnotation(JsonTypeName.class)) {
           return bean.getBeanAnnotation(JsonTypeName.class).value();
         }
       }
@@ -180,7 +180,7 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
    */
   protected JavaType typeFromReplacedSuperClass(String id, IBean<?> bean) {
     Class<?> baseLookupClazz = bean.getBeanClazz();
-    while (m_beanManagerUtility.hasAnnotation(bean, Replace.class)) {
+    while (bean.hasAnnotation(Replace.class)) {
       bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
       if (hasMatchingJsonTypeAnnotation(bean.getBeanClazz(), id)) {
         return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, baseLookupClazz);

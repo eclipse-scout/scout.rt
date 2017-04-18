@@ -14,21 +14,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Test if Platform.get with autostart does allow for reentrant calls to Platform.get
  */
 public class PlatformStartTest {
-  private static final Logger LOG = LoggerFactory.getLogger(PlatformStartTest.class);
 
   private static ClassLoader oldContextLoader;
   private static IPlatform oldPlatform;
@@ -56,43 +50,6 @@ public class PlatformStartTest {
     assertNotNull(p);
     assertEquals(FixturePlatformWithReentrantCall.class, p.getClass());
     assertSame(p, FixturePlatformWithReentrantCall.reentrantPlatform);
-  }
-
-  @Test
-  public void testPerformance() throws Exception {
-    ClassLoader loader = new PlatformOverrideClassLoader(getClass().getClassLoader(), FixturePlatformWithReentrantCall.class);
-    Thread.currentThread().setContextClassLoader(loader);
-
-    Platform.set(null);
-    IPlatform p = Platform.get();
-    p.awaitPlatformStarted();
-
-    final AtomicLong dtSum = new AtomicLong();
-    Thread[] t = new Thread[5];
-    for (int k = 0; k < t.length; k++) {
-      t[k] = new Thread(new Runnable() {
-        @Override
-        public void run() {
-          int n = 100000000;
-          long t0 = System.nanoTime();
-          State state = null;
-          for (int i = 0; i < n; i++) {
-            state = Platform.get().getState();
-          }
-          long t1 = System.nanoTime();
-          assertNotNull(state);
-          dtSum.addAndGet(t1 - t0);
-        }
-      });
-      t[k].start();
-    }
-    for (int i = 0; i < t.length; i++) {
-      t[i].join();
-    }
-    long dtMillis = dtSum.longValue() / t.length / 1000000L;
-    if (dtMillis > 2000L) {
-      LOG.error("This test must complete within 2 seconds. It took {}ms.", dtMillis);
-    }
   }
 
   @Test

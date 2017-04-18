@@ -14,13 +14,11 @@ public class InterfaceBeanTest {
 
   private IBean<Object> m_baseBean;
   private IBean<Object> m_childBean;
-  private IBean<Object> m_wrongChildBean;
 
   @Before
   public void registerTestServices() {
     m_baseBean = Platform.get().getBeanManager().registerBean(new BeanMetaData(IBaseTest.class).withApplicationScoped(false));
     m_childBean = Platform.get().getBeanManager().registerBean(new BeanMetaData(IChildTest.class).withApplicationScoped(false));
-    m_wrongChildBean = Platform.get().getBeanManager().registerBean(new BeanMetaData(IWrongChildTest.class).withApplicationScoped(false));
   }
 
   /**
@@ -37,19 +35,10 @@ public class InterfaceBeanTest {
     Assert.assertEquals(IChildTest.class, childBean.getBeanClazz());
   }
 
-  /**
-   * Test that @Replace on interfaces causes an error
-   */
-  @Test(expected = IllegalArgumentException.class)
-  public void testInterfaceBeanWithReplace() {
-    BEANS.getBeanManager().getBean(IWrongChildTest.class);
-  }
-
   @After
   public void unRegisterTestServices() {
     Platform.get().getBeanManager().unregisterBean(m_baseBean);
     Platform.get().getBeanManager().unregisterBean(m_childBean);
-    Platform.get().getBeanManager().unregisterBean(m_wrongChildBean);
   }
 
   private interface IBaseTest {
@@ -57,15 +46,6 @@ public class InterfaceBeanTest {
   }
 
   private interface IChildTest extends IBaseTest {
-
-  }
-
-  private interface IWrongBaseTest {
-
-  }
-
-  @Replace
-  private interface IWrongChildTest extends IWrongBaseTest {
 
   }
 }

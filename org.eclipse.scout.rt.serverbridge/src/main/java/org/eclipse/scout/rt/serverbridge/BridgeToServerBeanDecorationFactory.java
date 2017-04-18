@@ -29,7 +29,7 @@ public class BridgeToServerBeanDecorationFactory extends SimpleBeanDecorationFac
   @Override
   public <T> IBeanDecorator<T> decorate(IBean<T> bean, Class<? extends T> queryType) {
     IBeanDecorator<T> decorator = super.decorate(bean, queryType);
-    if (bean.getBeanAnnotation(TunnelToServer.class) != null) {
+    if (bean.hasAnnotation(TunnelToServer.class)) {
       decorator = new BridgeToServerBeanDecorator<>(decorator);
     }
     return decorator;

@@ -42,6 +42,8 @@ public interface IBean<T> {
    */
   <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotation);
 
+  <ANNOTATION extends Annotation> boolean hasAnnotation(Class<ANNOTATION> annotation);
+
   /**
    * @return The {@link Class} of this {@link IBean}.
    */

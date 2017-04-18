@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class DoubleReplaceTest {
     Assert.assertEquals(FixtureB.class, bm.uniqueBean(FixtureB.class).getInstance().getClass());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testBase() {
     BeanManagerImplementor bm = createBeanManager(FixtureBase.class, FixtureA.class, FixtureB.class);
     bm.uniqueBean(FixtureBase.class);

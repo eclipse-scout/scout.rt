@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.mom.api.marshaller;
 
-import java.lang.annotation.Annotation;
-
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -46,13 +44,5 @@ public class BeanManagerUtility {
       }
     }
     return null;
-  }
-
-  /**
-   * @return {@code true} if the specified {@code bean} is not {@code null} and is annotated by the specified
-   *         {@code annotation}, else {@code false}.
-   */
-  public <ANNOTATION extends Annotation> boolean hasAnnotation(IBean<?> bean, Class<ANNOTATION> annotation) {
-    return bean != null && bean.getBeanAnnotation(annotation) != null;
   }
 }

@@ -8,13 +8,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -80,16 +76,5 @@ public class BeanManagerUtilityTest {
 
   @JsonTypeName("foo")
   public static class ClassWithJsonTypeName {
-  }
-
-  @Test
-  public void testHasAnnotation() {
-    assertFalse(s_utility.hasAnnotation(null, null));
-    assertFalse(s_utility.hasAnnotation(null, Replace.class));
-    assertFalse(s_utility.hasAnnotation(new BeanImplementor<>(new BeanMetaData(String.class)), Replace.class));
-
-    assertTrue(s_utility.hasAnnotation(new BeanImplementor<>(new BeanMetaData(String.class).withReplace(true)), Replace.class));
-    assertTrue(s_utility.hasAnnotation(new BeanImplementor<>(new BeanMetaData(String.class).withAnnotation(AnnotationFactory.createCreateImmediately())), CreateImmediately.class));
-    assertTrue(s_utility.hasAnnotation(new BeanImplementor<>(new BeanMetaData(ClassWithJsonTypeName.class)), JsonTypeName.class));
   }
 }

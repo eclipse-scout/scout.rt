@@ -40,7 +40,7 @@ public class BeanImplementor<T> implements IBean<T> {
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
     m_instanceAvailable = m_initialInstance != null;
-    if (m_initialInstance != null && getBeanAnnotation(ApplicationScoped.class) == null) {
+    if (m_initialInstance != null && !hasAnnotation(ApplicationScoped.class)) {
       throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", getBeanClazz().getName(), ApplicationScoped.class.getName()));
     }
     if (beanData.getProducer() != null) {
@@ -60,6 +60,11 @@ public class BeanImplementor<T> implements IBean<T> {
   @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
     return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
+  }
+
+  @Override
+  public <ANNOTATION extends Annotation> boolean hasAnnotation(Class<ANNOTATION> annotation) {
+    return getBeanAnnotation(annotation) != null;
   }
 
   @Override

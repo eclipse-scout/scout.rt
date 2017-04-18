@@ -39,12 +39,14 @@ public class WsProviderCorrelationIdHandlerTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_beans = TestingUtility.registerBean(new BeanMetaData(CorrelationId.class, new CorrelationId() {
-      @Override
-      public String newCorrelationId() {
-        return STATIC_CORRELATION_ID;
-      }
-    }).withApplicationScoped(true).withReplace(true));
+    s_beans = TestingUtility.registerBean(new BeanMetaData(P_FixtureCorrelationId.class, new P_FixtureCorrelationId()).withApplicationScoped(true).withReplace(true));
+  }
+
+  private static final class P_FixtureCorrelationId extends CorrelationId {
+    @Override
+    public String newCorrelationId() {
+      return STATIC_CORRELATION_ID;
+    }
   }
 
   @AfterClass

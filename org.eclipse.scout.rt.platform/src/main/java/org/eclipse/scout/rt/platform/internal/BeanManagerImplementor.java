@@ -323,10 +323,10 @@ public class BeanManagerImplementor implements IBeanManager {
   }
 
   public static boolean isCreateImmediately(IBean<?> bean) {
-    return bean.getBeanAnnotation(CreateImmediately.class) != null;
+    return bean.hasAnnotation(CreateImmediately.class);
   }
 
   public static boolean isApplicationScoped(IBean<?> bean) {
-    return bean.getBeanAnnotation(ApplicationScoped.class) != null;
+    return bean.hasAnnotation(ApplicationScoped.class);
   }
 }

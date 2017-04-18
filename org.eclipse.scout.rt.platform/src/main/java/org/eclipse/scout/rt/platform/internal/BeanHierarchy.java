@@ -26,15 +26,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * This class is not thread safe
  */
 public class BeanHierarchy<T> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(BeanHierarchy.class);
 
   private final Class<T> m_clazz;
   private final Set<IBean<T>> m_beans;
@@ -128,43 +125,36 @@ public class BeanHierarchy<T> {
         }
 
         //manage replaced beans
-        Map<Class<?>, IBean<?>> extendsMap = new HashMap<>();//key is replaced by value
+        final Map<Class<?>, IBean<?>> extendsMap = new HashMap<>();//key is replaced by value
         for (IBean<T> bean : list) {
-          if (bean.getBeanAnnotation(Replace.class) != null) {
-            Class<?> superClazz = null;
-            if (bean.getBeanClazz().isInterface()) {
-              throw new IllegalArgumentException('@' + Replace.class.getSimpleName() + " annotation not supported on interface: " + bean + '.');
-            }
-            else {
-              //class replaces class
-              Class<?> s = bean.getBeanClazz().getSuperclass();
-              if (s != null) {
-                if (Modifier.isAbstract(s.getModifiers())) {
-                  LOG.warn("Cannot replace an abstract super class: {}. Delete this @{} annotation.", bean, Replace.class.getSimpleName());
-                }
-                else {
-                  superClazz = s;
-                }
-              }
-            }
+          if (bean.hasAnnotation(Replace.class)) {
+            Assertions.assertFalse(bean.getBeanClazz().isInterface(), "@{} annotation not supported on interface: {}.", Replace.class.getSimpleName(), bean);
+            Class<?> superClazz = bean.getBeanClazz().getSuperclass();
+            Assertions.assertNotNull(superClazz, "@{} annotation not supported for bean '{}' because it has no super class.", Replace.class.getSimpleName(), bean);
+            Assertions.assertNotEquals(Object.class, superClazz, "@{} annotation not supported for bean '{}' because it has no super class.", Replace.class.getSimpleName(), bean);
+            Assertions.assertFalse(Modifier.isAbstract(superClazz.getModifiers()), "Cannot replace an abstract super class: {}. Delete this @{} annotation.", bean, Replace.class.getSimpleName());
+
             if (superClazz != null) {
               IBean<?> existingBean = extendsMap.get(superClazz);
               if (existingBean == null) {
                 //only add if first to override, respects @Order annotation
                 extendsMap.put(superClazz, bean);
               }
-              else if (orderOf(existingBean) == orderOf(bean)) {
-                throw new IllegalArgumentException("Bean '" + existingBean.getBeanClazz().getName() + "' and '" + bean.getBeanClazz().getName()
-                    + "' replace the same super class and have identical orders. No unique result possible.");
+              else {
+                Assertions.assertFalse(orderOf(existingBean) == orderOf(bean),
+                    "Bean '{}' and '{}' replace the same super class and have identical orders. No unique result possible.",
+                    existingBean.getBeanClazz().getName(), bean.getBeanClazz().getName());
               }
             }
           }
         }
+
         //find most specific version of @Replaced class
         Class<T> refClazz = m_clazz;
         while (extendsMap.containsKey(refClazz)) {
           refClazz = (Class<T>) extendsMap.get(refClazz).getBeanClazz();
         }
+
         //remove replaced beans
         for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
           if (extendsMap.containsKey(it.next().getBeanClazz())) {

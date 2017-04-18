@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
@@ -328,7 +329,7 @@ public class JandexTypeNameIdResolverTest {
     }
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = AssertionException.class)
   public void testMarshallUnmarshallProjectBeanNotUnique() {
     IBean registeredProjectBean1 = TestingUtility.registerBean(new BeanMetaData(ProjectBean1.class).withReplace(true));
     IBean registeredProjectBean2 = TestingUtility.registerBean(new BeanMetaData(ProjectBean2.class).withReplace(true));

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.context;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -119,6 +120,7 @@ public final class ClientRunContexts {
    * Factory to create initialized {@link ClientRunContext} objects.
    */
   @Replace
+  @Order(4900) // specify an order so that if ClientRunContextFactory and ServerRunContextFactory are on the class-path the winning one is defined (client first)
   public static class ClientRunContextFactory extends RunContextFactory {
 
     @Override
