@@ -464,6 +464,17 @@ describe("DateField", function() {
       expectPrediction('2', '2.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
     });
 
+    it("can predict yyyy.MM", function() {
+      var model = createModel();
+      model.dateFormatPattern = 'yyyy.MM';
+      var dateField = createFieldAndFocusAndOpenPicker(model);
+      var now = new Date();
+
+      dateField.$dateField.val('2');
+      dateField._onDateFieldBlur();
+      expect(dateField.$dateField.val()).toBe('2002.' + ('0' + (now.getMonth() + 1)).slice(-2));
+    });
+
   });
 
   it("can predict partial years", function() {
