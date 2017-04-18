@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.platform.util.Assertions;
  * @author aho
  */
 public class BenchColumnData extends FlexboxLayoutData {
-  public static final int TOP = 0;
+  public static final int NORTH = 0;
   public static final int CENTER = 1;
-  public static final int BOTTOM = 2;
+  public static final int SOUTH = 2;
   private FlexboxLayoutData[] m_rows = {
       new FlexboxLayoutData(),
       new FlexboxLayoutData(),
@@ -23,13 +23,13 @@ public class BenchColumnData extends FlexboxLayoutData {
     return m_rows;
   }
 
-  public BenchColumnData withTop(FlexboxLayoutData data) {
-    m_rows[TOP] = data;
+  public BenchColumnData withNorth(FlexboxLayoutData data) {
+    m_rows[NORTH] = data;
     return this;
   }
 
-  public FlexboxLayoutData getTop() {
-    return m_rows[TOP];
+  public FlexboxLayoutData getNorth() {
+    return m_rows[NORTH];
   }
 
   public BenchColumnData withCenter(FlexboxLayoutData data) {
@@ -41,13 +41,13 @@ public class BenchColumnData extends FlexboxLayoutData {
     return m_rows[CENTER];
   }
 
-  public BenchColumnData withBottom(FlexboxLayoutData data) {
-    m_rows[BOTTOM] = data;
+  public BenchColumnData withSouth(FlexboxLayoutData data) {
+    m_rows[SOUTH] = data;
     return this;
   }
 
-  public FlexboxLayoutData getBottom() {
-    return m_rows[BOTTOM];
+  public FlexboxLayoutData getSouth() {
+    return m_rows[SOUTH];
   }
 
   @Override
@@ -80,14 +80,14 @@ public class BenchColumnData extends FlexboxLayoutData {
     Assertions.assertInstance(copyRaw, BenchColumnData.class);
     super.copyValues(copyRaw);
     BenchColumnData copy = (BenchColumnData) copyRaw;
-    if (getBottom() != null) {
-      copy.withBottom(getBottom().copy());
+    if (getSouth() != null) {
+      copy.withSouth(getSouth().copy());
     }
     if (getCenter() != null) {
       copy.withCenter(getCenter().copy());
     }
-    if (getTop() != null) {
-      copy.withTop(getTop().copy());
+    if (getNorth() != null) {
+      copy.withNorth(getNorth().copy());
     }
     return copy;
   }
