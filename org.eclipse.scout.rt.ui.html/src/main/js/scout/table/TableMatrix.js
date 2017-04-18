@@ -13,7 +13,6 @@ scout.TableMatrix = function(table, session) {
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
-  this._columns = table.columns;
   this._rows = table.rows;
   this._table = table;
 };
@@ -395,21 +394,20 @@ scout.TableMatrix.prototype.calculate = function() {
 };
 
 scout.TableMatrix.prototype.columnCount = function() {
-  var colCount = [];
+  var c, column, r, row, cellValue,
+    columns = this.columns(),
+    colCount = [],
+    count = 0;
 
-  var count = 0;
-  for (var c = 0; c < this._columns.length; c++) {
-    var column = this._columns[c];
-    if (column instanceof scout.NumberColumn) {
-      continue;
-    }
+  for (c = 0; c < columns.length; c++) {
+    column = columns[c];
     colCount.push([column, []]);
 
-    for (var r = 0; r < this._rows.length; r++) {
-      var row = this._rows[r];
-      var v = this._table.cellValue(column, row);
-      if (colCount[count][1].indexOf(v) === -1) {
-        colCount[count][1].push(v);
+    for (r = 0; r < this._rows.length; r++) {
+      row = this._rows[r];
+      cellValue = this._table.cellValue(column, row);
+      if (colCount[count][1].indexOf(cellValue) === -1) {
+        colCount[count][1].push(cellValue);
       }
     }
 
@@ -420,5 +418,30 @@ scout.TableMatrix.prototype.columnCount = function() {
 };
 
 scout.TableMatrix.prototype.isEmpty = function() {
-  return this._rows.length === 0 || this._columns.length === 0;
+  return this._rows.length === 0 || this.columns().length === 0;
+};
+
+/**
+ * @returns valid columns for table-matrix (not instance of scout.NumberColumn and not guiOnly)
+ * @param filterNumberColumns whether or not to filter scout.NumberColumn, default is true
+ */
+scout.TableMatrix.prototype.columns = function(filterNumberColumns) {
+  filterNumberColumns = scout.nvl(filterNumberColumns, true);
+  return this._table.visibleColumns().filter(function(column) {
+    if (column.guiOnly) {
+      return false;
+    }
+    if (filterNumberColumns && column instanceof scout.NumberColumn) {
+      return false;
+    }
+    return true;
+  });
+};
+
+/**
+ * Table rows and columns are not always in a consistent state.
+ * @returns {boolean} true, if table is in a valid, consistent state
+ * */
+scout.TableMatrix.prototype.isMatrixValid = function() {
+  return this._table.rows.length === 0 || this.columns(false).length === this._table.rows[0].cells.length;
 };
