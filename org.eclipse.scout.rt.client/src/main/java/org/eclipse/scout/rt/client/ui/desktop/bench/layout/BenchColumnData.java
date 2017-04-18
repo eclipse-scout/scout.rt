@@ -23,29 +23,56 @@ public class BenchColumnData extends FlexboxLayoutData {
     return m_rows;
   }
 
+  /**
+   * To provide a configuration of the north view stack. Null for default values.
+   *
+   * @param data
+   * @return this fluent API
+   */
   public BenchColumnData withNorth(FlexboxLayoutData data) {
     m_rows[NORTH] = data;
     return this;
   }
 
+  /**
+   * @see BenchColumnData#withNorth(FlexboxLayoutData)
+   */
   public FlexboxLayoutData getNorth() {
     return m_rows[NORTH];
   }
 
+  /**
+   * To provide a configuration of the Center view stack. Null for default values.
+   *
+   * @param data
+   * @return this fluent API
+   */
   public BenchColumnData withCenter(FlexboxLayoutData data) {
     m_rows[CENTER] = data;
     return this;
   }
 
+  /**
+   * @see BenchColumnData#withCenter(FlexboxLayoutData)
+   */
   public FlexboxLayoutData getCenter() {
     return m_rows[CENTER];
   }
 
+  /**
+   * To provide a configuration of the south view stack. Null for default values.
+   *
+   * @param data
+   * @return this fluent API
+   */
   public BenchColumnData withSouth(FlexboxLayoutData data) {
     m_rows[SOUTH] = data;
     return this;
   }
 
+  /**
+   * @see BenchColumnData#withSouth(FlexboxLayoutData)
+   */
   public FlexboxLayoutData getSouth() {
     return m_rows[SOUTH];
   }

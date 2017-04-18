@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 /**
  * <h3>{@link BenchLayoutData}</h3>
- *
- * @author aho
  */
 public class BenchLayoutData {
   public static final int WEST = 0;
@@ -19,11 +17,22 @@ public class BenchLayoutData {
       new BenchColumnData(),
   };
 
+  /**
+   * The cache key is used to cache the bench layout modifications (splitter movements) in the browsers session store.
+   * Aware the settings are not cached over different browsers nor systems.
+   *
+   * @param cacheKey
+   *          the key used in the session store of the browser.
+   * @return this fluent API
+   */
   public BenchLayoutData withCacheKey(String cacheKey) {
     m_cacheKey = cacheKey;
     return this;
   }
 
+  /**
+   * @see BenchLayoutData#withCacheKey(String)
+   */
   public String getCacheKey() {
     return m_cacheKey;
   }
@@ -32,29 +41,56 @@ public class BenchLayoutData {
     return m_columns;
   }
 
+  /**
+   * To provide a configuration of all west view stacks (NW, W, SW). Null for default values.
+   *
+   * @param data
+   * @return this fluent API
+   */
   public BenchLayoutData withWest(BenchColumnData data) {
     m_columns[WEST] = data;
     return this;
   }
 
+  /**
+   * @see BenchLayoutData#withWest(BenchColumnData)
+   */
   public BenchColumnData getWest() {
     return m_columns[WEST];
   }
 
+  /**
+   * To provide a configuration of all center view stacks (N, C, S). Null for default values.
+   *
+   * @param data
+   * @return this fluent API
+   */
   public BenchLayoutData withCenter(BenchColumnData data) {
     m_columns[CENTER] = data;
     return this;
   }
 
+  /**
+   * @see BenchColumnData#withCenter(FlexboxLayoutData)
+   */
   public BenchColumnData getCenter() {
     return m_columns[CENTER];
   }
 
+  /**
+   * To provide a configuration of all east view stacks (NE, E, SE). Null for default values.
+   *
+   * @param data
+   * @return this fluent API
+   */
   public BenchLayoutData withEast(BenchColumnData data) {
     m_columns[EAST] = data;
     return this;
   }
 
+  /**
+   * @see BenchLayoutData#withEast(BenchColumnData)
+   */
   public BenchColumnData getEast() {
     return m_columns[EAST];
   }
