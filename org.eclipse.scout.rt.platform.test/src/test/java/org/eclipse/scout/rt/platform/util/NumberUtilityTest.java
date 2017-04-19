@@ -141,6 +141,43 @@ public class NumberUtilityTest {
   }
 
   @Test
+  public void testIsDoubleDifferent() {
+    assertTrue(NumberUtility.isDoubleDifferent(1.1113d, 1.1115d, 0.0001d));
+    assertTrue(NumberUtility.isDoubleDifferent(1.0d, 2.0d, 0.9d));
+    assertFalse(NumberUtility.isDoubleDifferent(1.111d, 1.112d, 0.01d));
+    assertFalse(NumberUtility.isDoubleDifferent(-0.0d, 0.0d, 0.000000001d));
+    assertFalse(NumberUtility.isDoubleDifferent(-0.0d, 0.0d, 1d));
+    assertFalse(NumberUtility.isDoubleDifferent(-0.0d, 0.0d, 0d));
+
+    // min/max values
+    assertTrue(NumberUtility.isDoubleDifferent(-Double.MAX_VALUE, Double.MAX_VALUE, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.MAX_VALUE, Double.MIN_VALUE, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.MIN_VALUE, Double.MAX_VALUE, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.MAX_VALUE, -Double.MAX_VALUE, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.MIN_VALUE, -Double.MIN_VALUE, 0d));
+    assertFalse(NumberUtility.isDoubleDifferent(Double.MAX_VALUE, Double.MAX_VALUE, 10000d));
+    assertFalse(NumberUtility.isDoubleDifferent(Double.MIN_VALUE, Double.MIN_VALUE, 10000d));
+    assertFalse(NumberUtility.isDoubleDifferent(-Double.MAX_VALUE, -Double.MAX_VALUE, 10000d));
+    assertFalse(NumberUtility.isDoubleDifferent(-Double.MIN_VALUE, -Double.MIN_VALUE, 10000d));
+
+    // infinity comparisons
+    assertFalse(NumberUtility.isDoubleDifferent(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 10000d));
+    assertFalse(NumberUtility.isDoubleDifferent(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.NEGATIVE_INFINITY, 100d, 10000d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.POSITIVE_INFINITY, 100d, 10000d));
+
+    // NaN comparisons
+    assertTrue(NumberUtility.isDoubleDifferent(1.0d, Double.NaN, 1d));
+    assertTrue(NumberUtility.isDoubleDifferent(Double.NaN, 1.0d, 1d));
+    assertFalse(NumberUtility.isDoubleDifferent(Double.NaN, Double.NaN, 1d));
+    assertFalse(NumberUtility.isDoubleDifferent(Float.NaN, Float.NaN, Float.POSITIVE_INFINITY));
+    assertFalse(NumberUtility.isDoubleDifferent(Double.NaN, Double.NaN, Double.POSITIVE_INFINITY));
+    assertFalse(NumberUtility.isDoubleDifferent(Double.NaN, Double.NaN, Double.NEGATIVE_INFINITY));
+  }
+
+  @Test
   public void testParseEmptyString() {
     assertEquals(0d, NumberUtility.parseDouble(""), 0.00001d);
     assertEquals(0l, NumberUtility.parseLong(""));

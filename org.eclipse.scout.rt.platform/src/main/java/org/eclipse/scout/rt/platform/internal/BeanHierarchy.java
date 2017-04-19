@@ -96,7 +96,7 @@ public class BeanHierarchy<T> {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "squid:S1244" /* Floating point numbers should not be tested for equality */})
   protected List<IBean<T>> query(boolean querySingle) {
     boolean isInitialized = false;
     m_queryCacheLock.readLock().lock();
@@ -134,17 +134,17 @@ public class BeanHierarchy<T> {
             Assertions.assertNotEquals(Object.class, superClazz, "@{} annotation not supported for bean '{}' because it has no super class.", Replace.class.getSimpleName(), bean);
             Assertions.assertFalse(Modifier.isAbstract(superClazz.getModifiers()), "Cannot replace an abstract super class: {}. Delete this @{} annotation.", bean, Replace.class.getSimpleName());
 
-            if (superClazz != null) {
-              IBean<?> existingBean = extendsMap.get(superClazz);
-              if (existingBean == null) {
-                //only add if first to override, respects @Order annotation
-                extendsMap.put(superClazz, bean);
-              }
-              else {
-                Assertions.assertFalse(orderOf(existingBean) == orderOf(bean),
-                    "Bean '{}' and '{}' replace the same super class and have identical orders. No unique result possible.",
-                    existingBean.getBeanClazz().getName(), bean.getBeanClazz().getName());
-              }
+            IBean<?> existingBean = extendsMap.get(superClazz);
+            if (existingBean == null) {
+              //only add if first to override, respects @Order annotation
+              extendsMap.put(superClazz, bean);
+            }
+            else {
+              // there is no calculation performed on bean orders (typically these are literals).
+              // therefore we accept direct equality check without epsilon.
+              Assertions.assertFalse(orderOf(existingBean) == orderOf(bean),
+                  "Bean '{}' and '{}' replace the same super class and have identical orders. No unique result possible.",
+                  existingBean.getBeanClazz().getName(), bean.getBeanClazz().getName());
             }
           }
         }

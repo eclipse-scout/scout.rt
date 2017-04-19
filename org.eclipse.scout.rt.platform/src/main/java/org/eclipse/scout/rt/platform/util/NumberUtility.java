@@ -404,6 +404,35 @@ public final class NumberUtility {
   }
 
   /**
+   * Compares the given double values. Returns {@code true} if the difference between the two double values is bigger
+   * than the given epsilon.<br>
+   * <br>
+   * Special cases:
+   * <ul>
+   * <li>{@code -0} and {@code +0} are considered to be equal even though
+   * {@code Double.valueOf(0d).equals(Double.valueOf(-0d))} returns {@code false}! This means this method behaves like
+   * {@code +0 == -0}.</li>
+   * <li>{@link Double#NaN} and {@link Double#NaN} are considered to be equal even though
+   * {@code Double.NaN == Double.NaN} returns {@code false}!</li>
+   * </ul>
+   *
+   * @param d1
+   *          The first double value
+   * @param d2
+   *          The second double value
+   * @param epsilon
+   *          The difference between the two to be considered equal.
+   * @return {@code false} if the difference between the two values is less or equal to the given epsilon.
+   */
+  public static boolean isDoubleDifferent(double d1, double d2, double epsilon) {
+    if (Double.compare(d1, d2) == 0) {
+      // handles NaN, Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY
+      return false;
+    }
+    return !(Math.abs(d1 - d2) <= Math.abs(epsilon));
+  }
+
+  /**
    * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
    */
   public static int nvl(Integer value, int valueWhenNull) {
