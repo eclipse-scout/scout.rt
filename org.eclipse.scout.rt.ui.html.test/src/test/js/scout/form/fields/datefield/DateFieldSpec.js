@@ -515,7 +515,7 @@ describe("DateField", function() {
         dateField.$dateField.triggerMouseDown();
         expect(findPicker().length).toBe(1);
 
-        selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
 
         dateField.$timeField.val('0442');
         dateField._onTimeFieldBlur();
@@ -564,7 +564,7 @@ describe("DateField", function() {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        var selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        var selectedDate = selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
         expect(dateField.popup).toBe(null);
       });
 
@@ -594,7 +594,7 @@ describe("DateField", function() {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        var selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        var selectedDate = selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
         expect(dateField.popup).toBe(null);
         expect(dateField.timestampAsDate).toEqual(selectedDate);
         expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(selectedDate));
@@ -634,12 +634,12 @@ describe("DateField", function() {
         expect(dateField.popup).toBe(null);
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
-        
+
         dateField.popup._field.$timeField.val('10:42');
         dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
-                
+
         expect(dateField.popup).toBe(null);
-        
+
         expectDate(dateField.timestampAsDate, 2016, 02, 29, 10, 42);
         expect(dateField.displayText).toBe('29.02.2016\n10:42');
         expect(dateField.$dateField.text()).toBe('29.02.2016');

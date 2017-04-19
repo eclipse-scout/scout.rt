@@ -25,12 +25,16 @@ scout.DatePickerPopup.prototype._init = function(options) {
   });
 };
 
+scout.DatePickerPopup.prototype._createLayout = function() {
+  return new scout.DatePickerPopupLayout(this);
+};
+
 scout.DatePickerPopup.prototype._render = function($parent) {
-  this.picker.render($parent);
-  this.$container = this.picker.$container;
-  this.$container.addClass('date-picker-popup');
-  this.htmlComp = this.picker.htmlComp;
+  this.$container = $parent.appendDiv('date-picker-popup');
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;
+  this.picker.render(this.$container);
 };
 
 /**

@@ -109,18 +109,12 @@ scout.Carousel.prototype._renderItemsInternal = function(item, skipRemove) {
 scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
   var $window = this.$carouselFilmstrip.window();
   this.$carouselFilmstrip.on('mousedown touchstart', function(event) {
-    var origPageX = event.pageX;
-    if (!origPageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length === 1) {
-      origPageX = event.originalEvent.touches[0].pageX;
-    }
+    var origPageX = scout.events.pageX(event);
     var origPosition = this.positionX;
     var minPositionX = this.$container.width() - this.$carouselFilmstrip.width();
     var containerWidth = this.$container.width();
     $window.on('mousemove.carouselDrag touchmove.carouselDrag', function(event) {
-      var pageX = event.pageX;
-      if (!pageX && event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length === 1) {
-        pageX = event.originalEvent.touches[0].pageX;
-      }
+      var pageX = scout.events.pageX(event);
       var moveX = pageX - origPageX;
       var positionX = origPosition + moveX;
       if (positionX !== this.positionX && positionX <= 0 && positionX >= minPositionX) {

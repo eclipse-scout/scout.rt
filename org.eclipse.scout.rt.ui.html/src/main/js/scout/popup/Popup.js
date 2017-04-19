@@ -216,7 +216,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
  * Method invoked once a mouse down event occurs outside the popup.
  */
 scout.Popup.prototype._onMouseDownOutside = function(event) {
-//  this.close();
+  this.close();
 };
 
 /**

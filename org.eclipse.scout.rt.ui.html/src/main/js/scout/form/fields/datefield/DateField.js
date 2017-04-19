@@ -1151,9 +1151,9 @@ scout.DateField.prototype.getDatePicker = function() {
  */
 scout.DateField.prototype.openPopupAndSelect = function(date) {
   if (!date) {
-    this.preselectDate(this._referenceDate());
+    this.preselectDate(this._referenceDate(), false);
   } else {
-    this.selectDate(date);
+    this.selectDate(date, false);
   }
 };
 

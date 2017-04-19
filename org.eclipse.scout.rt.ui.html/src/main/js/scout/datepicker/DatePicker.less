@@ -8,27 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.date-picker.has-error {
-  border-color: @error-border-color;
-}
-
-.date-picker {
-  height: 237px;
-  width: 252px;
+.date-picker-popup {
   position: absolute;
-  background-color: @control-background-color;
+  width: 252px;
   border: 1px solid @popup-border-color;
   border-radius: @border-radius;
   #scout.drop-shadow();
-
-  /* necessary for animation */
   overflow: hidden;
+
+  &.has-error {
+    border-color: @error-border-color;
+  }
 }
 
-/* necessary for animation */
+.date-picker {
+  position: relative;
+  background-color: @control-background-color;
+}
+
 .date-picker-scrollable {
   position: relative;
-  padding: 0 6px;
   width: 100%;
 }
 
@@ -38,18 +37,16 @@
   width: 100%;
 }
 
-/* necessary for animation */
 .date-picker-month {
   display: table;
   width: 100%;
+  padding: 0 6px 3px 6px;
 }
 
 .date-picker-weekdays {
   display: table-row;
-  width: 100%;
 }
 
-/* weekday header */
 .date-picker-weekday {
   display: table-cell;
   padding: 8px 0;
@@ -59,53 +56,50 @@
 
 .date-picker-week {
   display: table-row;
-  width: 100%;
 }
 
 .date-picker-day {
   display: table-cell;
-  position: relative;
   text-align: center;
   vertical-align: middle;
-  padding: 7px;
 
   .date-picker.touch & {
-    padding: 14px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 
-  &::before {
-    position: absolute;
-    display: none;
-    width: 25px;
-    height: 25px;
-    top: calc(~'50%' - 12.5px);
-    left: calc(~'50%' - 12.5px);
-
-    content: '';
-    z-index: -1;
-
+  & > .text {
+    display: inline-block;
+    padding: 5px;
+    margin-top: 2px;
     border-radius: 50%;
     border: 1px solid transparent;
   }
 
-  &:hover:not(.date-picker-disabled) {
-    &::before {
-      display: block;
+  &.ten > .text {
+    /* increase padding a bit to center days between 10 and 19 nicer */
+    padding-right: 6px;
+  }
+
+  /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
+  &:active:not(.disabled),
+  .date-picker:not(.touch) &:hover:not(.disabled) {
+    & > .text {
       border-color: @item-selection-border-color;
       background-color: @palette-blue-0;
     }
 
-    &.date-picker-now::before {
+    &.date-picker-now > .text {
       border-color: @highlight-color;
       background-color: @palette-orange-0;
     }
 
-    &.date-picker-selected {
-      &::before {
+    &.selected {
+      & > .text {
         background-color: @palette-blue-4;
       }
 
-      &.date-picker-now::before {
+      &.date-picker-now > .text {
         background-color: @palette-orange-3;
       }
     }
@@ -128,37 +122,35 @@
     font-weight: bold;
   }
 
-  &.date-picker-preselected {
-    &::before {
-      display: block;
+  &.preselected {
+    & > .text {
       border-color: @item-selection-border-color;
       border-style: dashed;
     }
 
-    &.date-picker-now::before {
+    &.date-picker-now > .text {
       border-color: @highlight-color;
     }
   }
 
-  &.date-picker-selected {
+  &.selected {
     color: @palette-white;
 
-    &::before {
-      display: block;
+    & > .text{
       background-color: @item-selection-border-color;
     }
 
     &.date-picker-now {
       color: @palette-white;
 
-      &::before {
+      & > .text {
         background-color: @highlight-color;
       }
     }
   }
 
   /* Must be after other style definitions, because 'disabled' should overrule other definitions */
-  &.date-picker-disabled {
+  &.disabled {
     color: @palette-gray-5;
   }
 }
@@ -172,8 +164,8 @@
 
   /* Additional space between navigation buttons on touch devices */
   &.touch {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 18px;
+    padding-right: 18px;
 
     & > .date-picker-left-m {
       margin-left: 26px;

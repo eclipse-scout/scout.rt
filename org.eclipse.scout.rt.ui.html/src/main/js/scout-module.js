@@ -29,6 +29,7 @@
   __include("scout/util/arrays.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
+  __include("scout/util/events.js");
   __include("scout/util/DetachHelper.js");
   __include("scout/util/Device.js");
   __include("scout/util/DoubleClickSupport.js");
@@ -140,8 +141,8 @@
   __include("scout/popup/TouchPopup.js");
   __include("scout/popup/TouchPopupLayout.js");
   __include("scout/datepicker/DatePicker.js");
-  __include("scout/datepicker/DatePickerLayout.js");
   __include("scout/datepicker/DatePickerPopup.js");
+  __include("scout/datepicker/DatePickerPopupLayout.js");
   __include("scout/datepicker/DatePickerTouchPopup.js");
   __include("scout/datepicker/DatePickerTouchPopupLayout.js");
   __include("scout/image/Image.js");
