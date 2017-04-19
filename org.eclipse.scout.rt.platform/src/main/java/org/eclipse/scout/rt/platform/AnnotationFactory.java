@@ -135,9 +135,8 @@ public final class AnnotationFactory {
         }
 
         Order other = (Order) obj;
-        return this.value() == other.value();
+        return Double.doubleToLongBits(value()) == Double.doubleToLongBits(other.value());
       }
     };
   }
-
 }
