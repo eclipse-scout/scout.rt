@@ -134,6 +134,10 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   protected void handleModelTreeEvent(TreeEvent event) {
+    if (!acceptModelTreeEvent(event)) {
+      return;
+    }
+
     super.handleModelTreeEvent(event);
 
     // When nodes are deleted, immediately detach the detail table from the deleted nodes. If we would do
@@ -144,6 +148,21 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     if (ObjectUtility.isOneOf(event.getType(), TreeEvent.TYPE_NODES_DELETED, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED)) {
       detachDetailTables(event.getNodes(), true);
     }
+  }
+
+  protected boolean acceptModelTreeEvent(TreeEvent event) {
+    // Don't fill the event buffer with events that are currently not relevant for the UI
+    if (event instanceof OutlineEvent && ObjectUtility.isOneOf(((OutlineEvent) event).getType(),
+        OutlineEvent.TYPE_PAGE_BEFORE_DATA_LOADED,
+        OutlineEvent.TYPE_PAGE_AFTER_DATA_LOADED,
+        OutlineEvent.TYPE_PAGE_AFTER_TABLE_INIT,
+        OutlineEvent.TYPE_PAGE_AFTER_PAGE_INIT,
+        OutlineEvent.TYPE_PAGE_AFTER_SEARCH_FORM_START,
+        OutlineEvent.TYPE_PAGE_AFTER_DISPOSE,
+        OutlineEvent.TYPE_PAGE_ACTIVATED)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -240,6 +259,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       case OutlineEvent.TYPE_PAGE_CHANGED:
         handleModelPageChanged((OutlineEvent) event);
         break;
+      // Note: Check acceptModelTreeEvent() before adding new cases here
       default:
         //NOP
     }
