@@ -252,7 +252,7 @@ scout.FlexboxLayout.prototype.ensureInitialValues = function(children, container
 
   }.bind(this));
 
-  var relativeFactor = totalPx / sumOfRelatives;
+  var relativeFactor = (totalPx - sumOfAbsolutePx) / sumOfRelatives;
   colLayoutDatas.filter(function(ld) {
     return ld.relative && ld.initial > -1 && !ld.sizePx;
   }).reduce(function(restWidth, ld) {
