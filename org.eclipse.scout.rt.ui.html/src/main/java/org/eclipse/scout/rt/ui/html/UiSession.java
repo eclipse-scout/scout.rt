@@ -376,7 +376,7 @@ public class UiSession implements IUiSession {
     // Cookie must not expire too early so that it does not break the heart beat
     // -> use a big max age. If the session expires or the user logs out the session will be invalidated normally
     int maxAge = 3600 * 24 * 365; // 1 year
-    Cookie cookie = new Cookie(config.getName(), httpSession.getId());
+    Cookie cookie = new Cookie(ObjectUtility.nvl(config.getName(), "JSESSIONID"), httpSession.getId());
     cookie.setMaxAge(maxAge);
     cookie.setComment(config.getComment());
     if (config.getDomain() != null) {
