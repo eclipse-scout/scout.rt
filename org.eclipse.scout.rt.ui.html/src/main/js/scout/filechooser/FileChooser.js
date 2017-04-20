@@ -211,6 +211,9 @@ scout.FileChooser.prototype.setMultiSelect = function(multiSelect) {
 };
 
 scout.FileChooser.prototype.addFiles = function(files) {
+  if (files instanceof FileList) {
+    files = scout.FileInput.fileListToArray(files);
+  }
   files = scout.arrays.ensure(files);
   if (files.length === 0) {
     return;
@@ -236,6 +239,9 @@ scout.FileChooser.prototype.removeFile = function(file) {
 };
 
 scout.FileChooser.prototype.setFiles = function(files) {
+  if (files instanceof FileList) {
+    files = scout.FileInput.fileListToArray(files);
+  }
   files = scout.arrays.ensure(files);
   this.setProperty('files', files);
 };

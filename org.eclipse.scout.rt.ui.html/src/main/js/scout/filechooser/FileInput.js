@@ -157,6 +157,9 @@ scout.FileInput.prototype.clear = function(file) {
 };
 
 scout.FileInput.prototype._setFiles = function(files) {
+  if (files instanceof FileList) {
+    files = scout.FileInput.fileListToArray(files);
+  }
   files = scout.arrays.ensure(files);
   if (scout.arrays.equals(this.files, files)) {
     return;
@@ -194,15 +197,10 @@ scout.FileInput.prototype.browse = function() {
 };
 
 scout.FileInput.prototype._onFileChange = function(event) {
-  var i,
-    files = [];
+  var files = [];
 
   if (!this.legacy) {
-    // convert FileList into array
-    var fileList = this.$fileInput[0].files;
-    for (i = 0; i < fileList.length; i++) {
-      files.push(fileList[i]);
-    }
+    files = this.$fileInput[0].files;
   } else {
     if (this.$fileInput[0].value) {
       files.push(this.$fileInput[0].value);
@@ -234,4 +232,12 @@ scout.FileInput.prototype._onDrop = function(event) {
       this._setFiles(files);
     }
   }
+};
+
+scout.FileInput.fileListToArray = function(fileList) {
+  var files = [], i;
+  for (i = 0; i < fileList.length; i++) {
+    files.push(fileList[i]);
+  }
+  return files;
 };
