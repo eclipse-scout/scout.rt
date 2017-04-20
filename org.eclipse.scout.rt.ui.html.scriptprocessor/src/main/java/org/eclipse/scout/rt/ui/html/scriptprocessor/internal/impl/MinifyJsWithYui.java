@@ -26,14 +26,6 @@ public class MinifyJsWithYui {
   }
 
   public String run(String content, boolean munge) throws IOException {
-    // FIXME [awe] 7.0 - remove this hack. Required because YUI is broken and cannot differentiate between the catch/throws
-    // JS language keywords and object properties with the name catch/throws >:(
-    boolean isJquery = content.startsWith("/*!\n * jQuery");
-    if (isJquery) {
-      content = content
-          .replaceAll("\\.catch", ".___catch___")
-          .replaceAll("\\.throws", ".___throws___");
-    }
     try (
         StringReader reader = new StringReader(content);
         StringWriter writer = new StringWriter();) {
@@ -63,13 +55,7 @@ public class MinifyJsWithYui {
       boolean disableOptimizations = false;
       compressor.compress(writer, -1, munge, verbose, preserveAllSemicolons, disableOptimizations);
       writer.flush();
-      String output = writer.toString();
-      if (isJquery) {
-        output = output
-            .replaceAll("\\.___catch___", ".catch")
-            .replaceAll("\\.___throws___", ".throws");
-      }
-      return output;
+      return writer.toString();
     }
   }
 
