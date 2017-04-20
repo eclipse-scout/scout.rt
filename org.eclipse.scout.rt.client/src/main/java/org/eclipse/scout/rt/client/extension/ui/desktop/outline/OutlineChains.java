@@ -81,4 +81,38 @@ public final class OutlineChains {
       callChain(methodInvocation);
     }
   }
+
+  public static class OutlineActivatedChain extends AbstractOutlineChain {
+
+    public OutlineActivatedChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
+      super(extensions);
+    }
+
+    public void execActivated() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) {
+          next.execActivated(OutlineActivatedChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class OutlineDeactivatedChain extends AbstractOutlineChain {
+
+    public OutlineDeactivatedChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
+      super(extensions);
+    }
+
+    public void execDeactivated() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IOutlineExtension<? extends AbstractOutline> next) {
+          next.execDeactivated(OutlineDeactivatedChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

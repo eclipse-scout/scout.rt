@@ -16,7 +16,7 @@
  */
 scout.Outline = function() {
   scout.Outline.parent.call(this);
-  this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+  this._addAdapterProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
 
   this.autoToggleBreadcrumbStyle = true;
   this.navigateButtonsVisible = true;
@@ -75,6 +75,7 @@ scout.Outline.prototype._init = function(model) {
   this._setDefaultDetailForm(this.defaultDetailForm);
   this._setOutlineOverviewVisible(this.outlineOverviewVisible);
 
+  this._setViews(this.views);
   this._setMenus(this.menus);
   this.updateDetailContent();
 };
@@ -392,8 +393,6 @@ scout.Outline.prototype._setNavigateButtonsVisibleForNode = function(node, paren
     }
   }
 };
-
-
 
 scout.Outline.prototype._appendNavigateButtonsForDetailForm = function(node) {
   var menus = this._createNavigateButtons(node, node.detailForm.staticMenus);
@@ -889,6 +888,15 @@ scout.Outline.prototype.activateCurrentPage = function() {
 
 scout.Outline.prototype.activePage = function() {
   return this.selectedNode();
+};
+
+scout.Outline.prototype._setViews = function(views) {
+  if (views) {
+    views.forEach(function(view) {
+      view.setDisplayParent(this);
+    }.bind(this));
+  }
+  this._setProperty('views', views);
 };
 
 /**

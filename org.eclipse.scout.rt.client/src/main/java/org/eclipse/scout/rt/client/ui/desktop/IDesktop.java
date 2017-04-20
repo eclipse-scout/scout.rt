@@ -253,6 +253,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
   List<IForm> getViews(IDisplayParent displayParent);
 
   /**
+   * @return all form selected in view tabs (top level forms)
+   */
+  Collection<IForm> getSelectedViews(IDisplayParent displayParent);
+
+  /**
    * @param formClass
    *          - class of the form to be searched
    * @param handlerClass
@@ -831,4 +836,5 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
    * @since 6.1
    */
   Future<Coordinates> requestGeolocation();
+
 }

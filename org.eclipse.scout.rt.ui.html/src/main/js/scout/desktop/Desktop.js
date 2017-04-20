@@ -37,7 +37,7 @@ scout.Desktop = function() {
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
   this.openUriHandler;
 
-  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
@@ -70,6 +70,7 @@ scout.Desktop.prototype._init = function(model) {
   this._popstateHandler = this.onPopstate.bind(this);
   this.updateSplitterVisibility();
   this.resolveTextKeys(['title']);
+  this._setViews(this.views);
   this._setViewButtons(this.viewButtons);
   this._setMenus(this.menus);
   this._setBenchLayoutData(this.benchLayoutData);
@@ -164,10 +165,10 @@ scout.Desktop.prototype._postRender = function() {
 
   // Render attached forms, message boxes and file choosers.
   this.initialFormRendering = true;
+  this._renderDisplayChildsOfOutline();
   this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
-  this._renderDisplayChildsOfOutline();
   this._renderNotifications();
 
   this.initialFormRendering = false;
@@ -217,6 +218,12 @@ scout.Desktop.prototype._renderDisplayChildsOfOutline = function() {
   this.outline.formController.render();
   this.outline.messageBoxController.render();
   this.outline.fileChooserController.render();
+  
+  if (this.outline.selectedViewTabs) {
+    this.outline.selectedViewTabs.forEach(function(selectedView) {
+      this.formController._activateView(selectedView);
+    }.bind(this));
+  }
 };
 
 scout.Desktop.prototype._removeDisplayChildsOfOutline = function() {
@@ -467,7 +474,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
     return;
   }
   try {
-    if(this.bench){
+    if (this.bench) {
       this.bench.setChanging(true);
     }
     if (this.rendered) {
@@ -487,10 +494,19 @@ scout.Desktop.prototype.setOutline = function(outline) {
       this._renderDisplayStyle();
     }
   } finally {
-    if(this.bench){
+    if (this.bench) {
       this.bench.setChanging(false);
     }
   }
+};
+
+scout.Desktop.prototype._setViews = function(views) {
+  if (views) {
+    views.forEach(function(view) {
+      view.setDisplayParent(this);
+    }.bind(this));
+  }
+  this._setProperty('views', views);
 };
 
 scout.Desktop.prototype._setViewButtons = function(viewButtons) {

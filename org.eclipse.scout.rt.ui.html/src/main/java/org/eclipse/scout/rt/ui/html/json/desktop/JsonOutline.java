@@ -93,6 +93,9 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putAdapterIdsProperty(json, "views", m_desktop.getViews(getModel()));
+    if (m_desktop.getSelectedViews(getModel()).size() > 0) {
+      putAdapterIdsProperty(json, "selectedViewTabs", m_desktop.getSelectedViews(getModel()));
+    }
     putAdapterIdsProperty(json, "dialogs", m_desktop.getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", m_desktop.getMessageBoxes(getModel()));
     putAdapterIdsProperty(json, "fileChoosers", m_desktop.getFileChoosers(getModel()));
@@ -105,6 +108,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     attachAdapter(getModel().getDefaultDetailForm());
 
     attachGlobalAdapters(m_desktop.getViews(getModel()));
+    attachGlobalAdapters(m_desktop.getSelectedViews(getModel()));
     attachGlobalAdapters(m_desktop.getDialogs(getModel(), false));
     attachGlobalAdapters(m_desktop.getMessageBoxes(getModel()));
     attachGlobalAdapters(m_desktop.getFileChoosers(getModel()));

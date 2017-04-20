@@ -70,6 +70,10 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   String PROP_NAVIGATE_BUTTONS_VISIBLE = "navigateButtonsVisible";
 
+  void activate();
+
+  void deactivate();
+
   /**
    * alias to {@link ITree#getSelectedNode()}
    */
@@ -197,4 +201,5 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   void fireAfterPageDispose(IPage<?> page);
 
   void firePageActivated(IPage<?> page);
+
 }
