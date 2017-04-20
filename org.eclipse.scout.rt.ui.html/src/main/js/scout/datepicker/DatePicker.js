@@ -148,8 +148,8 @@ scout.DatePicker.prototype._renderMonth = function(month) {
 
   var $box = this.$parent.makeDiv('date-picker-month-box');
   this._build$DateBox(month.viewDate).appendTo($box);
-  $box[0].addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
-  $box.appendTo(this.$scrollable);
+  $box.on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
+    .appendTo(this.$scrollable);
 
   // Fix the size of the box
   if (!this._boxWidth) {
@@ -551,7 +551,7 @@ scout.DatePicker.prototype._onDayClick = function(event) {
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
-  event = event || this.$container.window(true).event;
+  event = event.originalEvent || this.$container.window(true).event.originalEvent;
   var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
   var diff = (wheelData >= 0 ? -1 : 1);
   this.shiftViewDate(0, diff, 0);
