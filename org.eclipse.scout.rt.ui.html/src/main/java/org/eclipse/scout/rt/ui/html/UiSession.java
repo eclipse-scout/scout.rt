@@ -225,7 +225,8 @@ public class UiSession implements IUiSession {
       // Add a cookie with the preferred user-language
       storePreferredLocaleInCookie(resp, m_clientSession.getLocale());
 
-      // Add a cookie with the jsessionid (depends on the user agent)
+      // Add a cookie with the HTTP session ID ("JSESSIONID"). Normally, this is done automatically by the container, but
+      // this methods allows to customize the session cookie (e.g. make the cookie persistent)
       storeHttpSessionIdInCookie(resp, httpSession, m_clientSession.getUserAgent());
 
       // Apply theme from model to HTTP session and cookie
@@ -342,31 +343,31 @@ public class UiSession implements IUiSession {
 
   protected void storeHttpSessionIdInCookie(HttpServletResponse resp, HttpSession httpSession, UserAgent userAgent) {
     if (!(userAgent.getUiSystem().equals(UiSystem.IOS) && userAgent.isStandalone())) {
-      // The session cookie shall only be created in standalone mode (=home screen mode of iOS)
+      // Special handling is only required for standalone mode in iOS ("home screen mode")
       return;
     }
-    SessionCookieConfig config = httpSession.getServletContext().getSessionCookieConfig();
-    if (config.getMaxAge() > 0) {
-      // Container will create the cookie, no need to do it by ourselves
-      // do not return to mark session as persistent, see below
-      LOG.info("Using persistent session cookie from container, maxAge is {}", config.getMaxAge());
+
+    SessionCookieConfig cookieConfig = httpSession.getServletContext().getSessionCookieConfig();
+    if (cookieConfig.getMaxAge() > 0) {
+      // Container will create the persistent cookie, no need to do it by ourselves.
+      LOG.info("Using persistent session cookie from container, maxAge is {} s", cookieConfig.getMaxAge());
     }
     else {
-      Cookie cookie = createSessionCookie(config, httpSession);
+      // Replace the session cookie with a persistent cookie.
+      // If the session expires or the user logs out the session will be invalidated normally.
+      Cookie cookie = createPersistentSessionCookie(cookieConfig, httpSession);
       resp.addCookie(cookie);
-      LOG.info("Created persistent session cookie, maxAge is {}", cookie.getMaxAge());
+      LOG.info("Created persistent session cookie, maxAge is {} s", cookie.getMaxAge());
     }
 
     // Mark session as persistent so that client session won't be disposed on an unload request
     m_persistent = true;
   }
 
-  protected Cookie createSessionCookie(SessionCookieConfig config, HttpSession httpSession) {
-    // Cookie must not expire too early so that it does not break the heart beat
-    // -> use a big max age. If the session expires or the user logs out the session will be invalidated normally
-    int maxAge = 3600 * 24 * 365; // 1 year
+  protected Cookie createPersistentSessionCookie(SessionCookieConfig config, HttpSession httpSession) {
     Cookie cookie = new Cookie(StringUtility.nvl(config.getName(), "JSESSIONID"), httpSession.getId());
-    cookie.setMaxAge(maxAge);
+    // The cookie must not expire too early so that it does not break the heart beat -> use a big max age.
+    cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(365)); // 1 year
     cookie.setComment(config.getComment());
     if (config.getDomain() != null) {
       cookie.setDomain(config.getDomain());
