@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 // Note: this class was written without inspecting the non-free org.json sourcecode.
@@ -101,6 +102,12 @@ public class JSONObject {
     @SuppressWarnings({"squid:S1206", "findbugs:EQ_UNUSUAL"}) // hashCode() cannot be implemented for value <code>null</code>.
     public boolean equals(Object o) {
       return o == this || o == null; // API specifies this broken equals implementation
+    }
+
+    // at least make the broken equals(null) consistent with Objects.hashCode(null).
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(null);
     }
 
     @Override
