@@ -210,7 +210,7 @@ public final class XmlUtility {
   }
 
   /**
-   * Gets all child {@link Element}s having given tagName and an attribute with the given value.
+   * Gets all child {@link Element}s having given tagName (case-sensitive) and an attribute with the given value.
    *
    * @param parent
    *          The parent {@link Element}
@@ -223,11 +223,11 @@ public final class XmlUtility {
    * @return A {@link List} with all child {@link Element} having given tagName and an attribute with the given value.
    */
   public static List<Element> getChildElementsWithAttributes(Element parent, String tagName, String requiredAttributeName, String requiredAttributeValue) {
-    NodeList endpoints = parent.getElementsByTagName(tagName);
-    List<Element> result = new LinkedList<Element>();
+    NodeList endpoints = parent.getChildNodes();
+    List<Element> result = new LinkedList<>();
     for (int i = 0; i < endpoints.getLength(); i++) {
       Node n = endpoints.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
+      if (n.getNodeType() == Node.ELEMENT_NODE && tagName.equals(n.getNodeName())) {
         Element e = (Element) n;
         if (e.hasAttribute(requiredAttributeName)) {
           String val = e.getAttribute(requiredAttributeName);
@@ -508,21 +508,15 @@ public final class XmlUtility {
    * @param parent
    *          The parent {@link Element}
    * @param tagName
-   *          The tag name the child {@link Element} must have. May be null. Then the first child element with any name
-   *          is returned.
+   *          The case-sensitive tag name the child {@link Element} must have. May be null. Then the first child element
+   *          with any name is returned.
    * @return The first child {@link Element} of the given parent {@link Element} having given tag name.
    */
   public static Element getFirstChildElement(Element parent, String tagName) {
-    NodeList children = null;
-    if (tagName == null) {
-      children = parent.getChildNodes();
-    }
-    else {
-      children = parent.getElementsByTagName(tagName);
-    }
+    final NodeList children = parent.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
+      if (n.getNodeType() == Node.ELEMENT_NODE && (tagName == null || tagName.equals(n.getNodeName()))) {
         return (Element) n;
       }
     }
@@ -546,23 +540,17 @@ public final class XmlUtility {
    * @param parent
    *          The parent {@link Element}.
    * @param tagName
-   *          The tag name of the child {@link Element}s to return. May be null. In this case all child {@link Element}s
-   *          are returned.
+   *          The case-sensitive tag name of the child {@link Element}s to return. May be null. In this case all child
+   *          {@link Element}s are returned.
    * @return A {@link List} containing all child {@link Element} of given parent {@link Element} having the given tag
    *         name.
    */
   public static List<Element> getChildElements(Element parent, String tagName) {
-    NodeList children = null;
-    if (tagName == null) {
-      children = parent.getChildNodes();
-    }
-    else {
-      children = parent.getElementsByTagName(tagName);
-    }
-    List<Element> result = new ArrayList<Element>(children.getLength());
+    final NodeList children = parent.getChildNodes();
+    List<Element> result = new ArrayList<>(children.getLength());
     for (int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
+      if (n.getNodeType() == Node.ELEMENT_NODE && (tagName == null || tagName.equals(n.getNodeName()))) {
         result.add((Element) n);
       }
     }
