@@ -906,7 +906,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
     interceptPrepareLookup(call);
     interceptPrepareKeyLookup(call, key);
-    updateLookupCall(call);
   }
 
   @Override
@@ -939,7 +938,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
     interceptPrepareLookup(call);
     interceptPrepareTextLookup(call, text);
-    updateLookupCall(call);
   }
 
   @Override
@@ -955,7 +953,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
     interceptPrepareLookup(call);
     interceptPrepareBrowseLookup(call, browseHint);
-    updateLookupCall(call);
   }
 
   @Override
@@ -971,16 +968,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     call.setActive(activeState);
     interceptPrepareLookup(call);
     interceptPrepareRecLookup(call, parentKey);
-    updateLookupCall(call);
-  }
-
-  protected void updateLookupCall(ILookupCall<LOOKUP_KEY> call) {
-    // if field itself is multiline, then the call has to be multiline
-    if (isMultilineText()) {
-      call.setMultilineText(true);
-    }
-    // update reference to current LookupCall
-    setLookupCall(call);
   }
 
   protected abstract VALUE returnLookupRowAsValue(ILookupRow<LOOKUP_KEY> lookupRow);
