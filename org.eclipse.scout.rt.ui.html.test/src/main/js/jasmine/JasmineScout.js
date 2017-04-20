@@ -94,6 +94,8 @@ function createSimpleModel(objectType, session, id) {
     id = scout.objectFactory.createUniqueId();
   }
   var parent = createNullParent(session);
+  parent.rendered = true;
+  parent.attached = true;
   return {
     id: id,
     objectType: objectType,

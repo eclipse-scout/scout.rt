@@ -71,6 +71,7 @@ scout.Table = function() {
   this._filterMenusHandler = this._filterMenus.bind(this);
   this.virtual = true;
   this.contextColumn;
+  this._rerenderViewPortAfterAttach = false;
   this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
 };
 scout.inherits(scout.Table, scout.Widget);
@@ -3486,6 +3487,11 @@ scout.Table.prototype._renderViewport = function() {
 };
 
 scout.Table.prototype._rerenderViewport = function() {
+  if (!this.isAttachedAndRendered()) {
+    // if table is not attached the correct viewPort can not be evaluated. Mark for rerender after attach.
+    this._rerenderViewPortAfterAttach = true;
+    return;
+  }
   this._removeRows();
   this._removeAggregateRows();
   this._renderFiller();
@@ -3753,6 +3759,16 @@ scout.Table.prototype.visibleColumns = function() {
   return this.columns.filter(function(column) {
     return column.visible;
   });
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Table.prototype._afterAttach = function(parent) {
+  if (this._rerenderViewPortAfterAttach) {
+    this._rerenderViewport();
+    this._rerenderViewPortAfterAttach = false;
+  }
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
