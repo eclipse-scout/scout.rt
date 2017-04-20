@@ -34,6 +34,7 @@ import java.util.Set;
  * -----------------------------
  * - Applied Scout code formatting rules
  * - Changed getString()/optString() to return null for JSON values "null" instead of the string "null".
+ * - Replaced task markers from the original source code with 'TO.DO'.
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -284,7 +285,7 @@ public class JSONObject {
    *          a {@link JSONObject}, {@link JSONArray}, String, Boolean, Integer, Long, Double, {@link #NULL} or null.
    *          May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    */
-  // TODO [5.2] bsh: Change {@code append) to {@link #append} when append is
+  // TO.DO Change {@code append) to {@link #append} when append is
   // unhidden.
   public JSONObject accumulate(String name, Object value) throws JSONException {
     Object current = nameValuePairs.get(checkName(name));
