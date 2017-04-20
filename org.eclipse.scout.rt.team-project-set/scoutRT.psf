@@ -1,39 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705155466_3" label="scout.rt" name="scout.rt">
-<item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.jaxws.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.jms" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.platform" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.json" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.platform.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.jaxws" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.jaxws.apt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.jdbc" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.jdbc.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.serverbridge" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.jaxws.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.jms" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.mom.api" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.platform" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.json" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.mom.jms" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.jdbc" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.jackson" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.jdbc.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.mom.api.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.rest.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.mom.jms.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.rest" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.jackson.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.platform.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.serverbridge" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server.jaxws" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.jaxws.apt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375704042674_2" label="scout.rt.client" name="scout.rt.client">
-<item elementID="=org.eclipse.scout.rt.svg.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.html.scriptprocessor.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.svg.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.html.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.svg.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.html.scriptprocessor" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.svg.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.svg.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.ui.html.scriptprocessor.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.ui.html.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.ui.html.selenium" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.svg.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.ui.html.scriptprocessor" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.rt.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1374843791650_20" label="scout.rt.releng" name="scout.rt.releng">
-<item elementID="=org.eclipse.scout.dev.jetty" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt" type="4"/>
-<item elementID="=org.eclipse.scout.dev.jetty.test.affix" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.dev.jetty.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.team-project-set" type="4"/>
+    <item elementID="=org.eclipse.scout.dev.jetty" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt" type="4"/>
+    <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt-settings" type="4"/>
+    <item elementID="=org.eclipse.scout.dev.jetty.test.affix" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item elementID="=org.eclipse.scout.dev.jetty.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+    <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.team-project-set" type="4"/>
 </workingSets>
 </psf>
