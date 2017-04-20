@@ -509,6 +509,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public Collection<IForm> getSelectedViews(IDisplayParent displayParent) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public <F extends IForm, H extends IFormHandler> List<F> findAllOpenViews(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey) {
     throw createUnsupportedOperationException();
   }

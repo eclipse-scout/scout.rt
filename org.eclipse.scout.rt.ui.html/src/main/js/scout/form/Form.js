@@ -48,6 +48,7 @@ scout.Form.DisplayHint = {
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
 
+  this._setViews(this.views);
   this.formController = scout.create('FormController', {
     displayParent: this,
     session: this.session
@@ -261,7 +262,7 @@ scout.Form.prototype._renderStatus = function() {
 scout.Form.prototype._renderSingleStatus = function(status, $prevIcon) {
   if (status && status.iconId) {
     var $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
-    if(status.cssClass()){
+    if (status.cssClass()) {
       $statusIcon.addClass(status.cssClass());
     }
     $statusIcon.prependTo(this.$statusContainer);
@@ -429,11 +430,27 @@ scout.Form.prototype.setEnabled = function(enabled, updateChildren) {
   this.rootGroupBox.setEnabled(enabled, undefined, updateChildren);
 };
 
+scout.Form.prototype._setViews = function(views) {
+  if (views) {
+    views.forEach(function(view) {
+      view.setDisplayParent(this);
+    }.bind(this));
+  }
+  this._setProperty('views', views);
+};
+
 /**
  * @override Widget.js
  */
 scout.Form.prototype.setDisabledStyle = function(disabledStyle) {
   this.rootGroupBox.setDisabledStyle(disabledStyle);
+};
+
+scout.Form.prototype.setDisplayParent = function(displayParent) {
+  if (this.displayParent === displayParent) {
+    return;
+  }
+  this.setProperty('displayParent', displayParent);
 };
 
 /**

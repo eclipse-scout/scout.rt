@@ -24,6 +24,28 @@ public final class FormUtility {
   private FormUtility() {
   }
 
+  public static String normalizeDisplayViewId(String viewId) {
+    if (viewId == null) {
+      return IForm.VIEW_ID_CENTER;
+    }
+    switch (viewId) {
+      case IForm.VIEW_ID_NW:
+      case IForm.VIEW_ID_W:
+      case IForm.VIEW_ID_SW:
+
+      case IForm.VIEW_ID_N:
+      case IForm.VIEW_ID_CENTER:
+      case IForm.VIEW_ID_S:
+
+      case IForm.VIEW_ID_NE:
+      case IForm.VIEW_ID_E:
+      case IForm.VIEW_ID_SE:
+        return viewId;
+      default:
+        return IForm.VIEW_ID_CENTER;
+    }
+  }
+
   /**
    * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
    * constructor after the form initConfig. This method is normally called before {@link #initFormFields(IForm)}.

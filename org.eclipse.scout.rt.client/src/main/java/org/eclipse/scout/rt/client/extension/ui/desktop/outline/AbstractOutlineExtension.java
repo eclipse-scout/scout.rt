@@ -14,8 +14,10 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineDeactivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineInitDefaultDetailFormChain;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
@@ -25,6 +27,16 @@ public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> ex
 
   public AbstractOutlineExtension(OWNER owner) {
     super(owner);
+  }
+
+  @Override
+  public void execActivated(OutlineActivatedChain chain) {
+    chain.execActivated();
+  }
+
+  @Override
+  public void execDeactivated(OutlineDeactivatedChain chain) {
+    chain.execDeactivated();
   }
 
   @Override
@@ -46,4 +58,5 @@ public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> ex
   public void execInitDefaultDetailForm(OutlineInitDefaultDetailFormChain chain) {
     chain.execInitDefaultDetailForm();
   }
+
 }

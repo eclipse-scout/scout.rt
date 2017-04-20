@@ -99,6 +99,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachGlobalAdapters(getModel().getViews(getModel()));
+    attachGlobalAdapters(getModel().getSelectedViews(getModel()));
     attachGlobalAdapters(getModel().getDialogs(getModel(), false));
     attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
     attachGlobalAdapters(getModel().getFileChoosers(getModel()));
@@ -353,6 +354,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
     putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
     putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
+    if (getModel().getSelectedViews(getModel()).size() > 0) {
+      putAdapterIdsProperty(json, "selectedViewTabs", getModel().getSelectedViews(getModel()));
+    }
     return json;
   }
 

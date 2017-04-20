@@ -72,6 +72,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
@@ -151,6 +152,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IForm m_pageDetailForm;
   private IForm m_pageSearchForm;
   private final FormStore m_formStore;
+  private final Map<String /*viewId*/, IForm> m_selectedViewTabs;
   private final MessageBoxStore m_messageBoxStore;
   private final FileChooserStore m_fileChooserStore;
   private final Set<IDesktopNotification> m_notifications = new LinkedHashSet<>(); // LinkedHashSet to preserve insertion order
@@ -179,6 +181,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_dataChangeListenerList = new HashMap<>();
     m_dataChangeEventBuffer = new ArrayList<>();
     m_formStore = BEANS.get(FormStore.class);
+    m_selectedViewTabs = new HashMap<String, IForm>();
     m_messageBoxStore = BEANS.get(MessageBoxStore.class);
     m_fileChooserStore = BEANS.get(FileChooserStore.class);
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withDesktop(this));
@@ -871,6 +874,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected void setActiveForm(IForm form) {
     if (form != null) {
       form.getUIFacade().fireFormActivatedFromUI();
+      if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
+        String displayViewId = FormUtility.normalizeDisplayViewId(form.getDisplayViewId());
+        m_selectedViewTabs.put(displayViewId, form);
+      }
     }
     propertySupport.setProperty(PROP_ACTIVE_FORM, form);
   }
@@ -888,6 +895,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public List<IForm> getViews(IDisplayParent displayParent) {
     return m_formStore.getViewsByDisplayParent(displayParent);
+  }
+
+  @Override
+  public Collection<IForm> getSelectedViews(IDisplayParent displayParent) {
+    List<IForm> selectedViewTabs = new ArrayList<>();
+    for (IForm f : m_selectedViewTabs.values()) {
+      if (f.getDisplayParent() == displayParent) {
+        selectedViewTabs.add(f);
+      }
+    }
+    return selectedViewTabs;
   }
 
   @Override
@@ -1062,9 +1080,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     //
     IOutline oldOutline = m_outline;
-    if (m_activeOutlineListener != null && oldOutline != null) {
-      oldOutline.removePropertyChangeListener(m_activeOutlineListener);
-      m_activeOutlineListener = null;
+    if (oldOutline != null) {
+      if (m_activeOutlineListener != null) {
+        oldOutline.removePropertyChangeListener(m_activeOutlineListener);
+        m_activeOutlineListener = null;
+      }
+      m_outline.deactivate();
     }
     // set new outline to set facts
     m_outline = newOutline;
@@ -1131,6 +1152,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setPageDetailTable(m_outline.getDetailTable());
     setPageSearchForm(m_outline.getSearchForm(), true);
     m_outline.makeActivePageToContextPage();
+    m_outline.activate();
   }
 
   @Override
@@ -1184,6 +1206,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     // The new active Form will be set by the UI or manually by IDesktop.activateForm(IForm).
     if (getActiveForm() == form) {
       setActiveForm(null);
+    }
+    if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
+      String displayViewId = FormUtility.normalizeDisplayViewId(form.getDisplayViewId());
+      if (m_selectedViewTabs.get(displayViewId) == form) {
+        m_selectedViewTabs.remove(displayViewId);
+      }
     }
     m_formStore.remove(form);
     fireFormHide(form);
@@ -1795,6 +1823,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   private void fireOutlineChanged(IOutline oldOutline, IOutline newOutline) {
+    // fire
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OUTLINE_CHANGED, newOutline);
+    fireDesktopEvent(e);
+
     if (oldOutline != newOutline) {
       //extensions
       for (IDesktopExtension ext : getDesktopExtensions()) {
@@ -1804,14 +1836,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             break;
           }
         }
-        catch (RuntimeException | PlatformError e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
+        catch (RuntimeException | PlatformError ex) {
+          BEANS.get(ExceptionHandler.class).handle(ex);
         }
       }
     }
-    // fire
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OUTLINE_CHANGED, newOutline);
-    fireDesktopEvent(e);
   }
 
   private void fireOutlineContentActivate() {

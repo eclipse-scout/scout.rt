@@ -19,8 +19,10 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateRootPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineDeactivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineInitDefaultDetailFormChain;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -284,6 +286,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Order(120)
   @ConfigOperation
   protected void execInitDefaultDetailForm() {
+  }
+
+  @Order(130)
+  @ConfigOperation
+  protected void execActivated() {
+  }
+
+  @Order(130)
+  @ConfigOperation
+  protected void execDeactivated() {
   }
 
   @Override
@@ -793,6 +805,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
+  public void activate() {
+    interceptActivated();
+  }
+
+  @Override
+  public void deactivate() {
+    interceptDeativated();
+  }
+
+  @Override
   public OutlineMediator getOutlineMediator() {
     return m_outlineMediator;
   }
@@ -928,6 +950,18 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     chain.execInitDefaultDetailForm();
   }
 
+  protected final void interceptActivated() {
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
+    OutlineActivatedChain chain = new OutlineActivatedChain(extensions);
+    chain.execActivated();
+  }
+
+  protected final void interceptDeativated() {
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
+    OutlineDeactivatedChain chain = new OutlineDeactivatedChain(extensions);
+    chain.execDeactivated();
+  }
+
   protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER> implements IOutlineExtension<OWNER> {
 
     public LocalOutlineExtension(OWNER owner) {
@@ -947,6 +981,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     @Override
     public void execInitDefaultDetailForm(OutlineInitDefaultDetailFormChain chain) {
       getOwner().execInitDefaultDetailForm();
+    }
+
+    @Override
+    public void execActivated(OutlineActivatedChain chain) {
+      getOwner().execActivated();
+    }
+
+    @Override
+    public void execDeactivated(OutlineDeactivatedChain chain) {
+      getOwner().execDeactivated();
     }
   }
 

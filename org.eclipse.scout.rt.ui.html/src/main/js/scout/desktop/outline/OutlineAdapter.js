@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.OutlineAdapter = function() {
   scout.OutlineAdapter.parent.call(this);
-  this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+  this._addAdapterProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
   this._nodeIdToRowMap = {};
   this._detailTableRowHandler = this._onDetailTableRowInitialized.bind(this);
 };
@@ -119,7 +119,7 @@ scout.OutlineAdapter.prototype._onDetailTableRowInitialized = function(event) {
   node = this.widget.nodesMap[nodeId];
 
   // If a row, which was already linked to a node, gets initialized again, re-apply the filter to make sure the node has the correct state
-  if (outline.rendered && node && outline._applyFiltersForNode(node)){
+  if (outline.rendered && node && outline._applyFiltersForNode(node)) {
     if (node.isFilterAccepted()) {
       outline._addToVisibleFlatList(node, false);
     } else {
@@ -146,4 +146,3 @@ scout.OutlineAdapter.prototype._linkNodeWithRowLater = function(page) {
   scout.Page.linkRowWithPage(row, page);
   delete this._nodeIdToRowMap[page.id];
 };
-

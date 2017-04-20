@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
-  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
   this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible', 'geolocationServiceAvailable']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
@@ -63,7 +63,7 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
     form = this.session.getOrCreateWidget(event.form, displayParent.widget);
     this.addFilterForWidgetEvent(function(widgetEvent) {
       return (widgetEvent.type === 'formActivated' &&
-          widgetEvent.form === form);
+        widgetEvent.form === form);
     });
     this.widget.showForm(form, displayParent.widget, event.position);
   }
