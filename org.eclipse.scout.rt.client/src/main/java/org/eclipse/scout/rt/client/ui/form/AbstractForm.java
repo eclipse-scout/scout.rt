@@ -2358,11 +2358,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       Document e = storeToXml();
       return XmlUtility.wellformDocument(e);
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("form : {}", getTitle(), e);
+    catch (RuntimeException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class)
+          .translate(e)
+          .withContextInfo("form", getClass().getName());
     }
   }
 
@@ -2415,6 +2414,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
+        if (field.getForm() != AbstractForm.this) {
+          // field is part of a wrapped form and is handled by the AbstractWrappedFormField
+          return true;
+        }
         Element xField = xFields.getOwnerDocument().createElement("field");
         try {
           field.storeToXml(xField);
@@ -2445,7 +2448,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     String formId = getFormId();
     String xmlId = root.getAttribute("formId");
     if (!formId.equals(xmlId)) {
-      throw new ProcessingException("xml id=" + xmlId + " does not match form id=" + formId);
+      throw new ProcessingException("xml id='{}' does not match form id='{}'", xmlId, formId);
     }
 
     // load properties
