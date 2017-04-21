@@ -39,18 +39,43 @@ describe('ResponseQueue', function() {
       rq.add({'#': 300, id: 5});
       rq.add({'#': 200, id: 6});
       rq.add({id: 8});
+      rq.add({'#': 150, id: 9});
 
-      expect(rq.queue.length).toBe(8);
+      expect(rq.queue.length).toBe(9);
       expect(rq.queue[0].id).toBe(1);
       expect(rq.queue[1].id).toBe(3);
       expect(rq.queue[2].id).toBe(2);
       expect(rq.queue[3].id).toBe(4);
       expect(rq.queue[4].id).toBe(7);
-      expect(rq.queue[5].id).toBe(6); // <--
-      expect(rq.queue[6].id).toBe(5); // <--
-      expect(rq.queue[7].id).toBe(8);
+      expect(rq.queue[5].id).toBe(9); // <--
+      expect(rq.queue[6].id).toBe(6); // <--
+      expect(rq.queue[7].id).toBe(5); // <--
+      expect(rq.queue[8].id).toBe(8);
 
       expect(rq.nextExpectedSequenceNo).toBe(1);
+    });
+
+    it('removes elements that are superseded by combined response', function() {
+      var session = createSession();
+      var rq = session.responseQueue;
+
+      expect(rq.nextExpectedSequenceNo).toBe(1);
+
+      rq.add({'#': 1, id: 1});
+      rq.add({'#': 2, id: 2});
+      rq.add({'#': 4, id: 4});
+      rq.add({'#': 8, combined: true, id: 8});
+      rq.add({'#': 3, id: 3});
+      rq.add({'#': 6, combined: true, id: 6});
+      rq.add({'#': 9, id: 9});
+
+      expect(rq.queue.length).toBe(2);
+      expect(rq.queue[0].id).toBe(8);
+      expect(rq.queue[1].id).toBe(9);
+
+      // assume "processed" until combined message
+      expect(rq.nextExpectedSequenceNo).toBe(8);
+      expect(rq.lastProcessedSequenceNo).toBe(7);
     });
 
   });
