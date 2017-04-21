@@ -1411,7 +1411,7 @@ scout.Planner.prototype.deleteAllResources = function() {
   this.selectRange(new scout.DateRange());
 };
 
-scout.Planner.prototype._updateResources = function(resources) {
+scout.Planner.prototype.updateResources = function(resources) {
   resources.forEach(function(updatedResource) {
     var oldResource = this.resourceMap[updatedResource.id];
     if (!oldResource) {
@@ -1429,6 +1429,7 @@ scout.Planner.prototype._updateResources = function(resources) {
       oldResource.$resource.replaceWith($updatedResource);
       $updatedResource.css('min-width', oldResource.$resource.css('min-width'));
       this._linkResource($updatedResource, updatedResource);
+      this._linkActivitiesForResource(updatedResource);
     }
   }.bind(this));
 };
