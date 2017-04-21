@@ -156,7 +156,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void handleJsonRequest(IUiSession uiSession, JsonRequest jsonRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
     // If client sent ACK#, cleanup response history accordingly
-    uiSession.confirmResponseProcessed(jsonRequest.getAckResponseSequenceNo());
+    uiSession.confirmResponseProcessed(jsonRequest.getAckSequenceNo());
 
     switch (jsonRequest.getRequestType()) {
       case LOG_REQUEST:
@@ -335,7 +335,10 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected void handleSyncResponseQueueRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     LOG.info("Sync response queue for UI session {}", uiSession.getUiSessionId());
-    // Without lock we might miss the response of a running UI request that was started before going offline.
+    // The "sync" request needs to acquire the UI session lock. If a request is still executing,
+    // this will cause the "sync" request to block. It is important to wait for the other request
+    // to finish, because we don't know if that request is still "connected" to a response channel.
+    // If it is not (because the connection was lost in the mean time), we would miss it's response.
     final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
     uiSessionLock.lock();
     try {

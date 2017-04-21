@@ -41,8 +41,8 @@ public class JsonRequest {
   public static final String PROP_EVENTS = "events";
   public static final String PROP_EVENT = "event";
   public static final String PROP_MESSAGE = "message";
-  public static final String PROP_ACK_RESPONSE_SEQUENCE_NO = "#ACK";
-  public static final String PROP_REQUEST_SEQUENCE_NO = "#";
+  public static final String PROP_SEQUENCE_NO = "#"; // request sequence no.
+  public static final String PROP_ACK_SEQUENCE_NO = "#ACK"; // acknowledge response sequence no.
 
   private final JSONObject m_request;
   private final RequestType m_requestType;
@@ -122,17 +122,17 @@ public class JsonRequest {
   }
 
   /**
-   * @return The acknowledged response sequence number
+   * @return The acknowledged <i>response</i> sequence number
    */
-  public Long getAckResponseSequenceNo() {
-    return JsonObjectUtility.optLong(m_request, PROP_ACK_RESPONSE_SEQUENCE_NO);
+  public Long getAckSequenceNo() {
+    return JsonObjectUtility.optLong(m_request, PROP_ACK_SEQUENCE_NO);
   }
 
   /**
-   * @return The sequence number of this request
+   * @return The sequence number of this <i>request</i>
    */
-  public Long getRequestSequenceNo() {
-    return JsonObjectUtility.optLong(m_request, PROP_REQUEST_SEQUENCE_NO);
+  public Long getSequenceNo() {
+    return JsonObjectUtility.optLong(m_request, PROP_SEQUENCE_NO);
   }
 
   @Override
