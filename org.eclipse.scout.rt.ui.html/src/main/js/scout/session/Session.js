@@ -55,7 +55,7 @@ scout.Session = function() {
   // This property is enabled by URL parameter &adapterExportEnabled=1. Default is false
   this.adapterExportEnabled = false;
   this._adapterDataCache = {};
-  this._busyCounter = 0; // >0 = busy
+  this._busy = false;
   this._busyIndicator;
   this._busyIndicatorTimeoutId;
   this._$requestPending;
@@ -560,6 +560,7 @@ scout.Session.prototype.defaultAjaxOptions = function(request) {
   // Ensure that certain request don't run forever. When a timeout occurs, the session
   // is put into offline mode. Note that normal requests should NOT be limited, because
   // the server processing might take very long (e.g. long running database query).
+  ajaxOptions.timeout = 0; // "infinite"
   if (request.cancel) {
     ajaxOptions.timeout = this.requestTimeoutCancel;
   }
@@ -624,9 +625,11 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxDone(data) {
     try {
-      // Note: remove busy handling _before_ processing the response, otherwise the focus cannot be set
+      // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
       // correctly, because the glasspane of the busy indicator is still visible.
-      if (busyHandling) {
+      // The second check prevents flickering of the busy indicator if there is a scheduled request
+      // that will be sent immediately afterwards (see onAjaxAlways).
+      if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
         this.setBusy(false);
       }
       success = this.responseQueue.process(data);
@@ -1152,16 +1155,15 @@ scout.Session.prototype.setRequestPending = function(pending) {
 
 scout.Session.prototype.setBusy = function(busy) {
   if (busy) {
-    if (this._busyCounter === 0) {
+    if (!this._busy) {
       this._renderBusy();
     }
-    this._busyCounter++;
+    this._busy = true;
   } else {
-    this._busyCounter--;
-    // Do not remove busy indicators if there is a scheduled request which will run immediately to prevent busy cursor flickering
-    if (this._busyCounter === 0 && (!this.areBusyIndicatedEventsQueued() || this.offline)) {
+    if (this._busy) {
       this._removeBusy();
     }
+    this._busy = false;
   }
 };
 
