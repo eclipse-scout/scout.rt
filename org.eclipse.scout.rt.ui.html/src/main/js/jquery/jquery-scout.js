@@ -98,7 +98,8 @@ function explodeShorthandProperties(properties) {
 $.cleanData = (function(orig) {
   return function(elems) {
     var events, elem, i;
-    for (i = 0; (elem = elems[i]); i++) {
+    for (i = 0;
+      (elem = elems[i]); i++) {
       try {
         // Only trigger remove when necessary to save time
         events = $._data(elem, 'events');
@@ -545,21 +546,19 @@ $.fn.appendIcon = function(iconId, cssClass) {
       .appendTo(this);
     return $icon;
   } else {
-    $icon = this.appendImg( icon.iconUrl, cssClass)
+    $icon = this.appendImg(icon.iconUrl, cssClass)
       .addClass('icon');
     return $icon;
   }
 };
 
 $.fn.appendImg = function(iconUrl, cssClass) {
-    var $icon = this.appendElement('<img>', cssClass);
-    if(iconUrl){
-      $icon.attr('src', iconUrl);
-    }
-    return $icon;
+  var $icon = this.appendElement('<img>', cssClass);
+  if (iconUrl) {
+    $icon.attr('src', iconUrl);
+  }
+  return $icon;
 };
-
-
 
 $.fn.makeSVG = function(type, cssClass, text, id) {
   var myDocument = this.document(true);
@@ -568,13 +567,13 @@ $.fn.makeSVG = function(type, cssClass, text, id) {
   }
   var $svg = $(myDocument.createElementNS('http://www.w3.org/2000/svg', type));
   if (cssClass) {
-    $svg.attrSVG('class', cssClass);
+    $svg.attr('class', cssClass);
   }
   if (text) {
     $svg.text(text);
   }
   if (id !== undefined) {
-    $svg.attrSVG('id', id);
+    $svg.attr('id', id);
   }
   return $svg;
 };
@@ -582,33 +581,6 @@ $.fn.makeSVG = function(type, cssClass, text, id) {
 // append SVG
 $.fn.appendSVG = function(type, cssClass, text, id) {
   return this.makeSVG(type, cssClass, text, id).appendTo(this);
-};
-
-// attr and class handling for svg
-$.fn.attrSVG = function(attributeName, value) {
-  if (this.length === 0) { // shortcut for empty collections
-    return this;
-  }
-  if (this.length === 1) { // shortcut for single element collections
-    this[0].setAttribute(attributeName, value);
-    return this;
-  }
-  return this.each(function() {
-    this.setAttribute(attributeName, value);
-  });
-};
-
-$.fn.removeAttrSVG = function(attributeName) {
-  if (this.length === 0) { // shortcut for empty collections
-    return this;
-  }
-  if (this.length === 1) { // shortcut for single element collections
-    this[0].removeAttribute(attributeName);
-    return this;
-  }
-  return this.each(function() {
-    this.removeAttribute(attributeName);
-  });
 };
 
 $.fn.attrXLINK = function(attributeName, value) {
@@ -622,47 +594,6 @@ $.fn.attrXLINK = function(attributeName, value) {
   return this.each(function() {
     this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
   });
-};
-
-$.fn.addClassSVG = function(cssClass) {
-  var old;
-  if (this.length === 0) { // shortcut for empty collections
-    return this;
-  }
-  if (this.length === 1) { // shortcut for single element collections
-    if (!this.hasClassSVG(cssClass)) {
-      old = this[0].getAttribute('class');
-      this[0].setAttribute('class', scout.strings.join(' ', old, cssClass).trim());
-    }
-    return this;
-  }
-  return this.each(function() {
-    if (!$(this).hasClassSVG(cssClass)) {
-      old = this.getAttribute('class');
-      this.setAttribute('class', scout.strings.join(' ', old, cssClass).trim());
-    }
-  });
-};
-
-$.fn.removeClassSVG = function(cssClass) {
-  var old;
-  if (this.length === 0) { // shortcut for empty collections
-    return this;
-  }
-  if (this.length === 1) { // shortcut for single element collections
-    old = ' ' + this[0].getAttribute('class') + ' ';
-    this[0].setAttribute('class', old.replace(' ' + cssClass + ' ', ' ').trim());
-    return this;
-  }
-  return this.each(function() {
-    var old = ' ' + this.getAttribute('class') + ' ';
-    this.setAttribute('class', old.replace(' ' + cssClass + ' ', ' ').trim());
-  });
-};
-
-$.fn.hasClassSVG = function(cssClass) {
-  var old = ' ' + this[0].getAttribute('class') + ' ';
-  return old.indexOf(' ' + cssClass + ' ') !== -1;
 };
 
 // select one and deselect siblings
@@ -1529,8 +1460,8 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
   $.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
     // check for conditions and support for blob / arraybuffer response type
     if (window.FormData && ((options.dataType && (options.dataType === 'binary')) ||
-       (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) ||
-       (window.Blob && options.data instanceof Blob))))) {
+        (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) ||
+          (window.Blob && options.data instanceof Blob))))) {
       return {
         // create new XMLHttpRequest
         send: function(headers, callback) {
