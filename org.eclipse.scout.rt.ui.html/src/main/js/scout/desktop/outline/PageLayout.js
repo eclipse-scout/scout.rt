@@ -21,6 +21,7 @@ scout.PageLayout.prototype.layout = function($container) {
     $text = this.page.$text,
     $icon = this.page.$icon(),
     titleHeight = 0,
+    iconHeight = 0,
     nodeMenuBar = this.outline.nodeMenuBar,
     nodeMenuBarWidth = 0,
     detailMenuBar = this.outline.detailMenuBar,
@@ -42,13 +43,17 @@ scout.PageLayout.prototype.layout = function($container) {
   }
 
   if (this.outline.detailContent) {
-    titleHeight = Math.max($text.outerHeight(true), $icon.outerHeight(true));
+    if ($icon.length > 0) {
+      iconHeight = $icon.outerHeight(true);
+    }
+    titleHeight = Math.max($text.outerHeight(true), iconHeight);
     this.outline.detailContent.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight));
   }
 };
 
 scout.PageLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize, containerSize, textHeight, iconHeight,
+  var prefSize, containerSize, textHeight,
+    iconHeight = 0,
     htmlContainer = this.page.htmlComp,
     detailContentPrefSize = new scout.Dimension(),
     $text = this.page.$text,
@@ -71,7 +76,10 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
     includeMargin: true,
     widthHint: containerSize.width - nodeMenuBarWidth
   }).height;
-  iconHeight = $icon.outerHeight(true);
+
+  if ($icon.length > 0) {
+    iconHeight = $icon.outerHeight(true);
+  }
   titlePrefHeight = Math.max(textHeight, iconHeight);
 
   if (detailMenuBar.visible) {
