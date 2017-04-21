@@ -32,31 +32,7 @@ scout.MenuBar = function() {
    * fit into the available menu-bar space.
    */
   this.visibleMenuItems = [];
-
-  this._menuItemPropertyChangeListener = function(event) {
-    // We do not update the items directly, because this listener may be fired many times in one
-    // user request (because many menus change one or more properties). Therefore, we just invalidate
-    // the MenuBarLayout. It will be updated automatically after the user request has finished,
-    // because the layout calls rebuildItemsInternal().
-    if (event.changedProperties.length > 0) {
-      if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
-        this.updateDefaultMenu();
-      } else if (event.changedProperties.indexOf('visible') > -1) {
-        var oldVisible = this.visible;
-        this.updateVisibility();
-        // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).
-        // If the menu is rendered, the menu itself triggers invalidateLayoutTree (see Menu.js#_renderVisible)
-        this.invalidateLayoutTree();
-        if (!oldVisible && this.visible) {
-          // If the menubar was previously invisible (because all menus were invisible) but
-          // is now visible, the menuboxes and the menus have to be rendered now. Otherwise,
-          // calculating the preferred size of the menubar, e.g. in the TableLayout, would
-          // return the wrong value (even if the menubar itself is visible).
-          this.revalidateLayout();
-        }
-      }
-    }
-  }.bind(this);
+  this._menuItemPropertyChangeListener = this._onMenuItemPropertyChange.bind(this);
 };
 scout.inherits(scout.MenuBar, scout.Widget);
 
@@ -67,6 +43,11 @@ scout.MenuBar.prototype._init = function(options) {
   this.menuSorter.menuBar = this;
   this.menuFilter = options.menuFilter;
   this.updateVisibility();
+};
+
+scout.MenuBar.prototype._destroy = function() {
+  scout.MenuBar.parent.prototype._destroy.call(this);
+  this._removeMenuListeners();
 };
 
 /**
@@ -390,7 +371,27 @@ scout.MenuBar.prototype._removeMenuItems = function() {
   }, this);
 };
 
-scout.MenuBar.prototype._destroy = function() {
-  scout.MenuBar.parent.prototype._destroy.call(this);
-  this._removeMenuListeners();
+scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
+  // We do not update the items directly, because this listener may be fired many times in one
+  // user request (because many menus change one or more properties). Therefore, we just invalidate
+  // the MenuBarLayout. It will be updated automatically after the user request has finished,
+  // because the layout calls rebuildItemsInternal().
+  if (event.changedProperties.length > 0) {
+    if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
+      this.updateDefaultMenu();
+    } else if (event.changedProperties.indexOf('visible') > -1) {
+      var oldVisible = this.visible;
+      this.updateVisibility();
+      // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).
+      // If the menu is rendered, the menu itself triggers invalidateLayoutTree (see Menu.js#_renderVisible)
+      this.invalidateLayoutTree();
+      if (!oldVisible && this.visible) {
+        // If the menubar was previously invisible (because all menus were invisible) but
+        // is now visible, the menuboxes and the menus have to be rendered now. Otherwise,
+        // calculating the preferred size of the menubar, e.g. in the TableLayout, would
+        // return the wrong value (even if the menubar itself is visible).
+        this.revalidateLayout();
+      }
+    }
+  }
 };
