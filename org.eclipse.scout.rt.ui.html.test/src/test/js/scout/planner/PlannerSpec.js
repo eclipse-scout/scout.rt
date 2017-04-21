@@ -62,6 +62,10 @@ describe("Planner", function() {
     return planner.$grid.find('.planner-resource');
   }
 
+  function find$ActivitiesForResource(resource) {
+    return resource.$cells.children('.planner-activity');
+  }
+
   describe("deleteResources", function() {
     var model, planner, resource0, resource1, resource2;
 
@@ -137,7 +141,7 @@ describe("Planner", function() {
 
       var updatedResource = createResource('new resource1');
       updatedResource.id = resource1.id;
-      planner._updateResources([updatedResource]);
+      planner.updateResources([updatedResource]);
       expect(planner.resources[1]).not.toBe(resource1);
       expect(planner.resources[1].resourceCell.text).toBe('new resource1');
       expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
@@ -151,11 +155,31 @@ describe("Planner", function() {
 
       var updatedResource = createResource('new resource1');
       updatedResource.id = resource1.id;
-      planner._updateResources([updatedResource]);
+      planner.updateResources([updatedResource]);
       $resource1 = find$Resources(planner).eq(1);
       expect($resource1.children('.resource-title').text()).toBe('new resource1');
       expect($resource1[0]).toBe(updatedResource.$resource[0]);
       expect($resource1.data('resource')).toBe(updatedResource);
+    });
+
+    it("updates activities", function() {
+      planner.render(session.$entryPoint);
+      $resource1 = find$Resources(planner).eq(1);
+      var $activity0 = find$ActivitiesForResource(resource1);
+      expect($activity0.text()).toBe('');
+      expect($activity0[0]).toBe(resource1.activities[0].$activity[0]);
+
+      var updatedResource = createResource('new resource1');
+      updatedResource.id = resource1.id;
+      updatedResource.activities[0].text = 'updated activity';
+      planner.updateResources([updatedResource]);
+      $resource1 = find$Resources(planner).eq(1);
+      $activity0 = find$ActivitiesForResource(updatedResource);
+      var updatedActivity = updatedResource.activities[0];
+      expect($activity0.text()).toBe('updated activity');
+      expect($activity0[0]).toBe(updatedActivity.$activity[0]);
+      expect($activity0.data('activity')).toBe(updatedActivity);
+      expect(planner.activityMap[updatedActivity.id]).toBe(updatedActivity);
     });
   });
 
@@ -324,6 +348,7 @@ describe("Planner", function() {
           lastHourOfDay: 23
         };
       });
+
       it("draws scale for WORK_WEEK with only showing every second label", function() {
         planner.displayMode = scout.Planner.DisplayMode.WORK_WEEK;
         planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-25'));

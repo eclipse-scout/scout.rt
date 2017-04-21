@@ -86,7 +86,7 @@ scout.PlannerAdapter.prototype._onResourcesSelected = function(resourceIds) {
 };
 
 scout.PlannerAdapter.prototype._onResourcesUpdated = function(resources) {
-  this.widget._updateResources(resources);
+  this.widget.updateResources(resources);
 };
 
 scout.PlannerAdapter.prototype.onModelAction = function(event) {
