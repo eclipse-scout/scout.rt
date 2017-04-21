@@ -43,6 +43,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
+import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -426,7 +427,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new FileDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(attachment.getName());
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), "UTF-8", null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -462,7 +463,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new BinaryResourceDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(attachment.getFilename());
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getFilename(), "UTF-8", null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();

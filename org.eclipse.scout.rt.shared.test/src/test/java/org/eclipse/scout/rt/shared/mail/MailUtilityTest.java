@@ -116,11 +116,11 @@ public class MailUtilityTest {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
     definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null)));
-    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample3.dat", null)));
+    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sämple3.dat", null)));
 
     MimeMessage message = MailUtility.createMimeMessage(definition);
 
-    verifyMimeMessage(message, plainText, htmlText, "sample1.dat", "sample2.dat", "sample3.dat");
+    verifyMimeMessage(message, plainText, htmlText, "sample1.dat", "sample2.dat", "sämple3.dat");
 
     // validate that the method call does not throw an exception
     MailUtility.collectMailParts(null, null, null, null);
@@ -441,7 +441,7 @@ public class MailUtilityTest {
     Assert.assertEquals("attachments parts size is wrong", attachmentFilenames.length, attachmentParts.size());
     Set<String> attachmentFilenamesSet = new HashSet<String>();
     for (Part part : attachmentParts) {
-      attachmentFilenamesSet.add(part.getFileName());
+      attachmentFilenamesSet.add(MimeUtility.decodeText(part.getFileName()));
     }
     Assert.assertEquals("attachments filenames size is wrong", attachmentFilenames.length, attachmentFilenamesSet.size());
     for (String attachmentFilename : attachmentFilenames) {
