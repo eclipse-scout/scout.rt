@@ -31,7 +31,7 @@ public class JsonStartupRequestTest {
 
     JsonStartupRequest startupReq = new JsonStartupRequest(jsonReq);
 
-    assertEquals(null, startupReq.getAckResponseSequenceNo());
+    assertEquals(null, startupReq.getAckSequenceNo());
     assertEquals("0", startupReq.getPartId());
     assertEquals(null, startupReq.getUserAgent());
     assertEquals(0, startupReq.getSessionStartupParams().size());
@@ -57,7 +57,7 @@ public class JsonStartupRequestTest {
 
     JsonStartupRequest startupReq = new JsonStartupRequest(jsonReq);
 
-    assertEquals(null, startupReq.getAckResponseSequenceNo());
+    assertEquals(null, startupReq.getAckSequenceNo());
     assertEquals("512", startupReq.getPartId());
     assertEquals(true, startupReq.getUserAgent().optBoolean("touch"));
     assertEquals("http://localhost/xyz", startupReq.getSessionStartupParams().get("url"));
