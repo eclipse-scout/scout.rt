@@ -120,7 +120,7 @@ public class UiSession implements IUiSession {
   private final P_RootAdapter m_rootJsonAdapter;
   private final AtomicLong m_jsonAdapterSeq = new AtomicLong(ROOT_ID);
   private final AtomicLong m_responseSequenceNo = new AtomicLong(1);
-  private final AtomicLong m_requestSequenceNo = new AtomicLong(-1);
+  private final RequestHistory m_requestHistory = BEANS.get(RequestHistory.class).withUiSession(this);
   private final ResponseHistory m_responseHistory = BEANS.get(ResponseHistory.class).withUiSession(this);
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private final HttpContext m_httpContext = new HttpContext();
@@ -654,7 +654,7 @@ public class UiSession implements IUiSession {
   protected void setRequestProcessed(JsonRequest jsonRequest) {
     Long requestSequenceNo = jsonRequest.getSequenceNo();
     if (requestSequenceNo != null) {
-      m_requestSequenceNo.set(requestSequenceNo);
+      m_requestHistory.setRequestProcessed(requestSequenceNo);
     }
   }
 
@@ -667,14 +667,15 @@ public class UiSession implements IUiSession {
     if (requestSequenceNo == null) {
       return false;
     }
-    return requestSequenceNo <= m_requestSequenceNo.get();
+    return m_requestHistory.isRequestProcessed(requestSequenceNo);
   }
 
   @Override
   public JSONObject processJsonRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse, final JsonRequest jsonRequest) {
     if (isAlreadyProcessed(jsonRequest)) {
-      LOG.debug("Request #{} was already processed. Ignoring request.", jsonRequest.getSequenceNo());
-      return null;
+      JSONObject response = m_responseHistory.getResponseForRequest(jsonRequest.getSequenceNo());
+      LOG.debug("Request #{} was already processed. Sending back response from history.", jsonRequest.getSequenceNo());
+      return response;
     }
 
     final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
@@ -773,7 +774,7 @@ public class UiSession implements IUiSession {
 
     // Remember response in history
     if (m_currentJsonResponse.getSequenceNo() != null) {
-      m_responseHistory.registerResponse(json, m_currentJsonResponse.getSequenceNo());
+      m_responseHistory.registerResponse(json, m_currentJsonRequest.getSequenceNo(), m_currentJsonResponse.getSequenceNo());
     }
     return json;
   }
@@ -1064,7 +1065,7 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public void waitForBackgroundJobs(final int pollWaitSeconds) throws InterruptedException {
+  public void waitForBackgroundJobs(JsonRequest jsonRequest, final int pollWaitSeconds) throws InterruptedException {
     // If another poller is currently blocking, interrupt it. This ensures that max. 1 polling
     // request is waiting for background jobs at the same time (relevant when the UI reconnects
     // after being offline).
@@ -1073,6 +1074,14 @@ public class UiSession implements IUiSession {
         m_pollerMonitor.cancel(true);
       }
       m_pollerMonitor = RunMonitor.CURRENT.get();
+    }
+
+    if (isAlreadyProcessed(jsonRequest)) {
+      // Don't block if request was already processed (simply return the previous response --> processJsonRequest)
+      synchronized (m_pollerQueueLock) {
+        m_pollerMonitor = null;
+      }
+      return;
     }
 
     LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);

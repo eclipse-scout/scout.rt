@@ -21,20 +21,30 @@ public class ResponseHistoryTest {
     history.toString();
     history.confirmResponseProcessed(1L);
     history.toSyncResponse();
+    assertNull(history.getRequestSequenceNo(1L));
+    assertNull(history.getResponseSequenceNo(1L));
     assertNull(history.getResponse(1L));
+    assertNull(history.getResponseForRequest(1L));
+    assertNull(history.getRequestSequenceNo(null));
+    assertNull(history.getResponseSequenceNo(null));
     assertNull(history.getResponse(null));
+    assertNull(history.getResponseForRequest(null));
 
     // Insert two requests
     JSONObject resp1 = new JSONObject();
     JSONObject resp2 = new JSONObject();
-    history.registerResponse(resp1, 7L);
-    history.registerResponse(resp2, 8L);
+    history.registerResponse(resp1, 1L, 7L);
+    history.registerResponse(resp2, 2L, 8L);
 
     // Test getters
     assertSame(resp1, history.getResponse(7L));
     assertSame(resp2, history.getResponse(8L));
-
-    // TODO: Test combined response
+    assertSame(resp1, history.getResponseForRequest(1L));
+    assertSame(resp2, history.getResponseForRequest(2L));
+    assertEquals(Long.valueOf(1), history.getRequestSequenceNo(7L));
+    assertEquals(Long.valueOf(2), history.getRequestSequenceNo(8L));
+    assertEquals(Long.valueOf(7), history.getResponseSequenceNo(1L));
+    assertEquals(Long.valueOf(8), history.getResponseSequenceNo(2L));
   }
 
   @Test
@@ -44,8 +54,8 @@ public class ResponseHistoryTest {
     // Insert two requests
     JSONObject resp1 = new JSONObject();
     JSONObject resp2 = new JSONObject();
-    history.registerResponse(resp1, 7L);
-    history.registerResponse(resp2, 8L);
+    history.registerResponse(resp1, 1L, 7L);
+    history.registerResponse(resp2, 2L, 8L);
 
     // Test confirm
     assertEquals(2, history.size());
@@ -57,8 +67,8 @@ public class ResponseHistoryTest {
     assertEquals(0, history.size());
 
     // Test confirm with higher sequence no.
-    history.registerResponse(resp1, 7L);
-    history.registerResponse(resp2, 8L);
+    history.registerResponse(resp1, 1L, 7L);
+    history.registerResponse(resp2, 2L, 8L);
     assertEquals(2, history.size());
     history.confirmResponseProcessed(9L); // auto-confirms #7 and #8
     assertEquals(0, history.size());
@@ -73,7 +83,7 @@ public class ResponseHistoryTest {
     for (int i = 0; i < 20; i++) {
       JSONObject resp = new JSONObject();
       all.add(resp);
-      history.registerResponse(resp, Long.valueOf(i));
+      history.registerResponse(resp, Long.valueOf(i), Long.valueOf(i));
       assertEquals(Math.min(i + 1, 10), history.size());
     }
 
@@ -91,31 +101,44 @@ public class ResponseHistoryTest {
   @Test(expected = AssertionException.class)
   public void testFail1() {
     ResponseHistory history = new ResponseHistory();
-    history.registerResponse(null, null); // null args
+    history.registerResponse(null, null, null); // null args
   }
 
   @Test(expected = AssertionException.class)
   public void testFail2() {
     ResponseHistory history = new ResponseHistory();
-    history.registerResponse(new JSONObject(), null); // null arg
+    history.registerResponse(new JSONObject(), 1L, null); // null arg
   }
 
   @Test(expected = AssertionException.class)
   public void testFail3() {
     ResponseHistory history = new ResponseHistory();
-    history.registerResponse(null, 1L); // null arg
+    history.registerResponse(new JSONObject(), null, 1L); // null arg
   }
 
   @Test(expected = AssertionException.class)
   public void testFail4() {
     ResponseHistory history = new ResponseHistory();
-    history.confirmResponseProcessed(null); // null arg
+    history.registerResponse(null, 1L, 1L); // null arg
   }
 
   @Test(expected = AssertionException.class)
   public void testFail5() {
     ResponseHistory history = new ResponseHistory();
-    history.registerResponse(new JSONObject(), 2L);
-    history.registerResponse(new JSONObject(), 2L); // response sequence no. already registered
+    history.confirmResponseProcessed(null); // null arg
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testFail6() {
+    ResponseHistory history = new ResponseHistory();
+    history.registerResponse(new JSONObject(), 1L, 2L);
+    history.registerResponse(new JSONObject(), 1L, 3L); // request sequence no. already registered
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testFail7() {
+    ResponseHistory history = new ResponseHistory();
+    history.registerResponse(new JSONObject(), 1L, 2L);
+    history.registerResponse(new JSONObject(), 2L, 2L); // response sequence no. already registered
   }
 }

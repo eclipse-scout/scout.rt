@@ -182,7 +182,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // GUI requests for the same session must be processed consecutively, therefore acquire "UI session lock"
     if (jsonRequest.getRequestType() == RequestType.POLL_REQUEST) {
       // Block for a certain time
-      boolean success = handlePollRequest(uiSession);
+      boolean success = handlePollRequest(uiSession, jsonRequest);
       if (!success) {
         return; // Interrupted while waiting -> return immediately without sending a response
       }
@@ -272,7 +272,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
    * @return <code>true</code> if the request is still valid after polling and response should be sent back to the UI.
    *         <code>false</code> when the polling was interrupted and the processing should be stopped immediately.
    */
-  protected boolean handlePollRequest(IUiSession uiSession) {
+  protected boolean handlePollRequest(IUiSession uiSession, JsonRequest jsonRequest) {
     int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
     int maxIdle = m_maxUserIdleTime;
     // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
@@ -284,7 +284,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // - the max. wait time has exceeded
     final long startNanos = System.nanoTime();
     try {
-      uiSession.waitForBackgroundJobs(pollWait);
+      uiSession.waitForBackgroundJobs(jsonRequest, pollWait);
     }
     catch (InterruptedException e) {
       if (LOG.isDebugEnabled()) {

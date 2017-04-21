@@ -10,69 +10,78 @@
  ******************************************************************************/
 scout.Reconnector = function(session) {
   this.session = session;
-  this.interval = 3000;
+  this.started = false;
+
+  // Delay before first ping
+  this.initialDelay = 1000; // ms
+  // Interval to be used between pings (indefinite retries).
+  this.interval = 3000; // ms
+  // Minimal assumed ping duration (to prevent flickering of the reconnect notification when AJAX call fails very fast)
+  this.minPingDuration = 1000; // ms
 };
 
 scout.Reconnector.prototype.start = function() {
-  this._schedulePing();
-};
-
-scout.Reconnector.prototype._schedulePing = function() {
-  if (this.pingScheduled) {
+  if (this.started) {
     return;
   }
 
-  this.pingScheduled = true;
-  setTimeout(function() {
-    this.ping();
-    this.pingScheduled = false;
-  }.bind(this), this.interval);
+  $.log.trace('[ajax reconnector] start');
+  this.started = true;
+  this._schedulePing(this.initialDelay);
 };
 
-scout.Reconnector.prototype.ping = function() {
-  this.pingTime = new Date();
+scout.Reconnector.prototype.stop = function() {
+  this.started = false;
+};
+
+scout.Reconnector.prototype._schedulePing = function(delay) {
+  $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
+  setTimeout(this._ping.bind(this), delay);
+};
+
+//
+//   [START]
+//      |
+//      v
+// +---------+          .--------.  (yes)
+// | _ping() | ------> < success? > ------> [END]
+// +---------+          '--------'
+//      ^                   |(no)
+//      |                   |
+//      +-------------------+
+//
+scout.Reconnector.prototype._ping = function() {
   this.session.onReconnecting();
 
-  var request = {
+  var pingAjaxOptions = this.session.defaultAjaxOptions({
     ping: true
-  };
+  });
 
-  var ajaxOptions = this.session.defaultAjaxOptions(request);
-
-  $.ajax(ajaxOptions)
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this));
-
-  // --- Helper methods ---
-
-  function onAjaxDone(data) {
-    this._onSuccess(data);
-  }
-
-  function onAjaxFail(jqXHR, textStatus, errorThrown) {
-    this._onFailure(request, jqXHR, textStatus, errorThrown);
-  }
+  $.log.trace('[ajax reconnector] ' + pingAjaxOptions.type + ' "' + pingAjaxOptions.url + '"');
+  this.pingStartTimestamp = Date.now();
+  $.ajax(pingAjaxOptions)
+    .done(this._onPingDone.bind(this))
+    .fail(this._onPingFail.bind(this));
 };
 
-scout.Reconnector.prototype._onSuccess = function() {
+scout.Reconnector.prototype._onPingDone = function(data, textStatus, jqXHR) {
+  $.log.trace('[ajax reconnector] ping success -> connection re-established!');
   this.session.onReconnectingSucceeded();
+  this.stop();
 };
 
-scout.Reconnector.prototype._onFailure = function() {
-  var minDuration = 1000;
-  var pingDuration = new Date().getTime() - this.pingTime.getTime();
+scout.Reconnector.prototype._onPingFail = function(jqXHR, textStatus, errorThrown) {
+  var handleFailedPing = function handleFailedPing() {
+    $.log.trace('[ajax reconnector] ping failed');
+    this.session.onReconnectingFailed();
+    this._schedulePing(this.interval);
+  }.bind(this);
 
-  if (pingDuration > minDuration) {
-    this._onFailureImpl();
+  var pingDuration = Date.now() - this.pingStartTimestamp;
+  if (pingDuration < this.minPingDuration) {
+    // Wait at least a certain time before informing about connection failure (to prevent flickering of the reconnecting notification)
+    setTimeout(handleFailedPing, this.minPingDuration - pingDuration);
   } else {
-    //Wait at least a certain time before informing about connection failure (to prevent flickering of the reconnecting notification)
-    setTimeout(function() {
-      this._onFailureImpl();
-    }.bind(this), minDuration - pingDuration);
+    handleFailedPing();
   }
-};
-
-scout.Reconnector.prototype._onFailureImpl = function() {
-  this.session.onReconnectingFailed();
-  this._schedulePing();
 };

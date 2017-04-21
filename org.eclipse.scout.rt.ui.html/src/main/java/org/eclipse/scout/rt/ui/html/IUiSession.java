@@ -193,7 +193,7 @@ public interface IUiSession {
   /**
    * Blocks the current thread/request until a model job started by a background job has terminated.
    */
-  void waitForBackgroundJobs(int pollWaitSeconds) throws InterruptedException;
+  void waitForBackgroundJobs(JsonRequest jsonRequest, int pollWaitSeconds) throws InterruptedException;
 
   /**
    * Sends a "localeChanged" event to the UI. All locale-relevant data (number formats, texts map etc.) is sent along.
