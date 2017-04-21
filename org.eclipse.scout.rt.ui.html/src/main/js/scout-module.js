@@ -26,6 +26,7 @@
   __include("scout/widget/NullWidgetAdapter.js");
   // Basic utilities
   __include("scout/util/arrays.js");
+  __include("scout/util/Call.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
   __include("scout/util/DetachHelper.js");
@@ -63,6 +64,7 @@
   __include("scout/code/LookupRow.js");
   __include("scout/code/CodeLookupCall.js"); // requires LookupCall.js
   // Session related
+  __include("scout/session/AjaxCall.js");
   __include("scout/session/BackgroundJobPollingSupport.js");
   __include("scout/session/BusyIndicator.js");
   __include("scout/session/RemoteEvent.js");

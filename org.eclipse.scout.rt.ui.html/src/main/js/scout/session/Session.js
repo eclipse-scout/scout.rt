@@ -41,7 +41,7 @@ scout.Session = function() {
   this.remoteUrl = 'json';
   this.unloadUrl = 'unload';
   this.modelAdapterRegistry = {};
-  this.ajaxRequests = [];
+  this.ajaxCalls = [];
   this.asyncEvents = [];
   this.responseQueue = new scout.ResponseQueue(this);
   this.requestsPendingCounter = 0;
@@ -122,6 +122,11 @@ scout.Session.JsonResponseError = {
  *     has been added to support the old behavior (no icons at all) without changing
  *     existing code. From Scout 6.2 showTreeIcons will be true by default, which
  *     means projects have to (potentially) migrate existing code.
+ *   [reconnectorOptions]
+ *     Optional, properties of this object are copied to the Session's reconnector
+ *     instance (see Reconnector.js).
+ *   [ajaxCallOptions]
+ *     Optional, properties of this object are copied to all instances of AjaxCall.js.
  */
 scout.Session.prototype.init = function(model) {
   var options = model || {};
@@ -148,6 +153,8 @@ scout.Session.prototype.init = function(model) {
   if (options.backgroundJobPollingEnabled === false) {
     this.backgroundJobPollingSupport.enabled = false;
   }
+  $.extend(this.reconnector, options.reconnectorOptions);
+  this.ajaxCallOptions = options.ajaxCallOptions;
 
   // Set inspector flag by looking at URL params. This is required when running in offline mode.
   // In online mode, the server may override this flag again, see _processStartupResponse().
@@ -595,6 +602,23 @@ scout.Session.prototype._decorateUrl = function(url, request) {
   return url;
 };
 
+scout.Session.prototype._getRequestName = function(request, defaultName) {
+  if (request.unload) {
+    return 'unload';
+  } else if (request.pollForBackgroundJobs) {
+    return 'pollForBackgroundJobs';
+  } else if (request.ping) {
+    return 'ping';
+  } else if (request.cancel) {
+    return 'cancel';
+  } else if (request.log) {
+    return 'log';
+  } else if (request.syncResponseQueue) {
+    return 'syncResponseQueue';
+  }
+  return defaultName;
+};
+
 scout.Session.prototype._requestToJson = function(request) {
   return JSON.stringify(request, function(key, value) {
     // Replacer function that filter certain properties from the resulting JSON string.
@@ -606,6 +630,15 @@ scout.Session.prototype._requestToJson = function(request) {
   });
 };
 
+scout.Session.prototype._callAjax = function(callOptions) {
+  var ajaxCall = scout.create('AjaxCall', $.extend({}, callOptions, this.ajaxCallOptions), {
+    ensureUniqueId: false
+  });
+  this.registerAjaxCall(ajaxCall);
+  return ajaxCall.call()
+    .always(this.unregisterAjaxCall.bind(this, ajaxCall));
+};
+
 scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling, request) {
   if (busyHandling) {
     this.setBusy(true);
@@ -615,11 +648,14 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   var jsError = null,
     success = false;
 
-  var xhr = $.ajax(ajaxOptions)
+  this._callAjax({
+      ajaxOptions: ajaxOptions,
+      request: request,
+      name: this._getRequestName(request, 'user request')
+    })
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
-  this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----
 
@@ -653,7 +689,6 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   // "done" --> data, textStatus, jqXHR
   // "fail" --> jqXHR, textStatus, errorThrown
   function onAjaxAlways(data, textStatus, errorThrown) {
-    this.unregisterAjaxRequest(xhr);
     this.setRequestPending(false);
     this.layoutValidator.validate();
 
@@ -668,6 +703,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
         // Send retry request first
         var retryRequest = this._retryRequest;
         this._retryRequest = null;
+        this.responseQueue.prepareRequest(retryRequest);
         this._sendRequest(retryRequest);
       } else if (this._queuedRequest) {
         // Send events that happened while being offline
@@ -691,16 +727,28 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   }
 };
 
-scout.Session.prototype.registerAjaxRequest = function(xhr) {
-  if (xhr) {
-    this.ajaxRequests.push(xhr);
-  }
+scout.Session.prototype.registerAjaxCall = function(ajaxCall) {
+  this.ajaxCalls.push(ajaxCall);
 };
 
-scout.Session.prototype.unregisterAjaxRequest = function(xhr) {
-  if (xhr) {
-    scout.arrays.remove(this.ajaxRequests, xhr);
-  }
+scout.Session.prototype.unregisterAjaxCall = function(ajaxCall) {
+  scout.arrays.remove(this.ajaxCalls, ajaxCall);
+};
+
+scout.Session.prototype.interruptAllAjaxCalls = function() {
+  // Because the error handlers alter the "this.ajaxCalls" array,
+  // the loop must operate on a copy of the original array!
+  this.ajaxCalls.slice().forEach(function(ajaxCall) {
+    ajaxCall.pendingCall && ajaxCall.pendingCall.abort();
+  });
+};
+
+scout.Session.prototype.abortAllAjaxCalls = function() {
+  // Because the error handlers alter the "this.ajaxCalls" array,
+  // the loop must operate on a copy of the original array!
+  this.ajaxCalls.slice().forEach(function(ajaxCall) {
+    ajaxCall.abort();
+  });
 };
 
 /**
@@ -721,20 +769,22 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  * a model job is done and no request initiated by a user is running.
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
+  this.backgroundJobPollingSupport.setRunning();
+
   var request = this._newRequest({
     pollForBackgroundJobs: true
   });
   this.responseQueue.prepareRequest(request);
 
-  this.backgroundJobPollingSupport.setRunning();
-
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.ajax(ajaxOptions)
+  this._callAjax({
+      ajaxOptions: ajaxOptions,
+      request: request,
+      name: this._getRequestName(request, 'request')
+    })
     .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this))
-    .always(onAjaxAlways.bind(this));
-  this.registerAjaxRequest(xhr);
+    .fail(onAjaxFail.bind(this));
 
   // --- Helper methods ---
 
@@ -775,13 +825,6 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     this.backgroundJobPollingSupport.setFailed();
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
-  }
-
-  // Variable arguments:
-  // "done" --> data, textStatus, jqXHR
-  // "fail" --> jqXHR, textStatus, errorThrown
-  function onAjaxAlways(data, textStatus, errorThrown) {
-    this.unregisterAjaxRequest(xhr);
   }
 };
 
@@ -844,8 +887,8 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
 scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown, request) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-  var offline = this._isOfflineError(jqXHR, textStatus, errorThrown, request);
-  if (offline) {
+  var offlineError = scout.AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, request);
+  if (offlineError) {
     if (this.ready) {
       this.goOffline();
       if (request && !request.pollForBackgroundJobs && !this._retryRequest) {
@@ -868,28 +911,6 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     noButtonText: (this.ready ? this.optText('ui.Ignore', 'Ignore') : null)
   };
   this.showFatalMessage(boxOptions, jqXHR.status + '.net');
-};
-
-scout.Session.prototype._isOfflineError = function(jqXHR, textStatus, errorThrown, request) {
-  var offline = (
-    // Status code = 0 -> no connection
-    !jqXHR.status ||
-    // Status code >= 12000 comes from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
-    jqXHR.status >= 12000 ||
-    // Status code 502 = Bad Gateway
-    // Status code 503 = Service Unavailable
-    // Status code 504 = Gateway Timeout
-    // Those codes usually happen when some network component between browser and UI server (e.g. a load balancer)
-    // has a short outage, most likely only temporarily. Therefore, we treat them like a lost connection.
-    // Otherwise, the polling loop would break, eventually causing the HTTP session to be invalidated on the
-    // server due to inactivity. Going offline starts the reconnector which regularly emits ping requests.
-    // This allows us to reconnect to the server as soon as the connection is fixed, hopefully saving the
-    // HTTP session from inactivation.
-    jqXHR.status === 502 ||
-    jqXHR.status === 503 ||
-    jqXHR.status === 504
-  );
-  return offline;
 };
 
 scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
@@ -1062,11 +1083,8 @@ scout.Session.prototype.goOffline = function() {
   }
   this.offline = true;
 
-  // Abort pending ajax requests. Because the error handlers alter the "this.ajaxRequest" array,
-  // the loop must operate on a copy of the original array.
-  this.ajaxRequests.slice().forEach(function(xhr) {
-    xhr.abort();
-  });
+  // Abort pending ajax requests.
+  this.abortAllAjaxCalls();
 
   // In Firefox, the current async polling request is interrupted immediately when the page is unloaded. Therefore,
   // an offline message would appear at once on the desktop. When reloading the page, all elements are cleared anyway,
@@ -1085,13 +1103,13 @@ scout.Session.prototype.goOffline = function() {
 
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
+  this.rootAdapter.goOnline();
 
   var request = this._newRequest({
     syncResponseQueue: true
   });
+  this.responseQueue.prepareRequest(request);
   this._sendRequest(request); // implies "_resumeBackgroundJobPolling", and also sends queued request
-
-  this.rootAdapter.goOnline();
 };
 
 scout.Session.prototype.onReconnecting = function() {
@@ -1241,20 +1259,7 @@ scout.Session.prototype.sendLogRequest = function(message) {
   }
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
-  var ajaxOptions = this.defaultAjaxOptions(request);
-
-  var xhr = $.ajax(ajaxOptions)
-    .always(onAjaxAlways.bind(this));
-  this.registerAjaxRequest(xhr);
-
-  // ----- Helper methods -----
-
-  // Variable arguments:
-  // "done" --> data, textStatus, jqXHR
-  // "fail" --> jqXHR, textStatus, errorThrown
-  function onAjaxAlways(data, textStatus, errorThrown) {
-    this.unregisterAjaxRequest(xhr);
-  }
+  $.ajax(this.defaultAjaxOptions(request));
 };
 
 scout.Session.prototype._newRequest = function(requestData) {
@@ -1262,8 +1267,8 @@ scout.Session.prototype._newRequest = function(requestData) {
     uiSessionId: this.uiSessionId
   }, requestData);
 
-  // Poll and log requests do not require a sequence number
-  if (!request.pollForBackgroundJobs && !request.log && !request.cancel) {
+  // Certain requests do not require a sequence number
+  if (!request.log && !request.syncResponseQueue) {
     request['#'] = this.requestSequenceNo++;
   }
   return request;

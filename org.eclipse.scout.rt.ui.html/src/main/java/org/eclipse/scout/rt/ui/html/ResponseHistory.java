@@ -1,6 +1,8 @@
 package org.eclipse.scout.rt.ui.html;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -15,8 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Collects JSON responses and their corresponding <i>response sequence number</i> until they are acknowledged by the
- * client. A maximum of 10 responses is stored in the history.
+ * Collects JSON responses and their corresponding <i>request sequence number</i> and <i>response sequence number</i>
+ * until they are acknowledged by the client. A maximum of 10 responses is stored in the history.
  * <p>
  * This class is thread-safe.
  */
@@ -27,6 +29,9 @@ public class ResponseHistory {
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
 
   private final Object m_mutex = new Object();
+
+  private final Map<Long, Long> m_requestToResponseMap = new HashMap<>(); // RequestSequenceNo -> ResponseSequenceNo
+  private final Map<Long, Long> m_responseToRequestMap = new HashMap<>(); // ResponseSequenceNo -> RequestSequenceNo
   private final SortedMap<Long, JSONObject> m_responses = new TreeMap<>(); // ResponseSequenceNo -> Response
 
   private UiSession m_uiSession;
@@ -45,19 +50,26 @@ public class ResponseHistory {
   }
 
   /**
-   * Stores the given response in the history, along with the <i>response sequence number</i>. If the history is already
-   * full, the oldest entry is discarded.
+   * Stores the given response in the history, along with the <i>request sequence number</i> and the <i>response
+   * sequence number</i>. If the history is already full, the oldest entry is discarded.
    *
    * @throws AssertionException
    *           if any of the given arguments is <code>null</code>
    */
-  public void registerResponse(JSONObject response, Long responseSequenceNo) {
+  public void registerResponse(JSONObject response, Long requestSequenceNo, Long responseSequenceNo) {
     Assertions.assertNotNull(response);
+    Assertions.assertNotNull(requestSequenceNo);
+
     Assertions.assertNotNull(responseSequenceNo);
 
     synchronized (m_mutex) {
       Assertions.assertFalse(m_responses.containsKey(responseSequenceNo), "ResponseSequenceNo {} already registered", responseSequenceNo);
+      Assertions.assertFalse(m_requestToResponseMap.containsKey(requestSequenceNo), "RequestSequenceNo {} already registered", requestSequenceNo);
+      Assertions.assertFalse(m_responseToRequestMap.containsKey(responseSequenceNo), "ResponseSequenceNo {} already registered", responseSequenceNo);
+
       m_responses.put(responseSequenceNo, response);
+      m_requestToResponseMap.put(requestSequenceNo, responseSequenceNo);
+      m_responseToRequestMap.put(responseSequenceNo, requestSequenceNo);
 
       if (m_responses.size() > MAX_RESPONSE_HISTORY_SIZE) {
         // Remove oldest entry to free up memory (protection against malicious clients that send no or wrong #ACKs)
@@ -72,7 +84,7 @@ public class ResponseHistory {
   /**
    * Confirms that the response with the given <i>response sequence number</i> has been successfully processed by the
    * client. The response is removed from the history. All responses that are older (i.e. have a lower response sequence
-   * number) automatically removed as well.
+   * number) and the "response - request" mappings are automatically removed as well.
    *
    * @throws AssertionException
    *           if the argument is <code>null</code>
@@ -85,6 +97,9 @@ public class ResponseHistory {
       for (Iterator<Long> it = m_responses.keySet().iterator(); it.hasNext();) {
         Long responseSequenceNo = it.next();
         if (responseSequenceNo <= confirmedResponseSequenceNo) {
+          Long requestSequenceNo = m_responseToRequestMap.get(responseSequenceNo);
+          m_requestToResponseMap.remove(requestSequenceNo);
+          m_responseToRequestMap.remove(responseSequenceNo);
           it.remove();
           removeCount++;
         }
@@ -134,6 +149,32 @@ public class ResponseHistory {
   }
 
   /**
+   * @return the <i>response sequence number</i> that corresponds to the given <i>request sequence number</i> (or
+   *         <code>null</code> if no such mapping exists in the history)
+   */
+  public Long getResponseSequenceNo(Long requestSequenceNo) {
+    if (requestSequenceNo == null) {
+      return null;
+    }
+    synchronized (m_mutex) {
+      return m_requestToResponseMap.get(requestSequenceNo);
+    }
+  }
+
+  /**
+   * @return the <i>request sequence number</i> that corresponds to the given <i>response sequence number</i> (or
+   *         <code>null</code> if no such mapping exists in the history)
+   */
+  public Long getRequestSequenceNo(Long responseSequenceNo) {
+    if (responseSequenceNo == null) {
+      return null;
+    }
+    synchronized (m_mutex) {
+      return m_responseToRequestMap.get(responseSequenceNo);
+    }
+  }
+
+  /**
    * @return the response with the given <i>response sequence number</i> (or <code>null</code> if no response with this
    *         sequence number exists in the history)
    */
@@ -143,6 +184,16 @@ public class ResponseHistory {
     }
     synchronized (m_mutex) {
       return m_responses.get(responseSequenceNo);
+    }
+  }
+
+  /**
+   * @return the response that was sent as answer for the request with the given <i>request sequence number</i> (or
+   *         <code>null</code> if no response for this request exists in the history)
+   */
+  public JSONObject getResponseForRequest(Long requestSequenceNo) {
+    synchronized (m_mutex) {
+      return getResponse(getResponseSequenceNo(requestSequenceNo));
     }
   }
 
