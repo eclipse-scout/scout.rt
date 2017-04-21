@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * This class is not thread safe
@@ -55,6 +56,18 @@ public class BeanHierarchy<T> {
    */
   public Set<IBean<T>> getBeans() {
     return m_beans;
+  }
+
+  /**
+   * @returns the exact matching {@link IBean} for specified {@code beanClazz}. The {@link IBean} is returned even if
+   *          the {@code beanClazz} was replaced by another bean implementation or is not the most specific bean for the
+   *          specified {@code beanClazz}. Returns {@code null} if no bean is available for the specified
+   *          {@code beanClazz}.
+   */
+  public IBean<T> getExactBean(Class<?> beanClazz) {
+    List<IBean<T>> beans = CollectionUtility.arrayList(m_beans);
+    Collections.sort(beans, ORDER_COMPARATOR);
+    return getExactBean(beans, beanClazz);
   }
 
   public void addBean(IBean<T> bean) {
@@ -114,14 +127,16 @@ public class BeanHierarchy<T> {
         //sort by Order ascending
         Collections.sort(list, ORDER_COMPARATOR);
 
-        //remove duplicate classes
-        Class<?> lastSeen = null;
+        //remove duplicate registered classes, keep only bean with lowest order
+        Set<Class<?>> seenBeans = new HashSet<>();
         for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
           IBean<T> bean = it.next();
-          if (bean.getBeanClazz() == lastSeen) {
+          if (seenBeans.contains(bean.getBeanClazz())) {
             it.remove();
           }
-          lastSeen = bean.getBeanClazz();
+          else {
+            seenBeans.add(bean.getBeanClazz());
+          }
         }
 
         //manage replaced beans
@@ -210,9 +225,17 @@ public class BeanHierarchy<T> {
     return m_all;
   }
 
-  protected static <T> IBean<T> getExactBean(List<IBean<T>> list, Class<?> c) {
+  /**
+   * @returns the exact matching {@link IBean} for the specified {@code beanClazz} according to {@code Order}. The
+   *          {@link IBean} is returned even if the {@code beanClazz} was replaced by another bean implementation or is
+   *          not the most specific bean for the specified {@code beanClazz}. Returns {@code null} if no bean is
+   *          available for the specified {@code beanClazz}.
+   *          <p>
+   *          <b>The list of beans is expected to be sorted using {@link #ORDER_COMPARATOR}.</b>
+   */
+  protected static <T> IBean<T> getExactBean(List<IBean<T>> list, Class<?> beanClazz) {
     for (IBean<T> bean : list) {
-      if (bean.getBeanClazz() == c) {
+      if (bean.getBeanClazz() == beanClazz) {
         return bean;
       }
     }

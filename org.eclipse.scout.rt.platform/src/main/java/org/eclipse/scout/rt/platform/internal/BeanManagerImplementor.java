@@ -206,6 +206,22 @@ public class BeanManagerImplementor implements IBeanManager {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public <T> IBean<T> getRegisteredBean(Class<?> beanClazz) {
+    m_lock.readLock().lock();
+    try {
+      BeanHierarchy h = m_beanHierarchies.get(beanClazz);
+      if (h != null) {
+        return h.getExactBean(beanClazz);
+      }
+      return null;
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
+  }
+
+  @Override
   public <T> IBean<T> getBean(Class<T> beanClazz) {
     IBean<T> result = optBean(beanClazz);
     if (result == null) {
@@ -251,6 +267,18 @@ public class BeanManagerImplementor implements IBeanManager {
       }
     }
     return all;
+  }
+
+  @Override
+  public <T> boolean isBean(Class<T> clazz) {
+    m_lock.readLock().lock();
+    try {
+      BeanHierarchy h = m_beanHierarchies.get(clazz);
+      return h != null && !h.getBeans().isEmpty();
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
   }
 
   protected void callPreDestroyOnBeans() {

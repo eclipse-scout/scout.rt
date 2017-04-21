@@ -4,8 +4,6 @@
  */
 package org.eclipse.scout.rt.jackson.databind;
 
-import javax.annotation.PostConstruct;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IBean;
@@ -24,13 +22,6 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 public class JandexJacksonAnnotationIntrospector extends JacksonAnnotationIntrospector {
   private static final long serialVersionUID = 1L;
 
-  protected BeanManagerUtility m_beanManagerUtility;
-
-  @PostConstruct
-  protected void init() {
-    m_beanManagerUtility = BEANS.get(BeanManagerUtility.class);
-  }
-
   /**
    * Method {@link #_findTypeResolver(MapperConfig, Annotated, JavaType)} is used by jackson to build the
    * {@link TypeResolverBuilder} according to a set of annotations on the object to serialize/deserialize.
@@ -47,7 +38,7 @@ public class JandexJacksonAnnotationIntrospector extends JacksonAnnotationIntros
       // if a type resolver builder is available and does not yet have a default implementation set, try to find correct default java class type
 
       // CASE 1: base type is a Scout bean, lookup most specific class to use
-      if (m_beanManagerUtility.isBeanClass(baseType.getRawClass())) {
+      if (BEANS.getBeanManager().isBean(baseType.getRawClass())) {
         IBean<?> uniqueBean = BEANS.getBeanManager().uniqueBean(baseType.getRawClass());
         if (uniqueBean != null) {
           builder.defaultImpl(uniqueBean.getBeanClazz());

@@ -35,6 +35,17 @@ public interface IBeanManager {
   <T> List<IBean<T>> getRegisteredBeans(Class<T> beanClazz);
 
   /**
+   * Lookup the exact {@link IBean} for the specified {@code beanClazz}. The {@link IBean} is returned even if the
+   * {@code beanClazz} was replaced by another bean implementation or is <b>not</b> the most specific bean for the
+   * specified {@code beanClazz}.
+   *
+   * @param beanClazz
+   *          The {@link Class} defining the bean to return.
+   * @return {@link IBean} with exact matching {@code beanClazz} or null if no matching bean could be found
+   */
+  <T> IBean<T> getRegisteredBean(Class<?> beanClazz);
+
+  /**
    * Gets the most specific {@link IBean} for the given {@link Class}.<br>
    * The most specific bean means: Of all {@link IBean}s that are part of the class hierarchy spanned by the given
    * beanClazz the one is returned that:
@@ -98,6 +109,14 @@ public interface IBeanManager {
    *         replaced by a child class (using {@link Replace} annotation).
    */
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
+
+  /**
+   * Checks whether there is a registered bean for the specified {@code clazz}.
+   *
+   * @return {@code true} if {@code clazz} is a registered bean (even if the {@code clazz} is replaced by another bean),
+   *         else {@code false}
+   */
+  <T> boolean isBean(Class<T> clazz);
 
   /**
    * This is a convenience for {@link IBeanManager#registerBean(BeanMetaData)} and calls

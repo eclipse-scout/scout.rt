@@ -33,12 +33,10 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
   private static final Logger LOG = LoggerFactory.getLogger(JandexTypeNameIdResolver.class);
 
   private JavaType m_baseType;
-  private BeanManagerUtility m_beanManagerUtility;
 
   @Override
   public void init(JavaType baseType) {
     m_baseType = baseType;
-    m_beanManagerUtility = BEANS.get(BeanManagerUtility.class);
   }
 
   @Override
@@ -74,9 +72,9 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
       return clazz.getAnnotation(JsonTypeName.class).value();
     }
     else {
-      IBean<?> bean = m_beanManagerUtility.lookupRegisteredBean(clazz);
+      IBean<?> bean = BEANS.getBeanManager().getRegisteredBean(clazz);
       while (hasAnnotation(bean, Replace.class)) {
-        bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
+        bean = BEANS.getBeanManager().getRegisteredBean(bean.getBeanClazz().getSuperclass());
         if (hasAnnotation(bean, JsonTypeName.class)) {
           return bean.getBeanAnnotation(JsonTypeName.class).value();
         }
@@ -151,7 +149,7 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
   protected JavaType typeFromClassOrSuperClass(String id, Class<?> lookupClazz) {
     // STEP 1: Check if lookup class itself has a matching type identifier
     if (hasMatchingJsonTypeAnnotation(lookupClazz, id)) {
-      if (m_beanManagerUtility.isBeanClass(lookupClazz)) {
+      if (BEANS.getBeanManager().isBean(lookupClazz)) {
         // CASE 1a: lookupClass has a matching JSON type annotation and is a Scout bean, lookup most specific bean using bean manager
         IBean<?> uniqueBean = BEANS.getBeanManager().uniqueBean(lookupClazz);
         if (uniqueBean != null) {
@@ -165,7 +163,7 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
     }
 
     // STEP 2: Check if base type class is replacing other bean(s) and check if their type identifier matches
-    IBean<?> bean = m_beanManagerUtility.lookupRegisteredBean(lookupClazz);
+    IBean<?> bean = BEANS.getBeanManager().getRegisteredBean(lookupClazz);
     if (bean != null) {
       JavaType javaType = typeFromReplacedSuperClass(id, bean);
       if (javaType != null) {
@@ -182,7 +180,7 @@ public class JandexTypeNameIdResolver implements TypeIdResolver {
   protected JavaType typeFromReplacedSuperClass(String id, IBean<?> bean) {
     Class<?> baseLookupClazz = bean.getBeanClazz();
     while (hasAnnotation(bean, Replace.class)) {
-      bean = m_beanManagerUtility.lookupRegisteredBean(bean.getBeanClazz().getSuperclass());
+      bean = BEANS.getBeanManager().getRegisteredBean(bean.getBeanClazz().getSuperclass());
       if (hasMatchingJsonTypeAnnotation(bean.getBeanClazz(), id)) {
         return TypeFactory.defaultInstance().constructSpecializedType(m_baseType, baseLookupClazz);
       }
