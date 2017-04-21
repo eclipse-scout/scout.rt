@@ -102,6 +102,10 @@
     vertical-align: top;
     padding-right: 7px;
     display: inline-block;
+    /* Use content-box for images because it leads to wrong behavior when someone sets a min-width/height
+     * on an IMG element that has padding and the available space for the image is 'min-width' - 'padding'
+     * See ticket 208111 */
+    box-sizing: content-box;
 
     &:not(.font-icon) {
       margin-top: -2px;
