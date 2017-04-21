@@ -9,7 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 .button-field > .button {
-  #scout.vertical-align-helper-after();
+  /* The 18px min-height is required because in Chrome the height of the ::after element
+   * is not calculated properly when height is set to 100%. This has the effect that buttons
+   * change their size when a button changes its focus state. See ticket 194111.
+   */
+  #scout.vertical-align-helper-after(18px);
 
   &.selected {
     border-style: inset;
