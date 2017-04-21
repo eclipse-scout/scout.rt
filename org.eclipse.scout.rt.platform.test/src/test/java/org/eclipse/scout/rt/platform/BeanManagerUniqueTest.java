@@ -29,6 +29,7 @@ public class BeanManagerUniqueTest {
   @Test
   public void testUnique() {
     assertNull(context.uniqueBean(AbstractBaseClass.class)); // multiple instances possible, uniqueBean should return null
+    assertNull(context.uniqueBean(Object.class)); // Object is not a Scout bean
     assertEquals(BaseClass.class, context.uniqueBean(BaseClass.class).getBeanClazz());
     assertEquals(ChildClassA.class, context.uniqueBean(ChildClassA.class).getBeanClazz());
     assertEquals(ChildClassB.class, context.uniqueBean(ChildClassB.class).getBeanClazz());

@@ -613,6 +613,29 @@ public class JandexTypeNameIdResolverTest {
     }
   }
 
+  /**
+   * Test-case with a base class and two subclasses which do not specify an own JSON type identifier.
+   * <p>
+   * This example is a completeness test for JandexTypeNameIdResolver, in a normal case this scenario is not
+   * reproducible due to a check for duplicated replaced classes within bean manager. This test case should fail, since
+   * JandexTypeNameIdResolver cannot find the correct matching class if more than one matching subclass is available.
+   */
+  @Test(expected = InvalidTypeIdException.class)
+  public void testPoJoClassWithMultipleImplementation() throws Exception {
+    IBean<?> personBean = TestingUtility.registerBean(new BeanMetaData(ProjectPerson.class));
+    IBean<?> person2Bean = TestingUtility.registerBean(new BeanMetaData(ProjectPerson2.class));
+    try {
+      String json = "{\"persons\":[{\"type\":\"Person\"},{\"type\":\"Person\"}]}";
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.setAnnotationIntrospector(BEANS.get(JandexJacksonAnnotationIntrospector.class));
+      mapper.readValue(json, PersonResponse.class);
+    }
+    finally {
+      TestingUtility.unregisterBean(personBean);
+      TestingUtility.unregisterBean(person2Bean);
+    }
+  }
+
   protected static <T> T marshallUnmarshall(T object) {
     return marshallUnmarshall(object, false, true);
   }
