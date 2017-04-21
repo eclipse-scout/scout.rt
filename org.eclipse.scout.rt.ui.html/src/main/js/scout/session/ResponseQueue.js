@@ -29,7 +29,8 @@ scout.ResponseQueue.prototype.add = function(response) {
   }
 
   // "Fast-forward" the expected sequence no. when a combined response is received
-  if (response.combined) {
+  if (sequenceNo && response.combined) {
+    this.lastProcessedSequenceNo = Math.max(sequenceNo - 1, this.lastProcessedSequenceNo);
     this.nextExpectedSequenceNo = Math.max(sequenceNo, this.nextExpectedSequenceNo);
   }
 
@@ -37,21 +38,28 @@ scout.ResponseQueue.prototype.add = function(response) {
     this.queue.push(response);
   } else {
     // Insert at correct position (ascending order)
-    var pos = null;
+    var newQueue = [];
+    var responseToInsert = response;
     for (var i = 0; i < this.queue.length; i++) {
       var el = this.queue[i];
-      if (el['#'] && el['#'] > sequenceNo) {
-        pos = i;
-        break;
+      if (el['#']) {
+        if (responseToInsert && el['#'] > sequenceNo) {
+          // insert at position
+          newQueue.push(response);
+          responseToInsert = null;
+        }
+        if (el['#'] <= this.lastProcessedSequenceNo) {
+          // skip obsolete elements (may happen when a combined response is added to the queue)
+          continue;
+        }
       }
+      newQueue.push(el);
     }
-    if (pos === null) {
+    if (responseToInsert) {
       // no element with bigger seqNo found -> insert as last element
-      this.queue.push(response);
-    } else {
-      // insert at position
-      scout.arrays.insert(this.queue, response, pos);
+      newQueue.push(responseToInsert);
     }
+    this.queue = newQueue;
   }
 };
 
