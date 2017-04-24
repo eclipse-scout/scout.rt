@@ -14,7 +14,6 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator.IUndecorator;
 
 /**
  * Processor to set a thread-local variable for the subsequent sequence of actions.
@@ -24,11 +23,10 @@ import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator.IUndecora
  *
  * @since 5.1
  */
-public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator, IUndecorator {
+public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator {
 
   protected final ThreadLocal<THREAD_LOCAL> m_threadLocal;
   protected final THREAD_LOCAL m_value;
-  private THREAD_LOCAL m_originValue;
 
   public ThreadLocalProcessor(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
     m_threadLocal = Assertions.assertNotNull(threadLocal);
@@ -37,22 +35,22 @@ public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator, I
 
   @Override
   public IUndecorator decorate() throws Exception {
-    m_originValue = m_threadLocal.get();
+    final THREAD_LOCAL originValue = m_threadLocal.get();
     m_threadLocal.set(m_value);
 
     // Restore value upon completion of the command.
-    return this;
-  }
+    return new IUndecorator() {
 
-  @Override
-  public void undecorate() {
-    if (m_originValue == null) {
-      m_threadLocal.remove();
-    }
-    else {
-      m_threadLocal.set(m_originValue);
-    }
-
+      @Override
+      public void undecorate() {
+        if (originValue == null) {
+          m_threadLocal.remove();
+        }
+        else {
+          m_threadLocal.set(originValue);
+        }
+      }
+    };
   }
 
   public ThreadLocal<THREAD_LOCAL> getThreadLocal() {
