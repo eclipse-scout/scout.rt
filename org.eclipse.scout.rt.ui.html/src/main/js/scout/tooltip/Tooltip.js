@@ -38,10 +38,31 @@ scout.Tooltip = function() {
   this.$content;
   this.menus = [];
   this._addAdapterProperties(['menus']);
+  this._renderLater = false;
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 
-scout.Tooltip.prototype._render = function($parent) {
+
+/** 
+ * We override the public render function here because we must also execute postRender
+ * (for tooltip positioning) when we render the tooltip 'later'. Basically all this is
+ * required because this.entryPoint() cannot be called while a parent of the tooltip is
+ * detached. So we must wait until the parent is attached again before we can render
+ * our tooltip.
+ */
+scout.Tooltip.prototype.render = function($parent) {
+  // when the parent of the tooltip is detached,
+  // or the tooltip-anchor is detached
+  if (!this.parent.isAttachedAndRendered() ||
+      this.$anchor && !this.$anchor.isAttached()) {
+    this._renderLater = true;
+    return;
+  }
+
+  scout.Tooltip.parent.prototype.render.call(this, $parent);
+};
+
+scout.Tooltip.prototype._render = function() {
   // Auto-detect parent
   this.$parent = this.$parent || this.entryPoint();
 
@@ -93,14 +114,15 @@ scout.Tooltip.prototype._render = function($parent) {
   }
 };
 
+scout.Tooltip.prototype._afterAttach = function(parent) {
+  if (this._renderLater && !this.rendered) {
+    this.render();
+    this._renderLater = false;
+  }
+};
+
 scout.Tooltip.prototype._postRender = function() {
   scout.Tooltip.parent.prototype._postRender.call(this);
-
-  // if the anchor to which the tooltip is added isn't attached (i.e. tabItem not being displayed) store the tooltip in the DetachHelper's storage for later retrieval
-  if (this.$anchor && !this.$anchor.isAttached()) {
-    this.session.detachHelper.storeTooltip(this.$anchor.getDetachRoot(), this);
-    return;
-  }
   this.position();
 };
 

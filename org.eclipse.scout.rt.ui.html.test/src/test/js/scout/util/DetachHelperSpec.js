@@ -77,15 +77,15 @@ describe("DetachHelper", function() {
     });
     tooltip.render($sandbox);
     $tooltip = $('.tooltip');
-    expect($div.data('tooltips').length).toBe(1);
+    expect(tooltip.rendered).toBe(false); // because $div and $anchor are not attached
     expect($tooltip.length).toBe(0);
 
     $div.appendTo($sandbox);
-    detachHelper.afterAttach($div);
+    tooltip._afterAttach(); // this would be typically called when scout.Form is attached again
 
     $tooltip = $('.tooltip');
+    expect(tooltip.rendered).toBe(true); // because $div is now attached
     expect($tooltip.length).toBe(1);
-    expect($div.data('tooltips')).toBe(null);
   });
 
   it("considers the context of $anchor -> only removes tooltips in that context", function() {
