@@ -14,9 +14,9 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
-import org.eclipse.scout.rt.shared.notification.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

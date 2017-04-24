@@ -19,8 +19,8 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.notification.TypeParameterBeanRegistry;
 
 /**
  * The {@link NotificationCoalescer} is used to coalesce notifications.

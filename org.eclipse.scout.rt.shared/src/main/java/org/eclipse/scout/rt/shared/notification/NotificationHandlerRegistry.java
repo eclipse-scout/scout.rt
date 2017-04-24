@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.IDispatchingNotificationHandler;
 import org.slf4j.Logger;

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.junit.Test;
 

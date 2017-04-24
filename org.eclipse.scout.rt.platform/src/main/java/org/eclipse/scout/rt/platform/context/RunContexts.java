@@ -120,9 +120,11 @@ public final class RunContexts {
   public static class RunContextFactory {
 
     public RunContext empty() {
-      return newInstance()
+      RunContext rc = newInstance()
           .withRunMonitor(BEANS.get(RunMonitor.class))
           .withTransactionScope(TransactionScope.REQUIRED);
+      rc.fillEmpty();
+      return rc;
     }
 
     public RunContext copyCurrent() {
