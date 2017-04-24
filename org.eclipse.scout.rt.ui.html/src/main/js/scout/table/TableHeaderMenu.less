@@ -368,6 +368,22 @@
   display: inline;
 }
 
+.table-header-menu-toggle-sort-order {
+  #scout.font-icon();
+  float: left;
+  cursor: pointer;
+  color: @table-header-menu-link-color;
+  padding-right: @table-header-menu-padding;
+}
+
+.table-header-menu-toggle-sort-order-alphabetically::before {
+  content: @icon-sort-alpha-asc;
+}
+
+.table-header-menu-toggle-sort-order-amount::before {
+  content: @icon-sort-amount-desc;
+}
+
 /* Filter fields group-box */
 .filter-fields {
   padding: 0;

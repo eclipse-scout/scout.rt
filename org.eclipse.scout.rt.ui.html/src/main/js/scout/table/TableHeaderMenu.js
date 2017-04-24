@@ -16,6 +16,7 @@ scout.TableHeaderMenu = function() {
   this.$columnActions;
   this.$columnFilters;
   this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
+  this.filterSortMode = scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
 
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
   this.on('locationChanged', this._onLocationChanged.bind(this));
@@ -30,6 +31,17 @@ scout.TableHeaderMenu.CheckedMode = {
   NONE: {
     checkAll: false,
     text: 'ui.SelectNoneFilter'
+  }
+};
+
+scout.TableHeaderMenu.SortMode = {
+  ALPHABETICALLY: {
+    text: 'ui.SortAlphabeticallyFilter',
+    cssClass: 'table-header-menu-toggle-sort-order-alphabetically'
+  },
+  AMOUNT: {
+    text: 'ui.SortByAmountFilter',
+    cssClass: 'table-header-menu-toggle-sort-order-amount'
   }
 };
 
@@ -560,6 +572,11 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   $filterActions = this.$filterTableGroup
     .appendDiv('table-header-menu-filter-actions');
 
+  this.$filterSortOrder = $filterActions
+    .appendDiv('table-header-menu-toggle-sort-order')
+    .on('click', this._onClickSortMode.bind(this))
+    .addClass(this.filterSortMode.cssClass);
+
   this.$filterToggleChecked = $filterActions
     .appendDiv('table-header-menu-filter-toggle-checked')
     .text(this.session.text(this.filterCheckedMode.text))
@@ -583,15 +600,16 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
         index: 0,
         text: 'filter-value',
         width: 160,
-        session: this.session
+        session: this.session,
+        sortIndex: 0,
+        uiSortPossible: true
       }),
-      scout.create('Column', {
+      scout.create('NumberColumn', {
         index: 1,
-        type: 'number',
-        horizontalAlignment: 1,
         text: 'aggregate-count',
         width: 40,
-        session: this.session
+        session: this.session,
+        uiSortPossible: true
       })
     ]
   });
@@ -655,6 +673,20 @@ scout.TableHeaderMenu.prototype._onClickFilterCheckedMode = function() {
   this._updateFilterTableActions();
 };
 
+scout.TableHeaderMenu.prototype._onClickSortMode = function() {
+  var sortMode = scout.TableHeaderMenu.SortMode;
+  if (this.filterSortMode === sortMode.ALPHABETICALLY) {
+    // sort by amount
+    this.filterTable.sort(this.filterTable.visibleColumns()[1], 'desc');
+    this.filterSortMode = sortMode.AMOUNT;
+  } else {
+    // sort alphabetically
+    this.filterTable.sort(this.filterTable.visibleColumns()[0], 'asc');
+    this.filterSortMode = sortMode.ALPHABETICALLY;
+  }
+  this._updateFilterTableActions();
+};
+
 scout.TableHeaderMenu.prototype._updateFilterTable = function() {
   if (this.filter.filterActive()) {
     this.table.addFilter(this.filter);
@@ -666,7 +698,13 @@ scout.TableHeaderMenu.prototype._updateFilterTable = function() {
 };
 
 scout.TableHeaderMenu.prototype._updateFilterTableActions = function() {
+  // checked mode
   this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
+  // sort mode
+  var sortMode = scout.TableHeaderMenu.SortMode;
+  var sortAlphabetically = this.filterSortMode === scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
+  this.$filterSortOrder.toggleClass(sortMode.ALPHABETICALLY.cssClass, sortAlphabetically);
+  this.$filterSortOrder.toggleClass(sortMode.AMOUNT.cssClass, !sortAlphabetically);
 };
 
 scout.TableHeaderMenu.prototype._renderFilterFields = function() {
