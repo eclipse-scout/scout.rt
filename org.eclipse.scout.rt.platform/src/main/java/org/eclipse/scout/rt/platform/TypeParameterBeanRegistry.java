@@ -8,7 +8,7 @@
 * Contributors:
 *     BSI Business Systems Integration AG - initial API and implementation
 ******************************************************************************/
-package org.eclipse.scout.rt.shared.notification;
+package org.eclipse.scout.rt.platform;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.PostConstruct;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -80,6 +81,19 @@ public class RunContext implements IAdaptable {
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
   protected ITransaction m_transaction;
   protected List<ITransactionMember> m_transactionMembers = new ArrayList<>();
+
+  protected List<IRunContextChainInterceptor<?, ?>> m_interceptors = new ArrayList<>();
+
+  @PostConstruct
+  protected void initChainInterceptors() {
+    List<IRunContextChainInterceptorProducer<RunContext>> producers = BEANS.get(RunContextChainIntercepterRegistry.class).getRunContextInterceptorProducer(this.getClass());
+    for (IRunContextChainInterceptorProducer<RunContext> producer : producers) {
+      IRunContextChainInterceptor<?, Object> interceptor = producer.create();
+      if (interceptor != null) {
+        m_interceptors.add(interceptor);
+      }
+    }
+  }
 
   /**
    * Runs the given {@link IRunnable} on behalf of this {@link RunContext}. Use this method if you run code that does
@@ -178,7 +192,8 @@ public class RunContext implements IAdaptable {
         .addAll(m_threadLocalProcessors.values())
         .addAll(contributions.asList())
         .addAll(m_diagnosticProcessors.values())
-        .add(transactionProcessor);
+        .add(transactionProcessor)
+        .addAll(m_interceptors);
   }
 
   /**
@@ -460,6 +475,7 @@ public class RunContext implements IAdaptable {
     m_transactionMembers = new ArrayList<>(origin.m_transactionMembers);
     m_threadLocalProcessors = new HashMap<>(origin.m_threadLocalProcessors);
     m_diagnosticProcessors = new HashMap<>(origin.m_diagnosticProcessors);
+    m_interceptors = new ArrayList<>(origin.m_interceptors);
   }
 
   /**
@@ -485,6 +501,17 @@ public class RunContext implements IAdaptable {
       @SuppressWarnings("unchecked")
       final ThreadLocal<Object> threadLocal = (ThreadLocal<Object>) threadLocalProcessor.getThreadLocal();
       m_threadLocalProcessors.put(threadLocal, new ThreadLocalProcessor<>(threadLocal, threadLocal.get()));
+    }
+
+    // copy interceptors
+    for (IRunContextChainInterceptor<?, ?> interceptor : m_interceptors) {
+      interceptor.fillCurrent();
+    }
+  }
+
+  protected void fillEmpty() {
+    for (IRunContextChainInterceptor<?, ?> interceptor : m_interceptors) {
+      interceptor.fillEmtpy();
     }
   }
 
