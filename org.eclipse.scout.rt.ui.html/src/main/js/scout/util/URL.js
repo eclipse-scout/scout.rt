@@ -66,12 +66,57 @@ scout.URL.prototype.addParameter = function(param, value) {
   return this;
 };
 
-scout.URL.prototype.toString = function() {
+/**
+ * Options:
+ *
+ *   sorter:
+ *     a function to be used instead of the default lexical ordering
+ *     based function
+ *
+ *   alwaysFirst:
+ *     an array of parameter names that should always be first in the
+ *     resulting string. Among those parameters, the order in the passed
+ *     array is respected.
+ *
+ *   alwaysLast:
+ *     similar to alwaysFirst, but puts the parameters at the end of
+ *     the resulting string.
+ */
+scout.URL.prototype.toString = function(options) {
   var result = this.baseUrlRaw;
 
   if (Object.keys(this.parameterMap).length) {
+    options = options || {};
+    var sorter = options.sorter || scout.URL._sorter;
+    if (options.alwaysFirst || options.alwaysLast) {
+      options.alwaysFirst = scout.arrays.ensure(options.alwaysFirst);
+      options.alwaysLast = scout.arrays.ensure(options.alwaysLast);
+      var origSorter = sorter;
+      sorter = function(a, b) {
+        var firstA = options.alwaysFirst.indexOf(a);
+        var firstB = options.alwaysFirst.indexOf(b);
+        var lastA = options.alwaysLast.indexOf(a);
+        var lastB = options.alwaysLast.indexOf(b);
+        // If A is marked as "alwaysFirst", sort them A-B. If B is also marked as "alwaysFirst", sort them
+        // by their position in the array. If only B is marked as "alwaysFirst", sort them B-A.
+        if (firstA !== -1) {
+          return (firstB === -1 ? -1 : firstA - firstB);
+        } else if (firstB !== -1) {
+          return 1;
+        }
+        // If A is marked as "alwaysLast", sort them B-A. If B is also marked as "alwaysLast", sort them
+        // by their position in the array. If only B is marked as "alwaysLast", sort them A-B.
+        if (lastA !== -1) {
+          return (lastB === -1 ? 1 : lastA - lastB);
+        } else if (lastB !== -1) {
+          return -1;
+        }
+        // Default order
+        return origSorter(a, b);
+      };
+    }
     // Built a sorted string of all formatted parameterMap entries
-    var reconstructedQueryPart = Object.keys(this.parameterMap).sort(scout.URL._sorter).map(function(key) {
+    var reconstructedQueryPart = Object.keys(this.parameterMap).sort(sorter).map(function(key) {
       var value = this.getParameter(key);
       // For multiple values, generate a parameter string for each value
       if (Array.isArray(value)) {

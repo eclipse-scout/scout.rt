@@ -106,4 +106,33 @@ describe("scout.URL", function() {
     expect(u.getParameter('wine')).toBe('château lafite');
   });
 
+  it("can sort parameters", function() {
+    var u = new scout.URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
+    u.addParameter('check', 'no');
+    u.addParameter('print');
+    u.addParameter('slow', null);
+    u.addParameter('x', '');
+    u.addParameter('user', 'admin');
+    expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check=no&debug&print&slow&submit=yes&user=admin&user=hugo&x=#66627');
+    var reverseAlphabetSorter = function(a, b) {
+      return -1 * scout.URL._sorter(a, b);
+    };
+    expect(u.toString({
+      sorter: reverseAlphabetSorter
+    })).toBe('http://www.simple.example/dir/file.html?x=&user=admin&user=hugo&submit=yes&slow&print&debug&check=no#66627');
+    expect(u.toString({
+      alwaysFirst: 'x'
+    })).toBe('http://www.simple.example/dir/file.html?x=&check=no&debug&print&slow&submit=yes&user=admin&user=hugo#66627');
+    expect(u.toString({
+      alwaysFirst: ['slow', 'debug', 'x']
+    })).toBe('http://www.simple.example/dir/file.html?slow&debug&x=&check=no&print&submit=yes&user=admin&user=hugo#66627');
+    expect(u.toString({
+      alwaysLast: ['print', 'check']
+    })).toBe('http://www.simple.example/dir/file.html?debug&slow&submit=yes&user=admin&user=hugo&x=&print&check=no#66627');
+    expect(u.toString({
+      alwaysLast: ['check', 'print'],
+      sorter: reverseAlphabetSorter
+    })).toBe('http://www.simple.example/dir/file.html?x=&user=admin&user=hugo&submit=yes&slow&debug&check=no&print#66627');
+  });
+
 });
