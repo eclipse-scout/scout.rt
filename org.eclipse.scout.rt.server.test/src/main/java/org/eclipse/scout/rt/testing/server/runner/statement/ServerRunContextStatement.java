@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -61,7 +62,12 @@ public class ServerRunContextStatement extends Statement {
 
     UserAgent userAgent = UserAgents.createDefault();
 
-    final IBean serverSessionBean = BEANS.getBeanManager().registerBean(new BeanMetaData(m_serverSessionAnnotation.value()).withOrder(-Long.MAX_VALUE));
+    Class<? extends ISession> sessionClass = m_serverSessionAnnotation.value();
+    IBean<? extends ISession> sessionBean = BEANS.getBeanManager().uniqueBean(sessionClass);
+    if (sessionBean != null) {
+      sessionClass = sessionBean.getBeanClazz();
+    }
+    final IBean serverSessionBean = BEANS.getBeanManager().registerBean(new BeanMetaData(sessionClass).withOrder(-Long.MAX_VALUE));
     try {
       // Obtain the server session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
       final IServerSession serverSession = BEANS.get(m_serverSessionAnnotation.provider()).provide(

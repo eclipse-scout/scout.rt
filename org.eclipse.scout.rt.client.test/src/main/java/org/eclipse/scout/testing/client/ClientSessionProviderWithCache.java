@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -97,6 +98,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     }
 
     // 3. Cache miss (optimistic locking because session creation might be a long running operation)
+    prepareSessionCreatingClientRunContext(clientRunContext);
     clientSession = super.provide(sessionId, clientRunContext);
 
     // 4. Cache the new client session, or return present session if created by another thread in the meantime (optimistic locking).
@@ -128,6 +130,16 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     }
   }
 
+  /**
+   * Hook method for adapting the {@link ClientRunContext} that is used for creating the new {@link IClientSession}
+   * instance.
+   *
+   * @since 7.0
+   */
+  protected void prepareSessionCreatingClientRunContext(final ClientRunContext clientRunContext) {
+    clientRunContext.withProperty("url", "http://localhost:8082"); // simulates the URL used by the user's browser
+  }
+
   @Override
   protected void registerSessionForNotifications(final IClientSession session, final String sessionId) {
     if (BEANS.get(IServiceTunnel.class).isActive()) {
@@ -151,5 +163,14 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
         }
       }
     });
+  }
+
+  @Override
+  protected void afterStartSession(IClientSession clientSession) {
+    final IDesktop desktop = clientSession.getDesktop();
+    if (desktop != null) {
+      desktop.getUIFacade().openFromUI();
+      desktop.getUIFacade().fireGuiAttached();
+    }
   }
 }
