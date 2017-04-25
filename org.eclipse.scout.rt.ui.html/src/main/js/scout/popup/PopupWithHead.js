@@ -149,9 +149,10 @@ scout.PopupWithHead.prototype.addClassToBody = function(clazz) {
 /**
  * @override Popup.js
  */
-scout.PopupWithHead.prototype._position = function($container, switchIfNecessary) {
-  if (!this.$container) {
-    //when layouting menu bar menues are first removed and then newly added prevent this.$contaier = null;
+scout.PopupWithHead.prototype._position = function(switchIfNecessary) {
+  var $container = this.$container;
+  if (!$container) {
+    // When layouting the menu bar, menus are removed at first and then added anew.
     return;
   }
   var openingDirectionX, openingDirectionY, overlap, pos;
@@ -175,7 +176,7 @@ scout.PopupWithHead.prototype._position = function($container, switchIfNecessary
   switchIfNecessary = scout.nvl(switchIfNecessary, true);
   if (switchIfNecessary) {
     pos = $container.offset();
-    overlap = this.overlap($container, {
+    overlap = this.overlap({
       x: pos.left,
       y: pos.top
     });

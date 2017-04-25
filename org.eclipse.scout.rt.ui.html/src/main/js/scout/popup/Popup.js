@@ -252,8 +252,9 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   }
 };
 
-scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
+scout.Popup.prototype.prefLocation = function(openingDirectionY) {
   var x, y, anchorBounds, height, openingDirectionX;
+  var $container = this.$container;
   if (!this.boundToAnchor || (!this.anchorBounds && !this.$anchor)) {
     return;
   }
@@ -291,7 +292,8 @@ scout.Popup.prototype.getAnchorBounds = function() {
   return anchorBounds;
 };
 
-scout.Popup.prototype.overlap = function($container, location) {
+scout.Popup.prototype.overlap = function(location) {
+  var $container = this.$container;
   if (!$container || !location) {
     return;
   }
@@ -309,15 +311,15 @@ scout.Popup.prototype.overlap = function($container, location) {
   };
 };
 
-scout.Popup.prototype.adjustLocation = function($container, location, switchIfNecessary) {
+scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
   var openingDirection, left, top,
-    overlap = this.overlap($container, location);
+    overlap = this.overlap(location);
 
   switchIfNecessary = scout.nvl(switchIfNecessary, true);
   if (overlap.y > 0 && switchIfNecessary) {
     // switch opening direction
     openingDirection = 'up';
-    location = this.prefLocation($container, openingDirection);
+    location = this.prefLocation(openingDirection);
   }
   left = location.x;
   top = location.y;
@@ -345,15 +347,15 @@ scout.Popup.prototype.prefSize = function($container) {
 
 scout.Popup.prototype.position = function(switchIfNecessary) {
   this._validateVisibility();
-  this._position(this.$container, switchIfNecessary);
+  this._position(switchIfNecessary);
 };
 
-scout.Popup.prototype._position = function($container, switchIfNecessary) {
-  var location = this.prefLocation($container);
+scout.Popup.prototype._position = function(switchIfNecessary) {
+  var location = this.prefLocation();
   if (!location) {
     return;
   }
-  location = this.adjustLocation($container, location, switchIfNecessary);
+  location = this.adjustLocation(location, switchIfNecessary);
   this.setLocation(location);
 };
 
