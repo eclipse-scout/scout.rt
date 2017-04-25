@@ -28,7 +28,7 @@ scout.PopupWithHead.prototype._init = function(options) {
 
   // Compared to a regular popup, the popup is aligned with the head and either opened left or right,
   // -> the width should be adjusted as well if it does not fit into the window
-  this.trimWidth = scout.nvl(options.trimWidth, true);
+  this.trimWidth = scout.nvl(options.trimWidth, this._headVisible);
 };
 
 scout.PopupWithHead.prototype._render = function($parent) {
