@@ -40,26 +40,27 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
  * @override
  */
 scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
+  if (!this.popup._headVisible) {
+    return scout.PopupWithHeadLayout.parent.prototype._calcMaxSizeAroundAnchor.call(this);
+  }
+
   // Position the popup at the desired location before doing any calculations,
   // but do no try to switch the position if there is not enough space
   this.popup.position(false);
 
   var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
     htmlComp = this.popup.htmlComp,
-    windowPaddingX = this.popup.windowPaddingX,
+    windowPaddingLeft = this.popup.windowPaddingX,
+    windowPaddingRight = this.popup.windowPaddingX,
     windowPaddingY = this.popup.windowPaddingY,
     popupBounds = scout.graphics.offsetBounds(htmlComp.$comp),
+    popupHeadBounds = scout.graphics.offsetBounds(this.popup.$head),
     popupMargins = htmlComp.getMargins(),
-    popupHeadSize = new scout.Dimension(0, 0),
     $window = this.popup.$container.window(),
     windowSize = new scout.Dimension($window.width(), $window.height());
 
-  if (this.popup.$head) {
-    popupHeadSize = scout.graphics.getSize(this.popup.$head);
-  }
-
-  maxWidthRight = (windowSize.width - popupBounds.x - windowPaddingX);
-  maxWidthLeft = (popupBounds.x + popupHeadSize.width - popupMargins.horizontal() - windowPaddingX);
+  maxWidthRight = windowSize.width - popupHeadBounds.x - windowPaddingRight;
+  maxWidthLeft = popupHeadBounds.x + popupHeadBounds.width - windowPaddingLeft;
   maxHeightDown = (windowSize.height - popupBounds.y - windowPaddingY);
   // head height is irrelevant because popup has a margin as height as the header
   maxHeightUp = (popupBounds.y - popupMargins.vertical() - windowPaddingY);
