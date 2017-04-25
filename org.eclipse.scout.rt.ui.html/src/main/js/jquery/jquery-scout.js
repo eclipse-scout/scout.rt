@@ -1173,13 +1173,33 @@ $.fn.fadeOutAndRemove = function(duration, callback) {
   });
 };
 
-var _oldhide = $.fn.hide;
+var __origHide = $.fn.hide;
 $.fn.hide = function() {
   this.trigger('hide');
-  var returnValue = _oldhide.apply(this, arguments);
-  return returnValue;
+  return __origHide.apply(this, arguments);
 };
-//TODO [7.0] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
+
+var __origWidth = $.fn.width;
+$.fn.width = function() {
+  return Math.ceil(__origWidth.apply(this, arguments));
+};
+
+var __origOuterWidth = $.fn.outerWidth;
+$.fn.outerWidth = function() {
+  return Math.ceil(__origOuterWidth.apply(this, arguments));
+};
+
+var __origHeight = $.fn.height;
+$.fn.height = function() {
+  return Math.ceil(__origHeight.apply(this, arguments));
+};
+
+var __origOuterHeight = $.fn.outerHeight;
+$.fn.outerHeight = function() {
+  return Math.ceil(__origOuterHeight.apply(this, arguments));
+};
+
+// TODO [7.0] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
 
 /**
  * Sets the given 'text' as text to the jQuery element, using the text() function (i.e. HTML is encoded automatically).
