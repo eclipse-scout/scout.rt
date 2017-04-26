@@ -76,6 +76,18 @@ public final class TypeCastUtility {
     return (T) instance.castValueImpl(object, castType);
   }
 
+  /**
+   * @param type
+   *          not null
+   * @return either the same type or if the type is a primitive type, the wrapper type of that primitive type
+   */
+  public static Class<?> getNonPrimitiveType(Class<?> type) {
+    if (type.isPrimitive()) {
+      return instance.getWrappedType(type);
+    }
+    return type;
+  }
+
   // instance
   /**
    * fast access to debug flag
@@ -189,8 +201,7 @@ public final class TypeCastUtility {
    * wrapper type for primitive types
    */
   private Class getWrappedType(Class primitiveType) {
-    Class wrappedType = m_wrapperTypeMap.get(primitiveType);
-    return wrappedType;
+    return m_wrapperTypeMap.get(primitiveType);
   }
 
   /**

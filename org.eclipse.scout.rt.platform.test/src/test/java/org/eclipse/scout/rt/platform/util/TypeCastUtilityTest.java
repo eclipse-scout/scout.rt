@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -21,7 +22,6 @@ import java.math.RoundingMode;
 
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.holders.LongArrayHolder;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.junit.Test;
 
 /**
@@ -107,7 +107,27 @@ public class TypeCastUtilityTest {
     assertFalse(TypeCastUtility.castValue("something", boolean.class));
 
     assertFalse(TypeCastUtility.castValue(null, boolean.class));
+  }
 
+  public void testGetNonPrimitiveType() throws Exception {
+    assertSame(TypeCastUtility.getNonPrimitiveType(char.class), Character.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(byte.class), Byte.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(boolean.class), Boolean.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(short.class), Short.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(int.class), Integer.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(long.class), Long.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(float.class), Float.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(double.class), Double.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(void.class), Void.class);
+
+    assertSame(TypeCastUtility.getNonPrimitiveType(Boolean.class), Boolean.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(Void.class), Void.class);
+    assertSame(TypeCastUtility.getNonPrimitiveType(Data0.class), Data0.class);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testGetNonPrimitiveTypeNull() throws Exception {
+    TypeCastUtility.getNonPrimitiveType(null);
   }
 
   protected BigDecimal createCustomBigDecimal(long l) {
