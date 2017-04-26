@@ -15,6 +15,7 @@ scout.ContextMenuPopup = function() {
   this._headVisible = false;
   this.menuItems = [];
   this.cloneMenuItems = true;
+  this._toggleSubMenuQueue = [];
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
@@ -65,6 +66,11 @@ scout.ContextMenuPopup.prototype._installScrollbars = function() {
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
   var duration = 300;
+  if (this.bodyAnimating) {
+    // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
+    this._toggleSubMenuQueue.push(this.removeSubMenuItems.bind(this, parentMenu, animated));
+    return;
+  }
 
   this.$body = parentMenu.parentMenu.$subMenuBody;
   // move new body to back
@@ -120,6 +126,10 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
           this.bodyAnimating = false;
           // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
           this._invalidateLayoutTreeAndRepositionPopup();
+          var next = this._toggleSubMenuQueue.shift();
+          if (next) {
+            next();
+          }
         }
       }.bind(this)
     });
@@ -147,6 +157,12 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     };
     return;
   }
+  if (this.bodyAnimating) {
+    // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
+    this._toggleSubMenuQueue.push(this.renderSubMenuItems.bind(this, parentMenu, menus, animated, initialSubMenuRendering));
+    return;
+  }
+
   var actualBounds = this.htmlComp.getBounds();
   var actualSize = this.htmlComp.getSize();
 
@@ -196,11 +212,6 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
       duration: duration,
       progress: this.revalidateLayout.bind(this),
-      complete: function() {
-        this.bodyAnimating = false;
-        // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
-        this._invalidateLayoutTreeAndRepositionPopup();
-      }.bind(this),
       queue: false
     });
 
@@ -218,6 +229,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       duration: duration,
       queue: false,
       complete: function() {
+        this.bodyAnimating = false;
         if (parentMenu.parentMenu.$subMenuBody) {
           scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
           parentMenu.parentMenu.$subMenuBody.detach();
@@ -225,6 +237,12 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
           this._installScrollbars();
           this._updateFirstLastClass();
           this.$body.css('box-shadow', '');
+        }
+        // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
+        this._invalidateLayoutTreeAndRepositionPopup();
+        var next = this._toggleSubMenuQueue.shift();
+        if (next) {
+          next();
         }
       }.bind(this)
     });
