@@ -74,23 +74,13 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     parentMenu.parentMenu._doActionTogglesSubMenu();
   }
 
-  var displayBackup = parentMenu.$subMenuBody.css('display');
-  parentMenu.$subMenuBody.css({
-    width: 'auto',
-    height: 'auto',
-    display: 'none'
-  });
-
   var actualBounds = this.htmlComp.getBounds();
   var actualSize = this.htmlComp.getSize();
 
   this.revalidateLayout();
   this.position();
 
-  parentMenu.$subMenuBody.css('display', displayBackup);
-  var position;
-  position = parentMenu.$placeHolder.position();
-
+  var position = parentMenu.$placeHolder.position();
   if (animated && this.rendered) {
     this.bodyAnimating = true;
     parentMenu.$subMenuBody.css({

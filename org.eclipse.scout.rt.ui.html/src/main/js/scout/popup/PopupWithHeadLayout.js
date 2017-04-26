@@ -74,14 +74,19 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
 
   if (!this.popup.bodyAnimating) {
     var popupStyleBackup = this.popup.$container.attr('style');
+    var $siblingBodies = this.popup.$body.siblings('.popup-body');
+    $siblingBodies.addClass('hidden');
     this.popup.$container.css({
       width: 'auto',
       height: 'auto'
     });
+
     prefSize = scout.graphics.prefSize(this.popup.$body, {
         includeMargin: true
       })
       .add(htmlComp.getInsets());
+
+    $siblingBodies.removeClass('hidden');
     this.popup.$container.attr('style', popupStyleBackup);
   } else {
     prefSize = scout.graphics.getSize(this.popup.$body, true);
