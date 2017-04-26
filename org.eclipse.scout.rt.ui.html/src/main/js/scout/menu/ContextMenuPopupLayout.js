@@ -27,8 +27,11 @@ scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItem
   $menuItems.each(function(index, menuItem) {
     var $menuItem = $(menuItem);
     var $icon = $menuItem.children('.icon');
+    var iconWidth = 0;
 
-    var iconWidth = $icon.outerWidth(true);
+    if ($icon.length > 0) {
+      iconWidth = $icon.outerWidth(true);
+    }
     textOffset = Math.max(textOffset, iconWidth);
   });
 
@@ -38,8 +41,11 @@ scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItem
     var $menuItem = $(menuItem);
     var $icon = $menuItem.children('.icon');
     var $text = $menuItem.children('.text');
+    var iconWidth = 0;
 
-    var iconWidth = $icon.outerWidth(true);
+    if ($icon.length > 0) {
+      iconWidth = $icon.outerWidth(true);
+    }
     $text.css('padding-left', textOffset - iconWidth);
   });
 };
