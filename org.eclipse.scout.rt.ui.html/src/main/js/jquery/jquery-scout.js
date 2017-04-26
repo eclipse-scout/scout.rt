@@ -1181,23 +1181,36 @@ $.fn.hide = function() {
 
 var __origWidth = $.fn.width;
 $.fn.width = function() {
-  return Math.ceil(__origWidth.apply(this, arguments));
+  return _ceilNumber(__origWidth.apply(this, arguments));
 };
 
 var __origOuterWidth = $.fn.outerWidth;
 $.fn.outerWidth = function() {
-  return Math.ceil(__origOuterWidth.apply(this, arguments));
+  return _ceilNumber(__origOuterWidth.apply(this, arguments));
 };
 
 var __origHeight = $.fn.height;
 $.fn.height = function() {
-  return Math.ceil(__origHeight.apply(this, arguments));
+  return _ceilNumber(__origHeight.apply(this, arguments));
 };
 
 var __origOuterHeight = $.fn.outerHeight;
 $.fn.outerHeight = function() {
-  return Math.ceil(__origOuterHeight.apply(this, arguments));
+  return _ceilNumber(__origOuterHeight.apply(this, arguments));
 };
+
+/**
+ * This function is required because most jQuery functions can be used with or without arguments
+ * and do return the jQuery instance when used as a setter (with arguments), ceiling should only
+ * be done, when used as getter (without arguments).
+ */
+function _ceilNumber(val) {
+  if (scout.objects.isNumber(val)) {
+    return Math.ceil(val);
+  } else {
+    return val;
+  }
+}
 
 // TODO [7.0] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
 
