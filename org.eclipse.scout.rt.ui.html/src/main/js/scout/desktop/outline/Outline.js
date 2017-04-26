@@ -18,7 +18,7 @@ scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
 
-  this.autoToggleBreadcrumbStyle = true;
+  this.toggleBreadcrumbStyleEnabled = true;
   this.navigateButtonsVisible = true;
   this.dialogs = [];
   this.views = [];

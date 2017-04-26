@@ -16,7 +16,7 @@
 scout.Tree = function() {
   scout.Tree.parent.call(this);
 
-  this.autoToggleBreadcrumbStyle = false;
+  this.toggleBreadcrumbStyleEnabled = false;
   this.autoCheckChildren = false;
   this.checkable = false;
   this.displayStyle = scout.Tree.DisplayStyle.DEFAULT;

@@ -398,7 +398,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * <p>
    * Subclasses can override this method. The default is {@link ITree#DISPLAY_STYLE_DEFAULT}.
    *
-   * @see #getConfiguredAutoToggleBreadcrumbStyle()
+   * @see #getConfiguredToggleBreadcrumbStyleEnabled()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
@@ -407,8 +407,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Configures whether the outline should automatically switch to the bread crumb style when getting smaller and back
-   * when getting bigger. The threshold is determined by the GUI.
+   * @deprecated use {@link AbstractTree#getConfiguredToggleBreadcrumbStyleEnabled()} instead, will be removed in Scout
+   *             7.0
+   */
+  @Deprecated
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(144)
+  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
+    return false;
+  }
+
+  /**
+   * Configures whether the tree should automatically switch to the bread crumb style when getting smaller and back when
+   * getting bigger. The threshold is determined by the GUI.
    * <p>
    * Subclasses can override this method. The default is false.
    *
@@ -416,8 +427,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(145)
-  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
-    return false;
+  protected boolean getConfiguredToggleBreadcrumbStyleEnabled() {
+    return getConfiguredAutoToggleBreadcrumbStyle();
   }
 
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
@@ -597,7 +608,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setDisplayStyle(getConfiguredDisplayStyle());
-    setAutoToggleBreadcrumbStyle(getConfiguredAutoToggleBreadcrumbStyle());
+    setToggleBreadcrumbStyleEnabled(getConfiguredToggleBreadcrumbStyleEnabled());
     setRootNode(new AbstractTreeNode() {
     });
     // add Convenience observer for drag & drop callbacks and event history
@@ -1086,14 +1097,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isAutoToggleBreadcrumbStyle() {
-    return propertySupport.getPropertyBool(PROP_AUTO_TOGGLE_BREADCRUMB_STYLE);
+    return isToggleBreadcrumbStyleEnabled();
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void setAutoToggleBreadcrumbStyle(boolean b) {
+    setToggleBreadcrumbStyleEnabled(b);
   }
 
   @Override
-  public void setAutoToggleBreadcrumbStyle(boolean b) {
-    propertySupport.setPropertyBool(PROP_AUTO_TOGGLE_BREADCRUMB_STYLE, b);
+  public boolean isToggleBreadcrumbStyleEnabled() {
+    return propertySupport.getPropertyBool(PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED);
+  }
+
+  @Override
+  public void setToggleBreadcrumbStyleEnabled(boolean b) {
+    propertySupport.setPropertyBool(PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED, b);
   }
 
   @Override

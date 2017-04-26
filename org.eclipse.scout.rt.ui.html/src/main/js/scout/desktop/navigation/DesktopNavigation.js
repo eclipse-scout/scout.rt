@@ -24,14 +24,23 @@ scout.DesktopNavigation.MIN_WIDTH; // Configured in sizes.css
 
 scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.parent.prototype._init.call(this, model);
-  scout.DesktopNavigation.MIN_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'min-width').minWidth);
-  scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'width').width);
-  scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation-breadcrumb', 'width').width);
+  scout.DesktopNavigation.MIN_WIDTH = this._widthFromStyle('desktop-navigation', 'min-width', 'minWidth', 49);
+  scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = this._widthFromStyle('desktop-navigation', 'width', 'width', 290);
+  scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = this._widthFromStyle('desktop-navigation-breadcrumb', 'width', 'width', 240);
   this.desktop = this.parent;
   this.layoutData = model.layoutData || {};
   this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
   this._setOutline(model.outline);
+};
+
+scout.DesktopNavigation.prototype._widthFromStyle = function(cssClass, cssProperty, property, defaultWidth) {
+  var width = scout.styles.get(cssClass, cssProperty)[property];
+  if ('auto' === width) {
+    return defaultWidth;
+  } else {
+    return $.pxToNumber(width);
+  }
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
@@ -98,22 +107,22 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
   this.setProperty('outline', outline);
 };
 
-scout.DesktopNavigation.prototype._setOutline = function(outline) {
-  var currentDisplayStyle;
+scout.DesktopNavigation.prototype._setOutline = function(newOutline) {
+  var oldOutline = this.outline;
   if (this.outline) {
-    currentDisplayStyle = this.outline.displayStyle;
     this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
   }
   if (this.rendered) {
     this._removeOutline();
   }
-  this.outline = outline;
+  this.outline = newOutline;
   if (this.outline) {
     this.outline.setParent(this);
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
-    // Make sure new outline uses same display style as old
-    if (currentDisplayStyle && this.outline.autoToggleBreadcrumbStyle) {
-      this.outline.setDisplayStyle(currentDisplayStyle);
+    // if both have breadcrumb-toggling enabled: make sure new outline uses same display style as old
+    if (this.outline.toggleBreadcrumbStyleEnabled && oldOutline && oldOutline.toggleBreadcrumbStyleEnabled &&
+        oldOutline.displayStyle) {
+      this.outline.setDisplayStyle(oldOutline.displayStyle);
     }
     this.outline.inBackground = this.desktop.inBackground;
     this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
@@ -149,7 +158,8 @@ scout.DesktopNavigation.prototype.setHandleVisible = function(visible) {
 
 scout.DesktopNavigation.prototype._updateHandle = function() {
   if (this.handle) {
-    this.handle.setRightVisible(this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
+    this.handle.setRightVisible(this.outline && this.outline.toggleBreadcrumbStyleEnabled &&
+        this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
   }
 };
 

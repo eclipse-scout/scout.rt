@@ -20,6 +20,7 @@ describe('DesktopNavigation', function() {
       }
     });
     desktop = session.desktop;
+    outlineHelper = new scout.OutlineSpecHelper(session);
   });
 
   describe('viewButtonBox', function() {
@@ -38,4 +39,71 @@ describe('DesktopNavigation', function() {
 
   });
 
+  describe('outline', function() {
+
+    it('collapses and expands in two steps when breadcrumb toggling enabled', function() {
+      var outline = _setupOutline(outlineHelper, desktop, true);
+
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.navigation.handle.leftVisible).toBe(true);
+      expect(desktop.navigation.handle.rightVisible).toBe(false);
+
+      // collapse to breadcrumb
+      desktop.shrinkNavigation();
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.BREADCRUMB);
+      expect(desktop.navigation.handle.leftVisible).toBe(true);
+      expect(desktop.navigation.handle.rightVisible).toBe(true);
+
+      // collapse completely
+      desktop.shrinkNavigation();
+      expect(desktop.navigationVisible).toBe(false);  // complete navigation invisible, handle-visibility not updated
+
+      //enlarge to breadcrumb
+      desktop.enlargeNavigation();
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.BREADCRUMB);
+      expect(desktop.navigation.handle.leftVisible).toBe(true);
+      expect(desktop.navigation.handle.rightVisible).toBe(true);
+
+      //enlarge to default
+      desktop.enlargeNavigation();
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.navigation.handle.leftVisible).toBe(true);
+      expect(desktop.navigation.handle.rightVisible).toBe(false);
+    });
+
+    it('collapses and expands in one step when breadcrumb toggling disabled', function() {
+      var outline = _setupOutline(outlineHelper, desktop, false);
+
+      expect(desktop.navigation.handle.leftVisible).toBe(true);
+      expect(desktop.navigation.handle.rightVisible).toBe(false);
+      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+
+      // collapse completely
+      desktop.shrinkNavigation();
+      expect(desktop.navigationVisible).toBe(false);  // complete navigation invisible, handle-visibility not updated
+
+      //enlarge to default
+      desktop.enlargeNavigation();
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.navigation.handle.leftVisible).toBe(true);
+      expect(desktop.navigation.handle.rightVisible).toBe(false);
+    });
+
+  });
+
 });
+
+function _setupOutline(outlineHelper, desktop, toggleBreadcrumbStyleEnabled) {
+  var model = outlineHelper.createModelFixture(3, 2);
+  var outline = outlineHelper.createOutline(model);
+  outline.toggleBreadcrumbStyleEnabled = toggleBreadcrumbStyleEnabled;
+  outline.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
+  desktop.setOutline(outline);
+  desktop.render(desktop.session.$entryPoint);
+  return outline;
+}

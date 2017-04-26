@@ -559,7 +559,8 @@ scout.Desktop.prototype.outlineDisplayStyle = function() {
 };
 
 scout.Desktop.prototype.shrinkNavigation = function() {
-  if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
+  if (this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
+      this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
     this.outline.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
   } else {
     this.setNavigationVisible(false);

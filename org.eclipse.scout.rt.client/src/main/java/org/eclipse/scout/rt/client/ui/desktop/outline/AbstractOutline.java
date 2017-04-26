@@ -188,16 +188,28 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Configures whether the outline should automatically switch to the bread crumb style when getting smaller and back
-   * when getting bigger. The threshold is determined by the GUI.
+   * @deprecated use {@link AbstractOutline#getConfiguredToggleBreadcrumbStyleEnabled()} instead, will be removed in
+   *             Scout 7.0
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
+    return true;
+  }
+
+  /**
+   * Configures whether the outline should automatically switch to the bread crumb style when getting smaller (either by
+   * navigation button or moved splitter) and back when getting bigger. The threshold in case of moved splitter is
+   * determined by the GUI.
    * <p>
    * Subclasses can override this method. The default is true.
    *
    * @see #getConfiguredDisplayStyle()
    */
   @Override
-  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
-    return true;
+  protected boolean getConfiguredToggleBreadcrumbStyleEnabled() {
+    return getConfiguredAutoToggleBreadcrumbStyle();
   }
 
   /**
