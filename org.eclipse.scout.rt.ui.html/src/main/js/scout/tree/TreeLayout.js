@@ -28,7 +28,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (this.tree.autoToggleBreadcrumbStyle) {
+  if (this.tree.toggleBreadcrumbStyleEnabled) {
     this.tree.setBreadcrumbStyleActive(containerSize.width <= this.tree.breadcrumbTogglingThreshold);
   }
 

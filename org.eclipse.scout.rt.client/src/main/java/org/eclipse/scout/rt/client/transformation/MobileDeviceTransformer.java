@@ -99,7 +99,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   public void transformOutline(IOutline outline) {
     outline.setNavigateButtonsVisible(false);
     outline.setLazyExpandingEnabled(false);
-    outline.setAutoToggleBreadcrumbStyle(false);
+    outline.setToggleBreadcrumbStyleEnabled(false);
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
   }
 

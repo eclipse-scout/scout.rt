@@ -215,10 +215,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         return getModel().getDisplayStyle();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_AUTO_TOGGLE_BREADCRUMB_STYLE, model) {
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isAutoToggleBreadcrumbStyle();
+        return getModel().isToggleBreadcrumbStyleEnabled();
       }
     });
   }

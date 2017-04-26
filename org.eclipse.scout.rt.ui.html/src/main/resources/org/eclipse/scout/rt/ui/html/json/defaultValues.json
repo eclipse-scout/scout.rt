@@ -213,7 +213,7 @@
       "geolocationServiceAvailable": true
     },
     "Outline": {
-      "autoToggleBreadcrumbStyle": true,
+      "toggleBreadcrumbStyleEnabled": true,
       "navigateButtonsVisible": true,
       "outlineOverviewVisible":true,
       "dialogs": [],
@@ -239,7 +239,7 @@
       "toggleAction": true
     },
     "Tree": {
-      "autoToggleBreadcrumbStyle": false,
+      "toggleBreadcrumbStyleEnabled": false,
       "displayStyle": "default",
       "dropType": 0,
       "dropMaximumSize": 52428800,

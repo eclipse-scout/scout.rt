@@ -51,7 +51,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppL
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
   String PROP_DISPLAY_STYLE = "displayStyle";
-  String PROP_AUTO_TOGGLE_BREADCRUMB_STYLE = "autoToggleBreadcrumbStyle";
+  String PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED = "toggleBreadcrumbStyleEnabled";
 
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_BREADCRUMB = "breadcrumb";
@@ -524,9 +524,21 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppL
    */
   void setDisplayStyle(String style);
 
+  /**
+   * @deprecated use {@link ITree#isToggleBreadcrumbStyleEnabled()} instead, will be removed in Scout 7.0
+   */
+  @Deprecated
   boolean isAutoToggleBreadcrumbStyle();
 
+  /**
+   * @deprecated use {@link ITree#setToggleBreadcrumbStyleEnabled()} instead, will be removed in Scout 7.0
+   */
+  @Deprecated
   void setAutoToggleBreadcrumbStyle(boolean b);
+
+  boolean isToggleBreadcrumbStyleEnabled();
+
+  void setToggleBreadcrumbStyleEnabled(boolean b);
 
   /**
    * informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,
