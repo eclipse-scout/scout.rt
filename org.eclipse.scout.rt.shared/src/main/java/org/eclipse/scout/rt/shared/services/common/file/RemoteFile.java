@@ -694,6 +694,10 @@ public class RemoteFile implements Serializable {
    * @since 2.7
    */
   public static String getContentTypeForExtension(String ext) {
+    if (ext == null) {
+      return null;
+    }
+
     if (ext.startsWith(".")) {
       ext = ext.substring(1);
     }
