@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Forwards get and post requests to the given remote URL.
  */
+@Bean
 public class HttpProxy {
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxy.class);
 
@@ -42,7 +45,10 @@ public class HttpProxy {
   public HttpProxy() {
     m_requestHeaderFilters = new ArrayList<>();
     m_responseHeaderFilters = new ArrayList<>();
+  }
 
+  @PostConstruct
+  protected void initialize() {
     // remove null header from response headers
     m_responseHeaderFilters.add(new HttpHeaderNameFilter(null));
 
