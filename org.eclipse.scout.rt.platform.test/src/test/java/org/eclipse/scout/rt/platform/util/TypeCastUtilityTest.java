@@ -109,6 +109,7 @@ public class TypeCastUtilityTest {
     assertFalse(TypeCastUtility.castValue(null, boolean.class));
   }
 
+  @Test
   public void testGetNonPrimitiveType() throws Exception {
     assertSame(TypeCastUtility.getNonPrimitiveType(char.class), Character.class);
     assertSame(TypeCastUtility.getNonPrimitiveType(byte.class), Byte.class);
