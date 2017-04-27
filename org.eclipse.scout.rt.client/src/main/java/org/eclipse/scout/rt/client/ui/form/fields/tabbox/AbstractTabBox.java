@@ -162,38 +162,39 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
 
     if (hasVisibleFieldsInternal()) {
-      final IGroupBox selectedBox = getSelectedTab();
-      if (selectedBox == null) {
-        for (IGroupBox box : getGroupBoxes()) {
-          if (box.isVisible()) {
-            setSelectedTab(box);
-            break;
-          }
+      setSelectedTab(findNewSelectedTab(getSelectedTab()));
+    }
+  }
+
+  protected IGroupBox findNewSelectedTab(final IGroupBox selectedBox) {
+    if (selectedBox == null) {
+      for (IGroupBox box : getGroupBoxes()) {
+        if (box.isVisible()) {
+          return box;
         }
       }
-      else if (!selectedBox.isVisible()) {
-        int index = getFieldIndex(selectedBox);
-        List<IGroupBox> boxes = getGroupBoxes();
-        // next to right side
-        for (int i = index + 1; i < getFieldCount(); i++) {
+    }
+    else if (!selectedBox.isVisible()) {
+      int index = getFieldIndex(selectedBox);
+      List<IGroupBox> boxes = getGroupBoxes();
+      // next to right side
+      for (int i = index + 1; i < getFieldCount(); i++) {
+        IGroupBox box = boxes.get(i);
+        if (box.isVisible()) {
+          return box;
+        }
+      }
+      if (getSelectedTab() == selectedBox) {
+        // next to left side
+        for (int i = index - 1; i >= 0; i--) {
           IGroupBox box = boxes.get(i);
           if (box.isVisible()) {
-            setSelectedTab(box);
-            break;
-          }
-        }
-        if (getSelectedTab() == selectedBox) {
-          // next to left side
-          for (int i = index - 1; i >= 0; i--) {
-            IGroupBox box = boxes.get(i);
-            if (box.isVisible()) {
-              setSelectedTab(box);
-              break;
-            }
+            return box;
           }
         }
       }
     }
+    return null; // no tab found
   }
 
   @Override
@@ -222,7 +223,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @Override
   public void setSelectedTab(IGroupBox box) {
-    if (box.getParentField() == this) {
+    if (box == null || box.getParentField() == this) {
       propertySupport.setProperty(PROP_SELECTED_TAB, box);
     }
   }
@@ -309,4 +310,16 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   protected ITabBoxExtension<? extends AbstractTabBox> createLocalExtension() {
     return new LocalTabBoxExtension<AbstractTabBox>(this);
   }
+
+  @Override
+  public void removeField(IFormField f) {
+    super.removeField(f);
+    // if tabitem (groupbox) is removed from tabbox, we must also reset the selected tab
+    // because otherwise the property would point to a tabitem that is no longer a child
+    // of this tabbox
+    if (f == getSelectedTab()) {
+      setSelectedTab(findNewSelectedTab(null));
+    }
+  }
+
 }
