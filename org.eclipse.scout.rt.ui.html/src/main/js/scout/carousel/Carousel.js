@@ -52,6 +52,14 @@ scout.Carousel.prototype._render = function($parent) {
   this.htmlCompFilmstrip = scout.HtmlComponent.install(this.$carouselFilmstrip, this.session);
 };
 
+scout.Carousel.prototype._remove = function() {
+  if (this.$carouselStatus) {
+    this.$carouselStatus.remove();
+    this.$carouselStatus = null;
+  }
+  scout.Carousel.parent.prototype._remove.call(this);
+};
+
 scout.Carousel.prototype._renderProperties = function() {
   scout.Carousel.parent.prototype._renderProperties.call(this);
 
@@ -156,6 +164,7 @@ scout.Carousel.prototype._renderWidgets = function() {
   }, this);
 
   if (this.$carouselStatus) {
+    this.$carouselStatusItems = [];
     this.$carouselItems.forEach(function() {
       var $statusItem = this.$carouselStatus.appendDiv('status-item');
       $statusItem.html(this.statusItemHtml);
