@@ -114,6 +114,7 @@ public class TableUserFilterManager {
    */
   public void setSerializedData(byte[] data) {
     try {
+      reset();
       Collection<IUserFilterState> filterStates = SerializationUtility.createObjectSerializer().deserialize(data, null);
       for (IUserFilterState filterState : filterStates) {
         boolean success = filterState.notifyDeserialized(m_table);
