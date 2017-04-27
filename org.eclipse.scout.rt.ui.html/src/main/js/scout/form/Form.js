@@ -140,7 +140,6 @@ scout.Form.prototype._renderForm = function($parent) {
 };
 
 scout.Form.prototype._initResizable = function() {
-  var $myWindow = this.$container.window();
   this.$container
     .resizable()
     .on('resize', this._onResize.bind(this));
@@ -155,11 +154,30 @@ scout.Form.prototype._onResize = function(event) {
   return false;
 };
 
-scout.Form.prototype.close = function() {
-  // TODO [7.0] awe,cgu: this is confusing, close sends a formClosing? May it be rejected? I would expect the form to be closed in offline mode too.
-  // Is it only used for popup windows? Suggestion: Rename close to kill, destroy the form and send a kill event (trigger('kill')).
-  this._send('formClosing');
+/**
+ * Renders the form by adding it to the desktop.
+ */
+scout.Form.prototype.open = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.session.desktop.showForm(this, this.displayParent);
 };
+
+/**
+ * Destroys the form and removes it from the desktop.
+ */
+scout.Form.prototype.close = function() {
+  var event = new scout.Event();
+  this.trigger('close', event);
+  if (!event.defaultPrevented) {
+    this._close();
+  }
+};
+
+scout.Form.prototype._close = function() {
+  this.session.desktop.hideForm(this);
+  this.destroy();
+};
+
 scout.Form.prototype._renderHeader = function() {
   if (this.isDialog()) {
     this.$header = this.$container.appendDiv('header');

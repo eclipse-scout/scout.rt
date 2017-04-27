@@ -49,7 +49,7 @@ describe('FormAdapter', function() {
 
   describe('onModelAction', function() {
 
-    describe('formClose', function() {
+    describe('disposeAdapter', function() {
 
       function createDisposeAdapterEvent(model) {
         return {

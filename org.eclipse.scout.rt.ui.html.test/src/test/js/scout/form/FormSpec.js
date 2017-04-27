@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global linkWidgetAndAdapter */
 describe('Form', function() {
   var session, helper;
 
@@ -27,6 +26,58 @@ describe('Form', function() {
     jasmine.clock().uninstall();
   });
 
+  describe('open', function() {
+
+    it('opens the form', function() {
+      var form = helper.createFormWithOneField();
+      form.open();
+      expect(form.rendered).toBe(true);
+      expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
+    });
+
+    it('adds it to the display parent', function() {
+      var parentForm = helper.createFormWithOneField();
+      parentForm.open();
+      expect(session.desktop.dialogs.indexOf(parentForm) > -1).toBe(true);
+
+      var form = helper.createFormWithOneField();
+      form.displayParent = parentForm;
+      form.open();
+      expect(form.rendered).toBe(true);
+      expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
+      expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
+    });
+
+  });
+
+  describe('close', function() {
+
+    it('closes the form', function() {
+      var form = helper.createFormWithOneField();
+      form.open();
+      form.close();
+      expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
+      expect(form.rendered).toBe(false);
+      expect(form.destroyed).toBe(true);
+    });
+
+    it('removes it from the display parent', function() {
+      var parentForm = helper.createFormWithOneField();
+      parentForm.open();
+
+      var form = helper.createFormWithOneField();
+      form.displayParent = parentForm;
+      form.open();
+      expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
+
+      form.close();
+      expect(parentForm.dialogs.indexOf(form) > -1).toBe(false);
+      expect(form.rendered).toBe(false);
+      expect(form.destroyed).toBe(true);
+    });
+
+  });
+
   describe('destroy', function() {
 
     it('destroys its children', function() {
@@ -38,35 +89,6 @@ describe('Form', function() {
       form.destroy();
       expect(form.rootGroupBox.destroyed).toBeTruthy();
       expect(form.rootGroupBox.fields[0].destroyed).toBeTruthy();
-    });
-
-  });
-
-  describe('onModelAction', function() {
-
-    describe('formClose', function() {
-
-      function createDisposeAdapterEvent(model) {
-        return {
-          target: session.uiSessionId,
-          type: 'disposeAdapter',
-          adapter: model.id
-        };
-      }
-
-      it('destroys the form', function() {
-        var form = helper.createFormWithOneField();
-        linkWidgetAndAdapter(form, 'FormAdapter');
-        spyOn(form, 'destroy');
-
-        var message = {
-          events: [createDisposeAdapterEvent(form)]
-        };
-        session._processSuccessResponse(message);
-
-        expect(form.destroy).toHaveBeenCalled();
-      });
-
     });
 
   });
