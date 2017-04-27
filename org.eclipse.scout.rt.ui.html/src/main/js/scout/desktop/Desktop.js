@@ -218,7 +218,7 @@ scout.Desktop.prototype._renderDisplayChildsOfOutline = function() {
   this.outline.formController.render();
   this.outline.messageBoxController.render();
   this.outline.fileChooserController.render();
-  
+
   if (this.outline.selectedViewTabs) {
     this.outline.selectedViewTabs.forEach(function(selectedView) {
       this.formController._activateView(selectedView);
@@ -856,7 +856,7 @@ scout.Desktop.prototype.onLayoutAnimationComplete = function() {
 };
 
 scout.Desktop.prototype.onResize = function(event) {
-  this.revalidateLayout();
+  this.revalidateLayoutTree();
 };
 
 scout.Desktop.prototype.onPopstate = function(event) {

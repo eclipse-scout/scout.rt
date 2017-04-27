@@ -679,14 +679,14 @@ scout.Widget.prototype.validateLayoutTree = function() {
   this.htmlComp.validateLayoutTree();
 };
 
-scout.Widget.prototype.revalidateLayoutTree = function() {
+scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
   if (!this.rendered) {
     return;
   }
   if (!this.htmlComp) {
     throw new Error('Function expects a htmlComp property');
   }
-  this.htmlComp.revalidateLayoutTree();
+  this.htmlComp.revalidateLayoutTree(invalidateParents);
 };
 
 scout.Widget.prototype.setLayoutData = function(layoutData) {

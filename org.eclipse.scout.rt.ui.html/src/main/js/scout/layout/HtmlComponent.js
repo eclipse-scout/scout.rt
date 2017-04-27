@@ -164,8 +164,8 @@ scout.HtmlComponent.prototype.validateLayoutTree = function() {
 /**
  * Performs invalidateLayoutTree() and validateLayoutTree() subsequently.
  */
-scout.HtmlComponent.prototype.revalidateLayoutTree = function() {
-  this.invalidateLayoutTree();
+scout.HtmlComponent.prototype.revalidateLayoutTree = function(invalidateParents) {
+  this.invalidateLayoutTree(invalidateParents);
   this.validateLayoutTree();
 };
 
