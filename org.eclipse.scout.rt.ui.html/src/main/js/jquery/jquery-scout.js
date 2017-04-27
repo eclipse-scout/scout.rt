@@ -337,32 +337,26 @@ $.fn.appendTextNode = function(text) {
 
 $.fn.appendIcon = function(iconId, cssClass) {
   if (!iconId) {
-    return this.appendImg(undefined, cssClass);
+    return this.appendImg(null, cssClass);
   }
-  var icon, $icon;
-  icon = scout.icons.parseIconId(iconId);
+  var icon = scout.icons.parseIconId(iconId);
   if (icon.isFontIcon()) {
-    $icon = this.makeSpan(cssClass, icon.iconCharacter)
-      .addClass(icon.appendCssClass('font-icon'))
+    return this.makeSpan(cssClass, icon.iconCharacter)
       .addClass('icon')
+      .addClass(icon.appendCssClass('font-icon'))
       .appendTo(this);
-    return $icon;
-  } else {
-    $icon = this.appendImg( icon.iconUrl, cssClass)
-      .addClass('icon');
-    return $icon;
   }
+  return this.appendImg( icon.iconUrl, cssClass)
+    .addClass('icon image-icon');
 };
 
 $.fn.appendImg = function(iconUrl, cssClass) {
-    var $icon = this.appendElement('<img>', cssClass);
-    if(iconUrl){
-      $icon.attr('src', iconUrl);
-    }
-    return $icon;
+  var $icon = this.appendElement('<img>', cssClass);
+  if (iconUrl) {
+    $icon.attr('src', iconUrl);
+  }
+  return $icon;
 };
-
-
 
 $.fn.makeSVG = function(type, cssClass, text, id) {
   var myDocument = this.document(true);
@@ -526,13 +520,13 @@ $.fn.icon = function(iconId) {
     icon = scout.icons.parseIconId(iconId);
     if (icon.isFontIcon()) {
       getOrCreateIconElement.call(this, $icon, '<span>')
-        .addClass(icon.appendCssClass('font-icon'))
         .addClass('icon')
+        .addClass(icon.appendCssClass('font-icon'))
         .text(icon.iconCharacter);
     } else {
       getOrCreateIconElement.call(this, $icon, '<img>')
         .attr('src', icon.iconUrl)
-        .addClass('icon');
+        .addClass('icon image-icon');
     }
   } else {
     removeIconElement.call(this, $icon);

@@ -109,6 +109,7 @@ describe('jquery-scout', function() {
       expect($e.children().length).toBe(1);
       expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
       expect($e.data('$icon').hasClass('font-icon')).toBe(true);
+      expect($e.data('$icon').hasClass('image-icon')).toBe(false);
       expect($e.data('$icon').hasClass('icon')).toBe(true);
       $e.icon(null);
       expect($e.children().length).toBe(0);
@@ -119,6 +120,7 @@ describe('jquery-scout', function() {
       expect($e.children().length).toBe(1);
       expect($e.data('$icon')[0]).toBe($e.children('img')[0]);
       expect($e.data('$icon').hasClass('font-icon')).toBe(false);
+      expect($e.data('$icon').hasClass('image-icon')).toBe(true);
       expect($e.data('$icon').hasClass('icon')).toBe(true);
       $e.icon(null);
       expect($e.children().length).toBe(0);
@@ -129,16 +131,19 @@ describe('jquery-scout', function() {
       expect($e.children().length).toBe(1);
       expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
       expect($e.data('$icon').hasClass('font-icon')).toBe(true);
+      expect($e.data('$icon').hasClass('image-icon')).toBe(false);
       expect($e.data('$icon').hasClass('icon')).toBe(true);
       $e.icon('hello');
       expect($e.children().length).toBe(1);
       expect($e.data('$icon')[0]).toBe($e.children('img')[0]);
       expect($e.data('$icon').hasClass('font-icon')).toBe(false);
+      expect($e.data('$icon').hasClass('image-icon')).toBe(true);
       expect($e.data('$icon').hasClass('icon')).toBe(true);
       $e.icon('font:X');
       expect($e.children().length).toBe(1);
       expect($e.data('$icon')[0]).toBe($e.children('span')[0]);
       expect($e.data('$icon').hasClass('font-icon')).toBe(true);
+      expect($e.data('$icon').hasClass('image-icon')).toBe(false);
       expect($e.data('$icon').hasClass('icon')).toBe(true);
 
       // Reset

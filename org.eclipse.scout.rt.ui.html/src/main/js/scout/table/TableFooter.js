@@ -88,7 +88,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .appendDiv('table-info-item table-info-status')
     .on('mousedown', this._onStatusMousedown.bind(this));
   this._$infoTableStatusIcon = this._$infoTableStatus
-    .appendSpan('font-icon icon');
+    .appendSpan('icon font-icon');
 
   // ------
 

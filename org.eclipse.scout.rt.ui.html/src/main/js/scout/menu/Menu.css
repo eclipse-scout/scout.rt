@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 @menu-item-height: 39px;
-@menu-item-max-icon-height: 16px;
-@menu-item-min-icon-width: 16px;
+@menu-item-max-image-icon-height: 16px;
+@menu-item-min-image-icon-width: 16px;
 
 .menu-item {
   position: relative;
@@ -63,14 +63,17 @@
   & > .icon {
     /* Move "a bit" towards the top, because the icon would not look centered with the text's baseline otherwise. */
     top: -1px;
-    /* Prevent large image icons from overlapping the menu item */
-    max-height: @menu-item-max-icon-height;
-    /* Ensure the default image icon size is taken from the beginning, so that the text does not "jump" when */
-    /* the image loading is complete. (For larger icons, the width will be increased afterwards.) */
-    min-width: @menu-item-min-icon-width;
 
     &.font-icon {
       font-size: 18px;
+    }
+
+    &.image-icon {
+      /* Prevent large image icons from overlapping the menu item */
+      max-height: @menu-item-max-image-icon-height;
+      /* Ensure the default image icon size is taken from the beginning, so that the text does not "jump" when */
+      /* the image loading is complete. (For larger icons, the width will be increased afterwards.) */
+      min-width: @menu-item-min-image-icon-width;
     }
 
     &.with-label {
@@ -78,7 +81,7 @@
     }
   }
 
-  &.disabled > .icon:not(.font-icon) {
+  &.disabled > .icon.image-icon {
     #scout.vendor(filter, grayscale(100%));
     opacity: 0.5;
   }
