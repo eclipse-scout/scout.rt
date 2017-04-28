@@ -85,6 +85,8 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEvent
           return event;
         }
 
+        // Ignore event if only type should be checked
+        return null;
       }
     }
     return event;
