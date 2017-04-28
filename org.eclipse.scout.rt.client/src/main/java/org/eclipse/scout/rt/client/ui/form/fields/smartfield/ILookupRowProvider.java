@@ -43,5 +43,5 @@ public interface ILookupRowProvider<LOOKUP_KEY> {
    * Invoke to load lookup rows asynchronously. Upon loading finished, the given callback is notified in the model
    * thread as specified by the given session aware {@link ClientRunContext}.
    */
-  IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext);
+  IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext);
 }

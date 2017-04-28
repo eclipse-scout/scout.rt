@@ -47,19 +47,19 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByKey();
 
-  IFuture<Void> getDataByKeyInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByKeyInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByText();
 
-  IFuture<Void> getDataByTextInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByTextInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByAll();
 
-  IFuture<Void> getDataByAllInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByAllInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByRec();
 
-  IFuture<Void> getDataByRecInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByRecInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   int getMaxRowCount();
 

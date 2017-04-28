@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -19,6 +20,9 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -26,7 +30,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -331,7 +334,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   }
 
   @Override
-  public IFuture<Void> getDataByKeyInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+  public IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByKeyInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
     return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
 
       @Override
@@ -353,7 +356,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   }
 
   @Override
-  public IFuture<Void> getDataByTextInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+  public IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByTextInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
     return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
 
       @Override
@@ -375,7 +378,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   }
 
   @Override
-  public IFuture<Void> getDataByAllInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+  public IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByAllInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
     return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
 
       @Override
@@ -396,7 +399,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   }
 
   @Override
-  public IFuture<Void> getDataByRecInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+  public IFuture<List<? extends ILookupRow<KEY_TYPE>>> getDataByRecInBackground(final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
     return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
 
       @Override
@@ -409,32 +412,35 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   /**
    * Loads data asynchronously, and calls the specified callback once completed.
    */
-  protected IFuture<Void> loadDataInBackground(final IDataProvider<KEY_TYPE> dataProvider, final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    return Jobs.schedule(new IRunnable() {
+  protected IFuture<List<? extends ILookupRow<KEY_TYPE>>> loadDataInBackground(final IDataProvider<KEY_TYPE> dataProvider, final RunContext runContext, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    IFuture<List<? extends ILookupRow<KEY_TYPE>>> future = Jobs.schedule(new Callable<List<? extends ILookupRow<KEY_TYPE>>>() {
 
       @Override
-      public void run() throws Exception {
-        loadData(dataProvider, callback);
+      public List<? extends ILookupRow<KEY_TYPE>> call() throws Exception {
+        return loadData(dataProvider);
       }
     }, Jobs.newInput()
         .withRunContext(runContext)
         .withName("Fetching lookup data [provider={}, lookupCall={}]", dataProvider.getClass().getName(), getClass().getName()));
+    return future.whenDone(new IDoneHandler<List<? extends ILookupRow<KEY_TYPE>>>() {
+
+      @Override
+      public void onDone(DoneEvent<List<? extends ILookupRow<KEY_TYPE>>> event) {
+        if (event.isFailed()) {
+          callback.onFailure(BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(event.getException()));
+        }
+        else if (!event.isCancelled()) {
+          callback.onSuccess(event.getResult());
+        }
+      }
+    }, runContext);
   }
 
   /**
    * Loads data synchronously, and calls the specified callback once completed.
    */
-  protected void loadData(final IDataProvider<KEY_TYPE> dataProvider, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
-    final List<? extends ILookupRow<KEY_TYPE>> rows;
-    try {
-      rows = dataProvider.provide();
-    }
-    catch (RuntimeException e) {
-      callback.onFailure(e);
-      return;
-    }
-
-    callback.onSuccess(rows);
+  protected List<? extends ILookupRow<KEY_TYPE>> loadData(final IDataProvider<KEY_TYPE> dataProvider) {
+    return dataProvider.provide();
   }
 
   @Override

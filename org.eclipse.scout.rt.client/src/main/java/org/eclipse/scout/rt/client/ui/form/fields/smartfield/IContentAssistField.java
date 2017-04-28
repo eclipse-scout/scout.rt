@@ -365,7 +365,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    *
    * @return {@link IFuture} to cancel data fetching
    */
-  IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+  IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
@@ -374,7 +374,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    *
    * @return {@link IFuture} to cancel data fetching.
    */
-  IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+  IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
@@ -383,7 +383,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    *
    * @return {@link IFuture} to cancel data fetching
    */
-  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+  IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
@@ -392,6 +392,6 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    *
    * @return {@link IFuture} to cancel data fetching
    */
-  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+  IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
 }
