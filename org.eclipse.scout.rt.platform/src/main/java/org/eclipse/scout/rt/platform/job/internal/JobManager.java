@@ -352,6 +352,7 @@ public class JobManager implements IJobManager {
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain, final JobFutureTask<?> future, final RunMonitor runMonitor, final JobInput input) {
     callableChain
+        .add(new CallableChainExceptionHandler<RESULT>())
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
         .add(BEANS.get(ThreadNameDecorator.class))

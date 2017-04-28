@@ -22,7 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +34,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestHandler}.
  */
-public class UiServlet extends HttpServlet {
+public class UiServlet extends AbstractHttpServlet {
   private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(UiServlet.class);

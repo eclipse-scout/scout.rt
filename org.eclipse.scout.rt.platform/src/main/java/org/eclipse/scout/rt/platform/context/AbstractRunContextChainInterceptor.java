@@ -5,7 +5,7 @@ package org.eclipse.scout.rt.platform.context;
  *
  * @author aho
  */
-public abstract class AbstractRunContextChainInterceptor<T, RESULT> implements IRunContextChainInterceptor<T, RESULT> {
+public abstract class AbstractRunContextChainInterceptor<RESULT> implements IRunContextChainInterceptor<RESULT> {
 
   @Override
   public void fillCurrent() {

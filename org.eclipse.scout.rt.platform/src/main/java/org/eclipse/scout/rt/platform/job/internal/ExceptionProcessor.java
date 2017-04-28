@@ -40,15 +40,19 @@ public class ExceptionProcessor<RESULT> implements ICallableInterceptor<RESULT> 
     try {
       return chain.continueChain();
     }
-    catch (final Exception | Error e) { // NOSONAR
+    catch (Exception | Error e) { // NOSONAR
+      boolean handled = false;
       if (m_input.getExceptionHandler() != null) {
         m_input.getExceptionHandler().handle(BEANS.get(DefaultExceptionTranslator.class).unwrap(e));
+        handled = true;
       }
-
       if (!m_input.isSwallowException()) {
+        if (handled) {
+          // decorate the exception as handled used for CallableChainExceptionHandler
+          throw new CallableChainHandledException(e);
+        }
         throw e;
       }
-
       return null;
     }
   }

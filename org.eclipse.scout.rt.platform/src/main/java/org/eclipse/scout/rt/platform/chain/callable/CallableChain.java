@@ -95,6 +95,18 @@ public class CallableChain<RESULT> {
   }
 
   /**
+   * Adds the given decorator at the index position to the chain to wrap the execution of a {@link Callable}.
+   *
+   * @throws IndexOutOfBoundsException
+   *           if the index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>)
+   * @return <code>this</code> in order to support method chaining.
+   */
+  public CallableChain<RESULT> add(int index, ICallableDecorator decorator) {
+    m_chainables.add(index, decorator);
+    return this;
+  }
+
+  /**
    * Adds the given elements to the end of this chain to decorate the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
@@ -113,6 +125,18 @@ public class CallableChain<RESULT> {
    */
   public CallableChain<RESULT> add(final ICallableInterceptor<RESULT> interceptor) {
     m_chainables.add(interceptor);
+    return this;
+  }
+
+  /**
+   * Adds the given interceptor at the index position to the chain to wrap the execution of a {@link Callable}.
+   *
+   * @throws IndexOutOfBoundsException
+   *           if the index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>)
+   * @return <code>this</code> in order to support method chaining.
+   */
+  public CallableChain<RESULT> add(int index, ICallableInterceptor<RESULT> interceptor) {
+    m_chainables.add(index, interceptor);
     return this;
   }
 
