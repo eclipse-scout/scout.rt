@@ -229,6 +229,27 @@ public class JsonTableTest {
     assertEquals(row4, tableRows.get(0));
   }
 
+  /**
+   * Response must not contain the row_order_changed event if the sort was triggered by the request
+   */
+  @Test
+  public void testIgnorableRowOrderChangedEvent() throws JSONException {
+    Table table = createTableFixture(5);
+
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    jsonTable.toJson();
+    IColumn column = table.getColumnSet().getFirstVisibleColumn();
+
+    // ----------
+
+    JsonEvent event = createJsonRowsSortedEvent(jsonTable.getColumnId(column), !column.isSortAscending());
+    jsonTable.handleUiEvent(event);
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), "rowOrderChanged");
+    assertTrue(responseEvents.size() == 0);
+  }
+
   @Test
   public void testColumnOrderChangedEvent() throws JSONException {
     TableWith3Cols table = new TableWith3Cols();
@@ -1370,6 +1391,14 @@ public class JsonTableTest {
     }
     data.put(JsonTable.PROP_ROW_IDS, rowIds);
     return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SELECTED, data);
+  }
+
+  public static JsonEvent createJsonRowsSortedEvent(String columnId, boolean asc) throws JSONException {
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
+    data.put("columnId", columnId);
+    data.put("sortAscending", asc);
+    return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SORTED, data);
   }
 
   public static JsonEvent createJsonRowsFilteredEvent(String... rowIds) throws JSONException {

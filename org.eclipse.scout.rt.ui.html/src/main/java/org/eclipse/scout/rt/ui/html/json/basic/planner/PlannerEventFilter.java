@@ -40,6 +40,9 @@ public class PlannerEventFilter extends AbstractEventFilter<PlannerEvent, Planne
           PlannerEvent newEvent = new PlannerEvent((IPlanner) m_jsonPlanner.getModel(), event.getType(), resources);
           return newEvent;
         }
+
+        // Ignore event if only type should be checked
+        return null;
       }
     }
     return event;

@@ -79,6 +79,8 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFil
           return newEvent;
         }
 
+        // Ignore event if only type should be checked
+        return null;
       }
     }
     return event;
