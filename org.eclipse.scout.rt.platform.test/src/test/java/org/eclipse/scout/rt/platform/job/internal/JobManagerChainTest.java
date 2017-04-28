@@ -40,12 +40,16 @@ public class JobManagerChainTest {
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 
-    // 1. ThreadLocalProcessor for IFuture.CURRENT
+    // 1. CallableChainExceptionHandler
     IChainable c = chainIterator.next();
+    assertEquals(CallableChainExceptionHandler.class, c.getClass());
+
+    // 2. ThreadLocalProcessor for IFuture.CURRENT
+    c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IFuture.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 2. ThreadLocalProcessor for RunMonitor.CURRENT
+    // 3. ThreadLocalProcessor for RunMonitor.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(RunMonitor.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
