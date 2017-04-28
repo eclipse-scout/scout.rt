@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
+import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -279,7 +279,7 @@ public class ServiceTunnelServletTest {
         .withSubject(Subject.getSubject(AccessController.getContext()))
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
-        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class));
+        .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp));
   }
 
 }

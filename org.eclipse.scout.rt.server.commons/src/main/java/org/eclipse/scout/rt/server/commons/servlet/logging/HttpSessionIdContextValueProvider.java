@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.server.commons.servlet.logging;
 
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.slf4j.MDC;
 
 /**
@@ -27,10 +25,14 @@ import org.slf4j.MDC;
  * @see MDC
  * @since 5.1
  */
-@ApplicationScoped
-public class HttpSessionIdContextValueProvider implements IDiagnosticContextValueProvider, IServletRunContextDiagnostics {
+public class HttpSessionIdContextValueProvider implements IDiagnosticContextValueProvider {
 
   public static final String KEY = "http.session.id";
+  private String m_sessionId;
+
+  public HttpSessionIdContextValueProvider(String sessionId) {
+    m_sessionId = sessionId;
+  }
 
   @Override
   public String key() {
@@ -39,7 +41,6 @@ public class HttpSessionIdContextValueProvider implements IDiagnosticContextValu
 
   @Override
   public String value() {
-    final HttpSession session = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getSession(false);
-    return session != null ? session.getId() : null;
+    return m_sessionId;
   }
 }

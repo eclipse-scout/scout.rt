@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.server.commons.servlet.logging;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
-import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.slf4j.MDC;
 
 /**
@@ -27,10 +25,15 @@ import org.slf4j.MDC;
  * @see MDC
  * @since 5.1
  */
-@ApplicationScoped
-public class HttpRequestUriContextValueProvider implements IDiagnosticContextValueProvider, IServletRunContextDiagnostics {
+public class HttpRequestUriContextValueProvider implements IDiagnosticContextValueProvider {
 
   public static final String KEY = "http.request.uri";
+  private String m_requestUri;
+
+  public HttpRequestUriContextValueProvider(String requestUri) {
+    m_requestUri = requestUri;
+
+  }
 
   @Override
   public String key() {
@@ -39,6 +42,6 @@ public class HttpRequestUriContextValueProvider implements IDiagnosticContextVal
 
   @Override
   public String value() {
-    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getRequestURI();
+    return m_requestUri;
   }
 }
