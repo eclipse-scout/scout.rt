@@ -220,7 +220,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     final LOOKUP_KEY lookupKey = interceptConvertValueToKey(getValue());
 
     m_valueChangedLookupCounter.incrementAndGet();
-    final IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> future = callKeyLookupInBackground(lookupKey, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
+    final IFuture<Void> future = callKeyLookupInBackground(lookupKey, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
 
       @Override
       public void onSuccess(final List<? extends ILookupRow<LOOKUP_KEY>> rows) {
@@ -232,10 +232,10 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         BEANS.get(ExceptionHandler.class).handle(exception);
       }
     });
-    future.whenDone(new IDoneHandler<List<? extends ILookupRow<LOOKUP_KEY>>>() {
+    future.whenDone(new IDoneHandler<Void>() {
 
       @Override
-      public void onDone(DoneEvent<List<? extends ILookupRow<LOOKUP_KEY>>> event) {
+      public void onDone(DoneEvent<Void> event) {
         // Release guard only upon very recent lookup has been finished.
         if (m_valueChangedLookupCounter.decrementAndGet() == 0) {
           m_contextInstalledCondition.setBlocking(false);

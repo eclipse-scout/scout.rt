@@ -1135,22 +1135,22 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   // non-blocking lookups using callbacks (legacy)
   @Override
-  public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+  public IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
     return fetchLookupRows(newByKeyLookupRowProvider(key), callback, true, 1);
   }
 
   @Override
-  public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+  public IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
     return fetchLookupRows(newByTextLookupRowProvider(text), callback, true, maxRowCount);
   }
 
   @Override
-  public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
     return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, callback);
   }
 
   @Override
-  public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
     return fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), callback, true, maxRowCount);
   }
 
@@ -1396,7 +1396,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         return lookupCall.getDataByKeyInBackground(clientRunContext, callback);
       }
 
@@ -1443,7 +1443,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         return lookupCall.getDataByAllInBackground(clientRunContext, callback);
       }
 
@@ -1492,7 +1492,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         return lookupCall.getDataByTextInBackground(clientRunContext, callback);
       }
 
@@ -1542,7 +1542,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         throw new UnsupportedOperationException("Legacy calls not supported");
       }
 
@@ -1564,7 +1564,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * @return {@link IFuture} if data is fetched asynchronously, or <code>null</code> for synchronous fetching, or if
    *         using {@link LocalLookupCall}.
    */
-  private IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> fetchLookupRows(final ILookupRowProvider<LOOKUP_KEY> dataProvider, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final boolean asynchronousFetching, final int maxRowCount) {
+  private IFuture<Void> fetchLookupRows(final ILookupRowProvider<LOOKUP_KEY> dataProvider, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final boolean asynchronousFetching, final int maxRowCount) {
     cancelPotentialLookup();
 
     if (getLookupCall() == null) {
@@ -1628,7 +1628,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     };
 
     // Start fetching lookup rows.
-    IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> asyncLookupFuture = null;
+    IFuture<Void> asyncLookupFuture = null;
     try {
       dataProvider.beforeProvide(lookupCall);
       if (asynchronousFetching) {
