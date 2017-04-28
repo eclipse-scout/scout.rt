@@ -13,3 +13,16 @@ scout.DesktopNotificationAdapter = function() {
 };
 scout.inherits(scout.DesktopNotificationAdapter, scout.ModelAdapter);
 
+scout.DesktopNotificationAdapter.prototype._onWidgetClose = function(event) {
+  this._send('closed', {
+    ref: event.ref
+  });
+};
+
+scout.DesktopNotificationAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'close') {
+    this._onWidgetClose(event);
+  } else {
+    scout.DesktopNotificationAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

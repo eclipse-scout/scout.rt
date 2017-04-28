@@ -49,12 +49,12 @@ scout.SvgField.prototype._renderSvgDocument = function() {
 scout.SvgField.prototype._onAppLinkAction = function(event) {
   var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
-  this._sendAppLinkAction(ref);
+  this._triggerAppLinkAction(ref);
   event.preventDefault();
 };
 
-scout.SvgField.prototype._sendAppLinkAction = function(ref) {
-  this._send('appLinkAction', {
+scout.SvgField.prototype._triggerAppLinkAction = function(ref) {
+  this.trigger('appLinkAction', {
     ref: ref
   });
 };

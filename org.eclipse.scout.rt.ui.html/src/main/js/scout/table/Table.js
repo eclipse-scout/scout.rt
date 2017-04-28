@@ -781,7 +781,7 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   sorted = this._sort(animateAggregateRows);
 
   data = {
-    columnId: column.id,
+    column: column,
     sortAscending: column.sortAscending
   };
   if (remove) {
@@ -791,10 +791,10 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
     data.multiSort = true;
   }
   if (sorted) {
-    this._send('rowsSorted', data);
+    this.trigger('rowsSorted', data);
   } else {
     // Delegate sorting to server when it is not possible on client side
-    this._send('sortRows', data);
+    this.trigger('sortRows', data);
     // hint to animate the aggregate after the row order changed event
     this._animateAggregateRows = animateAggregateRows;
   }
@@ -1822,7 +1822,7 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   sorted = this._sort(true);
 
   data = {
-    columnId: column.id,
+    column: column,
     groupAscending: column.sortAscending
   };
   if (remove) {
@@ -1833,10 +1833,10 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   }
   this._triggerGroupingChanged();
   if (sorted) {
-    this._send('rowsGrouped', data);
+    this.trigger('rowsGrouped', data);
   } else {
     // Delegate sorting to server when it is not possible on client side
-    this._send('groupRows', data);
+    this.trigger('groupRows', data);
 
     // hint to animate the aggregate after the row order changed event
     this._animateAggregateRows = true;

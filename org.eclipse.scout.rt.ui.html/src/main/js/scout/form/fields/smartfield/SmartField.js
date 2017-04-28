@@ -482,11 +482,11 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     // a selected proposal (ticket #168652).
     var textDeleted = scout.strings.empty(displayText) && scout.strings.hasText(this._oldDisplayText);
     if (textDeleted && !this._navigating) {
-      this._sendDeleteProposal(displayText);
+      this._setDisplayText(displayText);
       this._triggerDeleteProposal(displayText);
     } else {
-      this._sendAcceptProposal(displayText, true, forceClose);
-      this._triggerAcceptProposal(displayText);
+      this._setDisplayText(displayText);
+      this._triggerAcceptProposal(displayText, true, forceClose);
     }
 
     if (this.embedded) {
@@ -501,8 +501,8 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     if (this._readDisplayText() === this._oldDisplayText) {
       return;
     }
-    this._sendAcceptProposal(displayText, false, forceClose);
-    this._triggerAcceptProposal(displayText);
+    this._setDisplayText(displayText);
+    this._triggerAcceptProposal(displayText, false, forceClose);
   }
 
   this.session.listen().done(this._onProposalSelectionDone.bind(this));
@@ -522,32 +522,11 @@ scout.SmartField.prototype._triggerDeleteProposal = function(displayText) {
   });
 };
 
-scout.SmartField.prototype._sendDeleteProposal = function(displayText) {
-  this._setDisplayText(displayText);
-  this._send('deleteProposal'); // TODO [7.0] cgu move to adapter
-};
-
-scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
+scout.SmartField.prototype._triggerAcceptProposal = function(displayText, chooser, forceClose) {
   this.trigger('acceptProposal', {
-    displayText: displayText
-  });
-};
-
-/**
- * Note: we set showBusyIndicator=false in this request, because without it it could cause two calls
- * to send/acceptProposal when the user presses Enter. The first one because of the keyDown event
- * and the second one because of the blur event caused by the busy indicator.
- */
-scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
-  this._setDisplayText(displayText);
-  this._send('acceptProposal', { // TODO [7.0] cgu: (smartfield) move to adapter
     displayText: displayText,
     chooser: chooser,
-    forceClose: forceClose,
-    showBusyIndicator: false,
-    coalesce: function(previous) {
-      return this.target === previous.target && this.type === previous.type;
-    }
+    forceClose: forceClose
   });
 };
 
@@ -572,13 +551,13 @@ scout.SmartField.prototype._closeProposal = function(notifyServer) {
   }
 
   if (scout.nvl(notifyServer, true)) {
-    this._sendCancelProposal();
+    this._triggerCancelProposal();
   }
   this.popup.close();
 };
 
-scout.SmartField.prototype._sendCancelProposal = function() {
-  this._send('cancelProposal');
+scout.SmartField.prototype._triggerCancelProposal = function() {
+  this.trigger('cancelProposal');
 };
 
 /**
@@ -605,7 +584,7 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
   } else {
     this._requestedProposal = true;
     $.log.debug('(SmartField#_openProposal) send openProposal. displayText=' + displayText + ' selectCurrentValue=' + selectCurrentValue);
-    this._send('openProposal', {
+    this.trigger('openProposal', {
       displayText: displayText,
       selectCurrentValue: selectCurrentValue,
       browseAll: browseAll
@@ -631,7 +610,7 @@ scout.SmartField.prototype.openPopup = function() {
 scout.SmartField.prototype._onPopupRemove = function(event) {
   this.popup = null;
   if (this.mode === scout.FormField.MODE_CELLEDITOR && this.proposalChooser) {
-    this._sendCancelProposal();
+    this._triggerCancelProposal();
   }
 };
 

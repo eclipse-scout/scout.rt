@@ -22,9 +22,55 @@ scout.SmartFieldAdapter.prototype._onWidgetProposalTyped = function(event) {
   });
 };
 
+scout.SmartFieldAdapter.prototype._onWidgetAcceptProposal = function(event) {
+  this._sendAcceptProposal(event.displayText, event.chooser, event.forceClose);
+};
+
+/**
+ * Note: we set showBusyIndicator=false in this request, because without it it could cause two calls
+ * to send/acceptProposal when the user presses Enter. The first one because of the keyDown event
+ * and the second one because of the blur event caused by the busy indicator.
+ */
+scout.SmartFieldAdapter.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
+  this._send('acceptProposal', {
+    displayText: displayText,
+    chooser: chooser,
+    forceClose: forceClose
+  }, {
+    showBusyIndicator: false,
+    coalesce: function(previous) {
+      return this.target === previous.target && this.type === previous.type;
+    }
+  });
+};
+
+scout.SmartFieldAdapter.prototype._onWidgetCancelProposal = function(event) {
+  this._send('cancelProposal');
+};
+
+scout.SmartFieldAdapter.prototype._onWidgetDeleteProposal = function(event) {
+  this._send('deleteProposal');
+};
+
+scout.SmartFieldAdapter.prototype._onWidgetOpenProposal = function(event) {
+  this._send('openProposal', {
+    displayText: event.displayText,
+    selectCurrentValue: event.selectCurrentValue,
+    browseAll: event.browseAll
+  });
+};
+
 scout.SmartFieldAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'proposalTyped') {
     this._onWidgetProposalTyped(event);
+  } else if (event.type === 'acceptProposal') {
+    this._onWidgetAcceptProposal(event);
+  } else if (event.type === 'cancelProposal') {
+    this._onWidgetCancelProposal(event);
+  } else if (event.type === 'deleteProposal') {
+    this._onWidgetDeleteProposal(event);
+  } else if (event.type === 'openProposal') {
+    this._onWidgetOpenProposal(event);
   } else {
     scout.SmartFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

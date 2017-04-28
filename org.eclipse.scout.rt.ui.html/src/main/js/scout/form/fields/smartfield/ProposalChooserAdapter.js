@@ -71,3 +71,17 @@ scout.ProposalChooserAdapter.prototype._injectSendFunction = function() {
 scout.ProposalChooserAdapter.prototype._syncModel = function(model) {
   this._injectSendFunction();
 };
+
+scout.ProposalChooserAdapter.prototype._onWidgetActiveFilterChanged = function(event) {
+  this._send('activeFilterChanged', {
+    state: event.state
+  });
+};
+
+scout.ProposalChooserAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'activeFilterChanged') {
+    this._onWidgetActiveFilterChanged(event);
+  } else {
+    scout.ProposalChooserAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

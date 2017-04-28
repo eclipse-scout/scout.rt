@@ -1141,13 +1141,6 @@ scout.Widget.prototype._removeAdapterProperties = function(properties) {
   }
 };
 
-// TODO [7.0] cgu temporary, remove after model adapter separation
-scout.Widget.prototype._send = function(type, data) {
-  data = $.extend({}, data); // create a copy, so we don't change the original data unintentionally
-  data.sendToServer = true;
-  this.trigger(type, data);
-};
-
 /**
  * Clones the widget and mirrors the events, see this.clone() and this.mirror() for details.
  */

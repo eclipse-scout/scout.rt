@@ -35,3 +35,23 @@ scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
     this.widget.setErrorStatus(errorStatus);
   }
 };
+
+scout.DateFieldAdapter.prototype._onWidgetParsingError = function(event) {
+  this._send('parsingError');
+};
+
+scout.DateFieldAdapter.prototype._onWidgetTimestampChanged = function(event) {
+  this._send('timestampChanged', {
+    timestamp: event.timestamp
+  });
+};
+
+scout.DateFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'parsingError') {
+    this._onWidgetParsingError(event);
+  } else if (event.type === 'timestampChanged') {
+    this._onWidgetTimestampChanged(event);
+  } else {
+    scout.DateFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

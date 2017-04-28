@@ -852,7 +852,7 @@ scout.DateField.prototype._findAllowedReferenceDate = function(referenceDate) {
   return referenceDate;
 };
 
-scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServer) {
+scout.DateField.prototype.updateTimestamp = function(timestampAsDate) {
   var timestamp = scout.dates.toJsonDate(timestampAsDate, false, this.hasDate, this.hasTime);
   if (timestamp !== this.timestamp || this.errorStatus) {
     this.timestamp = timestamp;
@@ -862,17 +862,12 @@ scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServ
       this.trigger('timestampChanged', {
         timestamp: this.timestamp
       });
-      if (scout.nvl(syncToServer, true)) {
-        this._send('timestampChanged', {
-          timestamp: this.timestamp
-        });
-      }
     }
   }
 };
 
-scout.DateField.prototype._sendParsingError = function() {
-  this._send('parsingError');
+scout.DateField.prototype._triggerParsingError = function() {
+  this.trigger('parsingError');
 };
 
 scout.DateField.prototype._triggerDisplayTextIfChanged = function() {
@@ -940,7 +935,7 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
     this.renderDate(this.timestampAsDate);
   } else {
     // parse error -> send error to server
-    this._sendParsingError();
+    this._triggerParsingError();
   }
 };
 

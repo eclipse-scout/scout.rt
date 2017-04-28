@@ -219,6 +219,42 @@ scout.TableAdapter.prototype._sendRowsFiltered = function(rowIds) {
   });
 };
 
+scout.TableAdapter.prototype._onWidgetRowsSorted = function(event) {
+  this._send('rowsSorted', {
+    columnId: event.column.id,
+    sortAscending: event.sortAscending,
+    sortingRemoved: event.sortingRemoved,
+    multiSort: event.multiSort
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetSortRows = function(event) {
+  this._send('sortRows', {
+    columnId: event.column.id,
+    sortAscending: event.sortAscending,
+    sortingRemoved: event.sortingRemoved,
+    multiSort: event.multiSort
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetRowsGrouped = function(event) {
+  this._send('rowsGrouped', {
+    columnId: event.column.id,
+    sortAscending: event.sortAscending,
+    groupingRemoved: event.groupingRemoved,
+    multiGroup: event.multiGroup
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetGroupRows = function(event) {
+  this._send('groupRows', {
+    columnId: event.column.id,
+    sortAscending: event.sortAscending,
+    groupingRemoved: event.groupingRemoved,
+    multiGroup: event.multiGroup
+  });
+};
+
 scout.TableAdapter.prototype._onWidgetRowAction = function(event) {
   this._sendRowAction(event.row, event.column);
 };
@@ -270,6 +306,14 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetRowsChecked(event);
   } else if (event.type === 'rowsFiltered') {
     this._onWidgetRowsFiltered(event);
+  } else  if (event.type === 'rowsSorted') {
+    this._onWidgetRowsSorted(event);
+  } else  if (event.type === 'sortRows') {
+    this._onWidgetSortRows(event);
+  } else  if (event.type === 'rowsGrouped') {
+    this._onWidgetRowsGrouped(event);
+  } else  if (event.type === 'groupRows') {
+    this._onWidgetGroupRows(event);
   } else if (event.type === 'rowClicked') {
     this._onWidgetRowClicked(event);
   } else if (event.type === 'rowAction') {

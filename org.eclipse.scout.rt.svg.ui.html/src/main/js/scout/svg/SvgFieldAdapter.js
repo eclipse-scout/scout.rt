@@ -12,3 +12,17 @@ scout.SvgFieldAdapter = function() {
   scout.SvgFieldAdapter.parent.call(this);
 };
 scout.inherits(scout.SvgFieldAdapter, scout.ValueFieldAdapter);
+
+scout.SvgFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {
+  this._send('appLinkAction', {
+    ref: event.ref
+  });
+};
+
+scout.SvgFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'appLinkAction') {
+    this._onWidgetAppLinkAction(event);
+  } else {
+    scout.SvgFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

@@ -41,7 +41,7 @@ scout.DesktopNotification.prototype._render = function($parent) {
 scout.DesktopNotification.prototype._remove = function() {
   scout.DesktopNotification.parent.prototype._remove.call(this);
   this._removeCloser();
-  this._send('closed');
+  this.trigger('close');
 };
 
 scout.DesktopNotification.prototype._renderProperties = function() {

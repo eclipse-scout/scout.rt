@@ -157,7 +157,7 @@ scout.ProposalChooser.prototype._renderButton = function(value, index) {
 };
 
 scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {
-  this._send('activeFilterChanged', {
+  this.trigger('activeFilterChanged', {
     state: radioValue
   });
 };

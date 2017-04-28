@@ -338,14 +338,6 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetDestroy(event);
   } else if (event.type === 'propertyChange') {
     this._onWidgetPropertyChange(event);
-  } else {
-    // TODO [7.0] cgu temporary, until model adapter separation
-    if (event.sendToServer) {
-      event = $.extend({}, event); // copy
-      delete event.source;
-      delete event.sendToServer;
-      this._send(event.type, event);
-    }
   }
 };
 
@@ -402,8 +394,8 @@ scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
   var modelClass = adapterData.modelClass;
   if (modelClass) {
     var pos = Math.max(0,
-        modelClass.lastIndexOf('$') + 1,
-        modelClass.lastIndexOf('.') + 1);
+      modelClass.lastIndexOf('$') + 1,
+      modelClass.lastIndexOf('.') + 1);
     adapterData.id = modelClass.substring(pos);
   }
   delete adapterData.owner;
