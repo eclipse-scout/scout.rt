@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
+import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
 
 /**
  * Filter which creates a {@link ServerRunContext} using the current {@link Subject} and calls the next filter inside
@@ -67,7 +67,8 @@ public class ServerRunContextFilter implements Filter {
         .produce(Subject.getSubject(AccessController.getContext()))
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
-        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
+//        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
+        .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))
         .withLocale(req.getLocale())
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
   }

@@ -4,6 +4,8 @@ import java.security.AccessController;
 import java.util.Collections;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
@@ -13,7 +15,7 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servlet.logging.IServletRunContextDiagnostics;
+import org.eclipse.scout.rt.server.commons.servlet.logging.ServletDiagnosticsProviderFactory;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.slf4j.Logger;
@@ -48,13 +50,16 @@ public class JaxWsRunContextLookup {
     final MessageContext messageContext = webServiceContext.getMessageContext();
     final JaxWsImplementorSpecifics implementor = BEANS.get(JaxWsImplementorSpecifics.class);
 
+    HttpServletRequest request = implementor.getServletRequest(messageContext);
+    HttpServletResponse response = implementor.getServletResponse(messageContext);
+
     return runContext
         .withSubject(subject)
         .withCorrelationId(cid)
         .withThreadLocal(IWebServiceContext.CURRENT, webServiceContext)
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, implementor.getServletRequest(messageContext))
-        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, implementor.getServletResponse(messageContext))
-        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class));
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, request)
+        .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, response)
+        .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(request, response));
   }
 
   /**
