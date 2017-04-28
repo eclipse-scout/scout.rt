@@ -79,6 +79,7 @@ public class ExceptionProcessorTest {
     JobInput jobInput = Jobs.newInput();
 
     CallableChain<String> chain = new CallableChain<>();
+    chain.add(new CallableChainExceptionHandler<String>());
     chain.add(new ExceptionProcessor<String>(jobInput));
     try {
       chain.call(new Callable<String>() {
