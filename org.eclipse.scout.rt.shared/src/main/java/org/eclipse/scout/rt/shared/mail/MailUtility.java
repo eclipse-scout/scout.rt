@@ -255,7 +255,7 @@ public final class MailUtility {
           if (in != null) {
             byte[] content = IOUtility.readBytes(in);
             try { // NOSONAR
-              text = new String(content, getCharacterEncodingOfMimePart(mimePart));
+              text = new String(content, getCharacterEncodingOfPart(mimePart));
             }
             catch (UnsupportedEncodingException e) {
               LOG.warn("unsupported encoding", e);
@@ -674,7 +674,14 @@ public final class MailUtility {
     return addrList.toArray(new InternetAddress[addrList.size()]);
   }
 
-  private static String getCharacterEncodingOfMimePart(MimePart part) throws MessagingException {
+  /**
+   * detects the character-encoding for the given part, default is UTF-8 if none is found
+   *
+   * @param part
+   * @return
+   * @throws MessagingException
+   */
+  public static String getCharacterEncodingOfPart(Part part) throws MessagingException {
     Pattern pattern = Pattern.compile("charset=\".*\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     Matcher matcher = pattern.matcher(part.getContentType());
     String characterEncoding = StandardCharsets.UTF_8.name(); // default, a good guess in Europe
