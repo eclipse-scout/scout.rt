@@ -82,13 +82,13 @@ public class RunContext implements IAdaptable {
   protected ITransaction m_transaction;
   protected List<ITransactionMember> m_transactionMembers = new ArrayList<>();
 
-  protected List<IRunContextChainInterceptor<?, ?>> m_interceptors = new ArrayList<>();
+  protected List<IRunContextChainInterceptor<?>> m_interceptors = new ArrayList<>();
 
   @PostConstruct
   protected void initChainInterceptors() {
     List<IRunContextChainInterceptorProducer<RunContext>> producers = BEANS.get(RunContextChainIntercepterRegistry.class).getRunContextInterceptorProducer(this.getClass());
     for (IRunContextChainInterceptorProducer<RunContext> producer : producers) {
-      IRunContextChainInterceptor<?, Object> interceptor = producer.create();
+      IRunContextChainInterceptor<Object> interceptor = producer.create();
       if (interceptor != null) {
         m_interceptors.add(interceptor);
       }
@@ -504,13 +504,13 @@ public class RunContext implements IAdaptable {
     }
 
     // copy interceptors
-    for (IRunContextChainInterceptor<?, ?> interceptor : m_interceptors) {
+    for (IRunContextChainInterceptor<?> interceptor : m_interceptors) {
       interceptor.fillCurrent();
     }
   }
 
   protected void fillEmpty() {
-    for (IRunContextChainInterceptor<?, ?> interceptor : m_interceptors) {
+    for (IRunContextChainInterceptor<?> interceptor : m_interceptors) {
       interceptor.fillEmtpy();
     }
   }

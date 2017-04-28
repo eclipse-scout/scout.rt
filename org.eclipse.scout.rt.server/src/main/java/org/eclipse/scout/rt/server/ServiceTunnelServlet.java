@@ -18,7 +18,6 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +33,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestore
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * Use this Servlet to dispatch scout UI service requests using {@link IServiceTunnelRequest},
  * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  */
-public class ServiceTunnelServlet extends HttpServlet {
+public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
 

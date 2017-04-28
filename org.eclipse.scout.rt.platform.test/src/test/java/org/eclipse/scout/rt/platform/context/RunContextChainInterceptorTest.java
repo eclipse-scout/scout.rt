@@ -121,9 +121,9 @@ public class RunContextChainInterceptorTest {
 
   private class ActivitiyLogInterceptorProducer implements IRunContextChainInterceptorProducer<RunContext> {
     @Override
-    public <R> IRunContextChainInterceptor<String, R> create() {
+    public <R> IRunContextChainInterceptor<R> create() {
 
-      return new AbstractRunContextChainInterceptor<String, R>() {
+      return new AbstractRunContextChainInterceptor<R>() {
 
         @Override
         public R intercept(Chain<R> chain) throws Exception {
@@ -147,12 +147,12 @@ public class RunContextChainInterceptorTest {
 
   private class ThreadLocalColorInterceptorProducer implements IRunContextChainInterceptorProducer<RunContext> {
     @Override
-    public <R> IRunContextChainInterceptor<String, R> create() {
+    public <R> IRunContextChainInterceptor<R> create() {
       return new P_ColorThreadLocalInterceptor<R>();
     }
   }
 
-  private class P_ColorThreadLocalInterceptor<RESULT> extends AbstractRunContextChainInterceptor<String, RESULT> {
+  private class P_ColorThreadLocalInterceptor<RESULT> extends AbstractRunContextChainInterceptor<RESULT> {
 
     private String m_color;
 

@@ -20,6 +20,6 @@ public interface IRunContextChainInterceptorProducer<T extends RunContext> {
    *
    * @return
    */
-  <RESULT> IRunContextChainInterceptor<?, RESULT> create();
+  <RESULT> IRunContextChainInterceptor<RESULT> create();
 
 }

@@ -105,8 +105,8 @@ public class ClientRunContextWithInterceptorProducerTest {
 
   private class RunContextInterceptorProducer implements IRunContextChainInterceptorProducer<RunContext> {
     @Override
-    public <RESULT> IRunContextChainInterceptor<?, RESULT> create() {
-      return new AbstractRunContextChainInterceptor<String, RESULT>() {
+    public <RESULT> IRunContextChainInterceptor<RESULT> create() {
+      return new AbstractRunContextChainInterceptor<RESULT>() {
         private String m_value;
 
         @Override
@@ -137,8 +137,8 @@ public class ClientRunContextWithInterceptorProducerTest {
 
   private class ClientRunContextInterceptorProducer implements IRunContextChainInterceptorProducer<ClientRunContext> {
     @Override
-    public <RESULT> IRunContextChainInterceptor<?, RESULT> create() {
-      return new AbstractRunContextChainInterceptor<String, RESULT>() {
+    public <RESULT> IRunContextChainInterceptor<RESULT> create() {
+      return new AbstractRunContextChainInterceptor<RESULT>() {
         private String m_value;
 
         @Override
