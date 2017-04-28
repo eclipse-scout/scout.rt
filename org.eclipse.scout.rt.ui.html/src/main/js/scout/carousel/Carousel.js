@@ -53,29 +53,67 @@ scout.Carousel.prototype._render = function($parent) {
 };
 
 scout.Carousel.prototype._remove = function() {
-  if (this.$carouselStatus) {
-    this.$carouselStatus.remove();
-    this.$carouselStatus = null;
-  }
+  this._removeStatus();
   scout.Carousel.parent.prototype._remove.call(this);
 };
 
 scout.Carousel.prototype._renderProperties = function() {
   scout.Carousel.parent.prototype._renderProperties.call(this);
 
-  this._renderStatusEnabled();
   this._renderWidgets();
   this._renderCurrentItem(); // must be called after renderWidgets
+  this._renderStatusEnabled();
+};
+
+scout.Carousel.prototype.setStatusEnabled = function(statusEnabled) {
+  this.setProperty('statusEnabled', statusEnabled);
 };
 
 scout.Carousel.prototype._renderStatusEnabled = function() {
-  if (this.statusEnabled && !this.$carouselStatus) {
+  if (this.statusEnabled) {
+    this._renderStatus();
+    this._renderStatusItems();
+    this._renderCurrentStatusItem();
+  } else {
+    this._removeStatus();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Carousel.prototype._renderStatus = function() {
+  if (!this.$carouselStatus) {
     this.$carouselStatus = this.$container.appendDiv('carousel-status');
     this.htmlCompStatus = scout.HtmlComponent.install(this.$carouselStatus, this.session);
   }
-  else if (!this.statusEnabled && this.$carouselStatus) {
+};
+
+scout.Carousel.prototype._removeStatus = function() {
+  if (this.$carouselStatus) {
     this.$carouselStatus.remove();
+    this.$carouselStatus = null;
   }
+};
+
+scout.Carousel.prototype._renderStatusItems = function() {
+  if (!this.$carouselStatus) {
+    return;
+  }
+  this.$carouselStatusItems = [];
+  this.$carouselStatus.empty();
+  this.$carouselItems.forEach(function() {
+    var $statusItem = this.$carouselStatus.appendDiv('status-item');
+    $statusItem.html(this.statusItemHtml);
+    this.$carouselStatusItems.push($statusItem);
+  }.bind(this));
+};
+
+scout.Carousel.prototype._renderCurrentStatusItem = function() {
+  if (!this.$carouselStatus) {
+    return;
+  }
+  this.$carouselStatusItems.forEach(function(e, i) {
+    e.toggleClass('current-item', i === this.currentItem);
+  }.bind(this));
 };
 
 scout.Carousel.prototype.recalcTransformation = function() {
@@ -85,16 +123,13 @@ scout.Carousel.prototype.recalcTransformation = function() {
   });
 };
 
+scout.Carousel.prototype.setCurrentItem = function(currentItem) {
+  this.setProperty('currentItem', currentItem);
+};
+
 scout.Carousel.prototype._renderCurrentItem = function() {
   this._renderItemsInternal(undefined, false);
-
-  this.$carouselStatusItems.forEach(function(e, i) {
-    if (i === this.currentItem) {
-      e.addClass('current-item');
-    } else {
-      e.removeClass('current-item');
-    }
-  }.bind(this));
+  this._renderCurrentStatusItem();
 };
 
 scout.Carousel.prototype._renderItemsInternal = function(item, skipRemove) {
@@ -107,11 +142,39 @@ scout.Carousel.prototype._renderItemsInternal = function(item, skipRemove) {
     }, this);
   }
   for (var i = Math.max(item - 1, 0); i < Math.min(item + 2, this.widgets.length); i++) {
-    if (!this.widgets[i].rendered) {
-      this.widgets[i].render(this.$carouselItems[i]);
-      this.widgets[i].htmlComp.revalidateLayout();
+    var widget = this.widgets[i];
+    if (!widget.rendered) {
+      widget.render(this.$carouselItems[i]);
+      widget.htmlComp.revalidateLayout();
     }
   }
+};
+
+scout.Carousel.prototype.setWidgets = function(widgets) {
+  this.setProperty('widgets', widgets);
+};
+
+scout.Carousel.prototype._renderWidgets = function() {
+  this.$carouselFilmstrip.empty();
+  this.$carouselItems = this.widgets.map(function(widget) {
+    var $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
+    var htmlComp = scout.HtmlComponent.install($carouselItem, this.session);
+    htmlComp.setLayout(new scout.SingleLayout());
+
+    // Add the CSS classes of the widget to be able to style the carousel items.
+    // Use a suffix to prevent conflicts
+    var cssClasses = widget.cssClassAsArray();
+    cssClasses.forEach(function(cssClass) {
+      $carouselItem.addClass(cssClass + '-carousel-item');
+    });
+
+    return $carouselItem;
+  }, this);
+
+  this._renderStatusItems();
+
+  // reset current item
+  this.setCurrentItem(0);
 };
 
 scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
@@ -152,34 +215,4 @@ scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
       }
     }.bind(this));
   }.bind(this));
-};
-
-scout.Carousel.prototype._renderWidgets = function() {
-  this.$carouselFilmstrip.empty();
-  this.$carouselItems = this.widgets.map(function(widget) {
-    var $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
-    var htmlComp = scout.HtmlComponent.install($carouselItem, this.session);
-    htmlComp.setLayout(new scout.SingleLayout());
-    return $carouselItem;
-  }, this);
-
-  if (this.$carouselStatus) {
-    this.$carouselStatusItems = [];
-    this.$carouselItems.forEach(function() {
-      var $statusItem = this.$carouselStatus.appendDiv('status-item');
-      $statusItem.html(this.statusItemHtml);
-      this.$carouselStatusItems.push($statusItem);
-    }.bind(this));
-  }
-
-  // reset current item
-  this.setCurrentItem(0);
-};
-
-scout.Carousel.prototype.setCurrentItem = function(currentItem) {
-  this.setProperty('currentItem', currentItem);
-};
-
-scout.Carousel.prototype.setWidgets = function(widgets) {
-  this.setProperty('widgets', widgets);
 };

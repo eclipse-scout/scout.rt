@@ -11,6 +11,7 @@
 scout.Image = function() {
   scout.Image.parent.call(this);
   this.autoFit = false;
+  this.imageUrl = null;
 };
 scout.inherits(scout.Image, scout.Widget);
 
@@ -32,7 +33,6 @@ scout.Image.prototype._render = function($parent) {
 
 scout.Image.prototype._renderProperties = function() {
   scout.Image.parent.prototype._renderProperties.call(this);
-  this._renderCssClass();
   this._renderImageUrl();
   this._renderAutoFit();
 };
@@ -40,18 +40,6 @@ scout.Image.prototype._renderProperties = function() {
 scout.Image.prototype._remove = function() {
   scout.Image.parent.prototype._remove.call(this);
   this.htmlComp = null;
-};
-
-scout.Image.prototype.setCssClass = function(cssClass) {
-  this.setProperty('cssClass', cssClass);
-};
-
-scout.Image.prototype._renderCssClass = function() {
-  this.$container.addClass(this.cssClass);
-};
-
-scout.Image.prototype._removeCssClass = function() {
-  this.$container.removeClass(this.cssClass);
 };
 
 scout.Image.prototype.setImageUrl = function(imageUrl) {
