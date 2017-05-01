@@ -67,7 +67,6 @@ public class ServerRunContextFilter implements Filter {
         .produce(Subject.getSubject(AccessController.getContext()))
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
-//        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
         .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))
         .withLocale(req.getLocale())
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());

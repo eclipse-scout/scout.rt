@@ -32,7 +32,6 @@ public class HttpRequestUriContextValueProvider implements IDiagnosticContextVal
 
   public HttpRequestUriContextValueProvider(String requestUri) {
     m_requestUri = requestUri;
-
   }
 
   @Override

@@ -11,9 +11,9 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 
 /**
- * <h3>{@link ServletDiagnosticsProviderFactory}</h3>
- *
- * @author aho
+ * Provides a list of diagnostic context value providers for the given HTTP servlet request and response. Those values
+ * are static, i.e. they are strings that remain readable after the request has been completed. No reference to the
+ * original request or response object must be held by the diagnostic context value providers.
  */
 @ApplicationScoped
 public class ServletDiagnosticsProviderFactory {

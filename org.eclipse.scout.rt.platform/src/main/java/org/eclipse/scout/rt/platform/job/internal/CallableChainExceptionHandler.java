@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link CallableChainExceptionHandler}</h3>
- * <p>
  * This exception handler is only for infrastructure reasons. It handles exceptions occurring in
  * {@link ICallableDecorator} and {@link ICallableInterceptor} which are before {@link ExceptionProcessor} in the
  * callable chain. Exceptions handled by the {@link ExceptionProcessor} will not be handled of this handler.
@@ -30,9 +28,7 @@ public class CallableChainExceptionHandler<RESULT> implements ICallableIntercept
       else if (e.getCause() instanceof Exception) {
         throw (Exception) e.getCause();
       }
-      else {
-        throw e;
-      }
+      throw e;
     }
     catch (Exception | Error err) { // NOSONAR
       LOG.warn("Exception in callable chain.", err);

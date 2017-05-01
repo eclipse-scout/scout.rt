@@ -86,7 +86,6 @@ public class UiServlet extends AbstractHttpServlet {
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, req)
         .withThreadLocal(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, resp)
         .withDiagnostics(BEANS.get(ServletDiagnosticsProviderFactory.class).getProviders(req, resp))
-//        .withDiagnostics(BEANS.all(IServletRunContextDiagnostics.class))
         .withLocale(getPreferredLocale(req))
         .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
   }

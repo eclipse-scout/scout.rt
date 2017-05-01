@@ -13,12 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
- * <h3>{@link AbstractHttpServlet}</h3>
+ * This servlet ensures that {@link HttpServletRequest} and {@link HttpServletResponse} are wrapped and will be
+ * invalidated after {@link HttpServlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} method has
+ * been completed. Any further access to those objects will throw an {@link IllegalStateException}.
  * <p>
- * This servlet ensures the {@link HttpServletRequest} and {@link HttpServletResponse} are wrapped and will be
- * invalidated after {@link HttpServlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} method
- * completed. Several app containers does so by default to ensure no asynchronous access to released requests and
- * responses.
+ * Some application containers already prevent asynchronous access to released/invalid resources. This servlet enables
+ * this behavior for all containers.
  */
 public abstract class AbstractHttpServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
@@ -42,23 +42,21 @@ public abstract class AbstractHttpServlet extends HttpServlet {
 
   private final class P_HttpInvocationHandler implements InvocationHandler {
 
-    private boolean m_invalidated = false;
+    private boolean m_valid = true;
     private Object m_origin;
 
     public P_HttpInvocationHandler(Object origin) {
       m_origin = origin;
-
     }
 
     private void invalidate() {
-      m_invalidated = true;
-
+      m_valid = false;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      if (m_invalidated) {
-        throw new PlatformException("Access to servlet request/response is not allowed after servlet request is completet.");
+      if (!m_valid) {
+        throw new PlatformException("Access to '{}' is not allowed because {} is no longer valid (request has been completed).", method, (m_origin instanceof HttpServletRequest ? "HTTP servlet request" : "HTTP servlet response"));
       }
       return method.invoke(m_origin, args);
     }
