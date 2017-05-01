@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
  * JAX-RS REST application registering all {@link IRestResource} and {@link ExceptionMapper} to JAX-RS context.
  */
 public class RestApplication extends Application {
+
   private static final Logger LOG = LoggerFactory.getLogger(RestApplication.class);
+
   private Set<Class<?>> m_classes = new HashSet<>();
 
   public RestApplication() {
@@ -43,14 +45,14 @@ public class RestApplication extends Application {
     for (@SuppressWarnings("rawtypes")
     IBean<ExceptionMapper> bean : BEANS.getBeanManager().getBeans(ExceptionMapper.class)) {
       classes.add(bean.getBeanClazz());
-      LOG.info("{} registered as exception mapper", bean.getBeanClazz());
+      LOG.info("{} registered as REST exception mapper", bean.getBeanClazz());
     }
   }
 
   protected void registerRestResources(Set<Class<?>> classes) {
     for (IBean<IRestResource> bean : BEANS.getBeanManager().getBeans(IRestResource.class)) {
       classes.add(bean.getBeanClazz());
-      LOG.info("{} registered as rest resource on path=/{}", bean.getBeanClazz(), getContextPath(bean));
+      LOG.info("{} registered as REST resource on path=/{}", bean.getBeanClazz(), getContextPath(bean));
     }
   }
 
