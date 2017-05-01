@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import javax.activation.DataSource;
 import javax.mail.util.SharedByteArrayInputStream;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 /**
@@ -45,7 +46,7 @@ public class BinaryResourceDataSource implements DataSource {
         if (indexDot > 0) {
           String fileExtension = null;
           fileExtension = filename.substring(indexDot + 1);
-          contentType = MailUtility.getContentTypeForExtension(fileExtension);
+          contentType = BEANS.get(MailHelper.class).getContentTypeForExtension(fileExtension);
           if (contentType == null) {
             contentType = "application/octet-stream";
           }

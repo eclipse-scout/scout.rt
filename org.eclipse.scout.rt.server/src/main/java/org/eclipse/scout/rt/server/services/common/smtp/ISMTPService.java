@@ -14,7 +14,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.shared.mail.MailUtility;
+import org.eclipse.scout.rt.shared.mail.MailHelper;
 
 /**
  * <h3>ISMTPService</h3> The service to send messages over the smtp protocol. <br>
@@ -39,7 +39,7 @@ public interface ISMTPService extends IService {
    * subject and body parts.
    *
    * @param message
-   * @see {@link MailUtility} to create a message
+   * @see {@link MailHelper} to create a message
    */
   void sendMessage(MimeMessage message);
 

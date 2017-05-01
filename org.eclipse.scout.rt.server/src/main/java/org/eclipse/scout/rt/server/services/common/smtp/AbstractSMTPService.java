@@ -17,6 +17,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -33,7 +34,7 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpSubjectPrefixPrope
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseAuthenticationProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUseSmtpsProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpUsernameProperty;
-import org.eclipse.scout.rt.shared.mail.MailUtility;
+import org.eclipse.scout.rt.shared.mail.MailHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,7 +217,7 @@ public abstract class AbstractSMTPService implements ISMTPService {
       // check debug receiver
       String debugReceiverEmail = getDebugReceiverEmail();
       if (debugReceiverEmail != null) {
-        allRecipients = new Address[]{MailUtility.createInternetAddress(debugReceiverEmail)};
+        allRecipients = new Address[]{BEANS.get(MailHelper.class).createInternetAddress(debugReceiverEmail)};
         LOG.debug("SMTP Service: debug receiver email set to: {}", debugReceiverEmail);
       }
       // from address
@@ -224,7 +225,7 @@ public abstract class AbstractSMTPService implements ISMTPService {
       if (fromAddresses == null || fromAddresses.length == 0) {
         String defaultFromEmail = getDefaultFromEmail();
         if (!StringUtility.isNullOrEmpty(defaultFromEmail)) {
-          message.setFrom(MailUtility.createInternetAddress(defaultFromEmail));
+          message.setFrom(BEANS.get(MailHelper.class).createInternetAddress(defaultFromEmail));
         }
       }
       if (allRecipients != null && allRecipients.length > 0) {

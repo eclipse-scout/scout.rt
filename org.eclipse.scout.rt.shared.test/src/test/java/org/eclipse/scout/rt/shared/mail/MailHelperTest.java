@@ -46,6 +46,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -55,9 +56,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * JUnit tests for {@link MailUtility}
+ * JUnit tests for {@link MailHelper}
  */
-public class MailUtilityTest {
+public class MailHelperTest {
 
   /**
    * Very rare, unknown character set. Currently UTF-7, by default Oracle JDK does not support it.
@@ -73,11 +74,11 @@ public class MailUtilityTest {
   @Test
   public void testMimeMessageWithoutSender() throws MessagingException {
     MailMessage definition = new MailMessage().withBodyPlainText("Body");
-    MimeMessage message = MailUtility.createMimeMessage(definition);
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(definition);
     assertNotNull(message);
 
     definition = new MailMessage().withSubject("Subject").withBodyPlainText("Body");
-    message = MailUtility.createMimeMessage(definition);
+    message = BEANS.get(MailHelper.class).createMimeMessage(definition);
     assertNotNull(message);
   }
 
@@ -86,7 +87,7 @@ public class MailUtilityTest {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     final String fileName = "test.file";
     File file = IOUtility.createTempFile(fileName, sampleData);
-    DataSource ds = MailUtility.createDataSource(file);
+    DataSource ds = BEANS.get(MailHelper.class).createDataSource(file);
     assertNotNull(ds);
     assertEquals(fileName, ds.getName());
     assertTrue(ds instanceof ByteArrayDataSource);
@@ -103,7 +104,7 @@ public class MailUtilityTest {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     final String fileName = "test.file";
 
-    DataSource ds = MailUtility.createDataSource(new ByteArrayInputStream(sampleData), fileName, null);
+    DataSource ds = BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), fileName, null);
     assertNotNull(ds);
     assertEquals(fileName, ds.getName());
     assertTrue(ds instanceof ByteArrayDataSource);
@@ -115,7 +116,7 @@ public class MailUtilityTest {
     }
 
     new MailMessage().withBodyPlainText("test").withAttachment(new MailAttachment(ds));
-    MimeMessage message = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText("test"));
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(new MailMessage().withBodyPlainText("test"));
     message.writeTo(new ByteArrayOutputStream());
   }
 
@@ -126,22 +127,22 @@ public class MailUtilityTest {
     MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(htmlText);
 
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
-    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
-    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null)));
-    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sämple3.dat", null)));
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null)));
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sämple3.dat", null)));
 
-    MimeMessage message = MailUtility.createMimeMessage(definition);
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(definition);
 
     verifyMimeMessage(message, plainText, htmlText, "sample1.dat", "sample2.dat", "sämple3.dat");
 
     // validate that the method call does not throw an exception
-    MailUtility.collectMailParts(null, null, null, null);
-    MailUtility.collectMailParts(message, null, null, null);
+    BEANS.get(MailHelper.class).collectMailParts(null, null, null, null);
+    BEANS.get(MailHelper.class).collectMailParts(message, null, null, null);
 
     List<Part> bodyCollector = new ArrayList<Part>();
     List<Part> attachmentCollector = new ArrayList<Part>();
     List<Part> inlineAttachmentCollector = new ArrayList<Part>();
-    MailUtility.collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
+    BEANS.get(MailHelper.class).collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
     assertEquals("body parts size is wrong", 2, bodyCollector.size());
     assertEquals("attachments parts size is wrong", 3, attachmentCollector.size());
     assertEquals("inline attachments parts size is wrong", 0, inlineAttachmentCollector.size());
@@ -149,40 +150,40 @@ public class MailUtilityTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateMimeMessageWithNull() throws Exception {
-    MailUtility.createMimeMessage(null);
+    BEANS.get(MailHelper.class).createMimeMessage(null);
   }
 
   @Test
   public void testCreateMimeMessage() throws Exception {
     // no plain text or html body
-    assertNull(MailUtility.createMimeMessage(new MailMessage()));
+    assertNull(BEANS.get(MailHelper.class).createMimeMessage(new MailMessage()));
 
     final String plainText = "plain text";
     final String html = "<html><body><p>html</p></body></html>";
 
-    MimeMessage plainTextMessage = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText(plainText));
+    MimeMessage plainTextMessage = BEANS.get(MailHelper.class).createMimeMessage(new MailMessage().withBodyPlainText(plainText));
     verifyMimeMessage(plainTextMessage, plainText, null);
 
-    MimeMessage htmlMessage = MailUtility.createMimeMessage(new MailMessage().withBodyHtml(html));
+    MimeMessage htmlMessage = BEANS.get(MailHelper.class).createMimeMessage(new MailMessage().withBodyHtml(html));
     verifyMimeMessage(htmlMessage, null, html);
 
-    MimeMessage plainTextAndHtmlMessage = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText(plainText).withBodyHtml(html));
+    MimeMessage plainTextAndHtmlMessage = BEANS.get(MailHelper.class).createMimeMessage(new MailMessage().withBodyPlainText(plainText).withBodyHtml(html));
     verifyMimeMessage(plainTextAndHtmlMessage, plainText, html);
 
     MailMessage definition =
         new MailMessage().withSubject("Subject").withBodyPlainText(plainText).withBodyHtml(html).withSender(createMailParticipant("info@example.org")).addToRecipients(createMailParticipants(CollectionUtility.arrayList("to1@example.org")));
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
     final String attachmentContentId = "mycontentid";
-    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null), null, null, attachmentContentId));
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null), null, null, attachmentContentId));
     definition.addCcRecipient(createMailParticipant("cc1@example.org"));
     definition.addCcRecipient(createMailParticipant("cc2@example.org"));
     definition.addBccRecipient(createMailParticipant("bcc1@example.org"));
     definition.addBccRecipient(createMailParticipant("bcc2@example.org"));
     definition.addBccRecipient(createMailParticipant("bcc3@example.org"));
-    MimeMessage msg = MailUtility.createMimeMessage(definition);
+    MimeMessage msg = BEANS.get(MailHelper.class).createMimeMessage(definition);
     verifyMimeMessage(msg, plainText, html, "sample1.dat");
     // exactly one, already verified by verify method
-    Part attachmentPart = CollectionUtility.firstElement(MailUtility.getAttachmentParts(msg));
+    Part attachmentPart = CollectionUtility.firstElement(BEANS.get(MailHelper.class).getAttachmentParts(msg));
     assertTrue("Attachment part is of wrong type", attachmentPart instanceof MimeBodyPart);
     MimeBodyPart bodyPart = (MimeBodyPart) attachmentPart;
     assertEquals("Wrong content id", "<" + attachmentContentId + ">", bodyPart.getContentID());
@@ -207,12 +208,12 @@ public class MailUtilityTest {
 
     MimeBodyPart bodyPart = new MimeBodyPart();
     bodyPart.setText("plain text", StandardCharsets.UTF_8.name());
-    bodyPart.addHeader(MailUtility.CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_PLAIN);
+    bodyPart.addHeader(MailHelper.CONTENT_TYPE_ID, MailHelper.CONTENT_TYPE_TEXT_PLAIN);
     multiPart.addBodyPart(bodyPart);
 
     BodyPart inlineAttachmentPart = new MimeBodyPart();
     inlineAttachmentPart.setContent("base-64-encoded-image-content", "image/gif");
-    inlineAttachmentPart.addHeader(MailUtility.CONTENT_TYPE_ID, "image/gif; name=\"graycol.gif\"");
+    inlineAttachmentPart.addHeader(MailHelper.CONTENT_TYPE_ID, "image/gif; name=\"graycol.gif\"");
     inlineAttachmentPart.addHeader("Content-ID", "<5__=4EBBF65EEFABF58A8f9e8a9@example.org>");
     inlineAttachmentPart.addHeader("Content-Disposition", Part.INLINE);
     multiPart.addBodyPart(inlineAttachmentPart);
@@ -220,7 +221,7 @@ public class MailUtilityTest {
     List<Part> bodyCollector = new ArrayList<Part>();
     List<Part> attachmentCollector = new ArrayList<Part>();
     List<Part> inlineAttachmentCollector = new ArrayList<Part>();
-    MailUtility.collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
+    BEANS.get(MailHelper.class).collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
     assertEquals("body parts size is wrong", 1, bodyCollector.size());
     assertEquals("attachments parts size is wrong", 0, attachmentCollector.size());
     assertEquals("inline attachments parts size is wrong", 1, inlineAttachmentCollector.size());
@@ -232,13 +233,13 @@ public class MailUtilityTest {
     final String plainText = "plain text";
     final String html = "<html><body><p>plain text</p></html>";
     MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(html);
-    MimeMessage message = MailUtility.createMimeMessage(definition);
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(definition);
     verifyMimeMessage(message, plainText, html /* no attachments*/);
 
     // add no attachments
-    MailUtility.addAttachmentsToMimeMessage(message, null);
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, null);
     verifyMimeMessage(message, plainText, html);
-    MailUtility.addAttachmentsToMimeMessage(message, new ArrayList<File>());
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, new ArrayList<File>());
     verifyMimeMessage(message, plainText, html);
 
     // add 3 attachments to mime message
@@ -247,7 +248,7 @@ public class MailUtilityTest {
     attachments.add(IOUtility.createTempFile("sample1.dat", sampleData));
     attachments.add(IOUtility.createTempFile("sample2.dat", sampleData));
     attachments.add(IOUtility.createTempFile("sample3_öüä.dat", sampleData));
-    MailUtility.addAttachmentsToMimeMessage(message, attachments);
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, attachments);
 
     // verify added attachments in java instance
     verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
@@ -255,7 +256,7 @@ public class MailUtilityTest {
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     message.writeTo(bos);
-    message = MailUtility.createMessageFromBytes(bos.toByteArray());
+    message = BEANS.get(MailHelper.class).createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
     verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
@@ -267,13 +268,13 @@ public class MailUtilityTest {
     final String plainText = "plain text";
     final String html = "<html><body><p>plain text</p></html>";
     MailMessage definition = new MailMessage().withBodyPlainText(plainText).withBodyHtml(html);
-    MimeMessage message = MailUtility.createMimeMessage(definition);
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(definition);
     verifyMimeMessage(message, plainText, html /* no attachments*/);
 
     // add no attachments
-    MailUtility.addAttachmentsToMimeMessage(message, null);
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, null);
     verifyMimeMessage(message, plainText, html);
-    MailUtility.addAttachmentsToMimeMessage(message, new ArrayList<File>());
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, new ArrayList<File>());
     verifyMimeMessage(message, plainText, html);
 
     // add 3 attachments to mime message
@@ -282,7 +283,7 @@ public class MailUtilityTest {
     attachments.add(new BinaryResource("sample1.dat", sampleData));
     attachments.add(new BinaryResource("sample2.dat", sampleData));
     attachments.add(new BinaryResource("sample3_öüä.dat", sampleData));
-    MailUtility.addResourcesAsAttachments(message, attachments);
+    BEANS.get(MailHelper.class).addResourcesAsAttachments(message, attachments);
 
     // verify added attachments in java instance
     verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
@@ -290,7 +291,7 @@ public class MailUtilityTest {
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     message.writeTo(bos);
-    message = MailUtility.createMessageFromBytes(bos.toByteArray());
+    message = BEANS.get(MailHelper.class).createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
     verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
@@ -340,7 +341,7 @@ public class MailUtilityTest {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
 
     MailMessage definition = new MailMessage();
-    definition.withAttachment(new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
+    definition.withAttachment(new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)));
 
     assertEquals("Number of attachments is wrong", 1, definition.getAttachments().size());
 
@@ -349,8 +350,8 @@ public class MailUtilityTest {
     assertEquals("Number of attachments is wrong", 0, definition.getAttachments().size());
 
     definition.withAttachments(CollectionUtility.arrayList(
-        new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)),
-        new MailAttachment(MailUtility.createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null))));
+        new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sample1.dat", null)),
+        new MailAttachment(BEANS.get(MailHelper.class).createDataSource(new ByteArrayInputStream(sampleData), "sample2.dat", null))));
 
     assertEquals("Number of attachments is wrong", 2, definition.getAttachments().size());
   }
@@ -370,7 +371,7 @@ public class MailUtilityTest {
     MailParticipant participant = new MailParticipant()
         .withEmail("test@gugus.com")
         .withName("André Böller");
-    InternetAddress address = MailUtility.createInternetAddress(participant);
+    InternetAddress address = BEANS.get(MailHelper.class).createInternetAddress(participant);
     String addressToString = address.toString();
     String addressPersonal = address.getPersonal();
     CharsetSafeMimeMessage msg = new CharsetSafeMimeMessage();
@@ -397,7 +398,7 @@ public class MailUtilityTest {
   @Test
   public void testInternetAddressIDN() throws Exception {
     final String email = "test@gügüs.com"; // internationalized domain name
-    InternetAddress address = MailUtility.createInternetAddress(email, "André Böller");
+    InternetAddress address = BEANS.get(MailHelper.class).createInternetAddress(email, "André Böller");
     String addressToString = address.toString();
     String addressPersonal = address.getPersonal();
     CharsetSafeMimeMessage msg = new CharsetSafeMimeMessage();
@@ -410,27 +411,27 @@ public class MailUtilityTest {
     assertEquals(IDN.toASCII(email), address2.getAddress());
     assertEquals(email, IDN.toUnicode(address2.getAddress()));
 
-    assertEquals("xn--peter@mller-zhb.de", MailUtility.createInternetAddress("peter@müller.de").getAddress());
+    assertEquals("xn--peter@mller-zhb.de", BEANS.get(MailHelper.class).createInternetAddress("peter@müller.de").getAddress());
   }
 
   @Test
   public void testInternetAddressEmpty() throws Exception {
-    assertNull(MailUtility.createInternetAddress((String) null));
-    assertNull(MailUtility.createInternetAddress((MailParticipant) null));
-    assertNull(MailUtility.createInternetAddress(""));
+    assertNull(BEANS.get(MailHelper.class).createInternetAddress((String) null));
+    assertNull(BEANS.get(MailHelper.class).createInternetAddress((MailParticipant) null));
+    assertNull(BEANS.get(MailHelper.class).createInternetAddress(""));
   }
 
   @Test(expected = ProcessingException.class)
   public void testInternetAddressInvalid() throws Exception {
-    assertNull(MailUtility.createInternetAddress("foo@bar@foo.de"));
+    assertNull(BEANS.get(MailHelper.class).createInternetAddress("foo@bar@foo.de"));
   }
 
   @Test
   public void testParseInternetAddressListEmpty() {
-    InternetAddress[] addresses = MailUtility.parseInternetAddressList(null);
+    InternetAddress[] addresses = BEANS.get(MailHelper.class).parseInternetAddressList(null);
     assertEquals(0, addresses.length);
 
-    addresses = MailUtility.parseInternetAddressList("");
+    addresses = BEANS.get(MailHelper.class).parseInternetAddressList("");
     assertEquals(0, addresses.length);
   }
 
@@ -444,7 +445,7 @@ public class MailUtilityTest {
   }
 
   protected void runTestParseInternetAddressList(String... inputAddresses) {
-    InternetAddress[] addresses = MailUtility.parseInternetAddressList(StringUtility.join(",", inputAddresses));
+    InternetAddress[] addresses = BEANS.get(MailHelper.class).parseInternetAddressList(StringUtility.join(",", inputAddresses));
     assertEquals(inputAddresses.length, addresses.length);
     for (int i = 0; i < inputAddresses.length; i++) {
       assertEquals(IDN.toASCII(inputAddresses[i]), addresses[i].getAddress());
@@ -470,12 +471,12 @@ public class MailUtilityTest {
 
   protected MimeMessage createMimeMessageUsingUnknownEncoding() throws IOException, MessagingException {
     MailMessage definition = new MailMessage().withBodyPlainText("a");
-    MimeMessage mimeMessage = MailUtility.createMimeMessage(definition);
+    MimeMessage mimeMessage = BEANS.get(MailHelper.class).createMimeMessage(definition);
     Object multipart0 = mimeMessage.getContent();
     Assert.assertTrue(multipart0 instanceof Multipart);
     Multipart multipart = (Multipart) multipart0;
     BodyPart plaintextPart = multipart.getBodyPart(0);
-    plaintextPart.setHeader(MailUtility.CONTENT_TYPE_ID, "text/plain; charset=\"" + RARE_UNKNOWN_CHARSET + "\"");
+    plaintextPart.setHeader(MailHelper.CONTENT_TYPE_ID, "text/plain; charset=\"" + RARE_UNKNOWN_CHARSET + "\"");
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
     mimeMessage.writeTo(bos);
@@ -496,7 +497,7 @@ public class MailUtilityTest {
   @Test
   public void testFallbackForUnknownEncoding() throws IOException, MessagingException {
     MimeMessage mimeMessage = createMimeMessageUsingUnknownEncoding();
-    Assert.assertEquals("a", MailUtility.getPlainText(mimeMessage));
+    Assert.assertEquals("a", BEANS.get(MailHelper.class).getPlainText(mimeMessage));
   }
 
   /**
@@ -521,20 +522,20 @@ public class MailUtilityTest {
    */
   private void verifyMimeMessage(MimeMessage message, String plainText, String htmlText, String... attachmentFilenames) throws IOException, MessagingException {
     if (plainText != null) {
-      assertEquals("wrong plain text", plainText, MailUtility.getPlainText(message));
+      assertEquals("wrong plain text", plainText, BEANS.get(MailHelper.class).getPlainText(message));
     }
     else {
-      assertNull("wrong plain text", MailUtility.getPlainText(message));
+      assertNull("wrong plain text", BEANS.get(MailHelper.class).getPlainText(message));
     }
 
     int bodyPartCount = 0;
     bodyPartCount += plainText == null ? 0 : 1;
     bodyPartCount += htmlText == null ? 0 : 1;
 
-    List<Part> bodyParts = MailUtility.getBodyParts(message);
+    List<Part> bodyParts = BEANS.get(MailHelper.class).getBodyParts(message);
     assertEquals("body parts size is wrong", bodyPartCount, bodyParts.size());
 
-    Part plainTextPart = MailUtility.getPlainTextPart(bodyParts);
+    Part plainTextPart = BEANS.get(MailHelper.class).getPlainTextPart(bodyParts);
     if (plainText != null) {
       assertNotNull("no plain text part found", plainTextPart);
       assertTrue("plain text part content is not string", plainTextPart.getContent() instanceof String);
@@ -544,7 +545,7 @@ public class MailUtilityTest {
       assertNull("plain text part found", plainTextPart);
     }
 
-    Part htmlPart = MailUtility.getHtmlPart(bodyParts);
+    Part htmlPart = BEANS.get(MailHelper.class).getHtmlPart(bodyParts);
     if (htmlText != null) {
       assertNotNull("no html part found", htmlPart);
       assertTrue("html part content is not string", htmlPart.getContent() instanceof String);
@@ -554,7 +555,7 @@ public class MailUtilityTest {
       assertNull("html part found", htmlPart);
     }
 
-    List<Part> attachmentParts = MailUtility.getAttachmentParts(message);
+    List<Part> attachmentParts = BEANS.get(MailHelper.class).getAttachmentParts(message);
     assertEquals("attachments parts size is wrong", attachmentFilenames.length, attachmentParts.size());
     Set<String> attachmentFilenamesSet = new HashSet<String>();
     for (Part part : attachmentParts) {
