@@ -23,6 +23,7 @@
   }
 
   & > .tree-data  {
+
     & > .scrollbar {
       &.y-axis {
         margin-right: 6px;
@@ -44,6 +45,8 @@
 
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
+      color: @navigation-color;
+      background-color: transparent;
       cursor: pointer;
       border: 0;
 
@@ -161,6 +164,7 @@
   }
 
   & > .tree-data {
+
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
       border-bottom: 1px solid @outline-breadcrumb-border-color;
@@ -221,6 +225,7 @@
 
   &:focus > .tree-data,
   &.focused > .tree-data {
+
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
 
