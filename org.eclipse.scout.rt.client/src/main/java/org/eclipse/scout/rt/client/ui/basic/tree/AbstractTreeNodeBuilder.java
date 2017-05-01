@@ -84,6 +84,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
     if (cell.getIconId() == null) {
       cell.setIconId(lookupRow.getIconId());
     }
+    cell.setCssClass(lookupRow.getCssClass());
     cell.setBackgroundColor(lookupRow.getBackgroundColor());
     cell.setForegroundColor(lookupRow.getForegroundColor());
     cell.setFont(lookupRow.getFont());
