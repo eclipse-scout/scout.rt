@@ -430,15 +430,17 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     IJsonAdapter<?> jsonAdapter = attachAdapter(notification);
     JSONObject jsonEvent = new JSONObject();
     jsonEvent.put(PROP_NOTIFICATION, jsonAdapter.getId());
-    addActionEvent(EVENT_ADD_NOTIFICATION, jsonAdapter, jsonEvent).protect();
+    addActionEvent(EVENT_ADD_NOTIFICATION, jsonAdapter, jsonEvent);
   }
 
   protected void handleModelNotificationRemoved(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
     IJsonAdapter<?> jsonAdapter = getAdapter(notification);
-    JSONObject jsonEvent = new JSONObject();
-    jsonEvent.put(PROP_NOTIFICATION, jsonAdapter.getId());
-    addActionEvent(EVENT_REMOVE_NOTIFICATION, jsonAdapter, jsonEvent).protect();
+    if (jsonAdapter != null) {
+      JSONObject jsonEvent = new JSONObject();
+      jsonEvent.put(PROP_NOTIFICATION, jsonAdapter.getId());
+      addActionEvent(EVENT_REMOVE_NOTIFICATION, jsonAdapter, jsonEvent);
+    }
   }
 
   @Override

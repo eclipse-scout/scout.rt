@@ -218,7 +218,7 @@ scout.Desktop.prototype._renderDisplayChildsOfOutline = function() {
   this.outline.formController.render();
   this.outline.messageBoxController.render();
   this.outline.fileChooserController.render();
-  
+
   if (this.outline.selectedViewTabs) {
     this.outline.selectedViewTabs.forEach(function(selectedView) {
       this.formController._activateView(selectedView);
@@ -638,7 +638,7 @@ scout.Desktop.prototype._renderNotification = function(notification) {
   }
   notification.fadeIn(this.$notifications);
   if (notification.duration > 0) {
-    notification._removeTimeout = setTimeout(this.removeNotification.bind(this, notification), notification.duration);
+    notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
   }
 };
 
@@ -647,7 +647,6 @@ scout.Desktop.prototype._renderNotification = function(notification) {
  * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
  */
 scout.Desktop.prototype.removeNotification = function(notification) {
-
   if (typeof notification === 'string') {
     var notificationId = notification;
     notification = scout.arrays.find(this.notifications, function(n) {
@@ -657,6 +656,9 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   if (!notification) {
     return;
   }
+  if (notification.removeTimeout) {
+    clearTimeout(notification.removeTimeout);
+  }
   scout.arrays.remove(this.notifications, notification);
   if (!this.rendered) {
     return;
@@ -664,9 +666,6 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   if (this.$notifications) {
     notification.fadeOut();
     notification.one('remove', this._onNotificationRemove.bind(this, notification));
-  }
-  if (notification._removeTimeout) {
-    clearTimeout(notification._removeTimeout);
   }
 };
 

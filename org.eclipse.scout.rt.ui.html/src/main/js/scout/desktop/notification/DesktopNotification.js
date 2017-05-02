@@ -12,7 +12,7 @@ scout.DesktopNotification = function() {
   scout.DesktopNotification.parent.call(this);
   this.closable = true;
   this.duration = 5000;
-  this._removeTimeout;
+  this.removeTimeout;
   this._removing = false;
 };
 scout.inherits(scout.DesktopNotification, scout.Notification);
@@ -24,7 +24,6 @@ scout.DesktopNotification.INFINITE = -1;
 
 scout.DesktopNotification.prototype._init = function(model) {
   scout.DesktopNotification.parent.prototype._init.call(this, model);
-  this.desktop = this.session.desktop;
 };
 
 scout.DesktopNotification.prototype._render = function($parent) {
@@ -41,7 +40,6 @@ scout.DesktopNotification.prototype._render = function($parent) {
 scout.DesktopNotification.prototype._remove = function() {
   scout.DesktopNotification.parent.prototype._remove.call(this);
   this._removeCloser();
-  this._send('closed');
 };
 
 scout.DesktopNotification.prototype._renderProperties = function() {
@@ -93,9 +91,18 @@ scout.DesktopNotification.prototype._renderCloser = function() {
 };
 
 scout.DesktopNotification.prototype._onCloseIconClick = function() {
+  this.hide();
+};
+
+scout.DesktopNotification.prototype.show = function() {
+  this.session.desktop.addNotification(this);
+};
+
+scout.DesktopNotification.prototype.hide = function() {
   if (this._removing) {
     return;
   }
+  this._send('close');
   this.session.desktop.removeNotification(this);
 };
 

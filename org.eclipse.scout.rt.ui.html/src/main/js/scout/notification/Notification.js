@@ -42,14 +42,6 @@ scout.Notification.prototype._renderProperties = function() {
   this._renderStatus();
 };
 
-/**
- * delegate function to desktop
- */
-scout.Notification.prototype.show = function() {
-  this.session.desktop.addNotification(this);
-};
-
-
 scout.Notification.prototype.setStatus = function(status) {
   this.setProperty('status', status);
 };
