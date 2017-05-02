@@ -445,6 +445,13 @@
   __include("scout/form/fields/smartfield/SmartFieldMultiline.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineAdapter.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineLayout.js");
+  __include("scout/form/fields/smartfield2/SmartField2.js");
+  __include("scout/form/fields/smartfield2/SmartField2Adapter.js");
+  __include("scout/form/fields/smartfield2/SmartField2CancelKeyStroke.js");
+  __include("scout/form/fields/smartfield2/SmartField2ToggleKeyStroke.js");
+  __include("scout/form/fields/smartfield2/SmartField2Popup.js");
+  __include("scout/form/fields/smartfield2/SmartField2PopupLayout.js");
+  __include("scout/form/fields/smartfield2/ScoutRemoteLookupCall.js");
   __include("scout/form/fields/splitbox/SplitBox.js");
   __include("scout/form/fields/splitbox/SplitBoxAdapter.js");
   __include("scout/form/fields/splitbox/SplitBoxCollapseKeyStroke.js");

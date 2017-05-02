@@ -1,0 +1,34 @@
+.dropdown-field {
+  & > .field {
+    #scout.text-field-with-icon(@icon-caret-down);
+    cursor: pointer;
+
+    & ~ .icon::before {
+      cursor: pointer;
+    }
+
+    &:focus,
+    &.focused {
+      #scout.focus-border();
+    }
+
+    &.disabled {
+      cursor: default;
+
+      & ~ .icon::before {
+        cursor: default;
+      }
+    }
+  }
+
+  &.popup-open > .field {
+    box-shadow: none;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+    & ~ .icon::before {
+      content: @icon-caret-up;
+    }
+  }
+}
