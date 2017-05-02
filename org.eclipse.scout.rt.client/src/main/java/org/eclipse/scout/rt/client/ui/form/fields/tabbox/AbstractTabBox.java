@@ -194,7 +194,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         }
       }
     }
-    return null; // no tab found
+    return selectedBox;
   }
 
   @Override
