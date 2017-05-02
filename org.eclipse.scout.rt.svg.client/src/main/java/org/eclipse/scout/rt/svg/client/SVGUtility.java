@@ -204,12 +204,12 @@ public final class SVGUtility {
   public static void setTransform(SVGElement e, float x, float y, float rotation) {
     SVGTransformList list = ((SVGTransformable) e).getTransform().getBaseVal();
     list.clear();
-    if (rotation != 0) {
+    if (isSet(rotation)) {
       SVGTransform tx = e.getOwnerSVGElement().createSVGTransform();
       tx.setRotate(rotation, 0, 0);
       list.appendItem(tx);
     }
-    if (x != 0 || y != 0) {
+    if (isSet(x) || isSet(y)) {
       SVGTransform tx = e.getOwnerSVGElement().createSVGTransform();
       tx.setTranslate(x, y);
       list.appendItem(tx);
@@ -247,7 +247,7 @@ public final class SVGUtility {
     //get font height
     float fontHeight = 0f;
     Node tmpNode = textElement;
-    while (fontHeight == 0f && tmpNode != null) {
+    while (!isSet(fontHeight) && tmpNode != null) {
       if (tmpNode instanceof SVGStylable) {
         //get font height
         String fontSizeText = ((SVGStylable) tmpNode).getStyle().getPropertyValue(SVGConstants.CSS_FONT_SIZE_PROPERTY);
@@ -259,7 +259,7 @@ public final class SVGUtility {
       //next
       tmpNode = tmpNode.getParentNode();
     }
-    if (fontHeight == 0f) {
+    if (!isSet(fontHeight)) {
       fontHeight = DEFAULT_FONT_HEIGHT;
     }
     Float rGap = rowGap == null ? Float.valueOf(1f) : rowGap;
@@ -623,4 +623,7 @@ public final class SVGUtility {
     }
   }
 
+  private static boolean isSet(float f) {
+    return f != 0;//NOSONAR
+  }
 }
