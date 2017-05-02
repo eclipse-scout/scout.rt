@@ -19,9 +19,35 @@ describe('DesktopNotification', function() {
     parent.session = session;
   });
 
+  it('will fade in, be added to the desktop and be renderd upon show() ', function() {
+    var notification = scout.create('DesktopNotification', {
+      parent: parent,
+      id: 'foo',
+      duration: -1
+    });
+    spyOn(notification, 'fadeIn').and.callThrough();
+    notification.show();
+    expect(notification.rendered).toBe(true);
+    expect(notification.fadeIn).toHaveBeenCalled();
+    expect(session.desktop.notifications[0]).toBe(notification);
+  });
+
+  it('will fade out and be removed from the dektop upon hide()', function() {
+    var notification = scout.create('DesktopNotification', {
+      parent: parent,
+      id: 'foo',
+      duration: -1
+    });
+    spyOn(notification, 'fadeOut').and.callThrough();
+    notification.show();
+    notification.hide();
+    expect(notification.fadeOut).toHaveBeenCalled();
+    expect(session.desktop.notifications[0]).toBe(undefined);
+  });
+
   it('_init copies properties from event (model)', function() {
-    var ntfc = new scout.DesktopNotification();
-    ntfc.init({
+    var notification = new scout.DesktopNotification();
+    notification.init({
       parent: parent,
       id: 'foo',
       duration: 123,
@@ -31,15 +57,15 @@ describe('DesktopNotification', function() {
         severity: scout.Status.Severity.OK
       }
     });
-    expect(ntfc.id).toBe('foo');
-    expect(ntfc.duration).toBe(123);
-    expect(ntfc.closable).toBe(true);
-    expect(ntfc.status.message).toBe('bar');
-    expect(ntfc.status.severity).toBe(scout.Status.Severity.OK);
+    expect(notification.id).toBe('foo');
+    expect(notification.duration).toBe(123);
+    expect(notification.closable).toBe(true);
+    expect(notification.status.message).toBe('bar');
+    expect(notification.status.severity).toBe(scout.Status.Severity.OK);
   });
 
   it('has close-icon when notification is closable', function() {
-    var ntfc = scout.create('DesktopNotification', {
+    var notification = scout.create('DesktopNotification', {
       parent: parent,
       id: 'foo',
       duration: 123,
@@ -49,10 +75,10 @@ describe('DesktopNotification', function() {
         severity: scout.Status.Severity.OK
       }
     });
-    ntfc.render($sandbox);
-    expect(ntfc.$container.find('.closer').length).toBe(1);
-    expect(ntfc.$container.find('.desktop-notification-content').text()).toBe('bar');
-    expect(ntfc.$container.hasClass('ok')).toBe(true);
+    notification.render($sandbox);
+    expect(notification.$container.find('.closer').length).toBe(1);
+    expect(notification.$container.find('.desktop-notification-content').text()).toBe('bar');
+    expect(notification.$container.hasClass('ok')).toBe(true);
   });
 
 });

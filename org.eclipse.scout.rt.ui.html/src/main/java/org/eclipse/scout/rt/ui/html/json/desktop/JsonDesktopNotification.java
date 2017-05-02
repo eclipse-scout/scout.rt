@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 
 public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends AbstractJsonPropertyObserver<DESKTOP_NOTIFICATION> {
 
-  public static final String EVENT_CLOSED = "closed";
+  public static final String EVENT_CLOSE = "close";
 
   public JsonDesktopNotification(DESKTOP_NOTIFICATION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -55,15 +55,15 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_CLOSED.equals(event.getType())) {
-      handleRemovedEvent();
+    if (EVENT_CLOSE.equals(event.getType())) {
+      handleUiClose();
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleRemovedEvent() {
+  protected void handleUiClose() {
     getModel().getUIFacade().fireClosedFromUI();
   }
 }

@@ -14,7 +14,7 @@ scout.DesktopNotificationAdapter = function() {
 scout.inherits(scout.DesktopNotificationAdapter, scout.ModelAdapter);
 
 scout.DesktopNotificationAdapter.prototype._onWidgetClose = function(event) {
-  this._send('closed', {
+  this._send('close', {
     ref: event.ref
   });
 };
