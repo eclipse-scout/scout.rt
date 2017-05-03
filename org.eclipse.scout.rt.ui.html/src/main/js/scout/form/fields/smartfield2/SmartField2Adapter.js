@@ -17,24 +17,8 @@ scout.inherits(scout.SmartField2Adapter, scout.ValueFieldAdapter);
 
 scout.SmartField2Adapter.prototype._postCreateWidget = function() {
   scout.SmartField2Adapter.parent.prototype._postCreateWidget.call(this);
-  this.widget.lookupCall = scout.create('ScoutRemoteLookupCall', this);
+  this.widget.lookupCall = scout.create('RemoteLookupCall', this);
 };
-
-//scout.SmartField2Adapter.prototype.onModelAction = function(event) {
-//  if (event.type === 'lookupResult') {
-//    this._onLookupResult(event);
-//  } else {
-//    scout.SmartField2Adapter.parent.prototype.onModelAction.call(this, event);
-//  }
-//};
-
-//scout.ValueFieldAdapter.prototype._onWidgetEvent = function(event) {
-//  if (event.type === 'value') {
-//    this._onWidgetDisplayTextChanged(event);
-//  } else {
-//    scout.ValueFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
-//  }
-//};
 
 scout.SmartField2Adapter.prototype._syncResult = function(result) {
   console.log('_syncResult', result);
@@ -58,10 +42,19 @@ scout.SmartField2Adapter.prototype._syncDisplayText = function(displayText) {
   // this.widget.parseAndSetValue(displayText);
 };
 
-scout.SmartField2Adapter.prototype.lookup = function() {
+scout.SmartField2Adapter.prototype.lookupAll = function() {
+  this._lookup('All', null);
+};
+
+scout.SmartField2Adapter.prototype.lookupByText = function(searchText) {
+  this._lookup('ByText', searchText);
+};
+
+scout.SmartField2Adapter.prototype._lookup = function(lookupType, searchText) {
+  var sendType = 'lookup' + lookupType;
   var request = {
-    text: this.widget._readDisplayText(),
-    filterKey: null
+    text: searchText,
+    filterKey: null // FIXME [awe] 7.0 - SF2: add filterKeys to request (only for byText or for all too?)
   };
-  this._send('lookupByText', request);
+  this._send(sendType, request);
 };

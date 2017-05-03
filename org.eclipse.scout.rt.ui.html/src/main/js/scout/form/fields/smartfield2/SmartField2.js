@@ -1,11 +1,24 @@
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
-  this.popup;
-  this.lookupCall;
-  this.codeType;
+  this.popup = null;
+  this.lookupCall = null;
+  this.codeType = null;
+  this._pendingLookup = null;
+
+  this.variant = scout.SmartField2.Variant.DROPDOWN;
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
+
+// FIXME [awe] 7.0 - SF2: überlegen ob wir das mit flags, mit subklassen oder mit strategies lösen wollen
+// zuerst mal flag ansatz ausprobieren und je nach code die eine oder andere methode anwenden.
+scout.SmartField2.Variant = {
+  DEFAULT: 'smart',
+  PROPOSAL: 'proposal',
+  DROPDOWN: 'dropdown'
+};
+
+scout.SmartField2.DEBOUNCE_DELAY = 200;
 
 /**
  * @override
@@ -16,6 +29,13 @@ scout.SmartField2.prototype._init = function(model) {
   this._setCodeType(this.codeType);
 };
 
+/**
+ * @override Widget.js
+ */
+scout.SmartField2.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
+
 scout.SmartField2.prototype._initKeyStrokeContext = function() {
   scout.SmartField2.parent.prototype._initKeyStrokeContext.call(this);
 
@@ -24,16 +44,24 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
 };
 
 scout.SmartField2.prototype._render = function($parent) {
-  this.addContainer($parent, 'dropdown-field');
+  var cssClass = this.variant + '-field';
+  this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
   this.addLabel();
 
-  var $field = scout.fields.makeInputDiv(this.$container)
-    .on('mousedown', this._onFieldMousedown.bind(this))
-    .on('blur', this._onFieldBlur.bind(this))
-    .on('keydown', this._onFieldKeydown.bind(this));
-
+  var $field = scout.fields.makeInputOrDiv(this)
+    .on('mousedown', this._onFieldMousedown.bind(this));
+  if (!this.touch) {
+    $field
+      .blur(this._onFieldBlur.bind(this))
+      .focus(this._onFieldFocus.bind(this))
+      .keyup(this._onFieldKeyup.bind(this))
+      .keydown(this._onFieldKeydown.bind(this));
+  }
   this.addField($field);
-  this.addMandatoryIndicator();
+
+  if (!this.embedded) {
+    this.addMandatoryIndicator();
+  }
   this.addIcon();
   this.addStatus();
 };
@@ -42,7 +70,7 @@ scout.SmartField2.prototype._render = function($parent) {
  * @override
  */
 scout.SmartField2.prototype._renderDisplayText = function() {
-  this.$field.text(this.displayText);
+  scout.fields.valOrText(this, this.$field, this.displayText);
 };
 
 /**
@@ -117,7 +145,7 @@ scout.SmartField2.prototype.openPopup = function() {
     this.popup = this._createPopup();
     this.popup.setLookupRows(result.lookupRows);
     this.popup.open();
-    this.popup.on('select', this._onItemSelect.bind(this));
+    this.popup.on('select', this._onLookupRowSelect.bind(this));
     this.popup.on('remove', function() {
       this.popup = null;
       if (this.rendered) {
@@ -179,6 +207,56 @@ scout.SmartField2.prototype._onIconMousedown = function(event) {
   this.togglePopup();
 };
 
+scout.SmartField2.prototype._onFieldFocus = function(event) {
+  // FIXME [awe] 7.0 - SF2: im original wird hier mit dem displayText was komisches gemacht. Ich hoffe das ist nicht mehr nötig
+};
+
+scout.SmartField2.prototype._onFieldKeyup = function(event) {
+  // Escape
+  if (event.which === scout.keys.ESCAPE) {
+    event.stopPropagation();
+    return;
+  }
+
+  // Enter
+  if (event.which === scout.keys.ENTER) {
+    event.stopPropagation();
+    return;
+  }
+
+  // Pop-ups shouldn't open when one of the following keys is pressed
+  var w = event.which;
+  if (
+    event.ctrlKey || event.altKey ||
+    w === scout.keys.TAB ||
+    w === scout.keys.SHIFT ||
+    w === scout.keys.CTRL ||
+    w === scout.keys.HOME ||
+    w === scout.keys.END ||
+    w === scout.keys.LEFT ||
+    w === scout.keys.RIGHT ||
+    this._isNavigationKey(event) ||
+    this._isFunctionKey(event)) {
+    return;
+  }
+
+  // The typed character is not available until the keyUp event happens
+  // That's why we must deal with that event here (and not in keyDown)
+  // We don't use _displayText() here because we always want the text the
+  // user has typed.
+  if (this.popup) {
+    this._proposalTyped();
+  } else {
+    this.openPopup();
+  }
+};
+
+/**
+ * @override Widget.js
+ */
+scout.SmartField.prototype._createKeyStrokeContext = function() {
+  return new scout.InputFieldKeyStrokeContext();
+};
 
 scout.SmartField2.prototype._onFieldKeydown = function(event) {
  if (this._isNavigationKey(event)) {
@@ -190,16 +268,41 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
  }
 };
 
-scout.SmartField2.prototype._isNavigationKey = function(e) {
-  return e.which === scout.keys.PAGE_UP ||
-    e.which === scout.keys.PAGE_DOWN ||
-    e.which === scout.keys.UP ||
-    e.which === scout.keys.DOWN ||
-    e.which === scout.keys.HOME ||
-    e.which === scout.keys.END;
+scout.SmartField2.prototype._isNavigationKey = function(event) {
+  var w = event.which;
+  return w === scout.keys.PAGE_UP ||
+    w === scout.keys.PAGE_DOWN ||
+    w === scout.keys.UP ||
+    w === scout.keys.DOWN ||
+    w === scout.keys.HOME ||
+    w === scout.keys.END;
 };
 
-scout.SmartField2.prototype._onItemSelect = function(event) {
+scout.SmartField2.prototype._isFunctionKey = function(e) {
+  return e.which >= scout.keys.F1 && e.which < scout.keys.F12;
+};
+
+
+scout.SmartField2.prototype._proposalTyped = function() {
+  var displayText = this._readDisplayText();
+  $.log.trace('(SmartField2#_proposalTyped) displayText=' + displayText);
+
+  // debounce lookup
+  if (this._pendingLookup) {
+    clearTimeout(this._pendingLookup);
+  }
+
+  this._pendingLookup = setTimeout(function() {
+    $.log.debug('(SmartField2#_proposalTyped) send displayText=' + displayText);
+    this.lookupCall.getByText(displayText).done(function(result) {
+      if (this.popup) {
+        this.popup.setLookupRows(result.lookupRows);
+      }
+    }.bind(this));
+  }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
+};
+
+scout.SmartField2.prototype._onLookupRowSelect = function(event) {
   this.setValue(event.lookupRow.key);
   this.closePopup();
 };

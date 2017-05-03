@@ -8,24 +8,42 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ScoutRemoteLookupCall = function(adapter) {
-  scout.ScoutRemoteLookupCall.parent.call(this);
+scout.RemoteLookupCall = function(adapter) {
+  scout.RemoteLookupCall.parent.call(this);
   this.adapter = adapter;
   this.deferred = null;
 };
-scout.inherits(scout.ScoutRemoteLookupCall, scout.LookupCall);
+scout.inherits(scout.RemoteLookupCall, scout.LookupCall);
 
 /**
  * To be implemented by the subclass.
  *
  * @returns {Promise} which returns {scout.LookupRow}s
  */
-scout.ScoutRemoteLookupCall.prototype.getAll = function() {
-  this.deferred = $.Deferred();
-  this.adapter.lookup();
+scout.RemoteLookupCall.prototype.getAll = function() {
+  this._newDeferred();
+  this.adapter.lookupAll();
   return this.deferred.promise();
 };
 
-scout.ScoutRemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
+scout.RemoteLookupCall.prototype.getByText = function(text) {
+  this._newDeferred();
+  this.adapter.lookupByText(text);
+  return this.deferred.promise();
+};
+
+scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
   this.deferred.resolve(lookupResult);
+};
+
+/**
+ * Creates a new deferred and rejects the previous one.
+ */
+scout.RemoteLookupCall.prototype._newDeferred = function() {
+  if (this.deferred) {
+    this.deferred.reject({
+      canceled: true
+    });
+  }
+  this.deferred = $.Deferred();
 };

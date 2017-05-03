@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -56,8 +55,8 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     if ("lookupByText".equals(event.getType())) {
       handleUiLookupByText(event);
     }
-    else if ("resolveCurrentKey".equals(event.getType())) {
-      handleUiResolveCurrentKey();
+    else if ("lookupAll".equals(event.getType())) {
+      handleUiLookupAll();
     }
     else {
       super.handleUiEvent(event);
@@ -79,7 +78,14 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     }
   }
 
-  // Sync operation
+  // Async operation (in background) Sets
+  protected void handleUiLookupByText(JsonEvent event) {
+    resetKeyMap();
+    String text = event.getData().optString("text");
+    String filterKey = event.getData().optString("filterKey");
+    getModel().lookupByText(text, filterKey);
+  }
+
   /**
    * Why resolve current key and not resolve key with a parameter? Because it is not guaranteed that the key is
    * serializable / comparable. So we cannot simply send the key from the UI to the server. Additionally we do not have
@@ -87,22 +93,8 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
    *
    * @param event
    */
-  protected void handleUiResolveCurrentKey() {
-    // FIXME [awe] 7.1 - wäre es nicht besser die applyLazyStlye sache auch im UI/browser zu machen?
-    // --> wahrscheinlich müssen wir es an beiden orten machen (für den JS-only fall)
-
-    // FIXME impl.
-  }
-
-  // Async operation (in background) Sets
-  protected void handleUiLookupByText(JsonEvent event) {
-    resetKeyMap();
-    String query = event.getData().optString("text");
-    query = "*";
-    String filterKey = event.getData().optString("filterKey");
-    if (StringUtility.hasText(query)) {
-      getModel().lookupByText(query, filterKey);
-    }
+  protected void handleUiLookupAll() {
+    getModel().lookupAll();
   }
 
   protected void resetKeyMap() {

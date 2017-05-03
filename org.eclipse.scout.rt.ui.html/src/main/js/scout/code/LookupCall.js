@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+// FIXME [awe] 7.0 - SF2: mit C.GU diskutieren: Abgrenzung LookupCall / LookupService in JS?
+
 /**
  * Base class for lookup calls.
  */
@@ -62,7 +65,12 @@ scout.LookupCall.prototype._textById = function(id) {
 /**
  * @returns {Promise} which returns {scout.LookupCall}s
  */
-scout.LookupCall.prototype.getAll = function() {
+scout.LookupCall.prototype.getAll = function() { // FIXME [awe] 7.0 - SF2: stimmt der kommentar? returns doch eher LookupROWs? nicht?
   // To be implemented by the subclass
   return $.resolvedPromise([]);
+};
+
+scout.LookupCall.prototype.getByText = function(text) {
+  // To be implemented by the subclass
+  return $.resolvedPromise(scout.create('LookupRow'));
 };

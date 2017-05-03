@@ -39,6 +39,8 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_MULTILINE_TEXT = "multilineText";
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
 
+  void lookupAll();
+
   void lookupByText(String text, Object filterKey);
 
   SmartField2Result getResult();

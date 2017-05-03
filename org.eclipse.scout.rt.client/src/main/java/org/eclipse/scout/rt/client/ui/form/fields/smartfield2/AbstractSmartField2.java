@@ -1059,6 +1059,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   //search and update the field with the result
 
   @Override
+  public void lookupAll() {
+    doSearch(null, false, false);
+  }
+
+  @Override
   public void lookupByText(String text, Object filterKey) {
     doSearch(text, false, false);
   }
