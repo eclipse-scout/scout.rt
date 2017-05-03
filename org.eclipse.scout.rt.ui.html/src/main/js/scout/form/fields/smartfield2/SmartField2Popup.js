@@ -13,11 +13,23 @@ scout.SmartField2Popup.prototype._createProposalChooser = function(model) {
   return new scout.TableProposalChooser2(this, this._onLookupRowSelected.bind(this));
 };
 
+scout.SmartField2Popup.prototype._smartField = function() {
+  return this.parent;
+};
+
+scout.SmartField2Popup.prototype._smartFieldBounds = function() {
+  return scout.graphics.offsetBounds(this.parent.$field);
+};
+
 /**
  * @override
  */
 scout.SmartField2Popup.prototype._createLayout = function() {
-  return new scout.SmartField2PopupLayout(this, this.proposalChooser);
+  if (this._smartField().variant === scout.SmartField2.Variant.DROPDOWN) {
+    return new scout.DropdownPopupLayout(this, this.proposalChooser);
+  } else {
+    return new scout.SmartField2PopupLayout(this, this.proposalChooser);
+  }
 };
 
 scout.SmartField2Popup.prototype._render = function($parent) {
@@ -33,7 +45,6 @@ scout.SmartField2Popup.prototype.setLookupRows = function(lookupRows) {
 scout.SmartField2Popup.prototype.getSelectedLookupRow = function() {
   return this.proposalChooser.getSelectedLookupRow();
 };
-
 
 /**
  * Delegates the key event to the proposal chooser.

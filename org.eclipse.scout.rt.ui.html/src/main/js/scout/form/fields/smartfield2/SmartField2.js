@@ -6,7 +6,8 @@ scout.SmartField2 = function() {
   this.codeType = null;
   this._pendingLookup = null;
 
-  this.variant = scout.SmartField2.Variant.DROPDOWN;
+  //this.variant = scout.SmartField2.Variant.DROPDOWN;
+  this.variant = scout.SmartField2.Variant.DEFAULT;
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 

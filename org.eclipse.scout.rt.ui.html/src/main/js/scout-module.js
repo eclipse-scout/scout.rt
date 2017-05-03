@@ -445,6 +445,7 @@
   __include("scout/form/fields/smartfield/SmartFieldMultiline.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineAdapter.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineLayout.js");
+  __include("scout/form/fields/smartfield2/DropdownPopupLayout.js");
   __include("scout/form/fields/smartfield2/SmartField2.js");
   __include("scout/form/fields/smartfield2/SmartField2Adapter.js");
   __include("scout/form/fields/smartfield2/SmartField2CancelKeyStroke.js");
