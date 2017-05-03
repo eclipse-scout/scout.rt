@@ -58,7 +58,7 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
 
   var lookupRow = this.popup.getSelectedLookupRow();
   if (lookupRow) {
-    this.setValue(lookupRow.id);
+    this.setValue(lookupRow.key);
   }
   this.closePopup();
 };
@@ -200,6 +200,18 @@ scout.SmartField2.prototype._isNavigationKey = function(e) {
 };
 
 scout.SmartField2.prototype._onItemSelect = function(event) {
-  this.setValue(event.lookupRow.id);
+  this.setValue(event.lookupRow.key);
   this.closePopup();
+};
+
+/**
+ * When you already have a complete lookup-row you can use this method
+ * instead of #setValue(value). This avoids that the smart-field must perform
+ * a lookup to resolve the display text for the value, because the text is
+ * already available on the lookup-row.
+ */
+scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
+  this.value = lookupRow.key;
+  this.setDisplayText(lookupRow.text);
+  // FIXME [awe] 7.0 - SF2: set other properties, see applyLazyStyles in Java
 };

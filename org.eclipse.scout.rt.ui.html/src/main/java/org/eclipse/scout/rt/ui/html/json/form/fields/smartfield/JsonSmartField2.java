@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -51,21 +53,55 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if ("lookup".equals(event.getType())) {
-      handleUiLookup(event);
+    if ("lookupByText".equals(event.getType())) {
+      handleUiLookupByText(event);
+    }
+    else if ("resolveCurrentKey".equals(event.getType())) {
+      handleUiResolveCurrentKey();
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiLookup(JsonEvent event) {
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IValueField.PROP_VALUE.equals(propertyName)) {
+      String mappedKey = data.optString("value");
+      VALUE key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
+      addPropertyEventFilterCondition("value", key);
+//      String displayText = ((AbstractValueField) getModel()).formatValue
+//      addPropertyEventFilterCondition("displayText", getModel().parseAndSetValue(text));
+      getModel().setValue(key); // FIXME [awe] 7.0 - SF2: use UI facade here?
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
+  }
+
+  // Sync operation
+  /**
+   * Why resolve current key and not resolve key with a parameter? Because it is not guaranteed that the key is
+   * serializable / comparable. So we cannot simply send the key from the UI to the server. Additionally we do not have
+   * a list of lookup rows as we have in lookupByText
+   *
+   * @param event
+   */
+  protected void handleUiResolveCurrentKey() {
+    // FIXME [awe] 7.1 - wäre es nicht besser die applyLazyStlye sache auch im UI/browser zu machen?
+    // --> wahrscheinlich müssen wir es an beiden orten machen (für den JS-only fall)
+
+    // FIXME impl.
+  }
+
+  // Async operation (in background) Sets
+  protected void handleUiLookupByText(JsonEvent event) {
     resetKeyMap();
-    String query = event.getData().optString("query");
+    String query = event.getData().optString("text");
     query = "*";
     String filterKey = event.getData().optString("filterKey");
     if (StringUtility.hasText(query)) {
-      getModel().query(query, filterKey);
+      getModel().lookupByText(query, filterKey);
     }
   }
 
@@ -75,10 +111,11 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     m_id = 0;
   }
 
-  protected void mapKey(Object key) {
+  protected int mapKey(Object key) {
     int id = m_id++;
     m_keyToIdMap.put(key, id); // TODO [awe] 7.0 - SF2: anstatt der map könnten wir auch einfach den index der lookupRow verwenden (und müssten dann eine list nehmen)
     m_idToKeyMap.put(id, key);
+    return id;
   }
 
   @SuppressWarnings("unchecked")
@@ -96,9 +133,9 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   }
 
   protected JSONObject lookupRowToJson(LookupRow<?> lookupRow) {
-    mapKey(lookupRow.getKey());
+    int mappedKey = mapKey(lookupRow.getKey());
     JSONObject json = new JSONObject();
-    json.put("key", lookupRow.getKey());
+    json.put("key", mappedKey);
     json.put("text", lookupRow.getText());
     return json;
   }

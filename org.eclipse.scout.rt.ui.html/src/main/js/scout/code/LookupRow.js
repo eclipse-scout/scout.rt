@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.LookupRow = function() {
-  this.id = null;
+  this.key = null;
   this.text = null;
 };
 
@@ -17,8 +17,8 @@ scout.LookupRow.prototype.init = function(model) {
   $.extend(this, model);
 };
 
-scout.LookupRow.prototype.setId = function(id) {
-  this.id = id;
+scout.LookupRow.prototype.setKey = function(key) {
+  this.key = key;
 };
 
 scout.LookupRow.prototype.setText = function(text) {

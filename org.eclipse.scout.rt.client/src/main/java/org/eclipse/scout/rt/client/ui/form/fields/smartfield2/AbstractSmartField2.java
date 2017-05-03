@@ -56,8 +56,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ILookupRowProvider;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooserProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.LookupRowHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -741,16 +739,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     }
   }
 
-  @Override
-  public IProposalChooserProvider<VALUE> getProposalChooserProvider() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setProposalChooserProvider(IProposalChooserProvider<VALUE> provider) {
-    throw new UnsupportedOperationException();
-  }
-
   public IContentAssistFieldLookupRowFetcher<VALUE> getLookupRowFetcher() {
     return m_lookupRowFetcher;
   }
@@ -855,11 +843,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public FontSpec getFont() {
     applyLazyStyles();
     return super.getFont();
-  }
-
-  @Override
-  public IProposalChooser<?, VALUE> getProposalChooser() {
-    throw new UnsupportedOperationException();
   }
 
   protected String toSearchText(String text) {
@@ -1076,8 +1059,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   //search and update the field with the result
 
   @Override
-  public void query(String queryText, Object filterKey) {
-    doSearch(queryText, false, false);
+  public void lookupByText(String text, Object filterKey) {
+    doSearch(text, false, false);
   }
 
   @Override
@@ -1227,10 +1210,10 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   protected IContentAssistFieldLookupRowFetcher<VALUE> createLookupRowFetcher() {
     if (isBrowseHierarchy()) {
-      return new HierarchicalContentAssistDataFetcher<>(this);
+      return new HierarchicalContentAssistDataFetcher<VALUE>(new SmartField2ContentAssistAdapter<VALUE>(this));
     }
     else {
-      return new ContentAssistFieldDataFetcher<>(this);
+      return new ContentAssistFieldDataFetcher<VALUE>(new SmartField2ContentAssistAdapter<VALUE>(this));
     }
   }
 
