@@ -115,6 +115,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     cell.setTooltipText(lookupRow.getTooltipText());
     cell.setBackgroundColor(lookupRow.getBackgroundColor());
     cell.setForegroundColor(lookupRow.getForegroundColor());
+    cell.setCssClass(lookupRow.getCssClass());
     cell.setFont(lookupRow.getFont());
     if (lookupRow.getIconId() != null) {
       cell.setIconId(lookupRow.getIconId());
