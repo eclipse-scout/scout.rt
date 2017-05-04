@@ -10,22 +10,40 @@
  ******************************************************************************/
 scout.TabBoxSpecHelper = function(session) {
   this.session = session;
-  this.formHelper = new scout.FormSpecHelper(session);
 };
 
-scout.TabBoxSpecHelper.prototype.createTabBox = function(tabItems) {
+scout.TabBoxSpecHelper.prototype.createTabBoxWith2Tabs = function(model) {
+  model = $.extend({
+    tabItems: [{
+      objectType: "TabItem",
+      label: "first"
+    }, {
+      objectType: "TabItem",
+      label: "second"
+    }]
+  }, model);
+  return this.createTabBox(model);
+};
+
+scout.TabBoxSpecHelper.prototype.createTabBoxWith = function(tabItems) {
   tabItems = scout.nvl(tabItems, []);
-  // Form is necessary to make keystrokes work
-  var form = this.formHelper.createFormWithOneField(this.session.desktop);
-  var tabBox = this.formHelper.createField('TabBox', form, {
-    selectedTab: tabItems[0],
-    tabItems: tabItems
+  return this.createTabBox({
+    tabItems: tabItems,
+    selectedTab: tabItems[0]
   });
-  form.render(this.session.$entryPoint);
-  return tabBox;
 };
 
-scout.TabBoxSpecHelper.prototype.createTabItem = function(modelProperties) {
-  var model = $.extend({label: 'Foo'}, modelProperties);
-  return this.formHelper.createField('TabItem', this.session.desktop, model);
+scout.TabBoxSpecHelper.prototype.createTabBox = function(model) {
+  model = $.extend({
+    parent: this.session.desktop,
+  }, model);
+
+  return scout.create('TabBox', model);
+};
+
+scout.TabBoxSpecHelper.prototype.createTabItem = function(model) {
+  model = $.extend({
+    parent: this.session.desktop
+  }, model);
+  return scout.create('TabItem', model);
 };

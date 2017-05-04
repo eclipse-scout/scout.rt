@@ -23,7 +23,7 @@ describe('TabBox', function() {
 
     beforeEach(function() {
       var tabItem = helper.createTabItem();
-      tabBox = helper.createTabBox([tabItem]);
+      tabBox = helper.createTabBoxWith([tabItem]);
     });
 
     it('does NOT call layout for the selected tab on initialization', function() {
@@ -44,7 +44,7 @@ describe('TabBox', function() {
     it('should select tabs by ID', function() {
       var tabItemA = helper.createTabItem({id: 'Foo'});
       var tabItemB = helper.createTabItem({id: 'Bar'});
-      var tabBox = helper.createTabBox([tabItemA, tabItemB]);
+      var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
       tabBox.selectTabById('Foo');
       expect(tabBox.selectedTab).toBe(tabItemA);
       tabBox.selectTabById('Bar');
@@ -58,7 +58,7 @@ describe('TabBox', function() {
     it('supports left/right keys to select a tab-item', function() {
       var tabItemA = helper.createTabItem();
       var tabItemB = helper.createTabItem();
-      var tabBox = helper.createTabBox([tabItemA, tabItemB]);
+      var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
       tabBox.render(session.$entryPoint);
 
       // check right/left keys

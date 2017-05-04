@@ -23,7 +23,7 @@ describe('TabItem', function() {
 
     beforeEach(function() {
       var tabItem = helper.createTabItem({label: 'Foo'});
-      tabBox = helper.createTabBox([tabItem]);
+      tabBox = helper.createTabBoxWith([tabItem]);
     });
 
     it('invalidates tabarea if status visibility changes', function() {
@@ -45,7 +45,7 @@ describe('TabItem', function() {
 
     beforeEach(function() {
       tabItem = helper.createTabItem({cssClass: 'foo1'});
-      var tabBox = helper.createTabBox([tabItem]);
+      var tabBox = helper.createTabBoxWith([tabItem]);
       tabBox.render(session.$entryPoint);
     });
 

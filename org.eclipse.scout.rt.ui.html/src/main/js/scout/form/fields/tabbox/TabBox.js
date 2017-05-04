@@ -140,7 +140,7 @@ scout.TabBox.prototype.setSelectedTab = function(selectedTab) {
   this.setProperty('selectedTab', selectedTab);
 };
 
-scout.TabBox.prototype._setSelectedTab = function(tab, notifyServer) {
+scout.TabBox.prototype._setSelectedTab = function(tab) {
   if (this.selectedTab === tab) {
     return;
   }

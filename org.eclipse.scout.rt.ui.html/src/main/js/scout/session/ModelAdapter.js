@@ -278,6 +278,10 @@ scout.ModelAdapter.prototype.addFilterForProperties = function(properties) {
 };
 
 scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
+  if (value instanceof scout.Widget) {
+    // In case of a remote widget property use the id, otherwise it would always return false
+    value = value.id;
+  }
   return this._propertyChangeEventFilter.filter(propertyName, value);
 };
 
