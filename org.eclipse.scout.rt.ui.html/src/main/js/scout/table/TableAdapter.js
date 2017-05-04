@@ -416,6 +416,9 @@ scout.TableAdapter.prototype._onColumnOrderChanged = function(columnIds) {
 };
 
 scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
+  columns.forEach(function(column) {
+    scout.defaultValues.applyTo(column);
+  });
   this.widget.updateColumnHeaders(columns);
 };
 
@@ -619,6 +622,16 @@ scout.TableAdapter.modifyColumnPrototype = function() {
   if (!scout.app.remote) {
     return;
   }
+
+  // init
+  scout.objects.replacePrototypeFunction(scout.Column, 'init', function(model) {
+    if (model.table && model.table.modelAdapter) {
+      // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
+      model = $.extend({}, model);
+      scout.defaultValues.applyTo(model);
+    }
+    this.initOrig(model);
+  }, true);
 
   // _ensureCell
   scout.objects.replacePrototypeFunction(scout.Column, '_ensureCell', function(vararg) {

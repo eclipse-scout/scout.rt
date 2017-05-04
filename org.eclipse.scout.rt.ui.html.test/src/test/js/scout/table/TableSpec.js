@@ -2583,12 +2583,12 @@ describe("Table", function() {
       table = helper.createTable(model);
       var text0 = table.columns[0].text;
 
-      column1 = helper.createModelColumn('newText1');
-      column1.id = model.columns[1].id;
+      column1 = $.extend({}, table.columns[1]);
+      column1.text = 'newText1';
       column1.sortActive = true;
       column1.sortAscending = true;
-      column2 = helper.createModelColumn('newText2');
-      column2.id = model.columns[2].id;
+      column2 = $.extend({}, table.columns[2]);
+      column2.text = 'newText2';
 
       table.updateColumnHeaders([ column1, column2 ]);
       expect(table.columns.length).toBe(3);
@@ -2617,10 +2617,9 @@ describe("Table", function() {
       expect(table.columns[2].sortAscending).toBe(true);
       expect(table.columns[2].sortIndex).toBe(0);
 
-      table.updateColumnHeaders([ {
-        id : model.columns[2].id,
+      table.updateColumnHeaders([ $.extend({}, table.columns[2], {
         sortActive : false
-      } ]);
+      })]);
       expect(table.columns[1].sortAscending).toBe(true);
       expect(table.columns[1].sortActive).toBe(true);
       expect(table.columns[1].sortIndex).toBe(0);
@@ -2639,12 +2638,12 @@ describe("Table", function() {
       expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
       expect($colHeaders.eq(2).text()).toBe(column2.text);
 
-      column1 = helper.createModelColumn('newText1');
-      column1.id = model.columns[1].id;
+      column1 = $.extend({}, table.columns[1]);
+      column1.text = 'newText1';
       column1.sortActive = true;
       column1.sortAscending = true;
-      column2 = helper.createModelColumn('newText2');
-      column2.id = model.columns[2].id;
+      column2 = $.extend({}, table.columns[2]);
+      column2.text = 'newText2';
 
       table.updateColumnHeaders([ column1, column2 ]);
       $colHeaders = table.header.findHeaderItems();
@@ -2661,16 +2660,15 @@ describe("Table", function() {
       var $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
 
-      column1 = helper.createModelColumn();
-      column1.id = model.columns[1].id;
+      column1 = $.extend({}, table.columns[1]);
       column1.headerCssClass = 'custom-header';
       table.updateColumnHeaders([ column1 ]);
       $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
       expect($colHeaders.eq(1)).toHaveClass('custom-header');
 
-      column1 = helper.createModelColumn();
-      column1.id = model.columns[1].id;
+      column1 = $.extend({}, table.columns[1]);
+      delete column1.headerCssClass;
       table.updateColumnHeaders([ column1 ]);
       $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0)).not.toHaveClass('custom-header');

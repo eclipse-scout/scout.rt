@@ -42,9 +42,6 @@ scout.Column.prototype.init = function(model) {
   // Copy all properties from model to this
   $.extend(this, model);
 
-  // Fill in the missing default values
-  scout.defaultValues.applyTo(this);
-
   // Initial width is only sent if it differs from width
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.nvl(this.width, 0);

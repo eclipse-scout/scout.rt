@@ -145,8 +145,8 @@ scout.Table.prototype._initColumns = function() {
   var column, i;
   for (i = 0; i < this.columns.length; i++) {
     this.columns[i].session = this.session;
+    this.columns[i].table = this;
     column = scout.create(this.columns[i]);
-    column.table = this;
     this.columns[i] = column;
 
     if (column.checkable) {
@@ -3665,11 +3665,10 @@ scout.Table.prototype.updateColumnOrder = function(columns) {
  * @param columns array of columns which were updated.
  */
 scout.Table.prototype.updateColumnHeaders = function(columns) {
-  var column, oldColumnState;
+  var column, oldColumnState, properties;
 
   // Update model columns
   for (var i = 0; i < columns.length; i++) {
-    scout.defaultValues.applyTo(columns[i], 'Column');
     column = this._columnById(columns[i].id);
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
