@@ -8,12 +8,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -129,7 +131,36 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     JSONObject json = new JSONObject();
     json.put("key", mappedKey);
     json.put("text", lookupRow.getText());
+    if (StringUtility.hasText(lookupRow.getIconId())) {
+      json.put("iconId", BinaryResourceUrlUtility.createIconUrl(lookupRow.getIconId()));
+    }
+    if (StringUtility.hasText(lookupRow.getTooltipText())) {
+      json.put("tooltipText", lookupRow.getTooltipText());
+    }
+    if (StringUtility.hasText(lookupRow.getBackgroundColor())) {
+      json.put("backgroundColor", lookupRow.getBackgroundColor());
+    }
+    if (StringUtility.hasText(lookupRow.getForegroundColor())) {
+      json.put("foregroundColor", lookupRow.getForegroundColor());
+    }
+    if (lookupRow.getFont() != null) {
+      json.put("font", lookupRow.getFont().toPattern());
+    }
+    if (!lookupRow.isEnabled()) {
+      json.put("enabled", lookupRow.isEnabled());
+    }
+    if (lookupRow.getParentKey() != null) {
+      json.put("parentKey", lookupRow.getParentKey()); // FIXME [awe] 7.0 - SF2: how to map the parentKey?
+    }
+    if (!lookupRow.isActive()) {
+      json.put("active", lookupRow.isActive());
+    }
+    if (lookupRow.getAdditionalTableRowData() != null && lookupRow.getAdditionalTableRowData().getCustomValues() != null) { // FIXME [awe] 7.0 - SF2: create isEmpty() method on AdditionalTableRowData
+      json.put("additionalTableRowData", lookupRow.getAdditionalTableRowData()); // FIXME [awe] 7.0 - SF2: impl. toJson for AdditionalTableRowData?
+    }
+    if (StringUtility.hasText(lookupRow.getCssClass())) {
+      json.put("cssClass", lookupRow.getCssClass());
+    }
     return json;
   }
-
 }

@@ -29,6 +29,7 @@ scout.Cell = function() {
   this._cachedEncodedText;
   this.text;
   this.value;
+  // FIXME [awe] 7.0 - list tooltipText here?
 };
 
 scout.Cell.prototype.init = function(model) {
