@@ -77,8 +77,14 @@
         throw new Error('Error while loading default values: ' + errorThrown);
       });
     }
+
+    // App initialization uses promises which are executed asynchronously
+    // -> Use the clock to make sure all promise callbacks are executed before any test starts.
+    jasmine.clock().install();
     var app = new scout.RemoteApp();
     app.init();
+    jasmine.clock().tick(1000);
+    jasmine.clock().uninstall();
 
     // breaks scrollbarsSpec in phantomjs
     scout.device.isTableAdditionalDivRequired = function() {
