@@ -254,8 +254,8 @@ describe('TableHeaderMenu', function() {
         table.render(session.$entryPoint);
         table.header.openTableHeaderMenu(column);
         var $filterItems = find$FilterItems(table);
-        expectTableRowText($filterItems, 0, 'unmarked');
-        expectTableRowText($filterItems, 1, 'marked');
+        expectTableRowText($filterItems, 0, 'marked');
+        expectTableRowText($filterItems, 1, 'unmarked');
         table.header.closeTableHeaderMenu();
       });
 

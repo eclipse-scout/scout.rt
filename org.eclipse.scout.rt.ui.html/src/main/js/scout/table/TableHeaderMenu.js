@@ -574,13 +574,13 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
 
   this.$filterSortOrder = $filterActions
     .appendDiv('table-header-menu-toggle-sort-order')
-    .on('click', this._onClickSortMode.bind(this))
+    .on('click', this._onSortModeClick.bind(this))
     .addClass(this.filterSortMode.cssClass);
 
   this.$filterToggleChecked = $filterActions
     .appendDiv('table-header-menu-filter-toggle-checked')
     .text(this.session.text(this.filterCheckedMode.text))
-    .on('click', this._onClickFilterCheckedMode.bind(this));
+    .on('click', this._onFilterCheckedModeClick.bind(this));
 
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
@@ -596,21 +596,27 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     checkableStyle: scout.Table.CheckableStyle.TABLE_ROW,
     // column-texts are not visible since header is not visible
     columns: [
-      scout.create('Column', {
+      {
+        objectType: 'Column',
         index: 0,
         text: 'filter-value',
         width: 160,
-        session: this.session,
-        sortIndex: 0,
-        uiSortPossible: true
-      }),
-      scout.create('NumberColumn', {
+        sortActive: true,
+        sortIndex: 1
+      },
+      {
+        objectType: 'NumberColumn',
         index: 1,
         text: 'aggregate-count',
-        width: 40,
-        session: this.session,
-        uiSortPossible: true
-      })
+        width: 40
+      },
+      {
+        objectType: 'NumberColumn',
+        index: 2,
+        displayable: false,
+        sortActive: true,
+        sortIndex: 0
+      }
     ]
   });
   this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
@@ -619,10 +625,11 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     tableRow = {
       cells: [
         scout.create('Cell', {
-          text: filterValue.text,
+          value: filterValue.text,
           iconId: filterValue.iconId
         }),
-        filterValue.count
+        filterValue.count,
+        filterValue.key === null ? 1: 0 // empty cell should always be at the bottom
       ],
       checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,
       dataMap: {
@@ -657,7 +664,7 @@ scout.TableHeaderMenu.prototype._filterByText = function() {
   return text;
 };
 
-scout.TableHeaderMenu.prototype._onClickFilterCheckedMode = function() {
+scout.TableHeaderMenu.prototype._onFilterCheckedModeClick = function() {
   var checkedMode = scout.TableHeaderMenu.CheckedMode;
   var checkAll = this.filterCheckedMode.checkAll;
   this.filter.selectedValues = [];
@@ -673,15 +680,16 @@ scout.TableHeaderMenu.prototype._onClickFilterCheckedMode = function() {
   this._updateFilterTableActions();
 };
 
-scout.TableHeaderMenu.prototype._onClickSortMode = function() {
+scout.TableHeaderMenu.prototype._onSortModeClick = function() {
   var sortMode = scout.TableHeaderMenu.SortMode;
   if (this.filterSortMode === sortMode.ALPHABETICALLY) {
     // sort by amount
-    this.filterTable.sort(this.filterTable.visibleColumns()[1], 'desc');
+    this.filterTable.sort(this.filterTable.columns[1], 'desc');
     this.filterSortMode = sortMode.AMOUNT;
   } else {
-    // sort alphabetically
-    this.filterTable.sort(this.filterTable.visibleColumns()[0], 'asc');
+    // sort alphabetically (first by invisible column to make sure empty cells are always at the bottom)
+    this.filterTable.sort(this.filterTable.columns[2], 'asc');
+    this.filterTable.sort(this.filterTable.columns[0], 'asc', true);
     this.filterSortMode = sortMode.ALPHABETICALLY;
   }
   this._updateFilterTableActions();
