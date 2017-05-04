@@ -45,12 +45,22 @@ scout.SmartField2Popup.prototype._render = function($parent) {
   this.proposalChooser.render(this.$container);
 };
 
-scout.SmartField2Popup.prototype.setLookupRows = function(lookupRows) {
-  this.proposalChooser.setLookupRows(lookupRows);
+scout.SmartField2Popup.prototype.setLookupResult = function(result) {
+  this.proposalChooser.setLookupResult(result);
 };
 
 scout.SmartField2Popup.prototype.getSelectedLookupRow = function() {
   return this.proposalChooser.getSelectedLookupRow();
+};
+
+scout.SmartField2Popup.prototype.setStatus = function(status) {
+  this.proposalChooser.setStatus(status);
+};
+
+scout.SmartField2Popup.prototype.setStatusLookupInProgress = function(status) {
+  this.proposalChooser.setStatus(scout.Status.ok({
+    message: 'searchingProposals'
+  }));
 };
 
 /**

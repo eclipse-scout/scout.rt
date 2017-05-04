@@ -46,6 +46,12 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
         return resultToJson((SmartField2Result<VALUE>) value);
       }
     });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_MAX_ROW_COUNT, model) {
+      @Override
+      protected TriState modelValue() {
+        return getModel().getActiveFilter();
+      }
+    });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_ACTIVE_FILTER_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
@@ -151,6 +157,9 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
       lookupRows.put(lookupRowToJson(lookupRow));
     }
     json.put("lookupRows", lookupRows);
+    if (result.isLookupFailed()) {
+      json.put("lookupFailed", result.isLookupFailed());
+    }
     return json;
   }
 

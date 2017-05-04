@@ -10,6 +10,8 @@ scout.SmartField2 = function() {
   this.activeFilter = null;
   this.activeFilterLabels = [];
 
+  this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
+
 
   //this.variant = scout.SmartField2.Variant.DROPDOWN;
   this.variant = scout.SmartField2.Variant.DEFAULT;
@@ -25,6 +27,8 @@ scout.SmartField2.Variant = {
 };
 
 scout.SmartField2.DEBOUNCE_DELAY = 200;
+
+scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT = 100;
 
 /**
  * @override
@@ -149,13 +153,15 @@ scout.SmartField2.prototype.openPopup = function() {
     return;
   }
 
+  this.showLookupInProgress();
   this.lookupCall.getAll().done(function(result) {
+    this.hideLookupInProgress();
     this.$container.addClass('popup-open');
     // On touch devices the field does not get the focus.
     // But it should look focused when the popup is open.
     this.$field.addClass('focused');
     this.popup = this._createPopup();
-    this.popup.setLookupRows(result.lookupRows);
+    this.popup.setLookupResult(result);
     this.popup.open();
     this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
     this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this));
@@ -191,6 +197,22 @@ scout.SmartField2.prototype._createPopup = function() {
     closeOnAnchorMousedown: false,
     field: this
   });
+};
+
+scout.SmartField2.prototype.showLookupInProgress = function() {
+  if (this.popup) {
+    this.$field.removeClass('lookup-in-progress');
+    this.popup.setStatusLookupInProgress();
+  } else {
+    this.$field.addClass('lookup-in-progress');
+  }
+};
+
+scout.SmartField2.prototype.hideLookupInProgress = function() {
+  this.$field.removeClass('lookup-in-progress');
+  if (this.popup) {
+    // this.popup.hideLookupInProgress();
+  }
 };
 
 /**
@@ -327,10 +349,24 @@ scout.SmartField2.prototype._startNewLookupByText = function() {
 
   this._pendingLookup = setTimeout(function() {
     $.log.debug('(SmartField2#_startNewLookupByText) searchText=' + searchText);
+    this.showLookupInProgress();
+    // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
     this.lookupCall.getByText(searchText).done(function(result) {
+      this.hideLookupInProgress();
       if (this.popup) {
-        this.popup.setLookupRows(result.lookupRows);
+        this.popup.setLookupResult(result);
       }
     }.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
+};
+
+/**
+ * Returns true if the smart-field lookup returns a lot of rows. In that case
+ * the proposal chooser must create a table with virtual scrolling, which means
+ * only the rows visible in the UI are rendered in the DOM. By default we render
+ * all rows, since this avoids problems with layout-invalidation with rows
+ * that have a bitmap-image (PNG) which is loaded asynchronously.
+ */
+scout.SmartField2.prototype.virtual = function() {
+  return this.browseMaxRowCount > scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
 };

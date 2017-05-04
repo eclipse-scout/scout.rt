@@ -83,6 +83,7 @@ scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow) {
 };
 
 scout.TableProposalChooser2.prototype._renderModel = function() {
+  this.model.setVirtual(this._smartField().virtual());
   this.model.render(this.$container);
 
   // Make sure table never gets the focus, but looks focused

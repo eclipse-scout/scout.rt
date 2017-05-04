@@ -74,3 +74,4 @@ scout.LookupCall.prototype.getByText = function(text) {
   // To be implemented by the subclass
   return $.resolvedPromise(scout.create('LookupRow'));
 };
+

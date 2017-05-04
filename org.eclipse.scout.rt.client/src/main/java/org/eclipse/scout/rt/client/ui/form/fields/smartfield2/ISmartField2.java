@@ -29,6 +29,9 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_ACTIVE_FILTER = "activeFilter";
   String PROP_ACTIVE_FILTER_LABELS = "activeFilterLabels";
 
+  String PROP_STATUS = "status";
+  String PROP_STATUS_VISIBLE = "statusVisible";
+
   /**
    * Hint to mark the {@link IFuture} used to load the field's initial lookup rows. Typically, this future must not be
    * cancelled.

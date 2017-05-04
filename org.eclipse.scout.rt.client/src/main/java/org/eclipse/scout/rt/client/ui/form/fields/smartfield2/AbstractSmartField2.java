@@ -121,7 +121,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   // cached lookup row
   private IContentAssistFieldLookupRowFetcher<VALUE> m_lookupRowFetcher;
-  private int m_maxRowCount;
   private String m_browseNewText;
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
@@ -406,7 +405,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void setTooltipText(String text) {
     super.setTooltipText(text);
     if (!m_installingRowContext) {
-      //Ticket 85'572: background color gets reseted after selecting a value
+      // Ticket 85'572: background color gets reseted after selecting a value
       m_decorationRow.withTooltipText(getTooltipText());
     }
   }
@@ -415,7 +414,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void setBackgroundColor(String c) {
     super.setBackgroundColor(c);
     if (!m_installingRowContext) {
-      //Ticket 85'572: background color gets reseted after selecting a value
+      // Ticket 85'572: background color gets reseted after selecting a value
       m_decorationRow.withBackgroundColor(getBackgroundColor());
     }
   }
@@ -424,7 +423,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void setForegroundColor(String c) {
     super.setForegroundColor(c);
     if (!m_installingRowContext) {
-      //Ticket 85'572: background color gets reseted after selecting a value
+      // Ticket 85'572: background color gets reseted after selecting a value
       m_decorationRow.withForegroundColor(getForegroundColor());
     }
   }
@@ -433,7 +432,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void setFont(FontSpec f) {
     super.setFont(f);
     if (!m_installingRowContext) {
-      //Ticket 85'572: background color gets reseted after selecting a value
+      // Ticket 85'572: background color gets reseted after selecting a value
       m_decorationRow.withFont(getFont());
     }
   }
@@ -548,7 +547,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public int getProposalFormHeight() { // FIXME awe remove
+  public int getProposalFormHeight() { // FIXME [awe] 7.0 - SF2: remove getProposalFormHeight
     return m_proposalFormHeight;
   }
 
@@ -646,12 +645,12 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public int getBrowseMaxRowCount() {
-    return m_maxRowCount;
+    return propertySupport.getPropertyInt(PROP_BROWSE_MAX_ROW_COUNT);
   }
 
   @Override
-  public void setBrowseMaxRowCount(int n) {
-    m_maxRowCount = n;
+  public void setBrowseMaxRowCount(int browseMaxRowCount) {
+    propertySupport.setPropertyInt(PROP_BROWSE_MAX_ROW_COUNT, browseMaxRowCount);
   }
 
   @Override
@@ -1011,7 +1010,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   protected VALUE returnLookupRowAsValue(ILookupRow<VALUE> lookupRow) {
-    // return interceptConvertKeyToValue(lookupRow.getKey());
     return lookupRow.getKey();
   }
 
@@ -1297,25 +1295,12 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     public void execPrepareKeyLookup(SmartField2PrepareKeyLookupChain<VALUE> chain, ILookupCall<VALUE> call, VALUE key) {
       getOwner().execPrepareKeyLookup(call, key);
     }
-
-//    @Override
-//    public VALUE execConvertValueToKey(MixedSmartFieldConvertValueToKeyChain<VALUE, VALUE> chain, VALUE value) {
-//      return getOwner().execConvertValueToKey(value);
-//    }
-//
-//    @Override
-//    public VALUE execConvertKeyToValue(MixedSmartFieldConvertKeyToValueChain<VALUE, VALUE> chain, VALUE key) {
-//      return getOwner().execConvertKeyToValue(key);
-//    }
-
   }
 
   @Override
   protected ISmartField2Extension<VALUE, ? extends AbstractSmartField2<VALUE>> createLocalExtension() {
     return new LocalSmartField2Extension<VALUE, AbstractSmartField2<VALUE>>(this);
   }
-
-  // FIXME AWE continue... make independent extensions - fix no more elements in chain exceptions
 
   protected final void interceptFilterBrowseLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
@@ -1383,18 +1368,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     chain.execPrepareKeyLookup(call, key);
   }
 
-//  protected final VALUE interceptConvertValueToKey(VALUE value) {
-//    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-//    MixedSmartFieldConvertValueToKeyChain<VALUE, VALUE> chain = new MixedSmartFieldConvertValueToKeyChain<VALUE, VALUE>(extensions);
-//    return chain.execConvertValueToKey(value);
-//  }
-//
-//  protected final VALUE interceptConvertKeyToValue(VALUE key) {
-//    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-//    MixedSmartFieldConvertKeyToValueChain<VALUE, VALUE> chain = new MixedSmartFieldConvertKeyToValueChain<VALUE, VALUE>(extensions);
-//    return chain.execConvertKeyToValue(key);
-//  }
-
   protected boolean isCurrentLookupRowSet() {
     return getCurrentLookupRow() != null;
   }
@@ -1424,21 +1397,17 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public VALUE getValueAsLookupKey() {
-    // return interceptConvertValueToKey(getValue());
     return getValue();
   }
 
   @Override
   public void acceptProposal(ILookupRow<VALUE> row) {
     setCurrentLookupRow(row);
-    // setValue(interceptConvertKeyToValue(row.getKey()));
     setValue(row.getKey());
   }
 
   @Override
   public void acceptProposal() {
-//    handleProposalChooserClosed();
-//    unregisterProposalChooserInternal();
     throw new UnsupportedOperationException();
   }
 

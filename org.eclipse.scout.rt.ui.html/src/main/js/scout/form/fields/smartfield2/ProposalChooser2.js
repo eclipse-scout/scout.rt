@@ -16,6 +16,8 @@ scout.ProposalChooser2 = function() { // FIXME [awe] 7.0 - SF2: merge with Smart
   this.$activeFilter = null;
   this.htmlComp = null;
   this._updateStatusTimeout = null;
+  this.status = null;
+  this.statusVisible = true;
 };
 scout.inherits(scout.ProposalChooser2, scout.Widget);
 
@@ -32,6 +34,10 @@ scout.ProposalChooser2.prototype._init = function(model) {
 
 scout.ProposalChooser2.prototype._createModel = function($parent) {
   throw new Error('_createModel() not implemented');
+};
+
+scout.ProposalChooser2.prototype.setLookupRows = function(lookupRows) {
+  throw new Error('setLookupRows() not implemented');
 };
 
 scout.ProposalChooser2.prototype._render = function($parent) {
@@ -120,6 +126,10 @@ scout.ProposalChooser2.prototype._updateStatus = function() {
 };
 
 scout.ProposalChooser2.prototype._updateStatusImpl = function() {
+  if (!this.rendered && !this.rendering) {
+    return;
+  }
+
   var
     oldVisible = this.$status.isVisible(),
     oldMessage = this.$status.text(),
@@ -179,9 +189,43 @@ scout.ProposalChooser2.prototype.setVirtual = function(virtual) {
   }
 };
 
+scout.ProposalChooser2.prototype.setStatus = function(status) {
+  this.setProperty('status', status);
+};
+
 scout.ProposalChooser2.prototype.setBusy = function(busy) {
   this.model.setProperty('loading', busy);
   this.model.setProperty('enabled', !busy);
+};
+
+scout.ProposalChooser2.prototype.setLookupResult = function(result) {
+  this.setLookupRows(result.lookupRows);
+  var status = this._computeStatus(result);
+  this.setStatus(status);
+};
+
+scout.ProposalChooser2.prototype._computeStatus = function(result) {
+  if (result.lookupFailed) {
+    return scout.Status.error({
+      message: '%%%Unbekannter Fehler%%%'
+    });
+  }
+
+  var rows = result.lookupRows;
+  if (rows.length === 0) {
+    // FIXME [awe] 7.0 - SF2: distinct between search for '*' and search for other
+    return scout.Status.warn({
+      message: '%%%Keine Vorschläge für "{0}" gefunden%%%'
+    });
+  }
+
+  if (rows.length > this._smartField().browseMaxRowCount) {
+    return scout.Status.info({
+      message: '%%%Mehr als {0} Datensätze%%%'
+    });
+  }
+
+  return null;
 };
 
 scout.ProposalChooser2.prototype._smartField = function() {
