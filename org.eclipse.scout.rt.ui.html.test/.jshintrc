@@ -1,10 +1,9 @@
 {
   "expr": true,
   "newcap": true,
-  "evil":true,
+  "evil": true,
   "undef": true,
   "browser": true,
-  "es3": true, // trailing comma,
   "curly": true,
   "globals": {
     "__include": false,
@@ -21,6 +20,7 @@
     "sandbox": false,
     "expect": false,
     "spyOn": false,
+    "fail": false,
     "sandboxSession": false,
     "sandboxDesktop": false,
     "mostRecentJsonRequest": false,
