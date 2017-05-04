@@ -47,3 +47,4 @@ scout.RemoteLookupCall.prototype._newDeferred = function() {
   }
   this.deferred = $.Deferred();
 };
+

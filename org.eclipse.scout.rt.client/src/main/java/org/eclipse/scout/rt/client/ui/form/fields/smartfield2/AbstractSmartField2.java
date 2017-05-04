@@ -126,8 +126,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
 
-  private TriState m_activeFilter;
-  private boolean m_activeFilterEnabled;
   private boolean m_browseAutoExpandAll;
   private boolean m_browseHierarchy;
   private boolean m_loadIncremental;
@@ -442,7 +440,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   protected void initConfig() {
-    m_activeFilter = TriState.TRUE;
+    setActiveFilter(TriState.TRUE);
     m_decorationRow = new LookupRow<VALUE>(null, "");
     super.initConfig();
     setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
@@ -490,17 +488,17 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public boolean isActiveFilterEnabled() {
-    return m_activeFilterEnabled;
+    return propertySupport.getPropertyBool(PROP_ACTIVE_FILTER_ENABLED);
   }
 
   @Override
   public void setActiveFilterEnabled(boolean b) {
-    m_activeFilterEnabled = b;
+    propertySupport.setPropertyBool(PROP_ACTIVE_FILTER_ENABLED, b);
   }
 
   @Override
   public TriState getActiveFilter() {
-    return m_activeFilter;
+    return (TriState) propertySupport.getProperty(PROP_ACTIVE_FILTER);
   }
 
   @Override
@@ -509,7 +507,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       if (t == null) {
         t = TriState.TRUE;
       }
-      m_activeFilter = t;
+      propertySupport.setProperty(PROP_ACTIVE_FILTER, t);
     }
   }
 
@@ -1064,7 +1062,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public void lookupByText(String text, Object filterKey) {
+  public void lookupByText(String text) {
     doSearch(text, false, false);
   }
 

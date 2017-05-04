@@ -25,6 +25,9 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   String PROP_RESULT = "result";
+  String PROP_ACTIVE_FILTER_ENABLED = "activeFilterEnabled";
+  String PROP_ACTIVE_FILTER = "activeFilter";
+  String PROP_ACTIVE_FILTER_LABELS = "activeFilterLabels";
 
   /**
    * Hint to mark the {@link IFuture} used to load the field's initial lookup rows. Typically, this future must not be
@@ -41,7 +44,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void lookupAll();
 
-  void lookupByText(String text, Object filterKey);
+  void lookupByText(String text);
 
   SmartField2Result getResult();
 

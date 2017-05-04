@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -45,6 +46,29 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
         return resultToJson((SmartField2Result<VALUE>) value);
       }
     });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_ACTIVE_FILTER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isActiveFilterEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_ACTIVE_FILTER, model) {
+      @Override
+      protected TriState modelValue() {
+        return getModel().getActiveFilter();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_ACTIVE_FILTER_LABELS, model) {
+      @Override
+      protected String[] modelValue() { // FIXME [awe] 7.0 - SF2: convert to JsonArray?
+        return getModel().getActiveFilterLabels();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return new JSONArray(value);
+      }
+    });
   }
 
   @Override
@@ -65,27 +89,31 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     }
   }
 
+  // FIXME [awe] 7.0 - SF2: use UI facade here?
+
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IValueField.PROP_VALUE.equals(propertyName)) {
       String mappedKey = data.optString("value");
       VALUE key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
-      addPropertyEventFilterCondition("value", key);
-//      String displayText = ((AbstractValueField) getModel()).formatValue
-//      addPropertyEventFilterCondition("displayText", getModel().parseAndSetValue(text));
-      getModel().setValue(key); // FIXME [awe] 7.0 - SF2: use UI facade here?
+      addPropertyEventFilterCondition(IValueField.PROP_VALUE, key);
+      getModel().setValue(key);
+    }
+    else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
+      String activeFilterString = data.optString("activeFilter", null);
+      TriState activeFilter = TriState.valueOf(activeFilterString);
+      addPropertyEventFilterCondition(ISmartField2.PROP_ACTIVE_FILTER, activeFilter);
+      getModel().setActiveFilter(activeFilter);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
   }
 
-  // Async operation (in background) Sets
   protected void handleUiLookupByText(JsonEvent event) {
     resetKeyMap();
-    String text = event.getData().optString("text");
-    String filterKey = event.getData().optString("filterKey");
-    getModel().lookupByText(text, filterKey);
+    String searchText = event.getData().optString("searchText");
+    getModel().lookupByText(searchText);
   }
 
   /**

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ProposalChooser2 = function() {
+scout.ProposalChooser2 = function() { // FIXME [awe] 7.0 - SF2: merge with SmartField2Popup?
   scout.ProposalChooser2.parent.call(this);
 
   this.$container = null;
@@ -47,7 +47,7 @@ scout.ProposalChooser2.prototype._render = function($parent) {
     .setVisible(false);
 
   // active filter
-  if (this.activeFilter) {
+  if (this._smartField().activeFilterEnabled) {
     this.activeFilterGroup = scout.create('RadioButtonGroup', {
       parent: this,
       labelVisible: false,
@@ -56,7 +56,7 @@ scout.ProposalChooser2.prototype._render = function($parent) {
 
     // add radio buttons
     scout.ProposalChooser2.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
-      this._renderButton(value, index);
+      this._renderActiveFilterButton(value, index);
     }, this);
 
     this.activeFilterGroup.render(this.$container);
@@ -147,12 +147,12 @@ scout.ProposalChooser2.prototype._setStatusMessage = function(message) {
   scout.Status.animateStatusMessage(this.$status, message);
 };
 
-scout.ProposalChooser2.prototype._renderButton = function(value, index) {
+scout.ProposalChooser2.prototype._renderActiveFilterButton = function(value, index) {
   var radio = scout.create('RadioButton', {
       parent: this.activeFilterGroup,
-      label: this.activeFilterLabels[index],
+      label: this._activeFilterLabel(index),
       radioValue: scout.ProposalChooser2.ACTIVE_FILTER_VALUES[index],
-      selected: this.activeFilter === value,
+      selected: this._smartField().activeFilter === value,
       focusWhenSelected: false,
       gridData: {
         x: index,
@@ -163,18 +163,15 @@ scout.ProposalChooser2.prototype._renderButton = function(value, index) {
 
   radio.on('propertyChange', function(event) {
     if (event.changedProperties.indexOf('selected') !== -1 && event.newProperties.selected === true) {
-      this._onActiveFilterChanged(event.source.radioValue);
+      this.trigger('activeFilterSelected', {
+        activeFilter: event.source.radioValue
+      });
     }
   }.bind(this));
 
   this.activeFilterGroup.addButton(radio);
 };
 
-scout.ProposalChooser2.prototype._onActiveFilterChanged = function(radioValue) {
-  this.trigger('activeFilterChanged', {
-    state: radioValue
-  });
-};
 
 scout.ProposalChooser2.prototype.setVirtual = function(virtual) {
   if (this.model instanceof scout.Table) {
@@ -185,4 +182,12 @@ scout.ProposalChooser2.prototype.setVirtual = function(virtual) {
 scout.ProposalChooser2.prototype.setBusy = function(busy) {
   this.model.setProperty('loading', busy);
   this.model.setProperty('enabled', !busy);
+};
+
+scout.ProposalChooser2.prototype._smartField = function() {
+  return this.parent._smartField();
+};
+
+scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {
+  return this._smartField().activeFilterLabels[index];
 };

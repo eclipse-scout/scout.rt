@@ -6,6 +6,11 @@ scout.SmartField2 = function() {
   this.codeType = null;
   this._pendingLookup = null;
 
+  this.activeFilterEnabled = false;
+  this.activeFilter = null;
+  this.activeFilterLabels = [];
+
+
   //this.variant = scout.SmartField2.Variant.DROPDOWN;
   this.variant = scout.SmartField2.Variant.DEFAULT;
 };
@@ -26,6 +31,12 @@ scout.SmartField2.DEBOUNCE_DELAY = 200;
  */
 scout.SmartField2.prototype._init = function(model) {
   scout.SmartField2.parent.prototype._init.call(this, model);
+
+  this.activeFilterLables = [
+    this.session.text('ui.All'),
+    this.session.text('ui.Inactive'),
+    this.session.text('ui.Active')];
+
   this._setLookupCall(this.lookupCall);
   this._setCodeType(this.codeType);
 };
@@ -146,7 +157,8 @@ scout.SmartField2.prototype.openPopup = function() {
     this.popup = this._createPopup();
     this.popup.setLookupRows(result.lookupRows);
     this.popup.open();
-    this.popup.on('lookupRowSelected', this._onLookupRowSelect.bind(this));
+    this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+    this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this));
     this.popup.on('remove', function() {
       this.popup = null;
       if (this.rendered) {
@@ -285,8 +297,28 @@ scout.SmartField2.prototype._isFunctionKey = function(e) {
 
 
 scout.SmartField2.prototype._proposalTyped = function() {
-  var displayText = this._readDisplayText();
-  $.log.trace('(SmartField2#_proposalTyped) displayText=' + displayText);
+  this._startNewLookupByText();
+};
+
+scout.SmartField2.prototype._onLookupRowSelected = function(event) {
+  this.setValue(event.lookupRow.key);
+  this.closePopup();
+};
+
+// FIXME [awe] 7.0 - SF2: discuss usage of activeFilter. With current impl. we cannot
+// use the activeFilter in the lookup call because it belongs to the widget state.
+scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
+  this.setActiveFilter(event.activeFilter);
+  this._startNewLookupByText();
+};
+
+scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
+  this.setProperty('activeFilter', this.activeFilterEnabled ? activeFilter : null);
+};
+
+scout.SmartField2.prototype._startNewLookupByText = function() {
+  var searchText = this._readDisplayText();
+  $.log.trace('(SmartField2#_startNewLookupByText) searchText=' + searchText);
 
   // debounce lookup
   if (this._pendingLookup) {
@@ -294,28 +326,11 @@ scout.SmartField2.prototype._proposalTyped = function() {
   }
 
   this._pendingLookup = setTimeout(function() {
-    $.log.debug('(SmartField2#_proposalTyped) send displayText=' + displayText);
-    this.lookupCall.getByText(displayText).done(function(result) {
+    $.log.debug('(SmartField2#_startNewLookupByText) searchText=' + searchText);
+    this.lookupCall.getByText(searchText).done(function(result) {
       if (this.popup) {
         this.popup.setLookupRows(result.lookupRows);
       }
     }.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
-};
-
-scout.SmartField2.prototype._onLookupRowSelect = function(event) {
-  this.setValue(event.lookupRow.key);
-  this.closePopup();
-};
-
-/**
- * When you already have a complete lookup-row you can use this method
- * instead of #setValue(value). This avoids that the smart-field must perform
- * a lookup to resolve the display text for the value, because the text is
- * already available on the lookup-row.
- */
-scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
-  this.value = lookupRow.key;
-  this.setDisplayText(lookupRow.text);
-  // FIXME [awe] 7.0 - SF2: set other properties, see applyLazyStyles in Java
 };

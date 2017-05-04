@@ -4,13 +4,15 @@ scout.SmartField2Popup = function() {
 };
 scout.inherits(scout.SmartField2Popup, scout.Popup);
 
-scout.SmartField2Popup.prototype._init = function(model) {
-  scout.SmartField2Popup.parent.prototype._init.call(this, model);
-  this.proposalChooser = this._createProposalChooser(model);
-  this.proposalChooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+scout.SmartField2Popup.prototype._init = function(options) {
+  options.withFocusContext = false;
+  scout.SmartField2Popup.parent.prototype._init.call(this, options);
+  this.proposalChooser = this._createProposalChooser();
+  this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
+  this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
 };
 
-scout.SmartField2Popup.prototype._createProposalChooser = function(model) {
+scout.SmartField2Popup.prototype._createProposalChooser = function() {
   return scout.create('TableProposalChooser2', {
     parent: this
   });
@@ -37,7 +39,9 @@ scout.SmartField2Popup.prototype._createLayout = function() {
 
 scout.SmartField2Popup.prototype._render = function($parent) {
   scout.SmartField2Popup.parent.prototype._render.call(this, $parent);
-  this.$container.addClass('dropdown-popup');
+  this.$container
+    .addClass('dropdown-popup')
+    .on('mousedown', this._onContainerMouseDown.bind(this));
   this.proposalChooser.render(this.$container);
 };
 
@@ -57,6 +61,20 @@ scout.SmartField2Popup.prototype.delegateKeyEvent = function(event) {
   this.proposalChooser.delegateKeyEvent(event);
 };
 
-scout.SmartField2Popup.prototype._onLookupRowSelected = function(event) {
-  this.trigger('lookupRowSelected', event); // just re-trigger the event
+scout.SmartField2Popup.prototype._triggerEvent = function(event) {
+  this.trigger(event.type, event);
+};
+
+/**
+ * This event handler is called before the mousedown handler on the _document_ is triggered
+ * This allows us to prevent the default, which is important for the CellEditorPopup which
+ * should stay open when the SmartField popup is closed. It also prevents the focus blur
+ * event on the SmartField input-field.
+ */
+// TODO [awe] 7.0 - SF2: check if still required --> see SmartField2Popup.js
+scout.SmartField2Popup.prototype._onContainerMouseDown = function(event) {
+  // when user clicks on proposal popup with table or tree (prevent default,
+  // so input-field does not lose the focus, popup will be closed by the
+  // proposal chooser impl.
+  return false;
 };

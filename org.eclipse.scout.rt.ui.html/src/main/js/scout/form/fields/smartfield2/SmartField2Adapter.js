@@ -11,7 +11,7 @@
 scout.SmartField2Adapter = function() {
   scout.SmartField2Adapter.parent.call(this);
 
-  this._addRemoteProperties(['value']);
+  this._addRemoteProperties(['value', 'activeFilter']);
 };
 scout.inherits(scout.SmartField2Adapter, scout.ValueFieldAdapter);
 
@@ -51,9 +51,7 @@ scout.SmartField2Adapter.prototype.lookupByText = function(searchText) {
 
 scout.SmartField2Adapter.prototype._lookup = function(lookupType, searchText) {
   var sendType = 'lookup' + lookupType;
-  var request = {
-    text: searchText,
-    filterKey: null // FIXME [awe] 7.0 - SF2: add filterKeys to request (only for byText or for all too?)
-  };
-  this._send(sendType, request);
+  this._send(sendType, {
+    searchText: searchText
+  });
 };
