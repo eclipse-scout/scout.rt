@@ -13,7 +13,8 @@ describe("scout.objects", function() {
   describe("copyProperties", function() {
 
     it("copies all properties", function() {
-      var dest = {}, source = {
+      var dest = {},
+        source = {
           foo: 6,
           bar: 7
         };
@@ -26,9 +27,9 @@ describe("scout.objects", function() {
       var dest = {};
       var TestConstructor = function() {
         this.foo = 6;
-        this.bar = 7;
       };
       var source = new TestConstructor();
+      TestConstructor.prototype.bar = 7;
       source.qux = 8;
 
       scout.objects.copyProperties(source, dest);
@@ -39,12 +40,56 @@ describe("scout.objects", function() {
 
   });
 
+  describe("copyOwnProperties", function() {
+
+    it("copies all properties", function() {
+      var dest = {},
+        source = {
+          foo: 6,
+          bar: 7
+        };
+      scout.objects.copyOwnProperties(source, dest);
+      expect(dest.foo).toBe(6);
+      expect(dest.bar).toBe(7);
+    });
+
+    it("does not copy the properties from prototype", function() {
+      var dest = {};
+      var TestConstructor = function() {
+        this.foo = 6;
+      };
+      TestConstructor.prototype.bar = 7;
+      var source = new TestConstructor();
+      source.qux = 8;
+
+      scout.objects.copyOwnProperties(source, dest);
+      expect(dest.foo).toBe(6);
+      expect(dest.bar).toBe(undefined);
+      expect(dest.qux).toBe(8);
+    });
+
+    it("copies only the properties specified by the filter, if there is one", function() {
+      var dest = {},
+        source = {
+          foo: 6,
+          bar: 7,
+          another: 8
+        };
+
+      scout.objects.copyOwnProperties(source, dest, ['bar', 'another']);
+      expect(dest.foo).toBe(undefined);
+      expect(dest.bar).toBe(7);
+      expect(dest.another).toBe(8);
+    });
+
+  });
+
   describe("countOwnProperties", function() {
 
     it("counts all own properties", function() {
       var o = {
-          first: 1,
-          second: 2
+        first: 1,
+        second: 2
       };
       var F = function() {
         this.foo = 66;
@@ -69,16 +114,31 @@ describe("scout.objects", function() {
 
     it("copies an object by value", function() {
       var o = {
-          first: 1,
-          second: 2,
-          arr: [],
-          arr2: [ {name: 'Hans'}, {name: 'Linda'} ],
-          hamlet: {
+        first: 1,
+        second: 2,
+        arr: [],
+        arr2: [{
+          name: 'Hans'
+        }, {
+          name: 'Linda'
+        }],
+        hamlet: {
+          type: 'Book',
+          title: {
+            shortTitle: 'Hamlet',
+            longTitle: 'The Tragicall Historie of Hamlet, Prince of Denmarke'
+          },
+          author: 'Shakespeare',
+          refs: [{
             type: 'Book',
-            title: { shortTitle: 'Hamlet', longTitle: 'The Tragicall Historie of Hamlet, Prince of Denmarke' },
+            author: 'Dickens',
+            title: '???'
+          }, {
+            type: 'Audio',
             author: 'Shakespeare',
-            refs: [ { type: 'Book', author: 'Dickens', title: '???' }, { type: 'Audio', author: 'Shakespeare', title: 'Hamlet on CD' } ]
-          }
+            title: 'Hamlet on CD'
+          }]
+        }
       };
       var o2 = scout.objects.valueCopy(o);
       o.first = 'one';
@@ -140,9 +200,9 @@ describe("scout.objects", function() {
         this.b = 'B';
       };
       var o1 = {
-          a: 'X',
-          b: 'Y',
-          c: 'Z'
+        a: 'X',
+        b: 'Y',
+        c: 'Z'
       };
       var o2 = new Class();
       o2.a = 'X';

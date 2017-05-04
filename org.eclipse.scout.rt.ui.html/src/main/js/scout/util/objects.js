@@ -22,13 +22,17 @@ scout.objects = {
   },
 
   /**
-   * Copies the own properties (excluding the ones from the prototype) from dest to source
+   * Copies the own properties (excluding the ones from the prototype) from dest to source.
+   * If a filter is specified, only the properties matching the ones in the filter are copied.
    * @memberOf scout.objects
+   * @param filter an array of property names. 
    */
-  copyOwnProperties: function(source, dest) {
+  copyOwnProperties: function(source, dest, filter) {
     var propertyName;
+    filter = scout.arrays.ensure(filter);
     for (propertyName in source) {
-      if (source.hasOwnProperty(propertyName)) {
+      if (source.hasOwnProperty(propertyName) &&
+          (filter.length === 0 || filter.indexOf(propertyName) > -1)) {
         dest[propertyName] = source[propertyName];
       }
     }
@@ -48,12 +52,12 @@ scout.objects = {
   },
 
   /**
-   * Copies the specified properties (including the ones from the prototype.) from dest to source.
+   * Copies the specified properties (including the ones from the prototype) from source to dest.
    * Properties that already exist on dest are NOT overwritten.
    */
   extractProperties: function(source, dest, properties) {
     properties.forEach(function(propertyName) {
-      if (!dest[propertyName]) {
+      if (dest[propertyName] === undefined) {
         dest[propertyName] = source[propertyName];
       }
     });
