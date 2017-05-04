@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.rest.test;
+package org.eclipse.scout.rt.rest;
 
 import static org.junit.Assert.assertTrue;
 

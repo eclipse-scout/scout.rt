@@ -6,7 +6,6 @@ package org.eclipse.scout.rt.rest.exception;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.slf4j.Logger;
@@ -23,16 +22,16 @@ import org.slf4j.LoggerFactory;
  * the exception cause. But it must not be sent to the client due to security reason.
  */
 @Bean
-public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
+public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
   @Override
-  public Response toResponse(Exception e) {
-    if (e instanceof WebApplicationException) {
-      return ((WebApplicationException) e).getResponse();
+  public Response toResponseImpl(Exception exception) {
+    if (exception instanceof WebApplicationException) {
+      return ((WebApplicationException) exception).getResponse();
     }
 
-    LOG.error("Exception while processing rest request", e);
+    LOG.error("Exception while processing rest request", exception);
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
 }
