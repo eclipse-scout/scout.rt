@@ -55,7 +55,7 @@ scout.Column.prototype.init = function(model) {
  * The default impl. does nothing.
  */
 scout.Column.prototype._init = function(model) {
-  // NOP
+  this._setDisplayable(this.displayable);
 };
 
 /**
@@ -568,7 +568,7 @@ scout.Column.prototype.setDisplayable = function(displayable) {
 
 scout.Column.prototype._setDisplayable = function(displayable) {
   this.displayable = displayable;
-  this.table.onColumnVisibilityChanged(this);
+  this.setVisible(displayable);
 };
 
 scout.Column.prototype.isContentValid = function(row) {
