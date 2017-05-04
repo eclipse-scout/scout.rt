@@ -21,7 +21,6 @@ scout.SmartField2Adapter.prototype._postCreateWidget = function() {
 };
 
 scout.SmartField2Adapter.prototype._syncResult = function(result) {
-  console.log('_syncResult', result);
   this.widget.lookupCall.resolveLookup(result);
 };
 

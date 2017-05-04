@@ -68,7 +68,7 @@ scout.SmartField2PopupLayout.prototype.preferredLayoutSize = function($container
 };
 
 scout.SmartField2PopupLayout.prototype._htmlProposalChooser = function() {
-  var proposalChooser = this.popup.proposalChooser.table; // FIXME [awe] 7.0 - SF2: make this work for other proposal chooser types
+  var proposalChooser = this.popup.proposalChooser;
   if (!proposalChooser) {
     return null;
   }

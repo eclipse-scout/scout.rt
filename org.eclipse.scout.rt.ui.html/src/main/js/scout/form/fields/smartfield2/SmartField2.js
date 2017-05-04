@@ -146,7 +146,7 @@ scout.SmartField2.prototype.openPopup = function() {
     this.popup = this._createPopup();
     this.popup.setLookupRows(result.lookupRows);
     this.popup.open();
-    this.popup.on('select', this._onLookupRowSelect.bind(this));
+    this.popup.on('lookupRowSelected', this._onLookupRowSelect.bind(this));
     this.popup.on('remove', function() {
       this.popup = null;
       if (this.rendered) {

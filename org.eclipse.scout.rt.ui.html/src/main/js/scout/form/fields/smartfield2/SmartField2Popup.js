@@ -7,10 +7,13 @@ scout.inherits(scout.SmartField2Popup, scout.Popup);
 scout.SmartField2Popup.prototype._init = function(model) {
   scout.SmartField2Popup.parent.prototype._init.call(this, model);
   this.proposalChooser = this._createProposalChooser(model);
+  this.proposalChooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
 };
 
 scout.SmartField2Popup.prototype._createProposalChooser = function(model) {
-  return new scout.TableProposalChooser2(this, this._onLookupRowSelected.bind(this));
+  return scout.create('TableProposalChooser2', {
+    parent: this
+  });
 };
 
 scout.SmartField2Popup.prototype._smartField = function() {
@@ -54,8 +57,6 @@ scout.SmartField2Popup.prototype.delegateKeyEvent = function(event) {
   this.proposalChooser.delegateKeyEvent(event);
 };
 
-scout.SmartField2Popup.prototype._onLookupRowSelected = function(lookupRow) {
-  this.trigger('select', {
-    lookupRow: lookupRow
-  });
+scout.SmartField2Popup.prototype._onLookupRowSelected = function(event) {
+  this.trigger('lookupRowSelected', event); // just re-trigger the event
 };

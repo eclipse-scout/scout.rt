@@ -1,51 +1,55 @@
-/**
- * This is a wrapper / interface around a table or tree, used to select a lookup row.
- *
- * @param {scout.SmartField2} smartField
- * @param {function} onLookupRowSelected callback to function called when lookup row is selected
- */
-scout.TableProposalChooser2 = function(smartField, onLookupRowSelected) {
-  this.smartField = smartField;
-  this.table = scout.create('Table', {
-    parent: smartField,
+scout.TableProposalChooser2 = function() {
+  scout.TableProposalChooser2.parent.call(this);
+};
+scout.inherits(scout.TableProposalChooser2, scout.ProposalChooser2);
+
+scout.TableProposalChooser2.prototype._createModel = function() {
+  var table = scout.create('Table', {
+    parent: this,
     headerVisible: false,
     autoResizeColumns: true,
     multiSelect: false,
     columns: [
       scout.create('Column', {
         index: 0,
-        session: smartField.session
+        session: this.session
       })
     ]
   });
 
-  this.table.on('rowClicked', function(event) {
-    onLookupRowSelected(this.getSelectedLookupRow());
-  }.bind(this));
+  table.on('rowClicked', this._triggerLookupRowSelected.bind(this));
+
+  return table;
+};
+
+scout.TableProposalChooser2.prototype._triggerLookupRowSelected = function(event) {
+  this.trigger('lookupRowSelected', {
+    lookupRow: this.getSelectedLookupRow()
+  });
 };
 
 scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
   var tableRows = [];
-  this.table.deleteAllRows();
+  this.model.deleteAllRows();
   lookupRows.forEach(function(lookupRow) {
     tableRows.push({
       cells: [lookupRow.text],
       lookupRow: lookupRow
     });
   });
-  this.table.insertRows(tableRows);
+  this.model.insertRows(tableRows);
 };
 
-scout.TableProposalChooser2.prototype.render = function($parent) {
-  this.table.render($parent);
+scout.TableProposalChooser2.prototype._renderModel = function() {
+  this.model.render(this.$container);
 
   // Make sure table never gets the focus, but looks focused
-  this.table.$container.setTabbable(false);
-  this.table.$container.addClass('focused');
+  this.model.$container.setTabbable(false);
+  this.model.$container.addClass('focused');
 };
 
 scout.TableProposalChooser2.prototype.getSelectedLookupRow = function() {
-  var selectedRow = this.table.selectedRows[0];
+  var selectedRow = this.model.selectedRows[0];
   if (!selectedRow) {
     return null;
   }
@@ -53,6 +57,6 @@ scout.TableProposalChooser2.prototype.getSelectedLookupRow = function() {
 };
 
 scout.TableProposalChooser2.prototype.delegateKeyEvent = function(event) {
-  this.table.$container.trigger(event);
+  this.model.$container.trigger(event);
 };
 
