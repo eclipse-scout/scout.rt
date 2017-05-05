@@ -215,13 +215,13 @@ scout.ProposalChooser2.prototype._computeStatus = function(result) {
   if (rows.length === 0) {
     // FIXME [awe] 7.0 - SF2: distinct between search for '*' and search for other
     return scout.Status.warn({
-      message: '%%%Keine Vorschläge für "{0}" gefunden%%%'
+      message: this.session.text('SmartFieldCannotComplete', result.searchText)
     });
   }
 
   if (rows.length > this._smartField().browseMaxRowCount) {
     return scout.Status.info({
-      message: '%%%Mehr als {0} Datensätze%%%'
+      message: this.session.text('SmartFieldMoreThanXRows', rows.length)
     });
   }
 

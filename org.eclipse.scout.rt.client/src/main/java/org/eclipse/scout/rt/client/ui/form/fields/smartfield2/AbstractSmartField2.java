@@ -1065,6 +1065,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
+  public void acceptByText(String text) {
+    handleAcceptByDisplayText(text);
+  }
+
+  @Override
   public void doSearch(boolean selectCurrentValue, boolean synchronous) {
     doSearch(getLookupRowFetcher().getLastSearchText(), selectCurrentValue, synchronous);
   }

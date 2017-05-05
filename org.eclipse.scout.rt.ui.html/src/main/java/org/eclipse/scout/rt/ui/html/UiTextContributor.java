@@ -25,6 +25,10 @@ public class UiTextContributor implements IUiTextContributor {
         "Column",
         "Cancel",
         "Ok",
+        "SmartFieldCannotComplete",
+        "SmartFieldInactiveRow",
+        "SmartFieldNotUnique",
+        "SmartFieldMoreThanXRows",
         "NavigationBackward",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",

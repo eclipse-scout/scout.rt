@@ -5,6 +5,7 @@ scout.SmartField2 = function() {
   this.lookupCall = null;
   this.codeType = null;
   this._pendingLookup = null;
+  this.lookupRow = null;
 
   this.activeFilterEnabled = false;
   this.activeFilter = null;
@@ -96,20 +97,74 @@ scout.SmartField2.prototype._renderDisplayText = function() {
  * @override
  */
 scout.SmartField2.prototype.acceptInput = function(whileTyping) {
-  if (!this.popup) {
+  var
+    searchText = this._readDisplayText(),
+    lookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
+
+  // abort pending lookups
+  if (this._pendingLookup) {
+    clearTimeout(this._pendingLookup);
+  }
+
+  // Do nothing when search text is equals to the text of the current lookup row
+  if (this.lookupRow && this.lookupRow.text === searchText) {
+    console.log('unchanged');
+    this.closePopup();
     return;
   }
 
-  var lookupRow = this.popup.getSelectedLookupRow();
-  if (lookupRow) {
-    this.setValue(lookupRow.key);
+  // 1.) when search text is empty and no lookup-row is selected, simply set the value to null
+  if (scout.strings.empty(searchText) && !lookupRow) {
+    console.log('empty');
+    this.setLookupRow(null);
+    this.closePopup();
+    return;
   }
-  this.closePopup();
+
+  // 2.) proposal chooser is open -> use the selected row as value
+  if (lookupRow) {
+    console.log('lookupRow selected');
+    this.setLookupRow(lookupRow);
+    this.closePopup();
+    return;
+  }
+
+  // 3.) proposal chooser is not open -> try to accept the current display text
+  // this causes a lookup which may fail and open a new proposal chooser (property
+  // change for 'result'). Or in case the text is empty, just set the value to null
+  console.log('getByText');
+  this.showLookupInProgress();
+  this.lookupCall.getByText(searchText).done(function(result) {
+
+    this.hideLookupInProgress();
+    var numLookupRows = result.lookupRows ? result.lookupRows.length : 0;
+
+    // when there's exactly one result, we accept that lookup row
+    if (numLookupRows === 1) {
+      this.setLookupRow(result.lookupRows[0]);
+      return;
+    }
+
+    // in any other case something went wrong
+    if (numLookupRows === 0) {
+      this.setErrorStatus(scout.Status.error({
+        message: this.session.text('SmartFieldCannotComplete', searchText)
+      }));
+      return;
+    }
+
+    if (numLookupRows > 1) {
+      this.setErrorStatus(scout.Status.error({
+        message: this.session.text('SmartFieldNotUnique', searchText)
+      }));
+      this.openPopup2(result);
+      return;
+    }
+
+    throw new Error('Unreachable code');
+  }.bind(this));
 };
 
-/**
- * @override
- */
 scout.SmartField2.prototype._renderEnabled = function() {
   scout.SmartField2.parent.prototype._renderEnabled.call(this);
 
@@ -147,31 +202,37 @@ scout.SmartField2.prototype._formatValue = function(value) {
   return this.lookupCall.textById(value);
 };
 
+
+/**
+ * @param {string} [searchText] optional search text. If set lookupCall#getByText() is called, otherwise lookupCall#getAll()
+ */
 scout.SmartField2.prototype.openPopup = function() {
+  // already open
   if (this.popup) {
-    // already open
     return;
   }
 
   this.showLookupInProgress();
-  this.lookupCall.getAll().done(function(result) {
-    this.hideLookupInProgress();
-    this.$container.addClass('popup-open');
-    // On touch devices the field does not get the focus.
-    // But it should look focused when the popup is open.
-    this.$field.addClass('focused');
-    this.popup = this._createPopup();
-    this.popup.setLookupResult(result);
-    this.popup.open();
-    this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
-    this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this));
-    this.popup.on('remove', function() {
-      this.popup = null;
-      if (this.rendered) {
-        this.$container.removeClass('popup-open');
-        this.$field.removeClass('focused');
-      }
-    }.bind(this));
+  this.lookupCall.getAll().done(this.openPopup2.bind(this));
+};
+
+scout.SmartField2.prototype.openPopup2 = function(result) {
+  this.hideLookupInProgress();
+  this.$container.addClass('popup-open');
+  // On touch devices the field does not get the focus.
+  // But it should look focused when the popup is open.
+  this.$field.addClass('focused');
+  this.popup = this._createPopup();
+  this.popup.setLookupResult(result);
+  this.popup.open();
+  this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+  this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this));
+  this.popup.on('remove', function() {
+    this.popup = null;
+    if (this.rendered) {
+      this.$container.removeClass('popup-open');
+      this.$field.removeClass('focused');
+    }
   }.bind(this));
 };
 
@@ -323,7 +384,7 @@ scout.SmartField2.prototype._proposalTyped = function() {
 };
 
 scout.SmartField2.prototype._onLookupRowSelected = function(event) {
-  this.setValue(event.lookupRow.key);
+  this.setLookupRow(event.lookupRow);
   this.closePopup();
 };
 
@@ -370,3 +431,12 @@ scout.SmartField2.prototype._startNewLookupByText = function() {
 scout.SmartField2.prototype.virtual = function() {
   return this.browseMaxRowCount > scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
 };
+
+scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
+  this.lookupRow = lookupRow;
+  var value = lookupRow ? lookupRow.key : null;
+  this.setErrorStatus(null);
+  this.setValue(value);
+};
+
+

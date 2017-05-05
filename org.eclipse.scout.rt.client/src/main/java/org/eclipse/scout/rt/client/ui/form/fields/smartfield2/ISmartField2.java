@@ -47,7 +47,16 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void lookupAll();
 
-  void lookupByText(String text);
+  void lookupByText(String searchText);
+
+  /**
+   * Other than setDisplayText this method does not only change the displayText, it also does a lookup for the given
+   * text and tries to set the result of that lookup as new value. As a result the field may become invalid when the
+   * lookup found no results or when the lookup returned more than one result.
+   * 
+   * @param searchText
+   */
+  void acceptByText(String searchText);
 
   SmartField2Result getResult();
 

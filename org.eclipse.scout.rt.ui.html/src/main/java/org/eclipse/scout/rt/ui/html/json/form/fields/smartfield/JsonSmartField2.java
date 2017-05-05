@@ -90,6 +90,9 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     else if ("lookupAll".equals(event.getType())) {
       handleUiLookupAll();
     }
+    else if ("acceptBySearchText".equals(event.getType())) {
+      handleUiAcceptBySearchText(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -120,6 +123,12 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     resetKeyMap();
     String searchText = event.getData().optString("searchText");
     getModel().lookupByText(searchText);
+  }
+
+  protected void handleUiAcceptBySearchText(JsonEvent event) {
+    resetKeyMap();
+    String searchText = event.getData().optString("searchText");
+    getModel().acceptByText(searchText);
   }
 
   /**
@@ -160,6 +169,7 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     if (result.isLookupFailed()) {
       json.put("lookupFailed", result.isLookupFailed());
     }
+    json.put("searchText", result.getSearchText());
     return json;
   }
 

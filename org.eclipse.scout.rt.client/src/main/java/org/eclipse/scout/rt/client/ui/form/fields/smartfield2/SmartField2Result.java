@@ -11,12 +11,15 @@ public class SmartField2Result<V> {
 
   private boolean m_lookupFailed;
 
+  private String m_searchText;
+
   /**
    * @param result
    */
   public SmartField2Result(IContentAssistFieldDataFetchResult<V> result) {
     m_lookupRows = result.getLookupRows();
     m_lookupFailed = result.getException() != null;
+    m_searchText = result.getSearchParam().getSearchText();
   }
 
   public List<ILookupRow<V>> getLookupRows() {
@@ -25,6 +28,10 @@ public class SmartField2Result<V> {
 
   public boolean isLookupFailed() {
     return m_lookupFailed;
+  }
+
+  public String getSearchText() {
+    return m_searchText;
   }
 
 }
