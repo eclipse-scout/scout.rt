@@ -288,5 +288,36 @@ describe('TableHeaderMenu', function() {
       });
 
     });
+
+    describe('sort mode', function() {
+
+      it('sorts alphabetically', function() {
+        var table = createSingleColumnTableByTexts(['BValue', 'AValue']);
+        var column = table.columns[0];
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var tableHeaderMenu = table.header._tableHeaderMenu;
+        var $filterItems = find$FilterItems(table);
+        expectTableRowText($filterItems, 0, 'AValue');
+        expectTableRowText($filterItems, 1, 'BValue');
+        expect(tableHeaderMenu.filterSortMode).toBe(scout.TableHeaderMenu.SortMode.ALPHABETICALLY);
+        table.header.closeTableHeaderMenu();
+      });
+
+      it('sorts by amount', function() {
+        var table = createSingleColumnTableByTexts(['BValue', 'AValue', 'BValue']);
+        var column = table.columns[0];
+        table.render(session.$entryPoint);
+        table.header.openTableHeaderMenu(column);
+        var tableHeaderMenu = table.header._tableHeaderMenu;
+        tableHeaderMenu._onSortModeClick(); // changes sort mode from 'alphabetically' (default) to 'amount'
+        var $filterItems = find$FilterItems(table);
+        expectTableRowText($filterItems, 0, 'BValue');
+        expectTableRowText($filterItems, 1, 'AValue');
+        expect(tableHeaderMenu.filterSortMode).toBe(scout.TableHeaderMenu.SortMode.AMOUNT);
+        table.header.closeTableHeaderMenu();
+      });
+
+    });
   });
 });
