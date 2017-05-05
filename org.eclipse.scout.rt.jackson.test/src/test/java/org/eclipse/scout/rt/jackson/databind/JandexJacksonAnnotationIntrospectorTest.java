@@ -279,8 +279,6 @@ public class JandexJacksonAnnotationIntrospectorTest {
    * {@link JandexJacksonAnnotationIntrospector}.
    */
   protected ObjectMapper newObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setAnnotationIntrospector(BEANS.get(JandexJacksonAnnotationIntrospector.class));
-    return mapper;
+    return BEANS.get(ObjectMapperFactory.class).create();
   }
 }
