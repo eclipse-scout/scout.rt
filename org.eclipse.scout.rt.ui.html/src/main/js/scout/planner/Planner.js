@@ -27,6 +27,9 @@ scout.Planner = function() {
 
   // visual
   this._resourceTitleWidth = 20;
+  this._rangeSelectionStarted = false;
+  this.startRow;
+  this.lastRow;
 
   // main elements
   this.$container;
@@ -66,6 +69,8 @@ scout.Planner.SelectionMode = {
   SINGLE_RANGE: 1,
   MULTI_RANGE: 2
 };
+
+scout.Planner.RANGE_SELECTION_MOVE_THRESHOLD = 10;
 
 /**
  * @override
@@ -826,16 +831,26 @@ scout.Planner.prototype._onCellMousedown = function(event) {
   var $activity,
     $resource,
     $target = $(event.target),
-    selectionMode = scout.Planner.SelectionMode;
+    selectionMode = scout.Planner.SelectionMode,
+    opensContextMenu = (event.which === 3 || event.which === 1 && event.ctrlKey);
 
   if (this.activitySelectable) {
+    if (!opensContextMenu && this.$selector) {
+      // Hide selector otherwise activity may not be resolved ($elementFromPoint would return the $selector)
+      // This allows selecting an activity which is inside a selection range
+      this.$selector.hide();
+    }
     $activity = this._$elementFromPoint(event.pageX, event.pageY);
+    if (!opensContextMenu && this.$selector) {
+      this.$selector.show();
+    }
     if ($activity.hasClass('planner-activity')) {
       $resource = $activity.parent().parent();
       this.selectResources([$resource.data('resource')]);
       this.selectActivity($activity.data('activity'));
       this.selectRange(new scout.DateRange());
-      return;
+    } else {
+      this.selectActivity(null);
     }
   }
 
@@ -843,27 +858,76 @@ scout.Planner.prototype._onCellMousedown = function(event) {
     return;
   }
 
-  if ($target.hasClass('selector') && (event.which === 3 || event.which === 1 && event.ctrlKey)) {
+  if ($target.hasClass('selector') && opensContextMenu) {
     // Right click on the selector must not clear the selection -> context menu will be opened
     return;
   }
 
+  if (!this.selectedActivity) {
+    // If not an activity was selected, start immediately, otherwise start as soon the mouse moves
+    this._startRangeSelection(event.pageX, event.pageY);
+  }
+
+  // add event handlers
+  this._cellMousemoveHandler = this._onCellMousemove.bind(this, event);
+  $target.document()
+    .on('mousemove', this._cellMousemoveHandler)
+    .one('mouseup', this._onDocumentMouseup.bind(this));
+};
+
+scout.Planner.prototype._startRangeSelection = function(pageX, pageY) {
   // init selector
-  this.startRow = this._findRow(event.pageY);
+  this.startRow = this._findRow(pageY);
   this.lastRow = this.startRow;
 
   // find range on scale
-  this.startRange = this._findScale(event.pageX);
+  this.startRange = this._findScale(pageX);
   this.lastRange = this.startRange;
 
   // draw
   this._select(true);
+  this._rangeSelectionStarted = true;
+};
 
-  // event
-  this._cellMousemoveHandler = this._onCellMousemove.bind(this);
-  $target.document()
-    .on('mousemove', this._cellMousemoveHandler)
-    .one('mouseup', this._onDocumentMouseup.bind(this));
+/**
+ * @returns true if the range selection may be started, false if not
+ */
+scout.Planner.prototype._prepareRangeSelectionByMousemove = function(mousedownEvent, mousemoveEvent) {
+  var moveX = mousedownEvent.pageX - mousemoveEvent.pageX;
+  var moveY = mousedownEvent.pageY - mousemoveEvent.pageY;
+  var moveThreshold = scout.Planner.RANGE_SELECTION_MOVE_THRESHOLD;
+  if (Math.abs(moveX) >= moveThreshold) {
+    // Accept if x movement is big enough
+    return true;
+  }
+  var mousedownRow = this._findRow(mousedownEvent.pageY);
+  var mousemoveRow = this._findRow(mousemoveEvent.pageY);
+  if (Math.abs(moveY) >= moveThreshold && this.selectionMode === scout.Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow) {
+    // Accept if y movement is big enough AND the row changed. No need to switch into range selection mode if cursor is still on the same row
+    return true;
+  }
+  return false;
+};
+
+scout.Planner.prototype._onCellMousemove = function(mousedownEvent, event) {
+  if (this.selectedActivity && !this._rangeSelectionStarted) {
+    // If an activity was selected, switch to range selection if the user moves the mouse
+    if (!this._prepareRangeSelectionByMousemove(mousedownEvent, event)) {
+      return;
+    }
+    this._startRangeSelection(mousedownEvent.pageX, mousedownEvent.pageY);
+  }
+
+  var lastRow = this._findRow(event.pageY);
+  if (lastRow) {
+    this.lastRow = lastRow;
+  }
+  var lastRange = this._findScale(event.pageX);
+  if (lastRange) {
+    this.lastRange = lastRange;
+  }
+
+  this._select(true);
 };
 
 scout.Planner.prototype._onResizeMousedown = function(event) {
@@ -888,19 +952,6 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
   return false;
 };
 
-scout.Planner.prototype._onCellMousemove = function(event) {
-  var lastRow = this._findRow(event.pageY);
-  if (lastRow) {
-    this.lastRow = lastRow;
-  }
-  var lastRange = this._findScale(event.pageX);
-  if (lastRange) {
-    this.lastRange = lastRange;
-  }
-
-  this._select(true);
-};
-
 scout.Planner.prototype._onResizeMousemove = function(event) {
   if (!this.rendered) {
     // planner may be removed in the meantime
@@ -910,7 +961,6 @@ scout.Planner.prototype._onResizeMousemove = function(event) {
   if (lastRange) {
     this.lastRange = lastRange;
   }
-
   this._select(true);
 };
 
@@ -925,6 +975,11 @@ scout.Planner.prototype._onDocumentMouseup = function(event) {
     $target.document().off('mousemove', this._resizeMousemoveHandler);
     this._resizeMousemoveHandler = null;
   }
+  if (!this._rangeSelectionStarted) {
+    // Range selection has not been initiated -> don't call select()
+    return;
+  }
+  this._rangeSelectionStarted = false;
   if (this.rendered) {
     this._select();
   }
