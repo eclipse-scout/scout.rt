@@ -570,7 +570,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
         row: row
       });
     } else {
-      this.prepareCellEditOrig();
+      this.prepareCellEditOrig(column, row, openFieldPopupOnCellEdit);
     }
   }, true);
 
@@ -581,7 +581,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
         field: field
       });
     } else {
-      this.completeCellEditOrig();
+      this.completeCellEditOrig(field);
     }
   }, true);
 
@@ -592,7 +592,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
         field: field
       });
     } else {
-      this.cancelCellEditOrig();
+      this.cancelCellEditOrig(field);
     }
   }, true);
 
@@ -604,7 +604,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
         this._group();
       }
     } else {
-      this._sortAfterInsertOrig();
+      this._sortAfterInsertOrig(wasEmpty);
     }
   }, true);
 
@@ -615,6 +615,18 @@ scout.TableAdapter.modifyTablePrototype = function() {
     } else {
       this._sortAfterUpdateOrig();
     }
+  }, true);
+
+  // uiSortPossible
+  scout.objects.replacePrototypeFunction(scout.Table, '_isSortingPossible', function(sortColumns) {
+    if (this.modelAdapter) {
+       // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
+       // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
+       // 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
+      var uiSortPossible = scout.nvl(this.uiSortPossible, true);
+      return uiSortPossible && this._isSortingPossibleOrig(sortColumns);
+    }
+    return this._isSortingPossibleOrig(sortColumns);
   }, true);
 };
 
@@ -668,6 +680,20 @@ scout.TableAdapter.modifyColumnPrototype = function() {
     } else {
       return this._ensureCellOrig(vararg);
     }
+  }, true);
+
+  // uiSortPossible
+  scout.objects.replacePrototypeFunction(scout.Column, 'isSortingPossible', function() {
+    if (this.table.modelAdapter) {
+       // Returns whether or not this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
+       // is never set and defaults to true. As a side effect of this function a comparator is installed.
+       // The comparator returns false if it could not be installed which means sorting should be delegated to server (e.g. collator is not available).
+       // In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the
+       // server or can be sorted by the client.
+      var uiSortPossible = scout.nvl(this.uiSortPossible, true);
+      return uiSortPossible && this.installComparator();
+    }
+    return this.isSortingPossibleOrig();
   }, true);
 };
 

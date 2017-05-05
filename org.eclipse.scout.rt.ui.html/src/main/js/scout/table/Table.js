@@ -628,7 +628,7 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   var sortColumns = this._sortColumns();
 
   // Initialize comparators
-  if (!this._isUiSortPossible(sortColumns)) {
+  if (!this._isSortingPossible(sortColumns)) {
     return false;
   }
   this.clearAggregateRows(animateAggregateRows);
@@ -655,14 +655,12 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
 };
 
 /**
- * In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
- * its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
- * 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
- * @see RemoteApp.js
+ * @returns whether or not sorting is possible. Asks each column to answer this question by calling Column#isSortingPossible.
  */
-scout.Table.prototype._isUiSortPossible = function(sortColumns) {
-  var uiSortPossible = scout.nvl(this.uiSortPossible, true);
-  return uiSortPossible && this._isColumnsUiSortPossible(sortColumns);
+scout.Table.prototype._isSortingPossible = function(sortColumns) {
+  return sortColumns.every(function(column) {
+    return column.isSortingPossible();
+  });
 };
 
 scout.Table.prototype._sortColumns = function() {
@@ -695,15 +693,6 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
     return 0;
   }
   this.rows.sort(compare.bind(this));
-};
-
-/**
- * @returns whether or not the column can be sorted (as a side effect a comparator is installed on each column)
- */
-scout.Table.prototype._isColumnsUiSortPossible = function(sortColumns) {
-  return sortColumns.every(function(column) {
-    return column.isUiSortPossible();
-  });
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {
@@ -3665,7 +3654,7 @@ scout.Table.prototype.updateColumnOrder = function(columns) {
  * @param columns array of columns which were updated.
  */
 scout.Table.prototype.updateColumnHeaders = function(columns) {
-  var column, oldColumnState, properties;
+  var column, oldColumnState;
 
   // Update model columns
   for (var i = 0; i < columns.length; i++) {

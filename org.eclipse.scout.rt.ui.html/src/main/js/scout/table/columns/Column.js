@@ -52,7 +52,6 @@ scout.Column.prototype.init = function(model) {
 
 /**
  * Override this function in order to implement custom init logic.
- * The default impl. does nothing.
  */
 scout.Column.prototype._init = function(model) {
   this._setDisplayable(this.displayable);
@@ -527,14 +526,13 @@ scout.Column.prototype.installComparator = function() {
 };
 
 /**
- * @returns whether or not this column can be used to sort on the client side. In a JS only the flag 'uiSortPossible'
- *     is never set and defaults to true. As a side effect of this function a comparator is installed on each column.
- *     In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the
- *     server or can be sorted by the client.
+ * @returns whether or not it is possible to sort this column.
+ * As a side effect a comparator is installed.
  */
-scout.Column.prototype.isUiSortPossible = function() {
-  var uiSortPossible = scout.nvl(this.uiSortPossible, true);
-  return uiSortPossible && this.installComparator();
+scout.Column.prototype.isSortingPossible = function() {
+  // If installation fails sorting is still possible (in case of the text comparator just without a collator)
+  this.installComparator();
+  return true;
 };
 
 scout.Column.prototype.compare = function(row1, row2) {

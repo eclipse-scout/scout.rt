@@ -25,7 +25,7 @@ scout.objects = {
    * Copies the own properties (excluding the ones from the prototype) from dest to source.
    * If a filter is specified, only the properties matching the ones in the filter are copied.
    * @memberOf scout.objects
-   * @param filter an array of property names. 
+   * @param filter an array of property names.
    */
   copyOwnProperties: function(source, dest, filter) {
     var propertyName;

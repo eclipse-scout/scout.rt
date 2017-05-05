@@ -35,7 +35,7 @@ scout.TabBoxSpecHelper.prototype.createTabBoxWith = function(tabItems) {
 
 scout.TabBoxSpecHelper.prototype.createTabBox = function(model) {
   model = $.extend({
-    parent: this.session.desktop,
+    parent: this.session.desktop
   }, model);
 
   return scout.create('TabBox', model);
