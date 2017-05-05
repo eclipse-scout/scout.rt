@@ -39,12 +39,6 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
     </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <!-- Must be compile-scope because used at APT time, However, this module is not bundled for RT. -->
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
 
   <build>

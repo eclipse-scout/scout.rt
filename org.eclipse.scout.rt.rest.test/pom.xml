@@ -31,11 +31,6 @@
       <artifactId>org.eclipse.scout.rt.rest</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-    </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>junit</groupId>
