@@ -852,6 +852,8 @@ scout.Planner.prototype._onCellMousedown = function(event) {
     } else {
       this.selectActivity(null);
     }
+  } else {
+    this.selectActivity(null);
   }
 
   if (this.selectionMode === selectionMode.NONE) {
