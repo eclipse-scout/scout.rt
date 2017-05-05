@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -51,6 +52,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   private List<IButton> m_customButtons;
   private List<IButton> m_systemButtons;
   private IGroupBoxBodyGrid m_bodyGrid;
+  private GroupBoxProcessButtonGrid m_customProcessButtonGrid;
+  private GroupBoxProcessButtonGrid m_systemProcessButtonGrid;
 
   public AbstractGroupBox() {
     this(true);
@@ -272,6 +275,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + bodyGridClazz.getName() + "'.", e));
       }
     }
+    m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);
+    m_systemProcessButtonGrid = new GroupBoxProcessButtonGrid(this, false, true);
     super.initConfig();
     categorizeFields();
 
@@ -398,6 +403,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void rebuildFieldGrid() {
     m_bodyGrid.validate(this);
+    m_customProcessButtonGrid.validate();
+    m_systemProcessButtonGrid.validate();
     if (isInitialized() && getForm() != null) {
       getForm().structureChanged(this);
     }
