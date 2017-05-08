@@ -268,7 +268,7 @@ describe('jquery-scout', function() {
       $('<style>.invisible {visibility: hidden !important;}</style>').appendTo($('#sandbox'));
     });
 
-    it('returns the element at point but only if it is a child', function() {
+    it('returns the element from point but only if it is a child', function() {
       var $container = $('<div>')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
         .appendTo($('#sandbox'));
@@ -308,7 +308,10 @@ describe('jquery-scout', function() {
         .appendTo($container);
       expect($(document).elementFromPoint(20, 20)[0]).toBe($elem[0]);
       expect($(document).elementFromPoint(19, 19)[0]).toBe($container[0]);
+      $('body').addClass('invisible');
+      // Probably very unlikely that someone uses this method on an empty document, but who knows...
       expect($(document).elementFromPoint(9, 9)[0]).toBe(document.documentElement);
+      $('body').removeClass('invisible');
     });
 
   });
