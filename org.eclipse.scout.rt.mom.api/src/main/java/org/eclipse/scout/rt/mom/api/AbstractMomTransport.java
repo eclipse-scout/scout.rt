@@ -25,7 +25,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractMomTransport.class);
 
-  protected final FinalValue<IMom> m_delegate = new FinalValue<>();
+  protected final FinalValue<IMomImplementor> m_delegate = new FinalValue<>();
 
   /**
    * @return the {@link IMomImplementor} class to use in this MOM. If <code>null</code> is returned, the
@@ -54,6 +54,7 @@ public abstract class AbstractMomTransport implements IMomTransport {
    * Unlike the other methods on this class, this method can be called <b>without</b> triggering the initialization of
    * the delegate.
    */
+  @Override
   public boolean isNullTransport() {
     final Class<? extends IMomImplementor> implementorClass = getConfiguredImplementor();
     return implementorClass == null || NullMomImplementor.class.isAssignableFrom(implementorClass);
@@ -108,18 +109,26 @@ public abstract class AbstractMomTransport implements IMomTransport {
    * @return the MOM delegate. The delegate is initialized <i>synchronously</i> when this method is first called (i.e.
    *         this call may block until the delegate is initialized).
    */
-  protected IMom getDelegate() {
+  protected IMomImplementor getDelegate() {
     if (!m_delegate.isSet()) {
       synchronized (m_delegate) {
-        m_delegate.setIfAbsent(new Callable<IMom>() {
+        m_delegate.setIfAbsent(new Callable<IMomImplementor>() {
           @Override
-          public IMom call() throws Exception {
+          public IMomImplementor call() throws Exception {
             return initDelegate();
           }
         });
       }
     }
     return m_delegate.get();
+  }
+
+  @Override
+  public boolean isReady() {
+    if (!m_delegate.isSet()) {
+      return false;
+    }
+    return m_delegate.get().isReady();
   }
 
   @Override

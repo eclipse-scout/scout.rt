@@ -91,16 +91,16 @@ public class TrivialAccessController implements IAccessController {
       return true;
     }
 
+    // Is request path excluded from authentication?
+    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
+      chain.doFilter(request, response);
+      return true;
+    }
+
     // Is already authenticated?
     final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
     if (principal != null) {
       BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
-      return true;
-    }
-
-    // Is request path excluded from authentication?
-    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
-      chain.doFilter(request, response);
       return true;
     }
 

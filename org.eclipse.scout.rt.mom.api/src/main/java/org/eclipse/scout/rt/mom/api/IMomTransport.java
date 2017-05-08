@@ -17,4 +17,9 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
  */
 @ApplicationScoped
 public interface IMomTransport extends IMom {
+
+  boolean isReady();
+
+  boolean isNullTransport();
+
 }
