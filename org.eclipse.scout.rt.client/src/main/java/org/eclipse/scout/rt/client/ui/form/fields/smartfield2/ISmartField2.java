@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
@@ -44,6 +45,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
+  String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
 
   void lookupAll();
 
@@ -211,23 +213,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   VALUE getValueAsLookupKey();
 
-  /**
-   * Sets the height of the proposal form in pixel. (The proposal form is smaller if there are not enought values to
-   * fill the proposal.)
-   *
-   * @param proposalFormHeight
-   *          height in pixel
-   */
-  void setProposalFormHeight(int proposalFormHeight);
-
-  /**
-   * @return the height of the proposal form in pixel
-   */
-  int getProposalFormHeight();
-
-  /**
-   * @return
-   */
   Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass();
 
   void acceptProposal();
@@ -236,7 +221,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   String getWildcard();
 
-  //search and update the field with the result
+  // search and update the field with the result
 
   /**
    * updates the lookup rows with the same search text as last time.
@@ -394,5 +379,9 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
    * @return {@link IFuture} to cancel data fetching
    */
   IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<VALUE> callback);
+
+  ColumnDescriptor[] getColumnDescriptors();
+
+  void setColumnDescriptors(ColumnDescriptor[] columnHeaders);
 
 }

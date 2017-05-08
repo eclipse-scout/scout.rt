@@ -4,17 +4,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
@@ -67,13 +70,24 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_ACTIVE_FILTER_LABELS, model) {
       @Override
-      protected String[] modelValue() { // FIXME [awe] 7.0 - SF2: convert to JsonArray?
+      protected String[] modelValue() {
         return getModel().getActiveFilterLabels();
       }
 
       @Override
       public Object prepareValueForToJson(Object value) {
         return new JSONArray(value);
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_COLUMN_DESCRIPTORS, model) {
+      @Override
+      protected ColumnDescriptor[] modelValue() {
+        return getModel().getColumnDescriptors();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return columnDescriptorsToJson(value);
       }
     });
   }
@@ -155,8 +169,9 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     }
     JSONObject json = new JSONObject();
     JSONArray lookupRows = new JSONArray();
+    boolean multipleColumns = getModel().getColumnDescriptors() != null;
     for (LookupRow<?> lookupRow : (Collection<LookupRow<?>>) result.getLookupRows()) {
-      lookupRows.put(lookupRowToJson(lookupRow));
+      lookupRows.put(lookupRowToJson(lookupRow, multipleColumns));
     }
     json.put("lookupRows", lookupRows);
     if (result.isLookupFailed()) {
@@ -166,7 +181,7 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     return json;
   }
 
-  protected JSONObject lookupRowToJson(LookupRow<?> lookupRow) {
+  protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {
     int mappedKey = mapKey(lookupRow.getKey());
     JSONObject json = new JSONObject();
     json.put("key", mappedKey);
@@ -195,12 +210,35 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     if (!lookupRow.isActive()) {
       json.put("active", lookupRow.isActive());
     }
-    if (lookupRow.getAdditionalTableRowData() != null && lookupRow.getAdditionalTableRowData().getCustomValues() != null) { // FIXME [awe] 7.0 - SF2: create isEmpty() method on AdditionalTableRowData
-      json.put("additionalTableRowData", lookupRow.getAdditionalTableRowData()); // FIXME [awe] 7.0 - SF2: impl. toJson for AdditionalTableRowData?
+    if (multipleColumns && lookupRow.getAdditionalTableRowData() != null) {
+      json.put("additionalTableRowData", tableRowDataToJson(lookupRow.getAdditionalTableRowData()));
     }
     if (StringUtility.hasText(lookupRow.getCssClass())) {
       json.put("cssClass", lookupRow.getCssClass());
     }
     return json;
+  }
+
+  protected Object tableRowDataToJson(AbstractTableRowData tableRowData) {
+    if (tableRowData == null) {
+      return null;
+    }
+    return MainJsonObjectFactory.get().createJsonObject(tableRowData).toJson();
+  }
+
+  protected JSONArray columnDescriptorsToJson(Object value) {
+    if (value == null) {
+      return null;
+    }
+    ColumnDescriptor[] descs = (ColumnDescriptor[]) value;
+    JSONArray array = new JSONArray();
+    for (ColumnDescriptor desc : descs) {
+      JSONObject json = new JSONObject();
+      json.put("propertyName", desc.getPropertyName());
+      json.put("width", desc.getWidth());
+      json.put("text", desc.getText());
+      array.put(json);
+    }
+    return array;
   }
 }

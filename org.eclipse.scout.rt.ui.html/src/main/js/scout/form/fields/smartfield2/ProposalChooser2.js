@@ -214,9 +214,10 @@ scout.ProposalChooser2.prototype._computeStatus = function(result) {
     });
   }
 
-  if (rows.length > this._smartField().browseMaxRowCount) {
+  var maxRows = this._smartField().browseMaxRowCount;
+  if (rows.length > maxRows) {
     return scout.Status.info({
-      message: this.session.text('SmartFieldMoreThanXRows', rows.length)
+      message: this.session.text('SmartFieldMoreThanXRows', maxRows)
     });
   }
 

@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -128,7 +129,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   private boolean m_browseHierarchy;
   private boolean m_loadIncremental;
   private boolean m_loadParentNodes;
-  private int m_proposalFormHeight;
   private String m_wildcard;
   private SmartField2Result m_result;
 
@@ -278,6 +278,20 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Order(300)
   protected String getConfiguredWildcard() {
     return "*";
+  }
+
+  /**
+   * This property has only an effect when the smart field has a table proposal chooser. When the returned value is
+   * null, no column headers are visible in the proposal chooser. If the returned value is a string array it contains
+   * the texts used for column headers, make sure that the number of elements in the array is equals to the number of
+   * cells in the proposal chooser table.
+   *
+   * @return
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(310)
+  protected ColumnDescriptor[] getConfiguredColumnDescriptors() {
+    return null;
   }
 
   /**
@@ -450,7 +464,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
-    setProposalFormHeight(getConfiguredProposalFormHeight());
+    setColumnDescriptors(getConfiguredColumnDescriptors());
+
     initLookupRowFetcher();
     // code type
     if (getConfiguredCodeType() != null) {
@@ -538,16 +553,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   protected void setResult(SmartField2Result<VALUE> result) {
     propertySupport.firePropertyChange(PROP_RESULT, null, result);
-  }
-
-  @Override
-  public void setProposalFormHeight(int proposalFormHeight) {
-    m_proposalFormHeight = proposalFormHeight;
-  }
-
-  @Override
-  public int getProposalFormHeight() { // FIXME [awe] 7.0 - SF2: remove getProposalFormHeight
-    return m_proposalFormHeight;
   }
 
   /**
@@ -660,6 +665,16 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void setBrowseNewText(String s) {
     m_browseNewText = s;
+  }
+
+  @Override
+  public ColumnDescriptor[] getColumnDescriptors() {
+    return (ColumnDescriptor[]) getProperty(PROP_COLUMN_DESCRIPTORS);
+  }
+
+  @Override
+  public void setColumnDescriptors(ColumnDescriptor[] columnDescriptors) {
+    setProperty(PROP_COLUMN_DESCRIPTORS, columnDescriptors);
   }
 
   @Override

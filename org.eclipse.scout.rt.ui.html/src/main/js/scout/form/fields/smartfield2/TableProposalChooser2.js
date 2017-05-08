@@ -4,17 +4,42 @@ scout.TableProposalChooser2 = function() {
 scout.inherits(scout.TableProposalChooser2, scout.ProposalChooser2);
 
 scout.TableProposalChooser2.prototype._createModel = function() {
+  var headerVisible, column,
+    columns = [],
+    descriptors = this._smartField().columnDescriptors,
+    autoResize = true;
+
+  if (descriptors) {
+    headerVisible = true;
+    descriptors.forEach(function(descriptor, index) {
+      column = scout.create('Column', {
+        index: index,
+        session: this.session,
+        text: descriptor.text
+      });
+
+      // if at least one of the descriptors defines a width, we set autoResize to false
+      if (descriptor.width) {
+        autoResize = false;
+        column.width = descriptor.width;
+      }
+
+      columns.push(column);
+    }, this);
+  } else {
+    headerVisible = false;
+    columns.push(scout.create('Column', {
+      index: 0,
+      session: this.session
+    }));
+  }
+
   var table = scout.create('Table', {
     parent: this,
-    headerVisible: false,
-    autoResizeColumns: true,
+    headerVisible: headerVisible,
+    autoResizeColumns: autoResize,
     multiSelect: false,
-    columns: [
-      scout.create('Column', {
-        index: 0,
-        session: this.session
-      })
-    ]
+    columns: columns
   });
 
   table.on('rowClicked', this._triggerLookupRowSelected.bind(this));
@@ -32,10 +57,12 @@ scout.TableProposalChooser2.prototype._triggerLookupRowSelected = function(event
 };
 
 scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
-  var tableRows = [];
+  var tableRows = [],
+    multipleColumns = !!this._smartField().columnDescriptors;
+
   this.model.deleteAllRows();
   lookupRows.forEach(function(lookupRow) {
-    tableRows.push(this._createTableRow(lookupRow));
+    tableRows.push(this._createTableRow(lookupRow, multipleColumns));
   }, this);
   this.model.insertRows(tableRows);
 };
@@ -44,15 +71,17 @@ scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
  * Creates a table-row for the given lookup-row.
  * @returns {object} table-row model
  */
-scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow) {
+scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow, multipleColumns) {
   var
-  cell = scout.create('Cell', {
-    text: lookupRow.text
-  }),
-  row = {
-    cells: [cell],
-    lookupRow: lookupRow
-  };
+    cell = scout.create('Cell', {
+      text: lookupRow.text
+    }),
+    cells = [cell],
+    row = {
+      cells: cells,
+      lookupRow: lookupRow
+    };
+
   if (lookupRow.iconId) {
     cell.iconId = lookupRow.iconId;
   }
@@ -75,10 +104,14 @@ scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow) {
   if (lookupRow.active === false) {
     row.active = false;
   }
-  //FIXME [awe] 7.0 - SF2: impl. additionalTableRowData
   if (lookupRow.cssClass) {
     cell.cssClass = lookupRow.cssClass;
   }
+
+  if (multipleColumns && lookupRow.additionalTableRowData) {
+    scout.arrays.pushAll(cells, this._transformTableRowData(lookupRow.additionalTableRowData));
+  }
+
   return row;
 };
 
@@ -102,4 +135,24 @@ scout.TableProposalChooser2.prototype.getSelectedLookupRow = function() {
 scout.TableProposalChooser2.prototype.delegateKeyEvent = function(event) {
   this.model.$container.trigger(event);
 };
+
+/**
+ * Takes the TableRowData bean and the infos provided by the column descriptors to create an
+ * array of additional values in the correct order, as defined by the descriptors.
+ */
+scout.TableProposalChooser2.prototype._transformTableRowData = function(tableRowData) {
+  var descriptors = this._smartField().columnDescriptors;
+  var cells = [];
+  descriptors.forEach(function(desc) {
+    if (desc.propertyName) { // default column descriptor (first column) has propertyName null
+      cells.push(scout.create('Cell', {
+        text: tableRowData[desc.propertyName]
+      }));
+    }
+  });
+  return cells;
+};
+
+
+
 

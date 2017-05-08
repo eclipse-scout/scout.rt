@@ -9,16 +9,12 @@ scout.SmartField2 = function() {
   this.codeType = null;
   this._pendingLookup = null;
   this.lookupRow = null;
-
+  this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
   this.activeFilterEnabled = false;
   this.activeFilter = null;
   this.activeFilterLabels = [];
-
-  this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
-
-
-  //this.variant = scout.SmartField2.Variant.DROPDOWN;
-  this.variant = scout.SmartField2.Variant.DEFAULT;
+  this.columnDescriptors = null;
+  this.variant = scout.SmartField2.Variant.DEFAULT; // scout.SmartField2.Variant.DROPDOWN;
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -259,7 +255,7 @@ scout.SmartField2.prototype.openPopup = function() {
   this.lookupCall.getAll().done(this.openPopup2.bind(this));
 };
 
-scout.SmartField2.prototype.openPopup2 = function(result) {
+scout.SmartField2.prototype.openPopup2 = function(result) { // FIXME [awe] 7.0 - SF2: improve naming openPopup2
   this.hideLookupInProgress();
   this.$container.addClass('popup-open');
   // On touch devices the field does not get the focus.
