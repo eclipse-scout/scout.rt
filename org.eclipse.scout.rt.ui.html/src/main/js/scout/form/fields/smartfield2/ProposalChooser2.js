@@ -21,11 +21,6 @@ scout.ProposalChooser2 = function() { // FIXME [awe] 7.0 - SF2: merge with Smart
 };
 scout.inherits(scout.ProposalChooser2, scout.Widget);
 
-/**
- * @see IContentAssistField#getActiveFilterLabels() - should have the same order.
- */
-scout.ProposalChooser2.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
-
 scout.ProposalChooser2.prototype._init = function(model) {
   scout.ProposalChooser2.parent.prototype._init.call(this, model);
 
@@ -61,7 +56,7 @@ scout.ProposalChooser2.prototype._render = function($parent) {
     });
 
     // add radio buttons
-    scout.ProposalChooser2.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
+    scout.SmartField2.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
       this._renderActiveFilterButton(value, index);
     }, this);
 
@@ -161,7 +156,7 @@ scout.ProposalChooser2.prototype._renderActiveFilterButton = function(value, ind
   var radio = scout.create('RadioButton', {
       parent: this.activeFilterGroup,
       label: this._activeFilterLabel(index),
-      radioValue: scout.ProposalChooser2.ACTIVE_FILTER_VALUES[index],
+      radioValue: scout.SmartField2.ACTIVE_FILTER_VALUES[index],
       selected: this._smartField().activeFilter === value,
       focusWhenSelected: false,
       gridData: {

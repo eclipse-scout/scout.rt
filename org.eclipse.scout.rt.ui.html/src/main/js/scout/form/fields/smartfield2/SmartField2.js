@@ -1,3 +1,6 @@
+// FIXME [awe] 7.0 - lookup row als property zwischen server und client hin und her schicken?
+// um das problem mit den lazy styles zu lösen
+
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
@@ -30,6 +33,11 @@ scout.SmartField2.Variant = {
 scout.SmartField2.DEBOUNCE_DELAY = 200;
 
 scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT = 100;
+
+/**
+ * @see IContentAssistField#getActiveFilterLabels() - should have the same order.
+ */
+scout.SmartField2.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
 /**
  * @override
@@ -99,7 +107,7 @@ scout.SmartField2.prototype._renderDisplayText = function() {
 scout.SmartField2.prototype.acceptInput = function(whileTyping) {
   var
     searchText = this._readDisplayText(),
-    lookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
+    selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
   // abort pending lookups
   if (this._pendingLookup) {
@@ -107,14 +115,14 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
   }
 
   // Do nothing when search text is equals to the text of the current lookup row
-  if (this.lookupRow && this.lookupRow.text === searchText) {
+  if (this.lookupRow && this.lookupRow.text === searchText && !selectedLookupRow) {
     console.log('unchanged');
     this.closePopup();
     return;
   }
 
   // 1.) when search text is empty and no lookup-row is selected, simply set the value to null
-  if (scout.strings.empty(searchText) && !lookupRow) {
+  if (scout.strings.empty(searchText) && !selectedLookupRow) {
     console.log('empty');
     this.setLookupRow(null);
     this.closePopup();
@@ -122,9 +130,9 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
   }
 
   // 2.) proposal chooser is open -> use the selected row as value
-  if (lookupRow) {
+  if (selectedLookupRow) {
     console.log('lookupRow selected');
-    this.setLookupRow(lookupRow);
+    this.setLookupRow(selectedLookupRow);
     this.closePopup();
     return;
   }
@@ -141,7 +149,14 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
 
     // when there's exactly one result, we accept that lookup row
     if (numLookupRows === 1) {
-      this.setLookupRow(result.lookupRows[0]);
+      var lookupRow = result.lookupRows[0];
+      if (this._isLookupRowActive(lookupRow)) {
+        this.setLookupRow(lookupRow);
+      } else {
+        this.setErrorStatus(scout.Status.error({
+          message: this.session.text('SmartFieldInactiveRow', searchText)
+        }));
+      }
       return;
     }
 
@@ -163,6 +178,27 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
 
     throw new Error('Unreachable code');
   }.bind(this));
+};
+
+/**
+ * Validates the given lookup row is enabled and matches the current activeFilter settings.
+ *
+ * @returns {boolean}
+ */
+scout.SmartField2.prototype._isLookupRowActive = function(lookupRow) {
+  if (!lookupRow.enabled) {
+    return false;
+  }
+  if (!this.activeFilterEnabled) {
+    return true;
+  }
+  if (this.activeFilter === 'TRUE') {
+    return lookupRow.active;
+  }
+  if (this.activeFilter === 'FALSE') {
+    return !lookupRow.active;
+  }
+  return true;
 };
 
 scout.SmartField2.prototype._renderEnabled = function() {
@@ -192,16 +228,23 @@ scout.SmartField2.prototype._setCodeType = function(codeType) {
   this.setProperty('lookupCall', lookupCall);
 };
 
-/**
- * @override
- */
 scout.SmartField2.prototype._formatValue = function(value) {
-  if (!this.lookupCall) {
-    return scout.strings.nvl(value) + '';
+  if (!value) {
+    return '';
   }
-  return this.lookupCall.textById(value);
-};
 
+  // we already have a lookup row - Note: in Scout Classic (remote case)
+  // we always end here and don't need to perform a getByKey lookup.
+  if (this.lookupRow) {
+    return this.lookupRow.text;
+  }
+
+  // we must do a lookup first to get the display text
+  return this.lookupCall.getByKey(value)
+    .then(function(lookupRow) {
+      return lookupRow ? lookupRow.text : '';
+    });
+};
 
 /**
  * @param {string} [searchText] optional search text. If set lookupCall#getByText() is called, otherwise lookupCall#getAll()
@@ -439,4 +482,17 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
   this.setValue(value);
 };
 
-
+scout.SmartField2.prototype._setValue = function(value) {
+  // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
+  // must of the time. Thus we must remove the reference to the old lookup row as early as possible
+  if (value) {
+    // when a value is set, we only keep the cached lookup row when the key of the lookup row is equals to the value
+    if (this.lookupRow && this.lookupRow.key != value) {
+      this.lookupRow = null;
+    }
+  } else {
+    // when value is set to null, we must also reset the cached lookup row
+    this.lookupRow = null;
+  }
+  scout.SmartField2.parent.prototype._setValue.call(this, value);
+};

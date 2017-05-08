@@ -42,6 +42,7 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
       }
 
       @Override
+      @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
         return resultToJson((SmartField2Result<VALUE>) value);
       }
@@ -90,9 +91,6 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     else if ("lookupAll".equals(event.getType())) {
       handleUiLookupAll();
     }
-    else if ("acceptBySearchText".equals(event.getType())) {
-      handleUiAcceptBySearchText(event);
-    }
     else {
       super.handleUiEvent(event);
     }
@@ -101,6 +99,7 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   // FIXME [awe] 7.0 - SF2: use UI facade here?
 
   @Override
+  @SuppressWarnings("unchecked")
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IValueField.PROP_VALUE.equals(propertyName)) {
       String mappedKey = data.optString("value");
@@ -123,12 +122,6 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     resetKeyMap();
     String searchText = event.getData().optString("searchText");
     getModel().lookupByText(searchText);
-  }
-
-  protected void handleUiAcceptBySearchText(JsonEvent event) {
-    resetKeyMap();
-    String searchText = event.getData().optString("searchText");
-    getModel().acceptByText(searchText);
   }
 
   /**

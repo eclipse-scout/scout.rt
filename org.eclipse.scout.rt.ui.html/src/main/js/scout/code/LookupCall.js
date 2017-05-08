@@ -30,7 +30,7 @@ scout.LookupCall.prototype._init = function(model) {
 /**
  * @returns {Promise} which returns a {scout.LookupCall}
  */
-scout.LookupCall.prototype.getById = function() {
+scout.LookupCall.prototype.getById = function(id) {
   // To be implemented by the subclass
   return $.resolvedPromise(scout.create('LookupRow'));
 };
@@ -63,15 +63,22 @@ scout.LookupCall.prototype._textById = function(id) {
 };
 
 /**
- * @returns {Promise} which returns {scout.LookupCall}s
+ * @return {Promise} resolves to an array of {scout.LookupRow}
  */
 scout.LookupCall.prototype.getAll = function() { // FIXME [awe] 7.0 - SF2: stimmt der kommentar? returns doch eher LookupROWs? nicht?
-  // To be implemented by the subclass
-  return $.resolvedPromise([]);
+  throw new Error('getAll() not implemented');
 };
 
+/**
+ * @return {Promise} resolves to an array of {scout.LookupRow}
+ */
 scout.LookupCall.prototype.getByText = function(text) {
-  // To be implemented by the subclass
-  return $.resolvedPromise(scout.create('LookupRow'));
+  throw new Error('getByText() not implemented');
 };
 
+/**
+ * @return {Promise} resolves to a single {scout.LookupRow}
+ */
+scout.LookupCall.prototype.getByKey = function(key) { // FIXME [awe] 7.0 - SF2: rename all getById to getByKey? discuss with C.GU
+  throw new Error('getByKey() not implemented');
+};

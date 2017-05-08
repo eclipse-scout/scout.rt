@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
@@ -950,65 +949,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     throw veto;
   }
 
-  protected boolean handleAcceptByDisplayText(String text) {
-    // do not change smart-field value if text of current lookup-row matches current display text
-    ILookupRow<VALUE> lookupRow = getCurrentLookupRow();
-    if (lookupRow != null && textEquals(text, lookupRow.getText())) {
-      return false;
-    }
-
-    String searchText = toSearchText(text);
-    IContentAssistSearchParam<VALUE> param = ContentAssistSearchParam.createTextParam(searchText, false);
-    getLookupRowFetcher().update(param, true);
-    List<? extends ILookupRow<VALUE>> lookupRows = getLookupRowFetcher().getResult().getLookupRows();
-    if (lookupRows == null || lookupRows.size() == 0) {
-      setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text), NO_RESULTS_ERROR_CODE);
-      return true;
-    }
-    else if (lookupRows.size() == 1) {
-      lookupRow = lookupRows.get(0);
-      if (lookupRowAccepted(lookupRow)) {
-        acceptProposal(lookupRow);
-      }
-      else {
-        setValidationError(text, TEXTS.get("SmartFieldInactiveRow", text), NO_RESULTS_ERROR_CODE);
-        return true;
-      }
-    }
-    else if (lookupRows.size() > 1) {
-      setValidationError(text, TEXTS.get("SmartFieldNotUnique", text), NOT_UNIQUE_ERROR_CODE);
-      return true;
-    }
-    return false;
-  }
-
-  private void setValidationError(String displayText, String errorMessage, int code) {
-    setCurrentLookupRow(null);
-    setDisplayText(displayText);
-    removeErrorStatus(ValidationFailedStatus.class); // remove existing validation errors first
-    addErrorStatus(new ValidationFailedStatus(errorMessage, ValidationFailedStatus.ERROR, code));
-  }
-
-  private boolean lookupRowAccepted(ILookupRow<VALUE> lookupRow) {
-    if (!lookupRow.isEnabled()) {
-      // when row is disabled, don't allow
-      return false;
-    }
-    TriState activeByLookupCall = getLookupCall().getActive();
-    switch (activeByLookupCall) {
-      case TRUE:
-        return lookupRow.isActive();
-      case FALSE:
-        return !lookupRow.isActive();
-      default: // UNDEFINED
-        return true;
-    }
-  }
-
-  private boolean textEquals(String displayText, String lookupRowText) {
-    return StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(displayText), StringUtility.emptyIfNull(lookupRowText));
-  }
-
   protected VALUE returnLookupRowAsValue(ILookupRow<VALUE> lookupRow) {
     return lookupRow.getKey();
   }
@@ -1062,11 +1002,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void lookupByText(String text) {
     doSearch(text, false, false);
-  }
-
-  @Override
-  public void acceptByText(String text) {
-    handleAcceptByDisplayText(text);
   }
 
   @Override
