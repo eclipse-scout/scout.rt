@@ -43,9 +43,12 @@ public interface IHeaderCell {
 
   String getCssClass();
 
+  boolean isHtmlEnabled();
+
   String getBackgroundColor();
 
   String getForegroundColor();
 
   FontSpec getFont();
+
 }

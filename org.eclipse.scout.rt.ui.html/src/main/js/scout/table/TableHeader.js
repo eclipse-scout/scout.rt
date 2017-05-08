@@ -332,8 +332,11 @@ scout.TableHeader.prototype._renderColumnText = function(column) {
     $header = column.$header,
     $headerText = $header.children('.table-header-item-text');
 
+  if (!column.headerHtmlEnabled) {
+    text = scout.strings.nl2br(text);
+  }
   // Make sure empty header is as height as the others to make it properly clickable
-  $headerText.htmlOrNbsp(scout.strings.nl2br(text), 'empty');
+  $headerText.htmlOrNbsp(text, 'empty');
   this._updateColumnIconAndTextStyle(column);
 };
 

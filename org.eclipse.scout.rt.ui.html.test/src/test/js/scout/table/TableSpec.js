@@ -2674,6 +2674,35 @@ describe("Table", function() {
       expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
       expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
     });
+
+    it("considers html enabled property of table header cells", function() {
+      model = helper.createModelFixture(4, 2);
+      table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+      column2 = model.columns[2];
+      var column3 = model.columns[3];
+
+      column0 = helper.createModelColumn('test');
+      column0.id = model.columns[0].id;
+      column1 = helper.createModelColumn('test');
+      column1.headerHtmlEnabled = true;
+      column1.id = model.columns[1].id;
+      column2 = helper.createModelColumn('<b>test</b>');
+      column2.id = model.columns[2].id;
+      column3 = helper.createModelColumn('<b>test</b>');
+      column3.headerHtmlEnabled = true;
+      column3.id = model.columns[3].id;
+      table.updateColumnHeaders([ column0, column1, column2, column3 ]);
+
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0).text()).toBe('test');
+      expect($colHeaders.eq(1).text()).toBe('test');
+      expect($colHeaders.eq(2).text()).toBe('<b>test</b>');
+      expect($colHeaders.eq(3).text()).toBe('test');
+    });
   });
 
   describe("headerVisible", function() {

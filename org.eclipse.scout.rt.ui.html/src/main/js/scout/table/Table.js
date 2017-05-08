@@ -3663,6 +3663,7 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
     column.text = columns[i].text;
     column.tooltipText = columns[i].tooltipText;
     column.headerCssClass = columns[i].headerCssClass;
+    column.headerHtmlEnabled = columns[i].headerHtmlEnabled;
     column.headerBackgroundColor = columns[i].headerBackgroundColor;
     column.headerForegroundColor = columns[i].headerForegroundColor;
     column.headerFont = columns[i].headerFont;

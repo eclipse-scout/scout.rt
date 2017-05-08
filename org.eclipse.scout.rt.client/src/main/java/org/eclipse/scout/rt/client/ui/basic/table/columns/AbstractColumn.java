@@ -216,6 +216,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures, if HTML rendering is enabled for this column header.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
+   * input) is encoded (security), if this property is enabled.
+   *
+   * @return {@code true}, if HTML rendering is enabled for this column header.{@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(110)
+  protected boolean getConfiguredHeaderHtmlEnabled() {
+    return false;
+  }
+
+  /**
    * Configures the color of this column header text. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
@@ -838,6 +852,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     }
     m_headerCell.setIconId(getConfiguredHeaderIconId());
     m_headerCell.setCssClass(getConfiguredHeaderCssClass());
+    m_headerCell.setHtmlEnabled(getConfiguredHeaderHtmlEnabled());
     if (getConfiguredHeaderForegroundColor() != null) {
       m_headerCell.setForegroundColor((getConfiguredHeaderForegroundColor()));
     }

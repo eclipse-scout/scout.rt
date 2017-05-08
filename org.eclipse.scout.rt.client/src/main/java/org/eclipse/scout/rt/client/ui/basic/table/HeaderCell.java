@@ -30,6 +30,7 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   private String m_tooltip;
   private int m_horizontalAlignment = -1;
   private String m_cssClass;
+  private boolean m_htmlEnabled;
   private String m_foregroundColor;
   private String m_backgroundColor;
   private FontSpec m_font;
@@ -68,6 +69,15 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   @Override
   public void setCssClass(String cssClass) {
     m_cssClass = cssClass;
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return m_htmlEnabled;
+  }
+
+  public void setHtmlEnabled(boolean htmlEnabled) {
+    m_htmlEnabled = htmlEnabled;
   }
 
   @Override

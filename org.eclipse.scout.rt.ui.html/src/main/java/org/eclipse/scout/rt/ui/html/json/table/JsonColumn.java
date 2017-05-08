@@ -87,6 +87,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
     json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
+    json.put("headerHtmlEnabled", getColumn().getHeaderCell().isHtmlEnabled());
     json.put("headerBackgroundColor", getColumn().getHeaderCell().getBackgroundColor());
     json.put("headerForegroundColor", getColumn().getHeaderCell().getForegroundColor());
     json.put("headerFont", getColumn().getHeaderCell().getFont() != null ? getColumn().getHeaderCell().getFont().toPattern() : null);
