@@ -836,11 +836,11 @@ scout.Planner.prototype._onCellMousedown = function(event) {
 
   if (this.activitySelectable) {
     if (!opensContextMenu && this.$selector) {
-      // Hide selector otherwise activity may not be resolved ($elementFromPoint would return the $selector)
+      // Hide selector otherwise activity may not be resolved (elementFromPoint would return the $selector)
       // This allows selecting an activity which is inside a selection range
       this.$selector.hide();
     }
-    $activity = this._$elementFromPoint(event.pageX, event.pageY);
+    $activity = this.$grid.elementFromPoint(event.pageX, event.pageY);
     if (!opensContextMenu && this.$selector) {
       this.$selector.show();
     }
@@ -1045,32 +1045,32 @@ scout.Planner.prototype._select = function(whileSelecting) {
 };
 
 scout.Planner.prototype._findRow = function(y) {
-  var x = this.$grid.offset().left + 10,
-    $row = this._$elementFromPoint(x, y).parent();
+  var $row,
+    gridBounds = scout.graphics.offsetBounds(this.$grid),
+    x = gridBounds.x + 10;
 
-  if ($row.hasClass('planner-resource')) {
+  y = Math.min(Math.max(y, 0), gridBounds.y + gridBounds.height - 1);
+  $row = this.$container.elementFromPoint(x, y, '.planner-resource');
+  if ($row.length > 0) {
     return $row.data('resource');
-  } else {
-    return null;
   }
+  return null;
 };
 
 scout.Planner.prototype._findScale = function(x) {
-  var y = this.$scale.offset().top + this.$scale.height() * 0.75,
-    $scale = this._$elementFromPoint(x, y);
+  var $scaleItem,
+    gridBounds = scout.graphics.offsetBounds(this.$grid),
+    y = this.$scale.offset().top + this.$scale.height() * 0.75;
 
-  if ($scale.data('date-from') !== undefined) {
-    return new scout.DateRange($scale.data('date-from').valueOf(), $scale.data('date-to').valueOf());
-  } else {
-    return null;
+  x = Math.min(Math.max(x, 0), gridBounds.x + gridBounds.width - 1);
+  $scaleItem = this.$container.elementFromPoint(x, y, '.scale-item');
+  if ($scaleItem.length > 0) {
+    return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
   }
+  return null;
 };
 
 /* -- helper ---------------------------------------------------- */
-
-scout.Planner.prototype._$elementFromPoint = function(x, y) {
-  return $(this.$container.document(true).elementFromPoint(x, y));
-};
 
 scout.Planner.prototype._dateFormat = function(date, pattern) {
   var d = new Date(date.valueOf()),
