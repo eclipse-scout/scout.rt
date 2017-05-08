@@ -786,7 +786,7 @@
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </pluginRepository>
-    <!-- Bintray Repository for test-release of https://github.com/mojohaus/flatten-maven-plugin/pull/13 -->
+    <!-- Bintray Repository for yui-compressor -->
     <pluginRepository>
       <snapshots>
         <enabled>false</enabled>
