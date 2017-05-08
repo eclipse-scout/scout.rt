@@ -262,5 +262,55 @@ describe('jquery-scout', function() {
 
   });
 
+  describe('elementFromPoint', function() {
+
+    beforeEach(function() {
+      $('<style>.invisible {visibility: hidden !important;}</style>').appendTo($('#sandbox'));
+    });
+
+    it('returns the element at point but only if it is a child', function() {
+      var $container = $('<div>')
+        .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
+        .appendTo($('#sandbox'));
+      var $elem = $('<div>')
+        .attr('style', 'position: absolute; left: 10px; top: 10px; width: 50px; height: 50px')
+        .appendTo($container);
+      expect($container.elementFromPoint(20, 20)[0]).toBe($elem[0]);
+      expect($container.elementFromPoint(19, 19)[0]).toBe($container[0]);
+      expect($container.elementFromPoint(9, 9).length).toBe(0);
+
+      $elem.appendTo($('#sandbox'));
+      expect($container.elementFromPoint(10, 10)[0]).toBe($container[0]);
+      expect($elem.elementFromPoint(10, 10)[0]).toBe($elem[0]);
+      expect($container.elementFromPoint(9, 9).length).toBe(0);
+    });
+
+    it('considers the selector', function() {
+      var $container = $('<div>')
+        .addClass('outer')
+        .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
+        .appendTo($('#sandbox'));
+      var $elem = $('<div>')
+        .addClass('inner')
+        .attr('style', 'position: absolute; left: 10px; top: 10px; width: 50px; height: 50px')
+        .appendTo($container);
+      expect($container.elementFromPoint(20, 20, '.inner')[0]).toBe($elem[0]);
+      expect($container.elementFromPoint(20, 20, '.outer')[0]).toBe($container[0]);
+      expect($container.elementFromPoint(20, 20, '.asdf').length).toBe(0);
+    });
+
+    it('returns the document element if no element matches and document is used as container', function() {
+      var $container = $('<div>')
+        .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
+        .appendTo($('#sandbox'));
+      var $elem = $('<div>')
+        .attr('style', 'position: absolute; left: 10px; top: 10px; width: 50px; height: 50px')
+        .appendTo($container);
+      expect($(document).elementFromPoint(20, 20)[0]).toBe($elem[0]);
+      expect($(document).elementFromPoint(19, 19)[0]).toBe($container[0]);
+      expect($(document).elementFromPoint(9, 9)[0]).toBe(document.documentElement);
+    });
+
+  });
 
  });

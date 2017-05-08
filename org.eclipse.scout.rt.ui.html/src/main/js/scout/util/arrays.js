@@ -358,7 +358,7 @@ scout.arrays = {
   },
 
   /**
-   * Converts an JS array of jQuery elements to a jQuery collection.
+   * Converts a JS array of jQuery elements to a jQuery collection.
    */
   $: function(arrayOfJQueryElements) {
     return $(arrayOfJQueryElements).map(function() {

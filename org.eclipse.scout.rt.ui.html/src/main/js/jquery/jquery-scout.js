@@ -407,7 +407,7 @@ $.fn.makeSpan = function(cssClass, text) {
 
 /**
  * @returns HTML document reference (ownerDocument) of the HTML element.
- * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+ * @param domElement (optional) if false this function returns a JQuery object, otherwise only the DOM element is returned
  */
 $.fn.document = function(domElement) {
   var myDocument = this.length ? this[0].ownerDocument : null;
@@ -440,6 +440,52 @@ $.fn.activeElement = function(domElement) {
   var myDocument = this.document(true),
     activeElement = myDocument ? myDocument.activeElement : null;
   return domElement ? activeElement : $(activeElement);
+};
+
+/**
+ * Returns the element at the given point considering only child elements and elements matching the selector, if specified.
+ */
+$.fn.elementFromPoint = function(x, y, selector) {
+  var $container = $(this),
+    doc = $container.document(true),
+    elements = [],
+    i = 0,
+    $element;
+
+  if (!doc) {
+    // If doc is null the $container itself is the document
+    doc = $container[0];
+  }
+
+  while (true) {
+    $element = $(doc.elementFromPoint(x, y));
+    if ($element.length === 0 || $element[0] === doc.documentElement) {
+      break;
+    }
+    if ($container.isOrHas($element) && (!selector || $element.is(selector))) {
+      break;
+    }
+    elements.push($element);
+    // make the element invisible to get the underlying element (uses visibility: hidden to make sure element size and position won't be changed)
+    $element.addClass('invisible');
+    i++;
+    if (i > 1000) {
+      $.log.warn('Infinite loop aborted', $element);
+      $element = $();
+      break;
+    }
+  }
+
+  if ($element[0] === doc.documentElement && $container[0] !== doc) {
+    // return an empty element if the only element found is the document element and the document element is not the container
+    $element = $();
+  }
+
+  elements.forEach(function($element) {
+    // show element again
+    $element.removeClass('invisible');
+  });
+  return $element;
 };
 
 /**
@@ -1130,6 +1176,9 @@ $.fn.disableSpellcheck = function() {
  * Returns whether the current element is the given element or has a child which is the given element.
  */
 $.fn.isOrHas = function(elem) {
+  if (elem instanceof $) {
+    elem = elem[0];
+  }
   return this[0] === elem || this.has(elem).length > 0;
 };
 
