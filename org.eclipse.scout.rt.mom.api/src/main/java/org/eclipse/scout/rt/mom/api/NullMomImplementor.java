@@ -18,6 +18,11 @@ public class NullMomImplementor implements IMomImplementor {
   }
 
   @Override
+  public boolean isReady() {
+    return true;
+  }
+
+  @Override
   public <DTO> void publish(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     // NOOP
   }

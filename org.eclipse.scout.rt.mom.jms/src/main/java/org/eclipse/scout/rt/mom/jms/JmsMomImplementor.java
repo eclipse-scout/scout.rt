@@ -240,6 +240,17 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   @Override
+  public boolean isReady() {
+    try {
+      return getConnection().getMetaData() != null;
+    }
+    catch (JMSException e) {
+      LOG.warn("failed to retrieve metadata", e);
+      return false;
+    }
+  }
+
+  @Override
   public <DTO> void publish(final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     assertNotNull(destination, "destination not specified");
     assertNotNull(input, "publishInput not specified");
@@ -655,4 +666,5 @@ public class JmsMomImplementor implements IMomImplementor {
    */
   public static class MomExceptionHandler extends ExceptionHandler {
   }
+
 }

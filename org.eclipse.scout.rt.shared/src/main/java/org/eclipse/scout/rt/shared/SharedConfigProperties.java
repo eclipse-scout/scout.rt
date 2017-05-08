@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -17,6 +21,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractSubjectConfigProperty;
@@ -113,6 +118,32 @@ public final class SharedConfigProperties {
         return value;
       }
       return null;
+    }
+
+  }
+
+  /**
+   * Property representing the list of URLs the {@link RemoteHealthChecker} has to check.
+   * <p>
+   * Example: <code>http://localhost:8080/status,http://localhost:8081/status</code>
+   */
+  public static class RemoteHealthCheckUrlsProperty extends AbstractConfigProperty<List<String>, String> {
+
+    @Override
+    public String getKey() {
+      return "scout.healthcheck.remoteUrls";
+    }
+
+    @Override
+    protected List<String> parse(String value) {
+      String[] tokens = StringUtility.tokenize(value, ',');
+      // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
+      return Arrays.asList(tokens);
+    }
+
+    @Override
+    protected List<String> getDefaultValue() {
+      return Collections.unmodifiableList(new ArrayList<String>(0));
     }
 
   }
