@@ -125,7 +125,7 @@ scout.SplitBox.prototype._render = function($parent) {
         var targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
 
         // Snap to begin and end
-        var tempSplitterOffsetX = splitterSize.width / 2;
+        var tempSplitterOffsetX = Math.floor((splitterSize.width + scout.HtmlEnvironment.fieldMandatoryIndicatorWidth) / 2);
         if (targetSplitterPositionLeft < SNAP_SIZE) {
           targetSplitterPositionLeft = 0;
           tempSplitterOffsetX = 0;
@@ -137,9 +137,9 @@ scout.SplitBox.prototype._render = function($parent) {
         // Update temporary splitter
         $tempSplitter.cssLeft(targetSplitterPositionLeft - tempSplitterOffsetX);
         // Normalize target position
-        newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
+        newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX);
         if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
-          newSplitterPosition = newSplitterPosition / (splitAreaSize.width - splitterSize.width - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
+          newSplitterPosition = newSplitterPosition / (splitAreaSize.width - splitterSize.width);
         } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
           newSplitterPosition = splitAreaSize.width - newSplitterPosition - splitterSize.width;
         }
@@ -148,7 +148,7 @@ scout.SplitBox.prototype._render = function($parent) {
         var targetSplitterPositionTop = event.pageY - splitAreaPosition.top;
 
         // Snap to begin and end
-        var tempSplitterOffsetY = splitterSize.height / 2;
+        var tempSplitterOffsetY = Math.floor(splitterSize.height / 2);
         if (targetSplitterPositionTop < SNAP_SIZE) {
           targetSplitterPositionTop = 0;
           tempSplitterOffsetY = 0;
@@ -160,9 +160,9 @@ scout.SplitBox.prototype._render = function($parent) {
         // Update temporary splitter
         $tempSplitter.cssTop(targetSplitterPositionTop - tempSplitterOffsetY);
         // Normalize target position
-        newSplitterPosition = targetSplitterPositionTop;
+        newSplitterPosition = targetSplitterPositionTop - tempSplitterOffsetY;
         if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
-          newSplitterPosition = newSplitterPosition / splitAreaSize.height;
+          newSplitterPosition = newSplitterPosition / (splitAreaSize.height - splitterSize.height);
         } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
           newSplitterPosition = splitAreaSize.height - newSplitterPosition - splitterSize.height;
         }
