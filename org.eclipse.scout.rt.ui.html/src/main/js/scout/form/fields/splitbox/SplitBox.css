@@ -11,10 +11,10 @@
 .split-box {
 
   & > .split-area {
-    @x-splitter-size: 40px - @mandatory-indicator-width;
-    @y-splitter-size: 15px;
     @splitter-line-size: 3px;
     @temp-splitter-line-size: 1px;
+    @x-splitter-padding: 19px;
+    @y-splitter-padding: 6px;
 
     & > .first-field,
     & > .second-field {
@@ -27,18 +27,25 @@
 
     & > .splitter {
       position: absolute;
-      background-color: @border-color;
 
-      &:hover {
+      /* Visible line */
+      &::before {
+        content: '';
+        display: block;
+        background-color: @border-color;
+        width: 100%;
+        height: 100%;
+      }
+      &:not(.disabled):not(.dragging):hover::before {
         background-color: @hover-color;
       }
 
       /* | */
       &.x-axis {
         height: 100%;
-        width: @x-splitter-size;
-        border-left: (ceil((@x-splitter-size - @mandatory-indicator-width - @splitter-line-size) / 2) + @mandatory-indicator-width) solid @background-color;
-        border-right: floor((@x-splitter-size - @mandatory-indicator-width - @splitter-line-size) / 2) solid @background-color;
+        width: @splitter-line-size + (2 * @x-splitter-padding) - @mandatory-indicator-width;
+        padding-left: @x-splitter-padding;
+        padding-right: (@x-splitter-padding - @mandatory-indicator-width);
         cursor: col-resize;
       }
 
@@ -46,22 +53,17 @@
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100%' - @mandatory-indicator-width);
-        height: @y-splitter-size;
-        border-top: ceil((@y-splitter-size - @splitter-line-size) / 2) solid @background-color;
-        border-bottom: floor((@y-splitter-size - @splitter-line-size) / 2) solid @background-color;
+        height: @splitter-line-size + (2 * @y-splitter-padding);
+        padding-top: @y-splitter-padding;
+        padding-bottom: @y-splitter-padding;
         cursor: row-resize;
       }
 
       &.dragging {
-        background-color: @border-color;
         opacity: 0.25;
       }
 
       &.disabled {
-        &:hover {
-          background-color: @border-color;
-        }
-
         cursor: default;
       }
     }
@@ -76,8 +78,8 @@
         height: 100%;
         width: @temp-splitter-line-size;
         border-left: @temp-splitter-line-size dashed @focus-border-color;
-        margin-left: ceil((@x-splitter-size - @mandatory-indicator-width - @temp-splitter-line-size) / 2) + @mandatory-indicator-width;
-        margin-right: floor((@x-splitter-size - @mandatory-indicator-width - @temp-splitter-line-size) / 2);
+        margin-left: @x-splitter-padding + ceil((@splitter-line-size - @temp-splitter-line-size) / 2);
+        margin-right: @x-splitter-padding + floor((@splitter-line-size - @temp-splitter-line-size) / 2) - @mandatory-indicator-width;
       }
 
       /* -- */
@@ -86,8 +88,8 @@
         width: calc(~'100%' - @mandatory-indicator-width);
         height: @temp-splitter-line-size;
         border-top: @temp-splitter-line-size dashed @focus-border-color;
-        margin-top: ceil((@y-splitter-size - @temp-splitter-line-size) / 2);
-        margin-bottom: floor((@y-splitter-size - @temp-splitter-line-size) / 2);
+        margin-top: @y-splitter-padding + ceil((@splitter-line-size - @temp-splitter-line-size) / 2);
+        margin-bottom: @y-splitter-padding + floor((@splitter-line-size - @temp-splitter-line-size) / 2);
       }
     }
   }
