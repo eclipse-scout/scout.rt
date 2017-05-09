@@ -121,11 +121,13 @@ public class PublishInput {
   /**
    * Sets multiple properties to be included as message property.
    * <p>
-   * This is a convenience method calling {@link #withProperties(String, String)} multiple times
+   * This is a convenience method calling {@link #withProperties(String, String)} multiple times.
    */
   public PublishInput withProperties(final Map<String, String> props) {
-    for (Map.Entry<String, String> e : props.entrySet()) {
-      withProperty(e.getKey(), e.getValue());
+    if (props != null) {
+      for (Map.Entry<String, String> e : props.entrySet()) {
+        withProperty(e.getKey(), e.getValue());
+      }
     }
     return this;
   }

@@ -578,15 +578,13 @@ public class JmsMomImplementorTest {
   public void testProperties() throws InterruptedException {
     IDestination<String> topic = MOM.newDestination("test/mom/testProperties", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
 
-    List<IDisposable> disposables = new ArrayList<>();
-
     final Capturer<String> capturer1 = new Capturer<>();
 
     // Subscribe for the destination
-    disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
       @Override
       public void onMessage(IMessage<String> message) {
-        capturer1.set((String) message.getProperty("prop"));
+        capturer1.set(message.getProperty("prop"));
       }
     }));
 
@@ -596,8 +594,41 @@ public class JmsMomImplementorTest {
 
     // Verify
     assertEquals("propValue", capturer1.get());
+  }
 
-    dispose(disposables);
+  @Test
+  public void testMultipleProperties() throws InterruptedException {
+    IDestination<String> topic = MOM.newDestination("test/mom/testProperties", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
+
+    final Capturer<String> capturer1 = new Capturer<>();
+
+    // Subscribe for the destination
+    m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
+      @Override
+      public void onMessage(IMessage<String> message) {
+        String result = StringUtility.join("|",
+            message.getProperty("prop"),
+            message.getProperty("123"),
+            message.getProperty("null"),
+            message.getProperty("last"));
+        capturer1.set(result);
+      }
+    }));
+
+    // Publish a message
+    Map<String, String> myMap = new HashMap<>();
+    myMap.put("prop", "propValue");
+    myMap.put("anotherProp", "not used");
+    myMap.put("123", "one-two-three");
+    myMap.put("null", null);
+    MOM.publish(JmsTestMom.class, topic, "hello world", MOM.newPublishInput()
+        .withProperties(null) // test null-safety
+        .withProperty("prop", "propValue")
+        .withProperties(myMap)
+        .withProperty("last", "."));
+
+    // Verify
+    assertEquals("propValue|one-two-three|.", capturer1.get());
   }
 
   @Test
