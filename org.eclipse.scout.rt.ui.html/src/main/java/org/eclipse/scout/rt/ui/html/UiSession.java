@@ -774,8 +774,10 @@ public class UiSession implements IUiSession {
 
     // Remember response in history
     if (m_currentJsonResponse.getSequenceNo() != null) {
-      m_responseHistory.registerResponse(json, m_currentJsonRequest.getSequenceNo(), m_currentJsonResponse.getSequenceNo());
+      Long currentRequestSequenceNo = (m_currentJsonRequest == null ? null : m_currentJsonRequest.getSequenceNo()); // optional, e.g. when uploading files
+      m_responseHistory.registerResponse(m_currentJsonResponse.getSequenceNo(), json, currentRequestSequenceNo);
     }
+
     return json;
   }
 

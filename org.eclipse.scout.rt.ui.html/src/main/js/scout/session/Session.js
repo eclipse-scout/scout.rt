@@ -603,18 +603,20 @@ scout.Session.prototype._decorateUrl = function(url, request) {
 };
 
 scout.Session.prototype._getRequestName = function(request, defaultName) {
-  if (request.unload) {
-    return 'unload';
-  } else if (request.pollForBackgroundJobs) {
-    return 'pollForBackgroundJobs';
-  } else if (request.ping) {
-    return 'ping';
-  } else if (request.cancel) {
-    return 'cancel';
-  } else if (request.log) {
-    return 'log';
-  } else if (request.syncResponseQueue) {
-    return 'syncResponseQueue';
+  if (request) {
+    if (request.unload) {
+      return 'unload';
+    } else if (request.pollForBackgroundJobs) {
+      return 'pollForBackgroundJobs';
+    } else if (request.ping) {
+      return 'ping';
+    } else if (request.cancel) {
+      return 'cancel';
+    } else if (request.log) {
+      return 'log';
+    } else if (request.syncResponseQueue) {
+      return 'syncResponseQueue';
+    }
   }
   return defaultName;
 };

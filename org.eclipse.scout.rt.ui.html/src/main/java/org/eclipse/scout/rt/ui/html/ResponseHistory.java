@@ -50,26 +50,37 @@ public class ResponseHistory {
   }
 
   /**
-   * Stores the given response in the history, along with the <i>request sequence number</i> and the <i>response
-   * sequence number</i>. If the history is already full, the oldest entry is discarded.
+   * Stores the given <u>response</u> in the history, along with the <u>response</u> sequence number. If a
+   * <u>request</u> sequence number is provided, a mapping between those sequence numbers is stored as well. This allows
+   * to retrieve the response by request sequence number.
+   * <p>
+   * If the history is already full, the oldest entry is discarded.
    *
+   * @param responseSequenceNo
+   *          The sequence number of the <u>response</u> to remember <i>(mandatory)</i>
+   * @param response
+   *          The <u>response</u> to remember <i>(mandatory)</i>
+   * @param requestSequenceNo
+   *          The sequence number of the <u>request</u> that caused the response <i>(optional)</i>
    * @throws AssertionException
-   *           if any of the given arguments is <code>null</code>
+   *           if mandatory arguments are <code>null</code>
    */
-  public void registerResponse(JSONObject response, Long requestSequenceNo, Long responseSequenceNo) {
-    Assertions.assertNotNull(response);
-    Assertions.assertNotNull(requestSequenceNo);
-
+  public void registerResponse(Long responseSequenceNo, JSONObject response, Long requestSequenceNo) {
     Assertions.assertNotNull(responseSequenceNo);
+    Assertions.assertNotNull(response);
 
     synchronized (m_mutex) {
-      Assertions.assertFalse(m_responses.containsKey(responseSequenceNo), "ResponseSequenceNo {} already registered", responseSequenceNo);
-      Assertions.assertFalse(m_requestToResponseMap.containsKey(requestSequenceNo), "RequestSequenceNo {} already registered", requestSequenceNo);
-      Assertions.assertFalse(m_responseToRequestMap.containsKey(responseSequenceNo), "ResponseSequenceNo {} already registered", responseSequenceNo);
+      Assertions.assertFalse(m_responses.containsKey(responseSequenceNo), "ResponseSequenceNo #{} already registered", responseSequenceNo);
+      if (requestSequenceNo != null) { // optional
+        Assertions.assertFalse(m_requestToResponseMap.containsKey(requestSequenceNo), "RequestSequenceNo #{} already registered", requestSequenceNo);
+        Assertions.assertFalse(m_responseToRequestMap.containsKey(responseSequenceNo), "ResponseSequenceNo #{} already registered", responseSequenceNo);
+      }
 
       m_responses.put(responseSequenceNo, response);
-      m_requestToResponseMap.put(requestSequenceNo, responseSequenceNo);
-      m_responseToRequestMap.put(responseSequenceNo, requestSequenceNo);
+      if (requestSequenceNo != null) { // optional
+        m_requestToResponseMap.put(requestSequenceNo, responseSequenceNo);
+        m_responseToRequestMap.put(responseSequenceNo, requestSequenceNo);
+      }
 
       if (m_responses.size() > MAX_RESPONSE_HISTORY_SIZE) {
         // Remove oldest entry to free up memory (protection against malicious clients that send no or wrong #ACKs)
