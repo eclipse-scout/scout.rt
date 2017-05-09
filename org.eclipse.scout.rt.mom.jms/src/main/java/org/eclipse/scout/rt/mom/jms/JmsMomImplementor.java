@@ -262,6 +262,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
     final Message message = JmsMessageWriter.newInstance(m_defaultSession, marshaller)
         .writeTransferObject(transferObject)
+        .writeReplyTo(input.getReplyTo() == null ? null : resolveJmsDestination(input.getReplyTo(), m_defaultSession))
         .writeProperties(input.getProperties())
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();
@@ -297,6 +298,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
     final Message message = JmsMessageWriter.newInstance(transactedSession, marshaller)
         .writeTransferObject(transferObject)
+        .writeReplyTo(input.getReplyTo() == null ? null : resolveJmsDestination(input.getReplyTo(), transactedSession))
         .writeProperties(input.getProperties())
         .writeCorrelationId(CorrelationId.CURRENT.get())
         .build();

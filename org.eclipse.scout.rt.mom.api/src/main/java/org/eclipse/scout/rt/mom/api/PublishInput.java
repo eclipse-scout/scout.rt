@@ -46,6 +46,7 @@ public class PublishInput {
   private long m_timeToLive = PublishInput.INFINITELY;
   private long m_requestReplyTimeout = PublishInput.INFINITELY;
   private boolean m_transactional = false;
+  private IDestination<?> m_replyTo;
 
   public int getDeliveryMode() {
     return m_deliveryMode;
@@ -117,6 +118,18 @@ public class PublishInput {
     return this;
   }
 
+  /**
+   * Sets multiple properties to be included as message property.
+   * <p>
+   * This is a convenience method calling {@link #withProperties(String, String)} multiple times
+   */
+  public PublishInput withProperties(final Map<String, String> props) {
+    for (Map.Entry<String, String> e : props.entrySet()) {
+      withProperty(e.getKey(), e.getValue());
+    }
+    return this;
+  }
+
   public boolean isTransactional() {
     return m_transactional;
   }
@@ -130,6 +143,18 @@ public class PublishInput {
    */
   public PublishInput withTransactional(final boolean transactional) {
     m_transactional = transactional;
+    return this;
+  }
+
+  public IDestination<?> getReplyTo() {
+    return m_replyTo;
+  }
+
+  /**
+   * Specifies the JMS replyTo for request/reply messages
+   */
+  public PublishInput withReplyTo(final IDestination<?> replyTo) {
+    m_replyTo = replyTo;
     return this;
   }
 }
