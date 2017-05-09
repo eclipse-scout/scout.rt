@@ -13,7 +13,8 @@ scout.SmartField2Popup.prototype._init = function(options) {
 };
 
 scout.SmartField2Popup.prototype._createProposalChooser = function() {
-  return scout.create('TableProposalChooser2', {
+  var objectType = this._smartField().browseHierarchy ? 'TreeProposalChooser2' : 'TableProposalChooser2';
+  return scout.create(objectType, {
     parent: this
   });
 };

@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldDataFetcher;
@@ -126,7 +125,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   private LookupRow m_decorationRow;
 
   private boolean m_browseAutoExpandAll;
-  private boolean m_browseHierarchy;
   private boolean m_loadIncremental;
   private boolean m_loadParentNodes;
   private String m_wildcard;
@@ -638,12 +636,12 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public boolean isBrowseHierarchy() {
-    return m_browseHierarchy;
+    return propertySupport.getPropertyBool(PROP_BROWSE_HIERARCHY);
   }
 
   @Override
-  public void setBrowseHierarchy(boolean b) {
-    m_browseHierarchy = b;
+  public void setBrowseHierarchy(boolean browseHierarchy) {
+    propertySupport.setPropertyBool(PROP_BROWSE_HIERARCHY, browseHierarchy);
     initLookupRowFetcher();
   }
 
@@ -691,7 +689,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       CodeLookupCall<VALUE> codeLookupCall = CodeLookupCall.newInstanceByService(m_codeTypeClass);
       m_lookupCall = codeLookupCall;
       ICodeType t = BEANS.opt(m_codeTypeClass);
-      if (t != null && !ConfigurationUtility.isMethodOverwrite(AbstractContentAssistField.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
+      if (t != null && !ConfigurationUtility.isMethodOverwrite(AbstractSmartField2.class, "getConfiguredBrowseHierarchy", new Class[0], this.getClass())) {
         setBrowseHierarchy(t.isHierarchy());
       }
     }

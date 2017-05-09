@@ -241,4 +241,11 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     }
     return array;
   }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put("browseHierarchy", getModel().isBrowseHierarchy());
+    return json;
+  }
 }
