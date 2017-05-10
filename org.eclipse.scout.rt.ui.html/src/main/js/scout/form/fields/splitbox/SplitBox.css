@@ -27,16 +27,10 @@
 
     & > .splitter {
       position: absolute;
+      background-color: @border-color;
+      background-clip: content-box; /* don't color padding */
 
-      /* Visible line */
-      &::before {
-        content: '';
-        display: block;
-        background-color: @border-color;
-        width: 100%;
-        height: 100%;
-      }
-      &:not(.disabled):not(.dragging):hover::before {
+      &:not(.disabled):not(.dragging):hover {
         background-color: @hover-color;
       }
 
