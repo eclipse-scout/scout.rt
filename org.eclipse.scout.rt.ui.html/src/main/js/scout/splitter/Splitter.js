@@ -126,7 +126,6 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
   }
 };
 scout.Splitter.prototype._onMouseDown = function(event) {
-//  console.log('splitter1 '+new Date().getTime());
   var splitterCenter = scout.graphics.offsetBounds(this.$container, true).center();
 
   // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
@@ -140,11 +139,9 @@ scout.Splitter.prototype._onMouseDown = function(event) {
     left: splitterCenter.x - event.pageX,
     top: splitterCenter.y - event.pageY
   };
-//  console.log('splitter2 '+new Date().getTime());
   this.trigger('moveStart', {
     position: this._getSplitterPosition(event)
   });
-//  console.log('splitter3 '+new Date().getTime());
   // Prevent text selection in a form
   event.preventDefault();
 };
