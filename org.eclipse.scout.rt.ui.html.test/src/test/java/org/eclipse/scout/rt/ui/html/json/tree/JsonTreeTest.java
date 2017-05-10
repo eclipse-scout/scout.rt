@@ -51,7 +51,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -671,7 +670,6 @@ public class JsonTreeTest {
   }
 
   @Test
-  @Ignore // TODO [6.1+] bsh, mru, abr: Enable this test once TreeEventBuffer is fixed and this test will be green (207681)
   public void testInsertAndDeleteInSameRequest() throws Exception {
     // Note: A test for the same problem (but without a real tree) can be found here:
     // org.eclipse.scout.rt.client.ui.basic.tree.TreeEventBufferTest.testInsertAndRemoveInSameRequest()

@@ -557,11 +557,24 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         return true;
       }
 
-      final boolean insertEvent = event.getType() == TreeEvent.TYPE_NODES_INSERTED;
-      event.removeNodes(m_allNodesToRemove, insertEvent ? m_removedNodesCollector : null);
+      final int type = event.getType();
+      final boolean insertEvent = type == TreeEvent.TYPE_NODES_INSERTED;
+      final boolean deleteEvent = type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED || type == TreeEvent.TYPE_NODES_DELETED;
 
-      if (!insertEvent) {
+      if (deleteEvent) {
+        Set<ITreeNode> additionalNodesToRemoveCollector = new HashSet<>();
+        event.removeNodes(m_allNodesToRemove, additionalNodesToRemoveCollector);
+        for (ITreeNode node : additionalNodesToRemoveCollector) {
+          registerNodeToRemoveWithAllChildren(node);
+        }
         return false;
+      }
+      else if (!insertEvent) {
+        event.removeNodes(m_allNodesToRemove, null);
+        return false;
+      }
+      else {
+        event.removeNodes(m_allNodesToRemove, m_removedNodesCollector);
       }
 
       for (Iterator<ITreeNode> it = m_nodesToRemove.iterator(); it.hasNext();) {
@@ -608,19 +621,26 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       m_childNodesByNodeToRemove = new HashMap<>();
       // collect nodes to remove and their child nodes
       for (ITreeNode node : m_deleteEvent.getNodesSet()) {
-        if (node == null) {
-          continue;
-        }
-        m_nodesToRemove.add(node);
-        m_allNodesToRemove.add(node);
-        if (node.getChildNodeCount() > 0) {
-          Set<ITreeNode> collector = new HashSet<>();
-          node.collectChildNodes(collector, true);
-          m_childNodesByNodeToRemove.put(node, collector);
-          m_allNodesToRemove.addAll(collector);
-        }
+        registerNodeToRemoveWithAllChildren(node);
       }
       m_removedNodesCollector = new HashSet<>();
+    }
+
+    /**
+     * Registers the given node to be removed along with all its children (direct and indirect).
+     */
+    protected void registerNodeToRemoveWithAllChildren(ITreeNode node) {
+      if (node == null) {
+        return;
+      }
+      m_nodesToRemove.add(node);
+      m_allNodesToRemove.add(node);
+      if (node.getChildNodeCount() > 0) {
+        Set<ITreeNode> collector = new HashSet<>();
+        node.collectChildNodes(collector, true);
+        m_childNodesByNodeToRemove.put(node, collector);
+        m_allNodesToRemove.addAll(collector);
+      }
     }
 
     public void complete() {
