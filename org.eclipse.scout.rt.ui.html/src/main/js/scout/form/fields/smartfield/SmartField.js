@@ -24,6 +24,7 @@
  *     events.
  */
 scout.SmartField = function() {
+  this._acceptProposalSent = false;
   scout.SmartField.parent.call(this);
 
   this.DEBOUNCE_DELAY = 200;
@@ -438,7 +439,7 @@ scout.SmartField.prototype.proposalSelected = function() {
 
 // See comment in ProposalChooserAdapter.js
 scout.SmartField.prototype._abortAcceptProposal = function(displayText) {
-  var abort = this.proposalSelectedInProgress && displayText === this._oldDisplayText;
+  var abort = this._acceptProposalSent || this.proposalSelectedInProgress && displayText === this._oldDisplayText;
   if (abort) {
     $.log.debug('(SmartField#_abortAcceptProposal) aborted _acceptProposal because displayText has not changed since proposal has been selected');
   }
@@ -511,6 +512,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
 scout.SmartField.prototype._onProposalSelectionDone = function(event) {
   $.log.debug('(SmartField#_onProposalSelectionDone) request done proposalChooser=' + this.proposalChooser);
   this.proposalSelectedInProgress = false;
+  this._acceptProposalSent = false;
   if (this._tabPrevented && !this.proposalChooser) {
     this._focusNextTabbable();
   }
@@ -540,6 +542,7 @@ scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
  */
 scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
   this._setDisplayText(displayText);
+  this._acceptProposalSent = true;
   this._send('acceptProposal', { // TODO [7.0] cgu: (smartfield) move to adapter
     displayText: displayText,
     chooser: chooser,
