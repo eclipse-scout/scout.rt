@@ -205,7 +205,7 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
       json.put("enabled", lookupRow.isEnabled());
     }
     if (lookupRow.getParentKey() != null) {
-      json.put("parentKey", lookupRow.getParentKey()); // FIXME [awe] 7.0 - SF2: how to map the parentKey?
+      json.put("parentKey", m_keyToIdMap.get(lookupRow.getParentKey())); // FIXME [awe] 7.0 - SF2: how to map the parentKey, in case of incremental loading?
     }
     if (!lookupRow.isActive()) {
       json.put("active", lookupRow.isActive());

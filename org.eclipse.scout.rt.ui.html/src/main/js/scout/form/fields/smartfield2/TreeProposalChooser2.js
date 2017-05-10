@@ -32,12 +32,13 @@ scout.TreeProposalChooser2.prototype.getSelectedLookupRow = function() {
 };
 
 scout.TreeProposalChooser2.prototype.setLookupRows = function(lookupRows) {
-  var treeNodes = [];
-
+  var treeNodesFlat = [];
   this.model.deleteAllChildNodes();
   lookupRows.forEach(function(lookupRow) {
-    treeNodes.push(this._createTreeNode(lookupRow));
+    treeNodesFlat.push(this._createTreeNode(lookupRow));
   }, this);
+
+  var treeNodes = this._flatListToTree(treeNodesFlat);
   this.model.insertNodes(treeNodes);
 };
 
@@ -45,12 +46,44 @@ scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
   var node = {
     childNodeIndex: 0,
     htmlEnabled: false,
-    iconId: 'icon/form.png',
+    iconId: lookupRow.iconId,
     id: lookupRow.key,
-    initialExpanded: false,
-    leaf: true,
+    parentId: scout.nvl(lookupRow.parentKey, 0),
+    expanded: true,
+    initialExpanded: true,
     text: lookupRow.text,
-    lookupRow: lookupRow
+    lookupRow: lookupRow,
+    leaf: true // later set to false, when child nodes are added
   };
   return node;
+};
+
+scout.TreeProposalChooser2.prototype._flatListToTree = function(treeNodesFlat) {
+  // 1. put all nodes with the same parent in a map (key=parentId, value=[nodes])
+  var nodesMap = {};
+  treeNodesFlat.forEach(function(treeNode) {
+    nodesMap[treeNode.id] = treeNode;
+  });
+
+  var rootNodes = [];
+
+  // 2. based on this map, set the childNodes references on the treeNodes
+  treeNodesFlat.forEach(function(treeNode) {
+    var parentNode = nodesMap[treeNode.parentId];
+    if (parentNode) {
+      if (!parentNode.childNodes) {
+        parentNode.childNodes = [];
+      }
+      treeNode.childNodeIndex = parentNode.childNodes.length;
+      treeNode.parentNode = parentNode;
+      parentNode.childNodes.push(treeNode);
+      parentNode.leaf = false;
+    } else {
+      treeNode.childNodeIndex = rootNodes.length;
+      treeNode.parentNode = null;
+      rootNodes.push(treeNode);
+    }
+  });
+
+  return rootNodes;
 };
