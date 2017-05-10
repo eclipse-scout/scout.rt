@@ -19,38 +19,37 @@
     top: 0;
     height: 100%;
     width: @splitter-size;
-    cursor: col-resize;
-    &.disabled{
-      cursor: initial;
+
+    &:not(.disabled) {
+      cursor: col-resize;
     }
 
     &.line {
-    padding-right: floor((@splitter-size - @splitter-line-size) / 2);
-    padding-left: ceil((@splitter-size - @splitter-line-size) / 2);
+      padding-right: floor((@splitter-size - @splitter-line-size) / 2);
+      padding-left: ceil((@splitter-size - @splitter-line-size) / 2);
     }
   }
-   &.y-axis {
+
+  &.y-axis {
     left: 0;
     width: 100%;
     height: @splitter-size;
-    cursor: row-resize;
-    &.disabled{
-      cursor: initial;
+
+    &:not(.disabled) {
+      cursor: row-resize;
     }
+
     &.line {
       padding-top: floor((@splitter-size - @splitter-line-size) / 2);
       padding-bottom: ceil((@splitter-size - @splitter-line-size) / 2);
     }
   }
-  &.line{
+
+  &.line {
     background-clip: content-box;
     background-color: @border-color;
-     &.disabled{
-      &:hover {
-        background-color: @border-color;
-      }
-    }
-    &:hover {
+
+    &:not(.disabled):hover {
       background-color: @hover-color;
     }
   }
