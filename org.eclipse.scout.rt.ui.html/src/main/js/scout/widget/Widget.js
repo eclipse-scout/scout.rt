@@ -895,7 +895,7 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
  * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see _preserveOnPropertyChangeProperties).
  *    If there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called instead of removing the widgets directly.
- * 3. Model update: If there is a custom sync function (e.g. _setXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
+ * 3. Model update: If there is a custom set function (e.g. _setXY where XY is the property name), it will be called. Otherwise the default set function _setProperty is called.
  * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
  */
 scout.Widget.prototype.setProperty = function(propertyName, value) {

@@ -423,24 +423,14 @@ scout.ModelAdapter.modifyWidgetPrototype = function() {
     }
 
     // Remote case
-    var modelAdapter = findModelAdapter(this);
-    if (modelAdapter) { // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
+    // If the widget has a model adapter use getOrCreateWidget of the session to resolve the child widget
+    if (this.modelAdapter) {
       return this.session.getOrCreateWidget(model, this); // model is a String, contains (remote) object ID
     }
 
     // Local case (default)
     model.parent = this;
     return scout.create(model);
-
-    function findModelAdapter(widget) {
-      while (widget) {
-        if (widget.modelAdapter) {
-          return widget.modelAdapter;
-        }
-        widget = widget.parent;
-      }
-      return null;
-    }
   });
 };
 
