@@ -34,7 +34,6 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
@@ -283,7 +282,6 @@ public class TreeEventBufferTest {
    * Insert a tree of nodes, and then remove them again (from inner to outer node)
    */
   @Test
-  @Ignore // TODO [6.1+] bsh, mru, abr: Enable this test once TreeEventBuffer is fixed and this test will be green (207681)
   public void testInsertAndRemoveInSameRequest() {
     // Note: A similar test but with a real tree can be found here:
     // org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest.testInsertAndDeleteInSameRequest()
