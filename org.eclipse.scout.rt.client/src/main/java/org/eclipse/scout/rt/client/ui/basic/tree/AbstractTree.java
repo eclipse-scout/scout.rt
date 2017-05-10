@@ -407,17 +407,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * @deprecated use {@link AbstractTree#getConfiguredToggleBreadcrumbStyleEnabled()} instead, will be removed in Scout
-   *             7.0
-   */
-  @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(144)
-  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
-    return false;
-  }
-
-  /**
    * Configures whether the tree should automatically switch to the bread crumb style when getting smaller and back when
    * getting bigger. The threshold is determined by the GUI.
    * <p>
@@ -428,7 +417,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(145)
   protected boolean getConfiguredToggleBreadcrumbStyleEnabled() {
-    return getConfiguredAutoToggleBreadcrumbStyle();
+    return false;
   }
 
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
@@ -1095,18 +1084,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void setDisplayStyle(String style) {
     propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isAutoToggleBreadcrumbStyle() {
-    return isToggleBreadcrumbStyleEnabled();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setAutoToggleBreadcrumbStyle(boolean b) {
-    setToggleBreadcrumbStyleEnabled(b);
   }
 
   @Override

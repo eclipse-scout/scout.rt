@@ -524,18 +524,6 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppL
    */
   void setDisplayStyle(String style);
 
-  /**
-   * @deprecated use {@link ITree#isToggleBreadcrumbStyleEnabled()} instead, will be removed in Scout 7.0
-   */
-  @Deprecated
-  boolean isAutoToggleBreadcrumbStyle();
-
-  /**
-   * @deprecated use {@link ITree#setToggleBreadcrumbStyleEnabled()} instead, will be removed in Scout 7.0
-   */
-  @Deprecated
-  void setAutoToggleBreadcrumbStyle(boolean b);
-
   boolean isToggleBreadcrumbStyleEnabled();
 
   void setToggleBreadcrumbStyleEnabled(boolean b);
