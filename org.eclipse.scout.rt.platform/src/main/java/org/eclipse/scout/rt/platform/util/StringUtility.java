@@ -1831,14 +1831,14 @@ public final class StringUtility {
    *
    * @return the escaped string (<code>""</code> if the input was <code>null</code>)
    */
-  public static String escapeRegexMetachars(String s) {
+  public static String escapeRegexMetachars(CharSequence s) {
     if (s == null) {
       s = "";
     }
     StringBuilder sb = new StringBuilder();
-    char[] ch = s.toCharArray();
-    for (int i = 0; i < ch.length; i++) {
-      switch (ch[i]) {
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      switch (c) {
         case '^':
         case '[':
         case '.':
@@ -1861,7 +1861,38 @@ public final class StringUtility {
           break;
         }
       }
-      sb.append(ch[i]);
+      sb.append(c);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Escapes the following characters in the given string that have a special meaning in regular expressions replacement
+   * strings by prefixing them with <code>\</code> (backslash):
+   * <p>
+   * Escaped characters: <code>$ \</code>
+   *
+   * @return the escaped string (<code>""</code> if the input was <code>null</code>)
+   */
+  public static String escapeRegexReplacementMetachars(CharSequence s) {
+    if (s == null) {
+      s = "";
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      switch (c) {
+        case '$':
+        case '\\': {
+          sb.append('\\');
+          break;
+        }
+        default: {
+          // nop
+          break;
+        }
+      }
+      sb.append(c);
     }
     return sb.toString();
   }
