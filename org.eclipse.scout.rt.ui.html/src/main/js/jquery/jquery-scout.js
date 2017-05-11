@@ -382,6 +382,20 @@ $.ajaxJson = function(url) {
   });
 };
 
+/**
+ * Ensures the given parameter is a jQuery object.<p>
+ * If it is a jQuery object, it will be returned as it is.
+ * If it isn't, it will be passed to $() in order to create one.
+ * <p>
+ * Just using $() on an existing jQuery object would clone it which would work but is unnecessary.
+ */
+$.ensure = function($elem) {
+  if ($elem instanceof $) {
+    return $elem;
+  }
+  return $($elem);
+};
+
 // === $.prototype extensions ===
 
 $.fn.nvl = function($element) {
