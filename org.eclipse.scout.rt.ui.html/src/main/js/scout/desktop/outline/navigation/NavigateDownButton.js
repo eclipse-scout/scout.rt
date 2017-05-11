@@ -33,8 +33,8 @@ scout.NavigateDownButton.prototype._destroy = function() {
   }
 };
 
-scout.NavigateDownButton.prototype._render = function($parent) {
-  scout.NavigateDownButton.parent.prototype._render.call(this, $parent);
+scout.NavigateDownButton.prototype._render = function() {
+  scout.NavigateDownButton.parent.prototype._render.call(this);
   this.$container.addClass('down');
 };
 

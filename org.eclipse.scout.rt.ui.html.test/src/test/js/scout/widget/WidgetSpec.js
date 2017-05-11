@@ -16,8 +16,8 @@ describe('Widget', function() {
     TestWidget.parent.call(this);
   };
   scout.inherits(TestWidget, scout.NullWidget);
-  TestWidget.prototype._render = function($parent) {
-    this.$container = $parent.appendDiv();
+  TestWidget.prototype._render = function() {
+    this.$container = this.$parent.appendDiv();
   };
 
   beforeEach(function() {
@@ -55,7 +55,7 @@ describe('Widget', function() {
 
     it('should set rendering flag to true _while_ the component is rendering', function() {
       var rendering;
-      widget._render = function($parent) {
+      widget._render = function() {
         rendering = this.rendering;
       };
       widget.init({

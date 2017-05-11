@@ -30,8 +30,8 @@ scout.YearPanel.prototype._init = function(model) {
   this.alwaysSelectFirstDay = model.alwaysSelectFirstDay;
 };
 
-scout.YearPanel.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('year-panel-container');
+scout.YearPanel.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('year-panel-container');
   this.$yearTitle = this.$container.appendDiv('year-panel-title');
   this.$yearList = this.$container.appendDiv('year-panel-list');
 };

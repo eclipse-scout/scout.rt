@@ -28,11 +28,11 @@ scout.NumberField.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
 
-scout.NumberField.prototype._render = function($parent) {
-  this.addContainer($parent, 'number-field');
+scout.NumberField.prototype._render = function() {
+  this.addContainer(this.$parent, 'number-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  var $field = scout.fields.makeTextField($parent)
+  var $field = scout.fields.makeTextField(this.$parent)
     .on('blur', this._onFieldBlur.bind(this));
   this.addField($field);
   this.addStatus();

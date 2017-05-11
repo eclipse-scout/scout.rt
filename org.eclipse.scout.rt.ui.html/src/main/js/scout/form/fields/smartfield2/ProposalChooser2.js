@@ -35,8 +35,8 @@ scout.ProposalChooser2.prototype.setLookupRows = function(lookupRows) {
   throw new Error('setLookupRows() not implemented');
 };
 
-scout.ProposalChooser2.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('proposal-chooser');
+scout.ProposalChooser2.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('proposal-chooser');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooser2Layout(this));
 
@@ -60,14 +60,14 @@ scout.ProposalChooser2.prototype._render = function($parent) {
       this._renderActiveFilterButton(value, index);
     }, this);
 
-    this.activeFilterGroup.render(this.$container);
+    this.activeFilterGroup.render();
     this.activeFilterGroup.$container.addClass('active-filter');
     this.activeFilterGroup.removeMandatoryIndicator();
   }
 };
 
 scout.ProposalChooser2.prototype._renderModel = function() {
-  this.model.render(this.$container);
+  this.model.render();
   if (this.model instanceof scout.Tree) { // FIXME [awe] 7.0 - SF2: move this to TreeProposalChooser
     // disable focus on field container
     this.model._onNodeControlMouseDownDoFocus = function() {};

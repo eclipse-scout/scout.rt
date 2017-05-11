@@ -16,8 +16,8 @@ scout.WrappedFormField = function() {
 };
 scout.inherits(scout.WrappedFormField, scout.FormField);
 
-scout.WrappedFormField.prototype._render = function($parent) {
-  this.addContainer($parent, 'wrapped-form-field');
+scout.WrappedFormField.prototype._render = function() {
+  this.addContainer(this.$parent, 'wrapped-form-field');
   this.addLabel();
   this.addStatus();
 };
@@ -39,7 +39,7 @@ scout.WrappedFormField.prototype._renderInnerForm = function() {
   this.innerForm.modal = false; // by definition, an inner form is not modal.
   this.innerForm.renderInitialFocusEnabled = this.initialFocusEnabled; // do not render initial focus of form if disabled.
 
-  this.innerForm.render(this.$container);
+  this.innerForm.render();
 
   this.addField(this.innerForm.$container);
   this.innerForm.invalidateLayoutTree();

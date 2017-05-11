@@ -61,13 +61,13 @@ scout.ClipboardField.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
 
-scout.ClipboardField.prototype._render = function($parent) {
+scout.ClipboardField.prototype._render = function() {
   // We don't use makeDiv() here intentionally because the DIV created must
   // not have the 'unselectable' attribute. Otherwise clipboard-field will
   // not work in IE9.
-  this.addContainer($parent, 'clipboard-field');
+  this.addContainer(this.$parent, 'clipboard-field');
   this.addLabel();
-  this.addField($parent.makeElement('<div>'));
+  this.addField(this.$parent.makeElement('<div>'));
   this.addStatus();
 
   this.$field
@@ -80,7 +80,7 @@ scout.ClipboardField.prototype._render = function($parent) {
     .on('copy', this._onCopy.bind(this))
     .on('cut', this._onCopy.bind(this));
 
-  $parent.on('click', function(event) {
+  this.$parent.on('click', function(event) {
     this.session.focusManager.requestFocus(this.$field);
   }.bind(this));
 

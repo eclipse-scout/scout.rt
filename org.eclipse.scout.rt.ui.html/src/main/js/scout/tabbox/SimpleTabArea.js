@@ -21,8 +21,8 @@ scout.SimpleTabArea.prototype._init = function(model) {
   this._viewTabSelectionHandler = this._onTabSelection.bind(this);
 };
 
-scout.SimpleTabArea.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('simple-tab-area');
+scout.SimpleTabArea.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('simple-tab-area');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SimpleTabAreaLayout(this));
 };

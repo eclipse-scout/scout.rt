@@ -53,12 +53,12 @@ scout.TableControl.prototype._createLayout = function() {
   return new scout.NullLayout();
 };
 
-scout.TableControl.prototype._render = function($parent) {
+scout.TableControl.prototype._render = function() {
   var classes = 'table-control ';
   if (this.cssClass) {
     classes += this.cssClass + '-table-control';
   }
-  this.$container = $parent.appendDiv(classes)
+  this.$container = this.$parent.appendDiv(classes)
     .on('mousedown', this._onMouseDown.bind(this))
     .data('control', this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

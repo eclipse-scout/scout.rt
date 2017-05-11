@@ -16,8 +16,8 @@ scout.CarouselField = function() {
 };
 scout.inherits(scout.CarouselField, scout.FormField);
 
-scout.CarouselField.prototype._render = function($parent) {
-  this.addContainer($parent, 'carousel-field');
+scout.CarouselField.prototype._render = function() {
+  this.addContainer(this.$parent, 'carousel-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
@@ -27,7 +27,7 @@ scout.CarouselField.prototype._render = function($parent) {
 };
 
 scout.CarouselField.prototype._renderCarousel = function() {
-  this.carousel.render(this.$container);
+  this.carousel.render();
   this.addField(this.carousel.$container);
 };
 

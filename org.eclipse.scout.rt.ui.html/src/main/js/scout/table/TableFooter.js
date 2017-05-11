@@ -38,13 +38,12 @@ scout.TableFooter.prototype._init = function(options) {
   }.bind(this);
 };
 
-scout.TableFooter.prototype._render = function($parent) {
+scout.TableFooter.prototype._render = function() {
   var filter;
-  $parent = $parent || this.table.$container;
 
-  this.$container = $parent.appendDiv('table-footer');
-  this._$window = $parent.window();
-  this._$body = $parent.body();
+  this.$container = this.$parent.appendDiv('table-footer');
+  this._$window = this.$parent.window();
+  this._$body = this.$parent.body();
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableFooterLayout(this));
@@ -60,7 +59,7 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$info = this.$container.appendDiv('table-info');
 
   // text filter
-  this._$textFilter = scout.fields.makeTextField($parent, 'table-text-filter')
+  this._$textFilter = scout.fields.makeTextField(this.$parent, 'table-text-filter')
     .appendTo(this._$info)
     .on('input', '', $.debounce(this._onFilterInput.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));

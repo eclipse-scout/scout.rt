@@ -26,8 +26,8 @@ scout.DesktopNotification.prototype._init = function(model) {
   scout.DesktopNotification.parent.prototype._init.call(this, model);
 };
 
-scout.DesktopNotification.prototype._render = function($parent) {
-  this.$container = $parent.prependDiv('desktop-notification');
+scout.DesktopNotification.prototype._render = function() {
+  this.$container = this.$parent.prependDiv('desktop-notification');
   this.$content = this.$container.appendDiv('desktop-notification-content');
   this.$messageText = this.$content.appendDiv('desktop-notification-message');
   this.$loader = this.$content.appendDiv('desktop-notification-loader');

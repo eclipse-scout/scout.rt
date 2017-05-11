@@ -39,8 +39,8 @@ scout.LoginBox.prototype.init = function(options) {
   $.extend(this, options);
 };
 
-scout.LoginBox.prototype.render = function($parent) {
-  scout.LoginBox.parent.prototype.render.call(this, $parent);
+scout.LoginBox.prototype._render = function() {
+  scout.LoginBox.parent.prototype._render.call(this);
 
   this.$container.addClass('login-box');
   this.$content.addClass('login-box-content ');

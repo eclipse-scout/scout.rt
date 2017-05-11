@@ -150,14 +150,14 @@ scout.FormField.prototype._initGridDataHints = function(gridDataHints) {
  * methods provided by the FormField class. A possible _render implementation could look like this.
  *
  * <pre>
- * this.addContainer($parent, 'form-field');
+ * this.addContainer(this.$parent, 'form-field');
  * this.addLabel();
- * this.addField($parent.makeDiv('foo', 'bar'));
+ * this.addField(this.$parent.makeDiv('foo', 'bar'));
  * this.addMandatoryIndicator();
  * this.addStatus();
  * </pre>
  */
-scout.FormField.prototype._render = function($parent) {
+scout.FormField.prototype._render = function() {
   throw new Error('sub-classes of scout.FormField must implement a _render method');
 };
 

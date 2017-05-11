@@ -53,8 +53,8 @@ scout.StringField.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
 
-scout.StringField.prototype._render = function($parent) {
-  this.addContainer($parent, 'string-field');
+scout.StringField.prototype._render = function() {
+  this.addContainer(this.$parent, 'string-field');
   this.addLabel();
   this.addMandatoryIndicator();
 
@@ -63,7 +63,7 @@ scout.StringField.prototype._render = function($parent) {
     var mousedownHandler = function() {
       this.mouseClicked = true;
     }.bind(this);
-    $field = $parent.makeElement('<textarea>')
+    $field = this.$parent.makeElement('<textarea>')
       .on('DOMMouseScroll mousewheel', function(event) {
         // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
         event.stopPropagation();
@@ -86,7 +86,7 @@ scout.StringField.prototype._render = function($parent) {
         this.$field.on('mousedown', mousedownHandler);
       }.bind(this));
   } else {
-    $field = scout.fields.makeTextField($parent);
+    $field = scout.fields.makeTextField(this.$parent);
   }
   $field.on('blur', this._onFieldBlur.bind(this));
 

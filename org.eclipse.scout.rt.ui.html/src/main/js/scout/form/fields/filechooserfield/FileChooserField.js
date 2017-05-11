@@ -34,8 +34,8 @@ scout.FileChooserField.prototype._initKeyStrokeContext = function() {
   }
 };
 
-scout.FileChooserField.prototype._render = function($parent) {
-  this.addContainer($parent, 'file-chooser-field');
+scout.FileChooserField.prototype._render = function() {
+  this.addContainer(this.$parent, 'file-chooser-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderFileInput();
@@ -44,7 +44,7 @@ scout.FileChooserField.prototype._render = function($parent) {
 };
 
 scout.FileChooserField.prototype._renderFileInput = function() {
-  this.fileInput.render(this.$container);
+  this.fileInput.render();
   this.addField(this.fileInput.$container);
 };
 

@@ -45,8 +45,8 @@ scout.MenuBarPopup.prototype.close = function(event) {
   }
 };
 
-scout.MenuBarPopup.prototype._render = function($parent) {
-  scout.MenuBarPopup.parent.prototype._render.call(this, $parent);
+scout.MenuBarPopup.prototype._render = function() {
+  scout.MenuBarPopup.parent.prototype._render.call(this);
   this.menu.on('propertyChange', this.parentMenuPropertyChangeHandler);
 };
 

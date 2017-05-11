@@ -17,8 +17,8 @@ scout.PlannerField = function() {
 };
 scout.inherits(scout.PlannerField, scout.FormField);
 
-scout.PlannerField.prototype._render = function($parent) {
-  this.addContainer($parent, 'planner-field');
+scout.PlannerField.prototype._render = function() {
+  this.addContainer(this.$parent, 'planner-field');
   this.addLabel();
   this.addStatus();
   if (this.planner) {
@@ -30,7 +30,7 @@ scout.PlannerField.prototype._render = function($parent) {
  * Will also be called by model adapter on property change event
  */
 scout.PlannerField.prototype._renderPlanner = function() {
-  this.planner.render(this.$container);
+  this.planner.render();
   this.addField(this.planner.$container);
 };
 

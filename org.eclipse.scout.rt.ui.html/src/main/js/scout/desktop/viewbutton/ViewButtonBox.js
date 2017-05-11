@@ -24,18 +24,18 @@ scout.ViewButtonBox.prototype._init = function(model) {
   this.desktop = this.session.desktop;
 };
 
-scout.ViewButtonBox.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('view-button-box');
+scout.ViewButtonBox.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('view-button-box');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
   this.viewMenuTab = scout.create('ViewMenuTab', {parent: this,
     viewMenus: this._viewButtons('MENU')
   });
-  this.viewMenuTab.render(this.$container);
+  this.viewMenuTab.render();
 
   this.viewTabs = this._viewButtons('TAB');
   this.viewTabs.forEach(function(viewTab, i) {
-    viewTab.render(this.$container);
+    viewTab.render();
     if (i === this.viewTabs.length - 1) {
       viewTab.last();
     }

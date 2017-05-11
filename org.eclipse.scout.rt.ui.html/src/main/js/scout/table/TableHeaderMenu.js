@@ -79,13 +79,13 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
   return new scout.TableHeaderMenuLayout(this);
 };
 
-scout.TableHeaderMenu.prototype._render = function($parent) {
+scout.TableHeaderMenu.prototype._render = function() {
   var leftGroups = [],
     $rightGroups = [];
 
   this.$headerItem.select(true);
 
-  this.$container = $parent.appendDiv('table-header-menu');
+  this.$container = this.$parent.appendDiv('table-header-menu');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.$body = this.$container.appendDiv('table-header-menu-body');

@@ -18,8 +18,8 @@ scout.NavigateUpButton = function() {
 };
 scout.inherits(scout.NavigateUpButton, scout.NavigateButton);
 
-scout.NavigateUpButton.prototype._render = function($parent) {
-  scout.NavigateUpButton.parent.prototype._render.call(this, $parent);
+scout.NavigateUpButton.prototype._render = function() {
+  scout.NavigateUpButton.parent.prototype._render.call(this);
   this.$container.addClass('up');
 };
 

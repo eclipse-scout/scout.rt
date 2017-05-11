@@ -26,8 +26,8 @@ scout.Slider.prototype._init = function(options) {
   this.step = options.step;
 };
 
-scout.Slider.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('slider');
+scout.Slider.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('slider');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.SliderLayout(this));
   this.$sliderInput = this.$container.appendElement('<input>', 'slider-input')

@@ -15,8 +15,8 @@ scout.PopupBlockerDesktopNotification.prototype._init = function(model) {
   };
 };
 
-scout.PopupBlockerDesktopNotification.prototype._render = function($parent) {
-  scout.PopupBlockerDesktopNotification.parent.prototype._render.call(this, $parent);
+scout.PopupBlockerDesktopNotification.prototype._render = function() {
+  scout.PopupBlockerDesktopNotification.parent.prototype._render.call(this);
 
   this.$messageText.addClass('popup-blocked-title');
   this.$link = this.$content.appendElement('<a>', 'popup-blocked-link')

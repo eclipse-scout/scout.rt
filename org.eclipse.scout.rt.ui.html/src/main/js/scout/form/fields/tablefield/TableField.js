@@ -45,8 +45,8 @@ scout.TableField.prototype._delegatePropertyChange = function(propertyName) {
   }.bind(this));
 };
 
-scout.TableField.prototype._render = function($parent) {
-  this.addContainer($parent, 'table-field');
+scout.TableField.prototype._render = function() {
+  this.addContainer(this.$parent, 'table-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
@@ -69,7 +69,7 @@ scout.TableField.prototype.setTable = function(table) {
 
 scout.TableField.prototype._renderTable = function() {
   if (this.table) {
-    this.table.render(this.$container);
+    this.table.render();
     this.addField(this.table.$container);
   }
 };

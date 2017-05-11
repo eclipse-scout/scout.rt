@@ -29,8 +29,8 @@ scout.FormMenuPopup.prototype._createLayout = function() {
   return new scout.FormMenuPopupLayout(this);
 };
 
-scout.FormMenuPopup.prototype._render = function($parent) {
-  scout.FormMenuPopup.parent.prototype._render.call(this, $parent);
+scout.FormMenuPopup.prototype._render = function() {
+  scout.FormMenuPopup.parent.prototype._render.call(this);
   this.$container.addClass('form-menu-popup');
 
   this.form.renderInitialFocusEnabled = false;

@@ -26,11 +26,11 @@ scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
 };
 
-scout.CheckBoxField.prototype._render = function($parent) {
-  this.addContainer($parent, 'check-box-field');
+scout.CheckBoxField.prototype._render = function() {
+  this.addContainer(this.$parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addFieldContainer($parent.makeDiv());
+  this.addFieldContainer(this.$parent.makeDiv());
 
   this.$checkBox = this.$fieldContainer
     .appendDiv('check-box')

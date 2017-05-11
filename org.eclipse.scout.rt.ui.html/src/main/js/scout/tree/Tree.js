@@ -286,8 +286,8 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
   return scout.Tree.visitNodes(nodes, func, parentNode);
 };
 
-scout.Tree.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('tree');
+scout.Tree.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('tree');
   if (this._additionalContainerClasses) {
     this.$container.addClass(this._additionalContainerClasses);
   }
@@ -317,7 +317,7 @@ scout.Tree.prototype._render = function($parent) {
     axis: this._scrolldirections
   });
   this._installNodeTooltipSupport();
-  this.menuBar.render(this.$container);
+  this.menuBar.render();
   this._updateNodeDimensions();
   // render display style before viewport (not in renderProperties) to have a correct style from the beginning
   this._renderDisplayStyle();

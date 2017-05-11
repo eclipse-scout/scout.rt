@@ -36,8 +36,8 @@ scout.DatePicker.prototype._init = function(options) {
   this.allowedDates = options.allowedDates;
 };
 
-scout.DatePicker.prototype._render = function($parent) {
-  this.$container = $parent
+scout.DatePicker.prototype._render = function() {
+  this.$container = this.$parent
     .appendDiv('date-picker')
     .toggleClass('touch', this.touch);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

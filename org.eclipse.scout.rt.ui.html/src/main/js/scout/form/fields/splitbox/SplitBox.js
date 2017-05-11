@@ -35,17 +35,17 @@ scout.SplitBox.prototype._init = function(model) {
   this._updateCollapseHandle();
 };
 
-scout.SplitBox.prototype._render = function($parent) {
-  this.addContainer($parent, 'split-box');
+scout.SplitBox.prototype._render = function() {
+  this.addContainer(this.$parent, 'split-box');
   // This widget does not support label, mandatoryIndicator and status
 
   // Create split area
-  this._$splitArea = $parent.makeDiv('split-area');
+  this._$splitArea = this.$parent.makeDiv('split-area');
   this.addField(this._$splitArea);
   this.htmlSplitArea = scout.HtmlComponent.install(this._$splitArea, this.session);
   this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
-  this._$window = $parent.window();
-  this._$body = $parent.body();
+  this._$window = this.$parent.window();
+  this._$body = this.$parent.body();
 
   // Add fields and splitter
   if (this.firstField) {
@@ -366,7 +366,7 @@ scout.SplitBox.prototype._setCollapseKeyStroke = function(keyStroke) {
 
 scout.SplitBox.prototype._renderCollapseHandle = function() {
   if (this._collapseHandle) {
-    this._collapseHandle.render(this.$container);
+    this._collapseHandle.render();
   }
 };
 

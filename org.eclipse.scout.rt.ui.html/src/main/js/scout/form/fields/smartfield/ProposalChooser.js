@@ -25,11 +25,11 @@ scout.inherits(scout.ProposalChooser, scout.Widget);
  */
 scout.ProposalChooser.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
-scout.ProposalChooser.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('proposal-chooser');
+scout.ProposalChooser.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('proposal-chooser');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
-  this.model.render(this.$container);
+  this.model.render();
   if (this.model instanceof scout.Tree) {
     // disable focus on field container
     this.model._onNodeControlMouseDownDoFocus = function() {};
@@ -53,7 +53,7 @@ scout.ProposalChooser.prototype._render = function($parent) {
       this._renderButton(value, index);
     }, this);
 
-    this.activeFilterGroup.render(this.$container);
+    this.activeFilterGroup.render();
     this.activeFilterGroup.$container.addClass('active-filter');
     this.activeFilterGroup.removeMandatoryIndicator();
   }

@@ -14,12 +14,12 @@ scout.CalendarField = function() {
 };
 scout.inherits(scout.CalendarField, scout.FormField);
 
-scout.CalendarField.prototype._render = function($parent) {
-  this.addContainer($parent, 'calendar-field');
+scout.CalendarField.prototype._render = function() {
+  this.addContainer(this.$parent, 'calendar-field');
   this.addLabel();
   this.addStatus();
   if (this.calendar) {
-    this.calendar.render(this.$container);
+    this.calendar.render();
     this.addField(this.calendar.$container);
   }
 };

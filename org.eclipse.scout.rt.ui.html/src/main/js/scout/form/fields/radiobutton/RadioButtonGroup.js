@@ -58,11 +58,11 @@ scout.RadioButtonGroup.prototype._init = function(model) {
   }, this);
 };
 
-scout.RadioButtonGroup.prototype._render = function($parent) {
+scout.RadioButtonGroup.prototype._render = function() {
   var env = scout.HtmlEnvironment,
     htmlBodyContainer;
 
-  this.addContainer($parent, 'radiobutton-group');
+  this.addContainer(this.$parent, 'radiobutton-group');
 
   this.$body = this.$container.appendDiv('radiobutton-group-body');
   htmlBodyContainer = scout.HtmlComponent.install(this.$body, this.session);

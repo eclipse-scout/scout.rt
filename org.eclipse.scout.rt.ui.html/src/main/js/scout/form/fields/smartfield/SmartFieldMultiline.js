@@ -15,12 +15,12 @@ scout.SmartFieldMultiline = function() {
 };
 scout.inherits(scout.SmartFieldMultiline, scout.SmartField);
 
-scout.SmartFieldMultiline.prototype._render = function($parent) {
+scout.SmartFieldMultiline.prototype._render = function() {
   var $field, htmlComp;
 
-  this.addContainer($parent, 'smart-field', new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, 'smart-field', new scout.SmartFieldLayout(this));
   this.addLabel();
-  this.addFieldContainer($parent.makeDiv());
+  this.addFieldContainer(this.$parent.makeDiv());
   htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 

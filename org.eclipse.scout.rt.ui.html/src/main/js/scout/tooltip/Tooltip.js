@@ -43,7 +43,7 @@ scout.Tooltip = function() {
 scout.inherits(scout.Tooltip, scout.Widget);
 
 
-/** 
+/**
  * We override the public render function here because we must also execute postRender
  * (for tooltip positioning) when we render the tooltip 'later'. Basically all this is
  * required because this.entryPoint() cannot be called while a parent of the tooltip is
@@ -58,14 +58,12 @@ scout.Tooltip.prototype.render = function($parent) {
     this._renderLater = true;
     return;
   }
-
+  // Use entry point by default
+  $parent = $parent || this.entryPoint();
   scout.Tooltip.parent.prototype.render.call(this, $parent);
 };
 
 scout.Tooltip.prototype._render = function() {
-  // Auto-detect parent
-  this.$parent = this.$parent || this.entryPoint();
-
   this.$container = this.$parent
     .appendDiv('tooltip')
     .data('tooltip', this);

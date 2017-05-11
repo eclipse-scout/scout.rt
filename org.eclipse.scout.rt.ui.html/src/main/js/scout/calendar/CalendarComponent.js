@@ -37,7 +37,7 @@ scout.CalendarComponent.prototype._remove = function() {
   scout.CalendarComponent.parent.prototype._remove.call(this);
 };
 
-scout.CalendarComponent.prototype._render = function($parent) {
+scout.CalendarComponent.prototype._render = function() {
   $.log.debug('(CalendarComponent#_render)');
   var i, partDay, $day, $part;
 

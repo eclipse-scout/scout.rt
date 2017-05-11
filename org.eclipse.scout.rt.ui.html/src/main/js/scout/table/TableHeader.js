@@ -35,7 +35,7 @@ scout.TableHeader.prototype._init = function(options) {
   this.updateMenuBar();
 };
 
-scout.TableHeader.prototype._render = function($parent) {
+scout.TableHeader.prototype._render = function() {
   this.$container = this.table.$data.beforeDiv('table-header');
 
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly

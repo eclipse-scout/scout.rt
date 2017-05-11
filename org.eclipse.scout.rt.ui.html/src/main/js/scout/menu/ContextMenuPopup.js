@@ -43,8 +43,8 @@ scout.ContextMenuPopup.prototype._createLayout = function() {
   return new scout.ContextMenuPopupLayout(this);
 };
 
-scout.ContextMenuPopup.prototype._render = function($parent) {
-  scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
+scout.ContextMenuPopup.prototype._render = function() {
+  scout.ContextMenuPopup.parent.prototype._render.call(this);
   this._installScrollbars();
   this._renderMenuItems();
 };

@@ -19,8 +19,8 @@ scout.TableTooltip.prototype._init = function(options) {
   this.table = options.table;
 };
 
-scout.TableTooltip.prototype._render = function($parent) {
-  scout.TableTooltip.parent.prototype._render.call(this, $parent);
+scout.TableTooltip.prototype._render = function() {
+  scout.TableTooltip.parent.prototype._render.call(this);
 
   this._rowOrderChangedFunc = function(event) {
     if (event.animating) {

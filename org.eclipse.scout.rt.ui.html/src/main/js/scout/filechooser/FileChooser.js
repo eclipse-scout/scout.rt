@@ -51,10 +51,10 @@ scout.FileChooser.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
-scout.FileChooser.prototype._render = function($parent) {
+scout.FileChooser.prototype._render = function() {
   // Render modality glasspanes (must precede adding the file chooser to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
-  this.$container = $parent.appendDiv('file-chooser');
+  this.$container = this.$parent.appendDiv('file-chooser');
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.draggable($handle);
 

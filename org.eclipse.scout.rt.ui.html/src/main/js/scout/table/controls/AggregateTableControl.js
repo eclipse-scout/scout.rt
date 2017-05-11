@@ -39,8 +39,8 @@ scout.AggregateTableControl.prototype._destroy = function() {
   this.table.off('aggregationFunctionChanged', this._aggregationFunctionChangedHandler);
 };
 
-scout.AggregateTableControl.prototype._render = function($parent) {
-  scout.AggregateTableControl.parent.prototype._render.call(this, $parent);
+scout.AggregateTableControl.prototype._render = function() {
+  scout.AggregateTableControl.parent.prototype._render.call(this);
   this._updateEnabledAndSelectedState();
 };
 

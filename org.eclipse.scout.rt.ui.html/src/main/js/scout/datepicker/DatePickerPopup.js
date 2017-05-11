@@ -29,12 +29,12 @@ scout.DatePickerPopup.prototype._createLayout = function() {
   return new scout.DatePickerPopupLayout(this);
 };
 
-scout.DatePickerPopup.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('date-picker-popup');
+scout.DatePickerPopup.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('date-picker-popup');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;
-  this.picker.render(this.$container);
+  this.picker.render();
 };
 
 /**

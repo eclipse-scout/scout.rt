@@ -35,8 +35,8 @@ scout.MobilePopup.prototype.prefLocation = function(openingDirectionY) {
   return new scout.Point(0, y);
 };
 
-scout.MobilePopup.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('popup mobile-popup');
+scout.MobilePopup.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('popup mobile-popup');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
@@ -60,7 +60,7 @@ scout.MobilePopup.prototype._renderWidget = function() {
   if (!this.widget) {
     return;
   }
-  this.widget.render(this.$container);
+  this.widget.render();
   this.widget.htmlComp.pixelBasedSizing = true;
   this.widget.$container.addClass('mobile-popup-widget');
   this.invalidateLayoutTree();

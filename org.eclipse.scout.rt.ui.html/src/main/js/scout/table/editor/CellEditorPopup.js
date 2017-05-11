@@ -60,8 +60,8 @@ scout.CellEditorPopup.prototype._open = function($parent, event) {
   this.pack();
 };
 
-scout.CellEditorPopup.prototype._render = function($parent) {
-  scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
+scout.CellEditorPopup.prototype._render = function() {
+  scout.CellEditorPopup.parent.prototype._render.call(this);
 
   var firstCell = this.table.visibleColumns().indexOf(this.column) === 0;
   this.$container.addClass('cell-editor-popup');
@@ -72,7 +72,7 @@ scout.CellEditorPopup.prototype._render = function($parent) {
 
   var field = this.cell.field;
   field.mode = scout.FormField.MODE_CELLEDITOR; // hint that this field is used within a cell-editor
-  field.render(this.$container);
+  field.render();
   field.prepareForCellEdit({
     firstCell: firstCell
   });

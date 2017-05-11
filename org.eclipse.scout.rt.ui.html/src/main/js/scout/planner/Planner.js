@@ -132,24 +132,24 @@ scout.Planner.prototype._initActivity = function(activity) {
   this.activityMap[activity.id] = activity;
 };
 
-scout.Planner.prototype._render = function($parent) {
+scout.Planner.prototype._render = function() {
   // basics, layout etc.
-  this.$container = $parent.appendDiv('planner');
+  this.$container = this.$parent.appendDiv('planner');
   var layout = new scout.PlannerLayout(this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 
   // main elements
-  this._header.render(this.$container);
-  this._yearPanel.render(this.$container);
+  this._header.render();
+  this._yearPanel.render();
   this.$grid = this.$container.appendDiv('planner-grid')
     .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
     .on('mousedown', '.resource-title', this._onResourceTitleMousedown.bind(this))
     .on('contextmenu', '.resource-title', this._onResourceTitleContextMenu.bind(this))
     .on('contextmenu', '.planner-activity', this._onActivityContextMenu.bind(this));
   this.$scale = this.$container.appendDiv('planner-scale');
-  this.menuBar.render(this.$container);
+  this.menuBar.render();
 
   scout.tooltips.install(this.$grid, {
     parent: this,

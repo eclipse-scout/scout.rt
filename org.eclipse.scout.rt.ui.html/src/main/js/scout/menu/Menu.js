@@ -45,11 +45,11 @@ scout.Menu.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.registerKeyStroke(new scout.MenuExecKeyStroke(this));
 };
 
-scout.Menu.prototype._render = function($parent) {
+scout.Menu.prototype._render = function() {
   if (this.separator) {
-    this._renderSeparator($parent);
+    this._renderSeparator();
   } else {
-    this._renderItem($parent);
+    this._renderItem();
   }
   this.$container.unfocusable();
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -61,12 +61,12 @@ scout.Menu.prototype._remove = function() {
   this.$subMenuBody = null;
 };
 
-scout.Menu.prototype._renderSeparator = function($parent) {
-  this.$container = $parent.appendDiv('menu-separator');
+scout.Menu.prototype._renderSeparator = function() {
+  this.$container = this.$parent.appendDiv('menu-separator');
 };
 
-scout.Menu.prototype._renderItem = function($parent) {
-  this.$container = $parent.appendDiv('menu-item');
+scout.Menu.prototype._renderItem = function() {
+  this.$container = this.$parent.appendDiv('menu-item');
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);
   }

@@ -21,8 +21,8 @@ scout.CollapseHandle.HorizontalAlignment = {
   RIGHT: 'right'
 };
 
-scout.CollapseHandle.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('collapse-handle');
+scout.CollapseHandle.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('collapse-handle');
   this.$container.on('mousedown', this._onMouseDown.bind(this));
 
   this.$left = this.$container.appendDiv('collapse-handle-body left');

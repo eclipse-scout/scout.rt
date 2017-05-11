@@ -20,15 +20,15 @@ scout.SliderField.prototype._init = function(model) {
   this.slider = scout.create('Slider', sliderOptions);
 };
 
-scout.SliderField.prototype._render = function($parent) {
-  this.addContainer($parent, 'slider-field');
+scout.SliderField.prototype._render = function() {
+  this.addContainer(this.$parent, 'slider-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderSlider();
 };
 
 scout.SliderField.prototype._renderSlider = function() {
-  this.slider.render(this.$container);
+  this.slider.render();
   this.addField(this.slider.$container);
 };
 

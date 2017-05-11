@@ -27,9 +27,9 @@ scout.ImageField.prototype._init = function(model) {
   this.image.on('error', this._onImageError.bind(this));
 };
 
-scout.ImageField.prototype._render = function($parent) {
-  this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
-  this.addFieldContainer($parent.makeDiv());
+scout.ImageField.prototype._render = function() {
+  this.addContainer(this.$parent, 'image-field', new scout.ImageFieldLayout(this));
+  this.addFieldContainer(this.$parent.makeDiv());
 
   // Complete the layout hierarchy between the image field and the image
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);

@@ -107,11 +107,11 @@ scout.GroupBox.prototype._keyStrokeBindTarget = function() {
   return this.$container;
 };
 
-scout.GroupBox.prototype._render = function($parent) {
+scout.GroupBox.prototype._render = function() {
   var htmlBody,
     env = scout.HtmlEnvironment;
 
-  this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
+  this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
 
   this.$title = this.$container.appendDiv('group-box-title');
   this.addLabel();
@@ -180,7 +180,7 @@ scout.GroupBox.prototype._renderNotification = function() {
   if (!this.notification) {
     return;
   }
-  this.notification.render(this.$container);
+  this.notification.render();
   this.notification.$container.insertBefore(this.$body);
 };
 
@@ -277,7 +277,7 @@ scout.GroupBox.prototype._renderMenuBarVisible = function() {
 };
 
 scout.GroupBox.prototype._renderMenuBar = function() {
-  this.menuBar.render(this.$container);
+  this.menuBar.render();
   if (this.menuBar.position === 'top') {
     // move after title
     this.menuBar.$container.insertAfter(this.$title);

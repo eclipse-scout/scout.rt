@@ -22,12 +22,12 @@ scout.IFrame = function() {
 };
 scout.inherits(scout.IFrame, scout.Widget);
 
-scout.IFrame.prototype._render = function($parent) {
+scout.IFrame.prototype._render = function() {
   if (this.wrapIframe) {
-    this.$container = $parent.appendDiv('iframe-wrapper');
+    this.$container = this.$parent.appendDiv('iframe-wrapper');
     this.$iframe = this.$container.appendElement('<iframe>', 'iframe');
   } else {
-    this.$iframe = $parent.appendElement('<iframe>', 'iframe');
+    this.$iframe = this.$parent.appendElement('<iframe>', 'iframe');
     this.$container = this.$iframe;
   }
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

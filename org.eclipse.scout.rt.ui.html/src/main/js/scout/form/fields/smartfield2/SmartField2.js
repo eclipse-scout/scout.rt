@@ -62,8 +62,8 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.registerKeyStroke(new scout.SmartField2ToggleKeyStroke(this));
 };
 
-scout.SmartField2.prototype._render = function($parent) {
-  this.addContainer($parent, cssClass(this.variant), new scout.SmartFieldLayout(this));
+scout.SmartField2.prototype._render = function() {
+  this.addContainer(this.$parent, cssClass(this.variant), new scout.SmartFieldLayout(this));
   this.addLabel();
 
   var $field = scout.fields.makeInputOrDiv(this)

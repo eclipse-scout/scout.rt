@@ -21,8 +21,8 @@ scout.TableRowDetail.prototype._init = function(model) {
   this.row = model.row;
 };
 
-scout.TableRowDetail.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('table-row-detail');
+scout.TableRowDetail.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('table-row-detail');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this._renderRow();
 };

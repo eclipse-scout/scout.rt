@@ -14,10 +14,12 @@
  * Note: It does not extend from Widget because widget has too many dependencies which are not needed for this simple use case (login-module does not include these dependencies)
  */
 scout.Box = function() {
+  this.$parent;
 };
 
 scout.Box.prototype.render = function($parent) {
-  this._render($parent);
+  this.$parent = $parent;
+  this._render();
   this.rendered = true;
 };
 
@@ -27,10 +29,10 @@ scout.Box.prototype.remove = function() {
   this.rendered = false;
 };
 
-scout.Box.prototype._render = function($parent) {
+scout.Box.prototype._render = function() {
   this.$container = $('<div>')
     .addClass('box')
-    .appendTo($parent);
+    .appendTo(this.$parent);
 
   this.$wrapper = $('<div>')
     .addClass('wrapper')

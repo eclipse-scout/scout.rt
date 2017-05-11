@@ -44,9 +44,9 @@ scout.Scrollbar = function() {
 };
 scout.inherits(scout.Scrollbar, scout.Widget);
 
-scout.Scrollbar.prototype._render = function($parent) {
+scout.Scrollbar.prototype._render = function() {
   // Create scrollbar and thumb
-  this.$container = $parent
+  this.$container = this.$parent
     .appendDiv('scrollbar')
     .addClass(this.axis + '-axis');
   this._$thumb = this.$container
@@ -64,11 +64,11 @@ scout.Scrollbar.prototype._render = function($parent) {
   this._scrollDir = this.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
   // Install listeners
-  var scrollbars = $parent.data('scrollbars');
+  var scrollbars = this.$parent.data('scrollbars');
   if (!scrollbars) {
-    throw new Error('Data "scrollbars" missing in ' + scout.graphics.debugOutput($parent) + '\nAncestors: ' + this.ancestorsToString(1));
+    throw new Error('Data "scrollbars" missing in ' + scout.graphics.debugOutput(this.$parent) + '\nAncestors: ' + this.ancestorsToString(1));
   }
-  $parent
+  this.$parent
     .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
     .on('scroll', this._onScrollHandler);
   scrollbars.forEach(function(scrollbar) {

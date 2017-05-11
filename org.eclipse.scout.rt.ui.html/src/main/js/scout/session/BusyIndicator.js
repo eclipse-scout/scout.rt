@@ -45,9 +45,13 @@ scout.BusyIndicator.prototype._init = function(model) {
   this.label = scout.nvl(model.label, this.session.text('ui.PleaseWait_'));
 };
 
-scout.BusyIndicator.prototype._render = function($parent) {
-  this.$parent = this.$parent || this.entryPoint();
+scout.BusyIndicator.prototype.render = function($parent) {
+  // Use entry point by default
+  $parent = $parent || this.entryPoint();
+  scout.BusyIndicator.parent.prototype.render.call(this, $parent);
+};
 
+scout.BusyIndicator.prototype._render = function() {
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
   this._glassPaneRenderer.renderGlassPanes();

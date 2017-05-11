@@ -13,10 +13,10 @@ scout.SvgField = function() {
 };
 scout.inherits(scout.SvgField, scout.ValueField);
 
-scout.SvgField.prototype._render = function($parent) {
-  this.addContainer($parent, 'svg-field');
+scout.SvgField.prototype._render = function() {
+  this.addContainer(this.$parent, 'svg-field');
   this.addLabel();
-  this.addField($parent.makeDiv());
+  this.addField(this.$parent.makeDiv());
   this.addMandatoryIndicator();
   this.addStatus();
 };

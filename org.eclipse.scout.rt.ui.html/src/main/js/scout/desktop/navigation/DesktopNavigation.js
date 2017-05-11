@@ -43,8 +43,8 @@ scout.DesktopNavigation.prototype._widthFromStyle = function(cssClass, cssProper
   }
 };
 
-scout.DesktopNavigation.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-navigation');
+scout.DesktopNavigation.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('desktop-navigation');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
   this.htmlComp.layoutData = this.layoutData;
@@ -79,7 +79,7 @@ scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
     parent: this,
     viewButtons: this.desktop.viewButtons
   });
-  this.viewButtonBox.render(this.$container);
+  this.viewButtonBox.render();
 };
 
 scout.DesktopNavigation.prototype._removeOutline = function() {
@@ -184,7 +184,7 @@ scout.DesktopNavigation.prototype._renderToolBox = function() {
     parent: this,
     menus: this.desktop.menus
   });
-  this.toolBox.render(this.$container);
+  this.toolBox.render();
 };
 
 scout.DesktopNavigation.prototype._removeToolBox = function() {
@@ -216,7 +216,7 @@ scout.DesktopNavigation.prototype._renderHandle = function() {
     return;
   }
   this.handle = this._createHandle();
-  this.handle.render(this.$container);
+  this.handle.render();
   this.handle.addCssClass('navigation-open');
   this.handle.on('action', this._onHandleAction.bind(this));
   this._updateHandle();

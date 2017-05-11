@@ -18,8 +18,8 @@ scout.DesktopLogo.prototype._init = function(model) {
   this.url = model.url;
 };
 
-scout.DesktopLogo.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-logo');
+scout.DesktopLogo.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('desktop-logo');
 };
 
 scout.DesktopLogo.prototype._renderProperties = function() {

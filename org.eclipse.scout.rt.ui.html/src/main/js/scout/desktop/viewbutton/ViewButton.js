@@ -14,11 +14,11 @@ scout.ViewButton = function() {
 };
 scout.inherits(scout.ViewButton, scout.Action);
 
-scout.ViewButton.prototype._render = function($parent) {
+scout.ViewButton.prototype._render = function() {
   if (this._isMenu()) {
-    this._renderAsMenuItem($parent);
+    this._renderAsMenuItem();
   } else {
-    this._renderAsTab($parent);
+    this._renderAsTab();
   }
 };
 
@@ -36,13 +36,13 @@ scout.ViewButton.prototype._isTab = function() {
   return this.displayStyle === 'TAB';
 };
 
-scout.ViewButton.prototype._renderAsMenuItem = function($parent) {
-  this.$container = $parent.appendDiv('view-menu-item')
+scout.ViewButton.prototype._renderAsMenuItem = function() {
+  this.$container = this.$parent.appendDiv('view-menu-item')
     .on('click', this._onMouseEvent.bind(this));
 };
 
-scout.ViewButton.prototype._renderAsTab = function($parent) {
-  this.$container = $parent.appendDiv('view-button-tab')
+scout.ViewButton.prototype._renderAsTab = function() {
+  this.$container = this.$parent.appendDiv('view-button-tab')
     .on('mousedown', this._onMouseEvent.bind(this));
 };
 

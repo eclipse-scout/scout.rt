@@ -13,10 +13,10 @@ scout.ColorField = function() {
 };
 scout.inherits(scout.ColorField, scout.ValueField);
 
-scout.ColorField.prototype._render = function($parent) {
-  this.addContainer($parent, 'color-field');
+scout.ColorField.prototype._render = function() {
+  this.addContainer(this.$parent, 'color-field');
   this.addLabel();
-  this.addField($parent.makeDiv('not-implemented').text('not implemented yet'));
+  this.addField(this.$parent.makeDiv('not-implemented').text('not implemented yet'));
   this.addMandatoryIndicator();
   this.addStatus();
 };

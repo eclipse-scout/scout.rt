@@ -31,8 +31,8 @@ scout.PopupWithHead.prototype._init = function(options) {
   this.trimWidth = scout.nvl(options.trimWidth, this._headVisible);
 };
 
-scout.PopupWithHead.prototype._render = function($parent) {
-  scout.PopupWithHead.parent.prototype._render.call(this, $parent);
+scout.PopupWithHead.prototype._render = function() {
+  scout.PopupWithHead.parent.prototype._render.call(this);
   this.$parent.window().on('resize', this.resizeHandler);
 
   this._$createBody();

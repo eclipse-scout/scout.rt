@@ -267,7 +267,7 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
   this._triggerAppLinkAction(column, $appLink.data('ref'));
 };
 
-scout.Table.prototype._render = function($parent) {
+scout.Table.prototype._render = function() {
   this.$container = this.$parent.appendDiv('table');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
@@ -293,7 +293,7 @@ scout.Table.prototype._render = function($parent) {
   });
   this._installImageListeners();
   this._installCellTooltipSupport();
-  this.menuBar.render(this.$container);
+  this.menuBar.render();
 
   // layout bugfix for IE9 (and maybe other browsers)
   if (scout.device.tableAdditionalDivRequired) {

@@ -54,8 +54,8 @@ scout.BenchColumn.prototype._keyStrokeBindTarget = function() {
   return this.$container;
 };
 
-scout.BenchColumn.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('bench-column');
+scout.BenchColumn.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('bench-column');
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
@@ -80,7 +80,7 @@ scout.BenchColumn.prototype._renderTabBoxes = function() {
 
 scout.BenchColumn.prototype._renderTabBox = function(tabBox) {
   if (!tabBox.rendered) {
-    tabBox.render(this.$container);
+    tabBox.render();
   }
 };
 
@@ -191,7 +191,7 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
           splitHorizontal: false,
           maxRatio: 1
         });
-        splitter.render(this.$container);
+        splitter.render();
         splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
         splitter.$container.addClass('line');
         arr.push(splitter);
@@ -272,7 +272,7 @@ scout.BenchColumn.prototype.addView = function(view, bringToFront) {
   if (this.rendered && tabBox.viewCount() === 1) {
     if (!tabBox.rendered) {
       // lazy render if the first view is added.
-      tabBox.render(this.$container);
+      tabBox.render();
     }
     this._revalidateSplitters(true);
     this.updateFirstLastMarker();

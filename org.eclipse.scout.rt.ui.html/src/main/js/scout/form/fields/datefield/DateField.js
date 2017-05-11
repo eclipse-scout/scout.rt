@@ -75,10 +75,10 @@ scout.DateField.prototype.createPopup = function() {
   });
 };
 
-scout.DateField.prototype._render = function($parent) {
-  this.addContainer($parent, 'date-field');
+scout.DateField.prototype._render = function() {
+  this.addContainer(this.$parent, 'date-field');
   this.addLabel();
-  this.addField($parent.makeDiv('date-time-composite'));
+  this.addField(this.$parent.makeDiv('date-time-composite'));
   this.addStatus(this.$field);
   if (!this.embedded) {
     this.addMandatoryIndicator();

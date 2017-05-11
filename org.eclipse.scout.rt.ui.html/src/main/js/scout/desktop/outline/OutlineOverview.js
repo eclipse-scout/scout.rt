@@ -21,8 +21,8 @@ scout.OutlineOverview.prototype._init = function(options) {
   this.id = options.id; // actually only necessary for a spec...
 };
 
-scout.OutlineOverview.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('outline-overview');
+scout.OutlineOverview.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('outline-overview');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.$content = this.$container.appendDiv('outline-overview-content');
   this.$content.appendDiv('outline-overview-icon').icon(this.outline.iconId);

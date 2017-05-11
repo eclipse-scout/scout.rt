@@ -24,8 +24,8 @@ describe("scout.tooltips", function() {
 
     model = helper.createFieldModel();
     formField = new scout.ValueField();
-    formField._render = function($parent) {
-      this.addContainer($parent, 'form-field');
+    formField._render = function() {
+      this.addContainer(this.$parent, 'form-field');
       this.addField($('<div>TestField</div>'));
       this.addStatus();
     };

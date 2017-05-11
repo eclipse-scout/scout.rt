@@ -25,8 +25,8 @@ scout.SmartFieldPopup.prototype._createLayout = function() {
   return new scout.SmartFieldPopupLayout(this);
 };
 
-scout.SmartFieldPopup.prototype._render = function($parent) {
-  this.$container = $parent
+scout.SmartFieldPopup.prototype._render = function() {
+  this.$container = this.$parent
     .appendDiv('smart-field-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this));
 
@@ -41,7 +41,7 @@ scout.SmartFieldPopup.prototype.setProposalChooser = function(proposalChooser) {
 
 scout.SmartFieldPopup.prototype._renderProposalChooser = function() {
   this.proposalChooser.setVirtual(this._field.virtual());
-  this.proposalChooser.render(this.$container);
+  this.proposalChooser.render();
   this.revalidateLayout();
 };
 

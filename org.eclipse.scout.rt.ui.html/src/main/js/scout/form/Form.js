@@ -97,14 +97,14 @@ scout.Form.prototype._renderProperties = function() {
   this._renderStatus();
 };
 
-scout.Form.prototype._render = function($parent) {
-  this._renderForm($parent);
+scout.Form.prototype._render = function() {
+  this._renderForm();
 };
 
-scout.Form.prototype._renderForm = function($parent) {
+scout.Form.prototype._renderForm = function() {
   var layout, $handle;
 
-  this.$container = $parent.appendDiv()
+  this.$container = this.$parent.appendDiv()
     .addClass(this.isDialog() ? 'dialog' : 'form')
     .data('model', this);
 
@@ -128,7 +128,7 @@ scout.Form.prototype._renderForm = function($parent) {
   }
 
   this.htmlComp.setLayout(layout);
-  this.rootGroupBox.render(this.$container);
+  this.rootGroupBox.render();
 
   if (this._locked) {
     this.disable();
@@ -327,7 +327,7 @@ scout.Form.prototype._updateTitleForDom = function() {
   function getOrAppendChildDiv($parent, cssClass) {
     var $div = $parent.children('.' + cssClass);
     if ($div.length === 0) {
-      $div = $parent.appendDiv(cssClass);
+      $div = this.$parent.appendDiv(cssClass);
     }
     return $div;
   }

@@ -105,8 +105,8 @@ scout.Popup.prototype.render = function($parent) {
   scout.Popup.parent.prototype.render.call(this, $popupParent);
 };
 
-scout.Popup.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('popup');
+scout.Popup.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('popup');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());

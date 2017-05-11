@@ -24,13 +24,13 @@ scout.TreeBox.prototype._init = function(model) {
   }
 };
 
-scout.TreeBox.prototype._render = function($parent) {
-  this.addContainer($parent, 'tree-box');
+scout.TreeBox.prototype._render = function() {
+  this.addContainer(this.$parent, 'tree-box');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
 
-  this.addFieldContainer($parent.makeDiv());
+  this.addFieldContainer(this.$parent.makeDiv());
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.TreeBoxLayout(this, this.tree, this.filterBox));
 

@@ -118,8 +118,8 @@ scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
   }
 };
 
-scout.Desktop.prototype._render = function($parent) {
-  this.$container = $parent;
+scout.Desktop.prototype._render = function() {
+  this.$container = this.$parent;
   this.$container.addClass('desktop');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
@@ -137,7 +137,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderDisplayStyle();
   this._renderNavigationHandleVisible();
   this.addOns.forEach(function(addOn) {
-    addOn.render(this.$container);
+    addOn.render();
   }, this);
 
   this.$container.window()
@@ -261,7 +261,7 @@ scout.Desktop.prototype._renderBench = function() {
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.bench.on('viewActivated', this._benchActiveViewChangedHandler);
-  this.bench.render(this.$container);
+  this.bench.render();
   this.bench.$container.insertBefore(this.$overlaySeparator);
   this.invalidateLayoutTree();
 };
@@ -300,7 +300,7 @@ scout.Desktop.prototype._renderNavigation = function() {
       fullWidth: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT
     }
   });
-  this.navigation.render(this.$container);
+  this.navigation.render();
   this.navigation.$container.prependTo(this.$container);
   this.invalidateLayoutTree();
 };
@@ -337,7 +337,7 @@ scout.Desktop.prototype._renderHeader = function() {
     animateRemoval: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
     toolBoxVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
-  this.header.render(this.$container);
+  this.header.render();
   this.header.$container.insertBefore(this.$overlaySeparator);
   this.invalidateLayoutTree();
 };
@@ -384,7 +384,7 @@ scout.Desktop.prototype._renderSplitter = function() {
     $anchor: this.navigation.$container,
     $root: this.$container
   });
-  this.splitter.render(this.$container);
+  this.splitter.render();
   this.splitter.$container.insertBefore(this.$overlaySeparator);
   this.splitter.on('move', this._onSplitterMove.bind(this));
   this.splitter.on('moveEnd', this._onSplitterMoveEnd.bind(this));

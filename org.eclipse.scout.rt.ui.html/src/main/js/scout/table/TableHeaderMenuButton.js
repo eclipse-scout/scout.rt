@@ -33,8 +33,8 @@ scout.TableHeaderMenuButton.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.registerKeyStroke([new scout.TableHeaderMenuButtonKeyStroke(this)]);
 };
 
-scout.TableHeaderMenuButton.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('table-header-menu-command')
+scout.TableHeaderMenuButton.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('table-header-menu-command')
     .unfocusable()
     .on('click', this._onClick.bind(this))
     .on('mouseenter', this._onMouseOver.bind(this))

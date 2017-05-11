@@ -6,8 +6,8 @@ scout.Composite = function() {
 };
 scout.inherits(scout.Composite, scout.Widget);
 
-scout.Composite.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv();
+scout.Composite.prototype._render = function() {
+  this.$container = this.$parent.appendDiv();
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 };
 
@@ -20,9 +20,9 @@ scout.Composite.prototype.setWidgets = function(widgets) {
   this.setProperty('widgets', widgets);
 };
 
-scout.Composite.prototype._renderWidgets = function($parent) {
+scout.Composite.prototype._renderWidgets = function() {
   this.widgets.forEach(function(widget) {
-    widget.render(this.$container);
+    widget.render();
   }, this);
   this.invalidateLayoutTree();
 };

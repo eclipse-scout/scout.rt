@@ -47,8 +47,8 @@ scout.ViewMenuPopup.prototype._initKeyStrokeContext = function() {
   scout.menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'view-menu-item');
 };
 
-scout.ViewMenuPopup.prototype._render = function($parent) {
-  scout.ViewMenuPopup.parent.prototype._render.call(this, $parent);
+scout.ViewMenuPopup.prototype._render = function() {
+  scout.ViewMenuPopup.parent.prototype._render.call(this);
 
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.render(this.$body);

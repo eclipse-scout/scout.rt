@@ -46,8 +46,8 @@ scout.SimpleTab.prototype.renderAfter = function($parent, sibling) {
   }
 };
 
-scout.SimpleTab.prototype._render = function($parent) {
-  this.$container = $parent.prependDiv('simple-tab');
+scout.SimpleTab.prototype._render = function() {
+  this.$container = this.$parent.prependDiv('simple-tab');
   this._mouseListener = this._onMouseDown.bind(this);
   this.$container.on('mousedown', this._mouseListener);
   this.$statusContainer = this.$container.appendDiv('status-container');

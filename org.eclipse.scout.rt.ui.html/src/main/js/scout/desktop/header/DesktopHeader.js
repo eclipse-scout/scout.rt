@@ -29,8 +29,8 @@ scout.DesktopHeader.prototype._init = function(model) {
   });
 };
 
-scout.DesktopHeader.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-header');
+scout.DesktopHeader.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('desktop-header');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
   this._renderViewButtonBoxVisible();
@@ -54,7 +54,7 @@ scout.DesktopHeader.prototype._remove = function() {
 };
 
 scout.DesktopHeader.prototype._renderViewTabs = function() {
-   this.tabArea.render(this.$container);
+   this.tabArea.render();
 };
 
 scout.DesktopHeader.prototype._renderToolBox = function() {
@@ -65,7 +65,7 @@ scout.DesktopHeader.prototype._renderToolBox = function() {
     parent: this,
     menus: this.desktop.menus
   });
-  this.toolBox.render(this.$container);
+  this.toolBox.render();
 };
 
 scout.DesktopHeader.prototype._removeToolBox = function() {
@@ -100,7 +100,7 @@ scout.DesktopHeader.prototype._renderLogo = function() {
       parent: this,
       url: this.logoUrl
     });
-    this.logo.render(this.$container);
+    this.logo.render();
   } else {
     this.logo.setUrl(this.logoUrl);
   }
@@ -122,7 +122,7 @@ scout.DesktopHeader.prototype._renderViewButtonBox = function() {
     parent: this,
     viewButtons: this.desktop.viewButtons
   });
-  this.viewButtonBox.render(this.$container);
+  this.viewButtonBox.render();
   this.viewButtonBox.$container.prependTo(this.$container);
   if (this.desktop.inBackground) {
     this.viewButtonBox.sendToBack();

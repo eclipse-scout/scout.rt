@@ -27,12 +27,12 @@ scout.Splitter.prototype._init = function(options) {
   this._$root = options.$root;
 };
 
-scout.Splitter.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('splitter')
+scout.Splitter.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this._$window = $parent.window();
-  this._$body = $parent.body();
+  this._$window = this.$parent.window();
+  this._$body = this.$parent.body();
 };
 
 scout.Splitter.prototype._renderEnabled = function() {

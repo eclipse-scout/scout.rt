@@ -31,9 +31,9 @@ scout.RadioButton.prototype._init = function(model) {
   this.focusWhenSelected = scout.nvl(model.focusWhenSelected, !scout.device.supportsFocusEmptyBeforeDiv());
 };
 
-scout.RadioButton.prototype._render = function($parent) {
-  this.addContainer($parent, 'radio-button', new scout.ButtonLayout(this));
-  this.addField($parent.makeDiv()
+scout.RadioButton.prototype._render = function() {
+  this.addContainer(this.$parent, 'radio-button', new scout.ButtonLayout(this));
+  this.addField(this.$parent.makeDiv()
     .on('mousedown', this._mouseDown.bind(this)));
   this.$field.data('radiobutton', this);
   this.addStatus();

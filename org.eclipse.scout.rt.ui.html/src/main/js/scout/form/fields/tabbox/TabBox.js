@@ -43,8 +43,8 @@ scout.TabBox.prototype._init = function(model) {
   this._updateMenuBar(this.menus);
 };
 
-scout.TabBox.prototype._render = function($parent) {
-  this.addContainer($parent, 'tab-box', new scout.TabBoxLayout(this));
+scout.TabBox.prototype._render = function() {
+  this.addContainer(this.$parent, 'tab-box', new scout.TabBoxLayout(this));
 
   this._$tabArea = this.$container
     .appendDiv('tab-area')

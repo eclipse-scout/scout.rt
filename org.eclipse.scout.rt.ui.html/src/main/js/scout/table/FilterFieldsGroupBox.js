@@ -13,8 +13,8 @@ scout.FilterFieldsGroupBox.prototype._init = function(model) {
 /**
  * @override GroupBox.js
  */
-scout.FilterFieldsGroupBox.prototype._render = function($parent) {
-  scout.FilterFieldsGroupBox.parent.prototype._render.call(this, $parent);
+scout.FilterFieldsGroupBox.prototype._render = function() {
+  scout.FilterFieldsGroupBox.parent.prototype._render.call(this);
   this.filter.modifyFilterFields();
 };
 

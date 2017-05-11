@@ -72,8 +72,8 @@ scout.ViewMenuTab.prototype._update = function() {
   this.iconId = (this.outlineViewButton && this.outlineViewButton.iconId) || this.defaultIconId;
 };
 
-scout.ViewMenuTab.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('view-button-tab')
+scout.ViewMenuTab.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('view-button-tab')
     .unfocusable()
     .on('mousedown', this.togglePopup.bind(this));
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

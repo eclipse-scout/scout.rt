@@ -254,7 +254,7 @@ describe("Calendar", function() {
 
       // init and render calendar
       var cal = helper.createCalendar(model);
-      cal._render($div);
+      cal.render($div);
 
       var viewRange = cal.viewRange;
       var selectedDate = cal.selectedDate;
@@ -288,7 +288,7 @@ describe("Calendar", function() {
 
       // init and render calendar
       var cal = helper.createCalendar(model);
-      cal._render($div);
+      cal.render($div);
 
       var viewRange = cal.viewRange;
 

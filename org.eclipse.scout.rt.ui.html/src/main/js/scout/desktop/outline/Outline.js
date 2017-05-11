@@ -133,8 +133,8 @@ scout.Outline.prototype._initTreeKeyStrokeContext = function() {
 /**
  * @override
  */
-scout.Outline.prototype._render = function($parent) {
-  scout.Outline.parent.prototype._render.call(this, $parent);
+scout.Outline.prototype._render = function() {
+  scout.Outline.parent.prototype._render.call(this);
 
   // Override layout
   this.htmlComp.setLayout(new scout.OutlineLayout(this));

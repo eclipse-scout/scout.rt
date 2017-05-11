@@ -108,8 +108,8 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function() {
   this.desktopKeyStrokeContext.registerKeyStroke(new scout.DesktopTabSelectKeyStroke(this.desktop));
 };
 
-scout.DesktopBench.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-bench');
+scout.DesktopBench.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('desktop-bench');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 
   this.htmlComp.setLayout(this._createLayout());
@@ -146,7 +146,7 @@ scout.DesktopBench.prototype._renderColumn = function(column) {
   if (!column || column.rendered) {
     return;
   }
-  column.render(this.$container);
+  column.render();
 };
 
 scout.DesktopBench.prototype._remove = function() {
@@ -208,7 +208,7 @@ scout.DesktopBench.prototype._renderNavigationHandle = function() {
     return;
   }
   this.navigationHandle = this._createNavigationHandle();
-  this.navigationHandle.render(this.$container);
+  this.navigationHandle.render();
   this.navigationHandle.addCssClass('navigation-closed');
   this.navigationHandle.on('action', this._onNavigationHandleAction.bind(this));
 };
@@ -512,7 +512,7 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
           $root: this.$container,
           maxRatio: 1
         });
-        splitter.render(this.$container);
+        splitter.render();
         splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
         splitter.$container.addClass('line');
 

@@ -46,8 +46,8 @@ scout.ButtonAdapterMenu.prototype._uninstallListeners = function() {
   this.button.off('destroy', this._buttonDestroyHandler);
 };
 
-scout.ButtonAdapterMenu.prototype._render = function($parent) {
-  scout.ButtonAdapterMenu.parent.prototype._render.call(this, $parent);
+scout.ButtonAdapterMenu.prototype._render = function() {
+  scout.ButtonAdapterMenu.parent.prototype._render.call(this);
   // Convenience: Add ID of original button to DOM for debugging purposes
   this.$container.attr('data-buttonadapter', this.button.id);
 };

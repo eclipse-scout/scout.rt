@@ -29,8 +29,8 @@ scout.Notification.prototype._init = function(model) {
   scout.texts.resolveTextProperty(this.status, 'message', this.session);
 };
 
-scout.Notification.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('notification');
+scout.Notification.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('notification');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
 };
 

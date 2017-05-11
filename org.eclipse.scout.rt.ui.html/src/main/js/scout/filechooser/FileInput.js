@@ -43,13 +43,13 @@ scout.FileInput.prototype._createKeyStrokeContext = function() {
   }
 };
 
-scout.FileInput.prototype._render = function($parent) {
-  this.$fileInput = $parent.makeElement('<input>')
+scout.FileInput.prototype._render = function() {
+  this.$fileInput = this.$parent.makeElement('<input>')
     .attr('type', 'file')
     .on('change', this._onFileChange.bind(this));
 
   if (!this.legacy) {
-    this.$container = $parent.appendDiv('file-input input-field')
+    this.$container = this.$parent.appendDiv('file-input input-field')
       .on('dragenter', this._onDragEnterOrOver.bind(this))
       .on('dragover', this._onDragEnterOrOver.bind(this))
       .on('drop', this._onDrop.bind(this));

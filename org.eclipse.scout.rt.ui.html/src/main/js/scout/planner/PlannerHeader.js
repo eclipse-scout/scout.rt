@@ -15,8 +15,8 @@ scout.PlannerHeader = function() {
 };
 scout.inherits(scout.PlannerHeader, scout.Widget);
 
-scout.PlannerHeader.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('planner-header');
+scout.PlannerHeader.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('planner-header');
   this.$range = this.$container.appendDiv('planner-range');
   this.$range.appendDiv('planner-previous').on('click', this._onPreviousClick.bind(this));
   this.$range.appendDiv('planner-today', this.session.text('ui.CalendarToday')).on('click', this._onTodayClick.bind(this));

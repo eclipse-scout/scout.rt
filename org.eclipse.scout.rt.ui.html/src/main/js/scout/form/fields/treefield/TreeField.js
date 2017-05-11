@@ -17,8 +17,8 @@ scout.TreeField = function() {
 };
 scout.inherits(scout.TreeField, scout.FormField);
 
-scout.TreeField.prototype._render = function($parent) {
-  this.addContainer($parent, 'tree-field');
+scout.TreeField.prototype._render = function() {
+  this.addContainer(this.$parent, 'tree-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
@@ -31,7 +31,7 @@ scout.TreeField.prototype._render = function($parent) {
  * Will also be called by model adapter on property change event
  */
 scout.TreeField.prototype._renderTree = function() {
-  this.tree.render(this.$container);
+  this.tree.render();
   this.addField(this.tree.$container);
 };
 

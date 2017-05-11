@@ -72,15 +72,12 @@ scout.MessageBox.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
-scout.MessageBox.prototype._render = function($parent) {
-  if (!$parent) {
-    throw new Error('Missing argument $parent');
-  }
+scout.MessageBox.prototype._render = function() {
   // Render modality glasspanes (must precede adding the message box to the DOM)
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
   this._glassPaneRenderer.renderGlassPanes();
 
-  this.$container = $parent.appendDiv('messagebox');
+  this.$container = this.$parent.appendDiv('messagebox');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.draggable($handle);

@@ -11,6 +11,7 @@
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
+  this.components = [];
   this.displayMode;
   this.displayCondensed;
   this.loadInProgress;
@@ -182,8 +183,8 @@ scout.Calendar.prototype._setMenus = function(menus) {
   $.log.debug('(Calendar#_setMenus) impl.');
 };
 
-scout.Calendar.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('calendar');
+scout.Calendar.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('calendar');
 
   var layout = new scout.CalendarLayout(this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -194,7 +195,7 @@ scout.Calendar.prototype._render = function($parent) {
   this.$header = this.$container.appendDiv('calendar-header');
   this.$headerRow1 = this.$header.appendDiv('calendar-header-row first');
   this.$headerRow2 = this.$header.appendDiv('calendar-header-row last');
-  this._yearPanel.render(this.$container);
+  this._yearPanel.render();
 
   this.$grid = this.$container.appendDiv('calendar-grid');
   this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
@@ -266,7 +267,7 @@ scout.Calendar.prototype._renderComponents = function() {
   this.components.sort(this._sortFromTo);
   this.components.forEach(function(component) {
     component.remove();
-    component.render(this.$container);
+    component.render();
   });
 
   this._arrangeComponents();

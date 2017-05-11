@@ -110,20 +110,20 @@ scout.Button.prototype._createLoadingSupport = function() {
  * The button form-field has no label and no status. Additionally it also has no container.
  * Container and field are the same thing.
  */
-scout.Button.prototype._render = function($parent) {
+scout.Button.prototype._render = function() {
   var $button;
   if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
     // Render as link-button/ menu-item.
     // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
     // Probably it would be more reasonable to change the configuration (which would lead to additional
     // effort required to change an existing application).
-    $button = $parent.makeDiv('link-button');
+    $button = this.$parent.makeDiv('link-button');
     // Separate $link element to have a smaller focus border
     this.$link = $button.appendDiv('menu-item link');
     this.$buttonLabel = this.$link.appendSpan('button-label text');
   } else {
     // render as button
-    $button = $parent.makeElement('<button>')
+    $button = this.$parent.makeElement('<button>')
       .addClass('button');
     this.$buttonLabel = $button.appendSpan('button-label');
 
@@ -131,7 +131,7 @@ scout.Button.prototype._render = function($parent) {
       $button.setTabbable(false);
     }
   }
-  this.addContainer($parent, 'button-field', new scout.ButtonLayout(this));
+  this.addContainer(this.$parent, 'button-field', new scout.ButtonLayout(this));
   this.addField($button);
   // TODO [7.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();

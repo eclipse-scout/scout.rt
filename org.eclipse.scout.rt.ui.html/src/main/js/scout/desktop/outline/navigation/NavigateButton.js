@@ -34,7 +34,7 @@ scout.inherits(scout.NavigateButton, scout.Menu);
 /**
  * @override
  */
-scout.NavigateButton.prototype._render = function($parent) {
+scout.NavigateButton.prototype._render = function() {
   if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
   } else {
@@ -48,7 +48,7 @@ scout.NavigateButton.prototype._render = function($parent) {
     this.iconId = this._defaultIconId;
   }
   this.enabled = this._buttonEnabled();
-  scout.NavigateButton.parent.prototype._render.call(this, $parent);
+  scout.NavigateButton.parent.prototype._render.call(this);
   this.$container.addClass('navigate-button small');
   this.$container.addClass(this._additionalCssClass);
   this.outline.keyStrokeContext.registerKeyStroke(this);

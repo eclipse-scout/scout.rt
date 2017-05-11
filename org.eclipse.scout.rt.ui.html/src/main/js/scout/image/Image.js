@@ -15,15 +15,15 @@ scout.Image = function() {
 };
 scout.inherits(scout.Image, scout.Widget);
 
-scout.Image.prototype._render = function($parent) {
-  this.$container = $parent.makeElement('<img>', 'image')
+scout.Image.prototype._render = function() {
+  this.$container = this.$parent.makeElement('<img>', 'image')
     .on('load', this._onImageLoad.bind(this))
     .on('error', this._onImageError.bind(this));
 
   if (scout.nvl(this.prepend, true)) {
-    this.$container.prependTo($parent);
+    this.$container.prependTo(this.$parent);
   } else {
-    this.$container.appendTo($parent);
+    this.$container.appendTo(this.$parent);
   }
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

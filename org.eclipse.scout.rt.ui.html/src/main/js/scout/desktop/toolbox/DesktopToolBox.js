@@ -29,7 +29,7 @@ scout.DesktopToolBox.prototype._initMenu = function(menu) {
 /**
  * @override
  */
-scout.DesktopToolBox.prototype._render = function($parent) {
-  scout.DesktopToolBox.parent.prototype._render.call(this, $parent);
+scout.DesktopToolBox.prototype._render = function() {
+  scout.DesktopToolBox.parent.prototype._render.call(this);
   this.$container.addClass('desktop-tool-box');
 };

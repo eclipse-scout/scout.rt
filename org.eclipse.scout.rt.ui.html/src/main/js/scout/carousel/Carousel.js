@@ -39,9 +39,9 @@ scout.Carousel.prototype._setGridData = function(gridData) {
   this._setProperty('gridData', new scout.GridData(gridData));
 };
 
-scout.Carousel.prototype._render = function($parent) {
+scout.Carousel.prototype._render = function() {
   // add container
-  this.$container = $parent.appendDiv('carousel');
+  this.$container = this.$parent.appendDiv('carousel');
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.CarouselLayout(this));

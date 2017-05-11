@@ -35,8 +35,8 @@ scout.MenuBox.prototype._initMenu = function(menu) {
 /**
  * @override Widget.js
  */
-scout.MenuBox.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('menu-box');
+scout.MenuBox.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('menu-box');
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBoxLayout(this));
@@ -50,7 +50,7 @@ scout.MenuBox.prototype._renderProperties = function() {
 
 scout.MenuBox.prototype._renderMenus = function() {
   this.menus.forEach(function(menu) {
-    menu.render(this.$container);
+    menu.render();
   }, this);
   this.invalidateLayoutTree();
 };

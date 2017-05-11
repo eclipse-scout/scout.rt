@@ -30,8 +30,8 @@ scout.LogoutBox.prototype.init = function(opts) {
   this.logoUrl = this.options.logoUrl;
 };
 
-scout.LogoutBox.prototype.render = function($parent) {
-  scout.LogoutBox.parent.prototype.render.call(this, $parent);
+scout.LogoutBox.prototype._render = function() {
+  scout.LogoutBox.parent.prototype._render.call(this);
 
   this.$content.addClass('small centered')
     .appendDiv().html(scout.strings.nl2br(this.texts.get('ui.LogoutSuccessful')));

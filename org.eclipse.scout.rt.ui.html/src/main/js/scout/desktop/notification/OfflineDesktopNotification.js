@@ -13,8 +13,8 @@ scout.OfflineDesktopNotification.prototype._init = function(model) {
   });
 };
 
-scout.OfflineDesktopNotification.prototype._render = function($parent) {
-  scout.OfflineDesktopNotification.parent.prototype._render.call(this, $parent);
+scout.OfflineDesktopNotification.prototype._render = function() {
+  scout.OfflineDesktopNotification.parent.prototype._render.call(this);
   this.$content.addClass('offline-message');
   this.$messageText.addClass('offline-message-text');
   this.$loader.text(this.session.text('ui.Reconnecting_'));

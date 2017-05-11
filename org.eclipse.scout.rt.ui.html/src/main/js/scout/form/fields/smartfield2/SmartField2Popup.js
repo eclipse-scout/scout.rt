@@ -38,12 +38,12 @@ scout.SmartField2Popup.prototype._createLayout = function() {
   }
 };
 
-scout.SmartField2Popup.prototype._render = function($parent) {
-  scout.SmartField2Popup.parent.prototype._render.call(this, $parent);
+scout.SmartField2Popup.prototype._render = function() {
+  scout.SmartField2Popup.parent.prototype._render.call(this);
   this.$container
     .addClass('dropdown-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this));
-  this.proposalChooser.render(this.$container);
+  this.proposalChooser.render();
 };
 
 scout.SmartField2Popup.prototype.setLookupResult = function(result) {

@@ -16,11 +16,11 @@ scout.SequenceBox = function() {
 };
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
-scout.SequenceBox.prototype._render = function($parent) {
+scout.SequenceBox.prototype._render = function() {
   var field, i;
-  this.addContainer($parent, 'sequence-box');
+  this.addContainer(this.$parent, 'sequence-box');
   this.addLabel();
-  this.addField($parent.makeDiv());
+  this.addField(this.$parent.makeDiv());
   this.addStatus();
   this._handleStatus();
   var htmlComp = scout.HtmlComponent.install(this.$field, this.session);

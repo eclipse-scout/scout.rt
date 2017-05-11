@@ -72,8 +72,8 @@ scout.MenuBar.prototype._initKeyStrokeContext = function() {
 /**
  * @override Widget.js
  */
-scout.MenuBar.prototype._render = function($parent) {
-  this.$container = $parent.makeDiv('menubar')
+scout.MenuBar.prototype._render = function() {
+  this.$container = this.$parent.makeDiv('menubar')
     .toggleClass('main-menubar', this.size === 'large');
 
   this.$left = this.$container.appendDiv('menubox left');
@@ -85,10 +85,10 @@ scout.MenuBar.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
 
   if (this.position === 'top') {
-    $parent.prepend(this.$container);
+    this.$parent.prepend(this.$container);
   } else {
     this.$container.addClass('bottom');
-    $parent.append(this.$container);
+    this.$parent.append(this.$container);
   }
   this.rebuildItemsInternal();
 };

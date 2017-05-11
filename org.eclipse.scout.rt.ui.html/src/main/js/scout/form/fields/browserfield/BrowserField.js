@@ -43,19 +43,19 @@ scout.BrowserField.prototype._init = function(model) {
   });
 };
 
-scout.BrowserField.prototype._render = function($parent) {
-  this.addContainer($parent, 'browser-field');
+scout.BrowserField.prototype._render = function() {
+  this.addContainer(this.$parent, 'browser-field');
   this.addLabel();
   this.addStatus();
 
   if (!this.showInExternalWindow) {
     // mode 1: <iframe>
-    this.iframe.render(this.$container);
+    this.iframe.render();
     this.addFieldContainer(this.iframe.$container);
     this.addField(this.iframe.$iframe);
   } else {
     // mode 2: separate window
-    this.addField($parent.makeDiv());
+    this.addField(this.$parent.makeDiv());
     this._externalWindowTextField = this.$field.appendDiv()
       .addClass('alt');
     this._externalWindowButton = this.$field.appendDiv()
@@ -63,7 +63,7 @@ scout.BrowserField.prototype._render = function($parent) {
       .on('click', this._openPopupWindow.bind(this));
   }
 
-  this.myWindow = $parent.window(true);
+  this.myWindow = this.$parent.window(true);
 
   this._messageListener = this._onMessage.bind(this);
   this.myWindow.addEventListener('message', this._messageListener);
@@ -288,7 +288,7 @@ scout.BrowserField.prototype._afterAttach = function(parent) {
   if (!this.showInExternalWindow && scout.device.requiresIframeSecurityAttribute()) {
     this.iframe.remove();
     this._removeField();
-    this.iframe.render(this.$container);
+    this.iframe.render();
     this.addFieldContainer(this.iframe.$container);
     this.addField(this.iframe.$iframe);
     this.htmlComp.revalidateLayout();

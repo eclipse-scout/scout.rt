@@ -23,8 +23,8 @@ scout.CompactTree.prototype._createTreeNode = function(nodeModel) {
   return scout.create('CompactTreeNode', nodeModel);
 };
 
-scout.CompactTree.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('compact-tree');
+scout.CompactTree.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('compact-tree');
 
   var layout = new scout.TreeLayout(this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -39,7 +39,7 @@ scout.CompactTree.prototype._render = function($parent) {
     parent: this,
     menuOrder: new scout.MenuItemsOrder(this.session, 'Tree')
   });
-  this.menuBar.render(this.$container);
+  this.menuBar.render();
 
   this.$nodesContainer = this.$data.appendDiv('nodes');
   this._updateNodeDimensions();

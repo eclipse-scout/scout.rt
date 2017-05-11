@@ -39,8 +39,8 @@ scout.SearchOutline.prototype._createKeyStrokeContextForSearchField = function()
   return keyStrokeContext;
 };
 
-scout.SearchOutline.prototype._render = function($parent) {
-  scout.SearchOutline.parent.prototype._render.call(this, $parent);
+scout.SearchOutline.prototype._render = function() {
+  scout.SearchOutline.parent.prototype._render.call(this);
 
   // Override layout
   this.htmlComp.setLayout(new scout.SearchOutlineLayout(this));

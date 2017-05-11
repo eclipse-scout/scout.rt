@@ -20,11 +20,11 @@ describe('FormField', function() {
 
   function createFormField(model) {
     var formField = new scout.FormField();
-    formField._render = function($parent) {
-      this.addContainer($parent, 'form-field');
+    formField._render = function() {
+      this.addContainer(this.$parent, 'form-field');
       this.addLabel();
       this.addMandatoryIndicator();
-      this.addField($parent.makeDiv());
+      this.addField(this.$parent.makeDiv());
       this.addStatus();
     };
     formField.init(model);

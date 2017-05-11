@@ -232,6 +232,11 @@ scout.Widget.prototype._destroyChild = function(child) {
   child.destroy();
 };
 
+/**
+ * @param [$parent] The jQuery element which is used as $parent when rendering this widget.
+ * It will be put onto the widget and is therefore accessible as this.$parent in the _render method.
+ * If not specified, the $container of the parent is used.
+ */
 scout.Widget.prototype.render = function($parent) {
   $.log.trace('Rendering widget: ' + this);
   if (!this.initialized) {
@@ -244,8 +249,8 @@ scout.Widget.prototype.render = function($parent) {
     throw new Error('Widget is destroyed: ' + this);
   }
   this.rendering = true;
-  this.$parent = $parent;
-  this._render($parent);
+  this.$parent = $parent || this.parent.$container;
+  this._render();
   this._renderProperties();
   this._renderInspectorInfo();
   this._linkWithDOM();
@@ -263,7 +268,7 @@ scout.Widget.prototype.render = function($parent) {
  * apply model values to the UI here, since this is done in the _renderProperties method later.
  * The default impl. does nothing.
  */
-scout.Widget.prototype._render = function($parent) {
+scout.Widget.prototype._render = function() {
   // NOP
 };
 

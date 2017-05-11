@@ -24,15 +24,15 @@ scout.TableHeaderMenuGroup.prototype._init = function(options) {
   this.text = this.session.text(this.textKey);
 };
 
-scout.TableHeaderMenuGroup.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('table-header-menu-group buttons');
+scout.TableHeaderMenuGroup.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('table-header-menu-group buttons');
   this.$text = this.$container.appendDiv('table-header-menu-group-text');
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
   this._renderText();
   this.children.forEach(function(child) {
-    child.render(this.$container);
+    child.render();
   }, this);
 };
 

@@ -42,8 +42,8 @@ scout.SimpleTabBox.prototype._keyStrokeBindTarget = function() {
   return this.$container;
 };
 
-scout.SimpleTabBox.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('view-tab-box');
+scout.SimpleTabBox.prototype._render = function() {
+  this.$container = this.$parent.appendDiv('view-tab-box');
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
@@ -65,7 +65,7 @@ scout.SimpleTabBox.prototype._renderProperties = function() {
 };
 
 scout.SimpleTabBox.prototype._renderTabArea = function() {
-  this.tabArea.render(this.$container);
+  this.tabArea.render();
   this.$tabArea = this.tabArea.$container;
   if (this.tabArea.attached) {
     this.$tabArea.insertBefore(this.$viewContent);

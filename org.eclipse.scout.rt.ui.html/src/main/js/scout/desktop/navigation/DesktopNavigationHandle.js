@@ -27,8 +27,8 @@ scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function() {
   ]);
 };
 
-scout.DesktopNavigationHandle.prototype._render = function($parent) {
-  scout.DesktopNavigationHandle.parent.prototype._render.call(this, $parent);
+scout.DesktopNavigationHandle.prototype._render = function() {
+  scout.DesktopNavigationHandle.parent.prototype._render.call(this);
   this.$container.addClass('desktop-navigation-handle');
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };

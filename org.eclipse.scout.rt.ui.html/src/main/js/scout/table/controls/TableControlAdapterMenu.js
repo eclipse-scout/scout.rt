@@ -39,8 +39,8 @@ scout.TableControlAdapterMenu.prototype._uninstallListeners = function() {
   this.tableControl.off('destroy', this._tableControlDestroyHandler);
 };
 
-scout.TableControlAdapterMenu.prototype._render = function($parent) {
-  scout.TableControlAdapterMenu.parent.prototype._render.call(this, $parent);
+scout.TableControlAdapterMenu.prototype._render = function() {
+  scout.TableControlAdapterMenu.parent.prototype._render.call(this);
   // Convenience: Add ID of original tableControl to DOM for debugging purposes
   this.$container.attr('data-tableControlAdapter', this.tableControl.id);
 };

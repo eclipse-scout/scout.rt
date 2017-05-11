@@ -24,11 +24,11 @@ scout.HtmlField.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
 };
 
-scout.HtmlField.prototype._render = function($parent) {
-  this.addContainer($parent, 'html-field');
+scout.HtmlField.prototype._render = function() {
+  this.addContainer(this.$parent, 'html-field');
   this.addLabel();
 
-  this.addField($parent.makeDiv());
+  this.addField(this.$parent.makeDiv());
   this.addStatus();
 };
 

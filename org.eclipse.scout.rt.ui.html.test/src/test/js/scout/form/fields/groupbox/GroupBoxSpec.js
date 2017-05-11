@@ -20,9 +20,6 @@ describe("GroupBox", function() {
 
   function createField(model, parent) {
     var field = new scout.GroupBox();
-    field.getForm = function() {
-      return createSimpleModel('Form', session);
-    };
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -56,7 +53,7 @@ describe("GroupBox", function() {
     });
 
     it("adds group-box div when label is set", function() {
-      groupBox._render($('#sandbox'));
+      groupBox.render($('#sandbox'));
       expect($('#sandbox')).toContainElement('div.group-box');
       expect($('#sandbox')).toContainElement('div.group-box-title');
     });

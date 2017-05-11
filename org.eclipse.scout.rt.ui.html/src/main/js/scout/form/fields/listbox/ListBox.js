@@ -24,13 +24,13 @@ scout.ListBox.prototype._init = function(model) {
   }
 };
 
-scout.ListBox.prototype._render = function($parent) {
-  this.addContainer($parent, 'list-box');
+scout.ListBox.prototype._render = function() {
+  this.addContainer(this.$parent, 'list-box');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
 
-  this.addFieldContainer($parent.makeDiv());
+  this.addFieldContainer(this.$parent.makeDiv());
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));
 
