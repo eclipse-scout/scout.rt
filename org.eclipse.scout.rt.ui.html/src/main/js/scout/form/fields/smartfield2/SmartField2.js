@@ -161,20 +161,28 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
       return;
     }
 
-    // in any other case something went wrong
-    if (numLookupRows === 0) {
-      this.setErrorStatus(scout.Status.error({
-        message: this.session.text('SmartFieldCannotComplete', searchText)
-      }));
+    if (this.isProposal()) {
+      // [proposal field] case
+      this.setValue(searchText);
       return;
-    }
 
-    if (numLookupRows > 1) { // FIXME [awe] 7.0 - SF2: proposal field continue --> wenn proposal nicht eindeutig --> egal
-      this.setErrorStatus(scout.Status.error({
-        message: this.session.text('SmartFieldNotUnique', searchText)
-      }));
-      this.openPopup2(result);
-      return;
+    } else {
+      // [smart field] case
+      // in any other case something went wrong
+      if (numLookupRows === 0) {
+        this.setErrorStatus(scout.Status.error({
+          message: this.session.text('SmartFieldCannotComplete', searchText)
+        }));
+        return;
+      }
+
+      if (numLookupRows > 1) { // FIXME [awe] 7.0 - SF2: proposal field continue --> wenn proposal nicht eindeutig --> egal
+        this.setErrorStatus(scout.Status.error({
+          message: this.session.text('SmartFieldNotUnique', searchText)
+        }));
+        this.openPopup2(result);
+        return;
+      }
     }
 
     throw new Error('Unreachable code');
@@ -233,6 +241,10 @@ scout.SmartField2.prototype._setCodeType = function(codeType) {
 };
 
 scout.SmartField2.prototype._formatValue = function(value) {
+  if (this.isProposal()) {
+    return scout.SmartField2.parent.prototype._formatValue.call(this, value);
+  }
+
   if (!value) {
     return '';
   }
@@ -330,9 +342,8 @@ scout.SmartField2.prototype.showLookupInProgress = function() {
 };
 
 scout.SmartField2.prototype.hideLookupInProgress = function() {
-  this.$field.removeClass('lookup-in-progress');
-  if (this.popup) {
-    // this.popup.hideLookupInProgress();
+  if (this.rendered) {
+    this.$field.removeClass('lookup-in-progress');
   }
 };
 
@@ -506,9 +517,12 @@ scout.SmartField2.prototype.isProposal = function() {
 
 scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
   this.lookupRow = lookupRow;
-  var value = lookupRow ? lookupRow.key : null;
   this.setErrorStatus(null);
-  this.setValue(value);
+  if (lookupRow) {
+    this.setValue(this.isProposal() ? lookupRow.text : lookupRow.key);
+  } else {
+    this.setValue(null);
+  }
 };
 
 scout.SmartField2.prototype._setValue = function(value) {
