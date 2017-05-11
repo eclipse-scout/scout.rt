@@ -198,7 +198,7 @@ scout.SplitBox.prototype._render = function($parent) {
   }
 
   function onInnerFieldPropertyChange(event) {
-    if (event.changedProperties.indexOf('visible') !== -1) {
+    if (event.name === 'visible') {
       // Mark layout as invalid
       this.htmlSplitArea.invalidateLayoutTree(false);
     }

@@ -38,8 +38,8 @@ scout.SequenceBox.prototype._render = function($parent) {
 };
 
 scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
-  var visibiltyChanged = (event.changedProperties.indexOf('visible') !== -1);
-  if (scout.arrays.containsAny(event.changedProperties, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
+  var visibiltyChanged = (event.name === 'visible');
+  if (scout.isOneOf(event.name, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
     this._handleStatus(visibiltyChanged);
   }
 };

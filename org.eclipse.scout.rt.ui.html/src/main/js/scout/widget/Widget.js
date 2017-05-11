@@ -844,36 +844,18 @@ scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
   }, this);
 };
 
-scout.Widget.prototype.triggerBulkPropertyChange = function(oldProperties, newProperties) {
-  var propertyChangeEvent = {
-    newProperties: newProperties,
-    oldProperties: oldProperties,
-    changedProperties: []
-  };
-  // To allow a listener to react only to properties that have really changed their value, we
-  // calculate the list of "changedProperties". This may be relevant, when the value on the model
-  // changes from A to B and back to A, which emits a property change event when in fact, the
-  // property has not really changed for the UI.
-  for (var prop in newProperties) {
-    if (newProperties[prop] !== oldProperties[prop]) {
-      propertyChangeEvent.changedProperties.push(prop);
-    }
-  }
-  this.trigger('propertyChange', propertyChangeEvent);
-};
-
 /**
- * Fires a property change for a single property.
+ * Triggers a property change for a single property.
  */
 scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, newValue) {
-  if (!propertyName) {
-    return;
-  }
-  var oldProperties = {},
-    newProperties = {};
-  oldProperties[propertyName] = oldValue;
-  newProperties[propertyName] = newValue;
-  this.triggerBulkPropertyChange(oldProperties, newProperties);
+  scout.assertParameter('propertyName', propertyName);
+  var event = new scout.Event({
+    type: oldValue,
+    name: propertyName,
+    oldValue: oldValue,
+    newValue: newValue
+  });
+  this.trigger('propertyChange', event);
 };
 
 /**
@@ -1231,9 +1213,7 @@ scout.Widget.prototype._onMirrorEvent = function(event) {
 };
 
 scout.Widget.prototype._onMirrorPropertyChange = function(event) {
-  event.changedProperties.forEach(function(property) {
-    this.callSetter(property, event.newProperties[property]);
-  }, this);
+  this.callSetter(event.name, event.newValue);
 };
 
 scout.Widget.prototype._onParentDestroy = function(event) {

@@ -253,13 +253,13 @@ scout.DesktopHeader.prototype.onBenchOutlineContentChange = function(content) {
 };
 
 scout.DesktopHeader.prototype._onDesktopPropertyChange = function(event) {
-  if (event.changedProperties.indexOf('navigationVisible') !== -1) {
+  if (event.name === 'navigationVisible') {
     this._onDesktopNavigationVisibleChange();
   }
 };
 
 scout.DesktopHeader.prototype._onOutlineContentMenuBarPropertyChange = function(event) {
-  if (event.changedProperties.indexOf('visible') !== -1) {
+  if (event.name === 'visible') {
     this.updateViewButtonStyling();
   }
 };

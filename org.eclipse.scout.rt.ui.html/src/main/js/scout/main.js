@@ -71,18 +71,22 @@ scout.assertParameter = function(parameterName, value, type) {
   }
 };
 
-scout.isOneOf = function() {
-  if (arguments.length >= 2) {
-    var value = arguments[0];
-    var argsToCheck;
-    if (arguments.length === 2 && Array.isArray(arguments[1])) {
-      argsToCheck = arguments[1];
-    } else {
-      argsToCheck = Array.prototype.slice.call(arguments, 1);
-    }
-    return argsToCheck.indexOf(value) !== -1;
+/**
+ * Checks if one of the arguments from 1-n is equal to the first argument.
+ * @param value
+ * @param arguments to check against the value, may be an array or a variable argument list.
+ */
+scout.isOneOf = function(value) {
+  if (arguments.length < 2) {
+    return false;
   }
-  return false;
+  var argsToCheck;
+  if (arguments.length === 2 && Array.isArray(arguments[1])) {
+    argsToCheck = arguments[1];
+  } else {
+    argsToCheck = Array.prototype.slice.call(arguments, 1);
+  }
+  return argsToCheck.indexOf(value) !== -1;
 };
 
 /**

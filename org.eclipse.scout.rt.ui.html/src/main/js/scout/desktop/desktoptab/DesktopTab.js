@@ -15,29 +15,29 @@ scout.DesktopTab = function() {
   this.view;
 
   this._propertyChangeListener = function(event) {
-    if (scout.arrays.containsAny(event.changedProperties, ['title'])) {
+    if (event.name === 'title') {
       this.setTitle(this.view.title);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['subTitle'])) {
+    if (event.name === 'subTitle') {
       this.setSubTitle(this.view.subTitle);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['iconId'])) {
+    if (event.name === 'iconId') {
       this.setIconId(this.view.iconId);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['cssClass'])) {
-      this.setCssClass(event.newProperties.cssClass);
+    if (event.name === 'cssClass') {
+      this.setCssClass(event.newValue);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['saveNeeded'])) {
-      this.setSaveNeeded(event.newProperties.saveNeeded);
+    if (event.name === 'saveNeeded') {
+      this.setSaveNeeded(event.newValue);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['saveNeededVisible'])) {
-      this.setSaveNeededVisible(event.newProperties.saveNeededVisible);
+    if (event.name === 'saveNeededVisible') {
+      this.setSaveNeededVisible(event.newValue);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['closable'])) {
-      this.setClosable(event.newProperties.closable);
+    if (event.name === 'closable') {
+      this.setClosable(event.newValue);
     }
-    if (scout.arrays.containsAny(event.changedProperties, ['status'])) {
-      this.setStatus(event.source.status);
+    if (event.name === 'status') {
+      this.setStatus(event.newValue);
     }
   }.bind(this);
   this._removeListener = this._onViewRemoved.bind(this);

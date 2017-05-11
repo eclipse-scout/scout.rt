@@ -386,22 +386,20 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
   // user request (because many menus change one or more properties). Therefore, we just invalidate
   // the MenuBarLayout. It will be updated automatically after the user request has finished,
   // because the layout calls rebuildItemsInternal().
-  if (event.changedProperties.length > 0) {
-    if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
-      this.updateDefaultMenu();
-    } else if (event.changedProperties.indexOf('visible') > -1) {
-      var oldVisible = this.visible;
-      this.updateVisibility();
-      // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).
-      // If the menu is rendered, the menu itself triggers invalidateLayoutTree (see Menu.js#_renderVisible)
-      this.invalidateLayoutTree();
-      if (!oldVisible && this.visible) {
-        // If the menubar was previously invisible (because all menus were invisible) but
-        // is now visible, the menuboxes and the menus have to be rendered now. Otherwise,
-        // calculating the preferred size of the menubar, e.g. in the TableLayout, would
-        // return the wrong value (even if the menubar itself is visible).
-        this.revalidateLayout();
-      }
+  if (event.name === 'enabled') {
+    this.updateDefaultMenu();
+  } else if (event.name === 'visible') {
+    var oldVisible = this.visible;
+    this.updateVisibility();
+    // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).
+    // If the menu is rendered, the menu itself triggers invalidateLayoutTree (see Menu.js#_renderVisible)
+    this.invalidateLayoutTree();
+    if (!oldVisible && this.visible) {
+      // If the menubar was previously invisible (because all menus were invisible) but
+      // is now visible, the menuboxes and the menus have to be rendered now. Otherwise,
+      // calculating the preferred size of the menubar, e.g. in the TableLayout, would
+      // return the wrong value (even if the menubar itself is visible).
+      this.revalidateLayout();
     }
   }
 };

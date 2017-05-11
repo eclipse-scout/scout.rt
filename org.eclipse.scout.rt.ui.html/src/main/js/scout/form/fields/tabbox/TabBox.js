@@ -24,16 +24,7 @@ scout.TabBox = function() {
   this._$tabArea;
   this._$tabContent;
 
-  this._tabItemPropertyChangeHandler = function(event) {
-    var numProperties = event.changedProperties.length;
-    if (numProperties === 1 && event.changedProperties[0] === 'enabled') {
-      // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
-      return;
-    }
-    if (numProperties > 0) {
-      scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
-    }
-  }.bind(this);
+  this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
@@ -270,5 +261,12 @@ scout.TabBox.prototype.focus = function() {
   }
   if (this.selectedTab) {
     this.selectedTab.requestFocus();
+  }
+};
+
+scout.TabBox.prototype._onTabItemPropertyChange = function(event) {
+  // No need to invalidate if the enabled state has changed (this should not affect the layout).
+  if (event.name !== 'enabled') {
+    scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
   }
 };

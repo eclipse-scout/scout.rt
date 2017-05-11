@@ -740,8 +740,8 @@ scout.TableHeader.prototype._onTableDataScroll = function() {
 };
 
 scout.TableHeader.prototype._onMenuBarPropertyChange = function(event) {
-  if (event.changedProperties.indexOf('visible') !== -1) {
-    this.$menuBarContainer.setVisible(event.newProperties.visible);
+  if (event.name === 'visible') {
+    this.$menuBarContainer.setVisible(event.newValue);
   }
 };
 

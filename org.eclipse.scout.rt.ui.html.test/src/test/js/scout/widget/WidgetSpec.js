@@ -30,10 +30,10 @@ describe('Widget', function() {
 
   function createWidget(model) {
     var defaults = {
+      parent: parent,
       session: session
     };
-    model = model || {};
-    $.extend(model, defaults);
+    model = $.extend({}, defaults, model);
     var widget = new TestWidget();
     widget.init(model);
     return widget;
@@ -96,45 +96,6 @@ describe('Widget', function() {
       widget.remove();
       expect(widget.rendered).toBe(false);
       expect(widget.attached).toBe(false);
-    });
-
-  });
-
-  describe('triggerPropertyChange', function() {
-
-    var propertyChangeEvent, widget;
-
-    beforeEach(function() {
-      widget = new TestWidget();
-    });
-
-    function firePropertyChange(oldValue, newValue) {
-      widget.on('propertyChange', function(event) {
-        propertyChangeEvent = event;
-      });
-      widget.triggerPropertyChange('selected', oldValue, newValue);
-    }
-
-    it('fires the expected event object', function() {
-      firePropertyChange(false, true);
-
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
-      expect(propertyChangeEvent.changedProperties.length).toBe(1);
-
-      expect(propertyChangeEvent.oldProperties.selected).toBe(false);
-      expect(propertyChangeEvent.newProperties.selected).toBe(true);
-      expect(propertyChangeEvent.changedProperties[0]).toBe('selected');
-    });
-
-    // TODO [7.0] awe: discuss with B.SH - when a property has _not_ changed, should it be
-    // fired as new/old property anyway? When no property has changed, should the propertyChange
-    // event be fired anyway?
-    it('changedProperties is only set when new and old value are not equals', function() {
-      firePropertyChange(true, true);
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
-      expect(propertyChangeEvent.changedProperties.length).toBe(0);
     });
 
   });
@@ -432,6 +393,36 @@ describe('Widget', function() {
   });
 
   describe('setProperty', function() {
+
+    it('triggers a property change event if the value changes', function() {
+      var propertyChangeEvent;
+      var widget = createWidget();
+      widget.on('propertyChange', function(event) {
+        propertyChangeEvent = event;
+      });
+      widget.setProperty('selected', true);
+      expect(propertyChangeEvent.type).toBe('propertyChange');
+      expect(propertyChangeEvent.name).toBe('selected');
+      expect(propertyChangeEvent.oldValue).toBe(undefined);
+      expect(propertyChangeEvent.newValue).toBe(true);
+
+      widget.setProperty('selected', false);
+      expect(propertyChangeEvent.type).toBe('propertyChange');
+      expect(propertyChangeEvent.name).toBe('selected');
+      expect(propertyChangeEvent.oldValue).toBe(true);
+      expect(propertyChangeEvent.newValue).toBe(false);
+    });
+
+    it('does not trigger a property change event if the value does not change', function() {
+      var propertyChangeEvent;
+      var widget = createWidget();
+      widget.on('propertyChange', function(event) {
+        propertyChangeEvent = event;
+      });
+      widget.selected = true;
+      widget.setProperty('selected', true);
+      expect(propertyChangeEvent).toBe(undefined);
+    });
 
     describe('with widget property', function() {
       it('links the widget with the new child widget', function() {

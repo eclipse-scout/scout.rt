@@ -452,7 +452,7 @@ scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
 };
 
 scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
-  if (scout.arrays.containsAny(event.changedProperties, ['defaultDetailForm', 'outlineOverview'])) {
+  if (scout.isOneOf(event.name, ['defaultDetailForm', 'outlineOverview'])) {
     this.updateOutlineContent();
   }
 };
@@ -479,12 +479,12 @@ scout.DesktopBench.prototype._onBenchLayoutDataChange = function(event) {
 };
 
 scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
-  if (event.changedProperties.indexOf('navigationVisible') !== -1) {
+  if (event.name === 'navigationVisible') {
     this._onDesktopNavigationVisibleChange();
-  } else if (event.changedProperties.indexOf('navigationHandleVisible') !== -1) {
+  } else if (event.name === 'navigationHandleVisible') {
     this._onDesktopNavigationHandleVisibleChange();
   }
-  if (event.changedProperties.indexOf('benchLayoutData') !== -1) {
+  if (event.name === 'benchLayoutData') {
     this._onBenchLayoutDataChange();
   }
 };

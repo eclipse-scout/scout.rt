@@ -167,7 +167,7 @@ scout.ProposalChooser2.prototype._renderActiveFilterButton = function(value, ind
     });
 
   radio.on('propertyChange', function(event) {
-    if (event.changedProperties.indexOf('selected') !== -1 && event.newProperties.selected === true) {
+    if (event.name === 'selected' && event.newValue === true) {
       this.trigger('activeFilterSelected', {
         activeFilter: event.source.radioValue
       });

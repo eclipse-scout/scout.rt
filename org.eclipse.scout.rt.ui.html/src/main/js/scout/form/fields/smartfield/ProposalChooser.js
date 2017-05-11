@@ -148,7 +148,7 @@ scout.ProposalChooser.prototype._renderButton = function(value, index) {
     });
 
   radio.on('propertyChange', function(event) {
-    if (event.changedProperties.indexOf('selected') !== -1 && event.newProperties.selected === true) {
+    if (event.name === 'selected' && event.newValue === true) {
       this._onActiveFilterChanged(event.source.radioValue);
     }
   }.bind(this));

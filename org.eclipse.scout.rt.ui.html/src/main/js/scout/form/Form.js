@@ -63,15 +63,15 @@ scout.Form.prototype._init = function(model) {
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, renderGlassPanes);
-  var glasspaneRendererHandler = function(event) {
-    //render glasspanes on parents after initialized
-    if (event.newProperties.displayParent) {
+  var propertyChangeHandler = function(event) {
+    // render glasspanes on parents after initialized
+    if (event.name === 'displayParent') {
       this._glassPaneRenderer.renderGlassPanes();
     }
   }.bind(this);
-  this.on('propertyChange', glasspaneRendererHandler);
+  this.on('propertyChange', propertyChangeHandler);
   this.one('destroy', function() {
-    this.off('propertyChange', glasspaneRendererHandler);
+    this.off('propertyChange', propertyChangeHandler);
   }.bind(this));
 };
 
