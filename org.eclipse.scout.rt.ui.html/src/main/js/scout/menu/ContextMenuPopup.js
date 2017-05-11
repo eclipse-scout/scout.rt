@@ -393,6 +393,10 @@ scout.ContextMenuPopup.prototype.$menuItems = function() {
   return this.$body.children('.menu-item');
 };
 
+scout.ContextMenuPopup.prototype.$visibleMenuItems = function() {
+  return this.$body.children('.menu-item:visible');
+};
+
 /**
  * Updates the first and last visible menu items with the according css classes.
  * Necessary because invisible menu-items are rendered.

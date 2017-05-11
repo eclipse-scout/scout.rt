@@ -14,7 +14,7 @@ scout.ContextMenuPopupLayout = function(popup) {
 scout.inherits(scout.ContextMenuPopupLayout, scout.PopupWithHeadLayout);
 
 scout.ContextMenuPopupLayout.prototype.layout = function($container) {
-  var $menuItems = this.popup.$menuItems();
+  var $menuItems = this.popup.$visibleMenuItems();
   this._adjustTextAlignment($menuItems);
   this._resetMaxWidthFor($menuItems);
   scout.ContextMenuPopupLayout.parent.prototype.layout.call(this, $container);
