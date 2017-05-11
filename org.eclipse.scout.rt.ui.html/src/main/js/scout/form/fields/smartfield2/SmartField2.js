@@ -45,9 +45,6 @@ scout.SmartField2.prototype._init = function(model) {
     this.session.text('ui.All'),
     this.session.text('ui.Inactive'),
     this.session.text('ui.Active')];
-
-  this._setLookupCall(this.lookupCall);
-  this._setCodeType(this.codeType);
 };
 
 /**
@@ -479,6 +476,7 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
 };
 
 scout.SmartField2.prototype._setValue = function(value) {
+  this._ensureLookupCall();
   // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
   // must of the time. Thus we must remove the reference to the old lookup row as early as possible
   if (value) {
@@ -491,4 +489,16 @@ scout.SmartField2.prototype._setValue = function(value) {
     this.lookupRow = null;
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
+};
+
+/**
+ * Ensures lookup call and code type are resolved before calling set value.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.SmartField2.prototype._ensureLookupCall = function() {
+  if (this.initialized) {
+    return;
+  }
+  this._setLookupCall(this.lookupCall);
+  this._setCodeType(this.codeType);
 };
