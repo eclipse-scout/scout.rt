@@ -1183,7 +1183,7 @@ $.fn.isContentTruncated = function() {
   // As a workaround, we do a second measurement of the uncut width before returning false.
   var oldStyle = this.attr('style');
   this.css('width', 'auto');
-  scrollWidth = this[0].scrollWidth;
+  scrollWidth = scout.graphics.getSize(this).width;
   this.attrOrRemove('style', oldStyle);
 
   return scrollWidth > clientWidth;
