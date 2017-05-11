@@ -188,20 +188,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return 0;
   }
 
-  /**
-   * Configures, if HTML rendering is enabled for this field.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
-   * input) is encoded (security), if this property is enabled.
-   *
-   * @return {@code true}, if HTML rendering is enabled for this field.{@code false} otherwise.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(420)
-  protected boolean getConfiguredHtmlEnabled() {
-    return false;
-  }
-
   @ConfigOperation
   @Order(500)
   protected TransferObject execDragRequest() {
@@ -254,7 +240,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     setDropType(configuredDropType);
     setDropMaximumSize(getConfiguredDropMaximumSize());
     setSelectionTrackingEnabled(getConfiguredSelectionTrackingEnabled());
-    setHtmlEnabled(getConfiguredHtmlEnabled());
     setSpellCheckEnabled(computeSpellCheckEnabled());
   }
 
@@ -568,16 +553,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   @Override
   public boolean isSpellCheckEnabled() {
     return propertySupport.getPropertyBool(PROP_SPELL_CHECK_ENABLED);
-  }
-
-  @Override
-  public void setHtmlEnabled(boolean enabled) {
-    propertySupport.setPropertyBool(PROP_HTML_ENABLED, enabled);
-  }
-
-  @Override
-  public boolean isHtmlEnabled() {
-    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
   /**

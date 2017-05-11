@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
-import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
-public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCapable {
+public interface IStringField extends IBasicField<String>, IDNDSupport {
 
   /**
    * @see IDNDSupport
