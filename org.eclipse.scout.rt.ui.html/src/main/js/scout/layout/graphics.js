@@ -247,9 +247,7 @@ scout.graphics = {
     if (!$comp) {
       return '$comp is undefined';
     }
-    if (!($comp instanceof $)) {
-      $comp = $($comp);
-    }
+    $comp = $.ensure($comp);
     if ($comp.length === 0) {
       return '$comp doesn\t match any elements';
     }

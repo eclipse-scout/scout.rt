@@ -1342,7 +1342,12 @@ scout.Widget.prototype.isAttachedAndRendered = function() {
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
+/**
+ * @param a HTML or jQuery element
+ * @returns the widget for the given element. If the element is not linked with a widget directly, it searches its ancestors for the widget.
+ */
 scout.Widget.getWidgetFor = function($elem) {
+  $elem = $.ensure($elem);
   while ($elem && $elem.length > 0) {
     var widget = $elem.data('widget');
     if (widget) {

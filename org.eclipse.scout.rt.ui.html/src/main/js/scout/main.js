@@ -135,6 +135,14 @@ scout.installGlobalMouseDownInterceptor = function(myDocument) {
 };
 
 /**
+ * Shortcut for scout.Widget.getWidgetFor($elem).
+ * @returns the widget for the given element
+ */
+scout.widget = function($elem) {
+  return scout.Widget.getWidgetFor($elem);
+};
+
+/**
  * Helper function to get the model adapter for a given adapterId. If there is more than one
  * session, e.g. in case of portlets, the second argument specifies the session to be queried
  * (can be either the zero-based index or the partId). If the session or the adapter could
