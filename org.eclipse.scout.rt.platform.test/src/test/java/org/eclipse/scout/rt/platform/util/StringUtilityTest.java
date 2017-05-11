@@ -486,6 +486,14 @@ public class StringUtilityTest {
   }
 
   @Test
+  public void testEscapeRegexReplacementMetachars() {
+    assertEquals("", StringUtility.escapeRegexReplacementMetachars(null));
+    assertEquals("", StringUtility.escapeRegexReplacementMetachars(""));
+    assertEquals("no metachar in source", StringUtility.escapeRegexReplacementMetachars("no metachar in source"));
+    assertEquals("all metachars: \\\\ \\$", StringUtility.escapeRegexReplacementMetachars("all metachars: \\ $"));
+  }
+
+  @Test
   public void testEqualsIgnoreNewLines() {
     String test = "no\ndifference";
     assertEquals(true, StringUtility.equalsIgnoreCase(test, test));

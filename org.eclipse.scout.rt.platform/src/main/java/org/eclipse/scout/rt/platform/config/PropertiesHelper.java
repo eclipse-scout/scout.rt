@@ -803,31 +803,43 @@ public class PropertiesHelper {
    *           if a variable could not be resolved in the current context.
    */
   protected String resolve(String s, Pattern pat) {
-    Set<String> loopDetection = null;
+    Matcher m = pat.matcher(s);
+    boolean found = m.find();
+    if (!found) {
+      return s;
+    }
     String t = s;
-    Matcher m = pat.matcher(t);
-    while (m.find()) {
-      String key = m.group(1);
-      String value = getProperty(key);
+    Set<String> loopDetection = new LinkedHashSet<>();
+    while (found) {
+      StringBuffer sb = new StringBuffer();
+      List<String> stageKeys = new ArrayList<>();
+      while (found) {
+        String key = m.group(1);
+        String value = getProperty(key);
 
-      if (!StringUtility.hasText(value)) {
-        throw new IllegalArgumentException("resolving expression '" + s + "': variable ${" + key + "} is not defined in the context.");
-      }
-      if (value.contains(s)) {
-        throw new IllegalArgumentException("resolving expression '" + s + "': loop detected (the resolved value contains the original expression): " + value);
-      }
+        if (!StringUtility.hasText(value)) {
+          throw new IllegalArgumentException("resolving expression '" + s + "': variable ${" + key + "} is not defined in the context.");
+        }
+        if (value.contains(s)) {
+          throw new IllegalArgumentException("resolving expression '" + s + "': loop detected (the resolved value contains the original expression): " + value);
+        }
 
-      t = t.substring(0, m.start()) + value + t.substring(m.end());
+        m.appendReplacement(sb, StringUtility.escapeRegexReplacementMetachars(value));
 
-      if (loopDetection == null) {
-        loopDetection = new LinkedHashSet<>();
+        stageKeys.add(key);
+        if (loopDetection.contains(key)) {
+          throw new IllegalArgumentException("resolving expression '" + s + "': loop detected: " + loopDetection);
+        }
+        found = m.find();
       }
-      if (loopDetection.contains(key)) {
-        throw new IllegalArgumentException("resolving expression '" + s + "': loop detected: " + loopDetection);
-      }
-      loopDetection.add(key);
+      m.appendTail(sb);
+
+      loopDetection.addAll(stageKeys);
+
       // next
+      t = sb.toString();
       m = pat.matcher(t);
+      found = m.find();
     }
 
     return t;

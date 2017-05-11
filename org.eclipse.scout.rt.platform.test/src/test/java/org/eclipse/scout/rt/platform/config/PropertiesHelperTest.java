@@ -49,6 +49,8 @@ public class PropertiesHelperTest {
   private static final String USER_HOME_VALUE = System.getProperty("user.home");
   private static final String OTHER_PROP_KEY = "otherProp";
   private static final String OTHER_PROP_VALUE = "otherVal";
+  private static final String SPECIAL_CHARS_KEY = "specialChars";
+  private static final String SPECIAL_CHARS_VALUE = "-$-\\-";
   private static final String RESOLVE_TEST_KEY = "a.resolve.test";
   private static final String RESOLVE_TEST_VALUE = "prefix" + USER_HOME_VALUE + "suffix";
   private static final String ATTR_USER_HOME_TEST_KEY = "aTestKey";
@@ -73,6 +75,7 @@ public class PropertiesHelperTest {
     PropertiesHelper instance = new PropertiesHelper(SAMPLE_CONFIG_PROPS);
     assertEquals(USER_HOME_VALUE, instance.getProperty(USER_HOME_KEY));
     assertEquals(OTHER_PROP_VALUE, instance.getProperty(OTHER_PROP_KEY));
+    assertEquals(SPECIAL_CHARS_VALUE, instance.getProperty(SPECIAL_CHARS_KEY));
     assertEquals(RESOLVE_TEST_VALUE, instance.getProperty(RESOLVE_TEST_KEY));
     assertEquals(ATTR_USER_HOME_TEST_VALUE, instance.getProperty(ATTR_USER_HOME_TEST_KEY));
     assertTrue(instance.getAllPropertyNames().contains(EMPTY_KEY));
@@ -235,6 +238,7 @@ public class PropertiesHelperTest {
   public void testRecursions() {
     PropertiesHelper h = new PropertiesHelper(REC_CONFIG_PROPS);
     assertEquals("aaaaaaaaaaaainnerbbbbbbbbbbbb", h.getProperty("prop1"));
+    assertEquals("abcbcbabcbcbabcbcbac", h.getProperty("sprop1"));
   }
 
   @Test
@@ -323,7 +327,7 @@ public class PropertiesHelperTest {
 
       PropertiesHelper h6 = new PropertiesHelper(HELPER_CONFIG_PROPS);
       assertEquals("aotherValb", h6.getProperty("keyWithPlaceholderFromImport"));
-      assertEquals(19, h6.getAllPropertyNames().size());
+      assertEquals(20, h6.getAllPropertyNames().size());
       assertEquals(-11, h6.getPropertyLong("longKey", -1));
     }
     finally {
@@ -421,7 +425,7 @@ public class PropertiesHelperTest {
   @Test
   public void testEntries() {
     PropertiesHelper instance = new PropertiesHelper(SAMPLE_CONFIG_PROPS);
-    assertEquals(16, instance.getAllPropertyNames().size());
-    assertEquals(16, instance.getAllEntries().size());
+    assertEquals(17, instance.getAllPropertyNames().size());
+    assertEquals(17, instance.getAllEntries().size());
   }
 }
