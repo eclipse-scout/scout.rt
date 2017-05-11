@@ -129,6 +129,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   private boolean m_loadParentNodes;
   private String m_wildcard;
   private SmartField2Result m_result;
+  private String m_variant;
 
   private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
   private final AtomicInteger m_valueChangedLookupCounter = new AtomicInteger();
@@ -290,6 +291,12 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Order(310)
   protected ColumnDescriptor[] getConfiguredColumnDescriptors() {
     return null;
+  }
+
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(320)
+  protected String getConfiguredVariant() {
+    return VARIANT_DEFAULT;
   }
 
   /**
@@ -463,6 +470,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
     setColumnDescriptors(getConfiguredColumnDescriptors());
+    setVariant(getConfiguredVariant());
 
     initLookupRowFetcher();
     // code type
@@ -1478,6 +1486,16 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
+  }
+
+  @Override
+  public String getVariant() {
+    return m_variant;
+  }
+
+  @Override
+  public void setVariant(String variant) {
+    m_variant = variant;
   }
 
   // ==== Lookup row fetching strategies ==== //

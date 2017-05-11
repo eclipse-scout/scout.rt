@@ -13,8 +13,11 @@ scout.icons = {
   ANGLE_DOWN: 'font:\uF107',
   ANGLE_UP: 'font:\uF106',
   CHART: 'font:\uE022',
+  CHEVRON_LEFT: 'font:\uF053',
+  CHEVRON_RIGHT: 'font:\uF054',
   COLLAPSE: 'font:\uE600',
   ELLIPSIS_V: 'font:\uE040',
+  FOLDER: 'font:\uE043',
   HOME: 'font:\uE601',
   SUM: 'font:\ue025',
   AVG: 'font:\ue026',
@@ -22,6 +25,7 @@ scout.icons = {
   MIN: 'font:\ue028',
   OUTLINE: 'font:\uE043',
   PENCIL: 'font:\uF040',
+  WORLD: 'font:\uE021',
 
   ICON_ID_REGEX: /\$\{iconId\:([a-zA-Z0-9_\.]*)\}/,
 

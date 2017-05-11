@@ -173,7 +173,7 @@ scout.Session.prototype.init = function(model) {
   });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
 
-  this.showTreeIcons = scout.nvl(options.showTreeIcons, false); // TODO [awe] 6.2: set to true by default
+  this.showTreeIcons = scout.nvl(options.showTreeIcons, true); // TODO [awe] 7.0 - SF2: set to true by default --> clean up icons in CRM
 };
 
 scout.Session.prototype._throwError = function(message) {

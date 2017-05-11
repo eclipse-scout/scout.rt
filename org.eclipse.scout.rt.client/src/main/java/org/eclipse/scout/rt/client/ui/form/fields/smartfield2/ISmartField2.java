@@ -48,6 +48,10 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
   String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
 
+  String VARIANT_DEFAULT = "default";
+  String VARIANT_DROPDOWN = "dropdown";
+  String VARIANT_PROPOSAL = "proposal";
+
   void lookupAll();
 
   void lookupByText(String searchText);
@@ -384,5 +388,9 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   ColumnDescriptor[] getColumnDescriptors();
 
   void setColumnDescriptors(ColumnDescriptor[] columnHeaders);
+
+  String getVariant();
+
+  void setVariant(String variant);
 
 }

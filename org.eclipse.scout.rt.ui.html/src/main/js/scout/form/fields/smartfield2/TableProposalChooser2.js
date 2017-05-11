@@ -132,10 +132,6 @@ scout.TableProposalChooser2.prototype.getSelectedLookupRow = function() {
   return selectedRow.lookupRow;
 };
 
-scout.TableProposalChooser2.prototype.delegateKeyEvent = function(event) {
-  this.model.$container.trigger(event);
-};
-
 /**
  * Takes the TableRowData bean and the infos provided by the column descriptors to create an
  * array of additional values in the correct order, as defined by the descriptors.

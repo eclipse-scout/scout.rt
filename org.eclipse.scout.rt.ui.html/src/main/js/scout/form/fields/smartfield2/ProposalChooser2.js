@@ -89,6 +89,10 @@ scout.ProposalChooser2.prototype.delegateEvent = function(event) {
   this.model.$container.trigger(event);
 };
 
+scout.ProposalChooser2.prototype.delegateKeyEvent = function(event) {
+  this.model.$container.trigger(event);
+};
+
 scout.ProposalChooser2.prototype._renderStatus = function() {
   this._updateStatus();
 };

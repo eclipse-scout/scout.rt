@@ -1,5 +1,5 @@
 // FIXME [awe] 7.0 - lookup row als property zwischen server und client hin und her schicken?
-// um das problem mit den lazy styles zu lösen
+// um das problem mit den lazy styles zu lösen?
 
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
@@ -10,18 +10,19 @@ scout.SmartField2 = function() {
   this._pendingLookup = null;
   this.lookupRow = null;
   this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
+  this.browseAutoExpandAll = true;
   this.activeFilterEnabled = false;
   this.activeFilter = null;
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
-  this.variant = scout.SmartField2.Variant.DEFAULT; // scout.SmartField2.Variant.DROPDOWN;
+  this.variant = scout.SmartField2.Variant.DEFAULT;
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
 // FIXME [awe] 7.0 - SF2: überlegen ob wir das mit flags, mit subklassen oder mit strategies lösen wollen
 // zuerst mal flag ansatz ausprobieren und je nach code die eine oder andere methode anwenden.
 scout.SmartField2.Variant = {
-  DEFAULT: 'smart',
+  DEFAULT: 'default',
   PROPOSAL: 'proposal',
   DROPDOWN: 'dropdown'
 };
@@ -62,8 +63,7 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
 };
 
 scout.SmartField2.prototype._render = function($parent) {
-  var cssClass = this.variant + '-field';
-  this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
+  this.addContainer($parent, cssClass(this.variant), new scout.SmartFieldLayout(this));
   this.addLabel();
 
   var $field = scout.fields.makeInputOrDiv(this)
@@ -82,6 +82,14 @@ scout.SmartField2.prototype._render = function($parent) {
   }
   this.addIcon();
   this.addStatus();
+
+  function cssClass(variant) {
+    var prefix = variant;
+    if (variant === scout.SmartField2.Variant.DEFAULT) {
+      prefix = 'smart';
+    }
+    return prefix + '-field';
+  }
 };
 
 /**
@@ -161,7 +169,7 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
       return;
     }
 
-    if (numLookupRows > 1) {
+    if (numLookupRows > 1) { // FIXME [awe] 7.0 - SF2: proposal field continue --> wenn proposal nicht eindeutig --> egal
       this.setErrorStatus(scout.Status.error({
         message: this.session.text('SmartFieldNotUnique', searchText)
       }));
@@ -207,6 +215,9 @@ scout.SmartField2.prototype._setLookupCall = function(lookupCall) {
     });
   }
   this._setProperty('lookupCall', lookupCall);
+
+  // FIXME [awe] 7.0 - SF2: im AbstractContentAssistField.java setCodeTypeClass hat es so eine Logik die schaut, ob das smart field
+  // selber hierarchy setzt, falls nicht wird das field auf den wert von codeType.hierarchy gesetzt
 };
 
 scout.SmartField2.prototype._setCodeType = function(codeType) {
@@ -240,19 +251,32 @@ scout.SmartField2.prototype._formatValue = function(value) {
 };
 
 /**
- * @param {string} [searchText] optional search text. If set lookupCall#getByText() is called, otherwise lookupCall#getAll()
+ * @param {boolean} [lookupAll] whether or not the lookup call should execute getAll() or getByText() with the current display text
  */
-scout.SmartField2.prototype.openPopup = function() {
+scout.SmartField2.prototype.openPopup = function(lookupAll) {
   // already open
   if (this.popup) {
     return;
   }
 
   this.showLookupInProgress();
-  this.lookupCall.getAll().done(this.openPopup2.bind(this));
+  var promise;
+  if (lookupAll) {
+    promise = this.lookupCall.getAll();
+    console.log('openPopup -> getAll()');
+  } else {
+    var searchText = this._readDisplayText();
+    promise = this.lookupCall.getByText(searchText);
+    console.log('openPopup -> getByText()');
+  }
+  promise.done(this.openPopup2.bind(this));
 };
 
 scout.SmartField2.prototype.openPopup2 = function(result) { // FIXME [awe] 7.0 - SF2: improve naming openPopup2
+  if (this.isProposal() && result.lookupRows.length === 0) {
+    return;
+  }
+
   this.hideLookupInProgress();
   this.$container.addClass('popup-open');
   // On touch devices the field does not get the focus.
@@ -282,7 +306,7 @@ scout.SmartField2.prototype.togglePopup = function() {
   if (this.popup) {
     this.closePopup();
   } else {
-    this.openPopup();
+    this.openPopup(true);
   }
 };
 
@@ -379,7 +403,7 @@ scout.SmartField2.prototype._onFieldKeyup = function(event) {
   if (this.popup) {
     this._proposalTyped();
   } else {
-    this.openPopup();
+    this.openPopup(false);
   }
 };
 
@@ -395,7 +419,7 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
    if (this.popup) {
      this.popup.delegateKeyEvent(event);
    } else {
-     this.openPopup();
+     this.openPopup(false);
    }
  }
 };
@@ -431,6 +455,10 @@ scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
   this._startNewLookupByText();
 };
 
+scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
+  this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
+};
+
 scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
   this.setProperty('activeFilter', this.activeFilterEnabled ? activeFilter : null);
 };
@@ -451,7 +479,11 @@ scout.SmartField2.prototype._startNewLookupByText = function() {
     this.lookupCall.getByText(searchText).done(function(result) {
       this.hideLookupInProgress();
       if (this.popup) {
-        this.popup.setLookupResult(result);
+        if (this.isProposal() && result.lookupRows.length === 0) {
+          this.closePopup();
+        } else {
+          this.popup.setLookupResult(result);
+        }
       }
     }.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
@@ -466,6 +498,10 @@ scout.SmartField2.prototype._startNewLookupByText = function() {
  */
 scout.SmartField2.prototype.virtual = function() {
   return this.browseMaxRowCount > scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
+};
+
+scout.SmartField2.prototype.isProposal = function() {
+  return this.variant === scout.SmartField2.Variant.PROPOSAL;
 };
 
 scout.SmartField2.prototype.setLookupRow = function(lookupRow) {

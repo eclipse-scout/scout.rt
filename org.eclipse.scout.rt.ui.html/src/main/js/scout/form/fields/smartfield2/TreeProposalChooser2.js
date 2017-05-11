@@ -32,30 +32,26 @@ scout.TreeProposalChooser2.prototype.getSelectedLookupRow = function() {
 };
 
 scout.TreeProposalChooser2.prototype.setLookupRows = function(lookupRows) {
-  var treeNodesFlat = [];
   this.model.deleteAllChildNodes();
-  lookupRows.forEach(function(lookupRow) {
-    treeNodesFlat.push(this._createTreeNode(lookupRow));
-  }, this);
-
+  var treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
   var treeNodes = this._flatListToTree(treeNodesFlat);
   this.model.insertNodes(treeNodes);
 };
 
 scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
-  var node = {
+  var expandAll = this._smartField().browseAutoExpandAll;
+  return {
     childNodeIndex: 0,
     htmlEnabled: false,
     iconId: lookupRow.iconId,
     id: lookupRow.key,
     parentId: scout.nvl(lookupRow.parentKey, 0),
-    expanded: true,
-    initialExpanded: true,
+    expanded: expandAll,
+    initialExpanded: expandAll,
     text: lookupRow.text,
     lookupRow: lookupRow,
     leaf: true // later set to false, when child nodes are added
   };
-  return node;
 };
 
 scout.TreeProposalChooser2.prototype._flatListToTree = function(treeNodesFlat) {
