@@ -28,7 +28,7 @@ scout.FormField = function() {
   this.gridData;
   this.gridDataHints = scout.create('GridData');
   this.$label;
-  this.errorStatus;
+  this.errorStatus = null;
 
   /**
    * Note the difference between $field and $fieldContainer:

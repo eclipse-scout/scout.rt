@@ -58,12 +58,14 @@
   __include("scout/util/hAlign.js");
   __include("scout/util/aggregation.js");
   __include("scout/util/webstorage.js");
-  // Code and Lookup
+  // Lookup calls
+  __include("scout/lookup/LookupCall.js");
+  __include("scout/lookup/LookupRow.js");
+  __include("scout/lookup/StaticLookupCall.js");
+  // Code
   __include("scout/code/Code.js");
   __include("scout/code/CodeType.js");
   __include("scout/code/codes.js");
-  __include("scout/code/LookupCall.js");
-  __include("scout/code/LookupRow.js");
   __include("scout/code/CodeLookupCall.js"); // requires LookupCall.js
   // Session related
   __include("scout/session/AjaxCall.js");

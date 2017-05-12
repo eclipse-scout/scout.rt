@@ -11,7 +11,6 @@
 scout.LookupRow = function(key, text) {
   this.key = scout.nvl(key, null);
   this.text = scout.nvl(text, null);
-
   this.enabled = true;
 };
 
