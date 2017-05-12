@@ -66,8 +66,10 @@ scout.SmartField2.prototype._render = function() {
   this.addContainer(this.$parent, cssClass(this.variant), new scout.SmartFieldLayout(this));
   this.addLabel();
 
-  var $field = scout.fields.makeInputOrDiv(this)
+  var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
+  var $field = fieldFunc(this)
     .on('mousedown', this._onFieldMousedown.bind(this));
+
   if (!this.touch) {
     $field
       .blur(this._onFieldBlur.bind(this))
@@ -92,9 +94,6 @@ scout.SmartField2.prototype._render = function() {
   }
 };
 
-/**
- * @override
- */
 scout.SmartField2.prototype._renderDisplayText = function() {
   scout.fields.valOrText(this, this.$field, this.displayText);
 };
@@ -102,8 +101,6 @@ scout.SmartField2.prototype._renderDisplayText = function() {
 /**
  * Accepts the selected lookup row and sets its id as value.
  * This function is called on blur, by a keystroke or programmatically at any time.
- *
- * @override
  */
 scout.SmartField2.prototype.acceptInput = function(whileTyping) {
   var
@@ -513,6 +510,10 @@ scout.SmartField2.prototype.virtual = function() {
 
 scout.SmartField2.prototype.isProposal = function() {
   return this.variant === scout.SmartField2.Variant.PROPOSAL;
+};
+
+scout.SmartField2.prototype.isDropdown = function() {
+  return this.variant === scout.SmartField2.Variant.DROPDOWN;
 };
 
 scout.SmartField2.prototype.setLookupRow = function(lookupRow) {

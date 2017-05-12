@@ -47,31 +47,42 @@ scout.fields = {
    *
    * @return when called with 2 arguments: $field.text() or $field.val()
    */
-  valOrText: function(field, $field, text) {
+  valOrText: function(field, $field, text) { // FIXME [awe] 7.0 - SF2: remove 1st argument - not required anymore because we simply check if it is a DIV or not
+    var isDiv = $field.is('div');
     if (arguments.length === 3) {
-      if (field.touch) {
+      if (isDiv) {
         $field.text(text);
       } else {
         $field.val(text);
       }
     } else {
-      return field.touch ? $field.text() : $field.val();
+      return isDiv ? $field.text() : $field.val();
     }
   },
 
   /**
-   * Creates a DIV element for touch-devices and an INPUT element for all other devices.
+   * Creates a DIV element for touch-devices and an INPUT element for all other devices,
+   * depending on the touch flag of the given field.
+   *
+   * @param {scout.FormField} field
+   * @param {string} [cssClass]
    */
   makeInputOrDiv: function(field, cssClass) {
     if (field.touch) {
-      return this.makeInputDiv(field.$container, cssClass);
+      return this.makeInputDiv(field, cssClass);
     } else {
       return scout.fields.makeTextField(field.$container, cssClass);
     }
   },
 
-  makeInputDiv: function($parent, cssClass) {
-    return $parent.makeDiv(scout.strings.join(' ', 'input-field', cssClass));
+  /**
+   * Creates a DIV element that looks like an INPUT element.
+   *
+   * @param {scout.FormField} field
+   * @param {string} [cssClass]
+   */
+  makeInputDiv: function(field, cssClass) {
+    return field.$container.makeDiv(scout.strings.join(' ', 'input-field', cssClass));
   },
 
   // note: the INPUT element does not process the click event when the field is disabled

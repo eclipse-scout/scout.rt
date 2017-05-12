@@ -35,7 +35,7 @@ scout.ValueField.prototype._renderDisplayText = function() {
 };
 
 scout.ValueField.prototype._readDisplayText = function() {
-  return this.$field.val();
+  return scout.fields.valOrText(this, this.$field);
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
