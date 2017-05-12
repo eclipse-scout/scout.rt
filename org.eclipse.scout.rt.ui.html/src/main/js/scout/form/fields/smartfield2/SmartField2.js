@@ -94,6 +94,10 @@ scout.SmartField2.prototype._render = function() {
   }
 };
 
+scout.SmartField2.prototype._readDisplayText = function() {
+  return scout.fields.valOrText(this, this.$field);
+};
+
 scout.SmartField2.prototype._renderDisplayText = function() {
   scout.fields.valOrText(this, this.$field, this.displayText);
 };

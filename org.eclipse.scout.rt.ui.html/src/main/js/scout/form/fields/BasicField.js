@@ -69,6 +69,14 @@ scout.BasicField.prototype.acceptInput = function(whileTyping) {
   scout.BasicField.parent.prototype.acceptInput.call(this, whileTyping);
 };
 
+scout.BasicField.prototype._renderDisplayText = function() {
+  this.$field.val(this.displayText);
+};
+
+scout.BasicField.prototype._readDisplayText = function() {
+  return this.$field.val();
+};
+
 /**
  * @override ValueField.js
  */

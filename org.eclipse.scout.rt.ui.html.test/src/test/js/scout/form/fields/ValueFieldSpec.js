@@ -202,6 +202,9 @@ describe('ValueField', function() {
         this.addField($('<input>'));
         this.addStatus();
       };
+      formField._readDisplayText = function() {
+        return this.$field.val();
+      };
       formField.init(model);
     });
 

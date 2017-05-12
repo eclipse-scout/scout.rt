@@ -30,12 +30,18 @@ scout.ValueField.prototype._renderProperties = function() {
   this._renderDisplayText();
 };
 
+/**
+ * The default impl. is a NOP, because not every ValueField has a sensible display text.
+ */
 scout.ValueField.prototype._renderDisplayText = function() {
-  this.$field.val(this.displayText);
+  // NOP
 };
 
+/**
+ * The default impl. returns an empty string, because not every ValueField has a sensible display text.
+ */
 scout.ValueField.prototype._readDisplayText = function() {
-  return scout.fields.valOrText(this, this.$field);
+  return '';
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
