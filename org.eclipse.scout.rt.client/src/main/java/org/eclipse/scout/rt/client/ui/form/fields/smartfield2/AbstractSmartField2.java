@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistSearch
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.HierarchicalContentAssistDataFetcher;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldDataFetchResult;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldLookupRowFetcher;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldTable;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ILookupRowProvider;
@@ -1329,52 +1328,15 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     chain.execPrepareKeyLookup(call, key);
   }
 
-  protected boolean isCurrentLookupRowSet() {
-    return getCurrentLookupRow() != null;
-  }
-
-  /**
-   * the default implementation simply casts one to the other type
-   */
-  @ConfigOperation
-  @Order(400)
-  protected VALUE execConvertKeyToValue(VALUE key) {
-    return (VALUE) key;
-  }
-
-  /**
-   * the default implementation simply casts one to the other type
-   */
-  @ConfigOperation
-  @Order(410)
-  protected VALUE execConvertValueToKey(VALUE value) {
-    return (VALUE) value;
-  }
-
   @Override
   public IContentAssistFieldUIFacade getUIFacade() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public VALUE getValueAsLookupKey() {
-    return getValue();
-  }
-
-  @Override
   public void acceptProposal(ILookupRow<VALUE> row) {
     setCurrentLookupRow(row);
     setValue(row.getKey());
-  }
-
-  @Override
-  public void acceptProposal() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass() {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -1432,6 +1394,10 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   protected String formatValueInternal(VALUE validKey) {
+    if (isProposal()) {
+      return super.formatValueInternal(validKey);
+    }
+
     if (validKey == null) {
       return "";
     }
@@ -1496,6 +1462,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void setVariant(String variant) {
     m_variant = variant;
+  }
+
+  @Override
+  public boolean isProposal() {
+    return VARIANT_PROPOSAL.equals(m_variant);
   }
 
   // ==== Lookup row fetching strategies ==== //

@@ -7,7 +7,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldListener;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldTable;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.TreeProposalChooser;
@@ -216,12 +215,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   IContentAssistFieldUIFacade getUIFacade();
 
-  VALUE getValueAsLookupKey();
-
-  Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass();
-
-  void acceptProposal();
-
   void setWildcard(String wildcard);
 
   String getWildcard();
@@ -392,5 +385,10 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String getVariant();
 
   void setVariant(String variant);
+
+  /**
+   * @return true if the variant of the smart-field instance is a <code>VARIANT_PROPOSAL</code>.
+   */
+  boolean isProposal();
 
 }
