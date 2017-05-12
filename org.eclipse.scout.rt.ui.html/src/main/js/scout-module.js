@@ -189,6 +189,8 @@
   __include("scout/filechooser/FileChooserAdapter.js");
   __include("scout/filechooser/FileChooserController.js");
   __include("scout/filechooser/FileInput.js");
+  __include("scout/router/Route.js");
+  __include("scout/router/router.js");
   __include("scout/slider/Slider.js");
   __include("scout/slider/SliderAdapter.js");
   __include("scout/slider/SliderLayout.js");

@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
-// FIXME [awe] 7.0 - SF2: mit C.GU diskutieren: Abgrenzung LookupCall / LookupService in JS?
-
 /**
  * Base class for lookup calls.
  */
