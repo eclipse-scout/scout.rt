@@ -72,6 +72,7 @@ scout.Table = function() {
   this.virtual = true;
   this.contextColumn;
   this._rerenderViewPortAfterAttach = false;
+  this._renderViewPortAfterAttach = false;
   this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
 };
 scout.inherits(scout.Table, scout.Widget);
@@ -3471,6 +3472,11 @@ scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
 scout.Table.prototype._renderViewport = function() {
+  if (!this.isAttachedAndRendered()) {
+    // if table is not attached the correct viewPort can not be evaluated. Mark for render after attach.
+    this._renderViewPortAfterAttach = true;
+    return;
+  }
   var viewRange = this._calculateCurrentViewRange();
   this._renderViewRange(viewRange);
 };
@@ -3754,9 +3760,14 @@ scout.Table.prototype.visibleColumns = function() {
  * @override Widget.js
  */
 scout.Table.prototype._afterAttach = function(parent) {
+  // this is an "if... else if..." to avoid rendering the viewport multiple
+  // times in case all ...afterAttach flags are set to true.
   if (this._rerenderViewPortAfterAttach) {
     this._rerenderViewport();
     this._rerenderViewPortAfterAttach = false;
+  } else if (this._renderViewPortAfterAttach) {
+    this._renderViewport();
+    this._renderViewPortAfterAttach = false;
   }
 };
 
