@@ -281,7 +281,7 @@ scout.BrowserField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
 /**
  * @override Widget.js
  */
-scout.BrowserField.prototype._afterAttach = function(parent) {
+scout.BrowserField.prototype._afterAttach = function() {
   // the security=restricted attribute prevents browsers (IE 9 and below) from
   // sending any cookies a second time
   // as a workaround for IFRAMEs to work, we have to recreate the whole field in that case

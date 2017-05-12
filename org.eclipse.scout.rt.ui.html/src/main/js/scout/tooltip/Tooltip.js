@@ -112,7 +112,7 @@ scout.Tooltip.prototype._render = function() {
   }
 };
 
-scout.Tooltip.prototype._afterAttach = function(parent) {
+scout.Tooltip.prototype._afterAttach = function() {
   if (this._renderLater && !this.rendered) {
     this.render();
     this._renderLater = false;
