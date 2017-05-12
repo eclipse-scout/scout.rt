@@ -33,6 +33,10 @@ scout.RemoteLookupCall.prototype.getByText = function(text) {
 };
 
 scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
+  var lookupRows = scout.arrays.ensure(lookupResult.lookupRows).map(function(lookupRowObject) {
+    return scout.create('LookupRow', lookupRowObject);
+  });
+  lookupResult.lookupRows = lookupRows;
   this.deferred.resolve(lookupResult);
 };
 
