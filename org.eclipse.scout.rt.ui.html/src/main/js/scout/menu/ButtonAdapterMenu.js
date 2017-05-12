@@ -97,6 +97,14 @@ scout.ButtonAdapterMenu.prototype.getFocusableElement = function() {
 };
 
 /**
+ * @override
+ */
+scout.ButtonAdapterMenu.prototype.requestFocus = function() {
+  // TODO cgu [7.0] merge focus and requestFocus, no need to have two methods
+  this.focus();
+};
+
+/**
  * Sets the focus on this field if the field is rendered.
  */
 scout.ButtonAdapterMenu.prototype.focus = function() {
