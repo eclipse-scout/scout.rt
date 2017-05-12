@@ -751,17 +751,18 @@ scout.Widget.prototype.attach = function() {
     return;
   }
   this._attach();
+  this._afterAttach();
   this._triggerChildrenAfterAttach(this);
 };
 
 scout.Widget.prototype._triggerChildrenAfterAttach = function(parent) {
   this.children.forEach(function(child) {
-    child._afterAttach(parent);
+    child._afterAttach();
     child._triggerChildrenAfterAttach(parent);
   });
 };
 
-scout.Widget.prototype._afterAttach = function(parent) {
+scout.Widget.prototype._afterAttach = function() {
   // NOP
 };
 
@@ -794,6 +795,7 @@ scout.Widget.prototype.detach = function() {
   }
 
   this._triggerChildrenBeforeDetach(this);
+  this._beforeDetach();
   this._detach();
 };
 
@@ -807,9 +809,9 @@ scout.Widget.prototype._detach = function() {
   this.attached = false;
 };
 
-scout.Widget.prototype._triggerChildrenBeforeDetach = function(parent) {
+scout.Widget.prototype._triggerChildrenBeforeDetach = function() {
   this.children.forEach(function(child) {
-    child._beforeDetach(parent);
+    child._beforeDetach();
     child._triggerChildrenBeforeDetach(parent);
   });
 };

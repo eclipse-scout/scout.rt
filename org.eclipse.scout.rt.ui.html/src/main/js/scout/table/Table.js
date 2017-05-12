@@ -3771,7 +3771,7 @@ scout.Table.prototype.visibleColumns = function() {
 /**
  * @override Widget.js
  */
-scout.Table.prototype._afterAttach = function(parent) {
+scout.Table.prototype._afterAttach = function() {
   // this is an "if... else if..." to avoid rendering the viewport multiple
   // times in case all ...afterAttach flags are set to true.
   if (this._rerenderViewPortAfterAttach) {
