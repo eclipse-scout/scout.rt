@@ -802,6 +802,7 @@ public class PropertiesHelper {
    * @throws IllegalArgumentException
    *           if a variable could not be resolved in the current context.
    */
+  @SuppressWarnings("squid:S1149")
   protected String resolve(String s, Pattern pat) {
     Matcher m = pat.matcher(s);
     boolean found = m.find();
@@ -824,7 +825,7 @@ public class PropertiesHelper {
           throw new IllegalArgumentException("resolving expression '" + s + "': loop detected (the resolved value contains the original expression): " + value);
         }
 
-        m.appendReplacement(sb, StringUtility.escapeRegexReplacementMetachars(value));
+        m.appendReplacement(sb, Matcher.quoteReplacement(value));
 
         stageKeys.add(key);
         if (loopDetection.contains(key)) {
