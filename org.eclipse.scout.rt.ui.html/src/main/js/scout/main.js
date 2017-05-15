@@ -135,44 +135,66 @@ scout.installGlobalMouseDownInterceptor = function(myDocument) {
 };
 
 /**
- * Shortcut for scout.Widget.getWidgetFor($elem).
- * @returns the widget for the given element
+ * Shortcut for scout.Widget.getWidgetFor().
+ *
+ * If the argument is a string or a number, this function will try to find the widget via
+ * DOM by looking for an element with the "data-id" attribute equal to the specified argument.
+ *
+ * @param widgetIdOrElement
+ *          a widget ID or a HTML or jQuery element
+ * @param partId
+ *          partId of the session the widget belongs to (optional, only relevant if the
+ *          argument is a widget ID)
+ * @returns
+ *          the widget for the given element
  */
-scout.widget = function($elem) {
+scout.widget = function(widgetIdOrElement, partId) {
+  if (scout.objects.isNullOrUndefined(widgetIdOrElement)) {
+    return null;
+  }
+  var $elem = widgetIdOrElement;
+  if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
+    // Find $element for ID
+    var session = scout.getSession(partId);
+    if (session && session.$entryPoint) {
+      var selector = '[data-id="' + (widgetIdOrElement + '').replace('"', '\\"') + '"]';
+      $elem = session.$entryPoint.find(selector).addBack(selector);
+    }
+  }
   return scout.Widget.getWidgetFor($elem);
 };
 
 /**
  * Helper function to get the model adapter for a given adapterId. If there is more than one
- * session, e.g. in case of portlets, the second argument specifies the session to be queried
- * (can be either the zero-based index or the partId). If the session or the adapter could
- * not be found, nothing is returned.
+ * session, e.g. in case of portlets, the second argument specifies the partId of the session
+ * to be queried. If not specified explicitly, the first session is used. If the session or
+ * the adapter could not be found, null is returned.
  */
-scout.adapter = function(adapterId, sessionIndex) {
-  var session = scout.getSession(sessionIndex);
+scout.adapter = function(adapterId, partId) {
+  if (scout.objects.isNullOrUndefined(adapterId)) {
+    return null;
+  }
+  var session = scout.getSession(partId);
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
+  return null;
 };
 
-scout.getSession = function(sessionIndex) {
+scout.getSession = function(partId) {
   if (!scout.sessions) {
     return null;
   }
-  var session;
-  if (scout.sessions.length === 1) {
-    session = scout.sessions[0];
-  } else {
-    sessionIndex = sessionIndex || 0;
-    for (var i = 0; i < scout.sessions.length; i++) {
-      if (scout.sessions[i].partId == sessionIndex) { // <-- compare with '==' is intentional! (NOSONAR)
-        sessionIndex = i;
-        break;
-      }
-    }
-    session = scout.sessions[sessionIndex];
+  if (scout.objects.isNullOrUndefined(partId)) {
+    return scout.sessions[0];
   }
-  return session;
+  for (var i = 0; i < scout.sessions.length; i++) {
+    var session = scout.sessions[i];
+    if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
+      return session;
+    }
+  }
+  return null;
 };
 
 /**
@@ -185,15 +207,20 @@ scout.getSession = function(sessionIndex) {
  *
  * @param adapterId
  */
-scout.exportAdapter = function(adapterId, sessionIndex) {
-  var session = scout.getSession(sessionIndex);
+scout.exportAdapter = function(adapterId, partId) {
+  var session = scout.getSession(partId);
   if (session && session.modelAdapterRegistry) {
     var adapter = session.getModelAdapter(adapterId);
+    if (!adapter) {
+      return null;
+    }
     var adapterData = cloneAdapterData(adapterId);
     resolveAdapterReferences(adapter, adapterData);
     adapterData.type = 'model'; // property 'type' is required for models.js
     return adapterData;
   }
+
+  // ----- Helper functions -----
 
   function cloneAdapterData(adapterId) {
     var adapterData = session.getAdapterData(adapterId);
