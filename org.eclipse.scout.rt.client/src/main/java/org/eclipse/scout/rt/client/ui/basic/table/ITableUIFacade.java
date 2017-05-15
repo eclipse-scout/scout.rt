@@ -109,6 +109,12 @@ public interface ITableUIFacade {
 
   void fireGroupColumnRemovedFromUI(IColumn<?> column);
 
+  void fireOrganizeColumnAddFromUI(IColumn<?> column);
+
+  void fireOrganizeColumnRemoveFromUI(IColumn<?> column);
+
+  void fireOrganizeColumnModifyFromUI(IColumn<?> column);
+
   void fireFilterAddedFromUI(IUserFilterState filter);
 
   void fireFilterRemovedFromUI(IUserFilterState filter);

@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -574,16 +573,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleUiColumnOrganizeAction(JsonEvent event) {
     JSONObject data = event.getData();
     String action = data.getString("action");
-    ITableOrganizer organizer = getModel().getTableOrganizer();
+    IColumn column = extractColumn(data);
     switch (action) {
       case "add":
-        organizer.addColumn(extractColumn(data));
+        getModel().getUIFacade().fireOrganizeColumnAddFromUI(column);
         break;
       case "remove":
-        organizer.removeColumn(extractColumn(data));
+        getModel().getUIFacade().fireOrganizeColumnRemoveFromUI(column);
         break;
       case "modify":
-        organizer.modifyColumn(extractColumn(data));
+        getModel().getUIFacade().fireOrganizeColumnModifyFromUI(column);
         break;
       default:
         throw new IllegalArgumentException();

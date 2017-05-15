@@ -4656,6 +4656,45 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
+    public void fireOrganizeColumnAddFromUI(IColumn<?> column) {
+      try {
+        pushUIProcessor();
+        //
+        getTableOrganizer().addColumn(column);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireOrganizeColumnRemoveFromUI(IColumn<?> column) {
+      try {
+        pushUIProcessor();
+        //
+        getTableOrganizer().removeColumn(column);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void fireOrganizeColumnModifyFromUI(IColumn<?> column) {
+      try {
+        pushUIProcessor();
+        //
+        getTableOrganizer().modifyColumn(column);
+        ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
     public void fireFilterAddedFromUI(IUserFilterState filter) {
       try {
         pushUIProcessor();
