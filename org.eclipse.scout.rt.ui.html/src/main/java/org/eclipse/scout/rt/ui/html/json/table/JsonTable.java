@@ -20,6 +20,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -588,6 +589,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       default:
         throw new IllegalArgumentException();
     }
+
+    ClientUIPreferences.getInstance().setAllTableColumnPreferences(getModel()); // flush preferences
   }
 
   protected void handleUiRowClicked(JsonEvent event) {
