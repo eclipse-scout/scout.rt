@@ -116,10 +116,16 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   @SuppressWarnings("unchecked")
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IValueField.PROP_VALUE.equals(propertyName)) {
-      String mappedKey = data.optString("value");
-      VALUE key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
-      addPropertyEventFilterCondition(IValueField.PROP_VALUE, key);
-      getModel().setValue(key);
+      if (getModel().isProposal()) {
+        String value = data.optString("value");
+        getModel().setValueForProposal(value);
+      }
+      else {
+        String mappedKey = data.optString("value");
+        VALUE key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
+        addPropertyEventFilterCondition(IValueField.PROP_VALUE, key);
+        getModel().setValue(key);
+      }
     }
     else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
       String activeFilterString = data.optString("activeFilter", null);

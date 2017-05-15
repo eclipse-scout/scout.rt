@@ -560,6 +560,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     propertySupport.firePropertyChange(PROP_RESULT, null, result);
   }
 
+  @Override
+  public void setValueForProposal(String value) {
+    setValue((VALUE) value);
+  }
+
   /**
    * see {@link AbstractSmartField#interceptBrowseNew(String)}
    */

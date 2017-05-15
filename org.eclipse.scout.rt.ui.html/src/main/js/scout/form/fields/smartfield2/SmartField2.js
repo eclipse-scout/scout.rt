@@ -1,6 +1,7 @@
-// FIXME [awe] 7.0 - lookup row als property zwischen server und client hin und her schicken?
+// FIXME [awe] 7.0 - SF2: lookup row als property zwischen server und client hin und her schicken?
 // um das problem mit den lazy styles zu lösen?
-
+// FIXME [awe] 7.0 - SF2: proposal table mit styles (colors, fonts) korrekt darstellen
+// FIXME [awe] 7.0 - SF2: tree proposal inkrementell nachladen
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
@@ -19,8 +20,6 @@ scout.SmartField2 = function() {
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
-// FIXME [awe] 7.0 - SF2: überlegen ob wir das mit flags, mit subklassen oder mit strategies lösen wollen
-// zuerst mal flag ansatz ausprobieren und je nach code die eine oder andere methode anwenden.
 scout.SmartField2.Variant = {
   DEFAULT: 'default',
   PROPOSAL: 'proposal',

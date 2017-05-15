@@ -391,4 +391,8 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
    */
   boolean isProposal();
 
+  void setValueForProposal(String value); // FIXME [awe] 7.0 - SF2: das müssen wir loswerden? mit AHO diskutieren, ich verstehe inzwischen, dass dieses
+  // ganze MixedCAFields zeugs nötig war weil es sonst bzgl. generics typen von value und lookup key compiler probleme gibt (der LOOKUP_KEY ist typisiert,
+  // und im fall von proposal-field != dem typ vom VALUE (String))
+
 }
