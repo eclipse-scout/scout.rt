@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldChangedMasterValueChain;
@@ -881,6 +880,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    *
    * @since 4.0.1
    */
+  @SuppressWarnings("squid:S1244") // Floating point numbers should not be tested for equality
   protected double calculateViewOrder() {
     double viewOrder = getConfiguredViewOrder();
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
@@ -953,18 +953,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       setValueChangeTriggerEnabled(false);
       //
       initFieldInternal();
-      interceptExecInitField();
+      interceptInitField();
       // init key strokes
       ActionUtility.initActions(getKeyStrokes());
     }
     finally {
       setValueChangeTriggerEnabled(true);
     }
-  }
-
-  protected final void interceptExecInitField() {
-    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    new FormFieldChains.FormFieldInitFieldChain(extensions).execInitField();
   }
 
   protected void initFieldInternal() {
