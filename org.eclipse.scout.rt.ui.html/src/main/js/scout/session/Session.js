@@ -71,7 +71,7 @@ scout.Session = function() {
     id: '1',
     objectType: 'RootAdapter'
   });
-  this.rootAdapter.createWidget({
+  this.root = this.rootAdapter.createWidget({
     session: this,
     id: '1',
     objectType: 'NullWidget'
