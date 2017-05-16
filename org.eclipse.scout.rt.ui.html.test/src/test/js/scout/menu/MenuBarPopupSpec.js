@@ -28,7 +28,7 @@ describe("MenuBarPopup", function() {
       text: 'the menu',
       childActions: [childMenu]
     });
-    menu.render(session.$entryPoint);
+    menu.render();
     menu.doAction();
     expect(menu.popup).toBeDefined();
     expect(menu.popup.rendered).toBe(true);
@@ -40,7 +40,7 @@ describe("MenuBarPopup", function() {
       text: 'the menu',
       childActions: [childMenu]
     });
-    menu.render(session.$entryPoint);
+    menu.render();
     menu.doAction();
     expect(menu.popup.$head.text()).toEqual('the menu');
 

@@ -31,7 +31,7 @@ describe("TableHeaderSpec", function() {
     it("attaches listener to the table but only once", function() {
       var model = helper.createModelFixture(2);
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.header).not.toBeUndefined();
       var listenerCount = table.events._eventListeners.length;
 

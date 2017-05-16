@@ -25,8 +25,7 @@ describe("MenuBar", function() {
 
   function createMenuBar() {
     return scout.create('MenuBar', {
-      parent: new scout.NullWidget(),
-      session: session,
+      parent: session.desktop,
       menuOrder: new scout.MenuItemsOrder(session, 'Table')
     });
   }
@@ -42,7 +41,7 @@ describe("MenuBar", function() {
       menu1.menuTypes = ['Table.EmptySpace', 'Table.SingleSelection'];
       menu2.menuTypes = ['Table.SingleSelection'];
 
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       menuBar.setMenuItems(menus);
 
       expect(menuBar.menuItems.length).toBe(3); // 2 + separator
@@ -57,7 +56,7 @@ describe("MenuBar", function() {
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
 
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       menuBar.setMenuItems(menus);
 
       // a separator must be added between EmptySpace and Selection Menus
@@ -87,7 +86,7 @@ describe("MenuBar", function() {
       menu1.visible = false;
       menu2.visible = false;
 
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       menuBar.setMenuItems(menus);
 
       expect(menuBar.menuItems.length).toBe(2);
@@ -109,7 +108,7 @@ describe("MenuBar", function() {
       menu1.visible = false;
       menu2.visible = true;
 
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       menuBar.setMenuItems(menus);
 
       expect(menuBar.menuItems.length).toBe(2);
@@ -127,7 +126,7 @@ describe("MenuBar", function() {
       menu = helper.createMenu(createModel('foo'));
       menuBar = createMenuBar();
     });
-    
+
     it('must listen on property changes of its menu items (even when menu bar is not rendered)', function() {
       menu.visible = false;
       menuBar.setMenuItems([menu]);
@@ -162,7 +161,7 @@ describe("MenuBar", function() {
       menu1.visible = true;
       menu2.visible = true;
       menuBar.setMenuItems(menus);
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       menuBar.$right.setVisible(false); // Right box should not influence the layout (due to missing css)
       menuBar.htmlComp.setSize(new scout.Dimension(500, 50));
 
@@ -188,7 +187,7 @@ describe("MenuBar", function() {
         menus = [menu1, menu2];
 
       menuBar.setMenuItems(menus);
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
 
       expect(menuBar.menuItems.length).toBe(2);
       expect(menuBar.menuItems[0]).toBe(menu1);
@@ -209,13 +208,12 @@ describe("MenuBar", function() {
         menus = [menu1, menu2];
 
       var ellipsisMenu = scout.menus.createEllipsisMenu({
-        parent: new scout.NullWidget(),
-        session: session
+        parent: session.desktop
       });
-      ellipsisMenu.render(session.$entryPoint);
+      ellipsisMenu.render();
 
       menuBar.setMenuItems(menus);
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       expect(menu1.rendered).toBe(true);
       expect(menu1.$container).not.toHaveClass('default-menu');
       expect(menu2.rendered).toBe(true);
@@ -242,13 +240,12 @@ describe("MenuBar", function() {
         menus = [menu1, menu2];
 
       var ellipsisMenu = scout.menus.createEllipsisMenu({
-        parent: new scout.NullWidget(),
-        session: session
+        parent: session.desktop
       });
-      ellipsisMenu.render(session.$entryPoint);
+      ellipsisMenu.render();
 
       menuBar.setMenuItems(menus);
-      menuBar.render(session.$entryPoint);
+      menuBar.render();
       expect(menu1.rendered).toBe(true);
       expect(menu1.$container).not.toHaveClass('default-menu');
       expect(menu2.rendered).toBe(true);

@@ -126,7 +126,7 @@ describe("TableAdapter", function() {
         var model = helper.createModelFixture(2, 5);
         var adapter = helper.createTableAdapter(model);
         var table = adapter.createWidget(model, session.desktop);
-        table.render(session.$entryPoint);
+        table.render();
 
         spyOn(table, 'selectRows');
 
@@ -328,7 +328,7 @@ describe("TableAdapter", function() {
       });
 
       it("correct DOM order for newly inserted rows", function() {
-        table.render(session.$entryPoint);
+        table.render();
         expect(table.rows.length).toBe(3);
 
         var newRows = [

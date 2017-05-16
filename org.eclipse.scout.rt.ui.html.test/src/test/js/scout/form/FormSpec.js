@@ -101,7 +101,7 @@ describe('Form', function() {
       form = helper.createFormWithOneField();
       form.cacheBounds = true;
       form.cacheBoundsKey = 'FOO';
-      form.render(session.$entryPoint);
+      form.render();
 
       scout.webstorage.removeItem(localStorage, 'scout:formBounds:FOO');
     });

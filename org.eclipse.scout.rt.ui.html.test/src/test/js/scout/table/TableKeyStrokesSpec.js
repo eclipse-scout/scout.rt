@@ -33,7 +33,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
 
       var row2 = table.rows[2];
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [row2]);
 
       table.$data.triggerKeyDown(scout.keys.UP);
@@ -48,7 +48,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.UP);
       helper.assertSelection(table, [table.rows[4]]);
@@ -58,7 +58,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
       table.selectAll();
 
       table.$data.triggerKeyDown(scout.keys.UP);
@@ -69,7 +69,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 1);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
@@ -86,7 +86,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
       var rows = table.rows;
 
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[0], rows[1]]);
 
       table.$data.triggerKeyDown(scout.keys.UP);
@@ -98,7 +98,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
       var rows = table.rows;
 
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[0], rows[1], rows[2]]);
 
       table.selectionHandler.lastActionRow = rows[2];
@@ -112,7 +112,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
 
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[4]]);
 
       table.selectionHandler.lastActionRow = rows[4];
@@ -126,7 +126,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
 
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
 
       table.selectionHandler.lastActionRow = rows[4];
@@ -139,7 +139,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 6);
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
       table.selectionHandler.lastActionRow = rows[4];
 
@@ -163,7 +163,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 5);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
         table.$data.triggerKeyDown(scout.keys.UP, 'shift');
@@ -179,7 +179,7 @@ describe("TableKeyStrokes", function() {
         var table = helper.createTable(model);
 
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
 
         table.selectionHandler.lastActionRow = rows[4];
@@ -197,7 +197,7 @@ describe("TableKeyStrokes", function() {
         var table = helper.createTable(model);
 
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[5]]);
 
         table.selectionHandler.lastActionRow = rows[5];
@@ -220,7 +220,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       var row2 = table.rows[2];
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [row2]);
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
@@ -235,7 +235,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
@@ -245,7 +245,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
       table.selectAll();
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
@@ -256,7 +256,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 1);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
@@ -273,7 +273,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
       var rows = table.rows;
 
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[3], rows[4]]);
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
@@ -285,7 +285,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
 
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[4]]);
 
       table.selectionHandler.lastActionRow = rows[2];
@@ -299,7 +299,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
 
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
 
       table.selectionHandler.lastActionRow = rows[2];
@@ -312,7 +312,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 6);
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
       table.selectionHandler.lastActionRow = rows[1];
 
@@ -336,7 +336,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 5);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
         table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
@@ -352,7 +352,7 @@ describe("TableKeyStrokes", function() {
         var table = helper.createTable(model);
 
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[4]]);
 
         table.selectionHandler.lastActionRow = rows[2];
@@ -370,7 +370,7 @@ describe("TableKeyStrokes", function() {
         var table = helper.createTable(model);
 
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[5]]);
 
         table.selectionHandler.lastActionRow = rows[2];
@@ -391,7 +391,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 4);
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[1]]);
 
       table.$data.triggerKeyDown(scout.keys.END);
@@ -404,7 +404,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 4);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[1]]);
 
         table.$data.triggerKeyDown(scout.keys.END, 'shift');
@@ -415,7 +415,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
 
         table.$data.triggerKeyDown(scout.keys.END, 'shift');
@@ -426,7 +426,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
         table.selectionHandler.lastActionRow = rows[1];
 
@@ -438,7 +438,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
         table.selectionHandler.lastActionRow = rows[1];
 
@@ -460,7 +460,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[5]]);
 
         table.$data.triggerKeyDown(scout.keys.END, 'shift');
@@ -471,7 +471,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 3);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
         table.selectionHandler.lastActionRow = rows[0];
 
@@ -489,7 +489,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 4);
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[2]]);
 
       table.$data.triggerKeyDown(scout.keys.HOME);
@@ -502,7 +502,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 4);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
         table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
@@ -513,7 +513,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[5]]);
 
         table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
@@ -524,7 +524,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[2], rows[4]]);
         table.selectionHandler.lastActionRow = rows[4];
 
@@ -536,7 +536,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
         table.selectionHandler.lastActionRow = rows[4];
 
@@ -558,7 +558,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 6);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[0]]);
 
         table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
@@ -569,7 +569,7 @@ describe("TableKeyStrokes", function() {
         var model = helper.createModelFixture(2, 3);
         var table = helper.createTable(model);
         var rows = table.rows;
-        table.render(session.$entryPoint);
+        table.render();
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
         table.selectionHandler.lastActionRow = rows[2];
 
@@ -589,7 +589,7 @@ describe("TableKeyStrokes", function() {
       var table = helper.createTable(model);
       var rows = table.rows;
       table.checkRow(rows[2], true);
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.SPACE);
       expect(rows[0].checked).toBe(false);
@@ -603,7 +603,7 @@ describe("TableKeyStrokes", function() {
       model.checkable = true;
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
       table.$data.triggerKeyDown(scout.keys.SPACE);
@@ -618,7 +618,7 @@ describe("TableKeyStrokes", function() {
       model.checkable = true;
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       table.checkRow(rows[2], true);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
@@ -641,7 +641,7 @@ describe("TableKeyStrokes", function() {
       model.checkable = true;
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.render(session.$entryPoint);
+      table.render();
       table.checkRow(rows[0], true);
       table.checkRow(rows[1], true);
       table.checkRow(rows[2], true);
@@ -663,7 +663,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 1);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
@@ -683,7 +683,7 @@ describe("TableKeyStrokes", function() {
       var model = helper.createModelFixture(2, 1);
       var table = helper.createTable(model);
 
-      table.render(session.$entryPoint);
+      table.render();
 
       table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);

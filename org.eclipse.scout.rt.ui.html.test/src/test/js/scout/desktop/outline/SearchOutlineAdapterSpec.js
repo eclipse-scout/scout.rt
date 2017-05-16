@@ -31,7 +31,7 @@ describe("SearchOutlineAdapter", function() {
       it("may be called multiple times", function() {
         var outline = scout.create(createSimpleModel('SearchOutline', session));
         linkWidgetAndAdapter(outline, 'SearchOutlineAdapter');
-        outline.render(session.$entryPoint);
+        outline.render();
 
         session.$entryPoint.focus();
         expect(document.activeElement).toBe(session.$entryPoint[0]);

@@ -41,7 +41,7 @@ describe("StringFieldAdapter", function() {
       it("may be called multiple times with the same text", function() {
         var field = createField(createModel());
         linkWidgetAndAdapter(field, 'StringFieldAdapter');
-        field.render(session.$entryPoint);
+        field.render();
         expect(field.$field[0].value).toBe('');
 
         var event = createPropertyChangeEvent(field, {

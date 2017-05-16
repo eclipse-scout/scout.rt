@@ -24,7 +24,7 @@ describe('FormLifecycle', function() {
     form = helper.createFormWithOneField();
     form.lifecycle = scout.create('FormLifecycle', {widget: form});
     field = form.rootGroupBox.fields[0];
-    form.render(session.$entryPoint);
+    form.render();
     jasmine.clock().install();
   });
 

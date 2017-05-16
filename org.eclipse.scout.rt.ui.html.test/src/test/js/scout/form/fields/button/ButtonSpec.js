@@ -23,7 +23,7 @@ describe("Button", function() {
         label: 'label',
         iconId: scout.icons.ANGLE_DOWN
       });
-      button.render(session.$entryPoint);
+      button.render();
       expect(button.$field.data('$icon')).toHaveClass('with-label');
 
       button.setLabel(null);
@@ -41,7 +41,7 @@ describe("Button", function() {
         label: 'label',
         iconId: scout.icons.ANGLE_DOWN
       });
-      button.render(session.$entryPoint);
+      button.render();
       expect(button.$field.data('$icon')).toHaveClass('with-label');
 
       button.setIconId(null);

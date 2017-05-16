@@ -34,7 +34,7 @@ describe('FormMenu', function() {
 
     it('opens and closes the form popup', function() {
       var menu = createMenu();
-      menu.render(session.$entryPoint);
+      menu.render();
       expect(findPopup()).not.toExist();
 
       menu.setSelected(true);
@@ -46,13 +46,12 @@ describe('FormMenu', function() {
 
     it('opens the popup and the ellipsis if the menu is overflown', function() {
       var ellipsisMenu = scout.menus.createEllipsisMenu({
-        parent: new scout.NullWidget(),
-        session: session
+        parent: session.desktop
       });
-      ellipsisMenu.render(session.$entryPoint);
+      ellipsisMenu.render();
 
       var menu = createMenu();
-      menu.render(session.$entryPoint);
+      menu.render();
 
       scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
       expect(menu.rendered).toBe(false);
@@ -70,13 +69,12 @@ describe('FormMenu', function() {
 
     it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', function() {
       var ellipsisMenu = scout.menus.createEllipsisMenu({
-        parent: new scout.NullWidget(),
-        session: session
+        parent: session.desktop
       });
-      ellipsisMenu.render(session.$entryPoint);
+      ellipsisMenu.render();
 
       var menu = createMenu({popupStyle: scout.FormMenu.PopupStyle.MOBILE});
-      menu.render(session.$entryPoint);
+      menu.render();
 
       scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
       expect(menu.rendered).toBe(false);
@@ -100,7 +98,7 @@ describe('FormMenu', function() {
       it('calls setSelected', function() {
         var menu = createMenu();
         linkWidgetAndAdapter(menu, 'MenuAdapter');
-        menu.render(session.$entryPoint);
+        menu.render();
         expect(findPopup()).not.toExist();
 
         spyOn(menu, 'setSelected');

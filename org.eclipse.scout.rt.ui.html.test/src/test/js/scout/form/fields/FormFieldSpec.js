@@ -97,13 +97,13 @@ describe('FormField', function() {
       });
 
       it('sets the label as placeholder', function() {
-        formField.render(session.$entryPoint);
+        formField.render();
         expect(formField.$label.html()).toBeFalsy();
         expect(formField.$field.attr('placeholder')).toBe(formField.label);
       });
 
       it('does not call field._renderLabelPosition initially', function() {
-        formField.render(session.$entryPoint);
+        formField.render();
         expect(formField.$label.html()).toBeFalsy();
         expect(formField.$field.attr('placeholder')).toBe(formField.label);
 
@@ -122,7 +122,7 @@ describe('FormField', function() {
 
       it('guarantees a minimum height if label is empty', function() {
         formField.label = '';
-        formField.render(session.$entryPoint);
+        formField.render();
         expect(formField.$label.html()).toBe('&nbsp;');
         expect(formField.$label).toBeVisible();
       });
@@ -131,7 +131,7 @@ describe('FormField', function() {
 
     it('does not display a status if status visible = false', function() {
       formField.statusVisible = false;
-      formField.render(session.$entryPoint);
+      formField.render();
 
       expect(formField.$status.isVisible()).toBe(false);
     });
@@ -147,7 +147,7 @@ describe('FormField', function() {
     });
 
     it('sets css class \'read-only\' when field is disabled and setDisabledStyle has been called ', function() {
-      formField.render(session.$entryPoint);
+      formField.render();
       formField.setDisabledStyle(scout.Widget.DisabledStyle.READ_ONLY);
       formField.setEnabled(false);
       expect(formField.$field.attr('class')).toContain('read-only');
@@ -167,7 +167,7 @@ describe('FormField', function() {
 
     it('adds class has-tooltip if there is a tooltip text', function() {
       formField.tooltipText = 'hello';
-      formField.render(session.$entryPoint);
+      formField.render();
       expect(formField.$container).toHaveClass('has-tooltip');
 
       formField.setTooltipText(null);
@@ -190,7 +190,7 @@ describe('FormField', function() {
       });
       formField.setMenusVisible(true);
       formField.setMenus([menu]);
-      formField.render(session.$entryPoint);
+      formField.render();
       expect(formField.$container).toHaveClass('has-menus');
 
       formField.setMenus([]);
@@ -204,7 +204,7 @@ describe('FormField', function() {
       formField.setMenusVisible(true);
       formField.setMenus([menu]);
       formField.setTooltipText('hello');
-      formField.render(session.$entryPoint);
+      formField.render();
       expect(formField.$container).toHaveClass('has-menus');
       expect(formField.$container).toHaveClass('has-tooltip');
 
@@ -226,14 +226,14 @@ describe('FormField', function() {
 
     it('shows a status if status visible = true', function() {
       formField.statusVisible = true;
-      formField.render(session.$entryPoint);
+      formField.render();
 
       expect(formField.$status.isVisible()).toBe(true);
     });
 
     it('does not show a status if status visible = false', function() {
       formField.statusVisible = false;
-      formField.render(session.$entryPoint);
+      formField.render();
 
       expect(formField.$status.isVisible()).toBe(false);
     });
@@ -241,7 +241,7 @@ describe('FormField', function() {
     it('shows a status even though status visible is false but tooltipText is set', function() {
       formField.statusVisible = false;
       formField.tooltipText = 'hello';
-      formField.render(session.$entryPoint);
+      formField.render();
 
       expect(formField.$status.isVisible()).toBe(true);
       formField.setTooltipText(null);
@@ -254,7 +254,7 @@ describe('FormField', function() {
         message: 'error',
         severity: scout.Status.Severity.ERROR
       });
-      formField.render(session.$entryPoint);
+      formField.render();
 
       expect(formField.$status.isVisible()).toBe(true);
       formField.setErrorStatus(null);

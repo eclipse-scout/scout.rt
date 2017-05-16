@@ -36,7 +36,7 @@ describe("Tree", function() {
 
       var model = helper.createModelFixture(1);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(1);
     });
@@ -45,7 +45,7 @@ describe("Tree", function() {
 
       var model = helper.createModelFixture();
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(0);
     });
@@ -70,7 +70,7 @@ describe("Tree", function() {
         rootNodeModel.expanded = true;
         model = helper.createModel([rootNodeModel]);
         tree = helper.createTree(model);
-        tree.render(session.$entryPoint);
+        tree.render();
 
         // child nodes
         var nodeModels = [
@@ -125,7 +125,7 @@ describe("Tree", function() {
       });
 
       it("updates html document if parent is expanded", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.revalidateLayoutTree();
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(12);
@@ -136,7 +136,7 @@ describe("Tree", function() {
       });
 
       it("updates html document at a specific position", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
 
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
         var newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
@@ -168,7 +168,7 @@ describe("Tree", function() {
 
     it("only updates the model if parent is collapsed", function() {
       tree.setNodeExpanded(node0, false);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
       expect(helper.findAllNodes(tree).length).toBe(9);
@@ -190,7 +190,7 @@ describe("Tree", function() {
       node0 = tree.nodes[0];
       node1 = tree.nodes[1];
       node2 = tree.nodes[2];
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
       var $node0 = node0.$node;
@@ -212,7 +212,7 @@ describe("Tree", function() {
       });
 
       it("inserts a html node if the parent node is selected", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.revalidateLayoutTree();
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
@@ -226,7 +226,7 @@ describe("Tree", function() {
       });
 
       it("only updates model if the parent node is not selected", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.revalidateLayoutTree();
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
@@ -239,7 +239,7 @@ describe("Tree", function() {
       });
 
       it("inserts html nodes at a specific position", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
 
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
         var newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
@@ -262,7 +262,7 @@ describe("Tree", function() {
       node0 = tree.nodes[0];
       node1 = tree.nodes[1];
       node2 = tree.nodes[2];
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
       var $node0 = node0.$node;
@@ -296,7 +296,7 @@ describe("Tree", function() {
     // an already existing node and simply changes a property of that instance
     it("update same node instance", function() {
       expect(node0.leaf).toBe(false);
-      tree.render(session.$entryPoint);
+      tree.render();
       node0.leaf = true;
       tree.updateNode(node0);
       // we expect that _decorateNode has been called and updates the DOM of the tree
@@ -324,7 +324,7 @@ describe("Tree", function() {
 
       it("updates the enabled state of the html node, if visible", function() {
         // Render tree and make sure child0 is visible
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.setNodeExpanded(node0, true);
         expect(child0.$node.isEnabled()).toBe(true);
         expect(child0.enabled).toBe(true);
@@ -338,7 +338,7 @@ describe("Tree", function() {
 
       it("updates the enabled state of the html node after expansion, if not visible", function() {
         // Render tree and make sure child0 is visible
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.setNodeExpanded(node0, true);
         expect(child0.$node.isEnabled()).toBe(true);
 
@@ -383,7 +383,7 @@ describe("Tree", function() {
 
       it("updates the enabled state of the html node, if visible", function() {
         // Render tree and make sure child0 is visible
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.setNodeExpanded(node0, true);
         expect($checkbox(child0).isEnabled()).toBe(true);
 
@@ -396,7 +396,7 @@ describe("Tree", function() {
 
       it("updates the enabled state of the html node after expansion, if not visible", function() {
         // Render tree and make sure child0 is visible
-        tree.render(session.$entryPoint);
+        tree.render();
         tree.setNodeExpanded(node0, true);
         expect($checkbox(child0).isEnabled()).toBe(true);
 
@@ -438,7 +438,7 @@ describe("Tree", function() {
     });
 
     it("updates the text of the html node", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
 
       node0.text = 'new Text';
       tree.changeNode(node0);
@@ -451,7 +451,7 @@ describe("Tree", function() {
 
     it("updates custom cssClass of model and html node", function() {
       tree.selectedNodes = [node0];
-      tree.render(session.$entryPoint);
+      tree.render();
 
       node0.cssClass = 'new-css-class';
       tree.changeNode(node0);
@@ -484,7 +484,7 @@ describe("Tree", function() {
 
     it("preserves child-of-selected when root nodes get changed", function() {
       tree.selectedNodes = [];
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
@@ -506,7 +506,7 @@ describe("Tree", function() {
     it("preserves child-of-selected when child nodes get changed", function() {
       tree.selectedNodes = [node1];
       tree.setNodeExpanded(node1, true);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
@@ -527,7 +527,7 @@ describe("Tree", function() {
 
     it("preserves group css class when nodes get updated", function() {
       tree.selectNode(node1);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree._isGroupingEnd = function(node) {
         return node.nodeType === scout.Page.NodeType.TABLE;
@@ -580,7 +580,7 @@ describe("Tree", function() {
 
       it("updates html document", function() {
         tree.setViewRangeSize(40);
-        tree.render(session.$entryPoint);
+        tree.render();
 
         var node2Child0 = node2.childNodes[0];
 
@@ -626,7 +626,7 @@ describe("Tree", function() {
         var lastNode = tree.nodes[5];
 
         var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
-        tree.render(session.$entryPoint);
+        tree.render();
         expect(tree.viewRangeRendered).toEqual(new scout.Range(1, 4));
         expect(tree.$nodes().length).toBe(3);
         expect(tree.nodes.length).toBe(6);
@@ -686,7 +686,7 @@ describe("Tree", function() {
 
       it("updates html document", function() {
         tree.setViewRangeSize(30);
-        tree.render(session.$entryPoint);
+        tree.render();
 
         tree.deleteNodes([node0]);
         expect(tree.visibleNodesFlat.length).toBe(26);
@@ -711,7 +711,7 @@ describe("Tree", function() {
         it("updates html document", function() {
           tree.setViewRangeSize(30);
           tree.setNodeExpanded(node0, false);
-          tree.render(session.$entryPoint);
+          tree.render();
 
           tree.deleteNodes([node0]);
           expect(helper.findAllNodes(tree).length).toBe(26);
@@ -732,7 +732,7 @@ describe("Tree", function() {
       });
 
       it("updates html document", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
 
         tree.deleteNodes([node0, node1, node2]);
         expect(helper.findAllNodes(tree).length).toBe(0);
@@ -772,7 +772,7 @@ describe("Tree", function() {
     });
 
     it("deletes all nodes from html document", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(12);
 
@@ -790,7 +790,7 @@ describe("Tree", function() {
     });
 
     it("deletes all nodes from html document for a given parent", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(12);
 
@@ -811,7 +811,7 @@ describe("Tree", function() {
     it("checks a subnode -> mark upper nodes ", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.checkable = true;
 
       var node;
@@ -836,7 +836,7 @@ describe("Tree", function() {
     it("checks a node -> mark upper nodes -> uncheck node and test if node keeps marked because children are checked", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.checkable = true;
       var node, nodeToCheck;
       //find node with more then one child level
@@ -875,7 +875,7 @@ describe("Tree", function() {
     it("checks a subnode and its sibling -> mark upper nodes -> uncheck one of the siblings", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.checkable = true;
       var nodeOne, nodeTwo;
       //find node with more then one child level
@@ -919,7 +919,7 @@ describe("Tree", function() {
     it("does not check a disabled node", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.checkable = true;
 
       var node = tree.nodes[0];
@@ -932,7 +932,7 @@ describe("Tree", function() {
       var model = helper.createModelFixture(4, 4);
       var tree = helper.createTree(model);
       tree.enabled = false;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var node = tree.nodes[0];
       tree.checkNode(node, true);
@@ -944,7 +944,7 @@ describe("Tree", function() {
       var tree = helper.createTree(model);
       tree.multiCheck = false;
       tree.checkable = true;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var node = tree.nodes[0],
         nodeTwo = tree.nodes[1];
@@ -969,7 +969,7 @@ describe("Tree", function() {
       tree.multiCheck = true;
       tree.checkable = true;
       tree.autoCheckChildren = true;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var node = tree.nodes[0];
       tree.checkNode(node, true);
@@ -986,7 +986,7 @@ describe("Tree", function() {
       tree.multiCheck = true;
       tree.checkable = true;
       tree.autoCheckChildren = false;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var node = tree.nodes[0];
       tree.checkNode(node, true);
@@ -1002,7 +1002,7 @@ describe("Tree", function() {
       var tree = helper.createTree(model);
       tree.multiCheck = false;
       tree.checkable = false;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var node = tree.nodes[0];
       tree.checkNode(node, true);
@@ -1024,7 +1024,7 @@ describe("Tree", function() {
       var model = helper.createModelFixture(1);
       var tree = helper.createTree(model);
       spyOn(tree, '_onNodeMouseDown');
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node = tree.$container.find('.tree-node:first');
       $node.triggerMouseDown();
@@ -1035,7 +1035,7 @@ describe("Tree", function() {
     it("updates model (selection)", function() {
       var model = helper.createModelFixture(1);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(tree.selectedNodes.length).toBe(0);
 
@@ -1052,7 +1052,7 @@ describe("Tree", function() {
     it("expands/collapses the node", function() {
       var model = helper.createModelFixture(1, 1, false);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
@@ -1069,7 +1069,7 @@ describe("Tree", function() {
     it("does the same as control single click (does NOT expand and immediately collapse again)", function() {
       var model = helper.createModelFixture(1, 1, false);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $nodeControl = tree.$container.find('.tree-node-control:first');
       var $node = $nodeControl.parent();
@@ -1094,7 +1094,7 @@ describe("Tree", function() {
       model.selectedNodes = [node0.id];
 
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
       expect(tree.$selectedNodes().length).toBe(1);
 
       tree.deselectAll();
@@ -1114,7 +1114,7 @@ describe("Tree", function() {
       var tree = helper.createTree(model);
       var node0 = tree.nodes[0];
 
-      tree.render(session.$entryPoint);
+      tree.render();
       expect(tree.$selectedNodes().length).toBe(0);
       expect(node0.$node.isSelected()).toBe(false);
 
@@ -1154,7 +1154,7 @@ describe("Tree", function() {
       var node0 = tree.nodes[0];
       var child0 = node0.childNodes[0];
       var grandchild0 = child0.childNodes[0];
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(node0.expanded).toBe(false);
       expect(child0.expanded).toBe(false);
@@ -1173,7 +1173,7 @@ describe("Tree", function() {
       var node0 = tree.nodes[0];
 
       tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree.selectNodes(node0);
 
@@ -1189,7 +1189,7 @@ describe("Tree", function() {
       var child1 = node1.childNodes[1];
       var grandchild1 = child1.childNodes[1];
 
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $parents = tree.$data.find('.tree-node.ancestor-of-selected');
       expect($parents.length).toBe(0);
@@ -1224,7 +1224,7 @@ describe("Tree", function() {
       var node1 = nodes[1];
       var child1 = node1.childNodes[1];
 
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
@@ -1255,7 +1255,7 @@ describe("Tree", function() {
       var child0 = nodes[1].childNodes[0];
       var child1 = nodes[1].childNodes[1];
       tree.viewRangeSize = 1;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(nodes[1].rendered).toBe(false);
       expect(child0.rendered).toBe(false);
@@ -1286,7 +1286,7 @@ describe("Tree", function() {
       var child1 = nodes[1].childNodes[1];
       var grandChild1 = child1.childNodes[1];
       tree.viewRangeSize = 1;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       // Only render one node
       tree._expandAllParentNodes(grandChild1);
@@ -1314,7 +1314,7 @@ describe("Tree", function() {
       var child1 = nodes[1].childNodes[1];
       var grandChild1 = child1.childNodes[1];
       tree.viewRangeSize = 1;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       // Only render one node
       tree._expandAllParentNodes(grandChild1);
@@ -1344,7 +1344,7 @@ describe("Tree", function() {
     });
 
     it("sets css class child-of-selected on direct children if the expanded node is selected", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree.selectNodes(node1);
       var $children = tree.$data.find('.tree-node.child-of-selected');
@@ -1363,7 +1363,7 @@ describe("Tree", function() {
     });
 
     it("renders the child nodes if parent is expanded", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $nodes = helper.findAllNodes(tree);
       expect($nodes.length).toBe(3);
@@ -1384,7 +1384,7 @@ describe("Tree", function() {
       });
 
       it("renders the child nodes if parent is expanded", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
 
         var $nodes = helper.findAllNodes(tree);
         expect($nodes.length).toBe(3);
@@ -1421,7 +1421,7 @@ describe("Tree", function() {
       var model = helper.createModelFixture(3, 3);
       var tree = helper.createTree(model);
       var nodes = tree.nodes;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(nodes[0].$node).not.toHaveClass('expanded');
       expect(nodes[0].childNodes[0].$node).toBeFalsy();
@@ -1443,7 +1443,7 @@ describe("Tree", function() {
       var node0 = tree.nodes[0];
 
       tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree.selectNodes(node0);
 
@@ -1463,7 +1463,7 @@ describe("Tree", function() {
       var i;
       var model = helper.createModelFixture(3, 2, true);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var allNodes = [];
       tree._visitNodes(tree.nodes, function(node) {
@@ -1494,7 +1494,7 @@ describe("Tree", function() {
     });
 
     it("Sets css class group on every element within the same group", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
       tree._isGroupingEnd = function(node) {
         return node.nodeType === scout.Page.NodeType.TABLE;
       };
@@ -1595,7 +1595,7 @@ describe("Tree", function() {
       var childNode0 = parentNode.childNodes[0];
       var childNode1 = parentNode.childNodes[1];
       var childNode2 = parentNode.childNodes[2];
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.expandNode(parentNode);
 
       tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
@@ -1611,7 +1611,7 @@ describe("Tree", function() {
       var childNode1 = parentNode.childNodes[1];
       var childNode2 = parentNode.childNodes[2];
       tree.viewRangeSize = 3;
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.expandNode(parentNode);
 
       // Needs explicit rendering of the viewport because this would be done later by the layout
@@ -1690,7 +1690,7 @@ describe("Tree", function() {
       var node1 = nodes[1];
       var node2 = nodes[2];
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.updateNodeOrder([node2, node1, node0]);
       var $nodes = tree.$nodes();
       expect($nodes.eq(0).data('node').id).toBe(node2.id);
@@ -1730,7 +1730,7 @@ describe("Tree", function() {
       var node1 = nodes[1];
       var node2 = nodes[2];
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.expandNode(node1);
       tree.updateNodeOrder([node2, node0, node1]);
       var $nodes = tree.$nodes();
@@ -1748,7 +1748,7 @@ describe("Tree", function() {
     it("filters nodes when filter() is called", function() {
       var model = helper.createModelFixture(1, 1, true);
       var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var filter = {
         accept: function(node) {
@@ -1792,7 +1792,7 @@ describe("Tree", function() {
         }
       };
       tree.addFilter(filter);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(tree.nodes[0].rendered).toBe(true);
       expect(tree.nodes[1].rendered).toBe(false);
@@ -1815,7 +1815,7 @@ describe("Tree", function() {
         }
       };
       tree.addFilter(filter);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(tree.nodes[0].attached).toBe(true);
       expect(tree.nodes[1].attached).toBe(false);
@@ -1838,7 +1838,7 @@ describe("Tree", function() {
         }
       };
       tree.addFilter(filter);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(tree.nodes[0].childNodes.length).toBe(2);
       expect(tree.nodes[0].rendered).toBe(true);
@@ -1927,7 +1927,7 @@ describe("Tree", function() {
       // test
       tree.setViewRangeSize(5);
       tree.setNodeExpanded(tree.visibleNodesFlat[2], true);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree.addFilter(filterA);
       tree._renderViewport();
@@ -1966,7 +1966,7 @@ describe("Tree", function() {
     });
 
     it("disables checkboxes when tree is disabled", function() {
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');
       expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');

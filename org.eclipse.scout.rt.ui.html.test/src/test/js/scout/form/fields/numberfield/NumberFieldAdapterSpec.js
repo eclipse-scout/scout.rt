@@ -44,7 +44,7 @@ describe('NumberFieldAdapter', function() {
     // Check if the calculator still works if a model adapter is attached
     var field = helper.createField('NumberField');
     linkWidgetAndAdapter(field, 'NumberFieldAdapter');
-    field.render(session.$entryPoint);
+    field.render();
     field.decimalFormat.decimalSeparatorChar = '.';
     field.decimalFormat.groupingChar = '\'';
 

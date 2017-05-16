@@ -58,7 +58,7 @@ describe("TableControl", function() {
     it("opens and closes the control container", function() {
       var action = createAction(createModel());
       table._setTableControls([action]);
-      table.render(session.$entryPoint);
+      table.render();
       var $controlContainer = table.footer.$controlContainer;
       expect($controlContainer).toBeHidden();
 
@@ -75,7 +75,7 @@ describe("TableControl", function() {
       table._setTableControls([action, action2]);
 
       action.selected = true;
-      table.render(session.$entryPoint);
+      table.render();
       var $controlContainer = table.footer.$controlContainer;
 
       expect($controlContainer).toBeVisible();
@@ -105,7 +105,7 @@ describe("TableControl", function() {
       table._setTableControls([action, action2]);
 
       action.selected = true;
-      table.render(session.$entryPoint);
+      table.render();
 
       action2.setSelected(true);
       sendQueuedAjaxCalls();

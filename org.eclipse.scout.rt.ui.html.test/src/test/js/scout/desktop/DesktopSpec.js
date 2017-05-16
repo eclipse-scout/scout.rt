@@ -67,9 +67,9 @@ describe('Desktop', function() {
         closable: true
       }).show();
       expect(desktop.notifications.length).toBe(1);
-      expect(desktop.session.$entryPoint.find('.desktop-notifications').length).toBe(0);
+      expect(session.$entryPoint.find('.desktop-notifications').length).toBe(0);
 
-      desktop.render(desktop.session.$entryPoint);
+      desktop.render(session.$entryPoint);
       expect(desktop.notifications.length).toBe(1);
       expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
     });

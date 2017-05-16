@@ -16,7 +16,7 @@ describe('FileChooserAdapter', function() {
   describe('cancel', function() {
     it('does not close the chooser but sends a cancel event', function() {
       var fileChooser = scout.create('FileChooser', {
-        parent: createNullParent(session)
+        parent: session.desktop
       });
       linkWidgetAndAdapter(fileChooser, 'FileChooserAdapter');
       fileChooser.open();

@@ -9,9 +9,9 @@ describe('IFrame', function() {
   describe('setLocation', function() {
     it('sets the location of the iframe', function() {
       var iframe = scout.create('IFrame', {
-        parent: createNullParent(session)
+        parent: session.desktop
       });
-      iframe.render(session.$entryPoint);
+      iframe.render();
       expect(iframe.location).toBe(null);
       expect(iframe.$iframe.attr('src')).toBe('about:blank');
 
@@ -22,10 +22,10 @@ describe('IFrame', function() {
 
     it('sets the location to about:blank if location is empty', function() {
       var iframe = scout.create('IFrame', {
-        parent: createNullParent(session),
+        parent: session.desktop,
         location: 'http://www.bing.com'
       });
-      iframe.render(session.$entryPoint);
+      iframe.render();
       expect(iframe.location).toBe('http://www.bing.com');
       expect(iframe.$iframe.attr('src')).toBe('http://www.bing.com');
 

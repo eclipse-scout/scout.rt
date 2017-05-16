@@ -52,7 +52,7 @@ describe("CellEditor", function() {
     model.rows[0].cells[0].editable = true;
     var adapter = helper.createTableAdapter(model) ;
     var table = adapter.createWidget(model, session.desktop);
-    table.render(session.$entryPoint);
+    table.render();
 
     var field = createStringField(table);
     table.startCellEdit(table.columns[0], table.rows[0], field);
@@ -78,7 +78,7 @@ describe("CellEditor", function() {
     beforeEach(function() {
       model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
       helper.applyDisplayStyle(table);
       $rows = table.$rows();
       $cells0 = $rows.eq(0).find('.table-cell');
@@ -299,7 +299,7 @@ describe("CellEditor", function() {
       $tooltip = $('.tooltip');
 
       expect($tooltip.length).toBe(0);
-      table.render(session.$entryPoint);
+      table.render();
       $tooltip = $('.tooltip');
       expect($tooltip.length).toBe(1);
     });
@@ -309,7 +309,7 @@ describe("CellEditor", function() {
       $tooltip = $('.tooltip');
 
       expect($tooltip.length).toBe(0);
-      table.render(session.$entryPoint);
+      table.render();
       $tooltip = $('.tooltip');
       expect($tooltip.length).toBe(0);
     });
@@ -335,7 +335,7 @@ describe("CellEditor", function() {
 
     it("reopens popup if row gets updated", function() {
       row0.cells[0].editable = true;
-      table.render(session.$entryPoint);
+      table.render();
       $cells0 = table.$cellsForRow(row0.$row);
       $cell0_0 = $cells0.eq(0);
       startAndAssertCellEdit(table, table.columns[0], row0);
@@ -357,7 +357,7 @@ describe("CellEditor", function() {
 
     it("closes popup if row gets deleted", function() {
       row0.cells[0].editable = true;
-      table.render(session.$entryPoint);
+      table.render();
       startAndAssertCellEdit(table, table.columns[0], row0);
       spyOn(table, 'cancelCellEdit');
 
@@ -372,7 +372,7 @@ describe("CellEditor", function() {
 
     it("closes popup if all rows get deleted", function() {
       row0.cells[0].editable = true;
-      table.render(session.$entryPoint);
+      table.render();
       startAndAssertCellEdit(table, table.columns[0], row0);
       spyOn(table, 'cancelCellEdit');
 
@@ -387,7 +387,7 @@ describe("CellEditor", function() {
 
     it("closes popup (before) table is detached", function() {
       row0.cells[0].editable = true;
-      table.render(session.$entryPoint);
+      table.render();
       startAndAssertCellEdit(table, table.columns[0], row0);
       expect(table.cellEditorPopup).toBeTruthy();
       table._beforeDetach(); // called by parent.detach();
@@ -396,7 +396,7 @@ describe("CellEditor", function() {
 
     it("closes popup when table is removed", function() {
       row0.cells[0].editable = true;
-      table.render(session.$entryPoint);
+      table.render();
       startAndAssertCellEdit(table, table.columns[0], row0);
       expect(table.cellEditorPopup).toBeTruthy();
       table.remove();
@@ -419,7 +419,7 @@ describe("CellEditor", function() {
       row0.cells[0].editable = true;
       row0.cells[0].errorStatus = 'Validation error';
 
-      table.render(session.$entryPoint);
+      table.render();
       expect($('.tooltip').length).toBe(1);
       expect(table.tooltips.length).toBe(1);
 

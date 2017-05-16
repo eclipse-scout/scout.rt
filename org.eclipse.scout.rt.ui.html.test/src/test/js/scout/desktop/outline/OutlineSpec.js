@@ -118,7 +118,7 @@ describe("Outline", function() {
       var node0 = tree.nodes[0];
 
       tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree.selectNodes(node0);
 
@@ -263,7 +263,7 @@ describe("Outline", function() {
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
       var node0 = outline.nodes[0];
-      outline.render(session.$entryPoint);
+      outline.render();
       outline.selectNodes(outline.nodes[1]);
 
       // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)

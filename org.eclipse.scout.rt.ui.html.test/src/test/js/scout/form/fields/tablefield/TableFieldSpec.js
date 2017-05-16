@@ -53,7 +53,7 @@ describe("T2ableField", function() {
     it('shows (renders) the table if the value is set', function() {
       var table = createTable(2, 2);
       var tableField = createTableField();
-      tableField.render(session.$entryPoint);
+      tableField.render();
 
       expect(tableField.table).toBeUndefined();
       tableField.setProperty('table', table);
@@ -66,7 +66,7 @@ describe("T2ableField", function() {
     it('destroys the table if value is changed to null', function() {
       var tableField = createTableFieldWithTable();
       var table = tableField.table;
-      tableField.render(session.$entryPoint);
+      tableField.render();
       expect(table.rendered).toBe(true);
       expect(table.owner).toBe(tableField);
       expect(table.parent).toBe(tableField);
@@ -81,7 +81,7 @@ describe("T2ableField", function() {
 
     it('table gets class \'field\' to make it work with the form field layout', function() {
       var tableField = createTableFieldWithTable();
-      tableField.render(session.$entryPoint);
+      tableField.render();
 
       expect(tableField.table.$container).toHaveClass('field');
     });
@@ -89,7 +89,7 @@ describe("T2ableField", function() {
     it('table gets class \'field\' to make it work with the form field layout (also when table is set later)', function() {
       var table = createTable(2, 2);
       var tableField = createTableField();
-      tableField.render(session.$entryPoint);
+      tableField.render();
 
       expect(tableField.table).toBeUndefined();
       tableField.setProperty('table', table);

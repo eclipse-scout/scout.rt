@@ -46,7 +46,7 @@ describe("GroupBoxBodyGrid01", function() {
       gridDataHints: new scout.GridData({})
     }));
     this.groupBox.setProperty('fields', this.fields);
-    this.groupBox.render(session.$entryPoint);
+    this.groupBox.render();
   });
 
   describe('group box layout 01', function() {

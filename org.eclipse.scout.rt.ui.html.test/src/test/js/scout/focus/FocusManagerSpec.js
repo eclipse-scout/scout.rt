@@ -53,7 +53,7 @@ describe('scout.FocusManager', function() {
       var tableHelper = new scout.TableSpecHelper(session);
       var tableModel = tableHelper.createModelFixture(2, 1);
       var table = tableHelper.createTable(tableModel);
-      table.render(session.$entryPoint);
+      table.render();
 
       // we don't really click - just simulate that the method has been called by the FocusManager
       var event = {
@@ -70,7 +70,7 @@ describe('scout.FocusManager', function() {
       var treeHelper = new scout.TreeSpecHelper(session);
       var treeModel = treeHelper.createModelFixture(1);
       var tree = treeHelper.createTree(treeModel);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       // we don't really click - just simulate that the method has been called by the FocusManager
       var event = {
@@ -98,7 +98,7 @@ describe('scout.FocusManager', function() {
       var form;
       beforeEach(function() {
         form = formHelper.createFormWithFields(session.desktop, false, 4);
-        form.render(session.$entryPoint);
+        form.render();
       });
 
       afterEach(function() {
@@ -135,7 +135,7 @@ describe('scout.FocusManager', function() {
         expect(sandboxContext.$container).toBe(session.$entryPoint);
 
         var dialog = formHelper.createFormWithFields(session.desktop, true, 2);
-        dialog.render(session.$entryPoint);
+        dialog.render();
 
         expect(session.focusManager._focusContexts.length).toBe(2);
 

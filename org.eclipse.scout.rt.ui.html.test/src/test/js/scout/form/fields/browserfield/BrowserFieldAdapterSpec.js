@@ -28,7 +28,7 @@ describe('BrowserFieldAdapter', function() {
     var model = createSimpleModel('BrowserField', session, 'foo');
     var adapter = scout.create('BrowserFieldAdapter', createAdapterModel(model));
     var browserField = adapter.createWidget(model, session.desktop);
-    browserField.render(session.$entryPoint);
+    browserField.render();
 
     // postMessage is an async call -> hard to test -> simulate it (window.postMessage('hello world', '*');)
     browserField._onMessage({

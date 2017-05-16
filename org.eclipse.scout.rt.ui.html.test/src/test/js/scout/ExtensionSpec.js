@@ -99,7 +99,7 @@ describe('Extension', function() {
     });
 
     it('should extend _renderProperties method', function() {
-      myStringField.render(session.$entryPoint);
+      myStringField.render();
       var $bar = $('.bar');
       var $foo = $('.foo');
       expect($bar.length).toBe(1);
@@ -108,7 +108,7 @@ describe('Extension', function() {
 
     it('should extend _renderInputMasked method', function() {
       myStringField.setProperty('inputMasked', true);
-      myStringField.render(session.$entryPoint);
+      myStringField.render();
       var typeAttr = $('input').attr('type');
       expect(typeAttr).toBe('ext-password');
     });

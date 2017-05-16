@@ -26,7 +26,9 @@ describe('DesktopNavigation', function() {
   describe('viewButtonBox', function() {
 
     it('is rendered if there are view buttons', function() {
-      desktop.viewButtons = [scout.create('ViewButton', {parent: desktop})];
+      desktop.viewButtons = [scout.create('ViewButton', {
+        parent: desktop
+      })];
       desktop.render(session.$entryPoint);
       expect(desktop.navigation.viewButtonBox.rendered).toBe(true);
     });
@@ -58,7 +60,7 @@ describe('DesktopNavigation', function() {
 
       // collapse completely
       desktop.shrinkNavigation();
-      expect(desktop.navigationVisible).toBe(false);  // complete navigation invisible, handle-visibility not updated
+      expect(desktop.navigationVisible).toBe(false); // complete navigation invisible, handle-visibility not updated
 
       //enlarge to breadcrumb
       desktop.enlargeNavigation();
@@ -84,7 +86,7 @@ describe('DesktopNavigation', function() {
 
       // collapse completely
       desktop.shrinkNavigation();
-      expect(desktop.navigationVisible).toBe(false);  // complete navigation invisible, handle-visibility not updated
+      expect(desktop.navigationVisible).toBe(false); // complete navigation invisible, handle-visibility not updated
 
       //enlarge to default
       desktop.enlargeNavigation();

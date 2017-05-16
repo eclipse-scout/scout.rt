@@ -9,7 +9,7 @@ describe('FileChooser', function() {
   describe('open', function() {
     it('opens the chooser', function() {
       var fileChooser = scout.create('FileChooser', {
-        parent: createNullParent(session)
+        parent: session.desktop
       });
       fileChooser.open();
       expect(fileChooser.rendered).toBe(true);
@@ -21,7 +21,7 @@ describe('FileChooser', function() {
   describe('close', function() {
     it('closes the chooser', function() {
       var fileChooser = scout.create('FileChooser', {
-        parent: createNullParent(session)
+        parent: session.desktop
       });
       fileChooser.open();
       fileChooser.close();
@@ -36,7 +36,7 @@ describe('FileChooser', function() {
         return;
       }
       var fileChooser = scout.create('FileChooser', {
-        parent: createNullParent(session),
+        parent: session.desktop,
         multiSelect: true
       });
       fileChooser.open();
@@ -57,7 +57,7 @@ describe('FileChooser', function() {
         return;
       }
       var fileChooser = scout.create('FileChooser', {
-        parent: createNullParent(session),
+        parent: session.desktop,
         multiSelect: false
       });
       fileChooser.open();
@@ -86,7 +86,7 @@ describe('FileChooser', function() {
       var file2 = new File([''], 'file 2');
       var file3 = new File([''], 'file 3');
       var fileChooser = scout.create('FileChooser', {
-        parent: createNullParent(session),
+        parent: session.desktop,
         multiSelect: true,
         files: [file1, file2, file3]
       });

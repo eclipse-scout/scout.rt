@@ -40,7 +40,7 @@ describe("BasicField", function() {
   describe("displayTextChanged must always be sent to server at the end of input, if at least one change has been was made", function() {
     it("updateDisplayTextOnModify = true, with changed text", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val('Test1');
       field.$field.trigger('input');
       jasmine.clock().tick(251); // because of debounce
@@ -63,7 +63,7 @@ describe("BasicField", function() {
 
     it("updateDisplayTextOnModify = false, with changed text", function() {
       field.updateDisplayTextOnModify = false;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val('Test2');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
@@ -85,7 +85,7 @@ describe("BasicField", function() {
 
     it("updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
       jasmine.clock().tick(251); // because of debounce
@@ -109,7 +109,7 @@ describe("BasicField", function() {
 
     it("updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
       jasmine.clock().tick(100); // debounced function has not been executed yet!
@@ -137,7 +137,7 @@ describe("BasicField", function() {
 
     it("updateDisplayTextOnModify = true, then acceptInput(false) is fired. -> send should be done immediately", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
       field.acceptInput(false);
@@ -152,7 +152,7 @@ describe("BasicField", function() {
 
     it("updateDisplayTextOnModify = true, w/o changed text", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.displayText = 'Test4'; // fake previous display text
       field.$field.val('Test4');
       field.$field.trigger('input');
@@ -175,7 +175,7 @@ describe("BasicField", function() {
 
     it("updateDisplayTextOnModify = false, w/o changed text", function() {
       field.updateDisplayTextOnModify = false;
-      field.render(session.$entryPoint);
+      field.render();
       field.displayText = 'Test5'; // fake previous display text
       field.$field.val('Test5');
       field.$field.trigger('input');
@@ -198,7 +198,7 @@ describe("BasicField", function() {
 
     it("does not fail if field is removed while acceptInput is still pending", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val('Test1');
       field.$field.trigger('input');
 

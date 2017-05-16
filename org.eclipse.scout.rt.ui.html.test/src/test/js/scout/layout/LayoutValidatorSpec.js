@@ -133,10 +133,9 @@ describe("LayoutValidator", function() {
 
     it("removes the widget from invalid components when a widget gets removed", function() {
       var widget = scout.create('StringField', {
-        parent: new scout.NullWidget(),
-        session: session
+        parent: session.desktop
       });
-      widget.render(session.$entryPoint);
+      widget.render();
 
       widget.invalidateLayoutTree();
       expect(session.layoutValidator._invalidComponents.length).toBe(1);

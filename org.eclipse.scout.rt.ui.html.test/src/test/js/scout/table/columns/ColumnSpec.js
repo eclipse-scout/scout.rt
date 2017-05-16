@@ -42,7 +42,7 @@ describe('Column', function() {
     model.rows[1].cells[2].horizontalAlignment = 1;
 
     var table = helper.createTable(model);
-    table.render(session.$entryPoint);
+    table.render();
 
     var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
@@ -91,7 +91,7 @@ describe('Column', function() {
     model.columns[0].text = 'header text';
     model.columns[1].text = 'header text\nNew line';
     var table = helper.createTable(model);
-    table.render(session.$entryPoint);
+    table.render();
 
     var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0Text = $headerItems.eq(0).children('.table-header-item-text');
@@ -106,7 +106,7 @@ describe('Column', function() {
     model.columns[0].cssClass = 'abc';
 
     var table = helper.createTable(model);
-    table.render(session.$entryPoint);
+    table.render();
 
     var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
@@ -127,7 +127,7 @@ describe('Column', function() {
     model.columns[0].objectType = 'BooleanColumn';
 
     var table = helper.createTable(model);
-    table.render(session.$entryPoint);
+    table.render();
 
     var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
@@ -148,7 +148,7 @@ describe('Column', function() {
     model.rows[0].cells[0].cssClass = 'custom-cell-0';
 
     var table = helper.createTable(model);
-    table.render(session.$entryPoint);
+    table.render();
 
     var $headerItems = table.header.$container.find('.table-header-item');
     var $headerItem0 = $headerItems.eq(0);
@@ -173,7 +173,7 @@ describe('Column', function() {
     model.rows[0].cells[1].htmlEnabled = true;
 
     var table = helper.createTable(model);
-    table.render(session.$entryPoint);
+    table.render();
 
     var $rows = table.$rows();
     var $cells0 = $rows.eq(0).find('.table-cell');
@@ -192,7 +192,7 @@ describe('Column', function() {
     expect(table.rows[0].cells[0]._cachedEncodedText).toBeFalsy();
 
     spyOn(scout.strings, 'encode').and.callThrough();
-    table.render(session.$entryPoint);
+    table.render();
 
     expect(scout.strings.encode.calls.count()).toBe(6); // header and table cells
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
@@ -202,7 +202,7 @@ describe('Column', function() {
     // re render -> encode must not be called again
     table.remove();
     scout.strings.encode.calls.reset();
-    table.render(session.$entryPoint);
+    table.render();
     expect(scout.strings.encode.calls.count()).toBe(3); // only for header cells
   });
 
@@ -216,7 +216,7 @@ describe('Column', function() {
       model.rows[0].cells[1].htmlEnabled = true;
 
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
 
       var $rows = table.$rows();
       var $cells0 = $rows.eq(0).find('.table-cell');
@@ -238,7 +238,7 @@ describe('Column', function() {
     it('wraps text if column.textWrap and table.multilineText are true', function() {
       table.multilineText = true;
       table.columns[0].textWrap = true;
-      table.render(session.$entryPoint);
+      table.render();
       $rows = table.$rows();
       $cells0 = $rows.eq(0).find('.table-cell');
       $cell0_0 = $cells0.eq(0);
@@ -248,7 +248,7 @@ describe('Column', function() {
     it('does not wrap text if column.textWrap is false and table.multilineText is true', function() {
       table.multilineText = true;
       table.columns[0].textWrap = false;
-      table.render(session.$entryPoint);
+      table.render();
       $rows = table.$rows();
       $cells0 = $rows.eq(0).find('.table-cell');
       $cell0_0 = $cells0.eq(0);
@@ -258,7 +258,7 @@ describe('Column', function() {
     it('does not wrap text if column.textWrap is true and table.multilineText is false', function() {
       table.multilineText = false;
       table.columns[0].textWrap = true;
-      table.render(session.$entryPoint);
+      table.render();
       $rows = table.$rows();
       $cells0 = $rows.eq(0).find('.table-cell');
       $cell0_0 = $cells0.eq(0);

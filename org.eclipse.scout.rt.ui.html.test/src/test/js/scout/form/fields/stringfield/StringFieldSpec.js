@@ -39,13 +39,13 @@ describe("StringField", function() {
   describe("Check if field is switched to password field if inputMasked is true", function() {
     it("set input masked", function() {
       field.inputMasked = true;
-      field.render(session.$entryPoint);
+      field.render();
       expect(field.$field.attr('type')).toBe('password');
     });
 
     it("set input not masked", function() {
       field.inputMasked = false;
-      field.render(session.$entryPoint);
+      field.render();
       expect(field.$field.attr('type')).toBe('text');
     });
 
@@ -53,25 +53,25 @@ describe("StringField", function() {
 
   describe("insertText", function() {
     it("expects empty field at the beginning", function() {
-      field.render(session.$entryPoint);
+      field.render();
       expect(field.$field[0].value).toBe('');
     });
 
     it("inserts text into an empty field", function() {
-      field.render(session.$entryPoint);
+      field.render();
       field.insertText('Test1');
       expect(field.$field[0].value).toBe('Test1');
     });
 
     it("appends text to the previous value (if no text is selected)", function() {
-      field.render(session.$entryPoint);
+      field.render();
       field.insertText('Test1');
       field.insertText('ABC2');
       expect(field.$field[0].value).toBe('Test1ABC2');
     });
 
     it("replaces selection #1 (if part of the text is selected, selection does not start at the beginning)", function() {
-      field.render(session.$entryPoint);
+      field.render();
       field.insertText('Test1');
       field.$field[0].selectionStart = 2;
       field.$field[0].selectionEnd = 4;
@@ -80,7 +80,7 @@ describe("StringField", function() {
     });
 
     it("replaces selection #2 (if part of the text is selected, start at the beginning)", function() {
-      field.render(session.$entryPoint);
+      field.render();
       field.insertText('Test1');
       field.$field[0].selectionStart = 0;
       field.$field[0].selectionEnd = 4;
@@ -89,7 +89,7 @@ describe("StringField", function() {
     });
 
     it("replaces selection #3 (if whole content is selected)", function() {
-      field.render(session.$entryPoint);
+      field.render();
       field.insertText('Test1');
       field.$field[0].select();
       field.insertText('ABC2');
@@ -97,7 +97,7 @@ describe("StringField", function() {
     });
 
     it("sends display text changed to server using accept text", function() {
-      field.render(session.$entryPoint);
+      field.render();
       field.insertText('Test1');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -122,7 +122,7 @@ describe("StringField", function() {
 
     it("sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true", function() {
       field.updateDisplayTextOnModify = true;
-      field.render(session.$entryPoint);
+      field.render();
       var message = {
         events: [createPropertyChangeEvent(field, {
           insertText: 'Test1'
@@ -173,7 +173,7 @@ describe("StringField", function() {
   describe('trim', function() {
     it('should restore selection', function() {
       field.trimText = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val(' foo ');
       field.$field[0].select();
       var selection = field._getSelection();
@@ -195,7 +195,7 @@ describe("StringField", function() {
         longText += 'too big to fail '; // 16 bytes x 3'500 = 56'000 bytes
       }
       field.trimText = true;
-      field.render(session.$entryPoint);
+      field.render();
       field.$field.val(' ' + longText + ' ');
       field.setDisplayText(longText);
       expect(true).toBe(true);

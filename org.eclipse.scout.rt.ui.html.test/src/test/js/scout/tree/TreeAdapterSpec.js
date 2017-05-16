@@ -33,7 +33,7 @@ describe("TreeAdapter", function() {
       var model = helper.createModelFixture(1);
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node = tree.$container.find('.tree-node:first');
       $node.triggerClick();
@@ -50,7 +50,7 @@ describe("TreeAdapter", function() {
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
       tree.checkable = true;
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
         .children('div');
@@ -67,7 +67,7 @@ describe("TreeAdapter", function() {
       var model = helper.createModelFixture(2);
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node0 = tree.nodes[0].$node;
       var $node1 = tree.nodes[1].$node;
@@ -91,7 +91,7 @@ describe("TreeAdapter", function() {
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
       var $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node0 = tree.nodes[0].$node;
       $node0.triggerMouseDown();
@@ -134,7 +134,7 @@ describe("TreeAdapter", function() {
       var model = helper.createModelFixture(1, 1, false);
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node = tree.$container.find('.tree-node:first');
       $node.triggerDoubleClick();
@@ -150,7 +150,7 @@ describe("TreeAdapter", function() {
       var model = helper.createModelFixture(1, 1, false);
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var $node = tree.$container.find('.tree-node:first');
       $node.triggerDoubleClick();
@@ -170,7 +170,7 @@ describe("TreeAdapter", function() {
       var node0 = tree.nodes[0];
       var child0 = node0.childNodes[0];
       var grandchild0 = child0.childNodes[0];
-      tree.render(session.$entryPoint);
+      tree.render();
 
       expect(node0.expanded).toBe(false);
       expect(child0.expanded).toBe(false);
@@ -257,7 +257,7 @@ describe("TreeAdapter", function() {
       var model = helper.createModelFixture(3, 2, true);
       var adapter = helper.createTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var allNodes = [];
       tree._visitNodes(tree.nodes, function(node) {
@@ -415,7 +415,7 @@ describe("TreeAdapter", function() {
       });
 
       it("updates the text of the node", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
         var event = helper.createNodeChangedEvent(model, node0.id);
         event.text = 'new Text';
         var message = {
@@ -504,7 +504,7 @@ describe("TreeAdapter", function() {
       });
 
       it("handles delete, collapse, insert, expand events correctly", function() {
-        tree.render(session.$entryPoint);
+        tree.render();
 
         // Delete child nodes from node0
         var message = {

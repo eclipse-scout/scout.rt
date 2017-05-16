@@ -101,7 +101,7 @@ describe("Planner", function() {
     });
 
     it("deletes resources from html document", function() {
-      planner.render(session.$entryPoint);
+      planner.render();
       expect(find$Resources(planner).length).toBe(3);
 
       planner.deleteResources([resource0]);
@@ -148,7 +148,7 @@ describe("Planner", function() {
     });
 
     it("updates resources in html document", function() {
-      planner.render(session.$entryPoint);
+      planner.render();
       $resource1 = find$Resources(planner).eq(1);
       expect($resource1.children('.resource-title').text()).toBe('resource1');
       expect($resource1[0]).toBe(resource1.$resource[0]);
@@ -163,7 +163,7 @@ describe("Planner", function() {
     });
 
     it("updates activities", function() {
-      planner.render(session.$entryPoint);
+      planner.render();
       $resource1 = find$Resources(planner).eq(1);
       var $activity0 = find$ActivitiesForResource(resource1);
       expect($activity0.text()).toBe('');
@@ -189,7 +189,7 @@ describe("Planner", function() {
     beforeEach(function() {
       model = createPlannerModel(0);
       planner = createPlanner(model);
-      planner.render(session.$entryPoint);
+      planner.render();
       planner.displayModeOptions = {};
     });
 
@@ -531,7 +531,7 @@ describe("Planner", function() {
     beforeEach(function() {
       model = createPlannerModel(0);
       planner = createPlanner(model);
-      planner.render(session.$entryPoint);
+      planner.render();
       planner.displayModeOptions = {};
     });
 

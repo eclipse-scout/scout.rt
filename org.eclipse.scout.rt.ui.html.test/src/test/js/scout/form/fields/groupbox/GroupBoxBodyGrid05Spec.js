@@ -71,7 +71,7 @@ describe("GroupBoxBodyGrid05", function() {
       systemType: scout.Button.SystemType.CLOSE
     }));
     this.groupBox.setProperty('fields', this.fields);
-    this.groupBox.render(session.$entryPoint);
+    this.groupBox.render();
   });
 
   describe('group box layout 05', function() {

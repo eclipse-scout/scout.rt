@@ -30,7 +30,7 @@ describe("scout.tooltips", function() {
       this.addStatus();
     };
     formField.init(model);
-    formField.render(session.$entryPoint);
+    formField.render();
   });
 
   afterEach(function() {

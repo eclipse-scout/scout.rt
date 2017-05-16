@@ -34,7 +34,7 @@ describe("CompactTreeAdapter", function() {
       var model = helper.createModelFixture(2, 1, true);
       var adapter = helper.createCompactTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);
-      tree.render(session.$entryPoint);
+      tree.render();
 
       var nodes = [tree.nodes[0]];
       adapter._onNodesSelected([nodes[0].id]);

@@ -99,7 +99,7 @@ describe("AggregateTableControl", function() {
 
     it("creates an aggregate row", function() {
       prepareTable();
-      table.render(session.$entryPoint);
+      table.render();
 
       expect($aggregateRow(tableControl).length).toBe(1);
     });
@@ -109,7 +109,7 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
-      table.render(session.$entryPoint);
+      table.render();
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCells = $aggrRow.children('.table-cell');
@@ -123,7 +123,7 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
-      table.render(session.$entryPoint);
+      table.render();
       table.changeAggregation(table.columns[1], 'none');
 
       var $aggrRow = $aggregateRow(tableControl);
@@ -137,7 +137,7 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
-      table.render(session.$entryPoint);
+      table.render();
 
       table.addFilter(createFilter(
         function(row) {
@@ -159,7 +159,7 @@ describe("AggregateTableControl", function() {
       column1.decimalFormat = new scout.DecimalFormat(session.locale, {
         pattern: '#.00'
       });
-      table.render(session.$entryPoint);
+      table.render();
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCell = $aggrRow.children('.table-cell').eq(1);
@@ -175,7 +175,7 @@ describe("AggregateTableControl", function() {
       column1.decimalFormat = new scout.DecimalFormat(session.locale, {
         pattern: '#.00'
       });
-      table.render(session.$entryPoint);
+      table.render();
 
       var $aggrRow = $aggregateRow(tableControl);
       var $aggrCell = $aggrRow.children('.table-cell').eq(1);
@@ -206,7 +206,7 @@ describe("AggregateTableControl", function() {
       tcModel.selected = true;
       tableControl = createAggregateTC(createModel(table));
       table._setTableControls([tableControl]);
-      table.render(session.$entryPoint);
+      table.render();
 
       expect(tableControl.enabled).toBe(false);
       expect(tableControl.selected).toBe(false);
@@ -229,7 +229,7 @@ describe("AggregateTableControl", function() {
       tcModel.selected = true;
       tableControl = createAggregateTC(tcModel);
       table._setTableControls([tableControl]);
-      table.render(session.$entryPoint);
+      table.render();
 
       expect(tableControl.enabled).toBe(true);
       expect(tableControl.selected).toBe(true);
@@ -252,7 +252,7 @@ describe("AggregateTableControl", function() {
       tcModel.selected = false;
       tableControl = createAggregateTC(tcModel);
       table._setTableControls([tableControl]);
-      table.render(session.$entryPoint);
+      table.render();
 
       expect(tableControl.enabled).toBe(false);
       expect(tableControl.selected).toBe(false);

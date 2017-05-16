@@ -54,7 +54,7 @@ describe('NumberColumn', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
-        table.render(session.$entryPoint);
+        table.render();
 
         table.setColumnBackgroundEffect(column0, 'colorGradient1');
         expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
@@ -66,7 +66,7 @@ describe('NumberColumn', function() {
         var model = helper.createModelSingleColumnByValues([0, 0.005, 0.006, 0.02], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
-        table.render(session.$entryPoint);
+        table.render();
 
         column0.decimalFormat = new scout.DecimalFormat(locale, {
           pattern: '#.00'
@@ -84,7 +84,7 @@ describe('NumberColumn', function() {
       var table = helper.createTable(model);
       var column0 = table.columns[0];
       table.viewRangeSize = 2;
-      table.render(session.$entryPoint);
+      table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
@@ -103,7 +103,7 @@ describe('NumberColumn', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
-      table.render(session.$entryPoint);
+      table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
       table.deleteRow(table.rows[2]);
@@ -115,7 +115,7 @@ describe('NumberColumn', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
-      table.render(session.$entryPoint);
+      table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
       var row = helper.createModelRowByValues(undefined, 200);
@@ -131,7 +131,7 @@ describe('NumberColumn', function() {
       model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
       var column0 = table.columns[0];
-      table.render(session.$entryPoint);
+      table.render();
 
       // Change row 0 value to 150, row 1 now has the lowest values
       var rows = helper.createModelRows(1, 1);
@@ -150,7 +150,7 @@ describe('NumberColumn', function() {
       var table = helper.createTable(model);
       var column0 = table.columns[0];
 
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
@@ -161,7 +161,7 @@ describe('NumberColumn', function() {
       model.rows[1].cells[0].backgroundColor = 'ff0000';
       var table = helper.createTable(model);
       var column0 = table.columns[0];
-      table.render(session.$entryPoint);
+      table.render();
 
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
       expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
@@ -184,7 +184,7 @@ describe('NumberColumn', function() {
         model.rows[1].cells[0].backgroundColor = 'ff0000';
         var table = helper.createTable(model);
         var column0 = table.columns[0];
-        table.render(session.$entryPoint);
+        table.render();
 
         table.setColumnBackgroundEffect(column0, 'barChart');
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
@@ -197,7 +197,7 @@ describe('NumberColumn', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
-        table.render(session.$entryPoint);
+        table.render();
 
         // initial: No effect
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
@@ -229,7 +229,7 @@ describe('NumberColumn', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
-        table.render(session.$entryPoint);
+        table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
         table.setColumnBackgroundEffect(column0, 'barChart');
@@ -248,7 +248,7 @@ describe('NumberColumn', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
-        table.render(session.$entryPoint);
+        table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
         table.modelAdapter._onColumnBackgroundEffectChanged({
@@ -275,7 +275,7 @@ describe('NumberColumn', function() {
       var model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
-      table.render(session.$entryPoint);
+      table.render();
 
       column0.decimalFormat = new scout.DecimalFormat(locale, {
         pattern: '#.00'

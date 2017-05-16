@@ -29,7 +29,7 @@ describe("RadioButtonGroup", function() {
   describe('enabled', function() {
     it('propagation', function() {
       var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
-      radioButtonGroup.render(session.$entryPoint);
+      radioButtonGroup.render();
 
       expectEnabled(radioButtonGroup, true, true);
       expectEnabled(radioButtonGroup.getFields()[0], true, true);

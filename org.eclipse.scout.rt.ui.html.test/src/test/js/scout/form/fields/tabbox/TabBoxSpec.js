@@ -28,12 +28,12 @@ describe('TabBox', function() {
 
     it('does NOT call layout for the selected tab on initialization', function() {
       spyOn(session.layoutValidator, 'invalidateTree').and.callThrough();
-      tabBox.render(session.$entryPoint);
+      tabBox.render();
       expect(session.layoutValidator.invalidateTree).not.toHaveBeenCalled();
     });
 
     it('must not create LogicalGridData for tab items', function() {
-      tabBox.render(session.$entryPoint);
+      tabBox.render();
       expect(tabBox.tabItems[0].htmlComp.layoutData).toBe(undefined);
     });
 
@@ -59,7 +59,7 @@ describe('TabBox', function() {
       var tabItemA = helper.createTabItem();
       var tabItemB = helper.createTabItem();
       var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
-      tabBox.render(session.$entryPoint);
+      tabBox.render();
 
       // check right/left keys
       expect(tabBox.selectedTab).toBe(tabItemA);

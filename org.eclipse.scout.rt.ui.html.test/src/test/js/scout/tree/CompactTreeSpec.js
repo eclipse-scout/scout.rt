@@ -35,7 +35,7 @@ describe("Compacttree", function() {
       var model = helper.createModelFixture(1);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 1));
-      tree.render(session.$entryPoint);
+      tree.render();
       expect(tree.nodes.length).toBe(1);
     });
 
@@ -43,7 +43,7 @@ describe("Compacttree", function() {
       var model = helper.createModelFixture(1,1, true);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 4));
-      tree.render(session.$entryPoint);
+      tree.render();
       expect(tree.nodes.length).toBe(1);
       expect(tree.visibleNodesFlat.length).toBe(2);
     });
@@ -52,7 +52,7 @@ describe("Compacttree", function() {
       var model = helper.createModelFixture(2,1,true);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
-      tree.render(session.$entryPoint);
+      tree.render();
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(6);
 
@@ -71,7 +71,7 @@ describe("Compacttree", function() {
       var model = helper.createModelFixture(2,1,true);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.deleteNodes([tree.nodes[0].childNodes[0]], tree.nodes[0]);
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(5);
@@ -91,7 +91,7 @@ describe("Compacttree", function() {
       var parent0 = tree.nodes[0];
       var child0 = parent0.childNodes[0];
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.deleteNodes([child0], parent0);
       tree.insertNodes([child0], parent0);
 
@@ -116,7 +116,7 @@ describe("Compacttree", function() {
       var model = helper.createModelFixture(2,1,true);
       var tree = helper.createCompactTree(model);
       spyOn(tree, 'selectNodes');
-      tree.render(session.$entryPoint);
+      tree.render();
 
       tree.nodes[0].childNodes[0].$node.triggerMouseDown();
       expect(tree.selectNodes).toHaveBeenCalled();

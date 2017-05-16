@@ -47,7 +47,7 @@ describe("ContextMenuPopup", function() {
 
       it('clones the given menus and renders the clones', function() {
         var menuItems = [menu];
-        menu.render(session.$entryPoint);
+        menu.render();
         popup = scout.create('ContextMenuPopup', {
           parent: session.desktop,
           session: session,
@@ -71,7 +71,7 @@ describe("ContextMenuPopup", function() {
 
       it('only destroys and removes the clones on popup close', function() {
         var menuItems = [menu];
-        menu.render(session.$entryPoint);
+        menu.render();
 
         popup = scout.create('ContextMenuPopup', {
           parent: session.desktop,

@@ -27,7 +27,7 @@ describe('WrappedForm', function() {
     // Must not contain an indicator to prevent a double indicator if the first field is mandatory too
     it('does not exist', function() {
       var field = createField({mandatory: true});
-      field.render(session.$entryPoint);
+      field.render();
 
       expect(field.$mandatory).toBeUndefined();
     });
@@ -40,7 +40,7 @@ describe('WrappedForm', function() {
       var field = createField({innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(false);
 
-      field.render(session.$entryPoint);
+      field.render();
 
       var $stringField = innerForm.rootGroupBox.fields[0].$field;
       expect(scout.focusUtils.isActiveElement($stringField)).toBe(false);
@@ -53,7 +53,7 @@ describe('WrappedForm', function() {
       var field = createField({initialFocusEnabled: true, innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(true);
 
-      field.render(session.$entryPoint);
+      field.render();
 
       var $stringField = innerForm.rootGroupBox.fields[0].$field;
       expect(scout.focusUtils.isActiveElement($stringField)).toBe(true);

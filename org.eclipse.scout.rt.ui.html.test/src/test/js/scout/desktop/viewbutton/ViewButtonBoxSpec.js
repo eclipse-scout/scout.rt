@@ -21,11 +21,9 @@ describe('ViewButtonBox', function() {
 
     beforeEach(function() {
       viewButtonBox = scout.create('ViewButtonBox', {
-        parent: new scout.NullWidget(),
-        session: session,
+        parent: session.desktop,
         viewButtons: [scout.create('ViewButton', {
-          parent: new scout.NullWidget(),
-          session: session,
+          parent: session.desktop,
           displayStyle: 'MENU',
           visible: true
         })]
@@ -33,25 +31,25 @@ describe('ViewButtonBox', function() {
     });
 
     it('is only visible if there are visible view buttons with displayStyle == "MENU"', function() {
-      viewButtonBox.render(session.$entryPoint);
+      viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(true);
     });
 
     it('is not visible if there are no visible view buttons ith displayStyle == "MENU"', function() {
       viewButtonBox.viewButtons[0].visible = false;
-      viewButtonBox.render(session.$entryPoint);
+      viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
     });
 
     it('is not visible if there are visible view buttons with displayStyle == "TAB"', function() {
       viewButtonBox.viewButtons[0].displayStyle = 'TAB';
-      viewButtonBox.render(session.$entryPoint);
+      viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
     });
 
     it('is not visible if there are no view buttons at all', function() {
       viewButtonBox.viewButtons = [];
-      viewButtonBox.render(session.$entryPoint);
+      viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
     });
 

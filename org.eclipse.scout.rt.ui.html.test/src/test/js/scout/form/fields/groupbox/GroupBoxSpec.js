@@ -96,7 +96,7 @@ describe("GroupBox", function() {
   describe('focus', function() {
     it('focus first focusable field in groupBox', function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
-      groupBox.render(session.$entryPoint);
+      groupBox.render();
       expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(false);
       groupBox.focus();
       expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(true);
@@ -117,7 +117,7 @@ describe("GroupBox", function() {
   describe('enabled', function() {
     it('propagation', function() {
       var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, false, 2);
-      groupBoxWithTwoChildren.render(session.$entryPoint);
+      groupBoxWithTwoChildren.render();
 
       expectEnabled(groupBoxWithTwoChildren, true, true);
       expectEnabled(groupBoxWithTwoChildren.getFields()[0], true, true);

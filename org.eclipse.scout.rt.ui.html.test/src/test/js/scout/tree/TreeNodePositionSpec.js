@@ -46,7 +46,7 @@ describe('TreeNodePosition', function() {
       node1 = helper.createModelNode('0_1', 'node1', 1);
       node2 = helper.createModelNode('0_2', 'node2');
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.insertNodes([node0, node2], rootNode);
       tree.insertNodes([node1], rootNode);
 
@@ -60,7 +60,7 @@ describe('TreeNodePosition', function() {
       node0 = helper.createModelNode('0_0', 'node0');
       var root1 = helper.createModelNode('1', 'root1', 1);
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.insertNodes([root1], null);
       tree.insertNodes([node0], rootNode);
 
@@ -76,7 +76,7 @@ describe('TreeNodePosition', function() {
       node1 = helper.createModelNode('0_1', 'node1');
       node2 = helper.createModelNode('0_2', 'node2');
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.insertNodes([node1, node2], rootNode);
       tree.insertNodes([node0], rootNode);
 
@@ -92,7 +92,7 @@ describe('TreeNodePosition', function() {
       node1 = helper.createModelNode('0_1', 'node1', 1);
       node2 = helper.createModelNode('0_2', 'node2', 2);
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.insertNodes([node0, node1], rootNode);
       tree.insertNodes([node2], rootNode);
 
@@ -116,7 +116,7 @@ describe('TreeNodePosition', function() {
 
       node2 = helper.createModelNode('0_2', 'node2'),
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.insertNodes([node0, node2], rootNode);
       tree.insertNodes([node1], rootNode);
 
@@ -139,7 +139,7 @@ describe('TreeNodePosition', function() {
 
       node1 = helper.createModelNode('1', 'root1', 1);
 
-      tree.render(session.$entryPoint);
+      tree.render();
       tree.insertNodes([node0], rootNode);
       tree.insertNodes([node1], null);
 

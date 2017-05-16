@@ -32,7 +32,7 @@ describe("TableFooterSpec", function() {
       var model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer).not.toBeUndefined();
       var listenerCount = table.events._eventListeners.length;
 
@@ -57,7 +57,7 @@ describe("TableFooterSpec", function() {
       var model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
 
       var controls = [createTableControl()];
       table.setTableControls(controls);
@@ -83,7 +83,7 @@ describe("TableFooterSpec", function() {
       var table = helper.createTable(model);
 
       // Check that status and tooltip is rendered when table is rendered
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
@@ -93,7 +93,7 @@ describe("TableFooterSpec", function() {
       // Check that status and tooltip are re-rendered when table is removed and rendered again
       table.remove();
       expect(table.footer._tableStatusTooltip).toBe(null);
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
@@ -108,7 +108,7 @@ describe("TableFooterSpec", function() {
 
       // Check that tooltip stays hidden when table is removed and rendered again
       table.remove();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip).toBe(null);
       expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
@@ -124,7 +124,7 @@ describe("TableFooterSpec", function() {
 
       // Check that tooltip stays visible when table is removed and rendered again
       table.remove();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
@@ -142,7 +142,7 @@ describe("TableFooterSpec", function() {
       var table = helper.createTable(model);
 
       // Check that status and tooltip is rendered when table is rendered
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
@@ -158,7 +158,7 @@ describe("TableFooterSpec", function() {
 
       // Check that tooltip is not rendered automatically when table is removed and rendered again
       table.remove();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip).toBe(null);
       expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
@@ -180,7 +180,7 @@ describe("TableFooterSpec", function() {
 
       // Check that tooltip is not rendered automatically when table is removed and rendered again
       table.remove();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip).toBe(null);
       expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
@@ -198,7 +198,7 @@ describe("TableFooterSpec", function() {
       expect(table.tableStatus.uiState).toBe(undefined);
 
       // Check visible
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.tableStatus.uiState).toBe('auto-hidden'); // because auto-removal is already scheduled at INFO level
 
@@ -221,7 +221,7 @@ describe("TableFooterSpec", function() {
       expect(table.tableStatus.uiState).toBe(undefined);
 
       // Check visible
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
       expect(table.tableStatus.uiState).toBe(undefined);
 

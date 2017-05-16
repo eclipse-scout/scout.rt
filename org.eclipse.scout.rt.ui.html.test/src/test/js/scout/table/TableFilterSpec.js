@@ -83,7 +83,7 @@ describe("TableFilter", function() {
 
       var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.filteredRows().length).toBe(1);
 
       var rows = helper.createModelRows(2, 1);
@@ -123,7 +123,7 @@ describe("TableFilter", function() {
       expect(table.rows[2].filterAccepted).toBe(false);
       expect(table.rows[2].$row).toBeFalsy();
 
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.rows[2].$row).toBeFalsy();
     });
 
@@ -138,7 +138,7 @@ describe("TableFilter", function() {
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.filteredRows().length).toBe(1);
       expect(table.rows[0].$row).toBeFalsy();
       expect(table.rows[1].$row).toBeTruthy();
@@ -204,7 +204,7 @@ describe("TableFilter", function() {
       expect(table.rows[0].$row).toBeFalsy();
       expect(table.rows[1].$row).toBeFalsy();
 
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.rows[0].$row).toBeFalsy();
       expect(table.rows[1].$row).toBeFalsy();
     });
@@ -218,7 +218,7 @@ describe("TableFilter", function() {
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.filteredRows().length).toBe(1);
 
       // insert new row -> not visible
@@ -252,7 +252,7 @@ describe("TableFilter", function() {
       // Filter active
       var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
-      table.render(session.$entryPoint);
+      table.render();
       expect(table._filterCount()).toBe(1);
       expect(table.rows.length).toBe(2);
       expect(table.filteredRows().length).toBe(1);
@@ -287,7 +287,7 @@ describe("TableFilter", function() {
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['1_0', '3_0']);
       table.filter();
-      table.render(session.$entryPoint);
+      table.render();
 
       expect(table.rows.length).toBe(7);
       expect(table.filteredRows().length).toBe(2);
@@ -308,7 +308,7 @@ describe("TableFilter", function() {
         column0 = table.columns[0],
         row1 = table.rows[1];
 
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.$emptyData).toBeUndefined();
 
       var filter = createAndRegisterColumnFilter(table, column0, ['asdf']);
@@ -337,7 +337,7 @@ describe("TableFilter", function() {
         table = helper.createTable(model),
         column0 = table.columns[0];
 
-      table.render(session.$entryPoint);
+      table.render();
       table.selectAll();
       expect(table.selectedRows.length).toBe(2);
 
@@ -356,7 +356,7 @@ describe("TableFilter", function() {
 
       var filter = createAndRegisterColumnFilter(table, column0, ['1_0', '2_0']);
       table.filter();
-      table.render(session.$entryPoint);
+      table.render();
       table.selectAll();
       expect(table.selectedRows.length).toBe(2);
       expect(table.selectedRows[0]).toBe(table.rows[1]);
@@ -378,7 +378,7 @@ describe("TableFilter", function() {
         column0 = model.columns[0],
         rows = table.rows;
       table._animationRowLimit = 0;
-      table.render(session.$entryPoint);
+      table.render();
 
       var $rows = table.$rows();
       var $row0 = $rows.eq(0);
@@ -461,7 +461,7 @@ describe("TableFilter", function() {
           table = helper.createTable(model),
           column0 = table.columns[0];
 
-        table.render(session.$entryPoint);
+        table.render();
 
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
@@ -491,7 +491,7 @@ describe("TableFilter", function() {
           table = helper.createTable(model),
           column0 = table.columns[0];
 
-        table.render(session.$entryPoint);
+        table.render();
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
@@ -511,7 +511,7 @@ describe("TableFilter", function() {
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
-        table.render(session.$entryPoint);
+        table.render();
 
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
@@ -533,7 +533,7 @@ describe("TableFilter", function() {
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
-        table.render(session.$entryPoint);
+        table.render();
         expect(table.filteredRows().length).toBe(1);
 
         spyOn(listener, '_onRowsFiltered');
@@ -562,7 +562,7 @@ describe("TableFilter", function() {
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
-        table.render(session.$entryPoint);
+        table.render();
         expect(table.filteredRows().length).toBe(1);
 
         spyOn(listener, '_onRowsFiltered');
@@ -582,7 +582,7 @@ describe("TableFilter", function() {
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
-        table.render(session.$entryPoint);
+        table.render();
         expect(table.filteredRows().length).toBe(1);
 
         spyOn(listener, '_onRowsFiltered');
@@ -602,7 +602,7 @@ describe("TableFilter", function() {
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
-        table.render(session.$entryPoint);
+        table.render();
 
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
@@ -624,7 +624,7 @@ describe("TableFilter", function() {
           table = adapter.createWidget(model, session.desktop),
           column0 = table.columns[0];
 
-        table.render(session.$entryPoint);
+        table.render();
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();

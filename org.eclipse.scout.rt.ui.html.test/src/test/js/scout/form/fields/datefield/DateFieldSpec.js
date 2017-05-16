@@ -47,7 +47,7 @@ describe("DateField", function() {
 
   function createFieldAndFocusAndOpenPicker(modelProperties) {
     var dateField = createField(modelProperties);
-    dateField.render(session.$entryPoint);
+    dateField.render();
 
     dateField.$dateField.focus();
     jasmine.clock().tick(101);
@@ -89,7 +89,7 @@ describe("DateField", function() {
 
     it("opens the datepicker", function() {
       var dateField = createField();
-      dateField.render(session.$entryPoint);
+      dateField.render();
       expect(findPicker().length).toBe(0);
 
       dateField.$dateField.triggerMouseDown();
@@ -106,7 +106,7 @@ describe("DateField", function() {
       model.hasDate = true;
       model.hasTime = true;
       var dateField = createField(model);
-      dateField.render(session.$entryPoint);
+      dateField.render();
       dateField.dateDisplayText = '14.04.2016';
       dateField.timeDisplayText = '12:28';
       expect(dateField.$dateField.val()).toBe('14.04.2016');
@@ -120,7 +120,7 @@ describe("DateField", function() {
       model.hasDate = true;
       model.hasTime = true;
       var dateField = createField(model);
-      dateField.render(session.$entryPoint);
+      dateField.render();
 
       dateField.setDisplayText('');
       expect(dateField.dateDisplayText).toBe('');
@@ -541,7 +541,7 @@ describe("DateField", function() {
         model.hasTime = true;
 
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerMouseDown();
         expect(findPicker().length).toBe(1);
@@ -564,7 +564,7 @@ describe("DateField", function() {
         var model = createModel();
         model.touch = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -578,7 +578,7 @@ describe("DateField", function() {
         model.touch = true;
         model.hasTime = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$timeField.triggerClick();
         expect(dateField.popup).toBe(undefined);
@@ -590,7 +590,7 @@ describe("DateField", function() {
         var model = createModel();
         model.touch = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -603,7 +603,7 @@ describe("DateField", function() {
         var model = createModel();
         model.touch = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -620,7 +620,7 @@ describe("DateField", function() {
         var model = createModel();
         model.touch = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -636,7 +636,7 @@ describe("DateField", function() {
         var model = createModel();
         model.touch = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -654,7 +654,7 @@ describe("DateField", function() {
         model.touch = true;
         model.hasTime = true;
         var dateField = createField(model);
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -683,7 +683,7 @@ describe("DateField", function() {
           timestamp: '2012-07-01',
           displayText: '01.07.2012'
         });
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         expect(dateField.$dateField.text()).toBe(dateField.displayText);
         dateField.$dateField.triggerClick();
@@ -697,7 +697,7 @@ describe("DateField", function() {
         var dateField = createField({
           touch: true
         });
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         // Open
         dateField.$dateField.triggerClick();
@@ -723,7 +723,7 @@ describe("DateField", function() {
           timestamp: '2012-07-01',
           displayText: '01.07.2012'
         });
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
@@ -743,7 +743,7 @@ describe("DateField", function() {
           timestamp: '2012-07-01',
           displayText: '01.07.2012'
         });
-        dateField.render(session.$entryPoint);
+        dateField.render();
 
         // Open and check display text
         dateField.$dateField.triggerClick();

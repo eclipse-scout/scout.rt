@@ -45,7 +45,7 @@ describe('SmartField', function() {
     });
 
     it('does not call _openProposal() when TAB, CTRL or ALT has been pressed', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField._openProposal = function(displayText, selectCurrentValue) {};
 
       var keyEvents = [
@@ -70,7 +70,7 @@ describe('SmartField', function() {
     });
 
     it('calls _openProposal() when a character key has been pressed', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField._browseOnce = true;
       smartField._openProposal = function(displayText, selectCurrentValue) {};
       var event = {
@@ -91,7 +91,7 @@ describe('SmartField', function() {
     });
 
     it('must reset _requestProposal property', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       expect(smartField._requestedProposal).toBe(false);
       smartField._openProposal(true);
       expect(smartField._requestedProposal).toBe(true);
@@ -107,7 +107,7 @@ describe('SmartField', function() {
 
     beforeEach(function() {
       smartField = createSmartFieldWithAdapter();
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField.$field.val('foo');
       smartField.remoteHandler = function(event, delay) {
         events[0] = event;
@@ -157,14 +157,14 @@ describe('SmartField', function() {
     });
 
     it('must set displayText', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField.$field.val('foo');
       smartField._acceptProposal();
       expect(smartField.displayText).toBe('foo');
     });
 
     it('must call clearTimeout() for pending typedProposal events', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField._sendTimeoutId = null;
       smartField.$field.val('bar');
       smartField._proposalTyped();
@@ -174,7 +174,7 @@ describe('SmartField', function() {
     });
 
     it('dont send _acceptProposal when displayText has not changed', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField._oldDisplayText = 'foo';
       smartField.$field.val('foo');
       smartField._acceptProposal();
@@ -184,7 +184,7 @@ describe('SmartField', function() {
     });
 
     it('send _acceptProposal when displayText has changed', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField._oldDisplayText = 'foo';
       smartField.$field.val('bar');
       smartField._acceptProposal();
@@ -201,7 +201,7 @@ describe('SmartField', function() {
 
     // test for ticket #168652
     it('send deleteProposal when displayText has been deleted quickly', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField._oldDisplayText = 'foo';
       smartField.$field.val('');
       smartField.proposalChooser = {}; // fake proposal-chooser is open
@@ -228,7 +228,7 @@ describe('SmartField', function() {
       linkWidgetAndAdapter(proposalChooser, 'ProposalChooserAdapter');
 
       smartField.touch = true;
-      smartField.render(session.$entryPoint);
+      smartField.render();
       smartField.$field.click();
       smartField.modelAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
@@ -264,7 +264,7 @@ describe('SmartField', function() {
         session: session
       });
       smartField.touch = true;
-      smartField.render(session.$entryPoint);
+      smartField.render();
       expect(smartField.popup.rendered).toBe(true);
       expect(smartField.popup._$widgetContainer.has(smartField.proposalChooser.$container));
       expect($('.touch-popup').length).toBe(1);
@@ -280,7 +280,7 @@ describe('SmartField', function() {
       });
       smartField.touch = true;
       smartField.displayText = 'row 1';
-      smartField.render(session.$entryPoint);
+      smartField.render();
 
       smartField.$field.triggerClick();
       expect(smartField.popup.rendered).toBe(true);
@@ -368,7 +368,7 @@ describe('SmartField', function() {
         lookupCall: lookupCall
       });
       var smartField = scout.create('SmartField', model);
-      smartField.render(session.$entryPoint);
+      smartField.render();
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
       expect(smartField.value).toBe(1);
@@ -381,7 +381,7 @@ describe('SmartField', function() {
         lookupCall: lookupCall
       });
       var smartFieldMultiline = scout.create('SmartFieldMultiline', model);
-      smartFieldMultiline.render(session.$entryPoint);
+      smartFieldMultiline.render();
       expect(smartFieldMultiline.displayText).toBe('');
       smartFieldMultiline.setValue(1);
       expect(smartFieldMultiline.value).toBe(1);
@@ -398,7 +398,7 @@ describe('SmartField', function() {
       smartField = createSmartFieldWithAdapter();
     });
     it('is also rendered if it is empty', function() {
-      smartField.render(session.$entryPoint);
+      smartField.render();
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
       expect(smartField.value).toBe(1);

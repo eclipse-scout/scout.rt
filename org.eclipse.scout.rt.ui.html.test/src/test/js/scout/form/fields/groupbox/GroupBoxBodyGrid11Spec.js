@@ -93,7 +93,7 @@ describe("GroupBoxBodyGrid11", function() {
       systemType: scout.Button.SystemType.CANCEL
     }));
     this.groupBox.setProperty('fields', this.fields);
-    this.groupBox.render(session.$entryPoint);
+    this.groupBox.render();
   });
 
   describe('group box layout 11', function() {

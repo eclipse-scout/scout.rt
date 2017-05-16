@@ -27,7 +27,7 @@ describe('TabItem', function() {
     });
 
     it('invalidates tabarea if status visibility changes', function() {
-      tabBox.render(session.$entryPoint);
+      tabBox.render();
       tabBox.validateLayout();
       expect(scout.HtmlComponent.get(tabBox._$tabArea).valid).toBe(true);
       expect(tabBox.tabItems[0]._computeStatusVisible()).toBe(false);
@@ -46,7 +46,7 @@ describe('TabItem', function() {
     beforeEach(function() {
       tabItem = helper.createTabItem({cssClass: 'foo1'});
       var tabBox = helper.createTabBoxWith([tabItem]);
-      tabBox.render(session.$entryPoint);
+      tabBox.render();
     });
 
     it('adds CSS class to both, TabItem and GroupBox', function() {

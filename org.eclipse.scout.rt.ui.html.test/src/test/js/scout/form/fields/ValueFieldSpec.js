@@ -45,7 +45,7 @@ describe('ValueField', function() {
       var menu0 = menuHelper.createMenu(menuHelper.createModel());
       formField.menus = [menu0];
       formField.menusVisible = true;
-      formField.render(session.$entryPoint);
+      formField.render();
       expect(formField.$status.isVisible()).toBe(true);
 
       formField.setProperty('menusVisible', false);
@@ -425,7 +425,7 @@ describe('ValueField', function() {
       menu2.visible = false;
       formField.menus = [menu1, menu2];
       formField.menusVisible = true;
-      formField.render(session.$entryPoint);
+      formField.render();
 
       formField.$status.triggerContextMenu();
 
@@ -443,7 +443,7 @@ describe('ValueField', function() {
       menu2.menuTypes = ['ValueField.Null'];
       formField.menus = [menu1, menu2];
       formField.menusVisible = true;
-      formField.render(session.$entryPoint);
+      formField.render();
 
       formField.currentMenuTypes = ['Null'];
       formField.$status.triggerContextMenu();
@@ -474,7 +474,7 @@ describe('ValueField', function() {
       menu1.menuTypes = ['ValueField.Null', 'ValueField.NotNull'];
       formField.menus = [menu1];
       formField.menusVisible = true;
-      formField.render(session.$entryPoint);
+      formField.render();
 
       formField.$field.focus();
       formField.$field.val('abc123contextmenu');

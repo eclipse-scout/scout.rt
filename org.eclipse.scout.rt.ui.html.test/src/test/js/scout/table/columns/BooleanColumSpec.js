@@ -35,7 +35,7 @@ describe('BooleanColumn', function() {
       var table = helper.createTable(model);
       expect(table.columns.length).toBe(3);
 
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.columns[0] instanceof scout.BooleanColumn).toBeTruthy();
     });
 
@@ -46,7 +46,7 @@ describe('BooleanColumn', function() {
       var table = helper.createTable(model);
       expect(table.columns.length).toBe(2);
 
-      table.render(session.$entryPoint);
+      table.render();
       expect(table.columns[0] instanceof scout.BooleanColumn).toBeFalsy();
     });
 
@@ -54,7 +54,7 @@ describe('BooleanColumn', function() {
       var model = helper.createModelFixture(2);
       model.checkable = true;
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
 
       expect(table.checkableColumn).not.toBeUndefined();
       expect(table.checkableColumn).toBe(table.columns[0]);
@@ -66,7 +66,7 @@ describe('BooleanColumn', function() {
       model.rows[0].checked = true;
       model.rows[1].checked = false;
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
       var $rows = table.$rows();
       var $checkbox = table.columns[0].$checkBox($rows.eq(0));
       expect($checkbox).toHaveClass('checked');
@@ -84,7 +84,7 @@ describe('BooleanColumn', function() {
       model.rows[0].cells[0].value = true;
       model.rows[1].cells[0].value = false;
       var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+      table.render();
       var $rows = table.$rows();
       var $checkbox = table.columns[0].$checkBox($rows.eq(0));
       expect($checkbox).toHaveClass('checked');
