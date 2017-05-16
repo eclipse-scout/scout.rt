@@ -77,11 +77,4 @@ public interface IMomImplementor extends IMom {
    *          property {@link #CONNECTION_FACTORY}.
    */
   void init(Map<Object, Object> properties) throws Exception; // NOSONAR
-
-  /**
-   * @return <code>true</code> if underlying implementation is initialized and ready. Return <code>false</code> for
-   *         example if an underlying connection is interrupted.
-   */
-  boolean isReady();
-
 }

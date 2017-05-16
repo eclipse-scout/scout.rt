@@ -6,7 +6,8 @@ package org.eclipse.scout.rt.server.mom;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.mom.api.IMomTransport;
+import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
+import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.healthcheck.AbstractHealthChecker;
 
@@ -15,7 +16,13 @@ import org.eclipse.scout.rt.server.commons.healthcheck.AbstractHealthChecker;
  */
 public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
 
-  protected abstract Class<? extends IMomTransport> getConfiguredMomClass();
+  protected abstract Class<? extends AbstractMomTransport> getConfiguredMomClass();
+
+  /**
+   * @param implementor
+   *          {@link IMomImplementor} from {@link AbstractMomTransport#getImplementor()}
+   */
+  protected abstract boolean execCheckHealth(IMomImplementor implementor) throws Exception;
 
   private final boolean m_isActive;
 
@@ -29,7 +36,7 @@ public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
   }
 
   protected boolean initializeActive() {
-    IMomTransport momTransport = BEANS.opt(getConfiguredMomClass());
+    AbstractMomTransport momTransport = BEANS.opt(getConfiguredMomClass());
     return momTransport != null && !momTransport.isNullTransport();
   }
 
@@ -40,8 +47,11 @@ public abstract class AbstractMomHealthChecker extends AbstractHealthChecker {
 
   @Override
   protected boolean execCheckHealth() throws Exception {
-    IMomTransport momTransport = BEANS.get(getConfiguredMomClass());
-    return momTransport.isReady();
+    IMomImplementor implementor = BEANS.get(getConfiguredMomClass()).getImplementor();
+    if (implementor == null) {
+      return false;
+    }
+    return execCheckHealth(implementor);
   }
 
 }

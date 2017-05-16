@@ -54,7 +54,6 @@ public abstract class AbstractMomTransport implements IMomTransport {
    * Unlike the other methods on this class, this method can be called <b>without</b> triggering the initialization of
    * the delegate.
    */
-  @Override
   public boolean isNullTransport() {
     final Class<? extends IMomImplementor> implementorClass = getConfiguredImplementor();
     return implementorClass == null || NullMomImplementor.class.isAssignableFrom(implementorClass);
@@ -123,12 +122,8 @@ public abstract class AbstractMomTransport implements IMomTransport {
     return m_delegate.get();
   }
 
-  @Override
-  public boolean isReady() {
-    if (!m_delegate.isSet()) {
-      return false;
-    }
-    return m_delegate.get().isReady();
+  public IMomImplementor getImplementor() {
+    return m_delegate.get();
   }
 
   @Override
