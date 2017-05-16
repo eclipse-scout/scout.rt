@@ -137,18 +137,18 @@ scout.installGlobalMouseDownInterceptor = function(myDocument) {
 };
 
 /**
- * Shortcut for scout.Widget.getWidgetFor().
- *
- * If the argument is a string or a number, this function will try to find the widget via
- * DOM by looking for an element with the "data-id" attribute equal to the specified argument.
+ * Resolves the widget using the given widget id or HTML element.
+ * <p>
+ * If the argument is a string or a number, it will search the widget hierarchy for the given id using Widget#widget(id).
+ * If the argument is a HTML or jQuery element, it will use scout.Widget#getWidgetFor() to get the widget which belongs to the given element.
  *
  * @param widgetIdOrElement
  *          a widget ID or a HTML or jQuery element
- * @param partId
+ * @param [partId]
  *          partId of the session the widget belongs to (optional, only relevant if the
- *          argument is a widget ID)
+ *          argument is a widget ID). If omitted, the first session is used.
  * @returns
- *          the widget for the given element
+ *          the widget for the given element or id
  */
 scout.widget = function(widgetIdOrElement, partId) {
   if (scout.objects.isNullOrUndefined(widgetIdOrElement)) {
@@ -156,11 +156,11 @@ scout.widget = function(widgetIdOrElement, partId) {
   }
   var $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
-    // Find $element for ID
+    // Find widget for ID
     var session = scout.getSession(partId);
-    if (session && session.$entryPoint) {
-      var selector = '[data-id="' + (widgetIdOrElement + '').replace('"', '\\"') + '"]';
-      $elem = session.$entryPoint.find(selector).addBack(selector);
+    if (session) {
+      widgetIdOrElement = scout.strings.asString(widgetIdOrElement);
+      return session.root.widget(widgetIdOrElement);
     }
   }
   return scout.Widget.getWidgetFor($elem);
