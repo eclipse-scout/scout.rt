@@ -21,20 +21,19 @@ scout.HeaderTabBoxController = function(bench, tabArea) {
   this.bench = bench;
 
   // event listeners
-  this._tabBoxChangedHandler = this._onViewsChanged.bind(this);
+  this._viewsChangedHandler = this._onViewsChanged.bind(this);
 
   scout.HeaderTabBoxController.parent.call(this, bench.getTabBox('C'), tabArea);
 
   this.tabAreaCenter = bench.getTabBox('C').tabArea;
-  this.tabAreaInHeader;
-
+  this.tabAreaInHeader = false;
 };
 scout.inherits(scout.HeaderTabBoxController, scout.SimpleTabBoxController);
 
 scout.HeaderTabBoxController.prototype._installListeners = function() {
   scout.HeaderTabBoxController.parent.prototype._installListeners.call(this);
-  this.bench.on('viewAdded', this._tabBoxChangedHandler);
-  this.bench.on('viewRemoved', this._tabBoxChangedHandler);
+  this.bench.on('viewAdded', this._viewsChangedHandler);
+  this.bench.on('viewRemoved', this._viewsChangedHandler);
 };
 
 scout.HeaderTabBoxController.prototype._onViewsChanged = function() {
@@ -50,19 +49,14 @@ scout.HeaderTabBoxController.prototype._onViewsChanged = function() {
 };
 
 scout.HeaderTabBoxController.prototype._setViewTabAreaInHeader = function(inHeader) {
-  if (this.tabAreaInHeader === inHeader) {
-    return;
-  }
   this.tabAreaInHeader = inHeader;
   this.tabAreaCenter.setVisible(!inHeader);
   this.tabArea.setVisible(inHeader);
 };
 
-
 scout.HeaderTabBoxController.prototype.getTabs = function() {
-  if(this.tabAreaInHeader){
+  if (this.tabAreaInHeader) {
     return this.tabArea.getTabs();
   }
   return this.tabAreaCenter.getTabs();
-
 };

@@ -51,13 +51,13 @@ scout.DesktopFormController.prototype._renderViews = function() {
       this._activateView(selectedView);
     }.bind(this));
   }
+
   // ensure in all view stacks the last view is activated
   if (this.desktop.bench) {
     this.desktop.bench.postRender();
     // ensure layout is done before continuing rendering dialogs.
     this.desktop.bench.htmlComp.validateLayoutTree();
   }
-
 };
 
 /**

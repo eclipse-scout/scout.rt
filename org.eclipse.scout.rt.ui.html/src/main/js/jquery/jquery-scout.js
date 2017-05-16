@@ -399,19 +399,14 @@ $.fn.makeElement = function(element, cssClass, text) {
  * @param text (optional) string used as inner text
  */
 $.fn.makeDiv = function(cssClass, text) {
-  var unselectable,
-    $div = this.makeElement('<div>', cssClass, text);
+  var $div = this.makeElement('<div>', cssClass, text);
 
-  if (scout.device) {
-    unselectable = scout.device.unselectableAttribute;
-  } else {
-    // scout.device may not be initialized yet (e.g. before app is created or if app bootstrap fails)
-    unselectable = scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
-  }
-
+  // scout.device may not be initialized yet (e.g. before app is created or if app bootstrap fails)
+  var unselectable = (scout.device ? scout.device.unselectableAttribute : scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE);
   if (unselectable.key) {
     $div.attr(unselectable.key, unselectable.value);
   }
+
   return $div;
 };
 

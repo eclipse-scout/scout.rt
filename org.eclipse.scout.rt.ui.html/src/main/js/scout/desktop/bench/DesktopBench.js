@@ -237,7 +237,6 @@ scout.DesktopBench.prototype.postRender = function() {
   this.columns.forEach(function(column) {
     column.postRender();
   });
-
 };
 
 scout.DesktopBench.prototype.setChanging = function(changing) {
