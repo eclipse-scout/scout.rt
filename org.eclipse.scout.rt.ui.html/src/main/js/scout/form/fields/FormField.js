@@ -55,6 +55,7 @@ scout.FormField = function() {
   this._addCloneProperties(['displayText']);
   this.mode = scout.FormField.MODE_DEFAULT;
   this.touched = false;
+  this.tooltipText = null;
   this.requiresSave = false;
   this.empty = true;
   this.preventInitialFocus = false;
@@ -109,7 +110,7 @@ scout.FormField.prototype._createLoadingSupport = function() {
 
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
-  this.resolveTextKeys(['label']);
+  this.resolveTextKeys(['label', 'tooltipText']);
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);
   this._setErrorStatus(this.errorStatus);
