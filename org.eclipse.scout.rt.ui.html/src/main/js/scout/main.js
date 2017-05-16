@@ -61,6 +61,7 @@ scout.nvl = function() {
  * to the function. Throws an Error when value is not set.
  *
  * @param type (optional) if this parameter is set, the given value must be of this type (instanceof check)
+ * @return the value (for direct assignment)
  */
 scout.assertParameter = function(parameterName, value, type) {
   if (scout.objects.isNullOrUndefined(value)) {
@@ -69,6 +70,7 @@ scout.assertParameter = function(parameterName, value, type) {
   if (type && !(value instanceof type)) {
     throw new Error('Parameter \'' + parameterName + '\' has wrong type');
   }
+  return value;
 };
 
 /**
