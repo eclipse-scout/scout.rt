@@ -56,18 +56,21 @@ scout.NumberColumnUserFilter.prototype.filterFieldsTitle = function() {
 scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from', 0);
   this.numberFromField.decimalFormat = this.column.decimalFormat;
-  this.numberFromField.setDisplayText(this.numberFrom);
-  this.numberFromField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
+  this.numberFromField.setValue(this.numberFrom);
+  this.numberFromField.on('propertyChange', this._onPropertyChange.bind(this));
 
   this.numberToField = groupBox.addFilterField('NumberField', 'ui.to', 1);
   this.numberToField.decimalFormat = this.column.decimalFormat;
-  this.numberToField.setDisplayText(this.numberTo);
-  this.numberToField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
+  this.numberToField.setValue(this.numberTo);
+  this.numberToField.on('propertyChange', this._onPropertyChange.bind(this));
 };
 
-scout.NumberColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  this.numberFrom = this.numberFromField.parse();
-  this.numberTo = this.numberToField.parse();
-  $.log.debug('(NumberColumnUserFilter#_onDisplayTextChanged) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
+scout.NumberColumnUserFilter.prototype._onPropertyChange = function(event) {
+  if (event.name !== 'value') {
+    return;
+  }
+  this.numberFrom = this.numberFromField.value;
+  this.numberTo = this.numberToField.value;
+  $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
 };

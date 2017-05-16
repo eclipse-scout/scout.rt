@@ -18,7 +18,7 @@
  *   <li>%</li>
  * </ul>
  */
-scout.DecimalFormat = function(locale, decimalFormatConfiguration) {
+scout.DecimalFormat = function(locale, options) {
   // format function will use these (defaults)
   this.positivePrefix = '';
   this.positiveSuffix = '';
@@ -31,10 +31,13 @@ scout.DecimalFormat = function(locale, decimalFormatConfiguration) {
   this.zeroAfter = 0;
   this.allAfter = 0;
 
-  decimalFormatConfiguration = decimalFormatConfiguration || {};
-  this.pattern = decimalFormatConfiguration.pattern || locale.decimalFormatPatternDefault;
-  this.multiplier = decimalFormatConfiguration.multiplier || 1;
-  this.roundingMode = decimalFormatConfiguration.roundingMode || scout.numbers.RoundingMode.HALF_UP;
+  if (typeof options === 'string') {
+    this.pattern = options;
+  }
+  options = options || {};
+  this.pattern = this.pattern || options.pattern || locale.decimalFormatPatternDefault;
+  this.multiplier = options.multiplier || 1;
+  this.roundingMode = options.roundingMode || scout.numbers.RoundingMode.HALF_UP;
 
   var SYMBOLS = scout.DecimalFormat.PATTERN_SYMBOLS;
   // Check if there are separate subpatterns for positive and negative numbers ("PositivePattern;NegativePattern")
@@ -121,10 +124,7 @@ scout.DecimalFormat.prototype.parse = function(numberString) {
   if (scout.strings.empty(numberString)) {
     return null;
   }
-  var pureNumber = numberString
-    .replace(new RegExp('[' + this.groupingChar + ']', 'g'), '')
-    .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.')
-    .replace(/\s/g, '');
+  var pureNumber = this.normalize(numberString);
   var number = Number(pureNumber);
   if (isNaN(number)) {
     throw new Error(numberString + ' is not a number (NaN)');
@@ -207,6 +207,19 @@ scout.DecimalFormat.prototype.round = function(number, applyMultiplier) {
     number /= this.multiplier;
   }
   return number;
+};
+
+/**
+ * Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
+ */
+scout.DecimalFormat.prototype.normalize = function(numberString) {
+  if (!numberString) {
+    return numberString;
+  }
+  return numberString
+    .replace(new RegExp('[' + this.groupingChar + ']', 'g'), '')
+    .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.')
+    .replace(/\s/g, '');
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

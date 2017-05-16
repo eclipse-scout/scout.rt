@@ -16,13 +16,24 @@ scout.ValueField = function() {
   scout.ValueField.parent.call(this);
   this.displayText = null;
   this.initialValue = null;
+  this.invalidValueMessageKey = 'InvalidValueMessageX';
   this.value = null;
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
 scout.ValueField.prototype._init = function(model) {
   scout.ValueField.parent.prototype._init.call(this, model);
-  this._setValue(this.value);
+  this._initValue(this.value);
+};
+
+/**
+ * Override this method if you need to influence the value initialization (e.g. do something before the value is initially set)
+ */
+scout.ValueField.prototype._initValue = function(value) {
+  // Delete value first, value may be invalid and must not be set
+  this.value = null;
+  this._setValue(value);
+  this._updateEmpty();
 };
 
 scout.ValueField.prototype._renderProperties = function() {
@@ -71,15 +82,54 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
     if (!whileTyping) {
       this.parseAndSetValue(displayText);
     }
-    this._triggerDisplayTextChanged(displayText, whileTyping);
+    // Display text may be formatted -> Use this.displayText
+    this._triggerDisplayTextChanged(this.displayText, whileTyping);
   }
 };
 
 scout.ValueField.prototype.parseAndSetValue = function(displayText) {
-  var parsedValue = this._parseValue(displayText);
-  this.setValue(parsedValue);
+  this.setErrorStatus(null);
+  try {
+    var event = new scout.Event({
+      displayText: displayText
+    });
+    this.trigger('parse', event);
+    if (!event.defaultPrevented) {
+      var parsedValue = this._parseValue(displayText);
+      this.setValue(parsedValue);
+    }
+  } catch(error) {
+    this._parsingFailed(displayText, error);
+  }
 };
 
+scout.ValueField.prototype._parsingFailed = function(displayText, error) {
+  $.log.debug('Parsing failed for field with id ' + this.id, error);
+  var event = new scout.Event({
+    displayText: displayText,
+    error: error
+  });
+  this.trigger('parseerror', event);
+  if (!event.defaultPrevented) {
+    var status = this._createParsingFailedStatus(displayText, error);
+    this.setErrorStatus(status);
+  }
+};
+
+scout.ValueField.prototype._createParsingFailedStatus = function(displayText, error) {
+  return this._createInvalidValueStatus(displayText, error);
+};
+
+/**
+ * Resets the value to its initial value.
+ */
+scout.ValueField.prototype.resetValue = function() {
+  this.setValue(this.initialValue);
+};
+
+/**
+ * @throws a message, a scout.Status or an error if the parsing fails
+ */
 scout.ValueField.prototype._parseValue = function(displayText) {
   // TODO [7.0] awe: this impl. is far too simple. Check how it is done in Java Scout, also discuss with A.SA
   // TODO [7.0] awe: check what happens when server does execFormatValue: abc -> ABC. Could this possibly
@@ -122,14 +172,23 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
 };
 
-// TODO [7.0] awe: check fields like DateField where setTimestamp is used instead of setValue
 scout.ValueField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
 
 scout.ValueField.prototype._setValue = function(value) {
   var oldValue = this.value;
-  this.value = this._validateValue(value);
+  if (this.initialized) {
+    this.setErrorStatus(null);
+  }
+
+  try {
+    this.value = this._validateValue(value);
+  } catch(error) {
+    this._validationFailed(value, error);
+    return;
+  }
+
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
@@ -138,6 +197,34 @@ scout.ValueField.prototype._setValue = function(value) {
   if (this.initialized || scout.objects.isNullOrUndefined(this.displayText)) {
     this._updateDisplayText();
   }
+};
+
+scout.ValueField.prototype._validationFailed = function(value, error) {
+  $.log.debug('Validation failed for field with id ' + this.id, error);
+  if (!this.initialized && this.errorStatus) {
+    // Don't override the error status specified by the init model
+    return;
+  }
+  var status = this._createValidationFailedStatus(value, error);
+  this.setErrorStatus(status);
+};
+
+scout.ValueField.prototype._createValidationFailedStatus = function(value, error) {
+  return this._createInvalidValueStatus(value, error);
+};
+
+scout.ValueField.prototype._createInvalidValueStatus = function(value, error) {
+  if (error instanceof scout.Status) {
+    return error;
+  }
+  if (typeof error === 'string') {
+    return scout.Status.error({
+      message: error
+    });
+  }
+  return scout.Status.error({
+    message: this.session.text(this.invalidValueMessageKey, value)
+  });
 };
 
 scout.ValueField.prototype._updateDisplayText = function() {
@@ -157,6 +244,7 @@ scout.ValueField.prototype._updateDisplayText = function() {
 
 /**
  * @returns the validated value
+ * @throws a message, a scout.Status or an error if the validation fails
  */
 scout.ValueField.prototype._validateValue = function(value) {
   return value;

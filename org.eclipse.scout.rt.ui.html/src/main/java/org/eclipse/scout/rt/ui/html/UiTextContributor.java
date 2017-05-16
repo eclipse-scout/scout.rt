@@ -30,6 +30,8 @@ public class UiTextContributor implements IUiTextContributor {
         "SmartFieldNotUnique",
         "SmartFieldMoreThanXRows",
         "NavigationBackward",
+        "InvalidValueMessageX",
+        "InvalidNumberMessageX",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
         "ui.CalendarDay",

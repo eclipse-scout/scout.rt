@@ -67,6 +67,16 @@ scout.SmartField.prototype._init = function(model) {
   scout.fields.initTouch(this, model);
 };
 
+/**
+ * Initializes lookup call and code type before calling set value.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.SmartField.prototype._initValue = function(value) {
+  this._setLookupCall(this.lookupCall);
+  this._setCodeType(this.codeType);
+  scout.SmartField.parent.prototype._initValue.call(this, value);
+};
+
 scout.SmartField.prototype.createPopup = function() {
   var popupType = this.touch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
   return scout.create(popupType, {
@@ -138,23 +148,6 @@ scout.SmartField.prototype._formatValue = function(value) {
     return scout.strings.nvl(value) + '';
   }
   return this.lookupCall.textById(value);
-};
-
-scout.SmartField.prototype._setValue = function(value) {
-  this._ensureLookupCall();
-  scout.SmartField.parent.prototype._setValue.call(this, value);
-};
-
-/**
- * Ensures lookup call and code type are resolved before calling set value.
- * This cannot be done in _init because the value field would call _setValue first
- */
-scout.SmartField.prototype._ensureLookupCall = function() {
-  if (this.initialized) {
-    return;
-  }
-  this._setLookupCall(this.lookupCall);
-  this._setCodeType(this.codeType);
 };
 
 scout.SmartField.prototype._setDisplayText = function(displayText) {

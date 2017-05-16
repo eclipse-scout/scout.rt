@@ -22,6 +22,21 @@ describe("DecimalFormat", function() {
     locale = null;
   });
 
+  describe("constructor", function() {
+    it("uses the pattern from the options", function() {
+      var decimalFormat = new scout.DecimalFormat(locale, {
+        pattern: '###0.00'
+      });
+      expect(decimalFormat.pattern).toBe('###0.00');
+    });
+
+    it("if the options parameter is a string, it assumes it is the pattern", function() {
+      // mainly done to be consistent with the DateFormat.js
+      var decimalFormat = new scout.DecimalFormat(locale, '###0.00');
+      expect(decimalFormat.pattern).toBe('###0.00');
+    });
+  });
+
   describe("format", function() {
 
     it("considers decimal separators", function() {

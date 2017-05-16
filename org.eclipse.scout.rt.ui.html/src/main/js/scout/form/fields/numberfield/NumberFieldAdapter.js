@@ -12,3 +12,16 @@ scout.NumberFieldAdapter = function() {
   scout.NumberFieldAdapter.parent.call(this);
 };
 scout.inherits(scout.NumberFieldAdapter, scout.BasicFieldAdapter);
+
+scout.NumberFieldAdapter.prototype._onWidgetParseerror = function(event) {
+  // The parsing might fail on JS side, but it might succeed on server side -> Don't show an error status, instead let the server decide
+  event.preventDefault();
+};
+
+scout.NumberFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'parseerror') {
+    this._onWidgetParseerror(event);
+  } else {
+    scout.NumberFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};

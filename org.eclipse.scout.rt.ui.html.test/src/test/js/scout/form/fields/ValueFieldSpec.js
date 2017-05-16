@@ -54,9 +54,9 @@ describe('ValueField', function() {
 
   });
 
-  describe('value and display text', function() {
+  describe('init', function() {
 
-    it('sets display text when value is set initially', function() {
+    it('sets display text using formatValue if value is set initially', function() {
       var field = helper.createField('StringField', session.desktop, {
         value: 'Foo'
       });
@@ -65,13 +65,83 @@ describe('ValueField', function() {
       expect(field.empty).toBe(false);
     });
 
-    it('does not override the display text using formatValue if display text is set initially', function() {
+    it('does not override display text using formatValue if display text is set initially', function() {
+      // Don't parse the value, this is actually the same as one would call setDisplayText after the init
       var field = helper.createField('StringField', session.desktop, {
         displayText: 'Bar'
       });
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('Bar');
       expect(field.empty).toBe(true);
+    });
+
+    it('does not override display text using formatValue if display text is set initially even if value is set as well', function() {
+      // Don't override display text, otherwise specifying the display text would not have any effect
+      var field = helper.createField('StringField', session.desktop, {
+        value: 'Foo',
+        displayText: 'ABC'
+      });
+      expect(field.value).toBe('Foo');
+      expect(field.displayText).toBe('ABC');
+      expect(field.empty).toBe(false);
+
+      // The same could be achieved using setValue and setDisplayText
+      field = helper.createField('StringField', session.desktop);
+      field.setValue('Foo');
+      field.setDisplayText('ABC');
+      expect(field.value).toBe('Foo');
+      expect(field.displayText).toBe('ABC');
+    });
+
+    it('does not set value if value is invalid initially', function() {
+      var field = new scout.StringField();
+      field._validateValue = function(value) {
+        throw "Validation failed";
+      };
+      field.init({
+        parent: session.desktop,
+        value: 'Foo'
+      });
+      expect(field.errorStatus.message).toBe('Validation failed');
+      expect(field.value).toBe(null);
+      expect(field.empty).toBe(true);
+    });
+
+    it('does not override the errorStatus if an errorStatus is set initially', function() {
+      // Mainly needed for page reload case with scout classic, but may be useful for scout JS too
+      var field = helper.createField('StringField', session.desktop, {
+        errorStatus: {
+          message: 'initial error status'
+        }
+      });
+      expect(field.errorStatus.message).toBe('initial error status');
+      expect(field.empty).toBe(true);
+    });
+
+    it('does not override the errorStatus if an errorStatus set initially even if an invalid value is set', function() {
+      // Don't override error status, otherwise specifying the error status would not have any effect
+      var field = new scout.StringField();
+      field._validateValue = function(value) {
+        throw "Validation failed";
+      };
+      field.init({
+        parent: session.desktop,
+        value: 'Foo',
+        errorStatus: {
+          message: 'initial error status'
+        }
+      });
+      expect(field.errorStatus.message).toBe('initial error status');
+
+      // If setValue is called after initialization, error status will be replaced
+      field.setValue('ABC');
+      expect(field.errorStatus.message).toBe('Validation failed');
+
+      // If calling setErrorStatus error status may be set explicitly independent of the value
+      field.setErrorStatus(scout.Status.error({
+        message: 'another error'
+      }));
+      expect(field.errorStatus.message).toBe('another error');
     });
 
     it('calls validate and format when value is set initially', function() {
@@ -91,23 +161,125 @@ describe('ValueField', function() {
       // 'gelb' -> (validate) 'rot' -> (format) 'lila'
       expect(field.displayText).toBe('lila');
     });
+  });
 
-    it('sets display text when value is set', function() {
+  describe('setValue', function() {
+
+    it('sets the value, formats it and sets the display text', function() {
       var field = helper.createField('StringField', session.desktop);
       field.setValue('Foo');
+      expect(field.value).toBe('Foo');
       expect(field.displayText).toBe('Foo');
       field.setValue(null);
+      expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
     });
 
-    it('sets value when parseAndSetValue is called', function() {
+    it('does not set the value but the error status if the validation fails', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._validateValue = function(value) {
+        throw new Error('Validation failed');
+      };
+      field.setValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+    });
+
+    it('deletes the error status if value is valid', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._validateValue = function(value) {
+        throw new Error('Validation failed');
+      };
+      field.setValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field._validateValue = function(value) {
+        return value;
+      };
+      field.setValue('Foo');
+      expect(field.value).toBe('Foo');
+      expect(field.errorStatus).toBe(null);
+    });
+
+  });
+
+  describe('_validateValue', function() {
+
+    it('may throw an error or a scout.Status if value is invalid', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._validateValue = function(value) {
+        throw new Error('an error');
+      };
+      field.setValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus.message).toBe('[undefined text: InvalidValueMessageX]');
+    });
+
+    it('may throw a scout.Status if value is invalid', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._validateValue = function(value) {
+        throw scout.Status.error({
+          message: 'Custom message'
+        });
+      };
+      field.setValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus.message).toBe('Custom message');
+    });
+
+    it('may throw a message if value is invalid', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._validateValue = function(value) {
+        throw "Invalid value";
+      };
+      field.setValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus.message).toBe('Invalid value');
+    });
+
+  });
+  describe('parseAndSetValue', function() {
+
+    it('parses and sets the value', function() {
       var field = helper.createField('StringField', session.desktop);
       field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe('Foo');
     });
 
-    it('sets value and display text when accept input is called', function() {
+    it('does not set the value but the error status if the parsing fails', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._parseValue = function(text) {
+        throw new Error('Parsing failed');
+      };
+      field.parseAndSetValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+    });
+
+    it('deletes the error status if parsing succeeds', function() {
+      var field = helper.createField('StringField', session.desktop);
+      field._parseValue = function(value) {
+        throw new Error('Validation failed');
+      };
+      field.parseAndSetValue('Foo');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+
+      field._parseValue = function(value) {
+        return value;
+      };
+      field.parseAndSetValue('Foo');
+      expect(field.value).toBe('Foo');
+      expect(field.errorStatus).toBe(null);
+    });
+
+  });
+
+  describe('acceptInput', function() {
+
+    it('accepts the current display text by calling parse, validate and format', function() {
       var field = helper.createField('StringField', session.desktop);
       field._parseValue = function(displayText) {
         return (displayText === 'blau' ? 'gelb' : displayText);
@@ -126,6 +298,38 @@ describe('ValueField', function() {
       expect(field.value).toBe('rot');
       // 'blau' -> (parse) 'gelb' -> (validate) 'rot' -> (format) 'lila'
       expect(field.displayText).toBe('lila');
+    });
+
+  });
+
+  describe('displayTextChanged', function() {
+
+    it('is triggered when input is accepted', function() {
+      var field = helper.createField('StringField');
+      var displayText;
+      field.render();
+      field.on('displayTextChanged', function(event) {
+        displayText = event.displayText;
+      });
+      field.$field.val('a value');
+      field.acceptInput();
+      expect(displayText).toBe('a value');
+    });
+
+    it('contains the actual displayText even if it was changed using format value', function() {
+      var field = helper.createField('StringField');
+      field.render();
+      field._formatValue = function(value) {
+        return 'formatted value';
+      };
+
+      var displayText;
+      field.on('displayTextChanged', function(event) {
+        displayText = event.displayText;
+      });
+      field.$field.val('a value');
+      field.acceptInput();
+      expect(displayText).toBe('formatted value');
     });
 
   });

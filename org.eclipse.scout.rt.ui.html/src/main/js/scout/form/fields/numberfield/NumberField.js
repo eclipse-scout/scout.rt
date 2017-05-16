@@ -10,15 +10,18 @@
  ******************************************************************************/
 scout.NumberField = function() {
   scout.NumberField.parent.call(this);
+  this.calc = new scout.Calculator();
+  this.invalidValueMessageKey = 'InvalidNumberMessageX';
 };
 scout.inherits(scout.NumberField, scout.BasicField);
 
-scout.NumberField.prototype._init = function(model) {
-  scout.NumberField.parent.prototype._init.call(this, model);
-  if (!(this.decimalFormat instanceof scout.DecimalFormat)) {
-    this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
-  }
-  this.calc = new scout.Calculator();
+/**
+ * Initializes the decimal format before calling set value.
+ * This cannot be done in _init because the value field would call _setValue first
+ */
+scout.NumberField.prototype._initValue = function(value) {
+  this._setDecimalFormat(this.decimalFormat);
+  scout.NumberField.parent.prototype._initValue.call(this, value);
 };
 
 /**
@@ -45,52 +48,55 @@ scout.NumberField.prototype._renderGridData = function() {
   });
 };
 
+scout.NumberField.prototype._getDefaultFormat = function(locale) {
+  return locale.decimalFormatPatternDefault;
+};
+
+scout.NumberField.prototype.setDecimalFormat = function(decimalFormat) {
+  this.setProperty('decimalFormat', decimalFormat);
+};
+
 scout.NumberField.prototype._setDecimalFormat = function(decimalFormat) {
+  if (!decimalFormat) {
+    decimalFormat = this._getDefaultFormat(this.session.locale);
+  }
   decimalFormat = scout.DecimalFormat.ensure(this.session.locale, decimalFormat);
   this._setProperty('decimalFormat', decimalFormat);
-};
 
-scout.NumberField.prototype._renderDecimalFormat = function() {
-  this._parse();
-};
-
-scout.NumberField.prototype.acceptInput = function(whileTyping) {
-  if (!whileTyping) {
-    this._parse();
+  if (this.initialized) {
+    this.parseAndSetValue(this.displayText);
+    // explicitly call update display text to make sure display text is updated even if value does not change
+    this._updateDisplayText();
   }
-  scout.NumberField.parent.prototype.acceptInput.call(this, whileTyping);
 };
 
-scout.NumberField.prototype.parse = function() {
-  var number = null;
-  try {
-    number = this.decimalFormat.parse(this.displayText);
-  } catch(e) {
-    // catch Error thrown when number isNaN
+scout.NumberField.prototype._parseValue = function(displayText) {
+  if (!displayText) {
+    return null;
   }
-  return number;
+
+  // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
+  // Only needed for calculator
+  var input = this.decimalFormat.normalize(displayText);
+
+  // if only math symbols are in the input string...
+  if (this.calc.isFormula(input)) {
+    // ...evaluate and return. If the display text changed, ValueField.js will make sure, the new display text is sent to the model.
+    return this.calc.evalFormula(input);
+  }
+  return this.decimalFormat.parse(displayText);
 };
 
-scout.NumberField.prototype._parse = function() {
-  var input = this.$field.val();
-  if (input) {
-    // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
-    input = input
-      .replace(new RegExp('[' + this.decimalFormat.groupingChar + ']', 'g'), '')
-      .replace(new RegExp('[' + this.decimalFormat.decimalSeparatorChar + ']', 'g'), '.')
-      .replace(/\s/g, '');
-
-    // if only math symbols are in the input string...
-    if (this.calc.isFormula(input)) {
-      // ...evaluate, reformat the result and set is to the field. If the display text
-      // changed, ValueField.js will make sure, the new value is sent to the model.
-      try {
-        input = this.calc.evalFormula(input);
-        input = this.decimalFormat.format(input, false);
-        this.$field.val(input);
-      } catch (err) {
-        // ignore errors, let the input be handled by scout model
-      }
-    }
+scout.NumberField.prototype._validateValue = function(value) {
+  if (scout.objects.isNullOrUndefined(value)) {
+    return value;
   }
+  if (typeof value !== 'number') {
+    throw this.session.text(this.invalidValueMessageKey, value);
+  }
+  return value;
+};
+
+scout.NumberField.prototype._formatValue = function(value) {
+  return this.decimalFormat.format(value, false); // parse does not support multiplier yet -> disable it for the formatting
 };

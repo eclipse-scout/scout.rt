@@ -105,7 +105,7 @@ scout.ButtonAdapterMenu.prototype.requestFocus = function() {
 /**
  * Sets the focus on this field if the field is rendered.
  */
-scout.ButtonAdapterMenu.prototype.focus = function() { // XXX 7.0 - mit ASA nochmal anschauen --> focus wird jetzt nicht mehr aufgerufen / requestFocus ist kein guter ersatz
+scout.ButtonAdapterMenu.prototype.focus = function() {
   if (!this.rendered) {
     return;
   }

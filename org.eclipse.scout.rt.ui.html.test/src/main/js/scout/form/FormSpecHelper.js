@@ -82,5 +82,6 @@ scout.FormSpecHelper.prototype.createFieldModel = function(objectType, parent, m
 };
 
 scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
+  parent = parent || this.session.desktop;
   return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
 };

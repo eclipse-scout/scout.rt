@@ -51,27 +51,26 @@ scout.Status.prototype.isError = function() {
 };
 
 /**
- * @returns all leaf status collected dept first.
+ * @returns all leaf status collected depth first.
  */
 scout.Status.prototype.getAllLeafStatus = function() {
-
   var flatStatus = [];
-  _collectLeafStatus.call(this, this, flatStatus);
+  collectLeafStatus.call(this, this, flatStatus);
   return flatStatus;
+
   // helper function
-  function _collectLeafStatus(status, collector) {
+  function collectLeafStatus(status, collector) {
     if (!status) {
       return;
     }
     if (status.children) {
       status.children.forEach(function(cs) {
-        _collectLeafStatus(cs, collector);
+        collectLeafStatus(cs, collector);
       }.bind(this));
     } else {
       collector.push(status);
     }
   }
-
 };
 
 /**
