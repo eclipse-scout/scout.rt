@@ -237,12 +237,14 @@ $.fn.makeElement = function(element, cssClass, text) {
  * @param text (optional) string used as inner text
  */
 $.fn.makeDiv = function(cssClass, text) {
-  var unselectable = scout.device.unselectableAttribute,
-    $div = this.makeElement('<div>', cssClass, text);
+  var $div = this.makeElement('<div>', cssClass, text);
 
+  // scout.device may not be initialized yet (e.g. before app is created or if app bootstrap fails)
+  var unselectable = (scout.device ? scout.device.unselectableAttribute : scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE);
   if (unselectable.key) {
     $div.attr(unselectable.key, unselectable.value);
   }
+
   return $div;
 };
 
@@ -346,7 +348,7 @@ $.fn.appendIcon = function(iconId, cssClass) {
       .addClass(icon.appendCssClass('font-icon'))
       .appendTo(this);
   }
-  return this.appendImg( icon.iconUrl, cssClass)
+  return this.appendImg(icon.iconUrl, cssClass)
     .addClass('icon image-icon');
 };
 
