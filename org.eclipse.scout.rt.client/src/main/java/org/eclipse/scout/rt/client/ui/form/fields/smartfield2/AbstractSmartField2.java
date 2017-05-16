@@ -558,11 +558,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     propertySupport.firePropertyChange(PROP_RESULT, null, result);
   }
 
-  @Override
-  public void setValueForProposal(String value) {
-    setValue((VALUE) value);
-  }
-
   /**
    * see {@link AbstractSmartField#interceptBrowseNew(String)}
    */
@@ -1404,10 +1399,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   protected String formatValueInternal(VALUE validKey) {
-    if (isProposal()) {
-      return super.formatValueInternal(validKey);
-    }
-
     if (validKey == null) {
       return "";
     }
@@ -1470,11 +1461,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void setVariant(String variant) {
     m_variant = variant;
-  }
-
-  @Override
-  public boolean isProposal() {
-    return VARIANT_PROPOSAL.equals(m_variant);
   }
 
   // ==== Lookup row fetching strategies ==== //

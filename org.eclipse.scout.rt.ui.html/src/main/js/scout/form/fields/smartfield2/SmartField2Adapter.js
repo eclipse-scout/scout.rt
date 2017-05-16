@@ -11,7 +11,7 @@
 scout.SmartField2Adapter = function() {
   scout.SmartField2Adapter.parent.call(this);
 
-  this._addRemoteProperties(['value', 'lookupRow', 'activeFilter']); // FIXME [awe] 7.0 - SF2: only send lookupRow in proposal case -> better have 2 classes?
+  this._addRemoteProperties(['value', 'activeFilter']);
 };
 scout.inherits(scout.SmartField2Adapter, scout.ValueFieldAdapter);
 

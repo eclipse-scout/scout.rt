@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> {
+public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonValueField<T> {
 
   // Contains always the mapping from the last performed lookup operation
   // all values are reset each time a new lookup starts
@@ -31,12 +31,12 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   private Map<Integer, Object> m_idToKeyMap = new HashMap<>();
   private int m_id = 0;
 
-  public JsonSmartField2(ISmartField2<VALUE> model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSmartField2(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
   @Override
-  protected void initJsonProperties(ISmartField2<VALUE> model) { // FIXME [awe] 7.0 - SF2: hier auch den value hoch schicken?
+  protected void initJsonProperties(T model) { // FIXME [awe] 7.0 - SF2: hier auch den value hoch schicken?
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_RESULT, model) {
       @Override
@@ -125,32 +125,9 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   // FIXME [awe] 7.0 - SF2: use UI facade here?
 
   @Override
-  @SuppressWarnings("unchecked")
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
-    if (ISmartField2.PROP_LOOKUP_ROW.equals(propertyName)) {
-      // only required for proposal field, because value is a string there. For regular smart-fields
-      // setValue will also set the right lookup row.
-      if (getModel().isProposal()) {
-        JSONObject lookupRow = data.optJSONObject("lookupRow");
-        VALUE key = null;
-        if (lookupRow != null) {
-          String mappedKey = lookupRow.getString("key");
-          key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
-        }
-        getModel().setLookupRowByKey(key);
-      }
-    }
-    else if (IValueField.PROP_VALUE.equals(propertyName)) {
-      if (getModel().isProposal()) {
-        String value = data.optString("value");
-        getModel().setValueForProposal(value);
-      }
-      else {
-        String mappedKey = data.optString("value");
-        VALUE key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
-        addPropertyEventFilterCondition(IValueField.PROP_VALUE, key);
-        getModel().setValue(key);
-      }
+    if (IValueField.PROP_VALUE.equals(propertyName)) {
+      handleUiPropertyChangeValue(data);
     }
     else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
       String activeFilterString = data.optString("activeFilter", null);
@@ -161,6 +138,13 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
+  }
+
+  protected void handleUiPropertyChangeValue(JSONObject data) {
+    String mappedKey = data.optString("value");
+    VALUE key = getLookupRowKeyForId(mappedKey);
+    addPropertyEventFilterCondition(IValueField.PROP_VALUE, key);
+    getModel().setValue(key);
   }
 
   protected void handleUiLookupByText(JsonEvent event) {
@@ -259,6 +243,11 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
       return null;
     }
     return MainJsonObjectFactory.get().createJsonObject(tableRowData).toJson();
+  }
+
+  @SuppressWarnings("unchecked")
+  protected VALUE getLookupRowKeyForId(String id) {
+    return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
   }
 
   protected JSONArray columnDescriptorsToJson(Object value) {

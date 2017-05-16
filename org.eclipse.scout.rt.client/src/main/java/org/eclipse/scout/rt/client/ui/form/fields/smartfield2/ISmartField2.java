@@ -50,7 +50,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   String VARIANT_DEFAULT = "default";
   String VARIANT_DROPDOWN = "dropdown";
-  String VARIANT_PROPOSAL = "proposal";
 
   void lookupAll();
 
@@ -386,15 +385,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String getVariant();
 
   void setVariant(String variant);
-
-  /**
-   * @return true if the variant of the smart-field instance is a <code>VARIANT_PROPOSAL</code>.
-   */
-  boolean isProposal();
-
-  void setValueForProposal(String value); // FIXME [awe] 7.0 - SF2: das müssen wir loswerden? mit AHO diskutieren, ich verstehe inzwischen, dass dieses
-  // ganze MixedCAFields zeugs nötig war weil es sonst bzgl. generics typen von value und lookup key compiler probleme gibt (der LOOKUP_KEY ist typisiert,
-  // und im fall von proposal-field != dem typ vom VALUE (String))
 
   ILookupRow<VALUE> getLookupRow();
 

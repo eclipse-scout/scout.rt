@@ -458,6 +458,8 @@
   __include("scout/form/fields/smartfield2/SmartField2ToggleKeyStroke.js");
   __include("scout/form/fields/smartfield2/SmartField2Popup.js");
   __include("scout/form/fields/smartfield2/SmartField2PopupLayout.js");
+  __include("scout/form/fields/smartfield2/ProposalField2.js");
+  __include("scout/form/fields/smartfield2/ProposalField2Adapter.js");
   __include("scout/form/fields/smartfield2/RemoteLookupCall.js");
   __include("scout/form/fields/smartfield2/ProposalChooser2.js");
   __include("scout/form/fields/smartfield2/ProposalChooser2Layout.js");

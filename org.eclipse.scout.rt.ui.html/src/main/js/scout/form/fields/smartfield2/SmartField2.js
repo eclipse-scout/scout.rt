@@ -1,8 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 // FIXME [awe] 7.0 - SF2: lookup row als property zwischen server und client hin und her schicken?
 // um das problem mit den lazy styles zu lösen?
 // FIXME [awe] 7.0 - SF2: proposal table mit styles (colors, fonts) korrekt darstellen
 // FIXME [awe] 7.0 - SF2: tree proposal inkrementell nachladen
-// FIXME [awe] 7.0 - SF2: maxLength property für proposal field
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
@@ -23,7 +32,6 @@ scout.inherits(scout.SmartField2, scout.ValueField);
 
 scout.SmartField2.Variant = {
   DEFAULT: 'default',
-  PROPOSAL: 'proposal',
   DROPDOWN: 'dropdown'
 };
 
@@ -172,32 +180,26 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
       return;
     }
 
-    if (this.isProposal()) {
-      // [proposal field] case
-      this.setValue(searchText);
-      return;
-
-    } else {
-      // [smart field] case
-      // in any other case something went wrong
-      if (numLookupRows === 0) {
-        this.setErrorStatus(scout.Status.error({
-          message: this.session.text('SmartFieldCannotComplete', searchText)
-        }));
-        return;
-      }
-
-      if (numLookupRows > 1) { // FIXME [awe] 7.0 - SF2: proposal field continue --> wenn proposal nicht eindeutig --> egal
-        this.setErrorStatus(scout.Status.error({
-          message: this.session.text('SmartFieldNotUnique', searchText)
-        }));
-        this.openPopup2(result);
-        return;
-      }
-    }
-
-    throw new Error('Unreachable code');
+    this._handleInvalidLookup(result, numLookupRows, searchText);
   }.bind(this));
+};
+
+scout.SmartField2.prototype._handleInvalidLookup = function(result, numLookupRows, searchText) {
+  // in any other case something went wrong
+  if (numLookupRows === 0) {
+    this.setErrorStatus(scout.Status.error({
+      message: this.session.text('SmartFieldCannotComplete', searchText)
+    }));
+    return;
+  }
+
+  if (numLookupRows > 1) {
+    this.setErrorStatus(scout.Status.error({
+      message: this.session.text('SmartFieldNotUnique', searchText)
+    }));
+    this.openPopup2(result);
+    return;
+  }
 };
 
 /**
@@ -252,10 +254,6 @@ scout.SmartField2.prototype._setCodeType = function(codeType) {
 };
 
 scout.SmartField2.prototype._formatValue = function(value) {
-  if (this.isProposal()) {
-    return scout.SmartField2.parent.prototype._formatValue.call(this, value);
-  }
-
   if (!value) {
     return '';
   }
@@ -296,10 +294,6 @@ scout.SmartField2.prototype.openPopup = function(lookupAll) {
 };
 
 scout.SmartField2.prototype.openPopup2 = function(result) { // FIXME [awe] 7.0 - SF2: improve naming openPopup2
-  if (this.isProposal() && result.lookupRows.length === 0) {
-    return;
-  }
-
   this.hideLookupInProgress();
   this.$container.addClass('popup-open');
   // On touch devices the field does not get the focus.
@@ -501,14 +495,14 @@ scout.SmartField2.prototype._startNewLookupByText = function() {
     this.lookupCall.getByText(searchText).done(function(result) {
       this.hideLookupInProgress();
       if (this.popup) {
-        if (this.isProposal() && result.lookupRows.length === 0) {
-          this.closePopup();
-        } else {
-          this.popup.setLookupResult(result);
-        }
+        this._handleLookupDone(result);
       }
     }.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
+};
+
+scout.SmartField2.prototype._handleLookupDone = function(result) {
+  this.popup.setLookupResult(result);
 };
 
 /**
@@ -520,10 +514,6 @@ scout.SmartField2.prototype._startNewLookupByText = function() {
  */
 scout.SmartField2.prototype.virtual = function() {
   return this.browseMaxRowCount > scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
-};
-
-scout.SmartField2.prototype.isProposal = function() {
-  return this.variant === scout.SmartField2.Variant.PROPOSAL;
 };
 
 scout.SmartField2.prototype.isDropdown = function() {
@@ -542,11 +532,15 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
   this.setErrorStatus(null);
   this._lockLookupRow = true; // FIXME [awe] 7.0 - SF2: ugly
   if (lookupRow) {
-    this.setValue(this.isProposal() ? lookupRow.text : lookupRow.key);
+    this.setValue(this._getValueFromLookupRow(lookupRow));
   } else {
     this.setValue(null);
   }
   this._lockLookupRow = false;
+};
+
+scout.SmartField2.prototype._getValueFromLookupRow = function(lookupRow) {
+  return lookupRow.key;
 };
 
 scout.SmartField2.prototype._setValue = function(value) {
