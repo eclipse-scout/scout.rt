@@ -849,7 +849,8 @@ scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
 };
 
 /**
- * Triggers a property change for a single property.
+ * Triggers a property change for a single property. The event is only triggered when
+ * old and new value are the same.
  */
 scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, newValue) {
   scout.assertParameter('propertyName', propertyName);
@@ -866,10 +867,11 @@ scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, 
  * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
  */
 scout.Widget.prototype._setProperty = function(propertyName, newValue) {
-  if (!propertyName) {
+  scout.assertParameter('propertyName', propertyName);
+  var oldValue = this[propertyName];
+  if (scout.objects.equals(oldValue, newValue)) {
     return;
   }
-  var oldValue = this[propertyName];
   this[propertyName] = newValue;
   this.triggerPropertyChange(propertyName, oldValue, newValue);
 };

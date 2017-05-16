@@ -2,6 +2,7 @@
 // um das problem mit den lazy styles zu lösen?
 // FIXME [awe] 7.0 - SF2: proposal table mit styles (colors, fonts) korrekt darstellen
 // FIXME [awe] 7.0 - SF2: tree proposal inkrementell nachladen
+// FIXME [awe] 7.0 - SF2: maxLength property für proposal field
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
@@ -529,27 +530,39 @@ scout.SmartField2.prototype.isDropdown = function() {
   return this.variant === scout.SmartField2.Variant.DROPDOWN;
 };
 
+scout.SmartField2.prototype._setLookupRow = function(lookupRow) {
+  this._setProperty('lookupRow', lookupRow);
+};
+
 scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
-  this.lookupRow = lookupRow;
+  if (this.lookupRow === lookupRow) {
+    return;
+  }
+  this._setLookupRow(lookupRow);
   this.setErrorStatus(null);
+  this._lockLookupRow = true; // FIXME [awe] 7.0 - SF2: ugly
   if (lookupRow) {
     this.setValue(this.isProposal() ? lookupRow.text : lookupRow.key);
   } else {
     this.setValue(null);
   }
+  this._lockLookupRow = false;
 };
 
 scout.SmartField2.prototype._setValue = function(value) {
   // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
   // must of the time. Thus we must remove the reference to the old lookup row as early as possible
-  if (value) {
-    // when a value is set, we only keep the cached lookup row when the key of the lookup row is equals to the value
-    if (this.lookupRow && this.lookupRow.key != value) {
-      this.lookupRow = null;
+  if (!this._lockLookupRow) {
+    if (value) {
+      // when a value is set, we only keep the cached lookup row when the key of the lookup row is equals to the value
+      if (this.lookupRow && this.lookupRow.key !== value) {
+        this._setLookupRow(null);
+      }
+    } else {
+      // when value is set to null, we must also reset the cached lookup row
+      this._setLookupRow(null);
     }
-  } else {
-    // when value is set to null, we must also reset the cached lookup row
-    this.lookupRow = null;
+    // FIXME [awe] 7.0 - SF2: lookupByKey starten
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
 };

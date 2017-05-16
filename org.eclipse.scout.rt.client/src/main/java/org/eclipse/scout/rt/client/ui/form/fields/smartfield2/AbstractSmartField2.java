@@ -141,8 +141,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       TEXTS.get("ui.Inactive"),
       TEXTS.get("ui.Active")};
 
-  private ILookupRow<VALUE> m_currentLookupRow;
-
   private volatile IFuture<?> m_lookupFuture;
 
   public AbstractSmartField2() {
@@ -776,11 +774,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
    * @return {@code true} if the current context row is valid, {@code false} otherwise.
    */
   protected boolean isCurrentLookupRowValid(VALUE validKey) {
-    if (getCurrentLookupRow() == null) {
+    if (getLookupRow() == null) {
       return true;
     }
 
-    return validKey == getCurrentLookupRow().getKey() || (validKey != null && validKey.equals(getCurrentLookupRow().getKey()));
+    return validKey == getLookupRow().getKey() || (validKey != null && validKey.equals(getLookupRow().getKey()));
   }
 
   @Override
@@ -870,12 +868,20 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return StringUtility.isNullOrEmpty(text) ? getWildcard() : text;
   }
 
-  public void setCurrentLookupRow(ILookupRow<VALUE> row) {
-    m_currentLookupRow = row;
+  @Override
+  public void setLookupRow(ILookupRow<VALUE> row) {
+    propertySupport.setProperty(PROP_LOOKUP_ROW, row);
   }
 
-  public ILookupRow<VALUE> getCurrentLookupRow() {
-    return m_currentLookupRow;
+  @Override
+  @SuppressWarnings("unchecked")
+  public ILookupRow<VALUE> getLookupRow() {
+    return (ILookupRow<VALUE>) propertySupport.getProperty(PROP_LOOKUP_ROW);
+  }
+
+  @Override
+  public void setLookupRowByKey(VALUE lookupKey) {
+    this.formatValueInternal(lookupKey);
   }
 
   @Override
@@ -964,7 +970,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       numResults = fetchResult.getLookupRows().size();
       if (numResults == 1) {
         ILookupRow<VALUE> singleMatchLookupRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
-        setCurrentLookupRow(singleMatchLookupRow);
+        setLookupRow(singleMatchLookupRow);
         return returnLookupRowAsValue(singleMatchLookupRow);
       }
     }
@@ -980,12 +986,12 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   protected VALUE parseValueInternal(String text) {
-    ILookupRow<VALUE> currentLookupRow = getCurrentLookupRow();
+    ILookupRow<VALUE> currentLookupRow = getLookupRow();
     if (currentLookupRow == null) {
       return handleMissingLookupRow(text);
     }
     else {
-      return returnLookupRowAsValue(getCurrentLookupRow());
+      return returnLookupRowAsValue(getLookupRow());
     }
   }
 
@@ -995,15 +1001,15 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
     // when value is null, current lookupRow must be null too
     if (validatedValue == null) {
-      setCurrentLookupRow(null);
+      setLookupRow(null);
       return validatedValue;
     }
 
     // set currentLookupRow to null, when new value doesn't match lookupRow
     // we must do this every time setValue() is called.
-    ILookupRow<VALUE> currentLookupRow = getCurrentLookupRow();
+    ILookupRow<VALUE> currentLookupRow = getLookupRow();
     if (currentLookupRow != null && !lookupRowMatchesValue(currentLookupRow, validatedValue)) {
-      setCurrentLookupRow(null);
+      setLookupRow(null);
     }
 
     return validatedValue;
@@ -1340,7 +1346,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void acceptProposal(ILookupRow<VALUE> row) {
-    setCurrentLookupRow(row);
+    setLookupRow(row);
     setValue(row.getKey());
   }
 
@@ -1356,7 +1362,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
     // When a current lookup-row is available, we don't need to perform a lookup
     // Usually this happens after the user has selected a row from the proposal-chooser (table or tree).
-    final ILookupRow<VALUE> currentLookupRow = getCurrentLookupRow();
+    final ILookupRow<VALUE> currentLookupRow = getLookupRow();
     if (currentLookupRow != null) {
       installLookupRowContext(currentLookupRow);
       m_contextInstalledCondition.setBlocking(false);
@@ -1369,7 +1375,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     }
 
     // When no current-lookup row is available we must perform a lookup by key (local or remote)
-    // final VALUE lookupKey = interceptConvertValueToKey(getValue());
     final VALUE lookupKey = getValue();
 
     m_valueChangedLookupCounter.incrementAndGet();
@@ -1411,14 +1416,13 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       return "";
     }
 
-    ILookupRow<VALUE> currentLookupRow = getCurrentLookupRow();
+    ILookupRow<VALUE> currentLookupRow = getLookupRow();
     if (currentLookupRow == null) {
       try {
-        // List<? extends ILookupRow<VALUE>> lookupRows = callKeyLookup(interceptConvertValueToKey(validKey));
         List<? extends ILookupRow<VALUE>> lookupRows = callKeyLookup(validKey);
         if (!lookupRows.isEmpty()) {
           currentLookupRow = lookupRows.get(0);
-          setCurrentLookupRow(currentLookupRow);
+          setLookupRow(currentLookupRow);
         }
       }
       catch (RuntimeException | PlatformError e) {
@@ -1449,7 +1453,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void refreshDisplayText() {
     if (getLookupCall() != null && getValue() != null) {
       try {
-        // List<? extends ILookupRow<VALUE>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
         List<? extends ILookupRow<VALUE>> rows = callKeyLookup(getValue());
         installLookupRowContext(CollectionUtility.firstElement(rows));
       }

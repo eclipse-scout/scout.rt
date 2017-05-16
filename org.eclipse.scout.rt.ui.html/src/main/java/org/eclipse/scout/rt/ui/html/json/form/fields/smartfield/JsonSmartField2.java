@@ -36,7 +36,7 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   }
 
   @Override
-  protected void initJsonProperties(ISmartField2<VALUE> model) {
+  protected void initJsonProperties(ISmartField2<VALUE> model) { // FIXME [awe] 7.0 - SF2: hier auch den value hoch schicken?
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_RESULT, model) {
       @Override
@@ -48,6 +48,18 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
         return resultToJson((SmartField2Result<VALUE>) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_LOOKUP_ROW, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getLookupRow();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return lookupRowToJson((LookupRow<VALUE>) value, false); // FIXME [awe] 7.0 - set multipleColumns parameter correctly
       }
     });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_MAX_ROW_COUNT, model) {
@@ -115,7 +127,20 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   @Override
   @SuppressWarnings("unchecked")
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
-    if (IValueField.PROP_VALUE.equals(propertyName)) {
+    if (ISmartField2.PROP_LOOKUP_ROW.equals(propertyName)) {
+      // only required for proposal field, because value is a string there. For regular smart-fields
+      // setValue will also set the right lookup row.
+      if (getModel().isProposal()) {
+        JSONObject lookupRow = data.optJSONObject("lookupRow");
+        VALUE key = null;
+        if (lookupRow != null) {
+          String mappedKey = lookupRow.getString("key");
+          key = (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(mappedKey));
+        }
+        getModel().setLookupRowByKey(key);
+      }
+    }
+    else if (IValueField.PROP_VALUE.equals(propertyName)) {
       if (getModel().isProposal()) {
         String value = data.optString("value");
         getModel().setValueForProposal(value);
@@ -188,6 +213,10 @@ public class JsonSmartField2<VALUE> extends JsonValueField<ISmartField2<VALUE>> 
   }
 
   protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {
+    if (lookupRow == null) {
+      return null;
+    }
+
     int mappedKey = mapKey(lookupRow.getKey());
     JSONObject json = new JSONObject();
     json.put("key", mappedKey);

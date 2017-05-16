@@ -46,6 +46,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_MULTILINE_TEXT = "multilineText";
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
   String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
+  String PROP_LOOKUP_ROW = "lookupRow";
 
   String VARIANT_DEFAULT = "default";
   String VARIANT_DROPDOWN = "dropdown";
@@ -394,5 +395,11 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   void setValueForProposal(String value); // FIXME [awe] 7.0 - SF2: das müssen wir loswerden? mit AHO diskutieren, ich verstehe inzwischen, dass dieses
   // ganze MixedCAFields zeugs nötig war weil es sonst bzgl. generics typen von value und lookup key compiler probleme gibt (der LOOKUP_KEY ist typisiert,
   // und im fall von proposal-field != dem typ vom VALUE (String))
+
+  ILookupRow<VALUE> getLookupRow();
+
+  void setLookupRow(ILookupRow<VALUE> lookupRow);
+
+  void setLookupRowByKey(VALUE lookupKey);
 
 }
