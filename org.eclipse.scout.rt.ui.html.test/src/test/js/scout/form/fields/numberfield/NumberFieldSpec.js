@@ -49,6 +49,14 @@ describe('NumberField', function() {
       expect(field.value).toBe(null);
     });
 
+    it('sets the error status and display text if the value is invalid', function() {
+      field.render();
+      field.setValue('abc');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.displayText).toBe("abc");
+    });
+
     it('uses another invalidation message than the value field', function() {
       field.render();
       field.setValue('123.5');

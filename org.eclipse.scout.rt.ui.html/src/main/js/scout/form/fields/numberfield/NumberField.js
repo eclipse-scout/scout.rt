@@ -98,5 +98,9 @@ scout.NumberField.prototype._validateValue = function(value) {
 };
 
 scout.NumberField.prototype._formatValue = function(value) {
+  if (!scout.objects.isNullOrUndefined(value) && typeof value !== 'number') {
+    // if setValue() would be called with something other than a number don't try to format it
+    return value;
+  }
   return this.decimalFormat.format(value, false); // parse does not support multiplier yet -> disable it for the formatting
 };

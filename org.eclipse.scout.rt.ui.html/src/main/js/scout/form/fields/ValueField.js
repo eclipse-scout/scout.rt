@@ -178,9 +178,7 @@ scout.ValueField.prototype.setValue = function(value) {
 
 scout.ValueField.prototype._setValue = function(value) {
   var oldValue = this.value;
-  if (this.initialized) {
-    this.setErrorStatus(null);
-  }
+  this._updateErrorStatus(null);
 
   try {
     this.value = this._validateValue(value);
@@ -192,21 +190,14 @@ scout.ValueField.prototype._setValue = function(value) {
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
-
-  // If a displayText is provided initially, use that text instead of using formatValue to generate a text based on the value
-  if (this.initialized || scout.objects.isNullOrUndefined(this.displayText)) {
-    this._updateDisplayText();
-  }
+  this._updateDisplayText();
 };
 
 scout.ValueField.prototype._validationFailed = function(value, error) {
   $.log.debug('Validation failed for field with id ' + this.id, error);
-  if (!this.initialized && this.errorStatus) {
-    // Don't override the error status specified by the init model
-    return;
-  }
   var status = this._createValidationFailedStatus(value, error);
-  this.setErrorStatus(status);
+  this._updateErrorStatus(status);
+  this._updateDisplayText(value);
 };
 
 scout.ValueField.prototype._createValidationFailedStatus = function(value, error) {
@@ -227,8 +218,21 @@ scout.ValueField.prototype._createInvalidValueStatus = function(value, error) {
   });
 };
 
-scout.ValueField.prototype._updateDisplayText = function() {
-  var returned = this._formatValue(this.value);
+scout.ValueField.prototype._updateErrorStatus = function(status) {
+  if (!this.initialized && this.errorStatus) {
+    // Don't override the error status specified by the init model
+    return;
+  }
+  this.setErrorStatus(status);
+};
+
+scout.ValueField.prototype._updateDisplayText = function(value) {
+  if (!this.initialized && !scout.objects.isNullOrUndefined(this.displayText)) {
+    // If a displayText is provided initially, use that text instead of using formatValue to generate a text based on the value
+    return;
+  }
+  value = scout.nvl(value, this.value);
+  var returned = this._formatValue(value);
   if (returned && $.isFunction(returned.promise)) {
     // Promise is returned -> set display text later
     returned

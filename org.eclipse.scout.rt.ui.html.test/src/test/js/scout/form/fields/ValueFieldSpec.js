@@ -175,7 +175,7 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('');
     });
 
-    it('does not set the value but the error status if the validation fails', function() {
+    it('does not set the value but the error status and display text if the validation fails', function() {
       var field = helper.createField('StringField', session.desktop);
       field._validateValue = function(value) {
         throw new Error('Validation failed');
@@ -183,6 +183,7 @@ describe('ValueField', function() {
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.displayText).toBe("Foo");
     });
 
     it('deletes the error status if value is valid', function() {
