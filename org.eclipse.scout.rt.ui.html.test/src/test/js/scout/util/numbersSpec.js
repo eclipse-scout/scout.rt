@@ -251,4 +251,20 @@ describe("scout.numbers", function() {
 
   });
 
+  describe("isNumber", function() {
+
+    it ("returns true if the value is a number", function() {
+      expect(scout.numbers.isNumber(3)).toBe(true);
+    });
+
+    it ("returns false if the value is not a number", function() {
+      expect(scout.numbers.isNumber('3')).toBe(false);
+    });
+
+    it ("returns false if the value is NaN", function() {
+      expect(scout.numbers.isNumber(NaN)).toBe(false);
+    });
+
+  });
+
 });
