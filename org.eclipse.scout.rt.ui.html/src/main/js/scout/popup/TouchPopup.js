@@ -36,7 +36,7 @@ scout.TouchPopup.prototype._fieldOverrides = function() {
   return {
     parent: this,
     popup: this,
-    labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
+    labelPosition: scout.FormField.LabelPosition.ON_FIELD,
     statusVisible: false,
     embedded: true,
     touch: false

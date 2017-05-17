@@ -167,7 +167,7 @@ scout.GroupBox.prototype._renderLabel = function() {
 };
 
 scout.GroupBox.prototype._renderStatusPosition = function() {
-  if (this.statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+  if (this.statusPosition === scout.FormField.StatusPosition.TOP) {
     // move into title
     this.$status.appendTo(this.$title);
   } else {

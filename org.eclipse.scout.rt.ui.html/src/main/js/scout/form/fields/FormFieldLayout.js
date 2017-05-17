@@ -22,7 +22,7 @@ scout.FormFieldLayout = function(formField) {
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;
 
   // use configured label width in pixel or default label width
-  if (scout.FormFieldLayout.LABEL_WIDTH_DEFAULT === formField.labelWidthInPixel) {
+  if (scout.FormField.LabelWidth.DEFAULT === formField.labelWidthInPixel) {
     this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
   } else {
     this.labelWidth = formField.labelWidthInPixel;
@@ -30,11 +30,8 @@ scout.FormFieldLayout = function(formField) {
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
-//Minimum field with to normal state, for smaller widths the "compact" style is applied.
+// Minimum field with to normal state, for smaller widths the "compact" style is applied.
 scout.FormFieldLayout.MIN_FIELD_WIDTH = 50;
-
-scout.FormFieldLayout.LABEL_WIDTH_UI = -1;
-scout.FormFieldLayout.LABEL_WIDTH_DEFAULT = 0;
 
 scout.FormFieldLayout.prototype.layout = function($container) {
   var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
@@ -54,7 +51,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
-    if (labelWidth === scout.FormFieldLayout.LABEL_WIDTH_UI || formField.labelUseUiWidth) {
+    if (labelWidth === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
@@ -63,10 +60,10 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         }).width;
       }
     }
-    if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+    if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
       scout.graphics.setBounds(formField.$label, top, left, labelWidth, this.rowHeight);
       left += labelWidth;
-    } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+    } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       formField.$label.cssHeight(this.rowHeight);
       top += formField.$label.outerHeight(true);
       labelHasFieldWidth = true;
@@ -83,7 +80,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     formField.$status
       .cssWidth(statusWidth);
     // If both status and label position is "top", pull status up (without margin on the right side)
-    if (formField.statusPosition === scout.FormField.STATUS_POSITION_TOP && labelHasFieldWidth) {
+    if (formField.statusPosition === scout.FormField.StatusPosition.TOP && labelHasFieldWidth) {
       var statusHeight = scout.graphics.prefSize(formField.$status).height;
       // Vertically center status with label
       var statusTop = containerPadding.top + formField.$label.cssPaddingTop() + (formField.$label.height() / 2) - (statusHeight / 2);
@@ -211,11 +208,11 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
         }).width;
       }
     }
-    labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
-      formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
+    labelPositionLeft = formField.labelPosition === scout.FormField.LabelPosition.DEFAULT ||
+      formField.labelPosition === scout.FormField.LabelPosition.LEFT;
     if (labelPositionLeft) {
       width += labelWidth;
-    } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+    } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
       topLabelHeight = formField.$label.outerHeight(true);
       height += topLabelHeight;
     }

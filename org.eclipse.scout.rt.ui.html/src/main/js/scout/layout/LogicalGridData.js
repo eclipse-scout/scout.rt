@@ -72,7 +72,7 @@ scout.LogicalGridData.prototype.validate = function() {
   this.heightHint = data.heightInPixel;
 
   // when having the label on top, the row height has to be increased
-  if (this.widget.labelVisible && this.widget.$label && this.widget.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+  if (this.widget.labelVisible && this.widget.$label && this.widget.labelPosition === scout.FormField.LabelPosition.TOP) {
     this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
   }
 };

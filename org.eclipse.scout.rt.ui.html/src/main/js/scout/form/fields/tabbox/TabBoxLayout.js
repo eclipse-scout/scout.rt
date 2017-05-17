@@ -35,7 +35,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaWidth = containerSize.subtract(tabAreaMargins).width;
     if ($status && $status.isVisible()) {
       this._layoutStatus();
-      if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+      if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
         tabAreaWidth -= $status.outerWidth(true);
       }
     }
@@ -64,7 +64,7 @@ scout.TabBoxLayout.prototype._layoutStatus = function() {
     statusPosition = this._tabBox.statusPosition,
     statusHeight = tabAreaInnerHeight - statusMargins.vertical();
 
-  if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+  if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
     statusTop += $tabArea.cssMarginTop();
   } else {
     statusHeight -= $status.cssBorderWidthY(); // status has a transparent border to align icon with text

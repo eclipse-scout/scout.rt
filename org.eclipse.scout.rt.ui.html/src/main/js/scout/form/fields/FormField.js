@@ -18,11 +18,11 @@ scout.FormField = function() {
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.keyStrokes = [];
   this.labelVisible = true;
-  this.labelPosition = scout.FormField.LABEL_POSITION_DEFAULT;
+  this.labelPosition = scout.FormField.LabelPosition.DEFAULT;
   this.labelWidthInPixel = 0;
   this.mandatory = false;
   this.statusVisible = true;
-  this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT;
+  this.statusPosition = scout.FormField.StatusPosition.DEFAULT;
   this.menus = [];
   this.menusVisible = false;
   this.gridData;
@@ -70,14 +70,23 @@ scout.FormField = function() {
 };
 scout.inherits(scout.FormField, scout.Widget);
 
-scout.FormField.LABEL_POSITION_DEFAULT = 0;
-scout.FormField.LABEL_POSITION_LEFT = 1;
-scout.FormField.LABEL_POSITION_ON_FIELD = 2;
-scout.FormField.LABEL_POSITION_RIGHT = 3;
-scout.FormField.LABEL_POSITION_TOP = 4;
+scout.FormField.LabelPosition = {
+  DEFAULT: 0,
+  LEFT: 1,
+  ON_FIELD: 2,
+  RIGHT: 3,
+  TOP: 4
+};
 
-scout.FormField.STATUS_POSITION_DEFAULT = 'default';
-scout.FormField.STATUS_POSITION_TOP = 'top';
+scout.FormField.LabelWidth = {
+  DEFAULT: 0,
+  UI: -1
+};
+
+scout.FormField.StatusPosition = {
+  DEFAULT: 'default',
+  TOP: 'top'
+};
 
 // see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
 scout.FormField.FULL_WIDTH = 0;
@@ -239,7 +248,7 @@ scout.FormField.prototype._renderVisible = function() {
 
 scout.FormField.prototype._renderLabel = function() {
   var label = this.label;
-  if (this.labelPosition === scout.FormField.LABEL_POSITION_ON_FIELD) {
+  if (this.labelPosition === scout.FormField.LabelPosition.ON_FIELD) {
     this._renderPlaceholder();
     if (this.$label) {
       this.$label.text('');
@@ -336,9 +345,21 @@ scout.FormField.prototype._renderChildVisible = function($child, visible) {
   }
 };
 
+scout.FormField.prototype.setLabelPosition = function(labelPosition) {
+  this.setProperty('labelPosition', labelPosition);
+};
+
 // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
 scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
+  if (this.rendered) {
+    var htmlCompParent = this.htmlComp.getParent();
+    if (htmlCompParent) {
+      htmlCompParent.invalidateLayoutTree();
+    }
+    // Validate now to prevent flickering
+    this.revalidateLayoutTree();
+  }
 };
 
 scout.FormField.prototype._setEnabled = function(enabled) {

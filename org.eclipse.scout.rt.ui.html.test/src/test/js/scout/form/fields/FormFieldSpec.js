@@ -93,7 +93,7 @@ describe('FormField', function() {
 
       beforeEach(function() {
         formField.label = 'labelName';
-        formField.labelPosition = scout.FormField.LABEL_POSITION_ON_FIELD;
+        formField.labelPosition = scout.FormField.LabelPosition.ON_FIELD;
       });
 
       it('sets the label as placeholder', function() {
@@ -117,7 +117,7 @@ describe('FormField', function() {
 
       beforeEach(function() {
         formField.label = 'labelName';
-        formField.labelPosition = scout.FormField.LABEL_POSITION_TOP;
+        formField.labelPosition = scout.FormField.LabelPosition.TOP;
       });
 
       it('guarantees a minimum height if label is empty', function() {

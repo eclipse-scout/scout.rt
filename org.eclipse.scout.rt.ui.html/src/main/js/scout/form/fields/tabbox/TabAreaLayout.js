@@ -37,7 +37,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   // If tab area contains a menubar, less space is available
   clientWidth -= scout.graphics.getSize(menuBar.$container, true).width;
 
-  if (statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+  if (statusPosition === scout.FormField.StatusPosition.TOP) {
     // Status on top means it is inside the tab area
     if ($status && $status.isVisible()) {
       statusWidth = $status.outerWidth(true);

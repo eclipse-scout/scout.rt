@@ -50,7 +50,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   gbBodySize.height -= menuBarSize.height;
 
   if (statusWidth > 0) {
-    if (statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+    if (statusPosition === scout.FormField.StatusPosition.TOP) {
       labelMarginX = $label.cssMarginX() + statusWidth;
       $label.css('width', 'calc(100% - ' + labelMarginX + 'px');
     } else {
@@ -97,7 +97,7 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
     statusPosition = this._groupBox.statusPosition;
 
   $status.cssWidth(this._statusWidth);
-  if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+  if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
     $status
       .cssTop(top + $groupBoxTitle.cssMarginTop())
       .cssRight(right)
