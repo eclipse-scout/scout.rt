@@ -45,6 +45,7 @@ public abstract class AbstractSeleniumTest {
   private static WebDriver s_driver;
 
   private final IgnoreTestOnMacOSRule m_ignoreTestOnMacOSRule = new IgnoreTestOnMacOSRule(this);
+  private final BrowserLogRule m_browserLogRule = new BrowserLogRule(this);
   private final SessionRule m_sessionRule = new SessionRule(this);
   private final ScreenshotRule m_screenshotRule = new ScreenshotRule(this);
 
@@ -54,7 +55,9 @@ public abstract class AbstractSeleniumTest {
    * @see https://github.com/junit-team/junit/issues/906
    */
   @Rule
-  public final TestRule m_mainRule = RuleChain.outerRule(m_ignoreTestOnMacOSRule)
+  public final TestRule m_mainRule = RuleChain
+      .outerRule(m_ignoreTestOnMacOSRule)
+      .around(m_browserLogRule)
       .around(m_sessionRule)
       .around(m_screenshotRule);
 

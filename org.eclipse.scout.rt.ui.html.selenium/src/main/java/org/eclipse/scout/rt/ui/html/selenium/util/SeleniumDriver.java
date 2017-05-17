@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.OS;
@@ -28,6 +29,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public final class SeleniumDriver {
@@ -73,6 +78,9 @@ public final class SeleniumDriver {
     System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
     logProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
 
+    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+
+    // Prepare options
     ChromeOptions options = new ChromeOptions();
     String chromeBinary = System.getProperty("chrome.binary");
     logProperty("chrome.binary", chromeBinary);
@@ -82,6 +90,12 @@ public final class SeleniumDriver {
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
     options.addArguments("--disable-infobars");
+    capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
+    // Set logging preferences (see BrowserLogRule)
+    LoggingPreferences logPrefs = new LoggingPreferences();
+    logPrefs.enable(LogType.BROWSER, Level.ALL);
+    capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
     // TODO [7.0] BSH Remove workaround, when Chrome bug is fixed
     // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
@@ -93,7 +107,7 @@ public final class SeleniumDriver {
             .usingAnyFreePort()
             .withEnvironment(env) // <--
             .build(),
-        options);
+        capabilities);
     //RemoteWebDriver driver = new ChromeDriver(options)
     // </WORKAROUND>
 
