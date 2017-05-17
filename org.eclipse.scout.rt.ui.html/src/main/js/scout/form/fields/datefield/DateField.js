@@ -189,6 +189,10 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
   return null;
 };
 
+scout.DateField.prototype.setDateFormatPattern = function(dateFormatPattern) {
+  this.setProperty('dateFormatPattern', dateFormatPattern);
+};
+
 scout.DateField.prototype._setDateFormatPattern = function(dateFormatPattern) {
   if (!dateFormatPattern) {
     dateFormatPattern = this.session.locale.dateFormatPatternDefault;

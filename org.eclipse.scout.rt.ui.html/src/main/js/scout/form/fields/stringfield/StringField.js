@@ -347,7 +347,11 @@ scout.StringField.prototype.triggerSelectionChange = function() {
 };
 
 scout.StringField.prototype._validateValue = function(value) {
-  if (this.trimText && !scout.objects.isNullOrUndefined(value)) {
+  if (scout.objects.isNullOrUndefined(value)) {
+    return value;
+  }
+  value = scout.strings.asString(value);
+  if (this.trimText) {
     value = value.trim();
   }
   return scout.StringField.parent.prototype._validateValue(value);

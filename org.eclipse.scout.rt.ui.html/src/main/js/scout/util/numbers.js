@@ -202,6 +202,13 @@ scout.numbers = {
       return number;
     }
     return Number(number);
+  },
+
+  /**
+   * Returns true if the given number is of type number but not NaN.
+   */
+  isNumber: function(number) {
+    return typeof number === 'number' && !Number.isNaN(number);
   }
 
 };

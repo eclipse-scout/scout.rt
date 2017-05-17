@@ -43,9 +43,16 @@ describe('NumberField', function() {
       expect(field.displayText).toBe('123.5');
     });
 
+    it('tries to convert the value into a number', function() {
+      field.render();
+      field.setValue('123.5');
+      expect(field.value).toBe(123.5);
+      expect(field.displayText).toBe('123.5');
+    });
+
     it('does not set the value if it is invalid', function() {
       field.render();
-      field.setValue('123.5'); // not a number
+      field.setValue('asdf');
       expect(field.value).toBe(null);
     });
 
@@ -59,7 +66,7 @@ describe('NumberField', function() {
 
     it('uses another invalidation message than the value field', function() {
       field.render();
-      field.setValue('123.5');
+      field.setValue('asdf');
       expect(field.errorStatus.message).toBe('[undefined text: InvalidNumberMessageX]');
     });
 

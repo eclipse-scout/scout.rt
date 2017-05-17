@@ -86,7 +86,7 @@ describe('ValueField', function() {
       expect(field.empty).toBe(false);
 
       // The same could be achieved using setValue and setDisplayText
-      field = helper.createField('StringField', session.desktop);
+      field = helper.createField('StringField');
       field.setValue('Foo');
       field.setDisplayText('ABC');
       expect(field.value).toBe('Foo');
@@ -166,7 +166,7 @@ describe('ValueField', function() {
   describe('setValue', function() {
 
     it('sets the value, formats it and sets the display text', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field.setValue('Foo');
       expect(field.value).toBe('Foo');
       expect(field.displayText).toBe('Foo');
@@ -176,7 +176,7 @@ describe('ValueField', function() {
     });
 
     it('does not set the value but the error status and display text if the validation fails', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._validateValue = function(value) {
         throw new Error('Validation failed');
       };
@@ -187,7 +187,7 @@ describe('ValueField', function() {
     });
 
     it('deletes the error status if value is valid', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._validateValue = function(value) {
         throw new Error('Validation failed');
       };
@@ -203,12 +203,32 @@ describe('ValueField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
+    it('does not fire a property change if the value has not changed', function() {
+      var field = helper.createField('StringField');
+      var count = 0;
+      field.on('propertyChange', function(event) {
+        if (event.name === 'value') {
+          count++;
+        }
+      });
+      field.setValue(' Foo   '); // trim is true
+      expect(field.value).toBe('Foo');
+      expect(count).toBe(1);
+
+      field.setValue('Foo ');
+      expect(field.value).toBe('Foo');
+      expect(field.errorStatus).toBe(null);
+      // still one, even if setValue was called with a different value, after validation the value is the same
+      expect(count).toBe(1);
+    });
+
+
   });
 
   describe('_validateValue', function() {
 
     it('may throw an error or a scout.Status if value is invalid', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._validateValue = function(value) {
         throw new Error('an error');
       };
@@ -218,7 +238,7 @@ describe('ValueField', function() {
     });
 
     it('may throw a scout.Status if value is invalid', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._validateValue = function(value) {
         throw scout.Status.error({
           message: 'Custom message'
@@ -230,7 +250,7 @@ describe('ValueField', function() {
     });
 
     it('may throw a message if value is invalid', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._validateValue = function(value) {
         throw "Invalid value";
       };
@@ -243,14 +263,14 @@ describe('ValueField', function() {
   describe('parseAndSetValue', function() {
 
     it('parses and sets the value', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe('Foo');
     });
 
     it('does not set the value but the error status if the parsing fails', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._parseValue = function(text) {
         throw new Error('Parsing failed');
       };
@@ -260,7 +280,7 @@ describe('ValueField', function() {
     });
 
     it('deletes the error status if parsing succeeds', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._parseValue = function(value) {
         throw new Error('Validation failed');
       };
@@ -281,7 +301,7 @@ describe('ValueField', function() {
   describe('acceptInput', function() {
 
     it('accepts the current display text by calling parse, validate and format', function() {
-      var field = helper.createField('StringField', session.desktop);
+      var field = helper.createField('StringField');
       field._parseValue = function(displayText) {
         return (displayText === 'blau' ? 'gelb' : displayText);
       };
@@ -340,7 +360,7 @@ describe('ValueField', function() {
     var field;
 
     beforeEach(function() {
-      field = helper.createField('StringField', session.desktop);
+      field = helper.createField('StringField');
     });
 
     it('sets initialValue when markAsSaved is called', function() {

@@ -36,14 +36,14 @@ describe("StringField", function() {
     return helper.createFieldModel();
   }
 
-  describe("Check if field is switched to password field if inputMasked is true", function() {
-    it("set input masked", function() {
+  describe("inputMasked", function() {
+    it("sets the field into password mode, if true", function() {
       field.inputMasked = true;
       field.render();
       expect(field.$field.attr('type')).toBe('password');
     });
 
-    it("set input not masked", function() {
+    it("unsets the password mode, if false", function() {
       field.inputMasked = false;
       field.render();
       expect(field.$field.attr('type')).toBe('text');
@@ -199,6 +199,28 @@ describe("StringField", function() {
       field.$field.val(' ' + longText + ' ');
       field.setDisplayText(longText);
       expect(true).toBe(true);
+    });
+  });
+
+  describe('setValue', function() {
+    var field;
+
+    beforeEach(function() {
+      field = helper.createField('StringField');
+    });
+
+    it('sets the value and display text if the value is valid', function() {
+      field.render();
+      field.setValue('hello');
+      expect(field.value).toBe('hello');
+      expect(field.displayText).toBe('hello');
+    });
+
+    it('tries to convert the value into a string', function() {
+      field.render();
+      field.setValue(10);
+      expect(field.value).toBe('10');
+      expect(field.displayText).toBe('10');
     });
   });
 

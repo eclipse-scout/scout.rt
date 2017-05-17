@@ -187,10 +187,14 @@ scout.ValueField.prototype._setValue = function(value) {
     return;
   }
 
+  this._updateDisplayText();
+  if (scout.objects.equals(oldValue, this.value)) {
+    return;
+  }
+
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
-  this._updateDisplayText();
 };
 
 scout.ValueField.prototype._validationFailed = function(value, error) {

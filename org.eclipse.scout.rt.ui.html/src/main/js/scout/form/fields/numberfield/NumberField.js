@@ -91,7 +91,8 @@ scout.NumberField.prototype._validateValue = function(value) {
   if (scout.objects.isNullOrUndefined(value)) {
     return value;
   }
-  if (typeof value !== 'number') {
+  value = scout.numbers.ensure(value);
+  if (!scout.numbers.isNumber(value)) {
     throw this.session.text(this.invalidValueMessageKey, value);
   }
   return value;
