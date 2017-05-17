@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_BYTES;
+import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_NO_PAYLOAD;
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_TEXT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_NULL_OBJECT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_REQUEST_REPLY_SUCCESS;
@@ -59,6 +60,8 @@ public class JmsMessageWriter {
         return session.createTextMessage();
       case MESSAGE_TYPE_BYTES:
         return session.createBytesMessage();
+      case MESSAGE_TYPE_NO_PAYLOAD:
+        return session.createMessage();
       default:
         throw new PlatformException("Unsupported message type '{}'", messageType);
     }
@@ -80,6 +83,8 @@ public class JmsMessageWriter {
         break;
       case MESSAGE_TYPE_BYTES:
         writeBytesMessage((BytesMessage) m_message, (byte[]) transportObject);
+        break;
+      case MESSAGE_TYPE_NO_PAYLOAD:
         break;
       default:
         throw new PlatformException("Unsupported transport type '{}'", m_marshaller.getMessageType());

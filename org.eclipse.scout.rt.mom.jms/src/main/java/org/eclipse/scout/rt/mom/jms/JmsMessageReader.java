@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_BYTES;
+import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_NO_PAYLOAD;
 import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_TEXT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_NULL_OBJECT;
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_REQUEST_REPLY_SUCCESS;
@@ -77,6 +78,9 @@ public class JmsMessageReader<DTO> {
         break;
       case MESSAGE_TYPE_BYTES:
         transferData = readBytesMessage((BytesMessage) m_message);
+        break;
+      case MESSAGE_TYPE_NO_PAYLOAD:
+        transferData = null;
         break;
       default:
         throw new PlatformException("Unsupported message type '{}'", m_marshaller.getMessageType());
