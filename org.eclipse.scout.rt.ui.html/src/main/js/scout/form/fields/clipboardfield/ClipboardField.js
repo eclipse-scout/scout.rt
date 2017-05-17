@@ -237,6 +237,8 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     // Prevent pasting in "copy" mode
     return false;
   }
+
+  var startPasteTimestamp = Date.now();
   var dataTransfer, myWindow = this.$container.window(true);
   this.$field.selectAllText();
   if (event.originalEvent.clipboardData) {
@@ -278,9 +280,20 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           contentCount++;
         });
       } else if (scout.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
-        var fileContent = item.getAsFile();
-        if (fileContent) {
-          filesArgument.push(item.getAsFile());
+        var file = item.getAsFile();
+        if (file) {
+          // When pasting an image from the clipboard, Chrome and Firefox create a File object with
+          // a generic name such as "image.png" or "grafik.png" (hardcoded in Chrome, locale-dependent
+          // in FF). It is therefore not possible to distinguish between a real file and a bitmap
+          // from the clipboard. The following code measures the time between the start of the paste
+          // event and the file's last modified timestamp. If it is "very small", the file is likely
+          // a bitmap from the clipbaord and not a real file. In that case, add a special "scoutName"
+          // attribute to the file object that is then used as a filename in session.uploadFiles().
+          var lastModifiedDiff = startPasteTimestamp - file.lastModified;
+          if (lastModifiedDiff < 1000) {
+            file.scoutName = '';
+          }
+          filesArgument.push(file);
           contentCount++;
         }
       }
@@ -302,7 +315,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
       };
       reader.onerror = function(event) {
         waitForFileReaderEvents--;
-        $.log.error('Error during file upload ' + item.name + ' / ' + event.target.error.code);
+        $.log.error('Error while reading file ' + item.name + ' / ' + event.target.error.code);
       };
       // start file reader
       waitForFileReaderEvents++;

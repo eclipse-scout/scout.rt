@@ -1039,7 +1039,8 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   $.each(files, function(index, value) {
     if (!allowedTypes || allowedTypes.length === 0 || scout.isOneOf(value.type, allowedTypes)) {
       totalSize += value.size;
-      formData.append('files', value, value.name || '');
+      var filename = scout.nvl(value.scoutName, value.name, ''); // see ClipboardField for comments on "scoutName"
+      formData.append('files', value, filename);
     }
   }.bind(this));
 
