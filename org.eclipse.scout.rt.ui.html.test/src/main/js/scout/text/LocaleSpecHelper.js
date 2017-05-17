@@ -17,6 +17,7 @@ scout.LocaleSpecHelper = function() {
 scout.LocaleSpecHelper.DEFAULT_LOCALE = 'de-CH';
 scout.LocaleSpecHelper.GERMAN_LOCALE = 'de-DE';
 scout.LocaleSpecHelper.DEFAULT_DATE_FORMAT_PATTERN = 'dd.MM.yyyy';
+scout.LocaleSpecHelper.DEFAULT_TIME_FORMAT_PATTERN = 'HH:mm';
 
 scout.LocaleSpecHelper.prototype.createModel = function(languageTag) {
   var model = {};
@@ -30,6 +31,7 @@ scout.LocaleSpecHelper.prototype.createLocale = function(languageTag) {
   model.decimalFormatPatternDefault = "#,##0.###";
   model.dateFormatSymbols = this.dateFormatSymbolsByLocale[languageTag];
   model.dateFormatPatternDefault = this.dateFormatPatternByLocale[languageTag] || scout.LocaleSpecHelper.DEFAULT_DATE_FORMAT_PATTERN;
+  model.timeFormatPatternDefault = scout.LocaleSpecHelper.DEFAULT_TIME_FORMAT_PATTERN;
   return new scout.Locale(model);
 };
 

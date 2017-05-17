@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -429,7 +428,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   protected class P_UIFacade implements IDateFieldUIFacade {
 
     @Override
-    public void setDateTimeFromUI(Date date) {
+    public void setValueFromUI(Date date) {
       if (!isEnabled() || !isVisible()) {
         return;
       }
@@ -445,15 +444,11 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
 
     @Override
-    public void setParseErrorFromUI() {
-      String invalidMessage = getDisplayText().replace("\n", " ");
-      ParsingFailedStatus status = new ParsingFailedStatus(ScoutTexts.get("InvalidValueMessageX", invalidMessage), getDisplayText());
-      addErrorStatus(status);
-    }
-
-    @Override
-    public void removeParseErrorFromUI() {
+    public void setErrorStatusFromUI(ParsingFailedStatus errorStatus) {
       removeErrorStatus(ParsingFailedStatus.class);
+      if (errorStatus != null) {
+        addErrorStatus(errorStatus);
+      }
     }
   }
 

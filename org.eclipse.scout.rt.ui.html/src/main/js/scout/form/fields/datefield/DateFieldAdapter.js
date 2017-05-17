@@ -10,48 +10,81 @@
  ******************************************************************************/
 scout.DateFieldAdapter = function() {
   scout.DateFieldAdapter.parent.call(this);
-  this.enabledWhenOffline = true;
+  this._errorStatus = null;
+  this._errorStatusDisplayText = null;
 };
 scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);
 
-scout.DateFieldAdapter.prototype._initProperties = function(model) {
-  if (model.errorStatus) {
-    model._modelErrorStatus = new scout.Status(model.errorStatus);
-  } else {
-    model._modelErrorStatus = null;
+/**
+ * @override
+ */
+scout.DateFieldAdapter.prototype._onWidgetDisplayTextChanged = function(event) {
+  var data = {
+      displayText: this.widget.displayText,
+      errorStatus: this.widget.errorStatus
+    };
+  // In case of an error, the value is still the old, valid value -> don't send it
+  if (!this.widget.errorStatus) {
+    data.value = scout.dates.toJsonDate(this.widget.value);
+  }
+  this._send('displayTextChanged', data, {
+    showBusyIndicator: !event.whileTyping,
+    coalesce: function(previous) {
+      return this.target === previous.target && this.type === previous.type;
+    }
+  });
+  this._errorStatus = null;
+  this._errorStatusDisplayText = null;
+};
+
+/**
+ * @override
+ */
+scout.DateFieldAdapter.prototype._syncDisplayText = function(displayText) {
+  // No need to call parseAndSetValue, the value will come separately
+  this.widget.setDisplayText(displayText);
+
+  if (this._errorStatus) {
+    this._errorStatusDisplayText = displayText;
   }
 };
 
 scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
-  // always store the error status from the server in a separate property
   if (errorStatus) {
-    this.widget._modelErrorStatus = new scout.Status(errorStatus);
-  } else {
-    this.widget._modelErrorStatus = null;
+    if (this.widget.errorStatus) {
+      // Don't loose information which part was invalid
+      errorStatus.invalidDate = this.widget.errorStatus.invalidDate;
+      errorStatus.invalidTime = this.widget.errorStatus.invalidTime;
+    } else {
+      // If the error happened only on server side, we do not know which part was invalid.
+      // Set both to true so that DateField._isDateValid / isTimeValid does not return true
+      errorStatus.invalidDate = true;
+      errorStatus.invalidTime = true;
+    }
   }
-  // if UI has already an error, don't overwrite it with the error status from the server
-  if (!this.widget._hasUiErrorStatus()) {
-    // info: this setter ensures that errorStatus object is converted to scout.Status
-    this.widget.setErrorStatus(errorStatus);
-  }
+
+  // Remember errorStatus from model
+  this._errorStatus = scout.Status.ensure(errorStatus);
+  this._errorStatusDisplayText = this.widget.displayText;
+  this.widget.setErrorStatus(errorStatus);
 };
 
-scout.DateFieldAdapter.prototype._onWidgetParsingError = function(event) {
-  this._send('parsingError');
-};
-
-scout.DateFieldAdapter.prototype._onWidgetTimestampChanged = function(event) {
-  this._send('timestampChanged', {
-    timestamp: event.timestamp
-  });
-};
-
-scout.DateFieldAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'parsingError') {
-    this._onWidgetParsingError(event);
-  } else if (event.type === 'timestampChanged') {
-    this._onWidgetTimestampChanged(event);
-  } else {
-    scout.DateFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+scout.DateFieldAdapter.modifyPrototype = function() {
+  if (!scout.app.remote) {
+    return;
   }
+
+  scout.objects.replacePrototypeFunction(scout.DateField, '_parseValue', function(displayText) {
+    if (this.modelAdapter) {
+      // If the server reported an error for that display text, make sure it will be shown in the UI if the user enters that display text again
+      if (this.modelAdapter._errorStatus && displayText === this.modelAdapter._errorStatusDisplayText) {
+        throw this.modelAdapter._errorStatus;
+      }
+      return this._parseValueOrig(displayText);
+    } else {
+      return this._parseValueOrig(displayText);
+    }
+  }, true);
 };
+
+scout.addAppListener('bootstrap', scout.DateFieldAdapter.modifyPrototype);

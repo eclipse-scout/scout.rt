@@ -10,27 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import java.beans.PropertyChangeEvent;
 import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
-
-  private static final String PROP_TIMESTAMP = "timestamp";
-  private static final String PROP_AUTO_TIMESTAMP = "autoTimestamp";
-  // UI events
-  private static final String EVENT_TIMESTAMP_CHANGED = "timestampChanged";
-  private static final String EVENT_PARSING_ERROR = "parsingError";
 
   public JsonDateField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -44,7 +38,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<T>(PROP_TIMESTAMP, model) {
+    putJsonProperty(new JsonProperty<T>(IValueField.PROP_VALUE, model) {
       @Override
       protected Date modelValue() {
         return getModel().getValue();
@@ -55,7 +49,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
         return dateToJson((Date) value);
       }
     });
-    putJsonProperty(new JsonProperty<T>(PROP_AUTO_TIMESTAMP, model) {
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_AUTO_DATE, model) {
       @Override
       protected Date modelValue() {
         return getModel().getAutoDate();
@@ -120,66 +114,28 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   @Override
-  protected void handleModelPropertyChange(PropertyChangeEvent event) {
-    String propertyName = event.getPropertyName();
-    // Translate "value changed" to "timestamp changed"
-    if (IDateField.PROP_VALUE.equals(propertyName)) {
-      PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
-      if (filteredEvent != null) {
-        addPropertyChangeEvent(PROP_TIMESTAMP, dateToJson((Date) event.getNewValue()));
+  protected void handleUiDisplayTextChanged(JsonEvent event) {
+    if (event.getData().has(IValueField.PROP_DISPLAY_TEXT)) {
+      String displayText = event.getData().getString(IValueField.PROP_DISPLAY_TEXT);
+      addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    }
+
+    if (event.getData().has(IValueField.PROP_ERROR_STATUS)) {
+      JSONObject status = event.getData().optJSONObject(IValueField.PROP_ERROR_STATUS);
+      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, status);
+      ParsingFailedStatus parseError = null;
+      if (status != null) {
+        String message = status.optString("message", null);
+        parseError = new ParsingFailedStatus(message, getModel().getDisplayText());
       }
-    }
-    // Translate "auto date changed" to "auto timestamp changed"
-    else if (IDateField.PROP_AUTO_DATE.equals(propertyName)) {
-      PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
-      if (filteredEvent != null) {
-        addPropertyChangeEvent(PROP_AUTO_TIMESTAMP, dateToJson((Date) event.getNewValue()));
-      }
-    }
-    else {
-      super.handleModelPropertyChange(event);
-    }
-  }
-
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_TIMESTAMP_CHANGED.equals(event.getType())) {
-      handleUiTimestampChanged(event);
-    }
-    else if (EVENT_PARSING_ERROR.equals(event.getType())) {
-      handleUiParsingError(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  protected void handleUiTimestampChanged(JsonEvent event) {
-    Date uiValue = new JsonDate(event.getData().optString(PROP_TIMESTAMP, null)).asJavaDate();
-    addPropertyEventFilterCondition(IValueField.PROP_VALUE, uiValue);
-    getModel().getUIFacade().removeParseErrorFromUI();
-    getModel().getUIFacade().setDateTimeFromUI(uiValue);
-
-    // If the model value is changed during validation, it needs to be updated in the GUI again.
-    Date modelValue = getModel().getValue();
-    if (!DateUtility.equals(uiValue, modelValue)) {
-      addPropertyChangeEvent(PROP_TIMESTAMP, dateToJson((Date) modelValue));
+      getModel().getUIFacade().setErrorStatusFromUI(parseError);
     }
 
-  }
-
-  protected void handleUiParsingError(JsonEvent event) {
-    getModel().getUIFacade().removeParseErrorFromUI();
-    getModel().getUIFacade().setParseErrorFromUI();
-  }
-
-  @Override
-  protected void handleUiDisplayTextChangedWhileTyping(String displayText) {
-    throw new IllegalStateException("While typing is not supported by the date field.");
-  }
-
-  @Override
-  protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
-    getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    if (event.getData().has(IValueField.PROP_VALUE)) {
+      Date value = new JsonDate(event.getData().optString(IValueField.PROP_VALUE, null)).asJavaDate();
+      addPropertyEventFilterCondition(IValueField.PROP_VALUE, value);
+      getModel().getUIFacade().setValueFromUI(value);
+    }
   }
 }

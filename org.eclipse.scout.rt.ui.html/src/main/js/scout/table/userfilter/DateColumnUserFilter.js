@@ -95,21 +95,20 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
  */
 scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.dateFromField = groupBox.addFilterField('DateField', 'ui.from', 0);
-  this.dateFromField.setTimestamp(toJsonDate(this.dateFrom));
-  this.dateFromField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
+  this.dateFromField.setValue(this.dateFrom);
+  this.dateFromField.on('propertyChange', this._onPropertyChange.bind(this));
 
   this.dateToField = groupBox.addFilterField('DateField', 'ui.to', 1);
-  this.dateToField.setTimestamp(toJsonDate(this.dateTo));
-  this.dateToField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
-
-  function toJsonDate(date) {
-    return date ? scout.dates.toJsonDate(date) : null;
-  }
+  this.dateToField.setValue(this.dateTo);
+  this.dateToField.on('propertyChange', this._onPropertyChange.bind(this));
 };
 
-scout.DateColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  this.dateFrom = this.dateFromField.timestampAsDate;
-  this.dateTo = this.dateToField.timestampAsDate;
+scout.DateColumnUserFilter.prototype._onPropertyChange = function(event) {
+  if (event.name !== 'value') {
+    return;
+  }
+  this.dateFrom = this.dateFromField.value;
+  this.dateTo = this.dateToField.value;
   $.log.debug('(DateColumnUserFilter#_onDisplayTextChanged) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
   this.triggerFilterFieldsChanged(event);
 };
@@ -124,18 +123,7 @@ scout.DateColumnUserFilter.prototype._onInput = function(event) {
     // popup has been closed in the mean time
     return;
   }
-  this.dateFrom = this._readDate(this.dateFromField);
-  this.dateTo = this._readDate(this.dateToField);
+  this.dateFrom = this.dateFromField.value;
+  this.dateTo = this.dateToField.value;
   this.triggerFilterFieldsChanged(event);
-};
-
-scout.DateColumnUserFilter.prototype._readDate = function(dateField) {
-  var displayText = dateField.$dateField.val();
-  if (!displayText) {
-    return null;
-  }
-  var datePrediction = dateField._predictDate(displayText);
-  if (datePrediction && datePrediction.date) {
-    return dateField._newTimestampAsDate(datePrediction.date, dateField.timestampAsDate);
-  }
 };

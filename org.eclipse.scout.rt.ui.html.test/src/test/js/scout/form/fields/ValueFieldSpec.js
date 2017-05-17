@@ -222,12 +222,11 @@ describe('ValueField', function() {
       expect(count).toBe(1);
     });
 
-
   });
 
   describe('_validateValue', function() {
 
-    it('may throw an error or a scout.Status if value is invalid', function() {
+    it('may throw an error if value is invalid', function() {
       var field = helper.createField('StringField');
       field._validateValue = function(value) {
         throw new Error('an error');
@@ -260,6 +259,7 @@ describe('ValueField', function() {
     });
 
   });
+
   describe('parseAndSetValue', function() {
 
     it('parses and sets the value', function() {

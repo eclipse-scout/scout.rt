@@ -16,7 +16,7 @@ scout.inherits(scout.DatePickerTouchPopup, scout.TouchPopup);
 scout.DatePickerTouchPopup.prototype._init = function(options) {
   scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
   this._field.on('displayTextChanged', this._onFieldDisplayTextChanged.bind(this));
-  this._field.on('timestampChanged', this._onFieldTimestampChanged.bind(this));
+  this._field.on('propertyChange', this._onFieldPropertyChange.bind(this));
 };
 
 /**
@@ -48,7 +48,9 @@ scout.DatePickerTouchPopup.prototype._onFieldDisplayTextChanged = function(event
   this._touchField.setDisplayText(event.displayText);
 };
 
-scout.DatePickerTouchPopup.prototype._onFieldTimestampChanged = function(event) {
+scout.DatePickerTouchPopup.prototype._onFieldPropertyChange = function(event) {
   // Delegate to original field
-  this._touchField.updateTimestamp(scout.dates.ensure(event.timestamp));
+  if (event.name === 'value') {
+    this._touchField.setValue(event.newValue);
+  }
 };

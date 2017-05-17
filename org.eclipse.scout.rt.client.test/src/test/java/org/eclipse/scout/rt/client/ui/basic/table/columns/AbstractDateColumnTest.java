@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumnTest.TestTable.TestDateColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.platform.Order;
@@ -68,7 +69,7 @@ public class AbstractDateColumnTest {
   private void setParseErrorInUI(ITableRow row, AbstractDateColumn column) {
     AbstractDateField field = (AbstractDateField) column.prepareEdit(row);
     field.getUIFacade().setDisplayTextFromUI("invalid");
-    field.getUIFacade().setParseErrorFromUI();
+    field.getUIFacade().setErrorStatusFromUI(new ParsingFailedStatus("Parsing failed", "invalid"));
     column.completeEdit(row, field);
   }
 

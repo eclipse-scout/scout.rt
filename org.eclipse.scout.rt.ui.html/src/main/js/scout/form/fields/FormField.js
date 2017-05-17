@@ -52,7 +52,6 @@ scout.FormField = function() {
    */
   this.$status;
   this._addWidgetProperties(['keyStrokes', 'menus']);
-  this._addCloneProperties(['displayText']);
   this.mode = scout.FormField.Mode.DEFAULT;
   this.touched = false;
   this.tooltipText = null;

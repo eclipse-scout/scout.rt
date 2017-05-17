@@ -322,10 +322,6 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
     return; // do nothing when no date was found
   }
 
-  this.trigger('dateSelect', {
-    date: date,
-    shifting: true
-  });
   this.selectDate(date, true);
 };
 

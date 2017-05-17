@@ -18,6 +18,7 @@ scout.ValueField = function() {
   this.initialValue = null;
   this.invalidValueMessageKey = 'InvalidValueMessageX';
   this.value = null;
+  this._addCloneProperties(['value', 'displayText']);
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
@@ -83,7 +84,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
       this.parseAndSetValue(displayText);
     }
     // Display text may be formatted -> Use this.displayText
-    this._triggerDisplayTextChanged(this.displayText, whileTyping);
+    this._triggerDisplayTextChanged(whileTyping);
   }
 };
 
@@ -160,9 +161,9 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
   }
 };
 
-scout.ValueField.prototype._triggerDisplayTextChanged = function(displayText, whileTyping) {
+scout.ValueField.prototype._triggerDisplayTextChanged = function(whileTyping) {
   var event = {
-    displayText: displayText,
+    displayText: this.displayText,
     whileTyping: !!whileTyping
   };
   this.trigger('displayTextChanged', event);
@@ -262,7 +263,7 @@ scout.ValueField.prototype._validateValue = function(value) {
  * @returns the formatted string or a promise
  */
 scout.ValueField.prototype._formatValue = function(value) {
-  return scout.nvl(value, '') + ''; // [6.2] awe: check impl. for fields other than StringField
+  return scout.nvl(value, '') + '';
 };
 
 scout.ValueField.prototype._updateTouched = function() {
