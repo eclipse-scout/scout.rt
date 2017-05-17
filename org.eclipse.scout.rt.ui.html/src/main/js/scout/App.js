@@ -33,7 +33,8 @@ scout.App.prototype.init = function(options) {
   return this._prepare(options)
     .then(this._bootstrap.bind(this, options.bootstrap))
     .then(this._init.bind(this, options))
-    .then(this._initDone.bind(this, options));
+    .then(this._initDone.bind(this, options))
+    .catch(this._fail.bind(this, options));
 };
 
 /**
@@ -270,6 +271,14 @@ scout.App.prototype._initDone = function(options) {
     options: options
   });
   $.log.info('App initialized');
+};
+
+scout.App.prototype._fail = function(options, error) {
+  $.log.error('App initialization failed', error);
+  var $error = $('body').appendDiv('startup-error');
+  $error.appendDiv('startup-error-title').text('The application could not be started');
+  $error.appendDiv('startup-error-message').text(error);
+  throw error;
 };
 
 /**

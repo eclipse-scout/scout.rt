@@ -475,10 +475,16 @@ a,
 
 .startup-error {
   #scout.user-select(text);
-  #scout.drop-shadow-large();
+  #scout.drop-shadow();
   margin: 100px 50px;
   padding: 20px;
-  border: 1px solid @focus-border-color;
+  border: 1px solid @error-border-color;
+  background-color: @error-background-color;
+}
+
+.startup-error-title {
+  font-weight: bold;
+  padding-bottom: 10px;
 }
 
 /* --- z-index --- */
