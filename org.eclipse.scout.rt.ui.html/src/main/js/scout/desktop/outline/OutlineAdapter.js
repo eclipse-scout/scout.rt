@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.OutlineAdapter = function() {
   scout.OutlineAdapter.parent.call(this);
-  this._addAdapterProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
   this._nodeIdToRowMap = {};
   this._detailTableRowHandler = this._onDetailTableRowInitialized.bind(this);
 };

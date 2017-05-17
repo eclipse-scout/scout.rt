@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.SequenceBoxAdapter = function() {
   scout.SequenceBoxAdapter.parent.call(this);
-  this._addAdapterProperties('fields');
 };
 scout.inherits(scout.SequenceBoxAdapter, scout.CompositeFieldAdapter);

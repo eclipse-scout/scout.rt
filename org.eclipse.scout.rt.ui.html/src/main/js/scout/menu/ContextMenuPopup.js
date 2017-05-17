@@ -24,7 +24,7 @@ scout.ContextMenuPopup.prototype._init = function(options) {
 
   // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
   if (options.cloneMenuItems === false) {
-    this._addAdapterProperties('menuItems');
+    this._addWidgetProperties('menuItems');
   }
 
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);

@@ -11,7 +11,7 @@
 
 scout.Carousel = function() {
   scout.Carousel.parent.call(this);
-  this._addAdapterProperties(['widgets']);
+  this._addWidgetProperties(['widgets']);
 
   // default values
   this.statusEnabled = true;

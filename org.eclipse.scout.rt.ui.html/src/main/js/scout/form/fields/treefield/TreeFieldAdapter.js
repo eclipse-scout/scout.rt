@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.TreeFieldAdapter = function() {
   scout.TreeFieldAdapter.parent.call(this);
-  this._addAdapterProperties(['tree']);
 };
 scout.inherits(scout.TreeFieldAdapter, scout.FormFieldAdapter);

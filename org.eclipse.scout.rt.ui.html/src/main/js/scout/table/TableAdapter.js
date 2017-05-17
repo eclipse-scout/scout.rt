@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.TableAdapter = function() {
   scout.TableAdapter.parent.call(this);
-  this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
   this._addRemoteProperties(['contextColumn']);
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);

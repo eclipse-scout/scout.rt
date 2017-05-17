@@ -37,7 +37,7 @@ scout.Tooltip = function() {
   this.htmlEnabled = false;
   this.$content;
   this.menus = [];
-  this._addAdapterProperties(['menus']);
+  this._addWidgetProperties(['menus']);
   this._renderLater = false;
 };
 scout.inherits(scout.Tooltip, scout.Widget);

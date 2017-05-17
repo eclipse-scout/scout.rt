@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.OutlineViewButtonAdapter = function() {
   scout.OutlineViewButtonAdapter.parent.call(this);
-  this._addAdapterProperties('outline');
 };
 scout.inherits(scout.OutlineViewButtonAdapter, scout.ViewButtonAdapter);
 

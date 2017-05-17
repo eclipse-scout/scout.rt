@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.PlannerField = function() {
   scout.PlannerField.parent.call(this);
-  this._addAdapterProperties(['planner']);
+  this._addWidgetProperties(['planner']);
 
   this.gridDataHints.weightY = 1.0;
   this.splitterPosition = 168;

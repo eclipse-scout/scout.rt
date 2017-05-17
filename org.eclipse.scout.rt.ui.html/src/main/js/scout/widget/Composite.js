@@ -2,7 +2,7 @@ scout.Composite = function() {
   scout.Composite.parent.call(this);
 
   this.widgets = [];
-  this._addAdapterProperties(['widgets']);
+  this._addWidgetProperties(['widgets']);
 };
 scout.inherits(scout.Composite, scout.Widget);
 

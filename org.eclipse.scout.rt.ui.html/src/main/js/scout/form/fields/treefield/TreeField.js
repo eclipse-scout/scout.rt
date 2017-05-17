@@ -13,7 +13,7 @@ scout.TreeField = function() {
 
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 3;
-  this._addAdapterProperties(['tree']);
+  this._addWidgetProperties(['tree']);
 };
 scout.inherits(scout.TreeField, scout.FormField);
 

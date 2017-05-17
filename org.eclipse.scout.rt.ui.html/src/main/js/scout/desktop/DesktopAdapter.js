@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
-  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
   this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible', 'geolocationServiceAvailable']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);

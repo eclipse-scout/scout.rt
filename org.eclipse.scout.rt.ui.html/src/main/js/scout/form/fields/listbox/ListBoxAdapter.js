@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.ListBoxAdapter = function() {
   scout.ListBoxAdapter.parent.call(this);
-  this._addAdapterProperties(['table', 'filterBox']);
 };
 scout.inherits(scout.ListBoxAdapter, scout.ValueFieldAdapter);

@@ -18,7 +18,7 @@ scout.TableField = function() {
   this._insertedRows = [];
   this._updatedRows = [];
   this._checkedRows = [];
-  this._addAdapterProperties(['table']);
+  this._addWidgetProperties(['table']);
 };
 scout.inherits(scout.TableField, scout.FormField);
 

@@ -18,7 +18,7 @@ scout.ViewMenuPopup = function() {
   this.viewMenus;
   this.viewButtonBoxBounds;
   this._tooltip;
-  this._addAdapterProperties('viewMenus');
+  this._addWidgetProperties('viewMenus');
   this._viewMenuDoActionHandler = this._onViewMenuDoAction.bind(this);
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);

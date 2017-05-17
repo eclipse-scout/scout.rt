@@ -46,7 +46,7 @@ scout.Planner = function() {
   };
 
   this.yearPanelVisible = false;
-  this._addAdapterProperties(['menus']);
+  this._addWidgetProperties(['menus']);
 };
 scout.inherits(scout.Planner, scout.Widget);
 

@@ -9,22 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * A ModelAdapter has a these naming-based contracts. Each property the model (=JSON data) has, is automatically
- * synchronized with the property with the same name in the ModelAdapter. When a property is synchronized it
- * happens in this defined order:
- *
- * <ol>
- * <li><b>_sync[propertyName](newValue, oldValue) method</b> [optional] if this method is present, it is called with the new- and the old value.
- *   Use this method to perform required conversions on the values provided by the model (for instance, convert a date-string into a date object),
- *   or use it when you have to do something based on the old-value.</li>
- * <li><b>Set property [propertyName]</b> if a _sync method is not present, the property is simply set. If the property is an adapter, as specified
- *   by the <code>_adapterProperties</code> list, the property is automatically transformed to an adapter instance.</li>
- * <li><b>_render[propertyName] method</b> at the point the _render method is called, the property is already set, so you can access its value
- *   by using this.[propertyName]. The _render method is required to update the UI based on the new property-value.</li>
- * </ol>
+ * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
+ * It also sends events to the server whenever an action happens on the widget.
  */
 scout.ModelAdapter = function() {
-  this._adapterProperties = []; // TODO [7.0] awe, cgu: Delete property _adapterProperties here and use property from Widget.js
   this.initialized = false;
   this.attached = false;
   this.destroyed = false;
@@ -165,21 +153,8 @@ scout.ModelAdapter.prototype._goOnline = function() {
   // NOP may be implemented by subclasses
 };
 
-scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
-  return this._adapterProperties.indexOf(propertyName) > -1;
-};
-
-scout.ModelAdapter.prototype._isRemoteProperty = function(propertyName) {
+scout.ModelAdapter.prototype.isRemoteProperty = function(propertyName) {
   return this._remoteProperties.indexOf(propertyName) > -1;
-};
-
-/**
- * Adds property name(s) of model properties which must be converted automatically to a model adapter.
- *
- * @param properties String or String-array with property names.
- */
-scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
-  this._addProperties('_adapterProperties', properties);
 };
 
 scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
@@ -191,19 +166,6 @@ scout.ModelAdapter.prototype._addProperties = function(propertyName, properties)
     this[propertyName] = this[propertyName].concat(properties);
   } else {
     this[propertyName].push(properties);
-  }
-};
-
-/**
- * Removes  property name(s) of model properties which must be converted automatically to a model adapter.
- *
- * Only used for special cases (e.g. when a model adapter wraps another adapter).
- */
-scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
-  if (Array.isArray(properties)) {
-    scout.arrays.removeAll(this._adapterProperties, properties);
-  } else {
-    scout.arrays.remove(this._adapterProperties, properties);
   }
 };
 
@@ -305,8 +267,8 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
     return;
   }
 
-  if (this._isRemoteProperty(propertyName)) {
-    if (value && this._isAdapterProperty(propertyName)) {
+  if (this.isRemoteProperty(propertyName)) {
+    if (value && this.widget.isWidgetProperty(propertyName)) {
       value = value.modelAdapter.id;
     }
     this._callSendProperty(propertyName, value);

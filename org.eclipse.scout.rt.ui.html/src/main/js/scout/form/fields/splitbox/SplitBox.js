@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.SplitBox = function() {
   scout.SplitBox.parent.call(this);
-  this._addAdapterProperties(['firstField', 'secondField', 'collapsibleField']);
+  this._addWidgetProperties(['firstField', 'secondField', 'collapsibleField']);
 
   this.fieldCollapsed = false;
   this.collapsibleField;

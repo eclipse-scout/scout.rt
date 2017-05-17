@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Menu = function() {
   scout.Menu.parent.call(this);
-  this._addAdapterProperties('childActions');
+  this._addWidgetProperties('childActions');
 
   this.defaultMenu = false;
   this.separator = false;

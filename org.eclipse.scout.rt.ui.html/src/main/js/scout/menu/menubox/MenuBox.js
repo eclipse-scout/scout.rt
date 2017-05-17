@@ -12,7 +12,7 @@ scout.MenuBox = function(menuBar) {
   scout.MenuBox.parent.call(this);
   this.compact = false;
   this.menus = [];
-  this._addAdapterProperties('menus');
+  this._addWidgetProperties('menus');
 };
 scout.inherits(scout.MenuBox, scout.Widget);
 

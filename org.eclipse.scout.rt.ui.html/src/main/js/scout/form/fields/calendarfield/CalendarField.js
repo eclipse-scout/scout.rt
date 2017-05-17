@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.CalendarField = function() {
   scout.CalendarField.parent.call(this);
-  this._addAdapterProperties(['calendar']);
+  this._addWidgetProperties(['calendar']);
 };
 scout.inherits(scout.CalendarField, scout.FormField);
 

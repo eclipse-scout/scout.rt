@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
-  this._addAdapterProperties('fields');
+  this._addWidgetProperties('fields');
 
   this.fields = [];
 };

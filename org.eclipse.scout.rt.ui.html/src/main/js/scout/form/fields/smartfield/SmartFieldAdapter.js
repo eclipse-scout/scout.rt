@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.SmartFieldAdapter = function() {
   scout.SmartFieldAdapter.parent.call(this);
-  this._addAdapterProperties(['proposalChooser']);
 };
 scout.inherits(scout.SmartFieldAdapter, scout.ValueFieldAdapter);
 

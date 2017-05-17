@@ -59,7 +59,7 @@ scout.Table = function() {
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this.$container;
   this.$data;
-  this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes']);
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];

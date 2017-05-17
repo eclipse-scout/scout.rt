@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.FormMenuAdapter = function() {
   scout.FormMenuAdapter.parent.call(this);
-  this._addAdapterProperties('form');
 };
 scout.inherits(scout.FormMenuAdapter, scout.MenuAdapter);

@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.ProposalChooser = function() {
   scout.ProposalChooser.parent.call(this);
-  this._addAdapterProperties(['model']);
+  this._addWidgetProperties(['model']);
   this.$container;
   this.$status;
   this.$activeFilter;

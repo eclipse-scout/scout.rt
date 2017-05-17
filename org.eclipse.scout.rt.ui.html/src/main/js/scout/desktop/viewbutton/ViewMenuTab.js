@@ -27,7 +27,7 @@ scout.ViewMenuTab = function() {
 
   this.defaultIconId = scout.icons.OUTLINE;
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
-  this._addAdapterProperties('viewMenus');
+  this._addWidgetProperties('viewMenus');
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 

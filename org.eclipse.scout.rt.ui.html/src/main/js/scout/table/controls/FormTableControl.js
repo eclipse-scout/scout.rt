@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.FormTableControl = function() {
   scout.FormTableControl.parent.call(this);
-  this._addAdapterProperties('form');
+  this._addWidgetProperties('form');
 };
 scout.inherits(scout.FormTableControl, scout.TableControl);
 

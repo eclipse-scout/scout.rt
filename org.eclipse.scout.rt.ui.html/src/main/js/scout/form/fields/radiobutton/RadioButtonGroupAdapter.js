@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.RadioButtonGroupAdapter = function() {
   scout.RadioButtonGroupAdapter.parent.call(this);
-  this._addAdapterProperties('formFields');
 };
 scout.inherits(scout.RadioButtonGroupAdapter, scout.ValueFieldAdapter);

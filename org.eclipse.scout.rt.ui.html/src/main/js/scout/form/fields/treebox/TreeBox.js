@@ -12,7 +12,7 @@ scout.TreeBox = function() {
   scout.TreeBox.parent.call(this);
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 2;
-  this._addAdapterProperties(['tree', 'filterBox']);
+  this._addWidgetProperties(['tree', 'filterBox']);
 };
 scout.inherits(scout.TreeBox, scout.ValueField);
 

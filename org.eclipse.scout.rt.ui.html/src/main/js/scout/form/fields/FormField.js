@@ -51,7 +51,7 @@ scout.FormField = function() {
    * The status label is used for error-status, tooltip-icon and menus.
    */
   this.$status;
-  this._addAdapterProperties(['keyStrokes', 'menus']);
+  this._addWidgetProperties(['keyStrokes', 'menus']);
   this._addCloneProperties(['displayText']);
   this.mode = scout.FormField.MODE_DEFAULT;
   this.touched = false;

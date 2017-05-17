@@ -30,12 +30,12 @@ describe('ModelAdapter', function() {
     });
     myObjectFactory.register('HasChildAdapter', function() {
       var adapter = new scout.ModelAdapter();
-      adapter._addAdapterProperties('childAdapter');
+      adapter._addWidgetProperties('childAdapter');
       return adapter;
     });
     myObjectFactory.register('HasChildAdapters', function() {
       var adapter = new scout.ModelAdapter();
-      adapter._addAdapterProperties('childAdapters');
+      adapter._addWidgetProperties('childAdapters');
       return adapter;
     });
     scout.objectFactory = myObjectFactory;

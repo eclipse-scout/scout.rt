@@ -12,7 +12,7 @@ scout.FormMenuPopup = function() {
   scout.FormMenuPopup.parent.call(this);
   this.formMenu;
   this.formMenuPropertyChangeHandler = this._onFormMenuPropertyChange.bind(this);
-  this._addAdapterProperties('form');
+  this._addWidgetProperties('form');
 };
 scout.inherits(scout.FormMenuPopup, scout.PopupWithHead);
 

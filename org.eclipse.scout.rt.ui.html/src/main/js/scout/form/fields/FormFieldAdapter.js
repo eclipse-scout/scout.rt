@@ -17,7 +17,6 @@ scout.FormFieldAdapter = function() {
    */
   this.enabledWhenOffline = false;
 
-  this._addAdapterProperties(['keyStrokes', 'menus']);
 };
 scout.inherits(scout.FormFieldAdapter, scout.ModelAdapter);
 

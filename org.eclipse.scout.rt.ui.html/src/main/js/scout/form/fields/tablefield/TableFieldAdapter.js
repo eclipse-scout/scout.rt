@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.TableFieldAdapter = function() {
   scout.TableFieldAdapter.parent.call(this);
-  this._addAdapterProperties(['table']);
 };
 scout.inherits(scout.TableFieldAdapter, scout.FormFieldAdapter);

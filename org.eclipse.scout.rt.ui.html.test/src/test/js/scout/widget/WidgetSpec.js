@@ -124,8 +124,8 @@ describe('Widget', function() {
     });
 
     it('\'text\' must be recognized as clone property, but not \'$container\'', function() {
-      expect(widget._isCloneProperty('text')).toBe(true);
-      expect(widget._isCloneProperty('$container')).toBe(false);
+      expect(widget.isCloneProperty('text')).toBe(true);
+      expect(widget.isCloneProperty('$container')).toBe(false);
     });
 
     it('prefers properties passed as modelOverride', function() {

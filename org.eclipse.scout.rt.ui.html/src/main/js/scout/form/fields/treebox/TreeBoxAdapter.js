@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.TreeBoxAdapter = function() {
   scout.TreeBoxAdapter.parent.call(this);
-  this._addAdapterProperties(['tree', 'filterBox']);
 };
 scout.inherits(scout.TreeBoxAdapter, scout.ValueFieldAdapter);

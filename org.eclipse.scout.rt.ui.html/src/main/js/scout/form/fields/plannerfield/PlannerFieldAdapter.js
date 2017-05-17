@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.PlannerFieldAdapter = function() {
   scout.PlannerFieldAdapter.parent.call(this);
-  this._addAdapterProperties(['planner']);
 };
 scout.inherits(scout.PlannerFieldAdapter, scout.FormFieldAdapter);

@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.ProposalChooserAdapter = function() {
   scout.ProposalChooserAdapter.parent.call(this);
-  this._addAdapterProperties(['model']);
 };
 scout.inherits(scout.ProposalChooserAdapter, scout.ModelAdapter);
 

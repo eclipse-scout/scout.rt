@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.MenuAdapter = function() {
   scout.MenuAdapter.parent.call(this);
-  this._addAdapterProperties('childActions');
 };
 scout.inherits(scout.MenuAdapter, scout.ActionAdapter);

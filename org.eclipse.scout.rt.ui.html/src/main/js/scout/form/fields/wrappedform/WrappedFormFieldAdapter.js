@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.WrappedFormFieldAdapter = function() {
   scout.WrappedFormFieldAdapter.parent.call(this);
-  this._addAdapterProperties(['innerForm']);
 };
 scout.inherits(scout.WrappedFormFieldAdapter, scout.FormFieldAdapter);

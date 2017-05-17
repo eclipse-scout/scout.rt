@@ -37,7 +37,7 @@ scout.Desktop = function() {
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
   this.openUriHandler;
 
-  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addWidgetProperties(['activeForm', 'viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);

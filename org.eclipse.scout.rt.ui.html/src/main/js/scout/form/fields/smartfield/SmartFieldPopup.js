@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.SmartFieldPopup = function() {
   scout.SmartFieldPopup.parent.call(this);
-  this._addAdapterProperties('proposalChooser');
+  this._addWidgetProperties('proposalChooser');
 };
 scout.inherits(scout.SmartFieldPopup, scout.Popup);
 

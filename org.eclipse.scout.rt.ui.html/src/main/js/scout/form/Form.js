@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Form = function() {
   scout.Form.parent.call(this);
-  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
+  this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
 
   this.displayHint = scout.Form.DisplayHint.DIALOG;
   this.maximizeEnabled = true;

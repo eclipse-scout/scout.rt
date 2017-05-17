@@ -11,7 +11,7 @@
 scout.NullWidget = function() {
   scout.NullWidget.parent.call(this);
 
-  this._addAdapterProperties(['childWidget']);
+  this._addWidgetProperties(['childWidget']);
 };
 scout.inherits(scout.NullWidget, scout.Widget);
 

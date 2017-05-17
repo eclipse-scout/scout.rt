@@ -236,27 +236,27 @@ scout.exportAdapter = function(adapterId, partId) {
 
   function resolveAdapterReferences(adapter, adapterData) {
     var tmpAdapter, tmpAdapterData;
-    adapter._adapterProperties.forEach(function(adapterPropertyName) {
-      var adapterPropertyValue = adapterData[adapterPropertyName];
-      if (!adapterPropertyValue) {
+    adapter.widget._widgetProperties.forEach(function(WidgetPropertyName) {
+      var WidgetPropertyValue = adapterData[WidgetPropertyName];
+      if (!WidgetPropertyValue) {
         return; // nothing to do when property is null
       }
-      if (Array.isArray(adapterPropertyValue)) {
+      if (Array.isArray(WidgetPropertyValue)) {
         // value is an array of adapter IDs
         var adapterDataArray = [];
-        adapterPropertyValue.forEach(function(adapterId) {
+        WidgetPropertyValue.forEach(function(adapterId) {
           tmpAdapter = session.getModelAdapter(adapterId);
           tmpAdapterData = cloneAdapterData(adapterId);
           resolveAdapterReferences(tmpAdapter, tmpAdapterData);
           adapterDataArray.push(tmpAdapterData);
         });
-        adapterData[adapterPropertyName] = adapterDataArray;
+        adapterData[WidgetPropertyName] = adapterDataArray;
       } else {
         // value is an adapter ID
-        tmpAdapter = session.getModelAdapter(adapterPropertyValue);
-        tmpAdapterData = cloneAdapterData(adapterPropertyValue);
+        tmpAdapter = session.getModelAdapter(WidgetPropertyValue);
+        tmpAdapterData = cloneAdapterData(WidgetPropertyValue);
         resolveAdapterReferences(tmpAdapter, tmpAdapterData);
-        adapterData[adapterPropertyName] = tmpAdapterData;
+        adapterData[WidgetPropertyName] = tmpAdapterData;
       }
     });
     adapterData = adapter.exportAdapterData(adapterData);

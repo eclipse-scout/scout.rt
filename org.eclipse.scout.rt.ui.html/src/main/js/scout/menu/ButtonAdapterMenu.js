@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.ButtonAdapterMenu = function() {
   scout.ButtonAdapterMenu.parent.call(this);
-  this._removeAdapterProperties('childActions'); // managed by button
+  this._removeWidgetProperties('childActions'); // managed by button
 
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
   this._buttonDestroyHandler = this._onButtonDestroy.bind(this);

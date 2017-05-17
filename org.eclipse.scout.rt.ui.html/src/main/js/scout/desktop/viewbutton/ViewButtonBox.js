@@ -15,7 +15,7 @@ scout.ViewButtonBox = function() {
   this.viewButtons = [];
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
   this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
-  this._addAdapterProperties(['viewButtons']);
+  this._addWidgetProperties(['viewButtons']);
 };
 scout.inherits(scout.ViewButtonBox, scout.Widget);
 

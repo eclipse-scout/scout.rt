@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.RadioButtonGroup = function() {
   scout.RadioButtonGroup.parent.call(this);
-  this._addAdapterProperties('formFields');
+  this._addWidgetProperties('formFields');
   this.formFields = [];
   this.radioButtons = [];
   this.selectedButton = null;

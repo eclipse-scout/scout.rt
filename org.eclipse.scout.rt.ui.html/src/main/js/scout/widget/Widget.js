@@ -51,10 +51,7 @@ scout.Widget = function() {
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval = false;
 
-  // TODO [7.0] awe, cgu: think about having a PropertConfig object or rename to 'widgetProperties'
-  // probably this PropertyConfig should be the same instance for all instances of the class and not be
-  // created for each instance of the class (saves memory)
-  this._adapterProperties = [];
+  this._widgetProperties = [];
   this._cloneProperties = ['visible', 'enabled', 'cssClass'];
   this._preserveOnPropertyChangeProperties = [];
   this._postRenderActions = [];
@@ -101,12 +98,12 @@ scout.Widget.prototype._init = function(model) {
     throw new Error('Session expected: ' + this);
   }
 
-  this._eachProperty(model, function(propertyName, value, isAdapterProperty) {
+  this._eachProperty(model, function(propertyName, value, isWidgetProperty) {
     if (value === undefined) {
       // Don't set the value if it is undefined, compared to null which is allowed explicitly ($.extend works in the same way)
       return;
     }
-    if (isAdapterProperty) {
+    if (isWidgetProperty) {
       value = this._prepareWidgetProperty(propertyName, value);
     }
     this._initProperty(propertyName, value);
@@ -903,7 +900,7 @@ scout.Widget.prototype.setProperty = function(propertyName, value) {
 };
 
 scout.Widget.prototype._prepareProperty = function(propertyName, value) {
-  if (!this._isAdapterProperty(propertyName)) {
+  if (!this.isWidgetProperty(propertyName)) {
     return value;
   }
   return this._prepareWidgetProperty(propertyName, value);
@@ -924,7 +921,7 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
   }
 
   // Destroy old child widget(s)
-  if (!this._isPreserveOnPropertyChangeProperty(propertyName)) {
+  if (!this.isPreserveOnPropertyChangeProperty(propertyName)) {
     this._destroyChildren(oldWidgets);
   }
 
@@ -939,10 +936,10 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
  * If it is a widget property, it removes the existing widgets. Render has to be implemented by the widget itself.
  */
 scout.Widget.prototype._callRemoveProperty = function(propertyName) {
-  if (!this._isAdapterProperty(propertyName)) {
+  if (!this.isWidgetProperty(propertyName)) {
     return;
   }
-  if (this._isPreserveOnPropertyChangeProperty(propertyName)) {
+  if (this.isPreserveOnPropertyChangeProperty(propertyName)) {
     return;
   }
   var widgets = this[propertyName];
@@ -1063,20 +1060,19 @@ scout.Widget.prototype.resolveIconIds = function(properties) {
   }, this);
 };
 
-// TODO [7.0] cgu temporary, rename
-scout.Widget.prototype._addAdapterProperties = function(properties) {
-  this._addProperties('_adapterProperties', properties);
+scout.Widget.prototype._addWidgetProperties = function(properties) {
+  this._addProperties('_widgetProperties', properties);
 };
 
-scout.Widget.prototype._isAdapterProperty = function(propertyName) {
-  return this._adapterProperties.indexOf(propertyName) > -1;
+scout.Widget.prototype.isWidgetProperty = function(propertyName) {
+  return this._widgetProperties.indexOf(propertyName) > -1;
 };
 
 scout.Widget.prototype._addCloneProperties = function(properties) {
   this._addProperties('_cloneProperties', properties);
 };
 
-scout.Widget.prototype._isCloneProperty = function(propertyName) {
+scout.Widget.prototype.isCloneProperty = function(propertyName) {
   return this._cloneProperties.indexOf(propertyName) > -1;
 };
 
@@ -1084,7 +1080,7 @@ scout.Widget.prototype._addPreserveOnPropertyChangeProperties = function(propert
   this._addProperties('_preserveOnPropertyChangeProperties', properties);
 };
 
-scout.Widget.prototype._isPreserveOnPropertyChangeProperty = function(propertyName) {
+scout.Widget.prototype.isPreserveOnPropertyChangeProperty = function(propertyName) {
   return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
 };
 
@@ -1103,7 +1099,7 @@ scout.Widget.prototype._eachProperty = function(model, func) {
 
   // Loop through primitive properties
   for (propertyName in model) {
-    if (this._adapterProperties.indexOf(propertyName) > -1) {
+    if (this._widgetProperties.indexOf(propertyName) > -1) {
       continue; // will be handled below
     }
     value = model[propertyName];
@@ -1111,8 +1107,8 @@ scout.Widget.prototype._eachProperty = function(model, func) {
   }
 
   //Loop through adapter properties (any order will do).
-  for (i = 0; i < this._adapterProperties.length; i++) {
-    propertyName = this._adapterProperties[i];
+  for (i = 0; i < this._widgetProperties.length; i++) {
+    propertyName = this._widgetProperties[i];
     value = model[propertyName];
     if (value === undefined) {
       continue;
@@ -1122,11 +1118,11 @@ scout.Widget.prototype._eachProperty = function(model, func) {
   }
 };
 
-scout.Widget.prototype._removeAdapterProperties = function(properties) {
+scout.Widget.prototype._removeWidgetProperties = function(properties) {
   if (Array.isArray(properties)) {
-    scout.arrays.removeAll(this._adapterProperties, properties);
+    scout.arrays.removeAll(this._widgetProperties, properties);
   } else {
-    scout.arrays.remove(this._adapterProperties, properties);
+    scout.arrays.remove(this._widgetProperties, properties);
   }
 };
 

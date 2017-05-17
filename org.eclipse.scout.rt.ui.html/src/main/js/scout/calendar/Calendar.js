@@ -52,7 +52,7 @@ scout.Calendar = function() {
    */
   this._listComponents = [];
 
-  this._addAdapterProperties(['components', 'menus', 'selectedComponent']);
+  this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
 };
 scout.inherits(scout.Calendar, scout.Widget);
 

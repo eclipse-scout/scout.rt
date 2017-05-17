@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.WrappedFormField = function() {
   scout.WrappedFormField.parent.call(this);
-  this._addAdapterProperties(['innerForm']);
+  this._addWidgetProperties(['innerForm']);
 
   this.initialFocusEnabled = false;
 };

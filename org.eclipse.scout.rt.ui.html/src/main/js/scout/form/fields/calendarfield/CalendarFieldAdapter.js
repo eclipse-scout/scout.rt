@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.CalendarFieldAdapter = function() {
   scout.CalendarFieldAdapter.parent.call(this);
-  this._addAdapterProperties(['calendar']);
 };
 scout.inherits(scout.CalendarFieldAdapter, scout.FormFieldAdapter);
