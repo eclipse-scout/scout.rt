@@ -1763,6 +1763,8 @@ scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes
           queue: false
         });
     }
+  } else if (insertBatch.$animationWrapper && insertBatch.animationCompleteFunc) {
+    insertBatch.animationCompleteFunc.call(this);
   }
 };
 
