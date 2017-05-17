@@ -20,6 +20,11 @@ public interface IMarshaller {
   int MESSAGE_TYPE_BYTES = 2;
 
   /**
+   * Indicates that no payload data is transferred.
+   */
+  int MESSAGE_TYPE_NO_PAYLOAD = 3;
+
+  /**
    * Marshalls the given transfer object into its transport type to be published.
    */
   Object marshall(Object transferObject, Map<String, String> context);
