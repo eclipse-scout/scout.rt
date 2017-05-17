@@ -20,13 +20,6 @@ scout.FormFieldLayout = function(formField) {
   this.mandatoryIndicatorWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
   this.statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;
-
-  // use configured label width in pixel or default label width
-  if (scout.FormField.LabelWidth.DEFAULT === formField.labelWidthInPixel) {
-    this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
-  } else {
-    this.labelWidth = formField.labelWidthInPixel;
-  }
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
@@ -37,7 +30,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
     htmlContainer = scout.HtmlComponent.get($container),
     formField = this.formField,
-    labelWidth = this.labelWidth,
+    labelWidth = this.labelWidth(),
     statusWidth = this.statusWidth;
 
   // Note: Position coordinates start _inside_ the border, therefore we only use the padding
@@ -51,7 +44,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
-    if (labelWidth === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
+    if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
@@ -194,12 +187,12 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
     height = scout.HtmlEnvironment.formRowHeight,
-    labelWidth = this.labelWidth,
+    labelWidth = this.labelWidth(),
     topLabelHeight = 0, // only set when label is on top
     formField = this.formField;
 
   if (this._isLabelVisible()) {
-    if (formField.labelUseUiWidth) {
+    if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
@@ -265,4 +258,12 @@ scout.FormFieldLayout.prototype.naturalSize = function(formField) {
   return scout.graphics.prefSize(formField.$fieldContainer, {
     includeMargin: true
   });
+};
+
+scout.FormFieldLayout.prototype.labelWidth = function() {
+  // use configured label width in pixel or default label width
+  if (scout.FormField.LabelWidth.DEFAULT === this.formField.labelWidthInPixel) {
+    return scout.HtmlEnvironment.fieldLabelWidth;
+  }
+  return this.formField.labelWidthInPixel;
 };

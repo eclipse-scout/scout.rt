@@ -259,7 +259,7 @@ scout.FormField.prototype._renderLabel = function() {
     this.$label.textOrNbsp(label, 'empty');
 
     // Invalidate layout if label width depends on its content
-    if (this.labelUseUiWidth) {
+    if (this.labelUseUiWidth || this.labelWidthInPixel === scout.FormField.LabelWidth.UI) {
       this.invalidateLayoutTree();
     }
   }
@@ -290,6 +290,14 @@ scout.FormField.prototype._renderLabelVisible = function() {
   var visible = this.labelVisible;
   this._renderChildVisible(this.$label, visible);
   this.$container.toggleClass('label-hidden', !visible);
+};
+
+scout.FormField.prototype.setLabelWidthInPixel = function(labelWidthInPixel) {
+  this.setProperty('labelWidthInPixel', labelWidthInPixel);
+};
+
+scout.FormField.prototype._renderLabelWidthInPixel = function() {
+  this.invalidateLayoutTree();
 };
 
 scout.FormField.prototype.setStatusVisible = function(visible) {
