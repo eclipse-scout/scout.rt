@@ -50,7 +50,9 @@ scout.FocusContext.prototype._onKeyDown = function(event) {
       $focusableElements = this.$container.find(':tabbable:visible'),
       firstFocusableElement = $focusableElements.first()[0],
       lastFocusableElement = $focusableElements.last()[0],
+      activeElementIndex = $focusableElements.index(activeElement),
       focusedElement;
+
     // Forward Tab
     if (!event.shiftKey) {
       // If the last focusable element is focused, or the focus is on the container, set the focus to the first focusable element
@@ -58,28 +60,28 @@ scout.FocusContext.prototype._onKeyDown = function(event) {
         $.suppressEvent(event);
         this._validateAndSetFocus(firstFocusableElement);
         focusedElement = firstFocusableElement;
-      } else if($focusableElements.length>0){
-        focusedElement = $focusableElements.get($focusableElements.index(activeElement) + 1);
-      }
-      else{
-        $.suppressEvent(event);
-        return;
+      } else if (activeElementIndex < $focusableElements.length - 1) {
+        focusedElement = $focusableElements.get(activeElementIndex + 1);
+        // Note: event is _not_ suppressed here --> will be handled by browser
       }
     }
     // Backward Tab (Shift+TAB)
     else {
       // If the first focusable element is focused, or the focus is on the container, set the focus to the last focusable element
-      if (lastFocusableElement && (activeElement === this.$container[0] || activeElement === firstFocusableElement)) {
+      if (lastFocusableElement && (activeElement === firstFocusableElement || activeElement === this.$container[0])) {
         $.suppressEvent(event);
         this._validateAndSetFocus(lastFocusableElement);
-        focusedElement = firstFocusableElement;
-      } else if($focusableElements.length>0){
-        focusedElement = $focusableElements.get($focusableElements.index(activeElement) - 1);
-      } else{
-        $.suppressEvent(event);
-        return;
+        focusedElement = lastFocusableElement;
+      } else if (activeElementIndex > 0) {
+        focusedElement = $focusableElements.get(activeElementIndex - 1);
+        // Note: event is _not_ suppressed here --> will be handled by browser
       }
     }
+    if (!focusedElement) {
+      return;
+    }
+
+    // Check if new focused element is currently visible, otherwise scroll the container
     var $focusableElement = $(focusedElement),
       containerBounds = scout.graphics.offsetBounds($focusableElement),
       $scrollable = $focusableElement.scrollParent();
