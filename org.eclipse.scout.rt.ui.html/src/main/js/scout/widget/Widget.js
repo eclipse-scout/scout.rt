@@ -855,7 +855,6 @@ scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
 scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, newValue) {
   scout.assertParameter('propertyName', propertyName);
   var event = new scout.Event({
-    type: oldValue,
     name: propertyName,
     oldValue: oldValue,
     newValue: newValue
