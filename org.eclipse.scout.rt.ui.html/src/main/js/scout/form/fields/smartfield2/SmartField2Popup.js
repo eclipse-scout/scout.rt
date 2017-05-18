@@ -74,6 +74,11 @@ scout.SmartField2Popup.prototype.setStatusLookupInProgress = function(status) {
   }));
 };
 
+scout.SmartField2Popup.prototype.selectFirstLookupRow = function() {
+  this.proposalChooser.selectFirstLookupRow();
+};
+
+
 /**
  * Delegates the key event to the proposal chooser.
  */

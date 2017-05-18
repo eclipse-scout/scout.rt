@@ -11,7 +11,7 @@
 scout.SmartField2ToggleKeyStroke = function(field) {
   scout.SmartField2ToggleKeyStroke.parent.call(this);
   this.field = field;
-  this.which = [scout.keys.SPACE, scout.keys.ENTER];
+  this.which = [scout.keys.ENTER]; // FIXME [awe] 7.0 - SF2: space required for DropDown style? add: ,  scout.keys.SPACE
   this.stopPropagation = true;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {

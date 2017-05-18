@@ -77,6 +77,12 @@ scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
   this.model.insertRows(tableRows);
 };
 
+scout.TableProposalChooser2.prototype.selectFirstLookupRow = function() {
+  if (this.model.rows.length) {
+    this.model.selectRow(this.model.rows[0]);
+  }
+};
+
 /**
  * Creates a table-row for the given lookup-row.
  * @returns {object} table-row model

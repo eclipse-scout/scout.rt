@@ -42,6 +42,12 @@ scout.TreeProposalChooser2.prototype.getSelectedLookupRow = function() {
   return selectedNode.lookupRow;
 };
 
+scout.TreeProposalChooser2.prototype.selectFirstLookupRow = function() {
+  if (this.model.nodes.length) {
+    this.model.selectNode(this.model.nodes[0]);
+  }
+};
+
 /**
  * @param {scout.LookupRow[]} lookupRows
  * @param {boolean} appendResult whether or not we must delete the tree

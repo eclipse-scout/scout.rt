@@ -28,6 +28,7 @@ scout.SmartField2 = function() {
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
   this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
+  this.pristine = true; // FIXME [awe] 7.0 - SF2: use touched property instead?
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -125,7 +126,12 @@ scout.SmartField2.prototype._renderDisplayText = function() {
  * Accepts the selected lookup row and sets its id as value.
  * This function is called on blur, by a keystroke or programmatically at any time.
  */
-scout.SmartField2.prototype.acceptInput = function(whileTyping) {
+scout.SmartField2.prototype.acceptInput = function() {
+  // if field is pristine (unchanged) do nothing at all
+  if (this.pristine) {
+    return;
+  }
+
   var
     searchText = this._readDisplayText(),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
@@ -215,7 +221,12 @@ scout.SmartField2.prototype._handleInvalidLookup = function(result, numLookupRow
     this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldNotUnique', searchText)
     }));
-    this.openPopup2(result);
+    if (this.popup) {
+      this.popup.setLookupResult(result);
+    } else {
+      this.openPopup2(result);
+    }
+    this.popup.selectFirstLookupRow();
     return;
   }
 };
@@ -272,7 +283,7 @@ scout.SmartField2.prototype._setCodeType = function(codeType) {
 };
 
 scout.SmartField2.prototype._formatValue = function(value) {
-  if (!value) {
+  if (scout.objects.isNullOrUndefined(value)) {
     return '';
   }
 
@@ -318,12 +329,14 @@ scout.SmartField2.prototype.openPopup2 = function(result) { // FIXME [awe] 7.0 -
   // But it should look focused when the popup is open.
   this.$field.addClass('focused');
   this.popup = this._createPopup();
+  console.log('set popup to instance != null');
   this.popup.setLookupResult(result);
   this.popup.open();
   this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
   this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this));
   this.popup.on('remove', function() {
     this.popup = null;
+    console.log('set popup to null');
     if (this.rendered) {
       this.$container.removeClass('popup-open');
       this.$field.removeClass('focused');
@@ -448,15 +461,37 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
 
-scout.SmartField2.prototype._onFieldKeydown = function(event) {
- if (this._isNavigationKey(event)) {
-   if (this.popup) {
-     this.popup.delegateKeyEvent(event);
-   } else {
-     this.openPopup(false);
-   }
- }
+scout.SmartField2.prototype._isPreventDefaultTabHandling = function(event) {
+  var doPrevent = !!this.popup;
+  $.log.trace('(SmartField2#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
+  return doPrevent;
 };
+
+scout.SmartField2.prototype._onFieldKeydown = function(event) {
+  // We must prevent default focus handling
+  if (event.which === scout.keys.TAB) {
+    if (this.mode === scout.FormField.MODE_DEFAULT) {
+      if (this._isPreventDefaultTabHandling()) {
+        event.preventDefault();
+        this._tabPrevented = {
+          directionBack: event.shiftKey
+        };
+      }
+    }
+    this.acceptInput();
+//    this._navigating = false;
+    return;
+  }
+
+  if (this._isNavigationKey(event)) {
+    if (this.popup) {
+      this.popup.delegateKeyEvent(event);
+    } else {
+      this.openPopup(false);
+    }
+  }
+};
+
 
 scout.SmartField2.prototype._isNavigationKey = function(event) {
   var w = event.which;
@@ -493,6 +528,10 @@ scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAl
   this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
 };
 
+scout.SmartField2.prototype.setBrowseLoadIncremental = function(browseLoadIncremental) {
+  this.setProperty('browseAutoLoadIncremental', browseLoadIncremental);
+};
+
 scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
   this.setProperty('activeFilter', this.activeFilterEnabled ? activeFilter : null);
 };
@@ -500,6 +539,7 @@ scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
 scout.SmartField2.prototype._startNewLookupByText = function() {
   var searchText = this._readDisplayText();
   $.log.trace('(SmartField2#_startNewLookupByText) searchText=' + searchText);
+  this.pristine = false;
 
   // debounce lookup
   if (this._pendingLookup) {
@@ -556,6 +596,19 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
     this.setValue(null);
   }
   this._lockLookupRow = false;
+
+  // In case we have a value X set, start to type search text, and then choose the lookup
+  // row from the proposal with exactly the same value X, setValue() does nothing because
+  // the value has not changed (even though the display text has) thus _formatValue is
+  // never called. That's why we always reset the display text to make sure the display
+  // text is correct.
+  this._resetDisplayText();
+};
+
+scout.SmartField2.prototype._resetDisplayText = function() {
+  if (this.rendered) {
+    this._renderDisplayText();
+  }
 };
 
 scout.SmartField2.prototype._getValueFromLookupRow = function(lookupRow) {
@@ -563,6 +616,8 @@ scout.SmartField2.prototype._getValueFromLookupRow = function(lookupRow) {
 };
 
 scout.SmartField2.prototype._setValue = function(value) {
+  this.pristine = true;
+
   // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
   // must of the time. Thus we must remove the reference to the old lookup row as early as possible
   if (!this._lockLookupRow) {

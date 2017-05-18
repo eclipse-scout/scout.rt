@@ -192,9 +192,20 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     m_id = 0;
   }
 
-  protected int mapKey(Object key) {
+  /**
+   * Returns a numeric ID for the given lookup row key. If the key is already mapped to an ID the existing ID is
+   * returned. Otherwise a new ID is returned.
+   *
+   * @param key
+   * @return
+   */
+  protected int getIdForLookupRowKey(Object key) {
+    if (m_keyToIdMap.containsKey(key)) {
+      return m_keyToIdMap.get(key);
+    }
+
     int id = m_id++;
-    m_keyToIdMap.put(key, id); // TODO [awe] 7.0 - SF2: anstatt der map könnten wir auch einfach den index der lookupRow verwenden (und müssten dann eine list nehmen)
+    m_keyToIdMap.put(key, id);
     m_idToKeyMap.put(id, key);
     return id;
   }
@@ -223,9 +234,8 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       return null;
     }
 
-    int mappedKey = mapKey(lookupRow.getKey());
     JSONObject json = new JSONObject();
-    json.put("key", mappedKey);
+    json.put("key", getIdForLookupRowKey(lookupRow.getKey()));
     json.put("text", lookupRow.getText());
     if (StringUtility.hasText(lookupRow.getIconId())) {
       json.put("iconId", BinaryResourceUrlUtility.createIconUrl(lookupRow.getIconId()));
@@ -246,7 +256,7 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       json.put("enabled", lookupRow.isEnabled());
     }
     if (lookupRow.getParentKey() != null) {
-      json.put("parentKey", m_keyToIdMap.get(lookupRow.getParentKey())); // FIXME [awe] 7.0 - SF2: how to map the parentKey, in case of incremental loading?
+      json.put("parentKey", getIdForLookupRowKey(lookupRow.getParentKey()));
     }
     if (!lookupRow.isActive()) {
       json.put("active", lookupRow.isActive());
