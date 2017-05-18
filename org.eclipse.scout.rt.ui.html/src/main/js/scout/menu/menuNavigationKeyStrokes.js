@@ -115,7 +115,9 @@ scout.inherits(scout.MenuNavigationExecKeyStroke, scout.MenuNavigationKeyStroke)
 
 scout.MenuNavigationExecKeyStroke.prototype.handle = function(event) {
   var $menuItem = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
-  $menuItem.data('widget').doAction();
+  if ($menuItem.length > 0) {
+    $menuItem.data('widget').doAction();
+  }
 };
 
 /**
