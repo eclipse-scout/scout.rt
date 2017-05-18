@@ -50,11 +50,12 @@
     display: inline-block;
     line-height: normal;
     height: auto;
+
+    /* Make IE trigger the :active state if the text or icon is pressed */
+    pointer-events: none;
   }
 
   & > .text {
-    /* Make element inline to inherit text-decoration property */
-    display: inline;
     /* SUPER HACK! */
     padding-top: 1px;
     padding-bottom: 1px;
