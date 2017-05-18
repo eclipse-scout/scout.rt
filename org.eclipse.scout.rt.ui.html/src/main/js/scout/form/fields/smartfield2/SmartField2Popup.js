@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 scout.SmartField2Popup = function() {
   scout.SmartField2Popup.parent.call(this);
   this.animateRemoval = true;
@@ -31,7 +41,7 @@ scout.SmartField2Popup.prototype._smartFieldBounds = function() {
  * @override
  */
 scout.SmartField2Popup.prototype._createLayout = function() {
-  if (this._smartField().variant === scout.SmartField2.Variant.DROPDOWN) {
+  if (this._smartField().variant === scout.SmartField2.DisplayStyle.DROPDOWN) {
     return new scout.DropdownPopupLayout(this, this.proposalChooser);
   } else {
     return new scout.SmartField2PopupLayout(this, this.proposalChooser);

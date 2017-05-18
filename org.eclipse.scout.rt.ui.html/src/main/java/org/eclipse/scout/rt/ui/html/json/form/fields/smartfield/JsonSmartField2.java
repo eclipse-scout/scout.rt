@@ -68,6 +68,18 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
         return getModel().getActiveFilter();
       }
     });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_AUTO_EXPAND_ALL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isBrowseAutoExpandAll();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_LOAD_INCREMENTAL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isBrowseLoadIncremental();
+      }
+    });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_ACTIVE_FILTER_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
@@ -117,6 +129,9 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     else if ("lookupAll".equals(event.getType())) {
       handleUiLookupAll();
     }
+    else if ("lookupByParentKey".equals(event.getType())) {
+      handleUiLookupByParentKey(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -151,6 +166,13 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     resetKeyMap();
     String searchText = event.getData().optString("searchText");
     getModel().lookupByText(searchText);
+  }
+
+  protected void handleUiLookupByParentKey(JsonEvent event) {
+    // resetKeyMap();
+    String mappedParentKey = event.getData().optString("parentKey");
+    VALUE parentKey = getLookupRowKeyForId(mappedParentKey);
+    getModel().lookupByParentKey(parentKey);
   }
 
   /**
@@ -269,8 +291,8 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put("browseHierarchy", getModel().isBrowseHierarchy());
-    json.put("variant", getModel().getVariant());
+    json.put(ISmartField2.PROP_DISPLAY_STYLE, getModel().getDisplayStyle());
+    json.put(ISmartField2.PROP_BROWSE_HIERARCHY, getModel().isBrowseHierarchy());
     return json;
   }
 }

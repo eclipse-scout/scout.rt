@@ -123,12 +123,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
 
-  private boolean m_browseAutoExpandAll;
-  private boolean m_loadIncremental;
-  private boolean m_loadParentNodes;
   private String m_wildcard;
   private SmartField2Result m_result;
-  private String m_variant;
 
   private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
   private final AtomicInteger m_valueChangedLookupCounter = new AtomicInteger();
@@ -292,8 +288,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(320)
-  protected String getConfiguredVariant() {
-    return VARIANT_DEFAULT;
+  protected String getConfiguredDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
   }
 
   /**
@@ -462,12 +458,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     setBrowseIconId(getConfiguredBrowseIconId());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
-    setLoadParentNodes(getConfiguredLoadParentNodes());
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
     setColumnDescriptors(getConfiguredColumnDescriptors());
-    setVariant(getConfiguredVariant());
+    setDisplayStyle(getConfiguredDisplayStyle());
 
     initLookupRowFetcher();
     // code type
@@ -611,32 +606,22 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public boolean isBrowseAutoExpandAll() {
-    return m_browseAutoExpandAll;
+    return propertySupport.getPropertyBool(PROP_BROWSE_AUTO_EXPAND_ALL);
   }
 
   @Override
-  public void setBrowseAutoExpandAll(boolean b) {
-    m_browseAutoExpandAll = b;
+  public void setBrowseAutoExpandAll(boolean browseAutoExpandAll) {
+    propertySupport.setPropertyBool(PROP_BROWSE_AUTO_EXPAND_ALL, browseAutoExpandAll);
   }
 
   @Override
   public boolean isBrowseLoadIncremental() {
-    return m_loadIncremental;
+    return propertySupport.getPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL);
   }
 
   @Override
-  public void setBrowseLoadIncremental(boolean b) {
-    m_loadIncremental = b;
-  }
-
-  @Override
-  public boolean isLoadParentNodes() {
-    return m_loadParentNodes;
-  }
-
-  @Override
-  public void setLoadParentNodes(boolean b) {
-    m_loadParentNodes = b;
+  public void setBrowseLoadIncremental(boolean browseLoadIncremental) {
+    propertySupport.setPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL, browseLoadIncremental);
   }
 
   @Override
@@ -1018,7 +1003,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return ObjectUtility.equals(lookupRow.getKey(), value);
   }
 
-  //search and update the field with the result
+  // search and update the field with the result
 
   @Override
   public void lookupAll() {
@@ -1029,6 +1014,13 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void lookupByText(String text) {
     doSearch(text, false, false);
   }
+
+  @Override
+  public void lookupByParentKey(VALUE parentKey) {
+    doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
+  }
+
+  // FIXME [awe] 7.0 - SF2: cleanup all the call* and do* methods, check what's really needed
 
   @Override
   public void doSearch(boolean selectCurrentValue, boolean synchronous) {
@@ -1454,13 +1446,13 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public String getVariant() {
-    return m_variant;
+  public String getDisplayStyle() {
+    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
   }
 
   @Override
-  public void setVariant(String variant) {
-    m_variant = variant;
+  public void setDisplayStyle(String displayStlye) {
+    propertySupport.setPropertyString(PROP_DISPLAY_STYLE, displayStlye);
   }
 
   // ==== Lookup row fetching strategies ==== //

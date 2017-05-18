@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
  */
 public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
+  String PROP_DISPLAY_STYLE = "displayStyle";
   String PROP_RESULT = "result";
   String PROP_ACTIVE_FILTER_ENABLED = "activeFilterEnabled";
   String PROP_ACTIVE_FILTER = "activeFilter";
@@ -42,18 +43,22 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   String PROP_BROWSE_ICON_ID = "browseIconId";
   String PROP_BROWSE_HIERARCHY = "browseHierarchy";
+  String PROP_BROWSE_LOAD_INCREMENTAL = "browseLoadIncremental";
+  String PROP_BROWSE_AUTO_EXPAND_ALL = "browseAutoExpandAll";
   String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
   String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
   String PROP_LOOKUP_ROW = "lookupRow";
 
-  String VARIANT_DEFAULT = "default";
-  String VARIANT_DROPDOWN = "dropdown";
+  String DISPLAY_STYLE_DEFAULT = "default";
+  String DISPLAY_STYLE_DROPDOWN = "dropdown";
 
   void lookupAll();
 
   void lookupByText(String searchText);
+
+  void lookupByParentKey(VALUE parentKey);
 
   SmartField2Result getResult();
 
@@ -132,19 +137,15 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   boolean isBrowseAutoExpandAll();
 
-  void setBrowseAutoExpandAll(boolean b);
+  void setBrowseAutoExpandAll(boolean browseAutoExpandAll);
 
   boolean isBrowseHierarchy();
 
-  void setBrowseHierarchy(boolean b);
+  void setBrowseHierarchy(boolean browseHierarchy);
 
   boolean isBrowseLoadIncremental();
 
-  void setBrowseLoadIncremental(boolean b);
-
-  boolean isLoadParentNodes();
-
-  void setLoadParentNodes(boolean b);
+  void setBrowseLoadIncremental(boolean browseLoadIncremental);
 
   /**
    * see {@link AbstractSmartField#execBrowseNew(String)}
@@ -382,9 +383,9 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void setColumnDescriptors(ColumnDescriptor[] columnHeaders);
 
-  String getVariant();
+  String getDisplayStyle();
 
-  void setVariant(String variant);
+  void setDisplayStyle(String displayStyle);
 
   ILookupRow<VALUE> getLookupRow();
 

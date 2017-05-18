@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,15 +22,16 @@ scout.SmartField2 = function() {
   this.lookupRow = null;
   this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
   this.browseAutoExpandAll = true;
+  this.browseLoadIncremental = true;
   this.activeFilterEnabled = false;
   this.activeFilter = null;
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
-  this.variant = scout.SmartField2.Variant.DEFAULT;
+  this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
-scout.SmartField2.Variant = {
+scout.SmartField2.DisplayStyle = {
   DEFAULT: 'default',
   DROPDOWN: 'dropdown'
 };
@@ -81,7 +82,7 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
 };
 
 scout.SmartField2.prototype._render = function() {
-  this.addContainer(this.$parent, cssClass(this.variant), new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, cssClass(this.displayStyle), new scout.SmartFieldLayout(this));
   this.addLabel();
 
   var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
@@ -105,7 +106,7 @@ scout.SmartField2.prototype._render = function() {
 
   function cssClass(variant) {
     var prefix = variant;
-    if (variant === scout.SmartField2.Variant.DEFAULT) {
+    if (variant === scout.SmartField2.DisplayStyle.DEFAULT) {
       prefix = 'smart';
     }
     return prefix + '-field';
@@ -182,6 +183,23 @@ scout.SmartField2.prototype.acceptInput = function(whileTyping) {
 
     this._handleInvalidLookup(result, numLookupRows, searchText);
   }.bind(this));
+};
+
+scout.SmartField2.prototype.lookupByParentKey = function(parentKey) {
+  console.log('lookupByParentKey');
+  this.showLookupInProgress();
+  return this.lookupCall.getByParentKey(parentKey)
+    .then(function(result) {
+
+      // Since this function is only used for hierarchical trees we
+      // can simply set the appendResult flag always to true here
+      result.appendResult = true;
+
+      this.hideLookupInProgress();
+      if (this.popup) {
+        this.popup.setLookupResult(result);
+      }
+    }.bind(this));
 };
 
 scout.SmartField2.prototype._handleInvalidLookup = function(result, numLookupRows, searchText) {
@@ -517,7 +535,7 @@ scout.SmartField2.prototype.virtual = function() {
 };
 
 scout.SmartField2.prototype.isDropdown = function() {
-  return this.variant === scout.SmartField2.Variant.DROPDOWN;
+  return this.displayStyle === scout.SmartField2.DisplayStyle.DROPDOWN;
 };
 
 scout.SmartField2.prototype._setLookupRow = function(lookupRow) {
@@ -530,7 +548,8 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
   }
   this._setLookupRow(lookupRow);
   this.setErrorStatus(null);
-  this._lockLookupRow = true; // FIXME [awe] 7.0 - SF2: ugly
+  // this flag is required so lookup row is not changed again, when _setValue is called
+  this._lockLookupRow = true;
   if (lookupRow) {
     this.setValue(this._getValueFromLookupRow(lookupRow));
   } else {

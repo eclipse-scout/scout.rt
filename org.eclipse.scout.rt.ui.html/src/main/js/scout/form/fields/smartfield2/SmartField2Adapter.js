@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,8 @@ scout.SmartField2Adapter = function() {
   this._addRemoteProperties(['value', 'activeFilter']);
 };
 scout.inherits(scout.SmartField2Adapter, scout.ValueFieldAdapter);
+
+// FIXME [awe] 7.1 - SF2: set defaults for smartfield2 values in defaults.json
 
 scout.SmartField2Adapter.prototype._postCreateWidget = function() {
   scout.SmartField2Adapter.parent.prototype._postCreateWidget.call(this);
@@ -42,16 +44,18 @@ scout.SmartField2Adapter.prototype._syncDisplayText = function(displayText) {
 };
 
 scout.SmartField2Adapter.prototype.lookupAll = function() {
-  this._lookup('All', null);
+  this._send('lookupAll');
 };
 
 scout.SmartField2Adapter.prototype.lookupByText = function(searchText) {
-  this._lookup('ByText', searchText);
-};
-
-scout.SmartField2Adapter.prototype._lookup = function(lookupType, searchText) {
-  var sendType = 'lookup' + lookupType;
-  this._send(sendType, {
+  this._send('lookupByText', {
     searchText: searchText
   });
 };
+
+scout.SmartField2Adapter.prototype.lookupByParentKey = function(parentKey) {
+  this._send('lookupByParentKey', {
+    parentKey: parentKey
+  });
+};
+

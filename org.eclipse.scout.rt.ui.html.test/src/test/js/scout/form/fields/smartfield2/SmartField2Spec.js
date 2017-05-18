@@ -42,7 +42,7 @@ describe('SmartField2', function() {
   describe('general behavior', function() {
 
     it('defaults', function() {
-      expect(field.variant).toBe('default');
+      expect(field.displayStyle).toBe('default');
       expect(field.value).toBe(null);
       expect(field.displayText).toBe(null);
       expect(field.lookupRow).toBe(null);
@@ -114,7 +114,7 @@ describe('SmartField2', function() {
     });
 
     it('defaults', function() {
-      expect(field.variant).toBe('proposal');
+      expect(field.displayStyle).toBe('proposal');
     });
 
     /**

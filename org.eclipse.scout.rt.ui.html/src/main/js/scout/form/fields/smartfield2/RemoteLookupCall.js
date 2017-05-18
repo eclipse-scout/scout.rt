@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,12 @@ scout.RemoteLookupCall.prototype.getAll = function() {
 scout.RemoteLookupCall.prototype.getByText = function(text) {
   this._newDeferred();
   this.adapter.lookupByText(text);
+  return this.deferred.promise();
+};
+
+scout.RemoteLookupCall.prototype.getByParentKey = function(parentKey) {
+  this._newDeferred();
+  this.adapter.lookupByParentKey(parentKey);
   return this.deferred.promise();
 };
 
