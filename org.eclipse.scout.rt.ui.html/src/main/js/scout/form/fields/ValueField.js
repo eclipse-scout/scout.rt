@@ -262,7 +262,7 @@ scout.ValueField.prototype._validateValue = function(value) {
  * @returns the formatted string or a promise
  */
 scout.ValueField.prototype._formatValue = function(value) {
-  return scout.nvl(value, ''); // [6.2] awe: check impl. for fields other than StringField
+  return scout.nvl(value, '') + ''; // [6.2] awe: check impl. for fields other than StringField
 };
 
 scout.ValueField.prototype._updateTouched = function() {
