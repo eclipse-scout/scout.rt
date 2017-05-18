@@ -10,6 +10,7 @@
   (function(scout, $, undefined) {
     __include("scout/desktop/outline/OutlineSpecHelper.js");
     __include("scout/form/FormSpecHelper.js");
+    __include("scout/form/fields/beanfield/TestBeanField.js");
     __include("scout/form/fields/tabbox/TabBoxSpecHelper.js");
     __include("scout/menu/MenuSpecHelper.js");
     __include("scout/table/TableSpecHelper.js");
