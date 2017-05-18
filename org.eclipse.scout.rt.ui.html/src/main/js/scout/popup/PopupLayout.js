@@ -66,6 +66,14 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
 scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
   var popupSize = new scout.Dimension(),
     maxSize = this._calcMaxSizeAroundAnchor();
+
+  // Compared to $comp.height() and width(), $comp.offset() may return fractional values. This means the maxSizes may be fractional as well.
+  // The popup sizes must be integers, otherwise reading the height/width later on might result in wrong calculations.
+  // This is especially important for the position calculation.
+  // Popup.position() uses popup.overlap(), if the popup height is lets say 90.5, overlapY would be 0.5 because height returned 91
+  // -> the popup switches its direction unnecessarily
+  maxSize = maxSize.floor();
+
   // Decide whether the prefSize can be used or the popup needs to be shrinked so that it fits into the viewport
   // The decision is based on the preferred opening direction
   // Example: The popup would like to be opened right and down
@@ -76,21 +84,13 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
   // The same happens for y direction if there is not enough space on the bottom
   popupSize.width = prefSize.width;
   if (this.popup.trimWidth) {
-    if (this.popup.openingDirectionX === 'right' &&
-      prefSize.width > maxSize.right && prefSize.width > maxSize.left) {
-      popupSize.width = Math.max(maxSize.right, maxSize.left);
-    } else if (this.popup.openingDirectionX === 'left' &&
-      prefSize.width > maxSize.left && prefSize.width > maxSize.right) {
+    if (prefSize.width > maxSize.right && prefSize.width > maxSize.left) {
       popupSize.width = Math.max(maxSize.right, maxSize.left);
     }
   }
   popupSize.height = prefSize.height;
   if (this.popup.trimHeight) {
-    if (this.popup.openingDirectionY === 'down' &&
-      prefSize.height > maxSize.bottom && prefSize.height > maxSize.top) {
-      popupSize.height = Math.max(maxSize.bottom, maxSize.top);
-    } else if (this.popup.openingDirectionY === 'up' &&
-      prefSize.height > maxSize.top && prefSize.height > maxSize.bottom) {
+    if (prefSize.height > maxSize.bottom && prefSize.height > maxSize.top) {
       popupSize.height = Math.max(maxSize.bottom, maxSize.top);
     }
   }

@@ -431,6 +431,10 @@ scout.Insets.prototype.clone = function() {
   return new scout.Insets(this.top, this.right, this.bottom, this.left);
 };
 
+scout.Insets.prototype.floor = function() {
+  return new scout.Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
+};
+
 /**
  * JavaScript port from java.util.TreeSet.
  */
