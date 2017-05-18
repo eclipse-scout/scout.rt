@@ -12,8 +12,8 @@ scout.TestBeanField = function() {
 };
 scout.inherits(scout.TestBeanField, scout.BeanField);
 
-scout.TestBeanField.prototype._render = function() {
-  scout.TestBeanField.parent.prototype._render.call(this);
+scout.TestBeanField.prototype._render = function($parent) {
+  scout.TestBeanField.parent.prototype._render.call(this, $parent);
   this.$container.addClass('test-bean-field');
 };
 

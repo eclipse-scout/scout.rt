@@ -35,16 +35,16 @@ describe("BeanField", function() {
   }
 
   it("renders the bean", function() {
-    field.render();
+    field.render(session.$entryPoint);
     expect(field.$container).toHaveClass('test-bean-field');
     expect(field.$field.children('.msg-from').text()).toBe('Message from Jasmine Test Runner');
     expect(field.$field.children('.msg-text').text()).toBe('It works!');
   });
 
   it("updates properties correctly", function() {
-    field.render();
+    field.render(session.$entryPoint);
     expect(field.value.sender).toBe('Jasmine Test Runner');
-    expect(field.displayText).toBe(null);
+    expect(field.displayText).toBe('');
 
     field.setValue({
       sender: 'Test Method'
@@ -52,7 +52,7 @@ describe("BeanField", function() {
     expect(field.$field.children('.msg-from').text()).toBe('Message from Test Method');
     expect(field.$field.children('.msg-text').text()).toBe('\u00A0'); // &nbsp;
     expect(field.value.sender).toBe('Test Method');
-    expect(field.displayText).toBe(null);
+    expect(field.displayText).toBe('');
 
     field.setDisplayText('XXX');  // should not change anything
     expect(field.$field.children('.msg-from').text()).toBe('Message from Test Method');
