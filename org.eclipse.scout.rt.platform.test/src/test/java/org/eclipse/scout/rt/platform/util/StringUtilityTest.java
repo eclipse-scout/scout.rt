@@ -680,6 +680,12 @@ public class StringUtilityTest {
     assertTrue(StringUtility.contains("abc", ".")); // <-- !
     assertTrue(StringUtility.contains("ab.c", "ab\\.c")); // <-- !
     assertTrue(StringUtility.contains("Der\nweisse\nHai", "^we"));
+
+    // non-ascii, case insensitive test cases
+    assertTrue(StringUtility.contains("Schätzung", "ÄT"));
+    assertFalse(StringUtility.contains("Schätzung", "AT"));
+    assertTrue(StringUtility.contains("Besançon", "ÇO"));
+    assertFalse(StringUtility.contains("Besançon", "CO"));
   }
 
   @Test

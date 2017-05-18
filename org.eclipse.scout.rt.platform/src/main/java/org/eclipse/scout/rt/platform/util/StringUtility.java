@@ -218,12 +218,12 @@ public final class StringUtility {
     BOOLEAN_TRUE.add("1");
   }
 
-  private static final Set<String> BOOLEAN_FLASE = new HashSet<String>(3);
+  private static final Set<String> BOOLEAN_FALSE = new HashSet<String>(3);
 
   static {
-    BOOLEAN_FLASE.add("false");
-    BOOLEAN_FLASE.add("no");
-    BOOLEAN_FLASE.add("0");
+    BOOLEAN_FALSE.add("false");
+    BOOLEAN_FALSE.add("no");
+    BOOLEAN_FALSE.add("0");
   }
 
   /**
@@ -249,7 +249,7 @@ public final class StringUtility {
     }
     s = s.toLowerCase().trim();
     if (defaultValue) {
-      return !BOOLEAN_FLASE.contains(s);
+      return !BOOLEAN_FALSE.contains(s);
     }
     else {
       return BOOLEAN_TRUE.contains(s);
@@ -387,7 +387,7 @@ public final class StringUtility {
   }
 
   /**
-   * @return a single tag <foo/>
+   * @return a single tag {@literal <foo/>}
    */
   private static TagBounds getSingleTag(String text, String tagName, int pos) {
     if (text == null) {
@@ -402,7 +402,7 @@ public final class StringUtility {
   }
 
   /**
-   * @return a start tag (ignores single tags) <foo> (not <foo/>)
+   * @return a start tag (ignores single tags) {@literal <foo>} (not {@literal <foo/>})
    */
   private static TagBounds getStartTag(String text, String tagName, boolean ignoreCase, int pos) {
     if (text == null) {
@@ -424,7 +424,7 @@ public final class StringUtility {
   }
 
   /**
-   * @return an end tag </foo>
+   * @return an end tag {@literal </foo>}
    */
   private static TagBounds getEndTag(String text, String tagName, boolean ignoreCase, int pos) {
     if (text == null) {
@@ -453,6 +453,20 @@ public final class StringUtility {
     return getTag(text, tagName, false);
   }
 
+  /**
+   * Extract the contents between a start and a end tag, resp "" when there is a single tag. Returns <code>null</code>
+   * when the tag is not found in the text. <br>
+   * <b>Note:</b> If <code>ignoreCase == true </code> is specified, this will only correctly identify case insensitive
+   * tag names with letters within the ASCII range.
+   *
+   * @param text
+   *          The text to search for the tag name
+   * @param tagName
+   *          The tag name to search for
+   * @param ignoreCase
+   *          Should the tag name be found regardless of case?
+   * @return The tag's contents if it can be found, null if it can not found, or "" if there is a single tag.
+   */
   public static String getTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
@@ -1824,7 +1838,7 @@ public final class StringUtility {
       return false;
     }
     try {
-      Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE | Pattern.DOTALL);
       return pattern.matcher(s).matches();
     }
     catch (RuntimeException t) {
