@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.KeyStrokeContext = function() {
+scout.KeyStrokeContext = function(options) {
   /*
    * Holds the target where to bind this context as keydown listener.
    * This can either be a static value or a function to resolve the target.
@@ -37,6 +37,9 @@ scout.KeyStrokeContext = function() {
    * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
    */
   this.invokeAcceptInputOnActiveValueField = false;
+
+  options = options || {};
+  $.extend(this, options);
 };
 
 /**
