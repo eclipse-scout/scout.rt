@@ -154,3 +154,7 @@ scout.KeyStrokeContext.prototype.$getBindTarget = function() {
 scout.KeyStrokeContext.prototype.$getScopeTarget = function() {
   return (typeof this.$scopeTarget === 'function' ? this.$scopeTarget() : this.$scopeTarget);
 };
+
+scout.KeyStrokeContext.prototype.clone = function() {
+  return new scout.KeyStrokeContext(scout.objects.copyOwnProperties(this, {}));
+};
