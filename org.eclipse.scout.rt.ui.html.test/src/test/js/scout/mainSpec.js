@@ -31,7 +31,7 @@ describe('main', function() {
       expect(scout.nvl(null, '')).toBe('');
       expect(scout.nvl(null, undefined)).toBe(undefined);
       expect(scout.nvl(null, null)).toBe(null);
-      expect(scout.nvl(null)).toBe(undefined);
+      expect(scout.nvl(null)).toBe(null);
       expect(scout.nvl(0, '123')).toBe(0);
       expect(scout.nvl(1, '123')).toBe(1);
       expect(scout.nvl(undefined, '123')).toBe('123');
@@ -40,6 +40,7 @@ describe('main', function() {
       expect(scout.nvl({}, {x: 2})).toEqual({});
       expect(scout.nvl({y: undefined}, {x: 2})).toEqual({y: undefined});
       expect(scout.nvl(null, {x: 2})).toEqual({x: 2});
+      expect(scout.nvl(null, undefined, '3', '4', null)).toBe('3');
     });
 
   });
