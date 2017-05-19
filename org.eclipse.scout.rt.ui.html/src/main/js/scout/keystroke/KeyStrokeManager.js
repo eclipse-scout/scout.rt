@@ -208,7 +208,7 @@ scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event)
       return;
     }
     // copy current keyStrokeContext and replace keyStrokes with filtered array 'keyStrokeFirePolicyAlways'
-    keyStrokeContext = new scout.KeyStrokeContext(keyStrokeContext);
+    keyStrokeContext = keyStrokeContext.clone();
     keyStrokeContext.keyStrokes = keyStrokeFirePolicyAlways;
   }
 
