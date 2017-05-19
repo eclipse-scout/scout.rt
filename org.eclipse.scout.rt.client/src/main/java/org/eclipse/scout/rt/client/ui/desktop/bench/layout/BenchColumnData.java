@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 /**
  * <h3>{@link BenchColumnData}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class BenchColumnData extends FlexboxLayoutData {
   public static final int NORTH = 0;

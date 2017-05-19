@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableComputeTableEmptySpaceMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
@@ -302,6 +303,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Order(110)
   protected IPage<?> execCreateChildPage(ITableRow row) {
     return null;
+  }
+
+  protected List<IMenu> execComputeTableEmptySpaceMenus() {
+    T table = getTable();
+    if (table == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    return ActionUtility.getActions(table.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
   }
 
   protected IPage<?> createDefaultChildPage(ITableRow row) {
@@ -848,11 +857,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   @Override
   public List<IMenu> computeTableEmptySpaceMenus() {
-    T table = getTable();
-    if (table == null) {
-      return CollectionUtility.emptyArrayList();
-    }
-    return ActionUtility.getActions(table.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
+    return interceptComputeTableEmptySpaceMenus();
   }
 
   /**
@@ -1036,6 +1041,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     chain.execInitSearchForm();
   }
 
+  protected final List<IMenu> interceptComputeTableEmptySpaceMenus() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    PageWithTableComputeTableEmptySpaceMenusChain<T> chain = new PageWithTableComputeTableEmptySpaceMenusChain<T>(extensions);
+    return chain.execComputeTableEmptySpaceMenus();
+  }
+
   protected static class LocalPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends LocalPageExtension<OWNER> implements IPageWithTableExtension<T, OWNER> {
 
     public LocalPageWithTableExtension(OWNER owner) {
@@ -1060,6 +1071,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     @Override
     public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) {
       getOwner().execInitSearchForm();
+    }
+
+    @Override
+    public List<IMenu> execComputeTableEmptySpaceMenus(PageWithTableComputeTableEmptySpaceMenusChain<? extends ITable> chain) {
+      return getOwner().execComputeTableEmptySpaceMenus();
     }
   }
 

@@ -174,13 +174,9 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> treeNodes);
 
   /**
-   * The default implementation returns the single selection menus from the parent table page's table.
-   * <p>
-   * If this behavior is not desired return an empty list instead.
+   * Do not override this method use {@link AbstractPage#execComputeParentTablePageMenus(IPageWithTable)} instead.
    *
-   * @param parentTablePage
-   *          Parent table page
-   * @return A list (non-null) of single selection menus.
+   * @see AbstractPage#execComputeParentTablePageMenus(IPageWithTable)
    */
   List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage);
 

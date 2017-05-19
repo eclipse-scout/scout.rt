@@ -7,7 +7,7 @@ import org.json.JSONObject;
 /**
  * <h3>{@link JsonLayoutData}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class JsonLayoutData implements IJsonObject {
 

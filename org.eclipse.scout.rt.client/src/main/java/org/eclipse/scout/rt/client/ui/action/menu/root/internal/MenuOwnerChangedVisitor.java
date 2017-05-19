@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
@@ -35,7 +36,7 @@ public class MenuOwnerChangedVisitor implements IActionVisitor {
 
   @Override
   public int visit(IAction action) {
-    if (action instanceof IMenu && !Collections.disjoint(((IMenu) action).getMenuTypes(), m_menuTypes)) {
+    if (action instanceof IMenu && !Collections.disjoint(((IMenu) action).getMenuTypes(), m_menuTypes) && !(action instanceof IReadOnlyMenu)) {
       IMenu menu = (IMenu) action;
       try {
         menu.handleOwnerValueChanged(m_ownerValue);

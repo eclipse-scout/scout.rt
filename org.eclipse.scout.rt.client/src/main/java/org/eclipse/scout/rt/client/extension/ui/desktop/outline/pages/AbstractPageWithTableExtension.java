@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableComputeTableEmptySpaceMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
@@ -45,4 +49,10 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) {
     chain.execInitSearchForm();
   }
+
+  @Override
+  public List<IMenu> execComputeTableEmptySpaceMenus(PageWithTableComputeTableEmptySpaceMenusChain<? extends ITable> chain) {
+    return chain.execComputeTableEmptySpaceMenus();
+  }
+
 }

@@ -171,10 +171,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   protected static IMenu unwrapOutlineWrapperMenu(IMenu menu) {
-    while (menu instanceof OutlineMenuWrapper) {
-      menu = ((OutlineMenuWrapper) menu).getWrappedMenu();
-    }
-    return menu;
+    return OutlineMenuWrapper.unwrapMenu(menu);
   }
 
   @Override

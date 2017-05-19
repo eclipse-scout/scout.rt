@@ -19,11 +19,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -42,11 +45,21 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * using the state of the original menu.
  */
 @ClassId("28ec2113-6461-4810-9527-253d0bf68788")
-public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu {
+public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu, IReadOnlyMenu {
 
   private IMenu m_wrappedMenu;
   private PropertyChangeListener m_wrappedMenuPropertyChangeListener;
   private Set<IMenuType> m_menuTypes;
+  private IActionFilter m_menuFilter;
+  private IMenuTypeMapper m_menuTypeMapper;
+  
+  public static final IActionFilter ACCEPT_ALL_FILTER = new IActionFilter() {
+
+    @Override
+    public boolean accept(IAction action) {
+      return true;
+    }
+  };
 
   public static final IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
@@ -60,16 +73,6 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
    */
   public interface IMenuTypeMapper {
     IMenuType map(IMenuType menuType);
-  }
-
-  /**
-   * Constructs a wrapper for a menu where the menuType of the menu and of each menu in the sub-hierarchy is the same as
-   * in the original
-   *
-   * @param wrappedMenu
-   */
-  protected OutlineMenuWrapper(IMenu wrappedMenu) {
-    this(wrappedMenu, AUTO_MENU_TYPE_MAPPER);
   }
 
   /**
@@ -89,7 +92,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
    */
   public static IMenu unwrapMenu(IMenu menu) {
     if (menu instanceof OutlineMenuWrapper) {
-      return ((OutlineMenuWrapper) menu).getWrappedMenu();
+      return unwrapMenu(((OutlineMenuWrapper) menu).getWrappedMenu());
     }
     else {
       return menu;
@@ -109,17 +112,33 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   /**
+   * Constructs a wrapper for a menu where the menuType of the menu and of each menu in the sub-hierarchy is the same as
+   * in the original
+   *
+   * @param wrappedMenu
+   */
+  protected OutlineMenuWrapper(IMenu wrappedMenu) {
+    this(wrappedMenu, AUTO_MENU_TYPE_MAPPER, ACCEPT_ALL_FILTER);
+  }
+
+  public OutlineMenuWrapper(IMenu wrappedMenu, IMenuTypeMapper mapper) {
+    this(wrappedMenu, mapper, ACCEPT_ALL_FILTER);
+  }
+
+  /**
    * @param menu
    *          the menu to wrap
-   * @param mapper
+   * @param menuTypeMapper
    *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
    *          mapper
    */
-  public OutlineMenuWrapper(IMenu menu, IMenuTypeMapper mapper) {
+  public OutlineMenuWrapper(IMenu menu, IMenuTypeMapper menuTypeMapper, IActionFilter menuFilter) {
     m_wrappedMenu = menu;
-    m_menuTypes = mapMenuTypes(menu, mapper);
-    m_wrappedMenuPropertyChangeListener = createWrappedMenuPropertyChangeListener(mapper);
-    setup(mapper);
+    m_menuTypeMapper = menuTypeMapper;
+    m_menuFilter = menuFilter;
+    m_menuTypes = mapMenuTypes(menu, menuTypeMapper);
+    m_wrappedMenuPropertyChangeListener = new P_WrappedMenuPropertyChangeListener();
+    setup(menuTypeMapper);
   }
 
   protected Set<IMenuType> mapMenuTypes(IMenu menu, IMenuTypeMapper mapper) {
@@ -131,34 +150,19 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
     return mappedTypes;
   }
 
-  protected PropertyChangeListener createWrappedMenuPropertyChangeListener(final IMenuTypeMapper mapper) {
-    return new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IActionNode.PROP_CHILD_ACTIONS.equals(evt.getPropertyName())) {
-          // Special handling for PROP_CHILD_ACTIONS, wrap child actions as well
-          wrapChildActions(mapper);
-        }
-        else {
-          // Duplicate all other events (pretending they came from the outline menu wrapper)
-          PropertyChangeEvent copy = new PropertyChangeEvent(OutlineMenuWrapper.this, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-          propertySupport.firePropertyChange(copy);
-        }
-      }
-    };
-  }
-
   protected void setup(final IMenuTypeMapper mapper) {
-    wrapChildActions(mapper);
+    wrapChildActions();
     m_wrappedMenu.addPropertyChangeListener(m_wrappedMenuPropertyChangeListener);
   }
 
-  protected void wrapChildActions(final IMenuTypeMapper mapper) {
+  protected void wrapChildActions() {
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
     List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
     // create child wrappers
-    for (IMenu m : childActions) {
-      wrappedChildActions.add(new OutlineMenuWrapper(m, mapper));
+    for (IAction a : ActionUtility.getActions(m_wrappedMenu.getChildActions(), m_menuFilter)) {
+      if (a instanceof IMenu) {
+        wrappedChildActions.add(new OutlineMenuWrapper((IMenu) a, m_menuTypeMapper, m_menuFilter));
+      }
     }
     propertySupport.setProperty(PROP_CHILD_ACTIONS, wrappedChildActions);
   }
@@ -552,5 +556,20 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
     sb.append(" visibleGranted=" + isVisibleGranted());
     sb.append("]");
     return sb.toString();
+  }
+
+  private class P_WrappedMenuPropertyChangeListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (IActionNode.PROP_CHILD_ACTIONS.equals(evt.getPropertyName())) {
+        // Special handling for PROP_CHILD_ACTIONS, wrap child actions as well
+        wrapChildActions();
+      }
+      else {
+        // Duplicate all other events (pretending they came from the outline menu wrapper)
+        PropertyChangeEvent copy = new PropertyChangeEvent(OutlineMenuWrapper.this, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+        propertySupport.firePropertyChange(copy);
+      }
+    }
   }
 }
