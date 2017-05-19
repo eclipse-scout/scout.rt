@@ -25,7 +25,7 @@ scout.inherits(scout.SmartField2ToggleKeyStroke, scout.KeyStroke);
  */
 scout.SmartField2ToggleKeyStroke.prototype.handle = function(event) {
   if (this.field.popup) {
-    this.field.acceptInput();
+    this.field.popup.selectLookupRow();
   } else {
     this.field.openPopup();
   }

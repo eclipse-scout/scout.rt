@@ -39,6 +39,10 @@ scout.ProposalChooser2.prototype.selectFirstLookupRow = function() {
   throw new Error('selectFirstLookupRow() not implemented');
 };
 
+scout.ProposalChooser2.prototype.triggerLookupRowSelected = function() {
+  throw new Error('triggerLookupRowSelected() not implemented');
+};
+
 scout.ProposalChooser2.prototype._render = function() {
   this.$container = this.$parent.appendDiv('proposal-chooser');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);

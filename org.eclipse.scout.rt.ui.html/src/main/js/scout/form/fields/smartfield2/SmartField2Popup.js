@@ -60,6 +60,7 @@ scout.SmartField2Popup.prototype.setLookupResult = function(result) {
   this.proposalChooser.setLookupResult(result);
 };
 
+// FIXME [awe] 7.0 - SF2: check if this function is still required when ENTER keystroke is handled properly
 scout.SmartField2Popup.prototype.getSelectedLookupRow = function() {
   return this.proposalChooser.getSelectedLookupRow();
 };
@@ -78,6 +79,9 @@ scout.SmartField2Popup.prototype.selectFirstLookupRow = function() {
   this.proposalChooser.selectFirstLookupRow();
 };
 
+scout.SmartField2Popup.prototype.selectLookupRow = function() {
+  this.proposalChooser.triggerLookupRowSelected();
+};
 
 /**
  * Delegates the key event to the proposal chooser.

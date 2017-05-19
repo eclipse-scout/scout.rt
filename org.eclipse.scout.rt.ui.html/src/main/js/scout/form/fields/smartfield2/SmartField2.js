@@ -370,16 +370,16 @@ scout.SmartField2.prototype._createPopup = function() {
 
 scout.SmartField2.prototype.showLookupInProgress = function() {
   if (this.popup) {
-    this.$field.removeClass('lookup-in-progress');
+    this.$container.removeClass('searching');
     this.popup.setStatusLookupInProgress();
   } else {
-    this.$field.addClass('lookup-in-progress');
+    this.$container.addClass('searching');
   }
 };
 
 scout.SmartField2.prototype.hideLookupInProgress = function() {
   if (this.rendered) {
-    this.$field.removeClass('lookup-in-progress');
+    this.$container.removeClass('searching');
   }
 };
 

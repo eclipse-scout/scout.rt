@@ -33,6 +33,17 @@
   }
 }
 
-.lookup-in-progress {
-  background-color: cyan;
+.smart-field.searching {
+
+  & > .icon {
+     #scout.animation(rotation 2s linear infinite);
+  }
+
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field {
+    #scout.text-field-with-icon(@icon-gear);
+  }
+
 }

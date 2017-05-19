@@ -52,17 +52,22 @@ scout.TableProposalChooser2.prototype._createModel = function() {
     columns: columns
   });
 
-  table.on('rowClicked', this._triggerLookupRowSelected.bind(this));
+  table.on('rowClicked', this._onRowClicked.bind(this));
 
   return table;
 };
 
-scout.TableProposalChooser2.prototype._triggerLookupRowSelected = function(event) {
-  if (!event.row.enabled) {
+scout.TableProposalChooser2.prototype._onRowClicked = function(event) {
+  this.triggerLookupRowSelected(event.row);
+};
+
+scout.TableProposalChooser2.prototype.triggerLookupRowSelected = function(row) {
+  row = row || this.model.selectedRow();
+  if (!row.enabled) {
     return;
   }
   this.trigger('lookupRowSelected', {
-    lookupRow: this.getSelectedLookupRow()
+    lookupRow: row.lookupRow
   });
 };
 
@@ -141,7 +146,7 @@ scout.TableProposalChooser2.prototype._renderModel = function() {
 };
 
 scout.TableProposalChooser2.prototype.getSelectedLookupRow = function() {
-  var selectedRow = this.model.selectedRows[0];
+  var selectedRow = this.model.selectedRow();
   if (!selectedRow) {
     return null;
   }

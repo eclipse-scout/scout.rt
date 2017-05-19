@@ -17,16 +17,21 @@ scout.TreeProposalChooser2.prototype._createModel = function() {
   var tree = scout.create('Tree', {
     parent: this
   });
-  tree.on('nodeClicked', this._triggerLookupRowSelected.bind(this));
+  tree.on('nodeClicked', this._onNodeClicked.bind(this));
   return tree;
 };
 
-scout.TreeProposalChooser2.prototype._triggerLookupRowSelected = function(event) {
-  if (!event.node.enabled) {
+scout.TreeProposalChooser2.prototype._onNodeClicked = function(event) {
+  this.triggerLookupRowSelected(event.node);
+};
+
+scout.TreeProposalChooser2.prototype.triggerLookupRowSelected = function(node) {
+  node = node || this.model.selectedNode();
+  if (!node.enabled) {
     return;
   }
   this.trigger('lookupRowSelected', {
-    lookupRow: this.getSelectedLookupRow()
+    lookupRow: node.lookupRow
   });
 };
 
