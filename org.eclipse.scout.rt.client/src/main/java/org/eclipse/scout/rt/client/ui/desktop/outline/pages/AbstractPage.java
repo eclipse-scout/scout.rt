@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.ComputeParentTablePageMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
@@ -514,6 +515,27 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
   }
 
+  /**
+   * The default implementation returns the single selection menus from the parent table page's table.
+   * <p>
+   * If this behavior is not desired return an empty list or filter the menus for your needs instead.
+   *
+   * @param parentTablePage
+   *          Parent table page
+   * @return A list (non-null) of single selection menus.
+   */
+  @Order(150)
+  @ConfigOperation
+  protected List<IMenu> execComputeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
+    ITableRow row = parentTablePage.getTableRowFor(this);
+    if (row == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    ITable table = parentTablePage.getTable();
+    table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
+    return ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
+  }
+
   protected abstract T createTable();
 
   @Override
@@ -952,14 +974,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public List<IMenu> computeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
-    ITableRow row = parentTablePage.getTableRowFor(this);
-    if (row == null) {
-      return CollectionUtility.emptyArrayList();
-    }
+    return interceptComputeParentTablePageMenus(parentTablePage);
 
-    ITable table = parentTablePage.getTable();
-    table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-    return ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
   }
 
   @Override
@@ -1113,6 +1129,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return chain.execCalculateVisible();
   }
 
+  protected final List<IMenu> interceptComputeParentTablePageMenus(IPageWithTable<?> parentTablePage) {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    ComputeParentTablePageMenusChain chain = new ComputeParentTablePageMenusChain(extensions);
+    return chain.execComputeParentTablePageMenus(parentTablePage);
+  }
+
   /**
    * Adapter listener that delegates NODE_UPDATED tree events to pageChanged events
    */
@@ -1181,10 +1203,17 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     public boolean execCalculateVisible(PageCalculateVisibleChain chain) {
       return getOwner().execCalculateVisible();
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<IMenu> execComputeParentTablePageMenus(ComputeParentTablePageMenusChain chain, IPageWithTable<?> parentTablePage) {
+      return getOwner().execComputeParentTablePageMenus(parentTablePage);
+    }
   }
 
   @Override
   protected IPageExtension<? extends AbstractPage> createLocalExtension() {
     return new LocalPageExtension<AbstractPage>(this);
   }
+
 }

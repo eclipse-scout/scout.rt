@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class PageChains {
@@ -193,6 +195,24 @@ public final class PageChains {
         @Override
         protected void callMethod(IPageExtension<? extends AbstractPage> next) {
           setReturnValue(next.execCalculateVisible(PageCalculateVisibleChain.this));
+        }
+      };
+      callChain(methodInvocation);
+      return methodInvocation.getReturnValue();
+    }
+  }
+
+  public static class ComputeParentTablePageMenusChain extends AbstractPageChain {
+
+    public ComputeParentTablePageMenusChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public List<IMenu> execComputeParentTablePageMenus(final IPageWithTable<?> parentTablePage) {
+      MethodInvocation<List<IMenu>> methodInvocation = new MethodInvocation<List<IMenu>>() {
+        @Override
+        protected void callMethod(IPageExtension<? extends AbstractPage> next) {
+          setReturnValue(next.execComputeParentTablePageMenus(ComputeParentTablePageMenusChain.this, parentTablePage));
         }
       };
       callChain(methodInvocation);

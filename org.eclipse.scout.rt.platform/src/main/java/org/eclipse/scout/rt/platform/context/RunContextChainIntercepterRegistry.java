@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 /**
  * <h3>{@link RunContextChainIntercepterRegistry}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 @ApplicationScoped
 public class RunContextChainIntercepterRegistry {

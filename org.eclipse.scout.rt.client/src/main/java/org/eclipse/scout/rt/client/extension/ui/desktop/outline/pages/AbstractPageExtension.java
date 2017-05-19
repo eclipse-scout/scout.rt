@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.AbstractTreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.ComputeParentTablePageMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDetailFormActivatedChain;
@@ -21,7 +24,9 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 
 public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends AbstractTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
 
@@ -77,5 +82,10 @@ public abstract class AbstractPageExtension<OWNER extends AbstractPage> extends 
   @Override
   public boolean execCalculateVisible(PageCalculateVisibleChain chain) {
     return chain.execCalculateVisible();
+  }
+
+  @Override
+  public List<IMenu> execComputeParentTablePageMenus(ComputeParentTablePageMenusChain chain, IPageWithTable<?> parentTablePage) {
+    return chain.execComputeParentTablePageMenus(parentTablePage);
   }
 }

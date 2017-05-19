@@ -260,6 +260,11 @@ scout.Menu.prototype._createPopup = function(event) {
     openingDirectionY: this.popupOpeningDirectionY
   };
 
+  if (this.parent.menuFilter) {
+    options.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+      return this.parent.menuFilter(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
+    }.bind(this);
+  }
   if (this.parent._filterMenusHandler) {
     options.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
       return this.parent._filterMenusHandler(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);

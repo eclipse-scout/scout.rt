@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -99,6 +100,24 @@ public final class PageWithTableChains {
         }
       };
       callChain(methodInvocation);
+    }
+  }
+
+  public static class PageWithTableComputeTableEmptySpaceMenusChain<T extends ITable> extends AbstractPageWithTableChain<T> {
+
+    public PageWithTableComputeTableEmptySpaceMenusChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions);
+    }
+
+    public List<IMenu> execComputeTableEmptySpaceMenus() {
+      MethodInvocation<List<IMenu>> methodInvocation = new MethodInvocation<List<IMenu>>() {
+        @Override
+        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) {
+          setReturnValue(next.execComputeTableEmptySpaceMenus(PageWithTableComputeTableEmptySpaceMenusChain.this));
+        }
+      };
+      callChain(methodInvocation);
+      return methodInvocation.getReturnValue();
     }
   }
 }

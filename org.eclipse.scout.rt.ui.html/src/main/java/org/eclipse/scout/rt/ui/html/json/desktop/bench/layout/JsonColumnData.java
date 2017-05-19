@@ -7,7 +7,7 @@ import org.json.JSONObject;
 /**
  * <h3>{@link JsonColumnData}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  */
 public class JsonColumnData extends JsonLayoutData {
 
