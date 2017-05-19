@@ -104,7 +104,6 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function() {
   this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
   this.desktopKeyStrokeContext.$scopeTarget = this.desktop.$container;
-  this.desktopKeyStrokeContext.registerKeyStroke(this.desktop.keyStrokes);
   this.desktopKeyStrokeContext.registerKeyStroke(new scout.DesktopTabSelectKeyStroke(this.desktop));
 };
 

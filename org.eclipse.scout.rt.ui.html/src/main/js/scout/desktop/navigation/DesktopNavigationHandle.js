@@ -18,7 +18,6 @@ scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function() {
 
   // Bound to desktop
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
-  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
   this.desktopKeyStrokeContext.$scopeTarget = this.session.desktop.$container;
   this.desktopKeyStrokeContext.registerKeyStroke([
