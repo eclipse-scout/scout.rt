@@ -1269,28 +1269,21 @@ scout.Widget.prototype.callSetter = function(propertyName, value) {
  * @param widgetId
  */
 scout.Widget.prototype.widget = function(widgetId) {
-  return _recWidget(this, widgetId);
+  return findWidgetRec(this);
 
-  function _recWidget(widget, widgetId) {
+  // ------ Helper functions -----
+
+  function findWidgetRec(widget) {
     if (widget.id === widgetId) {
       return widget;
     }
-    var i, child;
-    if (widget.children && widget.children.length > 0) {
-      for (i = 0; i < widget.children.length; i++) {
-        child = widget.children[i];
-        if (child.id === widgetId) {
-          return child;
-        } else {
-          child = _recWidget(child, widgetId);
-          if (child) {
-            return child;
-          }
-        }
+    for (var i = 0; i < widget.children.length; i++) {
+      var result = findWidgetRec(widget.children[i]);
+      if (result) {
+        return result;
       }
-    } else {
-      return null;
     }
+    return null; // not found
   }
 };
 
