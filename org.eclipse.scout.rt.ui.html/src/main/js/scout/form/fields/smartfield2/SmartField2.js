@@ -10,8 +10,6 @@
  ******************************************************************************/
 // FIXME [awe] 7.0 - SF2: lookup row als property zwischen server und client hin und her schicken?
 // um das problem mit den lazy styles zu lösen?
-// FIXME [awe] 7.0 - SF2: proposal table mit styles (colors, fonts) korrekt darstellen
-// FIXME [awe] 7.0 - SF2: tree proposal inkrementell nachladen
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
@@ -479,7 +477,6 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
       }
     }
     this.acceptInput();
-//    this._navigating = false;
     return;
   }
 
@@ -487,7 +484,7 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
     if (this.popup) {
       this.popup.delegateKeyEvent(event);
     } else {
-      this.openPopup(false);
+      this.openPopup(true);
     }
   }
 };
@@ -633,7 +630,6 @@ scout.SmartField2.prototype._setValue = function(value) {
       // when value is set to null, we must also reset the cached lookup row
       this._setLookupRow(null);
     }
-    // FIXME [awe] 7.0 - SF2: lookupByKey starten
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
 };

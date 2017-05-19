@@ -87,7 +87,7 @@ describe('SmartField2', function() {
       field.render(session.desktop.$container);
       field.$field.val('b');
       field._onFieldKeyup({});
-      expect(field.$field.hasClass('lookup-in-progress')).toBe(true);
+      expect(field.$container.hasClass('searching')).toBe(true);
       jasmine.clock().tick(300);
       // expect we have 2 table rows
       expect(field.popup).not.toBe(null);

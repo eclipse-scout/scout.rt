@@ -48,13 +48,14 @@ scout.StaticLookupCall.prototype._queryByText = function(text) {
     return scout.strings.startsWith(data[0].toLowerCase(), text.toLowerCase());
   });
   this.resolveLookup({
+    searchText: text,
     lookupRows: datas.map(this._dataToLookupRow)
   });
 };
 
 scout.StaticLookupCall.prototype.getByKey = function(key) {
   this._newDeferred();
-  setTimeout(this._queryByKey.bind(this), this._delay);
+  setTimeout(this._queryByKey.bind(this, key), this._delay);
   return this.deferred.promise();
 };
 
