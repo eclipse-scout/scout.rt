@@ -1,3 +1,5 @@
+
+
 /*******************************************************************************
  * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -100,38 +102,6 @@ describe('SmartField2', function() {
   });
 
   describe('default (smart field) with tree proposal', function() {
-
-  });
-
-  describe('proposal field', function() {
-
-    beforeEach(function() {
-      field = scout.create('SmartField2', {
-        parent: session.desktop,
-        variant: 'proposal',
-        lookupCall: 'DummyLookupCall'
-      });
-    });
-
-    it('defaults', function() {
-      expect(field.displayStyle).toBe('proposal');
-    });
-
-    /**
-     * Proposal field acts as regular string field when setValue is called
-     * No matter if the typed text exists as record in the lookup call, we
-     * simply set value/display text to it.
-     */
-    it('setValue', function() {
-      field.setValue('Foo');
-      expect(field.value).toBe('Foo');
-      expect(field.displayText).toBe('Foo');
-
-      field.setValue('Xyz');
-      expect(field.value).toBe('Xyz');
-      expect(field.displayText).toBe('Xyz');
-      expect(field.errorStatus).toBe(null);
-    });
 
   });
 
