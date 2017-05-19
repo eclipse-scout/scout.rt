@@ -325,6 +325,30 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(parent, modelClass).findElement(By.className("link-button"));
   }
 
+  public WebElement waitUntilMenuItemClickable(WebElement parent, String menuText) {
+    return waitUntilElementClickable(parent, By.xpath("//div[contains(@class, 'menu-item')]/span[contains(@class, 'text') and contains(text(), '" + menuText + "')]/.."));
+  }
+
+  public WebElement waitUntilMenuItemClickable(String menuText) {
+    return waitUntilMenuItemClickable(null, menuText);
+  }
+
+  public WebElement waitUntilTreeNodeClickable(WebElement parent, String nodeText) {
+    return waitUntilElementClickable(parent, By.xpath("//div[contains(@class, 'tree-node')]/span[contains(@class, 'text') and contains(text(), '" + nodeText + "')]"));
+  }
+
+  public WebElement waitUntilTreeNodeClickable(String nodeText) {
+    return waitUntilTreeNodeClickable(null, nodeText);
+  }
+
+  public WebElement waitUntilTableCellClickable(WebElement parent, String cellText) {
+    return waitUntilElementClickable(parent, By.xpath("//div[contains(@class, 'table-row')]/div[contains(@class, 'table-cell') and contains(text(), '" + cellText + "')]"));
+  }
+
+  public WebElement waitUntilTableCellClickable(String cellText) {
+    return waitUntilTableCellClickable(null, cellText);
+  }
+
   public void clickCheckBox(WebElement parent, Class<?> modelClass) {
     clickCheckBox(parent.findElement(SeleniumUtil.byModelClass(modelClass)));
   }
