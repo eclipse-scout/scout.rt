@@ -53,7 +53,7 @@ scout.FormField = function() {
   this.$status;
   this._addWidgetProperties(['keyStrokes', 'menus']);
   this._addCloneProperties(['displayText']);
-  this.mode = scout.FormField.MODE_DEFAULT;
+  this.mode = scout.FormField.Mode.DEFAULT;
   this.touched = false;
   this.tooltipText = null;
   this.requiresSave = false;
@@ -91,15 +91,10 @@ scout.FormField.StatusPosition = {
 // see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
 scout.FormField.FULL_WIDTH = 0;
 
-/**
- * Indicates the field to be used in default mode, e.g. in a Form.
- */
-scout.FormField.MODE_DEFAULT = 'default';
-
-/**
- * Indicates the field to be used within a cell editor.
- */
-scout.FormField.MODE_CELLEDITOR = 'celleditor';
+scout.FormField.Mode = {
+  DEFAULT: 'default',
+  CELLEDITOR: 'celleditor'
+};
 
 /**
  * @override
@@ -601,7 +596,7 @@ scout.FormField.prototype._showStatusMessage = function() {
 
     // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
     // (parsing and validation will be handled by the cell/column itself)
-    if (this.mode === scout.FormField.MODE_CELLEDITOR) {
+    if (this.mode === scout.FormField.Mode.CELLEDITOR) {
       return;
     }
   }

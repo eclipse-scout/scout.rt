@@ -273,7 +273,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
 
   // We must prevent default focus handling
   if (e.which === scout.keys.TAB) {
-    if (this.mode === scout.FormField.MODE_DEFAULT) {
+    if (this.mode === scout.FormField.Mode.DEFAULT) {
       if (this._isPreventDefaultTabHandling()) {
         e.preventDefault();
         this._tabPrevented = {
@@ -616,7 +616,7 @@ scout.SmartField.prototype.openPopup = function() {
 
 scout.SmartField.prototype._onPopupRemove = function(event) {
   this.popup = null;
-  if (this.mode === scout.FormField.MODE_CELLEDITOR && this.proposalChooser) {
+  if (this.mode === scout.FormField.Mode.CELLEDITOR && this.proposalChooser) {
     this._triggerCancelProposal();
   }
 };
@@ -652,7 +652,7 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
 };
 
 /**
- * Method invoked if being rendered within a cell-editor (mode='scout.FormField.MODE_CELLEDITOR'), and once the editor finished its rendering.
+ * Method invoked if being rendered within a cell-editor (mode='scout.FormField.Mode.CELLEDITOR'), and once the editor finished its rendering.
  */
 scout.SmartField.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {

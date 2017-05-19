@@ -468,7 +468,7 @@ scout.SmartField2.prototype._isPreventDefaultTabHandling = function(event) {
 scout.SmartField2.prototype._onFieldKeydown = function(event) {
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
-    if (this.mode === scout.FormField.MODE_DEFAULT) {
+    if (this.mode === scout.FormField.Mode.DEFAULT) {
       if (this._isPreventDefaultTabHandling()) {
         event.preventDefault();
         this._tabPrevented = {

@@ -71,7 +71,7 @@ scout.CellEditorPopup.prototype._render = function() {
   }
 
   var field = this.cell.field;
-  field.mode = scout.FormField.MODE_CELLEDITOR; // hint that this field is used within a cell-editor
+  field.mode = scout.FormField.Mode.CELLEDITOR; // hint that this field is used within a cell-editor
   field.render();
   field.prepareForCellEdit({
     firstCell: firstCell
