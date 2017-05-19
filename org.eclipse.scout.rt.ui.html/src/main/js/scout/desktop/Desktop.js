@@ -73,6 +73,7 @@ scout.Desktop.prototype._init = function(model) {
   this._setViews(this.views);
   this._setViewButtons(this.viewButtons);
   this._setMenus(this.menus);
+  this._setKeyStrokes(this.keyStrokes);
   this._setBenchLayoutData(this.benchLayoutData);
   this.openUriHandler = scout.create('OpenUriHandler', {
     session: this.session
@@ -102,6 +103,7 @@ scout.Desktop.prototype._createKeyStrokeContext = function() {
 scout.Desktop.prototype._initKeyStrokeContext = function() {
   scout.Desktop.parent.prototype._initKeyStrokeContext.call(this);
 
+  this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   // Keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active
   this.keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
   this.keyStrokeContext.registerKeyStroke(new scout.DisableBrowserTabSwitchingKeyStroke(this));
@@ -514,15 +516,20 @@ scout.Desktop.prototype._setViewButtons = function(viewButtons) {
   this._setProperty('viewButtons', viewButtons);
 };
 
+scout.Desktop.prototype.setMenus = function(menus) {
+  if (this.header) {
+    this.header.setMenus(menus);
+  }
+};
+
 scout.Desktop.prototype._setMenus = function(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
 };
 
-scout.Desktop.prototype.setMenus = function(menus) {
-  if (this.header) {
-    this.header.setMenus(menus);
-  }
+scout.Desktop.prototype._setKeyStrokes = function(keyStrokes) {
+  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
+  this._setProperty('keyStrokes', keyStrokes);
 };
 
 scout.Desktop.prototype.setNavigationHandleVisible = function(visible) {
