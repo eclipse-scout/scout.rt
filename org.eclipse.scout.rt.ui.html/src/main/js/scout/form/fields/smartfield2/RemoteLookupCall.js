@@ -32,9 +32,9 @@ scout.RemoteLookupCall.prototype.getByText = function(text) {
   return this.deferred.promise();
 };
 
-scout.RemoteLookupCall.prototype.getByParentKey = function(parentKey) {
+scout.RemoteLookupCall.prototype.getByRec = function(rec) {
   this._newDeferred();
-  this.adapter.lookupByParentKey(parentKey);
+  this.adapter.lookupByRec(rec);
   return this.deferred.promise();
 };
 

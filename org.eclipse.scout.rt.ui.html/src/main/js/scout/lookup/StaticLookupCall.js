@@ -26,43 +26,48 @@ scout.StaticLookupCall.MAX_ROW_COUNT = 100;
 
 scout.StaticLookupCall.prototype.getAll = function() {
   this._newDeferred();
-  setTimeout(function() {
-    var datas = this._data().slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
-    this.resolveLookup({
-      lookupRows: datas.map(this._dataToLookupRow)
-    });
-  }.bind(this), this._delay);
+  setTimeout(this._queryAll.bind(this), this._delay);
   return this.deferred.promise();
+};
+
+scout.StaticLookupCall.prototype._queryAll = function() {
+  var datas = this._data().slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
+  this.resolveLookup({
+    lookupRows: datas.map(this._dataToLookupRow)
+  });
 };
 
 scout.StaticLookupCall.prototype.getByText = function(text) {
   this._newDeferred();
-  setTimeout(function() {
-    var datas = this._data().filter(function(data) {
-      return scout.strings.startsWith(data[0].toLowerCase(), text.toLowerCase());
-    });
-    this.resolveLookup({
-      lookupRows: datas.map(this._dataToLookupRow)
-    });
-  }.bind(this), this._delay);
+  setTimeout(this._queryByText.bind(this, text), this._delay);
   return this.deferred.promise();
+};
+
+scout.StaticLookupCall.prototype._queryByText = function(text) {
+  var datas = this._data().filter(function(data) {
+    return scout.strings.startsWith(data[0].toLowerCase(), text.toLowerCase());
+  });
+  this.resolveLookup({
+    lookupRows: datas.map(this._dataToLookupRow)
+  });
 };
 
 scout.StaticLookupCall.prototype.getByKey = function(key) {
   this._newDeferred();
-  setTimeout(function() {
-    var data = scout.arrays.find(this._data(), function(data) {
-      return data[1] === key;
-    });
-    if (data) {
-      this.resolveLookup(this._dataToLookupRow(data));
-    } else {
-      this.deferred.reject();
-    }
-  }.bind(this), this._delay);
+  setTimeout(this._queryByKey.bind(this), this._delay);
   return this.deferred.promise();
 };
 
+scout.StaticLookupCall.prototype._queryByKey = function(key) {
+  var data = scout.arrays.find(this._data(), function(data) {
+    return data[1] === key;
+  });
+  if (data) {
+    this.resolveLookup(this._dataToLookupRow(data));
+  } else {
+    this.deferred.reject();
+  }
+};
 
 scout.StaticLookupCall.prototype.resolveLookup = function(lookupResult) {
   this.deferred.resolve(lookupResult);

@@ -1016,7 +1016,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public void lookupByParentKey(VALUE parentKey) {
+  public void lookupByRec(VALUE parentKey) {
     doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
   }
 

@@ -129,8 +129,8 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     else if ("lookupAll".equals(event.getType())) {
       handleUiLookupAll();
     }
-    else if ("lookupByParentKey".equals(event.getType())) {
-      handleUiLookupByParentKey(event);
+    else if ("lookupByRec".equals(event.getType())) {
+      handleUiLookupByRec(event);
     }
     else {
       super.handleUiEvent(event);
@@ -168,11 +168,11 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     getModel().lookupByText(searchText);
   }
 
-  protected void handleUiLookupByParentKey(JsonEvent event) {
+  protected void handleUiLookupByRec(JsonEvent event) {
     // resetKeyMap();
-    String mappedParentKey = event.getData().optString("parentKey");
-    VALUE parentKey = getLookupRowKeyForId(mappedParentKey);
-    getModel().lookupByParentKey(parentKey);
+    String mappedParentKey = event.getData().optString("rec");
+    VALUE rec = getLookupRowKeyForId(mappedParentKey);
+    getModel().lookupByRec(rec);
   }
 
   /**

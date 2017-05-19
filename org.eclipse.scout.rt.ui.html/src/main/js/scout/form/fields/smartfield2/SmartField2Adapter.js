@@ -53,9 +53,9 @@ scout.SmartField2Adapter.prototype.lookupByText = function(searchText) {
   });
 };
 
-scout.SmartField2Adapter.prototype.lookupByParentKey = function(parentKey) {
-  this._send('lookupByParentKey', {
-    parentKey: parentKey
+scout.SmartField2Adapter.prototype.lookupByRec = function(rec) {
+  this._send('lookupByRec', {
+    rec: rec
   });
 };
 

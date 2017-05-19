@@ -58,7 +58,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void lookupByText(String searchText);
 
-  void lookupByParentKey(VALUE parentKey);
+  void lookupByRec(VALUE parentKey);
 
   SmartField2Result getResult();
 

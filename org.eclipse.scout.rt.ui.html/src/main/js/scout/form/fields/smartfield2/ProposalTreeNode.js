@@ -21,7 +21,7 @@ scout.ProposalTreeNode.prototype.loadChildren = function() {
   if (this.isBrowseLoadIncremental()) {
     var parentKey = this.lookupRow.key;
     console.log('browseLoadIncremental=true parentKey=', parentKey);
-    return this.proposalChooser._smartField().lookupByParentKey(parentKey);
+    return this.proposalChooser._smartField().lookupByRec(parentKey);
   }
   // child nodes are already loaded -> same as parent.loadChildren
   console.log('browseLoadIncremental=false');

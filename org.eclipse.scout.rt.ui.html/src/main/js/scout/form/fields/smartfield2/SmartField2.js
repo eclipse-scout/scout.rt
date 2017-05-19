@@ -191,10 +191,10 @@ scout.SmartField2.prototype.acceptInput = function() {
   }.bind(this));
 };
 
-scout.SmartField2.prototype.lookupByParentKey = function(parentKey) {
-  console.log('lookupByParentKey');
+scout.SmartField2.prototype.lookupByRec = function(rec) {
+  console.log('lookupByRec');
   this.showLookupInProgress();
-  return this.lookupCall.getByParentKey(parentKey)
+  return this.lookupCall.getByRec(rec)
     .then(function(result) {
 
       // Since this function is only used for hierarchical trees we
@@ -529,7 +529,10 @@ scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAl
 };
 
 scout.SmartField2.prototype.setBrowseLoadIncremental = function(browseLoadIncremental) {
-  this.setProperty('browseAutoLoadIncremental', browseLoadIncremental);
+  this.setProperty('browseLoadIncremental', browseLoadIncremental);
+  if (this.lookupCall) {
+    this.lookupCall.setLoadIncremental(browseLoadIncremental); // FIXME [awe] 7.0 - SF2: discuss with C.GU, really a property for all lookups?
+  }
 };
 
 scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {

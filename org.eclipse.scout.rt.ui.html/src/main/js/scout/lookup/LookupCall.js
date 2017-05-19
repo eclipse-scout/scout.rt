@@ -14,6 +14,9 @@
  */
 scout.LookupCall = function() {
   this.session = null;
+
+  this.hierarchical = false;
+  this.loadIncremental = false;
 };
 
 scout.LookupCall.prototype.init = function(model) {
@@ -23,6 +26,14 @@ scout.LookupCall.prototype.init = function(model) {
 
 scout.LookupCall.prototype._init = function(model) {
   $.extend(this, model);
+};
+
+scout.LookupCall.prototype.setLoadIncremental = function(loadIncremental) {
+  this.loadIncremental = loadIncremental;
+};
+
+scout.LookupCall.prototype.setHierarchical = function(hierarchical) {
+  this.hierarchical = hierarchical;
 };
 
 /**
@@ -61,14 +72,14 @@ scout.LookupCall.prototype._textById = function(id) {
 };
 
 /**
- * @return {Promise} resolves to an array of {scout.LookupRow}
+ * @return {Promise} resolves to an array of {scout.LookupRow}s
  */
 scout.LookupCall.prototype.getAll = function() { // FIXME [awe] 7.0 - SF2: stimmt der kommentar? returns doch eher LookupROWs? nicht?
   throw new Error('getAll() not implemented');
 };
 
 /**
- * @return {Promise} resolves to an array of {scout.LookupRow}
+ * @return {Promise} resolves to an array of {scout.LookupRow}s
  */
 scout.LookupCall.prototype.getByText = function(text) {
   throw new Error('getByText() not implemented');
@@ -79,4 +90,14 @@ scout.LookupCall.prototype.getByText = function(text) {
  */
 scout.LookupCall.prototype.getByKey = function(key) { // FIXME [awe] 7.0 - SF2: rename all getById to getByKey? discuss with C.GU
   throw new Error('getByKey() not implemented');
+};
+
+/**
+ * Returns a list of lookup rows for the given parent key. This is used for incremental lookups.
+ *
+ * @return {Promise} resolves to an array of {scout.LookupRow}s.
+ * @param {object} rec references the parent key
+ */
+scout.LookupCall.prototype.getByRec = function(rec) {
+  throw new Error('getByRec() not implemented');
 };
