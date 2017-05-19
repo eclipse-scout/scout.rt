@@ -46,7 +46,7 @@ scout.LoadingSupport.prototype.renderLoading = function() {
     // --- 1. not loading -> loading ---
 
     var renderLoading = function() {
-      if (this.widget.rendered) {
+      if (this.widget.rendered || this.widget.rendering) {
         // Hide widget content
         this.$container().addClass('loading');
         // Create loading indicator
