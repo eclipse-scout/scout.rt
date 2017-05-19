@@ -13,17 +13,20 @@ scout.objects = {
   /**
    * Copies all the properties (including the ones from the prototype.) from dest to source
    * @memberOf scout.objects
+   * @returns the destination object (the destination parameter will be modified as well)
    */
   copyProperties: function(source, dest) {
     var propertyName;
     for (propertyName in source) {
       dest[propertyName] = source[propertyName];
     }
+    return dest;
   },
 
   /**
    * Copies the own properties (excluding the ones from the prototype) from dest to source
    * @memberOf scout.objects
+   * @returns the destination object (the destination parameter will be modified as well)
    */
   copyOwnProperties: function(source, dest) {
     var propertyName;
@@ -32,6 +35,7 @@ scout.objects = {
         dest[propertyName] = source[propertyName];
       }
     }
+    return dest;
   },
 
   /**

@@ -60,33 +60,7 @@ scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeCon
     throw new Error('missing bind-target for KeyStrokeContext: ' + keyStrokeContext);
   }
 
-  keyStrokeContext._handler = function(event) {
-    // check if scopeTarget is covered by glass pane
-    if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
-      // check if any action with 'keyStrokeFirePolicy=IAction.KEYSTROKE_FIRE_POLICY_ALWAYS' is in keyStrokeContext
-      var keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, function(k) { // (will at least return an empty array)
-        return k.field && k.field.keyStrokeFirePolicy === scout.Action.KEYSTROKE_FIRE_POLICY_ALWAYS;
-      });
-      if (keyStrokeFirePolicyAlways.length === 0) {
-        return;
-      }
-      // copy current keyStrokeContext and replace keyStrokes with filtered array 'keyStrokeFirePolicyAlways'
-      keyStrokeContext = $.extend({}, keyStrokeContext);
-      keyStrokeContext.keyStrokes = keyStrokeFirePolicyAlways;
-    }
-
-    if (this._isHelpKeyStroke(event)) {
-      if (event.originalEvent.renderingHelp || !this._helpRendered) {
-        event.originalEvent.renderingHelp = true; // flag to let superior keyStrokeContexts render their help keys
-        this._helpRendered = true; // flag to only render help once, if help key is held down
-        this._installHelpDisposeListener(event);
-        this._renderKeys(keyStrokeContext, event);
-      }
-    } else {
-      this._handleKeyStrokeEvent(keyStrokeContext, event);
-    }
-  }.bind(this);
-
+  keyStrokeContext._handler = this._onKeyEvent.bind(this, keyStrokeContext);
   keyStrokeContext._handler.$target = keyStrokeContext.$getBindTarget();
   keyStrokeContext._handler.$target.keydown(keyStrokeContext._handler);
   keyStrokeContext._handler.$target.keyup(keyStrokeContext._handler);
@@ -219,4 +193,31 @@ scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
   $myWindow.on('blur', helpDisposeHandler); // once the current browser tab/window is left
 
   return false;
+};
+
+scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event) {
+  // check if scopeTarget is covered by glass pane
+  if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
+    // check if any action with 'keyStrokeFirePolicy=IAction.KEYSTROKE_FIRE_POLICY_ALWAYS' is in keyStrokeContext
+    var keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, function(k) { // (will at least return an empty array)
+      return k.field && k.field.keyStrokeFirePolicy === scout.Action.KEYSTROKE_FIRE_POLICY_ALWAYS;
+    });
+    if (keyStrokeFirePolicyAlways.length === 0) {
+      return;
+    }
+    // copy current keyStrokeContext and replace keyStrokes with filtered array 'keyStrokeFirePolicyAlways'
+    keyStrokeContext = keyStrokeContext.clone();
+    keyStrokeContext.keyStrokes = keyStrokeFirePolicyAlways;
+  }
+
+  if (this._isHelpKeyStroke(event)) {
+    if (event.originalEvent.renderingHelp || !this._helpRendered) {
+      event.originalEvent.renderingHelp = true; // flag to let superior keyStrokeContexts render their help keys
+      this._helpRendered = true; // flag to only render help once, if help key is held down
+      this._installHelpDisposeListener(event);
+      this._renderKeys(keyStrokeContext, event);
+    }
+  } else {
+    this._handleKeyStrokeEvent(keyStrokeContext, event);
+  }
 };
