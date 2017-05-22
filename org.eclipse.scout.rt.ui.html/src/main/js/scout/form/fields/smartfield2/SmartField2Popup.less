@@ -1,12 +1,4 @@
-.dropdown-popup {
-  border: 1px solid @popup-border-color;
-  border-top-color: @border-color;
-  border-bottom-left-radius: @border-radius;
-  border-bottom-right-radius: @border-radius;
-  background-color: @palette-white;
-  #scout.drop-shadow();
-  min-width: 200px;
-
+.dropdown-field-popup, .smart-field-popup {
   &.animate-open {
     #scout.transform-origin(top);
     #scout.transform(scaleY(0));
@@ -19,6 +11,16 @@
     #scout.animation-name(shrink-y);
     #scout.animation-duration(0.15s);
   }
+}
+
+.dropdown-field-popup {
+  border: 1px solid @popup-border-color;
+  border-top-color: @border-color;
+  border-bottom-left-radius: @border-radius;
+  border-bottom-right-radius: @border-radius;
+  background-color: @palette-white;
+  #scout.drop-shadow();
+  min-width: 200px;
 
   & > .table {
     & > .table-data > .table-row {

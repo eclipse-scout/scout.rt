@@ -49,9 +49,10 @@ scout.SmartField2Popup.prototype._createLayout = function() {
 };
 
 scout.SmartField2Popup.prototype._render = function() {
+  var cssClass = this._smartField().cssClassPrefix() + '-popup';
   scout.SmartField2Popup.parent.prototype._render.call(this);
   this.$container
-    .addClass('dropdown-popup')
+    .addClass(cssClass)
     .on('mousedown', this._onContainerMouseDown.bind(this));
   this.proposalChooser.render();
 };
