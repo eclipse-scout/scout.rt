@@ -1920,7 +1920,12 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
   }
 };
 
+scout.Tree.prototype.insertNode = function(node, parentNode) {
+  this.insertNodes([node], parentNode);
+};
+
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
+  nodes = scout.arrays.ensure(nodes);
   this._ensureTreeNodes(nodes);
   if (parentNode && !(parentNode instanceof scout.TreeNode)) {
     throw new Error('parent has to be a tree node: ' + parentNode);
@@ -1983,6 +1988,7 @@ scout.Tree.prototype.updateNode = function(node) {
 };
 
 scout.Tree.prototype.updateNodes = function(nodes) {
+  nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(updatedNode) {
     var propertiesChanged,
       oldNode = this.nodesMap[updatedNode.id];
@@ -2053,9 +2059,14 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   return propertiesChanged;
 };
 
+scout.Tree.prototype.deleteNode = function(node, parentNode) {
+  this.deleteNodes([node], parentNode);
+};
+
 scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
   var deletedNodes = [];
 
+  nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(node) {
     if (parentNode) {
       if (node.parentNode !== parentNode) {

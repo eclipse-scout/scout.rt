@@ -15,6 +15,7 @@ scout.NavigateDownButton = function() {
   this.iconId = this._defaultIconId;
   this.keyStroke = 'enter';
   this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
+  this._outlineInitPageHandler = this._onOutlineInitPage.bind(this);
 };
 scout.inherits(scout.NavigateDownButton, scout.NavigateButton);
 
@@ -24,13 +25,16 @@ scout.NavigateDownButton.prototype._init = function(options) {
   if (this.node.detailTable) {
     this.node.detailTable.on('rowsSelected', this._detailTableRowsSelectedHandler);
   }
+  this.outline.on('initPage', this._outlineInitPageHandler);
 };
 
 scout.NavigateDownButton.prototype._destroy = function() {
-  scout.NavigateDownButton.parent.prototype._destroy.call(this);
   if (this.node.detailTable) {
     this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
   }
+  this.outline.off('initPage', this._outlineInitPageHandler);
+
+  scout.NavigateDownButton.parent.prototype._destroy.call(this);
 };
 
 scout.NavigateDownButton.prototype._render = function() {
@@ -56,13 +60,12 @@ scout.NavigateDownButton.prototype._buttonEnabled = function() {
     return false;
   }
 
-  // when it's not a leaf and not a detail - the button is only enabled when a single row is selected
+  // when it's not a leaf and not a detail - the button is only enabled when a single row is selected and that row is linked to a page
   var table = this.node.detailTable;
   if (table) {
-    return table.selectedRows.length === 1;
-  } else {
-    return true;
+    return table.selectedRows.length === 1 && !!table.selectedRows[0].page;
   }
+  return true;
 };
 
 scout.NavigateDownButton.prototype._drill = function() {
@@ -102,4 +105,11 @@ scout.NavigateDownButton.prototype._drill = function() {
 
 scout.NavigateDownButton.prototype._onDetailTableRowsSelected = function(event) {
   this.updateEnabled();
+};
+
+scout.NavigateDownButton.prototype._onOutlineInitPage = function(event) {
+  var table = this.node.detailTable;
+  if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
+    this.updateEnabled();
+  }
 };

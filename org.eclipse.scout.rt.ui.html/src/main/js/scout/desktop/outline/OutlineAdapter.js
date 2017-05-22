@@ -28,6 +28,7 @@ scout.OutlineAdapter.prototype._postCreateWidget = function() {
   var outline = this.widget;
   outline._visitNodes(outline.nodes, this._onWidgetInitPage.bind(this));
 };
+
 scout.OutlineAdapter.prototype._onPageChanged = function(event) {
   var page;
   if (event.nodeId) {
