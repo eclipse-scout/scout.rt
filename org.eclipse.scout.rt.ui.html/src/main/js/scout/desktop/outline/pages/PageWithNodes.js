@@ -56,7 +56,9 @@ scout.PageWithNodes.prototype._rebuildDetailTable = function(childPages) {
 
 scout.PageWithNodes.prototype._unlinkAllTableRows = function(rows) {
   rows.forEach(function(row) {
-    scout.Page.unlinkRowWithPage(row);
+    if (row.page) {
+      row.page.unlinkWithRow(row);
+    }
   });
 };
 
@@ -66,7 +68,7 @@ scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPage
       parent: this.detailTable,
       cells: [childPage.text]}
     );
-    scout.Page.linkRowWithPage(row, childPage);
+    childPage.linkWithRow(row);
     return row;
   }, this);
 };

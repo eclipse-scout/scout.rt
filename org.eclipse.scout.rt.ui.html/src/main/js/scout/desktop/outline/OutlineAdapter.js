@@ -96,7 +96,7 @@ scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
   var nodeId = row.nodeId,
     node = this.widget.nodesMap[nodeId];
   if (node) {
-    scout.Page.linkRowWithPage(row, node);
+    node.linkWithRow(row);
   } else {
     // Prepare for linking later because node has not been inserted yet
     // see: #_linkNodeWithRowLater
@@ -107,7 +107,7 @@ scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
 scout.OutlineAdapter.prototype._unlinkNodeWithRow = function(row) {
   var node = this.widget.nodesMap[row.nodeId];
   if (node) {
-    scout.Page.unlinkRowWithPage(row, node);
+    node.unlinkWithRow(row);
   }
 };
 
@@ -143,6 +143,6 @@ scout.OutlineAdapter.prototype._linkNodeWithRowLater = function(page) {
     return;
   }
   var row = this._nodeIdToRowMap[page.id];
-  scout.Page.linkRowWithPage(row, page);
+  page.linkWithRow(row);
   delete this._nodeIdToRowMap[page.id];
 };

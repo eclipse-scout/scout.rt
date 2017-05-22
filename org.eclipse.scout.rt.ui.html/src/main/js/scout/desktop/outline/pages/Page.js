@@ -219,20 +219,18 @@ scout.Page.prototype.reloadPage = function () {
   }
 };
 
-/**
- * @static
- */
-scout.Page.linkRowWithPage = function(row, page) {
-  row.page = page;
-  page.row = row;
+scout.Page.prototype.linkWithRow = function(row) {
+  this.row = row;
+  row.page = this;
+  this.getOutline().trigger('linkPageWithRow', {
+    page: this,
+    row: row
+  });
 };
 
-/**
- * @static
- */
-scout.Page.unlinkRowWithPage = function(row, page) {
+scout.Page.prototype.unlinkWithRow = function(row) {
+  delete this.row;
   delete row.page;
-  delete page.row;
 };
 
 scout.Page.prototype._onTableRowsFiltered = function(event) {

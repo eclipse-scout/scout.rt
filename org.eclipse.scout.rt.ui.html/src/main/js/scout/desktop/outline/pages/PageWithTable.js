@@ -40,7 +40,7 @@ scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
   var rows = scout.arrays.ensure(event.rows),
     childPages = rows.map(function(row) {
       var childPage = row.page;
-      scout.Page.unlinkRowWithPage(row, childPage);
+      childPage.unlinkWithRow(row);
       return childPage;
     }, this);
 
@@ -84,7 +84,7 @@ scout.PageWithTable.prototype._createChildPageInternal = function(row) {
   if (childPage === null && this.alwaysCreateChildPage) {
     childPage = this.createDefaultChildPage(row);
   }
-  scout.Page.linkRowWithPage(row, childPage);
+  childPage.linkWithRow(row);
   childPage = childPage.updatePageFromTableRow(row);
   return childPage;
 };
