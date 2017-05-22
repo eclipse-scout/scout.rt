@@ -10,20 +10,22 @@
  ******************************************************************************/
 describe('NavigateDownButton', function() {
 
-  var session, outline, menu,
-    node = new scout.Page();
+  var session, outline, menu, node;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    outline = {
-      session: session
-    };
-    var model = createSimpleModel('NavigateDownButton', session);
-    model.outline = outline;
-    model.node = node;
-    menu = new scout.NavigateDownButton();
-    menu.init(model);
+    outline = scout.create('Outline', {
+      parent: session.desktop
+    });
+    node = scout.create('Page', {
+      parent: outline
+    });
+    menu = scout.create('NavigateDownButton', {
+      parent: session.desktop,
+      outline: outline,
+      node: node
+    });
   });
 
   it('_toggleDetail is always false', function() {
@@ -95,8 +97,58 @@ describe('NavigateDownButton', function() {
       expect(menu._buttonEnabled()).toBe(false);
 
       node.detailTable.selectedRows = [{
+        id: '1',
+        page: {}
+      }];
+      expect(menu._buttonEnabled()).toBe(true);
+    });
+
+    it('is not enabled when selected row is not linked to a page', function() {
+      node.leaf = false; // node is not a leaf
+      menu._isDetail = function() { // currently we're not displaying the detail-form
+        return false;
+      };
+      node.detailTable = scout.create('Table', {
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      expect(menu._buttonEnabled()).toBe(false);
+
+      node.detailTable.selectedRows = [{
         id: '1'
       }];
+      expect(menu._buttonEnabled()).toBe(false);
+
+      node.detailTable.selectedRows[0].page = {};
+      expect(menu._buttonEnabled()).toBe(true);
+    });
+
+    it('is enabled when selected row is linked to a page later when page is inserted (remote case)', function() {
+      linkWidgetAndAdapter(outline, 'OutlineAdapter');
+      node.leaf = false; // node is not a leaf
+      menu._isDetail = function() { // currently we're not displaying the detail-form
+        return false;
+      };
+      node.detailTable = scout.create('Table', {
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      outline.insertNode(node);
+      expect(menu._buttonEnabled()).toBe(false);
+
+      var page = scout.create('Page', {
+        parent: outline,
+        parentNode: node
+      });
+      var row = scout.create('TableRow', {
+        parent: node.detailTable,
+        nodeId: page.id
+      });
+      node.detailTable.insertRow(row);
+      node.detailTable.selectRow(row);
+      expect(menu._buttonEnabled()).toBe(false);
+
+      outline.insertNode(page);
       expect(menu._buttonEnabled()).toBe(true);
     });
   });
@@ -117,7 +169,6 @@ describe('NavigateDownButton', function() {
     outline.nodesMap = {
       '123': drillNode
     };
-    outline.selectNodes = function(node) {};
 
     spyOn(outline, 'selectNodes');
     menu._drill();
