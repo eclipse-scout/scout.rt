@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -692,12 +693,7 @@ public class UiSession implements IUiSession {
           public void run() throws Exception {
             processJsonRequestInternal();
           }
-        }, ModelJobs.newInput(clientRunContext)
-            .withName("Processing JSON request")
-            .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, jsonRequest.getRequestType() == RequestType.POLL_REQUEST)
-            // Handle exceptions instantaneously in job manager, and not by submitter.
-            // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
-            .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
+        }, createJsonRequestModelJobInput(jsonRequest, clientRunContext));
 
         // 2. Wait for all model jobs of the session.
         BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
@@ -736,6 +732,20 @@ public class UiSession implements IUiSession {
         LOG.debug("Adapter count after request: {}", m_jsonAdapterRegistry.size());
       }
     }
+  }
+
+  /**
+   * Creates a new {@link JobInput} for the model job created by
+   * {@link #processJsonRequest(HttpServletRequest, HttpServletResponse, JsonRequest)}.<br>
+   * May be overridden to customize the input.
+   */
+  protected JobInput createJsonRequestModelJobInput(final JsonRequest jsonRequest, final ClientRunContext clientRunContext) {
+    return ModelJobs.newInput(clientRunContext)
+        .withName("Processing JSON request")
+        .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, jsonRequest.getRequestType() == RequestType.POLL_REQUEST)
+        // Handle exceptions instantaneously in job manager, and not by submitter.
+        // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
+        .withExceptionHandling(BEANS.get(ExceptionHandler.class), true);
   }
 
   /**
@@ -821,11 +831,7 @@ public class UiSession implements IUiSession {
           public void run() throws Exception {
             resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
           }
-        }, ModelJobs.newInput(clientRunContext)
-            .withName("Processing file upload request")
-            // Handle exceptions instantaneously in job manager, and not by submitter.
-            // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
-            .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
+        }, createFileUploadModelJobInput(clientRunContext));
 
         // 2. Wait for all model jobs of the session.
         BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
@@ -858,6 +864,19 @@ public class UiSession implements IUiSession {
         dispose();
       }
     }
+  }
+
+  /**
+   * Creates a new {@link JobInput} for the model job created by {@link #processFileUpload(HttpServletRequest,
+   * HttpServletResponse, IBinaryResourceConsumer, List, Map).<br>
+   * May be overridden to customize the input.
+   */
+  protected JobInput createFileUploadModelJobInput(final ClientRunContext clientRunContext) {
+    return ModelJobs.newInput(clientRunContext)
+        .withName("Processing file upload request")
+        // Handle exceptions instantaneously in job manager, and not by submitter.
+        // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
+        .withExceptionHandling(BEANS.get(ExceptionHandler.class), true);
   }
 
   @Override
