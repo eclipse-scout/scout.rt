@@ -162,9 +162,11 @@ describe('NavigateDownButton', function() {
         nodeId: '123'
       }]
     });
-    var drillNode = new scout.Page();
+    var drillNode = scout.create('Page', {
+      parent: outline
+    });
     var firstRow = node.detailTable.rows[0];
-    scout.Page.linkRowWithPage(firstRow, drillNode);
+    drillNode.linkWithRow(firstRow);
     node.detailTable.selectRows(firstRow);
     outline.nodesMap = {
       '123': drillNode

@@ -15,7 +15,7 @@ scout.NavigateDownButton = function() {
   this.iconId = this._defaultIconId;
   this.keyStroke = 'enter';
   this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
-  this._outlineInitPageHandler = this._onOutlineInitPage.bind(this);
+  this._outlineLinkPageWithRowHandler = this._onOutlineLinkPageWithRow.bind(this);
 };
 scout.inherits(scout.NavigateDownButton, scout.NavigateButton);
 
@@ -25,14 +25,14 @@ scout.NavigateDownButton.prototype._init = function(options) {
   if (this.node.detailTable) {
     this.node.detailTable.on('rowsSelected', this._detailTableRowsSelectedHandler);
   }
-  this.outline.on('initPage', this._outlineInitPageHandler);
+  this.outline.on('linkPageWithRow', this._outlineLinkPageWithRowHandler);
 };
 
 scout.NavigateDownButton.prototype._destroy = function() {
   if (this.node.detailTable) {
     this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
   }
-  this.outline.off('initPage', this._outlineInitPageHandler);
+  this.outline.off('linkPageWithRow', this._outlineLinkPageWithRowHandler);
 
   scout.NavigateDownButton.parent.prototype._destroy.call(this);
 };
@@ -107,7 +107,7 @@ scout.NavigateDownButton.prototype._onDetailTableRowsSelected = function(event) 
   this.updateEnabled();
 };
 
-scout.NavigateDownButton.prototype._onOutlineInitPage = function(event) {
+scout.NavigateDownButton.prototype._onOutlineLinkPageWithRow = function(event) {
   var table = this.node.detailTable;
   if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
     this.updateEnabled();

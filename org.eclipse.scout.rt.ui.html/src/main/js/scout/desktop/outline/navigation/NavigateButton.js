@@ -86,5 +86,9 @@ scout.NavigateButton.prototype.updateEnabled = function() {
   this.enabled = this._buttonEnabled();
   if (this.rendered) {
     this._renderEnabled();
+    // Make sure default menu is correctly visualized (necessary if button is disabled and is being enabled on the fly (e.g. table reload))
+    if (this.enabled && this.parent instanceof scout.MenuBar) {
+      this.parent.updateDefaultMenu();
+    }
   }
 };
