@@ -136,7 +136,7 @@ describe("Table", function() {
       model.rowIconVisible = true;
       table = helper.createTable(model);
       row = helper.createModelRow(1, [ 'Foo' ]);
-      row.rowIcon = scout.icons.HOME;
+      row.rowIcon = scout.icons.WORLD;
       table.insertRow(row);
 
       var columns = table.columns;

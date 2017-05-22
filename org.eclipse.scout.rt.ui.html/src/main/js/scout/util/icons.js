@@ -15,7 +15,6 @@ scout.icons = {
   CHART: 'font:\uE022',
   COLLAPSE: 'font:\uE600',
   ELLIPSIS_V: 'font:\uE040',
-  HOME: 'font:\uE601',
   SUM: 'font:\ue025',
   AVG: 'font:\ue026',
   MAX: 'font:\ue027',
