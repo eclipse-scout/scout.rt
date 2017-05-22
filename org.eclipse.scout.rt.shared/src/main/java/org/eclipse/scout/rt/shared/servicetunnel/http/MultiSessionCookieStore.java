@@ -15,16 +15,11 @@ import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.session.ISessionListener;
-import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.eclipse.scout.rt.shared.http.AbstractMultiSessionCookieStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,29 +27,18 @@ import org.slf4j.LoggerFactory;
  * HTTP cookie store implementation that manages different sets of cookies ("cookie jars"), one per {@link ISession}.
  */
 @Bean
-public class MultiSessionCookieStore implements CookieStore {
+public class MultiSessionCookieStore extends AbstractMultiSessionCookieStore<CookieStore> implements CookieStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(MultiSessionCookieStore.class);
 
-  private final ReadWriteLock m_cookieStoresLock = new ReentrantReadWriteLock();
-  /**
-   * Access to this map synchronized with the ReadWriteLock {@link #m_cookieStoresLock}.
-   */
-  private final Map<ISession, CookieStore> m_cookieStores;
-  private final CookieStore m_defaultCookieStore;
-
-  public MultiSessionCookieStore() {
-    // Use a WeakHashMap to ensure that client sessions are not retained when no longer needed.
-    m_cookieStores = new WeakHashMap<ISession, CookieStore>();
-    m_defaultCookieStore = createDefaultCookieStore();
-  }
-
-  private CookieStore createDefaultCookieStore() {
-    CookieStore cookieStore = createInMemoryCookieStore();
+  @Override
+  protected CookieStore createDefaultCookieStore() {
+    CookieStore cookieStore = createNewCookieStore();
     return new P_DefaultCookieStoreDecorator(cookieStore);
   }
 
-  private CookieStore createInMemoryCookieStore() {
+  @Override
+  protected CookieStore createNewCookieStore() {
     // Because java.net.InMemoryCookieStore is package private, this is the only way to create a new instance.
     return new CookieManager().getCookieStore();
   }
@@ -87,64 +71,6 @@ public class MultiSessionCookieStore implements CookieStore {
   @Override
   public boolean removeAll() {
     return getDelegate().removeAll();
-  }
-
-  private CookieStore getDelegate() {
-    ISession currentSession = ISession.CURRENT.get();
-    if (currentSession == null) {
-      return m_defaultCookieStore;
-    }
-
-    // Check cache with read lock first.
-    m_cookieStoresLock.readLock().lock();
-    try {
-      CookieStore cookieStore = m_cookieStores.get(currentSession);
-      if (cookieStore != null) {
-        return cookieStore;
-      }
-    }
-    finally {
-      m_cookieStoresLock.readLock().unlock();
-    }
-    // No entry found - get write lock to create it
-    m_cookieStoresLock.writeLock().lock();
-    try {
-      // In the meantime, the cookie store might have been created already by another thread - check again.
-      CookieStore cookieStore = m_cookieStores.get(currentSession);
-      if (cookieStore != null) {
-        return cookieStore;
-      }
-      else {
-        cookieStore = createInMemoryCookieStore();
-        m_cookieStores.put(currentSession, cookieStore);
-        currentSession.addListener(new P_SessionStoppedListenr());
-        return cookieStore;
-      }
-    }
-    finally {
-      m_cookieStoresLock.writeLock().unlock();
-    }
-  }
-
-  public void sessionStopped(ISession session) {
-    m_cookieStoresLock.writeLock().lock();
-    try {
-      m_cookieStores.remove(session);
-    }
-    finally {
-      m_cookieStoresLock.writeLock().unlock();
-    }
-  }
-
-  private class P_SessionStoppedListenr implements ISessionListener {
-    @Override
-    public void sessionChanged(SessionEvent event) {
-      if (SessionEvent.TYPE_STOPPED == event.getType()) {
-        ISession session = event.getSource();
-        sessionStopped(session);
-        session.removeListener(this);
-      }
-    }
   }
 
   private static class P_DefaultCookieStoreDecorator implements CookieStore {

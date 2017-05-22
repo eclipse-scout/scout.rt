@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URLConnection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +26,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.api.client.http.HttpResponse;
 
 /**
  * This class is a {@link Callable} to invoke the service operation as described by {@link IServiceTunnelRequest}
@@ -70,16 +70,14 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       nBytes = requestData.length;
 
       // Send the request to the server.
-      final URLConnection urlConnection = m_tunnel.createURLConnection(m_serviceRequest, requestData);
-
+      HttpResponse resp = m_tunnel.executeRequest(m_serviceRequest, requestData);
       // Receive the response.
-      final int httpStatusCode = (urlConnection instanceof HttpURLConnection ? ((HttpURLConnection) urlConnection).getResponseCode() : 200);
-      m_tunnel.interceptHttpResponse(urlConnection, m_serviceRequest, httpStatusCode);
-      if (httpStatusCode != 0 && (httpStatusCode < 200 || httpStatusCode > 299)) {
-        return new ServiceTunnelResponse(new HttpException(httpStatusCode)); // request failed
+      m_tunnel.interceptHttpResponse(resp, m_serviceRequest);
+      if (resp.getStatusCode() != 0 && (resp.getStatusCode() < 200 || resp.getStatusCode() > 299)) {
+        return new ServiceTunnelResponse(new HttpException(resp.getStatusCode())); // request failed
       }
 
-      try (InputStream in = urlConnection.getInputStream()) {
+      try (InputStream in = resp.getContent()) {
         return m_tunnel.getContentHandler().readResponse(in);
       }
     }

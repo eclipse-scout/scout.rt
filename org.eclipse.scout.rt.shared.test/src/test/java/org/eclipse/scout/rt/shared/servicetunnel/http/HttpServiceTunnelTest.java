@@ -1,12 +1,5 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,9 +7,9 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.net.URLConnection;
 
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
+import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -24,6 +17,18 @@ import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.testing.http.MockHttpTransport;
+import com.google.api.client.testing.http.MockLowLevelHttpResponse;
+
+import static org.mockito.Mockito.when;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link HttpServiceTunnel}
@@ -41,14 +46,28 @@ public class HttpServiceTunnelTest {
   public void testTunnel() throws IOException {
     when(mockUrl.getValue()).thenReturn("http://localhost");
 
-    ServiceTunnelResponse expectedResponse = new ServiceTunnelResponse("testData", new Object[]{});
-    final URLConnection urlConnection = mock(URLConnection.class);
-    when(urlConnection.getInputStream()).thenReturn(getInputStream(expectedResponse));
+    final MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(getInputStream(new ServiceTunnelResponse("testData", new Object[]{})));
 
     HttpServiceTunnel tunnel = new HttpServiceTunnel() {
+
       @Override
-      protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
-        return urlConnection;
+      protected IHttpTransportManager getHttpTransportManager() {
+        return new IHttpTransportManager() {
+
+          private MockHttpTransport m_transport = new MockHttpTransport.Builder()
+              .setLowLevelHttpResponse(expectedResponse)
+              .build();
+
+          @Override
+          public HttpTransport getHttpTransport() {
+            return m_transport;
+          }
+
+          @Override
+          public HttpRequestFactory getHttpRequestFactory() {
+            return m_transport.createRequestFactory();
+          }
+        };
       }
     };
     tunnel.setContentHandler(getTestContentHandler());

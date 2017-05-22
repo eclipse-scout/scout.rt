@@ -11,10 +11,8 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -32,11 +30,19 @@ import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
+import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+
+import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpResponse;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
@@ -47,6 +53,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   private IServiceTunnelContentHandler m_contentHandler;
   private final URL m_serverUrl;
+  private final GenericUrl m_genericUrl;
   private final boolean m_active;
 
   public HttpServiceTunnel() {
@@ -55,6 +62,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   public HttpServiceTunnel(URL url) {
     m_serverUrl = url;
+    m_genericUrl = url != null ? new GenericUrl(url) : null;
     m_active = url != null;
   }
 
@@ -73,21 +81,28 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     return m_active;
   }
 
+  public GenericUrl getGenericUrl() {
+    return m_genericUrl;
+  }
+
   public URL getServerUrl() {
     return m_serverUrl;
   }
 
   /**
+   * Execute a {@link ServiceTunnelRequest}, returns the plain {@link HttpResponse} - (executed and) ready to be
+   * processed to create a {@link ServiceTunnelResponse}.
+   *
    * @param call
    *          the original call
    * @param callData
    *          the data created by the {@link IServiceTunnelContentHandler} used by this tunnel Create url connection and
    *          write post data (if required)
    * @throws IOException
-   *           override this method to customize the creation of the {@link URLConnection} see
-   *           {@link #addCustomHeaders(URLConnection, String)}
+   *           override this method to customize the creation of the {@link HttpResponse} see
+   *           {@link #addCustomHeaders(HttpRequest, ServiceTunnelRequest, byte[])}
    */
-  protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
     // fast check of wrong URL's for this tunnel
     if (!"http".equalsIgnoreCase(getServerUrl().getProtocol()) && !"https".equalsIgnoreCase(getServerUrl().getProtocol())) {
       throw new IOException("URL '" + getServerUrl().toString() + "' is not supported by this tunnel ('" + getClass().getName() + "').");
@@ -97,24 +112,26 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
       throw new IllegalArgumentException("No target URL configured. Please specify a target URL in the config.properties using property '" + key + "'.");
     }
 
-    // configure POST with text/xml
-    URLConnection urlConn = getServerUrl().openConnection();
-    String contentType = "text/xml";
-    urlConn.setRequestProperty("Content-type", contentType);
-    urlConn.setDoOutput(true);
-    urlConn.setDoInput(true);
-    urlConn.setDefaultUseCaches(false);
-    urlConn.setUseCaches(false);
-    addCustomHeaders(urlConn, "POST", call, callData);
-    try (OutputStream httpOut = urlConn.getOutputStream()) {
-      httpOut.write(callData);
-    }
-    return urlConn;
+    HttpRequestFactory requestFactory = getHttpTransportManager().getHttpRequestFactory();
+    HttpRequest request = requestFactory.buildPostRequest(getGenericUrl(), new ByteArrayContent(null, callData));
+    HttpHeaders headers = request.getHeaders();
+    headers.setCacheControl("no-cache");
+    headers.setContentType("text/xml");
+    headers.put("Pragma", "no-cache");
+    addCustomHeaders(request, call, callData);
+    return request.execute();
   }
 
   /**
-   * @param urlConn
-   *          connection object
+   * @return the {@link IHttpTransportManager}
+   */
+  protected IHttpTransportManager getHttpTransportManager() {
+    return BEANS.get(HttpServiceTunnelTransportManager.class);
+  }
+
+  /**
+   * @param httpRequest
+   *          request object
    * @param method
    *          GET or POST override this method to add custom HTTP headers
    * @param call
@@ -124,16 +141,16 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    * @throws IOException
    * @since 6.0
    */
-  protected void addCustomHeaders(URLConnection urlConn, String method, ServiceTunnelRequest call, byte[] callData) throws IOException {
-    addSignatureHeader(urlConn, method, callData);
-    addCorrelationId(urlConn);
+  protected void addCustomHeaders(HttpRequest httpRequest, ServiceTunnelRequest call, byte[] callData) throws IOException {
+    addSignatureHeader(httpRequest, callData);
+    addCorrelationId(httpRequest);
   }
 
-  protected void addSignatureHeader(URLConnection urlConn, String method, byte[] callData) throws IOException {
+  protected void addSignatureHeader(HttpRequest httpRequest, byte[] callData) throws IOException {
     try {
-      String token = createAuthToken(urlConn, method, callData);
+      String token = createAuthToken(httpRequest, callData);
       if (StringUtility.hasText(token)) {
-        urlConn.setRequestProperty(TOKEN_AUTH_HTTP_HEADER, token);
+        httpRequest.getHeaders().put(TOKEN_AUTH_HTTP_HEADER, token);
       }
     }
     catch (RuntimeException e) {
@@ -144,14 +161,14 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   /**
    * Method invoked to add the <em>correlation ID</em> as HTTP header to the request.
    */
-  protected void addCorrelationId(final URLConnection urlConn) throws IOException {
+  protected void addCorrelationId(final HttpRequest httpRequest) throws IOException {
     final String cid = CorrelationId.CURRENT.get();
     if (cid != null) {
-      urlConn.setRequestProperty(CorrelationId.HTTP_HEADER_NAME, cid);
+      httpRequest.getHeaders().put(CorrelationId.HTTP_HEADER_NAME, cid);
     }
   }
 
-  protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) {
+  protected String createAuthToken(HttpRequest httpRequest, byte[] callData) {
     DefaultAuthToken token = DefaultAuthToken.create();
     if (token == null) {
       return null;
@@ -236,7 +253,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    * This method is called just after the HTTP response is received, but before being processed, and might be used to
    * read and interpret custom HTTP headers.
    */
-  protected void interceptHttpResponse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
+  protected void interceptHttpResponse(HttpResponse httpResponse, ServiceTunnelRequest call) {
     // subclasses may intercept HTTP response
   }
 

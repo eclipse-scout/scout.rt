@@ -11,12 +11,9 @@
 package org.eclipse.scout.rt.client.fixture;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,6 +24,8 @@ import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceUtility;
+
+import com.google.api.client.http.HttpResponse;
 
 @IgnoreBean
 public class MockServiceTunnel extends ClientHttpServiceTunnel {
@@ -76,37 +75,42 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   }
 
   @Override
-  protected URLConnection createURLConnection(final ServiceTunnelRequest call, byte[] callData) throws IOException {
-    URLConnection urlConn = new MockHttpURLConnection(getServerUrl()) {
-      @Override
-      protected void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
-        ServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
-        try {
-          m_runningMap.put(call.getRequestSequence(), Thread.currentThread());
-          //
-          ServiceTunnelResponse res = MockServiceTunnel.this.mockServiceCall(req);
-          if (res.getException() != null) {
-            throw new Exception(res.getException());
-          }
-          getContentHandler().writeResponse(servletOut, res);
-        }
-        finally {
-          m_runningMap.remove(call.getRequestSequence());
-        }
-      }
-    };
-    //
-    String contentType = "text/xml";
-    urlConn.setRequestProperty("Content-type", contentType);
-    urlConn.setDoOutput(true);
-    urlConn.setDoInput(true);
-    urlConn.setDefaultUseCaches(false);
-    urlConn.setUseCaches(false);
-    //
-    OutputStream httpOut = urlConn.getOutputStream();
-    httpOut.write(callData);
-    httpOut.close();
-    httpOut = null;
-    return urlConn;
+  protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
+    return null;
   }
+
+//  @Override
+//  protected URLConnection createURLConnection(final ServiceTunnelRequest call, byte[] callData) throws IOException {
+//    URLConnection urlConn = new MockHttpURLConnection(getServerUrl()) {
+//      @Override
+//      protected void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
+//        ServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
+//        try {
+//          m_runningMap.put(call.getRequestSequence(), Thread.currentThread());
+//          //
+//          ServiceTunnelResponse res = MockServiceTunnel.this.mockServiceCall(req);
+//          if (res.getException() != null) {
+//            throw new Exception(res.getException());
+//          }
+//          getContentHandler().writeResponse(servletOut, res);
+//        }
+//        finally {
+//          m_runningMap.remove(call.getRequestSequence());
+//        }
+//      }
+//    };
+//    //
+//    String contentType = "text/xml";
+//    urlConn.setRequestProperty("Content-type", contentType);
+//    urlConn.setDoOutput(true);
+//    urlConn.setDoInput(true);
+//    urlConn.setDefaultUseCaches(false);
+//    urlConn.setUseCaches(false);
+//    //
+//    OutputStream httpOut = urlConn.getOutputStream();
+//    httpOut.write(callData);
+//    httpOut.close();
+//    httpOut = null;
+//    return urlConn;
+//  }
 }
