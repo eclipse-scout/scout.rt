@@ -29,6 +29,7 @@ scout.Scrollbar = function() {
   this._dir = 'top'; // x: 'left'
   this._dirReverse = 'bottom'; // x: 'right'
   this._scrollDir = 'scrollTop'; // x: 'scrollLeft
+  this._thumbClipping = new scout.Insets(0, 0, 0, 0);
 
   // Event Handling
   this._onScrollHandler = this._onScroll.bind(this);
@@ -37,6 +38,7 @@ scout.Scrollbar = function() {
   this._onThumbMousedownHandler = this._onThumbMousedown.bind(this);
   this._onDocumentMousemoveHandler = this._onDocumentMousemove.bind(this);
   this._onDocumentMouseupHandler = this._onDocumentMouseup.bind(this);
+  this._onAncestorScrollOrResizeHandler = this.update.bind(this);
 
   // Fix Scrollbar
   this._fixScrollbarHandler = this._fixScrollbar.bind(this);
@@ -77,6 +79,9 @@ scout.Scrollbar.prototype._render = function($parent) {
   }.bind(this));
   this.$container.on('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.on('mousedown', this._onThumbMousedownHandler);
+  // Scrollbar might be clipped to prevent overlapping an ancestor. In order to reset this clipping the scrollbar needs
+  // an update whenever a parent div is scrolled ore resized.
+  this.$container.parents('div').on('scroll resize', this._onAncestorScrollOrResizeHandler);
 };
 
 scout.Scrollbar.prototype._remove = function() {
@@ -91,6 +96,7 @@ scout.Scrollbar.prototype._remove = function() {
   }.bind(this));
   this.$container.off('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.off('mousedown', '', this._onThumbMousedownHandler);
+  this.$container.parents('div').off('scroll resize', this._onAncestorScrollOrResizeHandler);
 
   scout.Scrollbar.parent.prototype._remove.call(this);
 };
@@ -141,8 +147,12 @@ scout.Scrollbar.prototype.update = function() {
   var posNew = scrollPos / (this._scrollSize - this._offsetSize) * thumbRange;
   this._$thumb.css(this._dir, posNew);
 
+  // In IE scrollsize sometimes is 1px bigger than offsetSize even in situations when the content should easily fit in
+  // the rendered size. This fix prevents the scrollbar from being shown in IE when not expected.
+  var ieOffsetFix = (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER) ? 1 : 0;
+
   // show scrollbar
-  if (this._offsetSize >= this._scrollSize) {
+  if (this._offsetSize + ieOffsetFix >= this._scrollSize) {
     this.$container.css('display', 'none');
   } else {
     this.$container.css('display', '');
@@ -155,10 +165,113 @@ scout.Scrollbar.prototype.update = function() {
     }
   }
 
+  this._clipWhenOverlappingAncestor();
+
   // Position the scrollbar(s)
   // Always update both to make sure every scrollbar (x and y) is positioned correctly
   this.$container.cssRight(-1 * scrollLeft);
   this.$container.cssBottom(-1 * scrollTop);
+};
+
+scout.Scrollbar.prototype._resetClipping = function() {
+  // Only reset dimension and position for the secondary axis,
+  // for the scroll-axis these properties are set during update()
+  if (this.axis === 'y') {
+    this._$thumb
+      .css('width', '')
+      .css('left', '');
+  } else {
+    this._$thumb
+      .css('height', '')
+      .css('top', '');
+  }
+  this._$thumb.removeClass('clipped-left clipped-right clipped-top clipped-bottom');
+  this._thumbClipping = new scout.Insets(0, 0, 0, 0);
+};
+
+/**
+ * Make sure scrollbar does not appear outside an ancestor when fixed
+ */
+scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
+  this._resetClipping();
+
+  // Clipping is only needed when scrollbar has a fixed position.
+  // Otherwise the over-size is handled by 'overflow: hidden;'.
+  if (this.$container.css('position') === 'fixed') {
+    var thumbBounds = scout.graphics.offsetBounds(this._$thumb);
+    var thumbWidth = thumbBounds.width;
+    var thumbHeight = thumbBounds.height;
+    var thumbEndX = thumbBounds.x + thumbBounds.width;
+    var thumbEndY = thumbBounds.y + thumbBounds.height;
+    var biggestAncestorBeginX = 0;
+    var biggestAncestorBeginY = 0;
+    var smallestAncestorEndX = thumbEndX;
+    var smallestAncestorEndY = thumbEndY;
+
+    // Find nearest clip boundaries: It is not necessarily the boundary of the closest ancestor-div in the DOM,
+    // because ancestor-divs themselves may be scrolled.
+    this.$container.parents('div').each(function() {
+      var $ancestor = $(this);
+      var ancestorBounds = scout.graphics.offsetBounds($ancestor);
+      if (ancestorBounds.x > biggestAncestorBeginX) {
+        biggestAncestorBeginX = ancestorBounds.x;
+      }
+      if (ancestorBounds.y > biggestAncestorBeginY) {
+        biggestAncestorBeginY = ancestorBounds.y;
+      }
+      var ancestorEndX = ancestorBounds.x + ancestorBounds.width;
+      if (ancestorEndX < smallestAncestorEndX) {
+        smallestAncestorEndX = ancestorEndX;
+      }
+      var ancestorEndY = ancestorBounds.y + ancestorBounds.height;
+      if (ancestorEndY < smallestAncestorEndY) {
+        smallestAncestorEndY = ancestorEndY;
+      }
+    });
+
+    var clipLeft = 0;
+    var clipRight = 0;
+    var clipTop = 0;
+    var clipBottom = 0;
+
+    // clip left
+    if(biggestAncestorBeginX > thumbBounds.x) {
+      clipLeft = biggestAncestorBeginX - thumbBounds.x;
+      thumbWidth -= clipLeft;
+      this._$thumb
+        .css('width', thumbWidth)
+        .css('left', scout.graphics.bounds(this._$thumb).x + clipLeft)
+        .addClass('clipped-left');
+    }
+
+    // clip top
+    if(biggestAncestorBeginY > thumbBounds.y) {
+      clipTop = biggestAncestorBeginY - thumbBounds.y;
+      thumbHeight -= clipTop;
+      this._$thumb
+        .css('height', thumbHeight)
+        .css('top', scout.graphics.bounds(this._$thumb).y + clipTop)
+        .addClass('clipped-top');
+    }
+
+    // clip right
+    if(thumbEndX > smallestAncestorEndX) {
+      clipRight = thumbEndX - smallestAncestorEndX;
+      this._$thumb
+        .css('width', thumbWidth - clipRight)
+        .addClass('clipped-right');
+    }
+
+    // clip bottom
+    if(thumbEndY > smallestAncestorEndY) {
+      clipBottom = thumbEndY - smallestAncestorEndY;
+      this._$thumb
+        .css('height', thumbHeight - clipBottom)
+        .addClass('clipped-bottom');
+    }
+
+    this._thumbClipping = new scout.Insets(clipTop, clipRight, clipBottom, clipLeft);
+  }
 };
 
 /**
@@ -234,8 +347,10 @@ scout.Scrollbar.prototype._onThumbMousedown = function(event) {
   } else {
     this.notifyBeforeScroll();
     // calculate thumbCenterOffset in px (offset from clicked point to thumb center)
-    var thumbSize = this._$thumb['outer' + this._dim](true); //including border, margin and padding
-    var thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2);
+    var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
+    var thumbSize = clipped + this._$thumb['outer' + this._dim](true); //including border, margin and padding
+    var thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
+    var thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
     var thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
 
     this._$thumb.addClass('scrollbar-thumb-move');
@@ -259,7 +374,8 @@ scout.Scrollbar.prototype._onDocumentMousemove = function(event) {
   // represents offset in px of clicked point in thumb to the center of the thumb (positive and negative)
   var thumbCenterOffset = event.data.thumbCenterOffset;
 
-  var thumbSize = this._$thumb['outer' + this._dim](true); //including border, margin and padding
+  var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
+  var thumbSize = clipped + this._$thumb['outer' + this._dim](true); //including border, margin and padding
   var size = this.$container[this._dim.toLowerCase()]() - thumbSize; // size of div excluding margin/padding/border
   var offset = this.$container.offset()[this._dir] + (thumbSize / 2);
 
@@ -303,6 +419,7 @@ scout.Scrollbar.prototype.notifyAfterScroll = function() {
  */
 scout.Scrollbar.prototype._fixScrollbar = function() {
   scout.scrollbars.fix(this.$container);
+  this.update();
 };
 
 /**
@@ -310,6 +427,7 @@ scout.Scrollbar.prototype._fixScrollbar = function() {
  */
 scout.Scrollbar.prototype._unfixScrollbar = function() {
   this._unfixTimeoutId = scout.scrollbars.unfix(this.$container, this._unfixTimeoutId);
+  this.update();
 };
 
 /*

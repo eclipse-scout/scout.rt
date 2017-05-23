@@ -31,6 +31,7 @@ scout.GroupBox = function() {
   this.processButtons = [];
   this.processMenus = [];
   this.staticMenus = [];
+  this.minWidthInPixel = 0;
 
   this.$body;
   this.$title;
@@ -118,13 +119,9 @@ scout.GroupBox.prototype._render = function($parent) {
   this.addStatus();
   this.$body = this.$container.appendDiv('group-box-body');
   htmlBody = scout.HtmlComponent.install(this.$body, this.session);
-  htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
-  if (this.scrollable) {
-    scout.scrollbars.install(this.$body, {
-      parent: this,
-      axis: 'y'
-    });
-  }
+  htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap, this.minWidthInPixel));
+
+  this._installScrollbars();
 
   this.controls.forEach(function(control) {
     control.render(this.$body);
@@ -132,6 +129,23 @@ scout.GroupBox.prototype._render = function($parent) {
     // set each children layout data to logical grid data
     control.setLayoutData(new scout.LogicalGridData(control));
   }, this);
+};
+
+scout.GroupBox.prototype._installScrollbars = function() {
+  scout.scrollbars.uninstall(this.$body, this.session);
+
+  // horizontal (x-axis) scrollbar is only installed when minWidthInPixel is > 0
+  if (this.scrollable) {
+    scout.scrollbars.install(this.$body, {
+      parent: this,
+      axis: ((this.minWidthInPixel > 0) ? 'both' : 'y')
+    });
+  } else if (this.minWidthInPixel > 0) {
+    scout.scrollbars.install(this.$body, {
+      parent: this,
+      axis: 'x'
+    });
+  }
 };
 
 scout.GroupBox.prototype._remove = function() {

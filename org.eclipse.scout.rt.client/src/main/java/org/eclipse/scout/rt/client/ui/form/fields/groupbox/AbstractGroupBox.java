@@ -46,7 +46,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   private IGroupBoxUIFacade m_uiFacade;
   private boolean m_mainBoxFlag = false;
-  private TriState m_scrollable;
   private List<IFormField> m_controlFields;
   private List<IGroupBox> m_groupBoxes;
   private List<IButton> m_customButtons;
@@ -207,7 +206,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   /**
-   * Configures whether this group box should be scrollable.</br>
+   * Configures whether this group box should be scrollable in horizontal direction.</br>
    * If the property is set to {@link TriState#TRUE}, a vertical scrollbar will appear if the content is too large to be
    * displayed.<br>
    * If the property is set to {@link TriState#UNDEFINED}, it will be true if the groupbox is the mainbox in a form.
@@ -261,6 +260,18 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return FULL_WIDTH;
   }
 
+  /**
+   * Sets the threshold for displaying a horizontal scrollbar. When set to 0 the groupbox is not scrollable in
+   * horizontal direction.
+   * <p>
+   * Default is 0.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(290)
+  protected int getConfiguredMinWidthInPixel() {
+    return 0;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -290,6 +301,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setBackgroundImageVerticalAlignment(getConfiguredBackgroundImageVerticalAlignment());
     setScrollable(getConfiguredScrollable());
     setSelectionKeyStroke(getConfiguredSelectionKeyStroke());
+    setMinWidthInPixel(getConfiguredMinWidthInPixel());
     initMenus();
   }
 
@@ -510,7 +522,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public TriState isScrollable() {
-    return m_scrollable;
+    return (TriState) propertySupport.getProperty(PROP_SCROLLABLE);
   }
 
   @Override
@@ -518,12 +530,12 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     if (scrollable == null) {
       scrollable = TriState.UNDEFINED;
     }
-    if (scrollable.equals(m_scrollable)) {
+    if (scrollable.equals(isScrollable())) {
       return;
     }
-    m_scrollable = scrollable;
-    if (m_scrollable.isTrue()) {
-      // force weighty to be > 0
+    propertySupport.setProperty(PROP_SCROLLABLE, scrollable);
+    if (scrollable.isTrue()) {
+      // force weightY to be > 0
       GridData gd = getGridDataHints();
       if (gd.weightY <= 0) {
         gd.weightY = 1;
@@ -554,6 +566,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setBorderVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_BORDER_VISIBLE, b);
+  }
+
+  @Override
+  public int getMinWidthInPixel() {
+    return propertySupport.getPropertyInt(PROP_MIN_WIDTH_IN_PIXEL);
+  }
+
+  @Override
+  public void setMinWidthInPixel(int minWidthInPixel) {
+    propertySupport.setPropertyInt(PROP_MIN_WIDTH_IN_PIXEL, minWidthInPixel);
   }
 
   @Override

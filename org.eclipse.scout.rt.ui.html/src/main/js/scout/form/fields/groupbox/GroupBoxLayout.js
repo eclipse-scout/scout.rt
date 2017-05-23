@@ -78,7 +78,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
-  if (htmlGbBody.scrollable) {
+   if (htmlGbBody.scrollable || this._groupBox.minWidthInPixel > 0 ) {
     scout.scrollbars.update(htmlGbBody.$comp);
   }
 };

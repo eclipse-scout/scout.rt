@@ -48,6 +48,26 @@
   border-radius: 4px;
   background-color: fade(@scrollbar-thumb-color, 30%);
 
+   &.clipped-left {
+     border-top-left-radius: 0px;
+     border-bottom-left-radius: 0px;
+   }
+
+   &.clipped-right {
+     border-top-right-radius: 0px;
+     border-bottom-right-radius: 0px;
+   }
+
+   &.clipped-top {
+     border-top-left-radius: 0px;
+     border-top-right-radius: 0px;
+   }
+
+   &.clipped-bottom {
+     border-bottom-left-radius: 0px;
+     border-bottom-right-radius: 0px;
+   }
+
   &.y-axis {
     width: @scrollbar-thumb-size;
     top: 0;
