@@ -50,6 +50,14 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    * {@link Integer}
    */
   String PROP_BACKGROUND_IMAGE_VERTICAL_ALIGNMENT = "backgroundImageVerticalAlignment";
+  /**
+   * {@link Integer}
+   */
+  String PROP_MIN_WIDTH_IN_PIXEL = "minWidthInPixel";
+  /**
+   * {@link TriState}
+   */
+  String PROP_SCROLLABLE = "scrollable";
 
   String BORDER_DECORATION_EMPTY = "empty";
   String BORDER_DECORATION_LINE = "line";
@@ -183,6 +191,11 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
 
   TriState isScrollable();
 
+  /**
+   * Setter for {@link AbstractGroupBox#getConfiguredScrollable()}
+   * <p>
+   * Only changes made before the groupbox is rendered have an effect.
+   */
   void setScrollable(TriState scrollable);
 
   /**
@@ -208,6 +221,18 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   String getSelectionKeyStroke();
 
   void setSelectionKeyStroke(String keystroke);
+
+  /**
+   * @see IGroupBox#setMinWidthInPixel(int)
+   */
+  int getMinWidthInPixel();
+
+  /**
+   * Setter for {@link AbstractGroupBox#getConfiguredMinWidthInPixel()}
+   * <p>
+   * Only changes made before the groupbox is rendered have an effect.
+   */
+  void setMinWidthInPixel(int minWidthInPixel);
 
   IGroupBoxUIFacade getUIFacade();
 

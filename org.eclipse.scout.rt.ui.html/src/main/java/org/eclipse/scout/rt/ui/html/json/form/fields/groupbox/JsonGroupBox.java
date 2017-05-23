@@ -31,7 +31,6 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
   public static final String EVENT_EXPANDED = "expanded";
 
   public static final String PROP_MAIN_BOX = "mainBox";
-  public static final String PROP_SCROLLABLE = "scrollable";
 
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -79,12 +78,6 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
         return getModel().isMainBox();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(PROP_SCROLLABLE, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isScrollable().isTrue();
-      }
-    });
     putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDABLE, model) {
       @Override
       protected Boolean modelValue() {
@@ -109,6 +102,8 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
+    json.put(IGroupBox.PROP_MIN_WIDTH_IN_PIXEL, getModel().getMinWidthInPixel());
+    json.put(IGroupBox.PROP_SCROLLABLE, getModel().isScrollable().getBooleanValue());
     return json;
   }
 

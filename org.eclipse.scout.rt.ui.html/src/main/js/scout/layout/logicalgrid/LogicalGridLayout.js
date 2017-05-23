@@ -11,7 +11,7 @@
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
  */
-scout.LogicalGridLayout = function(widget, hgap, vgap) {
+scout.LogicalGridLayout = function(widget, hgap, vgap, minWidthInPixel) {
   scout.LogicalGridLayout.parent.call(this);
   this.cssClass = 'logical-grid-layout';
   this.validityBasedOnContainerSize = new scout.Dimension();
@@ -20,6 +20,7 @@ scout.LogicalGridLayout = function(widget, hgap, vgap) {
   this.info = null;
   this.hgap = hgap || 0;
   this.vgap = vgap || 0;
+  this.minWidthInPixel = minWidthInPixel || 0;
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
@@ -65,6 +66,9 @@ scout.LogicalGridLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.getAvailableSize(),
     containerInsets = htmlContainer.getInsets();
+  if (this.minWidthInPixel > 0 && containerSize.width < this.minWidthInPixel) {
+    containerSize.width = this.minWidthInPixel;
+  }
   $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
   var cellBounds = this.info.layoutCellBounds(containerSize, containerInsets);
 
