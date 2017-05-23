@@ -29,8 +29,8 @@ scout.FormTableControl.prototype._renderContent = function($parent) {
 
   // Tab box gets a special style if it is the first field in the root group box
   var rootGroupBox = this.form.rootGroupBox;
-  if (rootGroupBox.fields[0] instanceof scout.TabBox) {
-    rootGroupBox.fields[0].$container.addClass('in-table-control');
+  if (rootGroupBox.controls[0] instanceof scout.TabBox) {
+    rootGroupBox.controls[0].$container.addClass('in-table-control');
   }
 
   this.form.$container.height($parent.height());

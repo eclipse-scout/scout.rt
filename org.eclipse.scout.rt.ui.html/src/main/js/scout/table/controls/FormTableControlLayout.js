@@ -30,8 +30,8 @@ scout.FormTableControlLayout.prototype.layout = function($container) {
 
     // special case: when the control is opened/resized and there is not enough space, ensure that the active element is
     // visible by scrolling to it
-    if (form.rootGroupBox.fields[0] instanceof scout.TabBox) {
-      var tabBox = form.rootGroupBox.fields[0];
+    if (form.rootGroupBox.controls[0] instanceof scout.TabBox) {
+      var tabBox = form.rootGroupBox.controls[0];
       var tab = tabBox.selectedTab;
       if (tab && tab.scrollable && tab.$body.has(document.activeElement)) {
         scout.scrollbars.scrollTo(tab.$body, $(document.activeElement));
