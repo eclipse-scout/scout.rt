@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.clipboard;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -65,7 +64,7 @@ public class HtmlScoutClipboardService implements IClipboardService {
     // anonymous text paste, no filename
     BinaryResource binaryResource = BinaryResources.create()
         .withContentType(MimeType.TXT.getType())
-        .withContent(StringUtility.emptyIfNull(textContents).getBytes(StandardCharsets.UTF_8))
+        .withContent(StringUtility.emptyIfNull(textContents))
         .build();
 
     form.getClipboardField().setValue(Collections.singleton(binaryResource));
