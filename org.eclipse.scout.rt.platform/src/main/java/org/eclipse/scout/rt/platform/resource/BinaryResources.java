@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.platform.resource;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
@@ -91,6 +92,34 @@ public final class BinaryResources {
    */
   public BinaryResources withContent(byte[] content) {
     m_content = content;
+    return this;
+  }
+
+  /**
+   * {@link StandardCharsets#UTF_8} encoding is used.
+   *
+   * @see #withContent(String, Charset).
+   */
+  public BinaryResources withContent(String content) {
+    return withContent(content, StandardCharsets.UTF_8);
+  }
+
+  /**
+   * @param content
+   *          The resource's content as string, the provided encoding will be used. If <code>null</code>, content and
+   *          charset will be <code>null</code>. The fingerprint for the given content is calculated automatically.
+   * @param charset
+   *          Charset to use for string content encoding and as {@link BinaryResource} charset. If <code>null</code> is
+   *          provided, {@link StandardCharsets#UTF_8} is used.
+   */
+  public BinaryResources withContent(String content, Charset charset) {
+    if (charset == null) {
+      charset = StandardCharsets.UTF_8;
+    }
+
+    m_content = content == null ? null : content.getBytes(charset);
+    m_charset = content == null ? null : charset.name();
+
     return this;
   }
 

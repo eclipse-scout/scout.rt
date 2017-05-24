@@ -67,7 +67,8 @@ public class BinaryResourceTest {
   public void testFullBuilder() {
     final String filename = "document.txt";
     final Charset charset = StandardCharsets.UTF_8;
-    final byte[] content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua".getBytes(charset);
+    final String stringContent = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. öüä."; // do not remove umlaut
+    final byte[] content = stringContent.getBytes(charset);
     final String contentType = MimeType.TEXT_PLAIN.getType();
     final long lastModified = BEANS.get(IDateProvider.class).currentMillis().getTime();
 
@@ -81,19 +82,34 @@ public class BinaryResourceTest {
 
     Assert.assertEquals(filename, res.getFilename());
     Assert.assertEquals("UTF-8", res.getCharset());
-    Assert.assertEquals(content, res.getContent());
+    Assert.assertArrayEquals(content, res.getContent());
     Assert.assertEquals(contentType, res.getContentType());
     Assert.assertEquals(lastModified, res.getLastModified());
     Assert.assertEquals(content.length, res.getContentLength());
 
     final byte[] newContent = "New content".getBytes(charset);
-    BinaryResource newRes = BinaryResources.create(res).withContent(newContent).build();
-    Assert.assertEquals(filename, newRes.getFilename());
-    Assert.assertEquals("UTF-8", newRes.getCharset());
-    Assert.assertEquals(newContent, newRes.getContent());
-    Assert.assertEquals(contentType, newRes.getContentType());
-    Assert.assertEquals(lastModified, newRes.getLastModified());
-    Assert.assertEquals(newContent.length, newRes.getContentLength());
+    res = BinaryResources.create(res).withContent(newContent).build();
+    Assert.assertEquals(filename, res.getFilename());
+    Assert.assertEquals("UTF-8", res.getCharset());
+    Assert.assertArrayEquals(newContent, res.getContent());
+    Assert.assertEquals(contentType, res.getContentType());
+    Assert.assertEquals(lastModified, res.getLastModified());
+    Assert.assertEquals(newContent.length, res.getContentLength());
+
+    // with string content: null
+    res = BinaryResources.create().withContent(content).withContent((String) null).build();
+    Assert.assertNull(res.getCharset());
+    Assert.assertNull(res.getContent());
+
+    // with string content: default encoding
+    res = BinaryResources.create().withContent(stringContent).build();
+    Assert.assertEquals("UTF-8", res.getCharset());
+    Assert.assertArrayEquals(stringContent.getBytes(StandardCharsets.UTF_8), res.getContent());
+
+    // with string content: iso 8859-1 encoding
+    res = BinaryResources.create().withContent(stringContent, StandardCharsets.ISO_8859_1).build();
+    Assert.assertEquals("ISO-8859-1", res.getCharset());
+    Assert.assertArrayEquals(stringContent.getBytes(StandardCharsets.ISO_8859_1), res.getContent());
   }
 
   @Test
