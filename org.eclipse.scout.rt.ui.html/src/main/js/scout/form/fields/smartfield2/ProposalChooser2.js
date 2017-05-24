@@ -207,33 +207,6 @@ scout.ProposalChooser2.prototype.setBusy = function(busy) {
 
 scout.ProposalChooser2.prototype.setLookupResult = function(result) {
   this.setLookupRows(result.lookupRows, scout.nvl(result.appendResult, false));
-  var status = this._computeStatus(result);
-  this.setStatus(status);
-};
-
-scout.ProposalChooser2.prototype._computeStatus = function(result) {
-  if (result.lookupFailed) {
-    return scout.Status.error({
-      message: '%%%Unbekannter Fehler%%%'
-    });
-  }
-
-  var rows = result.lookupRows;
-  if (rows.length === 0) {
-    // FIXME [awe] 7.0 - SF2: distinct between search for '*' and search for other
-    return scout.Status.warn({
-      message: this.session.text('SmartFieldCannotComplete', result.searchText)
-    });
-  }
-
-  var maxRows = this._smartField().browseMaxRowCount;
-  if (rows.length > maxRows) {
-    return scout.Status.info({
-      message: this.session.text('SmartFieldMoreThanXRows', maxRows)
-    });
-  }
-
-  return null;
 };
 
 scout.ProposalChooser2.prototype._smartField = function() {

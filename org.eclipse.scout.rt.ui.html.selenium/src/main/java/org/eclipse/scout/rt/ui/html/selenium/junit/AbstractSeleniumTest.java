@@ -349,6 +349,11 @@ public abstract class AbstractSeleniumTest {
     return waitUntilTableCellClickable(null, cellText);
   }
 
+  public Boolean waitUntilDataRequestPendingDone() {
+    WebElement entryPoint = findElement(By.className("scout"));
+    return waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
+  }
+
   public void clickCheckBox(WebElement parent, Class<?> modelClass) {
     clickCheckBox(parent.findElement(SeleniumUtil.byModelClass(modelClass)));
   }

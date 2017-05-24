@@ -16,6 +16,7 @@ scout.SmartField2CancelKeyStroke = function(field) {
   this.field = field;
   this.which = [scout.keys.ESC];
   this.stopPropagation = true;
+  this.preventInvokeAcceptInputOnActiveValueField = true;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
@@ -28,10 +29,8 @@ scout.SmartField2CancelKeyStroke.prototype._accept = function(event) {
   if (!accepted) {
     return false;
   }
-
   if (!this.field.popup) {
     return false;
-
   }
   return true;
 };
@@ -41,4 +40,5 @@ scout.SmartField2CancelKeyStroke.prototype._accept = function(event) {
  */
 scout.SmartField2CancelKeyStroke.prototype.handle = function(event) {
   this.field.closePopup();
+  this.field.resetDisplayText();
 };

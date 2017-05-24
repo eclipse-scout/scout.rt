@@ -21,27 +21,21 @@ scout.ProposalField2.prototype._getValueFromLookupRow = function(lookupRow) {
   return lookupRow.text;
 };
 
-scout.ProposalField2.prototype._handleInvalidLookup = function(result, numLookupRows, searchText) {
-  this.setValue(searchText);
+scout.ProposalField2.prototype._acceptInputFail = function(result) {
+  this.closePopup();
+  this.setValue(result.searchText);
 };
 
-scout.ProposalField2.prototype.openPopup2 = function(result) {
+scout.ProposalField2.prototype._lookupByTextOrAllDone = function(result) {
   if (result.lookupRows.length === 0) {
+    this.hideLookupInProgress();
+    this.closePopup();
     return;
   }
-  scout.ProposalField2.parent.prototype.openPopup2.call(this, result);
+  scout.ProposalField2.parent.prototype._lookupByTextOrAllDone.call(this, result);
 };
 
 scout.ProposalField2.prototype._formatValue = function(value) {
   return scout.nvl(value, '');
 };
-
-scout.ProposalField2.prototype._handleLookupDone = function(result) {
-  if (result.lookupRows.length === 0) {
-    this.closePopup();
-  } else {
-    this.popup.setLookupResult(result);
-  }
-};
-
 

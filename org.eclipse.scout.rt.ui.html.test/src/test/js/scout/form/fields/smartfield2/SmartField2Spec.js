@@ -85,6 +85,7 @@ describe('SmartField2', function() {
     it('load proposals for the current displayText', function() {
       field = createFieldWithLookupCall();
       field.render(session.desktop.$container);
+      field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
       field._onFieldKeyup({});
       expect(field.$container.hasClass('searching')).toBe(true);

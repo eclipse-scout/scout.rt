@@ -58,12 +58,13 @@ scout.TableProposalChooser2.prototype._createModel = function() {
 };
 
 scout.TableProposalChooser2.prototype._onRowClicked = function(event) {
+  this.setBusy(true);
   this.triggerLookupRowSelected(event.row);
 };
 
 scout.TableProposalChooser2.prototype.triggerLookupRowSelected = function(row) {
   row = row || this.model.selectedRow();
-  if (!row.enabled) {
+  if (!row || !row.enabled) {
     return;
   }
   this.trigger('lookupRowSelected', {

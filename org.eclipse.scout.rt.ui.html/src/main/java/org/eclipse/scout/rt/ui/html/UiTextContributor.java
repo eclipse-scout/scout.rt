@@ -32,6 +32,7 @@ public class UiTextContributor implements IUiTextContributor {
         "NavigationBackward",
         "InvalidValueMessageX",
         "InvalidNumberMessageX",
+        "searchingProposals",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
         "ui.CalendarDay",

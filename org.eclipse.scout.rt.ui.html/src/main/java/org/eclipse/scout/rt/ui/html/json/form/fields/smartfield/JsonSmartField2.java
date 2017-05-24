@@ -23,6 +23,10 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+// FIXME [awe] 7.0 - SF2: key problem lösen... angenommen wir tippen im GUI "b*" und der lookup liefert drei rows zurück "0: B1", "1: B2", "2: B3"
+// wir wählen B1 (key=0). Jetzt tippen wir im Suchfeld B2. Nun wird die Map auf dem Server resetted und für B2 ein key 0 angelegt. Das GUI hat nun
+// das gefühl, dass es nichts ändern muss, weil der value ja schon 0 ist --> Die Keys müssen stabil bleiben!
+
 public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonValueField<T> {
 
   // Contains always the mapping from the last performed lookup operation
@@ -163,13 +167,11 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
   }
 
   protected void handleUiLookupByText(JsonEvent event) {
-    resetKeyMap();
     String searchText = event.getData().optString("searchText");
     getModel().lookupByText(searchText);
   }
 
   protected void handleUiLookupByRec(JsonEvent event) {
-    // resetKeyMap();
     String mappedParentKey = event.getData().optString("rec");
     VALUE rec = getLookupRowKeyForId(mappedParentKey);
     getModel().lookupByRec(rec);
@@ -279,7 +281,12 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
 
   @SuppressWarnings("unchecked")
   protected VALUE getLookupRowKeyForId(String id) {
-    return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
+    if (StringUtility.isNullOrEmpty(id)) {
+      return null;
+    }
+    else {
+      return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
+    }
   }
 
   protected JSONArray columnDescriptorsToJson(Object value) {
