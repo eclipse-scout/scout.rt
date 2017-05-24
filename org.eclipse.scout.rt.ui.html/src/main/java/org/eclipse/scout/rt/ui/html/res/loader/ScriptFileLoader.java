@@ -61,7 +61,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     if (out != null) {
       BinaryResource content = BinaryResources.create()
           .withFilename(out.getPathInfo())
-          .withCharset(StandardCharsets.UTF_8.name())
+          .withCharset(StandardCharsets.UTF_8)
           .withContent(out.getContent())
           .withLastModified(out.getLastModified())
           .withCachingAllowed(true)

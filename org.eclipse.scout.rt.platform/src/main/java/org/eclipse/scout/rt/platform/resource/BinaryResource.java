@@ -215,8 +215,10 @@ public final class BinaryResource implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + (int) m_lastModified;
+    // Note: Arrays.hashCode(m_content) is not used here due to performance considerations.
     result = prime * result + ((m_content == null) ? 0 : m_content.length);
     result = prime * result + ((m_filename == null) ? 0 : m_filename.hashCode());
+    result = prime * result + ((m_contentType == null) ? 0 : m_contentType.hashCode());
     return result;
   }
 
@@ -241,7 +243,7 @@ public final class BinaryResource implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-    sb.append("content: ");
+    sb.append(", content: ");
     if (m_content == null) {
       sb.append("null");
     }
