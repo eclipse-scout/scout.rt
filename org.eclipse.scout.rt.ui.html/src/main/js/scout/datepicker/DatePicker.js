@@ -264,8 +264,8 @@ scout.DatePicker.prototype._renderSelectedDate = function() {
  * @param options object with following properties: viewDate, preselectedDate, selectedDate, animated
  */
 scout.DatePicker.prototype.show = function(options) {
-  var selectedDate = options.selectedDate;
-  var preselectedDate = options.preselectedDate;
+  var selectedDate = options.selectedDate || this.selectedDate;
+  var preselectedDate = options.preselectedDate || this.preselectedDate;
   var animated = options.animated;
   var viewDate = options.viewDate || options.selectedDate || new Date();
   var viewDateDiff = 0;
@@ -417,6 +417,14 @@ scout.DatePicker.prototype._build$DateBox = function(viewDate) {
       cl += ' date-picker-now';
     }
 
+    if (scout.dates.isSameDay(this.selectedDate, start)) {
+      cl += ' selected';
+    }
+
+    if (scout.dates.isSameDay(this.preselectedDate, start)) {
+      cl += ' preselected';
+    }
+
     // helps to center days between 10 and 19 nicer (especially when website is zoomed > 100%)
     if (dayInMonth > 9 && dayInMonth < 20) {
       cl += ' ten';
@@ -541,6 +549,7 @@ scout.DatePicker.prototype._onDayClick = function(event) {
   }
   var $target = $(event.currentTarget);
   var date = $target.data('date');
+  this.selectDate(date);
   this.trigger('dateSelect', {
     date: date
   });
