@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-/**
- * C
- */
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBigDecimalColumnExtension;
@@ -28,7 +25,11 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<BigDecimal> implements IBigDecimalColumn {
 
   public AbstractBigDecimalColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractBigDecimalColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

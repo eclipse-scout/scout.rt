@@ -20,6 +20,14 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 @ClassId("2804d433-bf07-4b47-aeae-c631fe2e8434")
 public abstract class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> implements IBeanColumn<VALUE> {
 
+  public AbstractBeanColumn() {
+    this(true);
+  }
+
+  public AbstractBeanColumn(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected boolean getConfiguredUiSortPossible() {
     return true;

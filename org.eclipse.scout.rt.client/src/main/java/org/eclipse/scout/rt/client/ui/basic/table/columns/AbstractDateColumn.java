@@ -40,7 +40,11 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   private Date m_autoDate;
 
   public AbstractDateColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractDateColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

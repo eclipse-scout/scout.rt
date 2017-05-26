@@ -28,7 +28,11 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigInteger> implements IBigIntegerColumn {
 
   public AbstractBigIntegerColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractBigIntegerColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

@@ -26,7 +26,11 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer> implements IIntegerColumn {
 
   public AbstractIntegerColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractIntegerColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

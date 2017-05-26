@@ -33,7 +33,11 @@ import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 public abstract class AbstractDecimalColumn<NUMBER extends Number> extends AbstractNumberColumn<NUMBER> implements IDecimalColumn<NUMBER> {
 
   public AbstractDecimalColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractDecimalColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

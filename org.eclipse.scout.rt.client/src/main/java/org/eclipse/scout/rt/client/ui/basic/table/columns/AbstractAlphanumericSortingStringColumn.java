@@ -20,6 +20,14 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @ClassId("86f11c9b-cde4-4619-9b2a-6bbcdd330feb")
 public abstract class AbstractAlphanumericSortingStringColumn extends AbstractStringColumn implements IAlphanumericSortingStringColumn {
 
+  public AbstractAlphanumericSortingStringColumn() {
+    this(true);
+  }
+
+  public AbstractAlphanumericSortingStringColumn(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   public int compareTableRows(ITableRow r1, ITableRow r2) {
     return StringUtility.ALPHANUMERIC_COMPARATOR_IGNORE_CASE.compare(getValue(r1), getValue(r2));

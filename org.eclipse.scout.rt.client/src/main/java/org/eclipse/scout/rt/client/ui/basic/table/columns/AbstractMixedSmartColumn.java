@@ -42,7 +42,11 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
   private IContributionOwner m_contributionHolder;
 
   public AbstractMixedSmartColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractMixedSmartColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

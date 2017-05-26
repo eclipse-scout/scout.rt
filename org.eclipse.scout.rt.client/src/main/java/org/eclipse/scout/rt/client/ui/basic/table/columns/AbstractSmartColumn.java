@@ -18,7 +18,11 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 public abstract class AbstractSmartColumn<VALUE> extends AbstractMixedSmartColumn<VALUE, VALUE> implements ISmartColumn<VALUE> {
 
   public AbstractSmartColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractSmartColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

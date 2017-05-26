@@ -24,7 +24,11 @@ public abstract class AbstractObjectColumn extends AbstractColumn<Object> implem
   // initConfig()
 
   public AbstractObjectColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractObjectColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @SuppressWarnings("unchecked")

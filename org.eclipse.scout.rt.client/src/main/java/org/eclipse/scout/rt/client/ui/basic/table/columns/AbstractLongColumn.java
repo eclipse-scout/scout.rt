@@ -26,7 +26,11 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> implements ILongColumn {
 
   public AbstractLongColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractLongColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

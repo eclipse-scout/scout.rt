@@ -31,7 +31,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   // initConfig()
 
   public AbstractStringColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractStringColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

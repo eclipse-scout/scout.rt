@@ -50,7 +50,11 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
   private ILookupCall<LOOKUP_TYPE> m_lookupCall;
 
   public AbstractContentAssistColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractContentAssistColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /*

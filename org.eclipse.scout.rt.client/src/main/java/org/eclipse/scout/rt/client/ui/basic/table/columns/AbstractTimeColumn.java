@@ -19,7 +19,11 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 public abstract class AbstractTimeColumn extends AbstractDateColumn {
 
   public AbstractTimeColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractTimeColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

@@ -44,7 +44,11 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   private String m_initialBackgroundEffect;
 
   public AbstractNumberColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractNumberColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   /**

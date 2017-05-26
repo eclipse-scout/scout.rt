@@ -18,6 +18,14 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 @ClassId("d5beef55-b40e-44f6-a539-be3bd75d3e33")
 public abstract class AbstractIconColumn extends AbstractColumn<String> implements IIconColumn {
 
+  public AbstractIconColumn() {
+    this(true);
+  }
+
+  public AbstractIconColumn(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected int getConfiguredWidth() {
     return 32;

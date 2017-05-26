@@ -32,7 +32,11 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   // initConfig()
 
   public AbstractBooleanColumn() {
-    super();
+    this(true);
+  }
+
+  public AbstractBooleanColumn(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override
