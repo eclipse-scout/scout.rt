@@ -30,7 +30,7 @@ scout.DateField = function() {
   // This is the storage for the time (as date) while the focus in the field (e.g. when
   // pressing up/down). In date fields, the date picker is used for that purposes.
   this._tempTimeDate;
-  this.invalidValueMessageKey = 'ui.InvalidDateFormat';
+  this.invalidValueMessageKey = 'ui.InvalidDate';
   this._addCloneProperties(['hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern', 'allowedDates', 'autoDate']);
 };
 scout.inherits(scout.DateField, scout.ValueField);
@@ -1089,7 +1089,7 @@ scout.DateField.prototype._setErrorStatusPart = function(property, valid) {
 
 scout.DateField.prototype._createErrorStatus = function() {
   return new scout.Status({
-    message: this.session.text('ui.InvalidDateFormat'),
+    message: this.session.text('ui.InvalidDate'),
     severity: scout.Status.Severity.ERROR
   });
 };

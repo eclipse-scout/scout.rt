@@ -47,7 +47,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.changeColumn",
         "ui.BooleanColumnGroupingTrue",
         "ui.BooleanColumnGroupingFalse",
-        "ui.InvalidDateFormat",
+        "ui.InvalidDate",
         "ui.EmptyCell",
         "ui.FilterBy_",
         "ui.SearchFor_",
