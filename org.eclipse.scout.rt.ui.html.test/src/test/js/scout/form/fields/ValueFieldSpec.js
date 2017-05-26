@@ -323,13 +323,13 @@ describe('ValueField', function() {
 
   });
 
-  describe('displayTextChanged', function() {
+  describe('acceptInput', function() {
 
     it('is triggered when input is accepted', function() {
       var field = helper.createField('StringField');
       var displayText;
       field.render();
-      field.on('displayTextChanged', function(event) {
+      field.on('acceptInput', function(event) {
         displayText = event.displayText;
       });
       field.$field.val('a value');
@@ -345,7 +345,7 @@ describe('ValueField', function() {
       };
 
       var displayText;
-      field.on('displayTextChanged', function(event) {
+      field.on('acceptInput', function(event) {
         displayText = event.displayText;
       });
       field.$field.val('a value');
@@ -504,7 +504,7 @@ describe('ValueField', function() {
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.RemoteEvent(formField.id, 'displayTextChanged', {
+      var event = new scout.RemoteEvent(formField.id, 'acceptInput', {
         displayText: 'abc123contextmenu',
         whileTyping: false
       });

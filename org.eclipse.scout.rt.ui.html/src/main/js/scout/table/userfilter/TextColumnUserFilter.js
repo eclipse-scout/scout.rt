@@ -60,13 +60,13 @@ scout.TextColumnUserFilter.prototype.addFilterFields = function(groupBox) {
     displayText: this.freeText,
     updateDisplayTextOnModify: true
   });
-  this.freeTextField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
+  this.freeTextField.on('acceptInput', this._onAcceptInput.bind(this));
   groupBox.addField0(this.freeTextField);
 };
 
-scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
+scout.TextColumnUserFilter.prototype._onAcceptInput = function(event) {
   this.freeText = this.freeTextField.$field.val().trim();
-  $.log.debug('(TextColumnUserFilter#_onDisplayTextChanged) freeText=' + this.freeText);
+  $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
   this.triggerFilterFieldsChanged(event);
 };
 

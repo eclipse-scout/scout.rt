@@ -67,7 +67,7 @@ scout.ValueField.prototype._onFieldBlur = function() {
  * It is also called by the _aboutToBlurByMouseDown() function, which is required because our Ok- and Cancel-buttons are not focusable (thus _onBlur() is
  * never called) but changes in the value-field must be sent to the server anyway when a button is clicked.
  * <p>
- * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerDisplayTextChanged().
+ * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerAcceptInput().
  * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
  */
 scout.ValueField.prototype.acceptInput = function(whileTyping) {
@@ -84,7 +84,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
       this.parseAndSetValue(displayText);
     }
     // Display text may be formatted -> Use this.displayText
-    this._triggerDisplayTextChanged(whileTyping);
+    this._triggerAcceptInput(whileTyping);
   }
 };
 
@@ -161,12 +161,12 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
   }
 };
 
-scout.ValueField.prototype._triggerDisplayTextChanged = function(whileTyping) {
+scout.ValueField.prototype._triggerAcceptInput = function(whileTyping) {
   var event = {
     displayText: this.displayText,
     whileTyping: !!whileTyping
   };
-  this.trigger('displayTextChanged', event);
+  this.trigger('acceptInput', event);
 };
 
 scout.ValueField.prototype.setDisplayText = function(displayText) {

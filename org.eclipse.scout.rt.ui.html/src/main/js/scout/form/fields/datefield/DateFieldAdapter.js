@@ -18,7 +18,7 @@ scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);
 /**
  * @override
  */
-scout.DateFieldAdapter.prototype._onWidgetDisplayTextChanged = function(event) {
+scout.DateFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   var data = {
       displayText: this.widget.displayText,
       errorStatus: this.widget.errorStatus
@@ -27,7 +27,7 @@ scout.DateFieldAdapter.prototype._onWidgetDisplayTextChanged = function(event) {
   if (!this.widget.errorStatus) {
     data.value = scout.dates.toJsonDate(this.widget.value);
   }
-  this._send('displayTextChanged', data, {
+  this._send('acceptInput', data, {
     showBusyIndicator: !event.whileTyping,
     coalesce: function(previous) {
       return this.target === previous.target && this.type === previous.type;

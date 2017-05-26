@@ -109,7 +109,7 @@ scout.DateColumnUserFilter.prototype._onPropertyChange = function(event) {
   }
   this.dateFrom = this.dateFromField.value;
   this.dateTo = this.dateToField.value;
-  $.log.debug('(DateColumnUserFilter#_onDisplayTextChanged) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
+  $.log.debug('(DateColumnUserFilter#_onAcceptInput) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
   this.triggerFilterFieldsChanged(event);
 };
 

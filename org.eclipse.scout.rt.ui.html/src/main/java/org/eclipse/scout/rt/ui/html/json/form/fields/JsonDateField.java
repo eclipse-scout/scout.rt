@@ -114,7 +114,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   @Override
-  protected void handleUiDisplayTextChanged(JsonEvent event) {
+  protected void handleUiAcceptInput(JsonEvent event) {
     if (event.getData().has(IValueField.PROP_DISPLAY_TEXT)) {
       String displayText = event.getData().getString(IValueField.PROP_DISPLAY_TEXT);
       addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);

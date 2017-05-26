@@ -13,8 +13,8 @@ scout.ValueFieldAdapter = function() {
 };
 scout.inherits(scout.ValueFieldAdapter, scout.FormFieldAdapter);
 
-scout.ValueFieldAdapter.prototype._onWidgetDisplayTextChanged = function(event) {
-  this._send('displayTextChanged', {
+scout.ValueFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
+  this._send('acceptInput', {
     displayText: event.displayText,
     whileTyping: event.whileTyping
   }, {
@@ -26,8 +26,8 @@ scout.ValueFieldAdapter.prototype._onWidgetDisplayTextChanged = function(event) 
 };
 
 scout.ValueFieldAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'displayTextChanged') {
-    this._onWidgetDisplayTextChanged(event);
+  if (event.type === 'acceptInput') {
+    this._onWidgetAcceptInput(event);
   } else {
     scout.ValueFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

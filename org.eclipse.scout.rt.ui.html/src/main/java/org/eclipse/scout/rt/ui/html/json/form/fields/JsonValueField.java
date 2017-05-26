@@ -47,7 +47,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * typing (this event is send after each key-press). You can distinct the two cases by looking on the while- Typing
    * flag.
    */
-  public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
+  public static final String EVENT_ACCEPT_INPUT = "acceptInput";
   public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
 
   private PropertyChangeListener m_contextMenuListener;
@@ -150,8 +150,8 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_DISPLAY_TEXT_CHANGED.equals(event.getType())) {
-      handleUiDisplayTextChanged(event);
+    if (EVENT_ACCEPT_INPUT.equals(event.getType())) {
+      handleUiAcceptInput(event);
     }
     else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
       handleUiExportToClipboard();
@@ -161,15 +161,15 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     }
   }
 
-  protected void handleUiDisplayTextChanged(JsonEvent event) {
+  protected void handleUiAcceptInput(JsonEvent event) {
     String displayText = event.getData().optString(IValueField.PROP_DISPLAY_TEXT);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
     boolean whileTyping = event.getData().optBoolean("whileTyping", false);
     if (whileTyping) {
-      handleUiDisplayTextChangedWhileTyping(displayText);
+      handleUiAcceptInputWhileTyping(displayText);
     }
     else {
-      handleUiDisplayTextChangedAfterTyping(displayText);
+      handleUiAcceptInputAfterTyping(displayText);
     }
   }
 
@@ -178,7 +178,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * <code>whileTyping = true</code>). The model field does not yet change its value. This method is usually only called
    * when the {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY} flag is set.
    */
-  protected void handleUiDisplayTextChangedWhileTyping(String displayText) {
+  protected void handleUiAcceptInputWhileTyping(String displayText) {
     // NOP may be implemented by sub-classes
   }
 
@@ -186,7 +186,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * Called by the UI when the displayText has changed and the editing action has finished (
    * <code>whileTyping = false</code>). The model field parses the displayText and updates its value.
    */
-  protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
+  protected void handleUiAcceptInputAfterTyping(String displayText) {
     // NOP may be implemented by sub-classes
   }
 

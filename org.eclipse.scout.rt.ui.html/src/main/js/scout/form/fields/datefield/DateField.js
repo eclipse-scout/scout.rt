@@ -603,7 +603,7 @@ scout.DateField.prototype.acceptInput = function() {
     }
   }
   if (inputChanged) {
-    this._triggerDisplayTextChanged();
+    this._triggerAcceptInput();
   }
 };
 
@@ -766,7 +766,7 @@ scout.DateField.prototype._onDatePickerDateSelect = function(event) {
   var newValue = this._newTimestampAsDate(event.date, this.value);
   this.setValue(newValue);
   this.closePopup();
-  this._triggerDisplayTextChanged();
+  this._triggerAcceptInput();
 };
 
 scout.DateField.prototype._createPredictionField = function($inputField) {
@@ -1214,11 +1214,11 @@ scout.DateField.prototype._renderDisabledStyle = function() {
 /**
  * @override
  */
-scout.DateField.prototype._triggerDisplayTextChanged = function() {
+scout.DateField.prototype._triggerAcceptInput = function() {
   var event = {
     displayText: this.displayText,
     errorStatus: this.errorStatus,
     value: this.value
   };
-  this.trigger('displayTextChanged', event);
+  this.trigger('acceptInput', event);
 };

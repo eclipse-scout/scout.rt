@@ -15,7 +15,7 @@ scout.inherits(scout.DatePickerTouchPopup, scout.TouchPopup);
 
 scout.DatePickerTouchPopup.prototype._init = function(options) {
   scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
-  this._field.on('displayTextChanged', this._onFieldDisplayTextChanged.bind(this));
+  this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
 };
 
 /**
@@ -43,7 +43,7 @@ scout.DatePickerTouchPopup.prototype._createLayout = function() {
   return new scout.DatePickerTouchPopupLayout(this);
 };
 
-scout.DatePickerTouchPopup.prototype._onFieldDisplayTextChanged = function(event) {
+scout.DatePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
   this._touchField.setErrorStatus(event.errorStatus);

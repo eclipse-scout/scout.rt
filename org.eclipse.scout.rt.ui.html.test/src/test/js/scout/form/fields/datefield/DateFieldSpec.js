@@ -435,7 +435,7 @@ describe('DateField', function() {
       // Order is important, displayText needs to be before value
       // Otherwise server would generate a display text as soon as value changes and send it back even if it is the same as the ui is sending
       var events = [
-        new scout.RemoteEvent(dateField.id, 'displayTextChanged', {
+        new scout.RemoteEvent(dateField.id, 'acceptInput', {
           displayText: '11.02.2015',
           value: '2015-02-11 00:00:00.000',
           errorStatus: null,
@@ -508,7 +508,7 @@ describe('DateField', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var events = [
-        new scout.RemoteEvent(dateField.id, 'displayTextChanged', {
+        new scout.RemoteEvent(dateField.id, 'acceptInput', {
           displayText: '01.02.2016',
           value: '2016-02-01 00:00:00.000',
           errorStatus: null,
