@@ -24,7 +24,8 @@ scout.DatePickerTouchPopup.prototype._init = function(options) {
 scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
   this._widget = scout.create('DatePicker', {
     parent: this,
-    dateFormat: options.dateFormat
+    dateFormat: options.dateFormat,
+    allowedDates: options.allowedDates
   });
 };
 

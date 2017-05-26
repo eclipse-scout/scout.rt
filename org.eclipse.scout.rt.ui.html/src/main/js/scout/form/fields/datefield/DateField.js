@@ -31,7 +31,7 @@ scout.DateField = function() {
   // pressing up/down). In date fields, the date picker is used for that purposes.
   this._tempTimeDate;
   this.invalidValueMessageKey = 'ui.InvalidDateFormat';
-  this._addCloneProperties(['hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern', 'allowedDates']);
+  this._addCloneProperties(['hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern', 'allowedDates', 'autoDate']);
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
@@ -308,11 +308,10 @@ scout.DateField.prototype._setAutoDate = function(autoDate) {
 
 scout.DateField.prototype._setAllowedDates = function(allowedDates) {
   if (Array.isArray(allowedDates)) {
-    var convAllowedDates = [];
-    allowedDates.forEach(function(dateString) {
-      convAllowedDates.push(scout.dates.parseJsonDate(dateString));
+    allowedDates = allowedDates.map(function(date) {
+      return scout.dates.ensure(date);
     });
-    this._setProperty('allowedDates', convAllowedDates);
+    this._setProperty('allowedDates', allowedDates);
   } else {
     this._setProperty('allowedDates', null);
   }
