@@ -144,7 +144,7 @@ scout.SimpleTabBox.prototype.revalidateLayout = function() {
 scout.SimpleTabBox.prototype.addView = function(view, bringToTop) {
   var activate = scout.nvl(bringToTop, true);
   // add to view stack
-  var siblingView = this._addToViewStack(view,activate);
+  var siblingView = this._addToViewStack(view, activate);
   view.setParent(this);
   this.trigger('viewAdded', {
     view: view,
@@ -160,7 +160,7 @@ scout.SimpleTabBox.prototype.addView = function(view, bringToTop) {
  * @param view
  * @return the view which is gonna be the sibling to insert the new view tab after.
  */
-scout.SimpleTabBox.prototype._addToViewStack = function(view,bringToTop) {
+scout.SimpleTabBox.prototype._addToViewStack = function(view, bringToTop) {
   var sibling;
   var index = this.viewStack.indexOf(view);
   if (index > -1) {

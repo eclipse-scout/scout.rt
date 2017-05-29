@@ -811,6 +811,9 @@ scout.Desktop.prototype.hideForm = function(form) {
     }
   }
   form.displayParent.formController.unregisterAndRemove(form);
+  if(this.benchVisible && this.bench.getViews().length === 0){
+    this.bringOutlineToFront();
+  }
 };
 
 scout.Desktop.prototype.activateForm = function(form) {
