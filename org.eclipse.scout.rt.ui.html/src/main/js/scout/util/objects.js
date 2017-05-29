@@ -230,6 +230,13 @@ scout.objects = {
   },
 
   /**
+   * @returns the key / name of a property
+   */
+  keyByValue: function(obj, value) {
+    return Object.keys(obj)[Object.values(obj).indexOf(value)];
+  },
+
+  /**
    * Java-like equals method. Compares the given objects by checking with ===, if that fails, the function
    * checks if both objects have an equals function and use the equals function to compare the two objects
    * by value.

@@ -206,6 +206,11 @@ scout.DateField.prototype._setDateFormatPattern = function(dateFormatPattern) {
   }
   this._setProperty('dateFormatPattern', dateFormatPattern);
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
+
+  if (this.initialized) {
+    // if format changes on the fly, just update the display text
+    this._updateDisplayText();
+  }
 };
 
 scout.DateField.prototype._renderDateFormatPattern = function() {
@@ -215,12 +220,21 @@ scout.DateField.prototype._renderDateFormatPattern = function() {
   this.getDatePicker().dateFormat = this.isolatedDateFormat;
 };
 
+scout.DateField.prototype.setTimeFormatPattern = function(timeFormatPattern) {
+  this.setProperty('timeFormatPattern', timeFormatPattern);
+};
+
 scout.DateField.prototype._setTimeFormatPattern = function(timeFormatPattern) {
   if (!timeFormatPattern) {
     timeFormatPattern = this.session.locale.timeFormatPatternDefault;
   }
   this._setProperty('timeFormatPattern', timeFormatPattern);
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
+
+  if (this.initialized) {
+    // if format changes on the fly, just update the display text
+    this._updateDisplayText();
+  }
 };
 
 /**

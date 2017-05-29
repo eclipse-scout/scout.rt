@@ -64,8 +64,7 @@ scout.NumberField.prototype._setDecimalFormat = function(decimalFormat) {
   this._setProperty('decimalFormat', decimalFormat);
 
   if (this.initialized) {
-    this.parseAndSetValue(this.displayText);
-    // explicitly call update display text to make sure display text is updated even if value does not change
+    // if format changes on the fly, just update the display text
     this._updateDisplayText();
   }
 };
