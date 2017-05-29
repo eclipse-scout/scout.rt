@@ -13,10 +13,13 @@
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
+  this.searching = false;
   this.popup = null;
   this.lookupCall = null;
   this.codeType = null;
   this._pendingLookup = null;
+  this._pendingSetSearching = null;
+  this._lookupInProgress = false;
   this._tabPrevented = null;
   this.lookupRow = null;
   this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
@@ -27,7 +30,7 @@ scout.SmartField2 = function() {
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
   this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
-  this.pristine = true; // FIXME [awe] 7.0 - SF2: use touched property instead?
+  this.pristine = true; // FIXME [awe] 7.0 - SF2: use touched property instead? or remove?
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -97,7 +100,6 @@ scout.SmartField2.prototype._render = function() {
   if (!this.touch) {
     $field
       .blur(this._onFieldBlur.bind(this))
-      .focus(this._onFieldFocus.bind(this))
       .keyup(this._onFieldKeyup.bind(this))
       .keydown(this._onFieldKeydown.bind(this));
   }
@@ -172,8 +174,8 @@ scout.SmartField2.prototype.acceptInput = function() {
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result'). Or in case the text is empty, just set the value to null
   $.log.debug('(SmartField2#acceptInput) getByText() searchText=', searchText);
-  this.showLookupInProgress();
-  this.lookupCall.getByText(searchText).done(this._acceptInputDone.bind(this));
+  this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
+    .done(this._acceptInputDone.bind(this));
 };
 
 scout.SmartField2.prototype._inputAccepted = function() {
@@ -198,7 +200,6 @@ scout.SmartField2.prototype._inputAccepted = function() {
 };
 
 scout.SmartField2.prototype._acceptInputDone = function(result) {
-  this.hideLookupInProgress();
 
   // when there's exactly one result, we accept that lookup row
   var numLookupRows = result.lookupRows.length;
@@ -252,15 +253,12 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
 
 scout.SmartField2.prototype.lookupByRec = function(rec) {
   $.log.debug('(SmartField2#lookupByRec) rec=', rec);
-  this.showLookupInProgress();
-  return this.lookupCall.getByRec(rec)
+  return this._executeLookup(this.lookupCall.getByRec.bind(this.lookupCall, rec))
     .then(function(result) {
 
       // Since this function is only used for hierarchical trees we
       // can simply set the appendResult flag always to true here
       result.appendResult = true;
-
-      this.hideLookupInProgress();
       if (this.isPopupOpen()) {
         this.popup.setLookupResult(result);
       }
@@ -330,7 +328,7 @@ scout.SmartField2.prototype._formatValue = function(value) {
   }
 
   // we must do a lookup first to get the display text
-  return this.lookupCall.getByKey(value)
+  return this._executeLookup(this.lookupCall.getByKey.bind(this.lookupCall, value))
     .then(function(lookupRow) {
       return lookupRow ? lookupRow.text : '';
     });
@@ -356,21 +354,19 @@ scout.SmartField2.prototype.openPopup = function(lookupAll) {
     lookupAll = false;
   }
 
-  this.showLookupInProgress();
   var promise;
   if (lookupAll) {
-    promise = this.lookupCall.getAll();
+    promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
     $.log.debug('(SmartField2#openPopup) getAll()');
   } else {
     var searchText = this._readDisplayText();
-    promise = this.lookupCall.getByText(searchText);
+    promise = this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText));
     $.log.debug('(SmartField2#openPopup) getByText() searchText=', searchText);
   }
   promise.done(this._lookupByTextOrAllDone.bind(this));
 };
 
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
-  this.hideLookupInProgress();
 
   // In cases where the user has tabbed to the next field, while results for the previous
   // smartfield are still loading: don't show the proposal popup.
@@ -448,21 +444,6 @@ scout.SmartField2.prototype.closePopup = function() {
   }
 };
 
-scout.SmartField2.prototype.showLookupInProgress = function() {
-  if (this.isPopupOpen()) {
-    this.$container.removeClass('searching');
-    this.popup.setStatusLookupInProgress();
-  } else {
-    this.$container.addClass('searching');
-  }
-};
-
-scout.SmartField2.prototype.hideLookupInProgress = function() {
-  if (this.rendered) {
-    this.$container.removeClass('searching');
-  }
-};
-
 /**
  * Calls acceptInput if mouse down happens outside of the field or popup
  * @override
@@ -501,8 +482,9 @@ scout.SmartField2.prototype.togglePopup = function() {
   }
 };
 
-scout.SmartField2.prototype._onFieldFocus = function(event) {
-  // FIXME [awe] 7.0 - SF2: im original wird hier mit dem displayText was komisches gemacht. Ich hoffe das ist nicht mehr nötig
+scout.SmartField2.prototype._onFieldBlur = function(event) {
+  scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
+  this.setSearching(false);
 };
 
 scout.SmartField2.prototype._onFieldKeyup = function(event) {
@@ -564,7 +546,7 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
  */
 scout.SmartField2.prototype._isPreventDefaultTabHandling = function(event) {
   var doPrevent = false;
-  if (this.isPopupOpen()) {
+  if (this.isPopupOpen() || this._lookupInProgress) {
     doPrevent = true;
   }
   $.log.trace('(SmartField2#_isPreventDefaultTabHandling) must prevent default when TAB was pressed = ' + doPrevent);
@@ -579,13 +561,13 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
-      if (this._isPreventDefaultTabHandling()) {
+//      if (this._isPreventDefaultTabHandling()) {
         event.preventDefault();
         $.log.info('(SmartField2#_onFieldKeydown) set _tabPrevented');
         this._tabPrevented = {
           shiftKey: event.shiftKey
         };
-      }
+//      }
     }
     this.acceptInput();
     return;
@@ -627,6 +609,14 @@ scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
   this._lookupByText();
 };
 
+scout.SmartField2.prototype.setSearching = function(searching) {
+  this.setProperty('searching', searching);
+};
+
+scout.SmartField2.prototype._renderSearching = function() {
+  this.$container.toggleClass('searching', this.searching);
+};
+
 scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
   this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
 };
@@ -654,10 +644,43 @@ scout.SmartField2.prototype._lookupByText = function() {
 
   this._pendingLookup = setTimeout(function() {
     $.log.debug('(SmartField2#_lookupByText) searchText=' + searchText);
-    this.showLookupInProgress();
     // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
-    this.lookupCall.getByText(searchText).done(this._lookupByTextOrAllDone.bind(this));
+    this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
+      .done(this._lookupByTextOrAllDone.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
+};
+
+/**
+ * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
+ */
+scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
+  this._lookupInProgress = true;
+  this.showLookupInProgress();
+  return lookupFunc()
+    .done(function() {
+      this._lookupInProgress = false;
+      this.hideLookupInProgress();
+    }.bind(this));
+};
+
+scout.SmartField2.prototype.showLookupInProgress = function() {
+  if (this.isPopupOpen()) {
+    this.popup.setStatusLookupInProgress();
+  }
+  if (this._pendingSetSearching) {
+    clearTimeout(this._pendingSetSearching);
+  }
+  this.setSearching(true); // always show searching immediately
+};
+
+scout.SmartField2.prototype.hideLookupInProgress = function() {
+  if (this._pendingSetSearching) {
+    clearTimeout(this._pendingSetSearching);
+  }
+  this._pendingSetSearching = setTimeout(function() {
+    this.setSearching(false);
+    this._pendingSetSearching = null;
+  }.bind(this), 250);
 };
 
 /**
