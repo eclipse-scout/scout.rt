@@ -46,10 +46,14 @@ describe('DateField', function() {
     var dateField = createField(modelProperties);
     dateField.render();
 
-    focusDate(dateField);
-    openDatePicker(dateField);
+    focusAndOpenDatePicker(dateField);
 
     return dateField;
+  }
+
+  function focusAndOpenDatePicker(dateField) {
+    focusDate(dateField);
+    openDatePicker(dateField);
   }
 
   function focusDate(dateField) {
@@ -60,10 +64,10 @@ describe('DateField', function() {
 
   function openDatePicker(dateField) {
     dateField.$dateField.triggerMouseDown();
-    expect(findPicker().length).toBe(1);
+    expect(findDatePicker().length).toBe(1);
   }
 
-  function findPicker() {
+  function findDatePicker() {
     return $('.date-picker');
   }
 
@@ -365,10 +369,10 @@ describe('DateField', function() {
         parent: session.desktop
       });
       dateField.render();
-      expect(findPicker().length).toBe(0);
+      expect(findDatePicker().length).toBe(0);
 
       dateField.$dateField.triggerMouseDown();
-      expect(findPicker().length).toBe(1);
+      expect(findDatePicker().length).toBe(1);
     });
 
   });
@@ -378,11 +382,11 @@ describe('DateField', function() {
     it('closes the datepicker', function() {
       var model = createModel();
       var dateField = createFieldAndFocusAndOpenPicker(model);
-      expect(findPicker().length).toBe(1);
+      expect(findDatePicker().length).toBe(1);
 
       dateField._onDateFieldBlur();
 
-      expect(findPicker().length).toBe(0);
+      expect(findDatePicker().length).toBe(0);
     });
 
     it('accepts the prediction', function() {
@@ -496,26 +500,59 @@ describe('DateField', function() {
 
   describe('picker', function() {
 
-    it('sends displayText and value if date was selected', function() {
-      var model = createModel({
+    it('sets selected date as field value when a date was selected', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
         autoDate: '2016-02-05'
       });
-      var dateField = createFieldAndFocusAndOpenPicker(model);
+      dateField.render();
+      focusAndOpenDatePicker(dateField);
 
       find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
       expect(dateField.$dateField.val()).toBe('01.02.2016');
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(dateField.displayText).toBe('01.02.2016');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+    });
 
-      var events = [
-        new scout.RemoteEvent(dateField.id, 'acceptInput', {
-          displayText: '01.02.2016',
-          value: '2016-02-01 00:00:00.000',
-          errorStatus: null,
-          showBusyIndicator: true
-        })
-      ];
-      expect(mostRecentJsonRequest()).toContainEventsExactly(events);
+    it('unselects the date if the field\'s text was removed', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        autoDate: '2016-02-05'
+      });
+      dateField.render();
+      focusAndOpenDatePicker(dateField);
+      find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
+      openDatePicker(dateField);
+      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+
+      dateField.$dateField.val('');
+      dateField.$dateField.trigger('input');
+      expect(dateField.getDatePicker().selectedDate).toBe(null);
+      expect(dateField.getDatePicker().preselectedDate.toISOString()).toBe(scout.dates.create('2016-02-05 00:00:00.000').toISOString());
+    });
+
+    it('sets selected date as field value when a date was selected even if another date was typed', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2016-02-01'
+      });
+      dateField.render();
+      focusAndOpenDatePicker(dateField);
+      expect(dateField.$dateField.val()).toBe('01.02.2016');
+      expect(dateField.displayText).toBe('01.02.2016');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+
+      // Enter another date
+      dateField.$dateField.val('02.02.2016');
+      dateField.$dateField.trigger('input');
+      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(scout.dates.create('2016-02-02 00:00:00.000').toISOString());
+
+      // Click the date which was selected when the picker opened
+      find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
+      expect(dateField.$dateField.val()).toBe('01.02.2016');
+      expect(dateField.displayText).toBe('01.02.2016');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
     });
 
   });
@@ -527,10 +564,10 @@ describe('DateField', function() {
       it('closes the datepicker', function() {
         var model = createModel();
         var dateField = createFieldAndFocusAndOpenPicker(model);
-        expect(findPicker().length).toBe(1);
+        expect(findDatePicker().length).toBe(1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.ESC);
-        expect(findPicker().length).toBe(0);
+        expect(findDatePicker().length).toBe(0);
       });
 
     });
@@ -551,7 +588,7 @@ describe('DateField', function() {
         dateField.$dateField.triggerKeyDown(scout.keys.ENTER);
         var date = dateField.value;
         expectDate(date, 2015, 2, 11);
-        expect(findPicker().length).toBe(0);
+        expect(findDatePicker().length).toBe(0);
       });
 
     });
@@ -580,6 +617,32 @@ describe('DateField', function() {
 
         dateField.acceptInput();
         expect(scout.dates.isSameDay(dateField.value, new Date())).toBe(true);
+      });
+
+      it('selects the current date if picker is open and no date is selected', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop
+        });
+        dateField.render();
+        focusDate(dateField);
+        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
+        expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
+        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dateField.value).toBe(null); // value is still unchanged
+
+        // Clear date
+        dateField.$dateField.val('');
+        dateField.$dateField.trigger('input');
+        expect(dateField.getDatePicker().selectedDate).toBe(null);
+        expect(scout.dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
+
+        // Assert that current date is selected
+        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
+        expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
+        expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dateField.value).toBe(null); // value is still unchanged
       });
 
       it('removes the error status if the date was invalid before opening the picker', function() {
@@ -829,7 +892,7 @@ describe('DateField', function() {
         dateField.render();
 
         dateField.$dateField.triggerMouseDown();
-        expect(findPicker().length).toBe(1);
+        expect(findDatePicker().length).toBe(1);
 
         selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
 
@@ -842,7 +905,7 @@ describe('DateField', function() {
         expect(dateField.displayText).toBe('27.09.1999\n04:42');
 
         dateField.$dateField.triggerMouseDown();
-        expect(findPicker().length).toBe(1);
+        expect(findDatePicker().length).toBe(1);
       });
 
       it('is opened if datefield is touched', function() {

@@ -291,6 +291,20 @@ scout.DateField.prototype._readTimeDisplayText = function() {
   return (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
 };
 
+/**
+ * @override
+ */
+scout.DateField.prototype.setDisplayText = function(displayText) {
+  // Overridden to avoid the equals check -> make sure renderDisplayText is executed whenever setDisplayText is called
+  // Reason: key up/down and picker day click modify the display text, but input doesn't
+  // -> reverting to a date using day click or up down after the input changed would not work anymore
+  // changing 'onXyInput' to always update the display text would fix that, but would break acceptInput
+  this._setDisplayText(displayText);
+  if (this.rendered) {
+    this._renderDisplayText();
+  }
+};
+
 scout.DateField.prototype._setDisplayText = function(displayText) {
   this.oldDisplayText = this.displayText;
   this._setProperty('displayText', displayText);

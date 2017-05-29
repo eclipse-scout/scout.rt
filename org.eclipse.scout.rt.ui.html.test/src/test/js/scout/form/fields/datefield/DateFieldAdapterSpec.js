@@ -27,15 +27,46 @@ describe("DateFieldAdapter", function() {
     $('.date-picker').remove();
   });
 
+  function createWithAdapter(model) {
+    model = model || {};
+    model = $.extend({
+      parent: session.desktop
+    }, model);
+    var field = scout.create('DateField', model);
+    linkWidgetAndAdapter(field, 'DateFieldAdapter');
+    return field;
+  }
+
+  function focusDate(dateField) {
+    dateField.$dateField.focus();
+    jasmine.clock().tick(101);
+    expect(dateField.$dateField).toBeFocused();
+  }
+
+  function openDatePicker(dateField) {
+    dateField.$dateField.triggerMouseDown();
+    expect(findDatePicker().length).toBe(1);
+  }
+
+  function findDatePicker() {
+    return $('.date-picker');
+  }
+
+  function find$Day(picker, date) {
+    var $box = picker.currentMonth.$container;
+    return $box.find('.date-picker-day').filter(function(i, elem) {
+      var $day = $(elem);
+      return (scout.dates.isSameDay(date, $day.data('date')));
+    }.bind(this));
+  }
+
   describe('parseValue', function() {
 
     it('sets the server errorStatus if the displayText was reverted to the one provoking the error', function() {
-      var field = scout.create('DateField', {
-        parent: session.desktop,
+      var field = createWithAdapter({
         hasTime: true,
         value: scout.dates.create('2017-05-23 12:30:00.000')
       });
-      linkWidgetAndAdapter(field, 'DateFieldAdapter');
       field.modelAdapter._syncErrorStatus({
         message: 'error status from server'
       });
@@ -58,11 +89,9 @@ describe("DateFieldAdapter", function() {
     });
 
     it('sets the server errorStatus if the displayText was reverted to the one provoking the error using key down/up', function() {
-      var field = scout.create('DateField', {
-        parent: session.desktop,
+      var field = createWithAdapter({
         value: scout.dates.create('2017-05-23')
       });
-      linkWidgetAndAdapter(field, 'DateFieldAdapter');
       field.modelAdapter._syncErrorStatus({
         message: 'error status from server'
       });
@@ -83,17 +112,43 @@ describe("DateFieldAdapter", function() {
     });
 
     it('does not accidentially remove the model error status on acceptInput', function() {
-      var field = scout.create('DateField', {
-        parent: session.desktop,
+      var field = createWithAdapter({
         value: scout.dates.create('2017-05-23')
       });
-      linkWidgetAndAdapter(field, 'DateFieldAdapter');
       field.modelAdapter._syncErrorStatus({
         message: 'error status from server'
       });
       field.render();
       field.acceptInput();
       expect(field.errorStatus.message).toBe('error status from server');
+    });
+
+  });
+
+  describe('picker', function() {
+
+    it('sends displayText and value if date was selected', function() {
+      var field = createWithAdapter({
+        autoDate: '2016-02-05'
+      });
+      field.render();
+      focusDate(field);
+      openDatePicker(field);
+
+      find$Day(field.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
+      expect(field.$dateField.val()).toBe('01.02.2016');
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var events = [
+        new scout.RemoteEvent(field.id, 'acceptInput', {
+          displayText: '01.02.2016',
+          value: '2016-02-01 00:00:00.000',
+          errorStatus: null,
+          showBusyIndicator: true
+        })
+      ];
+      expect(mostRecentJsonRequest()).toContainEventsExactly(events);
     });
 
   });

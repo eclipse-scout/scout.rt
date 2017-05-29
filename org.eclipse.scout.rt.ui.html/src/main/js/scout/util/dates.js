@@ -118,6 +118,13 @@ scout.dates = {
       date.getDate() === date2.getDate();
   },
 
+  isSameMonth: function(date, date2) {
+    if (!date || !date2) {
+      return false;
+    }
+    return scout.dates.compareMonths(date, date2) === 0;
+  },
+
   /**
    * @return the difference of the two dates in number of months.
    */

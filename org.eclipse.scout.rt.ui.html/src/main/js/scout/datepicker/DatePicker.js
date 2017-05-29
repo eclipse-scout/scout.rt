@@ -31,9 +31,7 @@ scout.inherits(scout.DatePicker, scout.Widget);
 
 scout.DatePicker.prototype._init = function(options) {
   scout.DatePicker.parent.prototype._init.call(this, options);
-  options = options || {};
-  this.dateFormat = options.dateFormat;
-  this.allowedDates = options.allowedDates;
+  this._setDateFormat(this.dateFormat);
 };
 
 scout.DatePicker.prototype._render = function() {
@@ -50,6 +48,14 @@ scout.DatePicker.prototype._render = function() {
   this.$container.appendDiv('date-picker-separator');
   this.$scrollable = this.$container.appendDiv('date-picker-scrollable');
   this._registerSwipeHandlers();
+};
+
+scout.DatePicker.prototype._setDateFormat = function(dateFormat) {
+  if (!dateFormat) {
+    dateFormat = this.session.locale.dateFormatPatternDefault;
+  }
+  dateFormat = scout.DateFormat.ensure(this.session.locale, dateFormat);
+  this._setProperty('dateFormat', dateFormat);
 };
 
 scout.DatePicker.prototype.prependMonth = function(month) {
@@ -162,7 +168,7 @@ scout.DatePicker.prototype._renderMonth = function(month) {
 };
 
 /**
- * @internal, use show, selectDate, shiftViewDate, etc. to change the view date
+ * @internal, use showDate, selectDate, shiftViewDate, etc. to change the view date
  */
 scout.DatePicker.prototype.setViewDate = function(viewDate, animated) {
   if (scout.objects.equals(this.viewDate, viewDate)) {
@@ -203,11 +209,12 @@ scout.DatePicker.prototype._renderViewDate = function(animated) {
 };
 
 scout.DatePicker.prototype.preselectDate = function(date, animated) {
-  this.show({
-    viewDate: date,
-    preselectedDate: date,
-    animated: animated
-  });
+  this.showDate(date, animated);
+  if (date) {
+    // Clear selection when a date is preselected
+    this.setSelectedDate(null);
+  }
+  this.setPreselectedDate(date);
 };
 
 /**
@@ -232,11 +239,12 @@ scout.DatePicker.prototype._renderPreselectedDate = function() {
 };
 
 scout.DatePicker.prototype.selectDate = function(date, animated) {
-  this.show({
-    viewDate: date,
-    selectedDate: date,
-    animated: animated
-  });
+  this.showDate(date, animated);
+  if (date) {
+    // Clear preselection when a date is selected
+    this.setPreselectedDate(null);
+  }
+  this.setSelectedDate(date);
 };
 
 /**
@@ -261,13 +269,11 @@ scout.DatePicker.prototype._renderSelectedDate = function() {
 };
 
 /**
- * @param options object with following properties: viewDate, preselectedDate, selectedDate, animated
+ * Shows the month which contains the given date.
+ * @param {Date} date
+ * @param {boolean} [animated] - Default is true
  */
-scout.DatePicker.prototype.show = function(options) {
-  var selectedDate = options.selectedDate || this.selectedDate;
-  var preselectedDate = options.preselectedDate || this.preselectedDate;
-  var animated = options.animated;
-  var viewDate = options.viewDate || options.selectedDate || new Date();
+scout.DatePicker.prototype.showDate = function(viewDate, animated) {
   var viewDateDiff = 0;
   if (this.viewDate) {
     viewDateDiff = scout.dates.compareMonths(viewDate, this.viewDate);
@@ -289,22 +295,12 @@ scout.DatePicker.prototype.show = function(options) {
     }
   }
   this.setViewDate(viewDate, animated);
-
-  if (selectedDate) {
-    // Clear preselection when a date is selected
-    preselectedDate = null;
-  }
-  this.setPreselectedDate(preselectedDate);
-  this.setSelectedDate(selectedDate);
 };
 
 scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
   var date = this.viewDate;
-
   date = scout.dates.shift(date, years, months, days);
-  this.show({
-    viewDate: date
-  });
+  this.showDate(date);
 };
 
 scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
