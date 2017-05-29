@@ -711,7 +711,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
 scout.Outline.prototype._attachDetailMenusListener = function(menuContainer) {
   if (!this._detailMenusChangeHandler) {
     this._detailMenusChangeHandler = function(event) {
-      if (event.name === 'menus' || event.name === 'tableControls') {
+      if (event.propertyName === 'menus' || event.propertyName === 'tableControls') {
         this.updateDetailMenus();
       }
     }.bind(this);

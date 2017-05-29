@@ -39,7 +39,7 @@ scout.TableField.prototype._init = function(model) {
 
 scout.TableField.prototype._delegatePropertyChange = function(propertyName) {
   this.on('propertyChange', function(event) {
-    if (event.name === propertyName) {
+    if (event.propertyName === propertyName) {
       this.table.callSetter(propertyName, event.newValue);
     }
   }.bind(this));

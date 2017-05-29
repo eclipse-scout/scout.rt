@@ -65,7 +65,7 @@ scout.Form.prototype._init = function(model) {
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, renderGlassPanes);
   var propertyChangeHandler = function(event) {
     // render glasspanes on parents after initialized
-    if (event.name === 'displayParent') {
+    if (event.propertyName === 'displayParent') {
       this._glassPaneRenderer.renderGlassPanes();
     }
   }.bind(this);

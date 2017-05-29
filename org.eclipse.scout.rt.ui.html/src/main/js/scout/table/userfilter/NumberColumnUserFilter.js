@@ -66,7 +66,7 @@ scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 };
 
 scout.NumberColumnUserFilter.prototype._onPropertyChange = function(event) {
-  if (event.name !== 'value') {
+  if (event.propertyName !== 'value') {
     return;
   }
   this.numberFrom = this.numberFromField.value;

@@ -108,7 +108,7 @@ scout.ViewButtonBox.prototype._onViewButtonSelected = function(event) {
 };
 
 scout.ViewButtonBox.prototype._onViewButtonPropertyChange = function(event) {
-  if (event.name === 'selected') {
+  if (event.propertyName === 'selected') {
     this._onViewButtonSelected(event);
   }
 };

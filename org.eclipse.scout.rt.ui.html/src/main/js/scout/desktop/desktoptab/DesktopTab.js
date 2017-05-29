@@ -15,28 +15,28 @@ scout.DesktopTab = function() {
   this.view;
 
   this._propertyChangeListener = function(event) {
-    if (event.name === 'title') {
+    if (event.propertyName === 'title') {
       this.setTitle(this.view.title);
     }
-    if (event.name === 'subTitle') {
+    if (event.propertyName === 'subTitle') {
       this.setSubTitle(this.view.subTitle);
     }
-    if (event.name === 'iconId') {
+    if (event.propertyName === 'iconId') {
       this.setIconId(this.view.iconId);
     }
-    if (event.name === 'cssClass') {
+    if (event.propertyName === 'cssClass') {
       this.setCssClass(event.newValue);
     }
-    if (event.name === 'saveNeeded') {
+    if (event.propertyName === 'saveNeeded') {
       this.setSaveNeeded(event.newValue);
     }
-    if (event.name === 'saveNeededVisible') {
+    if (event.propertyName === 'saveNeededVisible') {
       this.setSaveNeededVisible(event.newValue);
     }
-    if (event.name === 'closable') {
+    if (event.propertyName === 'closable') {
       this.setClosable(event.newValue);
     }
-    if (event.name === 'status') {
+    if (event.propertyName === 'status') {
       this.setStatus(event.newValue);
     }
   }.bind(this);

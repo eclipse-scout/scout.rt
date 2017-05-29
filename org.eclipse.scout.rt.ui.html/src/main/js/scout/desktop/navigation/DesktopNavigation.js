@@ -235,13 +235,13 @@ scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {
 };
 
 scout.DesktopNavigation.prototype._onOutlinePropertyChange = function(event) {
-  if (event.name === 'displayStyle') {
+  if (event.propertyName === 'displayStyle') {
     this._updateHandle();
   }
 };
 
 scout.DesktopNavigation.prototype._onDesktopPropertyChange = function(event) {
-  if (event.name === 'navigationHandleVisible') {
+  if (event.propertyName === 'navigationHandleVisible') {
     this.updateHandleVisibility();
   }
 };

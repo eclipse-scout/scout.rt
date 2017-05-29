@@ -104,7 +104,7 @@ scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 };
 
 scout.DateColumnUserFilter.prototype._onPropertyChange = function(event) {
-  if (event.name !== 'value') {
+  if (event.propertyName !== 'value') {
     return;
   }
   this.dateFrom = this.dateFromField.value;

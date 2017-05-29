@@ -357,7 +357,7 @@ scout.ContextMenuPopup.prototype._onCloneMenuDoAction = function(event) {
 };
 
 scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
-  if (event.name === 'selected') {
+  if (event.propertyName === 'selected') {
     var menu = event.source;
     // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
     menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
@@ -443,9 +443,9 @@ scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
   if (!this.rendered) {
     return;
   }
-  if (event.name === 'visible') {
+  if (event.propertyName === 'visible') {
     this._updateFirstLastClass();
-  } else if (event.name === 'selected') {
+  } else if (event.propertyName === 'selected') {
     // Key stroke navigation marks the currently focused item as selected.
     // When a sub menu item is opened while another element is selected (focused), make sure the other element gets unselected.
     // Otherwise two items would be selected when the sub menu is closed again.

@@ -266,7 +266,7 @@ scout.TabBox.prototype.focus = function() {
 
 scout.TabBox.prototype._onTabItemPropertyChange = function(event) {
   // No need to invalidate if the enabled state has changed (this should not affect the layout).
-  if (event.name !== 'enabled') {
+  if (event.propertyName !== 'enabled') {
     scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
   }
 };

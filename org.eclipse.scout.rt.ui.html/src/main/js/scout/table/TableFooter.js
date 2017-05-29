@@ -685,7 +685,7 @@ scout.TableFooter.prototype._onTableStatusChanged = function(event) {
 };
 
 scout.TableFooter.prototype._onTablePropertyChange = function(event) {
-  if (event.name === 'multiSelect') {
+  if (event.propertyName === 'multiSelect') {
     this._updateInfoSelectionVisibility();
   }
 };

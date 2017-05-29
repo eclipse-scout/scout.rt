@@ -450,7 +450,7 @@ scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
 };
 
 scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
-  if (scout.isOneOf(event.name, ['defaultDetailForm', 'outlineOverview'])) {
+  if (scout.isOneOf(event.propertyName, ['defaultDetailForm', 'outlineOverview'])) {
     this.updateOutlineContent();
   }
 };
@@ -477,12 +477,12 @@ scout.DesktopBench.prototype._onBenchLayoutDataChange = function(event) {
 };
 
 scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
-  if (event.name === 'navigationVisible') {
+  if (event.propertyName === 'navigationVisible') {
     this._onDesktopNavigationVisibleChange();
-  } else if (event.name === 'navigationHandleVisible') {
+  } else if (event.propertyName === 'navigationHandleVisible') {
     this._onDesktopNavigationHandleVisibleChange();
   }
-  if (event.name === 'benchLayoutData') {
+  if (event.propertyName === 'benchLayoutData') {
     this._onBenchLayoutDataChange();
   }
 };

@@ -63,7 +63,7 @@ scout.CalendarModesMenu.prototype.getMenuForMode = function(displayMode) {
 };
 
 scout.CalendarModesMenu.prototype._onMenuPropertyChange = function(event) {
-  if (event.name === 'selected') {
+  if (event.propertyName === 'selected') {
     var selected = event.newValue;
     if (selected) {
       var displayMode = event.source.displayMode;

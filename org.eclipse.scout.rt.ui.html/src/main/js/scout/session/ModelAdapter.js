@@ -257,7 +257,7 @@ scout.ModelAdapter.prototype.resetEventFilters = function() {
 };
 
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
-  var propertyName = event.name;
+  var propertyName = event.propertyName;
   var value = event.newValue;
 
   // TODO [7.0] cgu This does not work if value will be converted into another object (e.g scout.DateRange.ensure(selectionRange) in Planner.js)

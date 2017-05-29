@@ -55,7 +55,7 @@ scout.ButtonAdapterMenu.prototype._render = function() {
 scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
   // Whenever a button property changes, apply the changes to the menu
   var changedProperties = {};
-  changedProperties[event.name] = event.newValue;
+  changedProperties[event.propertyName] = event.newValue;
   changedProperties = scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties);
   for (var prop in changedProperties) { // NOSONAR
     this.callSetter(prop, changedProperties[prop]);

@@ -855,7 +855,7 @@ scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
 scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, newValue) {
   scout.assertParameter('propertyName', propertyName);
   var event = new scout.Event({
-    name: propertyName,
+    propertyName: propertyName,
     oldValue: oldValue,
     newValue: newValue
   });
@@ -1217,7 +1217,7 @@ scout.Widget.prototype._onMirrorEvent = function(event) {
 };
 
 scout.Widget.prototype._onMirrorPropertyChange = function(event) {
-  this.callSetter(event.name, event.newValue);
+  this.callSetter(event.propertyName, event.newValue);
 };
 
 scout.Widget.prototype._onParentDestroy = function(event) {

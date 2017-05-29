@@ -386,9 +386,9 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
   // user request (because many menus change one or more properties). Therefore, we just invalidate
   // the MenuBarLayout. It will be updated automatically after the user request has finished,
   // because the layout calls rebuildItemsInternal().
-  if (event.name === 'enabled') {
+  if (event.propertyName === 'enabled') {
     this.updateDefaultMenu();
-  } else if (event.name === 'visible') {
+  } else if (event.propertyName === 'visible') {
     var oldVisible = this.visible;
     this.updateVisibility();
     // Mainly necessary for menus currently not rendered (e.g. in ellipsis menu).

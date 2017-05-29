@@ -210,7 +210,7 @@ scout.ViewMenuTab.prototype.bringToFront = function() {
 };
 
 scout.ViewMenuTab.prototype._onViewMenuPropertyChange = function(event) {
-  if (event.name === 'visible') {
+  if (event.propertyName === 'visible') {
     this.updateVisibility();
   }
 };

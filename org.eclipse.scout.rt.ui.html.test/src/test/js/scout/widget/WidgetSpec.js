@@ -402,13 +402,13 @@ describe('Widget', function() {
       });
       widget.setProperty('selected', true);
       expect(propertyChangeEvent.type).toBe('propertyChange');
-      expect(propertyChangeEvent.name).toBe('selected');
+      expect(propertyChangeEvent.propertyName).toBe('selected');
       expect(propertyChangeEvent.oldValue).toBe(undefined);
       expect(propertyChangeEvent.newValue).toBe(true);
 
       widget.setProperty('selected', false);
       expect(propertyChangeEvent.type).toBe('propertyChange');
-      expect(propertyChangeEvent.name).toBe('selected');
+      expect(propertyChangeEvent.propertyName).toBe('selected');
       expect(propertyChangeEvent.oldValue).toBe(true);
       expect(propertyChangeEvent.newValue).toBe(false);
     });

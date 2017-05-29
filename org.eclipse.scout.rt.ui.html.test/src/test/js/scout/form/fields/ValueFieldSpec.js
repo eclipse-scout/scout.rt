@@ -207,7 +207,7 @@ describe('ValueField', function() {
       var field = helper.createField('StringField');
       var count = 0;
       field.on('propertyChange', function(event) {
-        if (event.name === 'value') {
+        if (event.propertyName === 'value') {
           count++;
         }
       });
