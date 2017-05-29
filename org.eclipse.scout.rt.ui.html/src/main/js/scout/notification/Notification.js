@@ -27,6 +27,7 @@ scout.Notification.prototype._init = function(model) {
     });
   }
   scout.texts.resolveTextProperty(this.status, 'message', this.session);
+  this._setStatus(this.status);
 };
 
 scout.Notification.prototype._render = function() {
@@ -48,15 +49,20 @@ scout.Notification.prototype._setStatus = function(status) {
   if (this.rendered) {
     this._removeStatus();
   }
+  status = scout.Status.ensure(status);
   this._setProperty('status', status);
 };
 
 scout.Notification.prototype._removeStatus = function() {
-  this.$container.removeClass(scout.Notification.cssClassForSeverity(this.status));
+  if (this.status) {
+    this.$container.removeClass(this.status.cssClass());
+  }
 };
 
 scout.Notification.prototype._renderStatus = function() {
-  this.$container.addClass(scout.Notification.cssClassForSeverity(this.status));
+  if (this.status) {
+    this.$container.addClass(this.status.cssClass());
+  }
   this._renderMessage();
 };
 
@@ -72,30 +78,4 @@ scout.Notification.prototype._renderMessage = function() {
 scout.Notification.prototype._renderVisible = function() {
   scout.Notification.parent.prototype._renderVisible.call(this);
   this.invalidateLayoutTree();
-};
-
-/**
- * @param {number} status
- * @returns {string}
- * @static
- */
-scout.Notification.cssClassForSeverity = function(status) {
-  var cssSeverity,
-    severity = scout.Status.Severity;
-
-  switch (status.severity) {
-    case severity.OK:
-      cssSeverity = 'ok';
-      break;
-    case severity.INFO:
-      cssSeverity = 'info';
-      break;
-    case severity.WARNING:
-      cssSeverity = 'warning';
-      break;
-    case severity.ERROR:
-      cssSeverity = 'error';
-      break;
-  }
-  return cssSeverity;
 };

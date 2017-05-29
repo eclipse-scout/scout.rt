@@ -280,7 +280,7 @@ scout.TableFooter.prototype._renderInfoSelection = function() {
 scout.TableFooter.prototype._renderInfoTableStatus = function() {
   var $info = this._$infoTableStatus;
   var tableStatus = this.table.tableStatus;
-  $info.removeClass(scout.Status.cssClasses);
+  $info.removeClass(scout.Status.SEVERITY_CSS_CLASSES);
   if (tableStatus) {
     $info.addClass(tableStatus.cssClass());
   }

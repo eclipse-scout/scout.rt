@@ -172,25 +172,8 @@ scout.Tooltip.prototype._renderText = function() {
 };
 
 scout.Tooltip.prototype._renderSeverity = function() {
-  this.$container.removeClass('tooltip-error tooltip-warning tooltip-info');
-  this.$container.addClass(this._cssClassForSeverity());
-};
-
-scout.Tooltip.prototype._cssClassForSeverity = function() {
-  var isInfo = (this.severity > scout.Status.Severity.OK);
-  var isWarning = (this.severity > scout.Status.Severity.INFO);
-  var isError = (this.severity > scout.Status.Severity.WARNING);
-
-  if (isError) {
-    return 'tooltip-error';
-  }
-  if (isWarning) {
-    return 'tooltip-warning';
-  }
-  if (isInfo) {
-    return 'tooltip-info';
-  }
-  return '';
+  this.$container.removeClass(scout.Status.SEVERITY_CSS_CLASSES);
+  this.$container.addClass(scout.Status.cssClassForSeverity(this.severity));
 };
 
 scout.Tooltip.prototype.setMenus = function(menus) {

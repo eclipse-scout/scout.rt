@@ -232,13 +232,13 @@ scout.TabItem.prototype._renderTooltipText = function() {
 
 scout.TabItem.prototype._renderErrorStatus = function() {
   var hasStatus = !!this.errorStatus,
-    statusClass = hasStatus ? this.errorStatus.cssClass() : '';
+    statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
 
   if (this.$container) {
-    this.$container.removeClass(scout.Status.cssClasses);
+    this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.$container.addClass(statusClass, hasStatus);
   }
-  this.$tabContainer.removeClass(scout.Status.cssClasses);
+  this.$tabContainer.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
   this.$tabContainer.addClass(statusClass, hasStatus);
 
   this._updateStatusVisible();

@@ -96,6 +96,8 @@ scout.FormField.Mode = {
   CELLEDITOR: 'celleditor'
 };
 
+scout.FormField.SEVERITY_CSS_CLASSES = 'has-error has-warning has-info has-ok';
+
 /**
  * @override
  */
@@ -201,12 +203,12 @@ scout.FormField.prototype._renderMandatory = function() {
 
 scout.FormField.prototype._renderErrorStatus = function() {
   var hasStatus = !!this.errorStatus,
-    statusClass = hasStatus ? this.errorStatus.cssClass() : '';
+    statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
 
-  this.$container.removeClass(scout.Status.cssClasses);
+  this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
   this.$container.addClass(statusClass, hasStatus);
   if (this.$field) {
-    this.$field.removeClass(scout.Status.cssClasses);
+    this.$field.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.$field.addClass(statusClass, hasStatus);
   }
 

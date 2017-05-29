@@ -208,30 +208,30 @@
 
   /* error */
 
-  &.has-error > .font-icon::before {
+  &.error > .font-icon::before {
     #scout.animation(attention 5s linear infinite);
     content: @icon-error;
   }
 
-  &.has-error.tooltip-active {
+  &.error.tooltip-active {
     color: @table-info-error-color;
   }
 
-  &.has-error.tooltip-active:hover {
+  &.error.tooltip-active:hover {
     color: @table-info-error-hover-color;
   }
 
   /* warning */
 
-  &.has-warning > .font-icon::before {
+  &.warning > .font-icon::before {
     content: @icon-error;
   }
 
-  &.has-warning.tooltip-active {
+  &.warning.tooltip-active {
     color: @table-info-warning-color;
   }
 
-  &.has-warning.tooltip-active:hover {
+  &.warning.tooltip-active:hover {
     color: @table-info-warning-hover-color;
   }
 }

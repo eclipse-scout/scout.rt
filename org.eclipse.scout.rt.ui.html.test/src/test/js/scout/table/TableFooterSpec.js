@@ -85,8 +85,8 @@ describe("TableFooterSpec", function() {
       // Check that status and tooltip is rendered when table is rendered
       table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
       expect(table.tableStatus.uiState).toBe(undefined);
 
@@ -95,14 +95,14 @@ describe("TableFooterSpec", function() {
       expect(table.footer._tableStatusTooltip).toBe(null);
       table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
 
       // Check that tooltip is hidden after mouse click on status
       table.footer._$infoTableStatusIcon.triggerMouseDownCapture();
       expect(table.footer._tableStatusTooltip).toBe(null);
-      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
       expect(table.tableStatus.uiState).toBe('user-hidden');
 
@@ -110,15 +110,15 @@ describe("TableFooterSpec", function() {
       table.remove();
       table.render();
       expect(table.footer._tableStatusTooltip).toBe(null);
-      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
       expect(table.tableStatus.uiState).toBe('user-hidden');
 
       // Check that tooltip is shown after second mouse click on status
       table.footer._$infoTableStatusIcon.triggerMouseDownCapture();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
       expect(table.tableStatus.uiState).toBe('user-shown');
 
@@ -126,8 +126,8 @@ describe("TableFooterSpec", function() {
       table.remove();
       table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-error')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-error')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('error')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('error')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
       expect(table.tableStatus.uiState).toBe('user-shown');
     });
@@ -144,15 +144,15 @@ describe("TableFooterSpec", function() {
       // Check that status and tooltip is rendered when table is rendered
       table.render();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
       expect(table.tableStatus.uiState).toBe('auto-hidden'); // because auto-removal is already scheduled at INFO level
 
       // Check that tooltip is hidden automatically after 5s
       jasmine.clock().tick(5100);
       expect(table.footer._tableStatusTooltip).toBe(null);
-      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
       expect(table.tableStatus.uiState).toBe('auto-hidden');
 
@@ -160,21 +160,21 @@ describe("TableFooterSpec", function() {
       table.remove();
       table.render();
       expect(table.footer._tableStatusTooltip).toBe(null);
-      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
       expect(table.tableStatus.uiState).toBe('auto-hidden');
 
       // Check that tooltip is shown again with a mouse click and _not_ hidden automatically again after 5s
       table.footer._$infoTableStatusIcon.triggerMouseDownCapture();
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
       expect(table.tableStatus.uiState).toBe('user-shown');
       jasmine.clock().tick(5100);
       expect(table.footer._tableStatusTooltip.rendered).toBe(true);
-      expect(table.footer._tableStatusTooltip.$container.hasClass('tooltip-info')).toBe(true);
-      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._tableStatusTooltip.$container.hasClass('info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(true);
       expect(table.tableStatus.uiState).toBe('user-shown');
 
@@ -182,7 +182,7 @@ describe("TableFooterSpec", function() {
       table.remove();
       table.render();
       expect(table.footer._tableStatusTooltip).toBe(null);
-      expect(table.footer._$infoTableStatus.hasClass('has-info')).toBe(true);
+      expect(table.footer._$infoTableStatus.hasClass('info')).toBe(true);
       expect(table.footer._$infoTableStatus.hasClass('tooltip-active')).toBe(false);
       expect(table.tableStatus.uiState).toBe('auto-hidden');
     });

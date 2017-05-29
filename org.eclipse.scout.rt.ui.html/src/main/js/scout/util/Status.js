@@ -32,7 +32,7 @@ scout.Status.Severity = {
   ERROR: 0x1000000
 };
 
-scout.Status.cssClasses = 'has-error has-warning has-info';
+scout.Status.SEVERITY_CSS_CLASSES = 'error warning info ok';
 
 scout.Status.prototype.cssClass = function() {
   return scout.Status.cssClassForSeverity(this.severity);
@@ -96,21 +96,30 @@ scout.Status.clone = function(original) {
   return original ? original.clone() : null;
 };
 
+/**
+ * @param {number} severity
+ * @returns {string}
+ * @static
+ */
 scout.Status.cssClassForSeverity = function(severity) {
-  var isInfo = (severity > scout.Status.Severity.OK);
-  var isWarning = (severity > scout.Status.Severity.INFO);
-  var isError = (severity > scout.Status.Severity.WARNING);
+  var cssSeverity,
+    Severity = scout.Status.Severity;
 
-  if (isError) {
-    return 'has-error';
+  switch (severity) {
+    case Severity.OK:
+      cssSeverity = 'ok';
+      break;
+    case Severity.INFO:
+      cssSeverity = 'info';
+      break;
+    case Severity.WARNING:
+      cssSeverity = 'warning';
+      break;
+    case Severity.ERROR:
+      cssSeverity = 'error';
+      break;
   }
-  if (isWarning) {
-    return 'has-warning';
-  }
-  if (isInfo) {
-    return 'has-info';
-  }
-  return '';
+  return cssSeverity;
 };
 
 scout.Status.animateStatusMessage = function($status, message) {

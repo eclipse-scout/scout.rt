@@ -344,33 +344,33 @@ scout.DateField.prototype._renderAllowedDates = function() {
 scout.DateField.prototype._renderErrorStatus = function() {
   scout.DateField.parent.prototype._renderErrorStatus.call(this);
   var hasStatus = !!this.errorStatus,
-    statusClass = hasStatus ? this.errorStatus.cssClass() : '';
+    statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
 
   if (this.$dateField) {
-    this.$dateField.removeClass(scout.Status.cssClasses);
+    this.$dateField.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.$dateField.toggleClass(statusClass, hasStatus);
 
     // Because the error color of field icons depends on the error status of sibling <input> elements.
     // The prediction fields are clones of the input fields, so the 'has-error' class has to be
     // removed from them as well to make the icon "valid".
     if (this._$predictDateField) {
-      this._$predictDateField.removeClass(scout.Status.cssClasses);
+      this._$predictDateField.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
       this._$predictDateField.toggleClass(statusClass, hasStatus);
     }
   }
 
   // Do the same for the time field
   if (this.$timeField) {
-    this.$timeField.removeClass(scout.Status.cssClasses);
+    this.$timeField.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.$timeField.toggleClass(statusClass, hasStatus);
     if (this._$predictTimeField) {
-      this._$predictTimeField.removeClass(scout.Status.cssClasses);
+      this._$predictTimeField.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
       this._$predictTimeField.toggleClass(statusClass, hasStatus);
     }
   }
 
   if (this.hasDate && this.popup) {
-    this.popup.$container.removeClass(scout.Status.cssClasses);
+    this.popup.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.popup.$container.toggleClass(statusClass, hasStatus);
   }
 };
