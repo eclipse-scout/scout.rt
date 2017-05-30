@@ -474,7 +474,7 @@ scout.SmartField2.prototype._onIconMousedown = function(event) {
 };
 
 scout.SmartField2.prototype.togglePopup = function() {
-  $.log.info('(SmartField2#togglePopup) popup=', this.popup);
+  $.log.info('(SmartField2#togglePopup) popupOpen=', this.isPopupOpen());
   if (this.isPopupOpen()) {
     this.closePopup();
   } else {
