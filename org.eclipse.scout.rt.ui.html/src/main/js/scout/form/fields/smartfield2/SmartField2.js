@@ -584,13 +584,19 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
 
 
 scout.SmartField2.prototype._isNavigationKey = function(event) {
-  var w = event.which;
-  return w === scout.keys.PAGE_UP ||
-    w === scout.keys.PAGE_DOWN ||
-    w === scout.keys.UP ||
-    w === scout.keys.DOWN ||
-    w === scout.keys.HOME ||
-    w === scout.keys.END;
+  var navigationKeys = [
+    scout.keys.PAGE_UP,
+    scout.keys.PAGE_DOWN,
+    scout.keys.UP,
+    scout.keys.DOWN
+  ];
+
+  if (this.isDropdown()) {
+    navigationKeys.push(scout.keys.HOME);
+    navigationKeys.push(scout.keys.END);
+  }
+
+  return scout.isOneOf(event.which, navigationKeys);
 };
 
 scout.SmartField2.prototype._isFunctionKey = function(e) {

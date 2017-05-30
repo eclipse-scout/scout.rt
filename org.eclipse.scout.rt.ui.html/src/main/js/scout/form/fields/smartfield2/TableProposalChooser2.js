@@ -81,6 +81,10 @@ scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
     tableRows.push(this._createTableRow(lookupRow, multipleColumns));
   }, this);
   this.model.insertRows(tableRows);
+
+  if (tableRows.length === 1) {
+    this.selectFirstLookupRow();
+  }
 };
 
 scout.TableProposalChooser2.prototype.selectFirstLookupRow = function() {
