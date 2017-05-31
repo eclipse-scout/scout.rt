@@ -77,8 +77,8 @@ scout.SplitBox.prototype._render = function() {
     if (this.splitterEnabled) {
       // Update mouse position (see resizeMove() for details)
       var mousePosition = {
-        x: event.clientX,
-        y: event.clientY
+        x: event.pageX,
+        y: event.pageY
       };
 
       // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
@@ -110,14 +110,14 @@ scout.SplitBox.prototype._render = function() {
     var SNAP_SIZE = 25;
 
     function resizeMove(event) {
-      if (event.clientX === mousePosition.x && event.clientY === mousePosition.y) {
+      if (event.pageX === mousePosition.x && event.pageY === mousePosition.y) {
         // Chrome bug: https://code.google.com/p/chromium/issues/detail?id=161464
         // When holding the mouse, but not moving it, a 'mousemove' event is fired every second nevertheless.
         return;
       }
       mousePosition = {
-        x: event.clientX,
-        y: event.clientY
+        x: event.pageX,
+        y: event.pageY
       };
 
       if (this.splitHorizontal) { // "|"
