@@ -1,8 +1,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +61,29 @@ public class IncrementalTreeBuilderTest {
     rows.add(new LookupRow<Long>(2L, "").withParentKey(1L));
     List<List<ILookupRow<Long>>> paths = builder.createPaths(rows, tree);
     assertTrue(paths.size() == 2);
+  }
+
+  @Test
+  public void testCreatePaths_NullKeyLookupRow() {
+    final Map<Long, ILookupRow<Long>> lookupRowsMap = new HashMap<>();
+    lookupRowsMap.put(1L, new LookupRow<Long>(1L, "A"));
+    lookupRowsMap.put(2L, new LookupRow<Long>(2L, "A-B").withParentKey(1L));
+    lookupRowsMap.put(null, new LookupRow<Long>(null, "(none)"));
+    Collection<ILookupRow<Long>> rows = lookupRowsMap.values();
+
+    IKeyLookupProvider<Long> provider = new IKeyLookupProvider<Long>() {
+
+      @Override
+      public ILookupRow<Long> getLookupRow(Long key) {
+        return lookupRowsMap.get(key);
+      }
+    };
+
+    ITree tree = createTestTree();
+    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(provider);
+
+    List<List<ILookupRow<Long>>> paths = builder.createPaths(rows, tree);
+    assertEquals(3, paths.size());
   }
 
   private ITree createTestTree() {
