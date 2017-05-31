@@ -99,13 +99,18 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
     Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> parentMap = createParentMap(existingTree);
     List<List<ILookupRow<LOOKUP_KEY>>> paths = new ArrayList<>();
     for (ILookupRow<LOOKUP_KEY> row : lookupRows) {
-      //build path to root for this row
+      // build path to root for this row
       List<ILookupRow<LOOKUP_KEY>> path = new ArrayList<>();
       ILookupRow<LOOKUP_KEY> r = row;
       while (r != null) {
         path.add(0, r);
+        LOOKUP_KEY parentKey = r.getParentKey();
+        if (parentKey == null) {
+          // no parent
+          break;
+        }
         if (!parentMap.containsKey(r.getKey())) {
-          ILookupRow<LOOKUP_KEY> parentRow = getLookupRow(r.getParentKey());
+          ILookupRow<LOOKUP_KEY> parentRow = getLookupRow(parentKey);
           parentMap.put(r.getKey(), parentRow);
         }
         r = parentMap.get(r.getKey());
