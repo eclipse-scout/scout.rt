@@ -57,8 +57,10 @@ scout.TreeProposalChooser2.prototype.selectFirstLookupRow = function() {
  * @param {scout.LookupRow[]} lookupRows
  * @param {boolean} appendResult whether or not we must delete the tree
  */
-scout.TreeProposalChooser2.prototype.setLookupRows = function(lookupRows, appendResult) {
-  var treeNodes, treeNodesFlat;
+scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
+  var treeNodes, treeNodesFlat,
+    lookupRows = result.lookupRows,
+    appendResult = scout.nvl(result.appendResult, false);
 
   if (appendResult) {
     treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
@@ -78,6 +80,32 @@ scout.TreeProposalChooser2.prototype.setLookupRows = function(lookupRows, append
     treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
     treeNodes = this._flatListToSubTree(treeNodesFlat);
     this.model.insertNodes(treeNodes);
+  }
+
+  if (result.browse) {
+    this.trySelectCurrentValue();
+  } else if (treeNodes.length === 1) {
+    this.selectFirstLookupRow();
+  }
+};
+
+scout.TreeProposalChooser2.prototype.trySelectCurrentValue = function() {
+  var currentValue = this._smartField().value;
+  if (scout.objects.isNullOrUndefined(currentValue)) {
+    return;
+  }
+  var allTreeNodes = scout.objects.values(this.model.nodesMap);
+  var treeNode = allTreeNodes.find(function(node) {
+    return node.lookupRow.key === currentValue;
+  });
+  if (treeNode) {
+    this.model.selectNode(treeNode);
+  }
+};
+
+scout.TreeProposalChooser2.prototype.selectFirstLookupRow = function() {
+  if (this.model.nodes.length) {
+    this.model.selectNode(this.model.nodes[0]);
   }
 };
 

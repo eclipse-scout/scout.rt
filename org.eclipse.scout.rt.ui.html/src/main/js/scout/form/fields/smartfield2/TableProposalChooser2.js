@@ -49,6 +49,7 @@ scout.TableProposalChooser2.prototype._createModel = function() {
     headerVisible: headerVisible,
     autoResizeColumns: autoResize,
     multiSelect: false,
+    scrollToSelection: true,
     columns: columns
   });
 
@@ -72,8 +73,10 @@ scout.TableProposalChooser2.prototype.triggerLookupRowSelected = function(row) {
   });
 };
 
-scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
-  var tableRows = [],
+scout.TableProposalChooser2.prototype.setLookupResult = function(result) {
+  var
+    tableRows = [],
+    lookupRows = result.lookupRows,
     multipleColumns = !!this._smartField().columnDescriptors;
 
   this.model.deleteAllRows();
@@ -82,8 +85,23 @@ scout.TableProposalChooser2.prototype.setLookupRows = function(lookupRows) {
   }, this);
   this.model.insertRows(tableRows);
 
-  if (tableRows.length === 1) {
+  if (result.browse) {
+    this.trySelectCurrentValue();
+  } else if (tableRows.length === 1) {
     this.selectFirstLookupRow();
+  }
+};
+
+scout.TableProposalChooser2.prototype.trySelectCurrentValue = function() {
+  var currentValue = this._smartField().value;
+  if (scout.objects.isNullOrUndefined(currentValue)) {
+    return;
+  }
+  var tableRow = this.model.rows.find(function(row) {
+    return row.lookupRow.key === currentValue;
+  });
+  if (tableRow) {
+    this.model.selectRow(tableRow);
   }
 };
 

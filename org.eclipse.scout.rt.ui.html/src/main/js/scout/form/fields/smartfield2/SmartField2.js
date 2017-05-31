@@ -335,10 +335,10 @@ scout.SmartField2.prototype._formatValue = function(value) {
 };
 
 /**
- * @param {boolean} [lookupAll] whether or not the lookup call should execute getAll() or getByText() with the current display text
+ * @param {boolean} [browse] whether or not the lookup call should execute getAll() or getByText() with the current display text
  */
-scout.SmartField2.prototype.openPopup = function(lookupAll) {
-  $.log.info('SmartField2#openPopup lookupAll=' + lookupAll + ' popup=' + this.popup);
+scout.SmartField2.prototype.openPopup = function(browse) {
+  $.log.info('SmartField2#openPopup browse=' + browse + ' popup=' + this.popup);
   // Reset scheduled focus next tabbable when user clicks on the smartfield
   // while a lookup is resolved.
   this._tabPrevented = null;
@@ -351,11 +351,11 @@ scout.SmartField2.prototype.openPopup = function(lookupAll) {
   // In case the field is invalid, we always want to start a lookup with the current display text
   // unless the error was 'no results' because in that case it would be pointless to search for that text
   if (this.errorStatus && this.errorStatus.errorCode !== scout.SmartField2.ErrorCode.NO_RESULTS) {
-    lookupAll = false;
+    browse = false;
   }
 
   var promise;
-  if (lookupAll) {
+  if (browse) {
     promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
     $.log.debug('(SmartField2#openPopup) getAll()');
   } else {
@@ -363,7 +363,10 @@ scout.SmartField2.prototype.openPopup = function(lookupAll) {
     promise = this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText));
     $.log.debug('(SmartField2#openPopup) getByText() searchText=', searchText);
   }
-  promise.done(this._lookupByTextOrAllDone.bind(this));
+  promise.done(function(result) {
+    result.browse = browse;
+    this._lookupByTextOrAllDone(result);
+  }.bind(this));
 };
 
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {

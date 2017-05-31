@@ -31,8 +31,8 @@ scout.ProposalChooser2.prototype._createModel = function($parent) {
   throw new Error('_createModel() not implemented');
 };
 
-scout.ProposalChooser2.prototype.setLookupRows = function(lookupRows) {
-  throw new Error('setLookupRows() not implemented');
+scout.ProposalChooser2.prototype.setLookupResult = function(result) {
+  throw new Error('setLookupResult() not implemented');
 };
 
 scout.ProposalChooser2.prototype.selectFirstLookupRow = function() {
@@ -203,10 +203,6 @@ scout.ProposalChooser2.prototype.setStatus = function(status) {
 scout.ProposalChooser2.prototype.setBusy = function(busy) {
   this.model.setProperty('loading', busy);
   this.model.setProperty('enabled', !busy);
-};
-
-scout.ProposalChooser2.prototype.setLookupResult = function(result) {
-  this.setLookupRows(result.lookupRows, scout.nvl(result.appendResult, false));
 };
 
 scout.ProposalChooser2.prototype._smartField = function() {
