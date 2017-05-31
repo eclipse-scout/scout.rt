@@ -17,6 +17,7 @@ import java.util.TimeZone;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -137,21 +138,31 @@ public class UtcDateTimeAdapter extends XmlAdapter<String, Date> {
 
     // local time of given timezone (or UTC timezone if missing)
     final XMLGregorianCalendar localTime = FACTORY.newXMLGregorianCalendar(rawValue);
+    if (localTime.getYear() == DatatypeConstants.FIELD_UNDEFINED
+        || localTime.getMonth() == DatatypeConstants.FIELD_UNDEFINED
+        || localTime.getDay() == DatatypeConstants.FIELD_UNDEFINED
+        || localTime.getHour() == DatatypeConstants.FIELD_UNDEFINED
+        || localTime.getMinute() == DatatypeConstants.FIELD_UNDEFINED) {
+      // date and time components are required
+      return null;
+    }
     final long utcMillis = localTime.toGregorianCalendar(null, null, ZULU_DEFAULTS).getTimeInMillis();
 
-    // UTC time
-    final GregorianCalendar zuluTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-    zuluTime.setTimeInMillis(utcMillis);
-    beforeUnmarshall(zuluTime);
+    final Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(utcMillis);
+    beforeUnmarshall(calendar);
 
-    return new Date(zuluTime.getTimeInMillis());
+    return calendar.getTime();
   }
 
   /**
    * Method invoked to intercept a 'zulu' time before being marshalled.
    * <p>
-   * The default implementation does nothing.
+   * The default implementation does nothing. TODO [8.0] hmu: remove
+   *
+   * @deprecated will be removed in 7.1
    */
+  @Deprecated
   protected void beforeMarshall(final XMLGregorianCalendar zuluTime) {
     // NOOP
   }
@@ -159,8 +170,11 @@ public class UtcDateTimeAdapter extends XmlAdapter<String, Date> {
   /**
    * Method invoked to intercept a 'zulu' time before being unmarshalled.
    * <p>
-   * The default implementation does nothing.
+   * TODO [8.0] hmu: remove
+   *
+   * @deprecated will be removed in 7.1 The default implementation does nothing.
    */
+  @Deprecated
   protected void beforeUnmarshall(final Calendar zuluTime) {
     // NOOP
   }
