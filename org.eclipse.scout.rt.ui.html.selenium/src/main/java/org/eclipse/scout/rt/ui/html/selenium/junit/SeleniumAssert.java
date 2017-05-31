@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public final class SeleniumAssert {
 
@@ -33,8 +34,8 @@ public final class SeleniumAssert {
    *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
    *          all of these classes, otherwise the assert will fail.
    */
-  public static void assertCssClass(WebElement element, String expectedCssClass) {
-    internalAssertCssClass(element, expectedCssClass, false);
+  public static void assertCssClass(AbstractSeleniumTest test, WebElement element, String expectedCssClass) {
+    test.waitUntil(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass));
   }
 
   /**
@@ -43,23 +44,8 @@ public final class SeleniumAssert {
    * @param element
    * @param expectedCssClass
    */
-  public static void assertCssClassNotExists(WebElement element, String expectedCssClass) {
-    internalAssertCssClass(element, expectedCssClass, true);
-  }
-
-  private static void internalAssertCssClass(WebElement element, String expectedCssClass, boolean mode) throws AssertionError {
-    String cssClassAttr = element.getAttribute("class");
-    if (cssClassAttr == null) {
-      throw new AssertionError("element has no 'class' attribute");
-    }
-    String[] expectedCssClassParts = expectedCssClass.split(" ");
-    for (String expectedCssClassPart : expectedCssClassParts) {
-      if (cssClassAttr.contains(expectedCssClassPart) == mode) {
-        String errorByMode = mode ? "contains '%s', but shouldn't." : "doesn't contain '%s'.";
-        throw new AssertionError("attribute 'class' " + String.format(errorByMode, expectedCssClassPart)
-            + " element='" + element.getTagName() + "' class='" + cssClassAttr + "'");
-      }
-    }
+  public static void assertCssClassNotExists(AbstractSeleniumTest test, WebElement element, String expectedCssClass) {
+    test.waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass)));
   }
 
   public static void assertInputFieldValue(AbstractSeleniumTest test, WebElement inputField, String expectedValue) {

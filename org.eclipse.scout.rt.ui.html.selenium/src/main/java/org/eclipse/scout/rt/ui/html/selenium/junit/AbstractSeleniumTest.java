@@ -182,23 +182,23 @@ public abstract class AbstractSeleniumTest {
    * Fills the given value into the first <code>input</code> {@link WebElement} that represents the given model class.
    * In turn, that field is the focus owner.
    */
-  public void fillInputField(Class<? extends IValueField<?>> modelClass, String value) {
-    fillInputField(null, modelClass, value);
+  public WebElement fillInputField(Class<? extends IValueField<?>> modelClass, String value) {
+    return fillInputField(null, modelClass, value);
   }
 
   /**
    * Fills the given value into the first <code>input</code> {@link WebElement} that represents the given model class,
    * and which is located somewhere beneath the given parent. In turn, that field is the focus owner.
    */
-  public void fillInputField(WebElement parent, Class<? extends IValueField<?>> modelClass, String value) {
+  public WebElement fillInputField(WebElement parent, Class<? extends IValueField<?>> modelClass, String value) {
     WebElement inputField = waitUntilInputFieldClickable(parent, modelClass);
-    fillInputField(inputField, value);
+    return fillInputField(inputField, value);
   }
 
   /**
    * Fills in the given value into the given {@link WebElement}.
    */
-  public void fillInputField(WebElement inputField, String value) {
+  public WebElement fillInputField(WebElement inputField, String value) {
     inputField.click();
     variablePause(1);
     inputField.clear();
@@ -209,6 +209,7 @@ public abstract class AbstractSeleniumTest {
     variablePause(2);
     switchTo().activeElement().sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
     shortPause();
+    return inputField;
   }
 
   /**
@@ -482,5 +483,28 @@ public abstract class AbstractSeleniumTest {
         }
       }
     });
+  }
+
+  /**
+   * Fails when the given element does not contain all of the given CSS classes.
+   *
+   * @param element
+   * @param expectedCssClass
+   *          A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
+   *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
+   *          all of these classes, otherwise the assert will fail.
+   */
+  public void assertCssClass(WebElement element, String expectedCssClass) {
+    waitUntil(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass));
+  }
+
+  /**
+   * Fails when the given element contains at least one of the given CSS classes.
+   *
+   * @param element
+   * @param expectedCssClass
+   */
+  public void assertCssClassNotExists(WebElement element, String expectedCssClass) {
+    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass)));
   }
 }

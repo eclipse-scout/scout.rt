@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.selenium.util;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -158,6 +160,49 @@ public final class SeleniumExpectedConditions {
             element, attributeName, value, comparator.getClass().getSimpleName(), m_actualValue);
       }
     };
+  }
+
+  /**
+   * Waits until the given element has the requested CSS class.
+   */
+  public static ExpectedCondition<Boolean> elementToHaveCssClass(final WebElement element, final String cssClass) {
+    return new ExpectedCondition<Boolean>() {
+      private String m_actualValue = null;
+
+      @Override
+      public Boolean apply(WebDriver driver) {
+        try {
+          m_actualValue = element.getAttribute("class");
+          if (m_actualValue == null) {
+            return null;
+          }
+          return hasCssClass(m_actualValue, cssClass);
+        }
+        catch (StaleElementReferenceException e) { // NOSONAR
+          return null;
+        }
+      }
+
+      @Override
+      public String toString() {
+        return String.format("element '%s' should have class '%s', but has '%s'",
+            element, cssClass, m_actualValue);
+      }
+    };
+  }
+
+  private static boolean hasCssClass(String cssClass, String expectedCssClass) throws AssertionError {
+    if (cssClass == null || expectedCssClass == null) {
+      return false;
+    }
+    String[] cssClasses = cssClass.split(" ");
+    String[] expectedCssClasses = expectedCssClass.split(" ");
+    for (String expectedCssClassPart : expectedCssClasses) {
+      if (CollectionUtility.contains(Arrays.asList(cssClasses), expectedCssClassPart)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static ExpectedCondition<Boolean> tableToHaveNumberOfRows(final WebElement table, final int numRows) {
