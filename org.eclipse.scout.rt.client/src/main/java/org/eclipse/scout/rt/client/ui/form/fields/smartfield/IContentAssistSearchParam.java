@@ -10,4 +10,6 @@ public interface IContentAssistSearchParam<LOOKUP_KEY> {
 
   boolean isByParentSearch();
 
+  String getWildcard();
+
 }

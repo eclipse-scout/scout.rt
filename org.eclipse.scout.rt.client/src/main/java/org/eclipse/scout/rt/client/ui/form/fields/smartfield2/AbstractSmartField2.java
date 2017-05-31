@@ -1029,7 +1029,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
-    IContentAssistSearchParam<VALUE> param = ContentAssistSearchParam.createTextParam(toSearchText(text), selectCurrentValue);
+    IContentAssistSearchParam<VALUE> param = ContentAssistSearchParam.createTextParam(getWildcard(), toSearchText(text), selectCurrentValue);
     doSearch(param, synchronous);
   }
 

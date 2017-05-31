@@ -8,12 +8,14 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
   private final LOOKUP_KEY m_parentKey;
   private final boolean m_isByParentSearch;
   private final boolean m_selectCurrentValue;
+  private final String m_wildcard;
 
-  ContentAssistSearchParam(String searchText, LOOKUP_KEY parentKey, boolean isByParentSearch, boolean selectCurrentValue) {
-    m_parentKey = parentKey;
-    m_selectCurrentValue = selectCurrentValue;
+  ContentAssistSearchParam(String wildcard, String searchText, LOOKUP_KEY parentKey, boolean isByParentSearch, boolean selectCurrentValue) {
+    m_wildcard = wildcard;
     m_searchText = searchText;
+    m_parentKey = parentKey;
     m_isByParentSearch = isByParentSearch;
+    m_selectCurrentValue = selectCurrentValue;
   }
 
   @Override
@@ -37,6 +39,11 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
   }
 
   @Override
+  public String getWildcard() {
+    return m_wildcard;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -44,6 +51,7 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
     result = prime * result + ((m_parentKey == null) ? 0 : m_parentKey.hashCode());
     result = prime * result + ((m_searchText == null) ? 0 : m_searchText.hashCode());
     result = prime * result + (m_selectCurrentValue ? 1231 : 1237);
+    result = prime * result + ((m_wildcard == null) ? 0 : m_wildcard.hashCode());
     return result;
   }
 
@@ -81,6 +89,14 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
     if (m_selectCurrentValue != other.m_selectCurrentValue) {
       return false;
     }
+    if (m_wildcard == null) {
+      if (other.m_wildcard != null) {
+        return false;
+      }
+    }
+    else if (!m_wildcard.equals(other.m_wildcard)) {
+      return false;
+    }
     return true;
   }
 
@@ -90,15 +106,16 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
         .attr("searchText", m_searchText)
         .attr("parentKey", m_parentKey)
         .attr("selectCurrentValue", m_selectCurrentValue)
+        .attr("wildcard", m_wildcard)
         .toString();
   }
 
-  public static <LOOKUP_KEY> IContentAssistSearchParam<LOOKUP_KEY> createTextParam(String searchText, boolean selectCurrentValue) {
-    return new ContentAssistSearchParam<LOOKUP_KEY>(searchText, null, false, selectCurrentValue);
+  public static <LOOKUP_KEY> IContentAssistSearchParam<LOOKUP_KEY> createTextParam(String wildcard, String searchText, boolean selectCurrentValue) {
+    return new ContentAssistSearchParam<LOOKUP_KEY>(wildcard, searchText, null, false, selectCurrentValue);
   }
 
   public static <LOOKUP_KEY> IContentAssistSearchParam<LOOKUP_KEY> createParentParam(LOOKUP_KEY parentKey, boolean selectCurrentValue) {
-    return new ContentAssistSearchParam<LOOKUP_KEY>(null, parentKey, true, selectCurrentValue);
+    return new ContentAssistSearchParam<LOOKUP_KEY>(null, null, parentKey, true, selectCurrentValue);
   }
 
 }

@@ -29,6 +29,7 @@ public class UiTextContributor implements IUiTextContributor {
         "SmartFieldInactiveRow",
         "SmartFieldNotUnique",
         "SmartFieldMoreThanXRows",
+        "SmartFieldNoDataFound",
         "NavigationBackward",
         "InvalidValueMessageX",
         "InvalidNumberMessageX",

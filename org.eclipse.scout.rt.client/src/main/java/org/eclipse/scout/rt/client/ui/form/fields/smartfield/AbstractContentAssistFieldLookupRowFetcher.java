@@ -78,7 +78,8 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
 
   @Override
   public IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
-    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(searchText, selectCurrentValue);
+    String wildcard = getContentAssistField().getWildcard();
+    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(wildcard, searchText, selectCurrentValue);
     return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(Collections.<ILookupRow<LOOKUP_KEY>> emptyList(), null, param);
   }
 

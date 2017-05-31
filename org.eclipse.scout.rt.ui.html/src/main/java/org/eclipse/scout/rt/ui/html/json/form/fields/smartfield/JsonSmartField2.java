@@ -224,10 +224,13 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       lookupRows.put(lookupRowToJson(lookupRow, multipleColumns));
     }
     json.put("lookupRows", lookupRows);
+    json.put("searchText", result.getSearchText());
     if (result.isLookupFailed()) {
       json.put("lookupFailed", result.isLookupFailed());
     }
-    json.put("searchText", result.getSearchText());
+    if (result.isNoData()) {
+      json.put("noData", result.isNoData());
+    }
     return json;
   }
 

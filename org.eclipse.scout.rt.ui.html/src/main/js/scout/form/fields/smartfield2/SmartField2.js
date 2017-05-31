@@ -387,7 +387,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   var numLookupRows = result.lookupRows.length;
-  if (numLookupRows === 0) {
+  if (numLookupRows === 0 &&!result.noData) {
     this.closePopup();
     this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
@@ -400,6 +400,14 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   if (numLookupRows > this.browseMaxRowCount) {
     popupStatus = scout.Status.info({
       message: this.session.text('SmartFieldMoreThanXRows', this.browseMaxRowCount)
+    });
+  }
+
+  // We don't want to set an error status on the field for the 'no data' case
+  // Only show the message as status in the proposal chooser popup
+  if (result.noData) {
+    popupStatus = scout.Status.info({
+      message: this.session.text('SmartFieldNoDataFound')
     });
   }
 
