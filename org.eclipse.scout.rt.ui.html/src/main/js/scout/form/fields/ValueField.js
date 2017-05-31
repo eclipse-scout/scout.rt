@@ -89,7 +89,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
 };
 
 scout.ValueField.prototype.parseAndSetValue = function(displayText) {
-  this.setErrorStatus(null);
+  this.clearErrorStatus();
   try {
     var event = new scout.Event({
       displayText: displayText
@@ -228,7 +228,11 @@ scout.ValueField.prototype._updateErrorStatus = function(status) {
     // Don't override the error status specified by the init model
     return;
   }
-  this.setErrorStatus(status);
+  if (!status) {
+    this.clearErrorStatus();
+  } else {
+    this.setErrorStatus(status);
+  }
 };
 
 scout.ValueField.prototype._updateDisplayText = function(value) {

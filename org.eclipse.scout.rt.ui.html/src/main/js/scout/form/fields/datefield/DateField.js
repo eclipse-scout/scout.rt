@@ -514,13 +514,16 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
     return;
   }
 
-  if (displayText && !this._isDateValid()) {
-    // If there is an error, try to parse the date. If it may be parsed, the error was likely a validation error.
-    // In that case use the parsed date as starting point and not the for the user invisible value
-    var parsedValue = this.isolatedDateFormat.parse(displayText, pickerStartDate);
-    if (parsedValue) {
-      pickerStartDate = parsedValue;
-      this._setDateValid(true);
+  if (event.which === scout.keys.UP || event.which === scout.keys.DOWN ||
+      event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
+    if (displayText && !this._isDateValid()) {
+      // If there is an error, try to parse the date. If it may be parsed, the error was likely a validation error.
+      // In that case use the parsed date as starting point and not the for the user invisible value
+      var parsedValue = this.isolatedDateFormat.parse(displayText, pickerStartDate);
+      if (parsedValue) {
+        pickerStartDate = parsedValue;
+        this._setDateValid(true);
+      }
     }
   }
   if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {

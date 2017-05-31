@@ -445,7 +445,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
     @Override
     public void setErrorStatusFromUI(ParsingFailedStatus errorStatus) {
-      removeErrorStatus(ParsingFailedStatus.class);
+      clearErrorStatus();
       if (errorStatus != null) {
         addErrorStatus(errorStatus);
       }

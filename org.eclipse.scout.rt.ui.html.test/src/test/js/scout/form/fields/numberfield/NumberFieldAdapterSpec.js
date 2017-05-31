@@ -38,6 +38,21 @@ describe('NumberFieldAdapter', function() {
       expect(field.errorStatus).toBe(null);
     });
 
+    it('prevents clearing the error status', function() {
+      // The error status is handled completely by the server, thus it must not be cleared by JS, even if the value is valid
+      // Use case: SequenceBox with number fields, second field contains smaller (invalid) value than first one, user types another too small value
+      // -> error status must stay (server won't send another error status because the message has not changed)
+      field.modelAdapter._syncPropertiesOnPropertyChange({errorStatus: {
+        message: 'error status from server'
+      }});
+      field.render();
+      expect(field.errorStatus.message).toBe('error status from server');
+
+      field.$field.val(5);
+      field.acceptInput();
+      expect(field.errorStatus.message).toBe('error status from server');
+    });
+
   });
 
   it('supports the calculator', function() {

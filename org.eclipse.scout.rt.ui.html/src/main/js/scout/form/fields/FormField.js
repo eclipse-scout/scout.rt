@@ -197,8 +197,25 @@ scout.FormField.prototype._remove = function() {
   this._uninstallDragAndDropHandler();
 };
 
+scout.FormField.prototype.setMandatory = function(mandatory) {
+  this.setProperty('mandatory', mandatory);
+};
+
 scout.FormField.prototype._renderMandatory = function() {
   this.$container.toggleClass('mandatory', this.mandatory);
+};
+
+scout.FormField.prototype.setErrorStatus = function(errorStatus) {
+  this.setProperty('errorStatus', errorStatus);
+};
+
+scout.FormField.prototype._setErrorStatus = function(errorStatus) {
+  errorStatus = scout.Status.ensure(errorStatus);
+  this._setProperty('errorStatus', errorStatus);
+};
+
+scout.FormField.prototype.clearErrorStatus = function() {
+  this.setErrorStatus(null);
 };
 
 scout.FormField.prototype._renderErrorStatus = function() {
@@ -218,6 +235,10 @@ scout.FormField.prototype._renderErrorStatus = function() {
   } else {
     this._hideStatusMessage();
   }
+};
+
+scout.FormField.prototype.setTooltipText = function(tooltipText) {
+  this.setProperty('tooltipText', tooltipText);
 };
 
 scout.FormField.prototype._renderTooltipText = function() {
@@ -241,6 +262,10 @@ scout.FormField.prototype._renderVisible = function() {
       htmlCompParent.invalidateLayoutTree();
     }
   }
+};
+
+scout.FormField.prototype.setLabel = function(label) {
+  this.setProperty('label', label);
 };
 
 scout.FormField.prototype._renderLabel = function() {
@@ -367,6 +392,31 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   }
 };
 
+/**
+ * Changes the enabled property of this form field to the given value.
+ * @param enabled
+ *          Required. The new enabled value
+ * @param updateParents
+ *          (optional) If true the enabled property of all parent form fields are updated to same value as well.
+ * @param updateChildren
+ *          (optional) If true the enabled property of all child form fields (recursive) are updated to same value as well.
+ */
+scout.FormField.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
+  scout.FormField.parent.prototype.setEnabled.call(this, enabled);
+
+  if (enabled && updateParents) {
+    this.visitParents(function(field) {
+      field.setEnabled(true);
+    });
+  }
+
+  if (updateChildren) {
+    this.visit(function(field) {
+      field.setEnabled(enabled);
+    });
+  }
+};
+
 scout.FormField.prototype._setEnabled = function(enabled) {
   this._setProperty('enabled', enabled);
   var parentEnabled = enabled;
@@ -419,6 +469,10 @@ scout.FormField.prototype._renderLabelBackgroundColor = function() {
   scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
+scout.FormField.prototype._setGridData = function(gridData) {
+  this._setProperty('gridData', new scout.GridData(gridData));
+};
+
 scout.FormField.prototype._renderGridData = function() {
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
@@ -428,16 +482,13 @@ scout.FormField.prototype._renderGridData = function() {
   }
 };
 
-scout.FormField.prototype._renderMenus = function() {
-  this._updateMenus();
+scout.FormField.prototype.setMenus = function(menus) {
+  this.setProperty('menus', menus);
 };
 
-scout.FormField.prototype._renderMenusVisible = function() {
-  this._updateMenus();
-};
-
-scout.FormField.prototype._renderPreventInitialFocus = function() {
-  this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
+scout.FormField.prototype._setMenus = function(menus) {
+  this.updateKeyStrokes(menus, this.menus);
+  this._setProperty('menus', menus);
 };
 
 scout.FormField.prototype._getCurrentMenus = function() {
@@ -455,72 +506,25 @@ scout.FormField.prototype._updateMenus = function() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };
 
-scout.FormField.prototype._setGridData = function(gridData) {
-  this._setProperty('gridData', new scout.GridData(gridData));
-};
-
-scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
-  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
-  this._setProperty('keyStrokes', keyStrokes);
-};
-
-scout.FormField.prototype._setMenus = function(menus) {
-  this.updateKeyStrokes(menus, this.menus);
-  this._setProperty('menus', menus);
-};
-
-scout.FormField.prototype._setErrorStatus = function(errorStatus) {
-  errorStatus = scout.Status.ensure(errorStatus);
-  this._setProperty('errorStatus', errorStatus);
-};
-
-scout.FormField.prototype.setLabel = function(label) {
-  this.setProperty('label', label);
-};
-
-scout.FormField.prototype.setTooltipText = function(tooltipText) {
-  this.setProperty('tooltipText', tooltipText);
-};
-
-/**
- * Changes the enabled property of this form field to the given value.
- * @param enabled
- *          Required. The new enabled value
- * @param updateParents
- *          (optional) If true the enabled property of all parent form fields are updated to same value as well.
- * @param updateChildren
- *          (optional) If true the enabled property of all child form fields (recursive) are updated to same value as well.
- */
-scout.FormField.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
-  scout.FormField.parent.prototype.setEnabled.call(this, enabled);
-
-  if (enabled && updateParents) {
-    this.visitParents(function(field) {
-      field.setEnabled(true);
-    });
-  }
-
-  if (updateChildren) {
-    this.visit(function(field) {
-      field.setEnabled(enabled);
-    });
-  }
-};
-
-scout.FormField.prototype.setErrorStatus = function(errorStatus) {
-  this.setProperty('errorStatus', errorStatus);
-};
-
-scout.FormField.prototype.setMenus = function(menus) {
-  this.setProperty('menus', menus);
+scout.FormField.prototype._renderMenus = function() {
+  this._updateMenus();
 };
 
 scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   this.setProperty('menusVisible', menusVisible);
 };
 
-scout.FormField.prototype.setMandatory = function(mandatory) {
-  this.setProperty('mandatory', mandatory);
+scout.FormField.prototype._renderMenusVisible = function() {
+  this._updateMenus();
+};
+
+scout.FormField.prototype._renderPreventInitialFocus = function() {
+  this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
+};
+
+scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
+  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
+  this._setProperty('keyStrokes', keyStrokes);
 };
 
 /**

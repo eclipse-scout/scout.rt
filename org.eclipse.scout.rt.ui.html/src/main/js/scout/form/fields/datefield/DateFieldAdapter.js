@@ -18,6 +18,17 @@ scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);
 /**
  * @override
  */
+scout.DateFieldAdapter.prototype._init = function(model) {
+  scout.DateFieldAdapter.parent.prototype._init.call(this, model);
+  this._errorStatus = scout.Status.ensure(model.errorStatus);
+  if (this._errorStatus) {
+    this._errorStatusDisplayText = model.displayText;
+  }
+};
+
+/**
+ * @override
+ */
 scout.DateFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   var data = {
       displayText: this.widget.displayText,

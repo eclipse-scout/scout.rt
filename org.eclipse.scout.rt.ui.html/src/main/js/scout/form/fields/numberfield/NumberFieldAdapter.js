@@ -25,3 +25,20 @@ scout.NumberFieldAdapter.prototype._onWidgetEvent = function(event) {
     scout.NumberFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
 };
+
+scout.NumberFieldAdapter.modifyPrototype = function() {
+  if (!scout.app.remote) {
+    return;
+  }
+
+  scout.objects.replacePrototypeFunction(scout.NumberField, 'clearErrorStatus', function() {
+    if (this.modelAdapter) {
+      // Don't do anything -> let server handle it
+      return;
+    } else {
+      return this.clearErrorStatusOrig();
+    }
+  }, true);
+};
+
+scout.addAppListener('bootstrap', scout.NumberFieldAdapter.modifyPrototype);
