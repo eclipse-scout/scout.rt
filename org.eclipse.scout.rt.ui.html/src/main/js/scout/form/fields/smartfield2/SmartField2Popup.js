@@ -20,6 +20,9 @@ scout.SmartField2Popup.prototype._init = function(options) {
   this.proposalChooser = this._createProposalChooser();
   this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
   this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
+
+  this.setLookupResult(options.lookupResult);
+  this.setStatus(options.status);
 };
 
 scout.SmartField2Popup.prototype._createProposalChooser = function() {

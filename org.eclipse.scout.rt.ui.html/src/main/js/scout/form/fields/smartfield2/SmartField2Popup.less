@@ -1,15 +1,27 @@
 .dropdown-field-popup, .smart-field-popup {
   &.animate-open {
-    #scout.transform-origin(top);
     #scout.transform(scaleY(0));
     #scout.animation-name(grow-y);
-    #scout.animation-duration(0.3s);
+    #scout.animation-duration(0.15s);
+
+    &.down {
+      #scout.transform-origin(top);
+    }
+    &.up {
+      #scout.transform-origin(bottom);
+    }
   }
 
   &.removed {
-    #scout.transform-origin(top);
     #scout.animation-name(shrink-y);
     #scout.animation-duration(0.15s);
+
+    &.down {
+      #scout.transform-origin(top);
+    }
+    &.up {
+      #scout.transform-origin(bottom);
+    }
   }
 }
 

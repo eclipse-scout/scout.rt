@@ -31,6 +31,7 @@ scout.SmartField2 = function() {
   this.columnDescriptors = null;
   this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
   this.pristine = true; // FIXME [awe] 7.0 - SF2: use touched property instead? or remove?
+  this._lastUserAction = null; // typing, selecting
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -142,6 +143,12 @@ scout.SmartField2.prototype.acceptInput = function() {
     searchText = this._readDisplayText(),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
+  // in case the user has typed something after he has selected a lookup row
+  // --> ignore the selection.
+  if ('typing' === this._lastUserAction) {
+    selectedLookupRow = null;
+  }
+
   // abort pending lookups
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
@@ -164,7 +171,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   // 2.) proposal chooser is open -> use the selected row as value
   if (selectedLookupRow) {
-    $.log.debug('(SmartField2#acceptInput) lookup-row selected. Set lookup-row, close popup', selectedLookupRow);
+    $.log.debug('(SmartField2#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
     this.setLookupRow(selectedLookupRow);
     this._inputAccepted();
     return;
@@ -440,11 +447,12 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   // Render popup, if not yet rendered and set results
-  if (!this.popup) {
+  if (this.popup) {
+    this.popup.setLookupResult(result);
+    this.popup.setStatus(popupStatus);
+  } else {
     this._renderPopup(result, popupStatus);
   }
-  this.popup.setLookupResult(result);
-  this.popup.setStatus(popupStatus);
 };
 
 scout.SmartField2.prototype._renderPopup = function(result, status) {
@@ -458,7 +466,9 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
     $anchor: this.$field,
     boundToAnchor: true,
     closeOnAnchorMousedown: false,
-    field: this
+    field: this,
+    lookupResult: result,
+    status: status
   });
 
   this.popup.open();
@@ -524,6 +534,7 @@ scout.SmartField2.prototype.togglePopup = function() {
 scout.SmartField2.prototype._onFieldBlur = function(event) {
   scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
   this.setSearching(false);
+  this._lastUserAction = null;
 };
 
 scout.SmartField2.prototype._onFieldKeyup = function(event) {
@@ -564,6 +575,7 @@ scout.SmartField2.prototype._onFieldKeyup = function(event) {
   // We don't use _displayText() here because we always want the text the
   // user has typed.
   if (this.isPopupOpen()) {
+    this._lastUserAction = 'typing';
     this._lookupByText();
   } else {
     $.log.debug('(SmartField2#_onFieldKeyup)');
@@ -600,13 +612,11 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
-//      if (this._isPreventDefaultTabHandling()) {
         event.preventDefault();
         $.log.info('(SmartField2#_onFieldKeydown) set _tabPrevented');
         this._tabPrevented = {
           shiftKey: event.shiftKey
         };
-//      }
     }
     this.acceptInput();
     return;
@@ -614,6 +624,7 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
 
   if (this._isNavigationKey(event)) {
     if (this.isPopupOpen()) {
+      this._lastUserAction = 'selecting';
       this.popup.delegateKeyEvent(event);
     } else {
       this.openPopup(true);

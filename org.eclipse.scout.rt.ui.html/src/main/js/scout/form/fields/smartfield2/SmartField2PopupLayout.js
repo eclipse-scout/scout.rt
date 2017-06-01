@@ -19,6 +19,8 @@
  */
 scout.SmartField2PopupLayout = function(popup) {
   scout.SmartField2PopupLayout.parent.call(this, popup);
+
+  this.animating = false;
 };
 scout.inherits(scout.SmartField2PopupLayout, scout.PopupLayout);
 
@@ -26,17 +28,28 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
   var size, popupSize,
     htmlProposalChooser = this._htmlProposalChooser();
 
+  // skip layout while CSS animation is running
+  if (this.animating) {
+    return;
+  }
+
   scout.SmartField2PopupLayout.parent.prototype.layout.call(this, $container);
 
   popupSize = this.popup.htmlComp.getSize();
-  if (htmlProposalChooser) {
-    size = popupSize.subtract(this.popup.htmlComp.getInsets());
-    htmlProposalChooser.setSize(size);
-  }
-  // Reposition because opening direction may have to be switched if popup gets bigger
-  // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
+  size = popupSize.subtract(this.popup.htmlComp.getInsets());
+  htmlProposalChooser.setSize(size);
+
   if (this.popup.htmlComp.layouted) {
+    // Reposition because opening direction may have to be switched if popup gets bigger
+    // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
     this.popup.position();
+  } else {
+    // The first time it gets layouted, add CSS class to be able to animate
+    this.animating = true;
+    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+      this.animating = false;
+    }.bind(this));
+    this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
   }
 };
 

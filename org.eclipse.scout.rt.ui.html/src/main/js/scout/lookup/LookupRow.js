@@ -26,3 +26,7 @@ scout.LookupRow.prototype.setKey = function(key) {
 scout.LookupRow.prototype.setText = function(text) {
   this.text = text;
 };
+
+scout.LookupRow.prototype.toString = function() {
+  return 'scout.LookupRow[key=' + this.key + ' text=' + this.text + ']';
+};
