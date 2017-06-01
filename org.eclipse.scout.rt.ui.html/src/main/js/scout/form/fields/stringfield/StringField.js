@@ -27,7 +27,7 @@ scout.StringField = function() {
 };
 scout.inherits(scout.StringField, scout.BasicField);
 
-scout.StringField.FORMAT = {
+scout.StringField.Format = {
   LOWER: 'a' /* IStringField.FORMAT_LOWER */ ,
   UPPER: 'A' /* IStringField.FORMAT_UPPER */
 };
@@ -189,11 +189,33 @@ scout.StringField.prototype._renderHasAction = function() {
   }
 };
 
+scout.StringField.prototype.setFormatUpper = function(formatUpper) {
+  if (formatUpper) {
+    this.setFormat(scout.StringField.Format.UPPER);
+  } else {
+    this.setFormat(null);
+  }
+};
+
+scout.StringField.prototype.setFormatLower = function(formatLower) {
+  if (formatLower) {
+    this.setFormat(scout.StringField.Format.LOWER);
+  } else {
+    this.setFormat(null);
+  }
+};
+
+scout.StringField.prototype.setFormat = function(format) {
+  this.setProperty('format', format);
+};
+
 scout.StringField.prototype._renderFormat = function() {
-  if (this.format === scout.StringField.FORMAT.LOWER) {
+  if (this.format === scout.StringField.Format.LOWER) {
     this.$field.css('text-transform', 'lowercase');
-  } else if (this.format === scout.StringField.FORMAT.UPPER) {
+  } else if (this.format === scout.StringField.Format.UPPER) {
     this.$field.css('text-transform', 'uppercase');
+  } else {
+    this.$field.css('text-transform', '');
   }
 };
 
