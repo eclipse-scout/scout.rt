@@ -19,8 +19,8 @@ scout.StringField = function() {
   this.selectionStart = 0;
   this.selectionEnd = 0;
   this.selectionTrackingEnabled = false;
+  this.spellCheckEnabled = false;
   this.trimText = true;
-  this.updateDisplayTextOnModify = false;
   this.wrapText = false;
 
   this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
@@ -126,6 +126,10 @@ scout.StringField.prototype.addIcon = function() {
     .on('click', this._onIconClick.bind(this));
 };
 
+scout.StringField.prototype.setMaxLength = function(maxLength) {
+  this.setProperty('maxLength', maxLength);
+};
+
 scout.StringField.prototype._renderMaxLength = function() {
   // Check if "maxLength" attribute is supported by browser
   if (this.$field[0].maxLength) {
@@ -133,14 +137,26 @@ scout.StringField.prototype._renderMaxLength = function() {
   } else {
     // Fallback for IE9
     this.$field.on('keyup paste', function(e) {
-      setTimeout(function() {
-        var text = this.$field.val();
-        if (text.length > this.maxLength) {
-          this.$field.val(text.slice(0, this.maxLength));
-        }
-      }.bind(this), 0);
+      setTimeout(truncate.bind(this), 0);
     }.bind(this));
   }
+
+  // Make sure current text does not exceed max length
+  truncate.call(this);
+  if (!this.rendering) {
+    this.parseAndSetValue(this._readDisplayText());
+  }
+
+  function truncate() {
+    var text = this.$field.val();
+    if (text.length > this.maxLength) {
+      this.$field.val(text.slice(0, this.maxLength));
+    }
+  }
+};
+
+scout.StringField.prototype.setSelectionStart = function(selectionStart) {
+  this.setProperty('selectionStart', selectionStart);
 };
 
 scout.StringField.prototype._renderSelectionStart = function() {
@@ -149,10 +165,18 @@ scout.StringField.prototype._renderSelectionStart = function() {
   }
 };
 
+scout.StringField.prototype.setSelectionEnd = function(selectionEnd) {
+  this.setProperty('selectionEnd', selectionEnd);
+};
+
 scout.StringField.prototype._renderSelectionEnd = function() {
   if (scout.nvl(this.selectionEnd, null) !== null) {
     this.$field[0].selectionEnd = this.selectionEnd;
   }
+};
+
+scout.StringField.prototype.setSelectionTrackingEnabled = function(selectionTrackingEnabled) {
+  this.setProperty('selectionTrackingEnabled', selectionTrackingEnabled);
 };
 
 scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
@@ -169,11 +193,19 @@ scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
   }
 };
 
+scout.StringField.prototype.setInputMasked = function(inputMasked) {
+  this.setProperty('inputMasked', inputMasked);
+};
+
 scout.StringField.prototype._renderInputMasked = function() {
   if (this.multilineText) {
     return;
   }
   this.$field.attr('type', (this.inputMasked ? 'password' : 'text'));
+};
+
+scout.StringField.prototype.setHasAction = function(hasAction) {
+  this.setProperty('hasAction', hasAction);
 };
 
 scout.StringField.prototype._renderHasAction = function() {
@@ -219,6 +251,10 @@ scout.StringField.prototype._renderFormat = function() {
   }
 };
 
+scout.StringField.prototype.setSpellCheckEnabled = function(spellCheckEnabled) {
+  this.setProperty('spellCheckEnabled', spellCheckEnabled);
+};
+
 scout.StringField.prototype._renderSpellCheckEnabled = function() {
   if (this.spellCheckEnabled) {
     this.$field.attr('spellcheck', 'true');
@@ -227,6 +263,9 @@ scout.StringField.prototype._renderSpellCheckEnabled = function() {
   }
 };
 
+/**
+ * @override
+ */
 scout.StringField.prototype._renderDisplayText = function() {
   var displayText = scout.strings.nvl(this.displayText);
   var oldDisplayText = scout.strings.nvl(this.$field.val());
@@ -286,8 +325,16 @@ scout.StringField.prototype._insertText = function(textToInsert) {
   this.acceptInput();
 };
 
+scout.StringField.prototype.setWrapText = function(wrapText) {
+  this.setProperty('wrapText', wrapText);
+};
+
 scout.StringField.prototype._renderWrapText = function() {
   this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
+};
+
+scout.StringField.prototype.setTrimText = function(trimText) {
+  this.setProperty('trimText', trimText);
 };
 
 scout.StringField.prototype._renderTrimText = function() {

@@ -16,6 +16,7 @@ scout.BasicField = function() {
   this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
   this.disabledCopyOverlay = true;
   this._displayTextModifiedTimeoutId = null;
+  this.updateDisplayTextOnModify = false;
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 

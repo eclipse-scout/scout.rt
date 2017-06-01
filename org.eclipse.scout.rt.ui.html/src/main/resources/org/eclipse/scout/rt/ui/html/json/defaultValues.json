@@ -42,6 +42,9 @@
         "heightInPixel": 0
       }
     },
+    "BasicField": {
+      "updateDisplayTextOnModify": false
+    },
     "ValueField": {
       "displayText": ""
     },
@@ -157,8 +160,8 @@
       "selectionTrackingEnabled": false,
       "selectionStart": 0,
       "selectionEnd": 0,
+      "spellCheckEnabled": false,
       "trimText": true,
-      "updateDisplayTextOnModify": false,
       "wrapText": false
     },
     "WrappedFormField": {
@@ -362,6 +365,11 @@
       "TreeField": null,
       "TreeBox": null,
       "ValueField": {
+        "BasicField": {
+          "ColorField": null,
+          "NumberField": null,
+          "StringField": null
+        },
         "BeanField": null,
         "CheckBoxField": null,
         "CalendarField": null,
@@ -370,12 +378,10 @@
         "FileChooserField": null,
         "HtmlField": null,
         "LabelField": null,
-        "NumberField": null,
         "SmartField": {
           "SmartFieldMultiline": null
         },
         "SliderField": null,
-        "StringField": null,
         "RadioButtonGroup": null
       },
       "WizardProgressField": null,
