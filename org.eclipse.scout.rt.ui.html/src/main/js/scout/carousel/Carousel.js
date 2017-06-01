@@ -119,7 +119,7 @@ scout.Carousel.prototype._renderCurrentStatusItem = function() {
 scout.Carousel.prototype.recalcTransformation = function() {
   this.positionX = this.currentItem * this.$container.width() * -1;
   this.$carouselFilmstrip.css({
-    "transform": " translateX(" + this.positionX + "px)"
+    transform: 'translateX(' + this.positionX + 'px)'
   });
 };
 
@@ -190,7 +190,7 @@ scout.Carousel.prototype._registerCarouselFilmstripEventListeners = function() {
       var positionX = origPosition + moveX;
       if (positionX !== this.positionX && positionX <= 0 && positionX >= minPositionX) {
         this.$carouselFilmstrip.css({
-          "transform": " translateX(" + positionX + "px)"
+          transform: 'translateX(' + positionX + 'px)'
         });
         this.positionX = positionX;
         // item

@@ -163,7 +163,7 @@ scout.PageWithTable.prototype._onLoadTableDataDone = function(tableData) {
 
 scout.PageWithTable.prototype._onLoadTableDataFail = function(error) {
   this.detailTable.setTableStatus(scout.Status.error({
-    message: this.session.text("ErrorWhileLoadingData")
+    message: this.session.text('ErrorWhileLoadingData')
   }));
   $.log.error('Failed to load tableData. error=', error);
 };

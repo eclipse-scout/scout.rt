@@ -88,12 +88,12 @@ scout.GroupBoxGridMatrixCursor.prototype.decrement = function() {
 
 scout.GroupBoxGridMatrixCursor.prototype.toString = function() {
   var builder = [];
-  builder.push("MatrixCursor [");
-  builder.push("orientation=" + this.orientation);
-  builder.push(", startX=" + this.startX);
-  builder.push(", startY=" + this.startY);
-  builder.push(", columnCount=" + this.columnCount);
-  builder.push(", currentIndex=" + this._currentIndex.x + ", " + this._currentIndex.y);
-  builder.push("]");
-  return builder.join("");
+  builder.push('MatrixCursor [');
+  builder.push('orientation=' + this.orientation);
+  builder.push(', startX=' + this.startX);
+  builder.push(', startY=' + this.startY);
+  builder.push(', columnCount=' + this.columnCount);
+  builder.push(', currentIndex=' + this._currentIndex.x + ', ' + this._currentIndex.y);
+  builder.push(']');
+  return builder.join('');
 };
