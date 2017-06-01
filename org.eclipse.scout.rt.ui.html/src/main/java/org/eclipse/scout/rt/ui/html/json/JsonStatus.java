@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.json.JSONObject;
 
 public class JsonStatus implements IJsonObject {
@@ -46,4 +47,19 @@ public class JsonStatus implements IJsonObject {
     }
     return new JsonStatus(status).toJson();
   }
+
+  public static IStatus toScoutObject(JSONObject jsonStatus) {
+    if (jsonStatus == null) {
+      return null;
+    }
+    String message = jsonStatus.optString("message");
+    int severity = jsonStatus.getInt("severity");
+    String iconId = jsonStatus.optString("iconId");
+    Status status = new Status(message, severity);
+    if (iconId != null) {
+      status.withIconId(iconId);
+    }
+    return status;
+  }
+
 }

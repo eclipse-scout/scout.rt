@@ -11,7 +11,7 @@
 scout.SmartField2Adapter = function() {
   scout.SmartField2Adapter.parent.call(this);
 
-  this._addRemoteProperties(['value', 'activeFilter']);
+  this._addRemoteProperties(['value', 'activeFilter', 'errorStatus', 'displayText']);
 };
 scout.inherits(scout.SmartField2Adapter, scout.ValueFieldAdapter);
 

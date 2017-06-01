@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
@@ -148,11 +150,27 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     if (IValueField.PROP_VALUE.equals(propertyName)) {
       handleUiPropertyChangeValue(data);
     }
+    else if (IValueField.PROP_DISPLAY_TEXT.equals(propertyName)) {
+      String displayText = data.optString(IValueField.PROP_DISPLAY_TEXT);
+      addPropertyEventFilterCondition(ISmartField2.PROP_DISPLAY_TEXT, displayText);
+      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    }
     else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
-      String activeFilterString = data.optString("activeFilter", null);
+      String activeFilterString = data.optString(ISmartField2.PROP_ACTIVE_FILTER, null);
       TriState activeFilter = TriState.valueOf(activeFilterString);
       addPropertyEventFilterCondition(ISmartField2.PROP_ACTIVE_FILTER, activeFilter);
-      getModel().setActiveFilter(activeFilter);
+      getModel().getUIFacade().setActiveFilterFromUI(activeFilter);
+    }
+    else if (IFormField.PROP_ERROR_STATUS.equals(propertyName)) {
+      // FIXME [awe] 7.0 - SF2: setErrorStatusFromUI wie in DateField UIFacade -> talk to C.GU, remove copy/paste
+      JSONObject status = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
+      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, status);
+      ParsingFailedStatus parseError = null;
+      if (status != null) {
+        String message = status.optString("message", null);
+        parseError = new ParsingFailedStatus(message, getModel().getDisplayText());
+      }
+      getModel().getUIFacade().setErrorStatusFromUI(parseError);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);

@@ -220,21 +220,24 @@ scout.SmartField2.prototype._acceptInputDone = function(result) {
 };
 
 scout.SmartField2.prototype._acceptInputFail = function(result) {
+  var searchText = result.searchText;
 
   // in any other case something went wrong
   var numLookupRows = result.lookupRows.length;
   if (numLookupRows === 0) {
     this.closePopup();
+    this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
-      message: this.session.text('SmartFieldCannotComplete', result.searchText),
+      message: this.session.text('SmartFieldCannotComplete', searchText),
       errorCode: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
     return;
   }
 
   if (numLookupRows > 1) {
+    this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
-      message: this.session.text('SmartFieldNotUnique', result.searchText),
+      message: this.session.text('SmartFieldNotUnique', searchText),
       errorCode: scout.SmartField2.ErrorCode.NOT_UNIQUE
     }));
     if (this.isPopupOpen()) {

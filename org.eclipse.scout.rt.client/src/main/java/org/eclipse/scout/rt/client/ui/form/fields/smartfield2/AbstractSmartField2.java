@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -51,7 +53,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistSearch
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.HierarchicalContentAssistDataFetcher;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldDataFetchResult;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldLookupRowFetcher;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ILookupRowProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.LookupRowHelper;
@@ -112,6 +113,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   private final EventListenerList m_listenerList = new EventListenerList();
+  private final ISmartField2UIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new SmartField2UIFacade(this), ModelContext.copyCurrent());
 
   // chooser security
   private Class<? extends ICodeType<?, VALUE>> m_codeTypeClass;
@@ -1327,8 +1329,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public IContentAssistFieldUIFacade getUIFacade() {
-    throw new UnsupportedOperationException();
+  public ISmartField2UIFacade getUIFacade() {
+    return m_uiFacade;
   }
 
   @Override
