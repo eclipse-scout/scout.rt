@@ -82,11 +82,7 @@ scout.Page.prototype._internalInitTable = function() {
     table = this._createTable();
   }
 
-  if (table) {
-    this._initTable(table);
-    table.setTableStatusVisible(this.tableStatusVisible);
-  }
-  this.detailTable = table;
+  this.setDetailTable(table);
 };
 
 scout.Page.prototype._internalInitDetailForm = function() {
@@ -94,7 +90,8 @@ scout.Page.prototype._internalInitDetailForm = function() {
   if (detailForm) {
     detailForm = this.getOutline()._createChild(detailForm);
   }
-  this.detailForm = detailForm;
+
+  this.setDetailForm(detailForm);
 };
 
 /**
@@ -120,7 +117,7 @@ scout.Page.prototype._ensureDetailForm = function() {
   if (this.detailForm) {
     return;
   }
-  this.detailForm = this.createDetailForm();
+  this.setDetailForm(this.createDetailForm());
 };
 
 // see Java: AbstractPage#pageActivatedNotify
@@ -153,6 +150,18 @@ scout.Page.prototype.pageForTableRow = function(row) {
     throw new Error('Table-row is not linked to a page');
   }
   return row.page;
+};
+
+scout.Page.prototype.setDetailForm = function(form) {
+  this.detailForm = form;
+};
+
+scout.Page.prototype.setDetailTable = function(table) {
+  if (table) {
+    this._initTable(table);
+    table.setTableStatusVisible(this.tableStatusVisible);
+  }
+  this.detailTable = table;
 };
 
 /**
