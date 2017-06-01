@@ -15,27 +15,24 @@ scout.FormTableControlLayout = function(control) {
 scout.inherits(scout.FormTableControlLayout, scout.AbstractLayout);
 
 scout.FormTableControlLayout.prototype.layout = function($container) {
-  if (!this.control.contentRendered) {
+  if (!this.control.contentRendered || !this.control.form) {
     return;
   }
 
-  var formSize,
-    form = this.control.form,
-    controlContentSize = scout.graphics.getSize(this.control.tableFooter.$controlContent);
-
-  if (this.control.form) {
-    var htmlForm = form.htmlComp;
+  var form = this.control.form,
+    htmlForm = form.htmlComp,
+    controlContentSize = scout.graphics.getSize(this.control.tableFooter.$controlContent),
     formSize = controlContentSize.subtract(htmlForm.getMargins());
-    htmlForm.setSize(formSize);
 
-    // special case: when the control is opened/resized and there is not enough space, ensure that the active element is
-    // visible by scrolling to it
-    if (form.rootGroupBox.fields[0] instanceof scout.TabBox) {
-      var tabBox = form.rootGroupBox.fields[0];
-      var tab = tabBox.selectedTab;
-      if (tab && tab.scrollable && tab.$body.has(document.activeElement)) {
-        scout.scrollbars.scrollTo(tab.$body, $(document.activeElement));
-      }
+  htmlForm.setSize(formSize);
+
+  // special case: when the control is opened/resized and there is not enough space, ensure that the active element is
+  // visible by scrolling to it
+  if (form.rootGroupBox.fields[0] instanceof scout.TabBox) {
+    var tabBox = form.rootGroupBox.fields[0];
+    var tab = tabBox.selectedTab;
+    if (tab && tab.scrollable && tab.$body.has(document.activeElement)) {
+      scout.scrollbars.scrollTo(tab.$body, $(document.activeElement));
     }
   }
 };
