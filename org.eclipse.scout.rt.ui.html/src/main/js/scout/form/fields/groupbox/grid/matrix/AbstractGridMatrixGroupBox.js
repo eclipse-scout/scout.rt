@@ -61,19 +61,19 @@ scout.AbstractGridMatrixGroupBox.prototype._isAllCellFree = function(x, y, w, h)
 };
 
 scout.AbstractGridMatrixGroupBox.prototype.toString = function() {
-  var ret = "----Group Box Grid Matrix [orientation="+this._cursor.orientation+", columnCount=" + this.getColumnCount() + ", rowCount=" + this.getRowCount() + "]--------------\n";
+  var ret = '----Group Box Grid Matrix [orientation=' + this._cursor.orientation + ', columnCount=' + this.getColumnCount() + ', rowCount=' + this.getRowCount() + ']--------------\n';
   var tempCursor = new scout.GroupBoxGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), this._cursor.orientation);
   while (tempCursor.increment()) {
     var cell = this._getAssignedCell(tempCursor.currentIndex());
-    ret += "cell[" + tempCursor.currentIndex().x + ", " + tempCursor.currentIndex().y + "] ";
+    ret += 'cell[' + tempCursor.currentIndex().x + ', ' + tempCursor.currentIndex().y + '] ';
     if (!cell) {
-      ret += "NULL";
+      ret += 'NULL';
     } else if (!cell.field) {
-      ret += "Placeholder";
+      ret += 'Placeholder';
     } else {
-      ret += cell.field + (cell.field ? ", [" + cell.field.label + "]" : "");
+      ret += cell.field + (cell.field ? ', [' + cell.field.label + ']' : '');
     }
-    ret += "\n";
+    ret += '\n';
   }
   return ret;
 };

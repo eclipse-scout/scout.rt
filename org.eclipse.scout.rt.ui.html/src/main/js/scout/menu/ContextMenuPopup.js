@@ -122,7 +122,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
 
           parentMenu.$subMenuBody.detach();
           this._installScrollbars();
-          this.$body.css('box-shadow', "");
+          this.$body.css('box-shadow', '');
           this.bodyAnimating = false;
           // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
           this._invalidateLayoutTreeAndRepositionPopup();

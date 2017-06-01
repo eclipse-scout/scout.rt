@@ -18,8 +18,8 @@ scout.ObjectFactory = function() {
   this._registry = {};
 };
 
-scout.ObjectFactory.NAMESPACE_SEPARATOR = ".";
-scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ":";
+scout.ObjectFactory.NAMESPACE_SEPARATOR = '.';
+scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ':';
 
 /**
  * Creates an object from the given objectType. Only the constructor is called.

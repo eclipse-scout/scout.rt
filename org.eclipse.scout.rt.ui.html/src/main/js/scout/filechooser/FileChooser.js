@@ -254,7 +254,7 @@ scout.FileChooser.prototype._renderFiles = function() {
     files.forEach(function(file) {
       var $file = this.$files.appendElement('<li>', 'file', file.name);
       // Append a space to allow the browser to break the line here when it gets too long
-      $file.append(" ");
+      $file.append(' ');
       var $remove = $file
         .appendSpan('remove menu-item')
         .on('click', this.removeFile.bind(this, file));

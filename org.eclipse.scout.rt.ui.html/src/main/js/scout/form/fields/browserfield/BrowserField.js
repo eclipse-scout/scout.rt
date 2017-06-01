@@ -29,8 +29,8 @@ scout.BrowserField = function() {
 scout.inherits(scout.BrowserField, scout.ValueField);
 
 scout.BrowserField.windowStates = {
-  WINDOW_OPEN: "true",
-  WINDOW_CLOSED: "false"
+  WINDOW_OPEN: 'true',
+  WINDOW_CLOSED: 'false'
 };
 
 scout.BrowserField.prototype._render = function($parent) {

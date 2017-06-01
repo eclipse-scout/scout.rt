@@ -24,7 +24,7 @@ scout.selenium = {
 
     scout.Session.prototype._sendCancelRequest = function() {
       setTimeout(origFunc.bind(scoutSession), delayMs);
-    }
+    };
   },
 
   restoreCancelRequest: function() {
@@ -32,7 +32,7 @@ scout.selenium = {
   },
 
   setSupportsTouch: function(touch) {
-    scout.device.features["_touch"] = true;
+    scout.device.features['_touch'] = true;
   },
 
   scrollToBottom: function($element) {

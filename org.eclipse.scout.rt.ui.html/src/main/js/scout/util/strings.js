@@ -266,7 +266,7 @@ scout.strings = {
     }
     string = this.asString(string);
     // see "escapeRegExp()" from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Using_special_characters
-    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& = last match
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& = last match
   },
 
   /**
