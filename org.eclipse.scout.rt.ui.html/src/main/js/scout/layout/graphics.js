@@ -241,6 +241,8 @@ scout.graphics = {
   }
 };
 
+//----------------------------------------------------------------------------
+
 /**
  * JavaScript port from java.awt.Point.
  */
@@ -263,6 +265,16 @@ scout.Point.prototype.equals = function(o) {
 scout.Point.prototype.clone = function(o) {
   return new scout.Point(this.x, this.y);
 };
+
+scout.Point.prototype.floor = function() {
+  return new scout.Point(Math.floor(this.x), Math.floor(this.y));
+};
+
+scout.Point.prototype.ceil = function() {
+  return new scout.Point(Math.ceil(this.x), Math.ceil(this.y));
+};
+
+//----------------------------------------------------------------------------
 
 /**
  * JavaScript port from java.awt.Dimension.
@@ -306,6 +318,16 @@ scout.Dimension.prototype.add = function(insets) {
     this.height + insets.vertical());
 };
 
+scout.Dimension.prototype.floor = function() {
+  return new scout.Dimension(Math.floor(this.width), Math.floor(this.height));
+};
+
+scout.Dimension.prototype.ceil = function() {
+  return new scout.Dimension(Math.ceil(this.width), Math.ceil(this.height));
+};
+
+//----------------------------------------------------------------------------
+
 /**
  * JavaScript port from java.awt.Rectangle.
  */
@@ -316,15 +338,15 @@ scout.Rectangle = function(x, y, width, height) {
   this.height = height || 0;
 };
 
+scout.Rectangle.prototype.toString = function() {
+  return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
+};
+
 scout.Rectangle.prototype.equals = function(o) {
   if (!o) {
     return false;
   }
   return (this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height);
-};
-
-scout.Rectangle.prototype.toString = function() {
-  return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
 };
 
 scout.Rectangle.prototype.clone = function(o) {
@@ -343,8 +365,8 @@ scout.Rectangle.prototype.subtract = function(insets) {
   return new scout.Rectangle(
     this.x + insets.left,
     this.y + insets.top,
-    this.width - insets.right,
-    this.height - insets.bottom);
+    this.width - insets.horizontal(),
+    this.height - insets.vertical());
 };
 
 scout.Rectangle.prototype.union = function(r) {
@@ -398,6 +420,16 @@ scout.Rectangle.prototype.union = function(r) {
   return new scout.Rectangle(tx1, ty1, tx2, ty2);
 };
 
+scout.Rectangle.prototype.floor = function() {
+  return new scout.Rectangle(Math.floor(this.x), Math.floor(this.y), Math.floor(this.width), Math.floor(this.height));
+};
+
+scout.Rectangle.prototype.ceil = function() {
+  return new scout.Rectangle(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.width), Math.ceil(this.height));
+};
+
+// ----------------------------------------------------------------------------
+
 /**
  * JavaScript port from java.awt.Insets.
  */
@@ -408,11 +440,19 @@ scout.Insets = function(top, right, bottom, left) {
   this.left = left || 0;
 };
 
+scout.Insets.prototype.toString = function() {
+  return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
+};
+
 scout.Insets.prototype.equals = function(o) {
   return this.top === o.top &&
     this.right === o.right &&
     this.bottom === o.bottom &&
     this.left === o.left;
+};
+
+scout.Insets.prototype.clone = function() {
+  return new scout.Insets(this.top, this.right, this.bottom, this.left);
 };
 
 scout.Insets.prototype.horizontal = function() {
@@ -423,45 +463,15 @@ scout.Insets.prototype.vertical = function() {
   return this.top + this.bottom;
 };
 
-scout.Insets.prototype.toString = function() {
-  return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
-};
-
-scout.Insets.prototype.clone = function() {
-  return new scout.Insets(this.top, this.right, this.bottom, this.left);
-};
-
 scout.Insets.prototype.floor = function() {
   return new scout.Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
 };
 
-/**
- * JavaScript port from java.util.TreeSet.
- */
-scout.TreeSet = function() {
-  this.array = [];
-  this.properties = {};
+scout.Insets.prototype.ceil = function() {
+  return new scout.Insets(Math.ceil(this.top), Math.ceil(this.right), Math.ceil(this.bottom), Math.ceil(this.left));
 };
 
-scout.TreeSet.prototype.add = function(value) {
-  if (!this.contains(value)) {
-    this.array.push(value);
-    this.array.sort();
-    this.properties[value] = true;
-  }
-};
-
-scout.TreeSet.prototype.size = function() {
-  return this.array.length;
-};
-
-scout.TreeSet.prototype.contains = function(value) {
-  return (value in this.properties);
-};
-
-scout.TreeSet.prototype.last = function() {
-  return this.array[this.array.length - 1];
-};
+// ----------------------------------------------------------------------------
 
 /**
  * HtmlEnvironment is used in place of org.eclipse.scout.rt.ui.swing.DefaultSwingEnvironment.
