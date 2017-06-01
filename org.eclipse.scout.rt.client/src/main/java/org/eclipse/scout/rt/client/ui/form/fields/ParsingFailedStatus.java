@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
  * Internal marker status for parsing errors.
@@ -25,6 +26,11 @@ public final class ParsingFailedStatus extends ScoutFieldStatus {
 
   public ParsingFailedStatus(String message, String parseInputString) {
     super(message, ERROR);
+    m_parseInputString = parseInputString;
+  }
+
+  public ParsingFailedStatus(IStatus status, String parseInputString) {
+    super(status.getMessage(), status.getIconId(), status.getSeverity(), status.getCode());
     m_parseInputString = parseInputString;
   }
 

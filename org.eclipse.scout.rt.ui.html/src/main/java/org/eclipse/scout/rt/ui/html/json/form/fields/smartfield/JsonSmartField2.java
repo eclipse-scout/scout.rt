@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -162,15 +163,14 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       getModel().getUIFacade().setActiveFilterFromUI(activeFilter);
     }
     else if (IFormField.PROP_ERROR_STATUS.equals(propertyName)) {
-      // FIXME [awe] 7.0 - SF2: setErrorStatusFromUI wie in DateField UIFacade -> talk to C.GU, remove copy/paste
-      JSONObject status = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
-      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, status);
-      ParsingFailedStatus parseError = null;
-      if (status != null) {
-        String message = status.optString("message", null);
-        parseError = new ParsingFailedStatus(message, getModel().getDisplayText());
+      // FIXME [awe] 7.0 - SF2: setErrorStatusFromUI wie in DateField UIFacade -> talk to C.GU, remove copy/paste, type/name of error seems to be wrong in case of smart-field
+      JSONObject jsonStatus = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
+      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, jsonStatus);
+      ParsingFailedStatus pfStatus = null;
+      if (jsonStatus != null) {
+        pfStatus = new ParsingFailedStatus(JsonStatus.toScoutObject(jsonStatus), getModel().getDisplayText());
       }
-      getModel().getUIFacade().setErrorStatusFromUI(parseError);
+      getModel().getUIFacade().setErrorStatusFromUI(pfStatus);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);

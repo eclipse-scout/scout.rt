@@ -264,9 +264,9 @@ scout.Form.prototype._renderStatus = function() {
   this.$statusIcons = [];
 
   if (this.status) {
-    var flatenStatus = this.status.getAllLeafStatus();
+    var statusList = this.status.asFlatList();
     var $prevIcon;
-    flatenStatus.forEach(function(sts) {
+    statusList.forEach(function(sts) {
       $prevIcon = this._renderSingleStatus(sts, $prevIcon);
       if ($prevIcon) {
         this.$statusIcons.push($prevIcon);

@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Status = function(model) {
-  this.message;
-  this.severity;
+  this.message = null;
+  this.severity = scout.Status.Severity.ERROR;
+  this.code = 0;
   $.extend(this, model);
 
   // severity may be a string (e.g. if set in a model json file) -> convert to real severity
@@ -51,27 +52,10 @@ scout.Status.prototype.isError = function() {
 };
 
 /**
- * @returns all leaf status, collected depth first.
+ * @returns {scout.Status[]} status including children as flat list.
  */
-scout.Status.prototype.getAllLeafStatus = function() {
-  var flatStatus = [];
-  collectLeafStatusRec(this);
-  return flatStatus;
-
-  // ----- Helper functions -----
-
-  function collectLeafStatusRec(status) {
-    if (!status) {
-      return;
-    }
-    if (status.children) {
-      status.children.forEach(function(childStatus) {
-        collectLeafStatusRec(childStatus);
-      });
-    } else { // leaf
-      flatStatus.push(status);
-    }
-  }
+scout.Status.prototype.asFlatList = function() {
+  return scout.Status.asFlatList(this);
 };
 
 /**
@@ -187,4 +171,21 @@ scout.Status.error = function(model) {
     severity: scout.Status.Severity.ERROR
   });
   return new scout.Status(model);
+};
+
+/**
+ * @returns {scout.Status[]} all Status objects as flat list (goes through the status hierarchy)
+ */
+scout.Status.asFlatList = function(status) {
+  if (!status) {
+    return [];
+  }
+  var list = [];
+  if (status.children) {
+    status.children.forEach(function(childStatus) {
+      scout.arrays.pushAll(list, scout.Status.asFlatList(childStatus));
+    });
+  }
+  list.push(status);
+  return list;
 };

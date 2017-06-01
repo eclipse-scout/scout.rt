@@ -226,19 +226,21 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
   var numLookupRows = result.lookupRows.length;
   if (numLookupRows === 0) {
     this.closePopup();
+    this.setValue(null);
     this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldCannotComplete', searchText),
-      errorCode: scout.SmartField2.ErrorCode.NO_RESULTS
+      code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
     return;
   }
 
   if (numLookupRows > 1) {
+    this.setValue(null);
     this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldNotUnique', searchText),
-      errorCode: scout.SmartField2.ErrorCode.NOT_UNIQUE
+      code: scout.SmartField2.ErrorCode.NOT_UNIQUE
     }));
     if (this.isPopupOpen()) {
       this.popup.setLookupResult(result);
@@ -353,7 +355,7 @@ scout.SmartField2.prototype.openPopup = function(browse) {
 
   // In case the field is invalid, we always want to start a lookup with the current display text
   // unless the error was 'no results' because in that case it would be pointless to search for that text
-  if (this.errorStatus && this.errorStatus.errorCode !== scout.SmartField2.ErrorCode.NO_RESULTS) {
+  if (this.errorStatus && !this._hasUiError(scout.SmartField2.ErrorCode.NO_RESULTS)) {
     browse = false;
   }
 
@@ -372,6 +374,32 @@ scout.SmartField2.prototype.openPopup = function(browse) {
   }.bind(this));
 };
 
+scout.SmartField2.prototype._hasUiError = function(codes) {
+  if (!this.errorStatus) {
+    return false;
+  }
+
+  if (codes) {
+    codes = scout.arrays.ensure(codes);
+  } else {
+    codes = [scout.SmartField2.ErrorCode.NO_RESULTS, scout.SmartField2.ErrorCode.NOT_UNIQUE];
+  }
+
+  // collect codes from the status hierarchy
+  var statusList = scout.Status.asFlatList(this.errorStatus);
+  var foundCodes = statusList.reduce(function(list, status) {
+    if (status.code && list.indexOf(status.code) === -1) {
+      list.push(status.code);
+    }
+    return list;
+  }, []);
+
+  // if one of the requested codes exist in the list of found codes
+  return codes.some(function(code) {
+    return foundCodes.indexOf(code) > -1;
+  });
+};
+
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   // In cases where the user has tabbed to the next field, while results for the previous
@@ -382,19 +410,16 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   // Remove error codes set from UI
-  if (this.errorStatus && (
-      this.errorStatus.errorCode === scout.SmartField2.ErrorCode.NO_RESULTS ||
-      this.errorStatus.errorCode === scout.SmartField2.ErrorCode.NOT_UNIQUE
-  )) {
+  if (this._hasUiError()) {
     this.setErrorStatus(null);
   }
 
   var numLookupRows = result.lookupRows.length;
   if (numLookupRows === 0 &&!result.noData) {
-    this.closePopup();
+    this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
     this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
-      errorCode: scout.SmartField2.ErrorCode.NO_RESULTS
+      code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
     return;
   }

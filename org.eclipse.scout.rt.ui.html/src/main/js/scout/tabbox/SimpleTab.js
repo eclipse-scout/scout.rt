@@ -139,9 +139,9 @@ scout.SimpleTab.prototype._renderStatus = function() {
   }.bind(this));
   this.$status = [];
   if (this.status) {
-    var flatenStatus = this.status.getAllLeafStatus();
+    var statusList = this.status.asFlatList();
     var $sibling = null;
-    flatenStatus.forEach(function(sts) {
+    statusList.forEach(function(sts) {
       $sibling = _renderSingleStatus.call(this, sts, $sibling);
       if ($sibling) {
         this.$status.push($sibling);
