@@ -18,7 +18,7 @@ scout.FormLifecycle.prototype._invalidElements = function() {
   var invalidFields = [];
 
   this.widget.visitFields(function(field) {
-    var result = field.validate();
+    var result = field.getValidationResult();
     if (result.valid) {
       return;
     }

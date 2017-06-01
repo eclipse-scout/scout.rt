@@ -18,12 +18,22 @@ scout.ValueField = function() {
   this.initialValue = null;
   this.invalidValueMessageKey = 'InvalidValueMessageX';
   this.value = null;
+  this.validators = [];
+  this.validators.push(this._validateValue.bind(this));
+  this.parser = this._parseValue.bind(this);
+  this.formatter = this._formatValue.bind(this);
   this._addCloneProperties(['value', 'displayText']);
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
 scout.ValueField.prototype._init = function(model) {
   scout.ValueField.parent.prototype._init.call(this, model);
+  if (this.validator) {
+    // Validators are kept in a list, allow a single validator to be set in the model, similar to parser and formatter.
+    // setValidator will add the new validator to this.validators and remove the other ones.
+    this.setValidator(this.validator);
+    delete this.validator;
+  }
   this._initValue(this.value);
 };
 
@@ -96,7 +106,7 @@ scout.ValueField.prototype.parseAndSetValue = function(displayText) {
     });
     this.trigger('parse', event);
     if (!event.defaultPrevented) {
-      var parsedValue = this._parseValue(displayText);
+      var parsedValue = this.parseValue(displayText);
       this.setValue(parsedValue);
     }
   } catch(error) {
@@ -122,10 +132,32 @@ scout.ValueField.prototype._createParsingFailedStatus = function(displayText, er
 };
 
 /**
- * Resets the value to its initial value.
+ * Replaces the existing parser. The parser is called during {@link #parseValue(displayText)}.
+ * <p>
+ * Remember calling the default parser passed as parameter to the parse function, if needed.
+ * @param {function} parser the new parser. If null, the default parser is used.
  */
-scout.ValueField.prototype.resetValue = function() {
-  this.setValue(this.initialValue);
+scout.ValueField.prototype.setParser = function(parser) {
+  this.setProperty('parser', parser);
+  if (this.initialized) {
+    this.parseAndSetValue(this.displayText);
+  }
+};
+
+scout.ValueField.prototype._setParser = function(parser) {
+  if (!parser) {
+    parser = this._parseValue.bind(this);
+  }
+  this._setProperty('parser', parser);
+};
+
+/**
+ * @returns the parsed value
+ * @throws a message, a scout.Status or an error if the parsing fails
+ */
+scout.ValueField.prototype.parseValue = function(displayText) {
+  var defaultParser = this._parseValue.bind(this);
+  return this.parser(displayText, defaultParser);
 };
 
 /**
@@ -177,12 +209,29 @@ scout.ValueField.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
 
+/**
+ * Resets the value to its initial value.
+ */
+scout.ValueField.prototype.resetValue = function() {
+  this.setValue(this.initialValue);
+};
+
+/**
+ * Default does nothing because the value field does not know which type the concrete field uses.
+ * May be overridden to cast the value to the required type.
+ * @returns the value with the correct type.
+ */
+scout.ValueField.prototype._ensureValue = function(value) {
+  return value;
+};
+
 scout.ValueField.prototype._setValue = function(value) {
   var oldValue = this.value;
   this._updateErrorStatus(null);
 
   try {
-    this.value = this._validateValue(value);
+    var typedValue = this._ensureValue(value);
+    this.value = this.validateValue(typedValue);
   } catch(error) {
     this._validationFailed(value, error);
     return;
@@ -196,6 +245,78 @@ scout.ValueField.prototype._setValue = function(value) {
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
+};
+
+/**
+ * Validates the value by executing the validators. If a new value is the result, it will be set.
+ */
+scout.ValueField.prototype.validate = function() {
+  this._setValue(this.value);
+};
+
+/**
+ * @param {function} validator the validator to be added
+ * @param {boolean} [revalidate] True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
+ */
+scout.ValueField.prototype.addValidator = function(validator, revalidate) {
+  var validators = this.validators.slice();
+  validators.push(validator);
+  this.setValidators(validators, revalidate);
+};
+
+/**
+ * @param {function} validator the validator to be removed
+ * @param {boolean} [revalidate] True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
+ */
+scout.ValueField.prototype.removeValidator = function(validator, revalidate) {
+  var validators = this.validators.slice();
+  scout.arrays.remove(validators, validator);
+  this.setValidators(validators, revalidate);
+};
+
+/**
+ * Replaces all existing validators with the given one. If you want to add multiple validators, use {@link #addValidator}.
+ * <p>
+ * Remember calling the default validator which is passed as parameter to the validate function, if needed.
+ * @param {function} validator the new validator which replaces every other. If null, the default validator is used.
+ */
+scout.ValueField.prototype.setValidator = function(validator, revalidate) {
+  if (!validator) {
+    validator = this._validateValue.bind(this);
+  }
+  var validators = [];
+  if (validator) {
+    validators = [validator];
+  }
+  this.setValidators(validators, revalidate);
+};
+
+scout.ValueField.prototype.setValidators = function(validators, revalidate) {
+  this.setProperty('validators', validators);
+  if (this.initialized && scout.nvl(revalidate, true)) {
+    this.validate();
+  }
+};
+
+/**
+ * @param the value to be validated
+ * @returns the validated value
+ * @throws a message, a scout.Status or an error if the validation fails
+ */
+scout.ValueField.prototype.validateValue = function(value) {
+  var defaultValidator = this._validateValue.bind(this);
+  this.validators.forEach(function(validator) {
+    value = validator(value, defaultValidator);
+  });
+  return value;
+};
+
+/**
+ * @returns the validated value
+ * @throws a message, a scout.Status or an error if the validation fails
+ */
+scout.ValueField.prototype._validateValue = function(value) {
+  return value;
 };
 
 scout.ValueField.prototype._validationFailed = function(value, error) {
@@ -241,7 +362,7 @@ scout.ValueField.prototype._updateDisplayText = function(value) {
     return;
   }
   value = scout.nvl(value, this.value);
-  var returned = this._formatValue(value);
+  var returned = this.formatValue(value);
   if (returned && $.isFunction(returned.promise)) {
     // Promise is returned -> set display text later
     returned
@@ -256,11 +377,31 @@ scout.ValueField.prototype._updateDisplayText = function(value) {
 };
 
 /**
- * @returns the validated value
- * @throws a message, a scout.Status or an error if the validation fails
+ * Replaces the existing formatter. The formatter is called during {@link #formatValue(value)}.
+ * <p>
+ * Remember calling the default formatter which is passed as parameter to the format function, if needed.
+ * @param {function} formatter the new formatter. If null, the default formatter is used.
  */
-scout.ValueField.prototype._validateValue = function(value) {
-  return value;
+scout.ValueField.prototype.setFormatter = function(formatter) {
+  this.setProperty('formatter', formatter);
+  if (this.initialized) {
+    this.validate();
+  }
+};
+
+scout.ValueField.prototype._setFormatter = function(formatter) {
+  if (!formatter) {
+    formatter = this._formatValue.bind(this);
+  }
+  this._setProperty('formatter', formatter);
+};
+
+/**
+ * @returns the formatted display text
+ */
+scout.ValueField.prototype.formatValue = function(value) {
+  var defaultFormatter = this._formatValue.bind(this);
+  return this.formatter(value, defaultFormatter);
 };
 
 /**

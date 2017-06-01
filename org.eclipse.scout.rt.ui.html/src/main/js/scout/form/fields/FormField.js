@@ -1033,7 +1033,10 @@ scout.FormField.prototype.computeRequiresSave = function() {
   return false;
 };
 
-scout.FormField.prototype.validate = function() {
+/**
+ * @returns {object} which contains 3 properties: valid, validByErrorStatus and validByMandatory
+ */
+scout.FormField.prototype.getValidationResult = function() {
   var validByErrorStatus = !this.errorStatus;
   var validByMandatory = !this.mandatory || !this.empty;
   var valid = validByErrorStatus && validByMandatory;

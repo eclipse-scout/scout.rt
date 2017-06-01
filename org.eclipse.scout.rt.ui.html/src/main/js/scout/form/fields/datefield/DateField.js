@@ -314,11 +314,22 @@ scout.DateField.prototype._setDisplayText = function(displayText) {
   this.timeDisplayText = parts.timeText;
 };
 
+/**
+ * @override
+ */
+scout.DateField.prototype._ensureValue = function(value) {
+  return scout.dates.ensure(value);
+};
+
+/**
+ * @param {Date} the date to validate
+ * @return {Date} the validated date
+ * @override
+ */
 scout.DateField.prototype._validateValue = function(value) {
   if (scout.objects.isNullOrUndefined(value)) {
     return value;
   }
-  value = scout.dates.ensure(value);
   if (!(value instanceof Date)) {
     throw this.session.text(this.invalidValueMessageKey, value);
   }
@@ -1123,6 +1134,17 @@ scout.DateField.prototype._createErrorStatus = function() {
     message: this.session.text('ui.InvalidDate'),
     severity: scout.Status.Severity.ERROR
   });
+};
+
+/**
+ * @override
+ */
+scout.DateField.prototype._createInvalidValueStatus = function(value, error) {
+  var errorStatus = scout.DateField.parent.prototype._createInvalidValueStatus.call(this, value, error);
+  // Set date and time to invalid, otherwise isDateValid and isTimeValid return false even though there is a validation error
+  errorStatus.invalidDate = true;
+  errorStatus.invalidTime = true;
+  return errorStatus;
 };
 
 scout.DateField.prototype._setDateValid = function(valid) {

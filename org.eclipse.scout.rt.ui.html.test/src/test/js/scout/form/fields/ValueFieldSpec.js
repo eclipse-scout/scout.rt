@@ -95,9 +95,9 @@ describe('ValueField', function() {
 
     it('does not set value if value is invalid initially', function() {
       var field = new scout.StringField();
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw "Validation failed";
-      };
+      });
       field.init({
         parent: session.desktop,
         value: 'Foo'
@@ -121,9 +121,9 @@ describe('ValueField', function() {
     it('does not override the errorStatus if an errorStatus set initially even if an invalid value is set', function() {
       // Don't override error status, otherwise specifying the error status would not have any effect
       var field = new scout.StringField();
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw "Validation failed";
-      };
+      });
       field.init({
         parent: session.desktop,
         value: 'Foo',
@@ -146,12 +146,12 @@ describe('ValueField', function() {
 
     it('calls validate and format when value is set initially', function() {
       var field = new scout.StringField();
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         return (value === 'gelb' ? 'rot' : value);
-      };
-      field._formatValue = function(value) {
+      });
+      field.setFormatter(function(value) {
         return (value === 'rot' ? 'lila' : value);
-      };
+      });
       field.init({
         parent: session.desktop,
         value: 'gelb'
@@ -177,9 +177,9 @@ describe('ValueField', function() {
 
     it('does not set the value but the error status and display text if the validation fails', function() {
       var field = helper.createField('StringField');
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw new Error('Validation failed');
-      };
+      });
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
@@ -188,16 +188,16 @@ describe('ValueField', function() {
 
     it('deletes the error status if value is valid', function() {
       var field = helper.createField('StringField');
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw new Error('Validation failed');
-      };
+      });
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
 
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         return value;
-      };
+      });
       field.setValue('Foo');
       expect(field.value).toBe('Foo');
       expect(field.errorStatus).toBe(null);
@@ -222,15 +222,38 @@ describe('ValueField', function() {
       expect(count).toBe(1);
     });
 
+    it('executes every validator when validating the value', function() {
+      var field = helper.createField('StringField');
+      field.addValidator(function(value) {
+        if (value === 'hi') {
+          throw 'Hi is not allowed';
+        }
+        return value;
+      }, false);
+      field.addValidator(function(value) {
+        if (value === 'hello') {
+          throw 'Hello is not allowed';
+        }
+        return value;
+      }, false);
+      expect(field.errorStatus).toBe(null);
+      field.setValue('hi');
+      expect(field.errorStatus.message).toBe('Hi is not allowed');
+      field.setValue('hello');
+      expect(field.errorStatus.message).toBe('Hello is not allowed');
+      field.setValue('Good evening');
+      expect(field.errorStatus).toBe(null);
+    });
+
   });
 
   describe('_validateValue', function() {
 
     it('may throw an error if value is invalid', function() {
       var field = helper.createField('StringField');
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw new Error('an error');
-      };
+      });
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus.message).toBe('[undefined text: InvalidValueMessageX]');
@@ -238,11 +261,11 @@ describe('ValueField', function() {
 
     it('may throw a scout.Status if value is invalid', function() {
       var field = helper.createField('StringField');
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw scout.Status.error({
           message: 'Custom message'
         });
-      };
+      });
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus.message).toBe('Custom message');
@@ -250,9 +273,9 @@ describe('ValueField', function() {
 
     it('may throw a message if value is invalid', function() {
       var field = helper.createField('StringField');
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw "Invalid value";
-      };
+      });
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus.message).toBe('Invalid value');
@@ -271,9 +294,9 @@ describe('ValueField', function() {
 
     it('does not set the value but the error status if the parsing fails', function() {
       var field = helper.createField('StringField');
-      field._parseValue = function(text) {
+      field.setParser(function(text) {
         throw new Error('Parsing failed');
-      };
+      });
       field.parseAndSetValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
@@ -281,16 +304,16 @@ describe('ValueField', function() {
 
     it('deletes the error status if parsing succeeds', function() {
       var field = helper.createField('StringField');
-      field._parseValue = function(value) {
+      field.setParser(function(value) {
         throw new Error('Validation failed');
-      };
+      });
       field.parseAndSetValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
 
-      field._parseValue = function(value) {
+      field.setParser(function(value) {
         return value;
-      };
+      });
       field.parseAndSetValue('Foo');
       expect(field.value).toBe('Foo');
       expect(field.errorStatus).toBe(null);
@@ -302,15 +325,15 @@ describe('ValueField', function() {
 
     it('accepts the current display text by calling parse, validate and format', function() {
       var field = helper.createField('StringField');
-      field._parseValue = function(displayText) {
+      field.setParser(function(displayText) {
         return (displayText === 'blau' ? 'gelb' : displayText);
-      };
-      field._validateValue = function(value) {
+      });
+      field.setValidator(function(value) {
         return (value === 'gelb' ? 'rot' : value);
-      };
-      field._formatValue = function(value) {
+      });
+      field.setFormatter(function(value) {
         return (value === 'rot' ? 'lila' : value);
-      };
+      });
       field._readDisplayText = function() {
         return 'blau';
       };
@@ -320,10 +343,6 @@ describe('ValueField', function() {
       // 'blau' -> (parse) 'gelb' -> (validate) 'rot' -> (format) 'lila'
       expect(field.displayText).toBe('lila');
     });
-
-  });
-
-  describe('acceptInput', function() {
 
     it('is triggered when input is accepted', function() {
       var field = helper.createField('StringField');
@@ -340,9 +359,9 @@ describe('ValueField', function() {
     it('contains the actual displayText even if it was changed using format value', function() {
       var field = helper.createField('StringField');
       field.render();
-      field._formatValue = function(value) {
+      field.setFormatter(function(value) {
         return 'formatted value';
-      };
+      });
 
       var displayText;
       field.on('acceptInput', function(event) {
@@ -351,6 +370,188 @@ describe('ValueField', function() {
       field.$field.val('a value');
       field.acceptInput();
       expect(displayText).toBe('formatted value');
+    });
+
+  });
+
+  describe('validator', function() {
+
+    it('may be set initially', function() {
+      var field = scout.create('StringField', {
+        parent: session.desktop,
+        value: 'hi',
+        validator: function(value, defaultValidator) {
+          value = defaultValidator(value);
+          if (value === 'hi') {
+            throw 'Hi is not allowed';
+          }
+          return value;
+        }
+      });
+      expect(field.validators.length).toBe(1);
+      expect(field.errorStatus.message).toBe('Hi is not allowed');
+      expect(field.value).toBe(null);
+    });
+
+  });
+
+  describe('addValidator', function() {
+
+    it('adds a validator and revalidates the value', function() {
+      var field = helper.createField('StringField');
+      field.setValue('hi');
+      field.addValidator(function(value) {
+        if (value === 'hi') {
+          throw 'Hi is not allowed';
+        }
+        return value;
+      });
+      expect(field.errorStatus.message).toBe('Hi is not allowed');
+      field.setValue('hello');
+      expect(field.errorStatus).toBe(null);
+    });
+
+  });
+
+  describe('removeValidator', function() {
+    var validator = function(value) {
+      if (value === 'hi') {
+        throw 'Hi is not allowed';
+      }
+      return value;
+    };
+
+    it('removes a validator and revalidates the value', function() {
+      var field = helper.createField('StringField');
+      field.setValue('hi');
+      field.addValidator(validator);
+      expect(field.errorStatus.message).toBe('Hi is not allowed');
+      field.removeValidator(validator);
+      expect(field.errorStatus).toBe(null);
+    });
+
+  });
+
+  describe('setValidator', function() {
+
+    it('removes every validator and sets the new one', function() {
+      var field = helper.createField('StringField');
+      expect(field.validators.length).toBe(1);
+      field.setValidator(function(value, defaultValidator) {
+        value = defaultValidator(value);
+        if (value === 'hi') {
+          throw 'Hi is not allowed';
+        }
+        return value;
+      });
+      expect(field.validators.length).toBe(1);
+      expect(field.errorStatus).toBe(null);
+      field.setValue('hi');
+      expect(field.errorStatus.message).toBe('Hi is not allowed');
+      field.setValue('Good evening');
+      expect(field.errorStatus).toBe(null);
+    });
+
+  });
+
+  describe('setValidators', function() {
+
+    it('replaces the list of validators with the given ones', function() {
+      var field = helper.createField('StringField');
+      field.setValidators([function(value) {
+        if (value === 'hi') {
+          throw 'Hi is not allowed';
+        }
+        return value;
+      }, function(value) {
+        if (value === 'hello') {
+          throw 'Hello is not allowed';
+        }
+        return value;
+      }]);
+      expect(field.validators.length).toBe(2);
+      expect(field.errorStatus).toBe(null);
+      field.setValue('hi');
+      expect(field.errorStatus.message).toBe('Hi is not allowed');
+      field.setValue('hello');
+      expect(field.errorStatus.message).toBe('Hello is not allowed');
+      field.setValue('Good evening');
+      expect(field.errorStatus).toBe(null);
+    });
+
+  });
+
+  describe('parser', function() {
+    it('may be set initially', function() {
+      var field = scout.create('StringField', {
+        parent: session.desktop,
+        parser: function(displayText, defaultParser) {
+          if (displayText) {
+            return displayText.replace(/-/g, '');
+          }
+          return defaultParser(displayText);
+        }
+      });
+      field.parseAndSetValue('1234-1234-1234-1234');
+      expect(field.value).toBe('1234123412341234');
+    });
+  });
+
+  describe('setParser', function() {
+
+    it('replaces the existing parser by a new one and parses the display text again', function() {
+      var field = helper.createField('StringField');
+      field.setValue('1234-1234-1234-1234');
+      expect(field.displayText).toBe('1234-1234-1234-1234');
+      expect(field.value).toBe('1234-1234-1234-1234');
+
+      field.setParser(function(displayText, defaultParser) {
+        if (displayText) {
+          return displayText.replace(/-/g, '');
+        }
+        return defaultParser(displayText);
+      });
+      expect(field.value).toBe('1234123412341234');
+      expect(field.displayText).toBe('1234123412341234');
+    });
+
+  });
+
+  describe('formatter', function() {
+    it('may be set initially', function() {
+      var field = scout.create('StringField', {
+        parent: session.desktop,
+        value: '1234123412341234',
+        formatter: function(value, defaultFormatter) {
+          var displayText = defaultFormatter(value);
+          if (!displayText) {
+            return displayText;
+          }
+          return displayText.match(/.{4}/g).join('-');
+        }
+      });
+      expect(field.value).toBe('1234123412341234');
+      expect(field.displayText).toBe('1234-1234-1234-1234');
+    });
+  });
+
+  describe('setFormatter', function() {
+
+    it('replaces the existing formatter by a new one and formats the value again', function() {
+      var field = helper.createField('StringField');
+      field.setValue('1234123412341234');
+      expect(field.value).toBe('1234123412341234');
+      expect(field.displayText).toBe('1234123412341234');
+
+      field.setFormatter(function(value, defaultFormatter) {
+        var displayText = defaultFormatter(value);
+        if (!displayText) {
+          return displayText;
+        }
+        return displayText.match(/.{4}/g).join('-');
+      });
+      expect(field.value).toBe('1234123412341234');
+      expect(field.displayText).toBe('1234-1234-1234-1234');
     });
 
   });
@@ -394,8 +595,8 @@ describe('ValueField', function() {
       field.setValue(null);
       field.setErrorStatus(null);
       field.setMandatory(false);
-      var status = field.validate();
-      expect(status.valid).toBe(true);
+      var result = field.getValidationResult();
+      expect(result.valid).toBe(true);
     });
 
     it('validate returns not valid when errorStatus is set or field is mandatory and empty', function() {
@@ -403,15 +604,15 @@ describe('ValueField', function() {
         severity: scout.Status.Severity.ERROR
       });
       field.setErrorStatus(errorStatus);
-      var status = field.validate();
-      expect(status.valid).toBe(false);
-      expect(status.validByErrorStatus).toBe(false);
+      var result = field.getValidationResult();
+      expect(result.valid).toBe(false);
+      expect(result.validByErrorStatus).toBe(false);
 
       field.setErrorStatus(null);
       field.setMandatory(true);
-      status = field.validate();
-      expect(status.valid).toBe(false);
-      expect(status.validByMandatory).toBe(false);
+      result = field.getValidationResult();
+      expect(result.valid).toBe(false);
+      expect(result.validByMandatory).toBe(false);
     });
 
   });

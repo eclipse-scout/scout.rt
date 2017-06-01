@@ -192,9 +192,9 @@ describe('DateField', function() {
         parent: session.desktop,
         hasTime: true
       });
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw new Error('Validation failed');
-      };
+      });
       field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
@@ -206,16 +206,16 @@ describe('DateField', function() {
         parent: session.desktop,
         hasTime: true
       });
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         throw new Error('Validation failed');
-      };
+      });
       field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
 
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         return value;
-      };
+      });
       field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
       expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-23 12:30:00.000').toISOString());
       expect(field.errorStatus).toBe(null);
@@ -232,12 +232,12 @@ describe('DateField', function() {
       });
       field.render();
       field.$dateField.focus();
-      field._validateValue = function(value) {
+      field.setValidator(function(value) {
         if (scout.dates.equals(value, scout.dates.create('2017-05-23 12:30:00.000'))) {
           throw new Error('Validation failed');
         }
         return value;
-      };
+      });
       // Enter invalid date
       field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
@@ -411,9 +411,12 @@ describe('DateField', function() {
     });
 
     it('updates the model with the selected value', function() {
-      var dateField = createFieldAndFocusAndOpenPicker({
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
         value: '2014-10-01'
       });
+      dateField.render();
+      focusAndOpenDatePicker(dateField);
       var dateBefore = dateField.value;
       expectDate(dateBefore, 2014, 10, 1);
 
@@ -576,8 +579,12 @@ describe('DateField', function() {
 
       it('updates the model with the selected value and closes picker', function() {
         var model = createModel();
-        model.value = '2014-10-01';
-        var dateField = createFieldAndFocusAndOpenPicker(model);
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          value: '2014-10-01'
+        });
+        dateField.render();
+        focusAndOpenDatePicker(dateField);
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 

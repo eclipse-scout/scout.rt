@@ -69,6 +69,9 @@ scout.NumberField.prototype._setDecimalFormat = function(decimalFormat) {
   }
 };
 
+/**
+ * @override
+ */
 scout.NumberField.prototype._parseValue = function(displayText) {
   if (!displayText) {
     return null;
@@ -86,17 +89,31 @@ scout.NumberField.prototype._parseValue = function(displayText) {
   return this.decimalFormat.parse(displayText);
 };
 
+/**
+ * @override
+ */
+scout.NumberField.prototype._ensureValue = function(value) {
+  return scout.numbers.ensure(value);
+};
+
+/**
+ * @param {number} the number to validate
+ * @return {number} the validated number
+ * @override
+ */
 scout.NumberField.prototype._validateValue = function(value) {
   if (scout.objects.isNullOrUndefined(value)) {
     return value;
   }
-  value = scout.numbers.ensure(value);
   if (!scout.numbers.isNumber(value)) {
     throw this.session.text(this.invalidValueMessageKey, value);
   }
   return value;
 };
 
+/**
+ * @override
+ */
 scout.NumberField.prototype._formatValue = function(value) {
   if (scout.objects.isNullOrUndefined(value)) {
     return '';

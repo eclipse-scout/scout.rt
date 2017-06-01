@@ -29,6 +29,20 @@ scout.DateFieldAdapter.prototype._init = function(model) {
 /**
  * @override
  */
+scout.DateFieldAdapter.prototype._attachWidget = function() {
+  scout.DateFieldAdapter.parent.prototype._attachWidget.call(this);
+  this.widget.setParser(function(displayText) {
+    // If the server reported an error for that display text, make sure it will be shown in the UI if the user enters that display text again
+    if (this.modelAdapter._errorStatus && displayText === this.modelAdapter._errorStatusDisplayText) {
+      throw this.modelAdapter._errorStatus;
+    }
+    return this._parseValue(displayText);
+  }.bind(this.widget));
+};
+
+/**
+ * @override
+ */
 scout.DateFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   var data = {
       displayText: this.widget.displayText,
@@ -79,23 +93,3 @@ scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {
   this._errorStatusDisplayText = this.widget.displayText;
   this.widget.setErrorStatus(errorStatus);
 };
-
-scout.DateFieldAdapter.modifyPrototype = function() {
-  if (!scout.app.remote) {
-    return;
-  }
-
-  scout.objects.replacePrototypeFunction(scout.DateField, '_parseValue', function(displayText) {
-    if (this.modelAdapter) {
-      // If the server reported an error for that display text, make sure it will be shown in the UI if the user enters that display text again
-      if (this.modelAdapter._errorStatus && displayText === this.modelAdapter._errorStatusDisplayText) {
-        throw this.modelAdapter._errorStatus;
-      }
-      return this._parseValueOrig(displayText);
-    } else {
-      return this._parseValueOrig(displayText);
-    }
-  }, true);
-};
-
-scout.addAppListener('bootstrap', scout.DateFieldAdapter.modifyPrototype);
