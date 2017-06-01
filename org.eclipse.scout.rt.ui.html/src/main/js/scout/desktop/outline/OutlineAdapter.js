@@ -36,14 +36,14 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
     page = this.widget._nodeById(event.nodeId);
 
     page.detailFormVisible = event.detailFormVisible;
-    page.detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
+    page.setDetailForm(this.session.getOrCreateWidget(event.detailForm, this.widget));
 
     if (page.detailTable) {
       this._destroyDetailTable(page);
     }
 
     page.detailTableVisible = event.detailTableVisible;
-    page.detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget);
+    page.setDetailTable(this.session.getOrCreateWidget(event.detailTable, this.widget));
 
     if (page.detailTable) {
       this._initDetailTable(page);
