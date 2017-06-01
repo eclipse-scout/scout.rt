@@ -164,10 +164,6 @@ scout.ValueField.prototype.parseValue = function(displayText) {
  * @throws a message, a scout.Status or an error if the parsing fails
  */
 scout.ValueField.prototype._parseValue = function(displayText) {
-  // TODO [7.0] awe: this impl. is far too simple. Check how it is done in Java Scout, also discuss with A.SA
-  // TODO [7.0] awe: check what happens when server does execFormatValue: abc -> ABC. Could this possibly
-  //                  lead to cycles? Probably it's not possible because our filters and because the adapter
-  //                  does not yet know the value. Example from BSH: collator AE - Ä
   return displayText;
 };
 
