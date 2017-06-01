@@ -11,6 +11,8 @@
 scout.FormTableControl = function() {
   scout.FormTableControl.parent.call(this);
   this._addWidgetProperties('form');
+
+  this._formDestroyedHandler = this._onFormDestroyed.bind(this);
 };
 scout.inherits(scout.FormTableControl, scout.TableControl);
 
@@ -41,7 +43,9 @@ scout.FormTableControl.prototype._renderContent = function($parent) {
 };
 
 scout.FormTableControl.prototype._removeContent = function() {
-  this.form.remove();
+  if (this.form) {
+    this.form.remove();
+  }
 };
 
 scout.FormTableControl.prototype._removeForm = function() {
@@ -60,7 +64,11 @@ scout.FormTableControl.prototype.isContentAvailable = function() {
 };
 
 scout.FormTableControl.prototype._setForm = function(form) {
+  if (this.form) {
+    this.form.off('destroy', this._formDestroyedHandler);
+  }
   if (form) {
+    form.on('destroy', this._formDestroyedHandler);
     form.rootGroupBox.menuBar.bottom();
   }
   this._setProperty('form', form);
@@ -68,4 +76,10 @@ scout.FormTableControl.prototype._setForm = function(form) {
 
 scout.FormTableControl.prototype.onControlContainerOpened = function() {
   this.form.renderInitialFocus();
+};
+
+scout.FormTableControl.prototype._onFormDestroyed = function(event) {
+  // Called when the inner form is destroyed --> unlink it from this table control
+  this._removeForm();
+  this._setForm(null);
 };
