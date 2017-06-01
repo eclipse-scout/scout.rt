@@ -25,6 +25,7 @@ public class JobNameContextValueProvider implements IDiagnosticContextValueProvi
 
   @Override
   public String value() {
-    return IFuture.CURRENT.get().getJobInput().getName();
+    IFuture<?> future = IFuture.CURRENT.get();
+    return future != null && future.getJobInput() != null ? future.getJobInput().getName() : null;
   }
 }
