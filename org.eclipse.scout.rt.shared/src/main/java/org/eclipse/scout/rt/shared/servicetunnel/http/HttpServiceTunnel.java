@@ -114,8 +114,6 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
     HttpRequestFactory requestFactory = getHttpTransportManager().getHttpRequestFactory();
     HttpRequest request = requestFactory.buildPostRequest(getGenericUrl(), new ByteArrayContent(null, callData));
-    // There may be service calls that take longer than the default (20sec). Allow indefinite
-    request.setReadTimeout(0);
     HttpHeaders headers = request.getHeaders();
     headers.setCacheControl("no-cache");
     headers.setContentType("text/xml");

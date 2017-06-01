@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
+import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
@@ -31,6 +32,11 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
   private volatile boolean m_active = true;
 
   /**
+   * Initialized?
+   */
+  private volatile boolean m_initialized = false;
+
+  /**
    * Cached {@link HttpTransport}.
    */
   private volatile HttpTransport m_httpTransport;
@@ -39,6 +45,11 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    * Cached {@link HttpRequestFactory}.
    */
   private volatile HttpRequestFactory m_httpRequestFactory;
+
+  /**
+   * Cached {@link HttpRequestInitializer}.
+   */
+  private volatile HttpRequestInitializer m_httpRequestInitializer;
 
   @Override
   public HttpTransport getHttpTransport() {
@@ -57,8 +68,9 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    * times.
    */
   protected void init() {
-    if (m_httpTransport == null) {
+    if (!m_initialized) {
       createHttpTransport();
+      m_initialized = true;
     }
   }
 
@@ -66,12 +78,21 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    * Create the {@link HttpTransport} (using factory), fill {@link #m_httpTransport} field.
    */
   protected synchronized void createHttpTransport() {
-    if (m_httpTransport != null || !m_active) {
+    if (m_initialized || !m_active) {
       return;
     }
 
+    m_httpRequestInitializer = createHttpRequestInitializer();
     m_httpTransport = BEANS.get(getHttpTransportFactory()).newHttpTransport(this);
     m_httpRequestFactory = m_httpTransport.createRequestFactory(getHttpRequestInitializer());
+  }
+
+  /**
+   * Default implementation of {@link HttpRequestInitializer} (see example for interface). We actually prefer to disable
+   * the read timeout.
+   */
+  protected HttpRequestInitializer createHttpRequestInitializer() {
+    return new DisableTimeoutHttpRequestInitializer();
   }
 
   /**
@@ -85,7 +106,7 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
    * Possibility to specify a {@link HttpRequestInitializer} used for all requests.
    */
   protected HttpRequestInitializer getHttpRequestInitializer() {
-    return null;
+    return m_httpRequestInitializer;
   }
 
   @Override
@@ -112,6 +133,17 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
     finally {
       m_active = false;
       m_httpTransport = null;
+    }
+  }
+
+  /**
+   * Example {@link HttpRequestInitializer} (see {@link HttpRequestInitializer}) to disable read timeout.
+   */
+  public static class DisableTimeoutHttpRequestInitializer implements HttpRequestInitializer {
+    @Override
+    public void initialize(HttpRequest request) throws IOException {
+      // There may be requests that take longer than the default (20sec). Allow indefinite (similar to default UrlConnection behavior).
+      request.setReadTimeout(0);
     }
   }
 }
