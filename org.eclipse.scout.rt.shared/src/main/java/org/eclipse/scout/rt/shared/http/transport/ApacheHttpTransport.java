@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.shared.http.transport;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 import org.apache.http.client.HttpClient;
@@ -34,6 +35,10 @@ public class ApacheHttpTransport extends HttpTransport {
 
   public ApacheHttpTransport(HttpClient httpClient) {
     m_httpClient = httpClient;
+  }
+
+  public HttpClient getHttpClient() {
+    return m_httpClient;
   }
 
   @Override
@@ -71,6 +76,14 @@ public class ApacheHttpTransport extends HttpTransport {
 
   protected ApacheHttpRequest createRequestInternal(HttpRequestBase req) {
     return new ApacheHttpRequest(m_httpClient, req);
+  }
+
+  @Override
+  public void shutdown() throws IOException {
+    HttpClient httpClient = getHttpClient();
+    if (httpClient instanceof Closeable) {
+      ((Closeable) httpClient).close();
+    }
   }
 
 }
