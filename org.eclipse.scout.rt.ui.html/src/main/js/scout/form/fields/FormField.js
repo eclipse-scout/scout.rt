@@ -353,11 +353,16 @@ scout.FormField.prototype._setEnabled = function(enabled) {
  * @override
  */
 scout.FormField.prototype._renderEnabled = function() {
-  scout.FormField.parent.prototype._renderEnabled.call(this);
-  this._updateDisabledCopyOverlay();
+  // Complete override, because Widget.js only looks at the "enabled" property. However,
+  // in FormFields, the property "enabledComputed" should be used instead.
+  if (this.$container) {
+    this.$container.setEnabled(this.enabledComputed);
+  }
   if (this.$field) {
     this.$field.setEnabled(this.enabledComputed);
   }
+  this._renderDisabledStyle();
+  this._updateDisabledCopyOverlay();
 };
 
 /**
