@@ -91,7 +91,7 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
 };
 
 scout.SmartField2.prototype._render = function() {
-  this.addContainer(this.$parent, this.cssClassPrefix(), new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, this.cssClassName(), new scout.SmartFieldLayout(this));
   this.addLabel();
 
   var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
@@ -113,7 +113,7 @@ scout.SmartField2.prototype._render = function() {
   this.addStatus();
 };
 
-scout.SmartField2.prototype.cssClassPrefix = function() {
+scout.SmartField2.prototype.cssClassName = function() {
   var prefix = this.displayStyle;
   if (this.displayStyle === scout.SmartField2.DisplayStyle.DEFAULT) {
     prefix = 'smart';

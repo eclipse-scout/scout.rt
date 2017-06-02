@@ -22,8 +22,12 @@ scout.ProposalField2.prototype._getValueFromLookupRow = function(lookupRow) {
 };
 
 scout.ProposalField2.prototype._acceptInputFail = function(result) {
-  this.closePopup();
   this.setValue(result.searchText);
+  this._inputAccepted();
+};
+
+scout.ProposalField2.prototype.cssClassName = function() {
+  return 'proposal-field';
 };
 
 scout.ProposalField2.prototype._lookupByTextOrAllDone = function(result) {
