@@ -20,10 +20,16 @@ scout.FileChooserField.prototype._init = function(model) {
     parent: this,
     acceptTypes: this.acceptTypes,
     text: this.displayText,
-    enabled: this.enabled,
+    enabled: this.enabledComputed,
     maximumUploadSize: this.maximumUploadSize
   });
   this.fileInput.on('change', this._onFileChange.bind(this));
+  this.on('propertyChange', function(event) {
+    if (event.propertyName === 'enabledComputed') {
+      // Propagate "enabledComputed" to inner widget
+      this.fileInput.setEnabled(event.newValue);
+    }
+  }.bind(this));
 };
 
 scout.FileChooserField.prototype._initKeyStrokeContext = function() {
@@ -68,9 +74,9 @@ scout.FileChooserField.prototype.setAcceptTypes = function(acceptTypes) {
   this.fileInput.setAcceptTypes(acceptTypes);
 };
 
-scout.FileChooserField.prototype.setEnabled = function(enabled) {
-  scout.FileChooserField.parent.prototype.setEnabled.call(this, enabled);
-  this.fileInput.setEnabled(enabled);
+scout.FileChooserField.prototype._renderEnabled = function() {
+  scout.FileChooserField.parent.prototype._renderEnabled.call(this);
+  this.$field.setTabbable(this.enabledComputed);
 };
 
 scout.FileChooserField.prototype.setMaximumUploadSize = function(maximumUploadSize) {
