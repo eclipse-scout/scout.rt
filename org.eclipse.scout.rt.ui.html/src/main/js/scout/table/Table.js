@@ -69,6 +69,7 @@ scout.Table = function() {
   this.viewRangeSize = 10;
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
+  this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
   this.virtual = true;
   this.contextColumn;
   this._rerenderViewPortAfterAttach = false;
@@ -312,6 +313,7 @@ scout.Table.prototype._render = function() {
   if (this.scrollToSelection) {
     this.revealSelection();
   }
+  this.session.desktop.on('popupopen', this._popupOpenHandler);
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -323,6 +325,7 @@ scout.Table.prototype._renderProperties = function() {
 };
 
 scout.Table.prototype._remove = function() {
+  this.session.desktop.off('popupopen', this._popupOpenHandler);
   scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
@@ -467,17 +470,6 @@ scout.Table.prototype.onContextMenu = function(event) {
           menuFilter: this._filterMenusHandler
         });
         this.contextMenu.open();
-
-        // Set table style to focused, so that it looks as it still has the focus.
-        // Must be called after open(), because opening the popup might cause another
-        // popup to close first (which will remove the 'focused' class).
-        if (this.enabled) {
-          this.$container.addClass('focused');
-          this.contextMenu.on('close', function(event) {
-            this.$container.removeClass('focused');
-            this.contextMenu = null;
-          }.bind(this));
-        }
       }
     }
   };
@@ -3768,6 +3760,21 @@ scout.Table.prototype._afterAttach = function() {
   } else if (this._renderViewPortAfterAttach) {
     this._renderViewport();
     this._renderViewPortAfterAttach = false;
+  }
+};
+
+// same as on scout.Tree.prototype._onDesktopPopupOpen
+scout.Table.prototype._onDesktopPopupOpen = function(event) {
+  var popup = event.popup;
+  if (!this.enabled) {
+    return;
+  }
+  // Set table style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus
+  if (this.has(popup) && popup instanceof scout.ContextMenuPopup) {
+    this.$container.addClass('focused');
+    popup.one('destroy', function() {
+      this.$container.removeClass('focused');
+    }.bind(this));
   }
 };
 

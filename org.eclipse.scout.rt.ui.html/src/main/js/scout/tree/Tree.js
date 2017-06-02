@@ -49,6 +49,7 @@ scout.Tree = function() {
   this._$animationWrapper = null; // used by _renderExpansion()
   this._$expandAnimationWrappers = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
+  this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
 
   // contains all parents of a selected node, the selected node and the first level children
   this._inSelectionPathList = {};
@@ -322,6 +323,7 @@ scout.Tree.prototype._render = function() {
   // render display style before viewport (not in renderProperties) to have a correct style from the beginning
   this._renderDisplayStyle();
   this._renderViewport();
+  this.session.desktop.on('popupopen', this._popupOpenHandler);
 };
 
 scout.Tree.prototype._postRender = function() {
@@ -330,6 +332,9 @@ scout.Tree.prototype._postRender = function() {
 };
 
 scout.Tree.prototype._remove = function() {
+  // remove listener
+  this.session.desktop.off('popupopen', this._popupOpenHandler);
+
   // stop all animations
   if (this._$animationWrapper) {
     this._$animationWrapper.stop(false, true);
@@ -2267,17 +2272,6 @@ scout.Tree.prototype._showContextMenu = function(event) {
       menuFilter: this._filterMenusHandler
     });
     this.contextMenu.open();
-
-    // Set table style to focused, so that it looks as it still has the focus.
-    // Must be called after open(), because opening the popup might cause another
-    // popup to close first (which will remove the 'focused' class).
-    if (this.enabled) {
-      this.$container.addClass('focused');
-      this.contextMenu.on('close', function(event) {
-        this.$container.removeClass('focused');
-        this.contextMenu = null;
-      }.bind(this));
-    }
   };
 
   scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
@@ -2814,6 +2808,21 @@ scout.Tree.prototype.changeNode = function(node) {
   this.trigger('nodeChanged', {
     node: node
   });
+};
+
+// same as on scout.Table.prototype._onDesktopPopupOpen
+scout.Tree.prototype._onDesktopPopupOpen = function(event) {
+  var popup = event.popup;
+  if (!this.enabled) {
+    return;
+  }
+  // Set tree style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus
+  if (this.has(popup) && popup instanceof scout.ContextMenuPopup) {
+    this.$container.addClass('focused');
+    popup.one('destroy', function() {
+      this.$container.removeClass('focused');
+    }.bind(this));
+  }
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
