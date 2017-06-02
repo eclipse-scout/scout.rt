@@ -8,8 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME [awe] 7.0 - SF2: lookup row als property zwischen server und client hin und her schicken?
-// um das problem mit den lazy styles zu lösen?
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
@@ -30,8 +28,8 @@ scout.SmartField2 = function() {
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
   this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
-  this.pristine = true; // FIXME [awe] 7.0 - SF2: use touched property instead? or remove?
-  this._lastUserAction = null; // typing, selecting
+  this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
+  this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -134,10 +132,9 @@ scout.SmartField2.prototype._renderDisplayText = function() {
  * This function is called on blur, by a keystroke or programmatically at any time.
  */
 scout.SmartField2.prototype.acceptInput = function() {
-  // if field is pristine (unchanged) do nothing at all
-//  if (this.pristine) {
-//    return;
-//  }
+  if (!this._acceptInputEnabled) {
+    return;
+  }
 
   var
     searchText = this._readDisplayText(),
@@ -145,7 +142,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
-  if ('typing' === this._lastUserAction) {
+  if (this._userWasTyping) {
     selectedLookupRow = null;
   }
 
@@ -186,6 +183,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 };
 
 scout.SmartField2.prototype._inputAccepted = function() {
+  this._userWasTyping = false;
   this.closePopup();
 
   // focus next tabbable
@@ -201,12 +199,15 @@ scout.SmartField2.prototype._inputAccepted = function() {
       nextIndex = 0;
     }
     $.log.debug('(SmartField2#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
+    this._acceptInputEnabled = false;
     $tabElements.eq(nextIndex).focus();
+    this._acceptInputEnabled = true;
     this._tabPrevented = null;
   }
 };
 
 scout.SmartField2.prototype._acceptInputDone = function(result) {
+  this._userWasTyping = false;
 
   // when there's exactly one result, we accept that lookup row
   var numLookupRows = result.lookupRows.length;
@@ -254,8 +255,6 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     } else {
       this._lookupByTextOrAllDone(result);
     }
-    // FIXME [awe] 7.0 - SF2: prüfen ob das Ok ist. Es gibt, den fall wo _lookupByTextOrAllDone aufgerufen wird,
-    // aber das feld selber nicht mehr den fokus hat. Dann wird this.popup nicth gesetzt
     if (this.isPopupOpen()) {
       this.popup.selectFirstLookupRow();
     }
@@ -534,7 +533,6 @@ scout.SmartField2.prototype.togglePopup = function() {
 scout.SmartField2.prototype._onFieldBlur = function(event) {
   scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
   this.setSearching(false);
-  this._lastUserAction = null;
 };
 
 scout.SmartField2.prototype._onFieldKeyup = function(event) {
@@ -575,7 +573,6 @@ scout.SmartField2.prototype._onFieldKeyup = function(event) {
   // We don't use _displayText() here because we always want the text the
   // user has typed.
   if (this.isPopupOpen()) {
-    this._lastUserAction = 'typing';
     this._lookupByText();
   } else {
     $.log.debug('(SmartField2#_onFieldKeyup)');
@@ -609,14 +606,16 @@ scout.SmartField2.prototype.isPopupOpen = function() {
 };
 
 scout.SmartField2.prototype._onFieldKeydown = function(event) {
+  this._updateUserWasTyping(event);
+
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
-        event.preventDefault();
-        $.log.info('(SmartField2#_onFieldKeydown) set _tabPrevented');
-        this._tabPrevented = {
-          shiftKey: event.shiftKey
-        };
+      event.preventDefault();
+      $.log.info('(SmartField2#_onFieldKeydown) set _tabPrevented');
+      this._tabPrevented = {
+        shiftKey: event.shiftKey
+      };
     }
     this.acceptInput();
     return;
@@ -624,7 +623,6 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
 
   if (this._isNavigationKey(event)) {
     if (this.isPopupOpen()) {
-      this._lastUserAction = 'selecting';
       this.popup.delegateKeyEvent(event);
     } else {
       this.openPopup(true);
@@ -632,6 +630,15 @@ scout.SmartField2.prototype._onFieldKeydown = function(event) {
   }
 };
 
+scout.SmartField2.prototype._updateUserWasTyping = function(event) {
+  var w = event.which;
+  if (w === scout.keys.TAB) {
+    // neutral, don't change flag
+  } else {
+    this._userWasTyping = !(this._isNavigationKey(event) || w === scout.keys.ENTER);
+  }
+  console.log('_userWasTyping', this._userWasTyping, w);
+};
 
 scout.SmartField2.prototype._isNavigationKey = function(event) {
   var navigationKeys = [
@@ -691,7 +698,6 @@ scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
 scout.SmartField2.prototype._lookupByText = function() {
   var searchText = this._readDisplayText();
   $.log.trace('(SmartField2#_lookupByText) searchText=' + searchText);
-  this.pristine = false;
 
   // debounce lookup
   if (this._pendingLookup) {
@@ -792,8 +798,6 @@ scout.SmartField2.prototype._getValueFromLookupRow = function(lookupRow) {
 };
 
 scout.SmartField2.prototype._setValue = function(value) {
-  this.pristine = true;
-
   // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
   // must of the time. Thus we must remove the reference to the old lookup row as early as possible
   if (!this._lockLookupRow) {
