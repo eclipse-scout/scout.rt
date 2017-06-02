@@ -1,7 +1,10 @@
 package org.eclipse.scout.rt.shared.http;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 
@@ -17,6 +20,10 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     HttpClientBuilder builder = HttpClients.custom();
 
     installMultiSessionCookieStore(builder);
+
+    builder.setConnectionTimeToLive(CONFIG.getPropertyValue(ApacheHttpTransportConnectionTimeToLiveProperty.class), TimeUnit.MILLISECONDS);
+    builder.setMaxConnPerRoute(CONFIG.getPropertyValue(ApacheHttpTransportMaxConnectionsPerRouteProperty.class));
+    builder.setMaxConnTotal(CONFIG.getPropertyValue(ApacheHttpTransportMaxConnectionsTotalProperty.class));
 
     interceptNewHttpTransport(builder, manager);
     manager.interceptNewHttpTransport(builder);
