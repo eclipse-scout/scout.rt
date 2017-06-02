@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -41,7 +42,6 @@ import org.eclipse.scout.rt.shared.extension.data.model.IDataModelEntityExtensio
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("d64571d4-5521-45c3-84c2-a22294542747")
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
@@ -121,6 +121,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    *
    * @since 3.10.0-M4
    */
+  @SuppressWarnings("squid:S1244")
   protected double calculateViewOrder() {
     double viewOrder = getConfiguredViewOrder();
     Class<?> cls = getClass();

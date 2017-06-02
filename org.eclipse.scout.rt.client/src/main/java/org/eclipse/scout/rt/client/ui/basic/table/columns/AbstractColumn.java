@@ -903,6 +903,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    *
    * @since 3.10.0-M4
    */
+  @SuppressWarnings("squid:S1244")
   protected double calculateViewOrder() {
     double viewOrder = getConfiguredViewOrder();
     Class<?> cls = getClass();

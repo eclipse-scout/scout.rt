@@ -339,6 +339,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    *
    * @since 4.0.1
    */
+  @SuppressWarnings("squid:S1244")
   protected double calculateViewOrder() {
     double viewOrder = getConfiguredViewOrder();
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
