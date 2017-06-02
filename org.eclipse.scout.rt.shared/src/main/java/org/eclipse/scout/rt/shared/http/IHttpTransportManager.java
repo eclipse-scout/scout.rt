@@ -20,4 +20,10 @@ public interface IHttpTransportManager {
    * Get the {@link HttpRequestFactory} for the specific {@link HttpTransport}.
    */
   HttpRequestFactory getHttpRequestFactory();
+
+  /**
+   * @param builder
+   *          builder if available
+   */
+  void interceptNewHttpTransport(Object builder);
 }

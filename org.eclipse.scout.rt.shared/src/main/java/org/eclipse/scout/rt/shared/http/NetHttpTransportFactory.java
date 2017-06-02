@@ -20,7 +20,10 @@ public class NetHttpTransportFactory implements IHttpTransportFactory {
   @Override
   public HttpTransport newHttpTransport(IHttpTransportManager manager) {
     NetHttpTransport.Builder builder = new NetHttpTransport.Builder();
+
     interceptNewHttpTransport(builder, manager);
+    manager.interceptNewHttpTransport(builder);
+
     return builder.build();
   }
 

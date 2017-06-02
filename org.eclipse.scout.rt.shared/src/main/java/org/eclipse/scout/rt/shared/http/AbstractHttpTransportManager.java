@@ -87,6 +87,11 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
     m_httpRequestFactory = m_httpTransport.createRequestFactory(getHttpRequestInitializer());
   }
 
+  @Override
+  public void interceptNewHttpTransport(Object builder) {
+    // nop
+  }
+
   /**
    * Default implementation of {@link HttpRequestInitializer} (see example for interface). We actually prefer to disable
    * the read timeout.

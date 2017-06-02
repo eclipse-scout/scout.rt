@@ -17,7 +17,9 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     HttpClientBuilder builder = HttpClients.custom();
 
     installMultiSessionCookieStore(builder);
+
     interceptNewHttpTransport(builder, manager);
+    manager.interceptNewHttpTransport(builder);
 
     return new ApacheHttpTransport(builder.build());
   }

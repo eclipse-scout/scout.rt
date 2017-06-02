@@ -67,6 +67,11 @@ public class HttpServiceTunnelTest {
           public HttpRequestFactory getHttpRequestFactory() {
             return m_transport.createRequestFactory();
           }
+
+          @Override
+          public void interceptNewHttpTransport(Object builder) {
+            // nop
+          }
         };
       }
     };
