@@ -41,11 +41,15 @@ public final class SeleniumJavaScript {
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static void injectSeleniumScript(AbstractSeleniumTest test) {
     try (InputStream is = test.getClass().getClassLoader().getResourceAsStream("selenium.js")) {
-      LOG.info("Found resource selenium.js " + (is != null));
       String js = IOUtility.readStringUTF8(is);
-      String oneLineJs = js.replaceAll("(\n|\r\n)", " "); // remove line breaks (unix or windows)
-      LOG.info("selenium.js bytes=" + js.length() + " content (one line)=" + oneLineJs);
-      executeScript(test, "$('body').prependElement('<script>').text('" + oneLineJs + "');");
+      String scriptAsJsString = "'" + js
+          .replaceAll("\\r", "") // remove \r
+          .replaceAll("\\n$", "") // remove trailing \n
+          .replaceAll("'", "\\\\'") // escape single quotes
+          .replaceAll("\\n", "' + \n'") + // split javascript string at inner line breaks
+          "'";
+      executeScript(test, "$('body').prependElement('<script>').text(" + scriptAsJsString + ");");
+      LOG.info("Injected selenium.js");
     }
     catch (IOException e) {
       throw new ProcessingException("resource", e);
