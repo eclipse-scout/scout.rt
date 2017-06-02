@@ -124,9 +124,13 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     //set container on menus
-    IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this, menus.getOrderedList());
+    IValueFieldContextMenu contextMenu = createContextMenu(menus);
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
+  }
+
+  protected IValueFieldContextMenu createContextMenu(OrderedCollection<IMenu> menus) {
+    return new ValueFieldContextMenu(this, menus.getOrderedList());
   }
 
   /**
