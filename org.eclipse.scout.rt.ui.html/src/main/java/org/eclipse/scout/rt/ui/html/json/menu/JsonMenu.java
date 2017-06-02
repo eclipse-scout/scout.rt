@@ -25,6 +25,7 @@ import org.json.JSONArray;
 public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
 
   public static final String PROP_SEPARATOR = "separator";
+  public static final String PROP_OUTLINE_MENU_WRAPPER = "outlineMenuWrapper";
 
   public JsonMenu(MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -38,21 +39,18 @@ public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
   @Override
   protected void initJsonProperties(MENU model) {
     super.initJsonProperties(model);
-
     putJsonProperty(new JsonProperty<MENU>(PROP_SEPARATOR, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isSeparator();
       }
     });
-
-    putJsonProperty(new JsonProperty<MENU>("outlineMenuWrapper", model) {
+    putJsonProperty(new JsonProperty<MENU>(PROP_OUTLINE_MENU_WRAPPER, model) {
       @Override
       protected Boolean modelValue() {
         return getModel() instanceof OutlineMenuWrapper;
       }
     });
-
     putJsonProperty(new JsonProperty<MENU>(IMenu.PROP_MENU_TYPES, model) {
       @Override
       protected Set<IMenuType> modelValue() {
@@ -69,6 +67,11 @@ public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
         return new JSONArray(menuTypes);
       }
     });
+    putJsonProperty(new JsonProperty<MENU>(IMenu.PROP_PREVENT_DOUBLE_CLICK, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isPreventDoubleClick();
+      }
+    });
   }
-
 }

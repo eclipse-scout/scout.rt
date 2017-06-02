@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 @ClassId("d3cdbb0d-4c53-4854-b6f2-23465050c3c5")
 public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
 
-  private static final String ACTION_RUNNING = "ACTION_RUNNING";
   private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
   private static final String INITIALIZED = "INITIALIZED";
   private static final String INHERIT_ACCESSIBILITY = "INHERIT_ACCESSIBILITY";
@@ -58,7 +57,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ACTION_RUNNING, ENABLED_INHERIT_ACCESSIBILITY);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ENABLED_INHERIT_ACCESSIBILITY);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, INHERIT_ACCESSIBILITY, TOGGLE_ACTION, SEPARATOR);
 
   /**
@@ -373,6 +372,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    *
    * @since 4.0.1
    */
+  @SuppressWarnings("squid:S1244")
   protected double calculateViewOrder() {
     double viewOrder = getConfiguredViewOrder();
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
@@ -418,13 +418,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @Override
   public void doAction() {
     if (isEnabled() && isVisible()) {
-      try {
-        setEnabledProcessingAction(false);
-        doActionInternal();
-      }
-      finally {
-        setEnabledProcessingAction(true);
-      }
+      doActionInternal();
     }
   }
 
@@ -631,15 +625,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public boolean isEnabledProcessingAction() {
-    return isEnabled(ACTION_RUNNING);
-  }
-
-  private void setEnabledProcessingAction(boolean enabledProcessing) {
-    setEnabled(enabledProcessing, ACTION_RUNNING);
-  }
-
-  @Override
   public void setEnabled(boolean enabled, String dimension) {
     m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
     setEnabledInternal();
@@ -783,6 +768,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   protected class P_UIFacade implements IActionUIFacade {
+
     @Override
     public void fireActionFromUI() {
       if (isEnabledIncludingParents() && isVisibleIncludingParents()) {

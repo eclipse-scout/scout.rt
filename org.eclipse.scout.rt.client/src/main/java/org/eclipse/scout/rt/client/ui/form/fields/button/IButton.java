@@ -37,6 +37,7 @@ public interface IButton extends IFormField {
   String PROP_KEY_STOKE = "keyStroke";
   String PROP_KEY_STROKE_SCOPE_CLASS = "keyStrokeScopeClass";
   String PROP_KEY_STROKE_SCOPE = "keyStrokeScope";
+  String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
 
   /*
    * System Types
@@ -109,20 +110,9 @@ public interface IButton extends IFormField {
    */
   void setSelected(boolean b);
 
-  /**
-   * Buttons set the property to false while in work.
-   *
-   * @return true if process button is not in {@link #doClick()} action
-   */
-  boolean isEnabledProcessing();
+  boolean isPreventDoubleClick();
 
-  void setEnabledProcessing(boolean b);
-
-  /**
-   * In case button was pressed and armed, this event sets armed=false<br>
-   * and prevents the button from firing an action
-   */
-  void disarm();
+  void setPreventDoubleClick(boolean preventDoubleClick);
 
   /**
    * request showing the (dropdown) menu popup

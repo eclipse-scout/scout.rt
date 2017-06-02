@@ -19,6 +19,7 @@ scout.Menu = function() {
   this.popup;
   this.excludedByFilter = false;
   this.subMenuIconVisible = true;
+  this.preventDoubleClick = false;
 
   /**
    * This property is set if this is a subMenu. The property is set when this submenu is rendered.
@@ -152,6 +153,9 @@ scout.Menu.prototype._getSubMenuLevel = function() {
 scout.Menu.prototype._onMouseEvent = function(event) {
   if (event.which !== 1) {
     return; // Other button than left mouse button --> nop
+  }
+  if (event.type === 'click' && event.detail > 1 && this.preventDoubleClick) {
+    return; // More than one consecutive click --> nop
   }
 
   // If menu has childActions, a popup should be rendered on click. To create

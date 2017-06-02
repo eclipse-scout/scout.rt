@@ -1808,9 +1808,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     Class<? extends IMenu> c = getReplacingMenuClass(menuType);
     for (IMenu m : getMenus()) {
       if (m.getClass() == c) {
-        if (!m.isEnabledProcessingAction()) {
-          return false;
-        }
         if ((!m.isInheritAccessibility()) || isEnabled()) {
           if (m.isVisible() && m.isEnabled()) {
             m.doAction();

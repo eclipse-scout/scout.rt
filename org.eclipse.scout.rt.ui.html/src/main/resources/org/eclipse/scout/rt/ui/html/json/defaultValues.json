@@ -66,7 +66,8 @@
       "separator": false,
       "outlineMenuWrapper": false,
       "childActions": [],
-      "menuTypes": ["Table.EmptySpace"]
+      "menuTypes": ["Table.EmptySpace"],
+      "preventDoubleClick": false
     },
     "Button": {
       "systemType": 0,
@@ -74,7 +75,8 @@
       "selected": false,
       "displayStyle": 0,
       "keyStroke": null,
-      "statusVisible": false
+      "statusVisible": false,
+      "preventDoubleClick": false
     },
     "CheckBoxField": {
       "triStateEnabled": false

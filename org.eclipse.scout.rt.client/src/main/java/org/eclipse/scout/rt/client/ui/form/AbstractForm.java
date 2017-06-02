@@ -2203,7 +2203,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           public boolean visitField(IFormField field, int level, int fieldIndex) {
             if (field instanceof IButton) {
               IButton b = (IButton) field;
-              if (b.isEnabled() && b.isVisible() && b.isEnabledProcessing()) {
+              if (b.isEnabled() && b.isVisible()) {
                 enabledSystemTypes.add(b.getSystemType());
                 enabledSystemButtons.add(b);
               }
@@ -2211,18 +2211,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
             return true;
           }
         };
-        try {
-          visitFields(v);
-          for (IButton b : enabledSystemButtons) {
-            b.setEnabledProcessing(false);
-          }
-          interceptOnCloseRequest(kill, enabledSystemTypes);
-        }
-        finally {
-          for (IButton b : enabledSystemButtons) {
-            b.setEnabledProcessing(true);
-          }
-        }
+        visitFields(v);
+        interceptOnCloseRequest(kill, enabledSystemTypes);
       }
       catch (RuntimeException | PlatformError e) {
         throw BEANS.get(PlatformExceptionTranslator.class).translate(e)

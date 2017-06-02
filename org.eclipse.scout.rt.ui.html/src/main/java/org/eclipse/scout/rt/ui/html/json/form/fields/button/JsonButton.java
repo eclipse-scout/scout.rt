@@ -87,11 +87,16 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
         return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
-
     putJsonProperty(new JsonProperty<IButton>(IButton.PROP_KEY_STOKE, model) {
       @Override
       protected String modelValue() {
         return getModel().getKeyStroke();
+      }
+    });
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_PREVENT_DOUBLE_CLICK, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isPreventDoubleClick();
       }
     });
   }

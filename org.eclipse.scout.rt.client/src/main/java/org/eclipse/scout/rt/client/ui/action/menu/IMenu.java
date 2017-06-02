@@ -21,7 +21,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
  * Interface for menus that normally appear in the gui on the menubar
  */
 public interface IMenu extends IActionNode<IMenu> {
+
   String PROP_MENU_TYPES = "menuTypes";
+  String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
 
   /**
    * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
@@ -31,11 +33,14 @@ public interface IMenu extends IActionNode<IMenu> {
    */
   Set<IMenuType> getMenuTypes();
 
+  boolean isPreventDoubleClick();
+
+  void setPreventDoubleClick(boolean preventDoubleClick);
+
   Object getOwnerValue();
 
   /**
    * @param newValue
    */
   void handleOwnerValueChanged(Object newValue);
-
 }

@@ -25,10 +25,6 @@ public class ButtonEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_CLICKED = 1;
   /**
-   * In case button was pressed and armed, this event sets armed=false and prevents the button from firing an action
-   */
-  public static final int TYPE_DISARM = 3;
-  /**
    * event to ui to request showing the (dropdown) menu popup
    */
   public static final int TYPE_REQUEST_POPUP = 4;

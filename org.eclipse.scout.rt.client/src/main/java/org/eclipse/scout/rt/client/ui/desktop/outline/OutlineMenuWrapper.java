@@ -52,7 +52,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   private Set<IMenuType> m_menuTypes;
   private IActionFilter m_menuFilter;
   private IMenuTypeMapper m_menuTypeMapper;
-  
+
   public static final IActionFilter ACCEPT_ALL_FILTER = new IActionFilter() {
 
     @Override
@@ -390,11 +390,6 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
-  public boolean isEnabledProcessingAction() {
-    return m_wrappedMenu.isEnabledProcessingAction();
-  }
-
-  @Override
   public boolean isEnabledInheritAccessibility() {
     return m_wrappedMenu.isEnabledInheritAccessibility();
   }
@@ -542,6 +537,16 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   @Override
   public boolean isEnabled(String dimension) {
     return m_wrappedMenu.isEnabled(dimension);
+  }
+
+  @Override
+  public boolean isPreventDoubleClick() {
+    return m_wrappedMenu.isPreventDoubleClick();
+  }
+
+  @Override
+  public void setPreventDoubleClick(boolean preventDoubleClick) {
+    unsupported();
   }
 
   @Override

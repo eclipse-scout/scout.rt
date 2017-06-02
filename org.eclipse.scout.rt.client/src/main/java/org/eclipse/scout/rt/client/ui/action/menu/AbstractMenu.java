@@ -78,6 +78,18 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
         TabBoxMenuType.Header);
   }
 
+  /**
+   * Configures whether two or more consecutive clicks on the menu within a short period of time (e.g. double click)
+   * should be prevented by the UI.
+   * <p>
+   * The default is <code>false</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(56)
+  protected boolean getConfiguredPreventDoubleClick() {
+    return false;
+  }
+
   @Override
   public Object getOwnerValue() {
     return m_ownerValue;
@@ -166,6 +178,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   protected void initConfig() {
     super.initConfig();
     setMenuTypes(getConfiguredMenuTypes());
+    setPreventDoubleClick(getConfiguredPreventDoubleClick());
   }
 
   @Override
@@ -222,6 +235,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   public void setMenuTypes(Set<? extends IMenuType> menuTypes) {
     propertySupport.setProperty(PROP_MENU_TYPES, CollectionUtility.<IMenuType> hashSet(menuTypes));
+  }
+
+  @Override
+  public boolean isPreventDoubleClick() {
+    return propertySupport.getPropertyBool(PROP_PREVENT_DOUBLE_CLICK);
+  }
+
+  @Override
+  public void setPreventDoubleClick(boolean preventDoubleClick) {
+    propertySupport.setPropertyBool(PROP_PREVENT_DOUBLE_CLICK, preventDoubleClick);
   }
 
   protected final void interceptOwnerValueChanged(Object newOwnerValue) {

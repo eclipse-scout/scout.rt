@@ -20,6 +20,7 @@ scout.Button = function() {
   this.selected = false;
   this.statusVisible = false;
   this.systemType = scout.Button.SystemType.NONE;
+  this.preventDoubleClick = false;
 
   this.$buttonLabel;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
@@ -312,6 +313,13 @@ scout.Button.prototype._setKeyStroke = function(keyStroke) {
 };
 
 scout.Button.prototype._onClick = function(event) {
+  if (event.which !== 1) {
+    return; // Other button than left mouse button --> nop
+  }
+  if (event.detail > 1 && this.preventDoubleClick) {
+    return; // More than one consecutive click --> nop
+  }
+
   if (this.enabledComputed) {
     this.doAction();
   }

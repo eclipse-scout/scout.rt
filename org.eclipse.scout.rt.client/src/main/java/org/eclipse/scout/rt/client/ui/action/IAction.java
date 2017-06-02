@@ -41,6 +41,7 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
   String PROP_KEYSTROKE_FIRE_POLICY = "keyStrokeFirePolicy";
   String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+
   byte HORIZONTAL_ALIGNMENT_LEFT = -1;
   byte HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
@@ -161,13 +162,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, 
    * when false, enabled property cannot be set to true
    */
   void setEnabledGranted(boolean b);
-
-  /**
-   * Actions set the property to false while in work.
-   *
-   * @return true if action is not in {@link IAction#doAction()}
-   */
-  boolean isEnabledProcessingAction();
 
   /**
    * Access control<br>

@@ -51,7 +51,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private int m_displayStyle;
   private boolean m_processButton;
   private boolean m_defaultButton;
-  private boolean m_enabledProcessing;
 
   public AbstractButton() {
     this(true);
@@ -59,7 +58,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   public AbstractButton(boolean callInitializer) {
     super(false);
-    m_enabledProcessing = true;
     m_listenerList = new EventListenerList();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     m_uiFacadeSetSelectedLock = new OptimisticLock();
@@ -202,6 +200,18 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
+   * Configures whether two or more consecutive clicks on the button within a short period of time (e.g. double click)
+   * should be prevented by the UI.
+   * <p>
+   * The default is <code>false</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  protected boolean getConfiguredPreventDoubleClick() {
+    return false;
+  }
+
+  /**
    * Called whenever this button is clicked. This button is disabled and cannot be clicked again until this method
    * returns.
    * <p>
@@ -240,6 +250,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setIconId(getConfiguredIconId());
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeScopeClass(getConfiguredKeyStrokeScopeClass());
+    setPreventDoubleClick(getConfiguredPreventDoubleClick());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -256,7 +267,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
-
   }
 
   @Override
@@ -373,16 +383,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public boolean isEnabledProcessing() {
-    return m_enabledProcessing;
-  }
-
-  @Override
-  public void setEnabledProcessing(boolean b) {
-    m_enabledProcessing = b;
-  }
-
-  @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
   }
@@ -398,16 +398,9 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   public void doClick() {
-    if (isEnabled() && isVisible() && isEnabledProcessing()) {
-      try {
-        setEnabledProcessing(false);
-
-        fireButtonClicked();
-        interceptClickAction();
-      }
-      finally {
-        setEnabledProcessing(true);
-      }
+    if (isEnabled() && isVisible()) {
+      fireButtonClicked();
+      interceptClickAction();
     }
   }
 
@@ -437,8 +430,13 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public void disarm() {
-    fireDisarmButton();
+  public boolean isPreventDoubleClick() {
+    return propertySupport.getPropertyBool(PROP_PREVENT_DOUBLE_CLICK);
+  }
+
+  @Override
+  public void setPreventDoubleClick(boolean preventDoubleClick) {
+    propertySupport.setPropertyBool(PROP_PREVENT_DOUBLE_CLICK, preventDoubleClick);
   }
 
   @Override
@@ -476,10 +474,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   private void fireButtonClicked() {
     fireButtonEvent(new ButtonEvent(this, ButtonEvent.TYPE_CLICKED));
-  }
-
-  private void fireDisarmButton() {
-    fireButtonEvent(new ButtonEvent(this, ButtonEvent.TYPE_DISARM));
   }
 
   private void fireRequestPopup() {
