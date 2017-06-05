@@ -38,9 +38,9 @@ scout.router = {
 
   activate: function(location) {
     if (!location) {
-      var regexp = new RegExp('https?://[a-zA-Z0-9_-]+:?[0-9]*/(.*)');
+      var regexp = new RegExp('[^/]*$'); // match everything after last slash
       var matches = regexp.exec(document.location.href);
-      location = matches[1];
+      location = matches[0];
     }
 
     // no route is set in the URL
@@ -58,7 +58,7 @@ scout.router = {
           return;
         }
 
-        // deactiavate old route
+        // deactivate old route
         if (this.currentRoute) {
           this.currentRoute.deactivate();
         }
