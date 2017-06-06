@@ -460,6 +460,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     setBrowseIconId(getConfiguredBrowseIconId());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
+    setLoadParentNodes(getConfiguredLoadParentNodes());
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
@@ -624,6 +625,16 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void setBrowseLoadIncremental(boolean browseLoadIncremental) {
     propertySupport.setPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL, browseLoadIncremental);
+  }
+
+  @Override
+  public boolean isLoadParentNodes() {
+    return propertySupport.getPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL);
+  }
+
+  @Override
+  public void setLoadParentNodes(boolean loadParentNodes) {
+    propertySupport.setPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL, loadParentNodes);
   }
 
   @Override
@@ -1165,8 +1176,16 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       setResult(null);
     }
     else {
+      if (isBrowseHierarchy()) {
+        result = addHierarchicalResults(result);
+      }
       setResult(new SmartField2Result<VALUE>(result));
     }
+  }
+
+  // FIXME [awe] 7.0 - SF2: continue... expand parent nodes
+  protected IContentAssistFieldDataFetchResult<VALUE> addHierarchicalResults(IContentAssistFieldDataFetchResult<VALUE> result) {
+    return new HierarchicalLookupResultBuilder<VALUE>(this).addParentLookupRows(result);
   }
 
   protected IContentAssistFieldLookupRowFetcher<VALUE> createLookupRowFetcher() {

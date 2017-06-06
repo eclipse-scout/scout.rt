@@ -59,6 +59,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
   String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
   String PROP_LOOKUP_ROW = "lookupRow";
+  String PROP_LOAD_PARENT_NODES = "loadParentNodes";
 
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_DROPDOWN = "dropdown";
@@ -155,6 +156,10 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   boolean isBrowseLoadIncremental();
 
   void setBrowseLoadIncremental(boolean browseLoadIncremental);
+
+  boolean isLoadParentNodes();
+
+  void setLoadParentNodes(boolean loadParentNodes);
 
   /**
    * see {@link AbstractSmartField#execBrowseNew(String)}
