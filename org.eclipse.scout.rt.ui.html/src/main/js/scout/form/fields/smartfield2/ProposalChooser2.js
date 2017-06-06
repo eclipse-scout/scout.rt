@@ -24,6 +24,12 @@ scout.inherits(scout.ProposalChooser2, scout.Widget);
 scout.ProposalChooser2.prototype._init = function(model) {
   scout.ProposalChooser2.parent.prototype._init.call(this, model);
 
+  // If smartField is not explicitly provided by model, use smartField instance
+  // from parent (which is usually the SmartField2Popup)
+  if (!model.smartField) {
+    this.smartField = this.parent.smartField;
+  }
+
   this.model = this._createModel();
 };
 
@@ -56,7 +62,7 @@ scout.ProposalChooser2.prototype._render = function() {
     .setVisible(false);
 
   // active filter
-  if (this._smartField().activeFilterEnabled) {
+  if (this.smartField.activeFilterEnabled) {
     this.activeFilterGroup = scout.create('RadioButtonGroup', {
       parent: this,
       labelVisible: false,
@@ -165,7 +171,7 @@ scout.ProposalChooser2.prototype._renderActiveFilterButton = function(value, ind
       parent: this.activeFilterGroup,
       label: this._activeFilterLabel(index),
       radioValue: scout.SmartField2.ACTIVE_FILTER_VALUES[index],
-      selected: this._smartField().activeFilter === value,
+      selected: this.smartField.activeFilter === value,
       focusWhenSelected: false,
       gridData: {
         x: index,
@@ -201,14 +207,6 @@ scout.ProposalChooser2.prototype.setBusy = function(busy) {
   this.model.setProperty('enabled', !busy);
 };
 
-scout.ProposalChooser2.prototype._smartField = function() {
-  if (this.parent instanceof scout.SmartField2) { // FIXME [awe] 7.0 - SF2: use PC with different parents?
-    return this.parent;
-  } else {
-    return this.parent._smartField();
-  }
-};
-
 scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {
-  return this._smartField().activeFilterLabels[index];
+  return this.smartField.activeFilterLabels[index];
 };

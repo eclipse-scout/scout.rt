@@ -16,7 +16,7 @@ scout.inherits(scout.TableProposalChooser2, scout.ProposalChooser2);
 scout.TableProposalChooser2.prototype._createModel = function() {
   var headerVisible, column,
     columns = [],
-    descriptors = this._smartField().columnDescriptors,
+    descriptors = this.smartField.columnDescriptors,
     autoResize = true;
 
   if (descriptors) {
@@ -77,7 +77,7 @@ scout.TableProposalChooser2.prototype.setLookupResult = function(result) {
   var
     tableRows = [],
     lookupRows = result.lookupRows,
-    multipleColumns = !!this._smartField().columnDescriptors;
+    multipleColumns = !!this.smartField.columnDescriptors;
 
   this.model.deleteAllRows();
   lookupRows.forEach(function(lookupRow) {
@@ -93,7 +93,7 @@ scout.TableProposalChooser2.prototype.setLookupResult = function(result) {
 };
 
 scout.TableProposalChooser2.prototype.trySelectCurrentValue = function() {
-  var currentValue = this._smartField().value;
+  var currentValue = this.smartField.value;
   if (scout.objects.isNullOrUndefined(currentValue)) {
     return;
   }
@@ -160,7 +160,7 @@ scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow, mult
 };
 
 scout.TableProposalChooser2.prototype._renderModel = function() {
-  this.model.setVirtual(this._smartField().virtual());
+  this.model.setVirtual(this.smartField.virtual());
   this.model.render();
 
   // Make sure table never gets the focus, but looks focused
@@ -181,7 +181,7 @@ scout.TableProposalChooser2.prototype.getSelectedLookupRow = function() {
  * array of additional values in the correct order, as defined by the descriptors.
  */
 scout.TableProposalChooser2.prototype._transformTableRowData = function(tableRowData) {
-  var descriptors = this._smartField().columnDescriptors;
+  var descriptors = this.smartField.columnDescriptors;
   var cells = [];
   descriptors.forEach(function(desc) {
     if (desc.propertyName) { // default column descriptor (first column) has propertyName null

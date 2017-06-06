@@ -37,7 +37,7 @@ scout.TreeProposalChooser2.prototype.triggerLookupRowSelected = function(node) {
 };
 
 scout.TreeProposalChooser2.prototype.isBrowseLoadIncremental = function() {
-  return this._smartField().browseLoadIncremental;
+  return this.smartField.browseLoadIncremental;
 };
 
 scout.TreeProposalChooser2.prototype.getSelectedLookupRow = function() {
@@ -120,7 +120,7 @@ scout.TreeProposalChooser2.prototype._expandAllParentNodes = function(treeNodesF
 };
 
 scout.TreeProposalChooser2.prototype.trySelectCurrentValue = function() {
-  var currentValue = this._smartField().value;
+  var currentValue = this.smartField.value;
   if (scout.objects.isNullOrUndefined(currentValue)) {
     return;
   }
@@ -142,7 +142,7 @@ scout.TreeProposalChooser2.prototype.selectFirstLookupRow = function() {
 scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
   var
     initialLeaf = true,
-    expandAll = this._smartField().browseAutoExpandAll,
+    expandAll = this.smartField.browseAutoExpandAll,
     loadIncremental = this.isBrowseLoadIncremental();
 
   if (loadIncremental) {

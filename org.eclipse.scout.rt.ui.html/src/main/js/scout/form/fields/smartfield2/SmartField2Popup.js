@@ -17,6 +17,8 @@ scout.inherits(scout.SmartField2Popup, scout.Popup);
 scout.SmartField2Popup.prototype._init = function(options) {
   options.withFocusContext = false;
   scout.SmartField2Popup.parent.prototype._init.call(this, options);
+
+  this.smartField = this.parent;
   this.proposalChooser = this._createProposalChooser();
   this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
   this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
@@ -26,25 +28,17 @@ scout.SmartField2Popup.prototype._init = function(options) {
 };
 
 scout.SmartField2Popup.prototype._createProposalChooser = function() {
-  var objectType = this._smartField().browseHierarchy ? 'TreeProposalChooser2' : 'TableProposalChooser2';
+  var objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser2' : 'TableProposalChooser2';
   return scout.create(objectType, {
     parent: this
   });
-};
-
-scout.SmartField2Popup.prototype._smartField = function() {
-  return this.parent;
-};
-
-scout.SmartField2Popup.prototype._smartFieldBounds = function() {
-  return scout.graphics.offsetBounds(this.parent.$field);
 };
 
 /**
  * @override
  */
 scout.SmartField2Popup.prototype._createLayout = function() {
-  if (this._smartField().variant === scout.SmartField2.DisplayStyle.DROPDOWN) {
+  if (this.smartField.variant === scout.SmartField2.DisplayStyle.DROPDOWN) {
     return new scout.DropdownPopupLayout(this, this.proposalChooser);
   } else {
     return new scout.SmartField2PopupLayout(this, this.proposalChooser);
@@ -52,7 +46,7 @@ scout.SmartField2Popup.prototype._createLayout = function() {
 };
 
 scout.SmartField2Popup.prototype._render = function() {
-  var cssClass = this._smartField().cssClassName() + '-popup';
+  var cssClass = this.smartField.cssClassName() + '-popup';
   scout.SmartField2Popup.parent.prototype._render.call(this);
   this.$container
     .addClass(cssClass)

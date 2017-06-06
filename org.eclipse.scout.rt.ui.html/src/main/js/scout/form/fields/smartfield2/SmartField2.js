@@ -238,7 +238,8 @@ scout.SmartField2.prototype._extendResult = function(result) {
   if (this.browseHierarchy) {
     // tree (hierarchical)
     var proposalChooser = scout.create('TreeProposalChooser2', {
-      parent: this
+      parent: this,
+      smartField: this
     });
     proposalChooser.setLookupResult(result);
     var leafs = proposalChooser.findLeafs();
