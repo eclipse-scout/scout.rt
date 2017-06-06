@@ -79,6 +79,9 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
     this.model.deleteAllChildNodes();
     treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
     treeNodes = this._flatListToSubTree(treeNodesFlat);
+    if (this._isLookupByText(result)) {
+      this._expandAllParentNodes(treeNodesFlat);
+    }
     this.model.insertNodes(treeNodes);
   }
 
@@ -86,6 +89,32 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
     this.trySelectCurrentValue();
   } else if (treeNodes.length === 1) {
     this.selectFirstLookupRow();
+  }
+};
+
+scout.TreeProposalChooser2.prototype._isLookupByText = function(result) {
+  return result.searchText !== result.wildcard;
+};
+
+scout.TreeProposalChooser2.prototype._expandAllParentNodes = function(treeNodesFlat) {
+  // when tree node is a leaf or children are not loaded yet
+  var leafs = treeNodesFlat.reduce(function(aggr, treeNode) {
+    if (treeNode.leaf || !treeNode.childNodesLoaded && treeNode.childNodes.length === 0) {
+      aggr.push(treeNode);
+    }
+    return aggr;
+  }, []);
+  leafs.forEach(expandPath.bind(this));
+
+  function expandPath(treeNode) {
+    if (!treeNode.parentNode || treeNode.parentNode.expanded) {
+      return;
+    }
+    treeNode = treeNode.parentNode;
+    while (treeNode) {
+      this.model.setNodeExpanded(treeNode, true);
+      treeNode = treeNode.parentNode;
+    }
   }
 };
 
@@ -140,6 +169,28 @@ scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
     lookupRow: lookupRow,
     leaf: initialLeaf
   });
+};
+
+/**
+ * This function is required in the 'accept input' case to find out
+ * if we have exactly one lookup row that matches. With a tree this is a bit difficult
+ * because the lookup call does not only return the lookup rows with a match, but also
+ * their parent nodes up to the root node (which don't match).
+ *
+ * Note: because we only match nodes that have the property leaf set to true, it's not
+ * possible to accept a node with accept input that is not a leaf.
+ *
+ * @returns the number of leafs in the current tree model.
+ */
+scout.TreeProposalChooser2.prototype.findLeafs = function() {
+  var leafs = [];
+  scout.Tree.visitNodes(this.model.nodes,
+    function(node, parentNode) {
+      if (node.leaf || !node.childNodes.length) {
+        leafs.push(node);
+      }
+    });
+  return leafs;
 };
 
 /**

@@ -20,6 +20,7 @@ scout.SmartField2 = function() {
   this._lookupInProgress = false;
   this._tabPrevented = null;
   this.lookupRow = null;
+  this.browseHierarchy = false;
   this.browseMaxRowCount = scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT;
   this.browseAutoExpandAll = true;
   this.browseLoadIncremental = true;
@@ -208,11 +209,11 @@ scout.SmartField2.prototype._inputAccepted = function() {
 
 scout.SmartField2.prototype._acceptInputDone = function(result) {
   this._userWasTyping = false;
+  this._extendResult(result);
 
   // when there's exactly one result, we accept that lookup row
-  var numLookupRows = result.lookupRows.length;
-  if (numLookupRows === 1) {
-    var lookupRow = result.lookupRows[0];
+  if (result.numLookupRows === 1) {
+    var lookupRow = result.singleMatch;
     if (this._isLookupRowActive(lookupRow)) {
       this.setLookupRow(lookupRow);
       this._inputAccepted();
@@ -227,12 +228,38 @@ scout.SmartField2.prototype._acceptInputDone = function(result) {
   this._acceptInputFail(result);
 };
 
+/**
+ * Extends the properties 'singleMatch' and 'numLookupRows' on the given result object.
+ * The implementation is different depending on the browseHierarchy property.
+ */
+scout.SmartField2.prototype._extendResult = function(result) {
+  result.singleMatch = null;
+
+  if (this.browseHierarchy) {
+    // tree (hierarchical)
+    var proposalChooser = scout.create('TreeProposalChooser2', {
+      parent: this
+    });
+    proposalChooser.setLookupResult(result);
+    var leafs = proposalChooser.findLeafs();
+    result.numLookupRows = leafs.length;
+    if (result.numLookupRows === 1) {
+      result.singleMatch = leafs[0].lookupRow;
+    }
+  } else {
+    // table
+    result.numLookupRows = result.lookupRows.length;
+    if (result.numLookupRows === 1) {
+      result.singleMatch = result.lookupRows[0];
+    }
+  }
+};
+
 scout.SmartField2.prototype._acceptInputFail = function(result) {
   var searchText = result.searchText;
 
   // in any other case something went wrong
-  var numLookupRows = result.lookupRows.length;
-  if (numLookupRows === 0) {
+  if (result.numLookupRows === 0) {
     this.closePopup();
     this.setValue(null);
     this.setDisplayText(searchText);
@@ -243,7 +270,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     return;
   }
 
-  if (numLookupRows > 1) {
+  if (result.numLookupRows > 1) {
     this.setValue(null);
     this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
@@ -637,7 +664,6 @@ scout.SmartField2.prototype._updateUserWasTyping = function(event) {
   } else {
     this._userWasTyping = !(this._isNavigationKey(event) || w === scout.keys.ENTER);
   }
-  console.log('_userWasTyping', this._userWasTyping, w);
 };
 
 scout.SmartField2.prototype._isNavigationKey = function(event) {

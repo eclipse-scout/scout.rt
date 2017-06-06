@@ -206,7 +206,11 @@ scout.ProposalChooser2.prototype.setBusy = function(busy) {
 };
 
 scout.ProposalChooser2.prototype._smartField = function() {
-  return this.parent._smartField();
+  if (this.parent instanceof scout.SmartField2) { // FIXME [awe] 7.0 - SF2: use PC with different parents?
+    return this.parent;
+  } else {
+    return this.parent._smartField();
+  }
 };
 
 scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {

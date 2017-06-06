@@ -1183,7 +1183,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     }
   }
 
-  // FIXME [awe] 7.0 - SF2: continue... expand parent nodes
   protected IContentAssistFieldDataFetchResult<VALUE> addHierarchicalResults(IContentAssistFieldDataFetchResult<VALUE> result) {
     return new HierarchicalLookupResultBuilder<VALUE>(this).addParentLookupRows(result);
   }
