@@ -25,15 +25,19 @@ scout.inherits(scout.ProposalChooser, scout.Widget);
  */
 scout.ProposalChooser.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
+scout.ProposalChooser.prototype._init = function(options) {
+  scout.ProposalChooser.parent.prototype._init.call(this, options);
+  // disable focus on field container
+  if (this.model instanceof scout.Tree) {
+    this.model.requestFocusOnNodeControlMouseDown = false;
+  }
+};
+
 scout.ProposalChooser.prototype._render = function() {
   this.$container = this.$parent.appendDiv('proposal-chooser');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
   this.model.render();
-  if (this.model instanceof scout.Tree) {
-    // disable focus on field container
-    this.model._onNodeControlMouseDownDoFocus = function() {};
-  }
 
   // status
   this.$status = this.$container

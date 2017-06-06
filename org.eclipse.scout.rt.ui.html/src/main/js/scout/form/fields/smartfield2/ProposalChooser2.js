@@ -76,10 +76,6 @@ scout.ProposalChooser2.prototype._render = function() {
 
 scout.ProposalChooser2.prototype._renderModel = function() {
   this.model.render();
-  if (this.model instanceof scout.Tree) { // FIXME [awe] 7.0 - SF2: move this to TreeProposalChooser
-    // disable focus on field container
-    this.model._onNodeControlMouseDownDoFocus = function() {};
-  }
 };
 
 scout.ProposalChooser2.prototype._renderProperties = function() {

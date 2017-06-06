@@ -15,7 +15,8 @@ scout.inherits(scout.TreeProposalChooser2, scout.ProposalChooser2);
 
 scout.TreeProposalChooser2.prototype._createModel = function() {
   var tree = scout.create('Tree', {
-    parent: this
+    parent: this,
+    requestFocusOnNodeControlMouseDown: false
   });
   tree.on('nodeClicked', this._onNodeClicked.bind(this));
   return tree;
