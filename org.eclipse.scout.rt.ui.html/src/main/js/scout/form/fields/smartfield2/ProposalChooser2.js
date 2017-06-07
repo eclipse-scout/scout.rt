@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ProposalChooser2 = function() {
+scout.ProposalChooser2 = function() { // FIXME [awe] 7.0 - SF2: merge with SmartField2Popup?
   scout.ProposalChooser2.parent.call(this);
 
   this.$container = null;
@@ -18,26 +18,19 @@ scout.ProposalChooser2 = function() {
   this._updateStatusTimeout = null;
   this.status = null;
   this.statusVisible = true;
-  this.animateRemoval = true;
 };
-scout.inherits(scout.ProposalChooser2, scout.Popup);
+scout.inherits(scout.ProposalChooser2, scout.Widget);
 
 scout.ProposalChooser2.prototype._init = function(model) {
-  model.withFocusContext = false;
   scout.ProposalChooser2.parent.prototype._init.call(this, model);
 
-  this.smartField = this.parent;
-  this.model = this._createModel();
-  this.setLookupResult(model.lookupResult);
-  this.setStatus(model.status);
-};
-
-scout.ProposalChooser2.prototype._createLayout = function() {
-  if (this.smartField.variant === scout.SmartField2.DisplayStyle.DROPDOWN) {
-    return new scout.DropdownPopupLayout(this, this);
-  } else {
-    return new scout.ProposalChooser2Layout(this, this);
+  // If smartField is not explicitly provided by model, use smartField instance
+  // from parent (which is usually the SmartField2Popup)
+  if (!model.smartField) {
+    this.smartField = this.parent.smartField;
   }
+
+  this.model = this._createModel();
 };
 
 scout.ProposalChooser2.prototype._createModel = function($parent) {
@@ -57,12 +50,9 @@ scout.ProposalChooser2.prototype.triggerLookupRowSelected = function() {
 };
 
 scout.ProposalChooser2.prototype._render = function() {
-  var cssClass = this.smartField.cssClassName() + '-popup';
-  scout.ProposalChooser2.parent.prototype._render.call(this);
-  this.$container
-    .addClass(cssClass)
-    .addClass('proposal-chooser')
-    .on('mousedown', this._onContainerMouseDown.bind(this));
+  this.$container = this.$parent.appendDiv('proposal-chooser');
+  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.ProposalChooser2Layout(this));
 
   this._renderModel();
 
@@ -110,7 +100,6 @@ scout.ProposalChooser2.prototype.delegateEvent = function(event) {
 };
 
 scout.ProposalChooser2.prototype.delegateKeyEvent = function(event) {
-  event.originalEvent.smartFieldEvent = true;
   this.model.$container.trigger(event);
 };
 
@@ -220,17 +209,4 @@ scout.ProposalChooser2.prototype.setBusy = function(busy) {
 
 scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {
   return this.smartField.activeFilterLabels[index];
-};
-
-/**
- * This event handler is called before the mousedown handler on the _document_ is triggered
- * This allows us to prevent the default, which is important for the CellEditorPopup which
- * should stay open when the SmartField popup is closed. It also prevents the focus blur
- * event on the SmartField input-field.
- */
-scout.ProposalChooser2.prototype._onContainerMouseDown = function(event) {
-  // when user clicks on proposal popup with table or tree (prevent default,
-  // so input-field does not lose the focus, popup will be closed by the
-  // proposal chooser impl.
-  return false;
 };

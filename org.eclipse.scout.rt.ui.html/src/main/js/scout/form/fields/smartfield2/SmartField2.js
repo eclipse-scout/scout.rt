@@ -239,8 +239,7 @@ scout.SmartField2.prototype._extendResult = function(result) {
     // tree (hierarchical)
     var proposalChooser = scout.create('TreeProposalChooser2', {
       parent: this,
-      smartField: this,
-      lookupResult: result
+      smartField: this
     });
     proposalChooser.setLookupResult(result);
     var leafs = proposalChooser.findLeafs();
@@ -489,8 +488,7 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
   this.$field.addClass('focused');
   this.$container.addClass('popup-open');
 
-  var objectType = this.browseHierarchy ? 'TreeProposalChooser2' : 'TableProposalChooser2';
-  this.popup = scout.create(objectType, {
+  this.popup = scout.create('SmartField2Popup', {
     parent: this,
     $anchor: this.$field,
     boundToAnchor: true,

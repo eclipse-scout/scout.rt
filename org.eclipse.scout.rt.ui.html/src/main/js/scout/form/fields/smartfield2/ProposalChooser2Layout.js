@@ -8,17 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
-/**
- * @param {scout.ProposalChooser2} proposalChooser (available by property this.popup)
- */
 scout.ProposalChooser2Layout = function(proposalChooser) {
-  scout.ProposalChooser2Layout.parent.call(this, proposalChooser);
-
+  scout.ProposalChooser2Layout.parent.call(this);
+  this._proposalChooser = proposalChooser;
   this._typeHandler = this._createTypeHandler(proposalChooser);
-  this.animating = false;
 };
-scout.inherits(scout.ProposalChooser2Layout, scout.PopupLayout);
+scout.inherits(scout.ProposalChooser2Layout, scout.AbstractLayout);
 
 /**
  * This factory creates type handlers for the various proposal types. By default we support Table and Tree.
@@ -31,7 +26,7 @@ scout.ProposalChooser2Layout.TYPE_HANDLER = {
     _fillerWidth: null,
     cssSelector: '.table',
     prepare: function($container, layout) {
-      this._table = layout.popup.model;
+      this._table = layout._proposalChooser.model;
     },
     /**
      * Clears the given CSS property and stores the old value as data with prefix 'backup'
@@ -113,7 +108,7 @@ scout.ProposalChooser2Layout.TYPE_HANDLER = {
     _tree: null,
     cssSelector: '.tree',
     prepare: function($container, layout) {
-      this._tree = layout.popup.model;
+      this._tree = layout._proposalChooser.model;
       var $nodes = this._tree.$data
         .children('.tree-node')
         .removeClass('first last');
@@ -151,57 +146,33 @@ scout.ProposalChooser2Layout.prototype._createTypeHandler = function(proposalCho
 };
 
 scout.ProposalChooser2Layout.prototype.layout = function($container) {
-  // skip layout while CSS animation is running
-  if (this.animating) {
-    return;
-  }
-
-  scout.ProposalChooser2Layout.parent.prototype.layout.call(this, $container);
-
-  var popupHtmlComp =  scout.HtmlComponent.get($container),
-    popupSize = popupHtmlComp.getSize().subtract(popupHtmlComp.getInsets());
-
-  var
-    modelHtmlComp = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
-    modelSize = popupSize.subtract(modelHtmlComp.getInsets()),
-    $status = this.popup.$status,
+  var filterPrefSize,
+    htmlContainer = scout.HtmlComponent.get($container),
+    htmlComp = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
+    size = htmlContainer.getSize().subtract(htmlContainer.getInsets()),
+    $status = this._proposalChooser.$status,
     hasStatus = $status && $status.isVisible(),
-    filter = this.popup.activeFilterGroup,
-    filterPrefSize;
+    filter = this._proposalChooser.activeFilterGroup;
 
   if (hasStatus) {
-    modelSize.height -= scout.graphics.getSize($status).height;
+    size.height -= scout.graphics.getSize($status).height;
   }
-
   if (filter) {
     filterPrefSize = filter.htmlComp.getPreferredSize();
-    modelSize.height -= filterPrefSize.height;
+    size.height -= filterPrefSize.height;
   }
 
   // when status or active-filter is available we must explicitly set the
   // height of the model (table or tree) in pixel. Otherwise we'd rely on
   // the CSS height which is set to 100%.
   if (hasStatus || filter) {
-    modelHtmlComp.pixelBasedSizing = true;
+    htmlComp.pixelBasedSizing = true;
   }
 
-  modelHtmlComp.setSize(modelSize);
+  htmlComp.setSize(size);
 
   if (filter) {
-    filter.htmlComp.setSize(new scout.Dimension(modelSize.width, filterPrefSize.height));
-  }
-
-  if (popupHtmlComp.layouted) {
-    // Reposition because opening direction may have to be switched if popup gets bigger
-    // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
-    this.popup.position();
-  } else {
-    // The first time it gets layouted, add CSS class to be able to animate
-    this.animating = true;
-    popupHtmlComp.$comp.oneAnimationEnd(function() {
-      this.animating = false;
-    }.bind(this));
-    popupHtmlComp.$comp.addClassForAnimation('animate-open');
+    filter.htmlComp.setSize(new scout.Dimension(size.width, filterPrefSize.height));
   }
 };
 
@@ -213,15 +184,14 @@ scout.ProposalChooser2Layout.prototype.layout = function($container) {
 scout.ProposalChooser2Layout.prototype.preferredLayoutSize = function($container) {
   var oldDisplay, prefSize, modelSize, statusSize, filterPrefSize,
     pcWidth, pcHeight,
-    popupHtmlComp = this.popup.htmlComp,
-    $status = this.popup.$status,
-    filter = this.popup.activeFilterGroup,
-    fieldBounds = scout.graphics.offsetBounds(this.popup.smartField.$field),
-    detachHelper = this.popup.session.detachHelper,
+    htmlComp = this._proposalChooser.htmlComp,
+    $status = this._proposalChooser.$status,
+    filter = this._proposalChooser.activeFilterGroup,
+    detachHelper = this._proposalChooser.session.detachHelper,
     $parent = $container.parent();
 
   this._typeHandler.prepare($container, this);
-  modelSize = this.popup.model.htmlComp.getPreferredSize();
+  modelSize = this._proposalChooser.model.htmlComp.getPreferredSize();
   prefSize = modelSize;
   detachHelper._storeScrollPositions($container);
 
@@ -266,17 +236,5 @@ scout.ProposalChooser2Layout.prototype.preferredLayoutSize = function($container
   }
 
   $container.toggleClass('empty', modelSize.height === 0);
-  prefSize = prefSize.add(popupHtmlComp.getInsets());
-  prefSize.width = Math.max(fieldBounds.width, prefSize.width);
-  prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
-
-  if (prefSize.width > this._maxWindowSize()) {
-    prefSize.width = this._maxWindowSize();
-  }
-
-  return prefSize;
-};
-
-scout.ProposalChooser2Layout.prototype._maxWindowSize = function() {
-  return this.popup.$container.window().width() - (2 * this.popup.windowPaddingX);
+  return prefSize.add(htmlComp.getInsets());
 };
