@@ -4,7 +4,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 
@@ -19,6 +22,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   public HttpTransport newHttpTransport(IHttpTransportManager manager) {
     HttpClientBuilder builder = HttpClients.custom();
 
+    installConfigurableProxySelector(builder);
     installMultiSessionCookieStore(builder);
 
     builder.setConnectionTimeToLive(CONFIG.getPropertyValue(ApacheHttpTransportConnectionTimeToLiveProperty.class), TimeUnit.MILLISECONDS);
@@ -32,10 +36,17 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   /**
+   * Install an instance of the {@link ConfigurableProxySelector} to select proxies.
+   */
+  protected void installConfigurableProxySelector(HttpClientBuilder builder) {
+    builder.setRoutePlanner(new SystemDefaultRoutePlanner(BEANS.get(ConfigurableProxySelector.class)));
+  }
+
+  /**
    * Install a {@link MultiSessionCookieStore} to store cookies by session.
    */
   protected void installMultiSessionCookieStore(HttpClientBuilder builder) {
-    builder.setDefaultCookieStore(new ApacheMultiSessionCookieStore());
+    builder.setDefaultCookieStore(BEANS.get(ApacheMultiSessionCookieStore.class));
   }
 
   /**
