@@ -755,9 +755,6 @@ scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
 };
 
 scout.SmartField2.prototype.showLookupInProgress = function() {
-  if (this.isPopupOpen()) {
-    this.popup.setStatusLookupInProgress();
-  }
   if (this._pendingSetSearching) {
     clearTimeout(this._pendingSetSearching);
   }

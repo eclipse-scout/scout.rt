@@ -100,12 +100,6 @@ scout.ProposalChooser2.prototype._renderProperties = function() {
   this.htmlComp.revalidateLayout();
 };
 
-scout.ProposalChooser2.prototype.setStatusLookupInProgress = function(status) {
-  this.setStatus(scout.Status.ok({
-    message: this.session.text('searchingProposals')
-  }));
-};
-
 /**
  * Delegates an event (e.g. keyup, keydown) to the model.$container of this instance,
  * calling the JQuery trigger method.
