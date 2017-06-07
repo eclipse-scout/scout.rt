@@ -45,7 +45,7 @@ scout.StaticLookupCall.prototype.getByText = function(text) {
 
 scout.StaticLookupCall.prototype._queryByText = function(text) {
   var datas = this._data().filter(function(data) {
-    return scout.strings.startsWith(data[0].toLowerCase(), text.toLowerCase());
+    return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
   });
   this.resolveLookup({
     searchText: text,
@@ -61,7 +61,7 @@ scout.StaticLookupCall.prototype.getByKey = function(key) {
 
 scout.StaticLookupCall.prototype._queryByKey = function(key) {
   var data = scout.arrays.find(this._data(), function(data) {
-    return data[1] === key;
+    return data[0] === key;
   });
   if (data) {
     this.resolveLookup(this._dataToLookupRow(data));
@@ -91,7 +91,7 @@ scout.StaticLookupCall.prototype.setDelay = function(delay) {
  * Implement this function to convert a single data array into an instance of scout.LookupRow.
  */
 scout.StaticLookupCall.prototype._dataToLookupRow = function(data) {
-  return new scout.LookupRow(data[1], data[0]);
+  return new scout.LookupRow(data[0], data[1]);
 };
 
 /**

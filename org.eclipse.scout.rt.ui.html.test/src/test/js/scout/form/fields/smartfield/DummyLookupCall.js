@@ -7,8 +7,8 @@ scout.inherits(scout.DummyLookupCall, scout.StaticLookupCall);
 
 scout.DummyLookupCall.prototype._data = function() {
   return [
-    ['Foo', 1],
-    ['Bar', 2],
-    ['Baz', 3]
+    [1, 'Foo'],
+    [2, 'Bar'],
+    [3, 'Baz']
   ];
 };
