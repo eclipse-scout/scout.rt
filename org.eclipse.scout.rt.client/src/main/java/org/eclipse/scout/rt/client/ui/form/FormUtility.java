@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -76,13 +75,6 @@ public final class FormUtility {
     GridData rootData = new GridData(rootBox.getGridDataHints());
     if (rootData.w == IFormField.FULL_WIDTH) {
       rootData.w = rootBox.getGridColumnCount();
-    }
-    //Legacy
-    if (form instanceof ISearchForm && rootData.weightY < 0) {
-      String viewId = ("" + form.getDisplayViewId()).toUpperCase();
-      if (viewId.indexOf("SEARCH") >= 0 || viewId.indexOf('S') >= 0) {
-        rootData.weightY = 0;
-      }
     }
     rootData.x = 0;
     rootData.y = 0;
