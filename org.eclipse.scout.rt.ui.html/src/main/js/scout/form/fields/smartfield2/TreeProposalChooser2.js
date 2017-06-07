@@ -91,6 +91,10 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
   } else if (treeNodes.length === 1) {
     this.selectFirstLookupRow();
   }
+
+  if (this.model.rendered) {
+    this.model.htmlComp.invalidateLayoutTree();
+  }
 };
 
 scout.TreeProposalChooser2.prototype._isLookupByText = function(result) {

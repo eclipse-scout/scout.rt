@@ -90,6 +90,10 @@ scout.TableProposalChooser2.prototype.setLookupResult = function(result) {
   } else if (tableRows.length === 1) {
     this.selectFirstLookupRow();
   }
+
+  if (this.model.rendered) {
+    this.model.htmlComp.invalidateLayoutTree();
+  }
 };
 
 scout.TableProposalChooser2.prototype.trySelectCurrentValue = function() {
