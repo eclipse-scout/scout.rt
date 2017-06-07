@@ -157,7 +157,7 @@ scout.Status.info = function(model) {
 scout.Status.warn = function(model) {
   model = model || {};
   model = $.extend({}, model, {
-    severity: scout.Status.Severity.WARN
+    severity: scout.Status.Severity.WARNING
   });
   return new scout.Status(model);
 };

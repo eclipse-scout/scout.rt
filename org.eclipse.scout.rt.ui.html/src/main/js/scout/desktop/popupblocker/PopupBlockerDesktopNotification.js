@@ -1,5 +1,6 @@
 scout.PopupBlockerDesktopNotification = function() {
   scout.PopupBlockerDesktopNotification.parent.call(this);
+  this.duration = scout.DesktopNotification.INFINITE;
   this.linkUrl;
 };
 scout.inherits(scout.PopupBlockerDesktopNotification, scout.DesktopNotification);
@@ -7,12 +8,10 @@ scout.inherits(scout.PopupBlockerDesktopNotification, scout.DesktopNotification)
 scout.PopupBlockerDesktopNotification.prototype._init = function(model) {
   scout.PopupBlockerDesktopNotification.parent.prototype._init.call(this, model);
   this.linkText = this.session.text('ui.OpenManually');
-  this.closable = true;
-  this.duration = scout.DesktopNotification.INFINITE;
-  this.status = {
+  this._setStatus({
     message: this.session.text('ui.PopupBlockerDetected'),
-    severity: scout.Status.Severity.WARN
-  };
+    severity: scout.Status.Severity.WARNING
+  });
 };
 
 scout.PopupBlockerDesktopNotification.prototype._render = function() {
