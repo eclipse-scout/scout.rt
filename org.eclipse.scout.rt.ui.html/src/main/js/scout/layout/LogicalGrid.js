@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.GroupBoxAdapter = function() {
-  scout.GroupBoxAdapter.parent.call(this);
-  this._addRemoteProperties(['expanded']);
+/**
+ * Base class for every logical grid. The concrete grids should implement {@link #_validate}.
+ */
+scout.LogicalGrid = function() {
+  this.dirty = true;
 };
-scout.inherits(scout.GroupBoxAdapter, scout.CompositeFieldAdapter);
+
+scout.LogicalGrid.prototype.setDirty = function(dirty) {
+  this.dirty = dirty;
+};
 
 /**
- * @override
+ * Calls {@link #_validate} if the grid is dirty. Sets dirty to false afterwards.
  */
-scout.GroupBoxAdapter.prototype._initModel = function(model, parent) {
-  model = scout.GroupBoxAdapter.parent.prototype._initModel.call(this, model, parent);
-  // Set logical grid to null -> Calculation happens on server side
-  model.logicalGrid = null;
-  return model;
+scout.LogicalGrid.prototype.validate = function(widget) {
+  if (!this.dirty) {
+    return;
+  }
+  this._validate(widget);
+  this.setDirty(false);
 };

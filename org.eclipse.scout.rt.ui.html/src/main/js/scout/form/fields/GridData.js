@@ -25,3 +25,13 @@ scout.GridData.createFromHints = function(field, gridColumnCount) {
   }
   return data;
 };
+
+scout.GridData.ensure = function(gridData) {
+  if (!gridData) {
+    return gridData;
+  }
+  if (gridData instanceof scout.GridData) {
+    return gridData;
+  }
+  return new scout.GridData(gridData);
+};

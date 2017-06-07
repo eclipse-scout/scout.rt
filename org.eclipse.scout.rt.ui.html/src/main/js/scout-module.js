@@ -86,6 +86,7 @@
   __include("scout/layout/HtmlComponent.js");
   __include("scout/layout/LayoutConstants.js");
   __include("scout/layout/LayoutValidator.js");
+  __include("scout/layout/LogicalGrid.js");
   __include("scout/layout/LogicalGridData.js");
   __include("scout/layout/LogicalGridLayout.js");
   __include("scout/layout/LogicalGridLayoutInfo.js");

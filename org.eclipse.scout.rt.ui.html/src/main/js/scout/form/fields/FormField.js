@@ -120,6 +120,7 @@ scout.FormField.prototype._init = function(model) {
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);
   this._setErrorStatus(this.errorStatus);
+  this._setGridDataHints(this.gridDataHints);
   this._setGridData(this.gridData);
   this._setEnabled(this.enabled);
   this._updateEmpty();
@@ -257,6 +258,7 @@ scout.FormField.prototype._renderTooltipText = function() {
 scout.FormField.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
   if (this.rendered) {
+    this.parent.invalidateLogicalGrid(false);
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) { // may be null if $container is detached
       htmlCompParent.invalidateLayoutTree();
@@ -474,8 +476,23 @@ scout.FormField.prototype._renderLabelBackgroundColor = function() {
   scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
+scout.FormField.prototype.setGridDataHints = function(gridData) {
+  this.setProperty('gridDataHints', gridData);
+};
+
+scout.FormField.prototype._setGridDataHints = function(gridData) {
+  if (!gridData) {
+    gridData = new scout.GridData();
+  }
+  this._setProperty('gridDataHints', scout.GridData.ensure(gridData));
+  this.parent.invalidateLogicalGrid();
+};
+
 scout.FormField.prototype._setGridData = function(gridData) {
-  this._setProperty('gridData', new scout.GridData(gridData));
+  if (!gridData) {
+    gridData = new scout.GridData();
+  }
+  this._setProperty('gridData', scout.GridData.ensure(gridData));
 };
 
 scout.FormField.prototype._renderGridData = function() {

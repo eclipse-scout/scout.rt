@@ -22,6 +22,7 @@ scout.GroupBox = function() {
   this.scrollable = false;
   this.expandable = false;
   this.expanded = true;
+  this.logicalGrid = scout.create('scout.VerticalSmartGroupBoxBodyGrid');
   this.gridColumnCount = 2;
   this.gridDataHints.useUiHeight = true;
   this.gridDataHints.w = scout.FormField.FULL_WIDTH;
@@ -114,8 +115,7 @@ scout.GroupBox.prototype._keyStrokeBindTarget = function() {
 };
 
 scout.GroupBox.prototype._render = function() {
-  var htmlBody,
-    env = scout.HtmlEnvironment;
+  var env = scout.HtmlEnvironment;
 
   this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
 
@@ -123,8 +123,8 @@ scout.GroupBox.prototype._render = function() {
   this.addLabel();
   this.addStatus();
   this.$body = this.$container.appendDiv('group-box-body');
-  htmlBody = scout.HtmlComponent.install(this.$body, this.session);
-  htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
+  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  this.htmlBody.setLayout(new scout.LogicalGridLayout(this, env.formColumnGap, env.formRowGap));
   if (this.scrollable) {
     scout.scrollbars.install(this.$body, {
       parent: this,
@@ -374,6 +374,21 @@ scout.GroupBox.prototype._renderExpanded = function() {
   }
 
   this.invalidateLayoutTree();
+};
+
+scout.GroupBox.prototype.setGridColumnCount = function(gridColumnCount) {
+  this.setProperty('gridColumnCount', gridColumnCount);
+  this.invalidateLogicalGrid();
+};
+
+/**
+ * @override
+ */
+scout.GroupBox.prototype.invalidateLogicalGrid = function(invalidateLayout) {
+  scout.GroupBox.parent.prototype.invalidateLogicalGrid.call(this, false);
+  if (scout.nvl(invalidateLayout, true) && this.rendered) {
+    this.htmlBody.invalidateLayoutTree();
+  }
 };
 
 /**

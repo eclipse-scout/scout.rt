@@ -90,11 +90,15 @@ scout.LogicalGridData.prototype._inheritWeightY = function() {
   return d;
 };
 
-scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
+scout.LogicalGridData.prototype._inheritWeightYRec = function(widget) {
   var found = false,
     sumWy = 0;
-  if (f instanceof scout.CompositeField) {
-    var i, inheritWeightY, child, children = f.getFields();
+
+  // The children may have a dirty grid -> make sure the grid is valid before reading any grid data properties
+  widget.validateLogicalGrid();
+
+  if (widget instanceof scout.CompositeField) {
+    var i, inheritWeightY, child, children = widget.getFields();
     for (i = 0; i < children.length; i++) {
       child = children[i];
       if (child.visible) {
@@ -112,14 +116,13 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
       }
     }
   } else {
-    sumWy = (f.gridData.h >= 2 ? f.gridData.h : 0);
+    sumWy = (widget.gridData.h >= 2 ? widget.gridData.h : 0);
     found = true;
   }
   if (found) {
     return sumWy;
-  } else {
-    return null;
   }
+  return null;
 };
 
 scout.LogicalGridData.prototype.isValidateRoot = function() {

@@ -59,6 +59,8 @@ scout.Widget = function() {
   this.events = this._createEventSupport();
   this.loadingSupport = this._createLoadingSupport();
   this.keyStrokeContext = this._createKeyStrokeContext();
+  // Widgets using scout.LogicalGridLayout may have a grid to calculate the grid data of the children
+  this.logicalGrid;
 };
 
 /**
@@ -108,6 +110,8 @@ scout.Widget.prototype._init = function(model) {
     }
     this._initProperty(propertyName, value);
   }.bind(this));
+
+  this._setLogicalGrid(this.logicalGrid);
 };
 
 /**
@@ -699,6 +703,50 @@ scout.Widget.prototype.setLayoutData = function(layoutData) {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.layoutData = layoutData;
+};
+
+/**
+ * If the widget uses a logical grid layout, the grid may be validated using this method.
+ * <p>
+ * If the grid is not dirty, nothing happens.
+ */
+scout.Widget.prototype.validateLogicalGrid = function() {
+  if (this.logicalGrid) {
+    this.logicalGrid.validate(this);
+  }
+};
+
+/**
+ * Marks the logical grid as dirty.<br>
+ * Does nothing, if there is no logical grid.
+ * @param {boolean} [invalidateLayout] true, to invalidate the layout afterwards, false if not. Default is true.
+ */
+scout.Widget.prototype.invalidateLogicalGrid = function(invalidateLayout) {
+  if (!this.initialized) {
+    return;
+  }
+  if (!this.logicalGrid) {
+    return;
+  }
+  this.logicalGrid.setDirty(true);
+  if (scout.nvl(invalidateLayout, true)) {
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.Widget.prototype.setLogicalGrid = function(logicalGrid) {
+  this.setProperty('logicalGrid', logicalGrid);
+};
+
+/**
+ * @param logicalGrid an instance of {@link scout.LogicalGrid} or a string representing the object type of a logical grid.
+ */
+scout.Widget.prototype._setLogicalGrid = function(logicalGrid) {
+  if (typeof logicalGrid === 'string') {
+    logicalGrid = scout.create(logicalGrid);
+  }
+  this._setProperty('logicalGrid', logicalGrid);
+  this.invalidateLogicalGrid();
 };
 
 //--- Event handling methods ---

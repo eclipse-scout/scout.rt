@@ -140,4 +140,85 @@ describe("GroupBox", function() {
     });
   });
 
+  describe('logical grid', function() {
+    it('is validated automatically by the logical grid layout', function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        gridColumnCount: 2,
+        fields: [{
+          objectType: 'StringField'
+        },
+        {
+          objectType: 'StringField'
+        },
+        {
+          objectType: 'StringField'
+        }]
+      });
+      groupBox.render();
+      expect(groupBox.fields[0].gridData.x).toBe(-1);
+      expect(groupBox.fields[0].gridData.y).toBe(-1);
+      expect(groupBox.fields[1].gridData.x).toBe(-1);
+      expect(groupBox.fields[1].gridData.y).toBe(-1);
+      expect(groupBox.fields[2].gridData.x).toBe(-1);
+      expect(groupBox.fields[2].gridData.y).toBe(-1);
+
+      // Logical grid will be validated along with the layout
+      groupBox.revalidateLayout();
+      expect(groupBox.fields[0].gridData.x).toBe(0);
+      expect(groupBox.fields[0].gridData.y).toBe(0);
+      expect(groupBox.fields[1].gridData.x).toBe(0);
+      expect(groupBox.fields[1].gridData.y).toBe(1);
+      expect(groupBox.fields[2].gridData.x).toBe(1);
+      expect(groupBox.fields[2].gridData.y).toBe(0);
+    });
+
+    it('will get dirty if a field gets invisible', function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        gridColumnCount: 2,
+        fields: [{
+          objectType: 'StringField'
+        },
+        {
+          objectType: 'StringField'
+        },
+        {
+          objectType: 'StringField'
+        }]
+      });
+      groupBox.render();
+      groupBox.revalidateLayout();
+
+      groupBox.fields[2].setVisible(false);
+      expect(groupBox.logicalGrid.dirty).toBe(true);
+
+      groupBox.revalidateLayout();
+      expect(groupBox.fields[0].gridData.x).toBe(0);
+      expect(groupBox.fields[0].gridData.y).toBe(0);
+      expect(groupBox.fields[1].gridData.x).toBe(1);
+      expect(groupBox.fields[1].gridData.y).toBe(0);
+    });
+
+    it('may be specified using the object type', function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        logicalGrid: 'HorizontalGroupBoxBodyGrid'
+      });
+      expect(groupBox.logicalGrid instanceof scout.HorizontalGroupBoxBodyGrid).toBe(true);
+
+      groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        logicalGrid: 'VerticalSmartGroupBoxBodyGrid'
+      });
+      expect(groupBox.logicalGrid instanceof scout.VerticalSmartGroupBoxBodyGrid).toBe(true);
+
+      groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        logicalGrid: scout.create('HorizontalGroupBoxBodyGrid')
+      });
+      expect(groupBox.logicalGrid instanceof scout.HorizontalGroupBoxBodyGrid).toBe(true);
+    });
+  });
+
 });

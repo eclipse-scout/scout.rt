@@ -9,13 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.AbstractGroupBoxBodyGrid = function() {
+  scout.AbstractGroupBoxBodyGrid.parent.call(this);
   this.gridRows = 0;
   this.gridColumns = 0;
 };
+scout.inherits(scout.AbstractGroupBoxBodyGrid, scout.LogicalGrid);
 
-scout.AbstractGroupBoxBodyGrid.prototype.init = function() {};
-
-scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox, recursive) {
+/**
+ * @override
+ */
+scout.AbstractGroupBoxBodyGrid.prototype._validate = function(groupBox) {
   // reset old state
   this.gridRows = 0;
   // step 0: column count
@@ -44,14 +47,6 @@ scout.AbstractGroupBoxBodyGrid.prototype.validate = function(groupBox, recursive
     this.layoutAllStatic(fieldsExceptProcessButtons);
   } else {
     this.layoutAllDynamic(fieldsExceptProcessButtons);
-  }
-
-  if (recursive && recursive === true) {
-    groupBox.fields.filter(function(e) {
-      return e.objectType === 'GroupBox';
-    }).forEach(function(e) {
-      this.validate(e, true);
-    }.bind(this));
   }
 };
 

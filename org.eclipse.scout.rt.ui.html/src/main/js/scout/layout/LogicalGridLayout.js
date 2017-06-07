@@ -11,11 +11,12 @@
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
  */
-scout.LogicalGridLayout = function(hgap, vgap) {
+scout.LogicalGridLayout = function(widget, hgap, vgap) {
   scout.LogicalGridLayout.parent.call(this);
   this.cssClass = 'logical-grid-layout';
   this.validityBasedOnContainerSize = new scout.Dimension();
   this.valid = false;
+  this.widget = widget;
   this.info = null;
   this.hgap = hgap || 0;
   this.vgap = vgap || 0;
@@ -42,6 +43,8 @@ scout.LogicalGridLayout.prototype.invalidate = function() {
 
 scout.LogicalGridLayout.prototype.validateLayout = function($container) {
   var visibleComps = [], visibleCons = [], cons;
+
+  this.widget.validateLogicalGrid();
 
   $container.children().each(function (idx, elem) {
     var $comp = $(elem);
