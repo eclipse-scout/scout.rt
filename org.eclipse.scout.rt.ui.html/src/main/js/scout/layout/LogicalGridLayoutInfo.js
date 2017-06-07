@@ -23,8 +23,8 @@ scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap) {
   this.height = [];
   this.weightX;
   this.weightY;
-  this.m_hgap = hgap;
-  this.m_vgap = vgap;
+  this.hgap = hgap;
+  this.vgap = vgap;
   this.m_cellBounds = [];
 
   // create a modifiable copy of the grid datas
@@ -374,8 +374,8 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) {
-  var w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.m_hgap), this.width, this.weightX);
-  var h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.m_vgap), this.height, this.weightY);
+  var w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.hgap), this.width, this.weightX);
+  var h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.vgap), this.height, this.weightY);
   this.m_cellBounds = scout.arrays.init(this.rows, null);
   var y = insets.top,
     r, x, c;
@@ -385,10 +385,10 @@ scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) 
     for (c = 0; c < this.cols; c++) {
       this.m_cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
       x += w[c];
-      x += this.m_hgap;
+      x += this.hgap;
     }
     y += h[r];
-    y += this.m_vgap;
+    y += this.vgap;
   }
   return this.m_cellBounds;
 };
@@ -476,13 +476,13 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
 
 scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(cons) {
   var gridW = cons.gridw;
-  return (scout.HtmlEnvironment.formColumnWidth * gridW) + (this.m_hgap * Math.max(0, gridW - 1));
+  return (scout.HtmlEnvironment.formColumnWidth * gridW) + (this.hgap * Math.max(0, gridW - 1));
 };
 
 scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
   var gridH = cons.gridh,
     addition = cons.logicalRowHeightAddition || 0;
-  return (scout.HtmlEnvironment.formRowHeight * gridH) + (this.m_vgap * Math.max(0, gridH - 1)) + addition;
+  return (scout.HtmlEnvironment.formRowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
 };
 
 scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {

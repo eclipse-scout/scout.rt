@@ -16,9 +16,9 @@ scout.LogicalGridLayout = function(hgap, vgap) {
   this.cssClass = 'logical-grid-layout';
   this.validityBasedOnContainerSize = new scout.Dimension();
   this.valid = false;
-  this.m_info;
-  this.m_hgap = hgap || 0;
-  this.m_vgap = vgap || 0;
+  this.info = null;
+  this.hgap = hgap || 0;
+  this.vgap = vgap || 0;
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
@@ -53,7 +53,7 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container) {
       visibleCons.push(cons);
     }
   });
-  this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap);
+  this.info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.hgap, this.vgap);
   $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
 
@@ -63,14 +63,14 @@ scout.LogicalGridLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getAvailableSize(),
     containerInsets = htmlContainer.getInsets();
   $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
-  var cellBounds = this.m_info.layoutCellBounds(containerSize, containerInsets);
+  var cellBounds = this.info.layoutCellBounds(containerSize, containerInsets);
 
   // Set bounds of components
   var r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
-  for (i = 0; i < this.m_info.$components.length; i++) {
-    $comp = this.m_info.$components[i];
+  for (i = 0; i < this.info.$components.length; i++) {
+    $comp = this.info.$components[i];
     htmlComp = scout.HtmlComponent.get($comp);
-    data = this.m_info.gridDatas[i];
+    data = this.info.gridDatas[i];
     r1 = cellBounds[data.gridy][data.gridx];
     r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
     r = r1.union(r2);
@@ -84,7 +84,7 @@ scout.LogicalGridLayout.prototype.layout = function($container) {
     if (data.fillHorizontal && data.fillVertical) {
       // ok
     } else {
-      d = this.m_info.compSize[i];
+      d = this.info.compSize[i];
       if (!data.fillHorizontal && d.width < r.width) {
         delta = r.width - d.width;
         r.width = d.width;
@@ -132,20 +132,20 @@ scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag)
   var dim = new scout.Dimension();
   // w
   var i, w, h, useCount = 0;
-  for (i = 0; i < this.m_info.cols; i++) {
-    w = this.m_info.width[i][sizeflag];
+  for (i = 0; i < this.info.cols; i++) {
+    w = this.info.width[i][sizeflag];
     if (useCount > 0) {
-      dim.width += this.m_hgap;
+      dim.width += this.hgap;
     }
     dim.width += w;
     useCount++;
   }
   // h
   useCount = 0;
-  for (i = 0; i < this.m_info.rows; i++) {
-    h = this.m_info.height[i][sizeflag];
+  for (i = 0; i < this.info.rows; i++) {
+    h = this.info.height[i][sizeflag];
     if (useCount > 0) {
-      dim.height += this.m_vgap;
+      dim.height += this.vgap;
     }
     dim.height += h;
     useCount++;
