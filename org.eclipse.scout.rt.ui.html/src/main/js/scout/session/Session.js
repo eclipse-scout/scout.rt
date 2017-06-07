@@ -1000,7 +1000,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
       session: this,
       parent: this.desktop || new scout.NullWidget(),
       iconId: options.iconId,
-      severity: scout.nvl(options.severity, scout.MessageBox.SEVERITY.ERROR),
+      severity: scout.nvl(options.severity, scout.Status.Severity.ERROR),
       header: options.header,
       body: options.body,
       hiddenText: options.hiddenText,

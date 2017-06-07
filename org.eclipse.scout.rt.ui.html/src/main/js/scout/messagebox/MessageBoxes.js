@@ -18,7 +18,7 @@ scout.MessageBoxes = function(parent) {
   this.noText = null;
   this.cancelText = null;
   this.bodyText = null;
-  this.severity = scout.MessageBox.SEVERITY.INFO;
+  this.severity = scout.Status.Severity.INFO;
   this.headerText = null;
   this.closeOnClick = true;
   this.html = false;
@@ -47,7 +47,7 @@ scout.MessageBoxes.prototype.withBody = function(bodyText, html) {
 };
 
 scout.MessageBoxes.prototype.withSeverity = function(severity) {
-  this.severity = scout.nvl(severity, scout.MessageBox.SEVERITY.INFO);
+  this.severity = scout.nvl(severity, scout.Status.Severity.INFO);
   return this;
 };
 scout.MessageBoxes.prototype.withYes = function(yesText) {
@@ -109,9 +109,9 @@ scout.MessageBoxes.prototype.buildAndOpen = function() {
 scout.MessageBoxes.prototype._headerTextForSeverity = function() {
   var session = this.parent.session;
   switch (this.severity) {
-    case scout.MessageBox.SEVERITY.WARNING:
+    case scout.Status.Severity.WARNING:
       return session.text('Warning');
-    case scout.MessageBox.SEVERITY.ERROR:
+    case scout.Status.Severity.ERROR:
       return session.text('Error');
     default: // ok and info
       return session.text('Info');
@@ -124,7 +124,7 @@ scout.MessageBoxes.prototype._headerTextForSeverity = function() {
  * @returns {Promise} resolved to clicked button
  * @param {Object} parent
  * @param {string} bodyText
- * @param {number} [severity] default is <code>scout.MessageBox.SEVERITY.INFO</code>
+ * @param {number} [severity] default is <code>scout.Status.Severity.INFO</code>
  * @static
  */
 scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
@@ -141,7 +141,7 @@ scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
  * @returns {Promise} resolved to clicked button
  * @param {Object} parent
  * @param {string} bodyText
- * @param {number} [severity] default is <code>scout.MessageBox.SEVERITY.INFO</code>
+ * @param {number} [severity] default is <code>scout.Status.Severity.INFO</code>
  * @static
  */
 scout.MessageBoxes.openYesNo = function(parent, bodyText, severity) {

@@ -120,7 +120,7 @@ scout.AbstractLifecycle.prototype.doOk = function() {
 
 scout.AbstractLifecycle.prototype._showYesNoCancelMessageBox = function(message, yesAction, noAction) {
   return new scout.MessageBoxes(this.widget)
-    .withSeverity(scout.MessageBox.SEVERITY.WARNING)
+    .withSeverity(scout.Status.Severity.WARNING)
     .withHeader(message)
     .withYes()
     .withNo()
@@ -142,7 +142,7 @@ scout.AbstractLifecycle.prototype._showYesNoCancelMessageBox = function(message,
  */
 scout.AbstractLifecycle.prototype._showStatusMessageBox = function(status) {
   return new scout.MessageBoxes(this.widget)
-    .withSeverity(scout.MessageBox.SEVERITY.ERROR)
+    .withSeverity(scout.Status.Severity.ERROR)
     .withBody(status.message, true)
     .withYes(this.session().text('Ok'))
     .buildAndOpen();

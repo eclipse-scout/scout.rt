@@ -33,15 +33,6 @@ scout.MessageBox = function() {
 };
 scout.inherits(scout.MessageBox, scout.Widget);
 
-// TODO [7.0] awe: same as scout.Status.Severity!? merge
-// represents severity codes from IStatus
-scout.MessageBox.SEVERITY = {
-  OK: 1,
-  INFO: 256,
-  WARNING: 65536,
-  ERROR: 16777216
-};
-
 scout.MessageBox.Buttons = {
   YES: 'yes',
   NO: 'no',
@@ -160,7 +151,7 @@ scout.MessageBox.prototype._renderIconId = function() {
 
 scout.MessageBox.prototype._renderSeverity = function() {
   this.$container.removeClass('severity-error');
-  if (this.severity === scout.MessageBox.SEVERITY.ERROR) {
+  if (this.severity === scout.Status.Severity.ERROR) {
     this.$container.addClass('severity-error');
   }
 };
