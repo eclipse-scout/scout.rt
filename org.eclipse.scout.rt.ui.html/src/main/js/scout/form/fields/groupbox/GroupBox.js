@@ -16,7 +16,7 @@ scout.GroupBox = function() {
   this.menus = [];
   this.menuBarVisible = true;
   this.notification;
-  this.borderDecoration = 'auto';
+  this.borderDecoration = scout.GroupBox.BorderDecoration.AUTO;
   this.borderVisible = true;
   this.mainBox = false;
   this.scrollable = false;
@@ -36,6 +36,12 @@ scout.GroupBox = function() {
   this.$title;
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
+
+scout.GroupBox.BorderDecoration = {
+  AUTO: 'auto',
+  EMPTY: 'empty',
+  LINE: 'line'
+};
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
@@ -247,15 +253,22 @@ scout.GroupBox.prototype.getFields = function() {
   return this.fields;
 };
 
+scout.GroupBox.prototype.setBorderVisible = function(borderVisible) {
+  this.setProperty('borderVisible', borderVisible);
+};
+
 scout.GroupBox.prototype._renderBorderVisible = function() {
   var borderVisible = this.borderVisible;
-  if (this.borderDecoration === 'auto') {
+  if (this.borderDecoration === scout.GroupBox.BorderDecoration.AUTO) {
     borderVisible = this._computeBorderVisible(borderVisible);
   }
 
-  if (!borderVisible) {
-    this.$body.addClass('y-padding-invisible');
-  }
+  this.$body.toggleClass('y-padding-invisible', !borderVisible);
+  this.invalidateLayoutTree();
+};
+
+scout.GroupBox.prototype.setBorderDecoration = function(borderDecoration) {
+  this.setProperty('borderDecoration', borderDecoration);
 };
 
 // Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
@@ -302,6 +315,10 @@ scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
   return borderVisible;
 };
 
+scout.GroupBox.prototype.setExpandable = function(expandable) {
+  this.setProperty('expandable', expandable);
+};
+
 scout.GroupBox.prototype._renderExpandable = function() {
   var expandable = this.expandable;
   var $control = this.$title.children('.group-box-control');
@@ -324,10 +341,14 @@ scout.GroupBox.prototype._renderExpandable = function() {
   }
 };
 
+scout.GroupBox.prototype.setExpanded = function(expanded) {
+  this.setProperty('expanded', expanded);
+};
+
 scout.GroupBox.prototype._renderExpanded = function() {
   var expanded = this.expanded;
   this.$container.toggleClass('collapsed', !expanded);
-  if (this.borderDecoration === 'line') {
+  if (this.borderDecoration === scout.GroupBox.BorderDecoration.LINE) {
     this.$container.toggleClass('with-line', !expanded);
   }
 
@@ -415,8 +436,4 @@ scout.GroupBox.prototype._onControlClick = function(event) {
     this.setExpanded(!this.expanded);
   }
   $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
-};
-
-scout.GroupBox.prototype.setExpanded = function(expanded) {
-  this.setProperty('expanded', expanded);
 };
