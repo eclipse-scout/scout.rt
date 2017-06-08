@@ -19,11 +19,17 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRebuildProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.jboss.jandex.CompositeIndex;
 import org.jboss.jandex.Index;
@@ -36,92 +42,239 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JandexInventoryBuilder {
-
   private static final Logger LOG = LoggerFactory.getLogger(JandexInventoryBuilder.class);
 
-  private static final String SCOUT_XML_PATH = "META-INF/scout.xml";
-  private static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";
+  public static final String SCOUT_XML_PATH = "META-INF/scout.xml";
+
+  public static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";
+
+  public enum RebuildStrategy {
+    IF_MISSING, IF_MODIFIED, ALWAYS
+  }
+
+  protected static class IndexMetaData {
+    private final long m_lastModified;
+    private final int m_fileCount;
+
+    protected IndexMetaData(long lastModified, int fileCount) {
+      m_lastModified = lastModified;
+      m_fileCount = fileCount;
+    }
+
+    protected long lastModified() {
+      return m_lastModified;
+    }
+
+    protected int fileCount() {
+      return m_fileCount;
+    }
+  }
+
+  private final RebuildStrategy m_rebuildStrategy;
 
   private final List<IndexView> m_indexList;
-  private final boolean m_forceRebuildFolderIndexes;
 
   public JandexInventoryBuilder() {
-    m_forceRebuildFolderIndexes = new JandexRebuildProperty().getValue(); // do not use the CONFIG class here because the platform is not ready yet
+    // do not use the CONFIG class here because the platform is not ready yet
+    this(
+        new JandexRebuildProperty().getValue()
+            ? RebuildStrategy.ALWAYS
+            : new PlatformDevModeProperty().getValue()
+                ? RebuildStrategy.IF_MODIFIED
+                : RebuildStrategy.IF_MISSING);
+  }
+
+  public JandexInventoryBuilder(RebuildStrategy rebuildStrategy) {
+    m_rebuildStrategy = rebuildStrategy;
     m_indexList = new ArrayList<>();
+  }
+
+  public RebuildStrategy getRebuildStrategy() {
+    return m_rebuildStrategy;
   }
 
   public void scanAllModules() {
     try {
       for (Enumeration<URL> en = getClass().getClassLoader().getResources(SCOUT_XML_PATH); en.hasMoreElements();) {
         URL url = en.nextElement();
-        scanModule(url);
+        URI indexUri = findIndexUri(url);
+        scanModule(indexUri);
       }
     }
     catch (IOException ex) {
-      throw new PlatformException("failed reading resources '" + SCOUT_XML_PATH + "'", ex);
+      throw new PlatformException("failed reading resources '{}'", SCOUT_XML_PATH, ex);
     }
   }
 
-  public void scanModule(URL url) {
-    String urlText = url.toExternalForm();
-    URI indexUri;
-    String indexUrl = urlText.substring(0, urlText.length() - SCOUT_XML_PATH.length()) + JANDEX_INDEX_PATH;
+  public Index scanModule(URI indexUri) {
     try {
-      indexUri = new URI(indexUrl);
-    }
-    catch (URISyntaxException ex) {
-      throw new PlatformException("Cannot create URI from: " + indexUrl, ex);
-    }
-
-    //check for prepared index
-    if (!(m_forceRebuildFolderIndexes && urlText.startsWith("file:"))) {
-      try (InputStream in = new BufferedInputStream(indexUri.toURL().openStream())) {
-        Index index = new IndexReader(in).read();
+      Index index = scanModuleUnsafe(indexUri);
+      if (index != null) {
         m_indexList.add(index);
-        LOG.debug("found pre-built {}", indexUri);
-        return;
       }
-      catch (FileNotFoundException e) {
-        LOG.debug("No pre-built index found: {}", indexUri, e);
-      }
-      catch (Exception ex) {
-        throw new PlatformException("error reading index: " + indexUri, ex);
-      }
+      return index;
     }
-
-    //scan location
-    if (m_forceRebuildFolderIndexes) {
-      LOG.info("forcing rebuild of index '{}'. scanning location...", indexUri);
-    }
-    else {
-      LOG.info("found no pre-built '{}'. scanning location...", indexUri);
-    }
-    try {
-      if (urlText.startsWith("jar:file:")) {
-        Indexer indexer = new Indexer();
-        File jarFile = new File(new URI("file:" + urlText.substring(9, urlText.lastIndexOf("!"))));
-        Index index = JarIndexer.createJarIndex(jarFile, indexer, false, false, false).getIndex();
-        m_indexList.add(index);
-        return;
-      }
-      if (urlText.startsWith("file:")) {
-        Indexer indexer = new Indexer();
-        File scoutXmlFolder = new File(url.toURI());
-        File classesFolder = scoutXmlFolder.getParentFile().getParentFile();
-        Index index = JandexFolderIndexer.createFolderIndex(classesFolder.toPath(), indexer);
-        m_indexList.add(index);
-        saveIndexFile(new File(classesFolder, JANDEX_INDEX_PATH), index);
-        return;
-      }
-      //unknown protocol
-      throw new PlatformException("unknown protocol: {}", urlText);
+    catch (PlatformException p) {
+      throw p;
     }
     catch (Exception ex) {
-      throw new PlatformException("Cannot scan location '{}' with jandex", urlText, ex);
+      throw new PlatformException("Cannot scan location '{}' with jandex", indexUri, ex);
     }
   }
 
-  protected void saveIndexFile(File file, Index index) {
+  protected Index scanModuleUnsafe(URI indexUri) throws IOException, URISyntaxException {
+    if ("file".equals(indexUri.getScheme())) {
+      return scanFolder(indexUri);
+    }
+    else if ("jar".equals(indexUri.getScheme())) {
+      return scanJar(indexUri);
+    }
+    else {
+      return scanOther(indexUri);
+    }
+  }
+
+  protected Index scanFolder(URI indexUri) throws IOException {
+    File indexFile = new File(indexUri);
+    File classesFolder = indexFile.getParentFile().getParentFile();
+    IndexMetaData newMeta = null;
+    Index index = null;
+    if (indexFile.exists()) {
+      switch (m_rebuildStrategy) {
+        case IF_MODIFIED:
+          newMeta = indexMetaData(classesFolder.toPath());
+          //pass 1: check modified
+          long oldModified = indexFile.lastModified();
+          if (newMeta.lastModified() > oldModified) {
+            LOG.info("drop old index '{}'. Index timestamp {} < current folder timestamp {}", indexUri, oldModified, newMeta.lastModified());
+            indexFile.delete();
+          }
+          else {
+            //pass 2: file count
+            index = readIndex(indexUri);
+            int oldFileCount = index.getKnownClasses().size();
+            if (newMeta.fileCount() != oldFileCount) {
+              LOG.info("drop old index '{}'. Index file count {} != current folder file count {}", indexUri, oldFileCount, newMeta.fileCount());
+              index = null;
+              indexFile.delete();
+            }
+          }
+          break;
+        case ALWAYS:
+          indexFile.delete();
+          break;
+        default:
+          //nop
+      }
+    }
+
+    if (index == null) {
+      index = readIndex(indexUri);
+    }
+    if (index != null) {
+      return index;
+    }
+
+    if (newMeta == null) {
+      newMeta = indexMetaData(classesFolder.toPath());
+    }
+    LOG.info("rebuild index '{}'. scanning location...", indexUri);
+    Indexer indexer = new Indexer();
+    index = createFolderIndex(classesFolder.toPath(), indexer);
+    saveIndex(indexFile, index);
+    indexFile.setLastModified(newMeta.lastModified());
+    return index;
+  }
+
+  protected Index scanJar(URI indexUri) throws URISyntaxException, IOException {
+    String s = indexUri.getRawSchemeSpecificPart();
+    File jarFile = new File(new URI(s.substring(0, s.lastIndexOf("!"))));
+    Index index = readIndex(indexUri);
+    if (index != null) {
+      return index;
+    }
+    LOG.info("found no pre-built '{}'. scanning location...", indexUri);
+    Indexer indexer = new Indexer();
+    return JarIndexer.createJarIndex(jarFile, indexer, false, false, false).getIndex();
+  }
+
+  protected Index scanOther(URI indexUri) {
+    Index index = readIndex(indexUri);
+    if (index != null) {
+      return index;
+    }
+    throw new PlatformException("unknown protocol in: {}", indexUri);
+  }
+
+  protected IndexMetaData indexMetaData(Path dir) throws IOException {
+    final AtomicLong lastModifiedRef = new AtomicLong();
+    final AtomicInteger fileCountRef = new AtomicInteger();
+    JandexFiles.walkFileTree(dir, new IJandexFileVisitor() {
+      @Override
+      public void visit(Path path, BasicFileAttributes attrs) throws IOException {
+        if (!acceptPathForIndex(path)) {
+          return;
+        }
+        fileCountRef.incrementAndGet();
+        long t = attrs.lastModifiedTime().toMillis();
+        if (t > lastModifiedRef.get()) {
+          lastModifiedRef.set(t);
+        }
+      }
+    });
+    return new IndexMetaData(lastModifiedRef.get(), fileCountRef.get());
+  }
+
+  protected boolean acceptPathForIndex(Path path) {
+    return true;
+  }
+
+  protected URI findIndexUri(URL scoutXmlUrl) {
+    String s = scoutXmlUrl.toExternalForm();
+    try {
+      return new URI(s.substring(0, s.length() - SCOUT_XML_PATH.length()) + JANDEX_INDEX_PATH);
+    }
+    catch (URISyntaxException ex) {
+      throw new PlatformException("Cannot find index URI from: {}", s, ex);
+    }
+  }
+
+  /**
+   * @param indexUri
+   * @return index or null
+   */
+  protected Index readIndex(URI indexUri) {
+    try (InputStream in = new BufferedInputStream(indexUri.toURL().openStream())) {
+      Index index = new IndexReader(in).read();
+      LOG.debug("found pre-built {}", indexUri);
+      return index;
+    }
+    catch (FileNotFoundException e) {
+      LOG.debug("No pre-built index found: {}", indexUri, e);
+      return null;
+    }
+    catch (Exception ex) {
+      throw new PlatformException("error reading index: " + indexUri, ex);
+    }
+  }
+
+  protected Index createFolderIndex(Path dir, final Indexer indexer) throws IOException {
+    JandexFiles.walkFileTree(dir, new IJandexFileVisitor() {
+      @Override
+      public void visit(Path path, BasicFileAttributes attrs) throws IOException {
+        appendPathToIndex(path, indexer);
+      }
+    });
+    return indexer.complete();
+  }
+
+  protected void appendPathToIndex(Path path, Indexer indexer) throws IOException {
+    try (InputStream in = Files.newInputStream(path)) {
+      indexer.index(in);
+    }
+  }
+
+  protected void saveIndex(File file, Index index) {
     try (FileOutputStream out = new FileOutputStream(file)) {
       LOG.debug("writing jandex index file: {}", file);
       new IndexWriter(out).write(index);
@@ -137,9 +290,5 @@ public class JandexInventoryBuilder {
 
   protected List<IndexView> getIndexList() {
     return m_indexList;
-  }
-
-  protected boolean isForceRebuildFolderIndexe() {
-    return m_forceRebuildFolderIndexes;
   }
 }

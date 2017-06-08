@@ -32,11 +32,11 @@ public final class ClassInventory {
   static {
     try {
       long t0 = System.nanoTime();
-      JandexInventoryBuilder beanFinder = new JandexInventoryBuilder();
-      beanFinder.scanAllModules();
-      IndexView index = beanFinder.finish();
+      JandexInventoryBuilder inventoryBuilder = new JandexInventoryBuilder();
+      inventoryBuilder.scanAllModules();
+      IndexView index = inventoryBuilder.finish();
       long nanos = System.nanoTime() - t0;
-      LOG.info("Finished preparation of jandex class inventory in {} ms", StringUtility.formatNanos(nanos));
+      LOG.info("Finished build of jandex class inventory in {} ms using rebuild strategy {}", StringUtility.formatNanos(nanos), inventoryBuilder.getRebuildStrategy());
       INSTANCE = new JandexClassInventory(index);
     }
     catch (Exception t) {

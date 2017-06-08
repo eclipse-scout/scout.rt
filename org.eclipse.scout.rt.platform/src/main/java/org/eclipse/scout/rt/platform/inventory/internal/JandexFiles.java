@@ -11,28 +11,19 @@
 package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.jboss.jandex.Index;
-import org.jboss.jandex.Indexer;
-
-public final class JandexFolderIndexer {
+public final class JandexFiles {
   private static final String CLASS_EXT = ".class";
 
-  private JandexFolderIndexer() {
+  private JandexFiles() {
   }
 
-  public static Index createFolderIndex(Path folderPath, Indexer indexer) throws IOException {
-    scanDirectory(folderPath, indexer);
-    return indexer.complete();
-  }
-
-  static void scanDirectory(Path dir, final Indexer indexer) throws IOException {
+  public static void walkFileTree(Path dir, final IJandexFileVisitor visitor) throws IOException {
     Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
@@ -40,9 +31,7 @@ public final class JandexFolderIndexer {
           return FileVisitResult.SKIP_SUBTREE;
         }
         if (!attrs.isDirectory() && path.toString().endsWith(CLASS_EXT)) {
-          try (InputStream in = Files.newInputStream(path)) {
-            indexer.index(in);
-          }
+          visitor.visit(path, attrs);
         }
         return FileVisitResult.CONTINUE;
       }
