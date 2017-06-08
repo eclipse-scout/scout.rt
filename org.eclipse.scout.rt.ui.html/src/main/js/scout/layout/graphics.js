@@ -251,6 +251,14 @@ scout.graphics = {
   },
 
   /**
+   * Returns a scout.Point consisting of the component's "cssLeft" and
+   * "cssTop" values (reverse operation to setLocation).
+   */
+  location: function($comp) {
+    return new scout.Point($comp.cssLeft(), $comp.cssTop());
+  },
+
+  /**
    * Returns the bounds of the element relative to the offset parent, insets included.
    * The sizes are rounded up, unless the option 'exact' is set to true.
    *
@@ -322,9 +330,14 @@ scout.graphics = {
 /**
  * JavaScript port from java.awt.Point.
  */
-scout.Point = function(x, y) {
-  this.x = x || 0;
-  this.y = y || 0;
+scout.Point = function(vararg, y) {
+  if (vararg instanceof scout.Point) {
+    this.x = vararg.x;
+    this.y = vararg.y;
+  } else {
+    this.x = vararg || 0;
+    this.y = y || 0;
+  }
 };
 
 scout.Point.prototype.toString = function() {
@@ -340,6 +353,14 @@ scout.Point.prototype.equals = function(o) {
 
 scout.Point.prototype.clone = function(o) {
   return new scout.Point(this.x, this.y);
+};
+
+scout.Point.prototype.add = function(point) {
+  return new scout.Point(this.x + point.x, this.y + point.y);
+};
+
+scout.Point.prototype.subtract = function(point) {
+  return new scout.Point(this.x - point.x, this.y - point.y);
 };
 
 scout.Point.prototype.floor = function() {
@@ -407,11 +428,18 @@ scout.Dimension.prototype.ceil = function() {
 /**
  * JavaScript port from java.awt.Rectangle.
  */
-scout.Rectangle = function(x, y, width, height) {
-  this.x = x || 0;
-  this.y = y || 0;
-  this.width = width || 0;
-  this.height = height || 0;
+scout.Rectangle = function(vararg, y, width, height) {
+  if (vararg instanceof scout.Rectangle) {
+    this.x = vararg.x;
+    this.y = vararg.y;
+    this.width = vararg.width;
+    this.height = vararg.height;
+  } else {
+    this.x = vararg || 0;
+    this.y = y || 0;
+    this.width = width || 0;
+    this.height = height || 0;
+  }
 };
 
 scout.Rectangle.prototype.toString = function() {
@@ -523,11 +551,18 @@ scout.Rectangle.prototype.ceil = function() {
 /**
  * JavaScript port from java.awt.Insets.
  */
-scout.Insets = function(top, right, bottom, left) {
-  this.top = top || 0;
-  this.right = right || 0;
-  this.bottom = bottom || 0;
-  this.left = left || 0;
+scout.Insets = function(vararg, right, bottom, left) {
+  if (vararg instanceof scout.Insets) {
+    this.top = vararg.top;
+    this.right = vararg.right;
+    this.bottom = vararg.bottom;
+    this.left = vararg.left;
+  } else {
+    this.top = vararg || 0;
+    this.right = right || 0;
+    this.bottom = bottom || 0;
+    this.left = left || 0;
+  }
 };
 
 scout.Insets.prototype.toString = function() {
