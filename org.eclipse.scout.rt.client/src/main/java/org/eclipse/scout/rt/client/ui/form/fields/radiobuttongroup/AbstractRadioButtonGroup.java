@@ -397,20 +397,15 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
+  @Override
+  public ICompositeFieldGrid<ICompositeField> getFieldGrid() {
+    return m_grid;
+  }
+
   protected void handleFieldVisibilityChanged() {
     if (isInitialized()) {
       rebuildFieldGrid();
     }
-  }
-
-  @Override
-  public final int getGridColumnCount() {
-    return m_grid != null ? m_grid.getGridColumnCount() : 1;
-  }
-
-  @Override
-  public final int getGridRowCount() {
-    return m_grid != null ? m_grid.getGridRowCount() : 1;
   }
 
   @Override

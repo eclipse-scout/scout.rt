@@ -189,7 +189,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Override
   protected void initConfig() {
     m_labelCompositionLock = new OptimisticLock();
-    m_grid = new SequenceBoxGrid(this);
+    m_grid = new SequenceBoxGrid();
     super.initConfig();
     setAutoCheckFromTo(getConfiguredAutoCheckFromTo());
     setEqualColumnWidths(getConfiguredEqualColumnWidths());
@@ -284,10 +284,15 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
   @Override
   public void rebuildFieldGrid() {
-    m_grid.validate();
+    m_grid.validate(this);
     if (isInitialized() && getForm() != null) {
       getForm().structureChanged(this);
     }
+  }
+
+  @Override
+  public SequenceBoxGrid getFieldGrid() {
+    return m_grid;
   }
 
   @Override
@@ -297,16 +302,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       // box is only visible when it has at least one visible item
       rebuildFieldGrid();
     }
-  }
-
-  @Override
-  public final int getGridColumnCount() {
-    return m_grid.getGridColumnCount();
-  }
-
-  @Override
-  public final int getGridRowCount() {
-    return m_grid.getGridRowCount();
   }
 
   @Override

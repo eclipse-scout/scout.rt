@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -1057,17 +1058,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Override
-  public final int getGridColumnCount() {
-    return 1;
-  }
-
-  @Override
-  public final int getGridRowCount() {
-    return 1;
-  }
-
-  @Override
   public void rebuildFieldGrid() {
+  }
+
+  @Override
+  public ICompositeFieldGrid<? extends ICompositeField> getFieldGrid() {
+    return null;
   }
 
   @Order(1)

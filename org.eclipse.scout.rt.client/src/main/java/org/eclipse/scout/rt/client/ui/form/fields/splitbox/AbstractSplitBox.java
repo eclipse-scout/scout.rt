@@ -111,7 +111,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    m_grid = new SplitBoxGrid(this);
+    m_grid = new SplitBoxGrid();
     super.initConfig();
     setSplitHorizontal(getConfiguredSplitHorizontal());
     setSplitterEnabled(getConfiguredSplitterEnabled());
@@ -128,10 +128,15 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
 
   @Override
   public void rebuildFieldGrid() {
-    m_grid.validate();
+    m_grid.validate(this);
     if (isInitialized() && getForm() != null) {
       getForm().structureChanged(this);
     }
+  }
+
+  @Override
+  public SplitBoxGrid getFieldGrid() {
+    return m_grid;
   }
 
   @Override
@@ -140,16 +145,6 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     if (isInitialized()) {
       rebuildFieldGrid();
     }
-  }
-
-  @Override
-  public final int getGridColumnCount() {
-    return m_grid.getGridColumnCount();
-  }
-
-  @Override
-  public final int getGridRowCount() {
-    return m_grid.getGridRowCount();
   }
 
   @Override

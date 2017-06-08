@@ -279,7 +279,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setExpanded(getConfiguredExpanded());
     setBorderVisible(getConfiguredBorderVisible());
     setBorderDecoration(getConfiguredBorderDecoration());
-    setGridColumnCountHint(getConfiguredGridColumnCount());
+    setGridColumnCount(getConfiguredGridColumnCount());
     setBackgroundImageName(getConfiguredBackgroundImageName());
     setBackgroundImageHorizontalAlignment(getConfiguredBackgroundImageHorizontalAlignment());
     setBackgroundImageVerticalAlignment(getConfiguredBackgroundImageVerticalAlignment());
@@ -473,32 +473,43 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     clearCategorization();
   }
 
+  /**
+   * @deprecated use {@link #getFieldGrid()} instead
+   */
   @Override
+  @Deprecated
   public IGroupBoxBodyGrid getBodyGrid() {
+    return getFieldGrid();
+  }
+
+  @Override
+  public IGroupBoxBodyGrid getFieldGrid() {
     return m_bodyGrid;
   }
 
   @Override
-  public final int getGridColumnCount() {
-    return m_bodyGrid.getGridColumnCount();
-  }
-
-  @Override
-  public final int getGridRowCount() {
-    return m_bodyGrid.getGridRowCount();
-  }
-
-  @Override
-  public void setGridColumnCountHint(int c) {
-    propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT_HINT, c);
+  public void setGridColumnCount(int c) {
+    propertySupport.setPropertyInt(PROP_GRID_COLUMN_COUNT, c);
     if (isInitialized()) {
       rebuildFieldGrid();
     }
   }
 
   @Override
+  public int getGridColumnCount() {
+    return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void setGridColumnCountHint(int c) {
+    setGridColumnCount(c);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public int getGridColumnCountHint() {
-    return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT_HINT);
+    return getGridColumnCount();
   }
 
   @Override

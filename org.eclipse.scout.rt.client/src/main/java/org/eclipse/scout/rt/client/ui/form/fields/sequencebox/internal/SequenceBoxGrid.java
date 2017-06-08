@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
@@ -22,22 +23,18 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 /**
  * Grid (model) layout of sequence box only visible process-buttons are used
  */
-public class SequenceBoxGrid {
-  private ISequenceBox m_rangeBox = null;
+public class SequenceBoxGrid implements ICompositeFieldGrid<ISequenceBox> {
   private int m_gridColumns;
   private int m_gridRows;
 
-  public SequenceBoxGrid(ISequenceBox rangeBox) {
-    m_rangeBox = rangeBox;
-  }
-
-  public void validate() {
+  @Override
+  public void validate(ISequenceBox sequenceBox) {
     // reset
     m_gridColumns = 0;
     m_gridRows = 0;
     List<IFormField> list = new ArrayList<IFormField>();
     // filter
-    for (IFormField f : m_rangeBox.getFields()) {
+    for (IFormField f : sequenceBox.getFields()) {
       if (f.isVisible()) {
         list.add(f);
       }
@@ -71,10 +68,12 @@ public class SequenceBoxGrid {
     m_gridColumns = x;
   }
 
+  @Override
   public int getGridColumnCount() {
     return m_gridColumns;
   }
 
+  @Override
   public int getGridRowCount() {
     return m_gridRows;
   }

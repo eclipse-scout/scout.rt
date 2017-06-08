@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal;
 import java.util.ArrayList;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -20,23 +21,19 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 /**
  * Grid (model) layout of tab box only visible process-buttons are used
  */
-public class TabBoxGrid {
-  private ITabBox m_tabBox = null;
+public class TabBoxGrid implements ICompositeFieldGrid<ITabBox> {
   private IFormField[] m_fields;
   private int m_gridColumns;
   private int m_gridRows;
 
-  public TabBoxGrid(ITabBox tabBox) {
-    m_tabBox = tabBox;
-  }
-
-  public void validate() {
+  @Override
+  public void validate(ITabBox tabBox) {
     // reset
     m_gridColumns = 0;
     m_gridRows = 0;
     ArrayList<IFormField> list = new ArrayList<IFormField>();
     // filter
-    for (IFormField f : m_tabBox.getGroupBoxes()) {
+    for (IFormField f : tabBox.getGroupBoxes()) {
       if (f.isVisible()) {
         list.add(f);
       }
@@ -63,10 +60,12 @@ public class TabBoxGrid {
     }
   }
 
+  @Override
   public int getGridColumnCount() {
     return m_gridColumns;
   }
 
+  @Override
   public int getGridRowCount() {
     return m_gridRows;
   }

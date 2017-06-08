@@ -70,13 +70,8 @@ public class CompositeFieldTest {
 class P_TestCompositeField extends AbstractCompositeField {
 
   @Override
-  public int getGridColumnCount() {
-    return 1;
-  }
-
-  @Override
-  public int getGridRowCount() {
-    return 1;
+  public ICompositeFieldGrid<? extends ICompositeField> getFieldGrid() {
+    return null;
   }
 
   public TextField getTextField() {
@@ -91,13 +86,8 @@ class P_TestCompositeField extends AbstractCompositeField {
 class P_BadVisitorCompositeField extends AbstractCompositeField {
 
   @Override
-  public int getGridColumnCount() {
-    return 1;
-  }
-
-  @Override
-  public int getGridRowCount() {
-    return 1;
+  public ICompositeFieldGrid<? extends ICompositeField> getFieldGrid() {
+    return null;
   }
 
   public FirstField getFirstField() {

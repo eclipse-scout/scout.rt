@@ -97,10 +97,10 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
         return getModel().isExpanded();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_GRID_COLUMN_COUNT_HINT, model) {
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_GRID_COLUMN_COUNT, model) {
       @Override
       protected Integer modelValue() {
-        return getModel().getGridColumnCountHint();
+        return getModel().getGridColumnCount();
       }
     });
   }

@@ -74,10 +74,8 @@ public final class FormUtility {
     // layout data for root group box
     GridData rootData = new GridData(rootBox.getGridDataHints());
     if (rootData.w == IFormField.FULL_WIDTH) {
-      rootData.w = rootBox.getGridColumnCount();
+      rootData.w = rootBox.getFieldGrid().getGridColumnCount();
     }
-    rootData.x = 0;
-    rootData.y = 0;
     rootBox.setGridDataInternal(rootData);
   }
 

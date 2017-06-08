@@ -29,7 +29,7 @@ public interface ICompositeField extends IFormField {
 
   /**
    * Visits this field and all of its child fields recursively.
-   * 
+   *
    * @param visitor
    *          The visitor to use. Must not be <code>null</code>.
    * @return <code>true</code> if all fields have been visited. <code>false</code> if the visitor cancelled the visit.
@@ -42,6 +42,8 @@ public interface ICompositeField extends IFormField {
    * recalculate and re-assign the logical x,y,w,h to each field in the groupbox
    */
   void rebuildFieldGrid();
+
+  ICompositeFieldGrid<? extends ICompositeField> getFieldGrid();
 
   /**
    * direct child fields including groupboxes
@@ -83,16 +85,6 @@ public interface ICompositeField extends IFormField {
    */
   @Override
   void setMandatory(boolean b);
-
-  /**
-   * The grid column count for fields in this composite box
-   */
-  int getGridColumnCount();
-
-  /**
-   * The grid row count for fields in this composite box
-   */
-  int getGridRowCount();
 
   /**
    * Removes the given field from this container. This operation is supported only as long as the form has not been

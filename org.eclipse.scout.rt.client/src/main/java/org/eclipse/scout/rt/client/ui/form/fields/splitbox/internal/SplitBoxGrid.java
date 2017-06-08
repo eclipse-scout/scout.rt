@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal;
 import java.util.ArrayList;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
@@ -20,17 +21,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 /**
  * Grid (model) layout of split box only visible parts are used
  */
-public class SplitBoxGrid {
-  private ISplitBox m_splitBox = null;
+public class SplitBoxGrid implements ICompositeFieldGrid<ISplitBox> {
   private IFormField[] m_fields;
   private int m_gridColumns;
   private int m_gridRows;
 
-  public SplitBoxGrid(ISplitBox splitBox) {
-    m_splitBox = splitBox;
-  }
-
-  public void validate() {
+  @Override
+  public void validate(ISplitBox m_splitBox) {
     // reset
     m_gridColumns = 2;
     m_gridRows = 1;
@@ -65,10 +62,12 @@ public class SplitBoxGrid {
     m_gridColumns = x;
   }
 
+  @Override
   public int getGridColumnCount() {
     return m_gridColumns;
   }
 
+  @Override
   public int getGridRowCount() {
     return m_gridRows;
   }

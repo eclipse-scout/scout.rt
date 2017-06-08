@@ -103,7 +103,7 @@ public abstract class AbstractGroupBoxBodyGrid implements IGroupBoxBodyGrid {
     int gridColumns = -1;
     IGroupBox tmp = groupBox;
     while (gridColumns < 0 && tmp != null) {
-      gridColumns = tmp.getGridColumnCountHint();
+      gridColumns = tmp.getGridColumnCount();
       tmp = tmp.getParentGroupBox();
     }
     if (gridColumns < 0) {

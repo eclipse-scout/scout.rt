@@ -96,7 +96,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    m_grid = new TabBoxGrid(this);
+    m_grid = new TabBoxGrid();
     setMarkStrategy(getConfiguredMarkStrategy());
     super.initConfig();
     addPropertyChangeListener(PROP_SELECTED_TAB, new PropertyChangeListener() {
@@ -146,10 +146,15 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @Override
   public void rebuildFieldGrid() {
-    m_grid.validate();
+    m_grid.validate(this);
     if (isInitialized() && getForm() != null) {
       getForm().structureChanged(this);
     }
+  }
+
+  @Override
+  public TabBoxGrid getFieldGrid() {
+    return m_grid;
   }
 
   @Override
@@ -195,16 +200,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
       }
     }
     return selectedBox;
-  }
-
-  @Override
-  public final int getGridColumnCount() {
-    return m_grid.getGridColumnCount();
-  }
-
-  @Override
-  public final int getGridRowCount() {
-    return m_grid.getGridRowCount();
   }
 
   @Override

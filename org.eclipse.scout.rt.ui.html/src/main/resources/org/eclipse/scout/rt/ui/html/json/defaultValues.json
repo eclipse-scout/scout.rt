@@ -92,7 +92,8 @@
       "scrollable": false,
       "expandable": false,
       "expanded": true,
-      "fields": []
+      "fields": [],
+      "gridColumnCount": -1
     },
     "TabBox": {
       "tabItems": []
