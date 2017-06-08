@@ -18,7 +18,7 @@ public class ApacheHttpTransportMaxConnectionsPerRouteProperty extends AbstractI
 
   @Override
   protected Integer getDefaultValue() {
-    return 1024;
+    return 32;
   }
 
   @Override

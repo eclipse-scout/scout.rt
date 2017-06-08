@@ -18,7 +18,7 @@ public class ApacheHttpTransportMaxConnectionsTotalProperty extends AbstractInte
 
   @Override
   protected Integer getDefaultValue() {
-    return 1024;
+    return 128;
   }
 
   @Override

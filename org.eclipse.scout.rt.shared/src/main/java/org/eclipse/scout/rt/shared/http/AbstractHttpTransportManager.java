@@ -1,6 +1,9 @@
 package org.eclipse.scout.rt.shared.http;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
@@ -8,10 +11,13 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 
+import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 
 /**
@@ -138,6 +144,16 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
     finally {
       m_active = false;
       m_httpTransport = null;
+    }
+  }
+
+  public byte[] readFromUrl(URL url) throws IOException {
+    GenericUrl genericUrl = new GenericUrl(url);
+    HttpRequest req = getHttpRequestFactory().buildGetRequest(genericUrl);
+    HttpResponse resp = req.execute();
+    Long contentLength = resp.getHeaders().getContentLength();
+    try (InputStream in = new BufferedInputStream(resp.getContent())) {
+      return IOUtility.readBytes(in, contentLength != null ? contentLength.intValue() : -1);
     }
   }
 
