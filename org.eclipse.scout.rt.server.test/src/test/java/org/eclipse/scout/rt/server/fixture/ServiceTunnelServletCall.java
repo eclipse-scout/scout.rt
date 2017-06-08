@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.fixture;
 
-import java.net.HttpURLConnection;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -18,6 +19,13 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnelTransportManager;
+
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpContent;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpResponse;
 
 /**
  * Calls the /process servlet. Requires the config.properties variable <code>server.url</code>
@@ -40,15 +48,35 @@ public class ServiceTunnelServletCall extends Thread {
   public void run() {
     try {
       URL url = new URL(m_serverUrl + "/process");
-      IServiceTunnelContentHandler contentHandler = BEANS.get(IServiceTunnelContentHandler.class);
+      final IServiceTunnelContentHandler contentHandler = BEANS.get(IServiceTunnelContentHandler.class);
       contentHandler.initialize();
       //
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestProperty("Authorization", "Basic " + Base64Utility.encode("admin:manager".getBytes()));
-      conn.setDoInput(true);
-      conn.setDoOutput(true);
-      contentHandler.writeRequest(conn.getOutputStream(), m_req);
-      m_res = contentHandler.readResponse(conn.getInputStream());
+      HttpRequestFactory requestFactory = BEANS.get(HttpServiceTunnelTransportManager.class).getHttpRequestFactory();
+      HttpRequest req = requestFactory.buildPostRequest(new GenericUrl(url), new HttpContent() {
+
+        @Override
+        public void writeTo(OutputStream out) throws IOException {
+          contentHandler.writeRequest(out, m_req);
+        }
+
+        @Override
+        public boolean retrySupported() {
+          return false;
+        }
+
+        @Override
+        public String getType() {
+          return null;
+        }
+
+        @Override
+        public long getLength() throws IOException {
+          return 0;
+        }
+      });
+      req.getHeaders().setAuthorization("Basic " + Base64Utility.encode("admin:manager".getBytes()));
+      HttpResponse resp = req.execute();
+      m_res = contentHandler.readResponse(resp.getContent());
     }
     catch (Throwable e) {
       m_res = new ServiceTunnelResponse(e);
