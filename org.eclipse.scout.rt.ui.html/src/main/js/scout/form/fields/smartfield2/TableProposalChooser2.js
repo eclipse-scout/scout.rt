@@ -111,6 +111,10 @@ scout.TableProposalChooser2.prototype.selectFirstLookupRow = function() {
   }
 };
 
+scout.TableProposalChooser2.prototype.clearLookupRows = function() {
+  this.model._removeAllRows(); // FIXME [awe] 7.0 - ask C.GU make "public"
+};
+
 /**
  * Creates a table-row for the given lookup-row.
  * @returns {object} table-row model

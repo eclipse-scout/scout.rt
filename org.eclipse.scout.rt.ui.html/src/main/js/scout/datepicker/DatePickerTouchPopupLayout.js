@@ -18,16 +18,15 @@ scout.inherits(scout.DatePickerTouchPopupLayout, scout.TouchPopupLayout);
  */
 scout.DatePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
   var popupWidth = scout.HtmlEnvironment.formColumnWidth,
-    popupHeight = 0;
+    containerInsets = this.popup.htmlComp.getInsets(),
+    fieldHtmlComp = this.popup._field.htmlComp,
+    widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
+    fieldPrefSize = fieldHtmlComp.getPreferredSize(options)
+      .add(fieldHtmlComp.getMargins()),
+    widgetContainerPrefSize = widgetContainerHtmlComp.getPreferredSize(options)
+      .add(widgetContainerHtmlComp.getMargins()),
+    headerHeight = scout.graphics.getSize(this.popup._$header, true).height,
+    popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
 
-  var containerInsets = this.popup.htmlComp.getInsets();
-  var fieldHtmlComp = this.popup._field.htmlComp;
-  var widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp;
-  var fieldPrefSize = fieldHtmlComp.getPreferredSize(options)
-    .add(fieldHtmlComp.getMargins());
-  var widgetContainerPrefSize = widgetContainerHtmlComp.getPreferredSize(options)
-    .add(widgetContainerHtmlComp.getMargins());
-
-  popupHeight = fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
   return new scout.Dimension(popupWidth, popupHeight);
 };

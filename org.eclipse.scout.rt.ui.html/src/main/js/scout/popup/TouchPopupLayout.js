@@ -17,13 +17,14 @@ scout.TouchPopupLayout.prototype.layout = function($container) {
   scout.TouchPopupLayout.parent.prototype.layout.call(this, $container);
 
   var popupSize = this.popup.htmlComp.getSize().subtract(this.popup.htmlComp.getInsets()),
+    headerHeight = scout.graphics.getSize(this.popup._$header, true).height,
     field = this.popup._field,
     fieldHeight = field.htmlComp.getPreferredSize().height,
     fieldMargins = field.htmlComp.getMargins(),
     fieldWidth = popupSize.width - fieldMargins.horizontal(),
-    widgetVerticalOffset = fieldHeight + fieldMargins.vertical();
+    widgetVerticalOffset = headerHeight + fieldHeight + fieldMargins.vertical();
 
-  field.htmlComp.setBounds(new scout.Rectangle(0, 0, fieldWidth, fieldHeight));
+  field.htmlComp.setBounds(new scout.Rectangle(0, headerHeight, fieldWidth, fieldHeight));
   this.popup._widgetContainerHtmlComp.setBounds(
     new scout.Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
 };

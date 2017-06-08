@@ -31,6 +31,9 @@ scout.SmartField2 = function() {
   this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
+
+  this._addWidgetProperties(['proposalChooser']);
+  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall']);
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -53,9 +56,6 @@ scout.SmartField2.DEFAULT_BROWSE_MAX_COUNT = 100;
  */
 scout.SmartField2.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
-/**
- * @override
- */
 scout.SmartField2.prototype._init = function(model) {
   scout.SmartField2.parent.prototype._init.call(this, model);
 
@@ -63,6 +63,8 @@ scout.SmartField2.prototype._init = function(model) {
     this.session.text('ui.All'),
     this.session.text('ui.Inactive'),
     this.session.text('ui.Active')];
+
+  scout.fields.initTouch(this, model);
 };
 
 /**
@@ -75,9 +77,6 @@ scout.SmartField2.prototype._initValue = function(value) {
   scout.SmartField2.parent.prototype._initValue.call(this, value);
 };
 
-/**
- * @override Widget.js
- */
 scout.SmartField2.prototype._createKeyStrokeContext = function() {
   return new scout.InputFieldKeyStrokeContext();
 };
@@ -94,7 +93,7 @@ scout.SmartField2.prototype._render = function() {
   this.addLabel();
 
   var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
-  var $field = fieldFunc(this)
+  var $field = fieldFunc.call(scout.fields, this)
     .on('mousedown', this._onFieldMousedown.bind(this));
 
   if (!this.touch) {
@@ -450,7 +449,11 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   var numLookupRows = result.lookupRows.length;
   if (numLookupRows === 0 &&!result.noData) {
-    this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
+    if (this.embedded) {
+      this.popup.clearLookupRows();
+    } else {
+      this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
+    }
     this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
@@ -488,10 +491,11 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
   this.$field.addClass('focused');
   this.$container.addClass('popup-open');
 
-  this.popup = scout.create('SmartField2Popup', {
+  var popupType = this.touch ? 'SmartField2TouchPopup' : 'SmartField2Popup';
+  this.popup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
-    boundToAnchor: true,
+    boundToAnchor: !this.touch,
     closeOnAnchorMousedown: false,
     field: this,
     lookupResult: result,
@@ -534,9 +538,10 @@ scout.SmartField2.prototype.aboutToBlurByMouseDown = function(target) {
 
 scout.SmartField2.prototype._onFieldMousedown = function(event) {
   $.log.debug('(SmartField2#_onFieldMousedown)');
-  if (!this.enabledComputed) {
+  if (!this.enabledComputed || !scout.fields.handleOnClick(this)) {
     return;
   }
+  this.$field.focus(); // required for touch case where field is a DIV
   this.togglePopup();
 };
 

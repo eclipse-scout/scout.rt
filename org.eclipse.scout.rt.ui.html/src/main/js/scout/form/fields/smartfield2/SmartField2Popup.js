@@ -67,12 +67,6 @@ scout.SmartField2Popup.prototype.setStatus = function(status) {
   this.proposalChooser.setStatus(status);
 };
 
-scout.SmartField2Popup.prototype.setStatusLookupInProgress = function(status) {
-  this.proposalChooser.setStatus(scout.Status.ok({
-    message: this.session.text('searchingProposals')
-  }));
-};
-
 scout.SmartField2Popup.prototype.selectFirstLookupRow = function() {
   this.proposalChooser.selectFirstLookupRow();
 };

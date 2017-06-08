@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ProposalChooser2 = function() { // FIXME [awe] 7.0 - SF2: merge with SmartField2Popup?
+scout.ProposalChooser2 = function() {
   scout.ProposalChooser2.parent.call(this);
 
   this.$container = null;
@@ -43,6 +43,10 @@ scout.ProposalChooser2.prototype.setLookupResult = function(result) {
 
 scout.ProposalChooser2.prototype.selectFirstLookupRow = function() {
   throw new Error('selectFirstLookupRow() not implemented');
+};
+
+scout.ProposalChooser2.prototype.clearLookupRows = function() {
+  throw new Error('clearLookupRows() not implemented');
 };
 
 scout.ProposalChooser2.prototype.triggerLookupRowSelected = function() {

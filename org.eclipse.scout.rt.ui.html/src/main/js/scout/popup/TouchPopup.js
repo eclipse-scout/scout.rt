@@ -64,6 +64,11 @@ scout.TouchPopup.prototype.prefLocation = function(openingDirectionY) {
 scout.TouchPopup.prototype._render = function() {
   this.$container = this.$parent.appendDiv('touch-popup');
 
+  this._$header = this.$container.appendDiv('touch-popup-header');
+  this._$header.appendDiv('status closer touch-popup-close-icon')
+      .on('click', this.close.bind(this));
+  this._$header.appendDiv('touch-popup-title').text(this._touchField.label);
+
   this._$widgetContainer = this.$container.appendDiv('touch-popup-widget-container');
   this._widgetContainerHtmlComp = scout.HtmlComponent.install(this._$widgetContainer, this.session);
   this._widgetContainerHtmlComp.setLayout(new scout.SingleLayout());

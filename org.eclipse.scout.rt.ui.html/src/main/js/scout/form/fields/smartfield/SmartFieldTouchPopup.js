@@ -67,3 +67,4 @@ scout.SmartFieldTouchPopup.prototype._delegateDisplayTextChanges = function(even
     this._field.on(eventType, this._delegateDisplayText.bind(this));
   }, this);
 };
+
