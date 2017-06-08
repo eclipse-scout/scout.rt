@@ -66,10 +66,8 @@ scout.MessageBoxes.prototype.withCancel = function(cancelText) {
 };
 
 scout.MessageBoxes.prototype.build = function() {
-  var headerText = scout.nvl(this.headerText, this._headerTextForSeverity());
   var options = {
     parent: this.parent,
-    header: headerText,
     body: this.bodyText,
     severity: this.severity
   };
@@ -104,18 +102,6 @@ scout.MessageBoxes.prototype.buildAndOpen = function() {
   }.bind(this));
   messageBox.open();
   return def.promise();
-};
-
-scout.MessageBoxes.prototype._headerTextForSeverity = function() {
-  var session = this.parent.session;
-  switch (this.severity) {
-    case scout.Status.Severity.WARNING:
-      return session.text('Warning');
-    case scout.Status.Severity.ERROR:
-      return session.text('Error');
-    default: // ok and info
-      return session.text('Info');
-  }
 };
 
 /**
