@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 
@@ -28,12 +29,14 @@ public class ApacheHttpResponse extends LowLevelHttpResponse {
 
   @Override
   public InputStream getContent() throws IOException {
-    return m_response.getEntity().getContent();
+    HttpEntity entity = m_response.getEntity();
+    return entity != null ? entity.getContent() : null;
   }
 
   @Override
   public String getContentEncoding() throws IOException {
-    Header contentEncoding = m_response.getEntity().getContentEncoding();
+    HttpEntity entity = m_response.getEntity();
+    Header contentEncoding = entity != null ? entity.getContentEncoding() : null;
     return contentEncoding != null ? contentEncoding.getValue() : null;
   }
 
@@ -44,7 +47,8 @@ public class ApacheHttpResponse extends LowLevelHttpResponse {
 
   @Override
   public String getContentType() throws IOException {
-    Header contentType = m_response.getEntity().getContentType();
+    HttpEntity entity = m_response.getEntity();
+    Header contentType = entity != null ? entity.getContentType() : null;
     return contentType != null ? contentType.getValue() : null;
   }
 
