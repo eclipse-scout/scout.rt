@@ -11,9 +11,9 @@
 scout.HorizontalGroupBoxBodyGrid = function() {
   scout.HorizontalGroupBoxBodyGrid.parent.call(this);
 };
-scout.inherits(scout.HorizontalGroupBoxBodyGrid, scout.AbstractGroupBoxBodyGrid);
+scout.inherits(scout.HorizontalGroupBoxBodyGrid, scout.GroupBoxBodyGrid);
 
-scout.AbstractGroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
+scout.GroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
   var matrix = new scout.HorizontalGridMatrixGroupBox(this.getGridColumnCount());
   matrix.computeGridData(fields);
   this.gridRows = matrix.getRowCount();

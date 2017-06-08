@@ -11,12 +11,12 @@
 scout.VerticalSmartGroupBoxBodyGrid = function() {
   scout.VerticalSmartGroupBoxBodyGrid.parent.call(this);
 };
-scout.inherits(scout.VerticalSmartGroupBoxBodyGrid, scout.AbstractGroupBoxBodyGrid);
+scout.inherits(scout.VerticalSmartGroupBoxBodyGrid, scout.GroupBoxBodyGrid);
 
 scout.VerticalSmartGroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
   var cellCount = 0;
   fields.forEach(function(f) {
-    var hints = scout.AbstractGroupBoxBodyGrid.getGridDataFromHints(f, this.getGridColumnCount());
+    var hints = scout.GroupBoxBodyGrid.getGridDataFromHints(f, this.getGridColumnCount());
     cellCount += hints.w * hints.h;
   }.bind(this));
 

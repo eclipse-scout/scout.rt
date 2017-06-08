@@ -406,7 +406,7 @@
   __include("scout/form/fields/groupbox/GroupBoxAdapter.js");
   __include("scout/form/fields/groupbox/GroupBoxLayout.js");
   __include("scout/form/fields/groupbox/GroupBoxMenuItemsOrder.js");
-  __include("scout/form/fields/groupbox/grid/AbstractGroupBoxBodyGrid.js");
+  __include("scout/form/fields/groupbox/grid/GroupBoxBodyGrid.js");
   __include("scout/form/fields/groupbox/grid/HorizontalGroupBoxBodyGrid.js");
   __include("scout/form/fields/groupbox/grid/VerticalSmartGroupBoxBodyGrid.js");
   __include("scout/form/fields/groupbox/grid/matrix/AbstractGridMatrixGroupBox.js");

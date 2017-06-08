@@ -26,7 +26,7 @@ scout.VerticalGridMatrixGroupBox.prototype.resetAll = function(columnCount, rowC
 scout.VerticalGridMatrixGroupBox.prototype.computeGridData = function(fields) {
   this._fields = fields;
   return fields.every(function(f, i) {
-    this._fieldGridDatas[i] = scout.AbstractGroupBoxBodyGrid.getGridDataFromHints(f, this._cursor.columnCount);
+    this._fieldGridDatas[i] = scout.GroupBoxBodyGrid.getGridDataFromHints(f, this._cursor.columnCount);
     return this._add(f, this._fieldGridDatas[i]);
   }.bind(this));
 };

@@ -8,17 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.AbstractGroupBoxBodyGrid = function() {
-  scout.AbstractGroupBoxBodyGrid.parent.call(this);
+/**
+ * @abstract
+ */
+scout.GroupBoxBodyGrid = function() {
+  scout.GroupBoxBodyGrid.parent.call(this);
   this.gridRows = 0;
   this.gridColumns = 0;
 };
-scout.inherits(scout.AbstractGroupBoxBodyGrid, scout.LogicalGrid);
+scout.inherits(scout.GroupBoxBodyGrid, scout.LogicalGrid);
 
 /**
  * @override
  */
-scout.AbstractGroupBoxBodyGrid.prototype._validate = function(groupBox) {
+scout.GroupBoxBodyGrid.prototype._validate = function(groupBox) {
   // reset old state
   this.gridRows = 0;
   // step 0: column count
@@ -50,7 +53,7 @@ scout.AbstractGroupBoxBodyGrid.prototype._validate = function(groupBox) {
   }
 };
 
-scout.AbstractGroupBoxBodyGrid.prototype.layoutAllStatic = function(fields) {
+scout.GroupBoxBodyGrid.prototype.layoutAllStatic = function(fields) {
   var hints = [];
   fields.forEach(function(v) {
     hints.push(scout.GridData.createFromHints(v, 1));
@@ -70,19 +73,19 @@ scout.AbstractGroupBoxBodyGrid.prototype.layoutAllStatic = function(fields) {
   this.gridColumns = totalGridW;
 };
 
-scout.AbstractGroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
+scout.GroupBoxBodyGrid.prototype.layoutAllDynamic = function(fields) {
   // abstract, must be implemented by sub classes
 };
 
-scout.AbstractGroupBoxBodyGrid.prototype.getGridColumnCount = function() {
+scout.GroupBoxBodyGrid.prototype.getGridColumnCount = function() {
   return this.gridColumns;
 };
 
-scout.AbstractGroupBoxBodyGrid.prototype.getGridRowCount = function() {
+scout.GroupBoxBodyGrid.prototype.getGridRowCount = function() {
   return this.gridRows;
 };
 
-scout.AbstractGroupBoxBodyGrid.prototype._computeGridColumnCount = function(groupBox) {
+scout.GroupBoxBodyGrid.prototype._computeGridColumnCount = function(groupBox) {
   var gridColumns = -1,
     tmp = groupBox;
   do {
@@ -94,7 +97,7 @@ scout.AbstractGroupBoxBodyGrid.prototype._computeGridColumnCount = function(grou
 /**
  * if grid w greater than group box column count. Grid w will be set to group box column count.
  */
-scout.AbstractGroupBoxBodyGrid.getGridDataFromHints = function(field, groupBoxColumnCount) {
+scout.GroupBoxBodyGrid.getGridDataFromHints = function(field, groupBoxColumnCount) {
   var data = scout.GridData.createFromHints(field, groupBoxColumnCount);
   data.w = Math.min(groupBoxColumnCount, data.w);
   return data;
