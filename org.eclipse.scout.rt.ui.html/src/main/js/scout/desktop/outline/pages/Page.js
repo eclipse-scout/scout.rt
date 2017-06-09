@@ -231,7 +231,7 @@ scout.Page.prototype.reloadPage = function () {
 scout.Page.prototype.linkWithRow = function(row) {
   this.row = row;
   row.page = this;
-  this.getOutline().trigger('linkPageWithRow', {
+  this.getOutline().trigger('pageRowLink', {
     page: this,
     row: row
   });

@@ -20,13 +20,13 @@ scout.OutlineAdapter.prototype._init = function(model) {
 };
 
 /**
- * We must call onWidgetInitPage because this adapter cannot process the 'initPage' event
+ * We must call onWidgetPageInit because this adapter cannot process the 'pageInit' event
  * while the widget is initialized, since the listener is not attached until the widget
  * is created completely.
  */
 scout.OutlineAdapter.prototype._postCreateWidget = function() {
   var outline = this.widget;
-  outline._visitNodes(outline.nodes, this._onWidgetInitPage.bind(this));
+  outline._visitNodes(outline.nodes, this._onWidgetPageInit.bind(this));
 };
 
 scout.OutlineAdapter.prototype._onPageChanged = function(event) {
@@ -55,8 +55,8 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
 };
 
 scout.OutlineAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'initPage') {
-    this._onWidgetInitPage(event.page);
+  if (event.type === 'pageInit') {
+    this._onWidgetPageInit(event.page);
   } else {
     scout.OutlineAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -70,7 +70,7 @@ scout.OutlineAdapter.prototype.onModelAction = function(event) {
   }
 };
 
-scout.OutlineAdapter.prototype._onWidgetInitPage = function(page) {
+scout.OutlineAdapter.prototype._onWidgetPageInit = function(page) {
   if (page.detailTable) {
     this._initDetailTable(page);
   }

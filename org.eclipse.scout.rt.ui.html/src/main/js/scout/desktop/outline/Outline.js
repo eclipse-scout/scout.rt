@@ -200,7 +200,7 @@ scout.Outline.prototype._renderEnabled = function() {
 scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   this._initDetailTableAndForm(node);
-  this.trigger('initPage', {
+  this.trigger('pageInit', {
     page: node
   });
 };
