@@ -960,7 +960,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
 
     @Override
-    public void fireComponentMovedFromUI(CalendarComponent comp, Date newDate) {
+    public void fireComponentMoveFromUI(CalendarComponent comp, Date newDate) {
       try {
         pushUIProcessor();
         comp = resolveComponent(comp);

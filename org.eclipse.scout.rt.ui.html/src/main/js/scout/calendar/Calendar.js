@@ -340,7 +340,7 @@ scout.Calendar.prototype._updateModel = function(animate) {
   this._exactRange = this._calcExactRange();
   this._yearPanel.setViewRange(this._exactRange);
   this.viewRange = this._calcViewRange();
-  this.trigger('modelChanged');
+  this.trigger('modelChange');
   this._updateScreen(animate);
 };
 
@@ -465,7 +465,7 @@ scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponen
   }
 
   if (changed) {
-    this.trigger('selectionChanged');
+    this.trigger('selectionChange');
     this._updateListPanel();
   }
 

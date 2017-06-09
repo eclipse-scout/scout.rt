@@ -19,19 +19,19 @@ scout.inherits(scout.CalendarAdapter, scout.ModelAdapter);
  * @override ModelAdapter.js
  */
 scout.CalendarAdapter.prototype._postCreateWidget = function() {
-  this._sendViewRangeChanged();
+  this._sendViewRangeChange();
 };
 
 /**
  * @override ModelAdapter.js
  */
 scout.CalendarAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'viewRangeChanged') {
-    this._sendViewRangeChanged();
-  } else if (event.type === 'modelChanged') {
-    this._sendModelChanged();
-  } else if (event.type === 'selectionChanged') {
-    this._sendSelectionChanged();
+  if (event.type === 'viewRangeChange') {
+    this._sendViewRangeChange();
+  } else if (event.type === 'modelChange') {
+    this._sendModelChange();
+  } else if (event.type === 'selectionChange') {
+    this._sendSelectionChange();
   } else {
     scout.CalendarAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -45,24 +45,24 @@ scout.CalendarAdapter.prototype._jsonSelectedDate = function() {
   return scout.dates.toJsonDate(this.widget.selectedDate);
 };
 
-scout.CalendarAdapter.prototype._sendViewRangeChanged = function() {
-  this._send('viewRangeChanged', {
+scout.CalendarAdapter.prototype._sendViewRangeChange = function() {
+  this._send('viewRangeChange', {
     viewRange: this._jsonViewRange()
   });
 };
 
-scout.CalendarAdapter.prototype._sendModelChanged = function() {
+scout.CalendarAdapter.prototype._sendModelChange = function() {
   var data = {
     viewRange: this._jsonViewRange(),
     selectedDate: this._jsonSelectedDate(),
     displayMode: this.widget.displayMode
   };
-  this._send('modelChanged', data);
+  this._send('modelChange', data);
 };
 
-scout.CalendarAdapter.prototype._sendSelectionChanged = function() {
+scout.CalendarAdapter.prototype._sendSelectionChange = function() {
   var selectedComponentId = this.widget.selectedComponent ? this.widget.selectedComponent.id : null;
-  this._send('selectionChanged', {
+  this._send('selectionChange', {
     date: this._jsonSelectedDate(),
     componentId: selectedComponentId
   });

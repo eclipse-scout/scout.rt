@@ -51,11 +51,11 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
 
   // from UI
   private static final String EVENT_COMPONENT_ACTION = "componentAction";
-  private static final String EVENT_COMPONENT_MOVED = "componentMoved";
+  private static final String EVENT_COMPONENT_MOVE = "componentMove";
   private static final String EVENT_RELOAD = "reload";
-  private static final String EVENT_SELECTION_CHANGED = "selectionChanged";
-  private static final String EVENT_VIEW_RANGE_CHANGED = "viewRangeChanged";
-  private static final String EVENT_MODEL_CHANGED = "modelChanged";
+  private static final String EVENT_SELECTION_CHANGE = "selectionChange";
+  private static final String EVENT_VIEW_RANGE_CHANGE = "viewRangeChange";
+  private static final String EVENT_MODEL_CHANGE = "modelChange";
 
   private CalendarListener m_calendarListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -224,20 +224,20 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     if (EVENT_COMPONENT_ACTION.equals(event.getType())) {
       handleUiComponentAction(event);
     }
-    else if (EVENT_COMPONENT_MOVED.equals(event.getType())) {
-      handleUiComponentMoved(event);
+    else if (EVENT_COMPONENT_MOVE.equals(event.getType())) {
+      handleUiComponentMove(event);
     }
     else if (EVENT_RELOAD.equals(event.getType())) {
       handleUiReload(event);
     }
-    else if (EVENT_SELECTION_CHANGED.equals(event.getType())) {
-      handleUiSelectionChanged(event);
+    else if (EVENT_SELECTION_CHANGE.equals(event.getType())) {
+      handleUiSelectionChange(event);
     }
-    else if (EVENT_MODEL_CHANGED.equals(event.getType())) {
-      handleUiModelChanged(event);
+    else if (EVENT_MODEL_CHANGE.equals(event.getType())) {
+      handleUiModelChange(event);
     }
-    else if (EVENT_VIEW_RANGE_CHANGED.equals(event.getType())) {
-      handleUiViewRangeChanged(event);
+    else if (EVENT_VIEW_RANGE_CHANGE.equals(event.getType())) {
+      handleUiViewRangeChange(event);
     }
     else {
       super.handleUiEvent(event);
@@ -248,18 +248,18 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     getModel().getUIFacade().fireComponentActionFromUI();
   }
 
-  protected void handleUiComponentMoved(JsonEvent event) {
+  protected void handleUiComponentMove(JsonEvent event) {
     JSONObject data = event.getData();
     Date newDate = toJavaDate(data, "newDate");
     JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component", null));
-    getModel().getUIFacade().fireComponentMovedFromUI(comp.getModel(), newDate);
+    getModel().getUIFacade().fireComponentMoveFromUI(comp.getModel(), newDate);
   }
 
   protected void handleUiReload(JsonEvent event) {
     getModel().getUIFacade().fireReloadFromUI();
   }
 
-  protected void handleUiSelectionChanged(JsonEvent event) {
+  protected void handleUiSelectionChange(JsonEvent event) {
     JSONObject data = event.getData();
     Date selectedDate = toJavaDate(data, "date");
     String componentId = data.optString("componentId", null);
@@ -277,7 +277,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     LOG.debug("date={} componentId={}", selectedDate, componentId);
   }
 
-  protected void handleUiModelChanged(JsonEvent event) {
+  protected void handleUiModelChange(JsonEvent event) {
     JSONObject data = event.getData();
 
     int displayMode = data.optInt("displayMode");
@@ -299,7 +299,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
   /**
    * The current calendar model has a strange behavior (bug?): when the view-range changes
    */
-  protected void handleUiViewRangeChanged(JsonEvent event) {
+  protected void handleUiViewRangeChange(JsonEvent event) {
     Range<Date> viewRange = extractViewRange(event.getData());
     addPropertyEventFilterCondition(ICalendar.PROP_VIEW_RANGE, viewRange);
     getModel().getUIFacade().setViewRangeFromUI(viewRange);
