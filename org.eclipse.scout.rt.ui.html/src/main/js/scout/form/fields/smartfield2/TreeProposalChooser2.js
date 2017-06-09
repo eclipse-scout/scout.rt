@@ -19,11 +19,11 @@ scout.TreeProposalChooser2.prototype._createModel = function() {
     requestFocusOnNodeControlMouseDown: false,
     scrollToSelection: true
   });
-  tree.on('nodeClicked', this._onNodeClicked.bind(this));
+  tree.on('nodeClick', this._onNodeClick.bind(this));
   return tree;
 };
 
-scout.TreeProposalChooser2.prototype._onNodeClicked = function(event) {
+scout.TreeProposalChooser2.prototype._onNodeClick = function(event) {
   this.triggerLookupRowSelected(event.node);
 };
 

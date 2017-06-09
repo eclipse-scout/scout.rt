@@ -2323,7 +2323,7 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
     return;
   }
 
-  this.trigger('nodeClicked', {
+  this.trigger('nodeClick', {
     node: node
   });
   return true;

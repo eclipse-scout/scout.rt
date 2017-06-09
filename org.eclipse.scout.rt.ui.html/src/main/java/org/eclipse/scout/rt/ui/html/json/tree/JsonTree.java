@@ -65,7 +65,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
   public static final String EVENT_ALL_CHILD_NODES_DELETED = "allChildNodesDeleted";
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
-  public static final String EVENT_NODE_CLICKED = "nodeClicked";
+  public static final String EVENT_NODE_CLICK = "nodeClick";
   public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
@@ -846,8 +846,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_NODE_CLICKED.equals(event.getType())) {
-      handleUiNodeClicked(event);
+    if (EVENT_NODE_CLICK.equals(event.getType())) {
+      handleUiNodeClick(event);
     }
     else if (EVENT_NODE_ACTION.equals(event.getType())) {
       handleUiNodeAction(event);
@@ -877,7 +877,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     }
   }
 
-  protected void handleUiNodeClicked(JsonEvent event) {
+  protected void handleUiNodeClick(JsonEvent event) {
     String nodeId = event.getData().getString(PROP_NODE_ID);
     ITreeNode node = optTreeNodeForNodeId(nodeId);
     if (node == null) {

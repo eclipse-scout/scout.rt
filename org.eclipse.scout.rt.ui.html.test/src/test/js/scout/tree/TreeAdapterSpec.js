@@ -42,7 +42,7 @@ describe("TreeAdapter", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodeClicked']);
+      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodeClick']);
     });
 
     it("sends selection, check and click events if tree is checkable and checkbox has been clicked", function() {
@@ -60,7 +60,7 @@ describe("TreeAdapter", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodesChecked', 'nodeClicked']);
+      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodesChecked', 'nodeClick']);
     });
 
     it("does not send click if mouse down happens on another node than mouseup", function() {
@@ -141,7 +141,7 @@ describe("TreeAdapter", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClicked', 'nodeAction', 'nodeExpanded']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClick', 'nodeAction', 'nodeExpanded']);
     });
   });
 
@@ -158,7 +158,7 @@ describe("TreeAdapter", function() {
       sendQueuedAjaxCalls();
 
       // clicked has to be after selected otherwise it is not possible to get the selected row in execNodeClick
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClicked', 'nodeAction', 'nodeExpanded']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClick', 'nodeAction', 'nodeExpanded']);
     });
   });
 

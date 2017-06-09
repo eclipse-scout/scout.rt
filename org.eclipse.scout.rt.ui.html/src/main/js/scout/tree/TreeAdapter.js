@@ -29,8 +29,8 @@ scout.TreeAdapter.prototype._sendNodesSelected = function(nodeIds, debounceSend)
   });
 };
 
-scout.TreeAdapter.prototype._onWidgetNodeClicked = function(event) {
-  this._send('nodeClicked', {
+scout.TreeAdapter.prototype._onWidgetNodeClick = function(event) {
+  this._send('nodeClick', {
     nodeId: event.node.id
   });
 };
@@ -76,8 +76,8 @@ scout.TreeAdapter.prototype._sendNodesChecked = function(nodes) {
 scout.TreeAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'nodesSelected') {
     this._onWidgetNodesSelected(event);
-  } else if (event.type === 'nodeClicked') {
-    this._onWidgetNodeClicked(event);
+  } else if (event.type === 'nodeClick') {
+    this._onWidgetNodeClick(event);
   } else if (event.type === 'nodeAction') {
     this._onWidgetNodeAction(event);
   } else if (event.type === 'nodeExpanded') {

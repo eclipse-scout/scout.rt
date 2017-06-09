@@ -42,7 +42,7 @@ describe('Session', function() {
       // initially there should be no request at all
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      send(session, 1, 'nodeClicked');
+      send(session, 1, 'nodeClick');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       send(session, 1, 'nodeSelected');
@@ -58,14 +58,14 @@ describe('Session', function() {
 
       // check that content is complete and in correct order
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
+      expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
     it('sends multiple async events in one call over multiple user interactions if sending was delayed', function() {
       var session = createSession();
 
       // send first event delayed (in 500 ms)
-      send(session, 1, 'nodeClicked', '', 500);
+      send(session, 1, 'nodeClick', '', 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
@@ -85,14 +85,14 @@ describe('Session', function() {
 
       // check that content is complete and in correct order
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
+      expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
     it('does not await the full delay if a susequent send call has a smaller delay', function() {
       var session = createSession();
 
       // send first event delayed (in 500 ms)
-      send(session, 1, 'nodeClicked', '', 500);
+      send(session, 1, 'nodeClick', '', 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
@@ -112,14 +112,14 @@ describe('Session', function() {
 
       // check that content is complete and in correct order
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
+      expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
     it('does not await the full delay if a previous send call has a smaller delay', function() {
       var session = createSession();
 
       // send first event with 300ms delay
-      send(session, 1, 'nodeClicked', '', 300);
+      send(session, 1, 'nodeClick', '', 300);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // send second event with 500ms delay
@@ -139,7 +139,7 @@ describe('Session', function() {
 
       // check that content is complete and in correct order
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected']);
+      expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected']);
     });
 
     it('coalesces events if event provides a coalesce function', function() {
@@ -213,7 +213,7 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
 
-      send(session, 1, 'nodeClicked');
+      send(session, 1, 'nodeClick');
 
       // trigger sending of second request
       jasmine.clock().tick(0);
@@ -222,16 +222,16 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(true);
-      expect(session.asyncEvents[0].type).toBe('nodeClicked');
+      expect(session.asyncEvents[0].type).toBe('nodeClick');
 
-      // receive response for nodeSelected -> request for nodeClicked gets sent
+      // receive response for nodeSelected -> request for nodeClick gets sent
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(true);
 
-      // receive response for nodeClicked
+      // receive response for nodeClick
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
       jasmine.clock().tick(0);
       expect(session.areEventsQueued()).toBe(false);
@@ -252,7 +252,7 @@ describe('Session', function() {
       expect(session.areRequestsPending()).toBe(true);
 
       // send second request delayed
-      send(session, 1, 'nodeClicked', '', 300);
+      send(session, 1, 'nodeClick', '', 300);
 
       // trigger sending of second request
       jasmine.clock().tick(0);
@@ -261,14 +261,14 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(true);
-      expect(session.asyncEvents[0].type).toBe('nodeClicked');
+      expect(session.asyncEvents[0].type).toBe('nodeClick');
 
-      // receive response for nodeSelected -> request for nodeClicked does not get sent because it should be sent delayed
+      // receive response for nodeSelected -> request for nodeClick does not get sent because it should be sent delayed
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(true);
-      expect(session.asyncEvents[0].type).toBe('nodeClicked');
+      expect(session.asyncEvents[0].type).toBe('nodeClick');
 
       // trigger sending of second request
       jasmine.clock().tick(300);
@@ -278,7 +278,7 @@ describe('Session', function() {
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(true);
 
-      // receive response for nodeClicked
+      // receive response for nodeClick
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areRequestsPending()).toBe(false);
@@ -340,7 +340,7 @@ describe('Session', function() {
       expect(requestData.startup).toBe(true);
 
       //don't send it on subsequent requests
-      send(session, 1, 'nodeClicked');
+      send(session, 1, 'nodeClick');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
@@ -360,7 +360,7 @@ describe('Session', function() {
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       // don't send it on subsequent requests
-      send(session, 1, 'nodeClicked');
+      send(session, 1, 'nodeClick');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
