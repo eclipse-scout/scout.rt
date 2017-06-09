@@ -18,10 +18,10 @@ scout.BenchColumn = function() {
   this.layoutData;
 
   // event listener functions
-  this._viewAddedHandler = this._onViewAdded.bind(this);
-  this._viewRemovedHandler = this._onViewRemoved.bind(this);
-  this._viewActivatedHandler = this._onViewActivated.bind(this);
-  this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
+  this._viewAddHandler = this._onViewAdd.bind(this);
+  this._viewRemoveHandler = this._onViewRemove.bind(this);
+  this._viewActivateHandler = this._onViewActivate.bind(this);
+  this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 };
 scout.inherits(scout.BenchColumn, scout.Widget);
 
@@ -123,26 +123,26 @@ scout.BenchColumn.prototype.getLayoutData = function() {
   return this.layoutData;
 };
 
-scout.BenchColumn.prototype._onViewAdded = function(event) {
-  this.trigger('viewAdded', {
+scout.BenchColumn.prototype._onViewAdd = function(event) {
+  this.trigger('viewAdd', {
     view: event.view
   });
 };
 
-scout.BenchColumn.prototype._onViewRemoved = function(event) {
-  this.trigger('viewRemoved', {
+scout.BenchColumn.prototype._onViewRemove = function(event) {
+  this.trigger('viewRemove', {
     view: event.view
   });
 };
 
-scout.BenchColumn.prototype._onViewActivated = function(event) {
-  this.trigger('viewActivated', {
+scout.BenchColumn.prototype._onViewActivate = function(event) {
+  this.trigger('viewActivate', {
     view: event.view
   });
 };
 
-scout.BenchColumn.prototype._onViewDeactivated = function(event) {
-  this.trigger('viewDeactivated', {
+scout.BenchColumn.prototype._onViewDeactivate = function(event) {
+  this.trigger('viewDeactivate', {
     view: event.view
   });
 };
@@ -163,10 +163,10 @@ scout.BenchColumn.prototype._createTabBoxes = function() {
       cssClass: scout.DesktopBench.TAB_BOX_CLASSES[i]
     });
     tabBox.setLayoutData(rowLayoutDatas[i]);
-    tabBox.on('viewAdded', this._viewAddedHandler);
-    tabBox.on('viewRemoved', this._viewRemovedHandler);
-    tabBox.on('viewActivated', this._viewActivatedHandler);
-    tabBox.on('viewDeactivated', this._viewDeactivatedHandler);
+    tabBox.on('viewAdd', this._viewAddHandler);
+    tabBox.on('viewRemove', this._viewRemoveHandler);
+    tabBox.on('viewActivate', this._viewActivateHandler);
+    tabBox.on('viewDeactivate', this._viewDeactivateHandler);
     this.tabBoxes.push(tabBox);
   }
 };

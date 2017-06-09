@@ -97,7 +97,7 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
 
   if (this.currentView) {
     this.currentView.detach();
-    this.trigger('viewDeactivated', {
+    this.trigger('viewDeactivate', {
       view: this.currentView
     });
     this.currentView = null;
@@ -111,7 +111,7 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   }
   this.currentView = view;
 
-  this.trigger('viewActivated', {
+  this.trigger('viewActivate', {
     view: view
   });
 
@@ -146,7 +146,7 @@ scout.SimpleTabBox.prototype.addView = function(view, bringToTop) {
   // add to view stack
   var siblingView = this._addToViewStack(view, activate);
   view.setParent(this);
-  this.trigger('viewAdded', {
+  this.trigger('viewAdd', {
     view: view,
     siblingView: siblingView
   });
@@ -235,7 +235,7 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
       view.remove();
       this._removeViewInProgress--;
     }
-    this.trigger('viewRemoved', {
+    this.trigger('viewRemove', {
       view: view
     });
 

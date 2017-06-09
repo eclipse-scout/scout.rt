@@ -25,7 +25,7 @@ scout.OutlineViewButton.prototype._doAction = function() {
   }
 };
 
-scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {
+scout.OutlineViewButton.prototype.onOutlineChange = function(outline) {
   var selected = !!outline && this.outline === outline;
   this.setSelected(selected);
 };

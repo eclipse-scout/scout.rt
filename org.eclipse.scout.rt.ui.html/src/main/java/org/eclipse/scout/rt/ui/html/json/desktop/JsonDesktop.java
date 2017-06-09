@@ -59,8 +59,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
-  private static final String EVENT_FORM_ACTIVATED = "formActivated";
-  private static final String EVENT_HISTORY_ENTRY_ACTIVATED = "historyEntryActivated";
+  private static final String EVENT_HISTORY_ENTRY_ACTIVATE = "historyEntryActivate";
   private static final String EVENT_GEOLOCATION_DETERMINED = "geolocationDetermined";
   private static final String EVENT_ADD_NOTIFICATION = "addNotification";
   private static final String EVENT_REMOVE_NOTIFICATION = "removeNotification";
@@ -113,11 +112,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_FORM_ACTIVATED.equals(event.getType())) {
-      handleUiFormActivated(event);
+    if (EVENT_FORM_ACTIVATE.equals(event.getType())) {
+      handleUiFormActivate(event);
     }
-    else if (EVENT_HISTORY_ENTRY_ACTIVATED.equals(event.getType())) {
-      handleUiHistoryEntryActivated(event);
+    else if (EVENT_HISTORY_ENTRY_ACTIVATE.equals(event.getType())) {
+      handleUiHistoryEntryActivate(event);
     }
     else if (EVENT_GEOLOCATION_DETERMINED.equals(event.getType())) {
       handleUiGeolocationDetermined(event);
@@ -127,10 +126,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  protected void handleUiHistoryEntryActivated(JsonEvent event) {
+  protected void handleUiHistoryEntryActivate(JsonEvent event) {
     addPropertyEventFilterCondition(m_browserHistoryFilter);
     String deepLinkPath = event.getData().optString("deepLinkPath");
-    getModel().getUIFacade().historyEntryActivatedFromUI(deepLinkPath);
+    getModel().getUIFacade().historyEntryActivateFromUI(deepLinkPath);
   }
 
   @Override
@@ -172,7 +171,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     getModel().getUIFacade().fireGeolocationDetermined(latitude, longitude);
   }
 
-  protected void handleUiFormActivated(JsonEvent event) {
+  protected void handleUiFormActivate(JsonEvent event) {
     String formId = event.getData().optString("formId", null);
     if (formId == null) {
       getModel().activateForm(null);

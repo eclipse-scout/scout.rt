@@ -19,18 +19,18 @@ scout.DesktopBench = function() {
   this.changed = false;
   this.layoutCacheKey = [];
 
-  this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._desktopOutlineChangeHandler = this._onDesktopOutlineChange.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
-  this._onOutlineContentDestroyedHandler = this._onOutlineContentDestroyed.bind(this);
+  this._outlineContentDestroyHandler = this._onoutlineContentDestroy.bind(this);
 
   // event listener functions
-  this._viewAddedHandler = this._onViewAdded.bind(this);
-  this._viewRemovedHandler = this._onViewRemoved.bind(this);
-  this._viewActivatedHandler = this._onViewActivated.bind(this);
-  this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
+  this._viewAddHandler = this._onViewAdd.bind(this);
+  this._viewRemoveHandler = this._onViewRemove.bind(this);
+  this._viewActivateHandler = this._onViewActivate.bind(this);
+  this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
 };
@@ -88,10 +88,10 @@ scout.DesktopBench.prototype._createColumns = function() {
       cacheKey: cacheKey,
       cssClass: scout.DesktopBench.VIEW_AREA_COLUMN_CLASSES[i]
     });
-    column.on('viewAdded', this._viewAddedHandler);
-    column.on('viewRemoved', this._viewRemovedHandler);
-    column.on('viewActivated', this._viewActivatedHandler);
-    column.on('viewDeactivated', this._viewDeactivatedHandler);
+    column.on('viewAdd', this._viewAddHandler);
+    column.on('viewRemove', this._viewRemoveHandler);
+    column.on('viewActivate', this._viewActivateHandler);
+    column.on('viewDeactivate', this._viewDeactivateHandler);
     this.columns.push(column);
   }
 };
@@ -120,7 +120,7 @@ scout.DesktopBench.prototype._render = function() {
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
-  this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
 };
 
@@ -150,7 +150,7 @@ scout.DesktopBench.prototype._renderColumn = function(column) {
 
 scout.DesktopBench.prototype._remove = function() {
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
-  this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopBench.parent.prototype._remove.call(this);
@@ -320,7 +320,7 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
     return;
   }
   if (oldContent) {
-    oldContent.off('destroy', this._onOutlineContentDestroyedHandler);
+    oldContent.off('destroy', this._outlineContentDestroyHandler);
   }
   if (this.rendered) {
     this._removeOutlineContent();
@@ -329,7 +329,7 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   // with a potentially destroyed content which would cause an error later, when we try to render the
   // bench with the outline-content.
   if (content) {
-    content.one('destroy', this._onOutlineContentDestroyedHandler);
+    content.one('destroy', this._outlineContentDestroyHandler);
   }
 
   this._setProperty('outlineContent', content);
@@ -425,12 +425,12 @@ scout.DesktopBench.prototype.updateNavigationHandleVisibility = function() {
   this.setNavigationHandleVisible(this.desktop.navigationHandleVisible && !this.desktop.navigationVisible);
 };
 
-scout.DesktopBench.prototype._onDesktopOutlineChanged = function(event) {
+scout.DesktopBench.prototype._onDesktopOutlineChange = function(event) {
   this.setOutline(this.desktop.outline);
   this.updateNavigationHandleVisibility();
 };
 
-scout.DesktopBench.prototype._onOutlineContentDestroyed = function(event) {
+scout.DesktopBench.prototype._onoutlineContentDestroy = function(event) {
   this.setOutlineContent(null);
 };
 
@@ -583,33 +583,33 @@ scout.DesktopBench.prototype._onSplitterMove = function(event) {
   }
 };
 
-scout.DesktopBench.prototype._onViewAdded = function(event) {
-  this.trigger('viewAdded', {
+scout.DesktopBench.prototype._onViewAdd = function(event) {
+  this.trigger('viewAdd', {
     view: event.view
   });
 };
 
-scout.DesktopBench.prototype._onViewRemoved = function(event) {
-  this.trigger('viewRemoved', {
+scout.DesktopBench.prototype._onViewRemove = function(event) {
+  this.trigger('viewRemove', {
     view: event.view
   });
 };
 
-scout.DesktopBench.prototype._onViewActivated = function(event) {
+scout.DesktopBench.prototype._onViewActivate = function(event) {
   var view = event.view;
   if (this.outlineContent === view) {
     this.desktop.bringOutlineToFront(this.desktop.outline);
   }
-  this.trigger('viewActivated', {
+  this.trigger('viewActivate', {
     view: view
   });
 };
 
-scout.DesktopBench.prototype._onViewDeactivated = function(event) {
+scout.DesktopBench.prototype._onViewDeactivate = function(event) {
   if (this.outlineContent === event.view) {
     this.desktop.sendOutlineToBack();
   }
-  this.trigger('viewDeactivated', {
+  this.trigger('viewDeactivate', {
     view: event.view
   });
 };

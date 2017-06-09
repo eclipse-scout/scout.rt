@@ -262,7 +262,7 @@ scout.Desktop.prototype._renderBench = function() {
     headerTabArea: this.header ? this.header.tabArea : undefined,
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
-  this.bench.on('viewActivated', this._benchActiveViewChangedHandler);
+  this.bench.on('viewActivate', this._benchActiveViewChangedHandler);
   this.bench.render();
   this.bench.$container.insertBefore(this.$overlaySeparator);
   this.invalidateLayoutTree();
@@ -272,7 +272,7 @@ scout.Desktop.prototype._removeBench = function() {
   if (!this.bench) {
     return;
   }
-  this.bench.off('viewActivated', this._benchActiveViewChangedHandler);
+  this.bench.off('viewActivate', this._benchActiveViewChangedHandler);
   this.bench.on('destroy', function() {
     this.bench = null;
     this.invalidateLayoutTree();
@@ -489,7 +489,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
       this.navigation.setOutline(this.outline);
     }
     // call render after triggering event so glasspane rendering taking place can refer to the current outline content
-    this.trigger('outlineChanged');
+    this.trigger('outlineChange');
 
     if (this.rendered) {
       this._renderDisplayChildsOfOutline();
@@ -839,11 +839,11 @@ scout.Desktop.prototype._setFormActivated = function(form) {
 
   this.activeForm = form;
 
-  this.triggerFormActivated(form);
+  this.triggerFormActivate(form);
 };
 
-scout.Desktop.prototype.triggerFormActivated = function(form) {
-  this.trigger('formActivated', {
+scout.Desktop.prototype.triggerFormActivate = function(form) {
+  this.trigger('formActivate', {
     form: form
   });
 };
@@ -872,7 +872,7 @@ scout.Desktop.prototype.onResize = function(event) {
 scout.Desktop.prototype.onPopstate = function(event) {
   var historyState = event.originalEvent.state;
   if (historyState && historyState.deepLinkPath) {
-    this.trigger('historyEntryActivated', historyState);
+    this.trigger('historyEntryActivate', historyState);
   }
 };
 

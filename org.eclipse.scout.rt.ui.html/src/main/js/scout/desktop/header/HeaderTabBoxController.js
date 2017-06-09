@@ -32,8 +32,8 @@ scout.inherits(scout.HeaderTabBoxController, scout.SimpleTabBoxController);
 
 scout.HeaderTabBoxController.prototype._installListeners = function() {
   scout.HeaderTabBoxController.parent.prototype._installListeners.call(this);
-  this.bench.on('viewAdded', this._viewsChangedHandler);
-  this.bench.on('viewRemoved', this._viewsChangedHandler);
+  this.bench.on('viewAdd', this._viewsChangedHandler);
+  this.bench.on('viewRemove', this._viewsChangedHandler);
 };
 
 scout.HeaderTabBoxController.prototype._onViewsChanged = function() {

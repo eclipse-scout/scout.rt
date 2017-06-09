@@ -73,7 +73,7 @@ public interface IDesktopUIFacade {
    * @param deepLinkPath
    *          The deep-link path which belongs to the activated history entry. This parameter may be null.
    */
-  void historyEntryActivatedFromUI(String deepLinkPath);
+  void historyEntryActivateFromUI(String deepLinkPath);
 
   void setNavigationVisibleFromUI(boolean visible);
 

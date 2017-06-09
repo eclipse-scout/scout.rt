@@ -2401,7 +2401,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected class P_UIFacade implements IDesktopUIFacade {
 
     @Override
-    public void historyEntryActivatedFromUI(String deepLinkPath) {
+    public void historyEntryActivateFromUI(String deepLinkPath) {
       try {
         handleDeepLink(deepLinkPath);
       }

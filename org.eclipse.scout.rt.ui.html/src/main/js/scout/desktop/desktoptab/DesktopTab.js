@@ -14,7 +14,7 @@ scout.DesktopTab = function() {
 
   this.view;
 
-  this._propertyChangeListener = function(event) {
+  this._viewPropertyChangeHandler = function(event) {
     if (event.propertyName === 'title') {
       this.setTitle(this.view.title);
     }
@@ -40,7 +40,7 @@ scout.DesktopTab = function() {
       this.setStatus(event.newValue);
     }
   }.bind(this);
-  this._removeListener = this._onViewRemoved.bind(this);
+  this._viewRemoveHandler = this._onViewRemove.bind(this);
 };
 
 scout.inherits(scout.DesktopTab, scout.SimpleTab);
@@ -61,13 +61,13 @@ scout.DesktopTab.prototype._init = function(options) {
 };
 
 scout.DesktopTab.prototype._installListeners = function() {
-  this.view.on('propertyChange', this._propertyChangeListener);
-  this.view.on('remove', this._removeListener);
+  this.view.on('propertyChange', this._viewPropertyChangeHandler);
+  this.view.on('remove', this._viewRemoveHandler);
 };
 
 scout.DesktopTab.prototype._uninstallListeners = function() {
-  this.view.off('propertyChange', this._propertyChangeListener);
-  this.view.off('remove', this._removeListener);
+  this.view.off('propertyChange', this._viewPropertyChangeHandler);
+  this.view.off('remove', this._viewRemoveHandler);
 };
 
 scout.DesktopTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
@@ -87,7 +87,7 @@ scout.DesktopTab.prototype._onClose = function() {
  * of the this tab, because in bench-mode the tab is never rendered
  * and thus the _remove function is never called.
  */
-scout.DesktopTab.prototype._onViewRemoved = function() {
+scout.DesktopTab.prototype._onViewRemove = function() {
   this._uninstallListeners();
   if (this.rendered) {
     this.remove();

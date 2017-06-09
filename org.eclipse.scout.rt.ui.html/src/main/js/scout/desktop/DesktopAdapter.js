@@ -22,22 +22,22 @@ scout.DesktopAdapter.prototype._goOnline = function() {
   this.widget.goOnline();
 };
 
-scout.DesktopAdapter.prototype._onWidgetHistoryEntryActivated = function(event) {
-  this._send('historyEntryActivated', {
+scout.DesktopAdapter.prototype._onWidgetHistoryEntryActivate = function(event) {
+  this._send('historyEntryActivate', {
     deepLinkPath: event.deepLinkPath
   });
 };
 
-scout.DesktopAdapter.prototype._onWidgetFormActivated = function(event) {
-  this._sendFormActivated(event.form);
+scout.DesktopAdapter.prototype._onWidgetFormActivate = function(event) {
+  this._sendFormActivate(event.form);
 };
 
-scout.DesktopAdapter.prototype._sendFormActivated = function(form) {
+scout.DesktopAdapter.prototype._sendFormActivate = function(form) {
   var eventData = {
     formId: form ? form.modelAdapter.id : null
   };
 
-  this._send('formActivated', eventData, {
+  this._send('formActivate', eventData, {
     coalesce: function(previous) {
       return this.target === previous.target && this.type === previous.type;
     }
@@ -45,10 +45,10 @@ scout.DesktopAdapter.prototype._sendFormActivated = function(form) {
 };
 
 scout.DesktopAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'formActivated') {
-    this._onWidgetFormActivated(event);
-  } else if (event.type === 'historyEntryActivated') {
-    this._onWidgetHistoryEntryActivated(event);
+  if (event.type === 'formActivate') {
+    this._onWidgetFormActivate(event);
+  } else if (event.type === 'historyEntryActivate') {
+    this._onWidgetHistoryEntryActivate(event);
   } else {
     scout.DesktopAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -61,7 +61,7 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
   if (displayParent) {
     form = this.session.getOrCreateWidget(event.form, displayParent.widget);
     this.addFilterForWidgetEvent(function(widgetEvent) {
-      return (widgetEvent.type === 'formActivated' &&
+      return (widgetEvent.type === 'formActivate' &&
         widgetEvent.form === form);
     });
     this.widget.showForm(form, displayParent.widget, event.position);

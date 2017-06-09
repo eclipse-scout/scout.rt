@@ -13,7 +13,7 @@ scout.ViewButtonBox = function() {
   this.viewMenuTab;
   this.viewTabs;
   this.viewButtons = [];
-  this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._desktopOutlineChangeHandler = this._onDesktopOutlineChange.bind(this);
   this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
   this._addWidgetProperties(['viewButtons']);
 };
@@ -41,15 +41,15 @@ scout.ViewButtonBox.prototype._render = function() {
     }
   }, this);
 
-  this._onDesktopOutlineChanged();
+  this._onDesktopOutlineChange();
   this.viewButtons.forEach(function(viewButton) {
     viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
   }, this);
-  this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
 };
 
 scout.ViewButtonBox.prototype._remove = function() {
-  this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
   this.viewButtons.forEach(function(viewButton) {
     viewButton.off('selected', this._viewButtonPropertyChangeHandler);
   }, this);
@@ -86,11 +86,11 @@ scout.ViewButtonBox.prototype.bringToFront = function() {
  * This method updates the state of the view-menu-tab and the selected state of outline-view-button-box.
  * This method must also work in offline mode.
  */
-scout.ViewButtonBox.prototype._onDesktopOutlineChanged = function(event) {
+scout.ViewButtonBox.prototype._onDesktopOutlineChange = function(event) {
   var outline = this.desktop.outline;
   this._viewButtons().forEach(function(viewTab) {
     if (viewTab instanceof scout.OutlineViewButton) {
-      viewTab.onOutlineChanged(outline);
+      viewTab.onOutlineChange(outline);
     }
   });
 };
