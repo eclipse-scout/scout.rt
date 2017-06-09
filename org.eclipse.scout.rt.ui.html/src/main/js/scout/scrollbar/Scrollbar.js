@@ -72,8 +72,8 @@ scout.Scrollbar.prototype._render = function() {
     .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
     .on('scroll', this._onScrollHandler);
   scrollbars.forEach(function(scrollbar) {
-    scrollbar.on('scrollstart', this._fixScrollbarHandler);
-    scrollbar.on('scrollend', this._unfixScrollbarHandler);
+    scrollbar.on('scrollStart', this._fixScrollbarHandler);
+    scrollbar.on('scrollEnd', this._unfixScrollbarHandler);
   }.bind(this));
   this.$container.on('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.on('mousedown', this._onThumbMousedownHandler);
@@ -86,8 +86,8 @@ scout.Scrollbar.prototype._remove = function() {
     .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
     .off('scroll', this._onScrollHandler);
   scrollbars.forEach(function(scrollbar) {
-    scrollbar.off('scrollstart', this._fixScrollbarHandler);
-    scrollbar.off('scrollend', this._unfixScrollbarHandler);
+    scrollbar.off('scrollStart', this._fixScrollbarHandler);
+    scrollbar.off('scrollEnd', this._unfixScrollbarHandler);
   }.bind(this));
   this.$container.off('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.off('mousedown', '', this._onThumbMousedownHandler);
@@ -286,11 +286,11 @@ scout.Scrollbar.prototype._onDocumentMouseup = function(event) {
 };
 
 scout.Scrollbar.prototype.notifyBeforeScroll = function() {
-  this.trigger('scrollstart');
+  this.trigger('scrollStart');
 };
 
 scout.Scrollbar.prototype.notifyAfterScroll = function() {
-  this.trigger('scrollend');
+  this.trigger('scrollEnd');
 };
 
 /*
