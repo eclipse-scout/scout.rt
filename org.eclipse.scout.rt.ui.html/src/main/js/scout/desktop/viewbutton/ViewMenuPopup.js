@@ -19,7 +19,7 @@ scout.ViewMenuPopup = function() {
   this.viewButtonBoxBounds;
   this._tooltip;
   this._addWidgetProperties('viewMenus');
-  this._viewMenuDoActionHandler = this._onViewMenuDoAction.bind(this);
+  this._viewMenuActionHandler = this._onViewMenuAction.bind(this);
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
@@ -52,7 +52,7 @@ scout.ViewMenuPopup.prototype._render = function() {
 
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.render(this.$body);
-    viewMenu.on('doAction', this._viewMenuDoActionHandler);
+    viewMenu.on('action', this._viewMenuActionHandler);
   }, this);
 
   // Add last marker to last visible item
@@ -69,7 +69,7 @@ scout.ViewMenuPopup.prototype._render = function() {
 
 scout.ViewMenuPopup.prototype._remove = function() {
   this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.off('doAction', this._viewMenuDoActionHandler);
+    viewMenu.off('action', this._viewMenuActionHandler);
   }, this);
 
   scout.ViewMenuPopup.parent.prototype._remove.call(this);
@@ -120,6 +120,6 @@ scout.ViewMenuPopup.prototype.position = function() {
   this.setLocation(new scout.Point(0, 0));
 };
 
-scout.ViewMenuPopup.prototype._onViewMenuDoAction = function(event) {
+scout.ViewMenuPopup.prototype._onViewMenuAction = function(event) {
   this.close();
 };

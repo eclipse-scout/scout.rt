@@ -335,23 +335,23 @@ scout.ContextMenuPopup.prototype._handleInitialSubMenus = function(initialSubMen
 };
 
 scout.ContextMenuPopup.prototype._attachMenuListeners = function(menu) {
-  var menuItemDoActionHandler = this._onMenuItemDoAction.bind(this);
+  var menuItemActionHandler = this._onMenuItemAction.bind(this);
   var menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
-  menu.on('doAction', menuItemDoActionHandler);
+  menu.on('action', menuItemActionHandler);
   menu.on('propertyChange', menuItemPropertyChange);
   this.one('remove', function() {
-    menu.off('doAction', menuItemDoActionHandler);
+    menu.off('action', menuItemActionHandler);
     menu.off('propertyChange', menuItemPropertyChange);
   });
 };
 
 scout.ContextMenuPopup.prototype._attachCloneMenuListeners = function(menu) {
-  menu.on('doAction', this._onCloneMenuDoAction.bind(this));
+  menu.on('action', this._onCloneMenuAction.bind(this));
   menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
   menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
 };
 
-scout.ContextMenuPopup.prototype._onCloneMenuDoAction = function(event) {
+scout.ContextMenuPopup.prototype._onCloneMenuAction = function(event) {
   var menu = event.source;
   menu.cloneOf.doAction();
 };
@@ -435,7 +435,7 @@ scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, 
   }
 };
 
-scout.ContextMenuPopup.prototype._onMenuItemDoAction = function(event) {
+scout.ContextMenuPopup.prototype._onMenuItemAction = function(event) {
   this.close();
 };
 

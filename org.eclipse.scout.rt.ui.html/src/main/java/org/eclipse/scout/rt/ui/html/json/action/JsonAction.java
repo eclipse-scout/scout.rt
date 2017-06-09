@@ -33,7 +33,7 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonAction.class);
 
-  public static final String EVENT_DO_ACTION = "doAction";
+  public static final String EVENT_ACTION = "action";
 
   public JsonAction(ACTION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -147,15 +147,15 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_DO_ACTION.equals(event.getType())) {
-      handleUiDoAction(event);
+    if (EVENT_ACTION.equals(event.getType())) {
+      handleUiAction(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiDoAction(JsonEvent event) {
+  protected void handleUiAction(JsonEvent event) {
     getModel().getUIFacade().fireActionFromUI();
   }
 

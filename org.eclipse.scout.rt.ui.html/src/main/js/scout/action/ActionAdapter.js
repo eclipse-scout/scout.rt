@@ -23,13 +23,13 @@ scout.ActionAdapter.prototype._goOnline = function() {
   this.widget.setEnabled(this._enabledBeforeOffline);
 };
 
-scout.ActionAdapter.prototype._onWidgetDoAction = function(event) {
-  this._send('doAction');
+scout.ActionAdapter.prototype._onWidgetAction = function(event) {
+  this._send('action');
 };
 
 scout.ActionAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'doAction') {
-    this._onWidgetDoAction(event);
+  if (event.type === 'action') {
+    this._onWidgetAction(event);
   } else {
     scout.ActionAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

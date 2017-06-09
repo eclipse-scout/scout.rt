@@ -210,7 +210,7 @@ scout.Action.prototype.prepareDoAction = function() {
 };
 
 scout.Action.prototype._doAction = function() {
-  this.trigger('doAction');
+  this.trigger('action');
 };
 
 scout.Action.prototype.setText = function(text) {

@@ -74,8 +74,8 @@ public class JsonOutlineViewButtonTest {
     JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
-    JsonEvent event = createJsonDoActionEvent(jsonViewButton.getId());
-    assertEquals("doAction", event.getType());
+    JsonEvent event = createJsonActionEvent(jsonViewButton.getId());
+    assertEquals("action", event.getType());
     jsonViewButton.handleUiEvent(event);
 
     // Outline needs to be created and sent if selection changes to true
@@ -102,8 +102,8 @@ public class JsonOutlineViewButtonTest {
     assertNull(outlineId);
   }
 
-  private static JsonEvent createJsonDoActionEvent(String adapterId) throws JSONException {
-    return new JsonEvent(adapterId, "doAction", null);
+  private static JsonEvent createJsonActionEvent(String adapterId) throws JSONException {
+    return new JsonEvent(adapterId, "action", null);
   }
 
 }

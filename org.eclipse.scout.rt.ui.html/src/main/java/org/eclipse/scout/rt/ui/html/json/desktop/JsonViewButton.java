@@ -29,9 +29,9 @@ public class JsonViewButton<VIEW_BUTTON extends IViewButton> extends JsonAction<
   }
 
   @Override
-  protected void handleUiDoAction(JsonEvent event) {
+  protected void handleUiAction(JsonEvent event) {
     getModel().getUIFacade().setSelectedFromUI(true);
-    super.handleUiDoAction(event);
+    super.handleUiAction(event);
   }
 
   @Override

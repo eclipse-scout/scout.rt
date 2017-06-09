@@ -154,7 +154,7 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       tabItem: tabItem,
       visible: tabItem.visible
     });
-    menu.on('doAction', function(event) {
+    menu.on('action', function(event) {
       $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
       tabBox.setSelectedTab(tabItem);
         popup.one('remove', function(event) {
