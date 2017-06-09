@@ -75,7 +75,7 @@ scout.Splitter.prototype.getRatio = function() {
  * @returns the effective position in pixel.
  * Note: This function does not fire any events.
  */
-scout.Splitter.prototype.setPosition = function(newPosition, updateRatio, firePositionChanged) {
+scout.Splitter.prototype.setPosition = function(newPosition, updateRatio, firePositionChange) {
   if (!$.isNumeric(newPosition)) {
     // Get size automatically from $anchor element's bounds
     var anchorBounds = scout.graphics.offsetBounds(this.$anchor);
@@ -89,12 +89,12 @@ scout.Splitter.prototype.setPosition = function(newPosition, updateRatio, firePo
     return;
   }
 
-  this._setPosition(newPosition, updateRatio, firePositionChanged);
+  this._setPosition(newPosition, updateRatio, firePositionChange);
   return newPosition;
 };
 
-scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, firePositionChanged) {
-  firePositionChanged = scout.nvl(firePositionChanged, true);
+scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, firePositionChange) {
+  firePositionChange = scout.nvl(firePositionChange, true);
   if (!$.isNumeric(newPosition)) {
     return;
   }
@@ -109,11 +109,11 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
     }
   }
   this.position = newPosition;
-  var positionChangedEvent = {
+  var positionChangeEvent = {
     position: newPosition
   };
-  if (firePositionChanged) {
-    this.trigger('positionChanged', positionChangedEvent);
+  if (firePositionChange) {
+    this.trigger('positionChange', positionChangeEvent);
   }
   if (this.rendered) {
     // Set the new position (center splitter around 'newPosition')
