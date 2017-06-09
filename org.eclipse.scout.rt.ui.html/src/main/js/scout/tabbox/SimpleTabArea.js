@@ -18,7 +18,7 @@ scout.SimpleTabArea.prototype._init = function(model) {
   scout.SimpleTabArea.parent.prototype._init.call(this, model);
   this._selectedViewTab;
 
-  this._viewTabSelectionHandler = this._onTabSelection.bind(this);
+  this._tabClickHandler = this._onTabClick.bind(this);
 };
 
 scout.SimpleTabArea.prototype._render = function() {
@@ -71,7 +71,7 @@ scout.SimpleTabArea.prototype._detach = function() {
   this.invalidateLayoutTree(false);
 };
 
-scout.SimpleTabArea.prototype._onTabSelection = function(event) {
+scout.SimpleTabArea.prototype._onTabClick = function(event) {
   this.selectTab(event.source);
 };
 
@@ -90,7 +90,7 @@ scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
     // Select the new view tab.
     viewTab.select();
   }
-  this.trigger('tabSelected', {
+  this.trigger('tabSelect', {
     viewTab: viewTab
   });
 };
@@ -116,7 +116,7 @@ scout.SimpleTabArea.prototype.addTab = function(tab, sibling) {
     insertPosition = this.tabs.indexOf(sibling);
   }
   this.tabs.splice(insertPosition + 1, 0, tab);
-  tab.on('tabClicked', this._viewTabSelectionHandler);
+  tab.on('click', this._tabClickHandler);
   if (this.rendered) {
     this._renderVisible();
     tab.renderAfter(this.$container, sibling);
@@ -129,7 +129,7 @@ scout.SimpleTabArea.prototype.destroyTab = function(tab) {
   if (index > -1) {
     this.tabs.splice(index, 1);
     tab.destroy();
-    tab.off('tabClicked', this._viewTabSelectionHandler);
+    tab.off('click', this._tabClickHandler);
     this._renderVisible();
     this.invalidateLayoutTree();
   }

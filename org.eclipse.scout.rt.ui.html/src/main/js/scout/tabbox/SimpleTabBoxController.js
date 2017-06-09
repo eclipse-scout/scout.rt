@@ -26,7 +26,7 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
   this._viewActivateHandler = this._onViewActivate.bind(this);
   this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 
-  this._viewTabSelectedHandler = this._onViewTabSelected.bind(this);
+  this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
 
   this._installListeners();
 };
@@ -37,7 +37,7 @@ scout.SimpleTabBoxController.prototype._installListeners = function() {
   this.tabBox.on('viewActivate', this._viewActivateHandler);
   this.tabBox.on('viewDeactivate', this._viewDeactivateHandler);
 
-  this.tabArea.on('tabSelected', this._viewTabSelectedHandler);
+  this.tabArea.on('tabSelect', this._viewTabSelectHandler);
 };
 
 scout.SimpleTabBoxController.prototype._onViewAdd = function(event) {
@@ -84,7 +84,7 @@ scout.SimpleTabBoxController.prototype._onViewDeactivate = function(event) {
   this.tabArea.deselectTab(viewTab);
 };
 
-scout.SimpleTabBoxController.prototype._onViewTabSelected = function(event) {
+scout.SimpleTabBoxController.prototype._onViewTabSelect = function(event) {
   if (!event.viewTab) {
     return;
   }

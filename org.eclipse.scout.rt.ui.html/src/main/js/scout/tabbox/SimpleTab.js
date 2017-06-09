@@ -191,7 +191,7 @@ scout.SimpleTab.prototype.deselect = function() {
 };
 
 scout.SimpleTab.prototype._onMouseDown = function(event) {
-  this.trigger('tabClicked');
+  this.trigger('click');
 };
 
 scout.SimpleTab.prototype._onClose = function() {};
