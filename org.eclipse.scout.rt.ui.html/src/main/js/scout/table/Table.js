@@ -313,7 +313,7 @@ scout.Table.prototype._render = function() {
   if (this.scrollToSelection) {
     this.revealSelection();
   }
-  this.session.desktop.on('popupopen', this._popupOpenHandler);
+  this.session.desktop.on('popupOpen', this._popupOpenHandler);
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -325,7 +325,7 @@ scout.Table.prototype._renderProperties = function() {
 };
 
 scout.Table.prototype._remove = function() {
-  this.session.desktop.off('popupopen', this._popupOpenHandler);
+  this.session.desktop.off('popupOpen', this._popupOpenHandler);
   scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer

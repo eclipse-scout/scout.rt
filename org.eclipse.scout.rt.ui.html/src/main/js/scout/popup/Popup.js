@@ -150,7 +150,7 @@ scout.Popup.prototype._attachCloseHandler = function() {
 
   // Install popup open close handler
   this._popupOpenHandler = this._onPopupOpen.bind(this);
-  this.session.desktop.on('popupopen', this._popupOpenHandler);
+  this.session.desktop.on('popupOpen', this._popupOpenHandler);
 
   // Install scroll close handler
   if (this.$anchor && this.boundToAnchor && this.scrollType) {
@@ -168,7 +168,7 @@ scout.Popup.prototype._detachCloseHandler = function() {
 
   // Uninstall popup open close handler
   if (this._popupOpenHandler) {
-    this.session.desktop.off('popupopen', this._popupOpenHandler);
+    this.session.desktop.off('popupOpen', this._popupOpenHandler);
     this._popupOpenHandler = null;
   }
 
@@ -363,7 +363,7 @@ scout.Popup.prototype.setLocation = function(location) {
   this.$container
     .css('left', location.x)
     .css('top', location.y);
-  this._triggerLocationChanged();
+  this._triggerLocationChange();
 };
 
 /**
@@ -389,15 +389,15 @@ scout.Popup.prototype._isInView = function() {
   return scout.scrollbars.isLocationInView(anchorBounds.center(), this.$anchor.scrollParent());
 };
 
-scout.Popup.prototype._triggerLocationChanged = function() {
-  this.trigger('locationChanged');
+scout.Popup.prototype._triggerLocationChange = function() {
+  this.trigger('locationChange');
 };
 
 /**
  * Fire event that this popup is about to open.
  */
 scout.Popup.prototype._triggerPopupOpenEvent = function() {
-  this.session.desktop.trigger('popupopen', {
+  this.session.desktop.trigger('popupOpen', {
     popup: this
   });
 };

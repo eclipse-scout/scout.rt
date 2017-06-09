@@ -324,7 +324,7 @@ scout.Tree.prototype._render = function() {
   // render display style before viewport (not in renderProperties) to have a correct style from the beginning
   this._renderDisplayStyle();
   this._renderViewport();
-  this.session.desktop.on('popupopen', this._popupOpenHandler);
+  this.session.desktop.on('popupOpen', this._popupOpenHandler);
 };
 
 scout.Tree.prototype._postRender = function() {
@@ -334,7 +334,7 @@ scout.Tree.prototype._postRender = function() {
 
 scout.Tree.prototype._remove = function() {
   // remove listener
-  this.session.desktop.off('popupopen', this._popupOpenHandler);
+  this.session.desktop.off('popupOpen', this._popupOpenHandler);
 
   // stop all animations
   if (this._$animationWrapper) {

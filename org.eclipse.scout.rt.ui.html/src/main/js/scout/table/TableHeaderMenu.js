@@ -19,7 +19,7 @@ scout.TableHeaderMenu = function() {
   this.filterSortMode = scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
 
   this._tableHeaderScrollHandler = this._onAnchorScroll.bind(this);
-  this.on('locationChanged', this._onLocationChanged.bind(this));
+  this.on('locationChange', this._onLocationChange.bind(this));
 };
 scout.inherits(scout.TableHeaderMenu, scout.Popup);
 
@@ -776,7 +776,7 @@ scout.TableHeaderMenu.prototype.setCompact = function(compact) {
   this.setProperty('compact', compact);
 };
 
-scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
+scout.TableHeaderMenu.prototype._onLocationChange = function(event) {
   var inView, containerBounds,
     isLocationInView = scout.scrollbars.isLocationInView,
     headerItemBounds = scout.graphics.offsetBounds(this.$headerItem),
