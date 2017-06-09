@@ -70,7 +70,7 @@ scout.router = {
         window.location.replace(location);
         $.log.info('router: activated route for location=', location);
 
-        this.events.trigger('routechanged', {
+        this.events.trigger('routeChange', {
           route: route
         });
         return;

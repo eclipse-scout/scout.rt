@@ -232,7 +232,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
   var parent = new scout.NullWidget();
   parent.session = session;
   this._createDesktop(parent);
-  this.trigger('desktopcreated');
+  this.trigger('desktopReady');
   session.render(function() {
     session._renderDesktop();
 
@@ -241,7 +241,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
     session.focusManager.validateFocus();
 
     session.ready = true;
-    this.trigger('sessionready', {session: session});
+    this.trigger('sessionReady', {session: session});
     $.log.info('Session initialized. Detected ' + scout.device);
   }.bind(this));
   return session;
