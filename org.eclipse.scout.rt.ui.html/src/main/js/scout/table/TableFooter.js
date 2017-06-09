@@ -16,9 +16,9 @@ scout.TableFooter = function() {
   this.resizing = false;
   this.table = null;
   this._tableRowsChangedHandler = this._onTableRowsChanged.bind(this);
-  this._tableRowsFilteredHandler = this._onTableRowsFiltered.bind(this);
-  this._tableAddFilterHandler = this._onTableAddFilter.bind(this);
-  this._tableRemoveFilterHandler = this._onTableRemoveFilter.bind(this);
+  this._tableFilterHandler = this._onTableFilter.bind(this);
+  this._tableFilterAddedHandler = this._onTableFilterAdded.bind(this);
+  this._tableFilterRemovedHandler = this._onTableFilterRemoved.bind(this);
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableStatusChangedHandler = this._onTableStatusChanged.bind(this);
   this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
@@ -99,9 +99,9 @@ scout.TableFooter.prototype._render = function() {
   this.table.on('rowsInserted', this._tableRowsChangedHandler);
   this.table.on('rowsDeleted', this._tableRowsChangedHandler);
   this.table.on('allRowsDeleted', this._tableRowsChangedHandler);
-  this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
-  this.table.on('addFilter', this._tableAddFilterHandler);
-  this.table.on('removeFilter', this._tableRemoveFilterHandler);
+  this.table.on('filter', this._tableFilterHandler);
+  this.table.on('filterAdded', this._tableFilterAddedHandler);
+  this.table.on('filterRemoved', this._tableFilterRemovedHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('statusChanged', this._tableStatusChangedHandler);
   this.table.on('propertyChange', this._tablePropertyChangeHandler);
@@ -118,9 +118,9 @@ scout.TableFooter.prototype._remove = function() {
   this.table.off('rowsInserted', this._tableRowsChangedHandler);
   this.table.off('rowsDeleted', this._tableRowsChangedHandler);
   this.table.off('allRowsDeleted', this._tableRowsChangedHandler);
-  this.table.off('rowsFiltered', this._tableRowsFilteredHandler);
-  this.table.off('addFilter', this._tableAddFilterHandler);
-  this.table.off('removeFilter', this._tableRemoveFilterHandler);
+  this.table.off('filter', this._tableFilterHandler);
+  this.table.off('filterAdded', this._tableFilterAddedHandler);
+  this.table.off('filterRemoved', this._tableFilterRemovedHandler);
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('statusChanged', this._tableStatusChangedHandler);
   this.table.off('propertyChange', this._tablePropertyChangeHandler);
@@ -649,12 +649,12 @@ scout.TableFooter.prototype._onTableRowsChanged = function(event) {
   this._renderInfoLoad();
 };
 
-scout.TableFooter.prototype._onTableRowsFiltered = function(event) {
+scout.TableFooter.prototype._onTableFilter = function(event) {
   this._renderInfoFilter();
   this._renderInfoSelection();
 };
 
-scout.TableFooter.prototype._onTableAddFilter = function(event) {
+scout.TableFooter.prototype._onTableFilterAdded = function(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
   if (event.filter.filterType === scout.TableTextUserFilter.Type) {
@@ -667,7 +667,7 @@ scout.TableFooter.prototype._onTableAddFilter = function(event) {
   }
 };
 
-scout.TableFooter.prototype._onTableRemoveFilter = function(event) {
+scout.TableFooter.prototype._onTableFilterRemoved = function(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
   if (event.filter.filterType === scout.TableTextUserFilter.Type) {

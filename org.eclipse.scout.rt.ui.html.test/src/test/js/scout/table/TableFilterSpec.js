@@ -427,9 +427,9 @@ describe("TableFilter", function() {
 
   describe("events", function() {
 
-    describe("rowsFiltered", function() {
+    describe("filter", function() {
       var listener = {
-        _onRowsFiltered: function() {}
+        _onFilter: function() {}
       };
 
       it("gets fired when table with a filter is initializing", function() {
@@ -438,22 +438,22 @@ describe("TableFilter", function() {
         var filter = createColumnFilterModel(model.columns[0].id, ['cell1_0']);
         model.filters = [filter];
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         table.init(model);
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("does not get fired when table with no filters is initializing", function() {
         var model = helper.createModelFixture(2, 2);
         var table = new scout.Table();
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         table.init(model);
-        expect(listener._onRowsFiltered).not.toHaveBeenCalled();
+        expect(listener._onFilter).not.toHaveBeenCalled();
       });
 
       it("gets fired if filter() is called", function() {
@@ -463,13 +463,13 @@ describe("TableFilter", function() {
 
         table.render();
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("gets fired if filter() is called, even if table is not rendered", function() {
@@ -477,13 +477,13 @@ describe("TableFilter", function() {
           table = helper.createTable(model),
           column0 = table.columns[0];
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("gets not fired if rows are filtered again but the filtered rows have not changed", function() {
@@ -496,11 +496,11 @@ describe("TableFilter", function() {
         var filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
         table.filter();
 
-        expect(listener._onRowsFiltered).not.toHaveBeenCalled();
+        expect(listener._onFilter).not.toHaveBeenCalled();
       });
 
       it("gets fired if rows are filtered during updateRows", function() {
@@ -513,8 +513,8 @@ describe("TableFilter", function() {
         table.filter();
         table.render();
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         var rows = helper.createModelRows(2, 1);
         rows[0].id = row1.id;
@@ -522,7 +522,7 @@ describe("TableFilter", function() {
         table.updateRows(rows);
 
         expect(table.filteredRows().length).toBe(0);
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("gets fired if rows are filtered during insertRows", function() {
@@ -536,22 +536,22 @@ describe("TableFilter", function() {
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         var rows = helper.createModelRows(2, 1);
         rows[0].cells[0].text = '1_0';
         table.insertRows(rows);
 
         expect(table.filteredRows().length).toBe(2);
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
 
         rows = helper.createModelRows(2, 1);
         rows[0].cells[0].value = 'wont accept';
         table.insertRows(rows);
 
         expect(table.filteredRows().length).toBe(2);
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("gets fired if rows are filtered during deleteRows", function() {
@@ -565,13 +565,13 @@ describe("TableFilter", function() {
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         table.deleteRows([row1]);
 
         expect(table.filteredRows().length).toBe(0);
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("gets fired if rows are filtered during deleteAllRows", function() {
@@ -585,13 +585,13 @@ describe("TableFilter", function() {
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         table.deleteAllRows();
 
         expect(table.filteredRows().length).toBe(0);
-        expect(listener._onRowsFiltered).toHaveBeenCalled();
+        expect(listener._onFilter).toHaveBeenCalled();
       });
 
       it("does not get fired if rows are updated but row filter state has not changed", function() {
@@ -604,8 +604,8 @@ describe("TableFilter", function() {
         table.filter();
         table.render();
 
-        spyOn(listener, '_onRowsFiltered');
-        table.on('rowsFiltered', listener._onRowsFiltered);
+        spyOn(listener, '_onFilter');
+        table.on('filter', listener._onFilter);
 
         // update cell 1 of row -> row still accepted by filter
         var rows = helper.createModelRows(2, 1);
@@ -615,7 +615,7 @@ describe("TableFilter", function() {
         table.updateRows(rows);
 
         expect(table.filteredRows().length).toBe(1);
-        expect(listener._onRowsFiltered).not.toHaveBeenCalled();
+        expect(listener._onFilter).not.toHaveBeenCalled();
       });
 
       it("gets sent to server containing rowIds when rows are filtered", function() {
@@ -636,7 +636,7 @@ describe("TableFilter", function() {
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
-        var event = new scout.RemoteEvent(table.id, 'rowsFiltered', {
+        var event = new scout.RemoteEvent(table.id, 'filter', {
           rowIds: [table.rows[1].id],
           showBusyIndicator: false
         });

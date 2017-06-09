@@ -13,8 +13,8 @@ scout.inherits(scout.NumberColumnUserFilter, scout.ColumnUserFilter);
 /**
  * @override ColumnUserFilter
  */
-scout.NumberColumnUserFilter.prototype.createAddFilterEventData = function() {
-  var data = scout.NumberColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
+scout.NumberColumnUserFilter.prototype.createFilterAddedEventData = function() {
+  var data = scout.NumberColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
   data.numberFrom = this.numberFrom;
   data.numberTo = this.numberTo;
   return data;

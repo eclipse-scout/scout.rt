@@ -12,7 +12,7 @@ scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
 
   this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
-  this._tableAddRemoveFilterHandler = this._onTableAddRemoveFilter.bind(this);
+  this._tableAddFilterRemovedHandler = this._onTableAddFilterRemoved.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
   this.dragging = false;
@@ -55,16 +55,16 @@ scout.TableHeader.prototype._render = function() {
   this._renderColumns();
 
   this.table.$data.on('scroll', this._tableDataScrollHandler);
-  this.table.on('addFilter', this._tableAddRemoveFilterHandler);
-  this.table.on('removeFilter', this._tableAddRemoveFilterHandler);
+  this.table.on('filterAdded', this._tableAddFilterRemovedHandler);
+  this.table.on('filterRemoved', this._tableAddFilterRemovedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
 };
 
 scout.TableHeader.prototype._remove = function() {
   this.table.$data.off('scroll', this._tableDataScrollHandler);
-  this.table.off('addFilter', this._tableAddRemoveFilterHandler);
-  this.table.off('removeFilter', this._tableAddRemoveFilterHandler);
+  this.table.off('filterAdded', this._tableAddFilterRemovedHandler);
+  this.table.off('filterRemoved', this._tableAddFilterRemovedHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('columnMoved', this._tableColumnMovedHandler);
 
@@ -690,10 +690,10 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
   // Install resize helpers. Those helpers make sure the header and the data element keep their
   // current width until the resizing has finished. Otherwise, make a column smaller while the
   // table has been horizontally scrolled to the right would behave very strange.
-  this.$headerColumnResizeHelper = this.$container
+  this.$headerColumnResizedHelper = this.$container
     .appendDiv('table-column-resize-helper')
     .css('width', this.table.rowWidth + this.table.rowBorderWidth);
-  this.$dataColumnResizeHelper = this.table.$data
+  this.$dataColumnResizedHelper = this.table.$data
     .appendDiv('table-column-resize-helper')
     .css('width', this.table.rowWidth);
 
@@ -719,10 +719,10 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
     delete column.resizingInProgress;
 
     // Remove resize helpers
-    that.$headerColumnResizeHelper.remove();
-    that.$headerColumnResizeHelper = null;
-    that.$dataColumnResizeHelper.remove();
-    that.$dataColumnResizeHelper = null;
+    that.$headerColumnResizedHelper.remove();
+    that.$headerColumnResizedHelper = null;
+    that.$dataColumnResizedHelper.remove();
+    that.$dataColumnResizedHelper = null;
 
     that._$window.off('mousemove.tableheader');
     that._$body.removeClass('col-resize');
@@ -745,7 +745,7 @@ scout.TableHeader.prototype._onMenuBarPropertyChange = function(event) {
   }
 };
 
-scout.TableHeader.prototype._onTableAddRemoveFilter = function(event) {
+scout.TableHeader.prototype._onTableAddFilterRemoved = function(event) {
   var column = event.filter.column;
   // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
   if (event.filter.filterType === scout.ColumnUserFilter.Type && column.$header) {

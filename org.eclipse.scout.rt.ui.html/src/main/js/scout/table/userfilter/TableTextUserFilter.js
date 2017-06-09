@@ -19,8 +19,8 @@ scout.TableTextUserFilter.Type = 'text';
 /**
  * @override TableUserFilter.js
  */
-scout.TableTextUserFilter.prototype.createAddFilterEventData = function() {
-  var data = scout.ColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
+scout.TableTextUserFilter.prototype.createFilterAddedEventData = function() {
+  var data = scout.ColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
   data.text = this.text;
   return data;
 };

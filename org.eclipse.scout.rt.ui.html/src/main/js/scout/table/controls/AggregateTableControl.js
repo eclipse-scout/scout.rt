@@ -54,7 +54,7 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.$data.on('scroll', this._tableDataScrollHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
-  this.table.on('groupingChanged rowsSelected rowsInserted rowsDeleted rowsFiltered allRowsDeleted',
+  this.table.on('rowsSelected rowsInserted rowsDeleted filter group allRowsDeleted',
     this._tableChangedHandler);
 };
 
@@ -64,7 +64,7 @@ scout.AggregateTableControl.prototype._removeContent = function() {
   this.table.$data.off('scroll', this._tableDataScrollHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('columnMoved', this._tableColumnMovedHandler);
-  this.table.off('groupingChanged rowsSelected rowsInserted rowsDeleted rowsFiltered allRowsDeleted',
+  this.table.off('rowsSelected rowsInserted rowsDeleted filter group allRowsDeleted',
     this._tableChangedHandler);
 };
 
@@ -129,12 +129,12 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
   this.$contentContainer.scrollLeft(scrollLeft);
 };
 
-scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(aggregationFunctionChanged) {
+scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(aggregationFunctionChangedd) {
   var enabled = this.table.containsAggregatedNumberColumn();
 
   // Select control if enabled, aggregation function changed and table is not grouped
   if (enabled) {
-    if (aggregationFunctionChanged && !this.table.isGrouped()) {
+    if (aggregationFunctionChangedd && !this.table.isGrouped()) {
       this.setSelected(true);
     }
   } else if (this.selected) {

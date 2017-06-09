@@ -584,16 +584,16 @@ describe("TableAdapter", function() {
 
   });
 
-  describe("_sendRowsFiltered", function() {
+  describe("_sendFilter", function() {
 
     // Test case for ticket #175700
     it("should not coalesce remove and 'add' events", function() {
       var model = helper.createModelFixture(1, 2);
       var adapter = helper.createTableAdapter(model);
       var table = adapter.createWidget(model, session.desktop);
-      adapter._sendRowsFiltered(['1', '2']); // should create a remove event, because number of rows is equals to the length of rowIds
-      adapter._sendRowsFiltered(['1']); // should create an 'add' event
-      adapter._sendRowsFiltered(['2']); // should be coalesced with previous add event
+      adapter._sendFilter(['1', '2']); // should create a remove event, because number of rows is equals to the length of rowIds
+      adapter._sendFilter(['1']); // should create an 'add' event
+      adapter._sendFilter(['2']); // should be coalesced with previous add event
       expect(session.asyncEvents.length).toBe(2);
       expect(session.asyncEvents[0].remove).toBe(true);
       expect(session.asyncEvents[1].remove).toBe(undefined);

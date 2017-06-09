@@ -11,7 +11,7 @@
 scout.OutlineAdapter = function() {
   scout.OutlineAdapter.parent.call(this);
   this._nodeIdToRowMap = {};
-  this._detailTableRowHandler = this._onDetailTableRowInitialized.bind(this);
+  this._detailTableRowInitHandler = this._onDetailTableRowInit.bind(this);
 };
 scout.inherits(scout.OutlineAdapter, scout.TreeAdapter);
 
@@ -81,14 +81,14 @@ scout.OutlineAdapter.prototype._initDetailTable = function(page) {
   this._nodeIdToRowMap = {};
   // link already existing rows now
   page.detailTable.rows.forEach(this._linkNodeWithRow.bind(this));
-  // rows which are inserted later are linked by _onDetailTableRowInitialized
-  page.detailTable.on('rowInitialized', this._detailTableRowHandler);
+  // rows which are inserted later are linked by _onDetailTableRowInit
+  page.detailTable.on('rowInit', this._detailTableRowInitHandler);
 };
 
 scout.OutlineAdapter.prototype._destroyDetailTable = function(page) {
   this._nodeIdToRowMap = {};
   page.detailTable.rows.forEach(this._unlinkNodeWithRow.bind(this));
-  page.detailTable.off('rowInitialized', this._detailTableRowHandler);
+  page.detailTable.off('rowInit', this._detailTableRowInitHandler);
 };
 
 scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
@@ -111,7 +111,7 @@ scout.OutlineAdapter.prototype._unlinkNodeWithRow = function(row) {
   }
 };
 
-scout.OutlineAdapter.prototype._onDetailTableRowInitialized = function(event) {
+scout.OutlineAdapter.prototype._onDetailTableRowInit = function(event) {
   var node,
     outline = this.widget,
     nodeId = event.row.nodeId;

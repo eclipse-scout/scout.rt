@@ -84,17 +84,15 @@ import org.slf4j.LoggerFactory;
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner, IBinaryResourceConsumer, IBinaryResourceProvider {
   private static final Logger LOG = LoggerFactory.getLogger(JsonTable.class);
 
-  public static final String EVENT_ROW_CLICKED = "rowClicked";
+  public static final String EVENT_ROW_CLICK = "rowClick";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_INSERTED = "rowsInserted";
   public static final String EVENT_ROWS_UPDATED = "rowsUpdated";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
-  public static final String EVENT_ROWS_SORTED = "rowsSorted";
-  public static final String EVENT_SORT_ROWS = "sortRows";
-  public static final String EVENT_ROWS_GROUPED = "rowsGrouped";
-  public static final String EVENT_GROUP_ROWS = "groupRows";
+  public static final String EVENT_SORT = "sort";
+  public static final String EVENT_GROUP = "group";
   public static final String EVENT_COLUMN_AGGR_FUNC_CHANGED = "aggregationFunctionChanged";
   public static final String EVENT_COLUMN_MOVED = "columnMoved";
   public static final String EVENT_COLUMN_RESIZED = "columnResized";
@@ -114,11 +112,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_CANCEL_CELL_EDIT = "cancelCellEdit";
   public static final String EVENT_REQUEST_FOCUS = "requestFocus";
   public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
-  public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
-  public static final String EVENT_ADD_FILTER = "addFilter";
-  public static final String EVENT_REMOVE_FILTER = "removeFilter";
+  public static final String EVENT_CLIPBOARD_EXPORT = "clipboardExport";
+  public static final String EVENT_FILTER_ADDED = "filterAdded";
+  public static final String EVENT_FILTER_REMOVED = "filterRemoved";
   public static final String EVENT_FILTERS_CHANGED = "filtersChanged";
-  public static final String EVENT_ROWS_FILTERED = "rowsFiltered";
+  public static final String EVENT_FILTER = "filter";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -486,8 +484,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_ROW_CLICKED.equals(event.getType())) {
-      handleUiRowClicked(event);
+    if (EVENT_ROW_CLICK.equals(event.getType())) {
+      handleUiRowClick(event);
     }
     else if (EVENT_ROW_ACTION.equals(event.getType())) {
       handleUiRowAction(event);
@@ -501,17 +499,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_RESET_COLUMNS.equals(event.getType())) {
       handleUiResetColumns(event);
     }
-    else if (EVENT_SORT_ROWS.equals(event.getType())) {
-      handleUiSortRows(event);
+    else if (EVENT_SORT.equals(event.getType())) {
+      handleUiSort(event);
     }
-    else if (EVENT_ROWS_SORTED.equals(event.getType())) {
-      handleUiRowsSorted(event);
-    }
-    else if (EVENT_GROUP_ROWS.equals(event.getType())) {
-      handleUiGroupRows(event);
-    }
-    else if (EVENT_ROWS_GROUPED.equals(event.getType())) {
-      handleUiRowsGrouped(event);
+    else if (EVENT_GROUP.equals(event.getType())) {
+      handleUiGroup(event);
     }
     else if (EVENT_COLUMN_MOVED.equals(event.getType())) {
       handleUiColumnMoved(event);
@@ -534,17 +526,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_CANCEL_CELL_EDIT.equals(event.getType())) {
       handleUiCancelCellEdit(event);
     }
-    else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
-      handleUiExportToClipboard(event);
+    else if (EVENT_CLIPBOARD_EXPORT.equals(event.getType())) {
+      handleUiClipboardExport(event);
     }
-    else if (EVENT_ADD_FILTER.equals(event.getType())) {
-      handleUiAddFilter(event);
+    else if (EVENT_FILTER_ADDED.equals(event.getType())) {
+      handleUiFilterAdded(event);
     }
-    else if (EVENT_REMOVE_FILTER.equals(event.getType())) {
-      handleUiRemoveFilter(event);
+    else if (EVENT_FILTER_REMOVED.equals(event.getType())) {
+      handleUiFilterRemoved(event);
     }
-    else if (EVENT_ROWS_FILTERED.equals(event.getType())) {
-      handleUiRowsFiltered(event);
+    else if (EVENT_FILTER.equals(event.getType())) {
+      handleUiFilter(event);
     }
     else if (EVENT_COLUMN_AGGR_FUNC_CHANGED.equals(event.getType())) {
       handleColumnAggregationFunctionChanged(event);
@@ -589,7 +581,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleUiRowClicked(JsonEvent event) {
+  protected void handleUiRowClick(JsonEvent event) {
     ITableRow tableRow = extractTableRow(event.getData());
     if (tableRow == null) {
       LOG.info("Requested table-row doesn't exist anymore -> skip rowClicked event");
@@ -642,16 +634,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * Makes sure that no rowOrderChanged event is returned to the client after sorting because the sorting already
    * happened on client as well.
    */
-  protected void handleUiRowsSorted(JsonEvent event) {
-    addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
-    fireSortRowsFromUi(event.getData());
+  protected void handleUiSort(JsonEvent event) {
+    if (!event.getData().optBoolean("sortingRequested")) {
+      addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
+    }
+    fireSortFromUi(event.getData());
   }
 
   protected void handleUiSortRows(JsonEvent event) {
-    fireSortRowsFromUi(event.getData());
+    fireSortFromUi(event.getData());
   }
 
-  protected void fireSortRowsFromUi(JSONObject data) {
+  protected void fireSortFromUi(JSONObject data) {
     IColumn column = extractColumn(data);
     boolean sortingRemoved = data.optBoolean("sortingRemoved");
 
@@ -666,17 +660,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleUiRowsGrouped(JsonEvent event) {
-    addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
-    fireGroupRowsFromUi(event.getData());
+  protected void handleUiGroup(JsonEvent event) {
+    if (!event.getData().optBoolean("groupingRequested")) {
+      addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
+    }
+    fireGroupFromUi(event.getData());
   }
 
-  protected void handleUiGroupRows(JsonEvent event) {
-    fireGroupRowsFromUi(event.getData());
-  }
-
-  protected void fireGroupRowsFromUi(JSONObject data) {
-
+  protected void fireGroupFromUi(JSONObject data) {
     IColumn column = extractColumn(data);
     boolean groupingRemoved = data.optBoolean("groupingRemoved");
 
@@ -688,7 +679,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       boolean groupAscending = data.getBoolean("groupAscending");
       getModel().getUIFacade().fireHeaderGroupFromUI(column, multiGroup, groupAscending);
     }
-
   }
 
   protected void handleColumnAggregationFunctionChanged(JsonEvent event) {
@@ -798,7 +788,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     jsonField.dispose();
   }
 
-  protected void handleUiExportToClipboard(JsonEvent event) {
+  protected void handleUiClipboardExport(JsonEvent event) {
     if (!ACCESS.check(new CopyToClipboardPermission())) {
       return;
     }
@@ -814,7 +804,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleUiAddFilter(JsonEvent event) {
+  protected void handleUiFilterAdded(JsonEvent event) {
     JSONObject data = event.getData();
     IUserFilterState filterState = createFilterState(data);
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_ADDED);
@@ -846,14 +836,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return getModel().getUserFilterManager().getFilter(type);
   }
 
-  protected void handleUiRemoveFilter(JsonEvent event) {
+  protected void handleUiFilterRemoved(JsonEvent event) {
     IUserFilterState filter = getFilterState(event.getData());
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_REMOVED);
     condition.setUserFilter(filter);
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
-  protected void handleUiRowsFiltered(JsonEvent event) {
+  protected void handleUiFilter(JsonEvent event) {
     if (event.getData().optBoolean("remove")) {
       getModel().getUIFacade().removeFilteredRowsFromUI();
     }
@@ -1199,7 +1189,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         break;
       case TableEvent.TYPE_USER_FILTER_ADDED:
       case TableEvent.TYPE_USER_FILTER_REMOVED:
-        handleModelUserFilterChanged(event);
+        handleModelUserFilterChange(event);
         break;
       case TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED:
         handleModelColumnAggregationChanged(event);
@@ -1372,7 +1362,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_SCROLL_TO_SELECTION).protect();
   }
 
-  protected void handleModelUserFilterChanged(TableEvent event) {
+  protected void handleModelUserFilterChange(TableEvent event) {
     Collection<IUserFilterState> filters = getModel().getUserFilterManager().getFilters();
     JSONObject jsonEvent = new JSONObject();
     jsonEvent.put(PROP_FILTERS, filtersToJson(filters));

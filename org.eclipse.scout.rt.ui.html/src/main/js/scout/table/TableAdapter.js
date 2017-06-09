@@ -29,13 +29,13 @@ scout.TableAdapter.prototype._sendRowsSelected = function(rowIds, debounceSend) 
   });
 };
 
-scout.TableAdapter.prototype._sendRowClicked = function(rowId, mouseButton, columnId) {
+scout.TableAdapter.prototype._sendRowClick = function(rowId, mouseButton, columnId) {
   var data = {
     rowId: rowId,
     columnId: columnId,
     mouseButton: mouseButton
   };
-  this._send('rowClicked', data);
+  this._send('rowClick', data);
 };
 
 scout.TableAdapter.prototype._onWidgetRowsSelected = function(event) {
@@ -43,26 +43,26 @@ scout.TableAdapter.prototype._onWidgetRowsSelected = function(event) {
   this._sendRowsSelected(rowIds, event.debounce);
 };
 
-scout.TableAdapter.prototype._onWidgetRowClicked = function(event) {
+scout.TableAdapter.prototype._onWidgetRowClick = function(event) {
   var columnId;
   if (event.column !== undefined) {
     columnId = event.column.id;
   }
 
-  this._sendRowClicked(event.row.id, event.mouseButton, columnId);
+  this._sendRowClick(event.row.id, event.mouseButton, columnId);
 };
 
-scout.TableAdapter.prototype._onWidgetAddFilter = function(event) {
+scout.TableAdapter.prototype._onWidgetFilterAdded = function(event) {
   var filter = event.filter;
   if (filter instanceof scout.TableUserFilter) {
-    this._send('addFilter', filter.createAddFilterEventData());
+    this._send('filterAdded', filter.createFilterAddedEventData());
   }
 };
 
-scout.TableAdapter.prototype._onWidgetRemoveFilter = function(event) {
+scout.TableAdapter.prototype._onWidgetFilterRemoved = function(event) {
   var filter = event.filter;
   if (filter instanceof scout.TableUserFilter) {
-    this._send('removeFilter', filter.createRemoveFilterEventData());
+    this._send('filterRemoved', filter.createFilterRemovedEventData());
   }
 };
 
@@ -194,12 +194,12 @@ scout.TableAdapter.prototype._sendRowsChecked = function(rows) {
   this._send('rowsChecked', data);
 };
 
-scout.TableAdapter.prototype._onWidgetRowsFiltered = function(event) {
+scout.TableAdapter.prototype._onWidgetFilter = function(event) {
   var rowIds = this.widget._rowsToIds(this.widget.filteredRows());
-  this._sendRowsFiltered(rowIds);
+  this._sendFilter(rowIds);
 };
 
-scout.TableAdapter.prototype._sendRowsFiltered = function(rowIds) {
+scout.TableAdapter.prototype._sendFilter = function(rowIds) {
   var eventData = {};
   if (rowIds.length === this.widget.rows.length) {
     eventData.remove = true;
@@ -209,7 +209,7 @@ scout.TableAdapter.prototype._sendRowsFiltered = function(rowIds) {
 
   // send with timeout, mainly for incremental load of a large table
   // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
-  this._send('rowsFiltered', eventData, {
+  this._send('filter', eventData, {
     delay: 250,
     coalesce: function(previous) {
       return this.target === previous.target && this.type === previous.type && this.remove === previous.remove;
@@ -218,39 +218,23 @@ scout.TableAdapter.prototype._sendRowsFiltered = function(rowIds) {
   });
 };
 
-scout.TableAdapter.prototype._onWidgetRowsSorted = function(event) {
-  this._send('rowsSorted', {
+scout.TableAdapter.prototype._onWidgetSort = function(event) {
+  this._send('sort', {
     columnId: event.column.id,
     sortAscending: event.sortAscending,
     sortingRemoved: event.sortingRemoved,
-    multiSort: event.multiSort
+    multiSort: event.multiSort,
+    sortingRequested: event.sortingRequested
   });
 };
 
-scout.TableAdapter.prototype._onWidgetSortRows = function(event) {
-  this._send('sortRows', {
+scout.TableAdapter.prototype._onWidgetGroup = function(event) {
+  this._send('group', {
     columnId: event.column.id,
-    sortAscending: event.sortAscending,
-    sortingRemoved: event.sortingRemoved,
-    multiSort: event.multiSort
-  });
-};
-
-scout.TableAdapter.prototype._onWidgetRowsGrouped = function(event) {
-  this._send('rowsGrouped', {
-    columnId: event.column.id,
-    sortAscending: event.sortAscending,
+    groupAscending: event.groupAscending,
     groupingRemoved: event.groupingRemoved,
-    multiGroup: event.multiGroup
-  });
-};
-
-scout.TableAdapter.prototype._onWidgetGroupRows = function(event) {
-  this._send('groupRows', {
-    columnId: event.column.id,
-    sortAscending: event.sortAscending,
-    groupingRemoved: event.groupingRemoved,
-    multiGroup: event.multiGroup
+    multiGroup: event.multiGroup,
+    groupingRequested: event.groupingRequested
   });
 };
 
@@ -295,7 +279,7 @@ scout.TableAdapter.prototype._onWidgetReload = function(event) {
 };
 
 scout.TableAdapter.prototype._onWidgetExportToClipbaord = function(event) {
-  this._send('exportToClipboard');
+  this._send('clipboardExport');
 };
 
 scout.TableAdapter.prototype._onWidgetEvent = function(event) {
@@ -303,18 +287,14 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetRowsSelected(event);
   } else if (event.type === 'rowsChecked') {
     this._onWidgetRowsChecked(event);
-  } else if (event.type === 'rowsFiltered') {
-    this._onWidgetRowsFiltered(event);
-  } else  if (event.type === 'rowsSorted') {
-    this._onWidgetRowsSorted(event);
-  } else  if (event.type === 'sortRows') {
-    this._onWidgetSortRows(event);
-  } else  if (event.type === 'rowsGrouped') {
-    this._onWidgetRowsGrouped(event);
-  } else  if (event.type === 'groupRows') {
-    this._onWidgetGroupRows(event);
-  } else if (event.type === 'rowClicked') {
-    this._onWidgetRowClicked(event);
+  } else if (event.type === 'filter') {
+    this._onWidgetFilter(event);
+  } else  if (event.type === 'sort') {
+    this._onWidgetSort(event);
+  } else  if (event.type === 'group') {
+    this._onWidgetGroup(event);
+  } else if (event.type === 'rowClick') {
+    this._onWidgetRowClick(event);
   } else if (event.type === 'rowAction') {
     this._onWidgetRowAction(event);
   } else if (event.type === 'prepareCellEdit') {
@@ -325,14 +305,14 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetCancelCellEdit(event);
   } else if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
-  } else if (event.type === 'exportToClipboard') {
+  } else if (event.type === 'clipboardExport') {
     this._onWidgetExportToClipbaord(event);
   } else if (event.type === 'reload') {
     this._onWidgetReload(event);
-  } else if (event.type === 'addFilter') {
-    this._onWidgetAddFilter(event);
-  } else if (event.type === 'removeFilter') {
-    this._onWidgetRemoveFilter(event);
+  } else if (event.type === 'filterAdded') {
+    this._onWidgetFilterAdded(event);
+  } else if (event.type === 'filterRemoved') {
+    this._onWidgetFilterRemoved(event);
   } else if (event.type === 'columnResized') {
     this._onWidgetColumnResized(event);
   } else if (event.type === 'columnMoved') {
@@ -486,8 +466,8 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
 };
 
 scout.TableAdapter.prototype._onFiltersChanged = function(filters) {
-  this.addFilterForWidgetEventType('addFilter');
-  this.addFilterForWidgetEventType('removeFilter');
+  this.addFilterForWidgetEventType('filterAdded');
+  this.addFilterForWidgetEventType('filterRemoved');
 
   this.widget.setFilters(filters);
   // do not refilter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)

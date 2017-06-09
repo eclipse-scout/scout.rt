@@ -66,7 +66,7 @@ scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWit
   pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
 };
 
-scout.OutlineMediator.prototype.onTableRowsFiltered = function(event, page) {
+scout.OutlineMediator.prototype.onTableFilter = function(event, page) {
   page.getOutline().filter();
 };
 

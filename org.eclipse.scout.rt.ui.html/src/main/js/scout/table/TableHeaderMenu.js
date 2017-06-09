@@ -69,8 +69,8 @@ scout.TableHeaderMenu.prototype._init = function(options) {
 
   if (this.hasFilterTable) {
     this._tableFilterHandler = this._onFilterTableChanged.bind(this);
-    this.table.on('addFilter', this._tableFilterHandler);
-    this.table.on('removeFilter', this._tableFilterHandler);
+    this.table.on('filterAdded', this._tableFilterHandler);
+    this.table.on('filterRemoved', this._tableFilterHandler);
     this._filterTableRowsCheckedHandler = this._onFilterTableRowsChecked.bind(this);
   }
 };
@@ -180,8 +180,8 @@ scout.TableHeaderMenu.prototype._remove = function() {
   }
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
-  this.table.off('addFilter', this._tableFilterHandler);
-  this.table.off('removeFilter', this._tableFilterHandler);
+  this.table.off('filterAdded', this._tableFilterHandler);
+  this.table.off('filterRemoved', this._tableFilterHandler);
   scout.scrollbars.uninstall(this.$body, this.session);
   scout.TableHeaderMenu.parent.prototype._remove.call(this);
 

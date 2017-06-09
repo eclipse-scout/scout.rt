@@ -304,7 +304,6 @@ scout.Outline.prototype.handleInitialExpanded = function() {
 scout.Outline.prototype._onNodeDeleted = function(node) {
   // Destroy table, which is attached at the root adapter. Form gets destroyed by form close event
   if (node.detailTable) {
-    node.detailTable.off('rowInitialized', this._detailTableRowHandler);
     node.detailTable.destroy();
     node.detailTable = null;
   }

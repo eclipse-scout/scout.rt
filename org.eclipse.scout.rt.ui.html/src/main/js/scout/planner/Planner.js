@@ -1419,7 +1419,7 @@ scout.Planner.prototype.insertResources = function(resources) {
   // Update model
   resources.forEach(function(resource) {
     this._initResource(resource);
-    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
+    // Always insert new rows at the end, if the order is wrong a rowOrderChanged event will follow
     this.resources.push(resource);
   }.bind(this));
 

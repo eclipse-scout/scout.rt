@@ -137,7 +137,7 @@ scout.Table.prototype._initRow = function(row) {
     row = scout.create('TableRow', row);
   }
   this.rowsMap[row.id] = row;
-  this.trigger('rowInitialized', {
+  this.trigger('rowInit', {
     row: row
   });
   return row;
@@ -429,7 +429,7 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   if ($appLink) {
     this._triggerAppLinkAction(column, $appLink.data('ref'));
   } else {
-    this._triggerRowClicked(row, mouseButton);
+    this._triggerRowClick(row, mouseButton);
   }
 };
 
@@ -580,7 +580,7 @@ scout.Table.prototype.reload = function() {
 };
 
 scout.Table.prototype.exportToClipboard = function() {
-  this._triggerExportToClipboard();
+  this._triggerClipboardExport();
 };
 
 scout.Table.prototype.setMultiSelect = function(multiSelect) {
@@ -637,10 +637,10 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   this._filteredRowsDirty = true; // order has been changed
   this._triggerRowOrderChanged();
   if (this.rendered) {
-    this._renderRowOrderChanges();
+    this._renderRowOrderChangeds();
   }
 
-  // Do it after row order has been rendered, because renderRowOrderChanges rerenders the whole viewport which would destroy the animation
+  // Do it after row order has been rendered, because renderRowOrderChangeds rerenders the whole viewport which would destroy the animation
   this._group(animateAggregateRows);
 
   // Sort was possible -> return true
@@ -688,7 +688,7 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   this.rows.sort(compare.bind(this));
 };
 
-scout.Table.prototype._renderRowOrderChanges = function() {
+scout.Table.prototype._renderRowOrderChangeds = function() {
   var animate,
     $rows = this.$rows(),
     oldRowPositions = {};
@@ -772,14 +772,13 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   if (multiSort) {
     data.multiSort = true;
   }
-  if (sorted) {
-    this.trigger('rowsSorted', data);
-  } else {
+  if (!sorted) {
     // Delegate sorting to server when it is not possible on client side
-    this.trigger('sortRows', data);
+    data.sortingRequested = true;
     // hint to animate the aggregate after the row order changed event
     this._animateAggregateRows = animateAggregateRows;
   }
+  this.trigger('sort', data);
 };
 
 scout.Table.prototype._addSortColumn = function(column, direction, multiSort) {
@@ -1465,12 +1464,12 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
   this._updateMenuBar();
 };
 
-scout.Table.prototype._triggerRowClicked = function(row, mouseButton, column) {
+scout.Table.prototype._triggerRowClick = function(row, mouseButton, column) {
   var event = {
     row: row,
     mouseButton: mouseButton
   };
-  this.trigger('rowClicked', event);
+  this.trigger('rowClick', event);
 };
 
 scout.Table.prototype._triggerRowAction = function(row, column) {
@@ -1813,16 +1812,14 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
   if (multiGroup) {
     data.multiGroup = true;
   }
-  this._triggerGroupingChanged();
-  if (sorted) {
-    this.trigger('rowsGrouped', data);
-  } else {
+  if (!sorted) {
     // Delegate sorting to server when it is not possible on client side
-    this.trigger('groupRows', data);
+    data.groupingRequested = true;
 
     // hint to animate the aggregate after the row order changed event
     this._animateAggregateRows = true;
   }
+  this.trigger('group', data);
 };
 
 scout.Table.prototype.removeColumnGrouping = function(column) {
@@ -1950,7 +1947,7 @@ scout.Table.prototype.insertRows = function(rows) {
   rows.forEach(function(row, i) {
     row = this._initRow(row);
     rows[i] = row;
-    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
+    // Always insert new rows at the end, if the order is wrong a rowOrderChanged event will follow
     this.rows.push(row);
   }, this);
 
@@ -2146,7 +2143,7 @@ scout.Table.prototype.updateRowOrder = function(rows) {
 
   this.clearAggregateRows(this._animateAggregateRows);
   if (this.rendered) {
-    this._renderRowOrderChanges();
+    this._renderRowOrderChangeds();
   }
   this._triggerRowOrderChanged();
 
@@ -2628,7 +2625,7 @@ scout.Table.prototype._rowsFiltered = function(hiddenRows) {
   this.deselectRows(hiddenRows);
   // notify
   this._filteredRowsDirty = true;
-  this._triggerRowsFiltered();
+  this._triggerFilter();
 };
 
 scout.Table.prototype._rowAcceptedByFilters = function(row) {
@@ -2661,7 +2658,7 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 
 /**
  * Applies the filters for the given rows.<p>
- * This function is intended to be used for new rows. That's why rowsFiltered event is only triggered if there are accepted rows in the given list.
+ * This function is intended to be used for new rows. That's why filter event is only triggered if there are accepted rows in the given list.
  */
 scout.Table.prototype._applyFilters = function(rows) {
   var filterChanged,
@@ -2712,7 +2709,7 @@ scout.Table.prototype.resetFilter = function() {
 
   // reset rows
   this.filter();
-  this._triggerFilterResetted();
+  this._triggerFilterReset();
 };
 
 scout.Table.prototype.resizeToFit = function(column) {
@@ -2737,7 +2734,7 @@ scout.Table.prototype.addFilter = function(filter) {
     throw new Error('key has to be defined');
   }
   this._filterMap[key] = filter;
-  this.trigger('addFilter', {
+  this.trigger('filterAdded', {
     filter: filter
   });
 };
@@ -2755,7 +2752,7 @@ scout.Table.prototype.removeFilterByKey = function(key) {
     return;
   }
   delete this._filterMap[key];
-  this.trigger('removeFilter', {
+  this.trigger('filterRemoved', {
     filter: filter
   });
 };
@@ -2909,12 +2906,12 @@ scout.Table.prototype._triggerRowsChecked = function(rows) {
   });
 };
 
-scout.Table.prototype._triggerRowsFiltered = function() {
-  this.trigger('rowsFiltered');
+scout.Table.prototype._triggerFilter = function() {
+  this.trigger('filter');
 };
 
-scout.Table.prototype._triggerFilterResetted = function() {
-  this.trigger('filterResetted');
+scout.Table.prototype._triggerFilterReset = function() {
+  this.trigger('filterReset');
 };
 
 scout.Table.prototype._triggerAppLinkAction = function(column, ref) {
@@ -2928,8 +2925,8 @@ scout.Table.prototype._triggerReload = function() {
   this.trigger('reload');
 };
 
-scout.Table.prototype._triggerExportToClipboard = function() {
-  this.trigger('exportToClipboard');
+scout.Table.prototype._triggerClipboardExport = function() {
+  this.trigger('clipboardExport');
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
@@ -2962,10 +2959,6 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
     column: column
   };
   this.trigger('aggregationFunctionChanged', event);
-};
-
-scout.Table.prototype._triggerGroupingChanged = function() {
-  this.trigger('groupingChanged');
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {

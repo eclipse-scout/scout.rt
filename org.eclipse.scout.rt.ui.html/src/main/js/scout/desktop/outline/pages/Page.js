@@ -103,12 +103,12 @@ scout.Page.prototype._createTable = function() {
 
 /**
  * Override this function to initialize the internal (detail) table. Default impl. delegates
- * <code>rowsFiltered</code> events to the outline mediator.
+ * <code>filter</code> events to the outline mediator.
  */
 scout.Page.prototype._initTable = function(table) {
-  table.on('rowsFiltered', this._onTableRowsFiltered.bind(this));
+  table.on('filter', this._onTableFilter.bind(this));
   if (this.drillDownOnRowClick) {
-    table.on('rowClicked', this._onTableRowClicked.bind(this));
+    table.on('rowClick', this._onTableRowClick.bind(this));
     table.setMultiSelect(false);
   }
 };
@@ -242,11 +242,11 @@ scout.Page.prototype.unlinkWithRow = function(row) {
   delete row.page;
 };
 
-scout.Page.prototype._onTableRowsFiltered = function(event) {
-  this.getOutline().mediator.onTableRowsFiltered(event, this);
+scout.Page.prototype._onTableFilter = function(event) {
+  this.getOutline().mediator.onTableFilter(event, this);
 };
 
-scout.Page.prototype._onTableRowClicked = function(event) {
+scout.Page.prototype._onTableRowClick = function(event) {
   if (!this.drillDownOnRowClick) {
     return;
   }

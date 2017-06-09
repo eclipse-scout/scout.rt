@@ -11,8 +11,8 @@ scout.inherits(scout.TextColumnUserFilter, scout.ColumnUserFilter);
 /**
  * @override ColumnUserFilter.js
  */
-scout.TextColumnUserFilter.prototype.createAddFilterEventData = function() {
-  var data = scout.TextColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
+scout.TextColumnUserFilter.prototype.createFilterAddedEventData = function() {
+  var data = scout.TextColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
   data.freeText = this.freeText;
   return data;
 };

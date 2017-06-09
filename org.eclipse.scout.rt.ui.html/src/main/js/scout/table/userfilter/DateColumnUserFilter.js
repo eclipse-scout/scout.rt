@@ -35,8 +35,8 @@ scout.DateColumnUserFilter.prototype.axisGroup = function() {
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.createAddFilterEventData = function() {
-  var data = scout.DateColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
+scout.DateColumnUserFilter.prototype.createFilterAddedEventData = function() {
+  var data = scout.DateColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
   data.dateFrom = scout.dates.toJsonDate(this.dateFrom);
   data.dateTo = scout.dates.toJsonDate(this.dateTo);
   return data;

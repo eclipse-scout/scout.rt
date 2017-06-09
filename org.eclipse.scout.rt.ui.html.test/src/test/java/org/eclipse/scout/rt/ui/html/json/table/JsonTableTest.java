@@ -1392,7 +1392,7 @@ public class JsonTableTest {
     JSONObject data = new JSONObject();
     data.put("columnId", columnId);
     data.put("sortAscending", asc);
-    return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SORTED, data);
+    return new JsonEvent(tableId, JsonTable.EVENT_SORT, data);
   }
 
   public static JsonEvent createJsonRowsFilteredEvent(String... rowIds) throws JSONException {
@@ -1405,7 +1405,7 @@ public class JsonTableTest {
       }
     }
     data.put(JsonTable.PROP_ROW_IDS, jsonRowIds);
-    return new JsonEvent(tableId, JsonTable.EVENT_ROWS_FILTERED, data);
+    return new JsonEvent(tableId, JsonTable.EVENT_FILTER, data);
   }
 
   public static JsonEvent createJsonColumnMovedEvent(String columnId, int index) throws JSONException {

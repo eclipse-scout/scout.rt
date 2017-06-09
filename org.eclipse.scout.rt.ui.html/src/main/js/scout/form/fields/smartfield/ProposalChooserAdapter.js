@@ -16,7 +16,7 @@ scout.inherits(scout.ProposalChooserAdapter, scout.ModelAdapter);
 scout.ProposalChooserAdapter.prototype._postCreateWidget = function() {
   this._injectSendFunction();
 
-  this.widget.model.on('rowClicked', this._onModelProposalSelected.bind(this));
+  this.widget.model.on('rowClick', this._onModelProposalSelected.bind(this));
 };
 
 scout.ProposalChooserAdapter.prototype._modelAdapter = function() {

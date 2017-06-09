@@ -22,13 +22,13 @@ scout.TableUserFilter.prototype._init = function(model) {
   $.extend(this, model);
 };
 
-scout.TableUserFilter.prototype.createAddFilterEventData = function() {
+scout.TableUserFilter.prototype.createFilterAddedEventData = function() {
   return {
     filterType: this.filterType
   };
 };
 
-scout.TableUserFilter.prototype.createRemoveFilterEventData = function() {
+scout.TableUserFilter.prototype.createFilterRemovedEventData = function() {
   return {
     filterType: this.filterType
   };

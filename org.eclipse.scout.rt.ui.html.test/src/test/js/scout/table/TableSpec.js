@@ -1233,7 +1233,7 @@ describe("Table", function() {
       });
     });
 
-    it("sends rowsSorted event when client side sorting is possible", function() {
+    it("sends sort without sortingRequested event when client side sorting is possible", function() {
       prepareTableWithAdapter();
       render(table);
       // Make sure sorting is not executed because it does not work with
@@ -1244,14 +1244,14 @@ describe("Table", function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.RemoteEvent(table.id, 'rowsSorted', {
+      var event = new scout.RemoteEvent(table.id, 'sort', {
         columnId : table.columns[0].id,
         sortAscending : false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("sends sortRows event when client side sorting is not possible", function() {
+    it("sends sort event with sortingRequested if client side sorting is not possible", function() {
       prepareTableWithAdapter();
       render(table);
       spyOn(scout.device, "supportsInternationalization").and.returnValue(false);
@@ -1259,9 +1259,10 @@ describe("Table", function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.RemoteEvent(table.id, 'sortRows', {
+      var event = new scout.RemoteEvent(table.id, 'sort', {
         columnId : table.columns[0].id,
-        sortAscending : false
+        sortAscending : false,
+        sortingRequested: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -1988,7 +1989,7 @@ describe("Table", function() {
 
       // clicked has to be after selected otherwise it is not possible to get
       // the selected row in execRowClick
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClick' ]);
     });
 
     it("sends only click if row already is selected", function() {
@@ -2001,7 +2002,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClick' ]);
 
       // Reset internal state because there is no "sleep" in JS
       table._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5
@@ -2011,7 +2012,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'rowClicked' ]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'rowClick' ]);
     });
 
     it("sends selection, checked and click events if table is checkable and checkbox has been clicked", function() {
@@ -2026,7 +2027,7 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowsChecked', 'rowClicked' ]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowsChecked', 'rowClick' ]);
     });
 
   });
@@ -2276,7 +2277,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       // exactly only one selection event for first row
-      expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClicked' ]);
+      expect(requestData).toContainEventTypesExactly([ 'property', 'rowsSelected', 'rowClick' ]);
 
       var event = [ new scout.RemoteEvent(table.id, 'rowsSelected', {
         rowIds : [ model.rows[0].id ]

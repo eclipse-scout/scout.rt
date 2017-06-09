@@ -53,12 +53,12 @@ scout.TableProposalChooser2.prototype._createModel = function() {
     columns: columns
   });
 
-  table.on('rowClicked', this._onRowClicked.bind(this));
+  table.on('rowClick', this._onRowClick.bind(this));
 
   return table;
 };
 
-scout.TableProposalChooser2.prototype._onRowClicked = function(event) {
+scout.TableProposalChooser2.prototype._onRowClick = function(event) {
   this.setBusy(true);
   this.triggerLookupRowSelected(event.row);
 };

@@ -104,15 +104,15 @@ scout.ColumnUserFilter.prototype._useTextInsteadOfNormValue = function(value) {
 /**
  * @override TableUserFilter.js
  */
-scout.ColumnUserFilter.prototype.createAddFilterEventData = function() {
-  var data = scout.ColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
+scout.ColumnUserFilter.prototype.createFilterAddedEventData = function() {
+  var data = scout.ColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
   data.columnId = this.column.id;
   data.selectedValues = this.selectedValues;
   return data;
 };
 
-scout.ColumnUserFilter.prototype.createRemoveFilterEventData = function() {
-  var data = scout.ColumnUserFilter.parent.prototype.createRemoveFilterEventData.call(this);
+scout.ColumnUserFilter.prototype.createFilterRemovedEventData = function() {
+  var data = scout.ColumnUserFilter.parent.prototype.createFilterRemovedEventData.call(this);
   data.columnId = this.column.id;
   return data;
 };
