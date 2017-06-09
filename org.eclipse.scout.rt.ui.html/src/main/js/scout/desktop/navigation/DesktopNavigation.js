@@ -50,7 +50,7 @@ scout.DesktopNavigation.prototype._render = function() {
   this.htmlComp.layoutData = this.layoutData;
 
   this.$body = this.$container.appendDiv('navigation-body')
-    .on('mousedown', this._onNavigationBodyMousedown.bind(this));
+    .on('mousedown', this._onNavigationBodyMouseDown.bind(this));
   this.htmlCompBody = scout.HtmlComponent.install(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
 
@@ -230,7 +230,7 @@ scout.DesktopNavigation.prototype._removeHandle = function() {
   this.handle = null;
 };
 
-scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {
+scout.DesktopNavigation.prototype._onNavigationBodyMouseDown = function(event) {
   this.desktop.bringOutlineToFront();
 };
 

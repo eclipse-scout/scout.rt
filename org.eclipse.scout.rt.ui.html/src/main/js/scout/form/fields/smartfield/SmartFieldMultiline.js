@@ -25,7 +25,7 @@ scout.SmartFieldMultiline.prototype._render = function() {
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 
   $field = scout.fields.makeInputOrDiv(this, 'multiline')
-    .on('mousedown', this._onMousedown.bind(this))
+    .on('mousedown', this._onMouseDown.bind(this))
     .appendTo(this.$fieldContainer);
   if (!this.touch) {
     $field

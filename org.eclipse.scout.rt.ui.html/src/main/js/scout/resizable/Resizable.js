@@ -18,8 +18,8 @@ scout.Resizable = function($container) {
   this.$container = $container;
   this._context = null;
 
-  this._mousedownHandler = this._onMousedown.bind(this);
-  this._mouseupHandler = this._onMouseup.bind(this);
+  this._mouseDownHandler = this._onMouseDown.bind(this);
+  this._mouseUpHandler = this._onMouseUp.bind(this);
   this._mousemoveHandler = this._onMousemove.bind(this);
   this._resizeHandler = this._resize.bind(this);
 };
@@ -33,13 +33,13 @@ scout.Resizable.FPS = 1000 / 15;
 scout.Resizable.prototype._appendResizeHandles = function() {
   this.$container.appendDiv('resizable-handle resizable-s')
     .data('axis', 'y')
-    .on('mousedown.resizable', this._mousedownHandler);
+    .on('mousedown.resizable', this._mouseDownHandler);
   this.$container.appendDiv('resizable-handle resizable-e')
     .data('axis', 'x')
-    .on('mousedown.resizable', this._mousedownHandler);
+    .on('mousedown.resizable', this._mouseDownHandler);
   this.$container.appendDiv('resizable-handle resizable-se resizable-gripsmall-se')
     .data('axis', 'xy')
-    .on('mousedown.resizable', this._mousedownHandler);
+    .on('mousedown.resizable', this._mouseDownHandler);
 };
 
 scout.Resizable.prototype.init = function(event) {
@@ -47,7 +47,7 @@ scout.Resizable.prototype.init = function(event) {
   this._appendResizeHandles();
 };
 
-scout.Resizable.prototype._onMousedown = function(event) {
+scout.Resizable.prototype._onMouseDown = function(event) {
   var $resizable = this.$container,
     $myWindow = $resizable.window(),
     $handle = $(event.target),
@@ -74,14 +74,14 @@ scout.Resizable.prototype._onMousedown = function(event) {
 
   $resizable.addClass('resizable-resizing');
   $resizable.document()
-    .on('mouseup.resizable', this._mouseupHandler)
+    .on('mouseup.resizable', this._mouseUpHandler)
     .on('mousemove.resizable', this._mousemoveHandler);
 };
 
-scout.Resizable.prototype._onMouseup = function(event) {
+scout.Resizable.prototype._onMouseUp = function(event) {
   this.$container.removeClass('resizable-resizing');
   this.$container.document()
-    .off('mouseup.resizable', this._mouseupHandler)
+    .off('mouseup.resizable', this._mouseUpHandler)
     .off('mousemove.resizable', this._mousemoveHandler);
   this._context = null;
 };

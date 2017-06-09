@@ -573,7 +573,7 @@ scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
   }
 };
 
-scout.FormField.prototype._onStatusMousedown = function(event) {
+scout.FormField.prototype._onStatusMouseDown = function(event) {
   var hasStatus = !!this.errorStatus,
     hasTooltip = !!this.tooltipText,
     hasMenus = this.menusVisible && this._hasMenus();
@@ -687,7 +687,7 @@ scout.FormField.prototype._showContextMenu = function() {
     $anchor: this.$status,
     menuItems: menus,
     cloneMenuItems: false,
-    closeOnAnchorMousedown: false
+    closeOnAnchorMouseDown: false
   });
   this.contextPopup.open();
 };
@@ -791,7 +791,7 @@ scout.FormField.prototype.addStatus = function() {
   }
   this.$status = this.$container
     .appendSpan('status')
-    .on('mousedown', this._onStatusMousedown.bind(this));
+    .on('mousedown', this._onStatusMouseDown.bind(this));
 };
 
 scout.FormField.prototype._removeStatus = function() {
@@ -831,10 +831,10 @@ scout.FormField.prototype.addIcon = function($parent) {
     $parent = this.$container;
   }
   this.$icon = scout.fields.appendIcon($parent)
-    .on('mousedown', this._onIconMousedown.bind(this));
+    .on('mousedown', this._onIconMouseDown.bind(this));
 };
 
-scout.FormField.prototype._onIconMousedown = function(event) {
+scout.FormField.prototype._onIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }

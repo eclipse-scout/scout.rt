@@ -84,8 +84,8 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
   }
 };
 
-scout.TabItem.prototype._onStatusMousedown = function(event) {
-  scout.TabItem.parent.prototype._onStatusMousedown.call(this, event);
+scout.TabItem.prototype._onStatusMouseDown = function(event) {
+  scout.TabItem.parent.prototype._onStatusMouseDown.call(this, event);
   // Prevent switching tabs when status gets clicked
   // Don't use event.preventDefault, otherwise other mouse listener (like tooltip mouse down) will not be executed as well
   this._preventTabActivation = true;
@@ -202,7 +202,7 @@ scout.TabItem.prototype.addStatus = function() {
   }
   this.$status = this.$tabContainer
     .appendSpan('status')
-    .on('mousedown', this._onStatusMousedown.bind(this))
+    .on('mousedown', this._onStatusMouseDown.bind(this))
     .cssWidth(scout.HtmlEnvironment.fieldStatusWidth);
 };
 

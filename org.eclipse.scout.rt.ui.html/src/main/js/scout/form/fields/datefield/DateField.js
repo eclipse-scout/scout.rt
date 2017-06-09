@@ -67,7 +67,7 @@ scout.DateField.prototype.createPopup = function() {
     parent: this,
     $anchor: this.$field,
     boundToAnchor: !this.touch,
-    closeOnAnchorMousedown: false,
+    closeOnAnchorMouseDown: false,
     field: this,
     allowedDates: this.allowedDates,
     dateFormat: this.isolatedDateFormat
@@ -115,11 +115,11 @@ scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
     this.$dateField = scout.fields.makeInputOrDiv(this, 'date')
-      .on('mousedown', this._onDateFieldMousedown.bind(this))
+      .on('mousedown', this._onDateFieldMouseDown.bind(this))
       .appendTo(this.$field);
     if (!this.touch) {
       this.$dateField
-        .on('keydown', this._onDateFieldKeydown.bind(this))
+        .on('keydown', this._onDateFieldKeyDown.bind(this))
         .on('input', this._onDateFieldInput.bind(this))
         .on('blur', this._onDateFieldBlur.bind(this));
     }
@@ -127,7 +127,7 @@ scout.DateField.prototype._renderHasDate = function() {
     scout.HtmlComponent.install(this.$dateField, this.session);
 
     this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
-      .on('mousedown', this._onDateIconMousedown.bind(this));
+      .on('mousedown', this._onDateIconMouseDown.bind(this));
 
   } else if (!this.hasDate && this.$dateField) {
     // Remove $dateField
@@ -150,12 +150,12 @@ scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
     this.$timeField = scout.fields.makeTextField(this.$container, 'time')
-      .on('keydown', this._onTimeFieldKeydown.bind(this))
+      .on('keydown', this._onTimeFieldKeyDown.bind(this))
       .on('input', this._onTimeFieldInput.bind(this))
       .on('blur', this._onTimeFieldBlur.bind(this))
       .appendTo(this.$field);
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
-      .on('mousedown', this._onTimeIconMousedown.bind(this));
+      .on('mousedown', this._onTimeIconMouseDown.bind(this));
     scout.HtmlComponent.install(this.$timeField, this.session);
 
   } else if (!this.hasTime && this.$timeField) {
@@ -424,13 +424,13 @@ scout.DateField.prototype._renderBackgroundColor = function() {
   this.$timeField && scout.styles.legacyStyle(this, this.$timeField);
 };
 
-scout.DateField.prototype._onDateFieldMousedown = function() {
+scout.DateField.prototype._onDateFieldMouseDown = function() {
   if (scout.fields.handleOnClick(this)) {
     this.openPopupAndSelect(this.value);
   }
 };
 
-scout.DateField.prototype._onDateIconMousedown = function(event) {
+scout.DateField.prototype._onDateIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
@@ -440,7 +440,7 @@ scout.DateField.prototype._onDateIconMousedown = function(event) {
   }
 };
 
-scout.DateField.prototype._onTimeIconMousedown = function(event) {
+scout.DateField.prototype._onTimeIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
@@ -467,7 +467,7 @@ scout.DateField.prototype._onTimeFieldBlur = function() {
  * Handle "navigation" keys, i.e. keys that don't emit visible characters. Character input is handled
  * in _onDateFieldInput(), which is fired after 'keydown'.
  */
-scout.DateField.prototype._onDateFieldKeydown = function(event) {
+scout.DateField.prototype._onDateFieldKeyDown = function(event) {
   var delta = 0,
     diffYears = 0,
     diffMonths = 0,
@@ -604,7 +604,7 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
  * action (not by JS) such as pressing a character key, deleting a character using DELETE or
  * BACKSPACE, cutting or pasting text with ctrl-x / ctrl-v or mouse drag'n'drop.
  * Keys that don't alter the content (e.g. modifier keys, arrow keys, home, end etc.) are handled
- * in _onDateFieldKeydown().
+ * in _onDateFieldKeyDown().
  */
 scout.DateField.prototype._onDateFieldInput = function(event) {
   var displayText = scout.fields.valOrText(this, this.$dateField);
@@ -681,7 +681,7 @@ scout.DateField.prototype.acceptDateTime = function(acceptDate, acceptTime) {
  * Handle "navigation" keys, i.e. keys that don't emit visible characters. Character input is handled
  * in _onTimeFieldInput(), which is fired after 'keydown'.
  */
-scout.DateField.prototype._onTimeFieldKeydown = function(event) {
+scout.DateField.prototype._onTimeFieldKeyDown = function(event) {
   var delta = 0,
     diffHours = 0,
     diffMinutes = 0,
@@ -775,7 +775,7 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
  * action (not by JS) such as pressing a character key, deleting a character using DELETE or
  * BACKSPACE, cutting or pasting text with ctrl-x / ctrl-v or mouse drag'n'drop.
  * Keys that don't alter the content (e.g. modifier keys, arrow keys, home, end etc.) are handled
- * in _onTimeFieldKeydown().
+ * in _onTimeFieldKeyDown().
  */
 scout.DateField.prototype._onTimeFieldInput = function(event) {
   var displayText = this.$timeField.val();

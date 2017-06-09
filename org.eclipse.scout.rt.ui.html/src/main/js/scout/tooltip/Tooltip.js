@@ -80,11 +80,11 @@ scout.Tooltip.prototype._render = function() {
 
   if (this.autoRemove) {
     // Every user action will remove the tooltip
-    this._mousedownHandler = this._onDocumentMousedown.bind(this);
+    this._mouseDownHandler = this._onDocumentMouseDown.bind(this);
     // The listener needs to be executed in the capturing phase -> Allows for having context menus inside the tooltip, otherwise click on context menu header would close the tooltip
-    this.$container.document(true).addEventListener('mousedown', this._mousedownHandler, true); // true=the event handler is executed in the capturing phase
+    this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
 
-    this._keydownHandler = this._onDocumentKeydown.bind(this);
+    this._keydownHandler = this._onDocumentKeyDown.bind(this);
     this.$container.document()
       .on('keydown', this._keydownHandler);
   }
@@ -125,9 +125,9 @@ scout.Tooltip.prototype._postRender = function() {
 };
 
 scout.Tooltip.prototype._remove = function() {
-  if (this._mousedownHandler) {
-    this.$container.document(true).removeEventListener('mousedown', this._mousedownHandler, true);
-    this._mousedownHandler = null;
+  if (this._mouseDownHandler) {
+    this.$container.document(true).removeEventListener('mousedown', this._mouseDownHandler, true);
+    this._mouseDownHandler = null;
   }
   if (this._keydownHandler) {
     this.$container.document().off('keydown', this._keydownHandler);
@@ -305,16 +305,16 @@ scout.Tooltip.prototype._onAnchorScroll = function(event) {
   }
 };
 
-scout.Tooltip.prototype._onDocumentMousedown = function(event) {
+scout.Tooltip.prototype._onDocumentMouseDown = function(event) {
   if (!this.rendered) {
     return false;
   }
-  if (this._isMousedownOutside(event)) {
-    this._onMousedownOutside(event);
+  if (this._isMouseDownOutside(event)) {
+    this._onMouseDownOutside(event);
   }
 };
 
-scout.Tooltip.prototype._isMousedownOutside = function(event) {
+scout.Tooltip.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget = scout.Widget.getWidgetFor($target);
 
@@ -328,11 +328,11 @@ scout.Tooltip.prototype._isMousedownOutside = function(event) {
 /**
  * Method invoked once a mouse down event occurs outside the tooltip.
  */
-scout.Tooltip.prototype._onMousedownOutside = function() {
+scout.Tooltip.prototype._onMouseDownOutside = function() {
   this.destroy();
 };
 
-scout.Tooltip.prototype._onDocumentKeydown = function(event) {
+scout.Tooltip.prototype._onDocumentKeyDown = function(event) {
   this.destroy();
 };
 

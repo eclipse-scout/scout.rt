@@ -54,7 +54,7 @@ scout.FileInput.prototype._render = function() {
       .on('dragover', this._onDragEnterOrOver.bind(this))
       .on('drop', this._onDrop.bind(this));
     this.$fileInput.appendTo(this.$container);
-    this.$container.on('mousedown', this._onMousedown.bind(this));
+    this.$container.on('mousedown', this._onMouseDown.bind(this));
     this.$text = this.$container.appendDiv('file-input-text');
   } else {
     this._renderLegacyMode();
@@ -211,7 +211,7 @@ scout.FileInput.prototype._onFileChange = function(event) {
   }
 };
 
-scout.FileInput.prototype._onMousedown = function() {
+scout.FileInput.prototype._onMouseDown = function() {
   if (!this.enabled) {
     return;
   }

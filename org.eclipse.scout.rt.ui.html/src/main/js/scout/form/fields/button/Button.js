@@ -209,7 +209,7 @@ scout.Button.prototype._openPopup = function() {
     parent: this,
     menuItems: this.menus,
     cloneMenuItems: false,
-    closeOnAnchorMousedown: false,
+    closeOnAnchorMouseDown: false,
     $anchor: this.$field
   });
   popup.open();

@@ -144,8 +144,8 @@ scout.Planner.prototype._render = function() {
   this._header.render();
   this._yearPanel.render();
   this.$grid = this.$container.appendDiv('planner-grid')
-    .on('mousedown', '.resource-cells', this._onCellMousedown.bind(this))
-    .on('mousedown', '.resource-title', this._onResourceTitleMousedown.bind(this))
+    .on('mousedown', '.resource-cells', this._onCellMouseDown.bind(this))
+    .on('mousedown', '.resource-title', this._onResourceTitleMouseDown.bind(this))
     .on('contextmenu', '.resource-title', this._onResourceTitleContextMenu.bind(this))
     .on('contextmenu', '.planner-activity', this._onActivityContextMenu.bind(this));
   this.$scale = this.$container.appendDiv('planner-scale');
@@ -257,7 +257,7 @@ scout.Planner.prototype._onYearPanelDateSelect = function(event) {
   this.setViewRangeFrom(event.date);
 };
 
-scout.Planner.prototype._onResourceTitleMousedown = function(event) {
+scout.Planner.prototype._onResourceTitleMouseDown = function(event) {
   var $resource = $(event.target).parent();
   if ($resource.isSelected()) {
     if (event.which === 3 || event.which === 1 && event.ctrlKey) {
@@ -827,7 +827,7 @@ scout.Planner.prototype._buildActivityHtml = function(activity) {
 
 /* -- selector -------------------------------------------------- */
 
-scout.Planner.prototype._onCellMousedown = function(event) {
+scout.Planner.prototype._onCellMouseDown = function(event) {
   var $activity,
     $resource,
     $target = $(event.target),
@@ -874,7 +874,7 @@ scout.Planner.prototype._onCellMousedown = function(event) {
   this._cellMousemoveHandler = this._onCellMousemove.bind(this, event);
   $target.document()
     .on('mousemove', this._cellMousemoveHandler)
-    .one('mouseup', this._onDocumentMouseup.bind(this));
+    .one('mouseup', this._onDocumentMouseUp.bind(this));
 };
 
 scout.Planner.prototype._startRangeSelection = function(pageX, pageY) {
@@ -932,7 +932,7 @@ scout.Planner.prototype._onCellMousemove = function(mousedownEvent, event) {
   this._select(true);
 };
 
-scout.Planner.prototype._onResizeMousedown = function(event) {
+scout.Planner.prototype._onResizeMouseDown = function(event) {
   var swap,
     $target = $(event.target);
 
@@ -949,7 +949,7 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
   this._resizeMousemoveHandler = this._onResizeMousemove.bind(this);
   $target.document()
     .on('mousemove', this._resizeMousemoveHandler)
-    .one('mouseup', this._onDocumentMouseup.bind(this));
+    .one('mouseup', this._onDocumentMouseUp.bind(this));
 
   return false;
 };
@@ -966,7 +966,7 @@ scout.Planner.prototype._onResizeMousemove = function(event) {
   this._select(true);
 };
 
-scout.Planner.prototype._onDocumentMouseup = function(event) {
+scout.Planner.prototype._onDocumentMouseUp = function(event) {
   var $target = $(event.target);
   $target.body().removeClass('col-resize');
   if (this._cellMousemoveHandler) {
@@ -1263,8 +1263,8 @@ scout.Planner.prototype._renderSelectionRange = function() {
   var $parent = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow;
   this.$selector = $parent.children('.resource-cells').appendDiv('selector');
   this.$selector.cssHeight($startRow.outerHeight() + Math.abs($lastRow[0].offsetTop - $startRow[0].offsetTop));
-  var $selectorResizeLeft = this.$selector.appendDiv('selector-resize-left').mousedown(this._onResizeMousedown.bind(this));
-  var $selectorResizeRight = this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMousedown.bind(this));
+  var $selectorResizeLeft = this.$selector.appendDiv('selector-resize-left').mousedown(this._onResizeMouseDown.bind(this));
+  var $selectorResizeRight = this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMouseDown.bind(this));
   this.$selector
     .css('left', 'calc(' + this.transformLeft(from) + '% - ' + $selectorResizeLeft.cssWidth() + 'px)')
     .css('width', 'calc(' + this.transformWidth(from, to) + '% + ' + ($selectorResizeLeft.cssWidth() + $selectorResizeRight.cssWidth()) + 'px)')

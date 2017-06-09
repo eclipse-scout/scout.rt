@@ -113,7 +113,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   if (this.enabled) {
     $header
       .on('click', this._onHeaderItemClick.bind(this))
-      .on('mousedown', this._onHeaderItemMousedown.bind(this));
+      .on('mousedown', this._onHeaderItemMouseDown.bind(this));
   }
 
   if (this.session.inspector) {
@@ -149,7 +149,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
       $separator.setEnabled(false);
     } else {
       $separator
-        .on('mousedown', '', this._onSeparatorMousedown.bind(this))
+        .on('mousedown', '', this._onSeparatorMouseDown.bind(this))
         .on('dblclick', this._onSeparatorDblclick.bind(this));
     }
     column.$separator = $separator;
@@ -549,7 +549,7 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   return false;
 };
 
-scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
+scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
   var diff = 0,
     that = this,
     startX = Math.floor(event.pageX),
@@ -678,7 +678,7 @@ scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
   }
 };
 
-scout.TableHeader.prototype._onSeparatorMousedown = function(event) {
+scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
   var startX = Math.floor(event.pageX),
     $header = $(event.target).prev(),
     column = $header.data('column'),

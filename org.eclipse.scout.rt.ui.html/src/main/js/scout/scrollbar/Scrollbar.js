@@ -33,10 +33,10 @@ scout.Scrollbar = function() {
   // Event Handling
   this._onScrollHandler = this._onScroll.bind(this);
   this._onScrollWheelHandler = this._onScrollWheel.bind(this);
-  this._onScrollbarMousedownHandler = this._onScrollbarMousedown.bind(this);
-  this._onThumbMousedownHandler = this._onThumbMousedown.bind(this);
+  this._onScrollbarMouseDownHandler = this._onScrollbarMouseDown.bind(this);
+  this._onThumbMouseDownHandler = this._onThumbMouseDown.bind(this);
   this._onDocumentMousemoveHandler = this._onDocumentMousemove.bind(this);
-  this._onDocumentMouseupHandler = this._onDocumentMouseup.bind(this);
+  this._onDocumentMouseUpHandler = this._onDocumentMouseUp.bind(this);
 
   // Fix Scrollbar
   this._fixScrollbarHandler = this._fixScrollbar.bind(this);
@@ -75,8 +75,8 @@ scout.Scrollbar.prototype._render = function() {
     scrollbar.on('scrollStart', this._fixScrollbarHandler);
     scrollbar.on('scrollEnd', this._unfixScrollbarHandler);
   }.bind(this));
-  this.$container.on('mousedown', this._onScrollbarMousedownHandler);
-  this._$thumb.on('mousedown', this._onThumbMousedownHandler);
+  this.$container.on('mousedown', this._onScrollbarMouseDownHandler);
+  this._$thumb.on('mousedown', this._onThumbMouseDownHandler);
 };
 
 scout.Scrollbar.prototype._remove = function() {
@@ -89,8 +89,8 @@ scout.Scrollbar.prototype._remove = function() {
     scrollbar.off('scrollStart', this._fixScrollbarHandler);
     scrollbar.off('scrollEnd', this._unfixScrollbarHandler);
   }.bind(this));
-  this.$container.off('mousedown', this._onScrollbarMousedownHandler);
-  this._$thumb.off('mousedown', '', this._onThumbMousedownHandler);
+  this.$container.off('mousedown', this._onScrollbarMouseDownHandler);
+  this._$thumb.off('mousedown', '', this._onThumbMouseDownHandler);
 
   scout.Scrollbar.parent.prototype._remove.call(this);
 };
@@ -200,7 +200,7 @@ scout.Scrollbar.prototype._onScrollWheel = function(event) {
   return false;
 };
 
-scout.Scrollbar.prototype._onScrollbarMousedown = function(event) {
+scout.Scrollbar.prototype._onScrollbarMouseDown = function(event) {
   this.notifyBeforeScroll();
 
   var clickableAreaSize = this.$container[this._dim.toLowerCase()]();
@@ -227,10 +227,10 @@ scout.Scrollbar.prototype._onScrollbarMousedown = function(event) {
   this.notifyAfterScroll();
 };
 
-scout.Scrollbar.prototype._onThumbMousedown = function(event) {
+scout.Scrollbar.prototype._onThumbMouseDown = function(event) {
   // ignore event if container is too small for thumb movement
   if (this._isContainerTooSmallForThumb()) {
-    return true; // let _onScrollbarMousedown handle the click event
+    return true; // let _onScrollbarMouseDown handle the click event
   } else {
     this.notifyBeforeScroll();
     // calculate thumbCenterOffset in px (offset from clicked point to thumb center)
@@ -244,7 +244,7 @@ scout.Scrollbar.prototype._onThumbMousedown = function(event) {
       .on('mousemove', {
         'thumbCenterOffset': thumbCenterOffset
       }, this._onDocumentMousemoveHandler)
-      .one('mouseup', this._onDocumentMouseupHandler);
+      .one('mouseup', this._onDocumentMouseUpHandler);
 
     return false;
   }
@@ -275,7 +275,7 @@ scout.Scrollbar.prototype._onDocumentMousemove = function(event) {
   this._scrollToAbsolutePoint(posNew);
 };
 
-scout.Scrollbar.prototype._onDocumentMouseup = function(event) {
+scout.Scrollbar.prototype._onDocumentMouseUp = function(event) {
   var $document = $(event.currentTarget);
   $document.off('mousemove', this._onDocumentMousemoveHandler);
   if (this.rendered) {

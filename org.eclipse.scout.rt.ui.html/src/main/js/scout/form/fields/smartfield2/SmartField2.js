@@ -94,13 +94,13 @@ scout.SmartField2.prototype._render = function() {
 
   var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
   var $field = fieldFunc.call(scout.fields, this)
-    .on('mousedown', this._onFieldMousedown.bind(this));
+    .on('mousedown', this._onFieldMouseDown.bind(this));
 
   if (!this.touch) {
     $field
       .blur(this._onFieldBlur.bind(this))
-      .keyup(this._onFieldKeyup.bind(this))
-      .keydown(this._onFieldKeydown.bind(this));
+      .keyup(this._onFieldKeyUp.bind(this))
+      .keydown(this._onFieldKeyDown.bind(this));
   }
   this.addField($field);
 
@@ -496,7 +496,7 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
     parent: this,
     $anchor: this.$field,
     boundToAnchor: !this.touch,
-    closeOnAnchorMousedown: false,
+    closeOnAnchorMouseDown: false,
     field: this,
     lookupResult: result,
     status: status
@@ -536,8 +536,8 @@ scout.SmartField2.prototype.aboutToBlurByMouseDown = function(target) {
   }
 };
 
-scout.SmartField2.prototype._onFieldMousedown = function(event) {
-  $.log.debug('(SmartField2#_onFieldMousedown)');
+scout.SmartField2.prototype._onFieldMouseDown = function(event) {
+  $.log.debug('(SmartField2#_onFieldMouseDown)');
   if (!this.enabledComputed || !scout.fields.handleOnClick(this)) {
     return;
   }
@@ -545,8 +545,8 @@ scout.SmartField2.prototype._onFieldMousedown = function(event) {
   this.togglePopup();
 };
 
-scout.SmartField2.prototype._onIconMousedown = function(event) {
-  $.log.debug('(SmartField2#_onIconMousedown)');
+scout.SmartField2.prototype._onIconMouseDown = function(event) {
+  $.log.debug('(SmartField2#_onIconMouseDown)');
   if (!this.enabledComputed) {
     return;
   }
@@ -568,7 +568,7 @@ scout.SmartField2.prototype._onFieldBlur = function(event) {
   this.setSearching(false);
 };
 
-scout.SmartField2.prototype._onFieldKeyup = function(event) {
+scout.SmartField2.prototype._onFieldKeyUp = function(event) {
   // Escape
   if (event.which === scout.keys.ESCAPE) {
     event.stopPropagation();
@@ -610,7 +610,7 @@ scout.SmartField2.prototype._onFieldKeyup = function(event) {
       this._lookupByText();
     }
   } else {
-    $.log.debug('(SmartField2#_onFieldKeyup)');
+    $.log.debug('(SmartField2#_onFieldKeyUp)');
     this.openPopup(false);
   }
 };
@@ -640,14 +640,14 @@ scout.SmartField2.prototype.isPopupOpen = function() {
   return this.popup && !this.popup.removalPending;
 };
 
-scout.SmartField2.prototype._onFieldKeydown = function(event) {
+scout.SmartField2.prototype._onFieldKeyDown = function(event) {
   this._updateUserWasTyping(event);
 
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
       event.preventDefault();
-      $.log.info('(SmartField2#_onFieldKeydown) set _tabPrevented');
+      $.log.info('(SmartField2#_onFieldKeyDown) set _tabPrevented');
       this._tabPrevented = {
         shiftKey: event.shiftKey
       };

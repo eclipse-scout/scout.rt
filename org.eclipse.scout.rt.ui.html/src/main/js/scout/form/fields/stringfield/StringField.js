@@ -60,7 +60,7 @@ scout.StringField.prototype._render = function() {
 
   var $field;
   if (this.multilineText) {
-    var mousedownHandler = function() {
+    var mouseDownHandler = function() {
       this.mouseClicked = true;
     }.bind(this);
     $field = this.$parent.makeElement('<textarea>')
@@ -68,9 +68,9 @@ scout.StringField.prototype._render = function() {
         // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
         event.stopPropagation();
       })
-      .on('mousedown', mousedownHandler)
+      .on('mousedown', mouseDownHandler)
       .on('focus', function(event) {
-        this.$field.off('mousedown', mousedownHandler);
+        this.$field.off('mousedown', mouseDownHandler);
         if (!this.mouseClicked) { // only trigger on tab focus in
           setTimeout(function() {
             if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
@@ -83,7 +83,7 @@ scout.StringField.prototype._render = function() {
         this.mouseClicked = false;
       }.bind(this))
       .on('focusout', function() {
-        this.$field.on('mousedown', mousedownHandler);
+        this.$field.on('mousedown', mouseDownHandler);
       }.bind(this));
   } else {
     $field = scout.fields.makeTextField(this.$parent);

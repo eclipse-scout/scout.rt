@@ -35,7 +35,7 @@ scout.Popup = function() {
   // If true, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
   // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
   // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
-  this.closeOnAnchorMousedown = true;
+  this.closeOnAnchorMouseDown = true;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -197,7 +197,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget;
 
-  if (!this.closeOnAnchorMousedown && this.$anchor && this.$anchor.isOrHas(event.target)) {
+  if (!this.closeOnAnchorMouseDown && this.$anchor && this.$anchor.isOrHas(event.target)) {
     // 1. Often times, click on the anchor opens and 2. click closes the popup
     // If we were closing the popup here, it would not be possible to achieve the described behavior anymore -> let anchor handle open and close.
     return false;

@@ -39,7 +39,7 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
   // Render glasspanes onto glasspane targets.
   $glassPane = $(glassPaneTarget)
     .appendDiv('glasspane')
-    .on('mousedown', this._onMousedown.bind(this));
+    .on('mousedown', this._onMouseDown.bind(this));
 
   // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
   // is blocked, since the element that blocks (e.g a message-box) may be opened in the main-window.
@@ -129,7 +129,7 @@ scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
   }
 };
 
-scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
+scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   var $animationTarget = null;
 
   if (this._element instanceof scout.Form && this._element.isView()) {

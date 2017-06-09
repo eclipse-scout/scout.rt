@@ -74,7 +74,7 @@ scout.ClipboardField.prototype._render = function() {
     .disableSpellcheck()
     .attr('contenteditable', true)
     .attr('tabindex', '0')
-    .on('keydown', this._onKeydown.bind(this))
+    .on('keydown', this._onKeyDown.bind(this))
     .on('input', this._onInput.bind(this))
     .on('paste', this._onPaste.bind(this))
     .on('copy', this._onCopy.bind(this))
@@ -163,7 +163,7 @@ scout.ClipboardField.prototype._getSelection = function() {
   return selection;
 };
 
-  scout.ClipboardField.prototype._onKeydown = function(event) {
+  scout.ClipboardField.prototype._onKeyDown = function(event) {
   if (scout.isOneOf(event.which, scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
     return false; // never allowed
   }

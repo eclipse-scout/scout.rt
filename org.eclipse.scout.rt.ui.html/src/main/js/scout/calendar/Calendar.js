@@ -249,7 +249,7 @@ scout.Calendar.prototype._render = function() {
   }
 
   // click event on all day and children elements
-  $('.calendar-day', this.$grid).mousedown(this._onDayMousedown.bind(this));
+  $('.calendar-day', this.$grid).mousedown(this._onDayMouseDown.bind(this));
   this._updateScreen(false);
 };
 
@@ -419,7 +419,7 @@ scout.Calendar.prototype._onListClick = function(event) {
   this._updateScreen(true);
 };
 
-scout.Calendar.prototype._onDayMousedown = function(event) {
+scout.Calendar.prototype._onDayMouseDown = function(event) {
   // we cannot use event.stopPropagation() in CalendarComponent.js because this would
   // prevent context-menus from being closed. With this awkward if-statement we only
   // process the event, when it is not bubbling up from somewhere else (= from mousedown

@@ -55,7 +55,7 @@ scout.CalendarComponent.prototype._render = function() {
       .data('component', this)
       .data('partDay', partDay)
       .data('tooltipText', this._description.bind(this))
-      .mousedown(this._onMousedown.bind(this))
+      .mousedown(this._onMouseDown.bind(this))
       .on('contextmenu', this._onContextMenu.bind(this));
     this.parent._tooltipSupport.install($part);
     this._$parts.push($part);
@@ -178,7 +178,7 @@ scout.CalendarComponent.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
 };
 
-scout.CalendarComponent.prototype._onMousedown = function(event) {
+scout.CalendarComponent.prototype._onMouseDown = function(event) {
   var $part = $(event.delegateTarget);
   this.parent._selectedComponentChanged(this, $part.data('partDay'));
 };

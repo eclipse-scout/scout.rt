@@ -32,7 +32,7 @@ scout.CalendarListComponent.prototype.render = function($parent) {
     .data('partDay', this.partDay)
     .addClass(source.item.cssClass)
     .toggleClass('comp-selected', source._selected)
-    .mousedown(source._onMousedown.bind(source))
+    .mousedown(source._onMouseDown.bind(source))
     .on('contextmenu', source._onContextMenu.bind(source))
     .html(source._description());
 };

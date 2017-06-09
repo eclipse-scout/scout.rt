@@ -86,7 +86,7 @@ scout.TableFooter.prototype._render = function() {
   // table status
   this._$infoTableStatus = this._$info
     .appendDiv('table-info-item table-info-status')
-    .on('mousedown', this._onStatusMousedown.bind(this));
+    .on('mousedown', this._onStatusMouseDown.bind(this));
   this._$infoTableStatusIcon = this._$infoTableStatus
     .appendSpan('icon font-icon');
 
@@ -583,7 +583,7 @@ scout.TableFooter.prototype.onControlSelected = function(control) {
   }
 };
 
-scout.TableFooter.prototype._onStatusMousedown = function(event) {
+scout.TableFooter.prototype._onStatusMouseDown = function(event) {
   // Toggle tooltip
   if (this._tableStatusTooltip) {
     this._hideTableStatusTooltip();
