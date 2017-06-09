@@ -63,6 +63,7 @@
   __include("scout/lookup/LookupCall.js");
   __include("scout/lookup/LookupRow.js");
   __include("scout/lookup/StaticLookupCall.js");
+  __include("scout/lookup/HierarchicalLookupResultBuilder.js");
   // Code
   __include("scout/code/Code.js");
   __include("scout/code/CodeType.js");

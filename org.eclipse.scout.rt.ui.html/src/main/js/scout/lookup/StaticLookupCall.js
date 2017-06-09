@@ -14,6 +14,11 @@
  * functions to provide data for lookup calls. Results are resolved as a Promise, the _delay
  * property controls how long it takes until the promise is resolved. By default that value is 0.
  * You can set it to a higher value for testing purposes.
+ *
+ * By default we assume that the data array uses the following indizes:
+ * 0: key
+ * 1: text
+ * 2: parentKey (optional)
  */
 scout.StaticLookupCall = function() {
   scout.StaticLookupCall.parent.call(this);
@@ -25,62 +30,97 @@ scout.inherits(scout.StaticLookupCall, scout.LookupCall);
 scout.StaticLookupCall.MAX_ROW_COUNT = 100;
 
 scout.StaticLookupCall.prototype.getAll = function() {
-  this._newDeferred();
-  setTimeout(this._queryAll.bind(this), this._delay);
-  return this.deferred.promise();
+  var deferred = $.Deferred();
+  setTimeout(this._queryAll.bind(this, deferred), this._delay);
+  return deferred.promise();
 };
 
-scout.StaticLookupCall.prototype._queryAll = function() {
+scout.StaticLookupCall.prototype._queryAll = function(deferred) {
   var datas = this._data().slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
-  this.resolveLookup({
+  deferred.resolve({
     lookupRows: datas.map(this._dataToLookupRow)
   });
 };
 
 scout.StaticLookupCall.prototype.getByText = function(text) {
-  this._newDeferred();
-  setTimeout(this._queryByText.bind(this, text), this._delay);
-  return this.deferred.promise();
+  var deferred = $.Deferred();
+  setTimeout(this._queryByText.bind(this, deferred, text), this._delay);
+  return deferred.promise();
 };
 
-scout.StaticLookupCall.prototype._queryByText = function(text) {
+scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
   var datas = this._data().filter(function(data) {
     return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
   });
-  this.resolveLookup({
-    searchText: text,
-    lookupRows: datas.map(this._dataToLookupRow)
-  });
+  var lookupRows = datas.map(this._dataToLookupRow);
+
+  // resolve non-hierarchical results immediately
+  if (!this.hierarchical) {
+    deferred.resolve({
+      searchText: text,
+      lookupRows: lookupRows
+    });
+  }
+
+  // if loadIncremental=false we must also load children
+  var promise, builder = new scout.HierarchicalLookupResultBuilder(this);
+  if (this.loadIncremental) {
+    promise = $.resolvedPromise(lookupRows);
+  } else {
+    promise = builder.addChildLookupRows(lookupRows);
+  }
+
+  // hierarchical lookups must first load their parent nodes
+  // before we can resolve the results
+  promise
+    .then(function(lookupRows) {
+      return builder.addParentLookupRows(lookupRows);
+    })
+    .done(function(lookupRows) {
+      deferred.resolve({
+        searchText: text,
+        lookupRows: lookupRows
+      });
+    }.bind(this))
+    .fail(function(error) {
+      throw error;
+    });
 };
 
 scout.StaticLookupCall.prototype.getByKey = function(key) {
-  this._newDeferred();
-  setTimeout(this._queryByKey.bind(this, key), this._delay);
-  return this.deferred.promise();
+  var deferred = $.Deferred();
+  setTimeout(this._queryByKey.bind(this, deferred, key), this._delay);
+  return deferred.promise();
 };
 
-scout.StaticLookupCall.prototype._queryByKey = function(key) {
+scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
   var data = scout.arrays.find(this._data(), function(data) {
     return data[0] === key;
   });
   if (data) {
-    this.resolveLookup(this._dataToLookupRow(data));
+    deferred.resolve(this._dataToLookupRow(data));
   } else {
-    this.deferred.reject();
+    deferred.reject();
   }
 };
 
-scout.StaticLookupCall.prototype.resolveLookup = function(lookupResult) {
-  this.deferred.resolve(lookupResult);
+scout.StaticLookupCall.prototype.getByRec = function(rec) {
+  var deferred = $.Deferred();
+  setTimeout(this._queryByRec.bind(this, deferred, rec), this._delay);
+  return deferred.promise();
 };
 
-scout.StaticLookupCall.prototype._newDeferred = function() {
-  if (this.deferred) {
-    this.deferred.reject({
-      canceled: true
-    });
-  }
-  this.deferred = $.Deferred();
+scout.StaticLookupCall.prototype._queryByRec = function(deferred, rec) {
+  var lookupRows = this._data().reduce(function(aggr, data) {
+    if (data[2] === rec) {
+      aggr.push(this._dataToLookupRow(data));
+    }
+    return aggr;
+  }.bind(this), []);
+  deferred.resolve({
+    rec: rec,
+    lookupRows: lookupRows
+  });
 };
 
 scout.StaticLookupCall.prototype.setDelay = function(delay) {
