@@ -27,13 +27,13 @@ public class SplitBoxGrid implements ICompositeFieldGrid<ISplitBox> {
   private int m_gridRows;
 
   @Override
-  public void validate(ISplitBox m_splitBox) {
+  public void validate(ISplitBox splitBox) {
     // reset
     m_gridColumns = 2;
     m_gridRows = 1;
     ArrayList<IFormField> list = new ArrayList<IFormField>();
     // filter
-    for (IFormField f : m_splitBox.getFields()) {
+    for (IFormField f : splitBox.getFields()) {
       if (f.isVisible()) {
         list.add(f);
       }
