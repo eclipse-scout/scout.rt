@@ -622,14 +622,14 @@ describe("TableKeyStrokes", function() {
       table.checkRow(rows[2], true);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      table.$data.triggerKeyDown(scout.keys.SPACE);
+      table.$data.triggerKeyDownCapture(scout.keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(true);
       expect(rows[2].checked).toBe(true);
       expect(rows[3].checked).toBe(false);
 
-      table.$data.triggerKeyUp(scout.keys.SPACE);
-      table.$data.triggerKeyDown(scout.keys.SPACE);
+      table.$data.triggerKeyUpCapture(scout.keys.SPACE);
+      table.$data.triggerKeyDownCapture(scout.keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);

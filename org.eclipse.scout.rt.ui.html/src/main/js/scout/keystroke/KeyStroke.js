@@ -85,11 +85,6 @@ scout.KeyStroke.prototype.accept = function(event) {
     return false;
   }
 
-  // Reset handleExecuted flag on keyup event
-  if (event.type === 'keyup') {
-    this._handleExecuted = false;
-  }
-
   // Check whether this event is accepted for execution.
   if (!this._accept(event)) {
     return false;
@@ -120,7 +115,23 @@ scout.KeyStroke.prototype.invokeHandle = function(event) {
   // we receive a key up event for that key
   if (!this._handleExecuted) {
     this.handle(event);
-    this._handleExecuted = true;
+
+    if (event.type === scout.KeyStrokeMode.DOWN) {
+      this._handleExecuted = true;
+
+      // Reset handleExecuted on the next key up event
+      // (use capturing phase to execute even if event.stopPropagation has been called)
+      var $target = $(event.target);
+      var $window = $target.window();
+      var keyStroke = this;
+      var keyUpHandler = {
+        handleEvent: function(event) {
+          keyStroke._handleExecuted = false;
+          $window[0].removeEventListener('keyup', this, true);
+        }
+      };
+      $window[0].addEventListener('keyup', keyUpHandler, true);
+    }
   }
 };
 
