@@ -606,7 +606,9 @@ scout.SmartField2.prototype._onFieldKeyup = function(event) {
   // We don't use _displayText() here because we always want the text the
   // user has typed.
   if (this.isPopupOpen()) {
-    this._lookupByText();
+    if (!this.isDropdown()) {
+      this._lookupByText();
+    }
   } else {
     $.log.debug('(SmartField2#_onFieldKeyup)');
     this.openPopup(false);

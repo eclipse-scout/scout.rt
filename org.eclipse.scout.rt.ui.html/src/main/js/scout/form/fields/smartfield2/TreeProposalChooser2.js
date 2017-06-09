@@ -16,7 +16,8 @@ scout.inherits(scout.TreeProposalChooser2, scout.ProposalChooser2);
 scout.TreeProposalChooser2.prototype._createModel = function() {
   var tree = scout.create('Tree', {
     parent: this,
-    requestFocusOnNodeControlMouseDown: false
+    requestFocusOnNodeControlMouseDown: false,
+    scrollToSelection: true
   });
   tree.on('nodeClicked', this._onNodeClicked.bind(this));
   return tree;
@@ -168,7 +169,7 @@ scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
     initialExpanded: expandAll,
     text: lookupRow.text,
     lookupRow: lookupRow,
-    leaf: initialLeaf
+    leaf: initialLeaf // FIXME [awe] 7.0 - SF2: wrong state when we lookupByText and smartField is loadIncremental=true (should be true instead of false)
   });
 };
 
