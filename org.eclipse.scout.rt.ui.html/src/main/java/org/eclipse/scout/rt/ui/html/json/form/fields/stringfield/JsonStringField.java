@@ -26,9 +26,8 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
 public class JsonStringField<T extends IStringField> extends JsonBasicField<T> implements IBinaryResourceConsumer {
 
-  public static final String EVENT_CALL_ACTION = "callAction";
-  public static final String EVENT_CALL_LINK_ACTION = "callLinkAction";
-  public static final String EVENT_SELECTION_CHANGED = "selectionChanged";
+  public static final String EVENT_ACTION = "action";
+  public static final String EVENT_SELECTION_CHANGE = "selectionChange";
 
   public JsonStringField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -130,25 +129,25 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_CALL_ACTION.equals(event.getType())) {
-      handleUiCallAction();
+    if (EVENT_ACTION.equals(event.getType())) {
+      handleUiAction();
     }
-    else if (EVENT_SELECTION_CHANGED.equals(event.getType())) {
-      handleUiSelectionChanged(event);
+    else if (EVENT_SELECTION_CHANGE.equals(event.getType())) {
+      handleUiSelectionChange(event);
     }
-    else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
-      handleUiExportToClipboard();
+    else if (EVENT_CLIPBOARD_EXPORT.equals(event.getType())) {
+      handleUiClipboardExport();
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiCallAction() {
+  protected void handleUiAction() {
     getModel().getUIFacade().fireActionFromUI();
   }
 
-  protected void handleUiSelectionChanged(JsonEvent event) {
+  protected void handleUiSelectionChange(JsonEvent event) {
     int selectionStart = event.getData().getInt(IStringField.PROP_SELECTION_START);
     int selectionEnd = event.getData().getInt(IStringField.PROP_SELECTION_END);
     addPropertyEventFilterCondition(IStringField.PROP_SELECTION_START, selectionStart);

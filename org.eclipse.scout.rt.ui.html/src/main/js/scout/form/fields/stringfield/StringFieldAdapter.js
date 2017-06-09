@@ -27,7 +27,7 @@ scout.StringFieldAdapter.prototype._syncInsertText = function(insertText) {
 scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
   // send delayed to avoid a lot of requests while selecting
   // coalesce: only send the latest selection changed event for a field
-  this._send('selectionChanged', {
+  this._send('selectionChange', {
     selectionStart: event.selectionStart,
     selectionEnd: event.selectionEnd
   }, {
@@ -39,7 +39,7 @@ scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
 };
 
 scout.StringFieldAdapter.prototype._onWidgetAction = function(event) {
-  this._send('callAction');
+  this._send('action');
 };
 
 scout.StringFieldAdapter.prototype._onWidgetEvent = function(event) {

@@ -48,7 +48,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * flag.
    */
   public static final String EVENT_ACCEPT_INPUT = "acceptInput";
-  public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
+  public static final String EVENT_CLIPBOARD_EXPORT = "clipboardExport";
 
   private PropertyChangeListener m_contextMenuListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -153,8 +153,8 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     if (EVENT_ACCEPT_INPUT.equals(event.getType())) {
       handleUiAcceptInput(event);
     }
-    else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
-      handleUiExportToClipboard();
+    else if (EVENT_CLIPBOARD_EXPORT.equals(event.getType())) {
+      handleUiClipboardExport();
     }
     else {
       super.handleUiEvent(event);
@@ -190,7 +190,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     // NOP may be implemented by sub-classes
   }
 
-  protected void handleUiExportToClipboard() {
+  protected void handleUiClipboardExport() {
     try {
       BEANS.get(IClipboardService.class).setTextContents(getModel().getDisplayText());
     }

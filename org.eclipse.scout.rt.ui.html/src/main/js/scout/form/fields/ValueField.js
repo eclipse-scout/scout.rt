@@ -120,7 +120,7 @@ scout.ValueField.prototype._parsingFailed = function(displayText, error) {
     displayText: displayText,
     error: error
   });
-  this.trigger('parseerror', event);
+  this.trigger('parseError', event);
   if (!event.defaultPrevented) {
     var status = this._createParsingFailedStatus(displayText, error);
     this.setErrorStatus(status);

@@ -289,9 +289,6 @@ scout.StringField.prototype.insertText = function(text) {
     this._postRenderActions.push(this.insertText.bind(this, text));
     return;
   }
-  this.trigger('insertText', {
-    text: text
-  });
   this._insertText(text);
 };
 

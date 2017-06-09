@@ -998,7 +998,7 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
   menu.on('action', function(event) {
     if (field instanceof scout.ValueField) {
       // TODO [7.0] cgu offline?
-      field.trigger('exportToClipboard');
+      field.trigger('clipboardExport');
     }
   });
 
