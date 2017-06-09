@@ -471,6 +471,40 @@ $.fn.triggerMouseDown = function(opts) {
   return this.triggerMouseAction('mousedown', opts);
 };
 
+$.fn.triggerKeyDownCapture = function(which) {
+  return this.triggerKeyCapture('keydown', which);
+};
+
+$.fn.triggerKeyUpCapture = function(which) {
+  return this.triggerKeyCapture('keyup', which);
+};
+
+$.fn.triggerKeyCapture = function(eventType, which) {
+  // Due to a Chrome bug, "new KeyboardEvent" cannot be used,
+  // as it doesn't set "which". We have to use this less specific
+  // constructor.
+  var eventObj;
+
+  try {
+    eventObj = new Event(eventType, {
+      'bubbles': true,
+      'cancelable': true
+    });
+  }
+  catch (e) {
+    // Workaround for PhantomJS
+    eventObj = document.createEvent('CustomEvent');
+    eventObj.initEvent(eventType, true, true);
+  }
+
+  eventObj.metaKey = eventObj.altKey = eventObj.shiftKey = eventObj.ctrlKey = false;
+  eventObj.keyCode = which;
+  eventObj.which = which;
+
+  this[0].dispatchEvent(eventObj);
+  return this;
+};
+
 $.fn.triggerMouseUp = function(opts) {
   return this.triggerMouseAction('mouseup', opts);
 };

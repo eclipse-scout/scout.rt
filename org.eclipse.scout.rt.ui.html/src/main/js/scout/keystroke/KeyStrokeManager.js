@@ -140,10 +140,17 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
   if (!keyStrokeContext.accept(event)) {
     return;
   }
+  
+  if (keyStrokeContext.keyStrokes.length < 1) {
+    return;
+  }
+
+  // Handle numpad keystroke
+  if (event.which >= 96 && event.which <= 105) {
+    event.which = event.which - 48;
+  }
 
   keyStrokeContext.keyStrokes.some(function(keyStroke) {
-    // Handle numpad keystroke
-    event.which = event.which >= 96 && event.which <= 105 ? event.which - 48 : event.which;
     if (!keyStroke.accept(event)) {
       return false;
     }
