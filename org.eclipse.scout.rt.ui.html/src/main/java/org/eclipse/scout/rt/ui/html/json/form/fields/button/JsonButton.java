@@ -141,8 +141,8 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (JsonEventType.CLICKED.matches(event)) {
-      getModel().getUIFacade().fireButtonClickedFromUI();
+    if (JsonEventType.CLICK.matches(event)) {
+      getModel().getUIFacade().fireButtonClickFromUI();
     }
     else {
       super.handleUiEvent(event);

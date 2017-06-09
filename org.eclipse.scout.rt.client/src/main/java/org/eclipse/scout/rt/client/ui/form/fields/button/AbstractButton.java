@@ -507,7 +507,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    */
   protected class P_UIFacade implements IButtonUIFacade {
     @Override
-    public void fireButtonClickedFromUI() {
+    public void fireButtonClickFromUI() {
       if (isEnabled() && isVisible()) {
         doClick();
       }

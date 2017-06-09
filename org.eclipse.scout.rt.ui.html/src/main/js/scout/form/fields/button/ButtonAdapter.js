@@ -37,7 +37,7 @@ scout.ButtonAdapter.prototype._resolveKeyStrokeScope = function() {
 };
 
 scout.ButtonAdapter.prototype._onWidgetClick = function(event) {
-  this._send('clicked');
+  this._send('click');
 };
 
 scout.ButtonAdapter.prototype._onWidgetEvent = function(event) {

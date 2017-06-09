@@ -66,7 +66,7 @@ public class FormBasicTest {
       @Override
       public void run() throws Exception {
         testSequence.add(2);
-        f.getButton("ok").getUIFacade().fireButtonClickedFromUI();
+        f.getButton("ok").getUIFacade().fireButtonClickFromUI();
         Thread.sleep(200L);
         testSequence.add(3);
       }

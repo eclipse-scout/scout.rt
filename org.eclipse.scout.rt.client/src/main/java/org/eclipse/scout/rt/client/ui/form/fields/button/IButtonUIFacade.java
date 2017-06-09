@@ -21,7 +21,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
  */
 public interface IButtonUIFacade {
 
-  void fireButtonClickedFromUI();
+  void fireButtonClickFromUI();
 
   void setSelectedFromUI(boolean b);
 

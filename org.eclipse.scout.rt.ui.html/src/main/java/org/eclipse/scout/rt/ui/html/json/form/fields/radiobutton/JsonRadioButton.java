@@ -38,7 +38,7 @@ public class JsonRadioButton<RADIO_BUTTON extends IRadioButton> extends JsonButt
       IButtonUIFacade uiFacade = getModel().getUIFacade();
       uiFacade.setSelectedFromUI(selected);
       if (selected) {
-        uiFacade.fireButtonClickedFromUI();
+        uiFacade.fireButtonClickFromUI();
       }
     }
   }

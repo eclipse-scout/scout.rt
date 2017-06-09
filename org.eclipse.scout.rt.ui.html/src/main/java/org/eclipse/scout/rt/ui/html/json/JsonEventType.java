@@ -15,7 +15,7 @@ package org.eclipse.scout.rt.ui.html.json;
  */
 public enum JsonEventType {
 
-  CLICKED("clicked"),
+  CLICK("click"),
   PROPERTY("property"),
   SELECT("select"),
   APP_LINK_ACTION("appLinkAction");
