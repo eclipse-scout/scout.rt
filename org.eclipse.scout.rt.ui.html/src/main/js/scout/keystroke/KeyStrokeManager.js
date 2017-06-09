@@ -137,6 +137,15 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
   if (!keyStrokeContext.accept(event)) {
     return;
   }
+  
+  if (keyStrokeContext.keyStrokes.length < 1) {
+    return;
+  }
+
+  // Handle numpad keystroke
+  if (event.which >= 96 && event.which <= 105) {
+    event.which = event.which - 48;
+  }
 
   // We create a copy of the keyStrokes array, because when a widget is disposed in the handle function
   // of a keystroke, all its keystrokes on the context are deleted. Which means no key stroke is processed
@@ -144,8 +153,6 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
   // the situation that the widget to which the keystroke belongs, is suddenly destroyed.
   var keyStrokesCopy = keyStrokeContext.keyStrokes.slice();
   keyStrokesCopy.some(function(keyStroke) {
-    // Handle numpad keystroke
-    event.which = event.which >= 96 && event.which <= 105 ? event.which - 48 : event.which;
     if (!keyStroke.accept(event)) {
       return false;
     }
