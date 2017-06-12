@@ -16,7 +16,7 @@
   background-color: @table-header-background-color;
   #scout.drop-shadow();
   #scout.focus-border();
-  margin-top: 45px;
+  margin: 45px 10px 10px 10px;
 }
 
 .touch-popup-field {
@@ -47,4 +47,11 @@
   position: absolute;
   right: 7px;
   top: 7px;
+}
+
+@media (max-height: @iphone5-height) {
+  .touch-popup {
+    /* move popup to top on small screens, no need to waste space*/
+    margin-top: 10px;
+  }
 }

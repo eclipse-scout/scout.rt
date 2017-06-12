@@ -19,6 +19,8 @@ scout.TouchPopup = function() {
   this._widget;
   this._$widgetContainer;
   this._widgetContainerHtmlComp;
+  this.windowPaddingX = 0;
+  this.windowPaddingY = 0;
 };
 scout.inherits(scout.TouchPopup, scout.Popup);
 
@@ -67,7 +69,7 @@ scout.TouchPopup.prototype._render = function() {
   this._$header = this.$container.appendDiv('touch-popup-header');
   this._$header.appendDiv('status closer touch-popup-close-icon')
       .on('click', this.close.bind(this));
-  this._$header.appendDiv('touch-popup-title').text(this._touchField.label);
+  this._$header.appendDiv('touch-popup-title').textOrNbsp(this._touchField.label, 'empty');
 
   this._$widgetContainer = this.$container.appendDiv('touch-popup-widget-container');
   this._widgetContainerHtmlComp = scout.HtmlComponent.install(this._$widgetContainer, this.session);
