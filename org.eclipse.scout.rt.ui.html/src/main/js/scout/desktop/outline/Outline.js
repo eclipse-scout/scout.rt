@@ -247,11 +247,11 @@ scout.Outline.prototype._decorateNode = function(node) {
   }
 };
 
-scout.Outline.prototype._createNavigateButtons = function(node, staticMenus) {
-  var menus = scout.arrays.ensure(staticMenus);
+scout.Outline.prototype._createNavigateButtons = function(node, parent) {
+  var menus = scout.arrays.ensure(parent.staticMenus);
   if (!this._hasMenu(menus, scout.NavigateUpButton)) {
     var upButton = scout.create('NavigateUpButton', {
-      parent: this,
+      parent: parent,
       outline: this,
       node: node
     });
@@ -259,7 +259,7 @@ scout.Outline.prototype._createNavigateButtons = function(node, staticMenus) {
   }
   if (!this._hasMenu(menus, scout.NavigateDownButton)) {
     var downButton = scout.create('NavigateDownButton', {
-      parent: this,
+      parent: parent,
       outline: this,
       node: node
     });
@@ -370,6 +370,10 @@ scout.Outline.prototype._updateOutlineOverview = function() {
   }
 };
 
+scout.Outline.prototype.setNavigateButtonsVisible = function(navigateButtonsVisible) {
+  this.setProperty('navigateButtonsVisible', navigateButtonsVisible);
+};
+
 scout.Outline.prototype._setNavigateButtonsVisible = function(navigateButtonsVisible) {
   this._setProperty('navigateButtonsVisible', navigateButtonsVisible);
   this._visitNodes(this.nodes, this._setNavigateButtonsVisibleForNode.bind(this));
@@ -394,35 +398,25 @@ scout.Outline.prototype._setNavigateButtonsVisibleForNode = function(node, paren
 };
 
 scout.Outline.prototype._appendNavigateButtonsForDetailForm = function(node) {
-  var menus = this._createNavigateButtons(node, node.detailForm.staticMenus);
+  var menus = this._createNavigateButtons(node, node.detailForm.rootGroupBox);
   node.detailForm.rootGroupBox.setStaticMenus(menus);
 };
 
 scout.Outline.prototype._appendNavigateButtonsForDetailTable = function(node) {
-  var menus = this._createNavigateButtons(node, node.detailTable.staticMenus);
+  var menus = this._createNavigateButtons(node, node.detailTable);
   node.detailTable.setStaticMenus(menus);
 };
 
 scout.Outline.prototype._removeNavigateButtonsForDetailForm = function(node) {
-  var staticMenus = [];
-  node.detailForm.rootGroupBox.staticMenus.forEach(function(menu) {
-    if (menu instanceof scout.NavigateUpButton || menu instanceof scout.NavigateDownButton) {
-      menu.destroy();
-    } else {
-      staticMenus.push(menu);
-    }
+  var staticMenus = node.detailForm.rootGroupBox.staticMenus.filter(function(menu) {
+    return !(menu instanceof scout.NavigateButton);
   });
   node.detailForm.rootGroupBox.setStaticMenus(staticMenus);
 };
 
 scout.Outline.prototype._removeNavigateButtonsForDetailTable = function(node) {
-  var staticMenus = [];
-  node.detailTable.staticMenus.forEach(function(menu) {
-    if (menu instanceof scout.NavigateUpButton || menu instanceof scout.NavigateDownButton) {
-      menu.destroy();
-    } else {
-      staticMenus.push(menu);
-    }
+  var staticMenus = node.detailTable.staticMenus.filter(function(menu) {
+    return !(menu instanceof scout.NavigateButton);
   });
   node.detailTable.setStaticMenus(staticMenus);
 };

@@ -252,7 +252,7 @@ describe("Outline", function() {
       expect(selectionListenerCount).toBe(initialListenerCount + 3); // listeners attached again
 
       outline.nodes[0].detailTable.destroy();
-      expect(node0.detailTable.events._eventListeners.length).toBe(1); // every listener should be removed now
+      expect(node0.detailTable.events._eventListeners.length).toBe(0); // every listener should be removed now
     });
   });
 
