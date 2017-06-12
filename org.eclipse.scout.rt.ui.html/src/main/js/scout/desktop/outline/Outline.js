@@ -337,15 +337,15 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
 
 scout.Outline.prototype._setDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
-  this._updateDetailForm();
+  this._updateOutlineOverview();
 };
 
 scout.Outline.prototype._setOutlineOverviewVisible = function(outlineOverviewVisible) {
   this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
-  this._updateDetailForm();
+  this._updateOutlineOverview();
 };
 
-scout.Outline.prototype._updateDetailForm = function() {
+scout.Outline.prototype._updateOutlineOverview = function() {
   if (this.defaultDetailForm) {
     if (this.outlineOverview) {
       this.outlineOverview.destroy();
@@ -366,7 +366,6 @@ scout.Outline.prototype._updateDetailForm = function() {
         this._setProperty('outlineOverview', null);
       }
     }
-
   }
 };
 

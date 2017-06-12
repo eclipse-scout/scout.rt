@@ -146,3 +146,69 @@ scout.OutlineAdapter.prototype._linkNodeWithRowLater = function(page) {
   page.linkWithRow(row);
   delete this._nodeIdToRowMap[page.id];
 };
+
+/**
+ * Static method to modify the prototype of scout.Outline.
+ */
+scout.OutlineAdapter.modifyOutlinePrototype = function() {
+  if (!scout.app.remote) {
+    return;
+  }
+
+  scout.objects.replacePrototypeFunction(scout.Outline, '_computeDetailContent', scout.OutlineAdapter._computeDetailContentRemote, true);
+  scout.objects.replacePrototypeFunction(scout.Outline, 'updateDetailMenus', scout.OutlineAdapter.updateDetailMenusRemote, true);
+};
+
+/**
+ * Replacement for Outline#_computeDetailContent(). 'This' points to the outline.
+ */
+scout.OutlineAdapter._computeDetailContentRemote = function() {
+  if (!this.modelAdapter) {
+    return this._computeDetailContentOrig();
+  }
+
+  var selectedPage = this.selectedNode();
+  if (!selectedPage) {
+    // Detail content is shown for the selected node only
+    return null;
+  }
+
+  // if there is a detail form, use this
+  if (selectedPage.detailForm || selectedPage.detailFormResolved) {
+    // If there is a detail form -> return (and set flag to true to make updateDetailMenusRemote work)
+    selectedPage.detailFormResolved = true;
+    return this._computeDetailContentOrig();
+  }
+
+  // It is not known yet whether there is a detail form -> wait for the requests to be processed before showing the table row detail
+  if (!this.session.areRequestsPending() && !this.session.areEventsQueued()) {
+    // There are no requests pending -> return (and set flag to true to make updateDetailMenusRemote work)
+    selectedPage.detailFormResolved = true;
+    return this._computeDetailContentOrig();
+  }
+
+  // Wait for the requests to complete
+  this.session.listen().done(function(selectedPage) {
+    if (selectedPage.detailFormResolved) {
+      // No need to update detail content again if resolved is true
+      return;
+    }
+    // Make sure the next time the page is selected it returns immediately and does not wait for requests to be completed
+    selectedPage.detailFormResolved = true;
+    this.updateDetailContent();
+  }.bind(this, selectedPage));
+};
+
+/**
+ * Replacement for Outline#updateDetailMenusRemote(). 'This' points to the outline.
+ */
+scout.OutlineAdapter.updateDetailMenusRemote = function() {
+  if (!this.modelAdapter) {
+    return this.updateDetailMenusOrig();
+  }
+  if (this.selectedNode() && this.selectedNode().detailFormResolved) {
+    return this.updateDetailMenusOrig();
+  }
+};
+
+scout.addAppListener('bootstrap', scout.OutlineAdapter.modifyOutlinePrototype);
