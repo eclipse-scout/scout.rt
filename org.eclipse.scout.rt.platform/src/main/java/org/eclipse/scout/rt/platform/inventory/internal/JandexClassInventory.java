@@ -45,11 +45,41 @@ public class JandexClassInventory implements IClassInventory {
   }
 
   @Override
+  public Set<IClassInfo> getAllKnownSubClasses(IClassInfo queryClassInfo) {
+    Assertions.assertNotNull(queryClassInfo);
+    Collection<ClassInfo> subclasses;
+    if (queryClassInfo.isInterface()) {
+      subclasses = m_index.getAllKnownImplementors(DotName.createSimple(queryClassInfo.name()));
+    }
+    else {
+      subclasses = m_index.getAllKnownSubclasses(DotName.createSimple(queryClassInfo.name()));
+    }
+    return convertClassInfos(subclasses);
+  }
+
+  @Override
   public Set<IClassInfo> getKnownAnnotatedTypes(Class<?> annotation) {
     Assertions.assertNotNull(annotation);
     Assertions.assertTrue(annotation.isAnnotation(), "given class is not an annotation: {}", annotation);
     Collection<AnnotationInstance> annotationInstances = m_index.getAnnotations(DotName.createSimple(annotation.getName()));
     return convertAnnotationInstance(annotationInstances);
+  }
+
+  @Override
+  public Set<IClassInfo> getKnownAnnotatedTypes(IClassInfo annotationInfo) {
+    Assertions.assertNotNull(annotationInfo);
+    Assertions.assertTrue(annotationInfo.isAnnotation(), "given class is not an annotation: {}", annotationInfo.name());
+    Collection<AnnotationInstance> annotationInstances = m_index.getAnnotations(DotName.createSimple(annotationInfo.name()));
+    return convertAnnotationInstance(annotationInstances);
+  }
+
+  public IClassInfo getClassInfo(String queryClassName) {
+    Assertions.assertNotNull(queryClassName);
+    ClassInfo ci = m_index.getClassByName(DotName.createSimple(queryClassName));
+    if (ci == null) {
+      return null;
+    }
+    return new JandexClassInfo(ci);
   }
 
   public IClassInfo getClassInfo(Class<?> queryClass) {

@@ -36,7 +36,9 @@ public final class ClassInventory {
       inventoryBuilder.scanAllModules();
       IndexView index = inventoryBuilder.finish();
       long nanos = System.nanoTime() - t0;
-      LOG.info("Finished build of jandex class inventory in {} ms using rebuild strategy {}", StringUtility.formatNanos(nanos), inventoryBuilder.getRebuildStrategy());
+      if (LOG.isInfoEnabled()) {
+        LOG.info("Building jandex class inventory with {} classes in {} ms using rebuild strategy {}", index.getKnownClasses().size(), StringUtility.formatNanos(nanos), inventoryBuilder.getRebuildStrategy());
+      }
       INSTANCE = new JandexClassInventory(index);
     }
     catch (Exception t) {

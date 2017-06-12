@@ -48,7 +48,7 @@ public class BeanFilter {
     // 2. register all classes that are somehow annotated with @Bean
     for (IClassInfo annotation : beanAnnotations) {
       try {
-        for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(annotation.resolveClass())) {
+        for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(annotation)) {
           collectWithSubClasses(classInventory, ci, allBeans);
         }
       }
@@ -73,7 +73,7 @@ public class BeanFilter {
 
     if (!ci.isFinal()) {
       try {
-        Set<IClassInfo> allKnownSubClasses = classInventory.getAllKnownSubClasses(ci.resolveClass());
+        Set<IClassInfo> allKnownSubClasses = classInventory.getAllKnownSubClasses(ci);
         for (IClassInfo subClass : allKnownSubClasses) {
           collect(subClass, collector);
         }
