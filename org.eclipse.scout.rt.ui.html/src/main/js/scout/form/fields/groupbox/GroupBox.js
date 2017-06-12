@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
-  this._addWidgetProperties(['fields', 'notification']);
+  this._addWidgetProperties(['fields', 'notification', 'staticMenus']);
 
   this.fields = [];
   this.menus = [];
@@ -442,7 +442,7 @@ scout.GroupBox.prototype._removeMenus = function() {
 };
 
 scout.GroupBox.prototype.setStaticMenus = function(staticMenus) {
-  this._setProperty('staticMenus', staticMenus);
+  this.setProperty('staticMenus', staticMenus);
   this._updateMenuBar();
 };
 

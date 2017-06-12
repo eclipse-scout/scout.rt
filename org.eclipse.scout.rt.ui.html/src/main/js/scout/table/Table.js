@@ -59,7 +59,7 @@ scout.Table = function() {
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this.$container;
   this.$data;
-  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes']);
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
@@ -1448,7 +1448,7 @@ scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, e
 };
 
 scout.Table.prototype.setStaticMenus = function(staticMenus) {
-  this._setProperty('staticMenus', staticMenus);
+  this.setProperty('staticMenus', staticMenus);
   this._updateMenuBar();
 };
 
