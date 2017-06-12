@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent> extends AbstractJsonAdapter<CALENDAR_COMPONENT> {
@@ -36,14 +37,15 @@ public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent>
     json.put("item", new JsonCalendarItem(getModel().getItem()).toJson());
     json.put("fromDate", new JsonDate(getModel().getFromDate()).asJsonString());
     json.put("toDate", new JsonDate(getModel().getToDate()).asJsonString());
+    JSONArray coveredDays = new JSONArray();
     if (getModel().getCoveredDays() != null) {
       for (Date coveredDay : getModel().getCoveredDays()) {
-        json.append("coveredDays", new JsonDate(coveredDay).asJsonString());
+        coveredDays.put(new JsonDate(coveredDay).asJsonString());
       }
     }
+    json.put("coveredDays", coveredDays);
     json.put("fullDay", getModel().isFullDay());
     json.put("draggable", getModel().getProvider().isMoveItemEnabled());
     return json;
   }
-
 }
