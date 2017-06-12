@@ -51,7 +51,8 @@ scout.TableControlAdapterMenu.prototype._onTableControlPropertyChange = function
   changedProperties[event.propertyName] = event.newValue;
   changedProperties = scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
   for (var prop in changedProperties) { // NOSONAR
-    this.callSetter(prop, changedProperties[prop]);
+    // Set the property (don't use callSetter because this may delegate to the table control)
+    this.setProperty(prop, changedProperties[prop]);
   }
 };
 
