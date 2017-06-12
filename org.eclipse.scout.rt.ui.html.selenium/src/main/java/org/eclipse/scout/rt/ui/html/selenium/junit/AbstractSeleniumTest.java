@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.selenium.SeleniumSuiteState;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumDriver;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
@@ -458,8 +457,7 @@ public abstract class AbstractSeleniumTest {
     waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
 
     // Wait for animations to finish
-    WebElement animation = CollectionUtility.firstElement(findElements(By.className("animation-wrapper")));
-    if (animation != null) {
+    for (WebElement animation : findElements(By.className("animation-wrapper"))) {
       waitUntilElementStaleness(animation);
     }
   }
