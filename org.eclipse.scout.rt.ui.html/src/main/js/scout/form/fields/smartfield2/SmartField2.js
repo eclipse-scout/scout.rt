@@ -571,7 +571,6 @@ scout.SmartField2.prototype._onFieldBlur = function(event) {
 scout.SmartField2.prototype._onFieldKeyUp = function(event) {
   // Escape
   if (event.which === scout.keys.ESCAPE) {
-    event.stopPropagation();
     return;
   }
 
@@ -613,13 +612,6 @@ scout.SmartField2.prototype._onFieldKeyUp = function(event) {
     $.log.debug('(SmartField2#_onFieldKeyUp)');
     this.openPopup(false);
   }
-};
-
-/**
- * @override Widget.js
- */
-scout.SmartField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
 };
 
 /**
