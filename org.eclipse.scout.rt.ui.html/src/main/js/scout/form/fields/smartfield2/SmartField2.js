@@ -161,6 +161,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   // 1.) when search text is empty and no lookup-row is selected, simply set the value to null
   if (scout.strings.empty(searchText) && !selectedLookupRow) {
     $.log.debug('(SmartField2#acceptInput) empty. Set lookup-row to null, close popup');
+    this.clearErrorStatus();
     this.setLookupRow(null);
     this._inputAccepted();
     return;
@@ -169,6 +170,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   // 2.) proposal chooser is open -> use the selected row as value
   if (selectedLookupRow) {
     $.log.debug('(SmartField2#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
+    this.clearErrorStatus();
     this.setLookupRow(selectedLookupRow);
     this._inputAccepted();
     return;
@@ -792,7 +794,6 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
     return;
   }
   this._setLookupRow(lookupRow);
-  this.setErrorStatus(null);
   // this flag is required so lookup row is not changed again, when _setValue is called
   this._lockLookupRow = true;
   if (lookupRow) {
