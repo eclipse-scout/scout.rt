@@ -96,15 +96,19 @@ scout.KeyStrokeContext.prototype._accept = function(event) {
   return true;
 };
 
+scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
+  this.registerKeyStrokes(keyStroke);
+};
+
 /**
  * Registers the given keystroke(s) if not installed yet.
  */
-scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
-  scout.arrays.ensure(keyStroke)
-    .map(this._resolveKeyStroke)
+scout.KeyStrokeContext.prototype.registerKeyStrokes = function(keyStrokes) {
+  scout.arrays.ensure(keyStrokes)
+    .map(this._resolveKeyStroke, this)
     .filter(function(ks) {
       return this.keyStrokes.indexOf(ks) === -1; // must not be registered yet
-    }.bind(this))
+    }, this)
     .forEach(function(ks) {
       this.keyStrokes.push(ks);
 
@@ -123,12 +127,18 @@ scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
  * Uninstalls the given keystroke. Has no effect if not installed.
  */
 scout.KeyStrokeContext.prototype.unregisterKeyStroke = function(keyStroke) {
-  keyStroke = this._resolveKeyStroke(keyStroke);
+  this.unregisterKeyStrokes(keyStroke);
+};
 
-  if (scout.arrays.remove(this.keyStrokes, keyStroke) && keyStroke.field && keyStroke.destroyListener) {
-    keyStroke.field.off('destroy', keyStroke.destroyListener);
-    keyStroke.destroyListener = null;
-  }
+scout.KeyStrokeContext.prototype.unregisterKeyStrokes = function(keyStrokes) {
+  scout.arrays.ensure(keyStrokes)
+    .map(this._resolveKeyStroke, this)
+    .forEach(function(ks) {
+      if (scout.arrays.remove(this.keyStrokes, ks) && ks.field && ks.destroyListener) {
+        ks.field.off('destroy', ks.destroyListener);
+        ks.destroyListener = null;
+      }
+    }, this);
 };
 
 scout.KeyStrokeContext.prototype._resolveKeyStroke = function(keyStroke) {
