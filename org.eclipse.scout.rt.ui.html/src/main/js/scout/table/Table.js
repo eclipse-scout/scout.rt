@@ -637,7 +637,7 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   this._filteredRowsDirty = true; // order has been changed
   this._triggerRowOrderChanged();
   if (this.rendered) {
-    this._renderRowOrderChangeds();
+    this._renderRowOrderChanges();
   }
 
   // Do it after row order has been rendered, because renderRowOrderChangeds rerenders the whole viewport which would destroy the animation
@@ -688,7 +688,7 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   this.rows.sort(compare.bind(this));
 };
 
-scout.Table.prototype._renderRowOrderChangeds = function() {
+scout.Table.prototype._renderRowOrderChanges = function() {
   var animate,
     $rows = this.$rows(),
     oldRowPositions = {};
@@ -2143,7 +2143,7 @@ scout.Table.prototype.updateRowOrder = function(rows) {
 
   this.clearAggregateRows(this._animateAggregateRows);
   if (this.rendered) {
-    this._renderRowOrderChangeds();
+    this._renderRowOrderChanges();
   }
   this._triggerRowOrderChanged();
 
