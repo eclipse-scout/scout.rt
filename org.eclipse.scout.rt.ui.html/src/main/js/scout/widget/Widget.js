@@ -896,17 +896,11 @@ scout.Widget.prototype.updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes)
 };
 
 scout.Widget.prototype.registerKeyStrokes = function(keyStrokes) {
-  keyStrokes = scout.arrays.ensure(keyStrokes);
-  keyStrokes.forEach(function(keyStroke) {
-    this.keyStrokeContext.registerKeyStroke(keyStroke);
-  }, this);
+  this.keyStrokeContext.registerKeyStrokes(keyStrokes);
 };
 
 scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
-  keyStrokes = scout.arrays.ensure(keyStrokes);
-  keyStrokes.forEach(function(keyStroke) {
-    this.keyStrokeContext.unregisterKeyStroke(keyStroke);
-  }, this);
+  this.keyStrokeContext.unregisterKeyStrokes(keyStrokes);
 };
 
 /**
