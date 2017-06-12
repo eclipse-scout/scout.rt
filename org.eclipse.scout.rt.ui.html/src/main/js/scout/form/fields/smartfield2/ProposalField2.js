@@ -49,4 +49,9 @@ scout.ProposalField2.prototype._acceptByText = function(searchText) {
   this._inputAccepted();
 };
 
-
+scout.ProposalField2.prototype.getValueForSelection = function() {
+  if (this.lookupRow) {
+    return this.lookupRow.key;
+  }
+  return null;
+};

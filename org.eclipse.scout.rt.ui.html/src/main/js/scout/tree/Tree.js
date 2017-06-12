@@ -575,6 +575,15 @@ scout.Tree.prototype._removeNode = function(node) {
  */
 scout.Tree.prototype._renderViewRange = function(viewRange) {
   if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
+
+    // When node with has changed (because of changes in layout) we must at least
+    // update the internal node width even though the view-range has not changed.
+    if (this.nodeWidthDirty) {
+      this._renderFiller();
+      this._updateDomNodeWidth();
+      this._updateDomNodeIconWidth();
+    }
+
     // Range already rendered -> do nothing
     return;
   }

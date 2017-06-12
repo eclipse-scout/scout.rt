@@ -844,3 +844,14 @@ scout.SmartField2.prototype._setValue = function(value) {
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
 };
+
+/**
+ * This function may be overridden to return another value than this.value.
+ * For instance the proposal field does'nt use the value but the key from the
+ * lookup row for comparison.
+ *
+ * @returns the value used to find the selected element in a proposal chooser.
+ */
+scout.SmartField2.prototype.getValueForSelection = function() {
+  return this.value;
+};

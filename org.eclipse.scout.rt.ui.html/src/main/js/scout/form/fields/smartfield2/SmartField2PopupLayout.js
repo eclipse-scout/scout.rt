@@ -46,10 +46,16 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
   } else {
     // The first time it gets layouted, add CSS class to be able to animate
     this.animating = true;
-    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
-      this.animating = false;
+
+    this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
+      this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+        this.animating = false;
+        // Set timeout is required because the browser returns wrong values when
+        // we measure DOM elements, which causes scrollTo() to fail.
+//        this.popup.revealSelection.bind(this.popup));
+      }.bind(this));
+      this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
     }.bind(this));
-    this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
   }
 };
 

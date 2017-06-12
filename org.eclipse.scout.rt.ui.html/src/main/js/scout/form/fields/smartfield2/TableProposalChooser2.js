@@ -93,7 +93,7 @@ scout.TableProposalChooser2.prototype.setLookupResult = function(result) {
 };
 
 scout.TableProposalChooser2.prototype.trySelectCurrentValue = function() {
-  var currentValue = this.smartField.value;
+  var currentValue = this.smartField.getValueForSelection();
   if (scout.objects.isNullOrUndefined(currentValue)) {
     return;
   }
@@ -196,7 +196,3 @@ scout.TableProposalChooser2.prototype._transformTableRowData = function(tableRow
   });
   return cells;
 };
-
-
-
-

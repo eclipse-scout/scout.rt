@@ -121,7 +121,7 @@ scout.TreeProposalChooser2.prototype._expandAllParentNodes = function(treeNodesF
 };
 
 scout.TreeProposalChooser2.prototype.trySelectCurrentValue = function() {
-  var currentValue = this.smartField.value;
+  var currentValue = this.smartField.getValueForSelection();
   if (scout.objects.isNullOrUndefined(currentValue)) {
     return;
   }
