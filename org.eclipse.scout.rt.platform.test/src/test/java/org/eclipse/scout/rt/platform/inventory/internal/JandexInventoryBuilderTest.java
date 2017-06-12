@@ -74,7 +74,7 @@ public class JandexInventoryBuilderTest {
     assertFalse(indexFile.exists());
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.ALWAYS);
     index = builder.scanModule(indexUri);
-    assertEquals(1, builder.readIndexCount);
+    assertEquals(0, builder.readIndexCount);
     assertEquals(1, builder.saveIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
@@ -83,7 +83,7 @@ public class JandexInventoryBuilderTest {
     //force rebuild (repeat now that file exists)
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.ALWAYS);
     index = builder.scanModule(indexUri);
-    assertEquals(1, builder.readIndexCount);
+    assertEquals(0, builder.readIndexCount);
     assertEquals(1, builder.saveIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
@@ -103,7 +103,7 @@ public class JandexInventoryBuilderTest {
     assertFalse(indexFile.exists());
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MISSING);
     index = builder.scanModule(indexUri);
-    assertEquals(1, builder.readIndexCount);
+    assertEquals(0, builder.readIndexCount);
     assertEquals(1, builder.saveIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
@@ -136,7 +136,7 @@ public class JandexInventoryBuilderTest {
     assertFalse(indexFile.exists());
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED);
     index = builder.scanModule(indexUri);
-    assertEquals(1, builder.readIndexCount);
+    assertEquals(0, builder.readIndexCount);
     assertEquals(1, builder.saveIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
@@ -165,7 +165,7 @@ public class JandexInventoryBuilderTest {
     aClassFile.setLastModified(indexFile.lastModified() + 120000L);
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED);
     index = builder.scanModule(indexUri);
-    assertEquals(1, builder.readIndexCount);
+    assertEquals(0, builder.readIndexCount);
     assertEquals(1, builder.saveIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
@@ -176,9 +176,9 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED)
         .withClassFixtureJandexInventoryObjectExcluded();
     index = builder.scanModule(indexUri);
-    assertEquals(2, builder.readIndexCount);
+    assertEquals(1, builder.readIndexCount);
     assertEquals(1, builder.saveIndexCount);
-    assertNull(builder.readIndexReturn);
+    assertNotNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
   }

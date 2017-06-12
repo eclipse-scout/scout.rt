@@ -139,7 +139,8 @@ public class JandexInventoryBuilder {
     File classesFolder = indexFile.getParentFile().getParentFile();
     IndexMetaData newMeta = null;
     Index index = null;
-    if (indexFile.exists()) {
+    boolean indexFileExists = indexFile.exists();
+    if (indexFileExists) {
       switch (m_rebuildStrategy) {
         case IF_MODIFIED:
           newMeta = indexMetaData(classesFolder.toPath());
@@ -147,7 +148,10 @@ public class JandexInventoryBuilder {
           long oldModified = indexFile.lastModified();
           if (newMeta.lastModified() > oldModified) {
             LOG.info("drop old index '{}'. Index timestamp {} < current folder timestamp {}", indexUri, oldModified, newMeta.lastModified());
-            indexFile.delete();
+            indexFileExists = false;
+            if (!indexFile.delete()) {
+              LOG.warn("cannot delete '{}'", indexFile);
+            }
           }
           else {
             //pass 2: file count
@@ -156,19 +160,25 @@ public class JandexInventoryBuilder {
             if (newMeta.fileCount() != oldFileCount) {
               LOG.info("drop old index '{}'. Index file count {} != current folder file count {}", indexUri, oldFileCount, newMeta.fileCount());
               index = null;
-              indexFile.delete();
+              indexFileExists = false;
+              if (!indexFile.delete()) {
+                LOG.warn("cannot delete '{}'", indexFile);
+              }
             }
           }
           break;
         case ALWAYS:
-          indexFile.delete();
+          indexFileExists = false;
+          if (!indexFile.delete()) {
+            LOG.warn("cannot delete '{}'", indexFile);
+          }
           break;
         default:
           //nop
       }
     }
 
-    if (index == null) {
+    if (index == null && indexFileExists) {
       index = readIndex(indexUri);
     }
     if (index != null) {
@@ -182,7 +192,9 @@ public class JandexInventoryBuilder {
     Indexer indexer = new Indexer();
     index = createFolderIndex(classesFolder.toPath(), indexer);
     saveIndex(indexFile, index);
-    indexFile.setLastModified(newMeta.lastModified());
+    if (!indexFile.setLastModified(newMeta.lastModified())) {
+      LOG.warn("cannot set lastModified on '{}'", indexFile);
+    }
     return index;
   }
 
