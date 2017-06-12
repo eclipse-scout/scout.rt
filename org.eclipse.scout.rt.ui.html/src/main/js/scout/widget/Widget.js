@@ -32,6 +32,8 @@ scout.Widget = function() {
    * called for the first time.
    */
   this.rendering = false;
+  this.removing = false;
+  this.removalPending = false;
 
   /**
    * The 'rendered' flag is set the true when initial rendering of the widget is completed.
@@ -179,8 +181,10 @@ scout.Widget.prototype.destroy = function() {
     // Already destroyed, do nothing
     return;
   }
-
-  if (this.animateRemoval && this.rendered) {
+  this.destroying = true;
+  if (this.rendered && (this.animateRemoval || this._isRemovalPrevented())) {
+    // Do not destroy yet if the removal happens animated
+    // Also don't destroy if the removal is pending to keep the parent / child link until removal finishes
     this.one('remove', function() {
       this.destroy();
     }.bind(this));
@@ -200,6 +204,7 @@ scout.Widget.prototype.destroy = function() {
   this.parent.off('destroy', this._parentDestroyHandler);
   this.parent = null;
 
+  this.destroying = false;
   this.destroyed = true;
   this.trigger('destroy');
 };
@@ -297,7 +302,7 @@ scout.Widget.prototype._postRender = function() {
 };
 
 scout.Widget.prototype.remove = function() {
-  if (!this.rendered || this._isRemovalPending()) {
+  if (!this.rendered || this._isRemovalPrevented()) {
     return;
   }
   if (this.animateRemoval) {
@@ -305,6 +310,14 @@ scout.Widget.prototype.remove = function() {
   } else {
     this._removeInternal();
   }
+};
+
+/**
+ * Will be called by {@link #remove()}. If true is returned, the widget won't be removed.<p>
+ * By default it just delegates to {@link #_isRemovalPending}. May be overridden to customize it.
+ */
+scout.Widget.prototype._isRemovalPrevented = function() {
+  return this._isRemovalPending();
 };
 
 /**

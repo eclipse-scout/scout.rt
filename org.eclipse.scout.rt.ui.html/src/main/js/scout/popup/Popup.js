@@ -133,6 +133,11 @@ scout.Popup.prototype._remove = function() {
   scout.Popup.parent.prototype._remove.call(this);
 };
 
+scout.Popup.prototype._isRemovalPrevented = function() {
+  // Never prevent. Default returns true if removal is pending by an animation, but popups should be closed before the animation starts
+  return false;
+};
+
 scout.Popup.prototype.close = function() {
   this.trigger('close');
   this.destroy();

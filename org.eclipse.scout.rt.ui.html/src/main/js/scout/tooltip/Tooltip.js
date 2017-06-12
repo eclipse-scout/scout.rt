@@ -148,6 +148,11 @@ scout.Tooltip.prototype._remove = function() {
   scout.Tooltip.parent.prototype._remove.call(this);
 };
 
+scout.Tooltip.prototype._isRemovalPrevented = function() {
+  // Never prevent. Default returns true if removal is pending by an animation, but tooltips should be closed before the animation starts
+  return false;
+};
+
 scout.Tooltip.prototype.setText = function(text) {
   this.setProperty('text', text);
 };
