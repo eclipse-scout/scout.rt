@@ -27,7 +27,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
   $splitter.removeClass('hidden');
 
   var firstFieldSize, secondFieldSize, firstFieldBounds, secondFieldBounds,
-    splitterSize = scout.graphics.getVisibleSize($splitter, true),
+    splitterSize = scout.graphics.size($splitter, true),
     availableSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
     hasFirstField = (htmlFirstField && htmlFirstField.isVisible()),
     hasSecondField = (htmlSecondField && htmlSecondField.isVisible()),
@@ -148,7 +148,7 @@ scout.SplitBoxLayout.prototype.preferredLayoutSize = function($container) {
     htmlSecondField = scout.HtmlComponent.optGet($fields.eq(1));
 
   var splitXAxis = this.splitBox.splitHorizontal;
-  var splitterSize = scout.graphics.getVisibleSize($splitter, true);
+  var splitterSize = scout.graphics.size($splitter, true);
 
   // Get preferred size of fields
   var firstFieldSize = new scout.Dimension(0, 0);

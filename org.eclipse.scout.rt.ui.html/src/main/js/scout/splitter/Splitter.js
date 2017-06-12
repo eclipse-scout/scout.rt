@@ -119,7 +119,7 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
   }
   if (this.rendered) {
     // Set the new position (center splitter around 'newPosition')
-    var splitterSize = scout.graphics.getVisibleSize(this.$container, true);
+    var splitterSize = scout.graphics.size(this.$container, true);
     if (this.splitHorizontal) {
       var x = newPosition - (splitterSize.width / 2);
       if (this.orientation === 'right') {

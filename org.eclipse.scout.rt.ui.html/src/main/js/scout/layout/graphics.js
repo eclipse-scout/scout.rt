@@ -196,15 +196,13 @@ scout.graphics = {
 
   /**
    * Returns the size of a visible component or (0,0) when component is invisible.
+   *
+   * @deprecated use scout.graphics.size() instead, will be removed with 7.1
    */
   getVisibleSize: function($comp, includeMargin) {
-    if ($comp.length === 1 && $comp.isVisible()) {
-      return scout.graphics.size($comp, {
-        includeMargin: includeMargin
-      });
-    } else {
-      return new scout.Dimension(0, 0);
-    }
+    return this.size($comp, {
+      includeMargin: includeMargin
+    });
   },
 
   /**

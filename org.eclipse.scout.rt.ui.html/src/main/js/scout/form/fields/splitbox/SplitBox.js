@@ -269,7 +269,7 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     // to the target type such that the current position in screen does not change.
     var splitAreaSize = this.htmlSplitArea.size(),
       splitterPosition = this.splitterPosition,
-      splitterSize = scout.graphics.getVisibleSize(this._$splitter, true),
+      splitterSize = scout.graphics.size(this._$splitter, true),
       minSplitterPosition = this.minSplitterPosition,
       totalSize = 0;
     if (this.splitHorizontal) { // "|"

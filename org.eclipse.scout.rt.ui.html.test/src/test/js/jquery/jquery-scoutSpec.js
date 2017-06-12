@@ -47,7 +47,7 @@ describe('jquery-scout', function() {
       $e.css('display', '');
       expect($e.isVisible()).toBe(true);
       $e.css('visibility', 'hidden');
-      expect($e.isVisible()).toBe(false);
+      expect($e.isVisible()).toBe(true);
       $e.css('visibility', '');
       expect($e.isVisible()).toBe(true);
     });
