@@ -68,6 +68,7 @@ scout.MessageBoxes.prototype.withCancel = function(cancelText) {
 scout.MessageBoxes.prototype.build = function() {
   var options = {
     parent: this.parent,
+    header: this.headerText,
     body: this.bodyText,
     severity: this.severity
   };
