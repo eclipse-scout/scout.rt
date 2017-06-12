@@ -179,7 +179,14 @@ scout.SmartField2.prototype.acceptInput = function() {
   // 3.) proposal chooser is not open -> try to accept the current display text
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result'). Or in case the text is empty, just set the value to null
-  $.log.debug('(SmartField2#acceptInput) getByText() searchText=', searchText);
+  this._acceptByText(searchText);
+};
+
+/**
+ * This function is intended to be overridden. Proposal field has another behavior than the smart field.
+ */
+scout.SmartField2.prototype._acceptByText = function(searchText) {
+  $.log.debug('(SmartField2#_acceptByText) searchText=', searchText);
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
     .done(this._acceptInputDone.bind(this));
 };

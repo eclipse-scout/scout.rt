@@ -43,3 +43,10 @@ scout.ProposalField2.prototype._formatValue = function(value) {
   return scout.nvl(value, '');
 };
 
+scout.ProposalField2.prototype._acceptByText = function(searchText) {
+  $.log.debug('(ProposalField2#_acceptByText) searchText=', searchText);
+  this.setValue(searchText);
+  this._inputAccepted();
+};
+
+
