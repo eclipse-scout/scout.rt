@@ -416,7 +416,7 @@ $.fn.makeSpan = function(cssClass, text) {
 
 /**
  * @returns HTML document reference (ownerDocument) of the HTML element.
- * @param domElement (optional) if false this function returns a JQuery object, otherwise only the DOM element is returned
+ * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.document = function(domElement) {
   var myDocument = this.length ? this[0].ownerDocument : null;
@@ -425,7 +425,7 @@ $.fn.document = function(domElement) {
 
 /**
  * @returns HTML window reference (defaultView) of the HTML element
- * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+ * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.window = function(domElement) {
   var myDocument = this.document(true),
@@ -443,7 +443,7 @@ $.fn.windowSize = function() {
 
 /**
  * @return HTML document reference (ownerDocument) of the HTML element.
- * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+ * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.activeElement = function(domElement) {
   var myDocument = this.document(true),
@@ -506,7 +506,7 @@ $.fn.body = function() {
 
 /**
  * @return the closest DOM element that has the 'scout' class.
- * @param domElement (optional) if true this function returns a JQuery object, otherwise only the DOM element is returned
+ * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.entryPoint = function(domElement) {
   var $element = this.closest('.scout');
