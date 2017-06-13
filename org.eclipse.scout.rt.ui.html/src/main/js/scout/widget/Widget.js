@@ -384,6 +384,10 @@ scout.Widget.prototype._removeAnimated = function() {
   this.removalPending = true;
   // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
   setTimeout(function() {
+    // check if the container has been removed in the meantime
+    if (!this.rendered) {
+      return;
+    }
     this.$container.addClass('removed');
     this.$container.oneAnimationEnd(function() {
       this.removalPending = false;
