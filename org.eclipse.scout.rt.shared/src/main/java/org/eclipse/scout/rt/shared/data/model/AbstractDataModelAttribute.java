@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -49,7 +50,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("350b5965-e92d-4f7e-b7b7-7135a572ff91")
 public abstract class AbstractDataModelAttribute extends AbstractPropertyObserver implements IDataModelAttribute, DataModelConstants, Serializable, IExtensibleObject {
@@ -612,8 +612,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   /**
    * Formats the raw value for the following attribute types:
    * <ul>
-   * <li>{@link DataModelConstants#TYPE_DOUBLE}</li>
-   * <li>{@link DataModelConstants#TYPE_PLAIN_DOUBLE}</li>
+   * <li>{@link DataModelConstants#TYPE_BIG_DECIMAL}</li>
+   * <li>{@link DataModelConstants#TYPE_PLAIN_BIG_DECIMAL}</li>
    * <li>{@link DataModelConstants#TYPE_PERCENT}</li>
    * </ul>
    *
@@ -623,7 +623,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    *          True if grouping should be used for formatting
    * @param percent
    *          True if a percent number format should be used for formatting
-   * @return Formatted value: raw value casted to Double, number format with 2 fraction digits
+   * @return Formatted value: raw value casted to BigDecimal, number format with 2 fraction digits
    */
   protected String formatBigDecimal(Object rawValue, boolean groupingUsed, boolean percent) {
     BigDecimal value = TypeCastUtility.castValue(rawValue, BigDecimal.class);
