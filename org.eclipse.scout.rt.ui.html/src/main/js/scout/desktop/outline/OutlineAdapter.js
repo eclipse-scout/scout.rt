@@ -79,7 +79,6 @@ scout.OutlineAdapter.prototype._onWidgetInitPage = function(page) {
 };
 
 scout.OutlineAdapter.prototype._initDetailTable = function(page) {
-  this._nodeIdToRowMap = {};
   // link already existing rows now
   page.detailTable.rows.forEach(this._linkNodeWithRow.bind(this));
   // rows which are inserted later are linked by _onDetailTableRowInitialized
@@ -94,8 +93,15 @@ scout.OutlineAdapter.prototype._destroyDetailTable = function(page) {
 
 scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
   scout.assertParameter('row', row);
-  var nodeId = row.nodeId,
-    node = this.widget.nodesMap[nodeId];
+  var node,
+    nodeId = row.nodeId;
+
+  if (nodeId === undefined) {
+    // nodeId is undefined if no node exists for that row (e.g. happens if the page containing the row is a leaf page)
+    return;
+  }
+
+  node = this.widget.nodesMap[nodeId];
   if (node) {
     node.linkWithRow(row);
   } else {
