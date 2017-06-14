@@ -49,6 +49,16 @@ public interface ITransaction extends ICancellable {
   <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(String memberId, IFunction<String, TRANSACTION_MEMBER> producer);
 
   /**
+   * Produces and registers the given transaction member using the given mapping function, but only if not registered
+   * yet. If the transaction has been cancelled, the <code>producer</code> will not be invoked and null will be
+   * returned. This allows the member to participate in the <code>2-phase-commit-protocol (2PC)</code>.
+   *
+   * @return transaction member registered, or which was produced by the given mapping function, or null in case the
+   *         transaction has been cancelled.
+   */
+  <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(String memberId, IFunction<String, TRANSACTION_MEMBER> producer);
+
+  /**
    * Returns the transaction member of the given member id, or <code>null</code> if not registered.
    */
   ITransactionMember getMember(String memberId);

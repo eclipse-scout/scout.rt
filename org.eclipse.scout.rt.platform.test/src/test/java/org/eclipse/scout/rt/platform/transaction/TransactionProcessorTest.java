@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.platform.transaction;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -34,6 +36,8 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.IFunction;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -616,6 +620,64 @@ public class TransactionProcessorTest {
         .withTransactionMembers(Arrays.asList(txMember)));
 
     chain.call(mock(Callable.class));
+  }
+
+  @Test
+  public void testRegisterMemberIfAbsentAndNotCancelled() {
+    BasicTransaction t = new BasicTransaction();
+    assertNotNull("expected non null transaction member object",
+        t.registerMemberIfAbsentAndNotCancelled("123", new IFunction<String, TestTransactionMember>() {
+
+          @Override
+          public TestTransactionMember apply(String memberId) {
+            return new TestTransactionMember(null);
+          }
+
+        }));
+  }
+
+  @Test
+  public void testRegisterMemberIfAbsentAndNotCancelledOnCancelledTransaction() {
+    BasicTransaction t = new BasicTransaction();
+    t.cancel(false);
+    assertNull("expected null transaction member object",
+        t.registerMemberIfAbsentAndNotCancelled("123", new IFunction<String, TestTransactionMember>() {
+
+          @Override
+          public TestTransactionMember apply(String memberId) {
+            fail("apply function must not be invoked; transaction was cancelled");
+            return null;
+          }
+
+        }));
+  }
+
+  @Test
+  public void testRegisterMemberIfAbsent() {
+    BasicTransaction t = new BasicTransaction();
+    assertNotNull("expected non null transaction member object",
+        t.registerMemberIfAbsent("123", new IFunction<String, TestTransactionMember>() {
+
+          @Override
+          public TestTransactionMember apply(String memberId) {
+            return new TestTransactionMember(null);
+          }
+
+        }));
+  }
+
+  @Test(expected = FutureCancelledError.class)
+  public void testRegisterMemberIfAbsentOnCancelledTransaction() {
+    BasicTransaction t = new BasicTransaction();
+    t.cancel(false);
+    t.registerMemberIfAbsent("123", new IFunction<String, TestTransactionMember>() {
+
+      @Override
+      public TestTransactionMember apply(String memberId) {
+        return new TestTransactionMember(null);
+      }
+
+    });
   }
 
   public static class TestTransactionMember implements ITransactionMember {
