@@ -84,7 +84,6 @@ scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
     return;
   }
   this.deselectTab(this._selectedViewTab);
-
   this._selectedViewTab = viewTab;
   if (viewTab) {
     // Select the new view tab.
@@ -93,6 +92,9 @@ scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
   this.trigger('tabSelect', {
     viewTab: viewTab
   });
+  if (viewTab.rendered && !viewTab.$container.isVisible()) {
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.SimpleTabArea.prototype.deselectTab = function(viewTab) {
@@ -103,7 +105,6 @@ scout.SimpleTabArea.prototype.deselectTab = function(viewTab) {
     return;
   }
   this._selectedViewTab.deselect();
-
 };
 
 scout.SimpleTabArea.prototype.getSelectedTab = function() {
