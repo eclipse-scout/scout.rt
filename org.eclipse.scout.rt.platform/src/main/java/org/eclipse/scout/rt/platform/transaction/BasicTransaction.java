@@ -57,10 +57,22 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer) {
+    return registerMemberIfAbsent(memberId, producer, true);
+  }
+
+  @Override
+  public <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsentAndNotCancelled(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer) {
+    return registerMemberIfAbsent(memberId, producer, false);
+  }
+
+  protected <TRANSACTION_MEMBER extends ITransactionMember> TRANSACTION_MEMBER registerMemberIfAbsent(final String memberId, final IFunction<String, TRANSACTION_MEMBER> producer, boolean throwIfCancelled) {
     synchronized (m_memberMapLock) {
       @SuppressWarnings("unchecked")
       TRANSACTION_MEMBER member = (TRANSACTION_MEMBER) getMember(memberId);
       if (member == null) {
+        if (!throwIfCancelled && m_cancelled) {
+          return null;
+        }
         member = producer.apply(memberId);
         registerMember(member);
       }
