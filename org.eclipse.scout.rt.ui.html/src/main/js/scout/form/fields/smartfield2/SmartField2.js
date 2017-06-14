@@ -133,8 +133,15 @@ scout.SmartField2.prototype._renderDisplayText = function() {
  */
 scout.SmartField2.prototype.acceptInput = function() {
   if (!this._acceptInputEnabled) {
+    $.log.trace('(SmartField2#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
     return;
   }
+
+  // Use a timeout to prevent multiple execution within the same user action
+  this._acceptInputEnabled = false;
+  setTimeout(function() {
+    this._acceptInputEnabled = true;
+  }.bind(this));
 
   var
     searchText = this._readDisplayText(),
@@ -208,9 +215,7 @@ scout.SmartField2.prototype._inputAccepted = function() {
       nextIndex = 0;
     }
     $.log.debug('(SmartField2#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
-    this._acceptInputEnabled = false;
     $tabElements.eq(nextIndex).focus();
-    this._acceptInputEnabled = true;
     this._tabPrevented = null;
   }
 };
@@ -306,6 +311,8 @@ scout.SmartField2.prototype.lookupByRec = function(rec) {
       // Since this function is only used for hierarchical trees we
       // can simply set the appendResult flag always to true here
       result.appendResult = true;
+      result.rec = rec;
+
       if (this.isPopupOpen()) {
         this.popup.setLookupResult(result);
       }

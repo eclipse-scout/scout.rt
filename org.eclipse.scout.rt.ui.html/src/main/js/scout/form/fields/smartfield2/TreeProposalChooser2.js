@@ -76,6 +76,12 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
       if (parentNode) {
         this.model.insertNodes(treeNodes, parentNode);
       }
+    } else {
+      // remove control icon, when no child nodes are available
+      var node = this.model.nodesMap[result.rec];
+      node.leaf = true;
+      node.childrenLoaded = true;
+      this.model.updateNode(node);
     }
   } else {
     this.model.deleteAllChildNodes();
