@@ -15,7 +15,7 @@
  * property controls how long it takes until the promise is resolved. By default that value is 0.
  * You can set it to a higher value for testing purposes.
  *
- * By default we assume that the data array uses the following indizes:
+ * By default we assume that the data array uses the following indices:
  * 0: key
  * 1: text
  * 2: parentKey (optional)

@@ -92,13 +92,22 @@ scout.Form.prototype._renderProperties = function() {
   this._renderSubTitle();
   this._renderIconId();
   this._renderClosable();
-  this._renderSaveNeedAndSaveNeedVisible();
+  this._renderSaveNeeded();
   this._renderCssClass();
   this._renderStatus();
 };
 
 scout.Form.prototype._render = function() {
   this._renderForm();
+};
+
+scout.Form.prototype._remove = function() {
+  this.formController.remove();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
+  this._glassPaneRenderer.removeGlassPanes();
+  this._uninstallFocusContext();
+  scout.Form.parent.prototype._remove.call(this);
 };
 
 scout.Form.prototype._renderForm = function() {
@@ -178,6 +187,44 @@ scout.Form.prototype._close = function() {
   this.destroy();
 };
 
+scout.Form.prototype.setClosable = function(closable) {
+  this.setProperty('closable', closable);
+};
+
+scout.Form.prototype._isClosable = function() {
+  var i, btn,
+    systemButtons = this.rootGroupBox.systemButtons;
+  for (i = 0; i < systemButtons.length; i++) {
+    btn = systemButtons[i];
+    if (btn.visible &&
+      btn.systemType === scout.Button.SystemType.CANCEL ||
+      btn.systemType === scout.Button.SystemType.CLOSE) {
+      return true;
+    }
+  }
+  return false;
+};
+
+scout.Form.prototype._renderClosable = function() {
+  if (!this.isDialog()) {
+    return;
+  }
+  this.$container.toggleClass('closable');
+  if (this.closable) {
+    if (this.$close) {
+      return;
+    }
+    this.$close = this.$statusContainer.appendDiv('status closer')
+      .on('click', this.close.bind(this));
+  } else {
+    if (!this.$close) {
+      return;
+    }
+    this.$close.remove();
+    this.$close = null;
+  }
+};
+
 scout.Form.prototype._renderHeader = function() {
   if (this.isDialog()) {
     this.$header = this.$container.appendDiv('header');
@@ -203,14 +250,6 @@ scout.Form.prototype._postRender = function() {
 };
 
 scout.Form.prototype._renderSaveNeeded = function() {
-  this._renderSaveNeedAndSaveNeedVisible();
-};
-
-scout.Form.prototype._renderSaveNeededVisible = function() {
-  this._renderSaveNeedAndSaveNeedVisible();
-};
-
-scout.Form.prototype._renderSaveNeedAndSaveNeedVisible = function() {
   if (!this.isDialog()) {
     return;
   }
@@ -237,7 +276,13 @@ scout.Form.prototype._renderSaveNeedAndSaveNeedVisible = function() {
   this.invalidateLayoutTree();
 };
 
-scout.Form.prototype._renderAskIfNeedSave = function() {};
+scout.Form.prototype.setSaveNeededVisible = function(visible) {
+  this.setProperty('saveNeededVisible', visible);
+};
+
+scout.Form.prototype._renderSaveNeededVisible = function() {
+  this._renderSaveNeeded();
+};
 
 scout.Form.prototype._renderCssClass = function(cssClass, oldCssClass) {
   cssClass = cssClass || this.cssClass;
@@ -245,6 +290,10 @@ scout.Form.prototype._renderCssClass = function(cssClass, oldCssClass) {
   this.$container.addClass(cssClass);
   // Layout could have been changed, e.g. if subtitle becomes visible
   this.invalidateLayoutTree();
+};
+
+scout.Form.prototype.setStatus = function(status) {
+  this.setProperty('status', status);
 };
 
 scout.Form.prototype._setStatus = function(status) {
@@ -349,20 +398,6 @@ scout.Form.prototype.isView = function() {
   return this.displayHint === scout.Form.DisplayHint.VIEW;
 };
 
-scout.Form.prototype._isClosable = function() {
-  var i, btn,
-    systemButtons = this.rootGroupBox.systemButtons;
-  for (i = 0; i < systemButtons.length; i++) {
-    btn = systemButtons[i];
-    if (btn.visible &&
-      btn.systemType === scout.Button.SystemType.CANCEL ||
-      btn.systemType === scout.Button.SystemType.CLOSE) {
-      return true;
-    }
-  }
-  return false;
-};
-
 scout.Form.prototype._onMove = function(newOffset) {
   this.trigger('move', newOffset);
   this.updateCacheBounds();
@@ -378,13 +413,8 @@ scout.Form.prototype.appendTo = function($parent) {
   this.$container.appendTo($parent);
 };
 
-scout.Form.prototype._remove = function() {
-  this.formController.remove();
-  this.messageBoxController.remove();
-  this.fileChooserController.remove();
-  this._glassPaneRenderer.removeGlassPanes();
-  this._uninstallFocusContext();
-  scout.Form.parent.prototype._remove.call(this);
+scout.Form.prototype.setTitle = function(title) {
+  this.setProperty('title', title);
 };
 
 scout.Form.prototype._renderTitle = function() {
@@ -397,6 +427,10 @@ scout.Form.prototype._renderTitle = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Form.prototype.setSubTitle = function(subTitle) {
+  this.setProperty('subTitle', subTitle);
+};
+
 scout.Form.prototype._renderSubTitle = function() {
   if (this.isDialog()) {
     this.$subTitle.text(this.subTitle);
@@ -407,31 +441,15 @@ scout.Form.prototype._renderSubTitle = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Form.prototype.setIconId = function(iconId) {
+  this.setProperty('iconId', iconId);
+};
+
 scout.Form.prototype._renderIconId = function() {
   if (this.isDialog()) {
     this.$icon.icon(this.iconId);
     // Layout could have been changed, e.g. if subtitle becomes visible
     this.invalidateLayoutTree();
-  }
-};
-
-scout.Form.prototype._renderClosable = function() {
-  if (!this.isDialog()) {
-    return;
-  }
-  this.$container.toggleClass('closable');
-  if (this.closable) {
-    if (this.$close) {
-      return;
-    }
-    this.$close = this.$statusContainer.appendDiv('status closer')
-      .on('click', this.close.bind(this));
-  } else {
-    if (!this.$close) {
-      return;
-    }
-    this.$close.remove();
-    this.$close = null;
   }
 };
 
