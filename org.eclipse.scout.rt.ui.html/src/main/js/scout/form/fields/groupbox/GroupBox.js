@@ -182,12 +182,18 @@ scout.GroupBox.prototype._renderStatusPosition = function() {
   this.invalidateLayoutTree();
 };
 
+scout.GroupBox.prototype.setNotification = function(notification) {
+  this.setProperty('notification', notification);
+};
+
 scout.GroupBox.prototype._renderNotification = function() {
   if (!this.notification) {
+    this.invalidateLayoutTree();
     return;
   }
   this.notification.render();
   this.notification.$container.insertBefore(this.$body);
+  this.invalidateLayoutTree();
 };
 
 scout.GroupBox.prototype._prepareFields = function() {
