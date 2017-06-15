@@ -92,7 +92,7 @@ scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
   this.trigger('tabSelected', {
     viewTab: viewTab
   });
-  if (viewTab.rendered && !viewTab.$container.isVisible()) {
+  if (viewTab && viewTab.rendered && !viewTab.$container.isVisible()) {
     this.invalidateLayoutTree();
   }
 };
