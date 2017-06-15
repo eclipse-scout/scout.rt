@@ -100,10 +100,10 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   var $header = this.$filler.beforeDiv('table-header-item')
     .setEnabled(this.enabled)
     .data('column', column)
-    .css('min-width', columnWidth + 'px')
-    .css('max-width', columnWidth + 'px')
-    .css('margin-left', marginLeft)
-    .css('margin-right', marginRight);
+    .cssMinWidth(columnWidth)
+    .cssMaxWidth(columnWidth)
+    .cssMarginLeft(marginLeft)
+    .cssMarginRight(marginRight);
   $header.appendSpan('table-header-item-text');
   if (this.enabled) {
     $header

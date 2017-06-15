@@ -234,11 +234,11 @@ scout.keyStrokeBox = {
       keyBoxText = 'Ctrl ' + keyBoxText;
     }
     if ($container.css('position') === 'absolute' || $container.css('position') === 'relative' || ($container.css('position') === 'static' && $existingKeyBoxes.length > 0)) {
-      return $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
+      return $container.prependDiv('key-box ', keyBoxText).css(align, offset + 'px');
     } else {
       var pos = $container.position();
       if (pos) {
-        return $container.prependDiv('key-box ', keyBoxText).css(align, '' + (pos.left + offset) + 'px');
+        return $container.prependDiv('key-box ', keyBoxText).css(align, (pos.left + offset) + 'px');
       } else {
         $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $container=' + $container);
       }

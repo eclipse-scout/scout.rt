@@ -236,4 +236,28 @@ describe('jquery-scout', function() {
 
   });
 
- });
+  describe('cssPxValue', function() {
+
+    it('is behaves differently with different types of arguments', function() {
+      var $test = $('#sandbox').appendDiv('test');
+
+      expect($test.cssPxValue('width') > 0).toBe(true);
+      $test.css('width', 'auto');
+      expect($test.cssPxValue('width') > 0).toBe(true); // cssPxValue always returns a number
+
+      expect($test.cssPxValue('width', 11)).toBe($test); // setter
+      expect($test.cssPxValue('width')).toBe(11);
+      expect($test.cssPxValue('width', '')).toBe($test); // setter
+      expect($test.cssPxValue('width') > 0).toBe(true);
+      expect($test.cssPxValue('width', '12px')).toBe($test); // setter
+      expect($test.cssPxValue('width')).toBe(12);
+      expect($test.cssPxValue('width', null)).toBe($test); // setter
+      var fullWidth = $test.cssPxValue('width');
+      expect(fullWidth > 0).toBe(true);
+      expect($test.cssPxValue('width', 'calc(100% - 10px)')).toBe($test); // setter
+      expect($test.cssPxValue('width')).toBe(fullWidth - 10);
+    });
+
+  });
+
+});
