@@ -84,8 +84,8 @@ scout.TableFocusFilterFieldKeyStroke.prototype.renderKeyBox = function($drawingA
   var $filterInput = event._$filterInput;
 
   var filterInputPosition = $filterInput.position();
-  var left = filterInputPosition.left + parseInt($filterInput.css('margin-left').replace('px', ''), 0) + 4;
-  $filterInput.beforeDiv('key-box char', 'a - z').css('left', left + 'px');
+  var left = filterInputPosition.left + $filterInput.cssMarginLeft() + 4;
+  $filterInput.beforeDiv('key-box char', 'a - z').cssLeft(left);
   return $filterInput.parent();
 };
 

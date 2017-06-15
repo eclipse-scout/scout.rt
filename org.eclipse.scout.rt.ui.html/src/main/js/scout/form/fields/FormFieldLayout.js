@@ -93,7 +93,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         .cssHeight(statusHeight);
       // Add padding to label to prevent overlay of text and status icon
       var w = scout.graphics.getSize(formField.$status, true).width;
-      formField.$label.css('padding-right', w + 'px');
+      formField.$label.cssPaddingRight(w);
     } else {
       // Default status position
       formField.$status

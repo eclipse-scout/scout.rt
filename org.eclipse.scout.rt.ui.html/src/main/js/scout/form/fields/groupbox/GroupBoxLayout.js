@@ -52,10 +52,10 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   if (statusWidth > 0) {
     if (statusPosition === scout.FormField.STATUS_POSITION_TOP) {
       labelMarginX = $label.cssMarginX() + statusWidth;
-      $label.css('width', 'calc(100% - ' + labelMarginX + 'px');
+      $label.cssWidth('calc(100% - ' + labelMarginX + 'px)');
     } else {
       titleMarginX = $groupBoxTitle.cssMarginX() + statusWidth;
-      $groupBoxTitle.css('width', 'calc(100% - ' + titleMarginX + 'px');
+      $groupBoxTitle.cssWidth('calc(100% - ' + titleMarginX + 'px)');
     }
   }
 

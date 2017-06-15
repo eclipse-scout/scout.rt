@@ -112,7 +112,7 @@ scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingA
     var width = $drawingArea.outerWidth();
     var wKeybox = $drawingArea.find('.key-box').outerWidth();
     var leftKeyBox = width / 2 - wKeybox / 2;
-    $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
+    $drawingArea.find('.key-box').cssLeft(leftKeyBox);
   }
 };
 
