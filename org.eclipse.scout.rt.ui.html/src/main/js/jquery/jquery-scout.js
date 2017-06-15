@@ -469,21 +469,39 @@ $.fn.window = function(domElement) {
 };
 
 /**
- * @returns {scout.Dimension} size of the window (width and height)
- */
-$.fn.windowSize = function() {
-  var $window = this.window();
-  return new scout.Dimension($window.width(), $window.height());
-};
-
-/**
- * @return HTML document reference (ownerDocument) of the HTML element.
+ * @returns HTML document reference (ownerDocument) of the HTML element.
  * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.activeElement = function(domElement) {
   var myDocument = this.document(true),
     activeElement = myDocument ? myDocument.activeElement : null;
   return domElement ? activeElement : $(activeElement);
+};
+
+/**
+ * @returns the BODY element of the HTML document in which the current HTML element is placed.
+ * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+ */
+$.fn.body = function(domElement) {
+  var $body = $('body', this.document(true));
+  return domElement ? $body[0] : $body;
+};
+
+/**
+ * @returns the closest DOM element that has the 'scout' class.
+ * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+ */
+$.fn.entryPoint = function(domElement) {
+  var $element = this.closest('.scout');
+  return domElement ? $element[0] : $element;
+};
+
+/**
+ * @returns {scout.Dimension} size of the window (width and height)
+ */
+$.fn.windowSize = function() {
+  var $window = this.window();
+  return new scout.Dimension($window.width(), $window.height());
 };
 
 /**
@@ -530,22 +548,6 @@ $.fn.elementFromPoint = function(x, y, selector) {
     $element.removeClass('invisible');
   });
   return $element;
-};
-
-/**
- * @return the BODY element of the HTML document in which the current HTML element is placed.
- */
-$.fn.body = function() {
-  return $('body', this.document(true));
-};
-
-/**
- * @return the closest DOM element that has the 'scout' class.
- * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- */
-$.fn.entryPoint = function(domElement) {
-  var $element = this.closest('.scout');
-  return domElement ? $element[0] : $element;
 };
 
 // prepend - and return new div for chaining
@@ -971,6 +973,19 @@ $.fn.offsetTo = function($to) {
   };
 };
 
+$.fn.cssPxValue = function(prop, value) {
+  if (value === undefined) {
+    return $.pxToNumber(this.css(prop));
+  }
+  if (value === null) {
+    value = ''; // "null" should also remove the CSS property
+  }
+  if (typeof value === 'string') {
+    return this.css(prop, value);
+  }
+  return this.css(prop, value + 'px');
+};
+
 $.fn.cssLeft = function(position) {
   return this.cssPxValue('left', position);
 };
@@ -1022,19 +1037,6 @@ $.fn.cssMaxHeight = function(maxHeight) {
 
 $.fn.cssLineHeight = function(height) {
   return this.cssPxValue('line-height', height);
-};
-
-$.fn.cssPxValue = function(prop, value) {
-  if (value === undefined) {
-    return $.pxToNumber(this.css(prop));
-  }
-  if (value === null) {
-    value = ''; // "null" should also remove the CSS property
-  }
-  if (typeof value === 'string') {
-    return this.css(prop, value);
-  }
-  return this.css(prop, value + 'px');
 };
 
 $.fn.cssMarginLeft = function(value) {
@@ -1281,11 +1283,7 @@ $.fn.outerHeight = function() {
  * be done, when used as getter (without arguments).
  */
 function _ceilNumber(val) {
-  if (scout.objects.isNumber(val)) {
-    return Math.ceil(val);
-  } else {
-    return val;
-  }
+  return scout.objects.isNumber(val) ? Math.ceil(val) : val;
 }
 
 // TODO [7.0] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
