@@ -122,8 +122,8 @@ scout.FormMenuActionKeyStroke.prototype._postRenderKeyBox = function($drawingAre
   if (this.field.iconId) {
     var wIcon = $drawingArea.find('.icon').width();
     var wKeybox = $drawingArea.find('.key-box').outerWidth();
-    var containerPadding = Number($drawingArea.css('padding-left').replace('px', ''));
+    var containerPadding = $drawingArea.cssPaddingLeft();
     var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
-    $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
+    $drawingArea.find('.key-box').cssLeft(leftKeyBox);
   }
 };

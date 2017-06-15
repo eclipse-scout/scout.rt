@@ -1000,8 +1000,24 @@ $.fn.cssWidth = function(width) {
   return this.cssPxValue('width', width);
 };
 
+$.fn.cssMinWidth = function(minWidth) {
+  return this.cssPxValue('min-width', minWidth);
+};
+
+$.fn.cssMaxWidth = function(maxWidth) {
+  return this.cssPxValue('max-width', maxWidth);
+};
+
 $.fn.cssHeight = function(height) {
   return this.cssPxValue('height', height);
+};
+
+$.fn.cssMinHeight = function(minHeight) {
+  return this.cssPxValue('min-height', minHeight);
+};
+
+$.fn.cssMaxHeight = function(maxHeight) {
+  return this.cssPxValue('max-height', maxHeight);
 };
 
 $.fn.cssLineHeight = function(height) {
@@ -1011,6 +1027,12 @@ $.fn.cssLineHeight = function(height) {
 $.fn.cssPxValue = function(prop, value) {
   if (value === undefined) {
     return $.pxToNumber(this.css(prop));
+  }
+  if (value === null) {
+    value = ''; // "null" should also remove the CSS property
+  }
+  if (typeof value === 'string') {
+    return this.css(prop, value);
   }
   return this.css(prop, value + 'px');
 };
