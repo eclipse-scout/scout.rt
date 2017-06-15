@@ -332,10 +332,11 @@ describe('jquery-scout', function() {
       expect($test.cssPxValue('width', '12px')).toBe($test); // setter
       expect($test.cssPxValue('width')).toBe(12);
       expect($test.cssPxValue('width', null)).toBe($test); // setter
-      var fullWidth = $test.cssPxValue('width');
-      expect(fullWidth > 0).toBe(true);
+      expect($test.cssPxValue('width') > 0).toBe(true);
+      expect($test.cssPxValue('width', '12px')).toBe($test); // setter
+      expect($test.cssPxValue('width')).toBe(12);
       expect($test.cssPxValue('width', 'calc(100% - 10px)')).toBe($test); // setter
-      expect($test.cssPxValue('width')).toBe(fullWidth - 10);
+      expect($test.cssPxValue('width') > 0).toBe(true);
     });
 
   });
