@@ -15,6 +15,7 @@ scout.Splitter = function() {
   this._$root;
   this.ratio;
   this.position; // current splitter position in pixels, updated by updatePosition()
+  this.orientation; // Direction sed to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
   this._addEventSupport();
 };
@@ -25,6 +26,7 @@ scout.Splitter.prototype._init = function(options) {
   this.splitHorizontal = scout.nvl(options.splitHorizontal, true);
   this.$anchor = options.$anchor;
   this._$root = options.$root;
+  this.orientation = scout.nvl(options.orientation, (this.splitHorizontal ? 'top' : 'left'));
 };
 
 scout.Splitter.prototype._render = function($parent) {
@@ -95,9 +97,19 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
     // Set the new position (center splitter around 'newPosition')
     var splitterSize = scout.graphics.getVisibleSize(this.$container, true);
     if (this.splitHorizontal) {
-      this.$container.cssLeft(newPosition - (splitterSize.width / 2));
+      var x = newPosition - (splitterSize.width / 2);
+      if (this.orientation === 'right') {
+        this.$container.cssRight(x);
+      } else {
+        this.$container.cssLeft(x);
+      }
     } else {
-      this.$container.cssTop(newPosition - (splitterSize.height / 2));
+      var y = newPosition - (splitterSize.height / 2);
+      if (this.orientation === 'bottom') {
+        this.$container.cssBottom(y);
+      } else {
+        this.$container.cssTop(y);
+      }
     }
   }
 };
@@ -125,9 +137,11 @@ scout.Splitter.prototype._onMouseDown = function(event) {
 scout.Splitter.prototype._getSplitterPosition = function(event) {
   var rootBounds = scout.graphics.offsetBounds(this._$root);
   if (this.splitHorizontal) {
-    return event.pageX + this._cursorOffset.left - rootBounds.x;
+    var x = event.pageX + this._cursorOffset.left - rootBounds.x;
+    return (this.orientation === 'right' ? rootBounds.width - x : x);
   } else {
-    return event.pageY + this._cursorOffset.top - rootBounds.y;
+    var y = event.pageY + this._cursorOffset.top - rootBounds.y;
+    return (this.orientation === 'bottom' ? rootBounds.height - y : y);
   }
 };
 
