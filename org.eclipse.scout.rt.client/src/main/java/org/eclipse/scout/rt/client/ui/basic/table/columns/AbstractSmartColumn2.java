@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
-@ClassId("fa923109-bdd0-41a1-9fc8-4a4add037a54")
+@ClassId("65eaf372-09ff-425a-ad82-5be17fa9f1a7")
 public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> implements ISmartColumn2<VALUE>, IContributionOwner {
 
   // DO NOT init members, this has the same effect as if they were set AFTER
@@ -497,7 +497,7 @@ public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> 
   /**
    * Internal editor field
    */
-  @ClassId("9d65fa81-25d5-49bc-92cc-54798e9f7803")
+  @ClassId("18e7b5e0-b4e4-424f-869b-7dab2f526560")
   @SuppressWarnings("bsiRulesDefinition:orderMissing")
   protected class SmartField2Editor extends AbstractSmartField2<VALUE> {
     private ITableRow m_row;
