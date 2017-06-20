@@ -601,7 +601,7 @@ $.fn.appendIcon = function(iconId, cssClass) {
       .addClass(icon.appendCssClass('font-icon'))
       .appendTo(this);
   }
-  return this.appendImg( icon.iconUrl, cssClass)
+  return this.appendImg(icon.iconUrl, cssClass)
     .addClass('icon image-icon');
 };
 
