@@ -414,43 +414,46 @@ scout.Table.prototype.onContextMenu = function(event) {
   var func = function(event) {
     event.preventDefault();
 
-    var menuItems;
-    if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
-      if (!event.pageX && !event.pageY) {
-        var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
-        var offset = $rowToDisplay.offset();
-        event.pageX = offset.left + 10;
-        event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
-      }
-      if (menuItems.length > 0) {
-        // Prevent firing of 'onClose'-handler during contextMenu.open()
-        // (Can lead to null-access when adding a new handler to this.popupMenu)
-        if (this.popupMenu) {
-          this.popupMenu.close();
-        }
-        this.popupMenu = scout.create('ContextMenuPopup', {
-          parent: this,
-          menuItems: menuItems,
-          location: {
-            x: event.pageX,
-            y: event.pageY
-          },
-          $anchor: this.$data,
-          menuFilter: this._filterMenusHandler
-        });
-        this.popupMenu.open();
+    // The table can be detached before this callback is executed. In that case, there is no need to show
+    // the context menu anymore.
+    if (!this.isAttachedAndRendered() || !this.selectedRows.length) {
+      return;
+    }
 
-        // Set table style to focused, so that it looks as it still has the focus.
-        // Must be called after open(), because opening the popup might cause another
-        // popup to close first (which will remove the 'focused' class).
-        if (this.enabled) {
-          this.$container.addClass('focused');
-          this.popupMenu.on('close', function(event) {
-            this.$container.removeClass('focused');
-            this.popupMenu = null;
-          }.bind(this));
-        }
+    var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+    if (!event.pageX && !event.pageY) {
+      var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
+      var offset = $rowToDisplay.offset();
+      event.pageX = offset.left + 10;
+      event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+    }
+    if (menuItems.length > 0) {
+      // Prevent firing of 'onClose'-handler during contextMenu.open()
+      // (Can lead to null-access when adding a new handler to this.popupMenu)
+      if (this.popupMenu) {
+        this.popupMenu.close();
+      }
+      this.popupMenu = scout.create('ContextMenuPopup', {
+        parent: this,
+        menuItems: menuItems,
+        location: {
+          x: event.pageX,
+          y: event.pageY
+        },
+        $anchor: this.$data,
+        menuFilter: this._filterMenusHandler
+      });
+      this.popupMenu.open();
+
+      // Set table style to focused, so that it looks as it still has the focus.
+      // Must be called after open(), because opening the popup might cause another
+      // popup to close first (which will remove the 'focused' class).
+      if (this.enabled) {
+        this.$container.addClass('focused');
+        this.popupMenu.on('close', function(event) {
+          this.$container.removeClass('focused');
+          this.popupMenu = null;
+        }.bind(this));
       }
     }
   };
