@@ -42,6 +42,28 @@ describe("Outline", function() {
     };
   }
 
+  describe("collapsing", function() {
+    // Regression test for erroneous behavior of MessageBoxController
+    it("still allows a messagebox to be shown", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
+      session.desktop.outline = outline;
+
+      var model = {
+          session: session,
+          parent: session.desktop,
+          severity: scout.MessageBox.SEVERITY.ERROR
+        };
+      var messageBox = scout.create('MessageBox', model);
+
+      // This collapses the registered outline
+      session.desktop.setNavigationVisible(false);
+
+      outline.messageBoxController.registerAndRender(messageBox);
+
+      expect(messageBox.rendered).toBe(true);
+    });
+  });
+
   describe("dispose", function() {
     var model, tree, node0;
 
