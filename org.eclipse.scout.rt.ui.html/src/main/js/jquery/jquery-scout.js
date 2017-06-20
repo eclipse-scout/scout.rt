@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * JQuery plugin with scout extensions
+ * jQuery plugin with scout extensions
  */
 
 // === internal methods ===
@@ -253,7 +253,7 @@ $.fn.makeSpan = function(cssClass, text) {
 };
 
 /**
- * @return HTML document reference (ownerDocument) of the HTML element.
+ * @returns HTML document reference (ownerDocument) of the HTML element.
  * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.document = function(domElement) {
@@ -262,7 +262,7 @@ $.fn.document = function(domElement) {
 };
 
 /**
- * @return HTML window reference (defaultView) of the HTML element
+ * @returns HTML window reference (defaultView) of the HTML element
  * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.window = function(domElement) {
@@ -499,7 +499,7 @@ $.fn.setVisible = function(visible) {
   var i, elem;
   for (i = 0; i < this.length; i++) {
     elem = this[i];
-    if (elemVisible(elem) != visible) {
+    if (elemVisible(elem) !== visible) {
       if (visible) {
         this.show();
       } else {
@@ -675,7 +675,6 @@ $.fn.addClassForAnimation = function(className, options) {
     // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
-    // delay must be greater than css animation duration
   }.bind(this));
 };
 
@@ -802,6 +801,15 @@ $.fn.cssTop = function(position) {
   return this.cssPxValue('top', position);
 };
 
+/**
+ * Sets the CSS properties 'left' and 'top' based on the x and y properties of the given point instance.
+ *
+ * @param {scout.Point} point
+ */
+$.fn.cssPosition = function(point) {
+  return this.cssLeft(point.x).cssTop(point.y);
+};
+
 $.fn.cssBottom = function(position) {
   return this.cssPxValue('bottom', position);
 };
@@ -872,6 +880,18 @@ $.fn.cssMarginY = function(value) {
 
 $.fn.cssPaddingTop = function(value) {
   return this.cssPxValue('padding-top', value);
+};
+
+$.fn.cssPaddingRight = function(value) {
+  return this.cssPxValue('padding-right', value);
+};
+
+$.fn.cssPaddingBottom = function(value) {
+  return this.cssPxValue('padding-bottom', value);
+};
+
+$.fn.cssPaddingLeft = function(value) {
+  return this.cssPxValue('padding-left', value);
 };
 
 $.fn.cssBorderBottomWidth = function(value) {
@@ -963,6 +983,9 @@ $.fn.disableSpellcheck = function() {
  * Returns whether the current element is the given element or has a child which is the given element.
  */
 $.fn.isOrHas = function(elem) {
+  if (elem instanceof $) {
+    elem = elem[0];
+  }
   return this[0] === elem || this.has(elem).length > 0;
 };
 
@@ -1226,12 +1249,12 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
   return this.each(function() {
     var that = this,
       numClicks = 0,
-      timeout = timeout || 300;
+      timeout = scout.nvl(timeout, 300);
     $(this).on('click', function(event) {
       numClicks++;
-      if (numClicks == 1) {
+      if (numClicks === 1) {
         setTimeout(function() {
-          if (numClicks == 1) {
+          if (numClicks === 1) {
             singleClickFunc.call(that, event);
           } else {
             doubleClickFunc.call(that, event);
