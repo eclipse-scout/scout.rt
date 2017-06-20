@@ -183,7 +183,7 @@ public class UiServlet extends AbstractHttpServlet {
       long start = System.nanoTime();
       try {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("request started");
+          LOG.debug("Request started");
         }
         List<IUiServletRequestHandler> handlers = BEANS.all(IUiServletRequestHandler.class);
         for (IUiServletRequestHandler handler : handlers) {
@@ -201,7 +201,7 @@ public class UiServlet extends AbstractHttpServlet {
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
+          LOG.debug("Request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
         }
       }
     }

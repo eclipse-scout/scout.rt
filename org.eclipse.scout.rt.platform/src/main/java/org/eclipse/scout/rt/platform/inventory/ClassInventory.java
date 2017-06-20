@@ -22,8 +22,9 @@ import org.slf4j.LoggerFactory;
  * Singleton with all the classes that were scanned in maven modules that contain /src/main/resources/META-INF/scout.xml
  */
 public final class ClassInventory {
+
   private static final Logger LOG = LoggerFactory.getLogger(ClassInventory.class);
-  private static IClassInventory INSTANCE;
+  private static final IClassInventory INSTANCE;
 
   public static IClassInventory get() {
     return INSTANCE;
@@ -33,11 +34,14 @@ public final class ClassInventory {
     try {
       long t0 = System.nanoTime();
       JandexInventoryBuilder inventoryBuilder = new JandexInventoryBuilder();
+      if (LOG.isInfoEnabled()) {
+        LOG.info("Building jandex class inventory using rebuild strategy {}...", inventoryBuilder.getRebuildStrategy());
+      }
       inventoryBuilder.scanAllModules();
       IndexView index = inventoryBuilder.finish();
       long nanos = System.nanoTime() - t0;
       if (LOG.isInfoEnabled()) {
-        LOG.info("Building jandex class inventory with {} classes in {} ms using rebuild strategy {}", index.getKnownClasses().size(), StringUtility.formatNanos(nanos), inventoryBuilder.getRebuildStrategy());
+        LOG.info("Finished building jandex class inventory in {} ms. Total class count: {}", StringUtility.formatNanos(nanos), index.getKnownClasses().size());
       }
       INSTANCE = new JandexClassInventory(index);
     }

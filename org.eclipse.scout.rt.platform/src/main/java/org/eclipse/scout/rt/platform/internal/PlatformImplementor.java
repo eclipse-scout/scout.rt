@@ -210,12 +210,12 @@ public class PlatformImplementor implements IPlatform {
     long t0 = System.nanoTime();
     Set<Class> allBeans = new BeanFilter().collect(ClassInventory.get());
     long t1 = System.nanoTime();
-    LOG.info("Collecting {} beans in {} ms", allBeans.size(), StringUtility.formatNanos(t1 - t0));
+    LOG.info("Collected {} beans in {} ms", allBeans.size(), StringUtility.formatNanos(t1 - t0));
     for (Class<?> bean : allBeans) {
       beanManager.registerClass(bean);
     }
     long t2 = System.nanoTime();
-    LOG.info("Registering {} beans in {} ms", allBeans.size(), StringUtility.formatNanos(t2 - t1));
+    LOG.info("Registered {} beans in {} ms", allBeans.size(), StringUtility.formatNanos(t2 - t1));
     return beanManager;
   }
 

@@ -86,23 +86,23 @@ public class LoggerPlatformListener implements IPlatformListener {
     try {
       StaticLoggerBinder loggerBinder = StaticLoggerBinder.getSingleton();
       loggerFactoryClassStr = loggerBinder.getLoggerFactoryClassStr();
-      LOG.debug("found slf4j logger factory [class={}, classStr={}]", loggerBinder.getLoggerFactory(), loggerFactoryClassStr);
+      LOG.debug("Found slf4j logger factory [class={}, classStr={}]", loggerBinder.getLoggerFactory(), loggerFactoryClassStr);
 
       String loggerSupportFqcn = getLoggerSupportFqcn(loggerFactoryClassStr);
-      LOG.debug("determined scout logger support FQCN [{}]", loggerSupportFqcn);
+      LOG.debug("Determined scout logger support FQCN {}", loggerSupportFqcn);
 
       if (loggerSupportFqcn != null) {
         loggerSupport = createLoggerSupport(loggerSupportFqcn);
       }
     }
     catch (Exception | NoClassDefFoundError e) { // catch NoClassDefFoundError by intention (threw if no slf4j binding is available)
-      LOG.warn("Could not determine or install factory speicific logger support. Falling back to [{}]", NullLoggerSupport.class.getName(), e);
+      LOG.warn("Could not determine or install factory speicific logger support. Falling back to {}", NullLoggerSupport.class.getName(), e);
     }
     if (loggerSupport == null) {
       loggerSupport = createNullLoggerSupport(loggerFactoryClassStr);
     }
     beanManager.registerBean(new BeanMetaData(ILoggerSupport.class, loggerSupport).withAnnotation(AnnotationFactory.createApplicationScoped()));
-    LOG.info("registered logger support [{}]", loggerSupport.getClass().getName());
+    LOG.info("Registered logger support {}", loggerSupport.getClass().getName());
   }
 
   /**

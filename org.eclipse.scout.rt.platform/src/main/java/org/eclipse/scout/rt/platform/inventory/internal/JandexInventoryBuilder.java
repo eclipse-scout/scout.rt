@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRebuildProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.jboss.jandex.CompositeIndex;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.IndexReader;
@@ -45,7 +47,6 @@ public class JandexInventoryBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(JandexInventoryBuilder.class);
 
   public static final String SCOUT_XML_PATH = "META-INF/scout.xml";
-
   public static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";
 
   public enum RebuildStrategy {
@@ -102,7 +103,7 @@ public class JandexInventoryBuilder {
       }
     }
     catch (IOException ex) {
-      throw new PlatformException("failed reading resources '{}'", SCOUT_XML_PATH, ex);
+      throw new PlatformException("Error while reading resources '{}'", SCOUT_XML_PATH, ex);
     }
   }
 
@@ -147,10 +148,14 @@ public class JandexInventoryBuilder {
           //pass 1: check modified
           long oldModified = indexFile.lastModified();
           if (newMeta.lastModified() > oldModified) {
-            LOG.info("drop old index '{}'. Index timestamp {} < current folder timestamp {}", indexUri, oldModified, newMeta.lastModified());
+            if (LOG.isInfoEnabled()) {
+              LOG.info("Drop outdated index '{}'. Index timestamp {} is older than folder timestamp {}.", indexUri,
+                  DateUtility.format(new Date(oldModified), "yyyy-MM-dd HH:mm:ss.SSS"),
+                  DateUtility.format(new Date(newMeta.lastModified()), "yyyy-MM-dd HH:mm:ss.SSS"));
+            }
             indexFileExists = false;
             if (!indexFile.delete()) {
-              LOG.warn("cannot delete '{}'", indexFile);
+              LOG.warn("Cannot delete '{}'", indexFile);
             }
           }
           else {
@@ -158,11 +163,11 @@ public class JandexInventoryBuilder {
             index = readIndex(indexUri);
             int oldFileCount = index.getKnownClasses().size();
             if (newMeta.fileCount() != oldFileCount) {
-              LOG.info("drop old index '{}'. Index file count {} != current folder file count {}", indexUri, oldFileCount, newMeta.fileCount());
+              LOG.info("Drop divergent index '{}'. Index file count {} != folder file count {}.", indexUri, oldFileCount, newMeta.fileCount());
               index = null;
               indexFileExists = false;
               if (!indexFile.delete()) {
-                LOG.warn("cannot delete '{}'", indexFile);
+                LOG.warn("Cannot delete '{}'", indexFile);
               }
             }
           }
@@ -170,7 +175,7 @@ public class JandexInventoryBuilder {
         case ALWAYS:
           indexFileExists = false;
           if (!indexFile.delete()) {
-            LOG.warn("cannot delete '{}'", indexFile);
+            LOG.warn("Cannot delete '{}'", indexFile);
           }
           break;
         default:
@@ -188,12 +193,12 @@ public class JandexInventoryBuilder {
     if (newMeta == null) {
       newMeta = indexMetaData(classesFolder.toPath());
     }
-    LOG.info("rebuild index '{}'. scanning location...", indexUri);
+    LOG.info("Rebuild index '{}'. Scanning location...", indexUri);
     Indexer indexer = new Indexer();
     index = createFolderIndex(classesFolder.toPath(), indexer);
     saveIndex(indexFile, index);
     if (!indexFile.setLastModified(newMeta.lastModified())) {
-      LOG.warn("cannot set lastModified on '{}'", indexFile);
+      LOG.warn("Cannot set lastModified on '{}'", indexFile);
     }
     return index;
   }
@@ -205,7 +210,7 @@ public class JandexInventoryBuilder {
     if (index != null) {
       return index;
     }
-    LOG.info("found no pre-built '{}'. scanning location...", indexUri);
+    LOG.info("Found no pre-built '{}'. Scanning location...", indexUri);
     Indexer indexer = new Indexer();
     return JarIndexer.createJarIndex(jarFile, indexer, false, false, false).getIndex();
   }
@@ -215,7 +220,7 @@ public class JandexInventoryBuilder {
     if (index != null) {
       return index;
     }
-    throw new PlatformException("unknown protocol in: {}", indexUri);
+    throw new PlatformException("Unknown protocol in '{}'", indexUri);
   }
 
   protected IndexMetaData indexMetaData(Path dir) throws IOException {
@@ -247,7 +252,7 @@ public class JandexInventoryBuilder {
       return new URI(s.substring(0, s.length() - SCOUT_XML_PATH.length()) + JANDEX_INDEX_PATH);
     }
     catch (URISyntaxException ex) {
-      throw new PlatformException("Cannot find index URI from: {}", s, ex);
+      throw new PlatformException("Cannot find index URI from '{}'", s, ex);
     }
   }
 
@@ -258,7 +263,7 @@ public class JandexInventoryBuilder {
   protected Index readIndex(URI indexUri) {
     try (InputStream in = new BufferedInputStream(indexUri.toURL().openStream())) {
       Index index = new IndexReader(in).read();
-      LOG.debug("found pre-built {}", indexUri);
+      LOG.debug("Found pre-built {}", indexUri);
       return index;
     }
     catch (FileNotFoundException e) {
@@ -266,7 +271,7 @@ public class JandexInventoryBuilder {
       return null;
     }
     catch (Exception ex) {
-      throw new PlatformException("error reading index: " + indexUri, ex);
+      throw new PlatformException("Error reading index '{}'", indexUri, ex);
     }
   }
 
@@ -288,11 +293,11 @@ public class JandexInventoryBuilder {
 
   protected void saveIndex(File file, Index index) {
     try (FileOutputStream out = new FileOutputStream(file)) {
-      LOG.debug("writing jandex index file: {}", file);
+      LOG.debug("Write jandex index file '{}'", file);
       new IndexWriter(out).write(index);
     }
     catch (Exception ex) {
-      LOG.warn("Cannot write jandex index file: {}", file, ex);
+      LOG.warn("Error while writing jandex index file '{}'", file, ex);
     }
   }
 

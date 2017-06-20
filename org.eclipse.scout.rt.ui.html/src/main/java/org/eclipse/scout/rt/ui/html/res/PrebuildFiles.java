@@ -66,7 +66,7 @@ public class PrebuildFiles implements IPlatformListener {
         LOG.error("Failed to load resource", e);
       }
     }
-    LOG.info("Finished pre-building of {} web resources {} ms", files.size(), StringUtility.formatNanos(System.nanoTime() - t0));
+    LOG.info("Finished pre-building of {} web resources in {} ms", files.size(), StringUtility.formatNanos(System.nanoTime() - t0));
   }
 
   protected HttpCacheObject loadResource(String file) throws IOException {
