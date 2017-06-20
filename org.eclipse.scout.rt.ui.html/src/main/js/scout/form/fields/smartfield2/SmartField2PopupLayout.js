@@ -41,19 +41,30 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
 
   if (this.popup.htmlComp.layouted) {
     // Reposition because opening direction may have to be switched if popup gets bigger
-    // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
+    // Don't do it the first time (will be done by popup.open), only if the popup is already
+    // open and gets layouted again
     this.popup.position();
   } else {
-    // The first time it gets layouted, add CSS class to be able to animate
+    // This code here is a bit complicated because:
+    // 1. we must position the scrollTo position before we start the animation
+    //    because it looks ugly, when we jump to the scroll position after the
+    //    animation has ended
+    // 2. we must first layout the popup with the table/tree correctly because
+    //    revealSelection doesn't work when popup has not the right size or is
+    //    not visible. That's why we must set the visibility to hidden.
+    // 3. we wait for the layout validator until the popup layout is validated
+    //    which means the scroll position is set correctly. Then we make the
+    //    popup visible again and start the animation (which shrinks the popup
+    //    to 1px height initially.
     this.animating = true;
+    this.popup.htmlComp.$comp.css('visibility', 'hidden');
+
+    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+      this.animating = false;
+    }.bind(this));
 
     this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
-      this.popup.htmlComp.$comp.oneAnimationEnd(function() {
-        this.animating = false;
-        // Set timeout is required because the browser returns wrong values when
-        // we measure DOM elements, which causes scrollTo() to fail.
-//        this.popup.revealSelection.bind(this.popup));
-      }.bind(this));
+      this.popup.htmlComp.$comp.css('visibility', '');
       this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
     }.bind(this));
   }
