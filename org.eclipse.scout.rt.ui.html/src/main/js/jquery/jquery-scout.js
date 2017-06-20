@@ -117,19 +117,33 @@ $.suppressEventIfDisabled = function(event, $target) {
 /**
  * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
  * (in milliseconds), but if the same function is called a second time within the waiting time,
- * the timer is reset. The default value for 'delay' is 250 ms.
+ * the timer is reset. The default value for 'delay' is 250 ms. The resulting function has a
+ * function member "cancel" that can be used to clear any scheduled calls to the original
+ * function. If no such call was scheduled, cancel() returns false, otherwise true.
  */
 $.debounce = function(fx, delay) {
   delay = (delay !== undefined) ? delay : 250;
   var timeoutId = null;
-  return function() {
+  var fn = function() {
     var that = this,
       args = arguments;
-    clearTimeout(timeoutId);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     timeoutId = setTimeout(function() {
+      timeoutId = null;
       fx.apply(that, args);
     }, delay);
   };
+  fn.cancel = function() {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+      return true;
+    }
+    return false;
+  };
+  return fn;
 };
 
 /**

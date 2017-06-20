@@ -19,6 +19,11 @@ describe('jquery-scout', function() {
     setFixtures(sandbox());
     $e = $('<div>');
     $e.appendTo($('#sandbox'));
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   describe('isEnabled', function() {
@@ -340,5 +345,51 @@ describe('jquery-scout', function() {
     });
 
   });
+
+  describe('debounce', function() {
+
+    it('is debounces function calls', function() {
+      var counter = 0;
+      function incImpl () {
+        counter++;
+      }
+      var inc = $.debounce(incImpl);
+      var incFast = $.debounce(incImpl, 40);
+
+      inc();
+      expect(counter).toBe(0); // still zero
+      jasmine.clock().tick(100);
+      expect(counter).toBe(0); // still zero
+      jasmine.clock().tick(200);
+      expect(counter).toBe(1);
+
+      inc();
+      jasmine.clock().tick(100);
+      inc();
+      inc();
+      expect(counter).toBe(1);
+      jasmine.clock().tick(200);
+      expect(counter).toBe(1); // counter was reset
+      jasmine.clock().tick(100);
+      expect(counter).toBe(2);
+
+      incFast();
+      expect(counter).toBe(2);
+      jasmine.clock().tick(100);
+      expect(counter).toBe(3);
+
+      inc();
+      jasmine.clock().tick(100);
+      expect(counter).toBe(3);
+      var cancelled = inc.cancel();
+      expect(cancelled).toBe(true);
+      jasmine.clock().tick(200);
+      expect(counter).toBe(3); // not changed, function was cancelled
+      cancelled = inc.cancel();
+      expect(cancelled).toBe(false);
+    });
+
+  });
+
 
 });
