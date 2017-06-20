@@ -53,6 +53,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String PROP_BROWSE_ICON_ID = "browseIconId";
   String PROP_BROWSE_HIERARCHY = "browseHierarchy";
   String PROP_BROWSE_LOAD_INCREMENTAL = "browseLoadIncremental";
+  String PROP_BROWSE_LOAD_PARENT_NODES = "browseLoadParentNodes";
   String PROP_BROWSE_AUTO_EXPAND_ALL = "browseAutoExpandAll";
   String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";

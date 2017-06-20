@@ -101,7 +101,7 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
 };
 
 scout.TreeProposalChooser2.prototype._isLookupByText = function(result) {
-  return result.searchText !== result.wildcard;
+  return !result.browse && result.searchText !== result.wildcard;
 };
 
 scout.TreeProposalChooser2.prototype._expandAllParentNodes = function(treeNodesFlat) {

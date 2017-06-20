@@ -628,13 +628,13 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public boolean isLoadParentNodes() {
-    return propertySupport.getPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL);
+  public boolean isLoadParentNodes() { // FIXME [awe] 7.0 - SF2: check if this is required in JS too, see HierarchicalLookupResultBuilder
+    return propertySupport.getPropertyBool(PROP_BROWSE_LOAD_PARENT_NODES);
   }
 
   @Override
   public void setLoadParentNodes(boolean loadParentNodes) {
-    propertySupport.setPropertyBool(PROP_BROWSE_LOAD_INCREMENTAL, loadParentNodes);
+    propertySupport.setPropertyBool(PROP_BROWSE_LOAD_PARENT_NODES, loadParentNodes);
   }
 
   @Override
