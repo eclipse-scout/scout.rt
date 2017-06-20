@@ -52,10 +52,16 @@ scout.MessageBoxController.prototype.render = function() {
 };
 
 scout.MessageBoxController.prototype._render = function(messageBox) {
-  // Only render message box if 'displayParent' is rendered yet; if not, the message box will be rendered once 'displayParent' is rendered.
-  if (!this.displayParent.rendered) {
+  // Use parent's function or (if not implemented) our own.
+  if (this.displayParent.acceptView) {
+    if (!this.displayParent.acceptView(messageBox)) {
+      return;
+    }
+  }
+  else if (!this.acceptView(messageBox)) {
     return;
   }
+
   // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
   if (messageBox.rendered) {
     return;
@@ -103,4 +109,8 @@ scout.MessageBoxController.prototype.detach = function() {
   this.displayParent.messageBoxes.forEach(function(messageBox) {
     messageBox.detach();
   }, this);
+};
+
+scout.MessageBoxController.prototype.acceptView = function(view) {
+  return this.displayParent.rendered;
 };
