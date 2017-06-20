@@ -566,7 +566,7 @@ $.fn.appendIcon = function(iconId, cssClass) {
       .addClass(icon.appendCssClass('font-icon'))
       .appendTo(this);
   }
-  return this.appendImg( icon.iconUrl, cssClass)
+  return this.appendImg(icon.iconUrl, cssClass)
     .addClass('icon image-icon');
 };
 
@@ -1553,8 +1553,8 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
   $.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
     // check for conditions and support for blob / arraybuffer response type
     if (window.FormData && ((options.dataType && (options.dataType === 'binary')) ||
-       (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) ||
-       (window.Blob && options.data instanceof Blob))))) {
+        (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) ||
+          (window.Blob && options.data instanceof Blob))))) {
       return {
         // create new XMLHttpRequest
         send: function(headers, callback) {
