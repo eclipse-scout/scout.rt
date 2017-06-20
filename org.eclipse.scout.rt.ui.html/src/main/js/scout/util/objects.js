@@ -13,12 +13,16 @@ scout.objects = {
   /**
    * Copies all the properties (including the ones from the prototype.) from dest to source
    * @memberOf scout.objects
+   * @param filter an array of property names.
    * @returns the destination object (the destination parameter will be modified as well)
    */
-  copyProperties: function(source, dest) {
+  copyProperties: function(source, dest, filter) {
     var propertyName;
+    filter = scout.arrays.ensure(filter);
     for (propertyName in source) {
-      dest[propertyName] = source[propertyName];
+      if (filter.length === 0 || filter.indexOf(propertyName) !== -1) {
+        dest[propertyName] = source[propertyName];
+      }
     }
     return dest;
   },
@@ -34,8 +38,7 @@ scout.objects = {
     var propertyName;
     filter = scout.arrays.ensure(filter);
     for (propertyName in source) {
-      if (source.hasOwnProperty(propertyName) &&
-          (filter.length === 0 || filter.indexOf(propertyName) > -1)) {
+      if (source.hasOwnProperty(propertyName) && (filter.length === 0 || filter.indexOf(propertyName) !== -1)) {
         dest[propertyName] = source[propertyName];
       }
     }

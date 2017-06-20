@@ -38,6 +38,27 @@ describe("scout.objects", function() {
       expect(dest.qux).toBe(8);
     });
 
+    it("copies only the properties specified by the filter, if there is one", function() {
+      var dest = {};
+      var TestConstructor = function() {
+        this.foo = 6;
+        this.xyz = 9;
+      };
+      var source = new TestConstructor();
+      TestConstructor.prototype.bar = 7;
+      TestConstructor.prototype.abc = 2;
+      source.qux = 8;
+      source.baz = 3;
+
+      scout.objects.copyProperties(source, dest, ['foo', 'bar', 'qux']);
+      expect(dest.foo).toBe(6);
+      expect(dest.bar).toBe(7);
+      expect(dest.qux).toBe(8);
+      expect(dest.xyz).toBe(undefined);
+      expect(dest.abc).toBe(undefined);
+      expect(dest.baz).toBe(undefined);
+    });
+
   });
 
   describe("copyOwnProperties", function() {
