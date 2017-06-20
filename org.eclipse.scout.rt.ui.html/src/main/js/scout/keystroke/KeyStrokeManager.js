@@ -59,8 +59,8 @@ scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeCon
 
   keyStrokeContext._handler = this._onKeyEvent.bind(this, keyStrokeContext);
   keyStrokeContext._handler.$target = keyStrokeContext.$getBindTarget();
-  keyStrokeContext._handler.$target.keydown(keyStrokeContext._handler);
-  keyStrokeContext._handler.$target.keyup(keyStrokeContext._handler);
+  keyStrokeContext._handler.$target.on('keydown', keyStrokeContext._handler);
+  keyStrokeContext._handler.$target.on('keyup', keyStrokeContext._handler);
 };
 
 /**
@@ -157,14 +157,6 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
 
     // Handle the keystroke
     keyStroke.invokeHandle(event);
-
-    if (this.session.desktop) { // check that desktop is ready (may be undefined on "Initialization failed" message, would cause an error when the user presses Enter)
-      this.session.desktop.trigger('keystrokeConsumed', {
-        keyStrokeEvent: event,
-        $target: keyStrokeContext.$getBindTarget(),
-        keyStroke: keyStroke
-      });
-    }
 
     // Break on 'stopImmediate'.
     return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true.
