@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
@@ -368,13 +370,15 @@ public class ScriptFileBuilder {
     boolean insideBlockComment = false;
     StringBuilder buf = new StringBuilder();
     String[] lines = text.split("[\\n]");
+    int linePrefixLength = ((lines.length + "").length());
+    DecimalFormat fmt = new DecimalFormat(StringUtility.rpad("", "0", linePrefixLength));
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*"));
       if (qualifier.length() > 0) {
         buf.append(qualifier).append("|");
       }
       buf.append(filename).append(":");
-      buf.append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo));
+      buf.append(fmt.format(lineNo));
       buf.append((insideBlockComment ? "//" : "*/")).append(" ");
       buf.append(line).append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
