@@ -60,8 +60,8 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   @Override
   public ICache<K, V> build() {
-    if (getCacheId() == null || getValueResolver() == null) {
-      throw new IllegalStateException("No cacheId or value-resolver set");
+    if (getCacheId() == null) {
+      throw new IllegalStateException("cacheId is null");
     }
     Map<K, V> cacheMap = createCacheMap();
     ICache<K, V> cache = createBasicCache(cacheMap);
