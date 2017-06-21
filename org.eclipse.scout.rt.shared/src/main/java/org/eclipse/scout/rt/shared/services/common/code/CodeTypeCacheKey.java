@@ -49,7 +49,7 @@ public class CodeTypeCacheKey implements Serializable {
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("locale", getLocale());
-    builder.ref("codeTypeClass", getCodeTypeClass());
+    builder.attr("codeTypeClass", getCodeTypeClass());
 
     return builder.toString();
   }
