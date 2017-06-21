@@ -26,10 +26,6 @@ scout.SmartField2Adapter.prototype._syncResult = function(result) {
   this.widget.lookupCall.resolveLookup(result);
 };
 
-scout.SmartField2Adapter.prototype._onLookupResult = function(event) {
-  this.widget.lookupCall.resolveLookup(event.data);
-};
-
 // FIXME [awe] 7.1 - SF2: discuss with B.SH, we must not call parseAndSetValue here
 // Das war notwendig, im Zusammenhang mit einem Searchform und dem Reset Button
 // Der Button setzt auf dem Server den Value auf null. Weil wir aber im Classic Protokoll

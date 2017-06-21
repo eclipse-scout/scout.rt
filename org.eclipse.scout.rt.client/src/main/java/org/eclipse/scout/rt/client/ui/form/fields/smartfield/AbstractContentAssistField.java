@@ -881,10 +881,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return (IProposalChooser<?, LOOKUP_KEY>) propertySupport.getProperty(PROP_PROPOSAL_CHOOSER);
   }
 
-  protected String toSearchText(String text) {
-    return StringUtility.isNullOrEmpty(text) ? getWildcard() : text;
-  }
-
   public void setCurrentLookupRow(ILookupRow<LOOKUP_KEY> row) {
     m_currentLookupRow = row;
   }
@@ -1032,7 +1028,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
-    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(getWildcard(), toSearchText(text), selectCurrentValue);
+    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(getWildcard(), text, selectCurrentValue);
     doSearch(param, synchronous);
   }
 

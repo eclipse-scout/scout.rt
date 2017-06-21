@@ -104,7 +104,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
     if (result != null) {
       rows = result.getLookupRows();
       selectCurrentValue = result.getSearchParam().isSelectCurrentValue();
-      searchText = result.getSearchParam().getSearchText();
+      searchText = result.getSearchParam().getSearchQuery();
     }
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();

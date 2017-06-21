@@ -91,7 +91,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
   @Override
   public String getLastSearchText() {
     if (getResult() != null) {
-      return getResult().getSearchParam().getSearchText();
+      return getResult().getSearchParam().getSearchQuery();
     }
     return null;
   }

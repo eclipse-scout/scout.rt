@@ -95,7 +95,7 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
 
   if (result.browse) {
     this.trySelectCurrentValue();
-  } else if (treeNodes.length === 1) {
+  } else if (treeNodesFlat.length === 1) {
     this.selectFirstLookupRow();
   }
 };

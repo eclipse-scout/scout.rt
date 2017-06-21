@@ -138,8 +138,8 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       }
     }
     else {
-      //select first search text
-      selectNodeByText(result.getSearchParam().getSearchText());
+      // select first search text
+      selectNodeByText(result.getSearchParam().getSearchQuery());
     }
   }
 

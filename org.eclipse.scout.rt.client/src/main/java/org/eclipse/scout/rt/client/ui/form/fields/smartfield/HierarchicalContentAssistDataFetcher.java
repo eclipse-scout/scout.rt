@@ -96,8 +96,8 @@ public class HierarchicalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCo
     if (query.isByParentSearch()) {
       return getContentAssistField().callSubTreeLookupInBackground(query.getParentKey(), false);
     }
-    else if (isTextLookup(query.getSearchText()) && !query.isSelectCurrentValue()) {
-      return getContentAssistField().callTextLookupInBackground(query.getSearchText(), true);
+    else if (isTextLookup(query.getSearchQuery()) && !query.isSelectCurrentValue()) {
+      return getContentAssistField().callTextLookupInBackground(query.getSearchQuery(), true);
     }
     else {
       return getContentAssistField().callBrowseLookupInBackground(true);

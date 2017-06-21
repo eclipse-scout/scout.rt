@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearchParam<LOOKUP_KEY> {
@@ -10,6 +11,14 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
   private final boolean m_selectCurrentValue;
   private final String m_wildcard;
 
+  /**
+   * @param wildcard
+   * @param searchText
+   *          Original search text as typed in the UI
+   * @param parentKey
+   * @param isByParentSearch
+   * @param selectCurrentValue
+   */
   ContentAssistSearchParam(String wildcard, String searchText, LOOKUP_KEY parentKey, boolean isByParentSearch, boolean selectCurrentValue) {
     m_wildcard = wildcard;
     m_searchText = searchText;
@@ -18,9 +27,18 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
     m_selectCurrentValue = selectCurrentValue;
   }
 
+  protected String toSearchText(String text) {
+    return m_searchText;
+  }
+
   @Override
   public String getSearchText() {
     return m_searchText;
+  }
+
+  @Override
+  public String getSearchQuery() {
+    return StringUtility.isNullOrEmpty(m_searchText) ? m_wildcard : m_searchText;
   }
 
   @Override

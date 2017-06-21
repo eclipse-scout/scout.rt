@@ -466,6 +466,7 @@
   __include("scout/form/fields/smartfield2/ProposalField2Adapter.js");
   __include("scout/form/fields/smartfield2/ProposalTreeNode.js");
   __include("scout/form/fields/smartfield2/RemoteLookupCall.js");
+  __include("scout/form/fields/smartfield2/RemoteLookupRequest.js");
   __include("scout/form/fields/smartfield2/ProposalChooser2.js");
   __include("scout/form/fields/smartfield2/ProposalChooser2Layout.js");
   __include("scout/form/fields/smartfield2/TableProposalChooser2.js");

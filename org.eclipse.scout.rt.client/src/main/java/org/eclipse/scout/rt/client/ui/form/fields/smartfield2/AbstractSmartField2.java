@@ -857,10 +857,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return super.getFont();
   }
 
-  protected String toSearchText(String text) {
-    return StringUtility.isNullOrEmpty(text) ? getWildcard() : text;
-  }
-
   @Override
   public void setLookupRow(ILookupRow<VALUE> row) {
     propertySupport.setProperty(PROP_LOOKUP_ROW, row);
@@ -1042,7 +1038,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
-    IContentAssistSearchParam<VALUE> param = ContentAssistSearchParam.createTextParam(getWildcard(), toSearchText(text), selectCurrentValue);
+    IContentAssistSearchParam<VALUE> param = ContentAssistSearchParam.createTextParam(getWildcard(), text, selectCurrentValue);
     doSearch(param, synchronous);
   }
 

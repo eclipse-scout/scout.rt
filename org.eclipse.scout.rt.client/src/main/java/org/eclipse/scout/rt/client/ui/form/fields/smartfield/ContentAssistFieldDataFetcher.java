@@ -25,7 +25,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
 
   @Override
   public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean synchronous) {
-    String searchText = query.getSearchText();
+    String searchText = query.getSearchQuery();
     String text = searchText;
     if (text == null) {
       text = "";

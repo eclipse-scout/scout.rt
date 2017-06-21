@@ -18,31 +18,25 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public class SmartField2Result<V> {
 
-  private List<ILookupRow<V>> m_lookupRows;
-  private boolean m_lookupFailed;
-  private String m_searchText;
-  private String m_wildcard;
+  private final IContentAssistFieldDataFetchResult<V> m_result;
 
   /**
    * @param result
    */
   public SmartField2Result(IContentAssistFieldDataFetchResult<V> result) {
-    m_lookupRows = result.getLookupRows();
-    m_lookupFailed = result.getException() != null;
-    m_searchText = result.getSearchParam().getSearchText();
-    m_wildcard = result.getSearchParam().getWildcard();
+    m_result = result;
   }
 
   public List<ILookupRow<V>> getLookupRows() {
-    return m_lookupRows;
+    return m_result.getLookupRows();
   }
 
   public boolean isLookupFailed() {
-    return m_lookupFailed;
+    return m_result.getException() != null;
   }
 
   public String getSearchText() {
-    return m_searchText;
+    return m_result.getSearchParam().getSearchText();
   }
 
   /**
@@ -50,10 +44,20 @@ public class SmartField2Result<V> {
    *         means no data is available (e.g. the database table is empty).
    */
   public boolean isNoData() {
-    if (m_lookupRows.size() > 0) {
+    if (getLookupRows().size() > 0) {
       return false;
     }
-    return ObjectUtility.equals(m_searchText, m_wildcard);
+    String searchQuery = m_result.getSearchParam().getSearchQuery();
+    String wildcard = m_result.getSearchParam().getWildcard();
+    return ObjectUtility.equals(searchQuery, wildcard);
+  }
+
+  public boolean isByRec() {
+    return m_result.getSearchParam().isByParentSearch();
+  }
+
+  public V getRec() {
+    return m_result.getSearchParam().getParentKey();
   }
 
 }

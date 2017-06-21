@@ -116,7 +116,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   public String getSearchText() {
     IContentAssistFieldDataFetchResult<LOOKUP_KEY> searchResult = getSearchResult();
     if (searchResult != null) {
-      return searchResult.getSearchParam().getSearchText();
+      return searchResult.getSearchParam().getSearchQuery();
     }
     return null;
   }
@@ -207,7 +207,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
     if (result != null) {
       rows = result.getLookupRows();
       exception = result.getException();
-      searchText = result.getSearchParam().getSearchText();
+      searchText = result.getSearchParam().getSearchQuery();
     }
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();

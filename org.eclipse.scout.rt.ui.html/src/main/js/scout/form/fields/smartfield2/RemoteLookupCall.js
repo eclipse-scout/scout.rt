@@ -21,24 +21,29 @@ scout.inherits(scout.RemoteLookupCall, scout.LookupCall);
  * @returns {Promise} which returns {scout.LookupRow}s
  */
 scout.RemoteLookupCall.prototype.getAll = function() {
-  this._newDeferred();
+  this._newDeferred(scout.RemoteLookupRequest.byText());
   this.adapter.lookupAll();
   return this.deferred.promise();
 };
 
 scout.RemoteLookupCall.prototype.getByText = function(text) {
-  this._newDeferred();
+  this._newDeferred(scout.RemoteLookupRequest.byText(text));
   this.adapter.lookupByText(text);
   return this.deferred.promise();
 };
 
 scout.RemoteLookupCall.prototype.getByRec = function(rec) {
-  this._newDeferred();
+  this._newDeferred(scout.RemoteLookupRequest.byRec(rec));
   this.adapter.lookupByRec(rec);
   return this.deferred.promise();
 };
 
 scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
+  if (!this._belongsToLatestRequest(lookupResult)) {
+    $.log.trace('(RemoteLookupCall#resolveLookup) ignore lookupResult. Does not belong to latest request', this.deferred.requestParameter);
+    return;
+  }
+
   var lookupRows = scout.arrays.ensure(lookupResult.lookupRows).map(function(lookupRowObject) {
     return scout.create('LookupRow', lookupRowObject);
   });
@@ -46,15 +51,26 @@ scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
   this.deferred.resolve(lookupResult);
 };
 
+scout.RemoteLookupCall.prototype._belongsToLatestRequest = function(lookupResult) {
+  var resultParameter;
+  if (lookupResult.hasOwnProperty('rec')) {
+    resultParameter = scout.RemoteLookupRequest.byRec(lookupResult.rec);
+  } else {
+    resultParameter = scout.RemoteLookupRequest.byText(lookupResult.searchText);
+  }
+  return this.deferred.requestParameter.equals(resultParameter);
+};
+
 /**
  * Creates a new deferred and rejects the previous one.
  */
-scout.RemoteLookupCall.prototype._newDeferred = function() {
+scout.RemoteLookupCall.prototype._newDeferred = function(requestParameter) {
   if (this.deferred) {
     this.deferred.reject({
       canceled: true
     });
   }
   this.deferred = $.Deferred();
+  this.deferred.requestParameter = requestParameter;
 };
 
