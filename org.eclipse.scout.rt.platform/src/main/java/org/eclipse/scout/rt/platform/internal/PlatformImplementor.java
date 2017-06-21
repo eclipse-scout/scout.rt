@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.config.IConfigurationValidator;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.slf4j.Logger;
@@ -207,8 +208,9 @@ public class PlatformImplementor implements IPlatform {
 
   protected BeanManagerImplementor createBeanManager() {
     BeanManagerImplementor beanManager = new BeanManagerImplementor();
+    IClassInventory inv = ClassInventory.get();
     long t0 = System.nanoTime();
-    Set<Class> allBeans = new BeanFilter().collect(ClassInventory.get());
+    Set<Class> allBeans = new BeanFilter().collect(inv);
     long t1 = System.nanoTime();
     LOG.info("Collected {} beans in {} ms", allBeans.size(), StringUtility.formatNanos(t1 - t0));
     for (Class<?> bean : allBeans) {
