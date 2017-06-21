@@ -12,19 +12,28 @@ package org.eclipse.scout.rt.platform.inventory.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder.RebuildStrategy;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
@@ -75,7 +84,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.ALWAYS);
     index = builder.scanModule(indexUri);
     assertEquals(0, builder.readIndexCount);
-    assertEquals(1, builder.saveIndexCount);
+    assertEquals(1, builder.writeIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -84,7 +93,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.ALWAYS);
     index = builder.scanModule(indexUri);
     assertEquals(0, builder.readIndexCount);
-    assertEquals(1, builder.saveIndexCount);
+    assertEquals(1, builder.writeIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -104,7 +113,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MISSING);
     index = builder.scanModule(indexUri);
     assertEquals(0, builder.readIndexCount);
-    assertEquals(1, builder.saveIndexCount);
+    assertEquals(1, builder.writeIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -113,7 +122,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MISSING);
     index = builder.scanModule(indexUri);
     assertEquals(1, builder.readIndexCount);
-    assertEquals(0, builder.saveIndexCount);
+    assertEquals(0, builder.writeIndexCount);
     assertNotNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -137,8 +146,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED);
     index = builder.scanModule(indexUri);
     assertEquals(0, builder.readIndexCount);
-    assertEquals(1, builder.saveIndexCount);
-    assertNull(builder.readIndexReturn);
+    assertEquals(1, builder.writeIndexCount);
     assertNotNull(index);
     assertTrue(indexFile.exists());
 
@@ -146,7 +154,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED);
     index = builder.scanModule(indexUri);
     assertEquals(1, builder.readIndexCount);
-    assertEquals(0, builder.saveIndexCount);
+    assertEquals(0, builder.writeIndexCount);
     assertNotNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -156,7 +164,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED);
     index = builder.scanModule(indexUri);
     assertEquals(1, builder.readIndexCount);
-    assertEquals(0, builder.saveIndexCount);
+    assertEquals(0, builder.writeIndexCount);
     assertNotNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -166,7 +174,7 @@ public class JandexInventoryBuilderTest {
     builder = new FixtureJandexInventoryBuilder(RebuildStrategy.IF_MODIFIED);
     index = builder.scanModule(indexUri);
     assertEquals(0, builder.readIndexCount);
-    assertEquals(1, builder.saveIndexCount);
+    assertEquals(1, builder.writeIndexCount);
     assertNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
@@ -177,16 +185,180 @@ public class JandexInventoryBuilderTest {
         .withClassFixtureJandexInventoryObjectExcluded();
     index = builder.scanModule(indexUri);
     assertEquals(1, builder.readIndexCount);
-    assertEquals(1, builder.saveIndexCount);
+    assertEquals(1, builder.writeIndexCount);
     assertNotNull(builder.readIndexReturn);
     assertNotNull(index);
     assertTrue(indexFile.exists());
   }
 
+  @Test
+  public void testFileLockLastModified() throws URISyntaxException, IOException {
+    URL scoutXml = getClass().getResource("/" + JandexInventoryBuilder.SCOUT_XML_PATH);
+    File targetFolder = new File(scoutXml.toURI()).getParentFile().getParentFile();
+    File f = new File(targetFolder, "testLock");
+    if (f.exists()) {
+      assertTrue(f.delete());
+    }
+    //create new lock file
+    long t0, t1, t2, t3, t4;
+    try (LockedFile r = new LockedFile(f)) {
+      t0 = r.lastModified();
+      SleepUtil.sleepSafe(2, TimeUnit.SECONDS);
+      nioWrite(r, "Foo");
+      t1 = r.lastModified();
+      SleepUtil.sleepSafe(2, TimeUnit.SECONDS);
+      t2 = r.lastModified();
+      r.setLastModified(1234567890000L);
+      t3 = r.lastModified();
+    }
+    t4 = f.lastModified();
+    assertNotEquals(t0, t1);
+    assertEquals(t1, t2);
+    assertNotEquals(t2, t3);
+    assertEquals(1234567890000L, t3);
+    assertEquals(1234567890000L, t4);
+
+    try (LockedFile r = new LockedFile(f)) {
+      t0 = r.lastModified();
+    }
+    t1 = f.lastModified();
+    assertEquals(1234567890000L, t0);
+    assertEquals(1234567890000L, t1);
+  }
+
+  @Test
+  public void testFileLockWithRandomAccessFile() throws URISyntaxException, IOException {
+    URL scoutXml = getClass().getResource("/" + JandexInventoryBuilder.SCOUT_XML_PATH);
+    File targetFolder = new File(scoutXml.toURI()).getParentFile().getParentFile();
+    File f = new File(targetFolder, "testFile");
+    if (f.exists()) {
+      assertTrue(f.delete());
+    }
+    //create new lock file
+    try (LockedFile r = new LockedFile(f)) {
+      nioWrite(r, "Foo");
+    }
+    //read existing lock file
+    try (LockedFile r = new LockedFile(f)) {
+      String s = nioRead(r);
+      assertEquals(3, s.length());
+      assertEquals("Foo", s);
+    }
+    //modify existing lock file write-read
+    try (LockedFile r = new LockedFile(f)) {
+      //write
+      nioWrite(r, "B");
+      //read
+      String s = nioRead(r);
+      assertEquals(1, s.length());
+      assertEquals("B", s);
+    }
+    //modify existing lock file read-write-read
+    try (LockedFile r = new LockedFile(f)) {
+      //read
+      String s = nioRead(r);
+      assertEquals(1, s.length());
+      assertEquals("B", s);
+      //write
+      nioWrite(r, "bar");
+      //read
+      s = nioRead(r);
+      assertEquals(3, s.length());
+      assertEquals("bar", s);
+    }
+    assertTrue(f.delete());
+  }
+
+  @Test
+  public void testFileLockConcurency() throws URISyntaxException, IOException, InterruptedException {
+    URL scoutXml = getClass().getResource("/" + JandexInventoryBuilder.SCOUT_XML_PATH);
+    File targetFolder = new File(scoutXml.toURI()).getParentFile().getParentFile();
+    final File f = new File(targetFolder, "testFile");
+    if (f.exists()) {
+      assertTrue(f.delete());
+    }
+    final CountDownLatch isBeforeLock = new CountDownLatch(2);
+    final CountDownLatch waitBeforeLock1 = new CountDownLatch(1);
+    final CountDownLatch waitBeforeLock2 = new CountDownLatch(1);
+    final CountDownLatch isInsideLock1 = new CountDownLatch(1);
+    final CountDownLatch isInsideLock2 = new CountDownLatch(1);
+    final CountDownLatch waitInsideLock1 = new CountDownLatch(1);
+    final CountDownLatch waitInsideLock2 = new CountDownLatch(1);
+    final CountDownLatch isAfterLock1 = new CountDownLatch(1);
+    final CountDownLatch isAfterLock2 = new CountDownLatch(1);
+    Callable<String> job1 = new Callable<String>() {
+      @Override
+      public String call() throws Exception {
+        isBeforeLock.countDown();
+        waitBeforeLock1.await();
+        String s = null;
+        try (LockedFile r = new LockedFile(f)) {
+          isInsideLock1.countDown();
+          waitInsideLock1.await();
+          //read
+          s = nioRead(r);
+          //write
+          nioWrite(r, "job1");
+        }
+        isAfterLock1.countDown();
+        return s;
+      }
+    };
+    Callable<String> job2 = new Callable<String>() {
+      @Override
+      public String call() throws Exception {
+        isBeforeLock.countDown();
+        waitBeforeLock2.await();
+        String s = null;
+        try (LockedFile r = new LockedFile(f)) {
+          isInsideLock2.countDown();
+          waitInsideLock2.await();
+          //read
+          s = nioRead(r);
+          //write
+          nioWrite(r, "job2");
+        }
+        isAfterLock2.countDown();
+        return s;
+      }
+    };
+    IFuture<String> f1 = Jobs.schedule(job1, Jobs.newInput());
+    IFuture<String> f2 = Jobs.schedule(job2, Jobs.newInput());
+
+    assertTrue(isBeforeLock.await(1, TimeUnit.MINUTES));
+    waitBeforeLock1.countDown();
+    assertTrue(isInsideLock1.await(1, TimeUnit.MINUTES));
+    waitBeforeLock2.countDown();
+    assertFalse(isInsideLock2.await(3, TimeUnit.SECONDS));
+
+    waitInsideLock1.countDown();
+    assertTrue(isAfterLock1.await(1, TimeUnit.MINUTES));
+
+    assertTrue(isInsideLock2.await(1, TimeUnit.MINUTES));
+    waitInsideLock2.countDown();
+    assertTrue(isAfterLock2.await(1, TimeUnit.MINUTES));
+
+    assertEquals("", f1.awaitDoneAndGet());
+    assertEquals("job1", f2.awaitDoneAndGet());
+    try (LockedFile r = new LockedFile(f)) {
+      assertEquals("job2", nioRead(r));
+    }
+
+    assertTrue(f.delete());
+  }
+
+  private static void nioWrite(LockedFile r, String s) throws IOException {
+    r.newOutputStream().write(s.getBytes());
+  }
+
+  private static String nioRead(LockedFile r) throws IOException {
+    return new String(IOUtility.readBytes(r.newInputStream()));
+  }
+
   private static class FixtureJandexInventoryBuilder extends JandexInventoryBuilder {
     int readIndexCount;
     Index readIndexReturn;
-    int saveIndexCount;
+    int writeIndexCount;
 
     private boolean m_fixtureClassExcluded;
 
@@ -200,16 +372,16 @@ public class JandexInventoryBuilderTest {
     }
 
     @Override
-    protected Index readIndex(URI indexUri) {
+    protected Index readIndex(URI indexUri, InputStream in) {
       readIndexCount++;
-      readIndexReturn = super.readIndex(indexUri);
+      readIndexReturn = super.readIndex(indexUri, in);
       return readIndexReturn;
     }
 
     @Override
-    protected void saveIndex(File file, Index index) {
-      saveIndexCount++;
-      super.saveIndex(file, index);
+    protected void writeIndex(Index index, LockedFile f) {
+      writeIndexCount++;
+      super.writeIndex(index, f);
     }
 
     @Override

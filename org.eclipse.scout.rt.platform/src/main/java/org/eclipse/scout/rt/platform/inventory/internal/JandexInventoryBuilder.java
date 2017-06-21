@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.inventory.internal;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -136,71 +135,64 @@ public class JandexInventoryBuilder {
   }
 
   protected Index scanFolder(URI indexUri) throws IOException {
-    File indexFile = new File(indexUri);
-    File classesFolder = indexFile.getParentFile().getParentFile();
-    IndexMetaData newMeta = null;
-    Index index = null;
-    boolean indexFileExists = indexFile.exists();
-    if (indexFileExists) {
-      switch (m_rebuildStrategy) {
-        case IF_MODIFIED:
-          newMeta = indexMetaData(classesFolder.toPath());
-          //pass 1: check modified
-          long oldModified = indexFile.lastModified();
-          if (newMeta.lastModified() > oldModified) {
-            if (LOG.isInfoEnabled()) {
-              LOG.info("Drop outdated index '{}'. Index timestamp {} is older than folder timestamp {}.", indexUri,
-                  DateUtility.format(new Date(oldModified), "yyyy-MM-dd HH:mm:ss.SSS"),
-                  DateUtility.format(new Date(newMeta.lastModified()), "yyyy-MM-dd HH:mm:ss.SSS"));
+    File indexFile0 = new File(indexUri);
+    File classesFolder = indexFile0.getParentFile().getParentFile();
+    try (LockedFile indexFile = new LockedFile(indexFile0)) {
+      IndexMetaData newMeta = null;
+      Index index = null;
+      boolean canReadFromIndexFile = indexFile.exists();
+      if (canReadFromIndexFile) {
+        switch (m_rebuildStrategy) {
+          case IF_MODIFIED:
+            newMeta = indexMetaData(classesFolder.toPath());
+            //pass 1: check modified
+            long oldModified = indexFile.lastModified();
+            if (newMeta.lastModified() > oldModified) {
+              if (LOG.isInfoEnabled()) {
+                LOG.info("Drop outdated index '{}'. Index timestamp {} is older than folder timestamp {}.", indexUri,
+                    DateUtility.format(new Date(oldModified), "yyyy-MM-dd HH:mm:ss.SSS"),
+                    DateUtility.format(new Date(newMeta.lastModified()), "yyyy-MM-dd HH:mm:ss.SSS"));
+              }
+              canReadFromIndexFile = false;
             }
-            indexFileExists = false;
-            if (!indexFile.delete()) {
-              LOG.warn("Cannot delete '{}'", indexFile);
-            }
-          }
-          else {
-            //pass 2: file count
-            index = readIndex(indexUri);
-            int oldFileCount = index.getKnownClasses().size();
-            if (newMeta.fileCount() != oldFileCount) {
-              LOG.info("Drop divergent index '{}'. Index file count {} != folder file count {}.", indexUri, oldFileCount, newMeta.fileCount());
-              index = null;
-              indexFileExists = false;
-              if (!indexFile.delete()) {
-                LOG.warn("Cannot delete '{}'", indexFile);
+            else {
+              //pass 2: file count
+              index = readIndex(indexUri, indexFile.newInputStream());
+              int oldFileCount = index.getKnownClasses().size();
+              if (newMeta.fileCount() != oldFileCount) {
+                LOG.info("Drop divergent index '{}'. Index file count {} != folder file count {}.", indexUri, oldFileCount, newMeta.fileCount());
+                index = null;
+                canReadFromIndexFile = false;
               }
             }
-          }
-          break;
-        case ALWAYS:
-          indexFileExists = false;
-          if (!indexFile.delete()) {
-            LOG.warn("Cannot delete '{}'", indexFile);
-          }
-          break;
-        default:
-          //nop
+            break;
+          case ALWAYS:
+            canReadFromIndexFile = false;
+            break;
+          default:
+            //nop
+        }
       }
-    }
 
-    if (index == null && indexFileExists) {
-      index = readIndex(indexUri);
-    }
-    if (index != null) {
+      if (index == null && canReadFromIndexFile) {
+        index = readIndex(indexUri, indexFile.newInputStream());
+      }
+      if (index != null) {
+        return index;
+      }
+
+      if (newMeta == null) {
+        newMeta = indexMetaData(classesFolder.toPath());
+      }
+      LOG.info("Rebuild index '{}'. Scanning location...", indexUri);
+      Indexer indexer = new Indexer();
+      index = createFolderIndex(classesFolder.toPath(), indexer);
+      writeIndex(index, indexFile);
+      if (!indexFile.setLastModified(newMeta.lastModified())) {
+        LOG.warn("Cannot set lastModified on '{}'", indexFile);
+      }
       return index;
     }
-
-    if (newMeta == null) {
-      newMeta = indexMetaData(classesFolder.toPath());
-    }
-    LOG.info("Rebuild index '{}'. Scanning location...", indexUri);
-    Indexer indexer = new Indexer();
-    index = createFolderIndex(classesFolder.toPath(), indexer);
-    saveIndex(indexFile, index);
-    if (!indexFile.setLastModified(newMeta.lastModified())) {
-      LOG.warn("Cannot set lastModified on '{}'", indexFile);
-    }
-    return index;
   }
 
   protected Index scanJar(URI indexUri) throws URISyntaxException, IOException {
@@ -262,13 +254,29 @@ public class JandexInventoryBuilder {
    */
   protected Index readIndex(URI indexUri) {
     try (InputStream in = new BufferedInputStream(indexUri.toURL().openStream())) {
-      Index index = new IndexReader(in).read();
-      LOG.debug("Found pre-built {}", indexUri);
-      return index;
+      return readIndex(indexUri, in);
+    }
+    catch (PlatformException e) {
+      throw e;
     }
     catch (FileNotFoundException e) {
       LOG.debug("No pre-built index found: {}", indexUri, e);
       return null;
+    }
+    catch (Exception ex) {
+      throw new PlatformException("Error reading index '{}'", indexUri, ex);
+    }
+  }
+
+  /**
+   * @param indexUri
+   * @return index or null
+   */
+  protected Index readIndex(URI indexUri, InputStream in) {
+    try {
+      Index index = new IndexReader(in).read();
+      LOG.debug("Found pre-built {}", indexUri);
+      return index;
     }
     catch (Exception ex) {
       throw new PlatformException("Error reading index '{}'", indexUri, ex);
@@ -291,13 +299,13 @@ public class JandexInventoryBuilder {
     }
   }
 
-  protected void saveIndex(File file, Index index) {
-    try (FileOutputStream out = new FileOutputStream(file)) {
-      LOG.debug("Write jandex index file '{}'", file);
-      new IndexWriter(out).write(index);
+  protected void writeIndex(Index index, LockedFile f) {
+    try {
+      LOG.debug("Write jandex index file '{}'", f);
+      new IndexWriter(f.newOutputStream()).write(index);
     }
     catch (Exception ex) {
-      LOG.warn("Error while writing jandex index file '{}'", file, ex);
+      LOG.warn("Error while writing jandex index file '{}'", f, ex);
     }
   }
 
