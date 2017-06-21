@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -39,6 +40,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class ConfigurationUtility {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurationUtility.class);
+
+  /**
+   * cache the result for all classes
+   */
+  private static final ConcurrentHashMap<Class, Class[]> declaredPublicClassesCache = new ConcurrentHashMap<>();
 
   private ConfigurationUtility() {
   }
@@ -172,7 +178,16 @@ public final class ConfigurationUtility {
    * get all declared classes (inner types) of the specified class and all its super classes
    */
   public static Class[] getDeclaredPublicClasses(Class c) {
-    return c.getClasses();
+    if (c.isSynthetic()) {
+      return c.getClasses();
+    }
+    Class[] a = declaredPublicClassesCache.get(c);
+    if (a != null) {
+      return a;
+    }
+    a = c.getClasses();
+    declaredPublicClassesCache.put(c, a);
+    return a;
   }
 
   public static <T> T newInnerInstance(Object instance, Class<T> innerClass) {
