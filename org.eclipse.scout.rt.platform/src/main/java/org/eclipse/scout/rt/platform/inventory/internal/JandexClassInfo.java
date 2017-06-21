@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 public class JandexClassInfo implements IClassInfo {
   private static final Logger LOG = LoggerFactory.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;
-  private volatile boolean m_hasNoArgsConstructor;
   private volatile Class<?> m_class;
 
   public JandexClassInfo(ClassInfo classInfo) {
@@ -49,7 +47,6 @@ public class JandexClassInfo implements IClassInfo {
         if (m_class == null) {
           try {
             m_class = Class.forName(name());
-            m_hasNoArgsConstructor = hasNoArgsConstructor(m_class);
           }
           catch (ClassNotFoundException | NoClassDefFoundError ex) {
             throw new PlatformException("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
@@ -59,19 +56,9 @@ public class JandexClassInfo implements IClassInfo {
     }
   }
 
-  protected boolean hasNoArgsConstructor(Class<?> c) {
-    for (Constructor<?> a : c.getDeclaredConstructors()) {
-      if (a.getParameterTypes().length == 0) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   @Override
   public boolean hasNoArgsConstructor() {
-    ensureClassLoaded();
-    return m_hasNoArgsConstructor;
+    return m_classInfo.hasNoArgsConstructor();
   }
 
   @Override
