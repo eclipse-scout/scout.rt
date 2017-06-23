@@ -147,11 +147,13 @@
     },
     "SplitBox": {
       "fieldCollapsed": false,
+      "fieldMinimized" : false,
       "collapsibleField": null,
+      "minSplitterPosition": null,
       "splitHorizontal": true,
       "splitterEnabled": true,
       "splitterPosition": 0.5,
-      "splitterPositionType": "relative"
+      "splitterPositionType": "relativeFirst"
     },
     "StringField": {
       "dropType": 0,

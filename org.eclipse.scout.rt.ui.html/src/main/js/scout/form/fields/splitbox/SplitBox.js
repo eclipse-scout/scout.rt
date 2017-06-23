@@ -11,6 +11,7 @@
 scout.SplitBox = function() {
   scout.SplitBox.parent.call(this);
   this._addWidgetProperties(['firstField', 'secondField', 'collapsibleField']);
+  this._addPreserveOnPropertyChangeProperties(['collapsibleField']);
 
   this.fieldCollapsed = false;
   this.collapsibleField;
@@ -18,14 +19,17 @@ scout.SplitBox = function() {
   this.splitHorizontal = true; // true = split x-axis, false = split y-axis
   this.splitterEnabled = true;
   this.splitterPosition = 0.5;
-  this.splitterPositionType = scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE;
+  this.minSplitterPosition;
+  this.splitterPositionType = scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
+  this.fieldMinimized = false;
 
   this._$splitArea;
   this._$splitter;
 };
 scout.inherits(scout.SplitBox, scout.CompositeField);
 
-scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE = 'relative';
+scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST = 'relativeFirst';
+scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND = 'relativeSecond';
 scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
 scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
@@ -111,7 +115,7 @@ scout.SplitBox.prototype._render = function() {
     }
 
     var newSplitterPosition = this.splitterPosition;
-    var SNAP_SIZE = 25;
+    var SNAP_SIZE = 10;
 
     function resizeMove(event) {
       if (event.pageX === mousePosition.x && event.pageY === mousePosition.y) {
@@ -128,24 +132,52 @@ scout.SplitBox.prototype._render = function() {
         // Calculate target splitter position (in area)
         var targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
 
+        // De-normalize minimum splitter position to allowed splitter range in pixel [minSplitterPositionLeft, maxSplitterPositionLeft]
+        var minSplitterPositionLeft;
+        var maxSplitterPositionLeft;
+
+        // Splitter width plus margin on right side, if temporary splitter position is x, the splitter div position is x-splitterOffset
+        var splitterOffset = Math.floor((splitterSize.width + scout.HtmlEnvironment.fieldMandatoryIndicatorWidth) / 2);
+
+        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST) {
+          minSplitterPositionLeft = scout.nvl(this.minSplitterPosition, 0);
+          // allow to move the splitter to right side, leaving minimal space for splitter div without right margin (=total splitter size minus offset)
+          maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset;
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+          minSplitterPositionLeft = (splitAreaSize.width - splitterSize.width) * scout.nvl(this.minSplitterPosition, 0);
+          // allow to move the splitter to right side, leaving minimal space for splitter div without right margin (=total splitter size minus offset)
+          maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset;
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          minSplitterPositionLeft = 0;
+          // allow to move the splitter to right side, leaving minimal space for splitter div without right margin, reserving space for minimum splitter size
+          maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset - scout.nvl(this.minSplitterPosition, 0);
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+          minSplitterPositionLeft = 0;
+          // allow to move the splitter to right side, leaving minimal space for splitter div without right margin, reserving space for minimum splitter size
+          maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset - Math.floor(scout.nvl(this.minSplitterPosition, 0) * (splitAreaSize.width - splitterSize.width));
+        }
+
         // Snap to begin and end
-        var tempSplitterOffsetX = Math.floor((splitterSize.width + scout.HtmlEnvironment.fieldMandatoryIndicatorWidth) / 2);
-        if (targetSplitterPositionLeft < SNAP_SIZE) {
-          targetSplitterPositionLeft = 0;
-          tempSplitterOffsetX = 0;
-        } else if (splitAreaSize.width - targetSplitterPositionLeft < SNAP_SIZE) {
-          targetSplitterPositionLeft = splitAreaSize.width;
-          tempSplitterOffsetX = splitterSize.width;
+        var tempSplitterOffsetX = splitterOffset;
+
+        if (targetSplitterPositionLeft < (minSplitterPositionLeft + splitterOffset + SNAP_SIZE)) {  // snap left if minimum position is reached (+ snap range)
+          targetSplitterPositionLeft = minSplitterPositionLeft;  // set splitter directly to left minimal bound
+          tempSplitterOffsetX = 0;  // setting splitter to left minimal bound, does not require an additional offset
+        } else if (targetSplitterPositionLeft > (maxSplitterPositionLeft - SNAP_SIZE)) {
+          targetSplitterPositionLeft = maxSplitterPositionLeft;
         }
 
         // Update temporary splitter
         $tempSplitter.cssLeft(targetSplitterPositionLeft - tempSplitterOffsetX);
-        // Normalize target position
+
+        // Normalize target position (available splitter area is (splitAreaSize.width - splitterSize.width))
         newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX);
-        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
           newSplitterPosition = newSplitterPosition / (splitAreaSize.width - splitterSize.width);
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+          newSplitterPosition = 1 - (newSplitterPosition / (splitAreaSize.width - splitterSize.width));
         } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
-          newSplitterPosition = splitAreaSize.width - newSplitterPosition - splitterSize.width;
+          newSplitterPosition = splitAreaSize.width - splitterSize.width - newSplitterPosition;
         }
       } else { // "--"
         // Calculate target splitter position (in area)
@@ -165,8 +197,10 @@ scout.SplitBox.prototype._render = function() {
         $tempSplitter.cssTop(targetSplitterPositionTop - tempSplitterOffsetY);
         // Normalize target position
         newSplitterPosition = targetSplitterPositionTop - tempSplitterOffsetY;
-        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
           newSplitterPosition = newSplitterPosition / (splitAreaSize.height - splitterSize.height);
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+          newSplitterPosition = 1 - (newSplitterPosition / (splitAreaSize.height - splitterSize.height));
         } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
           newSplitterPosition = splitAreaSize.height - newSplitterPosition - splitterSize.height;
         }
@@ -191,10 +225,6 @@ scout.SplitBox.prototype._render = function() {
 
         // Update split box
         this.newSplitterPosition(newSplitterPosition);
-        if (this.rendered) {
-          // TODO [7.0] cgu: remove this, should not be necessary anymore with 6.0
-          this.htmlSplitArea.validateLayout(); // validate layout immediately (was invalidated by newSplitterPosition())
-        }
       }
     }
 
@@ -243,6 +273,7 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     var splitAreaSize = this.htmlSplitArea.size(),
       splitterPosition = this.splitterPosition,
       splitterSize = scout.graphics.getVisibleSize(this._$splitter, true),
+      minSplitterPosition = this.minSplitterPosition,
       totalSize = 0;
     if (this.splitHorizontal) { // "|"
       totalSize = splitAreaSize.width - splitterSize.width;
@@ -251,31 +282,53 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     }
 
     // Convert value depending on the old and new type system
-    var oldIsRelative = (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE);
-    var newIsRelative = (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE);
+    var oldIsRelative = this._isSplitterPositionTypeRelative(this._oldSplitterPositionType);
+    var newIsRelative = this._isSplitterPositionTypeRelative(this.splitterPositionType);
     var oldIsAbsolute = !oldIsRelative;
     var newIsAbsolute = !newIsRelative;
     if (oldIsRelative && newIsAbsolute) {
       // From relative to absolute
-      if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
-        splitterPosition = totalSize - (totalSize * splitterPosition);
+      if ((this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) ||
+          (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)) {
+        splitterPosition = totalSize - (totalSize * splitterPosition); // changed from first to second field or from second to first field, invert splitter position
       } else {
         splitterPosition = totalSize * splitterPosition;
       }
+      // convert minimum splitter position
+      if (minSplitterPosition) {
+        minSplitterPosition = totalSize * minSplitterPosition;
+      }
     } else if (oldIsAbsolute && newIsRelative) {
       // From absolute to relative
-      if (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
-        splitterPosition = (totalSize - splitterPosition) / totalSize;
+      if ((this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) ||
+          (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)) {
+        splitterPosition = (totalSize - splitterPosition) / totalSize;  // changed from first to second field or from second to first field, invert splitter position
       } else {
         splitterPosition = splitterPosition / totalSize;
       }
+
+      // convert minimum splitter position
+      if (minSplitterPosition) {
+        minSplitterPosition = minSplitterPosition / totalSize;
+      }
     } else if (oldIsAbsolute && newIsAbsolute) {
       splitterPosition = (totalSize - splitterPosition);
+      // do not convert minimum splitter position, unit did not change
+    } else { // oldIsRelative && newIsRelative
+      splitterPosition = 1 - splitterPosition;
+      // do not convert minimum splitter position, unit did not change
     }
+    // set new minimum splitter position
+    this.setMinSplitterPosition(minSplitterPosition);
+
     // Set as new splitter position
     this._oldSplitterPositionType = null;
     this.newSplitterPosition(splitterPosition);
   }
+};
+
+scout.SplitBox.prototype._isSplitterPositionTypeRelative = function(positionType) {
+  return (positionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (positionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND);
 };
 
 scout.SplitBox.prototype._renderSplitterEnabled = function() {
@@ -304,11 +357,13 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
     this.unregisterKeyStrokes(this.collapseKeyStroke);
   }
   if (this.collapsibleField) {
+    var horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.LEFT;
+    if (this.collapsibleField !== this.firstField) {
+      horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.RIGHT;
+    }
+
     if (!this._collapseHandle) {
-      var horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.LEFT;
-      if (this.collapsibleField !== this.firstField) {
-        horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.RIGHT;
-      }
+      // create new collapse handle
       this._collapseHandle = scout.create('CollapseHandle', {
         parent: this,
         horizontalAlignment: horizontalAlignment
@@ -317,7 +372,14 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
       if (this.collapseKeyStroke) {
         this.registerKeyStrokes(this.collapseKeyStroke);
       }
+      if (this.rendered) {
+        this._renderCollapseHandle();
+      }
+    } else {
+      // update existing collapse handle
+      this._collapseHandle.setHorizontalAlignment(horizontalAlignment);
     }
+
     this._updateCollapseHandleButtons();
   } else {
      if (this._collapseHandle) {
@@ -328,17 +390,78 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
 };
 
 scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
-  var leftVisible, rightVisible,
-    collapsed = this.fieldCollapsed;
-  if (this.collapsibleField === this.firstField) {
-    leftVisible  = !collapsed;
-    rightVisible =  collapsed;
-  } else {
-    leftVisible  =  collapsed;
-    rightVisible = !collapsed;
+  if (!this._collapseHandle) {
+    return;
   }
+  var leftVisible, rightVisible,
+    collapsed = this.fieldCollapsed,
+    minimized = this.fieldMinimized,
+    minimizable = !!this.minSplitterPosition,
+    positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
+    positionNotAccordingCollapsibleField = (positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField);
+
+    if (positionTypeFirstField) {
+      if (positionNotAccordingCollapsibleField) {
+        leftVisible  = (!minimized && minimizable) || collapsed; // left = decrease collapsible field size. Decrease field in this order [minimized <- default <- collapsed]
+        rightVisible = !collapsed; // right = increase collapsible field size. Increase field in this order [minimized -> default -> collapsed]
+      } else {
+        leftVisible  = !collapsed; // left = increase collapsible field size. Increase field in this order [default <- minimized <- collapsed]
+        rightVisible =  collapsed || (minimized && minimizable); // right = decrease collapsible field size. Decrease field in this order [default -> minimized -> collapsed]
+      }
+    } else {
+      if (positionNotAccordingCollapsibleField) {
+        leftVisible  = !collapsed; // left = decrease collapsible field size. Decrease field in this order [collapsed <- default <- minimized]
+        rightVisible = (!minimized && minimizable) || collapsed; // right = increase collapsible field size. Increase field in this order [collapsed -> default -> minimized]
+      } else {
+        leftVisible =  collapsed || (minimized && minimizable); // left = decrease collapsible field size. Decrease field in this order [collapsed <- minimized <- default]
+        rightVisible  = !collapsed; // right = increase collapsible field size. Increase field in this order [collapsed -> minimized -> default]
+      }
+    }
+
   this._collapseHandle.setLeftVisible(leftVisible);
   this._collapseHandle.setRightVisible(rightVisible);
+};
+
+scout.SplitBox.prototype.getEffectiveSplitterPosition = function() {
+  if (this.minSplitterPosition && this.fieldMinimized) {
+    return this.minSplitterPosition;
+  } else {
+    return this.splitterPosition;
+  }
+};
+
+scout.SplitBox.prototype.setMinSplitterPosition = function(minSplitterPosition) {
+  this.setProperty('minSplitterPosition', minSplitterPosition);
+  this._updateCollapseHandleButtons();
+};
+
+scout.SplitBox.prototype._renderMinSplitterPosition = function() {
+  // minimum splitter position is considered automatically when layout is updated
+  if (this.rendered) { // don't invalidate layout on initial rendering
+    this.htmlSplitArea.invalidateLayoutTree(false);
+  }
+};
+
+scout.SplitBox.prototype.setFieldMinimized = function(minimized) {
+  this.setProperty('fieldMinimized', minimized);
+  this._updateCollapseHandleButtons();
+};
+
+scout.SplitBox.prototype._renderFieldMinimized = function() {
+  if (this.firstField) {
+    this.firstField.$container.removeClass('minimized');
+  }
+  if (this.secondField) {
+    this.secondField.$container.removeClass('minimized');
+  }
+  if (this.collapsibleField && this.fieldMinimized) {
+    this.collapsibleField.$container.addClass('minimized');
+  }
+
+  // field minimized state is considered automatically when layout is updated
+  if (this.rendered) { // don't invalidate layout on initial rendering
+    this.htmlSplitArea.invalidateLayoutTree(false);
+  }
 };
 
 scout.SplitBox.prototype._renderCollapsibleField = function() {
@@ -375,7 +498,7 @@ scout.SplitBox.prototype._renderCollapseHandle = function() {
 };
 
 scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
-  if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+  if (this._isSplitterPositionTypeRelative(this.splitterPositionType)) {
     // Ensure range 0..1
     newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
   } else {
@@ -383,21 +506,90 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
     newSplitterPosition = Math.max(0, newSplitterPosition);
   }
 
-  // Set new value (send to server if changed)
+  // Ensure splitter within allowed range, toggle field minimized state if new splitter position is within minimal range
+  if (this.minSplitterPosition && this._isSplitterPositionInMinimalRange(newSplitterPosition)) {
+    this.setFieldMinimized(true);
+    return;
+  }
+
+  // Set new value (send to server if changed
   var positionChanged = (this.splitterPosition !== newSplitterPosition);
   this.splitterPosition = newSplitterPosition;
+
   if (positionChanged) {
     this.trigger('positionChange', {
       position: newSplitterPosition
     });
   }
 
+  this._updateFieldMinimized();
+  this._updateCollapseHandleButtons();
+
   // Mark layout as invalid
   this.htmlSplitArea.invalidateLayoutTree(false);
 };
 
-scout.SplitBox.prototype.toggleFieldCollapsed = function() {
-  this.setFieldCollapsed(!this.fieldCollapsed);
+scout.SplitBox.prototype._updateFieldMinimized = function() {
+  this.setFieldMinimized(this._isSplitterPositionInMinimalRange(this.splitterPosition));
+};
+
+scout.SplitBox.prototype._isSplitterPositionInMinimalRange = function(newSplitterPosition) {
+  if (!this.minSplitterPosition) {
+    return false;
+  }
+  return newSplitterPosition <= this.minSplitterPosition;
+};
+
+scout.SplitBox.prototype.toggleFieldCollapsed = function(event) {
+  var collapsed = this.fieldCollapsed,
+    minimized = this.fieldMinimized,
+    minimizable = !!this.minSplitterPosition,
+    positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
+    increaseField = (!!event.left && !positionTypeFirstField) || (!!event.right && positionTypeFirstField);
+
+  if ((positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField)) {
+    // Splitter is not positioned according (absolute or relative) to collapsible field
+    // - Mode toggles to increase collapsible field size: field collapsed --> field default --> field minimized
+    // - Mode toggles to decrease collapsible field size: field collapsed <-- field default <-- field minimized
+    if (increaseField) {
+      if (collapsed) {
+        // not possible, button is not visible (field is collapsed and cannot further increase its size)
+      } else if (minimized && minimizable) {
+        this.setFieldMinimized(false);
+      } else {
+        this.setFieldCollapsed(true);
+      }
+    } else {
+      if (collapsed) {
+        this.setFieldCollapsed(false);
+      } else if (minimized) {
+        // not possible, button is not visible (field is minimized and cannot further decrease its size)
+      } else if (minimizable) {
+        this.setFieldMinimized(true);
+      }
+    }
+  } else {
+    // Splitter is positioned according (absolute or relative) to collapsible field
+    // - Mode toggles to increase collapsible field size: field collapsed --> field minimized --> field default
+    // - Mode toggles to decrease collapsible field size: field collapsed <-- field minimized <-- field default
+    if (increaseField) {
+      if (collapsed) {
+        this.setFieldCollapsed(false);
+      } else if (minimized) {
+        this.setFieldMinimized(false);
+      } else {
+        // not possible, button is not visible (field has default size and cannot further increase its size)
+      }
+    } else {
+      if (collapsed) {
+        // not possible, button is not visible (field is collapsed and cannot further decrease its size)
+      } else if (minimized || !minimizable) {
+        this.setFieldCollapsed(true);
+      } else {
+        this.setFieldMinimized(true);
+      }
+    }
+  }
 };
 
 /**

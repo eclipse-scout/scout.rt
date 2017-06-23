@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.SplitBoxAdapter = function() {
   scout.SplitBoxAdapter.parent.call(this);
-  this._addRemoteProperties(['collapsibleField', 'fieldCollapsed']);
+  this._addRemoteProperties(['collapsibleField', 'fieldCollapsed', 'minSplitterPosition', 'fieldMinimized']);
 };
 scout.inherits(scout.SplitBoxAdapter, scout.CompositeFieldAdapter);
 

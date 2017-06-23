@@ -98,17 +98,59 @@ public final class JsonObjectUtility {
   }
 
   /**
-   * Like {@link JSONObject#optLong(String)}, but returns <code>null</code> if the property does not exist (the other
-   * method can only return primitives).
+   * Like {@link JSONObject#optLong(String)}, but returns <code>null</code> if the property does not exist or is null
+   * (the other method can only return primitives).
    */
   public static Long optLong(JSONObject json, String propertyName) {
     if (json == null || propertyName == null) {
       return null;
     }
+    // method optLong(propertyName) returns 0L for values (e.g. strings) which are not convertible to a long value, use optLong(propertyName, fallback) method to return null for not convertible values
     long value = json.optLong(propertyName, -1);
     if (value == -1) {
       // Check if the value is really -1
       long value2 = json.optLong(propertyName, -2);
+      if (value2 == -2) {
+        return null;
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Like {@link JSONObject#optDouble(String)}, but returns <code>null</code> if the property does not exist or is null
+   * (the other method can only return primitives).
+   */
+  @SuppressWarnings("squid:S1244")
+  public static Double optDouble(JSONObject json, String propertyName) {
+    if (json == null || propertyName == null) {
+      return null;
+    }
+    // method optDouble(propertyName) returns NaN for values (e.g. strings) which are not convertible to a double value, use optDouble(propertyName, fallback) method to return null for not convertible values
+    double value = json.optDouble(propertyName, -1);
+    if (value == -1) {
+      // Check if the value is really -1
+      double value2 = json.optDouble(propertyName, -2);
+      if (value2 == -2) {
+        return null;
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Like {@link JSONObject#optInt(String)}, but returns <code>null</code> if the property does not exist or is null
+   * (the other method can only return primitives).
+   */
+  public static Integer optInt(JSONObject json, String propertyName) {
+    if (json == null || propertyName == null) {
+      return null;
+    }
+    // method optInt(propertyName) returns 0 for values (e.g. strings) which are not convertible to an int value, use optInt(propertyName, fallback) method to return null for not convertible values
+    int value = json.optInt(propertyName, -1);
+    if (value == -1) {
+      // Check if the value is really -1
+      int value2 = json.optInt(propertyName, -2);
       if (value2 == -2) {
         return null;
       }

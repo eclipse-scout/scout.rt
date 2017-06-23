@@ -88,6 +88,54 @@ public class JsonObjectUtilityTest {
   }
 
   @Test
+  public void testOptDouble() {
+    JSONObject json = new JSONObject();
+    json.put("test", "Test-String");
+    json.put("value", 12345);
+    json.put("zero", 0);
+    json.put("neg", -1);
+    json.put("fracValue", 1.9);
+    json.put("existing", true);
+
+    // should not throw exception
+    assertNull(JsonObjectUtility.optDouble(null, null));
+    assertNull(JsonObjectUtility.optDouble(json, null));
+    assertNull(JsonObjectUtility.optDouble(null, "test"));
+
+    assertNull(JsonObjectUtility.optDouble(json, "test"));
+    assertNull(JsonObjectUtility.optDouble(json, "xyz"));
+    assertNull(JsonObjectUtility.optDouble(json, "existing"));
+    assertEquals(12345.0, JsonObjectUtility.optDouble(json, "value"), 0.0);
+    assertEquals(0.0, JsonObjectUtility.optDouble(json, "zero"), 0.0);
+    assertEquals(-1.0, JsonObjectUtility.optDouble(json, "neg"), 0.0);
+    assertEquals(1.9, JsonObjectUtility.optDouble(json, "fracValue"), 0.0);
+  }
+
+  @Test
+  public void testOptInt() {
+    JSONObject json = new JSONObject();
+    json.put("test", "Test-String");
+    json.put("value", 12345);
+    json.put("zero", 0);
+    json.put("neg", -1);
+    json.put("fracValue", 1.9);
+    json.put("existing", true);
+
+    // should not throw exception
+    assertNull(JsonObjectUtility.optInt(null, null));
+    assertNull(JsonObjectUtility.optInt(json, null));
+    assertNull(JsonObjectUtility.optInt(null, "test"));
+
+    assertNull(JsonObjectUtility.optInt(json, "test"));
+    assertNull(JsonObjectUtility.optInt(json, "xyz"));
+    assertNull(JsonObjectUtility.optInt(json, "existing"));
+    assertEquals((Integer) 12345, JsonObjectUtility.optInt(json, "value"));
+    assertEquals((Integer) 0, JsonObjectUtility.optInt(json, "zero"));
+    assertEquals((Integer) (-1), JsonObjectUtility.optInt(json, "neg"));
+    assertEquals((Integer) 1, JsonObjectUtility.optInt(json, "fracValue")); // cut off by cast
+  }
+
+  @Test
   public void testPutIfNotNull() {
     // Default behavior
     JSONArray array = new JSONArray();

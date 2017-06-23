@@ -72,10 +72,16 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return 0.5;
   }
 
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(345)
+  protected Double getConfiguredMinSplitterPosition() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.STRING)
   @Order(340)
   protected String getConfiguredSplitterPositionType() {
-    return SPLITTER_POSITION_TYPE_RELATIVE;
+    return SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -108,6 +114,12 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(400)
+  protected boolean getConfiguredFieldMinimized() {
+    return false;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -116,6 +128,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     setSplitHorizontal(getConfiguredSplitHorizontal());
     setSplitterEnabled(getConfiguredSplitterEnabled());
     setSplitterPosition(getConfiguredSplitterPosition());
+    setMinSplitterPosition(getConfiguredMinSplitterPosition());
     setSplitterPositionType(getConfiguredSplitterPositionType());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     setCacheSplitterPositionPropertyName(getConfiguredCacheSplitterPositionPropertyName());
@@ -124,6 +137,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     }
     setFieldCollapsed(getConfiguredFieldCollapsed());
     setCollapseKeyStroke(getConfiguredCollapseKeyStroke());
+    setFieldMinimized(getConfiguredFieldMinimized());
   }
 
   @Override
@@ -178,6 +192,16 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   }
 
   @Override
+  public Double getMinSplitterPosition() {
+    return (Double) propertySupport.getProperty(PROP_MIN_SPLITTER_POSITION);
+  }
+
+  @Override
+  public void setMinSplitterPosition(Double minPosition) {
+    propertySupport.setProperty(PROP_MIN_SPLITTER_POSITION, minPosition);
+  }
+
+  @Override
   public String getSplitterPositionType() {
     return propertySupport.getPropertyString(PROP_SPLITTER_POSITION_TYPE);
   }
@@ -185,6 +209,16 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   public void setSplitterPositionType(String splitterPositionType) {
     propertySupport.setPropertyString(PROP_SPLITTER_POSITION_TYPE, splitterPositionType);
+  }
+
+  @Override
+  public boolean isFieldMinimized() {
+    return propertySupport.getPropertyBool(PROP_FIELD_MINIMIZED);
+  }
+
+  @Override
+  public void setFieldMinimized(boolean minimized) {
+    propertySupport.setPropertyBool(PROP_FIELD_MINIMIZED, minimized);
   }
 
   @Override
@@ -247,6 +281,21 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     @Override
     public void setSplitterPositionFromUI(double splitterPosition) {
       setSplitterPosition(splitterPosition);
+    }
+
+    @Override
+    public void setMinSplitterPositionFromUI(Double minSplitterPosition) {
+      setMinSplitterPosition(minSplitterPosition);
+    }
+
+    @Override
+    public void setFieldCollapsedFromUI(boolean collapsed) {
+      setFieldCollapsed(collapsed);
+    }
+
+    @Override
+    public void setFieldMinimizedFromUI(boolean minimized) {
+      setFieldMinimized(minimized);
     }
   } // end UIFacade
 

@@ -13,4 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 public interface ISplitBoxUIFacade {
 
   void setSplitterPositionFromUI(double splitterPosition);
+
+  void setMinSplitterPositionFromUI(Double minSplitterPosition);
+
+  void setFieldCollapsedFromUI(boolean collapsed);
+
+  void setFieldMinimizedFromUI(boolean minimized);
 }

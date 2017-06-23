@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
@@ -70,6 +71,12 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
         return getModel().getSplitterPosition();
       }
     });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_MIN_SPLITTER_POSITION, model) {
+      @Override
+      protected Double modelValue() {
+        return getModel().getMinSplitterPosition();
+      }
+    });
     putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_SPLITTER_POSITION_TYPE, model) {
       @Override
       protected String modelValue() {
@@ -111,6 +118,12 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
         return getModel().getCollapseKeyStroke();
       }
     });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_FIELD_MINIMIZED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isFieldMinimized();
+      }
+    });
   }
 
   @Override
@@ -147,18 +160,28 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
     }
   }
 
+  protected void handleUiSetSplitterPosition(JsonEvent event) {
+    double splitterPosition = event.getData().optDouble("splitterPosition");
+    addPropertyEventFilterCondition(ISplitBox.PROP_SPLITTER_POSITION, splitterPosition);
+    getModel().getUIFacade().setSplitterPositionFromUI(splitterPosition);
+  }
+
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ISplitBox.PROP_FIELD_COLLAPSED.equals(propertyName)) {
       boolean fieldCollapsed = data.getBoolean("fieldCollapsed");
       addPropertyEventFilterCondition(ISplitBox.PROP_FIELD_COLLAPSED, fieldCollapsed);
-      getModel().setFieldCollapsed(fieldCollapsed);
+      getModel().getUIFacade().setFieldCollapsedFromUI(fieldCollapsed);
     }
-  }
-
-  protected void handleUiSetSplitterPosition(JsonEvent event) {
-    double splitterPosition = event.getData().optDouble("splitterPosition");
-    addPropertyEventFilterCondition(ISplitBox.PROP_SPLITTER_POSITION, splitterPosition);
-    getModel().getUIFacade().setSplitterPositionFromUI(splitterPosition);
+    else if (ISplitBox.PROP_FIELD_MINIMIZED.equals(propertyName)) {
+      boolean fieldMinimized = data.getBoolean("fieldMinimized");
+      addPropertyEventFilterCondition(ISplitBox.PROP_FIELD_MINIMIZED, fieldMinimized);
+      getModel().getUIFacade().setFieldMinimizedFromUI(fieldMinimized);
+    }
+    else if (ISplitBox.PROP_MIN_SPLITTER_POSITION.equals(propertyName)) {
+      Double minSplitterPosition = JsonObjectUtility.optDouble(data, "minSplitterPosition");
+      addPropertyEventFilterCondition(ISplitBox.PROP_MIN_SPLITTER_POSITION, minSplitterPosition);
+      getModel().getUIFacade().setMinSplitterPositionFromUI(minSplitterPosition);
+    }
   }
 }

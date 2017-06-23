@@ -33,7 +33,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
     hasSecondField = (htmlSecondField && htmlSecondField.isVisible()),
     hasTwoFields = hasFirstField && hasSecondField,
     hasOneField = !hasTwoFields && (hasFirstField || hasSecondField),
-    splitterPosition = this.splitBox.splitterPosition;
+    splitterPosition = this.splitBox.getEffectiveSplitterPosition();
 
   // remove splitter size from available with, only when both fields are visible
   // otherwise the splitter is invisible and requires no space.
@@ -52,10 +52,14 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
     firstFieldSize = new scout.Dimension(availableSizeForFields);
     secondFieldSize = new scout.Dimension(availableSizeForFields);
     if (splitXAxis) { // "|"
-      if (this.splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
-        // Relative
+      if (this.splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+        // Relative first
         firstFieldSize.width = Math.floor(firstFieldSize.width * splitterPosition);
         secondFieldSize.width -= firstFieldSize.width;
+      } else if (this.splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+        // Relative second
+        secondFieldSize.width = Math.floor(secondFieldSize.width * splitterPosition);
+        firstFieldSize.width -= secondFieldSize.width;
       } else {
         // Absolute
         splitterPosition = Math.min(splitterPosition, availableSizeForFields.width);
@@ -68,10 +72,14 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
         }
       }
     } else { // "--"
-      if (this.splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
-        // Relative
+      if (this.splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+        // Relative first
         firstFieldSize.height = Math.floor(firstFieldSize.height * splitterPosition);
         secondFieldSize.height -= firstFieldSize.height;
+      } else if (this.splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+        // Relative second
+        secondFieldSize.height = Math.floor(secondFieldSize.height * splitterPosition);
+        firstFieldSize.height -= secondFieldSize.height;
       } else {
         // Absolute
         splitterPosition = Math.min(splitterPosition, availableSizeForFields.height);
@@ -112,23 +120,23 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
 
   // Calculate collapse button position
   if (this.splitBox._collapseHandle) {
-    this._positionCollapseHandle(hasFirstField, firstFieldBounds);
+    var $collapseHandle = this.splitBox._collapseHandle.$container;
+
+    // Show collapse handle, if split box has two fields which are visible (one field may be collapsed)
+    var collapseHandleVisible = this.splitBox.firstField && this.splitBox.firstField.visible && this.splitBox.secondField && this.splitBox.secondField.visible;
+    $collapseHandle.toggleClass('hidden', !collapseHandleVisible);
+
+    var x = null;
+    if (hasTwoFields) {
+      //- if 1st field is collapsible -> align button on the right side of the field (there is not enough space on the left side)
+      //- if 2nd field is collapsible -> button is always aligned on the right side using CSS
+      if (this.splitBox.collapsibleField === this.splitBox.firstField) {
+        var collapseHandleSize = scout.graphics.size($collapseHandle);
+        x = firstFieldBounds.width - collapseHandleSize.width;
+      }
+    }
+    $collapseHandle.cssLeft(x);
   }
-};
-
-scout.SplitBoxLayout.prototype._positionCollapseHandle = function(hasFirstField, firstFieldBounds) {
-  //- if 1st field is collapsible -> align button on the right side of the field (there is not enough space on the left side)
-  //- if 2nd field is collapsible -> button is always aligned on the right side using CSS
-  // top position is set using CSS
-  var x,
-    $collapseHandle = this.splitBox._collapseHandle.$container,
-    collapseHandleSize = scout.graphics.size($collapseHandle);
-
-  if (this.splitBox.collapsibleField === this.splitBox.firstField) {
-    x = hasFirstField ? firstFieldBounds.width - collapseHandleSize.width : 0;
-  }
-
-  $collapseHandle.cssLeft(x);
 };
 
 scout.SplitBoxLayout.prototype.preferredLayoutSize = function($container) {
