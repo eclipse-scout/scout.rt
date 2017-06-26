@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -135,14 +135,14 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
     assertNull(getErrorStatus());
     setValue(101);
     assertNotNull(getErrorStatus());
-    assertEquals(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
 
     setMinValue(10);
 
     setValue(20);
     assertNull(getErrorStatus());
     setValue(101);
-    assertEquals(ScoutTexts.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
   }
 
   @Test
@@ -153,14 +153,14 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
     assertNull(getErrorStatus());
     setValue(99);
     assertNotNull(getErrorStatus());
-    assertEquals(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())), getErrorStatus().getMessage());
 
     setMaxValue(200);
 
     setValue(150);
     assertNull(getErrorStatus());
     setValue(50);
-    assertEquals(ScoutTexts.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
   }
 
   private String formatWithFractionDigits(Number number, int fractionDigits) {

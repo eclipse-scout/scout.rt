@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttr
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
@@ -50,7 +50,7 @@ public class AttributeNode extends AbstractComposerNode {
     }
     String prefix = "";
     if (getSiblingBefore() != null) {
-      prefix = ScoutTexts.get("ExtendedSearchAnd") + " ";
+      prefix = TEXTS.get("ExtendedSearchAnd") + " ";
     }
     if (m_op != null && m_attribute != null) {
       if (m_attribute.getType() == DataModelConstants.TYPE_AGGREGATE_COUNT) {
@@ -129,7 +129,7 @@ public class AttributeNode extends AbstractComposerNode {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchEditAttributeMenu");
+      return TEXTS.get("ExtendedSearchEditAttributeMenu");
     }
 
     @Override
@@ -167,7 +167,7 @@ public class AttributeNode extends AbstractComposerNode {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchRemoveAttributeMenu");
+      return TEXTS.get("ExtendedSearchRemoveAttributeMenu");
     }
 
     @Override

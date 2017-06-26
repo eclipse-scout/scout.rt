@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("60f8536e-c0db-44c5-88ae-83289620f790")
 public abstract class AbstractFormStateButton extends AbstractButton {
@@ -31,7 +31,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
    */
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("FormStateLoad");
+    return TEXTS.get("FormStateLoad");
   }
 
   @Override
@@ -45,7 +45,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("FormStateStore");
+      return TEXTS.get("FormStateStore");
     }
 
     @Override
@@ -60,7 +60,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("FormStateStoreAs");
+      return TEXTS.get("FormStateStoreAs");
     }
 
     @Override

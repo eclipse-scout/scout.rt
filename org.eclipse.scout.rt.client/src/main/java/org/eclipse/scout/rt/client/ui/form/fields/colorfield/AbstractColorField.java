@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.ColorUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("1411a921-017a-4d64-b898-9ab01b9fa73a")
 public abstract class AbstractColorField extends AbstractBasicField<String> implements IColorField {
@@ -71,16 +71,16 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
         if (r < 0 || r > 255
             || g < 0 || g > 255
             || b < 0 || b > 255) {
-          throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
+          throw new ProcessingException(TEXTS.get("InvalidValueMessageX", text));
         }
         String hexValue = ColorUtility.rgbToText(r, g, b).toUpperCase();
         return hexValue;
       }
     }
     catch (Exception e) {
-      throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
+      throw new ProcessingException(TEXTS.get("InvalidValueMessageX", text), e);
     }
-    throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
+    throw new ProcessingException(TEXTS.get("InvalidValueMessageX", text));
   }
 
   @Override

@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
@@ -71,7 +71,7 @@ public class BookmarkViewForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("Bookmarks");
+    return TEXTS.get("Bookmarks");
   }
 
   public void startView() {
@@ -119,7 +119,7 @@ public class BookmarkViewForm extends AbstractForm {
       public class BookmarksBox extends AbstractGroupBox {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("Bookmarks");
+          return TEXTS.get("Bookmarks");
         }
 
         @Override
@@ -134,12 +134,12 @@ public class BookmarkViewForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return ScoutTexts.get("FilterBookmarkTree");
+            return TEXTS.get("FilterBookmarkTree");
           }
 
           @Override
           protected String getConfiguredTooltipText() {
-            return ScoutTexts.get("SmartFindLabel");
+            return TEXTS.get("SmartFindLabel");
           }
 
           @Override
@@ -211,7 +211,7 @@ public class BookmarkViewForm extends AbstractForm {
         public class AddBookmarksLinkButton extends AbstractLinkButton {
           @Override
           protected String getConfiguredLabel() {
-            return ScoutTexts.get("BookmarksAddMenu");
+            return TEXTS.get("BookmarksAddMenu");
           }
 
           @Override
@@ -271,7 +271,7 @@ public class BookmarkViewForm extends AbstractForm {
         public class SetStartPageLinkButton extends AbstractLinkButton {
           @Override
           protected String getConfiguredLabel() {
-            return ScoutTexts.get("BookmarksStartPageMenuSet");
+            return TEXTS.get("BookmarksStartPageMenuSet");
           }
 
           @Override
@@ -297,7 +297,7 @@ public class BookmarkViewForm extends AbstractForm {
         public class ClearStartPageLinkButton extends AbstractLinkButton {
           @Override
           protected String getConfiguredLabel() {
-            return ScoutTexts.get("BookmarksStartPageMenuClear");
+            return TEXTS.get("BookmarksStartPageMenuClear");
           }
 
           @Override

@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -319,7 +319,7 @@ public class ServiceOperationInvoker {
           .withSeverity(ve.getStatus().getSeverity());
     }
     else {
-      p = new ProcessingException(ScoutTexts.get("RequestProblem"));
+      p = new ProcessingException(TEXTS.get("RequestProblem"));
     }
     p.setStackTrace(new StackTraceElement[0]);
     return p;

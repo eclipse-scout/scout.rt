@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.jdbc.SQL;
 import org.eclipse.scout.rt.server.services.lookup.AbstractLookupService;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
@@ -131,7 +131,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
   public List<ILookupRow<T>> getDataByAll(ILookupCall<T> call) {
     String sql = getConfiguredSqlSelect();
     if (containsRefusingAllTag(sql)) {
-      throw new VetoException(ScoutTexts.get("SearchTextIsTooGeneral"));
+      throw new VetoException(TEXTS.get("SearchTextIsTooGeneral"));
     }
     List<ILookupRow<T>> rows = execLoadLookupRows(sql, filterSqlByAll(sql), call);
     return rows;

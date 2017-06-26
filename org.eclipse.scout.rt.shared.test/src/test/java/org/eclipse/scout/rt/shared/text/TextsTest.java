@@ -14,20 +14,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -36,22 +29,6 @@ import org.junit.runner.RunWith;
  */
 @RunWith(PlatformTestRunner.class)
 public class TextsTest {
-
-  private List<IBean<?>> m_testTextService;
-
-  @Before
-  public void before() {
-    m_testTextService = TestingUtility.registerBeans(
-        new BeanMetaData(TestTextProviderService.class)
-            .withApplicationScoped(true));
-    ScoutTexts.CURRENT.set(new ScoutTexts(BEANS.all(ITextProviderService.class)));
-  }
-
-  @After
-  public void after() {
-    TestingUtility.unregisterBeans(m_testTextService);
-    ScoutTexts.CURRENT.remove();
-  }
 
   @Test
   public void testGet() {
@@ -68,7 +45,7 @@ public class TextsTest {
 
   @Test
   public void testGetTextMap() {
-    Map<String, String> textMap = ScoutTexts.getInstance().getTextMap(Locale.ENGLISH);
+    Map<String, String> textMap = BEANS.get(ScoutTexts.class).getTextMap(Locale.ENGLISH);
     assertNotNull(textMap);
   }
 }

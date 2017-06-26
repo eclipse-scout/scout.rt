@@ -80,7 +80,6 @@ import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -967,7 +966,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       }
     }
 
-    VetoException veto = new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
+    VetoException veto = new VetoException(TEXTS.get("SmartFieldCannotComplete", text));
     veto.withCode(numResults > 1 ? NOT_UNIQUE_ERROR_CODE : NO_RESULTS_ERROR_CODE);
     throw veto;
   }

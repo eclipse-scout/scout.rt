@@ -49,7 +49,6 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -776,7 +775,7 @@ public final class BookmarkUtility {
       final boolean childPageHidden = childPage == null || (!childPage.isFilterAccepted() && table.getUserFilterManager() != null);
       if (childPageHidden) {
         table.getUserFilterManager().reset();
-        tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResetColumnFilters"), IStatus.WARNING));
+        tablePage.setTableStatus(new Status(TEXTS.get("BookmarkResetColumnFilters"), IStatus.WARNING));
       }
     }
 
@@ -785,10 +784,10 @@ public final class BookmarkUtility {
       if (resetViewAndWarnOnFail) {
         // set appropriate warning
         if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
-          tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.ERROR));
+          tablePage.setTableStatus(new Status(TEXTS.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.ERROR));
         }
         else {
-          tablePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
+          tablePage.setTableStatus(new Status(TEXTS.get("BookmarkResolutionCanceled"), IStatus.ERROR));
         }
       }
       childPage = null;
@@ -816,7 +815,7 @@ public final class BookmarkUtility {
       }
       // set appropriate warning if child page is not available or filtered out
       if (childPage == null && resetViewAndWarnOnFail) {
-        nodePage.setTableStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.ERROR));
+        nodePage.setTableStatus(new Status(TEXTS.get("BookmarkResolutionCanceled"), IStatus.ERROR));
       }
     }
     return childPage;

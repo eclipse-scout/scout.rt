@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -53,7 +52,6 @@ public class AbstractServerSessionTest {
     byte[] serializedSession = m_objs.serialize(m_testSession);
     IServerSession deserializedSession = m_objs.deserialize(serializedSession, IServerSession.class);
     assertSessionsEquals(m_testSession, deserializedSession);
-    assertNotNull(deserializedSession.getTexts());
   }
 
   @Test
@@ -62,7 +60,6 @@ public class AbstractServerSessionTest {
     byte[] serializedSession = m_objs.serialize(m_testSession);
     IServerSession deserializedSession = m_objs.deserialize(serializedSession, IServerSession.class);
     assertSessionsEquals(m_testSession, deserializedSession);
-    assertNotNull(deserializedSession.getTexts());
   }
 
   private void assertSessionsEquals(IServerSession expected, IServerSession actual) {

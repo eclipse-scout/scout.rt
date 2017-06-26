@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc;
 
-import java.lang.reflect.Method;
 import java.security.Permission;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -66,6 +65,7 @@ import org.eclipse.scout.rt.server.jdbc.internal.pool.SqlConnectionPool;
 import org.eclipse.scout.rt.server.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
@@ -93,7 +93,6 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   private final String m_defaultPass;
   private final int m_queryCacheSize;
   private final int m_maxFetchMemorySize;
-  private final Class<? extends ScoutTexts> m_nlsProvider;
   private final ISqlStyle m_sqlStyle;
 
   private final Map<String, List<Class<?>>> m_permissionNameToDescriptor;
@@ -123,7 +122,6 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     m_jdbcPoolConnectionBusyTimeout = getPropertyValue(SqlJdbcPoolConnectionBusyTimeoutProperty.class, getConfiguredJdbcPoolConnectionBusyTimeout());
     m_jdbcPoolConnectionLifetime = getPropertyValue(SqlJdbcPoolConnectionLifetimeProperty.class, getConfiguredJdbcPoolConnectionLifetime());
     m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
-    m_nlsProvider = getConfiguredNlsProvider();
 
     // load sql style
     Class<? extends ISqlStyle> styleClass = getConfiguredSqlStyle();
@@ -219,6 +217,11 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     return null;
   }
 
+  /**
+   * @deprecated scope-specific text support is removed without replacement. {@link TEXTS#get(String)} is used instead.
+   */
+  // TODO [7.1] abr: remove this method
+  @Deprecated
   @ConfigProperty(ConfigProperty.NLS_PROVIDER)
   @Order(70)
   protected Class<? extends ScoutTexts> getConfiguredNlsProvider() {
@@ -399,20 +402,8 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       if (args.length < 1) {
         throw new IllegalArgumentException("expected at least 1 argument for function '" + functionName + "'");
       }
-      if (args.length == 1) {
-        String[] tmp = new String[2];
-        tmp[0] = args[0];
-        tmp[1] = null;
-        args = tmp;
-      }
-      try {
-        Method m = getNlsProvider().getMethod("get", new Class[]{String.class, String[].class});
-        Object ret = m.invoke(null, (Object[]) args);
-        return ret != null ? ret : new StringHolder();
-      }
-      catch (Exception t) {
-        throw new ProcessingException("unknown function in DynamicNls, check 'getConfiguredNlsProvider' / 'getNlsProvider': get", t);
-      }
+      String ret = TEXTS.get(args[0]);
+      return ret != null ? ret : new StringHolder();
     }
     else {
       throw new IllegalArgumentException("undefined function '" + functionName + "'");
@@ -536,8 +527,13 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     return null;
   }
 
+  /**
+   * @deprecated scope-specific text support is removed without replacement. {@link TEXTS#get(String)} is used instead.
+   */
+  // TODO [7.1] abr: remove this method
+  @Deprecated
   public Class<? extends ScoutTexts> getNlsProvider() {
-    return m_nlsProvider;
+    return null;
   }
 
   @Override

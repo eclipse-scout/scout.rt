@@ -16,7 +16,7 @@ import java.util.Collections;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * Factory for message boxes.
@@ -52,21 +52,21 @@ public final class MessageBoxes {
    * Do not forget to call {@link #show()} at the end.
    */
   public static IMessageBox createOk() {
-    return MessageBoxes.create().withYesButtonText(ScoutTexts.get("OkButton"));
+    return MessageBoxes.create().withYesButtonText(TEXTS.get("OkButton"));
   }
 
   /**
    * Creates e message box with yes and not buttons.
    */
   public static IMessageBox createYesNo() {
-    return MessageBoxes.create().withYesButtonText(ScoutTexts.get("YesButton")).withNoButtonText(ScoutTexts.get("NoButton"));
+    return MessageBoxes.create().withYesButtonText(TEXTS.get("YesButton")).withNoButtonText(TEXTS.get("NoButton"));
   }
 
   /**
    * Creates a message box with yes, no and cancel buttons.
    */
   public static IMessageBox createYesNoCancel() {
-    return MessageBoxes.createYesNo().withCancelButtonText(ScoutTexts.get("CancelButton"));
+    return MessageBoxes.createYesNo().withCancelButtonText(TEXTS.get("CancelButton"));
   }
 
   /**
@@ -149,11 +149,11 @@ public final class MessageBoxes {
     String header = null;
     String body = null;
     if (itemType != null) {
-      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationTextX", itemType) : ScoutTexts.get("DeleteConfirmationTextNoItemListX", itemType));
+      header = (n > 0 ? TEXTS.get("DeleteConfirmationTextX", itemType) : TEXTS.get("DeleteConfirmationTextNoItemListX", itemType));
       body = (n > 0 ? t.toString() : null);
     }
     else {
-      header = (n > 0 ? ScoutTexts.get("DeleteConfirmationText") : ScoutTexts.get("DeleteConfirmationTextNoItemList"));
+      header = (n > 0 ? TEXTS.get("DeleteConfirmationText") : TEXTS.get("DeleteConfirmationTextNoItemList"));
       body = (n > 0 ? t.toString() : null);
     }
 

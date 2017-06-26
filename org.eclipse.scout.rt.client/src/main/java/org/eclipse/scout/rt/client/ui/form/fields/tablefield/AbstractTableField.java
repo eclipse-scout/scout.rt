@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.slf4j.Logger;
@@ -428,7 +428,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       table.ensureInvalidColumnsVisible();
     }
     if (tableDesc != null) {
-      tableDesc.setDisplayText(ScoutTexts.get("TableName") + " " + getLabel() + ": " + CollectionUtility.format(columnNames));
+      tableDesc.setDisplayText(TEXTS.get("TableName") + " " + getLabel() + ": " + CollectionUtility.format(columnNames));
     }
     return tableDesc;
   }

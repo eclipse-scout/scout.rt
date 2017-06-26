@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -43,13 +44,13 @@ public class TextKeyTextProviderService implements ITextProviderService {
     LOG.info("Register TextKeyTextProviderService with high priority. ScoutTexts will return text keys instead of localized texts");
     BeanMetaData beanData = new BeanMetaData(TextKeyTextProviderService.class).withOrder(Double.MIN_VALUE + 1);
     Platform.get().getBeanManager().registerBean(beanData);
-    ScoutTexts.getInstance().reloadTextProviders();
+    BEANS.get(ScoutTexts.class).reloadTextProviders();
   }
 
   public static void unregister() {
     LOG.info("Unregistered TextKeyTextProviderService. ScoutTexts will work as usual");
     Platform.get().getBeanManager().unregisterClass(TextKeyTextProviderService.class);
-    ScoutTexts.getInstance().reloadTextProviders();
+    BEANS.get(ScoutTexts.class).reloadTextProviders();
   }
 
   /**

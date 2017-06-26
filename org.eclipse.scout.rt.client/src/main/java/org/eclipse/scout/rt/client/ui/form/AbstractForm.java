@@ -126,7 +126,6 @@ import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.PreferredValue;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -301,7 +300,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
   protected String getConfiguredCancelVerificationText() {
-    return ScoutTexts.get("FormSaveChangesQuestion");
+    return TEXTS.get("FormSaveChangesQuestion");
   }
 
   /**
@@ -1886,7 +1885,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     List<CharSequence> content = new ArrayList<>();
 
     if (mandatoryTexts.size() > 0) {
-      content.add(HTML.bold(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
+      content.add(HTML.bold(TEXTS.get("FormEmptyMandatoryFieldsMessage")));
 
       List<IHtmlListElement> mandatoryTextElements = new ArrayList<>();
       for (String e : mandatoryTexts) {
@@ -1896,7 +1895,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       content.add(HTML.br());
     }
     if (invalidTexts.size() > 0) {
-      content.add(HTML.bold(ScoutTexts.get("FormInvalidFieldsMessage")));
+      content.add(HTML.bold(TEXTS.get("FormInvalidFieldsMessage")));
 
       List<IHtmlListElement> invalidTextElements = new ArrayList<>();
       for (String e : invalidTexts) {
@@ -1986,7 +1985,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           return;
         }
         else {
-          VetoException e = new VetoException(ScoutTexts.get("UserCancelledOperation"));
+          VetoException e = new VetoException(TEXTS.get("UserCancelledOperation"));
           e.consume();
           throw e;
         }
@@ -2507,7 +2506,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       getDesktop().openUri(res, OpenUriAction.DOWNLOAD);
     }
     catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException(ScoutTexts.get("FormExportXml") + " " + getTitle(), e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException(TEXTS.get("FormExportXml") + " " + getTitle(), e));
     }
   }
 

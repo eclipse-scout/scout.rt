@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.data.model.DataModelAttributeOp;
@@ -76,7 +76,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(listBox);
     listBox.setValue(new HashSet<Long>(Arrays.asList(2L)));
     m_searchFilterService.applySearchDelegate(listBox, m_searchFilter, false);
-    Assert.assertEquals(LABEL + " " + ScoutTexts.get("LogicIn") + " " + listBox.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicIn") + " " + listBox.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -86,7 +86,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(treeBox);
     treeBox.setValue(new HashSet<Long>(Arrays.asList(2L)));
     m_searchFilterService.applySearchDelegate(treeBox, m_searchFilter, false);
-    Assert.assertEquals(LABEL + " " + ScoutTexts.get("LogicIn") + " " + treeBox.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicIn") + " " + treeBox.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -96,7 +96,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(labelField);
     labelField.setValue("value");
     m_searchFilterService.applySearchDelegate(labelField, m_searchFilter, false);
-    Assert.assertEquals(LABEL + " " + ScoutTexts.get("LogicLike") + " " + labelField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + labelField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -106,7 +106,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(stringField);
     stringField.setValue("value");
     m_searchFilterService.applySearchDelegate(stringField, m_searchFilter, false);
-    Assert.assertEquals(LABEL + " " + ScoutTexts.get("LogicLike") + " " + stringField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -116,7 +116,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(htmlField);
     htmlField.setValue("value");
     m_searchFilterService.applySearchDelegate(htmlField, m_searchFilter, false);
-    Assert.assertEquals(LABEL + " " + ScoutTexts.get("LogicLike") + " " + htmlField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + htmlField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -158,7 +158,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(field);
     field.setValue(1L);
     m_searchFilterService.applySearchDelegate(field, m_searchFilter, false);
-    Assert.assertEquals(LABEL + " " + ScoutTexts.get("LogicEQ") + " " + field.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicEQ") + " " + field.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -180,7 +180,7 @@ public class DefaultSearchFilterServiceTest {
     Assert.assertEquals("", m_searchFilter.getDisplayTextsPlain());
     stringField.setValue("value");
     m_searchFilterService.applySearchDelegate(stringField, m_searchFilter, false);
-    Assert.assertEquals(seqBox.getLabel() + " " + ScoutTexts.get("LogicLike") + " " + stringField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(seqBox.getLabel() + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test

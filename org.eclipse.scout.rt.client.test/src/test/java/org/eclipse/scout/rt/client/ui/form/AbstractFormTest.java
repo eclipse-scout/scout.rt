@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -136,7 +136,7 @@ public class AbstractFormTest {
     String htmlErrorMessage = "";
 
     String expectedErrorMessage = HTML.fragment(
-        HTML.bold(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")),
+        HTML.bold(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
         HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(": "))),
         HTML.br()).toHtml();
 

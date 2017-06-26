@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -100,7 +101,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   private IMemoryPolicy m_memoryPolicy;
   private final SessionData m_sessionData;
-  private ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
   private URI m_browserUri;
@@ -112,7 +112,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this, true);
-    m_scoutTexts = new ScoutTexts();
     m_sharedVariableMap = new SharedVariableMap();
 
     setLocale(NlsLocale.get());
@@ -165,14 +164,14 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * Returns the {@link ScoutTexts} instance assigned to the type (class) of the current ClientSession.
-   * <p>
-   * Override this method to set the application specific texts implementation
-   * </p>
+   * @deprecated use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
    */
+  // TODO [7.1] abr: remove this method
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public ScoutTexts getTexts() {
-    return m_scoutTexts;
+    return BEANS.get(ScoutTexts.class);
   }
 
   @Override

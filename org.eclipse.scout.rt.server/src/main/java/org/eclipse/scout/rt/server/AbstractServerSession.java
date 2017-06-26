@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.server;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +34,7 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -64,7 +63,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private boolean m_active;
   private final SessionData m_sessionData;
   private final SharedVariableMap m_sharedVariableMap;
-  private transient ScoutTexts m_scoutTexts;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
@@ -72,19 +70,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_sessionData = new SessionData();
     m_sharedVariableMap = new SharedVariableMap();
     m_objectExtensions = new ObjectExtensions<>(this, true);
-    m_scoutTexts = new ScoutTexts();
     if (autoInitConfig) {
       interceptInitConfig();
-    }
-  }
-
-  /**
-   * This method is used for deserialization.
-   */
-  private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-    ois.defaultReadObject();
-    if (m_scoutTexts == null) {
-      m_scoutTexts = new ScoutTexts();
     }
   }
 
@@ -132,16 +119,14 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   /**
-   * <p>
-   * Returns the {@link ScoutTexts} instance assigned to the type (class) of the current ServerSession.
-   * </p>
-   * <p>
-   * Override this method to set the application specific texts implementation
-   * </p>
+   * @deprecated use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
    */
+  // TODO [7.1] abr: remove this method
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public ScoutTexts getTexts() {
-    return m_scoutTexts;
+    return BEANS.get(ScoutTexts.class);
   }
 
   @Override

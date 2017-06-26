@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,10 +157,10 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   private <T extends Comparable<T>> IStatus checkFromTo(IValueField<T> from, IValueField<T> to, boolean lessMessage) {
     if (from != null && to != null && ObjectUtility.compareTo(from.getValue(), to.getValue()) > 0) {
       if (lessMessage) {
-        return new InvalidSequenceStatus(ScoutTexts.get("XMustBeLessThanOrEqualY", from.getLabel(), to.getLabel()));
+        return new InvalidSequenceStatus(TEXTS.get("XMustBeLessThanOrEqualY", from.getLabel(), to.getLabel()));
       }
       else {
-        return new InvalidSequenceStatus(ScoutTexts.get("XMustBeGreaterThanOrEqualY", to.getLabel(), from.getLabel()));
+        return new InvalidSequenceStatus(TEXTS.get("XMustBeGreaterThanOrEqualY", to.getLabel(), from.getLabel()));
       }
     }
     return null;

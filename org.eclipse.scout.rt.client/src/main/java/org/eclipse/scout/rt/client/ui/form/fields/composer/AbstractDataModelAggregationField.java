@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -48,7 +48,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
 
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("ComposerFieldAggregationLabel");
+    return TEXTS.get("ComposerFieldAggregationLabel");
   }
 
   @Override

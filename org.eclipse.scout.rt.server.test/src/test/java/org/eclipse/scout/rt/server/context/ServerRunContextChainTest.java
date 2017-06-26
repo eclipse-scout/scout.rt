@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -121,12 +120,7 @@ public class ServerRunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(ClientNotificationCollector.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 15. ThreadLocalProcessor for ScoutTexts.CURRENT
-    c = chainIterator.next();
-    assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(ScoutTexts.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
-
-    // 16. TransactionProcessor
+    // 15. TransactionProcessor
     c = chainIterator.next();
     assertEquals(TransactionProcessor.class, c.getClass());
 

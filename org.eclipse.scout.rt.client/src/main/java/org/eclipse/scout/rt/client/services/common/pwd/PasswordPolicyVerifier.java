@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,16 +66,16 @@ public class PasswordPolicyVerifier {
         if (remainDays < warnInAdvanceDays) {
           String header;
           if (remainDays == 0) {
-            header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Today"));
+            header = TEXTS.get("PasswordWillExpireHeaderX", TEXTS.get("Today"));
           }
           else if (remainDays == 1) {
-            header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow"));
+            header = TEXTS.get("PasswordWillExpireHeaderX", TEXTS.get("Tomorrow"));
           }
           else {
-            header = ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays));
+            header = TEXTS.get("PasswordWillExpireHeaderX", TEXTS.get("InDaysX", "" + remainDays));
           }
 
-          int answer = MessageBoxes.createYesNoCancel().withHeader(header).withBody(ScoutTexts.get("PasswordWillExpireInfo")).show();
+          int answer = MessageBoxes.createYesNoCancel().withHeader(header).withBody(TEXTS.get("PasswordWillExpireInfo")).show();
           if (answer == MessageBox.YES_OPTION) {
             changeNow = true;
           }
@@ -83,7 +83,7 @@ public class PasswordPolicyVerifier {
       }
       else {
         // has expired
-        MessageBoxes.createOk().withHeader(ScoutTexts.get("PasswordHasExpiredTitle")).withBody(ScoutTexts.get("PasswordHasExpiredHeader")).show();
+        MessageBoxes.createOk().withHeader(TEXTS.get("PasswordHasExpiredTitle")).withBody(TEXTS.get("PasswordHasExpiredHeader")).show();
         changeNow = true;
       }
       //

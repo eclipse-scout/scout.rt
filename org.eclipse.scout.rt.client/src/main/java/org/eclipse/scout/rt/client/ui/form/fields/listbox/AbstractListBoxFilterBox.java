@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -164,7 +164,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("SelectedStates");
+        return TEXTS.get("SelectedStates");
       }
 
       @Override
@@ -189,7 +189,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("AllStates");
+        return TEXTS.get("AllStates");
       }
 
       @Override
@@ -252,7 +252,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("ActiveStates");
+        return TEXTS.get("ActiveStates");
       }
 
       @Override
@@ -277,7 +277,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("InactiveStates");
+        return TEXTS.get("InactiveStates");
       }
 
       @Override
@@ -302,7 +302,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("ActiveAndInactiveStates");
+        return TEXTS.get("ActiveAndInactiveStates");
       }
 
       @Override

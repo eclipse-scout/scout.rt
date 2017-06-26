@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 @Order(5100)
@@ -67,7 +67,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractListBox<?>) {
       AbstractListBox<?> valueField = (AbstractListBox<?>) field;
       if (!valueField.getValue().isEmpty()) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicIn") + " " + valueField.getDisplayText());
+        search.addDisplayText(label + " " + TEXTS.get("LogicIn") + " " + valueField.getDisplayText());
       }
       return;
     }
@@ -75,7 +75,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractTreeBox<?>) {
       AbstractTreeBox<?> valueField = (AbstractTreeBox<?>) field;
       if (!valueField.getValue().isEmpty()) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicIn") + " " + valueField.getDisplayText());
+        search.addDisplayText(label + " " + TEXTS.get("LogicIn") + " " + valueField.getDisplayText());
       }
       return;
     }
@@ -83,7 +83,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractStringField || field instanceof AbstractHtmlField || field instanceof AbstractLabelField) {
       AbstractValueField<?> valueField = (AbstractValueField<?>) field;
       if (valueField.getValue() != null) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicLike") + " " + valueField.getDisplayText());
+        search.addDisplayText(label + " " + TEXTS.get("LogicLike") + " " + valueField.getDisplayText());
       }
       return;
     }
@@ -108,7 +108,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractValueField<?>) {
       AbstractValueField<?> valueField = (AbstractValueField<?>) field;
       if (valueField.getValue() != null) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicEQ") + " " + valueField.getDisplayText());
+        search.addDisplayText(label + " " + TEXTS.get("LogicEQ") + " " + valueField.getDisplayText());
       }
       return;
     }

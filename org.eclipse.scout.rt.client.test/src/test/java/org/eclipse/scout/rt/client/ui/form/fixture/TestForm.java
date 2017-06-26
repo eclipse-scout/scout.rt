@@ -24,10 +24,10 @@ import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box.Text3Field;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G3Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G3Box.G4Box;
-import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.OkButton;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.Text1Field;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.Text4Field;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.data.form.fixture.TestFormData;
 
 @FormData(value = TestFormData.class, sdkCommand = SdkCommand.USE)

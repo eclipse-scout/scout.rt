@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 /**
@@ -40,7 +40,7 @@ public class AddEntityMenu extends AbstractMenu {
 
   @Override
   protected void execInitAction() {
-    setText(ScoutTexts.get("ExtendedSearchAddEntityPrefix") + " " + m_entity.getText());
+    setText(TEXTS.get("ExtendedSearchAddEntityPrefix") + " " + m_entity.getText());
     setIconId(m_entity.getIconId());
     if (m_propertyChangeListener == null) {
       m_propertyChangeListener = new P_PropertyChangeListener();

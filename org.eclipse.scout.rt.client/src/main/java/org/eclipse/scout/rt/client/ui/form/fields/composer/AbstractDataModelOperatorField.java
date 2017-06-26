@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -42,7 +42,7 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
 
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("Op");
+    return TEXTS.get("Op");
   }
 
   @Override

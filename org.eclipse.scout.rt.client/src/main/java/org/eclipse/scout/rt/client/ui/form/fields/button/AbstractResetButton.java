@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("059a286e-5445-459e-8b5e-77bd2b019064")
 public abstract class AbstractResetButton extends AbstractButton {
@@ -35,7 +35,7 @@ public abstract class AbstractResetButton extends AbstractButton {
 
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("ResetButton");
+    return TEXTS.get("ResetButton");
   }
 
   @Override

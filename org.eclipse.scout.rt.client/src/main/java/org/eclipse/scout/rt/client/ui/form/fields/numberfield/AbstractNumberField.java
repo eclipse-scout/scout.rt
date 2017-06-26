@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")
 public abstract class AbstractNumberField<NUMBER extends Number> extends AbstractBasicField<NUMBER> implements INumberField<NUMBER> {
@@ -349,13 +349,13 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       BigDecimal valBeforeRounding = (BigDecimal) getFormatInternal().parse(text, p);
       // check for bad syntax
       if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
-        throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
+        throw new ProcessingException(TEXTS.get("InvalidNumberMessageX", text));
       }
       try {
         retVal = roundParsedValue(valBeforeRounding);
       }
       catch (ArithmeticException e) { // NOSONAR
-        throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
+        throw new ProcessingException(TEXTS.get("InvalidNumberMessageX", text));
       }
       // check for bad range
       if (getMinPossibleValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMinPossibleValue())) < 0) {
@@ -370,19 +370,19 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
   private void throwNumberTooLarge() {
     if (getMinValue() == null || ObjectUtility.equals(getMinValue(), getMinPossibleValue())) {
-      throw new VetoException(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())));
+      throw new VetoException(TEXTS.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())));
     }
     else {
-      throw new VetoException(ScoutTexts.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())));
+      throw new VetoException(TEXTS.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())));
     }
   }
 
   private void throwNumberTooSmall() {
     if (getMaxValue() == null || ObjectUtility.equals(getMaxValue(), getMaxPossibleValue())) {
-      throw new VetoException(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())));
+      throw new VetoException(TEXTS.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())));
     }
     else {
-      throw new VetoException(ScoutTexts.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())));
+      throw new VetoException(TEXTS.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())));
     }
   }
 

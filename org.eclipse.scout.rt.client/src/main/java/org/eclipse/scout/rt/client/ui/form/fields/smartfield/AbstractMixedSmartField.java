@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
@@ -127,7 +126,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       }
     }
 
-    VetoException veto = new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
+    VetoException veto = new VetoException(TEXTS.get("SmartFieldCannotComplete", text));
     veto.withCode(numResults > 1 ? NOT_UNIQUE_ERROR_CODE : NO_RESULTS_ERROR_CODE);
     throw veto;
   }

@@ -63,7 +63,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -1067,7 +1067,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         if (cell.getFont() == null) {
           cell.setFont(FontSpec.parse("italic"));
         }
-        getTextColumnInternal().setValue(tableRow, dataRow.getText() + " (" + ScoutTexts.get("InactiveState") + ")");
+        getTextColumnInternal().setValue(tableRow, dataRow.getText() + " (" + TEXTS.get("InactiveState") + ")");
       }
       return tableRow;
     }

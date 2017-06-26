@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
@@ -61,14 +61,14 @@ public class EntityNode extends AbstractComposerNode {
   protected void execDecorateCell(Cell cell) {
     StringBuilder label = new StringBuilder();
     if (getSiblingBefore() != null) {
-      label.append(ScoutTexts.get("ExtendedSearchAnd") + " ");
+      label.append(TEXTS.get("ExtendedSearchAnd") + " ");
     }
     if (isNegative()) {
-      label.append(ScoutTexts.get("ExtendedSearchNot") + " ");
+      label.append(TEXTS.get("ExtendedSearchNot") + " ");
     }
     label.append(m_entity.getText());
     if (getChildNodeCount() > 0) {
-      label.append(" " + ScoutTexts.get("ExtendedSearchEntitySuffix"));
+      label.append(" " + TEXTS.get("ExtendedSearchEntitySuffix"));
     }
     cell.setText(label.toString());
   }
@@ -118,7 +118,7 @@ public class EntityNode extends AbstractComposerNode {
   public class AddEitherOrOnEntityMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchAddEitherOrMenu");
+      return TEXTS.get("ExtendedSearchAddEitherOrMenu");
     }
 
     @Override
@@ -141,7 +141,7 @@ public class EntityNode extends AbstractComposerNode {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchNegateMenu");
+      return TEXTS.get("ExtendedSearchNegateMenu");
     }
 
     @Override
@@ -160,7 +160,7 @@ public class EntityNode extends AbstractComposerNode {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchRemoveMenu");
+      return TEXTS.get("ExtendedSearchRemoveMenu");
     }
 
     @Override

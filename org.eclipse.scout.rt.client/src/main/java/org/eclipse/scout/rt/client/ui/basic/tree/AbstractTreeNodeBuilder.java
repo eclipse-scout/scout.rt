@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -91,7 +91,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
       if (cell.getFont() == null) {
         cell.setFont(FontSpec.parse("italic"));
       }
-      cell.setText(lookupRow.getText() + " (" + ScoutTexts.get("InactiveState") + ")");
+      cell.setText(lookupRow.getText() + " (" + TEXTS.get("InactiveState") + ")");
     }
     return treeNode;
   }

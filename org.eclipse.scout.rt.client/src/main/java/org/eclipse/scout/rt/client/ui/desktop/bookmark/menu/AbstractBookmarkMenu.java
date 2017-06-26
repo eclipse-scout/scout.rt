@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.security.CreateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
@@ -59,7 +59,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   protected String getConfiguredText() {
-    return ScoutTexts.get("BookmarksMainMenu");
+    return TEXTS.get("BookmarksMainMenu");
   }
 
   @Override
@@ -180,7 +180,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   public class AddUserBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("BookmarksAddMenu");
+      return TEXTS.get("BookmarksAddMenu");
     }
 
     @Override
@@ -199,7 +199,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   public class AddGlobalBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("GlobalBookmarksAddMenu");
+      return TEXTS.get("GlobalBookmarksAddMenu");
     }
 
     @Override
@@ -219,7 +219,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   public class ManageBookmarksMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("BookmarksManageMenu");
+      return TEXTS.get("BookmarksManageMenu");
     }
 
     @Override
@@ -234,7 +234,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   public class StartBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("BookmarksStartPageMenu");
+      return TEXTS.get("BookmarksStartPageMenu");
     }
 
     @Order(1)
@@ -242,7 +242,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     public class ActivateStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("BookmarksStartPageMenuGoto");
+        return TEXTS.get("BookmarksStartPageMenuGoto");
       }
 
       @Override
@@ -274,7 +274,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     public class SetStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("BookmarksStartPageMenuSet");
+        return TEXTS.get("BookmarksStartPageMenuSet");
       }
 
       @Override
@@ -290,7 +290,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     public class DeleteStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("BookmarksStartPageMenuClear");
+        return TEXTS.get("BookmarksStartPageMenuClear");
       }
 
       @Override

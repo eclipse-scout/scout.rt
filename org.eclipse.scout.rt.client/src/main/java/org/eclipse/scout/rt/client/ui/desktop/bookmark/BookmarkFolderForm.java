@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("605749af-29e7-47a8-a929-5102da1ab6b4")
 public class BookmarkFolderForm extends AbstractForm {
@@ -30,7 +30,7 @@ public class BookmarkFolderForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("Folders");
+    return TEXTS.get("Folders");
   }
 
   public void startNew() {
@@ -67,7 +67,7 @@ public class BookmarkFolderForm extends AbstractForm {
       public class NameField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("Name");
+          return TEXTS.get("Name");
         }
 
         @Override

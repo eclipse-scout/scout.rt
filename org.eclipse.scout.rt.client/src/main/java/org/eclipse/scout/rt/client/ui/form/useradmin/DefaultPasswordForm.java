@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
@@ -46,7 +46,7 @@ public class DefaultPasswordForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("ChangePassword");
+    return TEXTS.get("ChangePassword");
   }
 
   public MainBox getMainBox() {
@@ -95,7 +95,7 @@ public class DefaultPasswordForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("OldPassword");
+          return TEXTS.get("OldPassword");
         }
 
         @Override
@@ -115,7 +115,7 @@ public class DefaultPasswordForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("NewPassword");
+          return TEXTS.get("NewPassword");
         }
 
         @Override
@@ -135,7 +135,7 @@ public class DefaultPasswordForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("RepeatPassword");
+          return TEXTS.get("RepeatPassword");
         }
 
         @Override
@@ -177,7 +177,7 @@ public class DefaultPasswordForm extends AbstractForm {
     @Override
     protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
-        throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
+        throw new VetoException(TEXTS.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.resetPassword(getUserId(), getNewPasswordField().getValue().toCharArray());
@@ -188,7 +188,7 @@ public class DefaultPasswordForm extends AbstractForm {
     @Override
     protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
-        throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
+        throw new VetoException(TEXTS.get("PasswordsDoNotMatch"));
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.changePassword(getUserId(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());

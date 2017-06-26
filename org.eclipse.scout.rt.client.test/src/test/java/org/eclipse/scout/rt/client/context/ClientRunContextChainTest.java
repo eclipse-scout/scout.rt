@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -113,27 +112,22 @@ public class ClientRunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(UserAgent.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 13. ThreadLocalProcessor for ScoutTexts.CURRENT
-    c = chainIterator.next();
-    assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(ScoutTexts.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
-
-    // 14. ThreadLocalProcessor for IDesktop.CURRENT
+    // 13. ThreadLocalProcessor for IDesktop.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IDesktop.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 15. ThreadLocalProcessor for IOutline.CURRENT
+    // 14. ThreadLocalProcessor for IOutline.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IOutline.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 16. ThreadLocalProcessor for IForm.CURRENT
+    // 15. ThreadLocalProcessor for IForm.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IForm.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 17. TransactionProcessor
+    // 16. TransactionProcessor
     c = chainIterator.next();
     assertEquals(TransactionProcessor.class, c.getClass());
     assertFalse(chainIterator.hasNext());

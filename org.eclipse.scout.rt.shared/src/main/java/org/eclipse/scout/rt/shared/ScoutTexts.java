@@ -15,60 +15,65 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 
 /**
- * This is the base class for translations access in scout applications.<br>
- * It provides prioritized access to all text services available to the scope.
+ * ScoutTexts provides support for text translations.
+ * <p>
+ * The actual translation is performed by {@link ITextProviderService}s. If none of them knows the text key a fallback
+ * text is used (see {@link #getDefaultFallback(String)} and
+ * {@link #getTextWithFallback(Locale, String, String, String...)}, respectively).
+ * <p>
+ * This implementation caches all available {@link ITextProviderService}s for better performance (otherwise 2/3 of a
+ * {@link #getText(String, String...)} invocation would be spend for collecting {@link ITextProviderService}s). Invoke
+ * {@link #reloadTextProviders()} after modifying the set of text provider services.
  *
+ * @see TEXTS
  * @see ITextProviderService
  */
+@ApplicationScoped
 public class ScoutTexts {
 
   /**
-   * The {@link ScoutTexts} which are currently associated with the current thread.
+   * Cached list of ordered {@link ITextProviderService}s
    */
-  public static final ThreadLocal<ScoutTexts> CURRENT = new ThreadLocal<>();
-
-  private static volatile ScoutTexts DEFAULT;
-
-  private List<? extends ITextProviderService> m_textProviders;
+  private volatile List<? extends ITextProviderService> m_textProviders;
 
   public ScoutTexts() {
-    this(BEANS.all(ITextProviderService.class));
+    reloadTextProviders();
   }
 
-  public ScoutTexts(List<? extends ITextProviderService> textProviders) {
-    m_textProviders = textProviders;
+  public void reloadTextProviders() {
+    m_textProviders = BEANS.all(ITextProviderService.class);
   }
 
+  /**
+   * @deprecated Use {@link TEXTS#get(String, String...)} instead.
+   */
+  // TODO [7.1] abr: remove this method
+  @Deprecated
   public static String get(String key, String... messageArguments) {
     return getInstance().getText(key, messageArguments);
   }
 
+  /**
+   * @deprecated Use {@link TEXTS#get(Locale, String, String...)} instead.
+   */
+  // TODO [7.1] abr: remove this method
+  @Deprecated
   public static String get(Locale locale, String key, String... messageArguments) {
     return getInstance().getText(locale, key, messageArguments);
   }
 
   /**
-   * @return {@link ScoutTexts} associated with the current thread or the JVM-wide instance if not set.
+   * @deprecated Use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
    */
+  // TODO [7.1] abr: remove this method
+  @Deprecated
   public static ScoutTexts getInstance() {
-    ScoutTexts texts = ScoutTexts.CURRENT.get();
-    if (texts != null) {
-      return texts;
-    }
-
-    // Create the global instance lazy because of the service call in the default constructor.
-    if (DEFAULT == null) {
-      synchronized (ScoutTexts.class) {
-        if (DEFAULT == null) {
-          DEFAULT = new ScoutTexts();
-        }
-      }
-    }
-    return DEFAULT;
+    return BEANS.get(ScoutTexts.class);
   }
 
   public final String getText(String key, String... messageArguments) {
@@ -80,7 +85,7 @@ public class ScoutTexts {
   }
 
   public Map<String, String> getTextMap(Locale locale) {
-    HashMap<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<String, String>();
     List<? extends ITextProviderService> providers = getTextProviders();
     for (int i = providers.size() - 1; i >= 0; i--) {
       map.putAll(providers.get(i).getTextMap(locale));
@@ -108,9 +113,5 @@ public class ScoutTexts {
 
   public String getTextWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
     return getTextInternal(locale, key, fallback, messageArguments);
-  }
-
-  public void reloadTextProviders() {
-    m_textProviders = BEANS.all(ITextProviderService.class);
   }
 }

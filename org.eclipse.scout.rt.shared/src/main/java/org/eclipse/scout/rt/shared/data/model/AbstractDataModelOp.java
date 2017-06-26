@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 public abstract class AbstractDataModelOp implements IDataModelAttributeOp, DataModelConstants, Serializable {
 
@@ -57,27 +57,27 @@ public abstract class AbstractDataModelOp implements IDataModelAttributeOp, Data
     if (aggregationType != null) {
       switch (aggregationType.intValue()) {
         case AGGREGATION_AVG: {
-          b.append(ScoutTexts.get("ComposerFieldAggregationAvg", attributeText));
+          b.append(TEXTS.get("ComposerFieldAggregationAvg", attributeText));
           break;
         }
         case AGGREGATION_COUNT: {
-          b.append(ScoutTexts.get("ComposerFieldAggregationCount", attributeText));
+          b.append(TEXTS.get("ComposerFieldAggregationCount", attributeText));
           break;
         }
         case AGGREGATION_MAX: {
-          b.append(ScoutTexts.get("ComposerFieldAggregationMax", attributeText));
+          b.append(TEXTS.get("ComposerFieldAggregationMax", attributeText));
           break;
         }
         case AGGREGATION_MEDIAN: {
-          b.append(ScoutTexts.get("ComposerFieldAggregationMedian", attributeText));
+          b.append(TEXTS.get("ComposerFieldAggregationMedian", attributeText));
           break;
         }
         case AGGREGATION_MIN: {
-          b.append(ScoutTexts.get("ComposerFieldAggregationMin", attributeText));
+          b.append(TEXTS.get("ComposerFieldAggregationMin", attributeText));
           break;
         }
         case AGGREGATION_SUM: {
-          b.append(ScoutTexts.get("ComposerFieldAggregationSum", attributeText));
+          b.append(TEXTS.get("ComposerFieldAggregationSum", attributeText));
           break;
         }
         default: {

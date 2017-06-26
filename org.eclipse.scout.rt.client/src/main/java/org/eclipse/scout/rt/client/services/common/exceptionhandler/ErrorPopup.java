@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 
 /**
@@ -83,11 +83,11 @@ public class ErrorPopup {
     m_parsedError = unwrapException(error);
 
     // Defaults
-    m_header = ScoutTexts.get("Error");
-    m_body = ScoutTexts.get("ErrorAndRetryTextDefault");
-    m_html = HTML.div(StringUtility.box(ScoutTexts.get("CorrelationId") + ": ", CorrelationId.CURRENT.get(), ""))
+    m_header = TEXTS.get("Error");
+    m_body = TEXTS.get("ErrorAndRetryTextDefault");
+    m_html = HTML.div(StringUtility.box(TEXTS.get("CorrelationId") + ": ", CorrelationId.CURRENT.get(), ""))
         .cssClass("error-popup-correlation-id");
-    m_yesButtonText = ScoutTexts.get("Ok");
+    m_yesButtonText = TEXTS.get("Ok");
     m_noButtonText = null;
     m_reloadOnYesClick = false;
     m_status = new Status(IStatus.ERROR);
@@ -185,16 +185,16 @@ public class ErrorPopup {
    * database etc.).
    */
   protected void parseNetError(Throwable t) {
-    m_header = ScoutTexts.get("NetErrorTitle");
-    m_body = ScoutTexts.get("NetSystemsNotAvailable") + "\n\n" + ScoutTexts.get("PleaseTryAgainLater");
+    m_header = TEXTS.get("NetErrorTitle");
+    m_body = TEXTS.get("NetSystemsNotAvailable") + "\n\n" + TEXTS.get("PleaseTryAgainLater");
   }
 
   /**
    * Sets the member variables for an exception that indicates an interruption.
    */
   protected void parseInterruptedError(Throwable t) {
-    m_header = ScoutTexts.get("InterruptedErrorTitle");
-    m_body = ScoutTexts.get("InterruptedErrorText");
+    m_header = TEXTS.get("InterruptedErrorTitle");
+    m_body = TEXTS.get("InterruptedErrorText");
     m_html = null;
     m_status = new Status(IStatus.INFO);
   }
@@ -218,12 +218,12 @@ public class ErrorPopup {
 
     // The application might be in an inconsistent state -> user should reload it.
     // The same message is shown if an exception occurs on the UI.
-    m_header = ScoutTexts.get("UnexpectedProblem");
+    m_header = TEXTS.get("UnexpectedProblem");
     m_body = StringUtility.join("\n\n",
-        ScoutTexts.get("InternalProcessingErrorMsg", (errorCode == null ? "" : " (" + ScoutTexts.get("ErrorCodeX", errorCode) + ")")),
-        ScoutTexts.get("UiInconsistentMsg"));
-    m_yesButtonText = ScoutTexts.get("Reload");
-    m_noButtonText = ScoutTexts.get("Ignore");
+        TEXTS.get("InternalProcessingErrorMsg", (errorCode == null ? "" : " (" + TEXTS.get("ErrorCodeX", errorCode) + ")")),
+        TEXTS.get("UiInconsistentMsg"));
+    m_yesButtonText = TEXTS.get("Reload");
+    m_noButtonText = TEXTS.get("Ignore");
     m_reloadOnYesClick = true;
   }
 }

@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollecto
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
 import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -64,8 +63,7 @@ public class ServerRunContext extends RunContext {
         .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
-        .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_clientNotificationCollector))
-        .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())));
+        .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_clientNotificationCollector));
   }
 
   @Override

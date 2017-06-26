@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * <h3>DefaultWizardContainerForm</h3> A container form containing a wizard form area (current step) a status area. see
@@ -166,7 +166,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardBackButton");
+        return TEXTS.get("WizardBackButton");
       }
 
       @Override
@@ -181,7 +181,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardNextButton");
+        return TEXTS.get("WizardNextButton");
       }
 
       @Override
@@ -201,7 +201,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardFinishButton");
+        return TEXTS.get("WizardFinishButton");
       }
 
       @Override
@@ -221,7 +221,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardCancelButton");
+        return TEXTS.get("WizardCancelButton");
       }
 
       @Override
@@ -246,7 +246,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardSuspendButton");
+        return TEXTS.get("WizardSuspendButton");
       }
 
       @Override
@@ -271,7 +271,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("ResetButton");
+        return TEXTS.get("ResetButton");
       }
 
       @Override

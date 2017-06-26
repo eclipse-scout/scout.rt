@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
@@ -242,10 +242,10 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     }
     catch (ThreadInterruptedError e) { // NOSONAR
       future.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
-      return new ServiceTunnelResponse(new ThreadInterruptedError(ScoutTexts.get("UserInterrupted"))); // Interruption has precedence over computation result or computation error.
+      return new ServiceTunnelResponse(new ThreadInterruptedError(TEXTS.get("UserInterrupted"))); // Interruption has precedence over computation result or computation error.
     }
     catch (FutureCancelledError e) { // NOSONAR
-      return new ServiceTunnelResponse(new FutureCancelledError(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
+      return new ServiceTunnelResponse(new FutureCancelledError(TEXTS.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
     }
   }
 

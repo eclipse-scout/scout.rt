@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("d5b9a643-bdf2-483c-8adf-e8728021611e")
 public abstract class AbstractCancelButton extends AbstractButton {
@@ -35,7 +35,7 @@ public abstract class AbstractCancelButton extends AbstractButton {
 
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("CancelButton");
+    return TEXTS.get("CancelButton");
   }
 
   @Override

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("5ca31667-6bdf-4e06-8d51-5e283aa16c52")
 public abstract class AbstractSearchButton extends AbstractButton {
@@ -35,7 +35,7 @@ public abstract class AbstractSearchButton extends AbstractButton {
 
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("SearchButton");
+    return TEXTS.get("SearchButton");
   }
 
   @Override

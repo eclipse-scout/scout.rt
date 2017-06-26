@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.OfficialVersion;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("dee01442-979d-4231-a3f9-bd2a163e752a")
 public class ScoutInfoForm extends AbstractForm {
@@ -51,7 +51,7 @@ public class ScoutInfoForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("Info");
+    return TEXTS.get("Info");
   }
 
   public MainBox getMainBox() {
@@ -112,12 +112,12 @@ public class ScoutInfoForm extends AbstractForm {
 
   protected Map<String, Object> getProperties() {
     Map<String, Object> props = new LinkedHashMap<>();
-    props.put(ScoutTexts.get("Username"), ClientSessionProvider.currentSession().getUserId());
+    props.put(TEXTS.get("Username"), ClientSessionProvider.currentSession().getUserId());
 
     Locale locale = NlsLocale.get();
-    props.put(ScoutTexts.get("Language"), locale.getDisplayLanguage(locale));
-    props.put(ScoutTexts.get("FormattingLocale"), locale);
-    props.put(ScoutTexts.get("ScoutVersion"), OfficialVersion.VERSION);
+    props.put(TEXTS.get("Language"), locale.getDisplayLanguage(locale));
+    props.put(TEXTS.get("FormattingLocale"), locale);
+    props.put(TEXTS.get("ScoutVersion"), OfficialVersion.VERSION);
     return props;
   }
 

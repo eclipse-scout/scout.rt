@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
@@ -147,13 +147,13 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   protected String getConfiguredGlobalBookmarkLabel() {
-    return ScoutTexts.get("GlobalBookmarks");
+    return TEXTS.get("GlobalBookmarks");
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(20)
   protected String getConfiguredPrivateBookmarkLabel() {
-    return ScoutTexts.get("PrivateBookmarks");
+    return TEXTS.get("PrivateBookmarks");
   }
 
   @ConfigProperty(ConfigProperty.FORM)
@@ -468,7 +468,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class NewRootFolderMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("NewBookmarkFolderMenu");
+        return TEXTS.get("NewBookmarkFolderMenu");
       }
 
       @Override
@@ -492,7 +492,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class NewChildFolderMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("NewBookmarkFolderMenu");
+        return TEXTS.get("NewBookmarkFolderMenu");
       }
 
       @Override
@@ -542,7 +542,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class RenameMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("RenameBookmarkFolderMenu");
+        return TEXTS.get("RenameBookmarkFolderMenu");
       }
 
       @Override
@@ -572,7 +572,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("DeleteFolderMenu");
+        return TEXTS.get("DeleteFolderMenu");
       }
 
       @Override
@@ -591,7 +591,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       protected void execOwnerValueChanged(Object newOwnerValue) {
         for (ITreeNode node : getTree().getSelectedNodes()) {
           if (!(node instanceof FolderNode)) {
-            setText(ScoutTexts.get("DeleteMenu"));
+            setText(TEXTS.get("DeleteMenu"));
           }
         }
       }
@@ -689,7 +689,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class OpenMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("ActivateBookmarkMenu");
+        return TEXTS.get("ActivateBookmarkMenu");
       }
 
       @Override
@@ -710,7 +710,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class EditMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("EditBookmarkMenu");
+        return TEXTS.get("EditBookmarkMenu");
       }
 
       @Override
@@ -792,7 +792,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
 
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("UpdateBookmarkMenu");
+        return TEXTS.get("UpdateBookmarkMenu");
       }
 
       @Override
@@ -825,7 +825,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("DeleteBookmarkMenu");
+        return TEXTS.get("DeleteBookmarkMenu");
       }
 
       @Override
@@ -875,7 +875,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class PublishMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("BookmarksPublishMenu");
+        return TEXTS.get("BookmarksPublishMenu");
       }
 
       @Override
@@ -905,7 +905,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     public class ApplyToSearchMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return ScoutTexts.get("BookmarksApplyToCurrentSearch");
+        return TEXTS.get("BookmarksApplyToCurrentSearch");
       }
 
       @Override
@@ -934,7 +934,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           }
         }
         if (success != null && !success) {
-          MessageBoxes.createOk().withBody(ScoutTexts.get("ApplyBookmarkToSearchFailedMessage")).show();
+          MessageBoxes.createOk().withBody(TEXTS.get("ApplyBookmarkToSearchFailedMessage")).show();
         }
       }
     }

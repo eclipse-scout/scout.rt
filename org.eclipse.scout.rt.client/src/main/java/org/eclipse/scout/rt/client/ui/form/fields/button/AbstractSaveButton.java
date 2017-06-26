@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("74551d0d-a923-49e9-aaeb-a212d77e460d")
 public abstract class AbstractSaveButton extends AbstractButton {
@@ -35,7 +35,7 @@ public abstract class AbstractSaveButton extends AbstractButton {
 
   @Override
   protected String getConfiguredLabel() {
-    return ScoutTexts.get("SaveButton");
+    return TEXTS.get("SaveButton");
   }
 
   @Override

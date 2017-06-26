@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -69,7 +69,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
           String text = null;
           switch (ag) {
             case DataModelConstants.AGGREGATION_AVG: {
-              text = ScoutTexts.get("ComposerFieldAggregationAvg", m_attribute.getText());
+              text = TEXTS.get("ComposerFieldAggregationAvg", m_attribute.getText());
               break;
             }
             case DataModelConstants.AGGREGATION_COUNT: {
@@ -77,24 +77,24 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
                 text = m_attribute.getText();
               }
               else {
-                text = ScoutTexts.get("ComposerFieldAggregationCount", m_attribute.getText());
+                text = TEXTS.get("ComposerFieldAggregationCount", m_attribute.getText());
               }
               break;
             }
             case DataModelConstants.AGGREGATION_MAX: {
-              text = ScoutTexts.get("ComposerFieldAggregationMax", m_attribute.getText());
+              text = TEXTS.get("ComposerFieldAggregationMax", m_attribute.getText());
               break;
             }
             case DataModelConstants.AGGREGATION_MEDIAN: {
-              text = ScoutTexts.get("ComposerFieldAggregationMedian", m_attribute.getText());
+              text = TEXTS.get("ComposerFieldAggregationMedian", m_attribute.getText());
               break;
             }
             case DataModelConstants.AGGREGATION_MIN: {
-              text = ScoutTexts.get("ComposerFieldAggregationMin", m_attribute.getText());
+              text = TEXTS.get("ComposerFieldAggregationMin", m_attribute.getText());
               break;
             }
             case DataModelConstants.AGGREGATION_SUM: {
-              text = ScoutTexts.get("ComposerFieldAggregationSum", m_attribute.getText());
+              text = TEXTS.get("ComposerFieldAggregationSum", m_attribute.getText());
               break;
             }
           }

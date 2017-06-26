@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.slf4j.Logger;
@@ -335,7 +335,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         return;
       }
       catch (Exception e) {
-        final String message = ScoutTexts.get("InvalidValueMessageX", StringUtility.emptyIfNull(rawValue));
+        final String message = TEXTS.get("InvalidValueMessageX", StringUtility.emptyIfNull(rawValue));
         ProcessingException pe = new ProcessingException(message, e);
         LOG.warn("Unexpected Error: ", pe);
         addErrorStatus(new ValidationFailedStatus<VALUE>(pe, rawValue));
@@ -527,7 +527,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
     catch (Exception e) {
       LOG.error("Unexpected Error: ", e);
-      ProcessingException pe = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
+      ProcessingException pe = new ProcessingException(TEXTS.get("InvalidValueMessageX", text), e);
       addErrorStatus(new ParsingFailedStatus(pe, text));
       return;
     }

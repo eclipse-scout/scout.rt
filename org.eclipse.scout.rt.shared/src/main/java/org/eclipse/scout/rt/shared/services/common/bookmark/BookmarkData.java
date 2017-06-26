@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 public class BookmarkData implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -22,9 +22,9 @@ public class BookmarkData implements Serializable {
 
   public BookmarkData() {
     m_globalBookmarks = new BookmarkFolder();
-    m_globalBookmarks.setTitle(ScoutTexts.get("GlobalBookmarks"));
+    m_globalBookmarks.setTitle(TEXTS.get("GlobalBookmarks"));
     m_userBookmarks = new BookmarkFolder();
-    m_userBookmarks.setTitle(ScoutTexts.get("Bookmarks"));
+    m_userBookmarks.setTitle(TEXTS.get("Bookmarks"));
   }
 
   protected BookmarkData(BookmarkData other) {
@@ -42,7 +42,7 @@ public class BookmarkData implements Serializable {
   public void setGlobalBookmarks(BookmarkFolder globalBookmarks) {
     m_globalBookmarks = globalBookmarks;
     if (m_globalBookmarks.getTitle() == null) {
-      m_globalBookmarks.setTitle(ScoutTexts.get("GlobalBookmarks"));
+      m_globalBookmarks.setTitle(TEXTS.get("GlobalBookmarks"));
     }
   }
 
@@ -56,7 +56,7 @@ public class BookmarkData implements Serializable {
   public void setUserBookmarks(BookmarkFolder userBookmarks) {
     m_userBookmarks = userBookmarks;
     if (m_userBookmarks.getTitle() == null) {
-      m_userBookmarks.setTitle(ScoutTexts.get("Bookmarks"));
+      m_userBookmarks.setTitle(TEXTS.get("Bookmarks"));
     }
   }
 

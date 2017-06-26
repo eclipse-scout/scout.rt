@@ -12,11 +12,11 @@ import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AbstractPe
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AbstractPersonTablePage.Table.EditMenu;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AllPersonTablePage;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.AllPersonTablePageExtension;
-import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktopExtension;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.EveryPersonTablePageExtension;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.OtherPersonTablePage;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktop;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktop.PersonPageTestOutline;
+import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonPageTestDesktopExtension;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonSearchForm;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonSearchFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.outline.pages.fixture.PersonSearchFormExtension.TopBoxExtension.TopBoxStringField;

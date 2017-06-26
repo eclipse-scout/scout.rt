@@ -21,7 +21,7 @@ import java.text.NumberFormat;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -127,14 +127,14 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
     setValue(BigDecimal.valueOf(101));
     assertNotNull(getErrorStatus());
 
-    assertEquals(ScoutTexts.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooLargeMessageX", formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
 
     setMinValue(BigDecimal.valueOf(10));
 
     setValue(BigDecimal.valueOf(20));
     assertNull(getErrorStatus());
     setValue(BigDecimal.valueOf(101));
-    assertEquals(ScoutTexts.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooLargeMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
   }
 
   @Test
@@ -145,14 +145,14 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
     assertNull(getErrorStatus());
     setValue(BigDecimal.valueOf(99));
     assertNotNull(getErrorStatus());
-    assertEquals(ScoutTexts.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooSmallMessageX", formatValueInternal(getMinValue())), getErrorStatus().getMessage());
 
     setMaxValue(BigDecimal.valueOf(200));
 
     setValue(BigDecimal.valueOf(150));
     assertNull(getErrorStatus());
     setValue(BigDecimal.valueOf(50));
-    assertEquals(ScoutTexts.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
+    assertEquals(TEXTS.get("NumberTooSmallMessageXY", formatValueInternal(getMinValue()), formatValueInternal(getMaxValue())), getErrorStatus().getMessage());
   }
 
   private String formatWithFractionDigits(Number number, int fractionDigits) {

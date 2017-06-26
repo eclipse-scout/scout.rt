@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.Locale;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsUtility;
 
 public final class TEXTS {
@@ -29,11 +30,10 @@ public final class TEXTS {
    * @return The translation.
    * @see ScoutTexts
    * @see NlsUtility
-   * @see ScoutTexts#CURRENT
    * @see Locale
    */
   public static String get(String key) {
-    return ScoutTexts.getInstance().getText(key);
+    return BEANS.get(ScoutTexts.class).getText(key);
   }
 
   /**
@@ -57,11 +57,10 @@ public final class TEXTS {
    * @return
    * @see ScoutTexts
    * @see NlsUtility
-   * @see ScoutTexts#CURRENT
    * @see Locale
    */
   public static String get(String key, String... messageArguments) {
-    return ScoutTexts.getInstance().getText(key, messageArguments);
+    return BEANS.get(ScoutTexts.class).getText(key, messageArguments);
   }
 
   /**
@@ -87,7 +86,7 @@ public final class TEXTS {
    * @see Locale
    */
   public static String get(Locale locale, String key, String... messageArguments) {
-    return ScoutTexts.getInstance().getText(locale, key, messageArguments);
+    return BEANS.get(ScoutTexts.class).getText(locale, key, messageArguments);
   }
 
   /**
@@ -105,7 +104,6 @@ public final class TEXTS {
   }
 
   public static String getWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
-    return ScoutTexts.getInstance().getTextWithFallback(locale, key, fallback, messageArguments);
+    return BEANS.get(ScoutTexts.class).getTextWithFallback(locale, key, fallback, messageArguments);
   }
-
 }

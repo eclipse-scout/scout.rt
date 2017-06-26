@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.security.DeleteGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.ReadUserBookmarkPermission;
@@ -46,7 +46,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("Bookmarks");
+    return TEXTS.get("Bookmarks");
   }
 
   @Override
@@ -96,7 +96,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     public class GlobalBox extends AbstractGroupBox {
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("GlobalBookmarks");
+        return TEXTS.get("GlobalBookmarks");
       }
 
       @Override
@@ -134,7 +134,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     public class UserBox extends AbstractGroupBox {
       @Override
       protected String getConfiguredLabel() {
-        return ScoutTexts.get("Bookmarks");
+        return TEXTS.get("Bookmarks");
       }
 
       @Override

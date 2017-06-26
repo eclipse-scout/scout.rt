@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 public class EitherOrNode extends AbstractComposerNode {
   private boolean m_beginEitherOr;
@@ -73,16 +73,16 @@ public class EitherOrNode extends AbstractComposerNode {
     String text = "";
     ITreeNode siblingBefore = getSiblingBefore();
     if (isBeginOfEitherOr() && siblingBefore != null) {
-      text += ScoutTexts.get("ExtendedSearchAnd") + " ";
+      text += TEXTS.get("ExtendedSearchAnd") + " ";
     }
     if (isBeginOfEitherOr()) {
-      text += ScoutTexts.get("ExtendedSearchEither");
+      text += TEXTS.get("ExtendedSearchEither");
     }
     else {
-      text += ScoutTexts.get("ExtendedSearchOr");
+      text += TEXTS.get("ExtendedSearchOr");
     }
     if (isNegative()) {
-      text += " " + ScoutTexts.get("ExtendedSearchNot");
+      text += " " + TEXTS.get("ExtendedSearchNot");
     }
     cell.setText(text);
   }
@@ -92,7 +92,7 @@ public class EitherOrNode extends AbstractComposerNode {
   public class AddAdditionalOrMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchAddAdditionalOrMenu");
+      return TEXTS.get("ExtendedSearchAddAdditionalOrMenu");
     }
 
     @Override
@@ -106,7 +106,7 @@ public class EitherOrNode extends AbstractComposerNode {
   public class AddEitherOrMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchAddEitherOrMenu");
+      return TEXTS.get("ExtendedSearchAddEitherOrMenu");
     }
 
     @Override
@@ -127,7 +127,7 @@ public class EitherOrNode extends AbstractComposerNode {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchNegateMenu");
+      return TEXTS.get("ExtendedSearchNegateMenu");
     }
 
     @Override
@@ -146,7 +146,7 @@ public class EitherOrNode extends AbstractComposerNode {
 
     @Override
     protected String getConfiguredText() {
-      return ScoutTexts.get("ExtendedSearchRemoveMenu");
+      return TEXTS.get("ExtendedSearchRemoveMenu");
     }
 
     @Override

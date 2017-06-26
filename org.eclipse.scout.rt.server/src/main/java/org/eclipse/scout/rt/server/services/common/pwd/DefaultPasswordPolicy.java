@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.services.common.pwd;
 import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG
@@ -27,31 +27,31 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
 
   @Override
   public String getText() {
-    return ScoutTexts.get("DefaultPasswordPolicyText");
+    return TEXTS.get("DefaultPasswordPolicyText");
   }
 
   @Override
   public void check(String userId, char[] newPassword, String userName, int historyIndex) {
     if (newPassword == null || newPassword.length < MIN_PASSWORD_LENGTH) {
-      throw new VetoException(ScoutTexts.get("PasswordMin8Chars"));
+      throw new VetoException(TEXTS.get("PasswordMin8Chars"));
     }
     if (historyIndex >= 0) {
-      throw new VetoException(ScoutTexts.get("PasswordNotSameAsLasts"));
+      throw new VetoException(TEXTS.get("PasswordNotSameAsLasts"));
     }
 
     char[] charsInPasswordSorted = Arrays.copyOf(newPassword, newPassword.length);
     Arrays.sort(charsInPasswordSorted);
     if (!containsOneOf(charsInPasswordSorted, "0123456789")) {
-      throw new VetoException(ScoutTexts.get("PasswordMinOneDigit"));
+      throw new VetoException(TEXTS.get("PasswordMinOneDigit"));
     }
     if (!containsOneOf(charsInPasswordSorted, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
-      throw new VetoException(ScoutTexts.get("PasswordMinOneChar"));
+      throw new VetoException(TEXTS.get("PasswordMinOneChar"));
     }
     if (!containsOneOf(charsInPasswordSorted, "!@#$%^&*()_+|~-=\\`{}[]:\";'<>?,./")) {
-      throw new VetoException(ScoutTexts.get("PasswordMinOnNonStdChar"));
+      throw new VetoException(TEXTS.get("PasswordMinOnNonStdChar"));
     }
     if (containsUsername(newPassword, userName)) {
-      throw new VetoException(ScoutTexts.get("PasswordUsernameNotPartOfPass"));
+      throw new VetoException(TEXTS.get("PasswordUsernameNotPartOfPass"));
     }
   }
 

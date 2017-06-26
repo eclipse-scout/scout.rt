@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -76,7 +76,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return ScoutTexts.get("Bookmark");
+    return TEXTS.get("Bookmark");
   }
 
   @Override
@@ -130,7 +130,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       public class TitleField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("Name");
+          return TEXTS.get("Name");
         }
 
         @Override
@@ -149,7 +149,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       public class FolderField extends AbstractSmartField2<BookmarkFolder> {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("BookmarkFolder");
+          return TEXTS.get("BookmarkFolder");
         }
 
         @Override
@@ -168,7 +168,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       public class KeyStrokeField extends AbstractSmartField2<String> {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("KeyStroke");
+          return TEXTS.get("KeyStroke");
         }
 
         @Override
@@ -187,7 +187,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       public class SortOrderField extends AbstractBigDecimalField {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("ColumnSorting");
+          return TEXTS.get("ColumnSorting");
         }
 
         @Override
@@ -206,7 +206,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       public class DescriptionField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
-          return ScoutTexts.get("Path");
+          return TEXTS.get("Path");
         }
 
         @Override

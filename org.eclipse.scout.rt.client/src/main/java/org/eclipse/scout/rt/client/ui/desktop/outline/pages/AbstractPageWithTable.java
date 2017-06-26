@@ -66,7 +66,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
@@ -273,7 +272,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
-      setTableStatus(new Status(ScoutTexts.get("TooManyRows"), IStatus.WARNING));
+      setTableStatus(new Status(TEXTS.get("TooManyRows"), IStatus.WARNING));
     }
     else {
       setTableStatus(null);
@@ -740,17 +739,17 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     catch (ThreadInterruptedError | FutureCancelledError e) {
       table.discardAllRows();
-      setTableStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
+      setTableStatus(new Status(TEXTS.get("SearchWasCanceled"), IStatus.ERROR));
       throw e;
     }
     catch (VetoException e) {
       table.discardAllRows();
-      setTableStatus(new Status(ObjectUtility.nvl(e.getDisplayMessage(), ScoutTexts.get("ErrorWhileLoadingData")), IStatus.ERROR));
+      setTableStatus(new Status(ObjectUtility.nvl(e.getDisplayMessage(), TEXTS.get("ErrorWhileLoadingData")), IStatus.ERROR));
       throw e;
     }
     catch (RuntimeException | PlatformError e) {
       table.discardAllRows();
-      setTableStatus(new Status(ScoutTexts.get("ErrorWhileLoadingData"), IStatus.ERROR));
+      setTableStatus(new Status(TEXTS.get("ErrorWhileLoadingData"), IStatus.ERROR));
       throw e;
     }
     finally {

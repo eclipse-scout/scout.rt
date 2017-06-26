@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
@@ -131,7 +131,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     for (IFormField f : getFields()) {
       f.setLabelVisible(false);
-      f.setLabel(ScoutTexts.get("Value"));
+      f.setLabel(TEXTS.get("Value"));
       f.setVisible(false);
       if (f instanceof ISequenceBox) {
         List<IFormField> sequenceBoxChildFields = ((ISequenceBox) f).getFields();
@@ -140,7 +140,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           firstField.setLabelVisible(false);
           if (sequenceBoxChildFields.size() > 1) {
             IFormField secondField = CollectionUtility.getElement(sequenceBoxChildFields, 1);
-            secondField.setLabel(ScoutTexts.get("and"));
+            secondField.setLabel(TEXTS.get("and"));
           }
         }
       }

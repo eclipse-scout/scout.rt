@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -1035,7 +1034,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public void doSearch(IContentAssistSearchParam<LOOKUP_KEY> param, boolean synchronous) {
     if (isProposalChooserRegistered()) {
-      getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
+      getProposalChooser().setStatus(new Status(TEXTS.get("searchingProposals"), IStatus.OK));
     }
     getLookupRowFetcher().update(param, synchronous);
   }

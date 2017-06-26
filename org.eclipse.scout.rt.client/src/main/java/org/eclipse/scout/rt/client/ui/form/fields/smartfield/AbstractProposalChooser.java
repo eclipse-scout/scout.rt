@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyObserver implements IProposalChooser<T, LOOKUP_KEY> {
@@ -225,15 +225,15 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
     }
     else if (rows.isEmpty()) {
       if (getContentAssistField().getWildcard().equals(searchText)) {
-        statusText = ScoutTexts.get("SmartFieldNoDataFound");
+        statusText = TEXTS.get("SmartFieldNoDataFound");
       }
       else {
-        statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
+        statusText = TEXTS.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
       }
       severity = IStatus.WARNING;
     }
     else if (rows.size() > m_contentAssistField.getBrowseMaxRowCount()) {
-      statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + m_contentAssistField.getBrowseMaxRowCount());
+      statusText = TEXTS.get("SmartFieldMoreThanXRows", "" + m_contentAssistField.getBrowseMaxRowCount());
       severity = IStatus.INFO;
     }
     if (statusText != null) {
