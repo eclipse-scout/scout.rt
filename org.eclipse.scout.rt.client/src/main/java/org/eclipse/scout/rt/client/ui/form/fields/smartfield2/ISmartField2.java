@@ -71,6 +71,8 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void lookupByRec(VALUE parentKey);
 
+  ILookupRow<VALUE> lookupByKey(VALUE key);
+
   SmartField2Result getResult();
 
   void addSmartFieldListener(ContentAssistFieldListener listener);
@@ -216,20 +218,26 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
    *          Using background=false assigns the value immediately, which results in an immediate call to the data
    *          provider. Whenever possible, background=true should be used to allow for batch calls to the backend.
    * @since 22.05.2009
+   * @deprecated
    */
-  void setUniquelyDefinedValue(boolean background);
+  @Deprecated
+  void setUniquelyDefinedValue(boolean background); // FIXME [awe] 7.0 - SF2: remove/deprecate method?
 
   /**
    * Sets the current lookup-row to null and also the accepted proposal from the proposal chooser (if available).
+   * @deprecated
    */
-  void clearProposal();
+  @Deprecated
+  void clearProposal(); // FIXME [awe] 7.0 - SF2: remove/deprecate method?
 
   /**
    * This method is normally used by a {@link IContentAssistFieldProposalForm#acceptProposal()}
+   * @deprecated
    */
-  void acceptProposal(ILookupRow<VALUE> row);
+  @Deprecated
+  void acceptProposal(ILookupRow<VALUE> row); // FIXME [awe] 7.0 - SF2: remove/deprecate method?
 
-  ISmartField2UIFacade getUIFacade();
+  ISmartField2UIFacade<VALUE> getUIFacade();
 
   void setWildcard(String wildcard);
 

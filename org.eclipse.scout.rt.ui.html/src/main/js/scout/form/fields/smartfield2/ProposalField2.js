@@ -14,6 +14,14 @@ scout.ProposalField2 = function() {
   this.maxLength = -1;
   this.trimText = true;
   this.autoCloseProposalChooser = false;
+
+  /**
+   * If this flag is set to true the proposal field performs a lookup by text when
+   * accept proposal is called. The behavior is similar to what the smart-field does
+   * in that case, but without the need to have a valid single match as the result
+   * from the lookup.
+   */
+  this.lookupOnAcceptByText = false;
 };
 scout.inherits(scout.ProposalField2, scout.SmartField2);
 
@@ -45,7 +53,32 @@ scout.ProposalField2.prototype._formatValue = function(value) {
 
 scout.ProposalField2.prototype._acceptByText = function(searchText) {
   $.log.debug('(ProposalField2#_acceptByText) searchText=', searchText);
-  this.setValue(searchText);
+  if (this.lookupOnAcceptByText) {
+    scout.ProposalField2.parent.prototype._acceptByText.call(this, searchText);
+  } else {
+    this.setValue(searchText);
+    this._inputAccepted();
+  }
+};
+
+/**
+ * Only used in case lookupOnAcceptByText is true. It's basically the same code
+ * as in the smart-field but without the error handling.
+ */
+scout.ProposalField2.prototype._acceptInputDone = function(result) {
+  this._userWasTyping = false;
+  this._extendResult(result);
+
+  // when there's exactly one result, we accept that lookup row
+  if (result.numLookupRows === 1) {
+    var lookupRow = result.singleMatch;
+    if (this._isLookupRowActive(lookupRow)) {
+      this.setLookupRow(lookupRow);
+    } else {
+      this.setValue(result.searchText);
+    }
+  }
+
   this._inputAccepted();
 };
 

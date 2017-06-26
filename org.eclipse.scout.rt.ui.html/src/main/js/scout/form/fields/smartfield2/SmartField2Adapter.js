@@ -11,7 +11,7 @@
 scout.SmartField2Adapter = function() {
   scout.SmartField2Adapter.parent.call(this);
 
-  this._addRemoteProperties(['value', 'activeFilter', 'errorStatus', 'displayText']);
+  this._addRemoteProperties(['activeFilter']);
 };
 scout.inherits(scout.SmartField2Adapter, scout.ValueFieldAdapter);
 
@@ -55,3 +55,16 @@ scout.SmartField2Adapter.prototype.lookupByRec = function(rec) {
   });
 };
 
+scout.SmartField2Adapter.prototype._onWidgetAcceptInput = function(event) {
+  this._send('acceptInput', {
+    displayText: event.displayText,
+    value: event.value,
+    lookupRow: event.lookupRow,
+    whileTyping: event.whileTyping
+  }, {
+    showBusyIndicator: !event.whileTyping,
+    coalesce: function(previous) {
+      return this.target === previous.target && this.type === previous.type && this.whileTyping === previous.whileTyping;
+    }
+  });
+};

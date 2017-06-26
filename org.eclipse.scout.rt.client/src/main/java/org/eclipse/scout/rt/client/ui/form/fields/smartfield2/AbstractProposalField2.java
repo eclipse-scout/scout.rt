@@ -10,10 +10,53 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 @ClassId("1c8c645d-9e75-4bb1-9f79-c0532d2cdb72")
 public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<VALUE> implements IProposalField2<VALUE> {
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+    setMaxLength(getConfiguredMaxLength());
+    setTrimText(getConfiguredTrimText());
+    setAutoCloseChooser(getConfiguredAutoCloseChooser());
+  }
+
+  /**
+   * Configures whether the proposal chooser should automatically be closed when there are no proposals available.
+   * <p>
+   * Subclasses can override this method. Default is true.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredAutoCloseChooser() { // FIXME [awe] 7.0 - SF2: remove this property!?
+    return true;
+  }
+
+  /**
+   * Configures the initial value of {@link AbstractProposalField#getMaxLength()
+   * <p>
+   * Subclasses can override this method
+   * <p>
+   * Default is 4000
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredMaxLength() {
+    return 4000;
+  }
+
+  /**
+   * @return true if leading and trailing whitespace should be stripped from the entered text while validating the
+   *         value. default is true.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredTrimText() {
+    return true;
+  }
 
   @Override
   public String getValueAsString() {
@@ -59,6 +102,11 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
   @Override
   public boolean isTrimText() {
     return propertySupport.getPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE);
+  }
+
+  @Override
+  protected boolean lookupRowMatchesValue(ILookupRow<VALUE> lookupRow, VALUE value) {
+    return ObjectUtility.equals(lookupRow.getText(), value);
   }
 
 }

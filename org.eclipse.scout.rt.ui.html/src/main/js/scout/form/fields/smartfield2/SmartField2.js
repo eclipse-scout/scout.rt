@@ -200,6 +200,7 @@ scout.SmartField2.prototype._acceptByText = function(searchText) {
 
 scout.SmartField2.prototype._inputAccepted = function() {
   this._userWasTyping = false;
+  this._triggerAcceptInput();
   this.closePopup();
 
   // focus next tabbable
@@ -378,14 +379,21 @@ scout.SmartField2.prototype._formatValue = function(value) {
   // we already have a lookup row - Note: in Scout Classic (remote case)
   // we always end here and don't need to perform a getByKey lookup.
   if (this.lookupRow) {
-    return this.lookupRow.text;
+    return this._formatLookupRow(this.lookupRow);
   }
 
   // we must do a lookup first to get the display text
   return this._executeLookup(this.lookupCall.getByKey.bind(this.lookupCall, value))
-    .then(function(lookupRow) {
-      return lookupRow ? lookupRow.text : '';
-    });
+    .then(this._formatLookupRow.bind(this));
+};
+
+/**
+ * This function is called when we need to format a display text from a given lookup
+ * row. By default the property 'text' is used for that purpose. Override this function
+ * if you need to format different properties from the lookupRow.
+ */
+scout.SmartField2.prototype._formatLookupRow = function(lookupRow) {
+  return lookupRow ? lookupRow.text : '';
 };
 
 /**
@@ -704,7 +712,7 @@ scout.SmartField2.prototype._isFunctionKey = function(e) {
 
 scout.SmartField2.prototype._onLookupRowSelected = function(event) {
   this.setLookupRow(event.lookupRow);
-  this.closePopup();
+  this._inputAccepted();
 };
 
 // FIXME [awe] 7.0 - SF2: discuss usage of activeFilter. With current impl. we cannot
@@ -861,4 +869,14 @@ scout.SmartField2.prototype._setValue = function(value) {
  */
 scout.SmartField2.prototype.getValueForSelection = function() {
   return this.value;
+};
+
+scout.SmartField2.prototype._triggerAcceptInput = function() {
+  var event = {
+    displayText: this.displayText,
+    errorStatus: this.errorStatus,
+    value: this.value,
+    lookupRow: this.lookupRow
+  };
+  this.trigger('acceptInput', event);
 };

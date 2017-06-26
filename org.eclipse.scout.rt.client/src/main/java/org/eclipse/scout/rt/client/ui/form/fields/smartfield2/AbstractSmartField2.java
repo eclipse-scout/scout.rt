@@ -113,7 +113,8 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final ISmartField2UIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new SmartField2UIFacade(this), ModelContext.copyCurrent());
+  @SuppressWarnings("unchecked")
+  private final ISmartField2UIFacade<VALUE> m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new SmartField2UIFacade(this), ModelContext.copyCurrent());
 
   // chooser security
   private Class<? extends ICodeType<?, VALUE>> m_codeTypeClass;
@@ -727,6 +728,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return m_wildcard;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setUniquelyDefinedValue(boolean background) {
     ILookupRowFetchedCallback<VALUE> callback = new ILookupRowFetchedCallback<VALUE>() {
@@ -779,6 +781,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return rawValue;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void clearProposal() {
     throw new UnsupportedOperationException();
@@ -1027,6 +1030,12 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void lookupByRec(VALUE parentKey) {
     doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
+  }
+
+  @Override
+  public ILookupRow<VALUE> lookupByKey(VALUE key) {
+    List<? extends ILookupRow<VALUE>> lookupRows = callKeyLookup(key);
+    return CollectionUtility.firstElement(lookupRows);
   }
 
   // FIXME [awe] 7.0 - SF2: cleanup all the call* and do* methods, check what's really needed
@@ -1343,10 +1352,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public ISmartField2UIFacade getUIFacade() {
+  public ISmartField2UIFacade<VALUE> getUIFacade() {
     return m_uiFacade;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void acceptProposal(ILookupRow<VALUE> row) {
     setLookupRow(row);

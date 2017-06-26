@@ -1,15 +1,14 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.IProposalField2;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonProposalField2<VALUE> extends JsonSmartField2<VALUE, IProposalField2<VALUE>> {
+public class JsonProposalField2<VALUE, FIELD extends IProposalField2<VALUE>> extends JsonSmartField2<VALUE, FIELD> {
 
-  public JsonProposalField2(IProposalField2<VALUE> model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonProposalField2(FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -19,7 +18,7 @@ public class JsonProposalField2<VALUE> extends JsonSmartField2<VALUE, IProposalF
   }
 
   @Override
-  protected void initJsonProperties(IProposalField2<VALUE> model) {
+  protected void initJsonProperties(FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IProposalField2<VALUE>>(IProposalField2.PROP_MAX_LENGTH, model) {
       @Override
@@ -45,24 +44,6 @@ public class JsonProposalField2<VALUE> extends JsonSmartField2<VALUE, IProposalF
   protected void handleUiPropertyChangeValue(JSONObject data) {
     String value = data.optString("value");
     getModel().setValueAsString(value);
-  }
-
-  @Override
-  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
-    if (ISmartField2.PROP_LOOKUP_ROW.equals(propertyName)) {
-      // only required for proposal field, because value is a string there. For regular smart-fields
-      // setValue will also set the right lookup row.
-      JSONObject lookupRow = data.optJSONObject("lookupRow");
-      VALUE key = null;
-      if (lookupRow != null) {
-        String mappedKey = lookupRow.getString("key");
-        key = getLookupRowKeyForId(mappedKey);
-      }
-      getModel().setLookupRowByKey(key);
-    }
-    else {
-      super.handleUiPropertyChange(propertyName, data);
-    }
   }
 
 }

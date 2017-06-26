@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -144,7 +145,33 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     }
   }
 
-  // FIXME [awe] 7.0 - SF2: use UI facade here?
+  @Override
+  protected void handleUiAcceptInput(JsonEvent event) {
+    JSONObject data = event.getData();
+    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
+      String displayText = data.getString(IValueField.PROP_DISPLAY_TEXT);
+      addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    }
+    if (data.has(IValueField.PROP_ERROR_STATUS)) {
+      JSONObject status = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
+      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, status);
+      ParsingFailedStatus parseError = null;
+      if (status != null) {
+        String message = status.optString("message", null);
+        parseError = new ParsingFailedStatus(message, getModel().getDisplayText());
+      }
+      getModel().getUIFacade().setErrorStatusFromUI(parseError);
+    }
+    if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
+      JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
+      ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+      getModel().getUIFacade().setLookupRowFromUI(lookupRow);
+    }
+    if (data.has(IValueField.PROP_VALUE)) {
+      handleUiPropertyChangeValue(data);
+    }
+  }
 
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
@@ -155,6 +182,11 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       String displayText = data.optString(IValueField.PROP_DISPLAY_TEXT);
       addPropertyEventFilterCondition(ISmartField2.PROP_DISPLAY_TEXT, displayText);
       getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    }
+    else if (ISmartField2.PROP_LOOKUP_ROW.equals(propertyName)) {
+      JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
+      ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+      getModel().getUIFacade().setLookupRowFromUI(lookupRow);
     }
     else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
       String activeFilterString = data.optString(ISmartField2.PROP_ACTIVE_FILTER, null);
@@ -255,6 +287,17 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       json.put("noData", result.isNoData());
     }
     return json;
+  }
+
+  protected ILookupRow<VALUE> lookupRowFromJson(JSONObject json) {
+    if (json == null) {
+      return null;
+    }
+
+    VALUE lookupRowKey = getLookupRowKeyForId(json.optString("key"));
+    ILookupRow<VALUE> lookupRow = getModel().lookupByKey(lookupRowKey);
+    // FIXME [awe] 7.0 - SF2: add other lookup row properties?
+    return lookupRow;
   }
 
   protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {

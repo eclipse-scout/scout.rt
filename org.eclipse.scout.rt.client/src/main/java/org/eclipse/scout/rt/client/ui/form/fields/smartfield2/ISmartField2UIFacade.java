@@ -12,13 +12,16 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public interface ISmartField2UIFacade {
+public interface ISmartField2UIFacade<VALUE> {
 
   void setDisplayTextFromUI(String text);
 
   void setErrorStatusFromUI(ParsingFailedStatus errorStatus);
 
   void setActiveFilterFromUI(TriState activeFilter);
+
+  void setLookupRowFromUI(ILookupRow<VALUE> lookupRow);
 
 }
