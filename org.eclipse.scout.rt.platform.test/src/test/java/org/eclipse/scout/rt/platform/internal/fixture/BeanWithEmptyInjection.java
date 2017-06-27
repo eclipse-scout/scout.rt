@@ -11,12 +11,16 @@
 package org.eclipse.scout.rt.platform.internal.fixture;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.InjectBean;
 
+/**
+ * Sample bean for testing with @Inject annotation and no constructor parameters
+ */
 @Bean
-public class EmptyCtorBean {
-  public EmptyCtorBean() {
+public class BeanWithEmptyInjection {
+
+  @InjectBean
+  public BeanWithEmptyInjection() {
   }
 
-  public void assertInit() {
-  }
 }

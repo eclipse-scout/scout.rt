@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -23,6 +24,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.InjectBean;
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -50,14 +53,64 @@ public final class BeanInstanceUtil {
       return cons.newInstance();
     }
     catch (Exception e) {
-      throw translateException("Could not create bean [" + beanClazz.getName() + "]", e);
+      throw translateException("Could not create bean [{}]", beanClazz, e);
     }
   }
 
   /**
-   * Invokes all {@link PostConstruct} annotated methods of the given instance.
+   * @return Constructor with {@link InjectBean} annotation
+   * @throws BeanCreationException
+   *           in case of multiple {@link InjectBean} annotated constructors
+   */
+  public static Constructor<?> getInjectionConstructor(Class<?> clazz) {
+    Constructor<?> result = null;
+    for (Constructor<?> cons : clazz.getDeclaredConstructors()) {
+      if (cons.getAnnotation(InjectBean.class) != null) {
+        if (result != null) {
+          throw new BeanCreationException("Found multiple @InjectBean constructors in {}", clazz);
+        }
+        result = cons;
+      }
+    }
+    return result;
+  }
+
+  public static Object[] getInjectionArguments(Class<?>[] argTypes) {
+    Object[] args = new Object[argTypes.length];
+    for (int i = 0; i < argTypes.length; i++) {
+      args[i] = BEANS.get(argTypes[i]);
+    }
+    return args;
+  }
+
+  /**
+   * Invokes all {@link InjectBean} annotated fields, all {@link InjectBean} and {@link PostConstruct} annotated methods
+   * of the given instance.
    */
   public static void initializeBeanInstance(Object instance) {
+    Collection<Field> fields = collectInjectedFields(instance.getClass());
+    for (Field field : fields) {
+      LOG.debug("injecting field {}", field);
+      try {
+        field.setAccessible(true);
+        Object value = BEANS.get(field.getType());
+        field.set(instance, value);
+      }
+      catch (Exception e) {
+        throw translateException("Exception while injecting field {}", field, e);
+      }
+    }
+    Collection<Method> initMethods = collectInjectedMethods(instance.getClass());
+    for (Method method : initMethods) {
+      LOG.debug("invoking injected method {}", method);
+      try {
+        method.setAccessible(true);
+        method.invoke(instance, getInjectionArguments(method.getParameterTypes()));
+      }
+      catch (Exception e) {
+        throw translateException("Exception while invoking @InjectBean method {}", method, e);
+      }
+    }
     Collection<Method> postConstructMethods = collectPostConstructMethods(instance.getClass());
     for (Method method : postConstructMethods) {
       LOG.debug("invoking post-construct method {}", method);
@@ -66,7 +119,7 @@ public final class BeanInstanceUtil {
         method.invoke(instance);
       }
       catch (Exception e) {
-        throw translateException("Exception while invoking @PostConstruct method", e);
+        throw translateException("Exception while invoking @PostConstruct method {}", method, e);
       }
     }
   }
@@ -85,7 +138,7 @@ public final class BeanInstanceUtil {
       initializeBeanInstance(instance);
     }
     catch (Exception e) {
-      throw translateException("Could not create bean [" + beanClazz.getName() + "]", e);
+      throw translateException("Could not create bean [{}]", beanClazz, e);
     }
     return instance;
   }
@@ -97,7 +150,7 @@ public final class BeanInstanceUtil {
    * <b>Note:</b> This utility must not use any features of the bean manager. Hence the usage of an
    * {@link IExceptionTranslator} is not suitable.
    */
-  static RuntimeException translateException(String message, Exception e) {
+  static RuntimeException translateException(String message, Object arg, Exception e) {
     Throwable t = e;
     while ((t instanceof UndeclaredThrowableException || t instanceof InvocationTargetException) && t.getCause() != null) {
       t = t.getCause();
@@ -105,7 +158,11 @@ public final class BeanInstanceUtil {
     if (t instanceof Error) {
       throw (Error) t;
     }
-    return new BeanCreationException(message, t);
+    return new BeanCreationException(message, arg, t);
+  }
+
+  static Collection<Method> collectInjectedMethods(Class<?> clazz) {
+    return collectNonStaticMethodsWithAnnotation(clazz, InjectBean.class, true, true);
   }
 
   /**
@@ -124,14 +181,14 @@ public final class BeanInstanceUtil {
    *           If unsupported methods are annotated with {@link PostConstruct} (i.e. those with parameters)
    */
   static Collection<Method> collectPostConstructMethods(Class<?> clazz) {
-    return collectMethodsWithAnnotation(clazz, PostConstruct.class, true);
+    return collectNonStaticMethodsWithAnnotation(clazz, PostConstruct.class, false, true);
   }
 
   static Collection<Method> collectPreDestroyMethods(Class<?> clazz) {
-    return collectMethodsWithAnnotation(clazz, PreDestroy.class, false);
+    return collectNonStaticMethodsWithAnnotation(clazz, PreDestroy.class, false, false);
   }
 
-  private static Collection<Method> collectMethodsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation, boolean throwOnError) {
+  private static Collection<Method> collectNonStaticMethodsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation, boolean allowArgs, boolean throwOnError) {
     final Map<String /*method name*/, Method> collector = new LinkedHashMap<>();
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
@@ -147,7 +204,7 @@ public final class BeanInstanceUtil {
           continue;
         }
         // check number of parameters
-        if (m.getParameterTypes().length != 0) {
+        if (!allowArgs && m.getParameterTypes().length != 0) {
           handleError(throwOnError, "Methods annotated with @{} must have no arguments [method={}]", annotation.getSimpleName(), m);
           continue;
         }
@@ -160,6 +217,41 @@ public final class BeanInstanceUtil {
 
         if (!collector.containsKey(name)) {
           collector.put(name, m);
+        }
+      }
+      currentClass = currentClass.getSuperclass();
+    }
+    return collector.values();
+  }
+
+  static Collection<Field> collectInjectedFields(Class<?> clazz) {
+    return collectNonStaticFieldsWithAnnotation(clazz, InjectBean.class, false);
+  }
+
+  private static Collection<Field> collectNonStaticFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation, boolean throwOnError) {
+    final Map<String /*field name*/, Field> collector = new LinkedHashMap<>();
+    Class<?> currentClass = clazz;
+    while (currentClass != null && currentClass != Object.class) {
+      for (Field f : currentClass.getDeclaredFields()) {
+        if (!f.isAnnotationPresent(annotation)) {
+          continue;
+        }
+
+        final int fieldModifiers = f.getModifiers();
+        // check static
+        if (Modifier.isStatic(fieldModifiers)) {
+          handleError(throwOnError, "Fields annotated with @{} must not be static [field={}]", annotation.getSimpleName(), f);
+          continue;
+        }
+
+        // compute field name (special handling for private fields)
+        String name = f.getName();
+        if (Modifier.isPrivate(fieldModifiers)) {
+          name = f.getDeclaringClass().getName() + ":" + name;
+        }
+
+        if (!collector.containsKey(name)) {
+          collector.put(name, f);
         }
       }
       currentClass = currentClass.getSuperclass();

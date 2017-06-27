@@ -12,10 +12,14 @@ package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
+import org.eclipse.scout.rt.platform.InjectBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.slf4j.Logger;
@@ -23,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 public class JandexClassInfo implements IClassInfo {
   private static final Logger LOG = LoggerFactory.getLogger(JandexClassInfo.class);
+  private static final String CONSTRUCTOR_NAME = "<init>";//NOSONAR
+
   private final ClassInfo m_classInfo;
   private volatile Class<?> m_class;
 
@@ -59,6 +65,26 @@ public class JandexClassInfo implements IClassInfo {
   @Override
   public boolean hasNoArgsConstructor() {
     return m_classInfo.hasNoArgsConstructor();
+  }
+
+  @Override
+  public boolean hasInjectableConstructor() {
+    List<AnnotationInstance> list = m_classInfo.annotations().get(DotName.createSimple(InjectBean.class.getName()));
+    if (list == null || list.isEmpty()) {
+      return false;
+    }
+    for (AnnotationInstance inst : list) {
+      AnnotationTarget target = inst.target();
+      if (AnnotationTarget.Kind.METHOD != target.kind()) {
+        continue;
+      }
+      if (!CONSTRUCTOR_NAME.equals(target.asMethod().name())) {
+        continue;
+      }
+      //target is annotated with @InjectBean, is a method and is a constructor
+      return true;
+    }
+    return false;
   }
 
   @Override

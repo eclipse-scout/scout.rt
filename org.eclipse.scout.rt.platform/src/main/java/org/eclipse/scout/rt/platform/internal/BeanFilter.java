@@ -97,9 +97,9 @@ public class BeanFilter {
       }
       return;
     }
-    if (!ci.hasNoArgsConstructor()) {
-      if (LOG.isWarnEnabled()) {
-        LOG.warn("Skipping bean candidate '{}' because it has no empty constructor().", ci.name());
+    if (!(ci.hasNoArgsConstructor() || ci.hasInjectableConstructor())) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Skipping bean candidate '{}' because it has no empty or injectable constructor().", ci.name());
       }
       return;
     }

@@ -312,7 +312,7 @@ public class BeanManagerImplementor implements IBeanManager {
       }
       catch (Exception e) {
         // log error but try to continue to allow other cleanup tasks
-        RuntimeException re = BeanInstanceUtil.translateException("Exception while invoking @PreDestroy method.", e);
+        RuntimeException re = BeanInstanceUtil.translateException("Exception while invoking @PreDestroy method {}", method, e);
         LOG.error("Error invoking @PreDestroy method {} on bean {}.", method, bean, re);
       }
     }

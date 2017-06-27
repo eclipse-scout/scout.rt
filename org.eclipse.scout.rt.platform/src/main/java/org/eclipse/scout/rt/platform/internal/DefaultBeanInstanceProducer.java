@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
@@ -296,7 +298,20 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
    * @return new instance. Never <code>null</code>.
    */
   protected T createInstance(Class<? extends T> beanClass) {
-    return BeanInstanceUtil.createBean(beanClass);
+    @SuppressWarnings("unchecked")
+    Constructor<T> injectCons = (Constructor<T>) BeanInstanceUtil.getInjectionConstructor(beanClass);
+    if (injectCons != null) {
+      try {
+        injectCons.setAccessible(true);
+        return injectCons.newInstance(BeanInstanceUtil.getInjectionArguments(injectCons.getParameterTypes()));
+      }
+      catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        throw new BeanCreationException(beanClass == null ? null : beanClass.getName(), e);
+      }
+    }
+    else {
+      return BeanInstanceUtil.createBean(beanClass);
+    }
   }
 
   /**

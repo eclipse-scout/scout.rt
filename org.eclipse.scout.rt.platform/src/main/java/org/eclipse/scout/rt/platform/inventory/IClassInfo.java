@@ -14,6 +14,8 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 import java.lang.reflect.Modifier;
 
+import org.eclipse.scout.rt.platform.InjectBean;
+
 /**
  * Information about a {@link Class}. This information may be available, before the class is loaded.
  *
@@ -51,6 +53,11 @@ public interface IClassInfo {
    * @return <code>true</code>, if the class has a constructor without any arguments.
    */
   boolean hasNoArgsConstructor();
+
+  /**
+   * @return <code>true</code>, if the class has a constructor with a {@link InjectBean} annotation.
+   */
+  boolean hasInjectableConstructor();
 
   /**
    * Returns <code>true</code> if the class represented by this class info is <b>directly</b> annotated with the given
