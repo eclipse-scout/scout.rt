@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
@@ -34,11 +35,18 @@ import org.junit.runner.RunWith;
 public class ThreadNameDecoratorTest {
 
   private IBean<ThreadNameDecorator> m_threadNameDecorator;
+  private Pattern m_threadNamePattern;
 
   @Before
   public void before() {
     // simulate productive mode
     m_threadNameDecorator = BEANS.getBeanManager().registerClass(ThreadNameDecorator.class);
+    if (Platform.get().inDevelopmentMode()) {
+      m_threadNamePattern = Pattern.compile("test-thread-\\d+.*");
+    }
+    else {
+      m_threadNamePattern = Pattern.compile("test-thread-\\d+");
+    }
   }
 
   @After
@@ -71,23 +79,23 @@ public class ThreadNameDecoratorTest {
 
     // Test while running
     assertTrue(latch1.await());
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), m_threadNamePattern.matcher(workerThread.get().getName()).matches());
     latch1.unblock();
 
     // Test while blocked
     JobTestUtil.waitForPermitCompetitors(semaphore, 0);
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), m_threadNamePattern.matcher(workerThread.get().getName()).matches());
 
     // Test while waiting for permit
     semaphore.withPermits(0);
     condition.setBlocking(false);
     JobTestUtil.waitForPermitCompetitors(semaphore, 1);
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), m_threadNamePattern.matcher(workerThread.get().getName()).matches());
 
     // Test while running
     semaphore.withPermits(1);
     assertTrue(latch2.await());
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), m_threadNamePattern.matcher(workerThread.get().getName()).matches());
     latch2.unblock();
   }
 }

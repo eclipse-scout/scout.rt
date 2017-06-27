@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Iterator;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.chain.IChainable;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
@@ -56,7 +57,12 @@ public class JobManagerChainTest {
 
     // 4. ThreadNameDecorator
     c = (IChainable) chainIterator.next();
-    assertEquals(ThreadNameDecorator.class, c.getClass());
+    if (Platform.get().inDevelopmentMode()) {
+      assertEquals(DevelopmentThreadNameDecorator.class, c.getClass());
+    }
+    else {
+      assertEquals(ThreadNameDecorator.class, c.getClass());
+    }
 
     // 5. JobNameContextValueProvider (MDC)
     c = (IChainable) chainIterator.next();
