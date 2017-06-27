@@ -22,6 +22,7 @@ scout.SmartField2Popup.prototype._init = function(options) {
   this.proposalChooser = this._createProposalChooser();
   this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
   this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
+  this.smartField.on('remove', this._onRemoveSmartField.bind(this));
 
   this.setLookupResult(options.lookupResult);
   this.setStatus(options.status);
@@ -99,4 +100,10 @@ scout.SmartField2Popup.prototype._onContainerMouseDown = function(event) {
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
   return false;
+};
+
+// when smart-field is removed, also remove popup. Don't animate removal in that case
+scout.SmartField2Popup.prototype._onRemoveSmartField = function(event) {
+  this.animateRemoval = false;
+  this.remove();
 };
