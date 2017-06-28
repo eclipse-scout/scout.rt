@@ -31,7 +31,7 @@ scout.FormTableControlLayout.prototype.layout = function($container) {
   if (form.rootGroupBox.controls[0] instanceof scout.TabBox) {
     var tabBox = form.rootGroupBox.controls[0];
     var tab = tabBox.selectedTab;
-    if (tab && tab.scrollable && tab.$body.has(document.activeElement)) {
+    if (tab && tab.scrollable && document.activeElement &&  tab.$body.has(document.activeElement)) {
       scout.scrollbars.scrollTo(tab.$body, $(document.activeElement));
     }
   }
