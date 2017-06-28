@@ -353,26 +353,25 @@ scout.TableMatrix.prototype.calculate = function() {
     }
 
     //To calculate correct y axis scale data.max must not be 0. If data.max===0-> log(data.max)=-infinity
-    if(scout.nvl(data.max, 0)===0){
+    if (scout.nvl(data.max, 0) === 0) {
       data.max = 0.1;
     }
 
-      var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
+    var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
 
-      data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
-      data.max = Math.ceil(data.max / 4) * 4;
-
+    data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
+    data.max = Math.ceil(data.max / 4) * 4;
   }
 
   // find dimensions and sort for x, y axis
   for (k = 0; k < this._allAxis.length; k++) {
     key = this._allAxis[k];
 
-    key.min = Math.min.apply(null, key);
-    key.max = Math.max.apply(null, key);
+    key.min = scout.arrays.min(key);
+    key.max = scout.arrays.max(key);
 
-    // null value should be handeld as first value (in charts)
-    if (key.indexOf(null) > -1) {
+    // null value should be handled as first value (in charts)
+    if (key.indexOf(null) !== -1) {
       key.max = key.max + 1;
     }
 
