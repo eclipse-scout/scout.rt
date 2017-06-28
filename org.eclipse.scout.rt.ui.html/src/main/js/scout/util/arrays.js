@@ -329,11 +329,23 @@ scout.arrays = {
   },
 
   max: function(arr) {
-    return Math.max.apply(Math, arr);
+    if (arr === null || arr === undefined) {
+      return Math.max.apply(Math, arr);
+    }
+
+    // Math.max() returns 0 (not null!) if arr contains only null and negative elements.
+    var filtered = arr.filter(scout.objects.isNumber);
+    return Math.max.apply(Math, filtered);
   },
 
   min: function(arr) {
-    return Math.min.apply(Math, arr);
+    if (arr === null || arr === undefined) {
+      return Math.min.apply(Math, arr);
+    }
+
+    // Math.min() returns 0 (not null!) if arr contains only null and non-negative elements.
+    var filtered = arr.filter(scout.objects.isNumber);
+    return Math.min.apply(Math, filtered);
   },
 
   //

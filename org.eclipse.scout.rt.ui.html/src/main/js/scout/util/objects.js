@@ -194,7 +194,7 @@ scout.objects = {
    * @returns {Boolean}
    */
   isNumber: function(obj) {
-    return obj !== null && !isNaN(obj) && isFinite(obj);
+    return obj !== null && !isNaN(obj) && isFinite(obj) && !isNaN(parseFloat(obj));
   },
 
   isString: function(obj) {
