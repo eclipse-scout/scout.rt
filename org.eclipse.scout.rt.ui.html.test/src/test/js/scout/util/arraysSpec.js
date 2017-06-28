@@ -149,6 +149,48 @@ describe("scout.arrays", function() {
     });
 
   });
+  
+  describe("max", function() {
+    it("returns 0 iff input contains 0", function() {
+      expect(scout.arrays.max([null, 5])).toBe(5);
+      expect(scout.arrays.max([null, 0])).toBe(0);
+      expect(scout.arrays.max([null, -13])).toBe(-13);
+    });
+
+    it("behaves like Math.max on null and undefined", function() {
+      var doTest = function(arr) {
+        expect(scout.arrays.max(arr)).toBe(Math.max.apply(Math, arr));
+      };
+
+      doTest(null);
+      doTest(undefined);
+    });
+
+    it("ignores non-number elements", function() {
+      expect(scout.arrays.max([null, 5, 6.7, false, undefined, NaN, {}, "batman"])).toBe(6.7);
+    });
+  });
+
+  describe("min", function() {
+    it("returns 0 iff input contains 0", function() {
+      expect(scout.arrays.min([null, 5])).toBe(5);
+      expect(scout.arrays.min([null, 0])).toBe(0);
+      expect(scout.arrays.min([null, -13])).toBe(-13);
+    });
+
+    it("behaves like Math.min on null and undefined", function() {
+      var doTest = function(arr) {
+        expect(scout.arrays.min(arr)).toBe(Math.min.apply(Math, arr));
+      };
+
+      doTest(null);
+      doTest(undefined);
+    });
+
+    it("ignores non-number elements", function() {
+      expect(scout.arrays.min([null, 5, 6.7, false, undefined, NaN, {}, "batman"])).toBe(5);
+    });
+  });
 
   describe("move", function() {
 
