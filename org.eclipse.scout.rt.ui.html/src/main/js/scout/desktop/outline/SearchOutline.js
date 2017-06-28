@@ -10,7 +10,9 @@
  ******************************************************************************/
 scout.SearchOutline = function() {
   scout.SearchOutline.parent.call(this);
+  this.hasText = false;
   this.$searchPanel;
+  this.$deletableIcon;
   this.$searchStatus;
   this.$queryField;
 };
@@ -48,8 +50,11 @@ scout.SearchOutline.prototype._render = function() {
   this.$container.addClass('search-outline');
   this.$searchPanel = this.$container.prependDiv('search-outline-panel');
   this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
-    .on('input', $.debounce(this._onQueryFieldInput.bind(this)))
+    .on('input', this._onQueryFieldInput.bind(this))
     .on('keypress', this._onQueryFieldKeyPress.bind(this));
+  this.$deletableIcon = this.$searchPanel.appendSpan('delete-icon unfocusable')
+    .on('click', this._onDeletableIconClick.bind(this));
+
   this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
     .on('click', this._onTitleClick.bind(this));
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
@@ -65,6 +70,7 @@ scout.SearchOutline.prototype._renderProperties = function() {
   scout.SearchOutline.parent.prototype._renderProperties.call(this);
   this._renderSearchQuery();
   this._renderSearchStatus();
+  this._updateHasText();
 };
 
 scout.SearchOutline.prototype._renderTitle = function() {
@@ -115,13 +121,16 @@ scout.SearchOutline.prototype._triggerSearch = function() {
 };
 
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {
-  // Don't send query if value did not change (may happen when _onQueryFieldInput is executed after _onQueryFieldKeyPress)
-  var searchQuery = this.$queryField.val();
-  if (this.searchQuery !== searchQuery) {
-    // Store locally so that the value persists when changing the outline without performing the search
-    this._setSearchQuery(searchQuery);
-    this._triggerSearch();
-  }
+  this._updateHasText();
+  // debounced search
+  $.debounce(this._search.bind(this))();
+
+};
+
+scout.SearchOutline.prototype._onDeletableIconClick = function(event) {
+  this.$queryField.val('');
+  this._updateHasText();
+  this._search();
 };
 
 scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
@@ -131,8 +140,22 @@ scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
   }
 };
 
+scout.SearchOutline.prototype._search = function(event) {
+  // Don't send query if value did not change (may happen when _onQueryFieldInput is executed after _onQueryFieldKeyPress)
+  var searchQuery = this.$queryField.val();
+  if (this.searchQuery !== searchQuery) {
+    // Store locally so that the value persists when changing the outline without performing the search
+    this._setSearchQuery(searchQuery);
+    this._triggerSearch();
+  }
+};
+
 scout.SearchOutline.prototype._setSearchQuery = function(searchQuery) {
   this.searchQuery = searchQuery;
+};
+
+scout.SearchOutline.prototype._updateHasText = function() {
+  this.$queryField.toggleClass('has-text', !!this.$queryField.val());
 };
 
 /**

@@ -16,6 +16,7 @@
 }
 
 .search-outline-panel {
+  position: relative;
   border-bottom: 1px solid @outline-title-border-color;
   padding-bottom: 14px;
   margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
@@ -35,6 +36,29 @@
   &:focus {
     border-color: @navigation-background-color;
     #scout.glow(@palette-white);
+    &.has-text {
+      padding-right: @text-field-padding-x + 15px;
+      & ~ .delete-icon {
+        display: block;
+      }
+    }
+  }
+
+  & ~ .delete-icon {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 0px;
+    height: 35px;
+    line-height: 35px;
+    margin-right: @text-field-padding-x;
+    cursor: pointer;
+    &::before{
+      #scout.font-icon();
+      font-size: 13px;
+      content: @icon-remove;
+      color: @text-field-icon-color;
+    }
   }
 }
 
@@ -56,6 +80,10 @@
     margin-right: @outline-title-margin-right;
     margin-left: @outline-title-margin-left;
     width: calc(~'100%' - (@outline-title-margin-left + @outline-title-margin-right));
+
+    & ~ .delete-icon {
+      margin-right: @outline-title-margin-right + @text-field-padding-x;
+    }
   }
 
   & > .search-outline-status {
