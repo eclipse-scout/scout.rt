@@ -135,6 +135,11 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     this._layoutIcon(formField, fieldBounds, right, top);
   }
 
+  // Deletable icon if present
+  if (formField.$deletableIcon && formField.$field) {
+    this._layoutDeletableIcon(formField, fieldBounds, right, top);
+  }
+
   // Make sure tooltip is at correct position after layouting, if there is one
   if (formField.tooltip && formField.tooltip.rendered) {
     formField.tooltip.position();
@@ -155,8 +160,8 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
 
     var pos = $field.position();
     var padding = scout.graphics.getInsets($field, {
-        includePadding: true
-      });
+      includePadding: true
+    });
 
     // subtract scrollbars sizes from width and height so overlay does not block scrollbars
     // we read the size from the scrollbar from our device, because we already determined
@@ -247,6 +252,33 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
     .cssTop(top)
     .cssHeight(height)
     .cssLineHeight(height);
+};
+
+scout.FormFieldLayout.prototype._layoutDeletableIcon = function(formField, fieldBounds, right, top) {
+  var height = this.rowHeight;
+  var iconWidth = 0;
+  if (fieldBounds) {
+    // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
+    height = fieldBounds.height;
+  }
+  if (formField.gridData.horizontalAlignment > 0) {
+    formField.$deletableIcon
+      .cssLeft(fieldBounds.x + formField.$field.cssBorderRightWidth())
+      .cssTop(top)
+      .cssHeight(height)
+      .cssLineHeight(height);
+  } else {
+    if (formField.$icon) {
+      iconWidth = scout.graphics.prefSize(formField.$icon, {
+        includeMargin: true
+      }).width;
+    }
+    formField.$deletableIcon
+      .cssRight(formField.$field.cssBorderRightWidth() + right + iconWidth)
+      .cssTop(top)
+      .cssHeight(height)
+      .cssLineHeight(height);
+  }
 };
 
 /**

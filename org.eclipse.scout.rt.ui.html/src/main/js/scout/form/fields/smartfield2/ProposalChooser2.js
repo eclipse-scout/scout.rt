@@ -45,6 +45,10 @@ scout.ProposalChooser2.prototype.selectFirstLookupRow = function() {
   throw new Error('selectFirstLookupRow() not implemented');
 };
 
+scout.ProposalChooser2.prototype.clearSelection = function() {
+  throw new Error('clearSelection() not implemented');
+};
+
 scout.ProposalChooser2.prototype.clearLookupRows = function() {
   throw new Error('clearLookupRows() not implemented');
 };

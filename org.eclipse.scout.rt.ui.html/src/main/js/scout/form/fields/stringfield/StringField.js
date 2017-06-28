@@ -88,9 +88,9 @@ scout.StringField.prototype._render = function() {
   } else {
     $field = scout.fields.makeTextField(this.$parent);
   }
-  $field.on('blur', this._onFieldBlur.bind(this));
 
   this.addField($field);
+  this.addDeletableIcon();
   this.addStatus();
 };
 

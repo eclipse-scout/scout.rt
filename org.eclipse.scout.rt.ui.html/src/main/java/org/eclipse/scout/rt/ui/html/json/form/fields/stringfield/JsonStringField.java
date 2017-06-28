@@ -166,6 +166,11 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
   }
 
   @Override
+  protected void handleUiClear(JsonEvent event) {
+    getModel().getUIFacade().parseAndSetValueFromUI(null);
+  }
+
+  @Override
   public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
     if ((getModel().getDropType() & IDNDSupport.TYPE_FILE_TRANSFER) == IDNDSupport.TYPE_FILE_TRANSFER) {
       ResourceListTransferObject transferObject = new ResourceListTransferObject(binaryResources);

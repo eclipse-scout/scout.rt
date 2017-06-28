@@ -55,6 +55,10 @@ scout.TreeProposalChooser2.prototype.selectFirstLookupRow = function() {
   }
 };
 
+scout.TreeProposalChooser2.prototype.clearSelection = function() {
+  this.model.deselectAll();
+};
+
 /**
  * @param {scout.LookupRow[]} lookupRows
  * @param {boolean} appendResult whether or not we must delete the tree

@@ -35,9 +35,9 @@ scout.NumberField.prototype._render = function() {
   this.addContainer(this.$parent, 'number-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  var $field = scout.fields.makeTextField(this.$parent)
-    .on('blur', this._onFieldBlur.bind(this));
+  var $field = scout.fields.makeTextField(this.$parent);
   this.addField($field);
+  this.addDeletableIcon();
   this.addStatus();
 };
 

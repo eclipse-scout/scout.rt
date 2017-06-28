@@ -30,12 +30,19 @@
   }
 
   &.has-action {
-
     & > input[type=text] {
       #scout.text-field-with-icon(@icon-arrow-right);
-
       ~ .icon {
         cursor: pointer;
+      }
+    }
+    &.deletable{
+      & > input[type=text] {
+        padding-right: @text-field-padding-x + 40px;
+        &.halign-right {
+          padding-left: @text-field-padding-x + 15px;
+          padding-right: @text-field-padding-x + 15px;
+        }
       }
     }
   }

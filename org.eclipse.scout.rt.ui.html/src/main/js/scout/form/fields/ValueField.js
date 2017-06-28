@@ -182,11 +182,14 @@ scout.ValueField.prototype._checkDisplayTextChanged = function(displayText, whil
  *        the DOM target where the mouse down event occurred.
  */
 scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
-  var eventOnField = this.$field.isOrHas(target);
-
+  var eventOnField = this.isFocusOnField(target);
   if (!eventOnField) {
     this.acceptInput(); // event outside this value field.
   }
+};
+
+scout.ValueField.prototype.isFocusOnField = function(target) {
+  return this.$field.isOrHas(target);
 };
 
 scout.ValueField.prototype._triggerAcceptInput = function(whileTyping) {
@@ -199,6 +202,20 @@ scout.ValueField.prototype._triggerAcceptInput = function(whileTyping) {
 
 scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
+};
+
+/**
+ * clears the display text and the value to null.
+ */
+scout.ValueField.prototype.clear = function(){
+  this.clearErrorStatus();
+  this.setValue(null);
+  this.setDisplayText();
+  this._triggerClear();
+};
+
+scout.ValueField.prototype._triggerClear = function() {
+  this.trigger('clear');
 };
 
 scout.ValueField.prototype.setValue = function(value) {

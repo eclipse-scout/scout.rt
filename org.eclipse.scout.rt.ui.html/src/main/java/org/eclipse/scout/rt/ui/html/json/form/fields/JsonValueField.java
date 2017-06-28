@@ -48,6 +48,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * flag.
    */
   public static final String EVENT_ACCEPT_INPUT = "acceptInput";
+  public static final String EVENT_CLEAR = "clear";
   public static final String EVENT_CLIPBOARD_EXPORT = "clipboardExport";
 
   private PropertyChangeListener m_contextMenuListener;
@@ -153,6 +154,9 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     if (EVENT_ACCEPT_INPUT.equals(event.getType())) {
       handleUiAcceptInput(event);
     }
+    else if (EVENT_CLEAR.equals(event.getType())) {
+      handleUiClear(event);
+    }
     else if (EVENT_CLIPBOARD_EXPORT.equals(event.getType())) {
       handleUiClipboardExport();
     }
@@ -187,6 +191,10 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * <code>whileTyping = false</code>). The model field parses the displayText and updates its value.
    */
   protected void handleUiAcceptInputAfterTyping(String displayText) {
+    // NOP may be implemented by sub-classes
+  }
+
+  protected void handleUiClear(JsonEvent event) {
     // NOP may be implemented by sub-classes
   }
 

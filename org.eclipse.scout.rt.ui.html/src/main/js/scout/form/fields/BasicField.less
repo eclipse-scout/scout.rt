@@ -1,0 +1,45 @@
+.basic-field.deletable {
+  & > .delete-icon {
+    position: absolute;
+    margin-right: @text-field-padding-x;
+    cursor: pointer;
+    &::before{
+      #scout.font-icon();
+      font-size: 13px;
+      content: @icon-remove;
+      color: @text-field-icon-color;
+    }
+  }
+
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field {
+    &:focus ~ .delete-icon::before,
+    &.focused ~ .delete-icon::before {
+      color: @text-field-icon-focus-color;
+    }
+    &.has-error ~ .delete-icon::before {
+      color: @text-field-icon-error-color;
+    }
+    &.disabled {
+      padding-right: @text-field-padding-x;
+    }
+
+    &.disabled ~ .delete-icon {
+      display: none;
+    }
+
+    padding-right: @text-field-padding-x + 15px;
+    &.halign-right {
+      padding-left: @text-field-padding-x + 15px;
+      padding-right: @text-field-padding-x;
+
+      ~ .delete-icon {
+        margin-left: @text-field-padding-x;
+        margin-right: 0;
+      }
+    }
+
+  }
+}

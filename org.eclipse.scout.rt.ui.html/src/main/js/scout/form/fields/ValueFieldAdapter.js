@@ -25,9 +25,20 @@ scout.ValueFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   });
 };
 
+scout.ValueFieldAdapter.prototype._onWidgetClear = function(event) {
+  this._send('clear', {}, {
+    showBusyIndicator: true,
+    coalesce: function(previous) {
+      return this.target === previous.target && this.type === previous.type;
+    }
+  });
+};
+
 scout.ValueFieldAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'acceptInput') {
     this._onWidgetAcceptInput(event);
+  } else if (event.type === 'clear') {
+    this._onWidgetClear(event);
   } else {
     scout.ValueFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

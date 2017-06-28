@@ -45,6 +45,31 @@
     }
   }
 }
+.date-field.date-deletable > .field {
+  & > input,
+  & > .input-field {
+
+    &.date {
+      #scout.text-field-with-icon(@icon-remove,~'.date');
+      ~ .icon.date{
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.date-field.time-deletable > .field {
+  & > input,
+  & > .input-field {
+    &.time {
+      #scout.text-field-with-icon(@icon-remove,~'.time');
+      ~ .icon.time{
+        cursor: pointer;
+      }
+    }
+  }
+}
+
 
 .date-picker-popup {
   &.down {
