@@ -83,8 +83,8 @@ scout.ProposalField2.prototype._acceptInputDone = function(result) {
 };
 
 scout.ProposalField2.prototype.getValueForSelection = function() {
-  if (this.lookupRow) {
-    return this.lookupRow.key;
+  if (!this._showSelection()) {
+    return null;
   }
-  return null;
+  return this.lookupRow.key;
 };

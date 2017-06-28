@@ -38,8 +38,11 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
 
 scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
   var position = 0;
-  // Don't insert if already inserted
+  // Don't insert if already inserted...
   if (this._invalidComponents.indexOf(htmlComp) >= 0) {
+    // FIXME [awe, cgu] 7.0 - SF2: review this change with C.GU... when component is already in list
+    // but no one triggers validation, validation is never scheduled
+    this._scheduleValidation(); // ... but schedule validation
     return;
   }
 
@@ -55,7 +58,10 @@ scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
   // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
   scout.arrays.insert(this._invalidComponents, htmlComp, position);
 
-  // Schedule validation
+  this._scheduleValidation();
+};
+
+scout.LayoutValidator.prototype._scheduleValidation = function() {
   if (this._validateTimeoutId === null) {
     this._validateTimeoutId = setTimeout(function() {
       this.validate();

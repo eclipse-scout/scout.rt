@@ -289,7 +289,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     this.closePopup();
     this.setValue(null);
     this.setDisplayText(searchText);
-    this.setErrorStatus(scout.Status.error({
+    this.setErrorStatus(scout.Status.warn({
       message: this.session.text('SmartFieldCannotComplete', searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
@@ -299,7 +299,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
   if (result.numLookupRows > 1) {
     this.setValue(null);
     this.setDisplayText(searchText);
-    this.setErrorStatus(scout.Status.error({
+    this.setErrorStatus(scout.Status.warn({
       message: this.session.text('SmartFieldNotUnique', searchText),
       code: scout.SmartField2.ErrorCode.NOT_UNIQUE
     }));
@@ -408,9 +408,11 @@ scout.SmartField2.prototype._formatLookupRow = function(lookupRow) {
 };
 
 /**
- * @param {boolean} [browse] whether or not the lookup call should execute getAll() or getByText() with the current display text
+ * @param {boolean} [browse] whether or not the lookup call should execute getAll() or getByText() with the current display text.
+ *     if browse is undefined, browse is set to true automatically if search text is empty
  */
 scout.SmartField2.prototype.openPopup = function(browse) {
+  var searchText = this._readDisplayText();
   $.log.info('SmartField2#openPopup browse=' + browse + ' popup=' + this.popup);
   // Reset scheduled focus next tabbable when user clicks on the smartfield
   // while a lookup is resolved.
@@ -421,9 +423,12 @@ scout.SmartField2.prototype.openPopup = function(browse) {
     return;
   }
 
-  // In case the field is invalid, we always want to start a lookup with the current display text
-  // unless the error was 'no results' because in that case it would be pointless to search for that text
-  if (this.errorStatus && !this._hasUiError(scout.SmartField2.ErrorCode.NO_RESULTS)) {
+  if (scout.strings.empty(searchText)) {
+    // if search text is empty - always do 'browse', no matter what the error code is
+    browse = true;
+  } else if (this.errorStatus && !this._hasUiError(scout.SmartField2.ErrorCode.NO_RESULTS)) {
+    // In case the field is invalid, we always want to start a lookup with the current display text
+    // unless the error was 'no results' because in that case it would be pointless to search for that text
     browse = false;
   }
 
@@ -432,7 +437,6 @@ scout.SmartField2.prototype.openPopup = function(browse) {
     promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
     $.log.debug('(SmartField2#openPopup) getAll()');
   } else {
-    var searchText = this._readDisplayText();
     promise = this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText));
     $.log.debug('(SmartField2#openPopup) getByText() searchText=', searchText);
   }
@@ -468,6 +472,31 @@ scout.SmartField2.prototype._hasUiError = function(codes) {
   });
 };
 
+scout.SmartField2.prototype._lookupByTextOrAll = function() {
+
+  // debounce lookup
+  if (this._pendingLookup) {
+    clearTimeout(this._pendingLookup);
+  }
+
+  var promise,
+    searchText = this._readDisplayText();
+
+  if (scout.strings.empty(searchText)) {
+    $.log.trace('(SmartField2#_lookupByTextOrAll) lookup byAll (seachText empty)');
+    promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
+  } else {
+    $.log.debug('(SmartField2#_lookupByTextOrAll) lookup byText searchText=' + searchText);
+    promise = this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText));
+  }
+
+  this._pendingLookup = setTimeout(function() {
+    $.log.debug('(SmartField2#_lookupByTextOrAll) execute pendingLookup');
+    // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
+    promise.done(this._lookupByTextOrAllDone.bind(this));
+  }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
+};
+
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   // In cases where the user has tabbed to the next field, while results for the previous
@@ -482,14 +511,25 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
     this.setErrorStatus(null);
   }
 
-  var numLookupRows = result.lookupRows.length;
-  if (numLookupRows === 0 && !result.noData) {
+  // We don't want to set an error status on the field for the 'no data' case
+  // Only show the message as status in the proposal chooser popup
+  var numLookupRows = result.lookupRows.length,
+    emptyResult = numLookupRows === 0; // FIXME [awe] 7.0 - SF2: check what to do with the noData flag on the UI server
+  if (emptyResult && result.browse) {
+    this.setErrorStatus(scout.Status.warn({
+      message: this.session.text('SmartFieldNoDataFound')
+    }));
+    this.closePopup();
+    return;
+  }
+
+  if (emptyResult) {
     if (this.embedded) {
       this.popup.clearLookupRows();
     } else {
       this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
     }
-    this.setErrorStatus(scout.Status.error({
+    this.setErrorStatus(scout.Status.warn({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
@@ -500,14 +540,6 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   if (numLookupRows > this.browseMaxRowCount) {
     popupStatus = scout.Status.info({
       message: this.session.text('SmartFieldMoreThanXRows', this.browseMaxRowCount)
-    });
-  }
-
-  // We don't want to set an error status on the field for the 'no data' case
-  // Only show the message as status in the proposal chooser popup
-  if (result.noData) {
-    popupStatus = scout.Status.info({
-      message: this.session.text('SmartFieldNoDataFound')
     });
   }
 
@@ -670,11 +702,11 @@ scout.SmartField2.prototype._onFieldKeyUp = function(event) {
   // user has typed.
   if (this.isPopupOpen()) {
     if (!this.isDropdown()) {
-      this._lookupByText();
+      this._lookupByTextOrAll();
     }
   } else {
-    $.log.debug('(SmartField2#_onFieldKeyUp)');
-    this.openPopup(false);
+    $.log.trace('(SmartField2#_onFieldKeyUp)');
+    this.openPopup();
   }
 };
 
@@ -759,7 +791,7 @@ scout.SmartField2.prototype._onLookupRowSelected = function(event) {
 // use the activeFilter in the lookup call because it belongs to the widget state.
 scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
   this.setActiveFilter(event.activeFilter);
-  this._lookupByText();
+  this._lookupByTextOrAll();
 };
 
 scout.SmartField2.prototype.setSearching = function(searching) {
@@ -799,23 +831,6 @@ scout.SmartField2.prototype._lookupByAll = function() {
     this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
       .done(this._lookupByTextOrAllDone.bind(this));
 
-  }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
-};
-
-scout.SmartField2.prototype._lookupByText = function() {
-  var searchText = this._readDisplayText();
-  $.log.trace('(SmartField2#_lookupByText) searchText=' + searchText);
-
-  // debounce lookup
-  if (this._pendingLookup) {
-    clearTimeout(this._pendingLookup);
-  }
-
-  this._pendingLookup = setTimeout(function() {
-    $.log.debug('(SmartField2#_lookupByText) searchText=' + searchText);
-    // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
-    this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
-      .done(this._lookupByTextOrAllDone.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
 };
 
@@ -925,7 +940,17 @@ scout.SmartField2.prototype._setValue = function(value) {
  * @returns the value used to find the selected element in a proposal chooser.
  */
 scout.SmartField2.prototype.getValueForSelection = function() {
-  return this.value;
+  return this._showSelection() ? this.value : null;
+};
+
+scout.SmartField2.prototype._showSelection = function() {
+  if (scout.objects.isNullOrUndefined(this.value)) {
+    return false;
+  }
+  if (scout.objects.isNullOrUndefined(this.lookupRow)) {
+    return false;
+  }
+  return this._readDisplayText() === this.lookupRow.text;
 };
 
 scout.SmartField2.prototype.setFocused = function(focused) {
