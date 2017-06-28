@@ -128,13 +128,6 @@ scout.GroupBox.prototype._render = function() {
   this.htmlBody.setLayout(new scout.LogicalGridLayout(this, env.formColumnGap, env.formRowGap, this.minWidthInPixel));
 
   this._installScrollbars();
-
-  this.controls.forEach(function(control) {
-    control.render(this.$body);
-
-    // set each children layout data to logical grid data
-    control.setLayoutData(new scout.LogicalGridData(control));
-  }, this);
 };
 
 scout.GroupBox.prototype._installScrollbars = function() {
@@ -159,6 +152,16 @@ scout.GroupBox.prototype._remove = function() {
     scout.scrollbars.uninstall(this.$body, this.session);
   }
   scout.GroupBox.parent.prototype._remove.call(this);
+};
+
+scout.GroupBox.prototype._renderControls = function() {
+  this.controls.forEach(function(control) {
+    if (!control.rendered) {
+      control.render(this.$body);
+      // set each children layout data to logical grid data
+      control.setLayoutData(new scout.LogicalGridData(control));
+    }
+  }, this);
 };
 
 scout.GroupBox.prototype._renderProperties = function() {
@@ -366,10 +369,9 @@ scout.GroupBox.prototype.setExpanded = function(expanded) {
 };
 
 scout.GroupBox.prototype._renderExpanded = function() {
-  var expanded = this.expanded;
-  this.$container.toggleClass('collapsed', !expanded);
+  this.$container.toggleClass('collapsed', !this.expanded);
   if (this.borderDecoration === scout.GroupBox.BorderDecoration.LINE) {
-    this.$container.toggleClass('with-line', !expanded);
+    this.$container.toggleClass('with-line', !this.expanded);
   }
 
   // Group boxes have set "useUiHeight=true" by default. When a group box is collapsed, it should not
@@ -385,6 +387,7 @@ scout.GroupBox.prototype._renderExpanded = function() {
     }
     // Update inner layout (e.g. menubar)
     this.invalidateLayout();
+    this._renderControls();
   } else {
     // If group box has a weight different than 0, we set it to zero and back up the old value
     if (this.gridData.weightY !== 0) {

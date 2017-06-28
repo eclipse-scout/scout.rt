@@ -57,6 +57,23 @@ describe("GroupBox", function() {
       expect($('#sandbox')).toContainElement('div.group-box');
       expect($('#sandbox')).toContainElement('div.group-box-title');
     });
+
+    it("renders controls initially if expanded", function () {
+      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
+      spyOn(groupBox, '_renderControls');
+      groupBox.render();
+      expect(groupBox._renderControls.calls.count()).toEqual(1);
+    });
+
+    it("does not render controls initially if collapsed, but on expand", function () {
+      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
+      spyOn(groupBox, '_renderControls');
+      groupBox.setExpanded(false);
+      groupBox.render();
+      expect(groupBox._renderControls.calls.count()).toEqual(0);
+      groupBox.setExpanded(true);
+      expect(groupBox._renderControls.calls.count()).toEqual(1);
+    });
   });
 
   describe('test predefined height and width in pixel', function() {
