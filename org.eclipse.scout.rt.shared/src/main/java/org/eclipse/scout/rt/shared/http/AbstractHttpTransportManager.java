@@ -100,10 +100,10 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
 
   /**
    * Default implementation of {@link HttpRequestInitializer} (see example for interface). We actually prefer to disable
-   * the read timeout.
+   * the read timeouts and do not throw exceptions in case of non 2xx responses.
    */
   protected HttpRequestInitializer createHttpRequestInitializer() {
-    return new DisableTimeoutHttpRequestInitializer();
+    return new DefaultHttpRequestInitializer();
   }
 
   /**
@@ -158,13 +158,17 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
   }
 
   /**
-   * Example {@link HttpRequestInitializer} (see {@link HttpRequestInitializer}) to disable read timeout.
+   * Example {@link HttpRequestInitializer} (see {@link HttpRequestInitializer}) to disable read timeout and do not
+   * throw exceptions in case of non 2xx responses.
    */
-  public static class DisableTimeoutHttpRequestInitializer implements HttpRequestInitializer {
+  public static class DefaultHttpRequestInitializer implements HttpRequestInitializer {
     @Override
     public void initialize(HttpRequest request) throws IOException {
       // There may be requests that take longer than the default (20sec). Allow indefinite (similar to default UrlConnection behavior).
       request.setReadTimeout(0);
+
+      // Do not throw an exception on execute error (similar to default UrlConnection behavior).
+      request.setThrowExceptionOnExecuteError(false);
     }
   }
 }
