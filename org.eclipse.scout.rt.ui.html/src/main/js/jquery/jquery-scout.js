@@ -902,10 +902,11 @@ $.fn.addClassForAnimation = function(className, options) {
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
   }.bind(this));
+  return this;
 };
 
 $.fn.oneAnimationEnd = function(selector, data, handler) {
-  this.one('animationend webkitAnimationEnd', selector, data, handler);
+  return this.one('animationend webkitAnimationEnd', selector, data, handler);
 };
 
 /**
@@ -1267,7 +1268,7 @@ $.fn.fadeOutAndRemove = function(duration, callback) {
     duration = undefined;
   }
   duration = scout.nvl(duration, 150);
-  this.stop(true).fadeOut(duration, function() {
+  return this.stop(true).fadeOut(duration, function() {
     $(this).remove();
     if (callback) {
       callback.call(this);
@@ -1374,6 +1375,7 @@ $.fn.restoreSelection = function(selection) {
   if (field && field === this.activeElement(true) && selection) {
     field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
   }
+  return this;
 };
 
 /**
@@ -1381,10 +1383,11 @@ $.fn.restoreSelection = function(selection) {
  */
 $.fn.attrOrRemove = function(attributeName, value) {
   if (value) {
-    $(this).attr(attributeName, value);
+    this.attr(attributeName, value);
   } else {
-    $(this).removeAttr(attributeName);
+    this.removeAttr(attributeName);
   }
+  return this;
 };
 
 $.fn.appendAppLink = function(appLinkBean, func) {
@@ -1464,6 +1467,7 @@ $.fn.selectAllText = function() {
     myWindow.getSelection().removeAllRanges();
     myWindow.getSelection().addRange(range);
   }
+  return this;
 };
 
 /**
