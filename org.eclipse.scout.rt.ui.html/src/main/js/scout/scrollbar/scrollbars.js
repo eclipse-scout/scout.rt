@@ -120,15 +120,15 @@ scout.scrollbars = {
       if (options.axis === 'both') {
         var scrollOptions = $.extend({}, options);
         scrollOptions.axis = 'y';
-        scrollbar = scout.create('Scrollbar', scrollOptions);
+        scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
         scrollbars.push(scrollbar);
 
         scrollOptions.axis = 'x';
         scrollOptions.mouseWheelNeedsShift = true;
-        scrollbar = scout.create('Scrollbar', scrollOptions);
+        scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
         scrollbars.push(scrollbar);
       } else {
-        scrollbar = scout.create('Scrollbar', options);
+        scrollbar = scout.create('Scrollbar', $.extend({}, options));
         scrollbars.push(scrollbar);
       }
       $container.css('overflow', 'hidden');
