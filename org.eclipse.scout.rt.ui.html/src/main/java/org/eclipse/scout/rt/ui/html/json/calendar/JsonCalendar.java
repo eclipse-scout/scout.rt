@@ -252,8 +252,15 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
   protected void handleUiComponentMoved(JsonEvent event) {
     JSONObject data = event.getData();
     Date newDate = toJavaDate(data, "newDate");
-    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component", null));
-    getModel().getUIFacade().fireComponentMovedFromUI(comp.getModel(), newDate);
+    String componentId = data.optString("component", null);
+
+    JsonCalendarComponent<CalendarComponent> component = resolveCalendarComponent(componentId);
+    if (component != null) {
+      getModel().getUIFacade().fireComponentMovedFromUI(component.getModel(), newDate);
+    }
+    else if (componentId != null) {
+      LOG.warn("Unkown component with ID {} [event='{}']", componentId, EVENT_COMPONENT_MOVED);
+    }
   }
 
   protected void handleUiReload(JsonEvent event) {
@@ -268,14 +275,16 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     String componentId = data.optString("componentId", null);
 
     CalendarComponent selectedComponent = null;
-    if (componentId != null) {
-      JsonCalendarComponent<CalendarComponent> jsonComponent = resolveCalendarComponent(componentId);
+    JsonCalendarComponent<CalendarComponent> jsonComponent = resolveCalendarComponent(componentId);
+    if (jsonComponent != null) {
       selectedComponent = jsonComponent.getModel();
       addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_COMPONENT, selectedComponent);
     }
+    else if (componentId != null) {
+      LOG.warn("Unkown component with ID {} [event='{}']", componentId, EVENT_SELECTION_CHANGED);
+    }
 
     addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
-
     getModel().getUIFacade().setSelectionFromUI(selectedDate, selectedComponent);
     LOG.debug("date={} componentId={}", selectedDate, componentId);
   }
@@ -321,6 +330,9 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
   }
 
   protected Date toJavaDate(JSONObject data, String propertyName) {
+    if (data == null || propertyName == null) {
+      return null;
+    }
     return new JsonDate(data.optString(propertyName, null)).asJavaDate();
   }
 
@@ -358,5 +370,4 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
       addActionEvent(EVENT_CALENDAR_CHANGED_BATCH, json);
     }
   }
-
 }
