@@ -42,7 +42,7 @@ public class SmartField2UIFacade<VALUE> implements ISmartField2UIFacade<VALUE> {
 
   @Override
   public void setLookupRowFromUI(ILookupRow<VALUE> lookupRow) {
-    m_smartField.setLookupRow(lookupRow);
+    m_smartField.setValueByLookupRow(lookupRow);
   }
 
 }

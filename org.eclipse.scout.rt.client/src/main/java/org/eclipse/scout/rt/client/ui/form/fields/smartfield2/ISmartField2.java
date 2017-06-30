@@ -26,7 +26,9 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
-// FIXME [awe] 7.0 - SF2: lookup/fetch schicht entrümpeln, prüfen ob wir den in-background bzw. den synchronous teil entfernen können.
+// FIXME [awe] 7.0 - SF2: prüfen welche lookup-methoden tatsächlich noch benötigt werden. Die synchronous methoden sollten eigentlich nicht
+// mehr gebraucht werden, ausser an der stelle wo wir beim setValue() sicherstellen wollen, dass die lookup-row dazu geladen wurde. Alle
+// anderen lookups sollten async sein.
 
 /**
  * Generic type V: value of the SmartField2, which is also the key used in lookup-rows.
@@ -210,33 +212,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void prepareRecLookup(ILookupCall<VALUE> call, VALUE parentKey, TriState activeState);
 
-  /**
-   * If the browse lookup call yields exactly one value, assign it to the smartfield, otherwise do nothing.
-   *
-   * @param background
-   *          true (default) if assignment should be done later which allows for one batch call for all smartfields.
-   *          Using background=false assigns the value immediately, which results in an immediate call to the data
-   *          provider. Whenever possible, background=true should be used to allow for batch calls to the backend.
-   * @since 22.05.2009
-   * @deprecated
-   */
-  @Deprecated
-  void setUniquelyDefinedValue(boolean background); // FIXME [awe] 7.0 - SF2: remove/deprecate method?
-
-  /**
-   * Sets the current lookup-row to null and also the accepted proposal from the proposal chooser (if available).
-   * @deprecated
-   */
-  @Deprecated
-  void clearProposal(); // FIXME [awe] 7.0 - SF2: remove/deprecate method?
-
-  /**
-   * This method is normally used by a {@link IContentAssistFieldProposalForm#acceptProposal()}
-   * @deprecated
-   */
-  @Deprecated
-  void acceptProposal(ILookupRow<VALUE> row); // FIXME [awe] 7.0 - SF2: remove/deprecate method?
-
   ISmartField2UIFacade<VALUE> getUIFacade();
 
   void setWildcard(String wildcard);
@@ -244,14 +219,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   String getWildcard();
 
   // search and update the field with the result
-
-  /**
-   * updates the lookup rows with the same search text as last time.
-   *
-   * @param selectCurrentValue
-   * @param synchronous
-   */
-  void doSearch(boolean selectCurrentValue, boolean synchronous);
 
   /**
    * @param searchText
@@ -414,6 +381,11 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void setLookupRow(ILookupRow<VALUE> lookupRow);
 
-  void setLookupRowByKey(VALUE lookupKey);
+  /**
+   * Sets the value by using the key of the given lookup row. The property <code>lookupRow</code> will be set too.
+   *
+   * @param lookupRow
+   */
+  void setValueByLookupRow(ILookupRow<VALUE> lookupRow);
 
 }

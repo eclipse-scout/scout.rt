@@ -6,9 +6,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonProposalField2<VALUE, FIELD extends IProposalField2<VALUE>> extends JsonSmartField2<VALUE, FIELD> {
+public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> extends JsonSmartField2<VALUE, MODEL> {
 
-  public JsonProposalField2(FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonProposalField2(MODEL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
@@ -18,7 +18,7 @@ public class JsonProposalField2<VALUE, FIELD extends IProposalField2<VALUE>> ext
   }
 
   @Override
-  protected void initJsonProperties(FIELD model) {
+  protected void initJsonProperties(MODEL model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IProposalField2<VALUE>>(IProposalField2.PROP_MAX_LENGTH, model) {
       @Override

@@ -158,6 +158,8 @@ scout.SmartField2.prototype.acceptInput = function() {
     searchText = this._readDisplayText(),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
+  this._setProperty('displayText', searchText); // FIXME [awe] 7.0 - SF2: set lookupRow/value to null when displayText does not match anymore!
+
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
   if (this._userWasTyping) {

@@ -568,7 +568,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
           // nop
         }
         else {
-          acceptProposal(newRow);
+          setValueByLookupRow(newRow);
         }
       }
       catch (Exception e) {
@@ -727,31 +727,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return m_wildcard;
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setUniquelyDefinedValue(boolean background) {
-    ILookupRowFetchedCallback<VALUE> callback = new ILookupRowFetchedCallback<VALUE>() {
-
-      @Override
-      public void onSuccess(List<? extends ILookupRow<VALUE>> rows) {
-        if (rows.size() == 1) {
-          acceptProposal(rows.get(0));
-        }
-      }
-
-      @Override
-      public void onFailure(RuntimeException e) {
-        // NOOP
-      }
-    };
-    if (background) {
-      callBrowseLookupInBackground(getWildcard(), 2, callback);
-    }
-    else {
-      callback.onSuccess(callBrowseLookup(getWildcard(), 2));
-    }
-  }
-
   public IContentAssistFieldLookupRowFetcher<VALUE> getLookupRowFetcher() {
     return m_lookupRowFetcher;
   }
@@ -778,12 +753,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   protected final VALUE execValidateValue(VALUE rawValue) {
     return rawValue;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void clearProposal() {
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -871,8 +840,22 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public void setLookupRowByKey(VALUE lookupKey) {
-    this.formatValueInternal(lookupKey);
+  public void setValueByLookupRow(ILookupRow<VALUE> row) {
+    setLookupRow(row);
+    if (row == null) {
+      setValue(null);
+    }
+    else {
+      setValue(getValueFromLookupRow(row));
+    }
+  }
+
+  /**
+   * @param row
+   * @return a property from the lookup row which is used as value (usually this is the key of the lookup row)
+   */
+  protected VALUE getValueFromLookupRow(ILookupRow<VALUE> row) {
+    return row.getKey();
   }
 
   @Override
@@ -1011,7 +994,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
    * matches. Override this method to implement another behavior.
    */
   protected boolean lookupRowMatchesValue(ILookupRow<VALUE> lookupRow, VALUE value) {
-    return ObjectUtility.equals(lookupRow.getKey(), value);
+    return ObjectUtility.equals(getValueFromLookupRow(lookupRow), value);
   }
 
   // search and update the field with the result
@@ -1038,11 +1021,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   // FIXME [awe] 7.0 - SF2: cleanup all the call* and do* methods, check what's really needed
-
-  @Override
-  public void doSearch(boolean selectCurrentValue, boolean synchronous) {
-    doSearch(getLookupRowFetcher().getLastSearchText(), selectCurrentValue, synchronous);
-  }
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
@@ -1353,13 +1331,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public ISmartField2UIFacade<VALUE> getUIFacade() {
     return m_uiFacade;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void acceptProposal(ILookupRow<VALUE> row) {
-    setLookupRow(row);
-    setValue(row.getKey());
   }
 
   @Override

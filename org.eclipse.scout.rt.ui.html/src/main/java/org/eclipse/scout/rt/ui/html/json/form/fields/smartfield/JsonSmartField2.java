@@ -27,11 +27,7 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// FIXME [awe] 7.0 - SF2: key problem lösen... angenommen wir tippen im GUI "b*" und der lookup liefert drei rows zurück "0: B1", "1: B2", "2: B3"
-// wir wählen B1 (key=0). Jetzt tippen wir im Suchfeld B2. Nun wird die Map auf dem Server resetted und für B2 ein key 0 angelegt. Das GUI hat nun
-// das gefühl, dass es nichts ändern muss, weil der value ja schon 0 ist --> Die Keys müssen stabil bleiben!
-
-public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonValueField<T> {
+public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends JsonValueField<MODEL> {
 
   // Contains always the mapping from the last performed lookup operation
   // all values are reset each time a new lookup starts
@@ -39,12 +35,12 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
   private Map<Integer, Object> m_idToKeyMap = new HashMap<>();
   private int m_id = 0;
 
-  public JsonSmartField2(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSmartField2(MODEL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
   @Override
-  protected void initJsonProperties(T model) { // FIXME [awe] 7.0 - SF2: hier auch den value hoch schicken?
+  protected void initJsonProperties(MODEL model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_RESULT, model) {
       @Override
@@ -163,12 +159,13 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
       }
       getModel().getUIFacade().setErrorStatusFromUI(parseError);
     }
+    // When we have a lookup row, we prefer the lookup row over the value
     if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
       JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
       ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
       getModel().getUIFacade().setLookupRowFromUI(lookupRow);
     }
-    if (data.has(IValueField.PROP_VALUE)) {
+    else if (data.has(IValueField.PROP_VALUE)) {
       handleUiPropertyChangeValue(data);
     }
   }
@@ -295,9 +292,12 @@ public class JsonSmartField2<VALUE, T extends ISmartField2<VALUE>> extends JsonV
     }
 
     VALUE lookupRowKey = getLookupRowKeyForId(json.optString("key"));
-    ILookupRow<VALUE> lookupRow = getModel().lookupByKey(lookupRowKey);
-    // FIXME [awe] 7.0 - SF2: add other lookup row properties?
-    return lookupRow;
+    String lookupRowText = json.optString("text");
+    return createLookupRow(lookupRowKey, lookupRowText, json);
+  }
+
+  protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
+    return new LookupRow<VALUE>(key, text);
   }
 
   protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {

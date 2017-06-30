@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 @ClassId("1c8c645d-9e75-4bb1-9f79-c0532d2cdb72")
@@ -105,8 +104,9 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
   }
 
   @Override
-  protected boolean lookupRowMatchesValue(ILookupRow<VALUE> lookupRow, VALUE value) {
-    return ObjectUtility.equals(lookupRow.getText(), value);
+  @SuppressWarnings("unchecked")
+  protected VALUE getValueFromLookupRow(ILookupRow<VALUE> row) {
+    return (VALUE) row.getText();
   }
 
 }
