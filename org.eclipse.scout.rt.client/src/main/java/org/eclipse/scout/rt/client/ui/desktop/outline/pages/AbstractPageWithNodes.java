@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNodesChains.PageWithNodesCreateChildPagesChain;
@@ -102,8 +101,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   protected void createChildPagesInternal(final List<IPage<?>> pageList) {
-    ClientRunContexts.copyCurrent()
-        .withOutline(getOutline(), true)
+    createDisplayParentRunContext()
         .run(new IRunnable() {
 
           @Override

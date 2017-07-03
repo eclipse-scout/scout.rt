@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
@@ -1056,30 +1057,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return;
     }
 
-    ClientRunContexts.copyCurrent()
-        .withOutline(newOutline, true)
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              m_outlineChanging = true;
-              setOutlineInternal(newOutline);
-            }
-            finally {
-              m_outlineChanging = false;
-            }
-          }
-        });
-    fireOutlineContentActivate();
+    try {
+      m_outlineChanging = true;
+      setOutlineInternal(newOutline);
+    }
+    finally {
+      m_outlineChanging = false;
+    }
   }
 
   protected void setOutlineInternal(IOutline newOutline) {
-    if (m_outline == newOutline) {
-      return;
-    }
-    //
-    IOutline oldOutline = m_outline;
+    final IOutline oldOutline = m_outline;
     if (oldOutline != null) {
       if (m_activeOutlineListener != null) {
         oldOutline.removePropertyChangeListener(m_activeOutlineListener);
@@ -1093,26 +1081,40 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (oldOutline != null) {
       oldOutline.clearContextPage();
     }
-    //
-    if (m_outline != null) {
-      m_activeOutlineListener = new P_ActiveOutlineListener();
-      m_outline.addPropertyChangeListener(m_activeOutlineListener);
-      setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
-    }
-    // <bsh 2010-10-15>
-    // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
-    // are only called when the new outline is null. When the new outline is _not_ null, we
-    // will override the "null" anyway (see below).
-    // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
+
+    final ClientRunContext ctx;
     if (m_outline == null) {
-      setPageDetailForm(null);
-      setPageDetailTable(null);
-      setPageSearchForm(null, true);
+      ctx = ClientRunContexts.copyCurrent().withOutline(null, true);
     }
-    // </bsh>
-    updateActiveFormOnOutlineChanged();
-    fireOutlineChanged(oldOutline, m_outline);
-    onOutlineChangedInternal();
+    else {
+      ctx = m_outline.createDisplayParentRunContext();
+    }
+    ctx.run(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        if (m_outline != null) {
+          m_activeOutlineListener = new P_ActiveOutlineListener();
+          m_outline.addPropertyChangeListener(m_activeOutlineListener);
+          setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
+        }
+        // <bsh 2010-10-15>
+        // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
+        // are only called when the new outline is null. When the new outline is _not_ null, we
+        // will override the "null" anyway (see below).
+        // This change is needed for the "on/off semantics" of the tool tab buttons to work correctly.
+        if (m_outline == null) {
+          setPageDetailForm(null);
+          setPageDetailTable(null);
+          setPageSearchForm(null, true);
+        }
+        // </bsh>
+        updateActiveFormOnOutlineChanged();
+        fireOutlineChanged(oldOutline, m_outline);
+        onOutlineChangedInternal();
+
+        fireOutlineContentActivate();
+      }
+    });
   }
 
   protected void updateActiveFormOnOutlineChanged() {

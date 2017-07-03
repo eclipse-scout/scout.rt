@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
@@ -141,9 +142,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
             getClass(), new Exception("origin"));
       }
 
-      ClientRunContexts
-          .copyCurrent()
-          .withOutline(getOutline(), true)
+      createDisplayParentRunContext()
           .run(
               new IRunnable() {
                 @Override
@@ -165,6 +164,22 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
               });
     }
     return m_table;
+  }
+
+  /**
+   * Creates a new {@link ClientRunContext} to be used for executing model logic in the context of a suitable display
+   * parent.
+   *
+   * @return Returns a {@link ClientRunContext} created by {@link IOutline#createDisplayParentRunContext()} or just a
+   *         copy of the current one, if {@link #getOutline()} returns <code>null</code>. Never <code>null</code>.
+   * @since 7.0
+   */
+  protected ClientRunContext createDisplayParentRunContext() {
+    final IOutline outline = getOutline();
+    if (outline != null) {
+      return outline.createDisplayParentRunContext();
+    }
+    return ClientRunContexts.copyCurrent();
   }
 
   protected void linkTableRowWithPage(ITableRow tableRow, IPage<?> page) {
@@ -802,8 +817,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (getConfiguredDetailForm() == null) {
       return null;
     }
-    return ClientRunContexts.copyCurrent()
-        .withOutline(getOutline(), true)
+    return createDisplayParentRunContext()
         .call(new Callable<IForm>() {
           @Override
           public IForm call() throws Exception {
@@ -909,8 +923,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public void dataChanged(final Object... dataTypes) {
-    ClientRunContexts.copyCurrent()
-        .withOutline(getOutline(), true)
+    createDisplayParentRunContext()
         .run(new IRunnable() {
 
           @Override
