@@ -213,19 +213,23 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
     this.$container.parents('div').each(function() {
       var $ancestor = $(this);
       var ancestorBounds = scout.graphics.offsetBounds($ancestor);
-      if (ancestorBounds.x > biggestAncestorBeginX) {
-        biggestAncestorBeginX = ancestorBounds.x;
+      if ($ancestor.css('overflow-x') !== 'visible') {
+        if (ancestorBounds.x > biggestAncestorBeginX) {
+          biggestAncestorBeginX = ancestorBounds.x;
+        }
+        var ancestorEndX = ancestorBounds.x + ancestorBounds.width;
+        if (ancestorEndX < smallestAncestorEndX) {
+          smallestAncestorEndX = ancestorEndX;
+        }
       }
-      if (ancestorBounds.y > biggestAncestorBeginY) {
-        biggestAncestorBeginY = ancestorBounds.y;
-      }
-      var ancestorEndX = ancestorBounds.x + ancestorBounds.width;
-      if (ancestorEndX < smallestAncestorEndX) {
-        smallestAncestorEndX = ancestorEndX;
-      }
-      var ancestorEndY = ancestorBounds.y + ancestorBounds.height;
-      if (ancestorEndY < smallestAncestorEndY) {
-        smallestAncestorEndY = ancestorEndY;
+      if ($ancestor.css('overflow-y') !== 'visible') {
+        if (ancestorBounds.y > biggestAncestorBeginY) {
+          biggestAncestorBeginY = ancestorBounds.y;
+        }
+        var ancestorEndY = ancestorBounds.y + ancestorBounds.height;
+        if (ancestorEndY < smallestAncestorEndY) {
+          smallestAncestorEndY = ancestorEndY;
+        }
       }
     });
 
@@ -235,7 +239,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
     var clipBottom = 0;
 
     // clip left
-    if(biggestAncestorBeginX > thumbBounds.x) {
+    if (biggestAncestorBeginX > thumbBounds.x) {
       clipLeft = biggestAncestorBeginX - thumbBounds.x;
       thumbWidth -= clipLeft;
       this._$thumb
@@ -245,7 +249,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
     }
 
     // clip top
-    if(biggestAncestorBeginY > thumbBounds.y) {
+    if (biggestAncestorBeginY > thumbBounds.y) {
       clipTop = biggestAncestorBeginY - thumbBounds.y;
       thumbHeight -= clipTop;
       this._$thumb
@@ -255,7 +259,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
     }
 
     // clip right
-    if(thumbEndX > smallestAncestorEndX) {
+    if (thumbEndX > smallestAncestorEndX) {
       clipRight = thumbEndX - smallestAncestorEndX;
       this._$thumb
         .css('width', thumbWidth - clipRight)
@@ -263,7 +267,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
     }
 
     // clip bottom
-    if(thumbEndY > smallestAncestorEndY) {
+    if (thumbEndY > smallestAncestorEndY) {
       clipBottom = thumbEndY - smallestAncestorEndY;
       this._$thumb
         .css('height', thumbHeight - clipBottom)
