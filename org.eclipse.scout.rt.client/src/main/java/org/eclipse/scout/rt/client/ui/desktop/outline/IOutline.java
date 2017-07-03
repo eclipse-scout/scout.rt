@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.security.Permission;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -202,4 +203,12 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   void firePageActivated(IPage<?> page);
 
+  /**
+   * Creates a new {@link ClientRunContext} to be used for executing model logic in the context of a suitable display
+   * parent.
+   *
+   * @return Returns a {@link ClientRunContext}, never <code>null</code>.
+   * @since 7.0
+   */
+  ClientRunContext createDisplayParentRunContext();
 }

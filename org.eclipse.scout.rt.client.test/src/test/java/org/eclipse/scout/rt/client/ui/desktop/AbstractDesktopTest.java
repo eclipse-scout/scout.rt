@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.deeplink.AbstractDeepLinkHandler;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.DeepLinks;
@@ -76,6 +77,7 @@ public class AbstractDesktopTest {
     m_outline = Mockito.mock(IOutline.class);
     Mockito.when(m_outline.getActivePage()).thenReturn(null);
     Mockito.when(m_outline.getRootNode()).thenReturn(node);
+    Mockito.when(m_outline.createDisplayParentRunContext()).thenReturn(ClientRunContexts.copyCurrent().withOutline(m_outline, true));
 
     m_desktop = new AbstractDesktop(false) {
       @Override

@@ -14,6 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.PageFieldChains.PageFieldPageChangedChain;
@@ -287,6 +289,12 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     @Override
     protected boolean getConfiguredRootNodeVisible() {
       return true;
+    }
+
+    @Override
+    public ClientRunContext createDisplayParentRunContext() {
+      // SimpleOutline is not a regular outline but a structure object without UI representation. Hence it may no act as display parent.
+      return ClientRunContexts.copyCurrent();
     }
   }
 

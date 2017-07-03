@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
@@ -107,14 +108,20 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   protected void callInitializer() {
     // Run the initialization on behalf of this Outline.
-    ClientRunContexts.copyCurrent()
-        .withOutline(this, true)
+    createDisplayParentRunContext()
         .run(new IRunnable() {
           @Override
           public void run() throws Exception {
             AbstractOutline.super.callInitializer();
           }
         });
+  }
+
+  @Override
+  public ClientRunContext createDisplayParentRunContext() {
+    return ClientRunContexts
+        .copyCurrent()
+        .withOutline(this, true);
   }
 
   /*
@@ -621,8 +628,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       return;
     }
 
-    ClientRunContexts.copyCurrent()
-        .withOutline(this, true)
+    createDisplayParentRunContext()
         .run(new IRunnable() {
           @Override
           public void run() throws Exception {

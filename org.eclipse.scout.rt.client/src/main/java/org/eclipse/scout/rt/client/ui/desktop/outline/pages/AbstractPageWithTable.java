@@ -16,7 +16,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
@@ -398,8 +397,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     try {
-      return ClientRunContexts.copyCurrent()
-          .withOutline(getOutline(), true)
+      return createDisplayParentRunContext()
           .call(new Callable<ISearchForm>() {
 
             @Override
@@ -940,8 +938,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         }
         case TableEvent.TYPE_ROWS_INSERTED: {
           if (!isLeaf()) {
-            ClientRunContexts.copyCurrent()
-                .withOutline(getOutline(), true)
+            createDisplayParentRunContext()
                 .run(new IRunnable() {
                   @Override
                   public void run() {
