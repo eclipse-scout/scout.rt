@@ -68,7 +68,8 @@ scout.MessageBox.prototype._render = function() {
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
   this._glassPaneRenderer.renderGlassPanes();
 
-  this.$container = this.$parent.appendDiv('messagebox');
+  this.$container = this.$parent.appendDiv('messagebox')
+    .on('mousedown', this._onMouseDown.bind(this));
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.draggable($handle);
@@ -184,6 +185,19 @@ scout.MessageBox.prototype._renderHiddenText = function() {
   }
 };
 
+scout.MessageBox.prototype._onMouseDown = function() {
+  // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
+  var parent = this.parent;
+  while (parent) {
+    if (!(parent instanceof scout.Form && parent.isDialog())) {
+      parent = parent.parent;
+    } else {
+      parent.activate();
+      return;
+    }
+  }
+};
+
 scout.MessageBox.prototype._onButtonClick = function(event, option) {
   this.trigger('action', {
     option: option
@@ -245,4 +259,3 @@ scout.MessageBox.prototype._detach = function() {
   this.$container.detach();
   scout.MessageBox.parent.prototype._detach.call(this);
 };
-

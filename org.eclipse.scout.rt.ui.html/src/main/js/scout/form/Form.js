@@ -135,6 +135,9 @@ scout.Form.prototype._renderForm = function() {
       this._initResizable();
     }
     this._renderHeader();
+    // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
+    // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
+    this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
   } else {
     layout = new scout.FormLayout(this);
   }
@@ -378,6 +381,14 @@ scout.Form.prototype._onResize = function(event) {
   this.htmlComp.layout.autoSize = autoSizeOld;
   this.updateCacheBounds();
   return false;
+};
+
+scout.Form.prototype._onDialogMouseDown = function() {
+  this.activate();
+};
+
+scout.Form.prototype.activate = function() {
+  this.session.desktop.activateForm(this);
 };
 
 scout.Form.prototype._renderHeader = function() {
