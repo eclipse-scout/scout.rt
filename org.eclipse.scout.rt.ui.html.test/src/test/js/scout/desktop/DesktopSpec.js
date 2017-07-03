@@ -322,7 +322,537 @@ describe('Desktop', function() {
       expect(form.parent).toBe(tabBox);
       expect(form.$container.parent()[0]).toBe(tabBox.$viewContent[0]);
     });
+  });
 
+  describe('activateForm', function() {
+
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
+    var desktopOverlayHtmlElements = function() {
+      return desktop.$container.children('.overlay-separator').nextAll().toArray();
+    };
+
+    var formElt = function(form) {
+      return form.$container[0];
+    };
+
+    var widgetHtmlElements = function(forms) {
+      var formElts = [];
+      forms.forEach(function(form) {
+        formElts.push(form.$container[0]);
+      });
+      return formElts;
+    };
+
+    it('brings non-modal dialog in front upon activation', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+    });
+
+    it('keeps the order of other non-modal dialogs even when one of them is the display-parent of the dialog to activate', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.setCssClass('DIALOG0');
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.setCssClass('DIALOG1');
+      dialog1.modal = false;
+      dialog1.parent = dialog0;
+      dialog1.displayParent = dialog0;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.setCssClass('DIALOG2');
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      desktop.activateForm(dialog1);
+      // expect dialog1 to be on top but it's parent still behind dialog2
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog2, dialog1]));
+      expect(desktop.activeForm).toBe(dialog1);
+    });
+
+    it('activates outline when activating dialog of other outline', function() {
+      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      desktop.setOutline(outline1);
+      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.setCssClass('DIALOG1');
+      dialog1.modal = false;
+      dialog1.parent = outline1;
+      dialog1.displayParent = outline1;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.setCssClass('DIALOG2');
+      dialog2.modal = false;
+      dialog2.parent = dialog1;
+      dialog2.displayParent= dialog1;
+      desktop.showForm(dialog2);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+      expect(dialog2.displayParent).toBe(dialog1);
+
+      desktop.setOutline(outline2);
+      // expect all dialogs hidden
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
+      expect(desktop.activeForm).toBe(undefined);
+
+      desktop.activateForm(dialog1);
+      // expect outline 1 to be activated
+      expect(desktop.outline).toBe(outline1);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, dialog1]));
+    });
+
+    it('activates outline when activating child dialog of other\'s outline dialog', function() {
+      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      desktop.setOutline(outline1);
+      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.setCssClass('DIALOG1');
+      dialog1.modal = false;
+      dialog1.parent = outline1;
+      dialog1.displayParent= outline1;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.setCssClass('DIALOG2');
+      dialog2.modal = false;
+      dialog2.parent = dialog1;
+      dialog2.displayParent= dialog1;
+      desktop.showForm(dialog2);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+      expect(dialog2.displayParent).toBe(dialog1);
+
+      desktop.setOutline(outline2);
+      // expect all dialogs hidden
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
+      expect(desktop.activeForm).toBe(undefined);
+
+      desktop.activateForm(dialog2);
+      // expect outline 1 to be activated
+      expect(desktop.outline).toBe(outline1);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
+    });
+
+    it('does not bring non-modal dialog in front of desktop-modal dialog', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var desktopModalDialog = formHelper.createFormWithOneField();
+      desktopModalDialog.modal = true;
+      desktop.showForm(desktopModalDialog);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, desktopModalDialog]));
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be in front of other non-modal dialog but behind desktop-modal dialog
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog0, desktopModalDialog]));
+    });
+
+    it('brings non-modal dialog in front of other non-modal dialog and it\'s modal child-dialog', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = true;
+      dialog2.parent = dialog1;
+      dialog2.displayParent = dialog1;
+      desktop.showForm(dialog2);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2]));
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+    });
+
+    it('brings complete hierarchy of a non-modal dialog with 2-levels of modal child dialogs in front', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var parentDialog = formHelper.createFormWithOneField();
+      parentDialog.modal = false;
+      desktop.showForm(parentDialog);
+
+      var modalChildDialogLevel1 = formHelper.createFormWithOneField();
+      modalChildDialogLevel1.modal = true;
+      modalChildDialogLevel1.parent = parentDialog;
+      modalChildDialogLevel1.displayParent = parentDialog;
+      desktop.showForm(modalChildDialogLevel1);
+
+      var modalChildDialogLevel2 = formHelper.createFormWithOneField();
+      modalChildDialogLevel2.modal = true;
+      modalChildDialogLevel2.parent = modalChildDialogLevel1;
+      modalChildDialogLevel2.displayParent = modalChildDialogLevel1;
+      desktop.showForm(modalChildDialogLevel2);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
+      expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(dialog1);
+      // expect dialog1 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0, dialog1]));
+      expect(desktop.activeForm).toBe(dialog1);
+
+      desktop.activateForm(parentDialog);
+      // expect complete hierarchy beginning with parentDialog to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
+      expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(modalChildDialogLevel1);
+      // expect complete hierarchy beginning with parentDialog to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog0, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
+      expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(modalChildDialogLevel2);
+      // expect complete hierarchy beginning with parentDialog to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog0, parentDialog, modalChildDialogLevel1, modalChildDialogLevel2]));
+      expect(desktop.activeForm).toBe(modalChildDialogLevel2);
+    });
+
+    it('keeps position of dialog\'s messagebox relative to it\'s parent dialog while reordering dialogs', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      var messagebox = scout.create('MessageBox', {
+        parent: dialog2,
+        displayParent: dialog2,
+        header: 'Title',
+        body: 'hello',
+        severity: scout.Status.Severity.INFO,
+        yesButtonText: 'OK'
+      });
+      messagebox.open();
+
+      // expect dialogs and messagebox to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, messagebox]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      desktop.activateForm(dialog0);
+      // expect messagebox between dialog2 and dialog0
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, messagebox, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(dialog1);
+      // expect messagebox between dialog2 and dialog0
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, messagebox, dialog0, dialog1]));
+      expect(desktop.activeForm).toBe(dialog1);
+
+      desktop.activateForm(dialog2);
+      // expect messagebox to be on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, messagebox]));
+      expect(desktop.activeForm).toBe(dialog2);
+    });
+
+    it('brings dialog with messagebox on top upon mousedown on messagebox', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var messagebox = scout.create('MessageBox', {
+        parent: dialog0,
+        displayParent: dialog0,
+        header: 'Title',
+        body: 'hello',
+        severity: scout.Status.Severity.INFO,
+        yesButtonText: 'OK'
+      });
+      messagebox.open();
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      // expect dialogs and messagebox to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, messagebox, dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      messagebox.$container.mousedown();
+      // expect dialog0 and messagebox on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0, messagebox]));
+      expect(desktop.activeForm).toBe(dialog0);
+    });
+
+    it('keeps desktop\'s messagebox on top while reordering dialogs', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      var messagebox = scout.create('MessageBox', {
+        parent: desktop,
+        displayParent: desktop,
+        header: 'Title',
+        body: 'hello',
+        severity: scout.Status.Severity.INFO,
+        yesButtonText: 'OK'
+      });
+      messagebox.open();
+
+      // expect dialogs and messagebox to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, messagebox]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      desktop.activateForm(dialog0);
+      // expect messagebox to stay on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0, messagebox]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(dialog1);
+      // expect messagebox to stay on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, dialog0, dialog1, messagebox]));
+      expect(desktop.activeForm).toBe(dialog1);
+
+      desktop.activateForm(dialog2);
+      // expect messagebox to stay on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, messagebox]));
+      expect(desktop.activeForm).toBe(dialog2);
+    });
+
+    it('keeps position of dialog\'s fileChooser relative to it\'s parent dialog while reordering dialogs', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      var fileChooser = scout.create('FileChooser', {
+        parent: dialog2,
+        displayParent: dialog2
+      });
+      fileChooser.open();
+
+      // expect dialogs and fileChooser to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      desktop.activateForm(dialog0);
+      // expect fileChooser between dialog2 and dialog0
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, fileChooser, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(dialog1);
+      // expect fileChooser between dialog2 and dialog0
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, fileChooser, dialog0, dialog1]));
+      expect(desktop.activeForm).toBe(dialog1);
+
+      desktop.activateForm(dialog2);
+      // expect fileChooser to be on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog2);
+    });
+
+    it('brings dialog with filechooser on top upon mousedown on filechooser', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var fileChooser = scout.create('FileChooser', {
+        parent: dialog0,
+        displayParent: dialog0
+      });
+      fileChooser.open();
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      // expect dialogs and fileChooser to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, fileChooser, dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      fileChooser.$container.mousedown();
+      // expect dialog0 and fileChooser on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog0);
+    });
+
+    it('does not change position of desktop\'s fileChooser while reordering dialogs', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.modal = false;
+      desktop.showForm(dialog1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      var fileChooser = scout.create('FileChooser', {
+        parent: desktop,
+        displayParent: desktop
+      });
+      fileChooser.open();
+
+      // expect dialogs and fileChooser to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog2);
+
+      desktop.activateForm(dialog0);
+      // expect fileChooser to stay on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2, dialog0, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(dialog1);
+      // expect fileChooser to stay on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, dialog0, dialog1, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog1);
+
+      desktop.activateForm(dialog2);
+      // expect fileChooser to stay on top
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog1, dialog2, fileChooser]));
+      expect(desktop.activeForm).toBe(dialog2);
+    });
+
+    it('activates parent view upon activation of child dialog', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var tabBox = desktop.bench.getTabBox('C');
+
+      var viewForm0 = formHelper.createFormWithOneField();
+      viewForm0.displayHint = scout.Form.DisplayHint.VIEW;
+      desktop.showForm(viewForm0);
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.modal = false;
+      dialog0.parent = viewForm0;
+      dialog0.displayParent = viewForm0;
+      desktop.showForm(dialog0);
+
+      // expect viewForm0 as currentView and dialog0 in the DOM
+      expect(tabBox.currentView).toEqual(viewForm0);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
+
+      var viewForm1 = formHelper.createFormWithOneField();
+      viewForm1.displayHint = scout.Form.DisplayHint.VIEW;
+      desktop.showForm(viewForm1);
+
+      // expect viewForm2 as currentView and dialog0 removed from the DOM
+      expect(tabBox.currentView).toEqual(viewForm1);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
+
+      desktop.activateForm(dialog0);
+      // expect viewForm0 as currentView and dialog0 in the DOM again
+      expect(tabBox.currentView).toEqual(viewForm0);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
+    });
   });
 
   describe('activeForm', function() {
