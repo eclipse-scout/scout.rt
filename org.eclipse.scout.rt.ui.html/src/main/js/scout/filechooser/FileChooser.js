@@ -54,7 +54,8 @@ scout.FileChooser.prototype._initKeyStrokeContext = function() {
 scout.FileChooser.prototype._render = function($parent) {
   // Render modality glasspanes (must precede adding the file chooser to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
-  this.$container = $parent.appendDiv('file-chooser');
+  this.$container = $parent.appendDiv('file-chooser')
+    .on('mousedown', this._onMouseDown.bind(this));
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
 
@@ -297,6 +298,19 @@ scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
 
 scout.FileChooser.prototype._onFileChange = function(event) {
   this.addFiles(event.files);
+};
+
+scout.FileChooser.prototype._onMouseDown = function(event, option) {
+  // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
+  var parent = this.parent;
+  while (parent) {
+    if (!(parent instanceof scout.Form && parent.isDialog())) {
+      parent = parent.parent;
+    } else {
+      parent.activate();
+      return;
+    }
+  }
 };
 
 /**
