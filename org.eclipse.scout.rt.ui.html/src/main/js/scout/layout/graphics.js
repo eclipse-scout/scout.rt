@@ -116,24 +116,48 @@ scout.graphics = {
    * way to set the size of a component when working with box model is to use css('width/height'...)
    * in favor of width/height() functions.
    */
+
   /**
-   * Returns the size of the component, insets included.
-   * @param includeMargin when set to true, returned dimensions include margins of component, default is <code>false</code>.
+   * Returns the size of the element, insets included. The sizes are rounded up, unless the option 'exact' is set to true.
+   *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * includeMargin            false           Whether to include $elem's margins in the returned size.
+   *
+   * exact                    false           When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up.
    */
-  getSize: function($comp, includeMargin) {
-    if (!$comp[0] || $comp.isDisplayNone()) {
+  size: function($elem, options) {
+    if (!$elem[0] || $elem.isDisplayNone()) {
       return new scout.Dimension(0, 0);
     }
-    var bcr = $comp[0].getBoundingClientRect();
+    var bcr = $elem[0].getBoundingClientRect();
     var size = new scout.Dimension(bcr.width, bcr.height);
-    if (scout.nvl(includeMargin, false)) {
-      size.width += $comp.cssMarginX();
-      size.height += $comp.cssMarginY();
+    var includeMargin = scout.nvl(options.includeMargin, false);
+    var exact = scout.nvl(options.exact, false);
+    if (includeMargin) {
+      size.width += $elem.cssMarginX();
+      size.height += $elem.cssMarginY();
     }
     // see comments in prefSize()
-    size.width = Math.ceil(size.width);
-    size.height = Math.ceil(size.height);
+    if (exact) {
+      size.width = size.width;
+      size.height = size.height;
+    } else {
+      size.width = Math.ceil(size.width);
+      size.height = Math.ceil(size.height);
+    }
     return size;
+  },
+
+  /**
+   * Returns the size of the component, insets included.
+   * @param {boolean} [includeMargin] when set to true, returned dimensions include margins of component, default is <code>false</code>.
+   * @deprecated use {@link scout.graphics.size instead}
+   */
+  getSize: function($comp, includeMargin) {
+    return scout.graphics.size($comp, {
+      includeMargin: includeMargin
+    });
   },
 
   setSize: function($comp, vararg, height) {

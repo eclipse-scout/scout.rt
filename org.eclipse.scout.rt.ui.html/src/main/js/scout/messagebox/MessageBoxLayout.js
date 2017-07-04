@@ -30,7 +30,9 @@ scout.MessageBoxLayout.prototype.layout = function($container) {
 
   scout.graphics.setSize($container, messageBoxSize);
 
-  var buttonsSize = scout.graphics.getSize(this.messageBox.$buttons);
+  var buttonsSize = scout.graphics.size(this.messageBox.$buttons, {
+    exact: true
+  });
   this.messageBox.$content.css('height', 'calc(100% - ' + buttonsSize.height + 'px)');
   scout.scrollbars.update(this.messageBox.$content);
 
