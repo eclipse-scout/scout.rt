@@ -1483,7 +1483,8 @@ $.fn.isContentTruncated = function() {
   var scrollWidth = this[0].scrollWidth;
 
   // 1. Fast return if scrollWidth is larger than width
-  if (scrollWidth > clientWidth) {
+  // IE sometimes returns a scrollWidth which is bigger than clientWidth but does not show an ellipsis.
+  if (scrollWidth > clientWidth && scout.device.browser !== scout.Device.Browser.INTERNET_EXPLORER) {
     return true;
   }
 
@@ -1492,9 +1493,11 @@ $.fn.isContentTruncated = function() {
   // to sub-pixel rendering. The text is "slightly" (0.2 pixels) larger than the clientWidth,
   // but scrollWidth returns the same value.
   // As a workaround, we do a second measurement of the uncut width before returning false.
+  clientWidth = this[0].getBoundingClientRect().width;
   var oldStyle = this.attr('style');
   this.css('width', 'auto');
-  scrollWidth = scout.graphics.getSize(this).width;
+  this.css('max-width', 'none');
+  scrollWidth =  this[0].getBoundingClientRect().width;
   this.attrOrRemove('style', oldStyle);
 
   return scrollWidth > clientWidth;
