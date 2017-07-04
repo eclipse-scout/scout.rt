@@ -29,11 +29,6 @@ scout.ProposalField2.prototype._getValueFromLookupRow = function(lookupRow) {
   return lookupRow.text;
 };
 
-scout.ProposalField2.prototype._acceptInputFail = function(result) {
-  this.setValue(result.searchText);
-  this._inputAccepted();
-};
-
 scout.ProposalField2.prototype.cssClassName = function() {
   return 'proposal-field';
 };
@@ -56,8 +51,7 @@ scout.ProposalField2.prototype._acceptByText = function(searchText) {
   if (this.lookupOnAcceptByText) {
     scout.ProposalField2.parent.prototype._acceptByText.call(this, searchText);
   } else {
-    this.setValue(searchText);
-    this._inputAccepted();
+    this._customTextAccepted(searchText);
   }
 };
 
@@ -65,7 +59,7 @@ scout.ProposalField2.prototype._acceptByText = function(searchText) {
  * Only used in case lookupOnAcceptByText is true. It's basically the same code
  * as in the smart-field but without the error handling.
  */
-scout.ProposalField2.prototype._acceptInputDone = function(result) {
+scout.ProposalField2.prototype._acceptByTextDone = function(result) {
   this._userWasTyping = false;
   this._extendResult(result);
 
@@ -74,12 +68,18 @@ scout.ProposalField2.prototype._acceptInputDone = function(result) {
     var lookupRow = result.singleMatch;
     if (this._isLookupRowActive(lookupRow)) {
       this.setLookupRow(lookupRow);
-    } else {
-      this.setValue(result.searchText);
+      this._inputAccepted();
+      return;
     }
   }
 
-  this._inputAccepted();
+  this._customTextAccepted(result.searchText);
+};
+
+scout.ProposalField2.prototype._customTextAccepted = function(searchText) {
+  this._setLookupRow(null); // only reset property lookup
+  this._setValue(searchText);
+  this._inputAccepted(true, false);
 };
 
 scout.ProposalField2.prototype.getValueForSelection = function() {

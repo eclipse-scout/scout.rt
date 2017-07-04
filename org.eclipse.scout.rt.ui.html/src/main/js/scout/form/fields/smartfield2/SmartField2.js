@@ -156,6 +156,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   var
     searchText = this._readDisplayText(),
+    searchTextChanged = this._checkDisplayTextChanged(searchText),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
   this._setProperty('displayText', searchText); // FIXME [awe] 7.0 - SF2: set lookupRow/value to null when displayText does not match anymore!
@@ -174,7 +175,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   // Do nothing when search text is equals to the text of the current lookup row
   if (this.lookupRow && this.lookupRow.text === searchText && !selectedLookupRow) {
     $.log.debug('(SmartField2#acceptInput) unchanged. Close popup');
-    this._inputAccepted();
+    this._inputAccepted(false);
     return;
   }
 
@@ -199,7 +200,11 @@ scout.SmartField2.prototype.acceptInput = function() {
   // 3.) proposal chooser is not open -> try to accept the current display text
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result'). Or in case the text is empty, just set the value to null
-  this._acceptByText(searchText);
+  if (searchTextChanged) {
+    this._acceptByText(searchText);
+  } else {
+    this._inputAccepted(false);
+  }
 };
 
 /**
@@ -208,15 +213,21 @@ scout.SmartField2.prototype.acceptInput = function() {
 scout.SmartField2.prototype._acceptByText = function(searchText) {
   $.log.debug('(SmartField2#_acceptByText) searchText=', searchText);
   this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
-    .done(this._acceptInputDone.bind(this));
+    .done(this._acceptByTextDone.bind(this));
 };
 
-scout.SmartField2.prototype._inputAccepted = function() {
+scout.SmartField2.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
+  triggerEvent = scout.nvl(triggerEvent, true);
+  acceptByLookupRow = scout.nvl(acceptByLookupRow, true);
   this._userWasTyping = false;
-  this._triggerAcceptInput();
+  if (triggerEvent) {
+    this._triggerAcceptInput(acceptByLookupRow);
+  }
   this.closePopup();
+  this._focusNextTabbable();
+};
 
-  // focus next tabbable
+scout.SmartField2.prototype._focusNextTabbable = function() {
   if (this._tabPrevented) {
     var $tabElements = this.entryPoint().find(':tabbable'),
       direction = this._tabPrevented.shiftKey ? -1 : 1,
@@ -234,7 +245,7 @@ scout.SmartField2.prototype._inputAccepted = function() {
   }
 };
 
-scout.SmartField2.prototype._acceptInputDone = function(result) {
+scout.SmartField2.prototype._acceptByTextDone = function(result) {
   this._userWasTyping = false;
   this._extendResult(result);
 
@@ -986,12 +997,13 @@ scout.SmartField2.prototype._renderDeletable = function() {
   this.$container.toggleClass('deletable', this.deletable);
 };
 
-scout.SmartField2.prototype._triggerAcceptInput = function() {
+scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow) {
   var event = {
     displayText: this.displayText,
     errorStatus: this.errorStatus,
     value: this.value,
-    lookupRow: this.lookupRow
+    lookupRow: this.lookupRow,
+    acceptByLookupRow: acceptByLookupRow
   };
   this.trigger('acceptInput', event);
 };

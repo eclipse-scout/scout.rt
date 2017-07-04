@@ -56,12 +56,16 @@ scout.SmartField2Adapter.prototype.lookupByRec = function(rec) {
 };
 
 scout.SmartField2Adapter.prototype._onWidgetAcceptInput = function(event) {
-  this._send('acceptInput', {
+  var eventData = {
     displayText: event.displayText,
-    value: event.value,
-    lookupRow: event.lookupRow,
-    whileTyping: event.whileTyping
-  }, {
+    value: event.value
+  };
+
+  if (event.acceptByLookupRow) {
+    eventData.lookupRow = event.lookupRow;
+  }
+
+  this._send('acceptInput', eventData, {
     showBusyIndicator: !event.whileTyping,
     coalesce: function(previous) {
       return this.target === previous.target && this.type === previous.type && this.whileTyping === previous.whileTyping;
