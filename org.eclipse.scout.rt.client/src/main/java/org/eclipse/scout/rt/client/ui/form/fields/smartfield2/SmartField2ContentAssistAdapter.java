@@ -46,7 +46,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.w3c.dom.Element;
 
-// FIXME [awe] 7.0 - SF2: remove when old content assist field is removed
+// FIXME [awe] 7.0 - SF2: remove this method after SF1 has been deleted
 /**
  * This adapter is used so we can use the old lookup/fetcher implementations which require the IContentAssistField
  * interface.

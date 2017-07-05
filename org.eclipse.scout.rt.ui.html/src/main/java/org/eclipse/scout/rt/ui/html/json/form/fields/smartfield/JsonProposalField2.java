@@ -32,12 +32,6 @@ public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> ext
         return getModel().isTrimText();
       }
     });
-    putJsonProperty(new JsonProperty<IProposalField2<VALUE>>(IProposalField2.PROP_AUTO_CLOSE_CHOOSER, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoCloseChooser();
-      }
-    });
   }
 
   @Override

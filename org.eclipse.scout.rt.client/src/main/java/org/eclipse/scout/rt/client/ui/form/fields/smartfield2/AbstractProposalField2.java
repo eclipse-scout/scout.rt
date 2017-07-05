@@ -23,17 +23,6 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
     super.initConfig();
     setMaxLength(getConfiguredMaxLength());
     setTrimText(getConfiguredTrimText());
-    setAutoCloseChooser(getConfiguredAutoCloseChooser());
-  }
-
-  /**
-   * Configures whether the proposal chooser should automatically be closed when there are no proposals available.
-   * <p>
-   * Subclasses can override this method. Default is true.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredAutoCloseChooser() { // FIXME [awe] 7.0 - SF2: remove this property!?
-    return true;
   }
 
   /**
@@ -71,16 +60,6 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
   @Override
   protected String formatValueInternal(VALUE value) {
     return value != null ? value.toString() : "";
-  }
-
-  @Override
-  public void setAutoCloseChooser(boolean autoCloseChooser) {
-    propertySupport.setPropertyBool(PROP_AUTO_CLOSE_CHOOSER, autoCloseChooser);
-  }
-
-  @Override
-  public boolean isAutoCloseChooser() {
-    return propertySupport.getPropertyBool(PROP_AUTO_CLOSE_CHOOSER);
   }
 
   @Override

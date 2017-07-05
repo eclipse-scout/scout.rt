@@ -11,9 +11,8 @@
 scout.ProposalField2 = function() {
   scout.ProposalField2.parent.call(this);
 
-  this.maxLength = -1;
+  this.maxLength = -1; // FIXME [awe] 7.0 - SF2: implement maxLength and trimText
   this.trimText = true;
-  this.autoCloseProposalChooser = false;
 
   /**
    * If this flag is set to true the proposal field performs a lookup by text when

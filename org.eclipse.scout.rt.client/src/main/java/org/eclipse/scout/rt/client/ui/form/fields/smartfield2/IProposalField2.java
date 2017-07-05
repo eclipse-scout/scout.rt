@@ -29,11 +29,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 public interface IProposalField2<VALUE> extends ISmartField2<VALUE> {
 
   /**
-   * {@link Boolean}
-   */
-  String PROP_AUTO_CLOSE_CHOOSER = "autoCloseChooser";
-
-  /**
    * {@link Integer}
    *
    * @since 6.1
@@ -50,16 +45,6 @@ public interface IProposalField2<VALUE> extends ISmartField2<VALUE> {
   String getValueAsString();
 
   void setValueAsString(String value);
-
-  /**
-   * @since 6.0
-   */
-  void setAutoCloseChooser(boolean autoCloseChooser);
-
-  /**
-   * @since 6.0
-   */
-  boolean isAutoCloseChooser();
 
   /**
    * @param maxLength
