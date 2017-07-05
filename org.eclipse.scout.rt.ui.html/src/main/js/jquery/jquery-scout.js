@@ -1290,6 +1290,29 @@ $.fn.fadeOutAndRemove = function(duration, callback) {
   });
 };
 
+$.fn.removeAnimated = function(cssClass, callback) {
+  if (callback === undefined && typeof cssClass === 'function') {
+    callback = cssClass;
+    cssClass = undefined;
+  }
+  if (this.isDisplayNone()) {
+    // Remove without animation
+    this.remove();
+    callback && callback.call(this);
+  }
+  else if (!scout.device.supportsCssAnimation()) {
+    // Cannot remove animated, remove with jQuery.fadeOut()
+    this.fadeOutAndRemove(callback);
+  } else {
+    // Add CSS class and wait for 'animationend' event
+    this.addClass(cssClass || 'removed');
+    this.oneAnimationEnd(function() {
+      $(this).remove();
+      callback && callback.call(this);
+    });
+  }
+};
+
 var _oldhide = $.fn.hide;
 $.fn.hide = function() {
   this.trigger('hide');
