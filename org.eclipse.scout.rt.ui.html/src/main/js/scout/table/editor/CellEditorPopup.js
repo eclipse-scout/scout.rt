@@ -128,8 +128,10 @@ scout.CellEditorPopup.prototype.position = function() {
     $cell = this.$anchor,
     insetsLeft = $tableData.cssPxValue('padding-left') + $row.cssBorderLeftWidth();
 
-  cellBounds = scout.graphics.bounds($cell, false, true);
-  rowBounds = scout.graphics.bounds($row, false, true);
+  cellBounds = scout.graphics.bounds($cell);
+  cellBounds.x += $cell.cssMarginX(); // first cell popup has a negative left margin
+  rowBounds = scout.graphics.bounds($row);
+  rowBounds.y += $row.cssMarginY(); // row has a negative top margin
   this.setLocation(new scout.Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
 };
 

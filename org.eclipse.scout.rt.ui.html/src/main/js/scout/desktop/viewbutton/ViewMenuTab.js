@@ -159,7 +159,9 @@ scout.ViewMenuTab.prototype._openPopup = function() {
     // already open
     return;
   }
-  var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
+  var naviBounds = scout.graphics.bounds(this.$container.parent(), {
+    includeMargin: true
+  });
   this.popup = scout.create('ViewMenuPopup', {
     parent: this,
     $tab: this.$container,

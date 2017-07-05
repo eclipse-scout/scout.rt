@@ -271,8 +271,8 @@ scout.scrollbars = {
       scrollOffsetUp = 4,
       scrollOffsetDown = 8,
       scrollableH = $scrollable.height(),
-      elementBounds = scout.graphics.offsetBounds($element, false, false),
-      scrollableBounds = scout.graphics.offsetBounds($scrollable, false, false),
+      elementBounds = scout.graphics.offsetBounds($element),
+      scrollableBounds = scout.graphics.offsetBounds($scrollable),
       elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp, // relative to scrollable y
       elementTopNew = 0,
       elementH = elementBounds.height + scrollOffsetDown,
@@ -282,7 +282,7 @@ scout.scrollbars = {
     // TODO [7.0] cgu: remove this hack, fix checkbox and radio buttons
     if (elementH === scrollOffsetDown && $element.data('valuefield') && $element.data('valuefield').$container) {
       $element = $element.data('valuefield').$container;
-      elementBounds = scout.graphics.offsetBounds($element, false, false);
+      elementBounds = scout.graphics.offsetBounds($element);
       elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp;
       elementH = elementBounds.height + scrollOffsetDown;
     }
@@ -314,7 +314,9 @@ scout.scrollbars = {
   scrollHorizontalTo: function($scrollable, $element) {
     var scrollTo,
       scrollableW = $scrollable.width(),
-      elementBounds = scout.graphics.bounds($element, true, true),
+      elementBounds = scout.graphics.bounds($element, {
+        includeMargin: true
+      }),
       elementLeft = elementBounds.x,
       elementW = elementBounds.width;
 

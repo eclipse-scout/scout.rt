@@ -130,6 +130,7 @@ scout.graphics = {
     if (!$elem[0] || $elem.isDisplayNone()) {
       return new scout.Dimension(0, 0);
     }
+    options = options || {};
     var bcr = $elem[0].getBoundingClientRect();
     var size = new scout.Dimension(bcr.width, bcr.height);
     var includeMargin = scout.nvl(options.includeMargin, false);
@@ -249,21 +250,38 @@ scout.graphics = {
       .cssTop(point.y);
   },
 
-  bounds: function($elem, includeSizeMargin, includePosMargin) {
+  /**
+   * Returns the bounds of the element relative to the offset parent, insets included.
+   * The sizes are rounded up, unless the option 'exact' is set to true.
+   *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * includeMargin            false           Whether to include $elem's margins in the returned size. X and Y are not affected by this option.
+   *
+   * exact                    false           When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option.
+   */
+  bounds: function($elem, options) {
     // TODO [7.0] cgu: merge with getBounds, ask a.we why parseCssPosition is used, or rename getBounds to cssBounds
-    return scout.graphics._bounds($elem, $elem.position(), includeSizeMargin, includePosMargin);
+    return scout.graphics._bounds($elem, $elem.position(), options);
   },
 
-  offsetBounds: function($elem, includeSizeMargin, includePosMargin) {
-    return scout.graphics._bounds($elem, $elem.offset(), includeSizeMargin, includePosMargin);
+  /**
+   * Returns the bounds of the element relative to the document, insets included.
+   * The sizes are rounded up, unless the option 'exact' is set to true.
+   *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * includeMargin            false           Whether to include $elem's margins in the returned size. X and Y are not affected by this option.
+   *
+   * exact                    false           When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option.
+   */
+  offsetBounds: function($elem, options) {
+    return scout.graphics._bounds($elem, $elem.offset(), options);
   },
 
-  _bounds: function($elem, pos, includeSizeMargin, includePosMargin) {
-    if (includePosMargin) {
-      pos.left += $elem.cssMarginLeft();
-      pos.top += $elem.cssMarginTop();
-    }
-    var size = scout.graphics.getSize($elem, includeSizeMargin);
+  _bounds: function($elem, pos, options) {
+    options = options || {};
+    var size = scout.graphics.size($elem, options);
     return new scout.Rectangle(pos.left, pos.top, size.width, size.height);
   },
 

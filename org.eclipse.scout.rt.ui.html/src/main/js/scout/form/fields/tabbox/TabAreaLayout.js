@@ -19,7 +19,9 @@ scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
 scout.TabAreaLayout.prototype.layout = function($container) {
   if (!this._ellipsisBounds) {
     this._createAndRenderEllipsis($container);
-    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis, true, true);
+    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis, {
+      includeMargin: true
+    });
   }
 
   this._destroyEllipsis();
@@ -63,7 +65,9 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     for (i = 0; i < this._tabBox.tabItems.length; i++) {
       tab = this._tabBox.tabItems[i];
       if (tab.visible) {
-        bounds = scout.graphics.bounds(tab.$tabContainer, true, true);
+        bounds = scout.graphics.bounds(tab.$tabContainer, {
+          includeMargin: true
+        });
         tabs.push(tab);
         tabBounds.push(bounds);
         // cannot use selectedTab property of TabBox, it points to the wrong index

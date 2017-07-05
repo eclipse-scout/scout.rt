@@ -292,7 +292,9 @@ scout.Popup.prototype.prefLocation = function(openingDirectionY) {
 scout.Popup.prototype.getAnchorBounds = function() {
   var anchorBounds = this.anchorBounds;
   if (!anchorBounds) {
-    anchorBounds = scout.graphics.offsetBounds(this.$anchor);
+    anchorBounds = scout.graphics.offsetBounds(this.$anchor, {
+      exact: true
+    });
   }
   return anchorBounds;
 };

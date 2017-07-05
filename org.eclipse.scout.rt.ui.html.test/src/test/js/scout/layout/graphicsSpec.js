@@ -62,21 +62,16 @@ describe("graphics", function() {
       expect(rect.y).toBe(7);
     });
 
-
-    it("returns rectangle with position from JQuery.position() including margin if includePosMargin is true", function() {
-      var rect = scout.graphics.bounds($div, false, true);
-      expect(rect.x).toBe(6 + 10);
-      expect(rect.y).toBe(7 + 10);
-    });
-
     it("returns rectangle with size from JQuery.outerWidth/Height", function() {
       var rect = scout.graphics.bounds($div);
       expect(rect.width).toBe(8);
       expect(rect.height).toBe(9);
     });
 
-    it("returns rectangle with size from  JQuery.outerWidth/Height() including margin if includeSizeMargin is true", function() {
-      var rect = scout.graphics.bounds($div, true);
+    it("returns rectangle with size from  JQuery.outerWidth/Height() including margin if includeMargin is true", function() {
+      var rect = scout.graphics.bounds($div, {
+        includeMargin: true
+      });
       expect(rect.width).toBe(8 + 2 * 10);
       expect(rect.height).toBe(9 + 2 * 10);
     });
