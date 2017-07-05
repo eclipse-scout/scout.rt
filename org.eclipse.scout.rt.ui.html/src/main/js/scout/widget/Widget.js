@@ -372,7 +372,7 @@ scout.Widget.prototype._removeInternal = function() {
  * After the animation is executed, the element gets removed using this._removeInternal.
  */
 scout.Widget.prototype._removeAnimated = function() {
-  if (!scout.device.supportsCssAnimation() || !this.$container) {
+  if (!scout.device.supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
     // Cannot remove animated, remove regularly
     this._removeInternal();
     return;
