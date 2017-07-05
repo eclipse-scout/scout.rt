@@ -162,3 +162,32 @@
     }
   }
 }
+
+@media only screen and(min-resolution: 96.96dpi) { /* 1.01dppx / 101% */
+  /* The browser may not display the 2px border properly when zoomed, it draws a white gap between the cell and the row border.
+     To prevent that the border is reduced to the simple 1px border. This is also applied if windows font size is set to medium (125%) */
+  .detail-table.table {
+
+    & > .table-data {
+
+      & > .table-row,
+      & > .table-aggregate-row {
+        border-left-width: 1px;
+        border-right-width: 1px;
+
+        &.select-top > .table-cell {
+          border-top-color: transparent;
+        }
+
+        &.select-bottom > .table-cell {
+          border-bottom-color: transparent;
+        }
+
+        &.select-single > .table-cell {
+          border-top-color: transparent;
+          border-bottom-color: transparent;
+        }
+      }
+    }
+  }
+}
