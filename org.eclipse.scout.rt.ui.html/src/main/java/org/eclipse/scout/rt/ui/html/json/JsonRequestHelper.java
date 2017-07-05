@@ -77,6 +77,8 @@ public class JsonRequestHelper {
   public JSONObject createSessionTimeoutResponse() {
     final JsonResponse response = new JsonResponse();
     response.markAsError(JsonResponse.ERR_SESSION_TIMEOUT, "The session has expired, please reload the page.");
+    // Implementation note - The same JSON message is also generated here:
+    // org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper.sendJsonSessionTimeout(HttpServletResponse)
     return response.toJson();
   }
 
