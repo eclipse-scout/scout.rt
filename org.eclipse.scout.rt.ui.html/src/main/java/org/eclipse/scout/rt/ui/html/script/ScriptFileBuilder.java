@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -370,15 +369,14 @@ public class ScriptFileBuilder {
     boolean insideBlockComment = false;
     StringBuilder buf = new StringBuilder();
     String[] lines = text.split("[\\n]");
-    int linePrefixLength = ((lines.length + "").length());
-    DecimalFormat fmt = new DecimalFormat(StringUtility.rpad("", "0", linePrefixLength));
+    int linePrefixLength = (lines.length + "").length();
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*"));
       if (qualifier.length() > 0) {
         buf.append(qualifier).append("|");
       }
       buf.append(filename).append(":");
-      buf.append(fmt.format(lineNo));
+      buf.append(StringUtility.rpad(lineNo + "", " ", linePrefixLength));
       buf.append((insideBlockComment ? "//" : "*/")).append(" ");
       buf.append(line).append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
