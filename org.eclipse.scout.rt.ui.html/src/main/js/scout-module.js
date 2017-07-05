@@ -96,6 +96,11 @@
   __include("scout/layout/SingleLayout.js");
   __include("scout/layout/flexbox/FlexboxLayout.js");
   __include("scout/layout/flexbox/FlexboxLayoutData.js");
+  // SimpleTabBox
+  __include("scout/tabbox/SimpleTabBoxController.js");
+  __include("scout/tabbox/SimpleTabBox.js");
+  __include("scout/tabbox/SimpleTabBoxLayout.js");
+  __include("scout/tabbox/SimpleTabViewContentLayout.js");
   // Keystroke handling
   __include("scout/keystroke/keys.js");
   __include("scout/keystroke/Key.js");
@@ -301,15 +306,12 @@
   // Desktop
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopAdapter.js");
-  __include("scout/desktop/DesktopLayout.js");
-  __include("scout/desktop/DesktopLogo.js");
   __include("scout/desktop/DesktopKeyStroke.js");
+  __include("scout/desktop/DesktopLogo.js");
+  __include("scout/desktop/DesktopLayout.js");
+  __include("scout/desktop/DesktopTabBoxController.js");
   __include("scout/desktop/PopupWindow.js");
   __include("scout/desktop/OpenUriHandler.js");
-  __include("scout/tabbox/SimpleTabBoxController.js");
-  __include("scout/tabbox/SimpleTabBox.js");
-  __include("scout/tabbox/SimpleTabBoxLayout.js");
-  __include("scout/tabbox/SimpleTabViewContentLayout.js");
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/BenchColumn.js");
   __include("scout/desktop/bench/layout/BenchRowLayoutData.js");

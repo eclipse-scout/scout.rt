@@ -63,7 +63,8 @@ scout.DesktopBench.prototype._init = function(model) {
   this.headerTabArea = model.headerTabArea;
   // controller for headerTabArea
   if (this.headerTabArea) {
-    this.headerTabAreaController = new scout.HeaderTabBoxController(this, this.headerTabArea);
+    this.headerTabAreaController = scout.create('HeaderTabBoxController');
+    this.headerTabAreaController.install(this, this.headerTabArea);
   }
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
   this.setOutline(this.desktop.outline);

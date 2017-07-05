@@ -17,18 +17,25 @@
  *
  * @see scout.SimpleTabBoxController
  */
-scout.HeaderTabBoxController = function(bench, tabArea) {
-  this.bench = bench;
+scout.HeaderTabBoxController = function() {
+  scout.HeaderTabBoxController.parent.call(this);
 
-  // event listeners
+  this.bench;
   this._viewsChangedHandler = this._onViewsChanged.bind(this);
 
-  scout.HeaderTabBoxController.parent.call(this, bench.getTabBox('C'), tabArea);
-
-  this.tabAreaCenter = bench.getTabBox('C').tabArea;
+  this.tabAreaCenter;
   this.tabAreaInHeader = false;
 };
-scout.inherits(scout.HeaderTabBoxController, scout.SimpleTabBoxController);
+scout.inherits(scout.HeaderTabBoxController, scout.DesktopTabBoxController);
+
+scout.HeaderTabBoxController.prototype.install = function(bench, tabArea) {
+  this.bench = scout.assertParameter('bench', bench);
+
+  var tabBoxCenter = this.bench.getTabBox('C');
+  this.tabAreaCenter = tabBoxCenter.tabArea;
+
+  scout.HeaderTabBoxController.parent.prototype.install.call(this, tabBoxCenter, tabArea);
+};
 
 scout.HeaderTabBoxController.prototype._installListeners = function() {
   scout.HeaderTabBoxController.parent.prototype._installListeners.call(this);

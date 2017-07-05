@@ -11,18 +11,17 @@
 .simple-tab {
   position: relative;
   display: inline-block;
+  vertical-align: top;
   /* 1px smaller than the header because of the bottom border (see .selected rule below) */
   height: calc(~'100% - 1px');
-  vertical-align: top;
-  width: 220px;
-  padding: 6px 10px 0 20px;
+  padding: 5px;
   cursor: pointer;
   background-color: @view-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
 
-  &.small {
-    width: 130px;
+  &.last {
+    border-right-width: 0;
   }
 
   &:hover {
@@ -46,7 +45,21 @@
     height: 100%;
   }
 
-  & .status-container {
+  &.animate-modality-highlight {
+    #scout.animation-flash-gray();
+  }
+
+  & > .title,
+  & > .sub-title {
+    #scout.overflow-ellipsis-nowrap();
+  }
+
+  & > .icon {
+    float: right;
+    margin-left: 5px;
+  }
+
+  & > .status-container {
    float: right;
 
    & > .status {
@@ -72,35 +85,11 @@
     }
   }
 
-  & > .title {
-   overflow: hidden;
-   width: auto;
-  }
-
   &.closable .closer {
     display: none;
   }
   &.closable.selected .closer {
     display: inline-block;
-  }
-
-  &.animate-modality-highlight {
-    #scout.animation-flash-gray();
-  }
-
-  & > .icon {
-    float: right;
-    margin-left: 5px;
-  }
-
-  & > .title {
-    #scout.overflow-ellipsis-nowrap();
-    #scout.font-text-large();
-  }
-
-  & > .sub-title {
-    #scout.overflow-ellipsis-nowrap();
-    #scout.font-text-normal();
   }
 }
 

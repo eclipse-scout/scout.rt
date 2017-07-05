@@ -9,12 +9,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopTab = function() {
-  scout.DesktopTab.parent.call(this);
-};
-scout.inherits(scout.DesktopTab, scout.SimpleTab);
 
-scout.DesktopTab.prototype._render = function() {
-  scout.DesktopTab.parent.prototype._render.call(this);
-  this.$container.addClass('desktop-tab');
+scout.DesktopTabBoxController = function() {
+  scout.DesktopTabBoxController.parent.call(this);
+};
+scout.inherits(scout.DesktopTabBoxController, scout.SimpleTabBoxController);
+
+scout.DesktopTabBoxController.prototype._createTab = function(view) {
+  return scout.create('DesktopTab', {
+    parent: this.tabArea,
+    view: view
+  });
 };

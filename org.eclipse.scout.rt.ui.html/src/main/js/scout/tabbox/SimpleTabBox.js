@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.SimpleTabBox = function() {
   scout.SimpleTabBox.parent.call(this);
+  this._addWidgetProperties(['tabArea']);
+
   this.$body;
   this.htmlComp;
   this.tabArea;
@@ -23,12 +25,18 @@ scout.SimpleTabBox.prototype._init = function(model) {
   scout.SimpleTabBox.parent.prototype._init.call(this, model);
   this.cssClass = model.cssClass;
 
-  // create view tabs
-  this.tabArea = scout.create('SimpleTabArea', {
-    parent: this
-  });
+  if (!this.tabArea) {
+    // default tab area
+    this.tabArea = scout.create('SimpleTabArea', {
+      parent: this
+    });
+  }
+  if (!this.controller) {
+    // default controller
+    this.controller = scout.create('SimpleTabBoxController');
+  }
   // link
-  this.controller = new scout.SimpleTabBoxController(this, this.tabArea);
+  this.controller.install(this, this.tabArea);
 
   this._viewDestroyedHandler = this._onViewDestroyed.bind(this);
 };
@@ -268,6 +276,7 @@ scout.SimpleTabBox.prototype.hasView = function(view) {
     return v === view;
   }).length > 0;
 };
+
 scout.SimpleTabBox.prototype.getViews = function(displayViewId) {
   return this.viewStack.filter(function(view) {
     if (!displayViewId) {

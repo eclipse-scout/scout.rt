@@ -1,6 +1,5 @@
 /*******************************************************************************
-
-* Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,31 +11,52 @@
 scout.SimpleTab = function() {
   scout.SimpleTab.parent.call(this);
 
-  this.title;
-  this.subTitle;
-  this.iconId;
-  this.status;
+  // optional
+  this.view = null;
 
-  this._mouseListener;
+  this.title = null;
+  this.subTitle = null;
+  this.iconId = null;
+  this.cssClass = null;
+  this.closable = false;
+  this.saveNeeded = false;
+  this.saveNeededVisible = false;
+  this.status = null;
+  this.selected = false;
 
-  // Container for the _Tab_ (not for the view).
-  this.$container;
-  this.$status = [];
+  // Order: $statusContainer, $iconContainer, $title, $subTitle
+  // - Status container needs to be the first element because it is "float: right".
+  // - Icon container is "float: left" , must be before title.
+  this.$title;
+  this.$subTitle;
+  this.$iconContainer;
+  this.$statusContainer;
+
+  this._statusContainerUsageCounter = 0;
+  this._statusIconDivs = [];
+
+  this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
+  this._viewRemoveListener = this._onViewRemove.bind(this);
 };
 scout.inherits(scout.SimpleTab, scout.Widget);
 
-scout.SimpleTab.prototype._init = function(options) {
-  scout.SimpleTab.parent.prototype._init.call(this, options);
-  this.title = options.title;
-  this.subTitle = options.subTitle;
-  this.iconId = options.iconId;
-  this.closable = options.closable;
-  this.saveNeeded = options.saveNeeded;
-  this.saveNeededVisible = options.saveNeededVisible;
-  this.closable = options.closable;
-  this.status = options.status;
-  this.selected = false;
-  this.cssClass = options.cssClass;
+scout.SimpleTab.prototype._init = function(model) {
+  scout.SimpleTab.parent.prototype._init.call(this, model);
+
+  this.view = model.view;
+
+  this.title = (this.view ? this.view.title : model.title);
+  this.subTitle = (this.view ? this.view.subTitle : model.subTitle);
+  this.iconId = (this.view ? this.view.iconId : model.iconId);
+  this.cssClass = (this.view ? this.view.cssClass : model.cssClass);
+  this.closable = (this.view ? this.view.closable : model.closable);
+  this.saveNeeded = (this.view ? this.view.saveNeeded : model.saveNeeded);
+  this.saveNeededVisible = (this.view ? this.view.saveNeededVisible : model.saveNeededVisible);
+  this.status = (this.view ? this.view.status : model.status);
+
+  if (this.view) {
+    this._installViewListeners();
+  }
 };
 
 scout.SimpleTab.prototype.renderAfter = function($parent, sibling) {
@@ -48,21 +68,169 @@ scout.SimpleTab.prototype.renderAfter = function($parent, sibling) {
 
 scout.SimpleTab.prototype._render = function() {
   this.$container = this.$parent.prependDiv('simple-tab');
-  this._mouseListener = this._onMouseDown.bind(this);
-  this.$container.on('mousedown', this._mouseListener);
-  this.$statusContainer = this.$container.appendDiv('status-container');
-  this.$icon = this.$container.appendDiv('icon-container');
-  this._$title = this.$container.appendDiv('title');
-  this._$subTitle = this.$container.appendDiv('sub-title');
+  this.$container.on('mousedown', this._onMouseDown.bind(this));
+};
 
+scout.SimpleTab.prototype._renderProperties = function() {
+  scout.SimpleTab.parent.prototype._renderProperties.call(this);
   this._renderTitle();
   this._renderSubTitle();
-  this._renderSelection();
+  this._renderIconId();
+  this._renderCssClass();
   this._renderClosable();
   this._renderSaveNeeded();
-  this._renderIconId();
   this._renderStatus();
-  this._renderCssClass();
+  this._renderSelected();
+};
+
+scout.SimpleTab.prototype._remove = function() {
+  this._remove$Title();
+  this._remove$SubTitle();
+  this._remove$IconContainer();
+  this._remove$StatusContainer();
+  scout.SimpleTab.parent.prototype._remove.call(this);
+};
+
+scout.SimpleTab.prototype._getOrCreate$Title = function() {
+  if (this.$title) {
+    return this.$title;
+  }
+  this.$title = this.$container.makeDiv('title');
+  if (this.$subTitle) {
+    this.$title.insertBefore(this.$subTitle);
+  } else if (this.$iconContainer) {
+    this.$title.insertAfter(this.$iconContainer);
+  } else if (this.$statusContainer) {
+    this.$title.insertAfter(this.$statusContainer);
+  } else {
+    this.$title.appendTo(this.$container);
+  }
+  return this.$title;
+};
+
+scout.SimpleTab.prototype._getOrCreate$SubTitle = function() {
+  if (this.$subTitle) {
+    return this.$subTitle;
+  }
+  this.$subTitle = this.$container.makeDiv('sub-title');
+  if (this.$title) {
+    this.$subTitle.insertAfter(this.$title);
+  } else if (this.$iconContainer) {
+    this.$subTitle.insertAfter(this.$iconContainer);
+  } else if (this.$statusContainer) {
+    this.$subTitle.insertAfter(this.$statusContainer);
+  } else {
+    this.$subTitle.appendTo(this.$container);
+  }
+  return this.$subTitle;
+};
+
+scout.SimpleTab.prototype._getOrCreate$IconContainer = function() {
+  if (this.$iconContainer) {
+    return this.$iconContainer;
+  }
+  this.$iconContainer = this.$container.makeDiv('icon-container');
+  if (this.$title) {
+    this.$iconContainer.insertBefore(this.$title);
+  } else if (this.$subTitle) {
+    this.$iconContainer.insertBefore(this.$subTitle);
+  } else if (this.$statusContainer) {
+    this.$iconContainer.insertAfter(this.$statusContainer);
+  } else {
+    this.$iconContainer.appendTo(this.$container);
+  }
+  return this.$iconContainer;
+};
+
+scout.SimpleTab.prototype._getOrCreate$StatusContainer = function() {
+  if (this.$statusContainer) {
+    return this.$statusContainer;
+  }
+  // Prepend because of "float: right"
+  this.$statusContainer = this.$container.prependDiv('status-container');
+  return this.$statusContainer;
+};
+
+scout.SimpleTab.prototype._remove$Title = function() {
+  if (this.$title) {
+    this.$title.remove();
+    this.$title = null;
+  }
+};
+
+scout.SimpleTab.prototype._remove$SubTitle = function() {
+  if (this.$subTitle) {
+    this.$subTitle.remove();
+    this.$subTitle = null;
+  }
+};
+
+scout.SimpleTab.prototype._remove$IconContainer = function() {
+  if (this.$iconContainer) {
+    this.$iconContainer.remove();
+    this.$iconContainer = null;
+  }
+};
+
+scout.SimpleTab.prototype._remove$StatusContainer = function() {
+  if (this.$statusContainer) {
+    this.$statusContainer.remove();
+    this.$statusContainer = null;
+  }
+};
+
+scout.SimpleTab.prototype.setTitle = function(title) {
+  this.setProperty('title', title);
+};
+
+scout.SimpleTab.prototype._renderTitle = function() {
+  if (this.title || this.subTitle) { // $title is always needed if subtitle is not empty
+    this._getOrCreate$Title().textOrNbsp(this.title);
+  } else {
+    this._remove$Title();
+  }
+};
+
+scout.SimpleTab.prototype.setSubTitle = function(subTitle) {
+  this.setProperty('subTitle', subTitle);
+};
+
+scout.SimpleTab.prototype._renderSubTitle = function() {
+  if (this.subTitle) {
+    if (!this.title) {
+      this._renderTitle();
+    }
+    this._getOrCreate$SubTitle().textOrNbsp(this.subTitle);
+  } else {
+    if (!this.title) {
+      this._renderTitle();
+    }
+    this._remove$SubTitle();
+  }
+};
+
+scout.SimpleTab.prototype.setIconId = function(iconId) {
+  this.setProperty('iconId', iconId);
+};
+
+scout.SimpleTab.prototype._renderIconId = function(iconId) {
+  if (this.iconId) {
+    this._getOrCreate$IconContainer().icon(this.iconId);
+  } else {
+    this._remove$IconContainer();
+  }
+};
+
+scout.SimpleTab.prototype.setCssClass = function(cssClass) {
+  this.setProperty('cssClass', cssClass);
+};
+
+scout.SimpleTab.prototype._renderCssClass = function() {
+  this.$container.addClass(this.cssClass);
+};
+
+scout.SimpleTab.prototype._removeCssClass = function() {
+  this.$container.removeClass(this.cssClass);
 };
 
 scout.SimpleTab.prototype.setClosable = function(closable) {
@@ -75,8 +243,9 @@ scout.SimpleTab.prototype._renderClosable = function() {
       return;
     }
     this.$container.addClass('closable');
-    this.$close = this.$statusContainer.appendDiv('status closer')
+    this.$close = this._getOrCreate$StatusContainer().appendDiv('status closer')
       .on('click', this._onClose.bind(this));
+    this._statusContainerUsageCounter++;
   } else {
     if (!this.$close) {
       return;
@@ -84,6 +253,10 @@ scout.SimpleTab.prototype._renderClosable = function() {
     this.$container.removeClass('closable');
     this.$close.remove();
     this.$close = null;
+    this._statusContainerUsageCounter--;
+    if (this._statusContainerUsageCounter === 0) {
+      this._remove$StatusContainer();
+    }
   }
 };
 
@@ -113,19 +286,19 @@ scout.SimpleTab.prototype._renderSaveNeeded = function() {
     if (this.$saveNeeded) {
       return;
     }
-    if (this.$close) {
-      this.$saveNeeded = this.$close.beforeDiv('status save-needer');
-    } else {
-      this.$saveNeeded = this.$statusContainer
-        .appendDiv('status save-needer');
-    }
+    this.$saveNeeded = this._getOrCreate$StatusContainer().prependDiv('status save-needer');
+    this._statusContainerUsageCounter++;
   } else {
-    this.$container.removeClass('save-needed');
     if (!this.$saveNeeded) {
       return;
     }
+    this.$container.removeClass('save-needed');
     this.$saveNeeded.remove();
     this.$saveNeeded = null;
+    this._statusContainerUsageCounter--;
+    if (this._statusContainerUsageCounter === 0) {
+      this._remove$StatusContainer();
+    }
   }
 };
 
@@ -134,108 +307,109 @@ scout.SimpleTab.prototype.setStatus = function(status) {
 };
 
 scout.SimpleTab.prototype._renderStatus = function() {
-  this.$status.forEach(function($sts) {
-    $sts.remove();
+  this._statusContainerUsageCounter -= (this._statusIconDivs.length === 0 ? 0 : 1);
+
+  this._statusIconDivs.forEach(function($statusIcon) {
+    $statusIcon.remove();
   }.bind(this));
-  this.$status = [];
+  this._statusIconDivs = [];
+
   if (this.status) {
-    var statusList = this.status.asFlatList();
-    var $sibling = null;
-    statusList.forEach(function(sts) {
-      $sibling = _renderSingleStatus.call(this, sts, $sibling);
-      if ($sibling) {
-        this.$status.push($sibling);
+    this.status.asFlatList().forEach(function(status) {
+      if (!status || !status.iconId) {
+        return;
       }
-
-    }.bind(this));
-  }
-
-  // private function
-  function _renderSingleStatus(status, $sibling) {
-    if (status && status.iconId) {
-
-      var $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
+      var $statusIcon = this._getOrCreate$StatusContainer().appendIcon(status.iconId, 'status');
       if (status.cssClass()) {
         $statusIcon.addClass(status.cssClass());
       }
-      if ($sibling) {
-        $sibling.after($statusIcon);
-      } else {
-        $statusIcon.prependTo(this.$statusContainer);
-      }
-      return $statusIcon;
-    } else {
-      return $sibling;
-    }
+      this._statusIconDivs.push($statusIcon);
+    }.bind(this));
   }
 
+  this._statusContainerUsageCounter += (this._statusIconDivs.length === 0 ? 0 : 1);
+  if (this._statusContainerUsageCounter === 0) {
+    this._remove$StatusContainer();
+  }
 };
 
 scout.SimpleTab.prototype.select = function() {
-  this.selected = true;
-  this._renderSelection();
-};
-
-scout.SimpleTab.prototype._renderSelection = function() {
-  if (this.$container) {
-    if (this.$container.select() === this.selected) {
-      return;
-    }
-    this.$container.select(this.selected);
-  }
+  this.setSelected(true);
 };
 
 scout.SimpleTab.prototype.deselect = function() {
-  this.selected = false;
-  this._renderSelection();
+  this.setSelected(false);
+};
+
+scout.SimpleTab.prototype.setSelected = function(selected) {
+  this.setProperty('selected', selected);
+};
+
+scout.SimpleTab.prototype._renderSelected = function() {
+  this.$container.select(this.selected);
 };
 
 scout.SimpleTab.prototype._onMouseDown = function(event) {
   this.trigger('click');
 };
 
-scout.SimpleTab.prototype._onClose = function() {};
-
-scout.SimpleTab.prototype.setTitle = function(title) {
-  this.setProperty('title', title);
-};
-
-scout.SimpleTab.prototype._renderTitle = function() {
-  this._$title.textOrNbsp(this.title);
-};
-
-scout.SimpleTab.prototype.setSubTitle = function(subTitle) {
-  this.setProperty('subTitle', subTitle);
-};
-
-scout.SimpleTab.prototype._renderSubTitle = function() {
-  this._$subTitle.textOrNbsp(this.subTitle);
-};
-
-scout.SimpleTab.prototype.setIconId = function(iconId) {
-  this.setProperty('iconId', iconId);
-};
-
-scout.SimpleTab.prototype._renderIconId = function(iconId) {
-  this.$icon.icon(this.iconId);
-};
-
-scout.SimpleTab.prototype._removeCssClass = function() {
-  this.$container.removeClass(this.cssClass);
-};
-
-scout.SimpleTab.prototype.setCssClass = function(cssClass) {
-  this.setProperty('cssClass', cssClass);
-};
-
-scout.SimpleTab.prototype._renderCssClass = function() {
-  this.$container.addClass(this.cssClass);
+scout.SimpleTab.prototype._onClose = function() {
+  if (this.view) {
+    this.view.close();
+  }
 };
 
 scout.SimpleTab.prototype.getMenuText = function() {
-  var text = this.title;
-  if (this.subTitle) {
-    text += ' (' + this.subTitle + ')';
+  return scout.strings.join(' ', this.title, scout.strings.box('(', this.subTitle, ')'));
+};
+
+scout.SimpleTab.prototype._installViewListeners = function() {
+  this.view.on('propertyChange', this._viewPropertyChangeListener);
+  this.view.on('remove', this._viewRemoveListener);
+};
+
+scout.SimpleTab.prototype._uninstallViewListeners = function() {
+  this.view.off('propertyChange', this._viewPropertyChangeListener);
+  this.view.off('remove', this._viewRemoveListener);
+};
+
+scout.SimpleTab.prototype._onViewPropertyChange = function(event) {
+  if (event.propertyName === 'title') {
+    this.setTitle(this.view.title);
   }
-  return text;
+  else if (event.propertyName === 'subTitle') {
+    this.setSubTitle(this.view.subTitle);
+  }
+  else if (event.propertyName === 'iconId') {
+    this.setIconId(this.view.iconId);
+  }
+  else if (event.propertyName === 'cssClass') {
+    this.setCssClass(event.newValue);
+  }
+  else if (event.propertyName === 'saveNeeded') {
+    this.setSaveNeeded(event.newValue);
+  }
+  else if (event.propertyName === 'saveNeededVisible') {
+    this.setSaveNeededVisible(event.newValue);
+  }
+  else if (event.propertyName === 'closable') {
+    this.setClosable(event.newValue);
+  }
+  else if (event.propertyName === 'status') {
+    this.setStatus(event.newValue);
+  }
+};
+
+/**
+ * We cannot not bind the 'remove' event of the view to the remove function
+ * of the this tab, because in bench-mode the tab is never rendered
+ * and thus the _remove function is never called.
+ */
+scout.SimpleTab.prototype._onViewRemove = function() {
+  this._uninstallViewListeners();
+  if (this.rendered) {
+    this.remove();
+  } else {
+    this.trigger('remove'); // FIXME STUDIO why is this needed?
+  }
 };

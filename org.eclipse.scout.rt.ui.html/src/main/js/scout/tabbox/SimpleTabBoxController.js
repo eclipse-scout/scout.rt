@@ -18,17 +18,29 @@
  * updates the {@link {@link scout.SimpleTabArea}}.
  */
 scout.SimpleTabBoxController = function(tabBox, tabArea) {
-  this.tabBox = tabBox;
-  this.tabArea = tabArea;
-
+  this.tabBox;
   this._viewAddHandler = this._onViewAdd.bind(this);
   this._viewRemoveHandler = this._onViewRemove.bind(this);
   this._viewActivateHandler = this._onViewActivate.bind(this);
   this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 
+  this.tabArea;
   this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
+};
+
+scout.SimpleTabBoxController.prototype.init = function(model) {
+  $.extend(this, model);
+};
+
+scout.SimpleTabBoxController.prototype.install = function(tabBox, tabArea) {
+  this.tabBox = scout.assertParameter('tabBox', tabBox);
+  this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
 
   this._installListeners();
+};
+
+scout.SimpleTabBoxController.prototype.uninstall = function() {
+  this._uninstallListeners();
 };
 
 scout.SimpleTabBoxController.prototype._installListeners = function() {
@@ -38,6 +50,15 @@ scout.SimpleTabBoxController.prototype._installListeners = function() {
   this.tabBox.on('viewDeactivate', this._viewDeactivateHandler);
 
   this.tabArea.on('tabSelect', this._viewTabSelectHandler);
+};
+
+scout.SimpleTabBoxController.prototype._uninstallListeners = function() {
+  this.tabBox.off('viewAdd', this._viewAddHandler);
+  this.tabBox.off('viewRemove', this._viewRemoveHandler);
+  this.tabBox.off('viewActivate', this._viewActivateHandler);
+  this.tabBox.off('viewDeactivate', this._viewDeactivateHandler);
+
+  this.tabArea.off('tabSelect', this._viewTabSelectHandler);
 };
 
 scout.SimpleTabBoxController.prototype._onViewAdd = function(event) {
@@ -53,10 +74,7 @@ scout.SimpleTabBoxController.prototype._onViewAdd = function(event) {
   viewTab = this._getTab(view);
   if (!viewTab) {
     siblingViewTab = this._getTab(siblingView);
-    viewTab = scout.create('DesktopTab', {
-      parent: this.tabArea,
-      view: view
-    });
+    viewTab = this._createTab(view);
     this.tabArea.addTab(viewTab, siblingViewTab);
   }
 };
@@ -92,6 +110,13 @@ scout.SimpleTabBoxController.prototype._onViewTabSelect = function(event) {
   this.tabBox.activateView(view);
 };
 
+scout.SimpleTabBoxController.prototype._createTab = function(view) {
+  return scout.create('SimpleTab', {
+    parent: this.tabArea,
+    view: view
+  });
+};
+
 scout.SimpleTabBoxController.prototype._getTab = function(view) {
   if (!view) {
     return;
@@ -114,5 +139,5 @@ scout.SimpleTabBoxController.prototype.getTabs = function() {
 /* ----- static functions ----- */
 
 scout.SimpleTabBoxController.hasViewTab = function(view) {
-  return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);
+  return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);  // FIXME STUDIO why???
 };
