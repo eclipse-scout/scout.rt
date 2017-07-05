@@ -298,7 +298,7 @@ describe('SmartField', function() {
       lookupCall = scout.create('LookupCall', {
         session: session
       });
-      lookupCall._textById = function(value) {
+      lookupCall._textByKey = function(value) {
         if (value === 1) {
           return 'hello';
         } else {
@@ -354,7 +354,7 @@ describe('SmartField', function() {
       lookupCall = scout.create('LookupCall', {
         session: session
       });
-      lookupCall._textById = function(value) {
+      lookupCall._textByKey = function(value) {
         if (value === 1) {
           return 'A Line1\nA Line2';
         } else {

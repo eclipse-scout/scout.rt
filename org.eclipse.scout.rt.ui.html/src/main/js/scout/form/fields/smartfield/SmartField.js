@@ -147,7 +147,7 @@ scout.SmartField.prototype._formatValue = function(value) {
   if (!this.lookupCall) {
     return scout.strings.nvl(value) + '';
   }
-  return this.lookupCall.textById(value);
+  return this.lookupCall.textByKey(value);
 };
 
 scout.SmartField.prototype._setDisplayText = function(displayText) {

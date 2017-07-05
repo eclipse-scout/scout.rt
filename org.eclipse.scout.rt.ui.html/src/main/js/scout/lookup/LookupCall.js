@@ -37,32 +37,24 @@ scout.LookupCall.prototype.setHierarchical = function(hierarchical) {
 };
 
 /**
- * @returns {Promise} which returns a {scout.LookupCall}
- */
-scout.LookupCall.prototype.getById = function(id) {
-  // To be implemented by the subclass
-  return $.resolvedPromise(scout.create('LookupRow'));
-};
-
-/**
- * You should not override this function. Instead override <code>_textById</code>.
+ * You should not override this function. Instead override <code>_textByKey</code>.
  *
- * @returns {Promise} which returns a text of the lookup row resolved by #getById
+ * @returns {Promise} which returns a text of the lookup row resolved by #getByKey
  */
-scout.LookupCall.prototype.textById = function(id) {
-  if (scout.objects.isNullOrUndefined(id)) {
+scout.LookupCall.prototype.textByKey = function(key) {
+  if (scout.objects.isNullOrUndefined(key)) {
     return $.resolvedPromise('');
   }
-  return this._textById(id);
+  return this._textByKey(key);
 };
 
 /**
- * Override this function to provide your own textById implementation.
+ * Override this function to provide your own textByKey implementation.
  *
- * @returns {Promise} which returns a text of the lookup row resolved by #getById
+ * @returns {Promise} which returns a text of the lookup row resolved by #getByKey
  */
-scout.LookupCall.prototype._textById = function(id) {
-  return this.getById(id)
+scout.LookupCall.prototype._textByKey = function(key) {
+  return this.getByKey(key)
     .then(function(lookupRow) {
       if (!lookupRow) {
         return '';
@@ -74,7 +66,7 @@ scout.LookupCall.prototype._textById = function(id) {
 /**
  * @return {Promise} resolves to an array of {scout.LookupRow}s
  */
-scout.LookupCall.prototype.getAll = function() { // FIXME [awe] 7.0 - SF2: stimmt der kommentar? returns doch eher LookupROWs? nicht?
+scout.LookupCall.prototype.getAll = function() {
   throw new Error('getAll() not implemented');
 };
 
@@ -88,7 +80,7 @@ scout.LookupCall.prototype.getByText = function(text) {
 /**
  * @return {Promise} resolves to a single {scout.LookupRow}
  */
-scout.LookupCall.prototype.getByKey = function(key) { // FIXME [awe] 7.0 - SF2: rename all getById to getByKey? discuss with C.GU
+scout.LookupCall.prototype.getByKey = function(key) {
   throw new Error('getByKey() not implemented');
 };
 
