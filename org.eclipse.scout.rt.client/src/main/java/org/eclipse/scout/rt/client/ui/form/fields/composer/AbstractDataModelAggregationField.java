@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.DataModelAggregationFieldChains.DataModelAggregationFieldAttributeChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IDataModelAggregationFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  * Expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
 @ClassId("678308dc-6f45-4284-9295-617b28b03cea")
-public abstract class AbstractDataModelAggregationField extends AbstractSmartField<Integer> implements IDataModelAggregationField {
+public abstract class AbstractDataModelAggregationField extends AbstractSmartField2<Integer> implements IDataModelAggregationField {
 
   public AbstractDataModelAggregationField() {
     this(true);
@@ -113,7 +113,7 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     chain.execAttributeChanged(attribute);
   }
 
-  protected static class LocalDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends LocalSmartFieldExtension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
+  protected static class LocalDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends LocalSmartField2Extension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
 
     public LocalDataModelAggregationFieldExtension(OWNER owner) {
       super(owner);

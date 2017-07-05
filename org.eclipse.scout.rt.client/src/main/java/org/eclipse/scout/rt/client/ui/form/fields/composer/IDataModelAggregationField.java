@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 
-public interface IDataModelAggregationField extends ISmartField<Integer> {
+public interface IDataModelAggregationField extends ISmartField2<Integer> {
 
 }
