@@ -36,7 +36,6 @@ describe('ProposalField2', function() {
     it('defaults', function() {
       expect(field.maxLength).toBe(-1);
       expect(field.trimText).toBe(true);
-      expect(field.autoCloseProposalChooser).toBe(false);
     });
 
     /**
@@ -53,6 +52,20 @@ describe('ProposalField2', function() {
       expect(field.value).toBe('Xyz');
       expect(field.displayText).toBe('Xyz');
       expect(field.errorStatus).toBe(null);
+    });
+
+    it('setLookupRow should set value too', function() {
+      var lookupRow = {
+        key: 123,
+        text: 'Foo'
+      };
+      field.setLookupRow(lookupRow);
+      expect(field.value).toBe('Foo');
+      expect(field.lookupRow).toBe(lookupRow);
+
+      field.setLookupRow(null);
+      expect(field.value).toBe(null);
+      expect(field.lookupRow).toBe(null);
     });
 
   });

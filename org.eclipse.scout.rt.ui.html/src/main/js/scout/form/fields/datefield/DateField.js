@@ -290,12 +290,12 @@ scout.DateField.prototype._readDisplayText = function() {
 };
 
 scout.DateField.prototype._renderDateDisplayText = function() {
-  scout.fields.valOrText(this, this.$dateField, this.dateDisplayText);
+  scout.fields.valOrText(this.$dateField, this.dateDisplayText);
   this._updateDateDeletable();
 };
 
 scout.DateField.prototype._readDateDisplayText = function() {
-  return (this._$predictDateField ? scout.fields.valOrText(this, this._$predictDateField) : scout.fields.valOrText(this, this.$dateField));
+  return (this._$predictDateField ? scout.fields.valOrText(this._$predictDateField) : scout.fields.valOrText(this.$dateField));
 };
 
 scout.DateField.prototype._renderTimeDisplayText = function() {
@@ -579,8 +579,8 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
     diffMonths = 0,
     diffDays = 0,
     cursorPos = this.$dateField[0].selectionStart,
-    displayText = scout.fields.valOrText(this, this.$dateField),
-    prediction = this._$predictDateField && scout.fields.valOrText(this, this._$predictDateField),
+    displayText = scout.fields.valOrText(this.$dateField),
+    prediction = this._$predictDateField && scout.fields.valOrText(this._$predictDateField),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
     pickerStartDate = this.value || this._referenceDate(),
     shiftDate = true;
@@ -713,7 +713,7 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
  * in _onDateFieldKeyDown().
  */
 scout.DateField.prototype._onDateFieldInput = function(event) {
-  var displayText = scout.fields.valOrText(this, this.$dateField);
+  var displayText = scout.fields.valOrText(this.$dateField);
 
   // If the focus has changed to another field in the meantime, don't predict anything and
   // don't show the picker. Just validate the input.
@@ -729,7 +729,7 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
   // Predict date
   var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
   if (datePrediction) {
-    scout.fields.valOrText(this, this._$predictDateField, datePrediction.text);
+    scout.fields.valOrText(this._$predictDateField, datePrediction.text);
     this.openPopupAndSelect(datePrediction.date);
   } else {
     // No valid prediction!

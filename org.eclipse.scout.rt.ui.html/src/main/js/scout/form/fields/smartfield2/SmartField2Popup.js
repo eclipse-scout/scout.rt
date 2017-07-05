@@ -59,7 +59,6 @@ scout.SmartField2Popup.prototype.setLookupResult = function(result) {
   this.proposalChooser.setLookupResult(result);
 };
 
-// FIXME [awe] 7.0 - SF2: check if this function is still required when ENTER keystroke is handled properly
 scout.SmartField2Popup.prototype.getSelectedLookupRow = function() {
   return this.proposalChooser.getSelectedLookupRow();
 };
@@ -94,7 +93,6 @@ scout.SmartField2Popup.prototype._triggerEvent = function(event) {
  * should stay open when the SmartField popup is closed. It also prevents the focus blur
  * event on the SmartField input-field.
  */
-// TODO [awe] 7.0 - SF2: check if still required --> see SmartField2Popup.js
 scout.SmartField2Popup.prototype._onContainerMouseDown = function(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the

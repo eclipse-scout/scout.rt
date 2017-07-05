@@ -130,11 +130,11 @@ scout.SmartField2.prototype.cssClassName = function() {
 };
 
 scout.SmartField2.prototype._readDisplayText = function() {
-  return scout.fields.valOrText(this, this.$field);
+  return scout.fields.valOrText(this.$field);
 };
 
 scout.SmartField2.prototype._renderDisplayText = function() {
-  scout.fields.valOrText(this, this.$field, this.displayText);
+  scout.fields.valOrText(this.$field, this.displayText);
   this._updateDeletable();
 };
 
@@ -427,14 +427,8 @@ scout.SmartField2.prototype._formatLookupRow = function(lookupRow) {
 scout.SmartField2.prototype.openPopup = function(browse) {
   var searchText = this._readDisplayText();
   $.log.info('SmartField2#openPopup browse=' + browse + ' popup=' + this.popup);
-  // Reset scheduled focus next tabbable when user clicks on the smartfield
-  // while a lookup is resolved.
+  // Reset scheduled focus next tabbable when user clicks on the smartfield while a lookup is resolved.
   this._tabPrevented = null;
-
-  // already open // FIXME [awe] 7.0 - SF2: check when this if applies
-  if (this.isPopupOpen()) {
-    return;
-  }
 
   if (scout.strings.empty(searchText)) {
     // if search text is empty - always do 'browse', no matter what the error code is

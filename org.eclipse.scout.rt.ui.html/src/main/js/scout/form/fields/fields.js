@@ -43,13 +43,13 @@ scout.fields = {
 
   /**
    * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #makeInputOrDiv().
-   * Works as setter when called with 3 arguments, works a getter when called with 2 arguments.
+   * Works as setter when called with 2 arguments, works a getter when called with 1 arguments.
    *
-   * @return when called with 2 arguments: $field.text() or $field.val()
+   * @return when called with 1 argument: $field.text() or $field.val()
    */
-  valOrText: function(field, $field, text) { // FIXME [awe] 7.0 - SF2: remove 1st argument - not required anymore because we simply check if it is a DIV or not
+  valOrText: function($field, text) {
     var isDiv = $field.is('div');
-    if (arguments.length === 3) {
+    if (arguments.length === 2) {
       if (isDiv) {
         $field.text(text);
       } else {

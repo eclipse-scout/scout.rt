@@ -372,7 +372,7 @@ describe('SmartField', function() {
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
       expect(smartField.value).toBe(1);
-      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('A Line1');
+      expect(scout.fields.valOrText(smartField.$field)).toBe('A Line1');
       expect(smartField._additionalLines).toEqual(['A Line2']);
     });
     it('multi-line lookupcall on multi-line field', function() {
@@ -385,7 +385,7 @@ describe('SmartField', function() {
       expect(smartFieldMultiline.displayText).toBe('');
       smartFieldMultiline.setValue(1);
       expect(smartFieldMultiline.value).toBe(1);
-      expect(scout.fields.valOrText(smartFieldMultiline, smartFieldMultiline.$field)).toBe('A Line1');
+      expect(scout.fields.valOrText(smartFieldMultiline.$field)).toBe('A Line1');
       expect(smartFieldMultiline._additionalLines).toEqual(['A Line2']);
       expect(smartFieldMultiline._$multilineField.html()).toEqual('A Line2');
     });
@@ -402,10 +402,10 @@ describe('SmartField', function() {
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
       expect(smartField.value).toBe(1);
-      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('1');
+      expect(scout.fields.valOrText(smartField.$field)).toBe('1');
       smartField.setValue(null);
       expect(smartField.value).toBe(null);
-      expect(scout.fields.valOrText(smartField, smartField.$field)).toBe('');
+      expect(scout.fields.valOrText(smartField.$field)).toBe('');
     });
   });
 

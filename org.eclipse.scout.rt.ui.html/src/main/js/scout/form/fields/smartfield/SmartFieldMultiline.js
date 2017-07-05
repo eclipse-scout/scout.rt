@@ -70,7 +70,7 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
  */
 scout.SmartFieldMultiline.prototype._readSearchText = function() {
   // Only read the first line
-  return scout.fields.valOrText(this, this.$field);
+  return scout.fields.valOrText(this.$field);
 };
 
 /**

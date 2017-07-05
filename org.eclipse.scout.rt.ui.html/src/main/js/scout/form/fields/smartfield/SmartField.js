@@ -164,15 +164,15 @@ scout.SmartField.prototype._renderDisplayText = function() {
   if (multilineText) {
     var firstLine = multilineText.shift();
     this._additionalLines = multilineText;
-    scout.fields.valOrText(this, this.$field, firstLine);
+    scout.fields.valOrText(this.$field, firstLine);
   } else {
     this._additionalLines = null;
-    scout.fields.valOrText(this, this.$field, displayText);
+    scout.fields.valOrText(this.$field, displayText);
   }
 };
 
 scout.SmartField.prototype._readDisplayText = function() {
-  var firstLine = scout.fields.valOrText(this, this.$field);
+  var firstLine = scout.fields.valOrText(this.$field);
   if (firstLine && this._additionalLines) {
     var newDisplayText = [firstLine].concat(this._additionalLines).join('\n');
     if (newDisplayText === this._oldDisplayText) {

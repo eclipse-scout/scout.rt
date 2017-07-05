@@ -19,7 +19,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
  * The value of a proposal field is always of type String. If a user coincidentally enters a text which also exists in
  * the proposal list, only the text is set and the lookupRow property is not s set. If a user has selected a proposal
  * from the proposal list the lookupRow property is set. That's how you can distinct between manually entered texts and
- * proposals choosen from the list.
+ * proposals chosen from the list.
  * <p>
  * There's no validation logic that checks for duplicates between manually entered text and the proposal list.
  *
