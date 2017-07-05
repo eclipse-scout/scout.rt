@@ -143,11 +143,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
   }
 
   @Override
-  public IDesktop getDesktop() {
-    return m_desktop;
-  }
-
-  @Override
   public IOutline getOutline() {
     return m_outline;
   }

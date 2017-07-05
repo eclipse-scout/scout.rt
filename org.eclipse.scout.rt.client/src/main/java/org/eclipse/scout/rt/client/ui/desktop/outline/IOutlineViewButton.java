@@ -11,11 +11,8 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 public interface IOutlineViewButton extends IViewButton {
-
-  IDesktop getDesktop(); // TODO [7.0] awe: remove this method, there are other ways to get the desktop
 
   IOutline getOutline();
 
