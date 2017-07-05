@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
@@ -368,13 +369,14 @@ public class ScriptFileBuilder {
     boolean insideBlockComment = false;
     StringBuilder buf = new StringBuilder();
     String[] lines = text.split("[\\n]");
+    int linePrefixLength = (lines.length + "").length();
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*"));
       if (qualifier.length() > 0) {
         buf.append(qualifier).append("|");
       }
       buf.append(filename).append(":");
-      buf.append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo));
+      buf.append(StringUtility.rpad(lineNo + "", " ", linePrefixLength));
       buf.append((insideBlockComment ? "//" : "*/")).append(" ");
       buf.append(line).append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
