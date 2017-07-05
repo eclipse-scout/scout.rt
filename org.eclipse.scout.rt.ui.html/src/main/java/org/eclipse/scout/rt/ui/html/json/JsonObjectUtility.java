@@ -117,6 +117,15 @@ public final class JsonObjectUtility {
   }
 
   /**
+   * Iff the given value is not <code>null</code>, it is added to the {@link JSONArray}. Otherwise, nothing happens.
+   */
+  public static void putIfNotNull(JSONArray jsonArray, Object value) {
+    if (jsonArray != null && value != null) {
+      jsonArray.put(value);
+    }
+  }
+
+  /**
    * Returns the given JSON object as formatted string with indent 2. <code>null</code> is returned as
    * <code>"null"</code>.
    */

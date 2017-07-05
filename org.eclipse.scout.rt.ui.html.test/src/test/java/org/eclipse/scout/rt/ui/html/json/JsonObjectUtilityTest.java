@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -84,5 +85,26 @@ public class JsonObjectUtilityTest {
     assertEquals((Long) 0L, JsonObjectUtility.optLong(json, "zero"));
     assertEquals((Long) (-1L), JsonObjectUtility.optLong(json, "neg"));
     assertEquals((Long) 1L, JsonObjectUtility.optLong(json, "fracValue")); // cut off by cast
+  }
+
+  @Test
+  public void testPutIfNotNull() {
+    // Default behavior
+    JSONArray array = new JSONArray();
+    array.put("element");
+    array.put(null);
+    array.put(JSONObject.NULL);
+    array.put(123);
+    assertEquals(4, array.length());
+    assertEquals("[\"element\",null,null,123]", array.toString());
+
+    // "putIfNotNull" behavior
+    JSONArray array2 = new JSONArray();
+    JsonObjectUtility.putIfNotNull(array2, "element");
+    JsonObjectUtility.putIfNotNull(array2, null);
+    JsonObjectUtility.putIfNotNull(array2, JSONObject.NULL);
+    JsonObjectUtility.putIfNotNull(array2, 123);
+    assertEquals(3, array2.length());
+    assertEquals("[\"element\",null,123]", array2.toString());
   }
 }
