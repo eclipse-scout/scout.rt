@@ -743,6 +743,16 @@ scout.Widget.prototype.entryPoint = function($element) {
   return $element.entryPoint();
 };
 
+scout.Widget.prototype.window = function(domElement) {
+  var $el = this.$container || this.$parent;
+  return $el ? $el.window(domElement) : (domElement ? null : $(null));
+};
+
+scout.Widget.prototype.document = function(domElement) {
+  var $el = this.$container || this.$parent;
+  return $el ? $el.document(domElement) : (domElement ? null : $(null));
+};
+
 /**
  * This method attaches the detached $container to the DOM.
  */
