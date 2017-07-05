@@ -16,7 +16,7 @@
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt-root</artifactId>
-  <version>7.0.0</version>
+  <version>7.0.100</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout RT ROOT Module</name>
 
