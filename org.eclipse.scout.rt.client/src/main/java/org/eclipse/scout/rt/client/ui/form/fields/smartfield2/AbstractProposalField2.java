@@ -18,6 +18,14 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 @ClassId("1c8c645d-9e75-4bb1-9f79-c0532d2cdb72")
 public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<VALUE> implements IProposalField2<VALUE> {
 
+  public AbstractProposalField2() {
+    this(true);
+  }
+
+  public AbstractProposalField2(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
