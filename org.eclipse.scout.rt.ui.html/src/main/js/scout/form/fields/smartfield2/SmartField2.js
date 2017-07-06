@@ -12,6 +12,7 @@ scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
   this.searching = false;
+  this.focused = false;
   this.deletable = false;
   this.popup = null;
   this.lookupCall = null;

@@ -13,6 +13,7 @@ scout.DateField = function() {
 
   this.autoDate;
   this.dateDeletable = false;
+  this.dateFocused = false;
   this.timeDeletable = false;
   this.dateFormatPattern;
   this.disabledCopyOverlay = true;
