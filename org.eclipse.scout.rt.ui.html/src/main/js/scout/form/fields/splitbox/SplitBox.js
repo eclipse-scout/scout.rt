@@ -91,9 +91,13 @@ scout.SplitBox.prototype._render = function() {
 
       // Get initial area and splitter bounds
       var splitAreaPosition = this._$splitArea.offset();
-      var splitAreaSize = scout.graphics.getSize(this._$splitArea, true);
+      var splitAreaSize = scout.graphics.size(this._$splitArea, {
+        includeMargin: true
+      });
       var splitterPosition = this._$splitter.offset();
-      var splitterSize = scout.graphics.getSize(this._$splitter, true);
+      var splitterSize = scout.graphics.size(this._$splitter, {
+        includeMargin: true
+      });
 
       // Create temporary splitter
       var $tempSplitter = this._$splitArea.appendDiv('temp-splitter')
@@ -236,7 +240,7 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
   if (this._oldSplitterPositionType) {
     // splitterPositionType changed while the split box was rendered --> convert splitterPosition
     // to the target type such that the current position in screen does not change.
-    var splitAreaSize = this.htmlSplitArea.getSize(),
+    var splitAreaSize = this.htmlSplitArea.size(),
       splitterPosition = this.splitterPosition,
       splitterSize = scout.graphics.getVisibleSize(this._$splitter, true),
       totalSize = 0;

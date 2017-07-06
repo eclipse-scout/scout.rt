@@ -575,7 +575,7 @@ scout.DesktopBench.prototype._updateSplitterMovable = function() {
 scout.DesktopBench.prototype._onSplitterMove = function(event) {
   var splitterIndex = this.components.indexOf(event.source);
   if (splitterIndex > 0 /*cannot be 0 since first element is a BenchColumn*/ ) {
-    var diff = event.position - event.source.htmlComp.getBounds().x - event.source.htmlComp.getMargins().left;
+    var diff = event.position - event.source.htmlComp.cssBounds().x - event.source.htmlComp.margins().left;
     event.source.getLayoutData().diff = diff;
     this.revalidateLayout();
     event.source.getLayoutData().diff = null;

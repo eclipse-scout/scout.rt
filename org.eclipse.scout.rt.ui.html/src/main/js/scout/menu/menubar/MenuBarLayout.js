@@ -40,7 +40,9 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   } else {
     // create ellipsis menu
     this._createAndRenderEllipsis(this._menuBar.$left, rightWidth === 0);
-    var ellipsisSize = scout.graphics.getSize(this._menuBar.ellipsis.$container, true);
+    var ellipsisSize = scout.graphics.size(this._menuBar.ellipsis.$container, {
+      includeMargin: true
+    });
 
     var remainingLeftWidth = Math.min(availableWidth - rightWidth, leftWidth);
 
@@ -64,7 +66,9 @@ scout.MenuBarLayout.prototype.layout = function($container) {
         // Always add right-aligned menus
         menuItemsCopy.push(menuItem);
       } else {
-        var itemSize = scout.graphics.getSize(menuItem.$container, true);
+        var itemSize = scout.graphics.size(menuItem.$container, {
+          includeMargin: true
+        });
         remainingLeftWidth -= itemSize.width;
         if (overflown || remainingLeftWidth < 0) {
           // Menu does not fit -> add to ellipsis menu
@@ -150,8 +154,8 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
  * @memberOf scout.MenuBarLayout
  */
 scout.MenuBarLayout.size = function(htmlMenuBar, containerSize) {
-  var menuBarSize = htmlMenuBar.getPreferredSize();
+  var menuBarSize = htmlMenuBar.prefSize();
   menuBarSize.width = containerSize.width;
-  menuBarSize = menuBarSize.subtract(htmlMenuBar.getMargins());
+  menuBarSize = menuBarSize.subtract(htmlMenuBar.margins());
   return menuBarSize;
 };

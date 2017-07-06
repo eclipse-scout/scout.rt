@@ -22,7 +22,7 @@ scout.inherits(scout.MenuBoxLayout, scout.AbstractLayout);
  */
 scout.MenuBoxLayout.prototype.layout = function($container) {
   var htmlContainer = this.menuBox.htmlComp,
-    containerSize = htmlContainer.getSize(),
+    containerSize = htmlContainer.size(),
     menus = this.visibleMenus(),
     menusWidth = 0;
 
@@ -222,13 +222,17 @@ scout.MenuBoxLayout.prototype._destroyEllipsis = function() {
  */
 scout.MenuBoxLayout.prototype._moveOverflowMenusIntoEllipsis = function(containerSize, menusWidth) {
   var collapsedMenus = [this._ellipsis];
-  var ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
+  var ellipsisSize = scout.graphics.size(this._ellipsis.$container, {
+    includeMargin: true
+  });
   menusWidth += ellipsisSize.width;
   this.visibleMenus().slice().reverse().forEach(function(menu) {
     var menuSize;
     if (menusWidth > containerSize.width) {
       // Menu does not fit -> move to ellipsis menu
-      menuSize = scout.graphics.getSize(menu.$container, true);
+      menuSize = scout.graphics.size(menu.$container, {
+        includeMargin: true
+      });
       menusWidth -= menuSize.width;
       scout.menus.moveMenuIntoEllipsis(menu, this._ellipsis);
     } else {
@@ -254,7 +258,7 @@ scout.MenuBoxLayout.prototype.actualPrefSize = function(menus) {
     includeMargin: true,
     useCssSize: true
   });
-  prefSize.width = menusWidth + this.menuBox.htmlComp.getInsets().horizontal();
+  prefSize.width = menusWidth + this.menuBox.htmlComp.insets().horizontal();
 
   return prefSize;
 };

@@ -16,11 +16,13 @@ scout.inherits(scout.TouchPopupLayout, scout.PopupLayout);
 scout.TouchPopupLayout.prototype.layout = function($container) {
   scout.TouchPopupLayout.parent.prototype.layout.call(this, $container);
 
-  var popupSize = this.popup.htmlComp.getSize().subtract(this.popup.htmlComp.getInsets()),
-    headerHeight = scout.graphics.getSize(this.popup._$header, true).height,
+  var popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
+    headerHeight = scout.graphics.size(this.popup._$header, {
+      includeMargin: true
+    }).height,
     field = this.popup._field,
-    fieldHeight = field.htmlComp.getPreferredSize().height,
-    fieldMargins = field.htmlComp.getMargins(),
+    fieldHeight = field.htmlComp.prefSize().height,
+    fieldMargins = field.htmlComp.margins(),
     fieldWidth = popupSize.width - fieldMargins.horizontal(),
     widgetVerticalOffset = headerHeight + fieldHeight + fieldMargins.vertical();
 

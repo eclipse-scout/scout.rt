@@ -53,7 +53,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
   }
 
   viewportBounds = scout.graphics.offsetBounds(table.$data);
-  dataInsets = scout.graphics.getInsets(table.$data);
+  dataInsets = scout.graphics.insets(table.$data);
   dataMarginTop = table.$data.cssMarginTop();
   viewportBounds = viewportBounds.subtract(dataInsets);
 

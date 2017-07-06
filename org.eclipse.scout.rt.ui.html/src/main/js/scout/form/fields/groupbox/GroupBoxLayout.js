@@ -29,8 +29,8 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     $groupBoxTitle = this._groupBox.$title,
     $label = this._groupBox.$label,
     $status = this._groupBox.$status,
-    containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+    containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if ($status && $status.isVisible()) {
     this._layoutStatus();
@@ -44,7 +44,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     menuBarSize = new scout.Dimension(0, 0);
   }
 
-  gbBodySize = containerSize.subtract(htmlGbBody.getMargins());
+  gbBodySize = containerSize.subtract(htmlGbBody.margins());
   gbBodySize.height -= this._titleHeight();
   gbBodySize.height -= this._notificationHeight();
   gbBodySize.height -= menuBarSize.height;
@@ -85,7 +85,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
 scout.GroupBoxLayout.prototype._layoutStatus = function() {
   var htmlContainer = this._groupBox.htmlComp,
-    containerPadding = htmlContainer.getInsets({
+    containerPadding = htmlContainer.insets({
       includeBorder: false
     }),
     top = containerPadding.top,
@@ -93,7 +93,7 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
     $groupBoxTitle = this._groupBox.$title,
     titleInnerHeight = $groupBoxTitle.innerHeight(),
     $status = this._groupBox.$status,
-    statusMargins = scout.graphics.getMargins($status),
+    statusMargins = scout.graphics.margins($status),
     statusPosition = this._groupBox.statusPosition;
 
   $status.cssWidth(this._statusWidth);
@@ -113,17 +113,17 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
     prefSize;
 
   if (this._groupBox.expanded) {
-    prefSize = htmlGbBody.getPreferredSize()
-      .add(htmlGbBody.getMargins());
+    prefSize = htmlGbBody.prefSize()
+      .add(htmlGbBody.margins());
 
     htmlMenuBar = this._htmlMenuBar();
     if (htmlMenuBar) {
-      prefSize.height += htmlMenuBar.getPreferredSize().height;
+      prefSize.height += htmlMenuBar.prefSize().height;
     }
   } else {
     prefSize = new scout.Dimension(0, 0);
   }
-  prefSize = prefSize.add(htmlContainer.getInsets());
+  prefSize = prefSize.add(htmlContainer.insets());
   prefSize.height += this._titleHeight();
   prefSize.height += this._notificationHeight();
 
@@ -148,7 +148,7 @@ scout.GroupBoxLayout.prototype._notificationHeight = function() {
   if (!this._groupBox.notification) {
     return 0;
   }
-  return this._groupBox.notification.htmlComp.getPreferredSize({
+  return this._groupBox.notification.htmlComp.prefSize({
     includeMargin: true
   }).height;
 };

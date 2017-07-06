@@ -35,8 +35,8 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
 
   scout.SmartField2PopupLayout.parent.prototype.layout.call(this, $container);
 
-  popupSize = this.popup.htmlComp.getSize();
-  size = popupSize.subtract(this.popup.htmlComp.getInsets());
+  popupSize = this.popup.htmlComp.size();
+  size = popupSize.subtract(this.popup.htmlComp.insets());
   htmlProposalChooser.setSize(size);
 
   if (this.popup.htmlComp.layouted) {
@@ -79,8 +79,8 @@ scout.SmartField2PopupLayout.prototype.preferredLayoutSize = function($container
     fieldBounds = scout.graphics.offsetBounds(this.popup.smartField.$field);
 
   if (htmlProposalChooser) {
-    prefSize = htmlProposalChooser.getPreferredSize();
-    prefSize = prefSize.add(this.popup.htmlComp.getInsets());
+    prefSize = htmlProposalChooser.prefSize();
+    prefSize = prefSize.add(this.popup.htmlComp.insets());
   } else {
     prefSize = new scout.Dimension(
       scout.HtmlEnvironment.formColumnWidth,

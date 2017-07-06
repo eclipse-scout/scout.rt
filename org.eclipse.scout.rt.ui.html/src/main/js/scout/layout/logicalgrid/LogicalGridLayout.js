@@ -26,7 +26,7 @@ scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
 scout.LogicalGridLayout.prototype._verifyLayout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.getSize();
+    containerSize = htmlContainer.size();
 
   if (!this.valid || !this.validityBasedOnContainerSize.equals(containerSize)) {
     this.validityBasedOnContainerSize = containerSize;
@@ -64,8 +64,8 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container) {
 scout.LogicalGridLayout.prototype.layout = function($container) {
   this._verifyLayout($container);
   var htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.getAvailableSize(),
-    containerInsets = htmlContainer.getInsets();
+    containerSize = htmlContainer.availableSize(),
+    containerInsets = htmlContainer.insets();
   if (this.minWidthInPixel > 0 && containerSize.width < this.minWidthInPixel) {
     containerSize.width = this.minWidthInPixel;
   }
@@ -85,7 +85,7 @@ scout.LogicalGridLayout.prototype.layout = function($container) {
       r.y += data.topInset;
       r.height -= data.topInset;
     }
-    margins = htmlComp.getMargins();
+    margins = htmlComp.margins();
     r.width -= margins.horizontal();
     r.height -= margins.vertical();
     if (data.fillHorizontal && data.fillVertical) {
@@ -158,7 +158,7 @@ scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag)
     useCount++;
   }
   // insets
-  var insets = scout.HtmlComponent.get($container).getInsets();
+  var insets = scout.HtmlComponent.get($container).insets();
   dim.width += insets.horizontal();
   dim.height += insets.vertical();
   return dim;

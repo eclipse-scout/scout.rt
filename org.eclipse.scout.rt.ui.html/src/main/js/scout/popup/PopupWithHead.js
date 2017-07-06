@@ -225,8 +225,12 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
     $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
   });
 
-  headSize = scout.graphics.getSize(this.$head, true);
-  bodySize = scout.graphics.getSize(this.$body, true);
+  headSize = scout.graphics.size(this.$head, {
+    includeMargin: true
+  });
+  bodySize = scout.graphics.size(this.$body, {
+    includeMargin: true
+  });
   bodySize.width = Math.max(bodySize.width, headSize.width);
   bodyWidth = bodySize.width;
 
@@ -237,8 +241,8 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   pos.top -= parentOffset.top;
 
   left = pos.left;
-  headInsets = scout.graphics.getInsets(this.$head);
-  menuInsets = scout.graphics.getInsets(this.$headBlueprint);
+  headInsets = scout.graphics.insets(this.$head);
+  menuInsets = scout.graphics.insets(this.$headBlueprint);
   top = pos.top - headInsets.top + menuInsets.top;
 
   if (openingDirectionY === 'up') {

@@ -22,7 +22,7 @@ scout.DialogLayout.prototype.layout = function($container) {
 
   var dialogSize, currentBounds,
     htmlComp = this._form.htmlComp,
-    dialogMargins = htmlComp.getMargins(),
+    dialogMargins = htmlComp.margins(),
     windowSize = $container.windowSize(),
     cacheBounds = this._form.readCacheBounds();
 
@@ -31,7 +31,9 @@ scout.DialogLayout.prototype.layout = function($container) {
     currentBounds = cacheBounds;
   } else {
     dialogSize = this.preferredLayoutSize($container);
-    currentBounds = htmlComp.getBounds(); // includes margins
+    currentBounds = htmlComp.cssBounds({
+      includeMargin: true
+    });
   }
 
   dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
@@ -88,7 +90,9 @@ scout.DialogLayout.fitContainerInWindow = function(windowSize, containerPosition
 scout.DialogLayout.positionContainerInWindow = function($container) {
   var
     windowSize = $container.windowSize(),
-    containerSize = scout.HtmlComponent.get($container).getSize(true),
+    containerSize = scout.HtmlComponent.get($container).size({
+      includeMargin: true
+    }),
     left = (windowSize.width - containerSize.width) / 2,
     top = (windowSize.height - containerSize.height) / 2;
 
@@ -102,4 +106,3 @@ scout.DialogLayout.positionContainerInWindow = function($container) {
 
   return new scout.Point(left, top);
 };
-

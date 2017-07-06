@@ -22,7 +22,7 @@ scout.TableLayout.prototype.layout = function($container) {
     controlContainerHeight = 0,
     controlContainerInsets,
     $data = this.table.$data,
-    dataMargins = scout.graphics.getMargins($data),
+    dataMargins = scout.graphics.margins($data),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = this.table.menuBar,
     footer = this.table.footer,
@@ -31,7 +31,7 @@ scout.TableLayout.prototype.layout = function($container) {
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
-    containerSize = htmlContainer.getAvailableSize().subtract(htmlContainer.getInsets()),
+    containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
 
   if (menuBar.visible) {
@@ -39,13 +39,13 @@ scout.TableLayout.prototype.layout = function($container) {
     menuBarHeight = menuBarSize.height;
   }
   if (header) {
-    headerHeight = scout.graphics.getSize(header.$container).height;
+    headerHeight = scout.graphics.size(header.$container).height;
   }
   if (footer) {
     // Layout table footer and add size of footer (including the control content) to 'height'
-    footerHeight = scout.graphics.getSize(footer.$container).height;
+    footerHeight = scout.graphics.size(footer.$container).height;
     controlContainerHeight = footer.computeControlContainerHeight(this.table, footer.selectedControl, !this._dataHeightPositive);
-    controlContainerInsets = scout.graphics.getInsets(footer.$controlContainer);
+    controlContainerInsets = scout.graphics.insets(footer.$controlContainer);
     if (!footer.animating) { // closing or opening: height is about to be changed
       footer.$controlContainer.height(controlContainerHeight);
       footer.$controlContent.outerHeight(controlContainerHeight - controlContainerInsets.vertical());

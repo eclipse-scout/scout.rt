@@ -18,12 +18,12 @@ scout.inherits(scout.TreeBoxLayout, scout.AbstractLayout);
 
 scout.TreeBoxLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    size = htmlContainer.getSize(),
+    size = htmlContainer.size(),
     height = size.height,
     filterBoxHeight;
 
   if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
-    filterBoxHeight = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height;
+    filterBoxHeight = scout.HtmlComponent.get(this.filterBox.$container).prefSize().height;
     height -= filterBoxHeight;
   }
 
@@ -53,21 +53,21 @@ scout.TreeBoxLayout.prototype.preferredLayoutSize = function($container) {
     width += treeBox.$status.outerWidth(true);
   }
 
-  // getSize of tree and size of filterBox
+  // size of tree and size of filterBox
   treeContainer = scout.HtmlComponent.optGet(this.tree.$container);
   if (treeContainer) {
-    prefSizeTree = treeContainer.getPreferredSize()
-      .add(htmlContainer.getInsets())
-      .add(treeContainer.getMargins());
+    prefSizeTree = treeContainer.prefSize()
+      .add(htmlContainer.insets())
+      .add(treeContainer.margins());
   } else {
     prefSizeTree = this.naturalSize(treeBox);
   }
 
   filterContainer = scout.HtmlComponent.optGet(this.filterBox.$container);
   if (filterContainer) {
-    prefSizeFilterBox = filterContainer.getPreferredSize()
-      .add(htmlContainer.getInsets())
-      .add(filterContainer.getMargins());
+    prefSizeFilterBox = filterContainer.prefSize()
+      .add(htmlContainer.insets())
+      .add(filterContainer.margins());
   } else {
     prefSizeTree = this.naturalSize(treeBox);
   }

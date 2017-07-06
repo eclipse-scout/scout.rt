@@ -19,9 +19,9 @@ scout.FormLayout.prototype.layout = function($container) {
     htmlRootGb = this._htmlRootGroupBox(),
     rootGbSize;
 
-  rootGbSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets())
-    .subtract(htmlRootGb.getMargins());
+  rootGbSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets())
+    .subtract(htmlRootGb.margins());
 
   if (this._form.isDialog()) {
     rootGbSize.height -= this._titleHeight();
@@ -36,9 +36,9 @@ scout.FormLayout.prototype.preferredLayoutSize = function($container) {
     htmlRootGb = this._htmlRootGroupBox(),
     prefSize;
 
-  prefSize = htmlRootGb.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(htmlRootGb.getMargins());
+  prefSize = htmlRootGb.prefSize()
+    .add(htmlContainer.insets())
+    .add(htmlRootGb.margins());
   prefSize.height += this._titleHeight();
 
   return prefSize;

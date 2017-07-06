@@ -80,8 +80,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     parentMenu.parentMenu._doActionTogglesSubMenu();
   }
 
-  var actualBounds = this.htmlComp.getBounds();
-  var actualSize = this.htmlComp.getSize();
+  var actualBounds = this.htmlComp.cssBounds();
 
   this.revalidateLayout();
   this.position();
@@ -93,7 +92,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       width: 'auto',
       height: 'auto'
     });
-    var targetSize = this.htmlComp.getSize();
+    var targetSize = this.htmlComp.size();
     parentMenu.$subMenuBody.css('box-shadow', 'none');
     this.htmlComp.setBounds(actualBounds);
     if (this.openingDirectionY !== 'up') {
@@ -101,13 +100,13 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       parentMenu.$subMenuBody.cssTop();
     }
     // move new body to top of popup
-    parentMenu.$subMenuBody.cssHeightAnimated(actualSize.height, parentMenu.$container.cssHeight(), {
+    parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, parentMenu.$container.cssHeight(), {
       duration: duration,
       queue: false
     });
 
     var endTopposition = position.top - this.$body.cssHeight(),
-      startTopposition = 0 - actualSize.height;
+      startTopposition = 0 - actualBounds.height;
 
     parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
       duration: duration,
@@ -134,14 +133,14 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       }.bind(this)
     });
 
-    this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
+    this.$body.cssWidthAnimated(actualBounds.width, targetSize.width, {
       duration: duration,
       progress: this.revalidateLayout.bind(this),
       queue: false
     });
 
-    if (targetSize.height !== actualSize.height) {
-      this.$body.cssHeightAnimated(actualSize.height, targetSize.height, {
+    if (targetSize.height !== actualBounds.height) {
+      this.$body.cssHeightAnimated(actualBounds.height, targetSize.height, {
         duration: duration,
         queue: false
       });
@@ -163,8 +162,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     return;
   }
 
-  var actualBounds = this.htmlComp.getBounds();
-  var actualSize = this.htmlComp.getSize();
+  var actualBounds = this.htmlComp.cssBounds();
 
   parentMenu.parentMenu.$subMenuBody = this.$body;
 
@@ -205,22 +203,21 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       width: 'auto',
       height: 'auto'
     });
-    var targetBounds = this.htmlComp.getBounds();
-    var targetSize = this.htmlComp.getSize();
+    var targetBounds = this.htmlComp.cssBounds();
     this.$body.css('box-shadow', 'none');
     // set container to element
-    this.$body.cssWidthAnimated(actualSize.width, targetSize.width, {
+    this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
       duration: duration,
       progress: this.revalidateLayout.bind(this),
       queue: false
     });
 
-    this.$body.cssHeightAnimated(parentMenu.$container.cssHeight(), targetSize.height, {
+    this.$body.cssHeightAnimated(parentMenu.$container.cssHeight(), targetBounds.height, {
       duration: duration,
       queue: false
     });
 
-    var endTopposition = 0 - targetSize.height,
+    var endTopposition = 0 - targetBounds.height,
       startTopposition = position.top - parentMenu.parentMenu.$subMenuBody.cssHeight(),
       topMargin = 0;
 
@@ -247,12 +244,12 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       }.bind(this)
     });
 
-    if (actualSize.height !== targetSize.height) {
-      parentMenu.parentMenu.$subMenuBody.cssHeightAnimated(actualSize.height, targetSize.height, {
+    if (actualBounds.height !== targetBounds.height) {
+      parentMenu.parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, targetBounds.height, {
         duration: duration,
         queue: false
       });
-      this.$container.cssHeight(actualSize.height, targetSize.height, {
+      this.$container.cssHeight(actualBounds.height, targetBounds.height, {
         duration: duration,
         queue: false
       });
@@ -263,11 +260,11 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
         queue: false
       }).css('overflow', 'visible');
       // ajust top of head and deco
-      this.$head.cssTopAnimated(actualSize.height, targetSize.height, {
+      this.$head.cssTopAnimated(actualBounds.height, targetBounds.height, {
         duration: duration,
         queue: false
       });
-      this.$deco.cssTopAnimated(actualSize.height - 1, targetSize.height - 1, {
+      this.$deco.cssTopAnimated(actualBounds.height - 1, targetBounds.height - 1, {
         duration: duration,
         queue: false
       });

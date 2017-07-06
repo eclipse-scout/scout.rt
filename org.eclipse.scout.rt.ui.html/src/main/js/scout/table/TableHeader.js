@@ -198,7 +198,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     marginLeft = this.table.rowBorderLeftWidth;
   } else if (isLastColumn) {
     marginRight = this.table.rowBorderRightWidth;
-    remainingHeaderSpace = this.$container.width() - this.table.rowWidth + scout.graphics.getInsets(this.table.$data).right;
+    remainingHeaderSpace = this.$container.width() - this.table.rowWidth + scout.graphics.insets(this.table.$data).right;
     $headerResize = $header.next('.table-header-resize');
 
     if (remainingHeaderSpace < menuBarWidth) {

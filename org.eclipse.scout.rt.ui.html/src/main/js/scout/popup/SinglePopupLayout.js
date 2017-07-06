@@ -31,9 +31,9 @@ scout.SinglePopupLayout.prototype.layout = function($container) {
     htmlChild = this._getHtmlSingleChild($container);
   }
   if (htmlChild) {
-    childSize = htmlContainer.getSize()
-      .subtract(htmlContainer.getInsets())
-      .subtract(htmlChild.getMargins());
+    childSize = htmlContainer.size()
+      .subtract(htmlContainer.insets())
+      .subtract(htmlChild.margins());
     htmlChild.setSize(childSize);
   }
 };
@@ -50,9 +50,9 @@ scout.SinglePopupLayout.prototype.preferredLayoutSize = function($container) {
     var prefSize,
       htmlContainer = this.popup.htmlComp;
 
-    prefSize = htmlChild.getPreferredSize()
-      .add(htmlContainer.getInsets())
-      .add(htmlChild.getMargins());
+    prefSize = htmlChild.prefSize()
+      .add(htmlContainer.insets())
+      .add(htmlChild.margins());
 
     return prefSize;
   }

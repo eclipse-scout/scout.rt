@@ -28,9 +28,9 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
 
   scout.SmartFieldPopupLayout.parent.prototype.layout.call(this, $container);
 
-  popupSize = this.popup.htmlComp.getSize();
+  popupSize = this.popup.htmlComp.size();
   if (htmlProposalChooser) {
-    size = popupSize.subtract(this.popup.htmlComp.getInsets());
+    size = popupSize.subtract(this.popup.htmlComp.insets());
     htmlProposalChooser.setSize(size);
   }
   // Reposition because opening direction may have to be switched if popup gets bigger
@@ -49,8 +49,8 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
     fieldBounds = this.popup._field._fieldBounds();
 
   if (htmlProposalChooser) {
-    prefSize = htmlProposalChooser.getPreferredSize();
-    prefSize = prefSize.add(this.popup.htmlComp.getInsets());
+    prefSize = htmlProposalChooser.prefSize();
+    prefSize = prefSize.add(this.popup.htmlComp.insets());
   } else {
     prefSize = new scout.Dimension(
       scout.HtmlEnvironment.formColumnWidth,

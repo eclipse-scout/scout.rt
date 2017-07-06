@@ -20,8 +20,8 @@ scout.OutlineLayout.prototype._layout = function($container) {
 
   scout.OutlineLayout.parent.prototype._layout.call(this, $container);
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if (this.outline.embedDetailContent) {
     var selectedNode = this.outline.selectedNodes[0];
@@ -32,9 +32,9 @@ scout.OutlineLayout.prototype._layout = function($container) {
         // Fix width so that prefSize returns the appropriate height (necessary for elements with text wrap)
         pageHtmlComp.$comp.cssWidth(containerSize.width);
 
-        var prefSize = pageHtmlComp.getPreferredSize();
+        var prefSize = pageHtmlComp.prefSize();
         pageHtmlComp.setSize(new scout.Dimension(containerSize.width, prefSize.height));
-        selectedNode.height = prefSize.height + pageHtmlComp.getMargins().vertical();
+        selectedNode.height = prefSize.height + pageHtmlComp.margins().vertical();
       }
     }
 
@@ -61,7 +61,9 @@ scout.OutlineLayout.prototype._layout = function($container) {
 scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {
   var titleSize = null;
   if (this.outline.titleVisible) {
-    titleSize = scout.graphics.getSize(this.outline.$title, true);
+    titleSize = scout.graphics.size(this.outline.$title, {
+      includeMargin: true
+    });
   }
   scout.OutlineLayout.parent.prototype._setDataHeight.call(this, heightOffset + (titleSize === null ? 0 : titleSize.height));
 };

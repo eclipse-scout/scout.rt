@@ -55,7 +55,7 @@ scout.PopupWindow.prototype._onReady = function() {
 
   // resize browser-window before layout?
   if (this.resizeToPrefSize) {
-    var prefSize = this.htmlComp.getPreferredSize(),
+    var prefSize = this.htmlComp.prefSize(),
     // we cannot simply set the pref. size of the component as window size,
     // since the window "chrome" (window-border, -title and location bar)
     // occupies some space. That's why we measure the difference between

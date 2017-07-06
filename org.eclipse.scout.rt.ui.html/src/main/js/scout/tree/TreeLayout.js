@@ -25,8 +25,8 @@ scout.TreeLayout.prototype._layout = function($container) {
     htmlMenuBar = menuBar.htmlComp,
     htmlContainer = this.tree.htmlComp;
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if (this.tree.toggleBreadcrumbStyleEnabled) {
     this.tree.setBreadcrumbStyleActive(containerSize.width <= this.tree.breadcrumbTogglingThreshold);
@@ -45,7 +45,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
   // Check if width has changed
-  if (htmlContainer.size && htmlContainer.size.width !== htmlContainer.getSize().width) {
+  if (htmlContainer.size && htmlContainer.size.width !== htmlContainer.size().width) {
     if (this.tree.isHorizontalScrollingEnabled()) {
       // Width is only relevant if horizontal scrolling is enabled -> mark as dirty
       this.tree.nodeWidthDirty = true;

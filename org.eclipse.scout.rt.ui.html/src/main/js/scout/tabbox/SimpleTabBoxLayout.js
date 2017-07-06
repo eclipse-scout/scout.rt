@@ -20,12 +20,12 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
     htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
     tabAreaSize ;
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   tabAreaSize = this._layoutTabArea(containerSize);
 
-  viewContentSize = containerSize.subtract(htmlViewContent.getMargins());
+  viewContentSize = containerSize.subtract(htmlViewContent.margins());
   viewContentSize.height -= tabAreaSize.height;
   htmlViewContent.setSize(viewContentSize);
 };
@@ -40,8 +40,8 @@ scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
   }
   // exprected the tab area is layouted dynamically only
   var htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
-    prefSize = htmlViewTabs.getPreferredSize(),
-    margins = htmlViewTabs.getMargins();
+    prefSize = htmlViewTabs.prefSize(),
+    margins = htmlViewTabs.margins();
   var size = new scout.Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
   htmlViewTabs.setSize(size);
   return  size;
@@ -58,13 +58,13 @@ scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container) {
     viewContentSize = new scout.Dimension();
 
   if (htmlViewTabs.isVisible()) {
-    viewTabsSize = htmlViewTabs.getPreferredSize()
-      .add(htmlViewTabs.getMargins());
+    viewTabsSize = htmlViewTabs.prefSize()
+      .add(htmlViewTabs.margins());
   }
 
-  viewContentSize = htmlViewContent.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(htmlViewContent.getMargins());
+  viewContentSize = htmlViewContent.prefSize()
+    .add(htmlContainer.insets())
+    .add(htmlViewContent.margins());
 
   return new scout.Dimension(
     Math.max(viewTabsSize.width, viewContentSize.width),

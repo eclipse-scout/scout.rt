@@ -22,10 +22,12 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     $controls = this._tableFooter._$controls,
     $info = this._tableFooter._$info,
     $infoItems = $info.find('.table-info-item'),
-    containerWidth = scout.graphics.getSize($container).width;
+    containerWidth = scout.graphics.size($container).width;
 
-  controlsWidth = scout.graphics.getSize($controls, true).width;
-  infoWidth = scout.graphics.getSize($info).width;
+  controlsWidth = scout.graphics.size($controls, {
+    includeMargin: true
+  }).width;
+  infoWidth = scout.graphics.size($info).width;
 
   // Remove width to make sure elements are as width as they want to be
   $infoItems.each(function() {
@@ -43,7 +45,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     this._tableFooter._compactStyle = false;
     this._tableFooter._renderInfo();
   }
-  infoWidth = scout.graphics.getSize($info).width;
+  infoWidth = scout.graphics.size($info).width;
   if (controlsWidth + infoWidth <= containerWidth) {
     // Make sure table info tooltip is not shown anymore (only available in compact style)
     if (this._tableFooter._tableInfoTooltip) {
@@ -57,7 +59,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     this._tableFooter._compactStyle = true;
     this._tableFooter._renderInfo();
 
-    infoWidth = scout.graphics.getSize($info).width;
+    infoWidth = scout.graphics.size($info).width;
     if (controlsWidth + infoWidth <= containerWidth) {
       contentFits = true;
     }

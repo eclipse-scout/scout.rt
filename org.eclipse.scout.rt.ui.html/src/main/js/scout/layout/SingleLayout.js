@@ -20,8 +20,8 @@ scout.inherits(scout.SingleLayout, scout.AbstractLayout);
 
 scout.SingleLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container);
-  var childSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets()),
+  var childSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets()),
     htmlChild = this._htmlChild;
 
   if (!htmlChild) {
@@ -38,7 +38,7 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
     htmlChild = this._getHtmlSingleChild($container);
   }
   if (htmlChild) {
-    return htmlChild.getPreferredSize();
+    return htmlChild.prefSize();
   } else {
     return new scout.Dimension(1, 1);
   }

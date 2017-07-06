@@ -20,9 +20,9 @@ scout.CellEditorPopupLayout.prototype.layout = function($container) {
   var size,
     htmlField = this._field.htmlComp;
 
-  size = this._htmlContainer.getAvailableSize()
-    .subtract(this._htmlContainer.getInsets())
-    .subtract(htmlField.getMargins());
+  size = this._htmlContainer.availableSize()
+    .subtract(this._htmlContainer.insets())
+    .subtract(htmlField.margins());
   htmlField.setSize(size);
 };
 

@@ -72,13 +72,13 @@ describe("HtmlComponent", function() {
 
   });
 
-  describe("getSize", function() {
+  describe("size", function() {
 
     addWidthHeightMock(jqueryMock);
 
     it("returns getBoundingClientRect() of JQuery comp", function() {
       var htmlComp = scout.HtmlComponent.install(jqueryMock, session);
-      var size = htmlComp.getSize();
+      var size = htmlComp.size();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
     });
@@ -100,7 +100,7 @@ describe("HtmlComponent", function() {
     it("accepts scout.Dimension as single argument", function() {
       spyOn($comp, 'css').and.callThrough();
       htmlComp.setSize(new scout.Dimension(6, 7));
-      var size = htmlComp.getSize();
+      var size = htmlComp.size();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
       expect($comp.css).toHaveBeenCalledWith('width', '6px');
@@ -115,7 +115,7 @@ describe("HtmlComponent", function() {
 
   });
 
-  describe("getInsets", function() {
+  describe("insets", function() {
 
     it("reads padding, margin and border correctly", function() {
       var jqueryObj = $('<div>').css({
@@ -135,38 +135,10 @@ describe("HtmlComponent", function() {
       });
       var htmlComp = scout.HtmlComponent.install(jqueryObj, session);
       var expected = new scout.Insets(15, 18, 21, 24);
-      var actual = htmlComp.getInsets({
+      var actual = htmlComp.insets({
         includeMargin: true
       });
       expect(actual).toEqual(expected);
-    });
-
-  });
-
-  describe("getBounds", function() {
-
-    var jqueryMock = {
-      css: function(key) {
-        if (key === 'top') {
-          return '5px';
-        } else if (key === 'left') {
-          return '4px';
-        } else {
-          throw new Error('unexpected CSS key');
-        }
-      }
-    };
-
-    addWidthHeightMock(jqueryMock);
-
-    it("returns bounds without 'px'", function() {
-      spyOn(jqueryMock, 'outerWidth').and.callThrough();
-      spyOn(jqueryMock, 'outerHeight').and.callThrough();
-      var actual = scout.graphics.getBounds(jqueryMock);
-      var expected = new scout.Rectangle(4, 5, 6, 7);
-      expect(actual).toEqual(expected);
-      expect(jqueryMock.outerWidth).toHaveBeenCalledWith(true);
-      expect(jqueryMock.outerHeight).toHaveBeenCalledWith(true);
     });
 
   });

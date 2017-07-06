@@ -17,7 +17,7 @@ scout.RowLayout.prototype.layout = function($container) {
   $container.children().each(function() {
     var htmlComp = scout.HtmlComponent.optGet($(this));
     if (htmlComp) {
-      htmlComp.setSize(htmlComp.getPreferredSize());
+      htmlComp.setSize(htmlComp.prefSize());
     }
   });
 };
@@ -31,14 +31,14 @@ scout.RowLayout.prototype.preferredLayoutSize = function($container) {
     var htmlChildPrefSize,
       htmlChild = scout.HtmlComponent.optGet($(this));
     if (htmlChild) {
-      htmlChildPrefSize = htmlChild.getPreferredSize()
-        .add(htmlChild.getMargins());
+      htmlChildPrefSize = htmlChild.prefSize()
+        .add(htmlChild.margins());
       maxWidth = Math.max(htmlChildPrefSize.width, maxWidth);
       prefSize.height += htmlChildPrefSize.height;
       prefSize.width = maxWidth;
     }
   });
 
-  prefSize = prefSize.add(htmlContainer.getInsets());
+  prefSize = prefSize.add(htmlContainer.insets());
   return prefSize;
 };

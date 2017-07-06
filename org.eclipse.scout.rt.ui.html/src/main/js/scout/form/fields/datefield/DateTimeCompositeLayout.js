@@ -29,15 +29,15 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     htmlDateField = ($dateField ? scout.HtmlComponent.get($dateField) : null),
     htmlTimeField = ($timeField ? scout.HtmlComponent.get($timeField) : null);
 
-  var availableSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  var availableSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   var dateFieldSize, timeFieldSize;
   // --- Date and time ---
   if (htmlDateField && htmlTimeField) {
     // Field size
-    var dateFieldMargins = htmlDateField.getMargins();
-    var timeFieldMargins = htmlTimeField.getMargins();
+    var dateFieldMargins = htmlDateField.margins();
+    var timeFieldMargins = htmlTimeField.margins();
     var compositeMargins = new scout.Insets(
       Math.max(dateFieldMargins.top, timeFieldMargins.top),
       Math.max(dateFieldMargins.right, timeFieldMargins.right),
@@ -81,7 +81,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
   // --- Date only ---
   else if (htmlDateField) {
     // Field size
-    dateFieldSize = availableSize.subtract(htmlDateField.getMargins());
+    dateFieldSize = availableSize.subtract(htmlDateField.margins());
     htmlDateField.setSize(dateFieldSize);
 
     // Icons
@@ -100,7 +100,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
   // --- Time only ---
   else if (htmlTimeField) {
     // Field size
-    timeFieldSize = availableSize.subtract(htmlTimeField.getMargins());
+    timeFieldSize = availableSize.subtract(htmlTimeField.margins());
     htmlTimeField.setSize(timeFieldSize);
 
     // Icons

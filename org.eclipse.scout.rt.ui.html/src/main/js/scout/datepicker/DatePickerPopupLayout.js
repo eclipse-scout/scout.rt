@@ -21,9 +21,9 @@ scout.DatePickerPopupLayout.prototype.layout = function($container) {
 
   scout.DatePickerPopupLayout.parent.prototype.layout.call(this, $container);
 
-  size = htmlComp.getSize()
-    .subtract(htmlComp.getInsets())
-    .subtract(htmlPicker.getMargins());
+  size = htmlComp.size()
+    .subtract(htmlComp.insets())
+    .subtract(htmlPicker.margins());
 
   htmlPicker.setSize(size);
 
@@ -39,9 +39,9 @@ scout.DatePickerPopupLayout.prototype.preferredLayoutSize = function($container)
     htmlComp = this.popup.htmlComp,
     htmlPicker = this.popup.picker.htmlComp;
 
-  prefSize = htmlPicker.getPreferredSize()
-    .add(htmlComp.getInsets())
-    .add(htmlPicker.getMargins());
+  prefSize = htmlPicker.prefSize()
+    .add(htmlComp.insets())
+    .add(htmlPicker.margins());
 
   return prefSize;
 };

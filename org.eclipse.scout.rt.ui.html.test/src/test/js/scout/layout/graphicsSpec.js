@@ -14,7 +14,7 @@ describe("graphics", function() {
     setFixtures(sandbox());
   });
 
-  describe("getBounds", function() {
+  describe("cssBounds", function() {
 
     var $div = $('<div>')
       .css('left', '6px')
@@ -23,8 +23,18 @@ describe("graphics", function() {
       .css('height', '9px')
       .css('margin', '10px');
 
-    it("returns JQuery.outerWidth/Height(true)", function() {
-      var rect = scout.graphics.getBounds($div);
+    it("returns width, height, x and y", function() {
+      var rect = scout.graphics.cssBounds($div);
+      expect(rect.x).toBe(6);
+      expect(rect.y).toBe(7);
+      expect(rect.width).toBe(8);
+      expect(rect.height).toBe(9);
+    });
+
+    it("returns width+margin, height+margin, x and y with includeMargin=true", function() {
+      var rect = scout.graphics.cssBounds($div, {
+        includeMargin: true
+      });
       expect(rect.x).toBe(6);
       expect(rect.y).toBe(7);
       expect(rect.width).toBe(28);
@@ -35,7 +45,7 @@ describe("graphics", function() {
       $div
         .css('left', 'auto')
         .css('top', 'auto');
-      var rect = scout.graphics.getBounds($div);
+      var rect = scout.graphics.cssBounds($div);
       expect(rect.x).toBe(0);
       expect(rect.y).toBe(0);
     });

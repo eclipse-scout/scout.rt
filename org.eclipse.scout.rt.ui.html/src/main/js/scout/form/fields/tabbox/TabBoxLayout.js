@@ -26,12 +26,12 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     $status = this._tabBox.$status,
     statusPosition = this._tabBox.statusPosition;
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if (htmlTabArea.isVisible()) {
-    tabAreaMargins = htmlTabArea.getMargins();
-    tabAreaHeight = htmlTabArea.getPreferredSize().height;
+    tabAreaMargins = htmlTabArea.margins();
+    tabAreaHeight = htmlTabArea.prefSize().height;
     tabAreaWidth = containerSize.subtract(tabAreaMargins).width;
     if ($status && $status.isVisible()) {
       this._layoutStatus();
@@ -44,14 +44,14 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaSize = innerTabAreaSize.add(tabAreaMargins);
   }
 
-  tabContentSize = containerSize.subtract(htmlTabContent.getMargins());
+  tabContentSize = containerSize.subtract(htmlTabContent.margins());
   tabContentSize.height -= tabAreaSize.height;
   htmlTabContent.setSize(tabContentSize);
 };
 
 scout.TabBoxLayout.prototype._layoutStatus = function() {
   var htmlContainer = this._tabBox.htmlComp,
-    containerPadding = htmlContainer.getInsets({
+    containerPadding = htmlContainer.insets({
       includeBorder: false
     }),
     top = containerPadding.top,
@@ -59,7 +59,7 @@ scout.TabBoxLayout.prototype._layoutStatus = function() {
     $tabArea = this._tabBox._$tabArea,
     tabAreaInnerHeight = $tabArea.innerHeight(),
     $status = this._tabBox.$status,
-    statusMargins = scout.graphics.getMargins($status),
+    statusMargins = scout.graphics.margins($status),
     statusTop = top,
     statusPosition = this._tabBox.statusPosition,
     statusHeight = tabAreaInnerHeight - statusMargins.vertical();
@@ -88,13 +88,13 @@ scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
     tabContentSize = new scout.Dimension();
 
   if (htmlTabArea.isVisible()) {
-    tabAreaSize = htmlTabArea.getPreferredSize()
-      .add(htmlTabArea.getMargins());
+    tabAreaSize = htmlTabArea.prefSize()
+      .add(htmlTabArea.margins());
   }
 
-  tabContentSize = htmlTabContent.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(htmlTabContent.getMargins());
+  tabContentSize = htmlTabContent.prefSize()
+    .add(htmlContainer.insets())
+    .add(htmlTabContent.margins());
 
   return new scout.Dimension(
     Math.max(tabAreaSize.width, tabContentSize.width),

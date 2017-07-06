@@ -21,32 +21,34 @@ scout.inherits(scout.DesktopHeaderLayout, scout.AbstractLayout);
 scout.DesktopHeaderLayout.prototype.layout = function($container) {
   var viewButtonBoxPrefSize, toolBoxPrefSize,
     htmlContainer = this.header.htmlComp,
-    containerSize = htmlContainer.getSize(),
+    containerSize = htmlContainer.size(),
     toolBox = this.header.toolBox,
     viewButtonBox = this.header.viewButtonBox,
     tabArea = this.header.tabArea,
     smallTabsPrefSize = tabArea.htmlComp.layout.smallPrefSize(),
-    tabsPrefSize = tabArea.htmlComp.getPreferredSize(),
+    tabsPrefSize = tabArea.htmlComp.prefSize(),
     tabsWidth = 0, // = available width for tabs
     logoWidth = 0,
     viewButtonBoxWidth = 0,
     toolBoxWidth = 0;
 
-  containerSize = containerSize.subtract(htmlContainer.getInsets());
+  containerSize = containerSize.subtract(htmlContainer.insets());
 
   if (this.header.logo) {
-    logoWidth = scout.graphics.getSize(this.header.logo.$container, true).width;
+    logoWidth = scout.graphics.size(this.header.logo.$container, {
+      includeMargin: true
+    }).width;
   }
 
   if (viewButtonBox) {
-    viewButtonBoxPrefSize = viewButtonBox.htmlComp.getPreferredSize();
+    viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize();
     viewButtonBoxWidth = viewButtonBoxPrefSize.width;
-    viewButtonBox.htmlComp.setSize(viewButtonBoxPrefSize.subtract(viewButtonBox.htmlComp.getMargins()));
+    viewButtonBox.htmlComp.setSize(viewButtonBoxPrefSize.subtract(viewButtonBox.htmlComp.margins()));
   }
   tabArea.htmlComp.$comp.cssLeft(viewButtonBoxWidth);
 
   if (toolBox) {
-    toolBoxPrefSize = toolBox.htmlComp.getPreferredSize();
+    toolBoxPrefSize = toolBox.htmlComp.prefSize();
     toolBoxWidth = toolBoxPrefSize.width;
     setToolBoxSize();
     setToolBoxLocation();
@@ -110,7 +112,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   function setToolBoxSize() {
-    toolBox.htmlComp.setSize(new scout.Dimension(toolBoxWidth, toolBoxPrefSize.height).subtract(toolBox.htmlComp.getMargins()));
+    toolBox.htmlComp.setSize(new scout.Dimension(toolBoxWidth, toolBoxPrefSize.height).subtract(toolBox.htmlComp.margins()));
   }
 
   function setToolBoxLocation() {

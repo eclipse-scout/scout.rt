@@ -17,17 +17,17 @@ scout.inherits(scout.DesktopNavigationLayout, scout.AbstractLayout);
 scout.DesktopNavigationLayout.prototype.layout = function($container) {
   var bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
     htmlContainer = this.navigation.htmlComp,
-    containerSize = htmlContainer.getSize(),
+    containerSize = htmlContainer.size(),
     htmlBody = this.navigation.htmlCompBody,
     toolBox = this.navigation.toolBox,
     viewButtonBox = this.navigation.viewButtonBox,
     viewButtonBoxHeight = 0,
     viewButtonBoxWidth = 0;
 
-  containerSize = containerSize.subtract(htmlContainer.getInsets());
+  containerSize = containerSize.subtract(htmlContainer.insets());
 
   if (viewButtonBox) {
-    viewButtonBoxPrefSize = viewButtonBox.htmlComp.getPreferredSize();
+    viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize();
     viewButtonBoxHeight = viewButtonBoxPrefSize.height;
     viewButtonBoxWidth = containerSize.width;
     if (toolBox) {
@@ -35,7 +35,7 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
     }
 
     viewButtonBoxSize = new scout.Dimension(viewButtonBoxWidth, viewButtonBoxHeight)
-      .subtract(viewButtonBox.htmlComp.getMargins());
+      .subtract(viewButtonBox.htmlComp.margins());
     viewButtonBox.htmlComp.setSize(viewButtonBoxSize);
   }
 
@@ -45,7 +45,7 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
   }
 
   bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonBoxHeight)
-    .subtract(htmlBody.getMargins());
+    .subtract(htmlBody.margins());
   htmlBody.setSize(bodySize);
   htmlBody.$comp.cssTop(viewButtonBoxHeight);
 };
@@ -56,23 +56,23 @@ scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($containe
     toolBox = this.navigation.toolBox,
     viewButtonBox = this.navigation.viewButtonBox;
 
-  var prefSize = htmlBody.getPreferredSize();
+  var prefSize = htmlBody.prefSize();
 
   var prefSizeBoxes = new scout.Dimension(0, 0);
   if (viewButtonBox) {
-    var prefSizeViewButtonBox = viewButtonBox.htmlComp.getPreferredSize();
+    var prefSizeViewButtonBox = viewButtonBox.htmlComp.prefSize();
     prefSizeBoxes.width += prefSizeViewButtonBox.width;
     prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeViewButtonBox.height);
   }
   if (toolBox) {
-    var prefSizeToolBox = toolBox.htmlComp.getPreferredSize();
+    var prefSizeToolBox = toolBox.htmlComp.prefSize();
     prefSizeBoxes.width += prefSizeToolBox.width;
     prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeToolBox.height);
   }
 
   prefSize.height += prefSizeBoxes.height;
   prefSize.width = Math.max(prefSize.width, prefSizeBoxes.width);
-  prefSize = prefSize.add(htmlContainer.getInsets());
+  prefSize = prefSize.add(htmlContainer.insets());
 
   return prefSize;
 };

@@ -254,8 +254,8 @@ scout.BenchColumn.prototype._updateSplitterMovable = function() {
 
 scout.BenchColumn.prototype._onSplitterMove = function(event) {
   var splitterIndex = this.components.indexOf(event.source);
-  if (splitterIndex > 0 /*cannot be 0 since first element is a BenchColumn*/ ) {
-    var diff = event.position - event.source.htmlComp.getBounds().y - event.source.htmlComp.getMargins().top;
+  if (splitterIndex > 0 /* cannot be 0 since first element is a BenchColumn */ ) {
+    var diff = event.position - event.source.htmlComp.cssBounds().y - event.source.htmlComp.margins().top;
     event.source.getLayoutData().diff = diff;
     this.revalidateLayout();
     event.source.getLayoutData().diff = null;

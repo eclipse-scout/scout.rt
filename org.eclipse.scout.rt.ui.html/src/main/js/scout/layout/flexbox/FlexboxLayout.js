@@ -96,10 +96,10 @@ scout.FlexboxLayout.prototype._computeCacheKey = function(childCount) {
 scout.FlexboxLayout.prototype.layout = function($container) {
   var children = this._getChildren($container),
     htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.getAvailableSize(),
+    containerSize = htmlContainer.availableSize(),
     splitterWithDelta;
 
-  containerSize = containerSize.subtract(htmlContainer.getInsets());
+  containerSize = containerSize.subtract(htmlContainer.insets());
 
   splitterWithDelta = children.filter(function(c) {
     return c.layoutData.diff;
@@ -216,10 +216,10 @@ scout.FlexboxLayout.prototype._adjust = function(children, delta, getWeightFunct
 
 scout.FlexboxLayout.prototype._getPreferredSize = function(htmlComp) {
   var prefSize;
-  prefSize = htmlComp.getPreferredSize({
+  prefSize = htmlComp.prefSize({
       useCssSize: true
     })
-    .add(htmlComp.getMargins());
+    .add(htmlComp.margins());
   return prefSize;
 };
 
@@ -318,8 +318,8 @@ scout.FlexboxLayout.prototype._getHeight = function(dimension) {
 
 scout.FlexboxLayout.prototype._layoutFromLayoutDataRow = function(children, containerSize) {
   children.reduce(function(x, comp) {
-    var margins = comp.getMargins();
-    var insets = comp.getInsets();
+    var margins = comp.margins();
+    var insets = comp.insets();
     var w = comp.layoutData.sizePx;
     var bounds = new scout.Rectangle(x - insets.left - margins.left, 0, w + insets.left + insets.right, containerSize.height);
     comp.setBounds(bounds);
@@ -329,8 +329,8 @@ scout.FlexboxLayout.prototype._layoutFromLayoutDataRow = function(children, cont
 
 scout.FlexboxLayout.prototype._layoutFromLayoutDataColumn = function(children, containerSize) {
   children.reduce(function(y, comp) {
-    var margins = comp.getMargins();
-    var insets = comp.getInsets();
+    var margins = comp.margins();
+    var insets = comp.insets();
     var h = comp.layoutData.sizePx;
     var bounds = new scout.Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
     comp.setBounds(bounds);

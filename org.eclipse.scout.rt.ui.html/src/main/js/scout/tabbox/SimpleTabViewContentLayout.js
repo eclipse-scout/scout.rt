@@ -21,9 +21,9 @@ scout.SimpleTabViewContentLayout.prototype.layout = function($container) {
   }
 
   var htmlContainer = scout.HtmlComponent.get($container);
-  var size = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets())
-    .subtract(currentView.htmlComp.getMargins());
+  var size = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets())
+    .subtract(currentView.htmlComp.margins());
 
   currentView.htmlComp.setSize(size);
 };
@@ -35,9 +35,9 @@ scout.SimpleTabViewContentLayout.prototype.preferredLayoutSize = function($conta
   }
 
   var htmlContainer = scout.HtmlComponent.get($container);
-  var prefSize = currentView.htmlComp.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(currentView.htmlComp.getMargins());
+  var prefSize = currentView.htmlComp.prefSize()
+    .add(htmlContainer.insets())
+    .add(currentView.htmlComp.margins());
 
   return prefSize;
 };

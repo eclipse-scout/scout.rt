@@ -20,10 +20,10 @@ scout.FormMenuPopupLayout.prototype.layout = function($container) {
 
   scout.FormMenuPopupLayout.parent.prototype.layout.call(this, $container);
 
-  popupSize = scout.graphics.getSize(this.popup.$body);
+  popupSize = scout.graphics.size(this.popup.$body);
 
   // set size of form
-  popupSize = popupSize.subtract(scout.graphics.getInsets(this.popup.$body));
+  popupSize = popupSize.subtract(scout.graphics.insets(this.popup.$body));
   htmlForm.setSize(popupSize);
 };
 
@@ -32,12 +32,12 @@ scout.FormMenuPopupLayout.prototype.preferredLayoutSize = function($container) {
     htmlForm = this.popup.form.htmlComp,
     prefSize;
 
-  prefSize = htmlForm.getPreferredSize()
-    .add(htmlComp.getInsets())
-    .add(scout.graphics.getInsets(this.popup.$body, {
+  prefSize = htmlForm.prefSize()
+    .add(htmlComp.insets())
+    .add(scout.graphics.insets(this.popup.$body, {
       includeMargin: true
     }))
-    .add(htmlForm.getMargins());
+    .add(htmlForm.margins());
 
   return prefSize;
 };

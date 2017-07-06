@@ -29,7 +29,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
   var bounds,
     tabArea = $container[0],
-    clientWidth = tabArea.clientWidth - scout.graphics.getInsets($container).horizontal(),
+    clientWidth = tabArea.clientWidth - scout.graphics.insets($container).horizontal(),
     scrollWidth = tabArea.scrollWidth,
     menuBar = this._tabBox.menuBar,
     $status = this._tabBox.$status,
@@ -37,7 +37,9 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     statusPosition = this._tabBox.statusPosition;
 
   // If tab area contains a menubar, less space is available
-  clientWidth -= scout.graphics.getSize(menuBar.$container, true).width;
+  clientWidth -= scout.graphics.size(menuBar.$container, {
+    includeMargin: true
+  }).width;
 
   if (statusPosition === scout.FormField.StatusPosition.TOP) {
     // Status on top means it is inside the tab area
@@ -86,7 +88,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
       if (clientWidth > bounds.width) {
         // in case of overflow, place selected tab at the left-most position...
-        var horizontalInsets = scout.graphics.getInsets($container).horizontal();
+        var horizontalInsets = scout.graphics.insets($container).horizontal();
 
         var viewWidth = bounds.width,
           delta = bounds.x - horizontalInsets, // delta used to start from x=0

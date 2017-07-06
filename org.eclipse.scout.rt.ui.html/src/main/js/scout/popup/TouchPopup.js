@@ -57,7 +57,7 @@ scout.TouchPopup.prototype._createLayout = function() {
  * @override Popup.js
  */
 scout.TouchPopup.prototype.prefLocation = function(openingDirectionY) {
-  var popupSize = this.htmlComp.getPreferredSize(),
+  var popupSize = this.htmlComp.prefSize(),
     windowWidth = this.$container.window().width(),
     x = Math.max(this.windowPaddingX, (windowWidth - popupSize.width) / 2);
   return new scout.Point(x, 0);

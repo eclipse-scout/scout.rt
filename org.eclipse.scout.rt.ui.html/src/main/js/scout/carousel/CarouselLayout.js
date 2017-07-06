@@ -20,15 +20,15 @@ scout.CarouselLayout.prototype.layout = function($container) {
   // recalculate style transformation after layout
   this.carousel.recalcTransformation();
 
-  var filmstripSize = this.carousel.htmlComp.getAvailableSize()
-    .subtract(this.carousel.htmlComp.getInsets())
-    .subtract(this.carousel.htmlCompFilmstrip.getMargins());
-  var itemSize = this.carousel.htmlComp.getAvailableSize()
-    .subtract(this.carousel.htmlComp.getInsets())
-    .subtract(this.carousel.htmlCompFilmstrip.getMargins());
+  var filmstripSize = this.carousel.htmlComp.availableSize()
+    .subtract(this.carousel.htmlComp.insets())
+    .subtract(this.carousel.htmlCompFilmstrip.margins());
+  var itemSize = this.carousel.htmlComp.availableSize()
+    .subtract(this.carousel.htmlComp.insets())
+    .subtract(this.carousel.htmlCompFilmstrip.margins());
 
   if (this.carousel.statusEnabled && this.carousel.htmlCompStatus) {
-    var carouselStatusSize = this.carousel.htmlCompStatus.getSize().add(this.carousel.htmlCompStatus.getMargins());
+    var carouselStatusSize = this.carousel.htmlCompStatus.size().add(this.carousel.htmlCompStatus.margins());
 
     filmstripSize.height -= carouselStatusSize.height;
     itemSize.height -= carouselStatusSize.height;
@@ -46,8 +46,8 @@ scout.CarouselLayout.prototype.layout = function($container) {
 
 scout.CarouselLayout.prototype.preferredLayoutSize = function($container) {
   var dim = (this.carousel.currentIndex < this.carousel.$carouselItems.length && this.carousel.currentIndex >= 0) ?
-    scout.HtmlComponent.get(this.carousel.$carouselItems[this.carousel.currentIndex]).getPreferredSize() :
+    scout.HtmlComponent.get(this.carousel.$carouselItems[this.carousel.currentIndex]).prefSize() :
     new scout.Dimension(1, 1);
-  dim += this.carousel.htmlCompStatus.getSize().height;
+  dim += this.carousel.htmlCompStatus.size().height;
   return dim;
 };

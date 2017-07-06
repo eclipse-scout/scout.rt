@@ -27,18 +27,18 @@ scout.PageLayout.prototype.layout = function($container) {
     detailMenuBar = this.outline.detailMenuBar,
     detailMenuBarHeight = 0;
 
-  containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if (nodeMenuBar.visible) {
-    nodeMenuBarWidth = nodeMenuBar.htmlComp.getPreferredSize().width;
+    nodeMenuBarWidth = nodeMenuBar.htmlComp.prefSize().width;
     $text.cssWidth(containerSize.width - nodeMenuBarWidth);
   }
 
   if (detailMenuBar.visible) {
-    detailMenuBarHeight = detailMenuBar.htmlComp.getPreferredSize().height;
+    detailMenuBarHeight = detailMenuBar.htmlComp.prefSize().height;
     detailMenuBarSize = new scout.Dimension(containerSize.width, detailMenuBarHeight)
-      .subtract(detailMenuBar.htmlComp.getMargins());
+      .subtract(detailMenuBar.htmlComp.margins());
     detailMenuBar.htmlComp.setSize(detailMenuBarSize);
   }
 
@@ -64,11 +64,11 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
     nodeMenuBar = this.outline.nodeMenuBar,
     nodeMenuBarWidth = 0;
 
-  containerSize = htmlContainer.getSize()
-    .subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.size()
+    .subtract(htmlContainer.insets());
 
   if (nodeMenuBar.visible) {
-    nodeMenuBarWidth = nodeMenuBar.htmlComp.getPreferredSize().width;
+    nodeMenuBarWidth = nodeMenuBar.htmlComp.prefSize().width;
   }
 
   // needs a width to be able to calculate the pref height -> container width needs to be correct already
@@ -83,14 +83,14 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   titlePrefHeight = Math.max(textHeight, iconHeight);
 
   if (detailMenuBar.visible) {
-    detailMenuBarPrefSize = detailMenuBar.htmlComp.getPreferredSize();
+    detailMenuBarPrefSize = detailMenuBar.htmlComp.prefSize();
   }
   if (this.outline.detailContent) {
     // Table row detail may contain wrapped text as well, but since it uses the full width there is no need to give a width hint
-    detailContentPrefSize = this.outline.detailContent.htmlComp.getPreferredSize();
+    detailContentPrefSize = this.outline.detailContent.htmlComp.prefSize();
   }
 
   prefSize = new scout.Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
-  prefSize = prefSize.add(htmlContainer.getInsets());
+  prefSize = prefSize.add(htmlContainer.insets());
   return prefSize;
 };

@@ -36,7 +36,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
     if (desktop.navigationVisible) {
       htmlNavigation = navigation.htmlComp;
       navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
-        .subtract(htmlNavigation.getMargins());
+        .subtract(htmlNavigation.margins());
       htmlNavigation.setSize(navigationSize);
     }
   }
@@ -52,7 +52,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
 
       // sizing
       headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
-        .subtract(htmlHeader.getMargins());
+        .subtract(htmlHeader.margins());
       if (!animated || fullWidthNavigation) {
         htmlHeader.setSize(headerSize);
       }
@@ -78,7 +78,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
 
       // sizing
       benchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
-        .subtract(htmlBench.getMargins());
+        .subtract(htmlBench.margins());
       if (!animated || fullWidthNavigation) {
         htmlBench.setSize(benchSize);
       }
@@ -131,9 +131,9 @@ scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size
 
 scout.DesktopLayout.prototype.containerSize = function() {
   var htmlContainer = this.desktop.htmlComp,
-    containerSize = htmlContainer.getAvailableSize();
+    containerSize = htmlContainer.availableSize();
 
-  return containerSize.subtract(htmlContainer.getInsets());
+  return containerSize.subtract(htmlContainer.insets());
 };
 
 scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize) {

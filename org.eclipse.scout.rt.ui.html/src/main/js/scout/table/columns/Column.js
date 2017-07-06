@@ -479,7 +479,7 @@ scout.Column.prototype.calculateOptimalWidth = function() {
   this.table.$data.append($tmp);
   var optimalWidth = this.minWidth;
   $tmp.children().each(function() {
-    optimalWidth = Math.max(optimalWidth, scout.graphics.getSize($(this)).width);
+    optimalWidth = Math.max(optimalWidth, scout.graphics.size($(this)).width);
   });
 
   // Remove

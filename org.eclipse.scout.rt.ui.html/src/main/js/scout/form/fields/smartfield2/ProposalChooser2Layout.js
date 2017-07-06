@@ -149,16 +149,16 @@ scout.ProposalChooser2Layout.prototype.layout = function($container) {
   var filterPrefSize,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlComp = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
-    size = htmlContainer.getSize().subtract(htmlContainer.getInsets()),
+    size = htmlContainer.size().subtract(htmlContainer.insets()),
     $status = this._proposalChooser.$status,
     hasStatus = $status && $status.isVisible(),
     filter = this._proposalChooser.activeFilterGroup;
 
   if (hasStatus) {
-    size.height -= scout.graphics.getSize($status).height;
+    size.height -= scout.graphics.size($status).height;
   }
   if (filter) {
-    filterPrefSize = filter.htmlComp.getPreferredSize();
+    filterPrefSize = filter.htmlComp.prefSize();
     size.height -= filterPrefSize.height;
   }
 
@@ -191,7 +191,7 @@ scout.ProposalChooser2Layout.prototype.preferredLayoutSize = function($container
     $parent = $container.parent();
 
   this._typeHandler.prepare($container, this);
-  modelSize = this._proposalChooser.model.htmlComp.getPreferredSize();
+  modelSize = this._proposalChooser.model.htmlComp.prefSize();
   prefSize = modelSize;
   detachHelper._storeScrollPositions($container);
 
@@ -231,10 +231,10 @@ scout.ProposalChooser2Layout.prototype.preferredLayoutSize = function($container
   }
 
   if (filter) {
-    filterPrefSize = filter.htmlComp.getPreferredSize();
+    filterPrefSize = filter.htmlComp.prefSize();
     prefSize = new scout.Dimension(Math.max(prefSize.width, filterPrefSize.width), prefSize.height + filterPrefSize.height);
   }
 
   $container.toggleClass('empty', modelSize.height === 0);
-  return prefSize.add(htmlComp.getInsets());
+  return prefSize.add(htmlComp.insets());
 };

@@ -142,8 +142,8 @@ scout.DatePicker.prototype._findMonthByViewDate = function(viewDate) {
  * @returns the x coordinate of the scrollable if the given month should be displayed
  */
 scout.DatePicker.prototype._scrollableLeftForMonth = function(month) {
-  var scrollableInsets = scout.graphics.getInsets(this.$scrollable);
-  var monthMargins = scout.graphics.getMargins(month.$container);
+  var scrollableInsets = scout.graphics.insets(this.$scrollable);
+  var monthMargins = scout.graphics.margins(month.$container);
   return -1 * (month.$container.position().left - monthMargins.left - scrollableInsets.left);
 };
 

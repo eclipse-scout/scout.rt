@@ -35,7 +35,7 @@ scout.OutlineOverview.prototype._render = function() {
 scout.OutlineOverview.prototype._attach = function() {
   this.$parent.append(this.$container);
   var htmlParent = this.htmlComp.getParent();
-  this.htmlComp.setSize(htmlParent.getSize());
+  this.htmlComp.setSize(htmlParent.size());
   this.session.detachHelper.afterAttach(this.$container);
   scout.OutlineOverview.parent.prototype._attach.call(this);
 };

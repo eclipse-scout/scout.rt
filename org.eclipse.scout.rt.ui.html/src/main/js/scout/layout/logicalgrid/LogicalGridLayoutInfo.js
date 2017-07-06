@@ -486,5 +486,5 @@ scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
 };
 
 scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
-  return scout.HtmlComponent.get($comp).getPreferredSize();
+  return scout.HtmlComponent.get($comp).prefSize();
 };

@@ -169,7 +169,7 @@ scout.TableFooter.prototype._renderResizer = function() {
       // Calculate new height of table control container
       var newHeight = Math.min(startHeight - dx, maxHeight);
       this.$controlContainer.height(newHeight);
-      var controlContainerInsets = scout.graphics.getInsets(this.$controlContainer);
+      var controlContainerInsets = scout.graphics.insets(this.$controlContainer);
       this.$controlContent.outerHeight(newHeight - controlContainerInsets.vertical());
       this._revalidateTableLayout();
     }
@@ -421,7 +421,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
 
   var allowedControlHeight = this.computeControlContainerHeight(this.table, control);
 
-  var insets = scout.graphics.getInsets(this.$controlContainer);
+  var insets = scout.graphics.insets(this.$controlContainer);
   this.$controlContent.outerHeight(allowedControlHeight - insets.vertical());
 
   // If container is opened the first time, set the height to 0 to make animation work
@@ -471,17 +471,17 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
 scout.TableFooter.prototype.computeControlContainerHeight = function(table, control, growControl) {
   var menuBarHeight = 0,
     footerHeight = 0,
-    containerHeight = scout.graphics.getSize(table.$container).height,
+    containerHeight = scout.graphics.size(table.$container).height,
     maxControlHeight,
     controlContainerHeight = 0,
-    dataMargins = scout.graphics.getMargins(table.$data),
+    dataMargins = scout.graphics.margins(table.$data),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = table.menuBar,
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     footer = table.footer,
     htmlContainer = table.htmlComp,
-    containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+    containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if (!footer) {
     return;
@@ -491,7 +491,7 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
     menuBarHeight = scout.MenuBarLayout.size(htmlMenuBar, containerSize).height;
   }
   // Layout table footer and add size of footer (including the control content) to 'height'
-  footerHeight = scout.graphics.getSize(footer.$container).height;
+  footerHeight = scout.graphics.size(footer.$container).height;
   if (footer.open) {
     if (footer.animating) {
       // Layout may be called when container stays open but changes its size using an animation.
@@ -499,7 +499,7 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
       controlContainerHeight = control.height;
     } else {
       // Measure the real height
-      controlContainerHeight = scout.graphics.getSize(footer.$controlContainer).height;
+      controlContainerHeight = scout.graphics.size(footer.$controlContainer).height;
       // Expand control height? (but only if not resizing)
       if (!footer.resizing && growControl) {
         controlContainerHeight = Math.max(control.height, controlContainerHeight);

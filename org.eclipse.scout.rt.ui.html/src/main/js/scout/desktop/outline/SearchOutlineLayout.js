@@ -16,7 +16,9 @@ scout.inherits(scout.SearchOutlineLayout, scout.OutlineLayout);
 
 scout.SearchOutlineLayout.prototype._setDataHeight = function(heightOffset) {
   // Add search panel height to heightOffset
-  var searchPanelSize = scout.graphics.getSize(this.outline.$searchPanel, true);
+  var searchPanelSize = scout.graphics.size(this.outline.$searchPanel, {
+    includeMargin: true
+  });
   heightOffset += searchPanelSize.height;
 
   scout.SearchOutlineLayout.parent.prototype._setDataHeight.call(this, heightOffset);

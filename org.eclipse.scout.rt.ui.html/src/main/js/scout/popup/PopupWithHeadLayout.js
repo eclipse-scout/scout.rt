@@ -17,15 +17,17 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
   scout.PopupWithHeadLayout.parent.prototype.layout.call(this, $container);
 
   var htmlComp = this.popup.htmlComp,
-    popupSize = htmlComp.getSize();
+    popupSize = htmlComp.size();
 
-  //while animating the body animation sets the size.
+  // While animating the body animation sets the size
   if (!this.popup.bodyAnimating) {
     // Set size of body
-    popupSize = popupSize.subtract(htmlComp.getInsets());
+    popupSize = popupSize.subtract(htmlComp.insets());
     if (this._headVisible) {
-      var headSize = scout.graphics.getSize(this.popup.$head, true);
-      //adjust popupsize if head changed size
+      var headSize = scout.graphics.size(this.popup.$head, {
+        includeMargin: true
+      });
+      // Adjust popup size if head changed size
       if (popupSize.width < headSize.width) {
         popupSize.width = headSize.width;
         scout.graphics.setSize(htmlComp.$comp, popupSize);
@@ -55,7 +57,7 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
     windowPaddingY = this.popup.windowPaddingY,
     popupBounds = scout.graphics.offsetBounds(htmlComp.$comp),
     popupHeadBounds = scout.graphics.offsetBounds(this.popup.$head),
-    popupMargins = htmlComp.getMargins(),
+    popupMargins = htmlComp.margins(),
     $window = this.popup.$container.window(),
     windowSize = new scout.Dimension($window.width(), $window.height());
 
@@ -84,16 +86,20 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
     prefSize = scout.graphics.prefSize(this.popup.$body, {
         includeMargin: true
       })
-      .add(htmlComp.getInsets());
+      .add(htmlComp.insets());
 
     $siblingBodies.removeClass('hidden');
     this.popup.$container.attr('style', popupStyleBackup);
   } else {
-    prefSize = scout.graphics.getSize(this.popup.$body, true);
+    prefSize = scout.graphics.size(this.popup.$body, {
+      includeMargin: true
+    });
   }
 
   if (this.popup._headVisible) {
-    var headSize = scout.graphics.getSize(this.popup.$head, true);
+    var headSize = scout.graphics.size(this.popup.$head, {
+      includeMargin: true
+    });
     prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
   }
   return prefSize;

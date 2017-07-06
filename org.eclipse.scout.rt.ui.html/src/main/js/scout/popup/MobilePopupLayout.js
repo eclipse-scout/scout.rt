@@ -17,13 +17,13 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
   scout.MobilePopupLayout.parent.prototype.layout.call(this, $container);
 
   var htmlPopup = this.popup.htmlComp,
-    popupSize = htmlPopup.getSize(),
+    popupSize = htmlPopup.size(),
     htmlWidget = this.popup.widget.htmlComp,
     widgetSize = 0,
     $header = this.popup.$header,
     headerSize = 0;
 
-  popupSize = popupSize.subtract(htmlPopup.getInsets());
+  popupSize = popupSize.subtract(htmlPopup.insets());
   headerSize = scout.graphics.prefSize($header, {
     includeMargin: true
   });
@@ -32,7 +32,7 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
   widgetSize = popupSize.clone();
   widgetSize.height -= headerSize.height;
   htmlWidget.setLocation(new scout.Point(0, headerSize.height));
-  htmlWidget.setSize(widgetSize.subtract(htmlWidget.getMargins()));
+  htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
 
   // The first time it gets layouted, add shown class to be able to animate
   if (!htmlPopup.layouted) {

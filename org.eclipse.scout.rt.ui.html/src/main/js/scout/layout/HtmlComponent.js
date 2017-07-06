@@ -40,6 +40,7 @@ scout.HtmlComponent = function($comp, session) {
    * e.g. by using CSS styling -> setSize won't be called.
    */
   this.pixelBasedSizing = true;
+  this.sizeCached = null;
   this.session = session;
 };
 
@@ -71,16 +72,23 @@ scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
 };
 
 /**
+ * @deprecated use {@link #availableSize} instead, will be removed with 7.1
+ */
+scout.HtmlComponent.prototype.getAvailableSize = function() {
+  return this.availableSize();
+};
+
+/**
  * Computes the preferred height if the component is scrollable and returns it if it is greater than the actual size.
  * If it is not scrollable, the actual height is returned.<p>
  * The returned width is always the actual width because there are no horizontal scrollbars.
  */
-scout.HtmlComponent.prototype.getAvailableSize = function() {
-  var size = this.getSize(),
+scout.HtmlComponent.prototype.availableSize = function() {
+  var size = this.size(),
     prefSize;
 
   if (this.scrollable) {
-    prefSize = this.getPreferredSize();
+    prefSize = this.prefSize();
     if (prefSize.height > size.height) {
       size.height = prefSize.height;
     }
@@ -125,7 +133,7 @@ scout.HtmlComponent.prototype.validateLayout = function() {
     this.layouting = false;
     this.layouted = true;
     // Save size for later use (necessary if pixelBasedSizing is set to false)
-    this.size = this.getSize();
+    this.sizeCached = this.size();
     this.valid = true;
   }
   return true;
@@ -196,12 +204,19 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
 };
 
 /**
+ * @deprecated use {@link #prefSize} instead, will be removed with 7.1
+ */
+scout.HtmlComponent.prototype.getPreferredSize = function(options) {
+  return this.prefSize(options);
+};
+
+/**
  * Returns the preferred size of the component, insets included.
  * @exception When component has no layout
  */
-scout.HtmlComponent.prototype.getPreferredSize = function(options) {
+scout.HtmlComponent.prototype.prefSize = function(options) {
   if (!this.layout) {
-    throw new Error('Called getPreferredSize() but component has no layout');
+    throw new Error('Called prefSize() but component has no layout');
   }
   options = options || {};
   var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
@@ -210,22 +225,43 @@ scout.HtmlComponent.prototype.getPreferredSize = function(options) {
 };
 
 /**
- * Returns the inset-dimensions of the component (padding and border, no margin).
+ * @deprecated use {@link #insets} instead, will be removed with 7.1
  */
 scout.HtmlComponent.prototype.getInsets = function(options) {
-  return scout.graphics.getInsets(this.$comp, options);
+  return scout.graphics.insets(this.$comp, options);
 };
 
+/**
+ * Returns the inset-dimensions of the component (padding and border, no margin).
+ */
+scout.HtmlComponent.prototype.insets = function(options) {
+  return scout.graphics.insets(this.$comp, options);
+};
+
+/**
+ * @deprecated use {@link #margins} instead, will be removed with 7.1
+ */
 scout.HtmlComponent.prototype.getMargins = function() {
-  return scout.graphics.getMargins(this.$comp);
+  return scout.graphics.margins(this.$comp);
+};
+
+scout.HtmlComponent.prototype.margins = function() {
+  return scout.graphics.margins(this.$comp);
+};
+
+/**
+ * @deprecated use {@link #size} instead, will be removed with 7.1
+ */
+scout.HtmlComponent.prototype.getSize = function(includeMargins) {
+  return scout.graphics.size(this.$comp, includeMargins);
 };
 
 /**
  * Returns the size of the component, insets included.
- * @param includeMargins when set to true, returned dimensions include margins of component
+ * @param options, see {@link scout.graphics#size} for details.
  */
-scout.HtmlComponent.prototype.getSize = function(includeMargins) {
-  return scout.graphics.getSize(this.$comp, includeMargins);
+scout.HtmlComponent.prototype.size = function(options) {
+  return scout.graphics.size(this.$comp, options);
 };
 
 /**
@@ -237,7 +273,7 @@ scout.HtmlComponent.prototype.setSize = function(size) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
-  var oldSize = this.size;
+  var oldSize = this.sizeCached;
   if (!size.equals(oldSize)) {
     this.invalidateLayout();
   }
@@ -247,12 +283,19 @@ scout.HtmlComponent.prototype.setSize = function(size) {
   this.validateLayout();
 };
 
-scout.HtmlComponent.prototype.getBounds = function() {
-  return scout.graphics.getBounds(this.$comp);
+scout.HtmlComponent.prototype.cssBounds = function(options) {
+  return scout.graphics.cssBounds(this.$comp, options);
 };
 
-scout.HtmlComponent.prototype.offsetBounds = function() {
-  return scout.graphics.offsetBounds(this.$comp);
+/**
+ * @deprecated use {@link #cssBounds} instead, will be removed with 7.1
+ */
+scout.HtmlComponent.prototype.getBounds = function() {
+  return scout.graphics.cssBounds(this.$comp);
+};
+
+scout.HtmlComponent.prototype.offsetBounds = function(options) {
+  return scout.graphics.offsetBounds(this.$comp, options);
 };
 
 /**
@@ -268,7 +311,7 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
-  var oldBounds = this.getBounds();
+  var oldBounds = this.cssBounds();
   if (!oldBounds.equals(bounds)) {
     this.invalidateLayout();
   }
@@ -280,7 +323,7 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
  * Sets the component to its preferred size.
  */
 scout.HtmlComponent.prototype.pack = function() {
-  var preferredSize = this.getPreferredSize();
+  var preferredSize = this.prefSize();
   this.setSize(preferredSize);
 };
 

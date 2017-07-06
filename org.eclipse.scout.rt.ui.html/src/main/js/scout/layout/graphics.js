@@ -153,7 +153,7 @@ scout.graphics = {
   /**
    * Returns the size of the component, insets included.
    * @param {boolean} [includeMargin] when set to true, returned dimensions include margins of component, default is <code>false</code>.
-   * @deprecated use {@link scout.graphics.size instead}
+   * @deprecated use {@link #size instead}, will be removed with 7.1
    */
   getSize: function($comp, includeMargin) {
     return scout.graphics.size($comp, {
@@ -174,23 +174,32 @@ scout.graphics = {
    */
   getVisibleSize: function($comp, includeMargin) {
     if ($comp.length === 1 && $comp.isVisible()) {
-      return scout.graphics.getSize($comp, includeMargin);
+      return scout.graphics.size($comp, {
+        includeMargin: includeMargin
+      });
     } else {
       return new scout.Dimension(0, 0);
     }
   },
 
   /**
-   * Returns the inset-dimensions of the component (padding, margin, border).
+   * @deprecated use {@link #insets} instead, will be removed with 7.1
    */
   getInsets: function($comp, options) {
+    return scout.graphics.insets($comp, options);
+  },
+
+  /**
+   * Returns the inset-dimensions of the component (padding, margin, border).
+   */
+  insets: function($comp, options) {
     options = options || {};
     var i,
       directions = ['top', 'right', 'bottom', 'left'],
       insets = [0, 0, 0, 0],
-      includeMargin = options.includeMargin !== undefined ? options.includeMargin : false,
-      includePadding = options.includePadding !== undefined ? options.includePadding : true,
-      includeBorder = options.includeBorder !== undefined ? options.includeBorder : true;
+      includeMargin = scout.nvl(options.includeMargin, false),
+      includePadding = scout.nvl(options.includePadding, true),
+      includeBorder = scout.nvl(options.includeBorder, true);
 
     for (i = 0; i < directions.length; i++) {
       if (includeMargin) {
@@ -206,34 +215,19 @@ scout.graphics = {
     return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
   },
 
+  /**
+   * @deprecated use {@link #margins} instead, will be removed with 7.1
+   */
   getMargins: function($comp) {
-    return scout.graphics.getInsets($comp, {
+    return scout.graphics.margins($comp);
+  },
+
+  margins: function($comp) {
+    return scout.graphics.insets($comp, {
       includeMargin: true,
       includePadding: false,
       includeBorder: false
     });
-  },
-
-  getBounds: function($comp) {
-    var parseCssPosition = function(prop) {
-      var value = $comp.css(prop);
-      return 'auto' === value ? 0 : parseInt(value, 10);
-    };
-    return new scout.Rectangle(
-      parseCssPosition('left'),
-      parseCssPosition('top'),
-      $comp.outerWidth(true),
-      $comp.outerHeight(true));
-  },
-
-  setBounds: function($comp, vararg, y, width, height) {
-    var bounds = vararg instanceof scout.Rectangle ?
-      vararg : new scout.Rectangle(vararg, y, width, height);
-    $comp
-      .cssLeft(bounds.x)
-      .cssTop(bounds.y)
-      .cssWidth(bounds.width)
-      .cssHeight(bounds.height);
   },
 
   /**
@@ -269,7 +263,6 @@ scout.graphics = {
    * exact                    false           When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option.
    */
   bounds: function($elem, options) {
-    // TODO [7.0] cgu: merge with getBounds, ask a.we why parseCssPosition is used, or rename getBounds to cssBounds
     return scout.graphics._bounds($elem, $elem.position(), options);
   },
 
@@ -287,10 +280,50 @@ scout.graphics = {
     return scout.graphics._bounds($elem, $elem.offset(), options);
   },
 
+  /**
+   * @deprecated use {@link #cssBounds} instead, will be removed with 7.1
+   */
+  getBounds: function($comp) {
+    return scout.graphics.cssBounds($comp);
+  },
+
+  /**
+   * Returns the bounds of the element by reading the CSS 'left' and 'top' attributes for the position.
+   * For the width and height the jQuery functions outerWidth() and outerHeight() are used.
+   *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * includeMargin            false           Whether to include $elem's margins in the returned size. X and Y are not affected by this option.
+   *
+   */
+  cssBounds: function($elem, options) {
+    options = options || {};
+    var parseCssPosition = function(prop) {
+      var value = $elem.css(prop);
+      return 'auto' === value ? 0 : parseInt(value, 10);
+    };
+    var includeMargin = scout.nvl(options.includeMargin, false);
+    return new scout.Rectangle(
+        parseCssPosition('left'),
+        parseCssPosition('top'),
+        $elem.outerWidth(includeMargin),
+        $elem.outerHeight(includeMargin));
+  },
+
   _bounds: function($elem, pos, options) {
     options = options || {};
     var size = scout.graphics.size($elem, options);
     return new scout.Rectangle(pos.left, pos.top, size.width, size.height);
+  },
+
+  setBounds: function($comp, vararg, y, width, height) {
+    var bounds = vararg instanceof scout.Rectangle ?
+      vararg : new scout.Rectangle(vararg, y, width, height);
+    $comp
+      .cssLeft(bounds.x)
+      .cssTop(bounds.y)
+      .cssWidth(bounds.width)
+      .cssHeight(bounds.height);
   },
 
   debugOutput: function($comp) {

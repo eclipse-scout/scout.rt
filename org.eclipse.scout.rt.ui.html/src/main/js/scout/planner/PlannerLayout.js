@@ -28,8 +28,8 @@ scout.PlannerLayout.prototype.layout = function($container) {
     scaleTop = 0,
     htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.planner.htmlComp,
-    containerSize = htmlContainer.getAvailableSize()
-    .subtract(htmlContainer.getInsets());
+    containerSize = htmlContainer.availableSize()
+    .subtract(htmlContainer.insets());
 
   if (menuBar.$container.isVisible()) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
@@ -41,10 +41,10 @@ scout.PlannerLayout.prototype.layout = function($container) {
   }
 
   if ($header.isVisible()) {
-    scaleTop += scout.graphics.getSize($header).height;
+    scaleTop += scout.graphics.size($header).height;
   }
   $scale.css('top', scaleTop);
-  gridTop += scaleTop + scout.graphics.getSize($scale).height;
+  gridTop += scaleTop + scout.graphics.size($scale).height;
   $grid.css('top', gridTop);
 
   yearContainerHeight = scaleTop + $yearContainer.cssMarginY();
@@ -140,7 +140,7 @@ scout.PlannerLayout.prototype._minWidth = function() {
     numScaleItemsLarge = $scaleItemsLarge.length,
     numScaleItemsSmall = $scaleItemsSmall.length,
     displayMode = scout.Planner.DisplayMode,
-    cellInsets = scout.graphics.getInsets($scaleItemsSmall, {includeBorder: false}),
+    cellInsets = scout.graphics.insets($scaleItemsSmall, {includeBorder: false}),
     minWidth = numScaleItemsSmall*cellInsets.horizontal(); //no matter what, this width must never be deceeded
 
   if (this.planner.displayMode === displayMode.DAY) {

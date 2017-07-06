@@ -34,7 +34,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     statusWidth = this.statusWidth;
 
   // Note: Position coordinates start _inside_ the border, therefore we only use the padding
-  containerPadding = htmlContainer.getInsets({
+  containerPadding = htmlContainer.insets({
     includeBorder: false
   });
   top = containerPadding.top;
@@ -82,7 +82,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         .cssRight(right + formField.$label.cssMarginRight())
         .cssHeight(statusHeight);
       // Add padding to label to prevent overlay of text and status icon
-      var w = scout.graphics.getSize(formField.$status, true).width;
+      var w = scout.graphics.size(formField.$status, {
+        includeMargin: true
+      }).width;
       formField.$label.cssPaddingRight(w);
     } else {
       // Default status position
@@ -103,9 +105,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       bottom - containerPadding.bottom,
       left - containerPadding.left);
     // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
-    var fieldMargins = scout.graphics.getMargins(formField.$fieldContainer);
-    fieldSize = htmlContainer.getAvailableSize()
-      .subtract(htmlContainer.getInsets())
+    var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
+    fieldSize = htmlContainer.availableSize()
+      .subtract(htmlContainer.insets())
       .subtract(fieldOffset)
       .subtract(fieldMargins);
     fieldBounds = new scout.Rectangle(left, top, fieldSize.width, fieldSize.height);
@@ -159,7 +161,7 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
     var $field = this.formField.$field;
 
     var pos = $field.position();
-    var padding = scout.graphics.getInsets($field, {
+    var padding = scout.graphics.insets($field, {
       includePadding: true
     });
 
@@ -225,9 +227,9 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   if (formField.$fieldContainer) {
     htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
-      prefSize = htmlField.getPreferredSize()
-        .add(htmlContainer.getInsets())
-        .add(htmlField.getMargins());
+      prefSize = htmlField.prefSize()
+        .add(htmlContainer.insets())
+        .add(htmlField.margins());
     } else {
       prefSize = this.naturalSize(formField);
     }

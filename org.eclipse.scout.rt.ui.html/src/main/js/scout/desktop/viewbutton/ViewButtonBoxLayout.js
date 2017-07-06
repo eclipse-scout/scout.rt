@@ -16,10 +16,10 @@ scout.inherits(scout.ViewButtonBoxLayout, scout.AbstractLayout);
 
 scout.ViewButtonBoxLayout.prototype.layout = function($container) {
   var htmlComp = this.viewButtonBox.htmlComp,
-    containerBounds = htmlComp.getBounds(),
+    containerSize = htmlComp.size(),
     $visibleTabs = $container.children(':visible'),
     tabCount = $visibleTabs.length,
-    tabWidth = (containerBounds.width / tabCount);
+    tabWidth = (containerSize.width / tabCount);
 
   $visibleTabs.each(function() {
     var $tab = $(this);

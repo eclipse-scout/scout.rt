@@ -241,7 +241,7 @@ scout.scrollbars = {
     $scrollable.data('scrollbarUpdatePending', true);
 
     function workaround() {
-      var size = scout.graphics.getSize($scrollable).subtract(scout.graphics.getInsets($scrollable, {
+      var size = scout.graphics.size($scrollable).subtract(scout.graphics.insets($scrollable, {
         includePadding: false,
         includeBorder: true
       }));

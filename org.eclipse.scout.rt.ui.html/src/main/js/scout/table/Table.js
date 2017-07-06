@@ -3210,7 +3210,7 @@ scout.Table.prototype._renderEmptyData = function(width) {
     }
     // measure header-width and subtract insets from table-data
     var
-      horizInsets = scout.graphics.getInsets(this.$data).horizontal(),
+      horizInsets = scout.graphics.insets(this.$data).horizontal(),
       headerWidth = scout.nvl(width, this.header.$container[0].scrollWidth) - horizInsets;
     this.$emptyData
       .css('min-width', headerWidth)
@@ -3696,7 +3696,7 @@ scout.Table.prototype.requestFocusInCell = function(column, row) {
 scout.Table.prototype._attach = function() {
   this.$parent.append(this.$container);
   var htmlParent = this.htmlComp.getParent();
-  this.htmlComp.setSize(htmlParent.getSize());
+  this.htmlComp.setSize(htmlParent.size());
   this.session.detachHelper.afterAttach(this.$container);
   scout.Table.parent.prototype._attach.call(this);
 };

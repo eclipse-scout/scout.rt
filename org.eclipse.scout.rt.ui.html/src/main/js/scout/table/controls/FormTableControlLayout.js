@@ -21,8 +21,8 @@ scout.FormTableControlLayout.prototype.layout = function($container) {
 
   var form = this.control.form,
     htmlForm = form.htmlComp,
-    controlContentSize = scout.graphics.getSize(this.control.tableFooter.$controlContent),
-    formSize = controlContentSize.subtract(htmlForm.getMargins());
+    controlContentSize = scout.graphics.size(this.control.tableFooter.$controlContent),
+    formSize = controlContentSize.subtract(htmlForm.margins());
 
   htmlForm.setSize(formSize);
 

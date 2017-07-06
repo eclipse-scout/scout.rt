@@ -26,12 +26,12 @@ scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH = 30;
 scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   var tabWidth,
     htmlContainer = this.tabArea.htmlComp,
-    containerSize = htmlContainer.getSize(),
+    containerSize = htmlContainer.size(),
     $tabs = htmlContainer.$comp.find('.simple-tab'),
     numTabs = this.tabArea.getTabs().length,
     smallPrefSize = this.smallPrefSize();
 
-  containerSize = containerSize.subtract(htmlContainer.getInsets());
+  containerSize = containerSize.subtract(htmlContainer.insets());
 
   // reset tabs and tool-items
   if (this._$overflowTab) {

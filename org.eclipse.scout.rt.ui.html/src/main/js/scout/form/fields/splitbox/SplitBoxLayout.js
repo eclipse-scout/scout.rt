@@ -28,7 +28,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
 
   var firstFieldSize, secondFieldSize, firstFieldBounds, secondFieldBounds,
     splitterSize = scout.graphics.getVisibleSize($splitter, true),
-    availableSize = htmlContainer.getAvailableSize().subtract(htmlContainer.getInsets()),
+    availableSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
     hasFirstField = (htmlFirstField && htmlFirstField.isVisible()),
     hasSecondField = (htmlSecondField && htmlSecondField.isVisible()),
     hasTwoFields = hasFirstField && hasSecondField,
@@ -84,8 +84,8 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
         }
       }
     }
-    firstFieldSize = firstFieldSize.subtract(htmlFirstField.getMargins());
-    secondFieldSize = secondFieldSize.subtract(htmlSecondField.getMargins());
+    firstFieldSize = firstFieldSize.subtract(htmlFirstField.margins());
+    secondFieldSize = secondFieldSize.subtract(htmlSecondField.margins());
 
     // Calculate and set bounds (splitter and second field have to be moved)
     firstFieldBounds = new scout.Rectangle(0, 0, firstFieldSize.width, firstFieldSize.height);
@@ -104,7 +104,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
   else {
     if (hasOneField) {
       var singleField = hasFirstField ? htmlFirstField : htmlSecondField,
-        singleFieldSize = availableSize.subtract(singleField.getMargins());
+        singleFieldSize = availableSize.subtract(singleField.margins());
       singleField.setBounds(new scout.Rectangle(0, 0, singleFieldSize.width, singleFieldSize.height));
     }
     $splitter.addClass('hidden');
@@ -122,7 +122,7 @@ scout.SplitBoxLayout.prototype._positionCollapseHandle = function(hasFirstField,
   // top position is set using CSS
   var x,
     $collapseHandle = this.splitBox._collapseHandle.$container,
-    collapseHandleSize = scout.graphics.getSize($collapseHandle);
+    collapseHandleSize = scout.graphics.size($collapseHandle);
 
   if (this.splitBox.collapsibleField === this.splitBox.firstField) {
     x = hasFirstField ? firstFieldBounds.width - collapseHandleSize.width : 0;
@@ -145,13 +145,13 @@ scout.SplitBoxLayout.prototype.preferredLayoutSize = function($container) {
   // Get preferred size of fields
   var firstFieldSize = new scout.Dimension(0, 0);
   if (htmlFirstField) {
-    firstFieldSize = htmlFirstField.getPreferredSize()
-      .add(htmlFirstField.getMargins());
+    firstFieldSize = htmlFirstField.prefSize()
+      .add(htmlFirstField.margins());
   }
   var secondFieldSize = new scout.Dimension(0, 0);
   if (htmlSecondField) {
-    secondFieldSize = htmlSecondField.getPreferredSize()
-      .add(htmlSecondField.getMargins());
+    secondFieldSize = htmlSecondField.prefSize()
+      .add(htmlSecondField.margins());
   }
 
   // Calculate prefSize
@@ -167,7 +167,7 @@ scout.SplitBoxLayout.prototype.preferredLayoutSize = function($container) {
       firstFieldSize.height + secondFieldSize.height + splitterSize.height
     );
   }
-  prefSize = prefSize.add(htmlContainer.getInsets());
+  prefSize = prefSize.add(htmlContainer.insets());
 
   return prefSize;
 };
