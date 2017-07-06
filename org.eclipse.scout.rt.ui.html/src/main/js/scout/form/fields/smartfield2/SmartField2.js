@@ -203,7 +203,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   // change for 'result'). Or in case the text is empty, just set the value to null
   if (searchTextChanged) {
     this._acceptByText(searchText);
-  } else {
+  } else if (!this._hasUiError()) {
     this._inputAccepted(false);
   }
 };

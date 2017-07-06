@@ -59,8 +59,16 @@ scout.SmartField2Popup.prototype.setLookupResult = function(result) {
   this.proposalChooser.setLookupResult(result);
 };
 
+/**
+ * @returns the selected lookup row from the proposal chooser. If the row is disabled this function returns null.
+ */
 scout.SmartField2Popup.prototype.getSelectedLookupRow = function() {
-  return this.proposalChooser.getSelectedLookupRow();
+  var lookupRow = this.proposalChooser.getSelectedLookupRow();
+  if (lookupRow && lookupRow.enabled) {
+    return lookupRow;
+  } else {
+    return null;
+  }
 };
 
 scout.SmartField2Popup.prototype.setStatus = function(status) {

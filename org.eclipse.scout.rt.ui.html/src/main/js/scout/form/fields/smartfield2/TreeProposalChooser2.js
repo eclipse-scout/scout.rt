@@ -171,6 +171,7 @@ scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
     parent: this.model,
     proposalChooser: this,
     childNodeIndex: 0,
+    enabled: lookupRow.enabled,
     htmlEnabled: false,
     iconId: lookupRow.iconId,
     id: lookupRow.key,

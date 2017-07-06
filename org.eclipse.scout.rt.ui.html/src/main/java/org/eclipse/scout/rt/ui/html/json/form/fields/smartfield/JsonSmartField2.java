@@ -297,7 +297,11 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
   }
 
   protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
-    return new LookupRow<VALUE>(key, text);
+    LookupRow<VALUE> lookupRow = new LookupRow<VALUE>(key, text);
+    if (json.has("enabled")) {
+      lookupRow.withEnabled(json.getBoolean("enabled"));
+    }
+    return lookupRow;
   }
 
   protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {

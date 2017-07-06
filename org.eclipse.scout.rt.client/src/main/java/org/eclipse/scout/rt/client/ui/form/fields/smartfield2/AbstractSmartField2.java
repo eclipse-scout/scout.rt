@@ -841,13 +841,15 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void setValueByLookupRow(ILookupRow<VALUE> row) {
-    setLookupRow(row);
     if (row == null) {
+      setLookupRow(null);
       setValue(null);
     }
-    else {
+    else if (row.isEnabled()) {
+      setLookupRow(row);
       setValue(getValueFromLookupRow(row));
     }
+    // don't do anything if row is disabled
   }
 
   /**
