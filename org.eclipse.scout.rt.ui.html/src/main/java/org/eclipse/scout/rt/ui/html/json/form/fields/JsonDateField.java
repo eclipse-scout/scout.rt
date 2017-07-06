@@ -115,7 +115,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
   @Override
   protected void handleUiClear(JsonEvent event) {
-    getModel().getUIFacade().setDisplayTextFromUI(null);
+    getModel().getUIFacade().setValueFromUI(null);
   }
 
   @Override
