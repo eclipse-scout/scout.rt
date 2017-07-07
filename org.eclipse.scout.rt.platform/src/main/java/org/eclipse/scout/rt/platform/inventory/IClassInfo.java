@@ -69,6 +69,15 @@ public interface IClassInfo {
   boolean hasAnnotation(Class<? extends Annotation> annotationType);
 
   /**
+   * If the class represented by this class info is <b>directly</b> annotated with the given annotation, the value
+   * corresponding to the annotation parameter is returned. Otherwise <code>null</code> is returned.
+   * </p>
+   * <b>Note</b>: Other than {@link Class#isAnnotationPresent(Class)} this method does not respect the {@link Inherited}
+   * annotation.
+   */
+  Object getAnnotationValue(Class<? extends Annotation> annotationType, String annotationParameterName);
+
+  /**
    * Loads the class, if necessary and returns it.
    *
    * @return loaded class
@@ -114,4 +123,5 @@ public interface IClassInfo {
    * @return <code>true</code>, if declared as an enum type, <code>false</code> otherwise
    */
   boolean isEnum();
+
 }

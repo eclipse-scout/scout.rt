@@ -18,8 +18,10 @@ import org.eclipse.scout.rt.platform.InjectBean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
+import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.slf4j.Logger;
@@ -90,6 +92,23 @@ public class JandexClassInfo implements IClassInfo {
   @Override
   public boolean hasAnnotation(Class<? extends Annotation> annotationType) {
     return m_classInfo.annotations().containsKey(DotName.createSimple(annotationType.getName()));
+  }
+
+  @Override
+  public Object getAnnotationValue(Class<? extends Annotation> annotationType, String annotationParameterName) {
+    List<AnnotationInstance> annotationInstances = m_classInfo.annotations().get(DotName.createSimple(annotationType.getName()));
+    if (CollectionUtility.isEmpty(annotationInstances)) {
+      return null;
+    }
+    for (AnnotationInstance annotationInstance : annotationInstances) {
+      if (annotationInstance.target().kind() == AnnotationTarget.Kind.CLASS) {
+        AnnotationValue annotationValue = annotationInstance.value(annotationParameterName);
+        if (annotationValue != null) {
+          return annotationValue.value();
+        }
+      }
+    }
+    return null;
   }
 
   @Override
