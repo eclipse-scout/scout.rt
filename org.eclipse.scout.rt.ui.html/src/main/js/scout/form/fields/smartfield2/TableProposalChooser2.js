@@ -49,6 +49,7 @@ scout.TableProposalChooser2.prototype._createModel = function() {
     headerVisible: headerVisible,
     autoResizeColumns: autoResize,
     multiSelect: false,
+    multilineText: true,
     scrollToSelection: true,
     columns: columns
   });

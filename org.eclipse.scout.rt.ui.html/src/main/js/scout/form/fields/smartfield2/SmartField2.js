@@ -33,6 +33,7 @@ scout.SmartField2 = function() {
   this.displayStyle = scout.SmartField2.DisplayStyle.DEFAULT;
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
+  this._acceptInputDeferred = $.Deferred();
 
   this._addWidgetProperties(['proposalChooser']);
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall']);
@@ -92,7 +93,7 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
 };
 
 scout.SmartField2.prototype._render = function() {
-  this.addContainer(this.$parent, this.cssClassName(), new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, this.cssClassName(), new scout.SmartField2Layout(this));
   this.addLabel();
 
   var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
@@ -104,8 +105,8 @@ scout.SmartField2.prototype._render = function() {
       .blur(this._onFieldBlur.bind(this))
       .focus(this._onFieldFocus.bind(this))
       .keyup(this._onFieldKeyUp.bind(this))
-      .keydown(this._onFieldKeyDown.bind(this));
-    $field.on('input', this._onInputChanged.bind(this));
+      .keydown(this._onFieldKeyDown.bind(this))
+      .on('input', this._onInputChanged.bind(this));
   }
   this.addField($field);
 
@@ -135,8 +136,12 @@ scout.SmartField2.prototype._readDisplayText = function() {
 };
 
 scout.SmartField2.prototype._renderDisplayText = function() {
-  scout.fields.valOrText(this.$field, this.displayText);
-  this._updateDeletable();
+  var displayText = scout.nvl(this.displayText, ''),
+   textLines = displayText.split('\n');
+  if (textLines.length) {
+    displayText = textLines[0];
+  }
+  scout.fields.valOrText(this.$field, displayText);
 };
 
 /**
@@ -146,7 +151,7 @@ scout.SmartField2.prototype._renderDisplayText = function() {
 scout.SmartField2.prototype.acceptInput = function() {
   if (!this._acceptInputEnabled) {
     $.log.trace('(SmartField2#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
-    return;
+    return this._acceptInputDeferred.promise();
   }
 
   // Use a timeout to prevent multiple execution within the same user action
@@ -161,6 +166,7 @@ scout.SmartField2.prototype.acceptInput = function() {
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
   this._setProperty('displayText', searchText); // FIXME [awe] 7.0 - SF2: set lookupRow/value to null when displayText does not match anymore!
+  this._acceptInputDeferred = $.Deferred();
 
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
@@ -226,6 +232,7 @@ scout.SmartField2.prototype._inputAccepted = function(triggerEvent, acceptByLook
   }
   this.closePopup();
   this._focusNextTabbable();
+  this._acceptInputDeferred.resolve();
 };
 
 scout.SmartField2.prototype._focusNextTabbable = function() {
@@ -958,7 +965,14 @@ scout.SmartField2.prototype._showSelection = function() {
   if (scout.objects.isNullOrUndefined(this.lookupRow)) {
     return false;
   }
-  return this._readDisplayText() === this.lookupRow.text;
+
+  // check if text matches (deal with multi-line)
+  var text = this._readDisplayText();
+  var additionalLines = this.additionalLines();
+  if (additionalLines) {
+    text = [text].concat(additionalLines).join('\n');
+  }
+  return text === this.lookupRow.text;
 };
 
 scout.SmartField2.prototype.setFocused = function(focused) {
@@ -1001,4 +1015,24 @@ scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow) {
     acceptByLookupRow: acceptByLookupRow
   };
   this.trigger('acceptInput', event);
+};
+
+/**
+ * Method invoked if being rendered within a cell-editor (mode='scout.FormField.Mode.CELLEDITOR'), and once the editor finished its rendering.
+ */
+scout.SmartField2.prototype.onCellEditorRendered = function(options) {
+  if (options.openFieldPopup) {
+    this._onFieldMouseDown();
+  }
+};
+
+scout.SmartField2.prototype.additionalLines = function() {
+  var text = scout.nvl(this.displayText, ''),
+    textLines = text.split('\n');
+  if (textLines.length > 1) {
+    textLines.shift();
+    return textLines;
+  } else {
+    return null;
+  }
 };

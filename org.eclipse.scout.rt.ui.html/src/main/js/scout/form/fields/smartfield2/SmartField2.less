@@ -34,7 +34,7 @@
 }
 .proposal-field.deletable,
 .smart-field.deletable {
-  & > .icon{
+  & > .icon {
 
   }
   & > input,
@@ -42,13 +42,14 @@
   & > .field > input,
   & > .field > .input-field {
     #scout.text-field-with-icon(@icon-remove);
-    ~ .icon{
+    ~ .icon {
       cursor: pointer;
     }
   }
 }
 
-.proposal-field.searching, .smart-field.searching {
+.proposal-field.searching,
+.smart-field.searching {
 
   & > .icon {
      #scout.animation(rotation 1.25s linear infinite);

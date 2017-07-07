@@ -143,9 +143,14 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   }
 
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
-  field.acceptInput();
+  // When acceptInput returns a promise, we must wait until input is accepted
+  var promise = field.acceptInput();
+  if (promise) { // FIXME [awe] 7.0 - SF2: continue... überlegen wie wir das verhalten vom alten smart field am besten hinbekommen
+    promise.then(this.table.completeCellEdit.bind(this.table, field));
+  } else {
+    this.table.completeCellEdit(field);
+  }
 
-  this.table.completeCellEdit(field);
   this.completeCellEditRequested = true;
 };
 

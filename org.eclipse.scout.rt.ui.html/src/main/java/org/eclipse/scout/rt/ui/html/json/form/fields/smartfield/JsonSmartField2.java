@@ -122,7 +122,12 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
 
   @Override
   public String getObjectType() {
-    return "SmartField2";
+    if (getModel().isMultilineText()) {
+      return "SmartField2Multiline";
+    }
+    else {
+      return "SmartField2";
+    }
   }
 
   @Override
@@ -163,6 +168,7 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
       JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
       ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+      addPropertyEventFilterCondition(ISmartField2.PROP_LOOKUP_ROW, lookupRow);
       getModel().getUIFacade().setLookupRowFromUI(lookupRow);
     }
     else if (data.has(IValueField.PROP_VALUE)) {
