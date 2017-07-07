@@ -57,7 +57,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Sum = "font:\ue025";
 
   /* awesome font icons */
-  public static final String Remove = "font:\uF00D";
+  public static final String Remove = "font:\uE045";
   public static final String RotateRight = "font:\uF01E";
   public static final String Pencil = "font:\uF040";
   public static final String ChevronLeft = "font:\uF053";
