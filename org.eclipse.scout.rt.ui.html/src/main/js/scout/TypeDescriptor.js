@@ -26,7 +26,7 @@ scout.TypeDescriptor = function(typeDescriptor, objectType, modelVariant) {
 
 scout.TypeDescriptor.prototype.newInstance = function(options) {
   var i, namespaces, className,
-    namespace = window.scout; // default namespace
+    namespace = scout; // default namespace
 
   if (this.modelVariant) {
     className = this.modelVariant.name + this.objectType.name;
