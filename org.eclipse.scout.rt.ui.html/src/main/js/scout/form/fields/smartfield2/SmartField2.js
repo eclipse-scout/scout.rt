@@ -19,6 +19,7 @@ scout.SmartField2 = function() {
   this.codeType = null;
   this._pendingLookup = null;
   this._pendingSetSearching = null;
+  this._pendingOpenPopup = false;
   this._lookupInProgress = false;
   this._tabPrevented = null;
   this.lookupRow = null;
@@ -434,9 +435,11 @@ scout.SmartField2.prototype._formatLookupRow = function(lookupRow) {
  */
 scout.SmartField2.prototype.openPopup = function(browse) {
   var searchText = this._readDisplayText();
-  $.log.info('SmartField2#openPopup browse=' + browse + ' popup=' + this.popup);
+  $.log.info('SmartField2#openPopup browse=' + browse + ' searchText=' + searchText + ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
+
   // Reset scheduled focus next tabbable when user clicks on the smartfield while a lookup is resolved.
   this._tabPrevented = null;
+  this._pendingOpenPopup = true;
 
   if (scout.strings.empty(searchText)) {
     // if search text is empty - always do 'browse', no matter what the error code is
@@ -447,18 +450,7 @@ scout.SmartField2.prototype.openPopup = function(browse) {
     browse = false;
   }
 
-  var promise;
-  if (browse) {
-    promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
-    $.log.debug('(SmartField2#openPopup) getAll()');
-  } else {
-    promise = this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText));
-    $.log.debug('(SmartField2#openPopup) getByText() searchText=', searchText);
-  }
-  promise.done(function(result) {
-    result.browse = browse;
-    this._lookupByTextOrAllDone(result);
-  }.bind(this));
+  this._lookupByTextOrAll(browse, searchText);
 };
 
 scout.SmartField2.prototype._hasUiError = function(codes) {
@@ -487,17 +479,18 @@ scout.SmartField2.prototype._hasUiError = function(codes) {
   });
 };
 
-scout.SmartField2.prototype._lookupByTextOrAll = function() {
+scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
+  // default values
+  searchText = scout.nvl(searchText, this._readDisplayText());
+  browse = scout.nvl(browse, scout.strings.empty(searchText));
 
   // debounce lookup
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
   }
 
-  var promise,
-    searchText = this._readDisplayText();
-
-  if (scout.strings.empty(searchText)) {
+  var promise;
+  if (browse) {
     $.log.trace('(SmartField2#_lookupByTextOrAll) lookup byAll (seachText empty)');
     promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
   } else {
@@ -508,7 +501,10 @@ scout.SmartField2.prototype._lookupByTextOrAll = function() {
   this._pendingLookup = setTimeout(function() {
     $.log.debug('(SmartField2#_lookupByTextOrAll) execute pendingLookup');
     // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
-    promise.done(this._lookupByTextOrAllDone.bind(this));
+    promise.done(function(result) {
+      result.browse = browse;
+      this._lookupByTextOrAllDone(result);
+    }.bind(this));
   }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
 };
 
@@ -574,6 +570,7 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
   this.$container.addClass('popup-open');
 
   var popupType = this.touch ? 'SmartField2TouchPopup' : 'SmartField2Popup';
+  this._pendingOpenPopup = false;
   this.popup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
@@ -601,6 +598,7 @@ scout.SmartField2.prototype.isFocused = function() {
 };
 
 scout.SmartField2.prototype.closePopup = function() {
+  this._pendingOpenPopup = false;
   if (this.popup) {
     this.popup.close();
   }
@@ -715,11 +713,11 @@ scout.SmartField2.prototype._onFieldKeyUp = function(event) {
   // That's why we must deal with that event here (and not in keyDown)
   // We don't use _displayText() here because we always want the text the
   // user has typed.
-  if (this.isPopupOpen()) {
+  if (this._pendingOpenPopup || this.isPopupOpen()) {
     if (!this.isDropdown()) {
       this._lookupByTextOrAll();
     }
-  } else {
+  } else if (!this._pendingOpenPopup) {
     $.log.trace('(SmartField2#_onFieldKeyUp)');
     this.openPopup();
   }
@@ -740,7 +738,7 @@ scout.SmartField2.prototype._isPreventDefaultTabHandling = function(event) {
 };
 
 scout.SmartField2.prototype.isPopupOpen = function() {
-  return this.popup && !this.popup.removalPending;
+  return !!(this.popup && !this.popup.removalPending);
 };
 
 scout.SmartField2.prototype._onFieldKeyDown = function(event) {
@@ -762,7 +760,7 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
   if (this._isNavigationKey(event)) {
     if (this.isPopupOpen()) {
       this.popup.delegateKeyEvent(event);
-    } else {
+    } else if (!this._pendingOpenPopup) {
       this.openPopup(true);
     }
   }
