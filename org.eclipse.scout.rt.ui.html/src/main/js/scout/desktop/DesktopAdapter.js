@@ -29,6 +29,9 @@ scout.DesktopAdapter.prototype._onWidgetHistoryEntryActivate = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onWidgetFormActivate = function(event) {
+  if (event.form && !event.form.modelAdapter) {
+    return; // Ignore ScoutJS forms
+  }
   this._sendFormActivate(event.form);
 };
 
