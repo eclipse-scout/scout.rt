@@ -527,10 +527,21 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   var numLookupRows = result.lookupRows.length,
     emptyResult = numLookupRows === 0; // FIXME [awe] 7.0 - SF2: check what to do with the noData flag on the UI server
   if (emptyResult && result.browse) {
-    this.setErrorStatus(scout.Status.warn({
-      message: this.session.text('SmartFieldNoDataFound')
-    }));
-    this.closePopup();
+    var status = scout.Status.warn({
+        message: this.session.text('SmartFieldNoDataFound')
+      });
+    this.setErrorStatus(status);
+
+    // When active filter is enabled we must always show the popup, because the user
+    // must be able to switch the filter properties. Otherwise a user could set the filter
+    // to 'inactive', and receives an empty result for that query, the popup is closed
+    // and the user can not switch the filter back to 'active' again because the filter
+    // control is not visible.
+    if (this.activeFilterEnabled) {
+      this._ensurePopup(result, status);
+    } else {
+      this.closePopup();
+    }
     return;
   }
 
@@ -555,11 +566,15 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   // Render popup, if not yet rendered and set results
+  this._ensurePopup(result, popupStatus);
+};
+
+scout.SmartField2.prototype._ensurePopup = function(result, status) {
   if (this.popup) {
     this.popup.setLookupResult(result);
-    this.popup.setStatus(popupStatus);
+    this.popup.setStatus(status);
   } else {
-    this._renderPopup(result, popupStatus);
+    this._renderPopup(result, status);
   }
 };
 
@@ -804,7 +819,7 @@ scout.SmartField2.prototype._onLookupRowSelected = function(event) {
 // use the activeFilter in the lookup call because it belongs to the widget state.
 scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
   this.setActiveFilter(event.activeFilter);
-  this._lookupByTextOrAll();
+  this._lookupByTextOrAll(true);
 };
 
 scout.SmartField2.prototype.setSearching = function(searching) {
