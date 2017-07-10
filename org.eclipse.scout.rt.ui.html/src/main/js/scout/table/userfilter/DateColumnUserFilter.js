@@ -94,11 +94,11 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
  * @override ColumnUserFilter.js
  */
 scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
-  this.dateFromField = groupBox.addFilterField('DateField', 'ui.from', 0);
+  this.dateFromField = groupBox.addFilterField('DateField', 'ui.from');
   this.dateFromField.setValue(this.dateFrom);
   this.dateFromField.on('propertyChange', this._onPropertyChange.bind(this));
 
-  this.dateToField = groupBox.addFilterField('DateField', 'ui.to', 1);
+  this.dateToField = groupBox.addFilterField('DateField', 'ui.to');
   this.dateToField.setValue(this.dateTo);
   this.dateToField.on('propertyChange', this._onPropertyChange.bind(this));
 };

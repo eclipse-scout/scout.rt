@@ -1,13 +1,13 @@
 scout.FilterFieldsGroupBox = function() {
   scout.FilterFieldsGroupBox.parent.call(this);
+  this.gridColumnCount = 1;
+  this.cssClass = 'filter-fields';
 };
 scout.inherits(scout.FilterFieldsGroupBox, scout.GroupBox);
 
 scout.FilterFieldsGroupBox.prototype._init = function(model) {
   scout.FilterFieldsGroupBox.parent.prototype._init.call(this, model);
-  this.filter = model.filter;
   this.filter.addFilterFields(this);
-  this.cssClass = 'filter-fields';
 };
 
 /**
@@ -22,16 +22,13 @@ scout.FilterFieldsGroupBox.prototype._renderProperties = function($parent) {
 // Prüfen ob wir eine sequence-box dafür verwenden wollen und dafür eine client-seitige validierung impl., diese
 // geschieht heute auf dem UI server. Evtl. wäre auch ein from/to validator für beliebige felder sinnvoll (auch
 // ausserhalb einer sequence-box)
-scout.FilterFieldsGroupBox.prototype.addFilterField = function(objectType, text, gridY) {
+scout.FilterFieldsGroupBox.prototype.addFilterField = function(objectType, text) {
   var field = scout.create(objectType, {
     parent: this,
     label: this.session.text(text),
     statusVisible: false,
     labelWidthInPixel: 50,
     maxLength: 100,
-    gridData: {
-      y: gridY
-    },
     updateDisplayTextOnModify: true
   });
   this.addField0(field);

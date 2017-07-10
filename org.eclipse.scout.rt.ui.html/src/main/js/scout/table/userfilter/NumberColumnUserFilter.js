@@ -54,12 +54,12 @@ scout.NumberColumnUserFilter.prototype.filterFieldsTitle = function() {
  * @override ColumnUserFilter
  */
 scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
-  this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from', 0);
+  this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from');
   this.numberFromField.decimalFormat = this.column.decimalFormat;
   this.numberFromField.setValue(this.numberFrom);
   this.numberFromField.on('propertyChange', this._onPropertyChange.bind(this));
 
-  this.numberToField = groupBox.addFilterField('NumberField', 'ui.to', 1);
+  this.numberToField = groupBox.addFilterField('NumberField', 'ui.to');
   this.numberToField.decimalFormat = this.column.decimalFormat;
   this.numberToField.setValue(this.numberTo);
   this.numberToField.on('propertyChange', this._onPropertyChange.bind(this));
