@@ -28,14 +28,12 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   $container.css('overflow', 'hidden');
   $container.css('display', 'inline-block'); // override "display: table"
   var availableWidth = $container.width();
+  var leftWidth = this._menuBar.$left.outerWidth(true);
+  var rightWidth = this._menuBar.$right.outerWidth(true);
   $container.attrOrRemove('style', oldStyle);
 
-  var leftWidth = this._menuBar.$left.width();
-  var rightWidth = this._menuBar.$right.width();
-
-  // use availableWidth + 1 because of rounding problems in JQuery
-  if (leftWidth + rightWidth <= availableWidth + 1) {
-    // ok, no ellisis required
+  if (leftWidth + rightWidth <= availableWidth) {
+    // ok, no ellipsis required
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   } else {
     // create ellipsis menu
