@@ -50,6 +50,7 @@ scout.Form.DisplayHint = {
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
 
+  this.resolveTextKeys(['title']);
   this._setViews(this.views);
   this.formController = scout.create('FormController', {
     displayParent: this,
