@@ -246,7 +246,7 @@ $.colorOpacity = function(hex, opacity) {
  * jQuery deferred object is returned which can be used to execute code after
  * the loading has been complete:
  *
- *   $injectScript('http://www....').done(function() { ... });
+ *   $.injectScript('http://www....').done(function() { ... });
  *
  * Options (optional):
  *
