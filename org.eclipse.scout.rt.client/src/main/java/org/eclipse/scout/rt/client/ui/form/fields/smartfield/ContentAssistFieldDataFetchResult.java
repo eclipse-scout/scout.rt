@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -22,6 +23,9 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
   private final Throwable m_processingException;
 
   public ContentAssistFieldDataFetchResult(List<ILookupRow<LOOKUP_KEY>> rows, Throwable failed, IContentAssistSearchParam<LOOKUP_KEY> searchParam) {
+    if (rows == null) {
+      rows = Collections.emptyList();
+    }
     m_lookupRows = rows;
     m_processingException = failed;
     m_searchParam = searchParam;

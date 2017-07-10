@@ -271,12 +271,12 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       return null;
     }
     JSONObject json = new JSONObject();
-    JSONArray lookupRows = new JSONArray();
+    JSONArray jsonLookupRows = new JSONArray();
     boolean multipleColumns = getModel().getColumnDescriptors() != null;
     for (LookupRow<?> lookupRow : (Collection<LookupRow<?>>) result.getLookupRows()) {
-      lookupRows.put(lookupRowToJson(lookupRow, multipleColumns));
+      jsonLookupRows.put(lookupRowToJson(lookupRow, multipleColumns));
     }
-    json.put("lookupRows", lookupRows);
+    json.put("lookupRows", jsonLookupRows);
     if (result.isByRec()) {
       json.put("rec", getIdForLookupRowKey(result.getRec()));
     }

@@ -11,10 +11,8 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> implements IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
@@ -80,7 +78,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
   public IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
     String wildcard = getContentAssistField().getWildcard();
     IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(wildcard, searchText, selectCurrentValue);
-    return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(Collections.<ILookupRow<LOOKUP_KEY>> emptyList(), null, param);
+    return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, null, param);
   }
 
   protected void setResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
