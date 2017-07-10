@@ -35,15 +35,8 @@ scout.SmartField2Popup.prototype._createProposalChooser = function() {
   });
 };
 
-/**
- * @override
- */
 scout.SmartField2Popup.prototype._createLayout = function() {
-  if (this.smartField.variant === scout.SmartField2.DisplayStyle.DROPDOWN) {
-    return new scout.DropdownPopupLayout(this, this.proposalChooser);
-  } else {
-    return new scout.SmartField2PopupLayout(this, this.proposalChooser);
-  }
+  return new scout.SmartField2PopupLayout(this, this.proposalChooser);
 };
 
 scout.SmartField2Popup.prototype._render = function() {

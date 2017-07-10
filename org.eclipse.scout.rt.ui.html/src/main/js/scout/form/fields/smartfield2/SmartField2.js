@@ -483,6 +483,11 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
   searchText = scout.nvl(searchText, this._readDisplayText());
   browse = scout.nvl(browse, scout.strings.empty(searchText));
 
+  // never do a text-lookup if field has dropdown style
+  if (this.isDropdown()) {
+    browse = true;
+  }
+
   // debounce lookup
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
@@ -774,7 +779,9 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
     return;
   }
 
-  if (this._isNavigationKey(event)) {
+  // If field has dropdown style, we open the popup immediately
+  // because we must not wait until text has been typed
+  if (this._isNavigationKey(event) || this.isDropdown()) {
     if (this.isPopupOpen()) {
       this.popup.delegateKeyEvent(event);
     } else if (!this._pendingOpenPopup) {
