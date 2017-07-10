@@ -90,7 +90,6 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
   scout.SmartField2.parent.prototype._initKeyStrokeContext.call(this);
 
   this.keyStrokeContext.registerKeyStroke(new scout.SmartField2CancelKeyStroke(this));
-  this.keyStrokeContext.registerKeyStroke(new scout.SmartField2ToggleKeyStroke(this));
 };
 
 scout.SmartField2.prototype._render = function() {
@@ -699,18 +698,13 @@ scout.SmartField2.prototype._onFieldKeyUp = function(event) {
     return;
   }
 
-  // Enter
-  if (event.which === scout.keys.ENTER) {
-    event.stopPropagation();
-    return;
-  }
-
   // Pop-ups shouldn't open when one of the following keys is pressed
   var w = event.which;
   var pasteShortcut = event.ctrlKey && w === scout.keys.V;
 
   if (!pasteShortcut && (
       event.ctrlKey || event.altKey ||
+      w === scout.keys.ENTER ||
       w === scout.keys.TAB ||
       w === scout.keys.SHIFT ||
       w === scout.keys.CTRL ||
@@ -769,6 +763,14 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
       };
     }
     this.acceptInput();
+    return;
+  }
+
+  if (event.which === scout.keys.ENTER) {
+    if (this.isPopupOpen()) {
+      this.popup.selectLookupRow();
+      event.stopPropagation();
+    }
     return;
   }
 
