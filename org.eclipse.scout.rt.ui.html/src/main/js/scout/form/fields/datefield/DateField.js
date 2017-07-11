@@ -11,17 +11,21 @@
 scout.DateField = function() {
   scout.DateField.parent.call(this);
 
+  this.popup;
   this.autoDate;
   this.dateDeletable = false;
   this.dateFocused = false;
-  this.timeDeletable = false;
   this.dateFormatPattern;
   this.disabledCopyOverlay = true;
   this.hasDate = true;
-  this.hasTime = false;
   this.oldDisplayText = '';
-  this.popup;
+
+  this.hasTime = false;
+  this.hasTimePopup = true;
+  this.timePickerResolution;
   this.timeFormatPattern;
+
+  this.timeDeletable = false;
 
   this.$dateField;
   this.$timeField;
@@ -52,6 +56,7 @@ scout.DateField.prototype._init = function(model) {
   this._setAutoDate(this.autoDate);
   this._setDisplayText(this.displayText);
   this._setAllowedDates(this.allowedDates);
+  this._setTimePickerResolution(this.timePickerResolution);
 };
 
 /**
@@ -64,7 +69,7 @@ scout.DateField.prototype._initValue = function(value) {
   scout.DateField.parent.prototype._initValue.call(this, value);
 };
 
-scout.DateField.prototype.createPopup = function() {
+scout.DateField.prototype.createDatePopup = function() {
   var popupType = this.touch ? 'DatePickerTouchPopup' : 'DatePickerPopup';
   return scout.create(popupType, {
     parent: this,
@@ -74,6 +79,18 @@ scout.DateField.prototype.createPopup = function() {
     field: this,
     allowedDates: this.allowedDates,
     dateFormat: this.isolatedDateFormat
+  });
+};
+
+scout.DateField.prototype.createTimePopup = function() {
+  var popupType = this.touch ? 'TimePickerTouchPopup' : 'TimePickerPopup';
+  return scout.create(popupType, {
+    parent: this,
+    $anchor: this.$timeField,
+    boundToAnchor: !this.touch,
+    closeOnAnchorMouseDown: false,
+    field: this,
+    timeResolution: this.timePickerResolution
   });
 };
 
@@ -93,7 +110,6 @@ scout.DateField.prototype._render = function() {
 scout.DateField.prototype._renderProperties = function() {
   this._renderHasDate();
   this._renderHasTime();
-  this._renderDateFormatPattern();
 
   // Has to be the last call, otherwise _renderErrorStatus() would operate on the wrong state.
   scout.DateField.parent.prototype._renderProperties.call(this);
@@ -159,11 +175,16 @@ scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
     this.$timeField = scout.fields.makeTextField(this.$container, 'time')
+      .on('mousedown', this._onTimeFieldMouseDown.bind(this))
+      .appendTo(this.$field);
+    if (!this.touch || !this.hasTimePopup) {
+    this.$timeField
       .on('keydown', this._onTimeFieldKeyDown.bind(this))
       .on('input', this._onTimeFieldInput.bind(this))
       .on('blur', this._onTimeFieldBlur.bind(this))
-      .on('focus', this._onTimeFieldFocus.bind(this))
-      .appendTo(this.$field);
+      .on('focus', this._onTimeFieldFocus.bind(this));
+    }
+
     scout.HtmlComponent.install(this.$timeField, this.session);
 
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
@@ -183,6 +204,23 @@ scout.DateField.prototype._renderHasTime = function() {
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
+
+
+scout.DateField.prototype.setTimePickerResolution = function(timePickerResolution) {
+  this.setProperty('timePickerResolution', timePickerResolution);
+};
+
+scout.DateField.prototype._setTimePickerResolution = function(timePickerResolution) {
+  if(timePickerResolution < 1){
+    // default
+    timePickerResolution = 10;
+    this.hasTimePopup = false;
+  }else{
+    this.hasTimePopup = true;
+  }
+  this._setProperty('timePickerResolution', timePickerResolution);
+};
+
 
 /**
  * @override FormField.js
@@ -226,12 +264,6 @@ scout.DateField.prototype._setDateFormatPattern = function(dateFormatPattern) {
   }
 };
 
-scout.DateField.prototype._renderDateFormatPattern = function() {
-  if (!this.popup) {
-    return;
-  }
-  this.getDatePicker().dateFormat = this.isolatedDateFormat;
-};
 
 scout.DateField.prototype.setTimeFormatPattern = function(timeFormatPattern) {
   this.setProperty('timeFormatPattern', timeFormatPattern);
@@ -372,12 +404,7 @@ scout.DateField.prototype._setAllowedDates = function(allowedDates) {
   }
 };
 
-scout.DateField.prototype._renderAllowedDates = function() {
-  if (!this.popup) {
-    return;
-  }
-  this.getDatePicker().allowedDates = this.allowedDates;
-};
+
 
 /**
  * @override FormField.js
@@ -410,7 +437,7 @@ scout.DateField.prototype._renderErrorStatus = function() {
     }
   }
 
-  if (this.hasDate && this.popup) {
+  if (this.popup) {
     this.popup.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.popup.$container.toggleClass(statusClass, hasStatus);
   }
@@ -442,7 +469,13 @@ scout.DateField.prototype._renderBackgroundColor = function() {
 
 scout.DateField.prototype._onDateFieldMouseDown = function() {
   if (scout.fields.handleOnClick(this)) {
-    this.openPopupAndSelect(this.value);
+    this.openDatePopupAndSelect(this.value);
+  }
+};
+
+scout.DateField.prototype._onTimeFieldMouseDown = function() {
+  if (scout.fields.handleOnClick(this)) {
+    this.openTimePopupAndSelect(this.value);
   }
 };
 
@@ -499,15 +532,22 @@ scout.DateField.prototype._onDateIconMouseDown = function(event) {
   this.$dateField.focus();
   if (this.dateDeletable) {
     this.clear();
-    if (this.popup && this.getDatePicker()) {
-      this.preselectDate(this._referenceDate(), false);
+    if(!this.embedded){
+
+      this.openDatePopupAndSelect(this.value);
+    }else{
+      if (this.value) {
+        this.selectDate(this.value, false);
+      } else {
+        this.preselectDate(this._referenceDate(), false);
+      }
     }
     this._updateDateDeletable();
     event.preventDefault();
     return;
   }
   if (!this.embedded) {
-    this.togglePopup();
+    this.toggleDatePopup();
   }
 };
 
@@ -520,7 +560,17 @@ scout.DateField.prototype._renderTimeFocused = function() {
 };
 
 scout.DateField.prototype._updateTimeDeletable = function() {
-  this.setTimeDeletable(scout.strings.hasText(this._readTimeDisplayText()) && this.timeFocused);
+  if (this.touch) {
+    return;
+  }
+  if (!this.$field) {
+    return;
+  }
+  var deletable = scout.strings.hasText(this._readTimeDisplayText());
+  if (!this.embedded) {
+    deletable = deletable && this.timeFocused;
+  }
+  this.setTimeDeletable(deletable);
 };
 
 scout.DateField.prototype.setTimeDeletable = function(timeDeletable) {
@@ -535,13 +585,17 @@ scout.DateField.prototype._onTimeIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
+  this.$timeField.focus();
   if (this.timeDeletable) {
     this.clear();
+    this.openTimePopupAndSelect(this.value);
     this._updateTimeDeletable();
     event.preventDefault();
     return;
   }
-  this.$timeField.focus();
+  if (!this.embedded) {
+    this.toggleTimePopup();
+  }
 };
 
 scout.DateField.prototype._onDateFieldBlur = function() {
@@ -560,6 +614,11 @@ scout.DateField.prototype._onDateFieldFocus = function(event) {
 };
 
 scout.DateField.prototype._onTimeFieldBlur = function() {
+  //Close picker and update model
+  if (!this.embedded) {
+    // in embedded mode we must update the date prediction but not close the popup
+    this.closePopup();
+  }
   this._tempTimeDate = null;
   this.setTimeFocused(false);
   this.acceptTime();
@@ -651,13 +710,13 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
       if (this.hasTime) { // keep time part
         pickerStartDate = scout.dates.combineDateTime(pickerStartDate, this.value || this.autoDate);
       }
-      this.openPopupAndSelect(pickerStartDate);
+      this.openDatePopupAndSelect(pickerStartDate);
       this._updateDisplayText(pickerStartDate);
       this._setDateValid(true);
       shiftDate = false; // don't shift if field has no value yet and popup was not open
     } else if (!this.popup) {
       // Otherwise, ensure picker is open
-      this.openPopupAndSelect(pickerStartDate);
+      this.openDatePopupAndSelect(pickerStartDate);
     }
     if (shiftDate) {
       diffMonths = (event.which === scout.keys.PAGE_UP ? -1 : 1);
@@ -689,13 +748,13 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
       if (this.hasTime) { // keep time part
         pickerStartDate = scout.dates.combineDateTime(pickerStartDate, this.value || this.autoDate);
       }
-      this.openPopupAndSelect(pickerStartDate);
+      this.openDatePopupAndSelect(pickerStartDate);
       this._updateDisplayText(pickerStartDate);
       this._setDateValid(true);
       shiftDate = false; // don't shift if field has no value yet and popup was not open
     } else if (!this.popup) {
       // Otherwise, ensure picker is open
-      this.openPopupAndSelect(pickerStartDate);
+      this.openDatePopupAndSelect(pickerStartDate);
     }
     if (shiftDate) {
       this.shiftSelectedDate(diffYears, diffMonths, diffDays);
@@ -731,7 +790,7 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
   var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
   if (datePrediction) {
     scout.fields.valOrText(this._$predictDateField, datePrediction.text);
-    this.openPopupAndSelect(datePrediction.date);
+    this.openDatePopupAndSelect(datePrediction.date);
   } else {
     // No valid prediction!
     this._removePredictionFields();
@@ -795,10 +854,11 @@ scout.DateField.prototype._onTimeFieldKeyDown = function(event) {
     diffMinutes = 0,
     diffSeconds = 0,
     cursorPos = this.$timeField[0].selectionStart,
-    displayText = this.$timeField.val(),
+    displayText =  this.$timeField.val(),
     prediction = this._$predictTimeField && this._$predictTimeField.val(),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
-    shiftDate = true;
+    pickerStartTime = this.value || this._referenceDate(),
+    shiftTime = true;
 
   // Don't propagate shift-tab to cell editor -> shift tab should focus date field
   if (this.hasDate &&
@@ -815,8 +875,7 @@ scout.DateField.prototype._onTimeFieldKeyDown = function(event) {
     event.which === scout.keys.HOME ||
     event.which === scout.keys.END ||
     event.which === scout.keys.CTRL ||
-    event.which === scout.keys.ALT ||
-    event.which === scout.keys.ESC) {
+    event.which === scout.keys.ALT) {
     // Default handling
     return;
   }
@@ -827,6 +886,15 @@ scout.DateField.prototype._onTimeFieldKeyDown = function(event) {
       // Accept the current prediction (if available)
       this._tempTimeDate = null;
       this.acceptTime();
+      this.closePopup();
+      $.suppressEvent(event);
+    }
+    return;
+  }
+
+  if (event.which === scout.keys.ESC) {
+    if (this.popup) {
+      // Close the picker, but don't do anything else
       this.closePopup();
       $.suppressEvent(event);
     }
@@ -855,26 +923,47 @@ scout.DateField.prototype._onTimeFieldKeyDown = function(event) {
       return;
     }
 
-    if (!this._tempTimeDate) {
-      var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
-      if (timePrediction && timePrediction.date) {
-        this._tempTimeDate = timePrediction.date;
-      } else {
-        this._tempTimeDate = this._referenceDate();
-        shiftDate = false;
+    if(this.hasTimePopup){
+      if (!displayText || !this._isTimeValid()) {
+        // If input is empty or invalid, set picker to reference date
+        pickerStartTime = this._referenceDate();
+        this.openTimePopupAndSelect(pickerStartTime);
+        this._updateDisplayText(pickerStartTime);
+        this._setTimeValid(true);
+        shiftTime = false; // don't shift if field has no value yet and popup was not open
+      } else if (!this.popup) {
+        // Otherwise, ensure picker is open
+        this.openTimePopupAndSelect(pickerStartTime);
       }
+      if (shiftTime) {
+        this.shiftSelectedTime(diffHours, diffMinutes, diffSeconds);
+        this._updateDisplayText(this.getTimePicker().selectedTime);
+      }
+      $.suppressEvent(event);
+      return;
+    }else{
+      // without picker
+      if (!this._tempTimeDate) {
+        var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
+        if (timePrediction && timePrediction.date) {
+          this._tempTimeDate = timePrediction.date;
+        } else {
+          this._tempTimeDate = this._referenceDate();
+          shiftTime = false;
+        }
+      }
+      if (shiftTime) {
+        this._tempTimeDate = scout.dates.shiftTime(this._tempTimeDate, diffHours, diffMinutes, diffSeconds);
+      }
+      if (this.hasDate) {
+        // Combine _tempTimeDate with existing date part
+        this._tempTimeDate = scout.dates.combineDateTime(this.value || this._referenceDate(), this._tempTimeDate);
+      }
+      this._updateDisplayText(this._tempTimeDate);
+      this._setTimeValid(true);
+      $.suppressEvent(event);
+      return;
     }
-    if (shiftDate) {
-      this._tempTimeDate = scout.dates.shiftTime(this._tempTimeDate, diffHours, diffMinutes, diffSeconds);
-    }
-    if (this.hasDate) {
-      // Combine _tempTimeDate with existing date part
-      this._tempTimeDate = scout.dates.combineDateTime(this.value || this._referenceDate(), this._tempTimeDate);
-    }
-    this._updateDisplayText(this._tempTimeDate);
-    this._setTimeValid(true);
-    $.suppressEvent(event);
-    return;
   }
 };
 
@@ -903,6 +992,7 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
   var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
   if (timePrediction) {
     this._$predictTimeField.val(timePrediction.text);
+    this.openTimePopupAndSelect(timePrediction.date);
   } else {
     // No valid prediction!
     this._tempTimeDate = null;
@@ -915,6 +1005,15 @@ scout.DateField.prototype._onDatePickerDateSelect = function(event) {
   this._setDateValid(true);
   this._setTimeValid(true);
   var newValue = this._newTimestampAsDate(event.date, this.value);
+  this.setValue(newValue);
+  this.closePopup();
+  this._triggerAcceptInput();
+};
+
+scout.DateField.prototype._onTimePickerTimeSelect = function(event) {
+  this._setDateValid(true);
+  this._setTimeValid(true);
+  var newValue = this._newTimestampAsDate(this.value, event.time);
   this.setValue(newValue);
   this.closePopup();
   this._triggerAcceptInput();
@@ -995,10 +1094,12 @@ scout.DateField.prototype._updateDisplayTextProperty = function() {
  * @override ValueField.js
  */
 scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
-  var dateFieldActive, timeFieldActive, eventOnDatePicker,
+  var dateFieldActive, timeFieldActive, eventOnDatePicker,eventOnTimePicker,
     eventOnDateField = this.$dateField ? (this.$dateField.isOrHas(target) || this.$dateFieldIcon.isOrHas(target)) : false,
     eventOnTimeField = this.$timeField ? (this.$timeField.isOrHas(target) || this.$timeFieldIcon.isOrHas(target)) : false,
-    eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
+    eventOnPopup = this.popup && this.popup.$container.isOrHas(target),
+    datePicker = this.getDatePicker(),
+      timePicker = this.getTimePicker();
 
   if (!eventOnDateField && !eventOnTimeField && !eventOnPopup) {
     // event outside this field.
@@ -1012,9 +1113,9 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
   // when date-field is embedded, time-prediction must be accepted before
   // the date-picker triggers the 'dateSelect' event.
   if (this.embedded) {
-    eventOnDatePicker = this.getDatePicker().$container.isOrHas(target);
-    timeFieldActive = scout.focusUtils.isActiveElement(this.$timeField);
-    if (eventOnDatePicker && timeFieldActive) {
+    eventOnDatePicker = datePicker && datePicker.$container.isOrHas(target);
+    eventOnTimePicker = timePicker && timePicker.$container.isOrHas(target);
+    if (eventOnDatePicker && eventOnTimePicker) {
       this.acceptTime();
     }
   }
@@ -1046,7 +1147,14 @@ scout.DateField.prototype._newTimestampAsDate = function(date, time) {
  * - the current date/time
  */
 scout.DateField.prototype._referenceDate = function() {
-  var referenceDate = this.autoDate || scout.dates.trunc(new Date());
+  var referenceDate = this.autoDate || scout.dates.ceil(new Date(), this.timePickerResolution);
+  if (this.autoDate) {
+    referenceDate = this.autoDate;
+  } else if (this.hasTime) {
+    referenceDate = scout.dates.ceil(new Date(), this.timePickerResolution);
+  } else {
+    referenceDate = scout.dates.trunc(new Date());
+  }
   if (this.allowedDates) {
     referenceDate = this._findAllowedReferenceDate(referenceDate);
   }
@@ -1075,13 +1183,13 @@ scout.DateField.prototype._findAllowedReferenceDate = function(referenceDate) {
   return referenceDate;
 };
 
-scout.DateField.prototype.openPopup = function(date) {
+scout.DateField.prototype.openDatePopup = function(date) {
   if (this.popup) {
     // already open
     return;
   }
 
-  this.popup = this.createPopup();
+  this.popup = this.createDatePopup();
   this.popup.open();
   this.popup.on('remove', function() {
     this.popup = null;
@@ -1095,12 +1203,35 @@ scout.DateField.prototype.closePopup = function() {
   }
 };
 
-scout.DateField.prototype.togglePopup = function() {
-  $.log.info('(DateField#togglePopup) popupOpen=', !!this.popup);
+scout.DateField.prototype.toggleDatePopup = function() {
+  $.log.info('(DateField#toggleDatePopup) popupOpen=', !!this.popup);
   if (this.popup) {
     this.closePopup();
   } else {
-    this.openPopupAndSelect(this.value);
+    this.openDatePopupAndSelect(this.value);
+  }
+};
+
+scout.DateField.prototype.openTimePopup = function(date) {
+  if (!this.hasTimePopup || this.popup) {
+    // already open
+    return;
+  }
+  this.popup = this.createTimePopup();
+  this.popup.open();
+  this.popup.on('remove', function() {
+    this.popup = null;
+  }.bind(this));
+  this.getTimePicker().on('timeSelect', this._onTimePickerTimeSelect.bind(this));
+};
+
+
+scout.DateField.prototype.toggleTimePopup = function() {
+  $.log.info('(DateField#toggleTimePopup) popupOpen=', !!this.popup);
+  if (this.popup) {
+    this.closePopup();
+  } else {
+    this.openTimePopupAndSelect(this.value);
   }
 };
 
@@ -1293,7 +1424,7 @@ scout.DateField.prototype._isTimeValid = function() {
  */
 scout.DateField.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup && this.hasDate) {
-    this.openPopupAndSelect(this.value);
+    this.openDatePopupAndSelect(this.value);
   }
 };
 
@@ -1324,7 +1455,9 @@ scout.DateField.prototype.prepareForCellEdit = function(opts) {
  *    for DatePickerPopup and DatePickerTouchPopup.
  */
 scout.DateField.prototype.getDatePicker = function() {
-  return this.popup.getDatePicker();
+  if(this.popup && this.popup.getDatePicker){
+    return this.popup.getDatePicker();
+  }
 };
 
 /**
@@ -1334,7 +1467,8 @@ scout.DateField.prototype.getDatePicker = function() {
  *          optional, Date to pass to the date picker. If no date is specified, the reference date
  *          is preselected (not selected!).
  */
-scout.DateField.prototype.openPopupAndSelect = function(date) {
+scout.DateField.prototype.openDatePopupAndSelect = function(date) {
+  this.openDatePopup();
   if (!date) {
     this.preselectDate(this._referenceDate(), false);
   } else {
@@ -1343,18 +1477,58 @@ scout.DateField.prototype.openPopupAndSelect = function(date) {
 };
 
 scout.DateField.prototype.preselectDate = function(date, animated) {
-  this.openPopup();
   this.getDatePicker().preselectDate(date, animated);
 };
 
 scout.DateField.prototype.selectDate = function(date, animated) {
-  this.openPopup();
   this.getDatePicker().selectDate(date, animated);
 };
 
+/**
+ * @returns DatePicker instance from popup, because the property name is different
+ *    for DatePickerPopup and DatePickerTouchPopup.
+ */
+scout.DateField.prototype.getTimePicker = function() {
+  if(this.popup && this.popup.getTimePicker){
+    return this.popup.getTimePicker();
+  }
+};
+/**
+ * Opens picker and selects date
+ *
+ * @param date
+ *          optional, Date to pass to the date picker. If no date is specified, the reference date
+ *          is preselected (not selected!).
+ */
+scout.DateField.prototype.openTimePopupAndSelect = function(time) {
+  // resolution < 1 means no picker required
+  if(!this.hasTimePopup){
+    return;
+  }
+  if (!time) {
+    this.preselectTime(this._referenceDate());
+  } else {
+    this.selectTime(time);
+  }
+};
+
+scout.DateField.prototype.preselectTime = function(time) {
+  this.openTimePopup();
+  this.getTimePicker().preselectTime(time);
+};
+
+scout.DateField.prototype.selectTime = function(time) {
+  this.openTimePopup();
+  this.getTimePicker().selectTime(time);
+};
+
 scout.DateField.prototype.shiftSelectedDate = function(years, months, days) {
-  this.openPopup();
+  this.openDatePopup();
   this.getDatePicker().shiftSelectedDate(years, months, days);
+};
+scout.DateField.prototype.shiftSelectedTime = function(hourUnits, minuteUnits, secondUnits) {
+  this.openTimePopup();
+  this.getTimePicker().shiftSelectedTime(hourUnits, minuteUnits, secondUnits);
 };
 
 scout.DateField.prototype._formatValue = function(value) {

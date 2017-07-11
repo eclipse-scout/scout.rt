@@ -20,6 +20,7 @@ public interface IDateField extends IValueField<Date> {
 
   String PROP_HAS_DATE = "hasDate";
   String PROP_HAS_TIME = "hasTime";
+  String PROP_TIMEPICKER_RESOLUTION = "timePickerResolution";
   String PROP_DATE_FORMAT_PATTERN = "dateFormatPattern";
   String PROP_TIME_FORMAT_PATTERN = "timeFormatPattern";
   String PROP_AUTO_DATE = "autoDate";
@@ -63,10 +64,25 @@ public interface IDateField extends IValueField<Date> {
   void setHasTime(boolean b);
 
   /**
+   * @return the time picker resolution
+   * @see IDateField#setTimePickerResolution(int)
+   */
+  int getTimePickerResolution();
+
+  /**
+   * To set the time picker resolution. If the resolution is < 1 the picker will not be displayed. Otherwise the picker
+   * starts with every full hour and 00 minutes and increments the minutes with the resolution until the minutes are
+   * less than 60.
+   *
+   * @param resolution
+   */
+  void setTimePickerResolution(int resolution);
+
+  /**
    * @param autoDate
    *          The date to be used when setting a value "automatically", e.g. when the date picker is opened initially or
-   *          when a date or time is entered and the other component has to be filled. <code>null</code> means
-   *          "use current date and time".
+   *          when a date or time is entered and the other component has to be filled. <code>null</code> means "use
+   *          current date and time".
    */
   void setAutoDate(Date autoDate);
 

@@ -66,6 +66,13 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
         return getModel().isHasTime();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_TIMEPICKER_RESOLUTION, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getTimePickerResolution();
+      }
+    });
+
     putJsonProperty(new JsonProperty<T>(IDateField.PROP_HAS_DATE, model) {
       @Override
       protected Boolean modelValue() {

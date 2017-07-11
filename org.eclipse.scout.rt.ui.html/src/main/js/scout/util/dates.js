@@ -109,6 +109,15 @@ scout.dates = {
     return scout.dates.shiftToNextOrPrevMonday(date, direction);
   },
 
+  isSameTime: function(date, date2) {
+    if (!date || !date2) {
+      return false;
+    }
+    return date.getHours() === date2.getHours() &&
+      date.getMinutes() === date2.getMinutes() &&
+      date.getSeconds() === date2.getSeconds();
+  },
+
   isSameDay: function(date, date2) {
     if (!date || !date2) {
       return false;
@@ -519,6 +528,47 @@ scout.dates = {
         date = new Date(date.getTime());
       }
       date.setHours(0, 0, 0, 0); // clear time
+    }
+    return date;
+  },
+
+  /**
+   * Returns the given date with time set to midnight (hours, minutes, seconds, milliseconds = 0).
+   *
+   * @param date (required)
+   *          The date to truncate.
+   * @param minutesResolution (optional) default 30
+   *          The amount of minutes added to every full hour XX:00 until > XX+1:00. The given date will ceiled to the next valid time.
+   *          e.g. time:15:05, resolution 40  -> 15:40
+   *               time: 15:41 resolution 40 -> 16:00
+   * @param createCopy (optional)
+   *          If this flag is true, a copy of the given date is returned (the input date is not
+   *          altered). If the flag is false, the given object is changed and then returned.
+   *          The default value for this flag is "true".
+   */
+  ceil: function(date, minutesResolution, createCopy) {
+    var h,
+      m,
+      mResulution = scout.nvl(minutesResolution, 30);
+    if (date) {
+      if (scout.nvl(createCopy, true)) {
+        date = new Date(date.getTime());
+      }
+
+      date.setSeconds(0, 0); // clear seconds and millis
+
+
+      m = (parseInt((date.getMinutes() + mResulution) / mResulution) * mResulution);
+      h = date.getHours();
+      if(m >= 60){
+        h++;
+        m = 0;
+      }
+      if(h > 23){
+        h = 0;
+        date.setDate(date.getDate() + 1);
+      }
+      date.setHours(h, m);
     }
     return date;
   }

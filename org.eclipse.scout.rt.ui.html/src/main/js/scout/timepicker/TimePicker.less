@@ -1,0 +1,147 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.time-picker-popup {
+  position: absolute;
+  border: 1px solid @popup-border-color;
+  border-radius: @border-radius;
+  #scout.drop-shadow();
+
+  &.has-error {
+    border-color: @error-border-color;
+  }
+}
+
+.time-picker {
+  position: relative;
+  background-color: @control-background-color;
+
+  &.touch {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+.day-table {
+  display: table;
+  width: 100%;
+  & > .hour-row {
+    display: table-row;
+
+    &:hover{
+      & > .label {
+        font-weight: bold;
+        color: @button-color;
+      }
+    }
+
+    & > .cell {
+      display: table-cell;
+      text-align: center;
+      vertical-align: middle;
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+      width: 35px;
+
+      .time-picker.touch & {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      &:first-child {
+        padding-left: 5px;
+      }
+      &:last-child {
+        padding-right: 10px;
+      }
+      &:not(:last-child):not(:first-child){
+        width: 35px;
+      }
+
+      &.hours {
+        color: @text-disabled-color;
+        background-color: @palette-blue-0;
+      }
+
+      &.minutes {
+        cursor: pointer;
+        > .text {
+          display: inline-block;
+          padding: 5px;
+          border-radius: @border-radius;
+          border: 1px solid transparent;
+        }
+
+        &.now {
+          color: @highlight-color;
+          font-weight: bold;
+        }
+
+        &.selected {
+          color: @palette-white;
+
+          & > .text{
+            background-color: @item-selection-border-color;
+          }
+
+          &.now {
+            color: @palette-white;
+
+            & > .text {
+              background-color: @highlight-color;
+            }
+          }
+        }
+
+        &.preselected {
+          & > .text {
+            border-color: @item-selection-border-color;
+            border-style: dashed;
+          }
+
+          &.now > .text {
+            border-color: @highlight-color;
+          }
+        }
+
+        /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
+        &:active:not(.disabled),
+        .time-picker:not(.touch) &:hover:not(.disabled) {
+          & > .text {
+            border-color: @item-selection-border-color;
+            background-color: @palette-blue-0;
+          }
+
+          &.now > .text {
+            border-color: @highlight-color;
+            background-color: @palette-orange-0;
+          }
+
+          &.selected {
+            & > .text {
+              background-color: @palette-blue-4;
+            }
+
+            &.now > .text {
+              background-color: @palette-orange-3;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.touch-popup-widget-container {
+  & > .time-picker {
+    border: none;
+  }
+}
+

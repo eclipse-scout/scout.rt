@@ -269,6 +269,12 @@
   __include("scout/table/userfilter/NumberColumnUserFilter.js");
   __include("scout/table/userfilter/TextColumnUserFilter.js");
   __include("scout/table/userfilter/TableTextUserFilter.js");
+  // TimePicker
+  __include("scout/timepicker/TimePicker.js");
+  __include("scout/timepicker/TimePickerPopup.js");
+  __include("scout/timepicker/TimePickerPopupLayout.js");
+  __include("scout/timepicker/TimePickerTouchPopup.js");
+  __include("scout/timepicker/TimePickerTouchPopupLayout.js");
   // Tree
   __include("scout/tree/Tree.js");
   __include("scout/tree/TreeAdapter.js");

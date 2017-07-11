@@ -132,6 +132,16 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   /**
+   * Configure the time picker steps. E.g. 15 for 15 minute steps starting with every full hour. If 60 % resolution !=
+   * 0, the minute steps starts every hour with 00 and rise in resolution steps.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(242)
+  protected int getConfiguredTimePickerResolution() {
+    return 30;
+  }
+
+  /**
    * Date to be used when setting a value "automatically", e.g. when the date picker is opened initially or when a date
    * or time is entered and the other component has to be filled. If no auto date is set (which is the default), the
    * current date (with time part "00:00:00.000") is used.
@@ -158,6 +168,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
     setHasDate(getConfiguredHasDate());
     setHasTime(getConfiguredHasTime());
+    setTimePickerResolution(getConfiguredTimePickerResolution());
     setAutoDate(getConfiguredAutoDate());
 
     setDateFormatPattern(getConfiguredDateFormatPattern());
@@ -257,6 +268,16 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     if (isInitialized()) {
       setValue(getValue());
     }
+  }
+
+  @Override
+  public void setTimePickerResolution(int resolution) {
+    propertySupport.setPropertyInt(PROP_TIMEPICKER_RESOLUTION, resolution);
+  }
+
+  @Override
+  public int getTimePickerResolution() {
+    return propertySupport.getPropertyInt(PROP_TIMEPICKER_RESOLUTION);
   }
 
   @Override

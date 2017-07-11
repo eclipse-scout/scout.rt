@@ -8,50 +8,50 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DatePickerTouchPopup = function() {
-  scout.DatePickerTouchPopup.parent.call(this);
+scout.TimePickerTouchPopup = function() {
+  scout.TimePickerTouchPopup.parent.call(this);
 };
-scout.inherits(scout.DatePickerTouchPopup, scout.TouchPopup);
+scout.inherits(scout.TimePickerTouchPopup, scout.TouchPopup);
 
-scout.DatePickerTouchPopup.prototype._init = function(options) {
-  scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
+scout.TimePickerTouchPopup.prototype._init = function(options) {
+  scout.TimePickerTouchPopup.parent.prototype._init.call(this, options);
   this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
   this._field.on('clear', this._onFieldClear.bind(this));
 };
 
 
-scout.DatePickerTouchPopup.prototype._fieldOverrides = function() {
-  var overrides =   scout.DatePickerTouchPopup.parent.prototype._fieldOverrides.call(this);
-  overrides.hasTime = false;
+scout.TimePickerTouchPopup.prototype._fieldOverrides = function() {
+  var overrides =   scout.TimePickerTouchPopup.parent.prototype._fieldOverrides.call(this);
+  // original and clone both point to the same popup instance
+  overrides.hasDate = false;
   return overrides;
 };
 
 /**
  * @override TouchPopup.js
  */
-scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
-  this._widget = scout.create('DatePicker', {
+scout.TimePickerTouchPopup.prototype._initWidget = function(options) {
+  this._widget = scout.create('TimePicker', {
     parent: this,
-    dateFormat: options.dateFormat,
-    allowedDates: options.allowedDates
+    timeResolution : options.timeResolution
   });
 };
 
 /**
  * @implements DatePickerPopup
  */
-scout.DatePickerTouchPopup.prototype.getDatePicker = function() {
+scout.TimePickerTouchPopup.prototype.getTimePicker = function() {
   return this._widget;
 };
 
 /**
  * @override
  */
-scout.DatePickerTouchPopup.prototype._createLayout = function() {
-  return new scout.DatePickerTouchPopupLayout(this);
+scout.TimePickerTouchPopup.prototype._createLayout = function() {
+  return new scout.TimePickerTouchPopupLayout(this);
 };
 
-scout.DatePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
+scout.TimePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
   this._touchField.setErrorStatus(event.errorStatus);
@@ -60,7 +60,7 @@ scout.DatePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
   }
 };
 
-scout.DatePickerTouchPopup.prototype._onFieldClear = function(event) {
+scout.TimePickerTouchPopup.prototype._onFieldClear = function(event) {
   // Delegate to original field
   this._touchField.clear();
 };
