@@ -2214,15 +2214,15 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
 
 /**
  * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
- * @see RemoteApp.js
+ * @see TableAdapter.js
  */
 scout.Table.prototype.completeCellEdit = function(field) {
-  this.endCellEdit(field, true);
+  return this.endCellEdit(field, true);
 };
 
 /**
  * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
- * @see RemoteApp.js
+ * @see TableAdapter.js
  */
 scout.Table.prototype.cancelCellEdit = function(field) {
   this.endCellEdit(field);

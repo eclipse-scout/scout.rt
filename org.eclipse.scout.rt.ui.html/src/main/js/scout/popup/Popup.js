@@ -250,9 +250,13 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   // Use case: Opening of a context menu or cell editor in a form popup
   // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
   // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
-  if (!this.isOrHas(event.popup) &&
-    !event.popup.isOrHas(this) &&
-    !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
+  var closable =
+    !this.isOrHas(event.popup) &&
+    !event.popup.isOrHas(this);
+  if (this.rendered) {
+    closable = closable && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
+  }
+  if (closable) {
     this.close();
   }
 };

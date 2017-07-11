@@ -212,6 +212,8 @@ scout.SmartField2.prototype.acceptInput = function() {
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
   }
+
+  return this._acceptInputDeferred.promise();
 };
 
 /**

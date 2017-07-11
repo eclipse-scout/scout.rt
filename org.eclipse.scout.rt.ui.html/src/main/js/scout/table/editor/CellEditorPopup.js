@@ -14,6 +14,7 @@ scout.CellEditorPopup = function() {
   this.column;
   this.row;
   this.cell;
+  this._pendingCompleteCellEdit = null;
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
 
@@ -135,23 +136,29 @@ scout.CellEditorPopup.prototype.position = function() {
   this.setLocation(new scout.Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
 };
 
+/**
+ * @returns {Promise} resolved when acceptInput is performed on the editor field
+ */
 scout.CellEditorPopup.prototype.completeEdit = function() {
-  var field = this.cell.field;
-  if (this.completeCellEditRequested) {
+  if (this._pendingCompleteCellEdit) {
     // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
-    return;
+    return this._pendingCompleteCellEdit;
   }
 
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
   // When acceptInput returns a promise, we must wait until input is accepted
-  var promise = field.acceptInput();
-  if (promise) { // FIXME [awe] 7.0 - SF2: continue... überlegen wie wir das verhalten vom alten smart field am besten hinbekommen
-    promise.then(this.table.completeCellEdit.bind(this.table, field));
-  } else {
-    this.table.completeCellEdit(field);
-  }
+  var field = this.cell.field;
+  this._pendingCompleteCellEdit = scout.nvl(field.acceptInput(), $.resolvedPromise())
+    .then(function() {
+      this.table.completeCellEdit(field);
+      this._pendingCompleteCellEdit = null;
+    }.bind(this));
 
-  this.completeCellEditRequested = true;
+  return this._pendingCompleteCellEdit;
+};
+
+scout.CellEditorPopup.prototype.isCompleteCellEditRequested = function() {
+  return !!this._pendingCompleteCellEdit;
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {
