@@ -33,7 +33,7 @@ scout.icons = {
   FOLDER: 'font:\uE043',
   SUM: 'font:\uE025',
 
-  REMOVE: 'font:\uF00D',
+  REMOVE: 'font:\uE045',
   ROTATE_RIGHT: 'font:\uF01E',
   PENCIL: 'font:\uF040',
   CHEVRON_LEFT: 'font:\uF053',
