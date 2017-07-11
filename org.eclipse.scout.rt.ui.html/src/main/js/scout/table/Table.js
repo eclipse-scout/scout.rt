@@ -3677,9 +3677,16 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
   }
 };
 
+/**
+ * @deprecated use #focusCell instead, will be removed with 7.1
+ */
 scout.Table.prototype.requestFocusInCell = function(column, row) {
+  this.focusCell(column, row);
+};
+
+scout.Table.prototype.focusCell = function(column, row) {
   if (!this.rendered || !this.isAttachedAndRendered()) {
-    this._postRenderActions.push(this.requestFocusInCell.bind(this, column, row));
+    this._postRenderActions.push(this.focusCell.bind(this, column, row));
     return;
   }
 

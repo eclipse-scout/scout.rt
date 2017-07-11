@@ -550,10 +550,11 @@ scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
 };
 
 /**
- * Sets the focus on this field if the field is rendered.
+ * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
  */
 scout.FormField.prototype.focus = function() {
   if (!this.rendered) {
+    this._postRenderActions.push(this.focus.bind(this));
     return;
   }
   if (this.$field) {

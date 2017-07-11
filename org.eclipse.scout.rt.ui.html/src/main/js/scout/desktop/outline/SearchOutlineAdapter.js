@@ -21,7 +21,7 @@ scout.SearchOutlineAdapter.prototype._initProperties = function(model) {
 };
 
 scout.SearchOutlineAdapter.prototype._syncRequestFocusQueryField = function() {
-  this.widget.requestFocusQueryField();
+  this.widget.focusQueryField();
 };
 
 scout.SearchOutlineAdapter.prototype._onWidgetSearch = function(event) {

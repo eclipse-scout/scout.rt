@@ -1332,19 +1332,31 @@ scout.Widget.prototype.widget = function(widgetId) {
 };
 
 /**
- * @deprecated Use this.widget() instead
+ * @deprecated Use this.widget() instead, will be removed with 7.1
  */
 scout.Widget.prototype.getWidgetById = function(widgetId) {
   return this.widget(widgetId);
 };
 
-scout.Widget.prototype.requestFocus = function() {
+/**
+ * Tries to set the focus on the widget.
+ * <p>
+ * By default the focus is set on the container but this may vary from widget to widget.
+ */
+scout.Widget.prototype.focus = function() {
   if (!this.rendered) {
-    this._postRenderActions.push(this.requestFocus.bind(this));
+    this._postRenderActions.push(this.focus.bind(this));
     return;
   }
 
   this.session.focusManager.requestFocus(this.$container);
+};
+
+/**
+ * @deprecated use #focus instead, will be removed with 7.1
+ */
+scout.Widget.prototype.requestFocus = function() {
+  this.focus();
 };
 
 /**

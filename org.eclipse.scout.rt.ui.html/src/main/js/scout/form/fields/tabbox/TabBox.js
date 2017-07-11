@@ -257,10 +257,11 @@ scout.TabBox.prototype.getTabItem = function(tabId) {
  */
 scout.TabBox.prototype.focus = function() {
   if (!this.rendered) {
+    this._postRenderActions.push(this.focus.bind(this));
     return;
   }
   if (this.selectedTab) {
-    this.selectedTab.requestFocus();
+    this.selectedTab.focus();
   }
 };
 

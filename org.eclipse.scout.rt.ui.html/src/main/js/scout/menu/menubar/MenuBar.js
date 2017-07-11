@@ -232,7 +232,7 @@ scout.MenuBar.prototype._updateItems = function() {
 
   // restore focus on previously focused item
   if (focusedMenuItem) {
-    focusedMenuItem.requestFocus();
+    focusedMenuItem.focus();
   }
 };
 

@@ -588,13 +588,6 @@ scout.Form.prototype.inFront = function() {
   return this.rendered && this.attached;
 };
 
-scout.Form.prototype.requestFocus = function(formField) {
-  if (!formField) {
-    return;
-  }
-  formField.focus();
-};
-
 scout.Form.prototype.visitFields = function(visitor) {
   this.rootGroupBox.visit(visitor);
 };

@@ -18,6 +18,7 @@ describe('Widget', function() {
   scout.inherits(TestWidget, scout.NullWidget);
   TestWidget.prototype._render = function() {
     this.$container = this.$parent.appendDiv();
+    this.$container.setTabbable(true);
   };
 
   beforeEach(function() {
@@ -593,6 +594,27 @@ describe('Widget', function() {
         expect(widget.cssClass).toBe('');
       });
 
+    });
+  });
+
+  describe('focus', function() {
+
+    it("sets the focus on the container", function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.render(session.$entryPoint);
+      widget.focus();
+      expect(document.activeElement).toBe(widget.$container[0]);
+    });
+
+    it("schedules the focus request if the widget is not rendered", function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.focus();
+      widget.render(session.$entryPoint);
+      expect(document.activeElement).toBe(widget.$container[0]);
     });
   });
 

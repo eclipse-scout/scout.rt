@@ -415,7 +415,7 @@ scout.TableAdapter.prototype._onEndCellEdit = function(fieldId) {
 };
 
 scout.TableAdapter.prototype._onRequestFocus = function() {
-  this.widget.requestFocus();
+  this.widget.focus();
 };
 
 scout.TableAdapter.prototype._onScrollToSelection = function() {
@@ -441,7 +441,7 @@ scout.TableAdapter.prototype._onRequestFocusInCell = function(event) {
   var row = this.widget._rowById(event.rowId),
     column = this.widget._columnById(event.columnId);
 
-  this.widget.requestFocusInCell(column, row);
+  this.widget.focusCell(column, row);
 };
 
 scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {

@@ -227,7 +227,7 @@ scout.TreeAdapter.prototype._onChildNodeOrderChanged = function(childNodeIds, pa
 };
 
 scout.TreeAdapter.prototype._onRequestFocus = function() {
-  this.widget.requestFocus();
+  this.widget.focus();
 };
 
 scout.TreeAdapter.prototype._onScrollToSelection = function() {
