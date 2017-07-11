@@ -253,7 +253,7 @@ scout.HtmlComponent.prototype.margins = function() {
  * @deprecated use {@link #size} instead, will be removed with 7.1
  */
 scout.HtmlComponent.prototype.getSize = function(includeMargins) {
-  return scout.graphics.size(this.$comp, includeMargins);
+  return scout.graphics.getSize(this.$comp, includeMargins);
 };
 
 /**

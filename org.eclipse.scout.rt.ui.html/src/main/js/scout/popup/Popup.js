@@ -382,7 +382,7 @@ scout.Popup.prototype._validateVisibility = function() {
   }
   var inView = this._isInView();
   var needsLayouting = this.$container.isVisible() !== inView && inView;
-  this.$container.setVisible(inView);
+  this.$container.toggleClass('invisible', !inView); // Use visibility: hidden to not break layouting / size measurement
   if (needsLayouting) {
     this.revalidateLayout();
   }
