@@ -222,29 +222,37 @@ describe("CellEditor", function() {
 
   describe("completeEdit", function() {
 
-    it("sends completeCellEdit", function() {
+    it("sends completeCellEdit", function(done) {
       var popup = createTableAndStartCellEdit();
-      popup.completeEdit();
-      sendQueuedAjaxCalls();
-
-      var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
-        fieldId: popup.cell.field.id
-      });
-      expect(mostRecentJsonRequest()).toContainEvents(event);
+      popup.completeEdit()
+        .then(function() {
+          sendQueuedAjaxCalls();
+          var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
+            fieldId: popup.cell.field.id
+          });
+          expect(mostRecentJsonRequest()).toContainEvents(event);
+          done();
+        });
+      jasmine.clock().tick(5);
     });
 
-    it("sends completeCellEdit only once", function() {
+    it("sends completeCellEdit only once", function(done) {
       var popup = createTableAndStartCellEdit();
-      popup.completeEdit();
-      popup.completeEdit();
-      sendQueuedAjaxCalls();
+      var doneFunc = function() {
+        sendQueuedAjaxCalls();
 
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(mostRecentJsonRequest().events.length).toBe(1);
-      var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
-        fieldId: popup.cell.field.id
-      });
-      expect(mostRecentJsonRequest()).toContainEvents(event);
+        expect(jasmine.Ajax.requests.count()).toBe(1);
+        expect(mostRecentJsonRequest().events.length).toBe(1);
+        var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
+          fieldId: popup.cell.field.id
+        });
+        expect(mostRecentJsonRequest()).toContainEvents(event);
+        done();
+      };
+
+      popup.completeEdit().then(doneFunc);
+      popup.completeEdit();
+      jasmine.clock().tick(5);
     });
 
 
