@@ -16,7 +16,7 @@ scout.ContextMenuKeyStroke = function(field, contextFunction, bindObject) {
   this.field = field;
   this.renderingHints.render = false;
 
-  this.which = [scout.keys.SELECT];
+  this.which = [scout.keys.SELECT]; // = "Menu" key
   this.ctrl = false;
   this.shift = false;
   this.stopPropagation = true;
