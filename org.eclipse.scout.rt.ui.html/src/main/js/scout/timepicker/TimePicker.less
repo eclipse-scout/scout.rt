@@ -26,6 +26,7 @@
   &.touch {
     overflow-x: hidden;
     overflow-y: auto;
+    min-width: 160px;
   }
 }
 
@@ -34,6 +35,8 @@
   width: 100%;
   & > .hour-row {
     display: table-row;
+    padding-left: 20px;
+    padding-right: 20px;
 
     &:hover{
       & > .label {
@@ -48,33 +51,37 @@
       vertical-align: middle;
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
-      width: 35px;
+      padding: 2px;
 
       .time-picker.touch & {
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding: 5px;
       }
 
       &:first-child {
-        padding-left: 5px;
+        padding-left: 7px;
+        .time-picker.touch & {
+          padding-left: 15px;
+        }
       }
       &:last-child {
-        padding-right: 10px;
+        padding-right: 12px;
+        .time-picker.touch & {
+          padding-right: 20px;
+        }
       }
-      &:not(:last-child):not(:first-child){
-        width: 35px;
+      > .text {
+        padding: 5px;
       }
 
       &.hours {
-        color: @text-disabled-color;
-        background-color: @palette-blue-0;
+        background-color: @panel-background-color;
+        border-right: 1px solid @border-color;
       }
 
       &.minutes {
         cursor: pointer;
         > .text {
           display: inline-block;
-          padding: 5px;
           border-radius: @border-radius;
           border: 1px solid transparent;
         }

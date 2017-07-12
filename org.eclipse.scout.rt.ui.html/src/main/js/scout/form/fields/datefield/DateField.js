@@ -24,7 +24,7 @@ scout.DateField = function() {
   this.hasTimePopup = true;
   this.timePickerResolution;
   this.timeFormatPattern;
-
+  this.timeFocused = false;
   this.timeDeletable = false;
 
   this.$dateField;
@@ -534,16 +534,21 @@ scout.DateField.prototype._onDateIconMouseDown = function(event) {
   this.$dateField.focus();
   if (this.dateDeletable) {
     this.clear();
-    if(!this.embedded){
-
-      this.openDatePopupAndSelect(this.value);
-    }else{
-      if (this.value) {
-        this.selectDate(this.value, false);
-      } else {
-        this.preselectDate(this._referenceDate(), false);
-      }
+    if (this.value) {
+      this.selectDate(this.value, false);
+    } else {
+      this.preselectDate(this._referenceDate(), false);
     }
+//    if(!this.embedded){
+//
+//      this.openDatePopupAndSelect(this.value);
+//    }else{
+//      if (this.value) {
+//        this.selectDate(this.value, false);
+//      } else {
+//        this.preselectDate(this._referenceDate(), false);
+//      }
+//    }
     this._updateDateDeletable();
     event.preventDefault();
     return;
@@ -590,7 +595,12 @@ scout.DateField.prototype._onTimeIconMouseDown = function(event) {
   this.$timeField.focus();
   if (this.timeDeletable) {
     this.clear();
-    this.openTimePopupAndSelect(this.value);
+    if (this.value) {
+      this.selectTime(this.value, false);
+    } else {
+      this.preselectTime(this._referenceDate(), false);
+    }
+//    this.openTimePopupAndSelect(this.value);
     this._updateTimeDeletable();
     event.preventDefault();
     return;
@@ -1479,11 +1489,17 @@ scout.DateField.prototype.openDatePopupAndSelect = function(date) {
 };
 
 scout.DateField.prototype.preselectDate = function(date, animated) {
-  this.getDatePicker().preselectDate(date, animated);
+  var datePicker = this.getDatePicker();
+  if(datePicker){
+    datePicker.preselectDate(date, animated);
+  }
 };
 
 scout.DateField.prototype.selectDate = function(date, animated) {
-  this.getDatePicker().selectDate(date, animated);
+  var datePicker = this.getDatePicker();
+  if(datePicker){
+    datePicker.selectDate(date, animated);
+  }
 };
 
 /**
@@ -1507,6 +1523,7 @@ scout.DateField.prototype.openTimePopupAndSelect = function(time) {
   if(!this.hasTimePopup){
     return;
   }
+  this.openTimePopup();
   if (!time) {
     this.preselectTime(this._referenceDate());
   } else {
@@ -1515,13 +1532,17 @@ scout.DateField.prototype.openTimePopupAndSelect = function(time) {
 };
 
 scout.DateField.prototype.preselectTime = function(time) {
-  this.openTimePopup();
-  this.getTimePicker().preselectTime(time);
+  var timePicker = this.getTimePicker();
+  if(timePicker){
+    timePicker.preselectTime(time);
+  }
 };
 
 scout.DateField.prototype.selectTime = function(time) {
-  this.openTimePopup();
-  this.getTimePicker().selectTime(time);
+  var timePicker = this.getTimePicker();
+  if(timePicker){
+    timePicker.selectTime(time);
+  }
 };
 
 scout.DateField.prototype.shiftSelectedDate = function(years, months, days) {

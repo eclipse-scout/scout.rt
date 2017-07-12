@@ -13,7 +13,6 @@ scout.TimePickerTouchPopupLayout = function(popup) {
 };
 scout.inherits(scout.TimePickerTouchPopupLayout, scout.TouchPopupLayout);
 
-
 scout.TimePickerTouchPopupLayout.prototype.layout = function($container) {
   scout.TimePickerTouchPopupLayout.parent.prototype.layout.call(this, $container);
   var htmlPicker = this.popup.getTimePicker().htmlComp;
@@ -24,16 +23,16 @@ scout.TimePickerTouchPopupLayout.prototype.layout = function($container) {
  * @override
  */
 scout.TimePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
-  var popupWidth = scout.HtmlEnvironment.formColumnWidth,
-    containerInsets = this.popup.htmlComp.getInsets(),
+  var containerInsets = this.popup.htmlComp.getInsets(),
     fieldHtmlComp = this.popup._field.htmlComp,
     widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
     fieldPrefSize = fieldHtmlComp.getPreferredSize(options)
-      .add(fieldHtmlComp.getMargins()),
+    .add(fieldHtmlComp.getMargins()),
     widgetContainerPrefSize = widgetContainerHtmlComp.getPreferredSize(options)
-      .add(widgetContainerHtmlComp.getMargins()),
+    .add(widgetContainerHtmlComp.getMargins()),
     headerHeight = scout.graphics.getSize(this.popup._$header, true).height,
-    popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
+    popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical(),
+    popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
 
   return new scout.Dimension(popupWidth, popupHeight);
 };

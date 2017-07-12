@@ -663,7 +663,7 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   this.$field.focus();
   if (this.deletable) {
     this.clear();
-    this._lookupByAll();
+    this.closePopup();
     this._updateDeletable();
     return;
   }
@@ -833,6 +833,7 @@ scout.SmartField2.prototype._isFunctionKey = function(e) {
 scout.SmartField2.prototype._onLookupRowSelected = function(event) {
   this.setLookupRow(event.lookupRow);
   this._inputAccepted();
+  this._updateDeletable();
 };
 
 // FIXME [awe] 7.0 - SF2: discuss usage of activeFilter. With current impl. we cannot

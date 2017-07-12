@@ -52,8 +52,9 @@ scout.TimePicker.prototype._renderTimeSelection = function() {
     currentHours = date.getHours();
 
     $hourRow = $box.appendDiv('hour-row');
-    $hourRow.appendDiv('cell  hours')
-      .data('time', new Date(date))
+    $time = $hourRow.appendDiv('cell  hours')
+      .data('time', new Date(date));
+    $time.appendSpan('text')
       .text(scout.dates.format(date, this.session.locale, 'HH'));
 
     while (currentHours === date.getHours()) {
