@@ -7,11 +7,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,20 +112,19 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
             LOG.debug("HealthCheck[{}] is finished and result is stored, status={}, future={}", getName(), result, m_future);
           }
           catch (Throwable t) {
+            result = false;
             LOG.warn("HealthCheck[{}] failed, future={}.", getName(), m_future, t);
-            throw new ProcessingException("HealthCheck[{}] failed, future={}", getName(), m_future, t);
           }
           m_lastStatus.set(BooleanUtility.nvl(result));
           m_timestamp.set(System.currentTimeMillis());
           m_future = null;
         }
         else if (m_timeout > 0 && m_futureStart + m_timeout < System.currentTimeMillis()) {
-          LOG.warn("HealthCheck[{}] has timed out after {}ms, future={}. Cancelling job now.", getName(), m_future, m_timeout);
+          LOG.warn("HealthCheck[{}] has timed out after {}ms, future={}. Cancelling job now.", getName(), m_timeout, m_future);
           m_future.cancel(true);
           m_future = null;
           m_lastStatus.set(false);
           m_timestamp.set(System.currentTimeMillis());
-          throw new TimedOutError("HealthCheck[{}] has timed, job cancelled.", getName()).withContextInfo("timeout", "{}ms", m_timeout);
         }
       }
 
