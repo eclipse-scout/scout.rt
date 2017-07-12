@@ -35,6 +35,8 @@ scout.SmartField2 = function() {
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
+  this._pendingSearching = null;
+  this._searchingStateDisplayedAt = 0;
 
   this._addWidgetProperties(['proposalChooser']);
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall']);
@@ -50,6 +52,13 @@ scout.SmartField2.ErrorCode = {
   NOT_UNIQUE: 1,
   NO_RESULTS: 2
 };
+
+/**
+ * This constant is used as delay when adding/removing the searching icon. When the lookup is faster than the delay
+ * we don't show the searching icon. If the lookup takes longer than the delay, we show the icon for at least 400 ms
+ * anyway, even when the lookup is already done. We do that to avoid flickering.
+ */
+scout.SmartField2.SEARCHING_DELAY = 400;
 
 scout.SmartField2.DEBOUNCE_DELAY = 200;
 
@@ -837,8 +846,41 @@ scout.SmartField2.prototype.setSearching = function(searching) {
   this.setProperty('searching', searching);
 };
 
+/**
+ * We display the searching icon:
+ * - only when search takes more than 250 ms
+ * - when searching status is displayed, we show it for at least 500 ms, even if search is already done
+ *   to avoid flickering
+ */
 scout.SmartField2.prototype._renderSearching = function() {
-  this.$container.toggleClass('searching', this.searching);
+  clearTimeout(this._pendingSearching);
+  if (this.searching) {
+    this._pendingSearching = setTimeout(this._renderAddSearching.bind(this), scout.SmartField2.SEARCHING_DELAY);
+  } else {
+    var searchingDuration = Date.now() - this._searchingStateDisplayedAt;
+    if (searchingDuration >= scout.SmartField2.SEARCHING_DELAY) {
+      // remove searching immediately
+      this._renderRemoveSearching();
+    } else {
+      // remove searching later
+      this._pendingSearching = setTimeout(this._renderRemoveSearching.bind(this),
+        scout.SmartField2.SEARCHING_DELAY - searchingDuration);
+    }
+  }
+};
+
+scout.SmartField2.prototype._renderAddSearching = function() {
+  this._searchingStateDisplayedAt = Date.now();
+  if (this.rendered) {
+    this.$container.addClass('searching');
+  }
+};
+
+scout.SmartField2.prototype._renderRemoveSearching = function() {
+  this._searchingStateDisplayedAt = 0;
+  if (this.rendered) {
+    this.$container.removeClass('searching');
+  }
 };
 
 scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
