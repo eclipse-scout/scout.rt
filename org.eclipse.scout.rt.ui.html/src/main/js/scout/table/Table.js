@@ -1541,15 +1541,15 @@ scout.Table.prototype.cellText = function(column, row) {
  * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
  * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
  */
-scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, backwards) {
+scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, reverse) {
   var pos, startColumnIndex, rowIndex, startRowIndex, predicate,
     colIndex = this.columns.indexOf(currentColumn);
 
   startColumnIndex = colIndex + 1;
-  if (backwards) {
+  if (reverse) {
     startColumnIndex = colIndex - 1;
   }
-  pos = this.nextEditableCellPosForRow(startColumnIndex, currentRow, backwards);
+  pos = this.nextEditableCellPosForRow(startColumnIndex, currentRow, reverse);
   if (pos) {
     return pos;
   }
@@ -1560,10 +1560,10 @@ scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, 
     }
 
     startColumnIndex = 0;
-    if (backwards) {
+    if (reverse) {
       startColumnIndex = this.columns.length - 1;
     }
-    pos = this.nextEditableCellPosForRow(startColumnIndex, row, backwards);
+    pos = this.nextEditableCellPosForRow(startColumnIndex, row, reverse);
     if (pos) {
       return true;
     }
@@ -1571,15 +1571,15 @@ scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, 
 
   rowIndex = this.rows.indexOf(currentRow);
   startRowIndex = rowIndex + 1;
-  if (backwards) {
+  if (reverse) {
     startRowIndex = rowIndex - 1;
   }
-  scout.arrays.findFrom(this.rows, startRowIndex, predicate, backwards);
+  scout.arrays.findFrom(this.rows, startRowIndex, predicate, reverse);
 
   return pos;
 };
 
-scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row, backwards) {
+scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row, reverse) {
   var cell, column, predicate;
 
   predicate = function(column) {
@@ -1591,7 +1591,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
     return this.enabled && row.enabled && cell.editable;
   }.bind(this);
 
-  column = scout.arrays.findFrom(this.columns, startColumnIndex, predicate, backwards);
+  column = scout.arrays.findFrom(this.columns, startColumnIndex, predicate, reverse);
   if (column) {
     return {
       column: column,

@@ -848,8 +848,8 @@ scout.SmartField2.prototype.setSearching = function(searching) {
 
 /**
  * We display the searching icon:
- * - only when search takes more than 250 ms
- * - when searching status is displayed, we show it for at least 500 ms, even if search is already done
+ * - only when search takes more than 400 ms
+ * - when searching status is displayed, we show it for at least 400 ms, even if search is already done
  *   to avoid flickering
  */
 scout.SmartField2.prototype._renderSearching = function() {

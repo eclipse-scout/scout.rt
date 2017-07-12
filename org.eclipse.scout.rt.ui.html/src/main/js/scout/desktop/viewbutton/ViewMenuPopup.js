@@ -56,7 +56,7 @@ scout.ViewMenuPopup.prototype._render = function() {
   }, this);
 
   // Add last marker to last visible item
-  var lastVisibleMenu = scout.arrays.findFromPrev(this.viewMenus, this.viewMenus.length - 1, function(viewMenu) {
+  var lastVisibleMenu = scout.arrays.findFromReverse(this.viewMenus, this.viewMenus.length - 1, function(viewMenu) {
     return viewMenu.visible;
   }, this);
   lastVisibleMenu.$container.addClass('last');

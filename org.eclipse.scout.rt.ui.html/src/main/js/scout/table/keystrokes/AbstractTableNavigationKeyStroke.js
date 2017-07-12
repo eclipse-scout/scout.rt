@@ -108,7 +108,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = fu
   if (rowIndex === 0) {
     return rows[rowIndex];
   }
-  row = scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
+  row = scout.arrays.findFromReverse(rows, rowIndex, function(row, i) {
     var previousRow = rows[i - 1];
     if (!previousRow) {
       return false;
@@ -130,7 +130,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
   if (rowIndex === rows.length - 1) {
     return rows[rowIndex];
   }
-  row = scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
+  row = scout.arrays.findFromReverse(rows, rowIndex, function(row, i) {
     var nextRow = rows[i + 1];
     if (!nextRow) {
       return false;
@@ -172,7 +172,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = functi
   if (startRowIndex === rows.length - 1) {
     return rows[startRowIndex];
   }
-  return scout.arrays.findFromNext(rows, startRowIndex, function(row, i) {
+  return scout.arrays.findFromForward(rows, startRowIndex, function(row, i) {
     var nextRowOffsetBounds, $nextRow,
       nextRow = rows[i + 1];
 
@@ -187,6 +187,6 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = functi
     }
     nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
     // If the next row is not fully visible in the viewport -> break and return current row
-    return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height);
+    return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height - 1);
   });
 };

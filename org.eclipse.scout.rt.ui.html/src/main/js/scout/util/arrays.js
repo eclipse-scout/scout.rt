@@ -270,15 +270,15 @@ scout.arrays = {
     return arr[index];
   },
 
-  findFrom: function(arr, startIndex, predicate, backwards) {
-    if (backwards) {
-      return scout.arrays.findFromPrev(arr, startIndex, predicate);
+  findFrom: function(arr, startIndex, predicate, reverse) {
+    if (reverse) {
+      return scout.arrays.findFromReverse(arr, startIndex, predicate);
     } else {
-      return scout.arrays.findFromNext(arr, startIndex, predicate);
+      return scout.arrays.findFromForward(arr, startIndex, predicate);
     }
   },
 
-  findFromNext: function(arr, startIndex, predicate) {
+  findFromForward: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
       return null;
     }
@@ -290,7 +290,14 @@ scout.arrays = {
     }
   },
 
-  findFromPrev: function(arr, startIndex, predicate) {
+  /**
+   * @Deprecated use findFromForward function instead. Will be removed with 7.1
+   */
+  findFromNext: function(arr, startIndex, predicate) {
+    return this.findFromForward(arr, startIndex, predicate);
+  },
+
+  findFromReverse: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
       return null;
     }
@@ -300,6 +307,13 @@ scout.arrays = {
         return element;
       }
     }
+  },
+
+  /**
+   * @Deprecated use findFromReverse function instead. Will be removed with 7.1
+   */
+  findFromPrev: function(arr, startIndex, predicate) {
+    return this.findFromReverse(arr, startIndex, predicate);
   },
 
   /**
