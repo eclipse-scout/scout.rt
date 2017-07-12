@@ -56,7 +56,7 @@ scout.DateField.prototype._init = function(model) {
   this._setAutoDate(this.autoDate);
   this._setDisplayText(this.displayText);
   this._setAllowedDates(this.allowedDates);
-  this._setTimePickerResolution(this.timePickerResolution);
+  this._setTimePickerResolution(this.timePickerResolution || 30);
 };
 
 /**
@@ -78,7 +78,8 @@ scout.DateField.prototype.createDatePopup = function() {
     closeOnAnchorMouseDown: false,
     field: this,
     allowedDates: this.allowedDates,
-    dateFormat: this.isolatedDateFormat
+    dateFormat: this.isolatedDateFormat,
+    displayText : this.dateDisplayText
   });
 };
 
@@ -90,7 +91,8 @@ scout.DateField.prototype.createTimePopup = function() {
     boundToAnchor: !this.touch,
     closeOnAnchorMouseDown: false,
     field: this,
-    timeResolution: this.timePickerResolution
+    timeResolution: this.timePickerResolution,
+    displayText : this.timeDisplayText
   });
 };
 

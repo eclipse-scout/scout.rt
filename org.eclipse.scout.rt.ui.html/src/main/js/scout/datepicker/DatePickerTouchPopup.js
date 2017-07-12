@@ -19,13 +19,6 @@ scout.DatePickerTouchPopup.prototype._init = function(options) {
   this._field.on('clear', this._onFieldClear.bind(this));
 };
 
-
-scout.DatePickerTouchPopup.prototype._fieldOverrides = function() {
-  var overrides =   scout.DatePickerTouchPopup.parent.prototype._fieldOverrides.call(this);
-  overrides.hasTime = false;
-  return overrides;
-};
-
 /**
  * @override TouchPopup.js
  */
@@ -36,7 +29,10 @@ scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
     allowedDates: options.allowedDates
   });
 };
-
+scout.DatePickerTouchPopup.prototype._render = function() {
+  scout.DatePickerTouchPopup.parent.prototype._render.call(this);
+  this._field.$container.addClass('date');
+};
 /**
  * @implements DatePickerPopup
  */

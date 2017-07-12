@@ -19,24 +19,20 @@ scout.TimePickerTouchPopup.prototype._init = function(options) {
   this._field.on('clear', this._onFieldClear.bind(this));
 };
 
-
-scout.TimePickerTouchPopup.prototype._fieldOverrides = function() {
-  var overrides =   scout.TimePickerTouchPopup.parent.prototype._fieldOverrides.call(this);
-  // original and clone both point to the same popup instance
-  overrides.hasDate = false;
-  return overrides;
-};
-
 /**
  * @override TouchPopup.js
  */
 scout.TimePickerTouchPopup.prototype._initWidget = function(options) {
   this._widget = scout.create('TimePicker', {
     parent: this,
-    timeResolution : options.timeResolution
+    timeResolution: options.timeResolution
   });
 };
 
+scout.TimePickerTouchPopup.prototype._render = function() {
+  scout.TimePickerTouchPopup.parent.prototype._render.call(this);
+  this._field.$container.addClass('time');
+};
 /**
  * @implements DatePickerPopup
  */

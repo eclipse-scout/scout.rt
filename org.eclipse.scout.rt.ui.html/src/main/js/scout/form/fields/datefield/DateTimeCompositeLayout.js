@@ -27,14 +27,16 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     $predictDateField = this._dateField._$predictDateField,
     $predictTimeField = this._dateField._$predictTimeField,
     htmlDateField = ($dateField ? scout.HtmlComponent.get($dateField) : null),
-    htmlTimeField = ($timeField ? scout.HtmlComponent.get($timeField) : null);
+    htmlTimeField = ($timeField ? scout.HtmlComponent.get($timeField) : null),
+    hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
+    hasTime = ($timeField ? !$timeField.isDisplayNone() : false);
 
   var availableSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets());
 
   var dateFieldSize, timeFieldSize;
   // --- Date and time ---
-  if (htmlDateField && htmlTimeField) {
+  if (hasDate && hasTime) {
     // Field size
     var dateFieldMargins = htmlDateField.margins();
     var timeFieldMargins = htmlTimeField.margins();
@@ -79,7 +81,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     }
   }
   // --- Date only ---
-  else if (htmlDateField) {
+  else if (hasDate) {
     // Field size
     dateFieldSize = availableSize.subtract(htmlDateField.margins());
     htmlDateField.setSize(dateFieldSize);
@@ -98,7 +100,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     }
   }
   // --- Time only ---
-  else if (htmlTimeField) {
+  else if (hasTime) {
     // Field size
     timeFieldSize = availableSize.subtract(htmlTimeField.margins());
     htmlTimeField.setSize(timeFieldSize);
@@ -131,17 +133,23 @@ scout.DateTimeCompositeLayout.prototype._hgap = function() {
 };
 
 scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize = scout.graphics.prefSize($container);
+  var prefSize = scout.graphics.prefSize($container),
+    $dateField = this._dateField.$dateField,
+    $timeField = this._dateField.$timeField,
+    hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
+    hasTime = ($timeField ? !$timeField.isDisplayNone() : false);
+
   // --- Date and time ---
-  if (this._dateField.hasDate && this._dateField.hasTime) {
+  if (hasDate && hasTime) {
     prefSize.width = this.MIN_DATE_FIELD_WIDTH + this._hgap() + this.MIN_TIME_FIELD_WIDTH;
   }
+
   // --- Date only ---
-  else if (this._dateField.hasDate) {
+  else if (hasDate) {
     prefSize.width = this.MIN_DATE_FIELD_WIDTH;
   }
   // --- Time only ---
-  else if (this._dateField.hasTime) {
+  else if (hasTime) {
     prefSize.width = this.MIN_TIME_FIELD_WIDTH;
   }
   return prefSize;

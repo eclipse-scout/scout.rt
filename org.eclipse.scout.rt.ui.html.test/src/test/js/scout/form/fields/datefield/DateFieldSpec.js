@@ -938,8 +938,8 @@ describe('DateField', function() {
         dateField.render();
 
         dateField.$timeField.triggerClick();
-        expect(dateField.popup).toBe(undefined);
-        expect($('.touch-popup').length).toBe(0);
+        expect(dateField.popup.rendered).toBe(true);
+        expect($('.touch-popup').length).toBe(1);
         expect($('.date-picker-popup').length).toBe(0);
       });
 
@@ -1025,7 +1025,7 @@ describe('DateField', function() {
         dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
 
         expect(dateField.popup).toBe(null);
-        dateField.$dateField.triggerClick();
+        dateField.$timeField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup._field.$timeField.val('10:42');
