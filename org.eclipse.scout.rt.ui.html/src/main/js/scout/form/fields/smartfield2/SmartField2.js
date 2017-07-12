@@ -1042,11 +1042,11 @@ scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow) {
 };
 
 /**
- * Method invoked if being rendered within a cell-editor (mode='scout.FormField.Mode.CELLEDITOR'), and once the editor finished its rendering.
+ * Function invoked if being rendered within a cell-editor (mode='scout.FormField.Mode.CELLEDITOR'), and once the editor finished its rendering.
  */
 scout.SmartField2.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {
-    this._onFieldMouseDown();
+    this.togglePopup();
   }
 };
 
