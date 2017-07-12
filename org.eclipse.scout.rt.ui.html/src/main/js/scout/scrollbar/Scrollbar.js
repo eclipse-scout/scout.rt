@@ -81,7 +81,8 @@ scout.Scrollbar.prototype._render = function($parent) {
   this._$thumb.on('mousedown', this._onThumbMousedownHandler);
   // Scrollbar might be clipped to prevent overlapping an ancestor. In order to reset this clipping the scrollbar needs
   // an update whenever a parent div is scrolled ore resized.
-  this.$container.parents('div').on('scroll resize', this._onAncestorScrollOrResizeHandler);
+  this._$anchestors = this.$container.parents('div')
+    .on('scroll resize', this._onAncestorScrollOrResizeHandler);
 };
 
 scout.Scrollbar.prototype._remove = function() {
@@ -96,7 +97,8 @@ scout.Scrollbar.prototype._remove = function() {
   }.bind(this));
   this.$container.off('mousedown', this._onScrollbarMousedownHandler);
   this._$thumb.off('mousedown', '', this._onThumbMousedownHandler);
-  this.$container.parents('div').off('scroll resize', this._onAncestorScrollOrResizeHandler);
+  this._$anchestors.off('scroll resize', this._onAncestorScrollOrResizeHandler);
+  this._$anchestors = null;
 
   scout.Scrollbar.parent.prototype._remove.call(this);
 };
