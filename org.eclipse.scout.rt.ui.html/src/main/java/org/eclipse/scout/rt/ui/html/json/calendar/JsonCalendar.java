@@ -258,7 +258,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
       getModel().getUIFacade().fireComponentMoveFromUI(component.getModel(), newDate);
     }
     else if (componentId != null) {
-      LOG.warn("Unkown component with ID {} [event='{}']", componentId, EVENT_COMPONENT_MOVE);
+      LOG.info("Unkown component with ID {} [event='{}']", componentId, EVENT_COMPONENT_MOVE);
     }
   }
 
@@ -278,7 +278,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
       addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_COMPONENT, selectedComponent);
     }
     else if (componentId != null) {
-      LOG.warn("Unkown component with ID {} [event='{}']", componentId, EVENT_SELECTION_CHANGE);
+      LOG.info("Unkown component with ID {} [event='{}']", componentId, EVENT_SELECTION_CHANGE);
     }
 
     addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
