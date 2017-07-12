@@ -88,7 +88,7 @@ describe('SmartField2', function() {
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
       field._onFieldKeyUp({});
-      expect(field.$container.hasClass('searching')).toBe(true);
+      expect(field.$container.hasClass('searching')).toBe(false); // loading indicator is not shown before 400 ms
       jasmine.clock().tick(300);
       // expect we have 2 table rows
       expect(field.popup).not.toBe(null);
