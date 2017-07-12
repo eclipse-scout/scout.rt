@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
  * Expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
 @ClassId("46d6ba4b-07a6-4fd8-bf84-7e372e0f80bc")
-public abstract class AbstractDataModelOperatorField extends AbstractSmartField<IDataModelAttributeOp> {
+public abstract class AbstractDataModelOperatorField extends AbstractSmartField2<IDataModelAttributeOp> {
 
   public AbstractDataModelOperatorField() {
     this(true);

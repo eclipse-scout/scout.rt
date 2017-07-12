@@ -441,7 +441,7 @@ public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> 
   }
 
   @Override
-  protected SmartField2Editor createDefaultEditor() {
+  protected ISmartField2<VALUE> createDefaultEditor() {
     return new SmartField2Editor();
   }
 
