@@ -75,6 +75,7 @@ scout.MenuBarLayout.prototype.layout = function($container) {
             // Check if ellipsis menu fits, otherwise the previous menu has to be removed as well
             if (previousMenuItem && remainingLeftWidth + itemSize.width - ellipsisSize.width < 0) {
               this._removeMenuItem(previousMenuItem);
+              scout.arrays.remove(menuItemsCopy, previousMenuItem);
             }
           }
           this._removeMenuItem(menuItem);
