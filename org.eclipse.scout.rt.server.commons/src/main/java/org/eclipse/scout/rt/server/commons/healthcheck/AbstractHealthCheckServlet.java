@@ -92,15 +92,18 @@ public abstract class AbstractHealthCheckServlet extends AbstractHttpServlet {
 
     int statusCode = failed.isEmpty() ? HttpServletResponse.SC_OK : HttpServletResponse.SC_SERVICE_UNAVAILABLE;
     String output = generateOutput(statusCode, checks, failed, false);
-    String detailedOutput = output;
-    if (LOG.isInfoEnabled() || Platform.get().inDevelopmentMode()) {
-      detailedOutput = generateOutput(statusCode, checks, failed, true);
-    }
-    LOG.info(detailedOutput);
 
     resp.setContentType("text/plain");
     resp.setStatus(statusCode);
-    resp.getWriter().print(Platform.get().inDevelopmentMode() ? detailedOutput : output);
+
+    if (LOG.isDebugEnabled() || Platform.get().inDevelopmentMode()) {
+      String detailedOutput = generateOutput(statusCode, checks, failed, true);
+      LOG.debug(detailedOutput);
+      resp.getWriter().print(Platform.get().inDevelopmentMode() ? detailedOutput : output);
+    }
+    else {
+      resp.getWriter().print(output);
+    }
   }
 
   protected List<IHealthChecker> getActiveHealthCheckers() {

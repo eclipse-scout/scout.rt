@@ -1,8 +1,6 @@
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,12 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -114,30 +109,32 @@ public class HealthCheckerTest {
     }
   }
 
-  @Test(expected = TimedOutError.class)
+  @Test
   public void testTimeout() throws Exception {
-    final Object sync = new Object();
+    final AtomicBoolean sleep = new AtomicBoolean(false);
 
-    IHealthChecker checker = createDummyHealthChecker(true, TimeUnit.DAYS.toMillis(1001), 1, new IRunnable() {
+    AbstractHealthChecker checker = createDummyHealthChecker(true, 0, TimeUnit.SECONDS.toMillis(1), new IRunnable() {
       @Override
       public void run() throws Exception {
-        // synchronize execution
-        synchronized (sync) {
-          sync.notifyAll();
+        if (sleep.get()) {
+          TimeUnit.SECONDS.sleep(10);
         }
-        // sleep for 1001 nights
-        TimeUnit.DAYS.sleep(1001);
       }
     });
-    // synchronize execution
-    synchronized (sync) {
-      checker.checkHealth(RunContexts.empty());
-      sync.wait();
-    }
+
+    // run without sleep
+    assertEquals("resultInitial", false, checker.checkHealth(RunContexts.empty()));
+    awaitDone(checker.getFuture());
+
+    // run with sleep
+    sleep.set(true);
+    assertEquals("resultT", true, checker.checkHealth(RunContexts.empty()));
+
     // wait for timeout
-    TimeUnit.MILLISECONDS.sleep(2);
-    // throws TimedOutError
-    checker.checkHealth(RunContexts.empty());
+    TimeUnit.SECONDS.sleep(2);
+
+    // fails due to timeout
+    assertEquals("resultF", false, checker.checkHealth(RunContexts.empty()));
   }
 
   @Test
@@ -193,30 +190,38 @@ public class HealthCheckerTest {
     final AtomicBoolean throwException = new AtomicBoolean(false);
 
     AbstractHealthChecker checker = createDummyHealthChecker(true, 0, 0, new IRunnable() {
+      int counter = 0;
+
       @Override
       public void run() throws Exception {
+        counter++;
         if (throwException.get()) {
-          throw new ArrayIndexOutOfBoundsException(-1);
+          throw new ArrayIndexOutOfBoundsException(counter);
         }
       }
     });
 
     // start and validate success
     checker.checkHealth(RunContexts.empty());
-    awaitDone(checker.getFuture());
 
-    // flip switch before checking the result as the checking of the result triggers a new check (TTL = 0)
-    throwException.set(true);
-    assertEquals("result1", true, checker.checkHealth(RunContexts.empty()));
+    // flip-flap between OK and exception throwing
+    for (int i = 0; i < 10; i++) {
+      // flip switch before checking the result as the checking of the result triggers a new check (TTL = 0)
+      awaitDone(checker.getFuture());
+      throwException.set(true);
 
-    // validate exception
+      assertEquals("resultT:" + i, true, checker.checkHealth(RunContexts.empty()));
+
+      // validate exception and flip switch back
+      awaitDone(checker.getFuture());
+      throwException.set(false);
+
+      assertEquals("resultF:" + i, false, checker.checkHealth(RunContexts.empty()));
+    }
+
+    // verify that the checker now stopped failing as there was no exception thrown
     awaitDone(checker.getFuture());
-    try {
-      checker.checkHealth(RunContexts.empty());
-    }
-    catch (ProcessingException pe) {
-      assertThat(pe, hasCause(IsInstanceOf.any(ArrayIndexOutOfBoundsException.class)));
-    }
+    assertEquals("resultZ", true, checker.checkHealth(RunContexts.empty()));
   }
 
 }
