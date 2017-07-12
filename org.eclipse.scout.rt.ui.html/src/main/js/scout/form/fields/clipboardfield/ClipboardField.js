@@ -81,12 +81,8 @@ scout.ClipboardField.prototype._render = function() {
     .on('cut', this._onCopy.bind(this));
 
   this.$parent.on('click', function(event) {
-    this.session.focusManager.requestFocus(this.$field);
+    this.focus();
   }.bind(this));
-
-  if (this.rendered) {
-    this.session.focusManager.requestFocus(this.$field);
-  }
 };
 
 scout.ClipboardField.prototype._renderProperties = function() {

@@ -27,7 +27,7 @@ scout.MenuBarRightKeyStroke.prototype.handle = function(event) {
     menuItem = menuItems[i];
     if (focusNext && menuItem.isTabTarget()) {
       this.field.setTabbableMenu(menuItem);
-      this.field.session.focusManager.requestFocus(menuItem.$container);
+      menuItem.focus();
       break;
     }
     if ($menuItemFocused[0] === menuItem.$container[0]) {

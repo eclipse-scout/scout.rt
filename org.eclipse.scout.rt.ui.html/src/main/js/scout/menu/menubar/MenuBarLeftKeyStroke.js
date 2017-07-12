@@ -28,7 +28,7 @@ scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
     if ($menuItemFocused[0] === menuItem.$container[0]) {
       if (lastValidItem) {
         this.field.setTabbableMenu(lastValidItem);
-        this.field.session.focusManager.requestFocus(lastValidItem.$container);
+        lastValidItem.focus();
       }
       break;
     }

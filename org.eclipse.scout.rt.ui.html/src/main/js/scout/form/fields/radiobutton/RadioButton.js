@@ -51,7 +51,7 @@ scout.RadioButton.prototype._remove = function() {
 scout.RadioButton.prototype._mouseDown = function(event) {
   this.select();
   if (this.focusWhenSelected) {
-    this.session.focusManager.requestFocus(this.$field);
+    this.focus();
     event.preventDefault();
   }
 };

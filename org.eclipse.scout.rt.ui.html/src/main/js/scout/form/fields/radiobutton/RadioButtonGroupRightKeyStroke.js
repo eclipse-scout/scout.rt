@@ -22,7 +22,7 @@ scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
   this.field.radioButtons.some(function(radioButton) {
     if (fieldBefore && radioButton.enabledComputed && radioButton.visible) {
       radioButton.select();
-      this.field.session.focusManager.requestFocus(radioButton.$field);
+      radioButton.focus();
       return true;
     }
     if (radioButton === focusedButton && radioButton.enabledComputed && radioButton.visible) {

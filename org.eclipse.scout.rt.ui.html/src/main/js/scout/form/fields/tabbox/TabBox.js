@@ -115,7 +115,7 @@ scout.TabBox.prototype.rebuildTabs = function() {
   }, this);
   this._renderTabs();
   if (focusedElement) {
-    this.session.focusManager.requestFocus(focusedElement.$tabContainer);
+    focusedElement.focusTab();
   }
 };
 
