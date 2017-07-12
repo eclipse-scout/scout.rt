@@ -50,7 +50,7 @@ scout.SearchOutline.prototype._render = function() {
   this.$container.addClass('search-outline');
   this.$searchPanel = this.$container.prependDiv('search-outline-panel');
   this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
-    .on('input', this._onQueryFieldInput.bind(this))
+    .on('input', this._createOnQueryFieldInputFunction().bind(this))
     .on('keypress', this._onQueryFieldKeyPress.bind(this));
   this.$deletableIcon = this.$searchPanel.appendSpan('delete-icon unfocusable')
     .on('click', this._onDeletableIconClick.bind(this));
@@ -127,11 +127,14 @@ scout.SearchOutline.prototype._triggerSearch = function() {
   });
 };
 
-scout.SearchOutline.prototype._onQueryFieldInput = function(event) {
-  this._updateHasText();
-  // debounced search
-  $.debounce(this._search.bind(this))();
-
+scout.SearchOutline.prototype._createOnQueryFieldInputFunction = function(event) {
+  var debounceFunction = $.debounce(this._search.bind(this));
+  var fn = function(event) {
+    this._updateHasText();
+    // debounced search
+    debounceFunction();
+  };
+  return fn;
 };
 
 scout.SearchOutline.prototype._onDeletableIconClick = function(event) {
@@ -148,7 +151,7 @@ scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
 };
 
 scout.SearchOutline.prototype._search = function(event) {
-  // Don't send query if value did not change (may happen when _onQueryFieldInput is executed after _onQueryFieldKeyPress)
+  // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
   var searchQuery = this.$queryField.val();
   if (this.searchQuery !== searchQuery) {
     // Store locally so that the value persists when changing the outline without performing the search
