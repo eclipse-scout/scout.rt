@@ -86,8 +86,8 @@ describe("GroupBox", function() {
         gridData: {
           x: 0,
           y: 0,
-          widthInPixel: 97,
-          heightInPixel: 123
+          widthInPixel: 27,
+          heightInPixel: 46
         },
         mainBox: true
       });
@@ -103,8 +103,8 @@ describe("GroupBox", function() {
       var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
         .appendTo($('head'));
       session.desktop.formController._renderDialog(form);
-      expect(form.rootGroupBox.$container.cssHeight()).toBe(123);
-      expect(form.rootGroupBox.$container.cssWidth()).toBe(97);
+      expect(form.rootGroupBox.$container.cssHeight()).toBe(46);
+      expect(form.rootGroupBox.$container.cssWidth()).toBe(27);
       $tmpStyle.remove();
     });
 
