@@ -54,9 +54,9 @@
       border-color: @item-selection-border-color;
     }
 
-    &.expanded > .submenu-icon::before {
-      display: inline-block;
-      #scout.transform(rotate(180deg));
+    &.expanded > .submenu-icon {
+      #scout.transform(rotateX(180deg));
+      top: 0;
     }
 
     & > .key-box {

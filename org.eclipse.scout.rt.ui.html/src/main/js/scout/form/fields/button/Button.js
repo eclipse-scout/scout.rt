@@ -44,6 +44,8 @@ scout.Button.DisplayStyle = {
   LINK: 3
 };
 
+scout.Button.SUBMENU_ICON = scout.icons.ANGLE_DOWN;
+
 scout.Button.prototype._init = function(model) {
   scout.Button.parent.prototype._init.call(this, model);
   this._setKeyStroke(this.keyStroke);
@@ -145,7 +147,10 @@ scout.Button.prototype._render = function() {
       this.keyStrokeContext.registerKeyStroke(menu);
     }, this);
     if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-      this.$submenuIcon = (this.$link || $button).appendSpan('submenu-icon');
+      var icon = scout.icons.parseIconId(scout.Button.SUBMENU_ICON);
+      this.$submenuIcon = (this.$link || $button)
+        .appendSpan('submenu-icon')
+        .text(icon.iconCharacter);
     }
   }
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);

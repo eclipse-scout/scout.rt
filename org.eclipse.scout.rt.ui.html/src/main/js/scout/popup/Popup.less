@@ -41,14 +41,11 @@
 
   /* Enable submenu */
   & > .submenu-icon {
+    #scout.submenu-icon();
     display: inline-block;
     vertical-align: middle;
-    padding-left: 8px;
-
-    &::before {
-      #scout.sub-menu-icon(@icon-angle-up);
-      top: -2px; /* optically center the arrow icon (see also: mixins.css) */
-    }
+    #scout.transform(rotateX(180deg));
+    top: 0;
   }
 
   & > .font-icon {

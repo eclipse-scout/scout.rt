@@ -37,6 +37,8 @@ scout.Menu = function() {
 };
 scout.inherits(scout.Menu, scout.Action);
 
+scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN;
+
 /**
  * @override
  */
@@ -78,7 +80,10 @@ scout.Menu.prototype._renderItem = function() {
     .on('contextmenu', mouseEventHandler)
     .on('click', mouseEventHandler);
   if (this.childActions.length > 0 && this.text && this.subMenuIconVisible) {
-    this.$submenuIcon = this.$container.appendSpan('submenu-icon');
+    var icon = scout.icons.parseIconId(scout.Menu.SUBMENU_ICON);
+    this.$submenuIcon = this.$container
+      .appendSpan('submenu-icon')
+      .text(icon.iconCharacter);
   }
 
   // when menus with button style are displayed in a overflow-menu,

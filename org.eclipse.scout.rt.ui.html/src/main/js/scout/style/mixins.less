@@ -401,15 +401,9 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  .sub-menu-icon(@icon: @icon-angle-down) {
-    display: block;
+  .submenu-icon() {
     #scout.font-icon();
-    font-size: 18px;
-    content: @icon;
-    height: 18px;
-    line-height: 18px;
-    position: relative;
-    top: -1px; /* optically center the arrow icon (see also: Popup.css) */
+    font-size: 16px;
   }
 
   /* Invisible pseudo element that enables vertical-align if container has height set */
