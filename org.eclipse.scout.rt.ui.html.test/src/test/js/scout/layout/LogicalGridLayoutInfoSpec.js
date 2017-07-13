@@ -42,7 +42,7 @@ describe("LogicalGridLayoutInfo", function() {
 
     function mockHtmlComp(jquery) {
       return {
-        getPreferredSize:function() {
+        prefSize:function() {
           return new scout.Dimension(1, 1);
         }
       };

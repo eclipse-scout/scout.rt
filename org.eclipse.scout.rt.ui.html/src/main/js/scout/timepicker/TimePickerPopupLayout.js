@@ -21,9 +21,9 @@ scout.TimePickerPopupLayout.prototype.layout = function($container) {
 
   scout.TimePickerPopupLayout.parent.prototype.layout.call(this, $container);
 
-  size = htmlComp.getSize()
-    .subtract(htmlComp.getInsets())
-    .subtract(htmlPicker.getMargins());
+  size = htmlComp.size()
+    .subtract(htmlComp.insets())
+    .subtract(htmlPicker.margins());
 
   htmlPicker.setSize(size);
 
@@ -39,9 +39,9 @@ scout.TimePickerPopupLayout.prototype.preferredLayoutSize = function($container)
     htmlComp = this.popup.htmlComp,
     htmlPicker = this.popup.picker.htmlComp;
 
-  prefSize = htmlPicker.getPreferredSize()
-    .add(htmlComp.getInsets())
-    .add(htmlPicker.getMargins());
+  prefSize = htmlPicker.prefSize()
+    .add(htmlComp.insets())
+    .add(htmlPicker.margins());
 
   prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
   return prefSize;

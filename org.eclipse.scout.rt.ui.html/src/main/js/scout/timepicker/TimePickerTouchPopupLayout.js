@@ -23,14 +23,16 @@ scout.TimePickerTouchPopupLayout.prototype.layout = function($container) {
  * @override
  */
 scout.TimePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
-  var containerInsets = this.popup.htmlComp.getInsets(),
+  var containerInsets = this.popup.htmlComp.insets(),
     fieldHtmlComp = this.popup._field.htmlComp,
     widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
-    fieldPrefSize = fieldHtmlComp.getPreferredSize(options)
-    .add(fieldHtmlComp.getMargins()),
-    widgetContainerPrefSize = widgetContainerHtmlComp.getPreferredSize(options)
-    .add(widgetContainerHtmlComp.getMargins()),
-    headerHeight = scout.graphics.getSize(this.popup._$header, true).height,
+    fieldPrefSize = fieldHtmlComp.prefSize(options)
+    .add(fieldHtmlComp.margins()),
+    widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
+    .add(widgetContainerHtmlComp.margins()),
+    headerHeight = scout.graphics.size(this.popup._$header, {
+      includeMargin: true
+    }).height,
     popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical(),
     popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
 
