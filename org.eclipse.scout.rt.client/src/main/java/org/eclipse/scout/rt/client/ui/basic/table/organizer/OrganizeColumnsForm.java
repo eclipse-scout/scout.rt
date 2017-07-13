@@ -417,7 +417,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredKeyStroke() {
-                return combineKeyStrokes(IKeyStroke.ENTER);
+                return IKeyStroke.ENTER;
               }
 
               @Override

@@ -20,6 +20,11 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
  */
 public interface IKeyStroke extends IAction {
 
+  /***
+   * @deprecated This is an implementation detail and should no longer be relied upon. To combine KeyStrokes, use
+   *             {@link AbstractAction#combineKeyStrokes}. Will be removed in 8.0.
+   */
+  @Deprecated
   String KEY_STROKE_SEPARATOR = "-";
 
   String SHIFT = "shift";
