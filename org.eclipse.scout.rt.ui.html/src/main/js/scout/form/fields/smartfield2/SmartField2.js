@@ -326,9 +326,12 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     }));
     if (this.isPopupOpen()) {
       this.popup.setLookupResult(result);
-      this.popup.selectFirstLookupRow();
     } else {
       this._lookupByTextOrAllDone(result);
+    }
+    // check again if popup is open yet (might have been opened by _lookupByTextOrAllDone)
+    if (this.isPopupOpen()) {
+      this.popup.selectFirstLookupRow();
     }
     return;
   }
