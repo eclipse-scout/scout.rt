@@ -42,6 +42,13 @@
     & > .text {
       text-decoration: underline;
     }
+
+    & > .icon,
+    & > .text,
+    & > .submenu-icon {
+      /* Reset pointer events to auto to make IE show the correct cursor (pointer-events: none in combination with display: inline breaks the cursor) */
+      pointer-events: auto;
+    }
   }
 
   &:focus {
