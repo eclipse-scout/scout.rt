@@ -53,12 +53,12 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
     windowPaddingX = this.popup.windowPaddingX,
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.margins(),
-    popupBounds = htmlComp.cssBounds(),
+    popupPosition = htmlComp.offset(),
     $window = this.popup.$container.window(),
     windowSize = new scout.Dimension($window.width(), $window.height());
 
-  maxWidth = (windowSize.width - popupMargins.horizontal() - popupBounds.x - windowPaddingX);
-  maxHeight = (windowSize.height - popupMargins.vertical() - popupBounds.y - windowPaddingY);
+  maxWidth = (windowSize.width - popupMargins.horizontal() - popupPosition.x - windowPaddingX);
+  maxHeight = (windowSize.height - popupMargins.vertical() - popupPosition.y - windowPaddingY);
 
   return new scout.Dimension(maxWidth, maxHeight);
 };

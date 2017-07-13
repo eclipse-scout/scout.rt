@@ -17,7 +17,7 @@ scout.inherits(scout.MessageBoxLayout, scout.AbstractLayout);
 scout.MessageBoxLayout.prototype.layout = function($container) {
   var htmlComp = scout.HtmlComponent.get($container),
     windowSize = $container.windowSize(),
-    currentBounds = htmlComp.cssBounds({
+    currentBounds = htmlComp.offsetBounds({
       includeMargin: true
     }),
     messageBoxSize = htmlComp.size(),

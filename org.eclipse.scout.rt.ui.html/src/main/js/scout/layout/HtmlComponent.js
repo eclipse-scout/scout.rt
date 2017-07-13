@@ -283,19 +283,27 @@ scout.HtmlComponent.prototype.setSize = function(size) {
   this.validateLayout();
 };
 
-scout.HtmlComponent.prototype.cssBounds = function(options) {
-  return scout.graphics.cssBounds(this.$comp, options);
-};
-
 /**
- * @deprecated use {@link #cssBounds} instead, will be removed with 7.1
+ * @deprecated use {@link #offsetBounds} or $elem.cssTop() and $elem.cssLeft() instead, will be removed with 7.1
  */
 scout.HtmlComponent.prototype.getBounds = function() {
-  return scout.graphics.cssBounds(this.$comp);
+  return scout.graphics.getBounds(this.$comp);
+};
+
+scout.HtmlComponent.prototype.bounds = function() {
+  return scout.graphics.bounds(this.$comp);
+};
+
+scout.HtmlComponent.prototype.position = function() {
+  return scout.graphics.position(this.$comp);
 };
 
 scout.HtmlComponent.prototype.offsetBounds = function(options) {
   return scout.graphics.offsetBounds(this.$comp, options);
+};
+
+scout.HtmlComponent.prototype.offset = function() {
+  return scout.graphics.offset(this.$comp);
 };
 
 /**
@@ -306,12 +314,16 @@ scout.HtmlComponent.prototype.setLocation = function(location) {
   scout.graphics.setLocation(this.$comp, location);
 };
 
+scout.HtmlComponent.prototype.location = function() {
+  return scout.graphics.location(this.$comp);
+};
+
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
   if (!this.isAttachedAndVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
-  var oldBounds = this.cssBounds();
+  var oldBounds = this.offsetBounds();
   if (!oldBounds.equals(bounds)) {
     this.invalidateLayout();
   }

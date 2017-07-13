@@ -267,6 +267,14 @@ scout.graphics = {
   },
 
   /**
+   * @returns {scout.Point} the position relative to the offset parent ($elem.position()).
+   */
+  position: function($elem) {
+    var pos = $elem.position();
+    return new scout.Point(pos.left, pos.top);
+  },
+
+  /**
    * Returns the bounds of the element relative to the document, insets included.
    * The sizes are rounded up, unless the option 'exact' is set to true.
    *
@@ -281,22 +289,17 @@ scout.graphics = {
   },
 
   /**
-   * @deprecated use {@link #cssBounds} instead, will be removed with 7.1
+   * @returns {scout.Point} the position relative to the document ($elem.offset()).
    */
-  getBounds: function($comp) {
-    return scout.graphics.cssBounds($comp);
+  offset: function($elem) {
+    var pos = $elem.offset();
+    return new scout.Point(pos.left, pos.top);
   },
 
   /**
-   * Returns the bounds of the element by reading the CSS 'left' and 'top' attributes for the position.
-   * For the width and height the jQuery functions outerWidth() and outerHeight() are used.
-   *
-   * OPTION                   DEFAULT VALUE   DESCRIPTION
-   * ------------------------------------------------------------------------------------------------------
-   * includeMargin            false           Whether to include $elem's margins in the returned size. X and Y are not affected by this option.
-   *
+   * @deprecated use {@link #offsetBounds} or $elem.cssTop() and $elem.cssLeft() instead, will be removed with 7.1
    */
-  cssBounds: function($elem, options) {
+  getBounds: function($elem, options) {
     options = options || {};
     var parseCssPosition = function(prop) {
       var value = $elem.css(prop);

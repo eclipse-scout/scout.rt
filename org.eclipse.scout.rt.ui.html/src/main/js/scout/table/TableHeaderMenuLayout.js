@@ -106,7 +106,7 @@ scout.TableHeaderMenuLayout.prototype._adjustSizeWithAnchor = function(prefSize)
     htmlComp = this.popup.htmlComp,
     windowPaddingX = this.popup.windowPaddingX,
     popupMargins = htmlComp.margins(),
-    popupBounds = htmlComp.cssBounds(),
+    popupBounds = htmlComp.offsetBounds(),
     $window = this.popup.$container.window(),
     windowWidth = $window.width();
 

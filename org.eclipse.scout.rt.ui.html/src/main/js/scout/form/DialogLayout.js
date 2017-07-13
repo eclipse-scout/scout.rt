@@ -31,7 +31,7 @@ scout.DialogLayout.prototype.layout = function($container) {
     currentBounds = cacheBounds;
   } else {
     dialogSize = this.preferredLayoutSize($container);
-    currentBounds = htmlComp.cssBounds({
+    currentBounds = htmlComp.offsetBounds({
       includeMargin: true
     });
   }
