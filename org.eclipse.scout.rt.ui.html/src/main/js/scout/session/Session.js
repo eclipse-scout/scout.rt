@@ -864,9 +864,9 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 
   if ($.log.isDebugEnabled()) {
     var cacheSize = scout.objects.countOwnProperties(this._adapterDataCache);
-    $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
+    $.log.trace('size of _adapterDataCache after response has been processed: ' + cacheSize);
     cacheSize = scout.objects.countOwnProperties(this.modelAdapterRegistry);
-    $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
+    $.log.trace('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
 };
 
@@ -879,7 +879,7 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
     count++;
   }
   if (count > 0) {
-    $.log.debug('Stored ' + count + ' properties in adapterDataCache');
+    $.log.trace('Stored ' + count + ' properties in adapterDataCache');
   }
 };
 

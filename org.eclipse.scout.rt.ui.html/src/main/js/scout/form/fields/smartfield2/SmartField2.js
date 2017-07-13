@@ -326,11 +326,9 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     }));
     if (this.isPopupOpen()) {
       this.popup.setLookupResult(result);
+      this.popup.selectFirstLookupRow();
     } else {
       this._lookupByTextOrAllDone(result);
-    }
-    if (this.isPopupOpen()) {
-      this.popup.selectFirstLookupRow();
     }
     return;
   }
@@ -488,28 +486,30 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
     browse = true;
   }
 
-  // debounce lookup
+  // clear pending lookup
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
+    this._pendingLookup = null;
   }
 
-  var promise;
+  var doneHandler = function(result) {
+    result.browse = browse;
+    this._lookupByTextOrAllDone(result);
+  }.bind(this);
+
+  // execute lookup byAll immediately
   if (browse) {
-    $.log.trace('(SmartField2#_lookupByTextOrAll) lookup byAll (seachText empty)');
-    promise = this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall));
+    $.log.debug('(SmartField2#_lookupByTextOrAll) lookup byAll (seachText empty)');
+    this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
+      .done(doneHandler);
   } else {
-    $.log.debug('(SmartField2#_lookupByTextOrAll) lookup byText searchText=' + searchText);
-    promise = this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText));
+    // execute lookup byText with a debounce/delay
+    this._pendingLookup = setTimeout(function() {
+      $.log.debug('(SmartField2#_lookupByTextOrAll) lookup byText searchText=' + searchText);
+      this._executeLookup(this.lookupCall.getByText.bind(this.lookupCall, searchText))
+        .done(doneHandler);
+    }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
   }
-
-  this._pendingLookup = setTimeout(function() {
-    $.log.debug('(SmartField2#_lookupByTextOrAll) execute pendingLookup');
-    // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
-    promise.done(function(result) {
-      result.browse = browse;
-      this._lookupByTextOrAllDone(result);
-    }.bind(this));
-  }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
 };
 
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
@@ -732,7 +732,6 @@ scout.SmartField2.prototype._onFieldKeyUp = function(event) {
       this._lookupByTextOrAll();
     }
   } else if (!this._pendingOpenPopup) {
-    $.log.trace('(SmartField2#_onFieldKeyUp)');
     this.openPopup();
   }
 };
@@ -762,7 +761,7 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
       event.preventDefault();
-      $.log.info('(SmartField2#_onFieldKeyDown) set _tabPrevented');
+      $.log.debug('(SmartField2#_onFieldKeyDown) set _tabPrevented');
       this._tabPrevented = {
         shiftKey: event.shiftKey
       };
@@ -825,8 +824,6 @@ scout.SmartField2.prototype._onLookupRowSelected = function(event) {
   this._updateDeletable();
 };
 
-// FIXME [awe] 7.0 - SF2: discuss usage of activeFilter. With current impl. we cannot
-// use the activeFilter in the lookup call because it belongs to the widget state.
 scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
   this.setActiveFilter(event.activeFilter);
   this._lookupByTextOrAll(true);
@@ -845,22 +842,6 @@ scout.SmartField2.prototype.setBrowseLoadIncremental = function(browseLoadIncrem
 
 scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
   this.setProperty('activeFilter', this.activeFilterEnabled ? activeFilter : null);
-};
-
-scout.SmartField2.prototype._lookupByAll = function() {
-  $.log.trace('(SmartField2#_lookupByAll)');
-
-  // debounce lookup
-  if (this._pendingLookup) {
-    clearTimeout(this._pendingLookup);
-  }
-
-  this._pendingLookup = setTimeout(function() {
-    $.log.debug('(SmartField2#_lookupByAll)');
-    this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
-      .done(this._lookupByTextOrAllDone.bind(this));
-
-  }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
 };
 
 /**
