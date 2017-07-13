@@ -13,13 +13,14 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 
 /**
  * interface for all composer related generic values fields
  */
-public interface IComposerValueField {
+public interface IComposerValueField extends IFormField {
 
   void addValueChangeListenerToTarget(PropertyChangeListener listener);
 
