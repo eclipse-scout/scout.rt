@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-@ClassId("ab22d90c-fedf-4f24-9ab2-4fd5096e36fb")
+@ClassId("7e21b24b-ddd8-4114-8b82-91dd396bf11b")
 public abstract class AbstractProposalColumn2<LOOKUP_TYPE> extends AbstractSmartColumn2<LOOKUP_TYPE> implements IProposalColumn2<LOOKUP_TYPE>, IContributionOwner {
 
   public AbstractProposalColumn2() {
@@ -188,7 +188,7 @@ public abstract class AbstractProposalColumn2<LOOKUP_TYPE> extends AbstractSmart
   /**
    * Internal editor field
    */
-  @ClassId("ceb1ae13-664c-43ce-a670-034e1f36c0b5")
+  @ClassId("45103179-6dc2-47b1-9b77-790507533714")
   @SuppressWarnings("bsiRulesDefinition:orderMissing")
   protected class ProposalField2Editor extends AbstractProposalField2<LOOKUP_TYPE> {
     private ITableRow m_row;
