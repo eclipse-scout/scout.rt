@@ -45,6 +45,10 @@ scout.ProposalField2.prototype._formatValue = function(value) {
   return scout.nvl(value, '');
 };
 
+scout.ProposalField2.prototype._ensureValue = function(value) {
+  return scout.strings.asString(value);
+};
+
 scout.ProposalField2.prototype._acceptByText = function(searchText) {
   $.log.debug('(ProposalField2#_acceptByText) searchText=', searchText);
   if (this.lookupOnAcceptByText) {
