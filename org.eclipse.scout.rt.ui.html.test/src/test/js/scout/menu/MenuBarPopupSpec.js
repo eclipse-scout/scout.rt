@@ -42,10 +42,10 @@ describe("MenuBarPopup", function() {
     });
     menu.render();
     menu.doAction();
-    expect(menu.popup.$head.text()).toEqual('the menu');
+    expect(menu.popup.$head.children('.text').text()).toEqual('the menu');
 
     menu.setText('new text');
     session.layoutValidator.validate();
-    expect(menu.popup.$head.text()).toEqual('new text');
+    expect(menu.popup.$head.children('.text').text()).toEqual('new text');
   });
 });
