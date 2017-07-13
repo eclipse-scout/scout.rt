@@ -34,7 +34,7 @@ scout.ProposalField2.prototype.cssClassName = function() {
 
 scout.ProposalField2.prototype._lookupByTextOrAllDone = function(result) {
   if (result.lookupRows.length === 0) {
-    this.hideLookupInProgress();
+    this.setLoading(false);
     this.closePopup();
     return;
   }

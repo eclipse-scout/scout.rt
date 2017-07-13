@@ -91,29 +91,6 @@
     #scout.error-status();
   }
 
-  /* Define a short transition for opacity changes on all field elements (used in .loading state) */
-  & > label,
-  & > .mandatory-indicator,
-  & > .field,
-  & > .status {
-    transition: opacity 0.15s; /* Same time is used in animation() of .loading-indicator */
-    opacity: 1;
-  }
-
-  &.loading {
-    & > label,
-    & > .mandatory-indicator,
-    & > .field,
-    & > .status {
-      /* Same as 'visibility: hidden', except it can be animated with CSS transitions */
-      opacity: 0;
-    }
-
-    & > .loading-indicator {
-      #scout.loading-indicator();
-    }
-  }
-
   .disabled-overlay {
     position: absolute;
   }

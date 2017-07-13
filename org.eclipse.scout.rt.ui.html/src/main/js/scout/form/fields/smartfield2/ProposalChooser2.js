@@ -95,7 +95,6 @@ scout.ProposalChooser2.prototype._renderModel = function() {
 scout.ProposalChooser2.prototype._renderProperties = function() {
   scout.ProposalChooser2.parent.prototype._renderProperties.call(this);
   this._updateStatus();
-  this.htmlComp.revalidateLayout();
 };
 
 /**

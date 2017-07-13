@@ -11,14 +11,12 @@
 scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
-  this.searching = false;
   this.focused = false;
   this.deletable = false;
   this.popup = null;
   this.lookupCall = null;
   this.codeType = null;
   this._pendingLookup = null;
-  this._pendingSetSearching = null;
   this._pendingOpenPopup = false;
   this._lookupInProgress = false;
   this._tabPrevented = null;
@@ -35,8 +33,6 @@ scout.SmartField2 = function() {
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
-  this._pendingSearching = null;
-  this._searchingStateDisplayedAt = 0;
 
   this._addWidgetProperties(['proposalChooser']);
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall']);
@@ -52,13 +48,6 @@ scout.SmartField2.ErrorCode = {
   NOT_UNIQUE: 1,
   NO_RESULTS: 2
 };
-
-/**
- * This constant is used as delay when adding/removing the searching icon. When the lookup is faster than the delay
- * we don't show the searching icon. If the lookup takes longer than the delay, we show the icon for at least 400 ms
- * anyway, even when the lookup is already done. We do that to avoid flickering.
- */
-scout.SmartField2.SEARCHING_DELAY = 400;
 
 scout.SmartField2.DEBOUNCE_DELAY = 200;
 
@@ -697,7 +686,7 @@ scout.SmartField2.prototype._onFieldBlur = function(event) {
   }
   scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
   this.setFocused(false);
-  this.setSearching(false);
+  this.setLoading(false);
 };
 
 scout.SmartField2.prototype._onFieldFocus = function(event) {
@@ -843,47 +832,6 @@ scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
   this._lookupByTextOrAll(true);
 };
 
-scout.SmartField2.prototype.setSearching = function(searching) {
-  this.setProperty('searching', searching);
-};
-
-/**
- * We display the searching icon:
- * - only when search takes more than 400 ms
- * - when searching status is displayed, we show it for at least 400 ms, even if search is already done
- *   to avoid flickering
- */
-scout.SmartField2.prototype._renderSearching = function() {
-  clearTimeout(this._pendingSearching);
-  if (this.searching) {
-    this._pendingSearching = setTimeout(this._renderAddSearching.bind(this), scout.SmartField2.SEARCHING_DELAY);
-  } else {
-    var searchingDuration = Date.now() - this._searchingStateDisplayedAt;
-    if (searchingDuration >= scout.SmartField2.SEARCHING_DELAY) {
-      // remove searching immediately
-      this._renderRemoveSearching();
-    } else {
-      // remove searching later
-      this._pendingSearching = setTimeout(this._renderRemoveSearching.bind(this),
-        scout.SmartField2.SEARCHING_DELAY - searchingDuration);
-    }
-  }
-};
-
-scout.SmartField2.prototype._renderAddSearching = function() {
-  this._searchingStateDisplayedAt = Date.now();
-  if (this.rendered) {
-    this.$container.addClass('searching');
-  }
-};
-
-scout.SmartField2.prototype._renderRemoveSearching = function() {
-  this._searchingStateDisplayedAt = 0;
-  if (this.rendered) {
-    this.$container.removeClass('searching');
-  }
-};
-
 scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
   this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
 };
@@ -891,7 +839,7 @@ scout.SmartField2.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAl
 scout.SmartField2.prototype.setBrowseLoadIncremental = function(browseLoadIncremental) {
   this.setProperty('browseLoadIncremental', browseLoadIncremental);
   if (this.lookupCall) {
-    this.lookupCall.setLoadIncremental(browseLoadIncremental); // FIXME [awe] 7.0 - SF2: discuss with C.GU, really a property for all lookups?
+    this.lookupCall.setLoadIncremental(browseLoadIncremental);
   }
 };
 
@@ -909,7 +857,6 @@ scout.SmartField2.prototype._lookupByAll = function() {
 
   this._pendingLookup = setTimeout(function() {
     $.log.debug('(SmartField2#_lookupByAll)');
-    // this.lookupCall.setActiveFilter(this.activeFilter); // FIXME [awe] 7.0 - SF2: add on LookupCall
     this._executeLookup(this.lookupCall.getAll.bind(this.lookupCall))
       .done(this._lookupByTextOrAllDone.bind(this));
 
@@ -921,29 +868,12 @@ scout.SmartField2.prototype._lookupByAll = function() {
  */
 scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
   this._lookupInProgress = true;
-  this.showLookupInProgress();
+  this.setLoading(true);
   return lookupFunc()
     .done(function() {
       this._lookupInProgress = false;
-      this.hideLookupInProgress();
+      this.setLoading(false);
     }.bind(this));
-};
-
-scout.SmartField2.prototype.showLookupInProgress = function() {
-  if (this._pendingSetSearching) {
-    clearTimeout(this._pendingSetSearching);
-  }
-  this.setSearching(true); // always show searching immediately
-};
-
-scout.SmartField2.prototype.hideLookupInProgress = function() {
-  if (this._pendingSetSearching) {
-    clearTimeout(this._pendingSetSearching);
-  }
-  this._pendingSetSearching = setTimeout(function() {
-    this.setSearching(false);
-    this._pendingSetSearching = null;
-  }.bind(this), 250);
 };
 
 /**
@@ -1102,4 +1032,11 @@ scout.SmartField2.prototype.additionalLines = function() {
   } else {
     return null;
   }
+};
+
+scout.SmartField2.prototype._createLoadingSupport = function() {
+  return new scout.SimpleLoadingSupport({
+    widget: this,
+    loadingIndicatorDelay: 400 // ms
+  });
 };
