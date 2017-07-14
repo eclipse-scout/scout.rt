@@ -17,6 +17,7 @@ scout.MobilePopup = function() {
   this.animateRemoval = true;
   this.widget;
   this.title;
+  this.withGlassPane = true;
   this._addWidgetProperties('widget');
 };
 scout.inherits(scout.MobilePopup, scout.Popup);
