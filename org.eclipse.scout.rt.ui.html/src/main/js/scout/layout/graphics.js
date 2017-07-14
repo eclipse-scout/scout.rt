@@ -41,6 +41,11 @@ scout.graphics = {
    *                                          scrolling position in $elem's data attributes.
    *
    * @memberOf scout.graphics
+   * @param $elem
+   *          the jQuery element to measure
+   * @param options
+   *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
+   *          of an object, the value is automatically converted to the option "includeMargin".
    */
   prefSize: function($elem, options) {
     // Return 0/0 if element is not displayed (display: none).
@@ -49,7 +54,13 @@ scout.graphics = {
       return new scout.Dimension(0, 0);
     }
 
-    options = options || {};
+    if (typeof options === 'boolean') {
+      options = {
+        includeMargin: options
+      };
+    } else {
+      options = options || {};
+    }
 
     var defaults = {
       includeMargin: false,
@@ -125,12 +136,26 @@ scout.graphics = {
    * includeMargin            false           Whether to include $elem's margins in the returned size.
    *
    * exact                    false           When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up.
+   *
+   * @param $elem
+   *          the jQuery element to measure
+   * @param options
+   *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
+   *          of an object, the value is automatically converted to the option "includeMargin".
    */
   size: function($elem, options) {
     if (!$elem[0] || $elem.isDisplayNone()) {
       return new scout.Dimension(0, 0);
     }
-    options = options || {};
+
+    if (typeof options === 'boolean') {
+      options = {
+        includeMargin: options
+      };
+    } else {
+      options = options || {};
+    }
+
     var bcr = $elem[0].getBoundingClientRect();
     var size = new scout.Dimension(bcr.width, bcr.height);
     var includeMargin = scout.nvl(options.includeMargin, false);
@@ -191,9 +216,30 @@ scout.graphics = {
 
   /**
    * Returns the inset-dimensions of the component (padding, margin, border).
+   *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * includeMargin            false           Whether to include $elem's margins in the returned insets.
+   *
+   * includePadding           true            Whether to include $elem's paddings in the returned insets.
+   *
+   * includeBorder            true            Whether to include $elem's borders in the returned insets.
+   *
+   * @param $elem
+   *          the jQuery element to measure
+   * @param options
+   *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
+   *          of an object, the value is automatically converted to the option "includeMargin".
    */
   insets: function($comp, options) {
-    options = options || {};
+    if (typeof options === 'boolean') {
+      options = {
+        includeMargin: options
+      };
+    } else {
+      options = options || {};
+    }
+
     var i,
       directions = ['top', 'right', 'bottom', 'left'],
       insets = [0, 0, 0, 0],
@@ -261,6 +307,12 @@ scout.graphics = {
    * includeMargin            false           Whether to include $elem's margins in the returned size. X and Y are not affected by this option.
    *
    * exact                    false           When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option.
+   *
+   * @param $elem
+   *          the jQuery element to measure
+   * @param options
+   *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
+   *          of an object, the value is automatically converted to the option "includeMargin".
    */
   bounds: function($elem, options) {
     return scout.graphics._bounds($elem, $elem.position(), options);
@@ -283,6 +335,12 @@ scout.graphics = {
    * includeMargin            false           Whether to include $elem's margins in the returned size. X and Y are not affected by this option.
    *
    * exact                    false           When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option.
+   *
+   * @param $elem
+   *          the jQuery element to measure
+   * @param options
+   *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
+   *          of an object, the value is automatically converted to the option "includeMargin".
    */
   offsetBounds: function($elem, options) {
     return scout.graphics._bounds($elem, $elem.offset(), options);
@@ -307,14 +365,13 @@ scout.graphics = {
     };
     var includeMargin = scout.nvl(options.includeMargin, false);
     return new scout.Rectangle(
-        parseCssPosition('left'),
-        parseCssPosition('top'),
-        $elem.outerWidth(includeMargin),
-        $elem.outerHeight(includeMargin));
+      parseCssPosition('left'),
+      parseCssPosition('top'),
+      $elem.outerWidth(includeMargin),
+      $elem.outerHeight(includeMargin));
   },
 
   _bounds: function($elem, pos, options) {
-    options = options || {};
     var size = scout.graphics.size($elem, options);
     return new scout.Rectangle(pos.left, pos.top, size.width, size.height);
   },

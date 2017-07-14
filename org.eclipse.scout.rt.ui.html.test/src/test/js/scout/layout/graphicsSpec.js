@@ -46,6 +46,11 @@ describe("graphics", function() {
       });
       expect(rect.width).toBe(8 + 2 * 10);
       expect(rect.height).toBe(9 + 2 * 10);
+
+      // check convenience short-hand version
+      var rect2 = scout.graphics.bounds($div, true);
+      expect(rect2.width).toBe(rect.width);
+      expect(rect2.height).toBe(rect.height);
     });
 
   });

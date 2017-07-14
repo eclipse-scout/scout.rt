@@ -139,6 +139,8 @@ describe("HtmlComponent", function() {
         includeMargin: true
       });
       expect(actual).toEqual(expected);
+      var actual2 = htmlComp.insets(true);
+      expect(actual2).toEqual(expected);
     });
 
   });

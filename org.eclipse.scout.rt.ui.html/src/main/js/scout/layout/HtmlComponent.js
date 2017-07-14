@@ -290,8 +290,8 @@ scout.HtmlComponent.prototype.getBounds = function() {
   return scout.graphics.getBounds(this.$comp);
 };
 
-scout.HtmlComponent.prototype.bounds = function() {
-  return scout.graphics.bounds(this.$comp);
+scout.HtmlComponent.prototype.bounds = function(options) {
+  return scout.graphics.bounds(this.$comp, options);
 };
 
 scout.HtmlComponent.prototype.position = function() {
