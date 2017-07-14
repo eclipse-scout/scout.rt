@@ -152,6 +152,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
     return f;
   }
 
+  @SuppressWarnings("deprecation")
   protected void mapEditorFieldProperties(IMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> f) {
     super.mapEditorFieldProperties(f);
     f.setBrowseNewText(getConfiguredBrowseNewText());
