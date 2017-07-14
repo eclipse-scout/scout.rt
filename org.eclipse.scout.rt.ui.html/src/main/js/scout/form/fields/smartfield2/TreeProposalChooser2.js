@@ -29,7 +29,7 @@ scout.TreeProposalChooser2.prototype._onNodeClick = function(event) {
 
 scout.TreeProposalChooser2.prototype.triggerLookupRowSelected = function(node) {
   node = node || this.model.selectedNode();
-  if (!node.enabled) {
+  if (!node || !node.enabled) {
     return;
   }
   this.trigger('lookupRowSelected', {
