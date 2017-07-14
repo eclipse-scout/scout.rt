@@ -32,6 +32,7 @@ scout.Column = function() {
   this.displayable = true;
   this.visible = true;
   this.textBased = true;
+  this.headerMenuEnabled = true;
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 60;

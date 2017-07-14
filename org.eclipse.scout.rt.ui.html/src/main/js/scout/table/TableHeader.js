@@ -547,8 +547,8 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey)) {
     this.table.removeColumnGrouping();
     this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-  } 
-  
+  }
+
   // header menus
   if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
     this.closeTableHeaderMenu();
