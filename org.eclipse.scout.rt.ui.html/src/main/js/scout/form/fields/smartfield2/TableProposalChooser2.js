@@ -51,7 +51,8 @@ scout.TableProposalChooser2.prototype._createModel = function() {
     multiSelect: false,
     multilineText: true,
     scrollToSelection: true,
-    columns: columns
+    columns: columns,
+    headerMenusEnabled: false
   });
 
   table.on('rowClick', this._onRowClick.bind(this));

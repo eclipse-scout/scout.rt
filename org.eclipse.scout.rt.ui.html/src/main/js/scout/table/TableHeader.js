@@ -15,6 +15,7 @@ scout.TableHeader = function() {
   this._tableAddFilterRemovedHandler = this._onTableAddFilterRemoved.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
+  this.headerMenusEnabled = true;
   this.dragging = false;
   this._renderedColumns = [];
 };
@@ -25,6 +26,7 @@ scout.TableHeader.prototype._init = function(options) {
 
   this.table = options.table;
   this.enabled = options.enabled;
+  this.headerMenusEnabled = scout.nvl(options.headerMenusEnabled, true);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -308,7 +310,7 @@ scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
 
 scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
   var $header = column.$header;
-  if (column.disallowHeaderMenu) {
+  if (!this._isHeaderMenuEnabled(column)) {
     $header.addClass('disabled');
   }
 
@@ -526,23 +528,31 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   this._arrangeHeaderItems($headers);
 };
 
+/**
+ * Header menus are enabled when property is enabled on the header itself and on the column too.
+ */
+scout.TableHeader.prototype._isHeaderMenuEnabled = function(column) {
+  return !!(column.headerMenuEnabled && this.headerMenusEnabled);
+};
+
 scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   var $headerItem = $(event.currentTarget),
     column = $headerItem.data('column');
 
-  if (column.disallowHeaderMenu) {
-    return;
-  }
 
+  // dragging & sorting
   if (this.dragging || this.columnMoved) {
     this.dragging = false;
     this.columnMoved = false;
   } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey)) {
     this.table.removeColumnGrouping();
     this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-  } else if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
+  } 
+  
+  // header menus
+  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
     this.closeTableHeaderMenu();
-  } else {
+  } else if (this._isHeaderMenuEnabled(column)) {
     this.openTableHeaderMenu(column);
   }
 

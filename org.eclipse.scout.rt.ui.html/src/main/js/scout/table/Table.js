@@ -75,6 +75,7 @@ scout.Table = function() {
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
   this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
+  this.headerMenusEnabled = true;
 };
 scout.inherits(scout.Table, scout.Widget);
 
@@ -234,7 +235,7 @@ scout.Table.prototype._insertBooleanColumn = function() {
     fixedWidth: true,
     fixedPosition: true,
     guiOnly: true,
-    disallowHeaderMenu: true,
+    headerMenuEnabled: false,
     showSeparator: false,
     width: scout.Column.NARROW_MIN_WIDTH,
     table: this
@@ -251,7 +252,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
       fixedWidth: true,
       fixedPosition: true,
       guiOnly: true,
-      disallowHeaderMenu: true,
+      headerMenuEnabled: false,
       showSeparator: false,
       width: scout.Column.NARROW_MIN_WIDTH,
       table: this
@@ -518,7 +519,8 @@ scout.Table.prototype._createHeader = function() {
   return scout.create('TableHeader', {
     parent: this,
     table: this,
-    enabled: this.headerEnabled
+    enabled: this.headerEnabled,
+    headerMenusEnabled: this.headerMenusEnabled
   });
 };
 
