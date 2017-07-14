@@ -339,12 +339,12 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
 
   @Override
   public String getKeyStroke() {
-    return propertySupport.getPropertyString(PROP_KEY_STOKE);
+    return propertySupport.getPropertyString(PROP_KEY_STROKE);
   }
 
   @Override
   public void setKeyStroke(String keyStroke) {
-    propertySupport.setPropertyString(PROP_KEY_STOKE, keyStroke);
+    propertySupport.setPropertyString(PROP_KEY_STROKE, keyStroke);
   }
 
   @Override

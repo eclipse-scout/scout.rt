@@ -209,6 +209,10 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
         getWizard().doFinish();
       }
 
+      /**
+       * This is intentionally the same as in {@link WizardNextStepButton}: If both buttons are visible, the leftmost
+       * (lowest {@link Order}) will capture this key stroke. If only one is visible, it alone will capture it.
+       */
       @Override
       protected String getConfiguredKeyStroke() {
         return IKeyStroke.ENTER;

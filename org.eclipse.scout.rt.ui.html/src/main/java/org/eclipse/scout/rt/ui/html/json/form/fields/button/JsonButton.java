@@ -87,7 +87,7 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
         return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
-    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_KEY_STOKE, model) {
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_KEY_STROKE, model) {
       @Override
       protected String modelValue() {
         return getModel().getKeyStroke();
