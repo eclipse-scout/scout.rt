@@ -139,18 +139,14 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
-  return scout.graphics.prefSize(this._groupBox.$title, {
-    includeMargin: true
-  }).height;
+  return scout.graphics.prefSize(this._groupBox.$title, true).height;
 };
 
 scout.GroupBoxLayout.prototype._notificationHeight = function() {
   if (!this._groupBox.notification) {
     return 0;
   }
-  return this._groupBox.notification.htmlComp.prefSize({
-    includeMargin: true
-  }).height;
+  return this._groupBox.notification.htmlComp.prefSize(true).height;
 };
 
 scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {

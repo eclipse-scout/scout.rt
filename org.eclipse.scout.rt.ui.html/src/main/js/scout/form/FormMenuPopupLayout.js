@@ -34,9 +34,7 @@ scout.FormMenuPopupLayout.prototype.preferredLayoutSize = function($container) {
 
   prefSize = htmlForm.prefSize()
     .add(htmlComp.insets())
-    .add(scout.graphics.insets(this.popup.$body, {
-      includeMargin: true
-    }))
+    .add(scout.graphics.insets(this.popup.$body, true))
     .add(htmlForm.margins());
 
   return prefSize;

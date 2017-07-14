@@ -17,9 +17,7 @@ scout.TouchPopupLayout.prototype.layout = function($container) {
   scout.TouchPopupLayout.parent.prototype.layout.call(this, $container);
 
   var popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
-    headerHeight = scout.graphics.size(this.popup._$header, {
-      includeMargin: true
-    }).height,
+    headerHeight = scout.graphics.size(this.popup._$header, true).height,
     field = this.popup._field,
     fieldHeight = field.htmlComp.prefSize().height,
     fieldMargins = field.htmlComp.margins(),

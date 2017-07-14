@@ -225,12 +225,8 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
     $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
   });
 
-  headSize = scout.graphics.size(this.$head, {
-    includeMargin: true
-  });
-  bodySize = scout.graphics.size(this.$body, {
-    includeMargin: true
-  });
+  headSize = scout.graphics.size(this.$head, true);
+  bodySize = scout.graphics.size(this.$body, true);
   bodySize.width = Math.max(bodySize.width, headSize.width);
   bodyWidth = bodySize.width;
 

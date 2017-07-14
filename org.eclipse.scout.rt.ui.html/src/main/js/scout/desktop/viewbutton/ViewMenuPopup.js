@@ -104,9 +104,7 @@ scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
 
 scout.ViewMenuPopup.prototype.position = function() {
   var pos = this.$tab.offset(),
-    headSize = scout.graphics.size(this.$tab, {
-      includeMargin: true
-    }),
+    headSize = scout.graphics.size(this.$tab, true),
     bodyTop = headSize.height;
 
   scout.graphics.setBounds(this.$head, pos.left, pos.top, headSize.width, headSize.height);

@@ -65,9 +65,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
 
     // Layout filter field(s) and get size
     filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), this._filterFieldsGroupBoxHeight()));
-    filterFieldGroupSize = scout.graphics.size($filterFieldsGroup, {
-      includeMargin: true
-    });
+    filterFieldGroupSize = scout.graphics.size($filterFieldsGroup, true);
   }
 
   // Filter table
@@ -122,9 +120,7 @@ scout.TableHeaderMenuLayout.prototype._adjustSizeWithAnchor = function(prefSize)
 
 // group title (size used for table + field container)
 scout.TableHeaderMenuLayout.prototype._groupTitleHeight = function($group) {
-  return scout.graphics.size($group.find('.table-header-menu-group-text'), {
-    includeMargin: true
-  }).height;
+  return scout.graphics.size($group.find('.table-header-menu-group-text'), true).height;
 };
 
 scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
@@ -145,17 +141,13 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
     oldMaxWidth = this._getMaxWidth();
 
   this._setMaxWidth(); // temp. remove max-width so we can determine pref. size
-  leftColumnHeight = scout.graphics.size(this.popup.$columnActions, {
-    includeMargin: true
-  }).height;
+  leftColumnHeight = scout.graphics.size(this.popup.$columnActions, true).height;
 
   // Filter table
   if (this.popup.hasFilterTable) {
     var
       $filterTableGroup = this.popup.$filterTableGroup,
-      filterTableHeight = this.popup.filterTable.htmlComp.size({
-        includeMargin: true
-      }).height,
+      filterTableHeight = this.popup.filterTable.htmlComp.size(true).height,
       filterTableContainerInsets = scout.graphics.insets($filterTableGroup),
       filterTableContainerHeight;
 

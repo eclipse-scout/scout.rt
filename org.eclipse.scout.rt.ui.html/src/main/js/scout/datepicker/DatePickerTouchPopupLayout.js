@@ -25,9 +25,7 @@ scout.DatePickerTouchPopupLayout.prototype.preferredLayoutSize = function($conta
       .add(fieldHtmlComp.margins()),
     widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
       .add(widgetContainerHtmlComp.margins()),
-    headerHeight = scout.graphics.size(this.popup._$header, {
-      includeMargin: true
-    }).height,
+    headerHeight = scout.graphics.size(this.popup._$header, true).height,
     popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
 
   return new scout.Dimension(popupWidth, popupHeight);

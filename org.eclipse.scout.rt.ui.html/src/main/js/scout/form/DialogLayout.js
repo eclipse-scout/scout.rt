@@ -31,9 +31,7 @@ scout.DialogLayout.prototype.layout = function($container) {
     currentBounds = cacheBounds;
   } else {
     dialogSize = this.preferredLayoutSize($container);
-    currentBounds = htmlComp.offsetBounds({
-      includeMargin: true
-    });
+    currentBounds = htmlComp.offsetBounds(true);
   }
 
   dialogSize = scout.DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
@@ -90,9 +88,7 @@ scout.DialogLayout.fitContainerInWindow = function(windowSize, containerPosition
 scout.DialogLayout.positionContainerInWindow = function($container) {
   var
     windowSize = $container.windowSize(),
-    containerSize = scout.HtmlComponent.get($container).size({
-      includeMargin: true
-    }),
+    containerSize = scout.HtmlComponent.get($container).size(true),
     left = (windowSize.width - containerSize.width) / 2,
     top = (windowSize.height - containerSize.height) / 2;
 

@@ -61,9 +61,7 @@ scout.OutlineLayout.prototype._layout = function($container) {
 scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {
   var titleSize = null;
   if (this.outline.titleVisible) {
-    titleSize = scout.graphics.size(this.outline.$title, {
-      includeMargin: true
-    });
+    titleSize = scout.graphics.size(this.outline.$title, true);
   }
   scout.OutlineLayout.parent.prototype._setDataHeight.call(this, heightOffset + (titleSize === null ? 0 : titleSize.height));
 };

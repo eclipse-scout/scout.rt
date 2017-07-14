@@ -48,9 +48,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, {
-          includeMargin: true
-        }).width;
+        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
       }
     }
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
@@ -82,9 +80,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         .cssRight(right + formField.$label.cssMarginRight())
         .cssHeight(statusHeight);
       // Add padding to label to prevent overlay of text and status icon
-      var w = scout.graphics.size(formField.$status, {
-        includeMargin: true
-      }).width;
+      var w = scout.graphics.size(formField.$status, true).width;
       formField.$label.cssPaddingRight(w);
     } else {
       // Default status position
@@ -203,9 +199,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, {
-          includeMargin: true
-        }).width;
+        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
       }
     }
     labelPositionLeft = formField.labelPosition === scout.FormField.LabelPosition.DEFAULT ||
@@ -271,9 +265,7 @@ scout.FormFieldLayout.prototype._layoutDeletableIcon = function(formField, field
       .cssLineHeight(height);
   } else {
     if (formField.$icon) {
-      iconWidth = scout.graphics.prefSize(formField.$icon, {
-        includeMargin: true
-      }).width;
+      iconWidth = scout.graphics.prefSize(formField.$icon, true).width;
     }
     formField.$deletableIcon
       .cssRight(formField.$field.cssBorderRightWidth() + right + iconWidth)
@@ -289,9 +281,7 @@ scout.FormFieldLayout.prototype._layoutDeletableIcon = function(formField, field
  * another size (which is required when the field-content is scrollable).
  */
 scout.FormFieldLayout.prototype.naturalSize = function(formField) {
-  return scout.graphics.prefSize(formField.$fieldContainer, {
-    includeMargin: true
-  });
+  return scout.graphics.prefSize(formField.$fieldContainer, true);
 };
 
 scout.FormFieldLayout.prototype.labelWidth = function() {

@@ -222,17 +222,13 @@ scout.MenuBoxLayout.prototype._destroyEllipsis = function() {
  */
 scout.MenuBoxLayout.prototype._moveOverflowMenusIntoEllipsis = function(containerSize, menusWidth) {
   var collapsedMenus = [this._ellipsis];
-  var ellipsisSize = scout.graphics.size(this._ellipsis.$container, {
-    includeMargin: true
-  });
+  var ellipsisSize = scout.graphics.size(this._ellipsis.$container, true);
   menusWidth += ellipsisSize.width;
   this.visibleMenus().slice().reverse().forEach(function(menu) {
     var menuSize;
     if (menusWidth > containerSize.width) {
       // Menu does not fit -> move to ellipsis menu
-      menuSize = scout.graphics.size(menu.$container, {
-        includeMargin: true
-      });
+      menuSize = scout.graphics.size(menu.$container, true);
       menusWidth -= menuSize.width;
       scout.menus.moveMenuIntoEllipsis(menu, this._ellipsis);
     } else {

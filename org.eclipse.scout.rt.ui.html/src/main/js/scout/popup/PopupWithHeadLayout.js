@@ -24,9 +24,7 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
     // Set size of body
     popupSize = popupSize.subtract(htmlComp.insets());
     if (this._headVisible) {
-      var headSize = scout.graphics.size(this.popup.$head, {
-        includeMargin: true
-      });
+      var headSize = scout.graphics.size(this.popup.$head, true);
       // Adjust popup size if head changed size
       if (popupSize.width < headSize.width) {
         popupSize.width = headSize.width;
@@ -83,23 +81,17 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
       height: 'auto'
     });
 
-    prefSize = scout.graphics.prefSize(this.popup.$body, {
-        includeMargin: true
-      })
+    prefSize = scout.graphics.prefSize(this.popup.$body, true)
       .add(htmlComp.insets());
 
     $siblingBodies.removeClass('hidden');
     this.popup.$container.attr('style', popupStyleBackup);
   } else {
-    prefSize = scout.graphics.size(this.popup.$body, {
-      includeMargin: true
-    });
+    prefSize = scout.graphics.size(this.popup.$body, true);
   }
 
   if (this.popup._headVisible) {
-    var headSize = scout.graphics.size(this.popup.$head, {
-      includeMargin: true
-    });
+    var headSize = scout.graphics.size(this.popup.$head, true);
     prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
   }
   return prefSize;

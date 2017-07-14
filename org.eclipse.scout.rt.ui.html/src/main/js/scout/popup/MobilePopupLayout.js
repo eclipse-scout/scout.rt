@@ -24,9 +24,7 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
     headerSize = 0;
 
   popupSize = popupSize.subtract(htmlPopup.insets());
-  headerSize = scout.graphics.prefSize($header, {
-    includeMargin: true
-  });
+  headerSize = scout.graphics.prefSize($header, true);
   scout.graphics.setLocation($header, new scout.Point(0, 0));
 
   widgetSize = popupSize.clone();

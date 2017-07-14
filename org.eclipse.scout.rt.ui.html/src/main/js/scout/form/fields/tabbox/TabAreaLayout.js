@@ -19,9 +19,7 @@ scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
 scout.TabAreaLayout.prototype.layout = function($container) {
   if (!this._ellipsisBounds) {
     this._createAndRenderEllipsis($container);
-    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis, {
-      includeMargin: true
-    });
+    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis, true);
   }
 
   this._destroyEllipsis();
@@ -37,9 +35,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     statusPosition = this._tabBox.statusPosition;
 
   // If tab area contains a menubar, less space is available
-  clientWidth -= scout.graphics.size(menuBar.$container, {
-    includeMargin: true
-  }).width;
+  clientWidth -= scout.graphics.size(menuBar.$container, true).width;
 
   if (statusPosition === scout.FormField.StatusPosition.TOP) {
     // Status on top means it is inside the tab area
@@ -67,9 +63,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     for (i = 0; i < this._tabBox.tabItems.length; i++) {
       tab = this._tabBox.tabItems[i];
       if (tab.visible) {
-        bounds = scout.graphics.bounds(tab.$tabContainer, {
-          includeMargin: true
-        });
+        bounds = scout.graphics.bounds(tab.$tabContainer, true);
         tabs.push(tab);
         tabBounds.push(bounds);
         // cannot use selectedTab property of TabBox, it points to the wrong index

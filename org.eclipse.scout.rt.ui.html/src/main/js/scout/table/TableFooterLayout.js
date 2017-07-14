@@ -24,9 +24,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     $infoItems = $info.find('.table-info-item'),
     containerWidth = scout.graphics.size($container).width;
 
-  controlsWidth = scout.graphics.size($controls, {
-    includeMargin: true
-  }).width;
+  controlsWidth = scout.graphics.size($controls, true).width;
   infoWidth = scout.graphics.size($info).width;
 
   // Remove width to make sure elements are as width as they want to be

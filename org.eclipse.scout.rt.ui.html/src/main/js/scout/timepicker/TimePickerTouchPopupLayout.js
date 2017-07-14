@@ -25,16 +25,16 @@ scout.TimePickerTouchPopupLayout.prototype.layout = function($container) {
 scout.TimePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
   var containerInsets = this.popup.htmlComp.insets(),
     fieldHtmlComp = this.popup._field.htmlComp,
-    widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
-    fieldPrefSize = fieldHtmlComp.prefSize(options)
-    .add(fieldHtmlComp.margins()),
-    widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
-    .add(widgetContainerHtmlComp.margins()),
-    headerHeight = scout.graphics.size(this.popup._$header, {
-      includeMargin: true
-    }).height,
-    popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical(),
-    popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
+    widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp;
+
+  var fieldPrefSize = fieldHtmlComp.prefSize(options)
+    .add(fieldHtmlComp.margins());
+  var widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
+    .add(widgetContainerHtmlComp.margins());
+
+  var headerHeight = scout.graphics.size(this.popup._$header, true).height;
+  var popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
+  var popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
 
   return new scout.Dimension(popupWidth, popupHeight);
 };

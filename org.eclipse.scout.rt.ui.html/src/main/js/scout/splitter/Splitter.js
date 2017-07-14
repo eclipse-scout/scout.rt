@@ -138,9 +138,7 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
   }
 };
 scout.Splitter.prototype._onMouseDown = function(event) {
-  var splitterCenter = scout.graphics.offsetBounds(this.$container, {
-    includeMargin: true
-  }).center();
+  var splitterCenter = scout.graphics.offsetBounds(this.$container, true).center();
 
   // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
   this._$window

@@ -35,9 +35,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   containerSize = containerSize.subtract(htmlContainer.insets());
 
   if (this.header.logo) {
-    logoWidth = scout.graphics.size(this.header.logo.$container, {
-      includeMargin: true
-    }).width;
+    logoWidth = scout.graphics.size(this.header.logo.$container, true).width;
   }
 
   if (viewButtonBox) {

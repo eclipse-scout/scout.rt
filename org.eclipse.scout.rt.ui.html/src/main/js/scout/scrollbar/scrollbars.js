@@ -314,9 +314,7 @@ scout.scrollbars = {
   scrollHorizontalTo: function($scrollable, $element) {
     var scrollTo,
       scrollableW = $scrollable.width(),
-      elementBounds = scout.graphics.bounds($element, {
-        includeMargin: true
-      }),
+      elementBounds = scout.graphics.bounds($element, true),
       elementLeft = elementBounds.x,
       elementW = elementBounds.width;
 
