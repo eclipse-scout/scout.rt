@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * Renders glassPanes over the 'glassPaneTargets' of an element.
+ * Renders glassPanes over the 'glassPaneTargets' of a widget.
  */
-scout.GlassPaneRenderer = function(session, element, enabled) {
-  this._element = element;
-  this._enabled = enabled;
-  this.session = session;
+scout.GlassPaneRenderer = function(widget, enabled) {
+  this._widget = widget;
+  this.session = widget.session;
+  this._enabled = scout.nvl(enabled, true);
   this._$glassPanes = [];
   this._$glassPaneTargets = [];
   this._deferredGlassPanes = [];
@@ -34,7 +34,13 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
-  var $glassPane;
+  var $glassPane,
+    $glassPaneTarget = $(glassPaneTarget);
+
+  if (this._widget.$container && this._widget.$container[0] === $glassPaneTarget[0]) {
+    // Don't render a glass pane on the widget itself (necessary if glass pane is added after the widget is rendered)
+    return;
+  }
 
   // Render glasspanes onto glasspane targets.
   $glassPane = $(glassPaneTarget)
@@ -42,7 +48,7 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
     .on('mousedown', this._onMouseDown.bind(this));
 
   // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
-  // is blocked, since the element that blocks (e.g a message-box) may be opened in the main-window.
+  // is blocked, since the widget that blocks (e.g a message-box) may be opened in the main-window.
   if ($glassPane.window(true).popupWindow) {
     $glassPane.addClass('dark');
   }
@@ -61,7 +67,7 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
     $glassPane.remove();
   });
 
-  //Unregister all deferedGlassPaneTargets
+  // Unregister all deferedGlassPaneTargets
   this._deferredGlassPanes.forEach(function(glassPaneTarget) {
     glassPaneTarget.removeGlassPaneRenderer(this);
   }, this);
@@ -101,7 +107,7 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
 scout.GlassPaneRenderer.prototype._resolveDisplayParent = function() {
   // Note: This has to be done after rendering, because otherwise session.desktop could be undefined!
   if (!this._resolvedDisplayParent) {
-    this._resolvedDisplayParent = this._element.displayParent || this.session.desktop;
+    this._resolvedDisplayParent = this._widget.displayParent || this.session.desktop;
   }
   return this._resolvedDisplayParent;
 };
@@ -132,16 +138,16 @@ scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
 scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   var $animationTarget = null;
 
-  if (this._element instanceof scout.Form && this._element.isView()) {
-    // If the blocking element is a view, the $container cannot be animated (this only works for dialogs). Instead,
+  if (this._widget instanceof scout.Form && this._widget.isView()) {
+    // If the blocking widget is a view, the $container cannot be animated (this only works for dialogs). Instead,
     // highlight the view tab (or the overflow item, if the view tab is not visible).
 
-    $animationTarget = this.session.desktop.bench.getViewTab(this._element).$container;
+    $animationTarget = this.session.desktop.bench.getViewTab(this._widget).$container;
     if (!$animationTarget.isVisible()) {
       $animationTarget = $animationTarget.siblings('.overflow-tab-item');
     }
-  } else if (this._element.$container) {
-    $animationTarget = this._element.$container;
+  } else if (this._widget.$container) {
+    $animationTarget = this._widget.$container;
   }
 
   if ($animationTarget) {

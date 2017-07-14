@@ -65,7 +65,7 @@ scout.MessageBox.prototype._initKeyStrokeContext = function() {
 
 scout.MessageBox.prototype._render = function() {
   // Render modality glasspanes (must precede adding the message box to the DOM)
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, true);
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
   this._glassPaneRenderer.renderGlassPanes();
 
   this.$container = this.$parent.appendDiv('messagebox');

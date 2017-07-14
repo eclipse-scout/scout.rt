@@ -11,13 +11,15 @@
 scout.Popup = function() {
   scout.Popup.parent.call(this);
 
-  this._mouseDownHandler;
-  this._scrollHandler;
-  this._popupOpenHandler;
+  this._mouseDownHandler = null;
+  this._scrollHandler = null;
+  this._popupOpenHandler = null;
+  this._glassPaneRenderer = null;
   this.anchorBounds;
   this.$anchor;
   this.windowPaddingX = 10;
   this.windowPaddingY = 5;
+  this.withGlassPane = false;
   this.withFocusContext = true;
   this.initialFocus = function() {
     return scout.focusRule.AUTO;
@@ -49,6 +51,9 @@ scout.Popup.prototype._init = function(options) {
 
   if (options.location) {
     this.anchorBounds = new scout.Rectangle(options.location.x, options.location.y, 0, 0);
+  }
+  if (this.withGlassPane) {
+    this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
   }
 };
 
@@ -110,11 +115,12 @@ scout.Popup.prototype._render = function() {
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
+};
 
-  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
-  if (this.withFocusContext && this.focusableContainer) {
-    this.$container.attr('tabindex', -1);
-  }
+scout.Popup.prototype._renderProperties = function() {
+  scout.Popup.parent.prototype._renderProperties.call(this);
+  this._renderWithFocusContext();
+  this._renderWithGlassPane();
 };
 
 scout.Popup.prototype._postRender = function() {
@@ -125,12 +131,28 @@ scout.Popup.prototype._postRender = function() {
 };
 
 scout.Popup.prototype._remove = function() {
+  if (this._glassPaneRenderer) {
+    this._glassPaneRenderer.removeGlassPanes();
+  }
   if (this.withFocusContext) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
   // remove all clean-up handlers
   this._detachCloseHandler();
   scout.Popup.parent.prototype._remove.call(this);
+};
+
+scout.Popup.prototype._renderWithFocusContext = function() {
+  // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
+  if (this.withFocusContext && this.focusableContainer) {
+    this.$container.attr('tabindex', -1);
+  }
+};
+
+scout.Popup.prototype._renderWithGlassPane = function() {
+  if (this._glassPaneRenderer) {
+    this._glassPaneRenderer.renderGlassPanes();
+  }
 };
 
 scout.Popup.prototype._isRemovalPrevented = function() {
