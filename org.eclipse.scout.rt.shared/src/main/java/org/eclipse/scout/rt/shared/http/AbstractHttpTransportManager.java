@@ -94,7 +94,7 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
   }
 
   @Override
-  public void interceptNewHttpTransport(Object builder) {
+  public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
     // nop
   }
 

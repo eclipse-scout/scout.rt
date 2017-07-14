@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -80,6 +81,17 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       try (InputStream in = resp.getContent()) {
         return m_tunnel.getContentHandler().readResponse(in);
       }
+    }
+    catch (IOException e) {
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.debug("Ignoring IOException for interrupted thread.", e);
+        return new ServiceTunnelResponse(new ThreadInterruptedError("Thread is interrupted.", e));
+      }
+      else if (RunMonitor.CURRENT.get().isCancelled()) {
+        LOG.debug("Ignoring IOException for cancelled thread.", e);
+        return new ServiceTunnelResponse(new FutureCancelledError("RunMonitor is cancelled.", e));
+      }
+      throw e;
     }
     finally {
       if (LOG.isDebugEnabled()) {

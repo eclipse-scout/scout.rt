@@ -22,7 +22,7 @@ public class NetHttpTransportFactory implements IHttpTransportFactory {
     NetHttpTransport.Builder builder = new NetHttpTransport.Builder();
 
     interceptNewHttpTransport(builder, manager);
-    manager.interceptNewHttpTransport(builder);
+    manager.interceptNewHttpTransport(new NetHttpTransportBuilder(builder));
 
     return builder.build();
   }
@@ -34,4 +34,15 @@ public class NetHttpTransportFactory implements IHttpTransportFactory {
     // nop
   }
 
+  public static class NetHttpTransportBuilder implements IHttpTransportBuilder {
+    private final NetHttpTransport.Builder m_builder;
+
+    public NetHttpTransportBuilder(NetHttpTransport.Builder builder) {
+      m_builder = builder;
+    }
+
+    public NetHttpTransport.Builder getBuilder() {
+      return m_builder;
+    }
+  }
 }

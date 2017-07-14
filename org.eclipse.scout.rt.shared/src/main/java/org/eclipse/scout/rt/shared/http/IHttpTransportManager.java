@@ -25,5 +25,5 @@ public interface IHttpTransportManager {
    * @param builder
    *          builder if available
    */
-  void interceptNewHttpTransport(Object builder);
+  void interceptNewHttpTransport(IHttpTransportBuilder builder);
 }

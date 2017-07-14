@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
+import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -69,7 +70,7 @@ public class HttpServiceTunnelTest {
           }
 
           @Override
-          public void interceptNewHttpTransport(Object builder) {
+          public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
             // nop
           }
         };

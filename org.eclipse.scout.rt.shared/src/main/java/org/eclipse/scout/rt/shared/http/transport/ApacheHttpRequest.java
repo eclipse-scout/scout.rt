@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
+import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.LowLevelHttpRequest;
 import com.google.api.client.http.LowLevelHttpResponse;
 import com.google.api.client.util.StreamingContent;
@@ -72,6 +73,9 @@ public class ApacheHttpRequest extends LowLevelHttpRequest {
 
         @Override
         public boolean isRepeatable() {
+          if (streamingContent instanceof HttpContent) {
+            return ((HttpContent) streamingContent).retrySupported();
+          }
           return false;
         }
 
