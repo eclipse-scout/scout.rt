@@ -197,7 +197,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * with this label.<br>
    * When clicked the method {@link #interceptBrowseNew(String)} is invoked, which in most cases is implemented as
    * opening a "New XY..." dialog
+   *
+   * @deprecated since 6.1 - will be removed with 7.0
    */
+  @Deprecated
   @ConfigProperty(ConfigProperty.STRING)
   @Order(315)
   protected String getConfiguredBrowseNewText() {
@@ -550,7 +553,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   /**
    * see {@link AbstractSmartField#interceptBrowseNew(String)}
+   *
+   * @deprecated
    */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void doBrowseNew(String newText) {
     if (getBrowseNewText() != null) {
@@ -650,11 +657,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     m_maxRowCount = n;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public String getBrowseNewText() {
     return m_browseNewText;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setBrowseNewText(String s) {
     m_browseNewText = s;
@@ -978,10 +987,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    */
   protected abstract VALUE handleMissingLookupRow(String text);
 
-  /**
-   * TODO [7.0] awe: check difference between handleMissingLookupRow and handleAcceptByDisplayText. Can we use the same
-   * method for both cases?
-   */
   protected abstract boolean handleAcceptByDisplayText(String text);
 
   @Override
