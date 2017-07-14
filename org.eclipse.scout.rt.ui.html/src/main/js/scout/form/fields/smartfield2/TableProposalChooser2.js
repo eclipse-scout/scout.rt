@@ -60,8 +60,12 @@ scout.TableProposalChooser2.prototype._createModel = function() {
 };
 
 scout.TableProposalChooser2.prototype._onRowClick = function(event) {
+  var row = event.row;
+  if (!row || !row.enabled) {
+    return;
+  }
   this.setBusy(true);
-  this.triggerLookupRowSelected(event.row);
+  this.triggerLookupRowSelected(row);
 };
 
 scout.TableProposalChooser2.prototype.triggerLookupRowSelected = function(row) {
