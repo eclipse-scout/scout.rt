@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.ISmartField2Extension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2BrowseNewChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterBrowseLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterKeyLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterLookupResultChain;
@@ -121,7 +120,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   // cached lookup row
   private IContentAssistFieldLookupRowFetcher<VALUE> m_lookupRowFetcher;
-  private String m_browseNewText;
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
 
@@ -212,18 +210,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   /**
-   * When the smart proposal finds no matching records and this property is not null, then it displays a link or menu
-   * with this label.<br>
-   * When clicked the method {@link #interceptBrowseNew(String)} is invoked, which in most cases is implemented as
-   * opening a "New XY..." dialog
-   */
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(315)
-  protected String getConfiguredBrowseNewText() {
-    return null;
-  }
-
-  /**
    * variant A: lookup by code type
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
@@ -292,21 +278,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Order(320)
   protected String getConfiguredDisplayStyle() {
     return DISPLAY_STYLE_DEFAULT;
-  }
-
-  /**
-   * see {@link #getConfiguredBrowseNewText()}<br>
-   * In most cases this method is implemented as opening a "New XY..." dialog.
-   * <p>
-   * The smartfield waits for the return of this method:<br>
-   * If null, it does nothing.<br>
-   * If {@link LookupRow#getKey()} is set, this key is set as the smartfields new value.<br>
-   * If {@link LookupRow#getText()} is set, this text is used as a search text and a parse is performed.
-   */
-  @ConfigOperation
-  @Order(225)
-  protected ILookupRow<VALUE> execBrowseNew(String searchText) {
-    return null;
   }
 
   /**
@@ -463,7 +434,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     setLoadParentNodes(getConfiguredLoadParentNodes());
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
-    setBrowseNewText(getConfiguredBrowseNewText());
     setColumnDescriptors(getConfiguredColumnDescriptors());
     setDisplayStyle(getConfiguredDisplayStyle());
 
@@ -556,27 +526,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     propertySupport.firePropertyChange(PROP_RESULT, null, result);
   }
 
-  /**
-   * see {@link AbstractSmartField#interceptBrowseNew(String)}
-   */
-  @Override
-  public void doBrowseNew(String newText) {
-    if (getBrowseNewText() != null) {
-      try {
-        ILookupRow<VALUE> newRow = interceptBrowseNew(newText);
-        if (newRow == null) {
-          // nop
-        }
-        else {
-          setValueByLookupRow(newRow);
-        }
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-    }
-  }
-
   @Override
   public String getBrowseIconId() {
     return propertySupport.getPropertyString(PROP_BROWSE_ICON_ID);
@@ -656,16 +605,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   @Override
   public void setBrowseMaxRowCount(int browseMaxRowCount) {
     propertySupport.setPropertyInt(PROP_BROWSE_MAX_ROW_COUNT, browseMaxRowCount);
-  }
-
-  @Override
-  public String getBrowseNewText() {
-    return m_browseNewText;
-  }
-
-  @Override
-  public void setBrowseNewText(String s) {
-    m_browseNewText = s;
   }
 
   @Override
@@ -1209,11 +1148,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     }
 
     @Override
-    public ILookupRow<VALUE> execBrowseNew(SmartField2BrowseNewChain<VALUE> chain, String searchText) {
-      return getOwner().execBrowseNew(searchText);
-    }
-
-    @Override
     public void execFilterKeyLookupResult(SmartField2FilterKeyLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
       getOwner().execFilterKeyLookupResult(call, result);
     }
@@ -1268,12 +1202,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SmartField2FilterBrowseLookupResultChain<VALUE> chain = new SmartField2FilterBrowseLookupResultChain<VALUE>(extensions);
     chain.execFilterBrowseLookupResult(call, result);
-  }
-
-  protected final ILookupRow<VALUE> interceptBrowseNew(String searchText) {
-    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SmartField2BrowseNewChain<VALUE> chain = new SmartField2BrowseNewChain<VALUE>(extensions);
-    return chain.execBrowseNew(searchText);
   }
 
   protected final void interceptFilterKeyLookupResult(ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2BrowseNewChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterBrowseLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterKeyLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterLookupResultChain;
@@ -31,8 +30,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 public interface ISmartField2Extension<VALUE, OWNER extends AbstractSmartField2<VALUE>> extends IValueFieldExtension<VALUE, OWNER> {
 
   void execFilterBrowseLookupResult(SmartField2FilterBrowseLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
-
-  ILookupRow<VALUE> execBrowseNew(SmartField2BrowseNewChain<VALUE> chain, String searchText);
 
   void execFilterKeyLookupResult(SmartField2FilterKeyLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result);
 

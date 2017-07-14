@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2BrowseNewChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterBrowseLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterKeyLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.SmartField2Chains.SmartField2FilterLookupResultChain;
@@ -27,11 +26,6 @@ public abstract class AbstractSmartField2Extension<VALUE, OWNER extends Abstract
   @Override
   public void execFilterBrowseLookupResult(SmartField2FilterBrowseLookupResultChain<VALUE> chain, ILookupCall<VALUE> call, List<ILookupRow<VALUE>> result) {
     chain.execFilterBrowseLookupResult(call, result);
-  }
-
-  @Override
-  public ILookupRow<VALUE> execBrowseNew(SmartField2BrowseNewChain<VALUE> chain, String searchText) {
-    return chain.execBrowseNew(searchText);
   }
 
   @Override

@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.TreeProposalChooser;
@@ -165,21 +164,6 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
   boolean isLoadParentNodes();
 
   void setLoadParentNodes(boolean loadParentNodes);
-
-  /**
-   * see {@link AbstractSmartField#execBrowseNew(String)}
-   */
-  String getBrowseNewText();
-
-  /**
-   * see {@link AbstractSmartField#execBrowseNew(String)}
-   */
-  void setBrowseNewText(String s);
-
-  /**
-   * see {@link AbstractSmartField#execBrowseNew(String)}
-   */
-  void doBrowseNew(String newText);
 
   /**
    * Filter selection of hierarchy browse tree. The level reported here is different than the one used in

@@ -48,24 +48,6 @@ public final class SmartField2Chains {
     }
   }
 
-  public static class SmartField2BrowseNewChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
-
-    public SmartField2BrowseNewChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
-      super(extensions);
-    }
-
-    public ILookupRow<VALUE> execBrowseNew(final String searchText) {
-      MethodInvocation<ILookupRow<VALUE>> methodInvocation = new MethodInvocation<ILookupRow<VALUE>>() {
-        @Override
-        protected void callMethod(ISmartField2Extension<VALUE, ? extends AbstractSmartField2<VALUE>> next) {
-          setReturnValue(next.execBrowseNew(SmartField2BrowseNewChain.this, searchText));
-        }
-      };
-      callChain(methodInvocation, searchText);
-      return methodInvocation.getReturnValue();
-    }
-  }
-
   public static class SmartField2FilterKeyLookupResultChain<VALUE> extends AbstractSmartField2Chain<VALUE> {
 
     public SmartField2FilterKeyLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
