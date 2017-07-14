@@ -192,7 +192,7 @@ public class HttpProxy {
     }
   }
 
-  protected void writeResponseStatus(HttpServletResponse resp, HttpResponse httpResp) throws IOException {
+  protected void writeResponseStatus(HttpServletResponse resp, HttpResponse httpResp) {
     int responseCode = httpResp.getStatusCode();
     resp.setStatus(responseCode);
   }

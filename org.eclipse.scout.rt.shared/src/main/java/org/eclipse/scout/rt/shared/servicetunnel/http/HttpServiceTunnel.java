@@ -161,7 +161,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   /**
    * Method invoked to add the <em>correlation ID</em> as HTTP header to the request.
    */
-  protected void addCorrelationId(final HttpRequest httpRequest) throws IOException {
+  protected void addCorrelationId(final HttpRequest httpRequest) {
     final String cid = CorrelationId.CURRENT.get();
     if (cid != null) {
       httpRequest.getHeaders().put(CorrelationId.HTTP_HEADER_NAME, cid);
