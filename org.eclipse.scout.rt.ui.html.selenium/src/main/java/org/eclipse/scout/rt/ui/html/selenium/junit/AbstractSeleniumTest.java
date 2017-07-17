@@ -349,9 +349,12 @@ public abstract class AbstractSeleniumTest {
     return waitUntilTableCellClickable(null, cellText);
   }
 
-  public Boolean waitUntilDataRequestPendingDone() {
+  /**
+   * Waits for all pending server calls to finish.
+   */
+  public void waitUntilDataRequestPendingDone() {
     WebElement entryPoint = findElement(By.className("scout"));
-    return waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
+    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
   }
 
   public void clickCheckBox(WebElement parent, Class<?> modelClass) {
@@ -459,8 +462,7 @@ public abstract class AbstractSeleniumTest {
     element.click();
 
     // Wait for pending server calls to finish
-    WebElement entryPoint = findElement(By.className("scout"));
-    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.attributeToEqualsValue(entryPoint, "data-request-pending", "true")));
+    waitUntilDataRequestPendingDone();
 
     // Wait for animations to finish
     for (WebElement animation : findElements(By.className("animation-wrapper"))) {
