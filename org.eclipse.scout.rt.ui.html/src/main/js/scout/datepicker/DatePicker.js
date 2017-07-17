@@ -471,6 +471,12 @@ scout.DatePicker.prototype._createHeaderText = function(viewDate) {
 
 scout.DatePicker.prototype._registerSwipeHandlers = function() {
   var $window = this.$scrollable.window();
+
+  this.$scrollable.on('touchmove', function(event) {
+    // prevent scrolling the background when swiping the date picker (iOS)
+    event.preventDefault();
+  });
+
   this.$scrollable.on(scout.events.touchdown(this.touch), function(event) {
     var origPageX = scout.events.pageX(event);
     var moveX = 0;
