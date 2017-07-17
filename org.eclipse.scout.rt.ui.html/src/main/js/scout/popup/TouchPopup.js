@@ -21,6 +21,7 @@ scout.TouchPopup = function() {
   this._widgetContainerHtmlComp;
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
+  this.withGlassPane = true;
 };
 scout.inherits(scout.TouchPopup, scout.Popup);
 
