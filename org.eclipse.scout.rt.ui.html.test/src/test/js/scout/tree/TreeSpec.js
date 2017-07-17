@@ -1884,7 +1884,7 @@ describe("Tree", function() {
         topLevelNode3,
         topLevelNodes = [],
         childNodes = [],
-        childNodeNames = ['A1','A2','A3','A4','A+B','B1','B2','B3','B4'];
+        childNodeNames = ['A1', 'A2', 'A3', 'A4', 'A+B', 'B1', 'B2', 'B3', 'B4'];
 
       // child nodes
       for (i = 0; i < childNodeNames.length; i++) {
@@ -2299,7 +2299,7 @@ describe("Tree", function() {
       tree = helper.createTree(model);
     });
 
-    it("should destroy all tree nodes and set destroyed flag", function()  {
+    it("should destroy all tree nodes and set destroyed flag", function() {
       var nodesMapCopy = $.extend({}, tree.nodesMap);
       scout.objects.values(nodesMapCopy).forEach(function(node) {
         expect(node.destroyed).toBe(false);
