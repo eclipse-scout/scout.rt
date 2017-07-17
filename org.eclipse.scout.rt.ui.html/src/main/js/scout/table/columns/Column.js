@@ -17,6 +17,7 @@ scout.Column = function() {
   this.headerHtmlEnabled = false;
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;
+  this.index = -1;
   this.mandatory = false;
   this.sortActive = false;
   this.sortAscending = true;

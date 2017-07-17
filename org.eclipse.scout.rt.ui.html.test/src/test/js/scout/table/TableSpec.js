@@ -2452,6 +2452,43 @@ describe("Table", function() {
 
   });
 
+  describe("initColumns", function() {
+    it("sets the column indices if not already set", function() {
+      var table = scout.create('Table', {
+        parent: session.desktop,
+        columns: [{
+          objectType: 'Column'
+        }, {
+          objectType: 'NumberColumn'
+        }, {
+          objectType: 'NumberColumn'
+        }]
+      });
+      expect(table.columns[0].index).toBe(0);
+      expect(table.columns[1].index).toBe(1);
+      expect(table.columns[2].index).toBe(2);
+    });
+
+    it("does not set the column indices if already set", function() {
+      var table = scout.create('Table', {
+        parent: session.desktop,
+        columns: [{
+          objectType: 'Column',
+          index: 2
+        }, {
+          objectType: 'NumberColumn',
+          index: 0
+        }, {
+          objectType: 'NumberColumn',
+          index: 1
+        }]
+      });
+      expect(table.columns[0].index).toBe(2);
+      expect(table.columns[1].index).toBe(0);
+      expect(table.columns[2].index).toBe(1);
+    });
+  });
+
   describe("updateColumnStructure", function() {
     var model, table, column0, column1, column2;
 

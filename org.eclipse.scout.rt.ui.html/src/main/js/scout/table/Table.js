@@ -151,6 +151,9 @@ scout.Table.prototype._initColumns = function() {
     this.columns[i].table = this;
     column = scout.create(this.columns[i]);
     this.columns[i] = column;
+    if (column.index < 0) {
+      column.index = i;
+    }
 
     if (column.checkable) {
       // set checkable column if this column is the checkable one

@@ -598,7 +598,6 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     columns: [
       {
         objectType: 'Column',
-        index: 0,
         text: 'filter-value',
         width: 160,
         sortActive: true,
@@ -606,13 +605,11 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
       },
       {
         objectType: 'NumberColumn',
-        index: 1,
         text: 'aggregate-count',
         width: 40
       },
       {
         objectType: 'NumberColumn',
-        index: 2,
         displayable: false,
         sortActive: true,
         sortIndex: 0

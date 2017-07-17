@@ -131,7 +131,6 @@ describe('TableTextUserFilter', function() {
         columns: [
           scout.create('ASpecBeanColumn', {
             session: session,
-            index: 0,
             width: 100
           })
         ]

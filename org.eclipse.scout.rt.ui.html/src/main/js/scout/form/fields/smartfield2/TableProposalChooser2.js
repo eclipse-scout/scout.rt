@@ -39,7 +39,6 @@ scout.TableProposalChooser2.prototype._createModel = function() {
   } else {
     headerVisible = false;
     columns.push(scout.create('Column', {
-      index: 0,
       session: this.session
     }));
   }
