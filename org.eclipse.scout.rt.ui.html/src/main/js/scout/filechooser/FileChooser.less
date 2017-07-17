@@ -12,10 +12,11 @@
   position: absolute;
   top: 25%;
   left: 50%;
-  width: 400px;
+  max-width: 400px;
   #scout.drop-shadow-large();
   border-top: 5px solid @active-color;
   border-radius: @border-radius;
+  background-color: @filechooser-background-color;
 
   & > .closable {
     position: absolute;
@@ -55,7 +56,7 @@
   border: 0 solid @palette-gray-5;
   border-left-width: 1px;
   border-right-width: 1px;
-  background-color: @control-background-color;
+  background-color: @filechooser-background-color;
   padding: 10px 20px;
 
   & > .legacy-upload-form {
