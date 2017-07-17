@@ -73,3 +73,14 @@ scout.FormMenuPopup.prototype._onFormMenuPropertyChange = function(event) {
     this.position();
   }.bind(this));
 };
+
+scout.FormMenuPopup.prototype._onResize = function() {
+  if (!this.rendered) {
+    // may already be removed if a parent popup is closed during the resize event
+    return;
+  }
+  // Don't close but layout and position, especially important for mobile devices if the popup contains an input field.
+  // In that case activating the field opens the keyboard which may resize the screen (android tablets).
+  this.revalidateLayout();
+  this.position(false);
+};

@@ -15,7 +15,7 @@ scout.PopupWithHead = function() {
   this.$deco;
   this.$parent;
   this._headVisible = true;
-  this.resizeHandler = this.onResize.bind(this);
+  this.resizeHandler = this._onResize.bind(this);
 };
 scout.inherits(scout.PopupWithHead, scout.Popup);
 
@@ -47,7 +47,7 @@ scout.PopupWithHead.prototype._postRender = function() {
   scout.scrollbars.update(this.$body);
 };
 
-scout.PopupWithHead.prototype.onResize = function() {
+scout.PopupWithHead.prototype._onResize = function() {
   if (!this.rendered) {
     // may already be removed if a parent popup is closed during the resize event
     return;
