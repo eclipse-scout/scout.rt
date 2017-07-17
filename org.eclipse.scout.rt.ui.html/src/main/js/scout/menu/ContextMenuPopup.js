@@ -135,6 +135,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
 
     this.$body.cssWidthAnimated(actualBounds.width, targetSize.width, {
       duration: duration,
+      start: this.revalidateLayout.bind(this),
       progress: this.revalidateLayout.bind(this),
       queue: false
     });
@@ -208,6 +209,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     // set container to element
     this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
       duration: duration,
+      start: this.revalidateLayout.bind(this),
       progress: this.revalidateLayout.bind(this),
       queue: false
     });
