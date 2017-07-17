@@ -18,6 +18,7 @@ scout.ProposalChooser2 = function() {
   this._updateStatusTimeout = null;
   this.status = null;
   this.statusVisible = true;
+  this.touch = false;
 };
 scout.inherits(scout.ProposalChooser2, scout.Widget);
 
@@ -58,7 +59,9 @@ scout.ProposalChooser2.prototype.triggerLookupRowSelected = function() {
 };
 
 scout.ProposalChooser2.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('proposal-chooser');
+  this.$container = this.$parent
+    .appendDiv('proposal-chooser')
+    .toggleClass('touch', this.touch);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooser2Layout(this));
 

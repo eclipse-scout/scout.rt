@@ -40,7 +40,8 @@ scout.SmartField2TouchPopup.prototype._initWidget = function(options) {
 scout.SmartField2TouchPopup.prototype._createProposalChooser = function() {
   var objectType = this.parent.browseHierarchy ? 'TreeProposalChooser2' : 'TableProposalChooser2';
   return scout.create(objectType, {
-    parent: this
+    parent: this,
+    touch: true
   });
 };
 
@@ -51,16 +52,6 @@ scout.SmartField2TouchPopup.prototype._fieldOverrides = function() {
   // -> The original smart field has to control the chooser
   obj.proposalChooser = null;
   return obj;
-};
-
-scout.SmartField2TouchPopup.prototype.setProposalChooser = function(proposalChooser) {
-  this.setProperty('proposalChooser', proposalChooser);
-};
-
-scout.SmartField2TouchPopup.prototype._renderProposalChooser = function() {
-  this._widget.render(this._$widgetContainer);
-  this._widget.$container.addClass('touch');
-  this._widgetContainerHtmlComp.invalidateLayoutTree();
 };
 
 scout.SmartField2TouchPopup.prototype._onFieldAcceptInput = function(event) { // FIXME [awe] 7.0 - SF2: consolidate this function / close and onMouseDownOutside
