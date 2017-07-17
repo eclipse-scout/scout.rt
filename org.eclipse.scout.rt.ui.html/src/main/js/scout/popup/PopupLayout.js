@@ -53,7 +53,7 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
     windowPaddingX = this.popup.windowPaddingX,
     windowPaddingY = this.popup.windowPaddingY,
     popupMargins = htmlComp.margins(),
-    popupPosition = htmlComp.offset(),
+    popupPosition = htmlComp.location(),
     $window = this.popup.$container.window(),
     windowSize = new scout.Dimension($window.width(), $window.height());
 
