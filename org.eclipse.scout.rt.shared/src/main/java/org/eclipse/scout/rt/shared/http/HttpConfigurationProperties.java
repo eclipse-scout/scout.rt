@@ -6,6 +6,9 @@ import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 
 public final class HttpConfigurationProperties {
 
+  private HttpConfigurationProperties() {
+  }
+
   /**
    * <p>
    * Configuration property to define the default maximum life time in milliseconds for kept alive connections for the

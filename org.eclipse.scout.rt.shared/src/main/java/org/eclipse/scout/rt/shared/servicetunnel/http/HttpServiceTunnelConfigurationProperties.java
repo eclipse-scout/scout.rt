@@ -6,6 +6,9 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 
 public final class HttpServiceTunnelConfigurationProperties {
 
+  private HttpServiceTunnelConfigurationProperties() {
+  }
+
   /**
    * <p>
    * Configuration property to define the default maximum connections per route property for the HTTP service tunnel (if
