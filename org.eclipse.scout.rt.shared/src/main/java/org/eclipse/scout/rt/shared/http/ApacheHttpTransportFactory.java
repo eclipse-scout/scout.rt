@@ -101,10 +101,12 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * {@link HttpClientBuilder}.
    */
   protected HttpClientConnectionManager getConfiguredConnectionManager() {
+    String[] sslProtocols = StringUtility.split(System.getProperty("https.protocols"), "\\s*,\\s*");
+    String[] sslCipherSuites = StringUtility.split(System.getProperty("https.cipherSuites"), "\\s*,\\s*");
     SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
         (SSLSocketFactory) SSLSocketFactory.getDefault(),
-        StringUtility.split(System.getProperty("https.protocols"), "\\s*,\\s*"),
-        StringUtility.split(System.getProperty("https.cipherSuites"), "\\s*,\\s*"),
+        sslProtocols != null && sslProtocols.length > 0 ? sslProtocols : null,
+        sslCipherSuites != null && sslCipherSuites.length > 0 ? sslCipherSuites : null,
         new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault()));
     final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
         RegistryBuilder.<ConnectionSocketFactory> create()
