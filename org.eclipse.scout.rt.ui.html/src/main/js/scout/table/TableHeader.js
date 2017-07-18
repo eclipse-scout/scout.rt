@@ -11,12 +11,14 @@
 scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
 
+  this.enabled = true;
+  this.dragging = false;
+  this.headerMenusEnabled = true;
+  this.table = null;
   this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
   this._tableAddFilterRemovedHandler = this._onTableAddFilterRemoved.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
-  this.headerMenusEnabled = true;
-  this.dragging = false;
   this._renderedColumns = [];
 };
 scout.inherits(scout.TableHeader, scout.Widget);
@@ -24,9 +26,6 @@ scout.inherits(scout.TableHeader, scout.Widget);
 scout.TableHeader.prototype._init = function(options) {
   scout.TableHeader.parent.prototype._init.call(this, options);
 
-  this.table = options.table;
-  this.enabled = options.enabled;
-  this.headerMenusEnabled = scout.nvl(options.headerMenusEnabled, true);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -274,7 +273,17 @@ scout.TableHeader.prototype._headerItemTooltipText = function($col) {
   }
 };
 
-scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
+scout.TableHeader.prototype.setHeaderMenusEnabled = function(headerMenusEnabled) {
+  this.setProperty('headerMenusEnabled', headerMenusEnabled);
+};
+
+scout.TableHeader.prototype._renderHeaderMenusEnabled = function() {
+  this._visibleColumns().forEach(function(column) {
+    this._decorateHeader(column);
+  }, this);
+};
+
+scout.TableHeader.prototype.openHeaderMenu = function(column) {
   var $header = column.$header;
   this._tableHeaderMenu = scout.create('TableHeaderMenu', {
     parent: this,
@@ -286,7 +295,7 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
   this._tableHeaderMenu.open();
 };
 
-scout.TableHeader.prototype.closeTableHeaderMenu = function() {
+scout.TableHeader.prototype.closeHeaderMenu = function() {
   this._tableHeaderMenu.destroy();
   this._tableHeaderMenu = null;
 };
@@ -309,16 +318,12 @@ scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
 };
 
 scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
-  var $header = column.$header;
-  if (!this._isHeaderMenuEnabled(column)) {
-    $header.addClass('disabled');
-  }
-
   this._renderColumnCssClass(column, oldColumnState);
   this._renderColumnText(column);
   this._renderColumnIconId(column);
   this._renderColumnState(column);
   this._renderColumnLegacyStyle(column);
+  this._renderColumnHeaderMenuEnabled(column);
 };
 
 scout.TableHeader.prototype._renderColumnCssClass = function(column, oldColumnState) {
@@ -360,6 +365,10 @@ scout.TableHeader.prototype._updateColumnIconAndTextStyle = function(column) {
 
 scout.TableHeader.prototype._renderColumnLegacyStyle = function(column) {
   scout.styles.legacyStyle(column, column.$header, 'header');
+};
+
+scout.TableHeader.prototype._renderColumnHeaderMenuEnabled = function(column) {
+  column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabled);
 };
 
 scout.TableHeader.prototype._renderColumnState = function(column) {
@@ -540,20 +549,16 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
     column = $headerItem.data('column');
 
 
-  // dragging & sorting
   if (this.dragging || this.columnMoved) {
     this.dragging = false;
     this.columnMoved = false;
   } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey)) {
     this.table.removeColumnGrouping();
     this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-  }
-
-  // header menus
-  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
-    this.closeTableHeaderMenu();
+  } else if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
+    this.closeHeaderMenu();
   } else if (this._isHeaderMenuEnabled(column)) {
-    this.openTableHeaderMenu(column);
+    this.openHeaderMenu(column);
   }
 
   return false;

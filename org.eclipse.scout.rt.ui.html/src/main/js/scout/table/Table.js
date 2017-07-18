@@ -19,6 +19,7 @@ scout.Table = function() {
   this.enabled = true;
   this.headerEnabled = true;
   this.headerVisible = true;
+  this.headerMenusEnabled = true;
   this.hasReloadHandler = false;
   this.keyStrokes = [];
   this.keyboardNavigation = true;
@@ -75,7 +76,6 @@ scout.Table = function() {
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
   this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
-  this.headerMenusEnabled = true;
 };
 scout.inherits(scout.Table, scout.Widget);
 
@@ -3008,6 +3008,13 @@ scout.Table.prototype._renderHeaderEnabled = function() {
   // Rebuild the table header when this property changes
   this._removeTableHeader();
   this._renderTableHeader();
+};
+
+scout.Table.prototype.setHeaderMenusEnabled = function(headerMenusEnabled) {
+  this.setProperty('headerMenusEnabled', headerMenusEnabled);
+  if (this.header) {
+    this.header.setHeaderMenusEnabled(this.headerMenusEnabled);
+  }
 };
 
 scout.Table.prototype.hasPermanentHeadOrTailSortColumns = function() {
