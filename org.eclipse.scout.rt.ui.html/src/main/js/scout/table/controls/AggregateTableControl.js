@@ -17,14 +17,13 @@ scout.AggregateTableControl = function() {
   this._tableChangedHandler = this._onTableChanged.bind(this);
   this._aggregationFunctionChangedHandler = this._onAggregationFunctionChanged.bind(this);
   this.cssClass = 'aggregate';
-  this.height = scout.AggregateTableControl.CONTAINER_SIZE;
+  this.height = 0; // Will be as height as a row
   this.animateDuration = scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION;
   this.resizerVisible = false;
   this.aggregateRow;
 };
 scout.inherits(scout.AggregateTableControl, scout.TableControl);
 
-scout.AggregateTableControl.CONTAINER_SIZE = 40;
 scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION = 200;
 
 scout.AggregateTableControl.prototype._init = function(model) {
@@ -42,6 +41,7 @@ scout.AggregateTableControl.prototype._destroy = function() {
 scout.AggregateTableControl.prototype._render = function() {
   scout.AggregateTableControl.parent.prototype._render.call(this);
   this._updateEnabledAndSelectedState();
+  this.height = this.table.rowHeight + scout.graphics.insets(this.table.footer.$controlContainer).vertical();
 };
 
 scout.AggregateTableControl.prototype._renderContent = function($parent) {

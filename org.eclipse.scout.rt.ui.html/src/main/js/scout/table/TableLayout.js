@@ -47,7 +47,7 @@ scout.TableLayout.prototype.layout = function($container) {
     controlContainerHeight = footer.computeControlContainerHeight(this.table, footer.selectedControl, !this._dataHeightPositive);
     controlContainerInsets = scout.graphics.insets(footer.$controlContainer);
     if (!footer.animating) { // closing or opening: height is about to be changed
-      footer.$controlContainer.height(controlContainerHeight);
+      footer.$controlContainer.cssHeight(controlContainerHeight);
       footer.$controlContent.outerHeight(controlContainerHeight - controlContainerInsets.vertical());
       footer.revalidateLayout();
     }
