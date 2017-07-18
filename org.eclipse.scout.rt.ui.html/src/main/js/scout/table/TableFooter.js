@@ -70,8 +70,7 @@ scout.TableFooter.prototype._render = function() {
     this._$textFilter.val(filter.text);
   }
   this.$deletableIcon = $filter.appendSpan('delete-icon unfocusable needsclick')
-  .on('mousedown', this._onDeleteFilterMouseDown.bind(this));
-
+    .on('mousedown', this._onDeleteFilterMouseDown.bind(this));
 
   // load info ("X rows loaded, click to reload")
   this._$infoLoad = this._$info
@@ -580,7 +579,6 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
   }
 };
 
-
 scout.TableFooter.prototype._updateHasFilterText = function() {
   this._$textFilter.toggleClass('has-text', !!this._$textFilter.val());
 };
@@ -611,13 +609,13 @@ scout.TableFooter.prototype._onStatusMouseDown = function(event) {
 };
 
 scout.TableFooter.prototype._createOnFilterFieldInputFunction = function() {
-    var debounceFunction = $.debounce(this._applyFilter.bind(this));
-    var fn = function(event) {
-      this._updateHasFilterText();
-      // debounced filter
-      debounceFunction();
-    };
-    return fn;
+  var debounceFunction = $.debounce(this._applyFilter.bind(this));
+  var fn = function(event) {
+    this._updateHasFilterText();
+    // debounced filter
+    debounceFunction();
+  };
+  return fn;
 };
 
 scout.TableFooter.prototype._onDeleteFilterMouseDown = function(event) {
@@ -629,10 +627,10 @@ scout.TableFooter.prototype._onDeleteFilterMouseDown = function(event) {
 
 scout.TableFooter.prototype._applyFilter = function(event) {
   var filter,
-  filterText = this._$textFilter.val();
+    filterText = this._$textFilter.val();
   if (this.filterText !== filterText) {
     this.filterText = filterText;
-    if(filterText){
+    if (filterText) {
       filter = scout.create('TableTextUserFilter', {
         session: this.session,
         table: this.table
@@ -640,7 +638,7 @@ scout.TableFooter.prototype._applyFilter = function(event) {
 
       filter.text = filterText;
       this.table.addFilter(filter);
-    }else{
+    } else {
       this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
     }
 
