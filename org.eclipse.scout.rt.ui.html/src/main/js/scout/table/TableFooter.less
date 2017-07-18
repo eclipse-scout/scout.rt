@@ -110,14 +110,45 @@
   right: 0;
 }
 
-.table-text-filter {
+.table-filter {
   display: inline-block;
+  position: relative;
   vertical-align: top;
-  width: 200px;
-  min-height: 26px;
-  font-size: 13px;
+
   margin-top: (@table-footer-height - 26px) / 2;
   margin-right: @table-control-padding;
+}
+.table-text-filter {
+  width: 100%;
+  min-height: 26px;
+  width: 200px;
+  font-size: 13px;
+
+  &:focus {
+    &.has-text {
+      padding-right: @text-field-padding-x + 15px;
+      & ~ .delete-icon {
+        display: block;
+      }
+    }
+  }
+
+  & ~ .delete-icon {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 1px;
+    min-height: 26px;
+    line-height: 26px;
+    padding-right: @text-field-padding-x;
+    cursor: pointer;
+    &::before{
+      #scout.font-icon();
+      font-size: 13px;
+      content: @icon-remove;
+      color: @text-field-icon-color;
+    }
+  }
 }
 
 .table-info-load,

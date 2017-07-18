@@ -656,8 +656,9 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
+  var _deletable = this.deletable;
   this.$field.focus();
-  if (this.deletable) {
+  if (_deletable) {
     this.clear();
     this.closePopup();
     this._updateDeletable();

@@ -39,7 +39,7 @@ scout.TableFooter.prototype._init = function(options) {
 };
 
 scout.TableFooter.prototype._render = function() {
-  var filter;
+  var filter, $filter;
 
   this.$container = this.$parent.appendDiv('table-footer');
   this._$window = this.$parent.window();
@@ -59,14 +59,19 @@ scout.TableFooter.prototype._render = function() {
   this._$info = this.$container.appendDiv('table-info');
 
   // text filter
-  this._$textFilter = scout.fields.makeTextField(this.$parent, 'table-text-filter')
-    .appendTo(this._$info)
-    .on('input', '', $.debounce(this._onFilterInput.bind(this)))
+  $filter = this._$info.appendDiv('table-filter');
+  this._$textFilter = scout.fields.makeTextField(this.$container, 'table-text-filter')
+    .appendTo($filter)
+    .on('input', '', this._createOnFilterFieldInputFunction().bind(this))
     .placeholder(this.session.text('ui.FilterBy_'));
+
   filter = this.table.getFilter(scout.TableTextUserFilter.Type);
   if (filter) {
     this._$textFilter.val(filter.text);
   }
+  this.$deletableIcon = $filter.appendSpan('delete-icon unfocusable needsclick')
+  .on('mousedown', this._onDeleteFilterMouseDown.bind(this));
+
 
   // load info ("X rows loaded, click to reload")
   this._$infoLoad = this._$info
@@ -107,6 +112,10 @@ scout.TableFooter.prototype._render = function() {
   this.table.on('propertyChange', this._tablePropertyChangeHandler);
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
+};
+
+scout.TableFooter.prototype._renderProperties = function() {
+  this._updateHasFilterText();
 };
 
 scout.TableFooter.prototype._remove = function() {
@@ -571,6 +580,11 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
   }
 };
 
+
+scout.TableFooter.prototype._updateHasFilterText = function() {
+  this._$textFilter.toggleClass('has-text', !!this._$textFilter.val());
+};
+
 scout.TableFooter.prototype.onControlSelected = function(control) {
   var previousControl = this.selectedControl;
   this.selectedControl = control;
@@ -596,26 +610,43 @@ scout.TableFooter.prototype._onStatusMouseDown = function(event) {
   }
 };
 
-scout.TableFooter.prototype._onFilterInput = function(event) {
+scout.TableFooter.prototype._createOnFilterFieldInputFunction = function() {
+    var debounceFunction = $.debounce(this._applyFilter.bind(this));
+    var fn = function(event) {
+      this._updateHasFilterText();
+      // debounced filter
+      debounceFunction();
+    };
+    return fn;
+};
+
+scout.TableFooter.prototype._onDeleteFilterMouseDown = function(event) {
+  this._$textFilter.val('');
+  this._updateHasFilterText();
+  this._applyFilter();
+  event.preventDefault();
+};
+
+scout.TableFooter.prototype._applyFilter = function(event) {
   var filter,
-    $input = $(event.currentTarget),
-    filterText = $input.val();
+  filterText = this._$textFilter.val();
+  if (this.filterText !== filterText) {
+    this.filterText = filterText;
+    if(filterText){
+      filter = scout.create('TableTextUserFilter', {
+        session: this.session,
+        table: this.table
+      });
 
-  if (filterText) {
-    filter = scout.create('TableTextUserFilter', {
-      session: this.session,
-      table: this.table
-    });
+      filter.text = filterText;
+      this.table.addFilter(filter);
+    }else{
+      this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
+    }
 
-    filter.text = filterText;
-    this.table.addFilter(filter);
-  } else {
-    this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
+    this.table.filter();
+    this.validateLayoutTree();
   }
-
-  this.table.filter();
-  this.validateLayoutTree();
-  event.stopPropagation();
 };
 
 scout.TableFooter.prototype._onInfoLoadClick = function() {

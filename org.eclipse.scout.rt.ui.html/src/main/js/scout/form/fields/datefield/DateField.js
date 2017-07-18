@@ -176,7 +176,7 @@ scout.DateField.prototype.setHasTime = function(hasTime) {
 scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
-    this.$timeField = scout.fields.makeTextField(this.$container, 'time')
+    this.$timeField = scout.fields.makeInputOrDiv(this, 'time')
       .on('mousedown', this._onTimeFieldMouseDown.bind(this))
       .appendTo(this.$field);
     if (!this.touch || !this.hasTimePopup) {
@@ -531,24 +531,15 @@ scout.DateField.prototype._onDateIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
+  var _deletable = this.dateDeletable;
   this.$dateField.focus();
-  if (this.dateDeletable) {
+  if (_deletable) {
     this.clear();
     if (this.value) {
       this.selectDate(this.value, false);
     } else {
       this.preselectDate(this._referenceDate(), false);
     }
-//    if(!this.embedded){
-//
-//      this.openDatePopupAndSelect(this.value);
-//    }else{
-//      if (this.value) {
-//        this.selectDate(this.value, false);
-//      } else {
-//        this.preselectDate(this._referenceDate(), false);
-//      }
-//    }
     this._updateDateDeletable();
     event.preventDefault();
     return;
@@ -592,15 +583,15 @@ scout.DateField.prototype._onTimeIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
+  var _deletable = this.timeDeletable;
   this.$timeField.focus();
-  if (this.timeDeletable) {
+  if (_deletable) {
     this.clear();
     if (this.value) {
       this.selectTime(this.value, false);
     } else {
       this.preselectTime(this._referenceDate(), false);
     }
-//    this.openTimePopupAndSelect(this.value);
     this._updateTimeDeletable();
     event.preventDefault();
     return;

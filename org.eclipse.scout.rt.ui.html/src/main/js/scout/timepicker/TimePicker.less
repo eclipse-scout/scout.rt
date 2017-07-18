@@ -70,7 +70,10 @@
         }
       }
       > .text {
+        display: inline-block;
         padding: 5px;
+        border: 1px solid transparent;
+        border-radius: @border-radius;
       }
 
       &.hours {
@@ -80,11 +83,6 @@
 
       &.minutes {
         cursor: pointer;
-        > .text {
-          display: inline-block;
-          border-radius: @border-radius;
-          border: 1px solid transparent;
-        }
 
         &.now {
           color: @highlight-color;

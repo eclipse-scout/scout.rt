@@ -60,7 +60,7 @@ scout.BasicField.prototype._onFieldFocus = function(event) {
   this.setFocused(true);
 };
 
-scout.BasicField.prototype._onDeletableIconClick = function(event) {
+scout.BasicField.prototype._onDeletableIconMouseDown = function(event) {
   scout.BasicField.parent.prototype._onIconMouseDown.call(this, event);
   if (this.deletable) {
     this.clear();
@@ -93,7 +93,7 @@ scout.BasicField.prototype.addField = function($field) {
 
 scout.BasicField.prototype.addDeletableIcon = function() {
   this.$deletableIcon = this.$container.appendSpan('delete-icon unfocusable')
-    .on('click', this._onDeletableIconClick.bind(this));
+    .on('mousedown', this._onDeletableIconMouseDown.bind(this));
 };
 
 scout.BasicField.prototype.isFocusOnField = function(target) {
