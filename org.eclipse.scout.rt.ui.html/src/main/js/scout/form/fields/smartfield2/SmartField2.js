@@ -644,7 +644,10 @@ scout.SmartField2.prototype.aboutToBlurByMouseDown = function(target) {
 
 scout.SmartField2.prototype._onFieldMouseDown = function(event) {
   $.log.debug('(SmartField2#_onFieldMouseDown)');
-  if (!this.enabledComputed || !scout.fields.handleOnClick(this)) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {
     return;
   }
   this.$field.focus(); // required for touch case where field is a DIV
