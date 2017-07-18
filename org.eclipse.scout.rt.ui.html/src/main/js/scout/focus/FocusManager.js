@@ -69,7 +69,7 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
  * wouldn't be much better.
  */
 scout.FocusManager.prototype._handleIEEvent = function(event) {
-  if (scout.device.browser !== scout.Device.Browser.INTERNET_EXPLORER) {
+  if (!scout.device.isInternetExplorer()) {
     return;
   }
 

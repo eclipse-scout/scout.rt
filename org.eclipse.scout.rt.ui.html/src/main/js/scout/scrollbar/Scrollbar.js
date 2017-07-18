@@ -151,7 +151,7 @@ scout.Scrollbar.prototype.update = function() {
 
   // In IE scrollsize sometimes is 1px bigger than offsetSize even in situations when the content should easily fit in
   // the rendered size. This fix prevents the scrollbar from being shown in IE when not expected.
-  var ieOffsetFix = (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER) ? 1 : 0;
+  var ieOffsetFix = scout.device.isInternetExplorer() ? 1 : 0;
 
   // show scrollbar
   if (this._offsetSize + ieOffsetFix >= this._scrollSize) {

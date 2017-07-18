@@ -1521,7 +1521,7 @@ $.fn.isContentTruncated = function() {
 
   // 1. Fast return if scrollWidth is larger than width
   // IE sometimes returns a scrollWidth which is bigger than clientWidth but does not show an ellipsis.
-  if (scrollWidth > clientWidth && scout.device.browser !== scout.Device.Browser.INTERNET_EXPLORER) {
+  if (scrollWidth > clientWidth && !scout.device.isInternetExplorer()) {
     return true;
   }
 

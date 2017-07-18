@@ -161,6 +161,10 @@ scout.Device.prototype.isIos = function() {
   return scout.Device.System.IOS === this.system;
 };
 
+scout.Device.prototype.isInternetExplorer = function() {
+  return scout.Device.Browser.INTERNET_EXPLORER === this.browser;
+};
+
 /**
  * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
  * Most of the time isIos() is the way to go.

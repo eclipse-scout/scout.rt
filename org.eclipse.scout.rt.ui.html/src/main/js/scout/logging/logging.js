@@ -51,10 +51,17 @@ scout.logging = {
     var defaultLogger = log4javascript.getDefaultLogger();
     defaultLogger.setLevel(this.parseLevel(logLevel));
     $.log = defaultLogger;
+
     this.initialized = true;
 
-    // Remove default PopUpAppender (which is the only appender at this point)
-    if (!showPopup) {
+    if (showPopup) {
+      // To avoid problems with our CSP rule which prohibits inline scripts we set the useDocumentWrite
+      // flag to false, so the console_uncompressed.html/js is loaded instead.
+      defaultLogger.getEffectiveAppenders().forEach(function(appender) {
+        appender.setUseDocumentWrite(false);
+      });
+    } else {
+      // Remove default PopUpAppender (which is the only appender at this point)
       defaultLogger.removeAllAppenders();
     }
 

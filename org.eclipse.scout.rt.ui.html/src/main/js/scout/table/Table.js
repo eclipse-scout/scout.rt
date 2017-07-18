@@ -2722,7 +2722,7 @@ scout.Table.prototype.resizeToFit = function(column) {
     return;
   }
   var calculatedSize = column.calculateOptimalWidth();
-  if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER && calculatedSize !== column.minWidth) {
+  if (scout.device.isInternetExplorer() && calculatedSize !== column.minWidth) {
     calculatedSize++;
   }
   if (column.width !== calculatedSize) {
