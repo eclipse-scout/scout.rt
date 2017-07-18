@@ -70,6 +70,7 @@
       "preventDoubleClick": false
     },
     "Button": {
+      "defaultButton": false,
       "systemType": 0,
       "processButton": true,
       "selected": false,
@@ -93,7 +94,8 @@
       "expandable": false,
       "expanded": true,
       "fields": [],
-      "gridColumnCount": -1
+      "gridColumnCount": -1,
+      "minWidthInPixel": 0
     },
     "TabBox": {
       "tabItems": []
@@ -141,9 +143,23 @@
       "fields": []
     },
     "SmartField": {
-      "proposal": false
+      "proposal": false,
+      "browseMaxRowCount": 100
     },
     "SmartFieldMultiline": {
+    },
+    "SmartField2": {
+      "activeFilterEnabled": false,
+      "activeFilterLabels": [],
+      "browseAutoExpandAll": true,
+      "browseHierarchy": false,
+      "browseLoadIncremental": false,
+      "browseMaxRowCount": 100,
+      "displayStyle": "default"
+    },
+    "ProposalField2": {
+      "maxLength": 4000,
+      "trimText": true
     },
     "SplitBox": {
       "fieldCollapsed": false,
@@ -174,7 +190,8 @@
     },
     "DateField": {
       "hasDate": true,
-      "hasTime": false
+      "hasTime": false,
+      "timePickerResolution": 30
     },
     "Table": {
       "autoResizeColumns": false,
@@ -184,6 +201,7 @@
       "dropType": 0,
       "dropMaximumSize": 52428800,
       "filters": [],
+      "groupingStyle": "bottom",
       "hasReloadHandler": false,
       "headerEnabled": true,
       "headerVisible": true,
@@ -206,7 +224,7 @@
       "toggleAction": true
     },
     "Desktop": {
-      "desktopStyle": "default",
+      "displayStyle": "default",
       "benchVisible": true,
       "headerVisible": true,
       "navigationVisible": true,
@@ -241,7 +259,9 @@
       "messageBoxes": [],
       "fileChoosers": [],
       "closable": true,
-      "cacheBounds": false
+      "cacheBounds": false,
+      "saveNeeded": false,
+      "saveNeededVisible": false
     },
     "FormMenu": {
       "toggleAction": true
@@ -299,6 +319,7 @@
       "editable": false,
       "enabled": true,
       "fixedWidth": false,
+      "grouped": false,
       "headerHtmlEnabled": false,
       "horizontalAlignment": -1,
       "htmlEnabled": false,
@@ -385,6 +406,10 @@
         "LabelField": null,
         "SmartField": {
           "SmartFieldMultiline": null
+        },
+        "SmartField2": {
+          "ProposalField2": null,
+          "SmartField2Multiline": null
         },
         "SliderField": null,
         "RadioButtonGroup": null

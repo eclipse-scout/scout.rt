@@ -26,6 +26,8 @@ scout.Form = function() {
   this.cacheBounds = false;
   this.resizable = true;
   this.rootGroupBox;
+  this.saveNeeded = false;
+  this.saveNeededVisible = false;
   this._locked;
   this.formController;
   this.messageBoxController;

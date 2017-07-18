@@ -44,7 +44,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
-  public static final String PROP_ASK_IF_NEED_SAVE = "askIfNeedSave";
   public static final String PROP_SAVE_NEEDED = IForm.PROP_SAVE_NEEDED;
   public static final String PROP_CACHE_BOUNDS = "cacheBounds";
   public static final String PROP_CACHE_BOUNDS_KEY = "cacheBoundsKey";
@@ -182,7 +181,6 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, PROP_ASK_IF_NEED_SAVE, model.isAskIfNeedSave());
     putProperty(json, PROP_CACHE_BOUNDS, model.isCacheBounds());
     if (model.isCacheBounds()) {
       putProperty(json, PROP_CACHE_BOUNDS_KEY, model.computeCacheBoundsKey());

@@ -292,12 +292,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getDropMaximumSize();
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TABLE_CUSTOMIZER, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().getTableCustomizer() != null;
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SORT_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
