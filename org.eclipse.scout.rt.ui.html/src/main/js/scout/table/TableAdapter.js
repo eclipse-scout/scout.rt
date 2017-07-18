@@ -402,7 +402,7 @@ scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
-  var column = this.widget._columnById(columnId),
+  var column = this.widget.columnById(columnId),
     row = this.widget._rowById(rowId),
     field = this.session.getOrCreateWidget(fieldId, this.widget);
 
@@ -424,7 +424,7 @@ scout.TableAdapter.prototype._onScrollToSelection = function() {
 
 scout.TableAdapter.prototype._onColumnBackgroundEffectChanged = function(event) {
   event.eventParts.forEach(function(eventPart) {
-    var column = this.widget._columnById(eventPart.columnId),
+    var column = this.widget.columnById(eventPart.columnId),
       backgroundEffect = eventPart.backgroundEffect;
 
     this.addFilterForWidgetEvent(function(widgetEvent) {
@@ -439,7 +439,7 @@ scout.TableAdapter.prototype._onColumnBackgroundEffectChanged = function(event) 
 
 scout.TableAdapter.prototype._onRequestFocusInCell = function(event) {
   var row = this.widget._rowById(event.rowId),
-    column = this.widget._columnById(event.columnId);
+    column = this.widget.columnById(event.columnId);
 
   this.widget.focusCell(column, row);
 };
@@ -450,7 +450,7 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
 
   event.eventParts.forEach(function(eventPart) {
     var func = eventPart.aggregationFunction,
-      column = this.widget._columnById(eventPart.columnId);
+      column = this.widget.columnById(eventPart.columnId);
 
     this.addFilterForWidgetEvent(function(widgetEvent) {
       return (widgetEvent.type === 'aggregationFunctionChanged' &&

@@ -747,6 +747,10 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 };
 
+scout.Table.prototype.setSortEnabled = function(sortEnabled) {
+  this.setProperty('sortEnabled', sortEnabled);
+};
+
 /**
  * @param multiSort true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
  * @param remove true to remove the column from the sort columns
@@ -1871,6 +1875,10 @@ scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
   }, this);
 };
 
+scout.Table.prototype.setMultiCheck = function(multiCheck) {
+  this.setProperty('multiCheck', multiCheck);
+};
+
 scout.Table.prototype.checkRow = function(row, checked) {
   this.checkRows([row], {
     checked: checked
@@ -2264,6 +2272,10 @@ scout.Table.prototype._renderScrollTop = function() {
   scout.scrollbars.scrollTop(this.$data, this.scrollTop);
 };
 
+scout.Table.prototype.setScrollToSelection = function(scrollToSelection) {
+  this.setProperty('scrollToSelection', scrollToSelection);
+};
+
 scout.Table.prototype.revealSelection = function() {
   if (!this.rendered) {
     // Execute delayed because table may be not layouted yet
@@ -2536,14 +2548,28 @@ scout.Table.prototype.$cell = function(column, $row) {
   return $row.children().eq(columnIndex);
 };
 
-scout.Table.prototype._columnById = function(columnId) { // TODO [7.0] awe: make this function 'public'
+scout.Table.prototype.columnById = function(columnId) {
   return scout.arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });
 };
 
+/**
+ * @deprecated use #columnById instead, will be removed with 7.1
+ */
+scout.Table.prototype._columnById = function(columnId) {
+  return this.columnById(columnId);
+};
+
+scout.Table.prototype.columnsByIds = function(columnIds) {
+  return columnIds.map(this.columnById.bind(this));
+};
+
+/**
+ * @deprecated use #columnByIds instead, will be removed with 7.1
+ */
 scout.Table.prototype._columnsByIds = function(columnIds) {
-  return columnIds.map(this._columnById.bind(this));
+  return this.columnsByIds(columnIds);
 };
 
 scout.Table.prototype.filter = function() {
@@ -2966,26 +2992,22 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
   this.trigger('aggregationFunctionChanged', event);
 };
 
+scout.Table.prototype.setHeaderVisible = function(visible) {
+  this.setProperty('headerVisible', visible);
+};
+
 scout.Table.prototype._renderHeaderVisible = function() {
   this._renderTableHeader();
+};
+
+scout.Table.prototype.setHeaderEnabled = function(headerEnabled) {
+  this.setProperty('headerEnabled', headerEnabled);
 };
 
 scout.Table.prototype._renderHeaderEnabled = function() {
   // Rebuild the table header when this property changes
   this._removeTableHeader();
   this._renderTableHeader();
-};
-
-scout.Table.prototype._setCheckable = function(checkable) {
-  this._setProperty('checkable', checkable);
-
-  var column = this.checkableColumn;
-  if (this.checkable && !column) {
-    this._insertBooleanColumn();
-  } else if (!this.checkable && column) {
-    scout.arrays.remove(this.columns, column);
-    this.checkableColumn = null;
-  }
 };
 
 scout.Table.prototype.hasPermanentHeadOrTailSortColumns = function() {
@@ -3011,6 +3033,10 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
       this._permanentTailSortColumns.push(c);
     }
   }, this);
+};
+
+scout.Table.prototype.setRowIconVisible = function(rowIconVisible) {
+  this.setProperty('rowIconVisible', rowIconVisible);
 };
 
 scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
@@ -3078,7 +3104,7 @@ scout.Table.prototype._ensureFilter = function(filter) {
     return filter;
   }
   if (filter.column) {
-    filter.column = this._columnById(filter.column);
+    filter.column = this.columnById(filter.column);
   }
   filter.table = this;
   filter.session = this.session;
@@ -3108,6 +3134,12 @@ scout.Table.prototype.setFooterVisible = function(visible) {
   if (visible && !this.footer) {
     this.footer = this._createFooter();
   }
+
+  // relink table controls to new footer
+  this.tableControls.forEach(function(control) {
+    control.tableFooter = this.footer;
+  }, this);
+
   if (this.rendered) {
     this._renderFooterVisible();
   }
@@ -3115,10 +3147,6 @@ scout.Table.prototype.setFooterVisible = function(visible) {
     this.footer.destroy();
     this.footer = null;
   }
-};
-
-scout.Table.prototype.setHeaderVisible = function(visible) {
-  this.setProperty('headerVisible', visible);
 };
 
 /**
@@ -3152,12 +3180,52 @@ scout.Table.prototype._renderRowChecked = function(row) {
   $styleElem.toggleClass('checked', row.checked);
 };
 
+scout.Table.prototype.setCheckable = function(checkable) {
+  this.setProperty('checkable', checkable);
+};
+
+scout.Table.prototype._setCheckable = function(checkable) {
+  this._setProperty('checkable', checkable);
+  this._updateCheckableColumn();
+};
+
+scout.Table.prototype._updateCheckableColumn = function() {
+  var column = this.checkableColumn;
+  var showCheckBoxes = this.checkable && this.checkableStyle === scout.Table.CheckableStyle.CHECKBOX;
+  if (showCheckBoxes && !column) {
+    this._insertBooleanColumn();
+  } else if (!showCheckBoxes && column) {
+    scout.arrays.remove(this.columns, column);
+    this.checkableColumn = null;
+  }
+};
+
 scout.Table.prototype._renderCheckable = function() {
   this._redraw();
 };
 
+scout.Table.prototype.setCheckableStyle = function(checkableStyle) {
+  this.setProperty('checkableStyle', checkableStyle);
+};
+
+scout.Table.prototype._setCheckableStyle = function(checkableStyle) {
+  this._setProperty('checkableStyle', checkableStyle);
+  this._updateCheckableColumn();
+};
+
+scout.Table.prototype._renderCheckableStyle = function() {
+  this.$container.toggleClass('checkable', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
+  if (this.rendered) {
+    this._redraw();
+  }
+};
+
 scout.Table.prototype._renderRowIconVisible = function() {
   this._redraw();
+};
+
+scout.Table.prototype.setGroupingStyle = function(groupingStyle) {
+  this.setProperty('groupingStyle', groupingStyle);
 };
 
 scout.Table.prototype._setGroupingStyle = function(groupingStyle) {
@@ -3287,6 +3355,10 @@ scout.Table.prototype._renderDisabledStyle = function() {
   this._renderDisabledStyleInternal(this.$data);
 };
 
+scout.Table.prototype.setAutoResizeColumns = function(autoResizeColumns) {
+  this.setProperty('autoResizeColumns', autoResizeColumns);
+};
+
 scout.Table.prototype._renderAutoResizeColumns = function() {
   if (this.autoResizeColumns) {
     this.invalidateLayoutTree();
@@ -3299,10 +3371,6 @@ scout.Table.prototype._renderDropType = function() {
   } else {
     this._uninstallDragAndDropHandler();
   }
-};
-
-scout.Table.prototype._renderCheckableStyle = function() {
-  this.$container.toggleClass('checkable', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
 };
 
 scout.Table.prototype._installDragAndDropHandler = function(event) {
@@ -3654,7 +3722,7 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
 
   // Update model columns
   for (var i = 0; i < columns.length; i++) {
-    column = this._columnById(columns[i].id);
+    column = this.columnById(columns[i].id);
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
     column.tooltipText = columns[i].tooltipText;
