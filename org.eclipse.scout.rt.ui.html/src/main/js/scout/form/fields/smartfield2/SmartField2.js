@@ -314,7 +314,6 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
       message: this.session.text('SmartFieldCannotComplete', searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
-    return;
   }
 
   if (result.numLookupRows > 1) {
@@ -333,8 +332,9 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     if (this.isPopupOpen()) {
       this.popup.selectFirstLookupRow();
     }
-    return;
   }
+
+  this._triggerAcceptInputFail();
 };
 
 scout.SmartField2.prototype.lookupByRec = function(rec) {
@@ -553,11 +553,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   }
 
   if (emptyResult) {
-    if (this.embedded) {
-      this.popup.clearLookupRows();
-    } else {
-      this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
-    }
+    this._handleEmptyResult();
     this.setErrorStatus(scout.Status.warn({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
@@ -582,6 +578,14 @@ scout.SmartField2.prototype._ensurePopup = function(result, status) {
     this.popup.setStatus(status);
   } else {
     this._renderPopup(result, status);
+  }
+};
+
+scout.SmartField2.prototype._handleEmptyResult = function() {
+  if (this.embedded) {
+    this.popup.clearLookupRows();
+  } else {
+    this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
   }
 };
 
@@ -774,10 +778,7 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
   }
 
   if (event.which === scout.keys.ENTER) {
-    if (this.isPopupOpen()) {
-      this.popup.selectLookupRow();
-      event.stopPropagation();
-    }
+    this._handleEnterKey(event);
     return;
   }
 
@@ -817,8 +818,15 @@ scout.SmartField2.prototype._isNavigationKey = function(event) {
   return scout.isOneOf(event.which, navigationKeys);
 };
 
-scout.SmartField2.prototype._isFunctionKey = function(e) {
-  return e.which >= scout.keys.F1 && e.which < scout.keys.F12;
+scout.SmartField2.prototype._handleEnterKey = function(event) {
+  if (this.isPopupOpen()) {
+    this.popup.selectLookupRow();
+    event.stopPropagation();
+  }
+};
+
+scout.SmartField2.prototype._isFunctionKey = function(event) {
+  return event.which >= scout.keys.F1 && event.which < scout.keys.F12;
 };
 
 scout.SmartField2.prototype._onLookupRowSelected = function(event) {
@@ -987,15 +995,22 @@ scout.SmartField2.prototype._renderDeletable = function() {
   this.$container.toggleClass('deletable', this.deletable);
 };
 
+scout.SmartField2.prototype._triggerAcceptInputFail = function() {
+  this._triggerAcceptInputEvent('acceptInputFail', false);
+};
+
 scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow) {
-  var event = {
+  this._triggerAcceptInputEvent('acceptInput', acceptByLookupRow);
+};
+
+scout.SmartField2.prototype._triggerAcceptInputEvent = function(eventType, acceptByLookupRow) {
+  this.trigger(eventType, {
     displayText: this.displayText,
     errorStatus: this.errorStatus,
     value: this.value,
     lookupRow: this.lookupRow,
     acceptByLookupRow: acceptByLookupRow
-  };
-  this.trigger('acceptInput', event);
+  });
 };
 
 /**

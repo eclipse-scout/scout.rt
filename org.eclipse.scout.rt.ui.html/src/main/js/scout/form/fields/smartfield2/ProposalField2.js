@@ -32,10 +32,15 @@ scout.ProposalField2.prototype.cssClassName = function() {
   return 'proposal-field';
 };
 
+scout.SmartField2.prototype._handleEnterKey = function(event) {
+  this.acceptInput();
+  event.stopPropagation();
+};
+
 scout.ProposalField2.prototype._lookupByTextOrAllDone = function(result) {
   if (result.lookupRows.length === 0) {
     this.setLoading(false);
-    this.closePopup();
+    this._handleEmptyResult();
     return;
   }
   scout.ProposalField2.parent.prototype._lookupByTextOrAllDone.call(this, result);

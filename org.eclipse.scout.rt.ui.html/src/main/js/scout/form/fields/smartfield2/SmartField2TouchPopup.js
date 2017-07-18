@@ -27,7 +27,7 @@ scout.SmartField2TouchPopup.prototype._init = function(options) {
   this.setLookupResult(options.lookupResult);
   this.setStatus(options.status);
 
-  this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
+  this._field.on('acceptInput acceptInputFail', this._onFieldAcceptInput.bind(this));
   this._field.on('clear', this._onFieldClear.bind(this));
 };
 
