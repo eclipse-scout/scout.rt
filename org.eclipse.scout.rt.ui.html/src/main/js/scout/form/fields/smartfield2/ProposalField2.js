@@ -32,7 +32,7 @@ scout.ProposalField2.prototype.cssClassName = function() {
   return 'proposal-field';
 };
 
-scout.SmartField2.prototype._handleEnterKey = function(event) {
+scout.ProposalField2.prototype._handleEnterKey = function(event) {
   this.acceptInput();
   event.stopPropagation();
 };
