@@ -45,12 +45,14 @@ scout.SmartField2Adapter.prototype.lookupAll = function() {
 
 scout.SmartField2Adapter.prototype.lookupByText = function(searchText) {
   this._send('lookupByText', {
+    showBusyIndicator: false,
     searchText: searchText
   });
 };
 
 scout.SmartField2Adapter.prototype.lookupByRec = function(rec) {
   this._send('lookupByRec', {
+    showBusyIndicator: false,
     rec: rec
   });
 };
