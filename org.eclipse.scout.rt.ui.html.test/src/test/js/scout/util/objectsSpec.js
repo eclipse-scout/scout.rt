@@ -316,4 +316,25 @@ describe("scout.objects", function() {
     });
   });
 
+  describe('argumentsToArray', function() {
+
+    it('returns an array', function() {
+      var result;
+      var func = function() {
+        result = scout.objects.argumentsToArray(arguments);
+      };
+
+      func();
+      expect(result).toEqual([]);
+
+      func(1);
+      expect(result).toEqual([1]);
+
+      func(undefined, 'a', 'b', null, undefined);
+      expect(result).toEqual([undefined, 'a', 'b', null, undefined]);
+      expect(scout.objects.isArray(result)).toBe(true);
+    });
+
+  });
+
 });

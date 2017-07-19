@@ -317,6 +317,18 @@ scout.arrays = {
   },
 
   /**
+   * Pushes all elements to the given array that are not null or undefined.
+   */
+  pushIfDefined: function(arr, elements) {
+    elements = scout.objects.argumentsToArray(arguments).slice(1).filter(function(element) {
+      return element !== null && element !== undefined;
+    });
+    if (arr && elements.length) {
+      Array.prototype.push.apply(arr, elements);
+    }
+  },
+
+  /**
    * @param encoded defaults to false
    */
   format: function(arr, delimiter, encodeHtml) {

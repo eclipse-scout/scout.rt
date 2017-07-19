@@ -149,7 +149,7 @@ describe("scout.arrays", function() {
     });
 
   });
-  
+
   describe("max", function() {
     it("returns 0 iff input contains 0", function() {
       expect(scout.arrays.max([null, 5])).toBe(5);
@@ -574,6 +574,44 @@ describe("scout.arrays", function() {
       expect(scout.arrays.last(['a', 'b', 'c'])).toBe('c');
       expect(scout.arrays.last([123, undefined, null])).toBe(null);
       expect(scout.arrays.last(['a', 'b', ''])).toBe('');
+    });
+
+  });
+
+  describe("pushIfDefined", function() {
+
+    it("pushes element only if it is defined", function() {
+      var arr = null;
+
+      // expect no errors:
+      scout.arrays.pushIfDefined();
+      scout.arrays.pushIfDefined(arr);
+      scout.arrays.pushIfDefined(arr, 'element');
+
+      arr = [];
+      scout.arrays.pushIfDefined(arr);
+      expect(arr).toEqual([]);
+      scout.arrays.pushIfDefined(arr, undefined);
+      expect(arr).toEqual([]);
+      scout.arrays.pushIfDefined(arr, null);
+      expect(arr).toEqual([]);
+      scout.arrays.pushIfDefined(arr, 'element');
+      expect(arr).toEqual(['element']);
+      scout.arrays.pushIfDefined(arr, 0);
+      expect(arr).toEqual(['element', 0]);
+      scout.arrays.pushIfDefined(arr, false);
+      scout.arrays.pushIfDefined(arr, true);
+      expect(arr).toEqual(['element', 0, false, true]);
+
+      arr = [];
+      scout.arrays.pushIfDefined(arr, null, 1, undefined, 2, 3, null, null, '');
+      expect(arr).toEqual([1, 2, 3, '']);
+
+      arr = [];
+      scout.arrays.pushIfDefined(arr, []);
+      expect(arr).toEqual([[]]);
+      scout.arrays.pushIfDefined(arr, [1, 2]);
+      expect(arr).toEqual([[], [1, 2]]);
     });
 
   });

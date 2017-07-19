@@ -300,7 +300,7 @@ scout.objects = {
    * @returns a real Array for the pseudo-array 'arguments'.
    */
   argumentsToArray: function(args) {
-    return Array.prototype.slice.call(args);
+    return args ? Array.prototype.slice.call(args) : [];
   },
 
   /**
