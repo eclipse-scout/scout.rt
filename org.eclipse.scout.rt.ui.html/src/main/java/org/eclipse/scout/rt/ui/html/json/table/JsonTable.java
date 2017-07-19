@@ -940,11 +940,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (row.getTable() == null || row.isStatusDeleted()) {
       return false;
     }
-    if (!row.isFilterAccepted()) {
-      // Accept if rejected by user row filter because gui is and should be aware of that row
-      return row.isRejectedByUser();
+    if (row.isFilterAccepted()) {
+      return true;
     }
-    return true;
+    // Accept if rejected by user row filter because gui is and should be aware of that row
+    return row.isRejectedByUser();
   }
 
   protected List<ITableRow> extractTableRows(JSONObject json) {

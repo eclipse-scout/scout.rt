@@ -262,15 +262,29 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     m_treeListener = null;
   }
 
+  protected void attachNodeInternal(ITreeNode node) {
+    // We create a node id because it can happen that we handle events
+    // concerning nodes which have not yet been assigned a node id.
+    // Rather than requiring callers to ensure that the nodes on which
+    // their events operate exist, we create them here ourselves.
+    getOrCreateNodeId(node);
+  }
+
   protected void attachNode(ITreeNode node, boolean attachChildren) {
-    // empty default implementation
+    if (!isNodeAccepted(node)) {
+      return;
+    }
+
+    attachNodeInternal(node);
+
+    if (attachChildren) {
+      attachNodes(node.getChildNodes(), true);
+    }
   }
 
   protected void attachNodes(Collection<ITreeNode> nodes, boolean attachChildren) {
     for (ITreeNode node : nodes) {
-      if (isNodeAccepted(node)) {
-        attachNode(node, attachChildren);
-      }
+      attachNode(node, attachChildren);
     }
   }
 
@@ -580,7 +594,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       return;
     }
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_NODES, (jsonNodes));
+    putProperty(jsonEvent, PROP_NODES, jsonNodes);
     addActionEvent(EVENT_NODES_CHECKED, jsonEvent);
   }
 

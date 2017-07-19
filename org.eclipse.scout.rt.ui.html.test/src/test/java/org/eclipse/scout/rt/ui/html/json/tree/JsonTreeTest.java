@@ -30,6 +30,9 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -38,6 +41,9 @@ import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
@@ -727,6 +733,36 @@ public class JsonTreeTest {
     response = m_uiSession.currentJsonResponse().toJson();
     System.out.println("Response #2: " + response);
     JsonTestUtility.endRequest(m_uiSession);
+  }
+
+  @Test
+  public void testDeletionOfAllChildrenOfUnknownNode() throws Exception {
+    IOutline outline = new Outline(new ArrayList<IPage<?>>());
+
+    ITreeNode parent = new TablePage(0);
+    ITreeNode node1 = new TablePage(0);
+    node1.setParentNodeInternal(parent);
+    ITreeNode node2 = new TablePage(0);
+    node2.setParentNodeInternal(parent);
+    ITreeNode node3 = new TablePage(0);
+    node3.setParentNodeInternal(parent);
+
+    outline.addChildNode(outline.getRootNode(), parent);
+    outline.addChildNode(parent, node1);
+    outline.addChildNode(parent, node2);
+    outline.addChildNode(parent, node3);
+
+    JsonOutline<IOutline> jsonOutline = m_uiSession.createJsonAdapter(outline, null);
+
+    List<ITreeNode> allChildren = CollectionUtility.arrayList(node1, node2, node3);
+
+    jsonOutline.bufferModelEvent(new TreeEvent(outline, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, parent, allChildren));
+    try {
+      jsonOutline.processBufferedEvents();
+    }
+    catch (UiException e) {
+      fail("Regression of ticket 210096: Tree does not contain node whose children are to be deleted.");
+    }
   }
 
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
