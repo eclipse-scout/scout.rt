@@ -116,8 +116,6 @@ scout.GroupBox.prototype._keyStrokeBindTarget = function() {
 };
 
 scout.GroupBox.prototype._render = function() {
-  var env = scout.HtmlEnvironment;
-
   this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
 
   this.$title = this.$container.appendDiv('group-box-title');
@@ -125,7 +123,7 @@ scout.GroupBox.prototype._render = function() {
   this.addStatus();
   this.$body = this.$container.appendDiv('group-box-body');
   this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
-  this.htmlBody.setLayout(new scout.LogicalGridLayout(this, env.formColumnGap, env.formRowGap, this.minWidthInPixel));
+  this.htmlBody.setLayout(this._createBodyLayout());
 
   this._installScrollbars();
 };
@@ -147,6 +145,15 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderMenuBarVisible();
 };
 
+scout.GroupBox.prototype._createLayout = function() {
+  return new scout.GroupBoxLayout(this);
+};
+
+scout.GroupBox.prototype._createBodyLayout = function() {
+  var env = scout.HtmlEnvironment;
+  return new scout.LogicalGridLayout(this, env.formColumnGap, env.formRowGap, this.minWidthInPixel);
+};
+
 scout.GroupBox.prototype._renderControls = function() {
   this.controls.forEach(function(control) {
     if (!control.rendered) {
@@ -155,10 +162,6 @@ scout.GroupBox.prototype._renderControls = function() {
       control.setLayoutData(new scout.LogicalGridData(control));
     }
   }, this);
-};
-
-scout.GroupBox.prototype._createLayout = function() {
-  return new scout.GroupBoxLayout(this);
 };
 
 scout.GroupBox.prototype._installScrollbars = function() {
