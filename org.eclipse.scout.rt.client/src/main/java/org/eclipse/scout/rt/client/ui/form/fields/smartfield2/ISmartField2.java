@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.TreeProposalChooser;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -72,13 +71,7 @@ public interface ISmartField2<VALUE> extends IValueField<VALUE> {
 
   void lookupByRec(VALUE parentKey);
 
-  ILookupRow<VALUE> lookupByKey(VALUE key);
-
   SmartField2Result getResult();
-
-  void addSmartFieldListener(ContentAssistFieldListener listener);
-
-  void removeSmartFieldListener(ContentAssistFieldListener listener);
 
   /**
    * true: inactive rows are display and can be also be parsed using the UI facade according to

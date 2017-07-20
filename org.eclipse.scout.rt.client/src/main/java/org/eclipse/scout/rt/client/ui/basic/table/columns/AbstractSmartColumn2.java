@@ -456,7 +456,7 @@ public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> 
         return StringUtility.compareIgnoreCase(s1, s2);
       }
       else {
-        VALUE t1 = getValue(r1); // FIXME [awe] 7.0 - SF2: call getValueAsString for proposal fields?
+        VALUE t1 = getValue(r1);
         VALUE t2 = getValue(r2);
         Integer sort1 = (t1 != null ? codeType.getCodeIndex(t1) : -1);
         Integer sort2 = (t2 != null ? codeType.getCodeIndex(t2) : -1);
