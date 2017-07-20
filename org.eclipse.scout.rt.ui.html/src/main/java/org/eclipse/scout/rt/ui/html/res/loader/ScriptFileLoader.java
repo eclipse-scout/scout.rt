@@ -85,7 +85,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     if (StringUtility.isNullOrEmpty(file)) {
       return false;
     }
-    return file.endsWith(".js") || file.endsWith(".css") || file.endsWith(".less");
+    return file.endsWith(".js") || file.endsWith(".less");
   }
 
 }
