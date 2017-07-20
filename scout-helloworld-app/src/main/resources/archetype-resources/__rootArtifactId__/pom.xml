@@ -20,7 +20,7 @@
   <properties>
     <${groupId}.${rootArtifactId}.version>${project.version}</${groupId}.${rootArtifactId}.version>
     <jdk.source.version>${javaVersion}</jdk.source.version>
-    <org.eclipse.scout.rt.version>7.0.100-SNAPSHOT</org.eclipse.scout.rt.version>
+    <org.eclipse.scout.rt.version>7.1.0-SNAPSHOT</org.eclipse.scout.rt.version>
   </properties>
 
   <modules>
