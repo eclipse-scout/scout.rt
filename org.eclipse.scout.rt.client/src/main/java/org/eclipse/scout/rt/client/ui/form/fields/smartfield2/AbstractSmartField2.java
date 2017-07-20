@@ -47,7 +47,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldDataFetcher;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistSearchParam;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.HierarchicalContentAssistDataFetcher;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldDataFetchResult;
@@ -70,7 +69,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -110,7 +108,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     return EMPTY_LOOKUP_ROW;
   }
 
-  private final EventListenerList m_listenerList = new EventListenerList();
   private final ISmartField2UIFacade<VALUE> m_uiFacade;
 
   // chooser security
@@ -462,19 +459,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
     setLookupRowFetcher(lookupRowFetcher);
   }
 
-  /**
-   * Model Observer
-   */
-  @Override
-  public void addSmartFieldListener(ContentAssistFieldListener listener) {
-    m_listenerList.add(ContentAssistFieldListener.class, listener);
-  }
-
-  @Override
-  public void removeSmartFieldListener(ContentAssistFieldListener listener) {
-    m_listenerList.remove(ContentAssistFieldListener.class, listener);
-  }
-
   @Override
   public boolean isActiveFilterEnabled() {
     return propertySupport.getPropertyBool(PROP_ACTIVE_FILTER_ENABLED);
@@ -582,7 +566,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public boolean isLoadParentNodes() { // FIXME [awe] 7.0 - SF2: check if this is required in JS too, see HierarchicalLookupResultBuilder
+  public boolean isLoadParentNodes() {
     return propertySupport.getPropertyBool(PROP_BROWSE_LOAD_PARENT_NODES);
   }
 
@@ -959,14 +943,6 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   public void lookupByRec(VALUE parentKey) {
     doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
   }
-
-  @Override
-  public ILookupRow<VALUE> lookupByKey(VALUE key) {
-    List<? extends ILookupRow<VALUE>> lookupRows = callKeyLookup(key);
-    return CollectionUtility.firstElement(lookupRows);
-  }
-
-  // FIXME [awe] 7.0 - SF2: cleanup all the call* and do* methods, check what's really needed
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
