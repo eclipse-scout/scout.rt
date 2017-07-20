@@ -20,13 +20,16 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
@@ -175,6 +178,51 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     else {
       handleUiAcceptInputAfterTyping(displayText);
     }
+  }
+
+  /**
+   * Info: the handle*Change methods below are used by some sub-classes, but not by all sub-classes. Additionally
+   * IValueField does not define a getUIFacade() method. The implementations of the UIFacade interfaces are quite
+   * different from each other, so there's no easy way to add the method to IValueField and implement an IValueUIFacade.
+   */
+
+  protected void handleUiDisplayTextChange(JSONObject data) {
+    String displayText = data.optString(IValueField.PROP_DISPLAY_TEXT);
+    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+    setDisplayTextFromUI(displayText);
+  }
+
+  protected void setDisplayTextFromUI(String displayText) {
+    // NOP may be implemented by sub-classes, using the individual UI facade implementation
+  }
+
+  protected void handleUiValueChange(JSONObject data) {
+    String jsonValue = data.optString(IValueField.PROP_VALUE, null);
+    Object value = jsonToValue(jsonValue);
+    addPropertyEventFilterCondition(IValueField.PROP_VALUE, value);
+    setValueFromUI(value);
+  }
+
+  protected void setValueFromUI(Object value) {
+    // NOP may be implemented by sub-classes, using the individual UI facade implementation
+  }
+
+  protected Object jsonToValue(String jsonValue) {
+    return jsonValue;
+  }
+
+  protected void handleUiErrorStatusChange(JSONObject data) {
+    JSONObject jsonStatus = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
+    addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, jsonStatus);
+    ParsingFailedStatus status = null;
+    if (jsonStatus != null) {
+      status = new ParsingFailedStatus(JsonStatus.toScoutObject(jsonStatus), getModel().getDisplayText());
+    }
+    setErrorStatusFromUI(status);
+  }
+
+  protected void setErrorStatusFromUI(IStatus status) {
+    // NOP may be implemented by sub-classes, using the individual UI facade implementation
   }
 
   /**

@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -127,27 +127,36 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
   @Override
   protected void handleUiAcceptInput(JsonEvent event) {
-    if (event.getData().has(IValueField.PROP_DISPLAY_TEXT)) {
-      String displayText = event.getData().getString(IValueField.PROP_DISPLAY_TEXT);
-      addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
-      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    JSONObject data = event.getData();
+    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
+      this.handleUiDisplayTextChange(data);
     }
-
-    if (event.getData().has(IValueField.PROP_ERROR_STATUS)) {
-      JSONObject status = event.getData().optJSONObject(IValueField.PROP_ERROR_STATUS);
-      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, status);
-      ParsingFailedStatus parseError = null;
-      if (status != null) {
-        String message = status.optString("message", null);
-        parseError = new ParsingFailedStatus(message, getModel().getDisplayText());
-      }
-      getModel().getUIFacade().setErrorStatusFromUI(parseError);
+    if (data.has(IValueField.PROP_ERROR_STATUS)) {
+      this.handleUiErrorStatusChange(data);
     }
-
-    if (event.getData().has(IValueField.PROP_VALUE)) {
-      Date value = new JsonDate(event.getData().optString(IValueField.PROP_VALUE, null)).asJavaDate();
-      addPropertyEventFilterCondition(IValueField.PROP_VALUE, value);
-      getModel().getUIFacade().setValueFromUI(value);
+    if (data.has(IValueField.PROP_VALUE)) {
+      this.handleUiValueChange(data);
     }
   }
+
+  @Override
+  protected Object jsonToValue(String jsonValue) {
+    return new JsonDate(jsonValue).asJavaDate();
+  }
+
+  @Override
+  protected void setValueFromUI(Object value) {
+    getModel().getUIFacade().setValueFromUI((Date) value);
+  }
+
+  @Override
+  protected void setDisplayTextFromUI(String displayText) {
+    getModel().getUIFacade().setDisplayTextFromUI(displayText);
+  }
+
+  @Override
+  protected void setErrorStatusFromUI(IStatus status) {
+    getModel().getUIFacade().setErrorStatusFromUI(status);
+  }
+
 }

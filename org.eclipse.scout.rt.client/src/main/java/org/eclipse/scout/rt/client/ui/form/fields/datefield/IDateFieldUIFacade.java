@@ -12,14 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.util.Date;
 
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueFieldUIFacade;
 
-public interface IDateFieldUIFacade {
-
-  void setValueFromUI(Date d);
-
-  void setDisplayTextFromUI(String text);
-
-  void setErrorStatusFromUI(ParsingFailedStatus errorStatus);
+public interface IDateFieldUIFacade extends IValueFieldUIFacade<Date> {
 
 }

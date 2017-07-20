@@ -72,4 +72,7 @@ public interface IProposalField2<VALUE> extends ISmartField2<VALUE> {
    */
   boolean isTrimText();
 
+  @Override
+  IProposalField2UIFacade<VALUE> getUIFacade();
+
 }
