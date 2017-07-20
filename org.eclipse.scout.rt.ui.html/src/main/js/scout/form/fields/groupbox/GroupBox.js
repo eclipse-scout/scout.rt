@@ -130,6 +130,37 @@ scout.GroupBox.prototype._render = function() {
   this._installScrollbars();
 };
 
+scout.GroupBox.prototype._remove = function() {
+  if (this.scrollable) {
+    scout.scrollbars.uninstall(this.$body, this.session);
+  }
+  scout.GroupBox.parent.prototype._remove.call(this);
+};
+
+scout.GroupBox.prototype._renderProperties = function() {
+  this._renderExpanded(); // Need to be before renderVisible is executed, otherwise controls might be rendered if group box is invisible which breaks some widgets (e.g. Tree and Table)
+  scout.GroupBox.parent.prototype._renderProperties.call(this);
+
+  this._renderNotification();
+  this._renderBorderVisible();
+  this._renderExpandable();
+  this._renderMenuBarVisible();
+};
+
+scout.GroupBox.prototype._renderControls = function() {
+  this.controls.forEach(function(control) {
+    if (!control.rendered) {
+      control.render(this.$body);
+      // set each children layout data to logical grid data
+      control.setLayoutData(new scout.LogicalGridData(control));
+    }
+  }, this);
+};
+
+scout.GroupBox.prototype._createLayout = function() {
+  return new scout.GroupBoxLayout(this);
+};
+
 scout.GroupBox.prototype._installScrollbars = function() {
   scout.scrollbars.uninstall(this.$body, this.session);
 
@@ -145,37 +176,6 @@ scout.GroupBox.prototype._installScrollbars = function() {
       axis: 'x'
     });
   }
-};
-
-scout.GroupBox.prototype._remove = function() {
-  if (this.scrollable) {
-    scout.scrollbars.uninstall(this.$body, this.session);
-  }
-  scout.GroupBox.parent.prototype._remove.call(this);
-};
-
-scout.GroupBox.prototype._renderControls = function() {
-  this.controls.forEach(function(control) {
-    if (!control.rendered) {
-      control.render(this.$body);
-      // set each children layout data to logical grid data
-      control.setLayoutData(new scout.LogicalGridData(control));
-    }
-  }, this);
-};
-
-scout.GroupBox.prototype._renderProperties = function() {
-  scout.GroupBox.parent.prototype._renderProperties.call(this);
-
-  this._renderNotification();
-  this._renderBorderVisible();
-  this._renderExpandable();
-  this._renderExpanded();
-  this._renderMenuBarVisible();
-};
-
-scout.GroupBox.prototype._createLayout = function() {
-  return new scout.GroupBoxLayout(this);
 };
 
 scout.GroupBox.prototype.addLabel = function() {

@@ -45,7 +45,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
   // Check if width has changed
-  if (htmlContainer.size && htmlContainer.size.width !== htmlContainer.size().width) {
+  if (htmlContainer.sizeCached && htmlContainer.sizeCached.width !== htmlContainer.size().width) {
     if (this.tree.isHorizontalScrollingEnabled()) {
       // Width is only relevant if horizontal scrolling is enabled -> mark as dirty
       this.tree.nodeWidthDirty = true;
