@@ -31,7 +31,11 @@
   /* add a transparent border to align text with normal buttons which also have a border */
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
-  #scout.vertical-align-helper-before();
+
+  .logical-grid-layout > & {
+    /* make sure link is centered when button has a fixed height (which is the case with logical grid layout) */
+    #scout.vertical-align-helper-before();
+  }
 
   & > .link.menu-item {
     /* Draw underline in child element, otherwise the position would not be correct in FF */
