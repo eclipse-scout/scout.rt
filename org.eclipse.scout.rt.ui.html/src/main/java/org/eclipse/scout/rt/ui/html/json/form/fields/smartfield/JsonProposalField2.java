@@ -4,7 +4,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.IProposalField2;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.json.JSONObject;
 
 public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> extends JsonSmartField2<VALUE, MODEL> {
 
@@ -35,9 +34,13 @@ public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> ext
   }
 
   @Override
-  protected void handleUiPropertyChangeValue(JSONObject data) {
-    String value = data.optString("value");
-    getModel().setValueAsString(value);
+  protected Object jsonToValue(String jsonValue) {
+    return jsonValue; // simply return the string
+  }
+
+  @Override
+  protected void setValueFromUI(Object value) {
+    getModel().getUIFacade().setValueAsStringFromUI((String) value);
   }
 
 }

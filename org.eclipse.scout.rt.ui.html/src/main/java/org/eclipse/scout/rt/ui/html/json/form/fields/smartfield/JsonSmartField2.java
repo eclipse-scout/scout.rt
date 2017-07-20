@@ -7,9 +7,9 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -63,7 +62,7 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       @Override
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        return lookupRowToJson((LookupRow<VALUE>) value, false); // FIXME [awe] 7.0 - set multipleColumns parameter correctly
+        return lookupRowToJson((LookupRow<VALUE>) value, hasMultipleColumns());
       }
     });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_MAX_ROW_COUNT, model) {
@@ -150,46 +149,30 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
   protected void handleUiAcceptInput(JsonEvent event) {
     JSONObject data = event.getData();
     if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
-      String displayText = data.getString(IValueField.PROP_DISPLAY_TEXT);
-      addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
-      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+      this.handleUiDisplayTextChange(data);
     }
     if (data.has(IValueField.PROP_ERROR_STATUS)) {
-      JSONObject status = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
-      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, status);
-      ParsingFailedStatus parseError = null;
-      if (status != null) {
-        String message = status.optString("message", null);
-        parseError = new ParsingFailedStatus(message, getModel().getDisplayText());
-      }
-      getModel().getUIFacade().setErrorStatusFromUI(parseError);
+      this.handleUiErrorStatusChange(data);
     }
     // When we have a lookup row, we prefer the lookup row over the value
     if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
-      JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
-      ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
-      addPropertyEventFilterCondition(ISmartField2.PROP_LOOKUP_ROW, lookupRow);
-      getModel().getUIFacade().setLookupRowFromUI(lookupRow);
+      this.handleUiLookupRowChange(data);
     }
     else if (data.has(IValueField.PROP_VALUE)) {
-      handleUiPropertyChangeValue(data);
+      handleUiValueChange(data);
     }
   }
 
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IValueField.PROP_VALUE.equals(propertyName)) {
-      handleUiPropertyChangeValue(data);
+      handleUiValueChange(data);
     }
     else if (IValueField.PROP_DISPLAY_TEXT.equals(propertyName)) {
-      String displayText = data.optString(IValueField.PROP_DISPLAY_TEXT);
-      addPropertyEventFilterCondition(ISmartField2.PROP_DISPLAY_TEXT, displayText);
-      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+      this.handleUiDisplayTextChange(data);
     }
     else if (ISmartField2.PROP_LOOKUP_ROW.equals(propertyName)) {
-      JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
-      ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
-      getModel().getUIFacade().setLookupRowFromUI(lookupRow);
+      this.handleUiLookupRowChange(data);
     }
     else if (ISmartField2.PROP_ACTIVE_FILTER.equals(propertyName)) {
       String activeFilterString = data.optString(ISmartField2.PROP_ACTIVE_FILTER, null);
@@ -198,25 +181,39 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
       getModel().getUIFacade().setActiveFilterFromUI(activeFilter);
     }
     else if (IFormField.PROP_ERROR_STATUS.equals(propertyName)) {
-      // FIXME [awe] 7.0 - SF2: setErrorStatusFromUI wie in DateField UIFacade -> talk to C.GU, remove copy/paste, type/name of error seems to be wrong in case of smart-field
-      JSONObject jsonStatus = data.optJSONObject(IValueField.PROP_ERROR_STATUS);
-      addPropertyEventFilterCondition(IValueField.PROP_ERROR_STATUS, jsonStatus);
-      ParsingFailedStatus pfStatus = null;
-      if (jsonStatus != null) {
-        pfStatus = new ParsingFailedStatus(JsonStatus.toScoutObject(jsonStatus), getModel().getDisplayText());
-      }
-      getModel().getUIFacade().setErrorStatusFromUI(pfStatus);
+      this.handleUiErrorStatusChange(data);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
   }
 
-  protected void handleUiPropertyChangeValue(JSONObject data) {
-    String mappedKey = data.optString("value");
-    VALUE key = getLookupRowKeyForId(mappedKey);
-    addPropertyEventFilterCondition(IValueField.PROP_VALUE, key);
-    getModel().setValue(key);
+  @Override
+  protected Object jsonToValue(String jsonValue) {
+    return getLookupRowKeyForId(jsonValue); // jsonValue == mapped key
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void setValueFromUI(Object value) {
+    getModel().getUIFacade().setValueFromUI((VALUE) value);
+  }
+
+  @Override
+  protected void setDisplayTextFromUI(String displayText) {
+    getModel().getUIFacade().setDisplayTextFromUI(displayText);
+  }
+
+  @Override
+  protected void setErrorStatusFromUI(IStatus status) {
+    getModel().getUIFacade().setErrorStatusFromUI(status);
+  }
+
+  protected void handleUiLookupRowChange(JSONObject data) {
+    JSONObject jsonLookupRow = data.optJSONObject(ISmartField2.PROP_LOOKUP_ROW);
+    ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+    addPropertyEventFilterCondition(ISmartField2.PROP_LOOKUP_ROW, lookupRow);
+    getModel().getUIFacade().setLookupRowFromUI(lookupRow);
   }
 
   protected void handleUiLookupByText(JsonEvent event) {
@@ -265,6 +262,10 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     return id;
   }
 
+  protected boolean hasMultipleColumns() {
+    return getModel().getColumnDescriptors() != null;
+  }
+
   @SuppressWarnings("unchecked")
   protected JSONObject resultToJson(SmartField2Result result) {
     if (result == null) {
@@ -272,9 +273,8 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     }
     JSONObject json = new JSONObject();
     JSONArray jsonLookupRows = new JSONArray();
-    boolean multipleColumns = getModel().getColumnDescriptors() != null;
     for (LookupRow<?> lookupRow : (Collection<LookupRow<?>>) result.getLookupRows()) {
-      jsonLookupRows.put(lookupRowToJson(lookupRow, multipleColumns));
+      jsonLookupRows.put(lookupRowToJson(lookupRow, hasMultipleColumns()));
     }
     json.put("lookupRows", jsonLookupRows);
     if (result.isByRec()) {

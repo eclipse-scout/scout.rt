@@ -10,14 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueFieldUIFacade;
-import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+public class ProposalField2UIFacade<VALUE> extends SmartField2UIFacade<VALUE> implements IProposalField2UIFacade<VALUE> {
 
-public interface ISmartField2UIFacade<VALUE> extends IValueFieldUIFacade<VALUE> {
+  @SuppressWarnings("unchecked")
+  public ProposalField2UIFacade(AbstractProposalField2 proposalField) {
+    super(proposalField);
+  }
 
-  void setActiveFilterFromUI(TriState activeFilter);
+  @Override
+  public void setValueAsStringFromUI(String value) {
+    getProposalField().setValueAsString(value);
+  }
 
-  void setLookupRowFromUI(ILookupRow<VALUE> lookupRow);
+  @SuppressWarnings("unchecked")
+  public IProposalField2<VALUE> getProposalField() {
+    return (IProposalField2<VALUE>) getSmartField();
+  }
 
 }

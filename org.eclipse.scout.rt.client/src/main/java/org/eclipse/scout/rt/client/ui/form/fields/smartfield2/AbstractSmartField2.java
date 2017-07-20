@@ -111,8 +111,7 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  @SuppressWarnings("unchecked")
-  private final ISmartField2UIFacade<VALUE> m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new SmartField2UIFacade(this), ModelContext.copyCurrent());
+  private final ISmartField2UIFacade<VALUE> m_uiFacade;
 
   // chooser security
   private Class<? extends ICodeType<?, VALUE>> m_codeTypeClass;
@@ -145,9 +144,15 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   public AbstractSmartField2(boolean callInitializer) {
     super(false); // do not auto-initialize via super constructor, because final members of this class would not be set yet.
+    this.m_uiFacade = this.createUIFacade();
     if (callInitializer) {
       callInitializer();
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected ISmartField2UIFacade<VALUE> createUIFacade() {
+    return BEANS.get(ModelContextProxy.class).newProxy(new SmartField2UIFacade(this), ModelContext.copyCurrent());
   }
 
   /*

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
@@ -28,7 +29,7 @@ public class SmartField2UIFacade<VALUE> implements ISmartField2UIFacade<VALUE> {
   }
 
   @Override
-  public void setErrorStatusFromUI(ParsingFailedStatus errorStatus) {
+  public void setErrorStatusFromUI(IStatus errorStatus) {
     m_smartField.removeErrorStatus(ParsingFailedStatus.class);
     if (errorStatus != null) {
       m_smartField.addErrorStatus(errorStatus);
@@ -43,6 +44,15 @@ public class SmartField2UIFacade<VALUE> implements ISmartField2UIFacade<VALUE> {
   @Override
   public void setLookupRowFromUI(ILookupRow<VALUE> lookupRow) {
     m_smartField.setValueByLookupRow(lookupRow);
+  }
+
+  @Override
+  public void setValueFromUI(VALUE value) {
+    m_smartField.setValue(value);
+  }
+
+  public AbstractSmartField2<VALUE> getSmartField() {
+    return m_smartField;
   }
 
 }

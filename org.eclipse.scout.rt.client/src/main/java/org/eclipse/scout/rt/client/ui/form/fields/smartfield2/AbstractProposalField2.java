@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -24,6 +27,12 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
 
   public AbstractProposalField2(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected ISmartField2UIFacade<VALUE> createUIFacade() {
+    return BEANS.get(ModelContextProxy.class).newProxy(new ProposalField2UIFacade(this), ModelContext.copyCurrent());
   }
 
   @Override
@@ -94,6 +103,11 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
   @SuppressWarnings("unchecked")
   protected VALUE getValueFromLookupRow(ILookupRow<VALUE> row) {
     return (VALUE) row.getText();
+  }
+
+  @Override
+  public IProposalField2UIFacade<VALUE> getUIFacade() {
+    return (IProposalField2UIFacade<VALUE>) super.getUIFacade();
   }
 
 }

@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IValueFieldUIFacade;
-import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+/**
+ * UI facade for proposal fields.
+ *
+ * @since 7.0
+ */
+public interface IProposalField2UIFacade<VALUE> extends ISmartField2UIFacade<VALUE> {
 
-public interface ISmartField2UIFacade<VALUE> extends IValueFieldUIFacade<VALUE> {
-
-  void setActiveFilterFromUI(TriState activeFilter);
-
-  void setLookupRowFromUI(ILookupRow<VALUE> lookupRow);
+  void setValueAsStringFromUI(String value);
 
 }
