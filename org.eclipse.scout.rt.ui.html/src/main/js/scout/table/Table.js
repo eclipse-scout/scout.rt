@@ -1231,7 +1231,7 @@ scout.Table.prototype._removeRowsInRange = function(range) {
   }
 };
 
-scout.Table.prototype._removeAllRows = function() {
+scout.Table.prototype.removeAllRows = function() {
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
@@ -1252,7 +1252,7 @@ scout.Table.prototype._removeAllRows = function() {
 scout.Table.prototype._removeRows = function(rows) {
   if (!rows) {
     rows = scout.arrays.ensure(rows);
-    this._removeAllRows();
+    this.removeAllRows();
     return;
   }
   rows = scout.arrays.ensure(rows);

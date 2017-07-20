@@ -54,7 +54,7 @@ scout.SmartField2TouchPopup.prototype._fieldOverrides = function() {
   return obj;
 };
 
-scout.SmartField2TouchPopup.prototype._onFieldAcceptInput = function(event) { // FIXME [awe] 7.0 - SF2: consolidate this function / close and onMouseDownOutside
+scout.SmartField2TouchPopup.prototype._onFieldAcceptInput = function(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
   this._touchField.setErrorStatus(event.errorStatus);

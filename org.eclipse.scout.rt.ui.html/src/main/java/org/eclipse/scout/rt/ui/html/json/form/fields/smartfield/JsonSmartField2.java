@@ -286,9 +286,6 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     if (result.isLookupFailed()) {
       json.put("lookupFailed", result.isLookupFailed());
     }
-    if (result.isNoData()) {
-      json.put("noData", result.isNoData());
-    }
     return json;
   }
 

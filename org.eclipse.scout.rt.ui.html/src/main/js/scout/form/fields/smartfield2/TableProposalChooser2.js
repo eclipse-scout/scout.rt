@@ -122,7 +122,7 @@ scout.TableProposalChooser2.prototype.clearSelection = function() {
 
 
 scout.TableProposalChooser2.prototype.clearLookupRows = function() {
-  this.model._removeAllRows(); // FIXME [awe] 7.0 - ask C.GU make "public"
+  this.model.removeAllRows();
 };
 
 /**
@@ -158,7 +158,6 @@ scout.TableProposalChooser2.prototype._createTableRow = function(lookupRow, mult
   if (lookupRow.enabled === false) {
     row.enabled = false;
   }
-  // FIXME [awe] 7.0 - SF2: impl. parentKey mapping / Tree
   if (lookupRow.active === false) {
     row.active = false;
   }

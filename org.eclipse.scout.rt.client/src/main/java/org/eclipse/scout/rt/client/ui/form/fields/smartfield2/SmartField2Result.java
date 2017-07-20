@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield2;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldDataFetchResult;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public class SmartField2Result<V> {
@@ -37,19 +36,6 @@ public class SmartField2Result<V> {
 
   public String getSearchText() {
     return m_result.getSearchParam().getSearchText();
-  }
-
-  /**
-   * @return When no lookup rows have been found and we've searched exactly for the wildcard character (default: *) this
-   *         means no data is available (e.g. the database table is empty).
-   */
-  public boolean isNoData() {
-    if (getLookupRows().size() > 0) {
-      return false;
-    }
-    String searchQuery = m_result.getSearchParam().getSearchQuery();
-    String wildcard = m_result.getSearchParam().getWildcard();
-    return ObjectUtility.equals(searchQuery, wildcard);
   }
 
   public boolean isByRec() {

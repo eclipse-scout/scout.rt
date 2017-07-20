@@ -387,9 +387,6 @@ scout.SmartField2.prototype._setLookupCall = function(lookupCall) {
     });
   }
   this._setProperty('lookupCall', lookupCall);
-
-  // FIXME [awe] 7.0 - SF2: im AbstractContentAssistField.java setCodeTypeClass hat es so eine Logik die schaut, ob das smart field
-  // selber hierarchy setzt, falls nicht wird das field auf den wert von codeType.hierarchy gesetzt
 };
 
 scout.SmartField2.prototype._setCodeType = function(codeType) {
@@ -532,7 +529,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   // We don't want to set an error status on the field for the 'no data' case
   // Only show the message as status in the proposal chooser popup
   var numLookupRows = result.lookupRows.length,
-    emptyResult = numLookupRows === 0; // FIXME [awe] 7.0 - SF2: check what to do with the noData flag on the UI server
+    emptyResult = numLookupRows === 0;
   if (emptyResult && result.browse) {
     var status = scout.Status.warn({
         message: this.session.text('SmartFieldNoDataFound')
@@ -585,7 +582,7 @@ scout.SmartField2.prototype._handleEmptyResult = function() {
   if (this.embedded) {
     this.popup.clearLookupRows();
   } else {
-    this.closePopup(); // FIXME [awe] 7.0 - SF2: also set displayText and value=null here?
+    this.closePopup();
   }
 };
 

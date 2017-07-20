@@ -72,7 +72,7 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
     treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
     treeNodes = this._flatListToSubTree(treeNodesFlat);
     if (treeNodes.length) {
-      var parentNode = null; // FIXME [awe] 7.0 - SF2: better return parentKey with result
+      var parentNode = null;
       treeNodes.forEach(function(treeNode) {
         parentNode = this.model.nodesMap[treeNode.parentId];
         this._appendChildNode(parentNode, treeNode);
@@ -180,7 +180,7 @@ scout.TreeProposalChooser2.prototype._createTreeNode = function(lookupRow) {
     initialExpanded: expandAll,
     text: lookupRow.text,
     lookupRow: lookupRow,
-    leaf: initialLeaf // FIXME [awe] 7.0 - SF2: wrong state when we lookupByText and smartField is loadIncremental=true (should be true instead of false)
+    leaf: initialLeaf
   });
 };
 
