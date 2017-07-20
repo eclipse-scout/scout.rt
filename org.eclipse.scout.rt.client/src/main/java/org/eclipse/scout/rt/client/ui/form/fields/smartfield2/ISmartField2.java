@@ -24,10 +24,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
-// FIXME [awe] 7.0 - SF2: prüfen welche lookup-methoden tatsächlich noch benötigt werden. Die synchronous methoden sollten eigentlich nicht
-// mehr gebraucht werden, ausser an der stelle wo wir beim setValue() sicherstellen wollen, dass die lookup-row dazu geladen wurde. Alle
-// anderen lookups sollten async sein.
-
 /**
  * Generic type V: value of the SmartField2, which is also the key used in lookup-rows.
  */
