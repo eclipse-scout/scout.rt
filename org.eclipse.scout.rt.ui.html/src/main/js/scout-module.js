@@ -187,7 +187,7 @@
   __include("scout/calendar/CalendarModesMenu.js");
   __include("scout/calendar/DateRange.js");
   __include("scout/calendar/YearPanel.js");
-  __include("scout/lifecycle/AbstractLifecycle.js");
+  __include("scout/lifecycle/Lifecycle.js");
   __include("scout/planner/Planner.js");
   __include("scout/planner/PlannerAdapter.js");
   __include("scout/planner/PlannerHeader.js");
@@ -206,11 +206,16 @@
   __include("scout/form/Form.js");
   __include("scout/form/FormAdapter.js");
   __include("scout/form/FormLayout.js");
-  __include("scout/form/FormLifecycle.js");
   __include("scout/form/FormMenu.js");
   __include("scout/form/FormMenuAdapter.js");
   __include("scout/form/FormMenuPopup.js");
   __include("scout/form/FormMenuPopupLayout.js");
+  __include("scout/form/lifecycle/FormLifecycle.js");
+  __include("scout/form/lifecycle/CancelMenu.js");
+  __include("scout/form/lifecycle/CloseMenu.js");
+  __include("scout/form/lifecycle/OkMenu.js");
+  __include("scout/form/lifecycle/ResetMenu.js");
+  __include("scout/form/lifecycle/SaveMenu.js");
   __include("scout/form/DialogLayout.js");
   // Table
   __include("scout/table/Table.js");

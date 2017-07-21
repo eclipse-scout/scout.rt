@@ -32,37 +32,37 @@ describe('FormLifecycle', function() {
     jasmine.clock().uninstall();
   });
 
-  describe('doCancel', function() {
+  describe('cancel', function() {
 
     it('don\'t open popup when nothing has been changed', function() {
-      form.lifecycle.doCancel();
+      form.lifecycle.cancel();
       expectMessageBox(false);
     });
 
     it('open popup when value of field has been changed', function() {
       field.setValue('Foo');
-      form.lifecycle.doCancel();
+      form.lifecycle.cancel();
       expectMessageBox(true);
     });
 
-    it('triggers disposeWidget event after cancel', function() {
+    it('triggers close event after cancel', function() {
       var disposed = false;
-      form.lifecycle.on('disposeWidget', function() {
+      form.lifecycle.on('close', function() {
         disposed = true;
       });
-      form.lifecycle.doCancel();
+      form.lifecycle.cancel();
       jasmine.clock().tick();
       expect(disposed).toBe(true);
     });
 
   });
 
-  describe('doOk', function() {
+  describe('ok', function() {
 
     it('should validate fields and display message box when form is saved', function() {
       field.setMandatory(true);
       field.setValue(null);
-      form.lifecycle.doOk();
+      form.lifecycle.ok();
       jasmine.clock().tick();
       expectMessageBox(true);
     });
@@ -75,7 +75,7 @@ describe('FormLifecycle', function() {
         saved = true;
         return $.resolvedPromise(scout.Status.ok());
       });
-      form.lifecycle.doOk();
+      form.lifecycle.ok();
       jasmine.clock().tick(1000);
       expectMessageBox(false);
       expect(saved).toBe(true);

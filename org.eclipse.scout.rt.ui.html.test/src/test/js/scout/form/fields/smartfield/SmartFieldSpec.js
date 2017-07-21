@@ -331,7 +331,7 @@ describe('SmartField', function() {
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
       smartField.setValue(undefined);
-      expect(smartField.value).toBe(undefined);
+      expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
     });
 

@@ -245,6 +245,17 @@ describe('ValueField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
+    it('converts undefined to null', function() {
+      // Allowing undefined would break the equals checks in ValueField.js
+      var field = helper.createField('StringField');
+      field.setValue(undefined);
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+      field.setValue(null);
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+    });
+
   });
 
   describe('_validateValue', function() {

@@ -712,11 +712,7 @@ scout.FormField.prototype.getFocusableElement = function() {
 };
 
 scout.FormField.prototype.getForm = function() {
-  var parent = this.parent;
-  while (parent && !(parent instanceof scout.Form)) {
-    parent = parent.parent;
-  }
-  return parent;
+  return scout.Form.findForm(this);
 };
 
 scout.FormField.prototype.getParentGroupBox = function() {
