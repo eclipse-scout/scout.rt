@@ -78,6 +78,47 @@ describe('Form', function() {
 
   });
 
+  describe('abort', function() {
+
+    it('closes the form if there is a close button', function() {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          mainBox: true,
+          menus: [{
+            objectType: 'CloseMenu',
+          }]
+        }
+      });
+      spyOn(form, 'close').and.callThrough();
+      spyOn(form, 'cancel').and.callThrough();
+      form.open();
+      form.abort();
+      expect(form.close.calls.count()).toEqual(1);
+      expect(form.cancel.calls.count()).toEqual(0);
+      expect(form.destroyed).toBe(true);
+    });
+
+    it('closes the form by using cancel if there is no close button', function() {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          mainBox: true
+        }
+      });
+      spyOn(form, 'close').and.callThrough();
+      spyOn(form, 'cancel').and.callThrough();
+      form.open();
+      form.abort();
+      expect(form.close.calls.count()).toEqual(0);
+      expect(form.cancel.calls.count()).toEqual(1);
+      expect(form.destroyed).toBe(true);
+    });
+
+  });
+
   describe('destroy', function() {
 
     it('destroys its children', function() {

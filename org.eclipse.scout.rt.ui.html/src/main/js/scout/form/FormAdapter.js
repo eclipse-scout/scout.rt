@@ -13,7 +13,7 @@ scout.FormAdapter = function() {
 };
 scout.inherits(scout.FormAdapter, scout.ModelAdapter);
 
-scout.FormAdapter.prototype._onWidgetClose = function(event) {
+scout.FormAdapter.prototype._onWidgetAbort = function(event) {
   // Do not close the form immediately, server will send the close event
   event.preventDefault();
 
@@ -21,8 +21,8 @@ scout.FormAdapter.prototype._onWidgetClose = function(event) {
 };
 
 scout.FormAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'close') {
-    this._onWidgetClose(event);
+  if (event.type === 'abort') {
+    this._onWidgetAbort(event);
   } else {
     scout.FormAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

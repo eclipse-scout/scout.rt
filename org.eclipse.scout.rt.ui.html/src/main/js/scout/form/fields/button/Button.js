@@ -193,9 +193,13 @@ scout.Button.prototype.doAction = function() {
   } else if (this.menus.length > 0) {
     this.togglePopup();
   } else {
-    this.trigger('click');
+    this._doAction();
   }
   return true;
+};
+
+scout.Button.prototype._doAction = function() {
+  this.trigger('click');
 };
 
 scout.Button.prototype.togglePopup = function() {

@@ -321,6 +321,7 @@ scout.ValueField.prototype.validateValue = function(value) {
   this.validators.forEach(function(validator) {
     value = validator(value, defaultValidator);
   });
+  value = scout.nvl(value, null); // Ensure value is never undefined (necessary for _updateTouched and should make it easier generally)
   return value;
 };
 

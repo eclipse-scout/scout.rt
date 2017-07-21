@@ -117,7 +117,11 @@ scout.Page.prototype._ensureDetailForm = function() {
   if (this.detailForm) {
     return;
   }
-  this.setDetailForm(this.createDetailForm());
+  var form = this.createDetailForm();
+  if (form && !form.displayParent) {
+    form.setDisplayParent(this.getOutline());
+  }
+  this.setDetailForm(form);
 };
 
 // see Java: AbstractPage#pageActivatedNotify

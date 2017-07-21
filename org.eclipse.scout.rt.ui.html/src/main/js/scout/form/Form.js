@@ -12,6 +12,8 @@ scout.Form = function() {
   scout.Form.parent.call(this);
   this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
 
+  this.askIfNeedSave = true;
+  this.data = {};
   this.displayHint = scout.Form.DisplayHint.DIALOG;
   this.maximizeEnabled = true;
   this.maximized = false;
@@ -75,14 +77,12 @@ scout.Form.prototype._init = function(model) {
   this.one('destroy', function() {
     this.off('propertyChange', propertyChangeHandler);
   }.bind(this));
+
+  this._installLifecycle();
 };
 
-scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
-  this._setProperty('rootGroupBox', rootGroupBox);
-  if (this.rootGroupBox &&
-    (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
-    this.rootGroupBox.menuBar.bottom();
-  }
+scout.Form.prototype._render = function() {
+  this._renderForm();
 };
 
 /**
@@ -99,8 +99,18 @@ scout.Form.prototype._renderProperties = function() {
   this._renderStatus();
 };
 
-scout.Form.prototype._render = function() {
-  this._renderForm();
+scout.Form.prototype._postRender = function() {
+  scout.Form.parent.prototype._postRender.call(this);
+
+  this._installFocusContext();
+  if (this.renderInitialFocusEnabled) {
+    this.renderInitialFocus();
+  }
+
+  // Render attached forms, message boxes and file choosers.
+  this.formController.render();
+  this.messageBoxController.render();
+  this.fileChooserController.render();
 };
 
 scout.Form.prototype._remove = function() {
@@ -150,6 +160,204 @@ scout.Form.prototype._renderForm = function() {
   }
 };
 
+scout.Form.prototype._installLifecycle = function() {
+  this.lifecycle = this._createLifecycle();
+  this.lifecycle.handle('load', this._onLifecycleLoad.bind(this));
+  this.lifecycle.handle('save', this._onLifecycleSave.bind(this));
+  this.lifecycle.on('reset', this._onLifecycleReset.bind(this));
+  this.lifecycle.on('close', this._onLifecycleClose.bind(this));
+};
+
+scout.Form.prototype._createLifecycle = function() {
+  return scout.create('FormLifecycle', {
+    widget: this,
+    askIfNeedSave: this.askIfNeedSave
+  });
+};
+
+/**
+ * Renders the form by adding it to the desktop.
+ */
+scout.Form.prototype.open = function() {
+  this.displayParent = this.displayParent || this.session.desktop;
+  this.session.desktop.showForm(this, this.displayParent);
+  return this.load();
+};
+
+/**
+ * Initializes the life cycle and calls the {@link _load} function.
+ * @returns {Promise}.
+ */
+scout.Form.prototype.load = function() {
+  return this.lifecycle.load();
+};
+
+scout.Form.prototype._onLifecycleLoad = function() {
+  return this._load().then(function(data) {
+    this.setData(data);
+    this.importData();
+    this.trigger('load');
+  }.bind(this));
+};
+
+/**
+ * Method may be implemented to load the data. By default, the provided this.data is returned.
+ */
+scout.Form.prototype._load = function() {
+  return $.resolvedPromise().then(function() {
+    return this.data;
+  }.bind(this));
+};
+
+scout.Form.prototype.setData = function(data) {
+  this.setProperty('data', data);
+};
+
+scout.Form.prototype.importData = function() {
+  // NOP
+};
+
+scout.Form.prototype.exportData = function() {
+  // NOP
+};
+
+/**
+ * Saves and closes the form.
+ * @returns {Promise}.
+ */
+scout.Form.prototype.ok = function() {
+  return this.lifecycle.ok();
+};
+
+/**
+ * Saves the changes without closing the form.
+ * @returns {Promise}.
+ */
+scout.Form.prototype.save = function() {
+  return this.lifecycle.save();
+};
+
+scout.Form.prototype._onLifecycleSave = function() {
+  var data = this.exportData();
+  return this._save(data).then(function() {
+    this.setData(data);
+    this.trigger('save');
+  }.bind(this));
+};
+
+scout.Form.prototype._save = function(data) {
+  return $.resolvedPromise();
+};
+
+/**
+ * Resets the form to its initial state.
+ * @returns {Promise}.
+ */
+scout.Form.prototype.reset = function() {
+  this.lifecycle.reset();
+};
+
+scout.Form.prototype._onLifecycleReset = function() {
+  this.trigger('reset');
+};
+
+/**
+ * Closes the form if there are no changes made. Otherwise it shows a message box asking to save the changes.
+ * @returns {Promise}.
+ */
+scout.Form.prototype.cancel = function() {
+  return this.lifecycle.cancel();
+};
+
+/**
+ * Closes the form and discards any unsaved changes.
+ * @returns {Promise}.
+ */
+scout.Form.prototype.close = function() {
+  return this.lifecycle.close();
+};
+
+/**
+ * Destroys the form and removes it from the desktop.
+ */
+scout.Form.prototype._onLifecycleClose = function() {
+  var event = new scout.Event();
+  this.trigger('close', event);
+  if (!event.defaultPrevented) {
+    this._close();
+  }
+};
+
+scout.Form.prototype._close = function() {
+  this.session.desktop.hideForm(this);
+  this.destroy();
+};
+
+/**
+ * This function is called when the user presses the "x" icon.<p>
+ * It will either call {@link #close()} or {@link #cancel()), depending on the enabled and visible system buttons, see {@link _abort}.
+ */
+scout.Form.prototype.abort = function() {
+  var event = new scout.Event();
+  this.trigger('abort', event);
+  if (!event.defaultPrevented) {
+    this._abort();
+  }
+};
+
+/**
+ * Will call {@link #close()} if there is a close menu or button, otherwise {@link #cancel()) will be called.
+ */
+scout.Form.prototype._abort = function() {
+  // Search for a close button in the menus and buttons of the root group box
+  var hasCloseButton = this.rootGroupBox.controls
+    .concat(this.rootGroupBox.menus)
+    .filter(function(control) {
+      var enabled = control.enabled;
+      if (control.enabledComputed !== undefined) {
+        enabled = control.enabledComputed; // Menus don't have enabledComputed, only form fields
+      }
+      return control.visible && enabled && control.systemType && control.systemType !== scout.Button.SystemType.NONE;
+    })
+    .some(function(control) {
+      return control.systemType === scout.Button.SystemType.CLOSE;
+    });
+
+  if (hasCloseButton) {
+    this.close();
+  } else {
+    this.cancel();
+  }
+};
+
+scout.Form.prototype.setClosable = function(closable) {
+  this.setProperty('closable', closable);
+};
+
+scout.Form.prototype._renderClosable = function() {
+  if (!this.isDialog()) {
+    return;
+  }
+  this.$container.toggleClass('closable');
+  if (this.closable) {
+    if (this.$close) {
+      return;
+    }
+    this.$close = this.$statusContainer.appendDiv('status closer')
+      .on('click', this._onCloseIconClick.bind(this));
+  } else {
+    if (!this.$close) {
+      return;
+    }
+    this.$close.remove();
+    this.$close = null;
+  }
+};
+
+scout.Form.prototype._onCloseIconClick = function() {
+  this.abort();
+};
+
 scout.Form.prototype._initResizable = function() {
   this.$container
     .resizable()
@@ -165,68 +373,6 @@ scout.Form.prototype._onResize = function(event) {
   return false;
 };
 
-/**
- * Renders the form by adding it to the desktop.
- */
-scout.Form.prototype.open = function() {
-  this.displayParent = this.displayParent || this.session.desktop;
-  this.session.desktop.showForm(this, this.displayParent);
-};
-
-/**
- * Destroys the form and removes it from the desktop.
- */
-scout.Form.prototype.close = function() {
-  var event = new scout.Event();
-  this.trigger('close', event);
-  if (!event.defaultPrevented) {
-    this._close();
-  }
-};
-
-scout.Form.prototype._close = function() {
-  this.session.desktop.hideForm(this);
-  this.destroy();
-};
-
-scout.Form.prototype.setClosable = function(closable) {
-  this.setProperty('closable', closable);
-};
-
-scout.Form.prototype._isClosable = function() {
-  var i, btn,
-    systemButtons = this.rootGroupBox.systemButtons;
-  for (i = 0; i < systemButtons.length; i++) {
-    btn = systemButtons[i];
-    if (btn.visible &&
-      btn.systemType === scout.Button.SystemType.CANCEL ||
-      btn.systemType === scout.Button.SystemType.CLOSE) {
-      return true;
-    }
-  }
-  return false;
-};
-
-scout.Form.prototype._renderClosable = function() {
-  if (!this.isDialog()) {
-    return;
-  }
-  this.$container.toggleClass('closable');
-  if (this.closable) {
-    if (this.$close) {
-      return;
-    }
-    this.$close = this.$statusContainer.appendDiv('status closer')
-      .on('click', this.close.bind(this));
-  } else {
-    if (!this.$close) {
-      return;
-    }
-    this.$close.remove();
-    this.$close = null;
-  }
-};
-
 scout.Form.prototype._renderHeader = function() {
   if (this.isDialog()) {
     this.$header = this.$container.appendDiv('header');
@@ -237,18 +383,12 @@ scout.Form.prototype._renderHeader = function() {
   }
 };
 
-scout.Form.prototype._postRender = function() {
-  scout.Form.parent.prototype._postRender.call(this);
-
-  this._installFocusContext();
-  if (this.renderInitialFocusEnabled) {
-    this.renderInitialFocus();
+scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
+  this._setProperty('rootGroupBox', rootGroupBox);
+  if (this.rootGroupBox &&
+    (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
+    this.rootGroupBox.menuBar.bottom();
   }
-
-  // Render attached forms, message boxes and file choosers.
-  this.formController.render();
-  this.messageBoxController.render();
-  this.fileChooserController.render();
 };
 
 scout.Form.prototype._renderSaveNeeded = function() {
@@ -276,6 +416,13 @@ scout.Form.prototype._renderSaveNeeded = function() {
   }
   // Layout could have been changed, e.g. if subtitle becomes visible
   this.invalidateLayoutTree();
+};
+
+scout.Form.prototype.setAskIfNeedSave = function(askIfNeedSave) {
+  this.setProperty('askIfNeedSave', askIfNeedSave);
+  if (this.lifecycle) {
+    this.lifecycle.setAskIfNeedSave(askIfNeedSave);
+  }
 };
 
 scout.Form.prototype.setSaveNeededVisible = function(visible) {
@@ -543,8 +690,7 @@ scout.Form.prototype.renderInitialFocus = function() {
   if (this.rendered) {
     if (!this.initialFocus) {
       this.session.focusManager.requestFocus(this.session.focusManager.findFirstFocusableElement(this.$container));
-    }
-    else if (this.initialFocus instanceof scout.FormField) {
+    } else if (this.initialFocus instanceof scout.FormField) {
       this.initialFocus.focus();
     }
   }
@@ -613,4 +759,15 @@ scout.Form.prototype.readCacheBounds = function() {
   }
   bounds = JSON.parse(bounds);
   return new scout.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+};
+
+/**
+ * Returns the form the widget belongs to (returns the first parent which is a {@link scout.Form}.
+ */
+scout.Form.findForm = function(widget) {
+  var parent = widget.parent;
+  while (parent && !(parent instanceof scout.Form)) {
+    parent = parent.parent;
+  }
+  return parent;
 };
