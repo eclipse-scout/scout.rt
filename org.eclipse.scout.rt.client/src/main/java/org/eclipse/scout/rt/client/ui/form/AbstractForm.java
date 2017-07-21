@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
+import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCloseTimerChain;
@@ -2384,16 +2385,18 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
     };
     Map<String, Object> props = BeanUtility.getProperties(this, AbstractForm.class, filter);
-    for (Entry<String, Object> entry : props.entrySet()) {
-      try {
-        Element xProp = root.getOwnerDocument().createElement("property");
-        xProps.appendChild(xProp);
-        xProp.setAttribute("name", entry.getKey());
-        XmlUtility.setObjectAttribute(xProp, "value", entry.getValue());
+    storePropertiesToXml(xProps, props);
+    // add extension properties
+    for (IExtension<?> ex : getAllExtensions()) {
+      Map<String, Object> extensionProps = BeanUtility.getProperties(ex, AbstractFormExtension.class, filter);
+      if (extensionProps.isEmpty()) {
+        continue;
       }
-      catch (Exception e) {
-        throw new ProcessingException("property " + entry.getKey() + " with value " + entry.getValue(), e);
-      }
+      Element xExtension = root.getOwnerDocument().createElement("extension");
+      xProps.appendChild(xExtension);
+      xExtension.setAttribute("extensionId", ex.getClass().getSimpleName());
+      xExtension.setAttribute("extensionQname", ex.getClass().getName());
+      storePropertiesToXml(xExtension, extensionProps);
     }
     // add fields
     final Element xFields = root.getOwnerDocument().createElement("fields");
@@ -2432,6 +2435,25 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  /**
+   * Adds a &lt;property&gt; element for every given property to the parent element.
+   *
+   * @see #loadPropertiesFromXml(Element)
+   */
+  protected void storePropertiesToXml(Element parent, Map<String, Object> props) {
+    for (Entry<String, Object> entry : props.entrySet()) {
+      try {
+        Element xProp = parent.getOwnerDocument().createElement("property");
+        parent.appendChild(xProp);
+        xProp.setAttribute("name", entry.getKey());
+        XmlUtility.setObjectAttribute(xProp, "value", entry.getValue());
+      }
+      catch (Exception e) {
+        throw new ProcessingException("property " + entry.getKey() + " with value " + entry.getValue(), e);
+      }
+    }
+  }
+
   @Override
   public void loadFromXml(Element root) {
     String formId = getFormId();
@@ -2441,22 +2463,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     // load properties
-    Map<String, Object> props = new HashMap<String, Object>();
     Element xProps = XmlUtility.getFirstChildElement(root, "properties");
-    if (xProps != null) {
-      for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
-        String name = xProp.getAttribute("name");
-        try {
-          Object o = XmlUtility.getObjectAttribute(xProp, "value");
-          props.put(name, o);
-        }
-        catch (Exception e) {
-          LOG.warn("Could not load XML property {}", name, e);
-        }
+    Map<String, Object> props = loadPropertiesFromXml(xProps);
+    BeanUtility.setProperties(this, props, true, null);
+
+    // load extension properties
+    for (Element xExtension : XmlUtility.getChildElements(xProps, "extension")) {
+      String extensionId = xExtension.getAttribute("extensionId");
+      String extensionQname = xExtension.getAttribute("extensionQname");
+      IFormExtension<? extends AbstractForm> extension = findFormExtensionById(extensionQname, extensionId);
+      if (extension == null) {
+        continue;
       }
+      Map<String, Object> extensionProps = loadPropertiesFromXml(xExtension);
+      BeanUtility.setProperties(extension, extensionProps, true, null);
     }
 
-    BeanUtility.setProperties(this, props, true, null);
     // load fields
     Element xFields = XmlUtility.getFirstChildElement(root, "fields");
     if (xFields != null) {
@@ -2495,6 +2517,48 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         return true;
       }
     });
+  }
+
+  /**
+   * Looks for an {@link IFormExtension} available on this form with the given extensionQname or extensionId (in this
+   * order).
+   *
+   * @return the form extension with the given qualified name, id or <code>null</code>, if no extension has been found.
+   */
+  protected IFormExtension<? extends AbstractForm> findFormExtensionById(String extensionQname, String extensionId) {
+    IFormExtension<?> candidate = null;
+    for (IFormExtension<? extends AbstractForm> extension : getAllExtensions()) {
+      if (extension.getClass().getName().equals(extensionQname)) {
+        return extension;
+      }
+      else if (candidate == null && extension.getClass().getSimpleName().equals(extensionId)) {
+        candidate = extension;
+      }
+    }
+    return candidate;
+  }
+
+  /**
+   * Extracts properties from &lt;property&gt; child elements in the given parent element.
+   *
+   * @return Map of property name to property value
+   * @see #storePropertiesToXml(Element, Map)
+   */
+  protected Map<String, Object> loadPropertiesFromXml(Element xProps) {
+    Map<String, Object> props = new HashMap<String, Object>();
+    if (xProps != null) {
+      for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
+        String name = xProp.getAttribute("name");
+        try {
+          Object o = XmlUtility.getObjectAttribute(xProp, "value");
+          props.put(name, o);
+        }
+        catch (Exception e) {
+          LOG.warn("Could not load XML property {}", name, e);
+        }
+      }
+    }
+    return props;
   }
 
   @Override
