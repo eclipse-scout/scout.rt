@@ -44,6 +44,21 @@ public class HtmlHelper {
    * <p>
    */
   public String toPlainText(String html) {
+    String s = toPlainTextNoTrim(html);
+    if (s != null) {
+      s = s.trim();
+    }
+    return s;
+  }
+
+  /**
+   * Same as <code>toPlainText(String)</code>, except that leading and trailing whitespace is preserved.
+   * 
+   * @param html
+   * @return
+   */
+  public String toPlainTextNoTrim(String html) {
+
     if (html == null || html.length() == 0) {
       return html;
     }
@@ -77,7 +92,6 @@ public class HtmlHelper {
     s = StringUtility.replace(s, "&#9;", "\t");
     s = StringUtility.replaceNoCase(s, "&#x9;", "\t");
 
-    s = s.trim();
     return s;
   }
 
