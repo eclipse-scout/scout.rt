@@ -38,7 +38,10 @@ scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
   if (!this.tabBox.rendered) {
     return new scout.Dimension(0,0);
   }
-  // exprected the tab area is layouted dynamically only
+  if (!this.tabBox.tabArea.visible) {
+    return new scout.Dimension(0,0);
+  }
+  // expected the tab area is layouted dynamically only
   var htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
     prefSize = htmlViewTabs.prefSize(),
     margins = htmlViewTabs.margins();

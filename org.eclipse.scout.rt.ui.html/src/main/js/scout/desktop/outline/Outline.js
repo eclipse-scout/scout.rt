@@ -59,7 +59,8 @@ scout.Outline.prototype._init = function(model) {
   // menu bars
   this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.GroupBoxMenuItemsOrder()
+    menuOrder: new scout.GroupBoxMenuItemsOrder(),
+    preventInitialFocus: true
   });
   this.nodeMenuBar = scout.create('MenuBar', {
     parent: this,
@@ -182,7 +183,6 @@ scout.Outline.prototype._removeTitle = function() {
 scout.Outline.prototype._renderTitleMenuBar = function() {
   if (this.titleVisible) {
     this.titleMenuBar.render(this.$title);
-    this.titleMenuBar.$container.addClass('prevent-initial-focus');
   }
 };
 

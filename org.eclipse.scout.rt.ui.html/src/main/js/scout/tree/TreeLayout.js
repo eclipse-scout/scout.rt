@@ -33,7 +33,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   }
 
   heightOffset = 0;
-  if (menuBar.$container.isVisible()) {
+  if (menuBar.visible) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     heightOffset += menuBarSize.height;

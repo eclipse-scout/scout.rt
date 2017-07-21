@@ -256,13 +256,14 @@ scout.FormField.prototype._renderTooltipText = function() {
  * @override
  */
 scout.FormField.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
-  if (this.rendered) {
+  scout.FormField.parent.prototype._renderVisible.call(this);
+  if (this.rendered || this.invisible) {
     this.parent.invalidateLogicalGrid(false);
-    var htmlCompParent = this.htmlComp.getParent();
-    if (htmlCompParent) { // may be null if $container is detached
-      htmlCompParent.invalidateLayoutTree();
-    }
+    this.htmlComp.invalidateLayoutTree();
+//    var htmlCompParent = this.htmlComp.getParent();
+//    if (htmlCompParent) { // may be null if $container is detached
+//      htmlCompParent.invalidateLayoutTree();
+//    }
   }
 };
 

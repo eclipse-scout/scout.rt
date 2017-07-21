@@ -104,7 +104,7 @@ scout.MenuBar.prototype._remove = function() {
  * @override
  */
 scout.MenuBar.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
+  scout.MenuBar.parent.prototype._renderVisible.call(this);
   this.invalidateLayoutTree();
 };
 
@@ -180,16 +180,17 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
     this.link(menuItems);
   }
 
-  if (this.rendered) {
+  var wasVisible = this.visible;
+  this.updateVisibility();
+
+  if (wasVisible && this.rendered) {
     var hasUnrenderedMenuItems = this.menuItems.some(function(elem) {
       return !elem.rendered;
     });
     if (!sameMenuItems || hasUnrenderedMenuItems) {
-      this.updateVisibility();
       this.rebuildItems(); // Re-layout menubar
     } else {
       // Don't rebuild menubar, but update "markers"
-      this.updateVisibility();
       this.updateDefaultMenu();
       this.updateLastItemMarker();
       this.updateLeftOfButtonMarker();

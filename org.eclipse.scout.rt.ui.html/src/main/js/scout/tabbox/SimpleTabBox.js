@@ -67,9 +67,7 @@ scout.SimpleTabBox.prototype._renderProperties = function() {
 scout.SimpleTabBox.prototype._renderTabArea = function() {
   this.tabArea.render();
   this.$tabArea = this.tabArea.$container;
-  if (this.tabArea.attached) {
-    this.$tabArea.insertBefore(this.$viewContent);
-  }
+  this.$tabArea.insertBefore(this.$viewContent);
 };
 
 scout.SimpleTabBox.prototype._renderView = function(view) {

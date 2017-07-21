@@ -45,11 +45,7 @@ scout.SimpleTabArea.prototype._renderTab = function(tab) {
 };
 
 scout.SimpleTabArea.prototype._renderVisible = function() {
-  if (this.visible && this.tabs.length > 0) {
-    this.attach();
-  } else {
-    this.detach();
-  }
+  scout.SimpleTabArea.parent.prototype._renderVisible.call(this);
   this.invalidateLayoutTree();
 };
 

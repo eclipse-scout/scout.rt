@@ -63,6 +63,7 @@ scout.Widget = function() {
   this.keyStrokeContext = this._createKeyStrokeContext();
   // Widgets using scout.LogicalGridLayout may have a grid to calculate the grid data of the children
   this.logicalGrid;
+  this.allowInitialFocus = true;
 };
 
 /**
@@ -256,6 +257,11 @@ scout.Widget.prototype.render = function($parent) {
   }
   this.rendering = true;
   this.$parent = $parent || this.parent.$container;
+  if (!this.visible) {
+    this._renderVisible();
+    this.rendering = false;
+    return;
+  }
   this._render();
   this._renderProperties();
   this._renderInspectorInfo();
@@ -283,10 +289,12 @@ scout.Widget.prototype._render = function() {
  * Here values of the model are applied to the DOM / UI.
  */
 scout.Widget.prototype._renderProperties = function() {
+  this._renderLayoutData();
   this._renderEnabled();
   this._renderVisible();
   this._renderCssClass();
   this._renderLoading();
+  this._renderPreventInitialFocus();
 };
 
 /**
@@ -566,14 +574,47 @@ scout.Widget.prototype._renderDisabledStyleInternal = function($element) {
 };
 
 scout.Widget.prototype.setVisible = function(visible) {
-  this.setProperty('visible', visible);
+  if (this.visible === visible) {
+    return;
+  }
+  this._setProperty('visible', visible);
+  if (this.rendered || this.invisible) {
+    this._renderVisible();
+  }
 };
 
 scout.Widget.prototype._renderVisible = function() {
-  if (!this.$container) {
-    return;
+  if (!this.visible) {
+    if (this.$placeholder && this.$placeholder.isAttached()) { // isAttached is necessary because someone could have called this.remove
+      return;
+    }
+
+    // replace content with a placeholder
+    this.$placeholder = this.$parent.appendDiv('hidden');
+    if (this.rendered) {
+      var $parent = this.$parent;
+      this.$placeholder.before(this.$container);
+      this.remove();
+      this.$parent = $parent;
+    }
+    this.$container = this.$placeholder;
+    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+    this.invisible = true;
+  } else {
+    if (!this.$placeholder) {
+      return;
+    }
+
+    // replace placeholder with the actual content
+    var $placeholder = this.$placeholder;
+    this.$placeholder = null;
+    this.$container = null;
+    this.render(this.$parent);
+    this.$container.after($placeholder);
+    // XXX move classes from $container? proposal: $container is the only element which is available in invisible state and may be modified (adding classes). or maybe we can even avoid that by by using widget.addClass
+    $placeholder.remove();
+    this.invisible = false;
   }
-  this.$container.setVisible(this.visible);
 };
 
 scout.Widget.prototype._setCssClass = function(cssClass) {
@@ -638,6 +679,17 @@ scout.Widget.prototype._renderLoading = function() {
     return;
   }
   this.loadingSupport.renderLoading();
+};
+
+scout.Widget.prototype.setPreventInitialFocus = function(preventInitialFocus) {
+  this.setProperty('preventInitialFocus', preventInitialFocus);
+};
+
+scout.Widget.prototype._renderPreventInitialFocus = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.toggleClass('prevent-initial-focus', this.preventInitialFocus);
 };
 
 //--- Layouting / HtmlComponent methods ---
@@ -713,13 +765,14 @@ scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
 };
 
 scout.Widget.prototype.setLayoutData = function(layoutData) {
-  if (!this.rendered) {
+  this.setProperty('layoutData', layoutData);
+};
+
+scout.Widget.prototype._renderLayoutData = function() {
+  if (!this.htmlComp) {
     return;
   }
-  if (!this.htmlComp) {
-    throw new Error('Function expects a htmlComp property');
-  }
-  this.htmlComp.layoutData = layoutData;
+  this.htmlComp.layoutData = this.layoutData;
 };
 
 /**

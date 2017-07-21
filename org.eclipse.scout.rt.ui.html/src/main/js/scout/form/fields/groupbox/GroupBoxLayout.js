@@ -162,11 +162,9 @@ scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSiz
  * Return menu-bar when it exists and it is visible.
  */
 scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
-  if (this._groupBox.menuBar && this._groupBox.menuBarVisible) {
+  if (this._groupBox.menuBar && this._groupBox.menuBarVisible && this._groupBox.menuBar.visible) {
     var htmlMenuBar = scout.HtmlComponent.get(this._groupBox.menuBar.$container);
-    if (htmlMenuBar.isVisible()) {
-      return htmlMenuBar;
-    }
+    return htmlMenuBar;
   }
   return null;
 };

@@ -17,6 +17,7 @@ scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
 scout.TableLayout.prototype.layout = function($container) {
   var menuBarHeight = 0,
+    menuBarSize,
     footerHeight = 0,
     headerHeight = 0,
     controlContainerHeight = 0,
@@ -29,12 +30,12 @@ scout.TableLayout.prototype.layout = function($container) {
     header = this.table.header,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
-    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    htmlMenuBar = menuBar.htmlComp,
     htmlContainer = this.table.htmlComp,
-    containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
-    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+    containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets());
 
   if (menuBar.visible) {
+    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     menuBarHeight = menuBarSize.height;
   }

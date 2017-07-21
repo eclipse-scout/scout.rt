@@ -101,7 +101,7 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
  * @override
  */
 scout.ViewMenuTab.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
+  scout.ViewMenuTab.parent.prototype._renderVisible.call(this);
   this.invalidateLayoutTree();
 };
 

@@ -22,7 +22,7 @@ scout.ListBoxLayout.prototype.layout = function($container) {
     height = size.height,
     filterBoxHeight;
 
-  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered && this.filterBox.visible) {
     filterBoxHeight = scout.HtmlComponent.get(this.filterBox.$container).prefSize().height;
     height -= filterBoxHeight;
   }
@@ -31,7 +31,7 @@ scout.ListBoxLayout.prototype.layout = function($container) {
   var htmlTable = scout.HtmlComponent.get(this.table.$container);
   htmlTable.setSize(new scout.Dimension(size.width, height));
 
-  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered && this.filterBox.visible) {
     var htmlFilterBox = scout.HtmlComponent.get(this.filterBox.$container);
     htmlFilterBox.setSize(new scout.Dimension(size.width, filterBoxHeight));
   }

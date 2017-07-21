@@ -755,7 +755,7 @@ scout.TableHeader.prototype._onTableDataScroll = function() {
 };
 
 scout.TableHeader.prototype._onMenuBarPropertyChange = function(event) {
-  if (event.propertyName === 'visible') {
+  if (event.propertyName === 'visible' && this.rendered) {
     this.$menuBarContainer.setVisible(event.newValue);
   }
 };
