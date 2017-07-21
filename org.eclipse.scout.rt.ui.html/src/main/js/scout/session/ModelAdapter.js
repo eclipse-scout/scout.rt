@@ -94,7 +94,7 @@ scout.ModelAdapter.prototype._initModel = function(model, parent) {
 /**
  * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
  */
-scout.ModelAdapter.prototype._initProperties = function() {
+scout.ModelAdapter.prototype._initProperties = function(model) {
   // NOP
 };
 

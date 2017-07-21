@@ -389,7 +389,37 @@ describe('jquery-scout', function() {
       expect(cancelled).toBe(false);
     });
 
-  });
+    it('it debounces only the first function call when reschedule=false', function() {
+      var counter = 0;
+      function incImpl () {
+        counter++;
+      }
+      var inc = $.debounce(incImpl, {
+        delay: 100,
+        reschedule: false
+      });
 
+      expect(counter).toBe(0); // still zero
+      inc();
+      expect(counter).toBe(0); // still zero
+      jasmine.clock().tick(50);
+      expect(counter).toBe(0); // still zero
+
+      inc(); // subsequent call before timeout was reached --> should not be rescheduled
+      expect(counter).toBe(0); // still zero
+      jasmine.clock().tick(60);
+      expect(counter).toBe(1); // first call was fired after 100ms
+
+      jasmine.clock().tick(200);
+      expect(counter).toBe(1); // second call was never executed
+
+      inc();
+      jasmine.clock().tick(90);
+      expect(counter).toBe(1); // third call still pending
+      jasmine.clock().tick(20);
+      expect(counter).toBe(2); // third call was executed again
+    });
+
+  });
 
 });

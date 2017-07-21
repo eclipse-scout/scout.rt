@@ -157,23 +157,56 @@ $.suppressEventIfDisabled = function(event, $target) {
 /**
  * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
  * (in milliseconds), but if the same function is called a second time within the waiting time,
- * the timer is reset. The default value for 'delay' is 250 ms. The resulting function has a
- * function member "cancel" that can be used to clear any scheduled calls to the original
- * function. If no such call was scheduled, cancel() returns false, otherwise true.
+ * depending on the 'reschedule' option, the timer is reset or the second call is ignored.
+ * The default value for the 'delay' option is 250 ms.
+ *
+ * The resulting function has a function member 'cancel' that can be used to clear any scheduled
+ * calls to the original function. If no such call was scheduled, cancel() returns false,
+ * otherwise true.
+ *
+ * OPTION         DEFAULT VALUE   DESCRIPTION
+ * ------------------------------------------------------------------------------------
+ * delay          250             Waiting time in milliseconds before the function is executed.
+ *
+ * reschedule     true            Defines whether subsequent call to the debounced function
+ *                                within the waiting time cause the timer to be reset or not.
+ *                                If the reschedule option is 'false', subsequent calls within
+ *                                the waiting time will just be ignored.
+ *
+ * @param fx
+ *          the function to wrap
+ * @param options
+ *          an optional options object (see table above). Short-hand version: If a number is passed instead
+ *          of an object, the value is automatically converted to the option 'delay'.
  */
-$.debounce = function(fx, delay) {
-  delay = (delay !== undefined) ? delay : 250;
+$.debounce = function(fx, options) {
+  if (typeof options === 'number') {
+    options = {
+        delay: options
+    };
+  }
+  options = $.extend({
+    delay: 250,
+    reschedule: true
+  }, options);
+
   var timeoutId = null;
   var fn = function() {
     var that = this,
       args = arguments;
+
+    if (timeoutId && !options.reschedule) {
+      // Function is already schedule but 'reschedule' option is set to false --> discard this request
+      return;
+    }
     if (timeoutId) {
+      // Function is already scheduled --> cancel current scheduled call and re-schedule the call
       clearTimeout(timeoutId);
     }
     timeoutId = setTimeout(function() {
       timeoutId = null;
       fx.apply(that, args);
-    }, delay);
+    }, options.delay);
   };
   fn.cancel = function() {
     if (timeoutId) {
