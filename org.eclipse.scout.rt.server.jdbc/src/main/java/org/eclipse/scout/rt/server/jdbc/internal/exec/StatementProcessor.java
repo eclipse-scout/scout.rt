@@ -24,8 +24,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.BeanArrayHolderFilter;
@@ -69,6 +71,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("deprecation")
 public class StatementProcessor implements IStatementProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(StatementProcessor.class);
+  private static final Pattern REGEX_DOT = Pattern.compile("[.]");
 
   static {
     if (LOG.isDebugEnabled()) {
@@ -81,19 +84,19 @@ public class StatementProcessor implements IStatementProcessor {
 
   private final ISqlService m_callerService;
   private final String m_originalStm;
-  private Object[] m_bindBases;
-  private int m_maxRowCount;
-  private int m_maxFetchSize = -1;
-  private BindModel m_bindModel;
-  private IToken[] m_ioTokens;
-  private List<IBindInput> m_inputList;
-  private List<IBindOutput> m_outputList;
+  private final Object[] m_bindBases;
+  private final int m_maxRowCount;
+  private final int m_maxFetchMemorySize;
+  private final BindModel m_bindModel;
+  private final IToken[] m_ioTokens;
+  private final List<IBindInput> m_inputList;
+  private final List<IBindOutput> m_outputList;
   // state
+  private int m_maxFetchSize = -1;
   private int m_currentInputBatchIndex = -1;
   private int m_currentOutputBatchIndex = -1;
   private String m_currentInputStm;
   private TreeMap<Integer/* jdbcBindIndex */, SqlBind> m_currentInputBindMap;
-  private int m_maxFetchMemorySize;
 
   public StatementProcessor(ISqlService callerService, String stm, Object[] bindBases) {
     this(callerService, stm, bindBases, 0);
@@ -112,19 +115,26 @@ public class StatementProcessor implements IStatementProcessor {
       m_originalStm = stm;
       m_maxRowCount = maxRowCount;
       m_maxFetchMemorySize = maxFetchMemorySize;
-      // expand bind bases to list
-      ArrayList<Object> bases = new ArrayList<Object>();
-      if (bindBases != null) {
-        for (int i = 0, n = bindBases.length; i < n; i++) {
-          bases.add(bindBases[i]);
+      // add session to binds if available
+      final IServerSession session = ServerSessionProvider.currentSession();
+      if (session != null) {
+        if (bindBases == null) {
+          m_bindBases = new Object[]{session};
+        }
+        else {
+          m_bindBases = new Object[bindBases.length + 1];
+          System.arraycopy(bindBases, 0, m_bindBases, 0, bindBases.length);
+          m_bindBases[m_bindBases.length - 1] = session;
         }
       }
-      // add server session as default
-      IServerSession session = ServerSessionProvider.currentSession();
-      if (session != null) {
-        bases.add(session);
+      else {
+        if (bindBases == null) {
+          m_bindBases = new Object[]{};
+        }
+        else {
+          m_bindBases = bindBases;
+        }
       }
-      m_bindBases = bases.toArray();
       //
       m_inputList = new ArrayList<IBindInput>();
       m_outputList = new ArrayList<IBindOutput>();
@@ -168,10 +178,10 @@ public class StatementProcessor implements IStatementProcessor {
       for (IToken t : intoModel.getOutputTokens()) {
         IBindOutput out = createOutput(t, m_bindBases);
         if (!out.isSelectInto()) {
-          throw new ProcessingException("out parameter is not a 'select into': " + out);
+          throw new ProcessingException("out parameter is not a 'select into': {}", out);
         }
         if (out.isJdbcBind()) {
-          throw new ProcessingException("out parameter is a jdbc bind: " + out);
+          throw new ProcessingException("out parameter is a jdbc bind: {}", out);
         }
         out.setJdbcBindIndex(-1);
         m_outputList.add(out);
@@ -871,29 +881,54 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   private IBindInput createInput(IToken bindToken, Object[] bindBases) {
-    IBindInput o = null;
     if (bindToken instanceof ValueInputToken) {
-      ValueInputToken valueInputToken = (ValueInputToken) bindToken;
-      String[] path = valueInputToken.getName().split("[.]");
-      for (int i = 0; i < bindBases.length; i++) {
-        Object bindBase = bindBases[i];
+      final ValueInputToken valueInputToken = (ValueInputToken) bindToken;
+      final String[] path = REGEX_DOT.split(valueInputToken.getName());
+
+      IBindInput result = null;
+      for (final Object bindBase : bindBases) {
         Class nullType = null;
         if (bindBase instanceof NVPair) {
           nullType = ((NVPair) bindBase).getNullType();
         }
-        o = createInputRec(valueInputToken, path, bindBases[i], nullType);
-        if (o != null) {
-          break;
+        final IBindInput in = createInputRec(valueInputToken, path, bindBase, nullType);
+        if (in != null) {
+          // bind found
+          if (isBindDuplicateCheckEnabled()) {
+            if (result == null) {
+              // first match found for the bind -> remember
+              result = in;
+            }
+            else {
+              // second match found
+              onDuplicateBind(valueInputToken);
+              return result;
+            }
+          }
+          else {
+            // no duplicate check necessary: directly return the first match
+            return in;
+          }
         }
       }
-      if (o == null) {
-        throw new ProcessingException("Cannot find input for '" + valueInputToken + "' in bind bases.");
+
+      if (result == null) {
+        throw new ProcessingException("Cannot find input for '{}' in bind bases.", valueInputToken);
       }
+      return result;
     }
     else if (bindToken instanceof FunctionInputToken) {
-      o = new FunctionInput(m_callerService, m_bindBases, (FunctionInputToken) bindToken);
+      return new FunctionInput(m_callerService, m_bindBases, (FunctionInputToken) bindToken);
     }
-    return o;
+    throw new ProcessingException("Cannot find input for {}", bindToken.getClass());
+  }
+
+  protected boolean isBindDuplicateCheckEnabled() {
+    return Platform.get().inDevelopmentMode();
+  }
+
+  protected void onDuplicateBind(IToken token) {
+    LOG.warn("Multiple matches for bind '{}'.", token);
   }
 
   private IBindInput createInputRec(ValueInputToken bindToken, String[] path, Object bindBase, Class nullType) {
@@ -935,7 +970,7 @@ public class StatementProcessor implements IStatementProcessor {
           }
           else {
             if (o == null) {
-              throw new ProcessingException("input bind " + bindToken + " resolves to null on path element: " + path[0]);
+              throw new ProcessingException("input bind {} resolves to null on path element: {}", bindToken, path[0]);
             }
           }
         }
@@ -971,7 +1006,7 @@ public class StatementProcessor implements IStatementProcessor {
           }
           else {
             if (o == null) {
-              throw new ProcessingException("input bind " + bindToken + " resolves to null on path element: " + path[0]);
+              throw new ProcessingException("input bind {} resolves to null on path element: {}", bindToken, path[0]);
             }
           }
         }
@@ -1095,7 +1130,7 @@ public class StatementProcessor implements IStatementProcessor {
       if (bindBase instanceof Collection && terminal) {
         return new BeanPropertyInput(path[0], ((Collection) bindBase).toArray(), bindToken);
       }
-      /* bean propertry */
+      /* bean property */
       try {
         Object propertyBean = bindBase;
         FastPropertyDescriptor pd = BeanUtility.getFastBeanInfo(propertyBean.getClass(), null).getPropertyDescriptor(path[0]);
@@ -1109,19 +1144,20 @@ public class StatementProcessor implements IStatementProcessor {
           }
           else {
             if (o == null) {
-              throw new ProcessingException("input bind " + bindToken + " resolves to null on path element: " + path[0]);
+              throw new ProcessingException("input bind {} resolves to null on path element: {}", bindToken, path[0]);
             }
           }
         }
       }
       catch (Exception e) {
         // obviously there is no such property
+        LOG.debug("Cannot access property.", e);
       }
     }
     //
     if (found) {
       if (terminal) {
-        throw new ProcessingException("input bind '" + bindToken.getName() + "' was not recognized as a terminal");
+        throw new ProcessingException("input bind '{}' was not recognized as a terminal", bindToken.getName());
       }
       // continue
       String[] newPath = new String[path.length - 1];
@@ -1152,24 +1188,37 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   private IBindOutput createOutput(IToken bindToken, Object[] bindBases) {
-    IBindOutput o = null;
     if (bindToken instanceof ValueOutputToken) {
+      IBindOutput result = null;
       ValueOutputToken valueOutputToken = (ValueOutputToken) bindToken;
-      String[] path = valueOutputToken.getName().split("[.]");
+      String[] path = REGEX_DOT.split(valueOutputToken.getName());
       for (int i = 0; i < bindBases.length; i++) {
-        o = createOutputRec(valueOutputToken, path, bindBases[i]);
-        if (o != null) {
-          break;
+        IBindOutput out = createOutputRec(valueOutputToken, path, bindBases[i]);
+        if (out != null) {
+          if (isBindDuplicateCheckEnabled()) {
+            if (result == null) {
+              // first match found for the bind -> remember
+              result = out;
+            }
+            else {
+              // second match found
+              onDuplicateBind(valueOutputToken);
+              return result;
+            }
+          }
+          else {
+            // no duplicate check necessary: directly return the first match
+            return out;
+          }
         }
       }
-      if (o == null) {
-        throw new ProcessingException("Cannot find output for '" + valueOutputToken + "' in bind base. When selecting into shared context variables make sure these variables are initialized using CONTEXT.set<i>PropertyName</i>(null)");
+
+      if (result == null) {
+        throw new ProcessingException("Cannot find output for '{}' in bind base. When selecting into shared context variables make sure these variables are initialized using CONTEXT.set<i>PropertyName</i>(null)", valueOutputToken);
       }
+      return result;
     }
-    else {
-      throw new ProcessingException("Cannot find output for '" + bindToken.getClass());
-    }
-    return o;
+    throw new ProcessingException("Cannot find output for {}", bindToken.getClass());
   }
 
   @SuppressWarnings("unchecked")
@@ -1213,7 +1262,7 @@ public class StatementProcessor implements IStatementProcessor {
             return new MapOutput((Map) bindBase, path[0], bindToken);
           }
           else {
-            throw new ProcessingException("output bind " + bindToken + " resolves to null on path element: " + path[0]);
+            throw new ProcessingException("output bind {} resolves to null on path element: {}", bindToken, path[0]);
           }
         }
         else {
@@ -1250,11 +1299,11 @@ public class StatementProcessor implements IStatementProcessor {
           }
         }
         else if (o == null) {
-          throw new ProcessingException("output bind " + bindToken + " resolves to null on path element: " + path[0]);
+          throw new ProcessingException("output bind {} resolves to null on path element: {}", bindToken, path[0]);
         }
         else {
           if (terminal) {
-            throw new ProcessingException("output bind " + bindToken + " is not a valid output container");
+            throw new ProcessingException("output bind {} is not a valid output container", bindToken);
           }
         }
       }
@@ -1333,19 +1382,19 @@ public class StatementProcessor implements IStatementProcessor {
             if (getter != null) {
               o = getter.invoke(bindBase, (Object[]) null);
               if (o instanceof ITableHolder) {
-                throw new ProcessingException("output bind '" + bindToken.getName() + "' is a table and should not be a terminal");
+                throw new ProcessingException("output bind '{}' is a table and should not be a terminal", bindToken.getName());
               }
               else if (o instanceof ITableBeanHolder) {
-                throw new ProcessingException("output bind '" + bindToken.getName() + "' is a table bean and should not be a terminal");
+                throw new ProcessingException("output bind '{}' is a table bean and should not be a terminal", bindToken.getName());
               }
               else if (o instanceof IBeanArrayHolder) {
-                throw new ProcessingException("output bind '" + bindToken.getName() + "' is a bean array and should not be a terminal");
+                throw new ProcessingException("output bind '{}' is a bean array and should not be a terminal", bindToken.getName());
               }
               else if (o instanceof IHolder) {
                 return createOutputTerminal((IHolder) o, bindToken);
               }
               else {
-                throw new ProcessingException("output bind '" + bindToken.getName() + "' is not a holder");
+                throw new ProcessingException("output bind '{}' is not a holder", bindToken.getName());
               }
             }
           }
@@ -1366,7 +1415,7 @@ public class StatementProcessor implements IStatementProcessor {
     //
     if (found) {
       if (terminal) {
-        throw new ProcessingException("output bind '" + bindToken.getName() + "' was not recognized as a terminal");
+        throw new ProcessingException("output bind '{}' was not recognized as a terminal", bindToken.getName());
       }
       // continue
       String[] newPath = new String[path.length - 1];
