@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.CancellationException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -107,24 +106,24 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   }
 
   /**
-   * Will throw a CancellationException if the future is already cancelled.
+   * Will throw a ThreadInterruptedException if the future is already cancelled.
    *
-   * @throws CancellationException
+   * @throws ThreadInterruptedException
    */
-  protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) throws CancellationException {
+  protected void checkAlreadyCancelled(ServiceTunnelRequest serviceRequest) throws ThreadInterruptedException {
     final IFuture<?> future = IFuture.CURRENT.get();
     if (future != null && future.isCancelled()) {
-      final StringBuilder cancellationExceptionText = new StringBuilder();
-      cancellationExceptionText.append("Future is already cancelled.");
+      final StringBuilder exceptionText = new StringBuilder();
+      exceptionText.append("Future is already cancelled.");
       if (serviceRequest != null) {
-        cancellationExceptionText.append(" (Request was '");
-        cancellationExceptionText.append(serviceRequest.getServiceInterfaceClassName());
-        cancellationExceptionText.append(".");
-        cancellationExceptionText.append(serviceRequest.getOperation());
-        cancellationExceptionText.append("(..)')");
+        exceptionText.append(" (Request was '");
+        exceptionText.append(serviceRequest.getServiceInterfaceClassName());
+        exceptionText.append(".");
+        exceptionText.append(serviceRequest.getOperation());
+        exceptionText.append("(..)')");
       }
 
-      throw new CancellationException(cancellationExceptionText.toString());
+      throw new ThreadInterruptedException(exceptionText.toString());
     }
   }
 
