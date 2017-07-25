@@ -86,12 +86,6 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    */
   String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
 
-  /**
-   * @deprecated use {@link #PROP_GRID_COLUMN_COUNT} instead
-   */
-  @Deprecated
-  String PROP_GRID_COLUMN_COUNT_HINT = PROP_GRID_COLUMN_COUNT;
-
   /*
    * Runtime
    */
@@ -158,23 +152,6 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   int getBackgroundImageHorizontalAlignment();
 
   void setBackgroundImageHorizontalAlignment(int a);
-
-  /**
-   * @return
-   */
-  IGroupBoxBodyGrid getBodyGrid();
-
-  /**
-   * @deprecated use {@link #getGridColumnCount()} instead
-   */
-  @Deprecated
-  int getGridColumnCountHint();
-
-  /**
-   * @deprecated use {@link #setGridColumnCount(int)} instead
-   */
-  @Deprecated
-  void setGridColumnCountHint(int c);
 
   /**
    * column count for this composite box<br>

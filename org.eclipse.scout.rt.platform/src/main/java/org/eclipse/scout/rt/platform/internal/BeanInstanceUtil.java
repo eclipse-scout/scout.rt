@@ -125,25 +125,6 @@ public final class BeanInstanceUtil {
   }
 
   /**
-   * Creates and initializes a new bean instance.
-   *
-   * @param beanClazz
-   * @return
-   * @deprecated Will be removed with Scout 7.1
-   */
-  @Deprecated
-  public static <T> T createAndInitializeBean(Class<T> beanClazz) {
-    T instance = createBean(beanClazz);
-    try {
-      initializeBeanInstance(instance);
-    }
-    catch (Exception e) {
-      throw translateException("Could not create bean [{}]", beanClazz, e);
-    }
-    return instance;
-  }
-
-  /**
    * Transforms the given exception: {@link UndeclaredThrowableException} and {@link InvocationTargetException} are
    * unpacked and wrapped into a {@link BeanCreationException}. {@link Error} are just rethrown.
    * <p>

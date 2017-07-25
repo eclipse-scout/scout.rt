@@ -33,8 +33,6 @@ import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -116,17 +114,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   private void setUserIdInternal(String newValue) {
     setSharedContextVariable("userId", String.class, newValue);
-  }
-
-  /**
-   * @deprecated use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public ScoutTexts getTexts() {
-    return BEANS.get(ScoutTexts.class);
   }
 
   @Override

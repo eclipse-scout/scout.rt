@@ -369,15 +369,6 @@ public class StringUtilityTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  public void testNvl() {
-    assertEquals("value", StringUtility.nvl("value", "subsitute"));
-    assertEquals("subsitute", StringUtility.nvl(null, "subsitute"));
-    assertEquals("", StringUtility.nvl("", "subsitute"));
-    assertEquals("5", StringUtility.nvl(Integer.valueOf(5), "subsitute"));
-  }
-
-  @Test
   public void testHasText() {
     assertTrue(StringUtility.hasText("scout"));
     assertTrue(StringUtility.hasText("                                      &"));
@@ -386,16 +377,6 @@ public class StringUtilityTest {
     assertFalse(StringUtility.hasText(""));
     assertFalse(StringUtility.hasText("                                   "));
     assertFalse(StringUtility.hasText("\t\n  \t\n"));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testSubstituteWhenEmpty() {
-    assertEquals("value", StringUtility.substituteWhenEmpty("value", "subsitute"));
-    assertEquals("subsitute", StringUtility.substituteWhenEmpty(null, "subsitute"));
-    assertEquals("subsitute", StringUtility.substituteWhenEmpty("", "subsitute"));
-    assertEquals("subsitute", StringUtility.substituteWhenEmpty("\t\n  \t\n", "subsitute"));
-    assertEquals("5", StringUtility.substituteWhenEmpty(Integer.valueOf(5), "subsitute"));
   }
 
   @Test
@@ -535,29 +516,6 @@ public class StringUtilityTest {
     assertTrue(StringUtility.endsWith("abc", "c"));
     assertTrue(StringUtility.endsWith("abc", "abc"));
     assertFalse(StringUtility.endsWith("abc", "zabc"));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation") // test it nevertheless...
-  public void testContains() {
-    assertFalse(StringUtility.contains(null, null));
-    assertFalse(StringUtility.contains("abc", null));
-    assertFalse(StringUtility.contains(null, "abc"));
-    assertFalse(StringUtility.contains("123", "abc"));
-    assertTrue(StringUtility.contains("abc", ""));
-    assertTrue(StringUtility.contains("abc", "b"));
-    assertTrue(StringUtility.contains("abc", "abc"));
-    assertFalse(StringUtility.contains("abc", "abcd"));
-    assertTrue(StringUtility.contains("ab.c", "."));
-    assertTrue(StringUtility.contains("abc", ".")); // <-- !
-    assertTrue(StringUtility.contains("ab.c", "ab\\.c")); // <-- !
-    assertTrue(StringUtility.contains("Der\nweisse\nHai", "^we"));
-
-    // non-ascii, case insensitive test cases
-    assertTrue(StringUtility.contains("Schätzung", "ÄT"));
-    assertFalse(StringUtility.contains("Schätzung", "AT"));
-    assertTrue(StringUtility.contains("Besançon", "ÇO"));
-    assertFalse(StringUtility.contains("Besançon", "CO"));
   }
 
   @Test

@@ -394,16 +394,6 @@ public final class NumberUtility {
   }
 
   /**
-   * @return {@code value} if not {@code null} otherwise {@code valueWhenNull}.
-   * @deprecated Use {@link ObjectUtility#nvl(Object, Object)} instead<br>
-   *             TODO [7.1] pbz: remove this method
-   */
-  @Deprecated
-  public static <T extends Number> T nvl(T value, T valueWhenNull) {
-    return ObjectUtility.nvl(value, valueWhenNull);
-  }
-
-  /**
    * Compares the given double values. Returns {@code true} if the difference between the two double values is bigger
    * than the given epsilon.<br>
    * <br>

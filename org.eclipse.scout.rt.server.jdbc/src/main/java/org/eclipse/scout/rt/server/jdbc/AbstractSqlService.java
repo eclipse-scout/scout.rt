@@ -64,7 +64,6 @@ import org.eclipse.scout.rt.server.jdbc.internal.pool.SqlConnectionBuilder;
 import org.eclipse.scout.rt.server.jdbc.internal.pool.SqlConnectionPool;
 import org.eclipse.scout.rt.server.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -214,17 +213,6 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   @ConfigProperty(ConfigProperty.STRING)
   @Order(30)
   protected String getConfiguredPassword() {
-    return null;
-  }
-
-  /**
-   * @deprecated scope-specific text support is removed without replacement. {@link TEXTS#get(String)} is used instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Deprecated
-  @ConfigProperty(ConfigProperty.NLS_PROVIDER)
-  @Order(70)
-  protected Class<? extends ScoutTexts> getConfiguredNlsProvider() {
     return null;
   }
 
@@ -524,15 +512,6 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     if (pool != null) {
       return pool.getInventory();
     }
-    return null;
-  }
-
-  /**
-   * @deprecated scope-specific text support is removed without replacement. {@link TEXTS#get(String)} is used instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Deprecated
-  public Class<? extends ScoutTexts> getNlsProvider() {
     return null;
   }
 

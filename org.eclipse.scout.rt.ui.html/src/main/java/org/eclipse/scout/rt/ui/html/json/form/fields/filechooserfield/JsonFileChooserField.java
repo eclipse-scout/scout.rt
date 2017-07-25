@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooserAcceptAttributeBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
@@ -29,8 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> extends JsonValueField<FILE_CHOOSER_FIELD> implements IBinaryResourceConsumer {
-
-  public static final String EVENT_CHOOSE_FILE = "chooseFile";
 
   public JsonFileChooserField(FILE_CHOOSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -66,23 +63,8 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_CHOOSE_FILE.equals(event.getType())) {
-      handleUiChooseFile();
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  @Override
   protected void handleUiAcceptInputAfterTyping(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
-  }
-
-  @SuppressWarnings("deprecation")
-  protected void handleUiChooseFile() {
-    getModel().getUIFacade().startFileChooserFromUI();
   }
 
   @Override

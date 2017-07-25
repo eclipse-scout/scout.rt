@@ -305,10 +305,20 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IStyleable, IAppL
   IEventHistory<TreeEvent> getEventHistory();
 
   /**
-   * true if multiple nodes can be selected (default false)
+   * <b>Please note:</b> Multi-select is not supported by the HTML UI yet. Multiple nodes can be selected
+   * programmatically using {@link #selectNodes(Collection, boolean)}.
+   *
+   * @return {@code true} if multiple nodes can be selected (default {@code false}).
    */
   boolean isMultiSelect();
 
+  /**
+   * <b>Please note:</b> Multi-select is not supported by the HTML UI yet. Multiple nodes can be selected
+   * programmatically using {@link #selectNodes(Collection, boolean)}.
+   *
+   * @param b
+   *          {@code true} if it should be possible to select multiple nodes. {@code false} otherwise.
+   */
   void setMultiSelect(boolean b);
 
   /**

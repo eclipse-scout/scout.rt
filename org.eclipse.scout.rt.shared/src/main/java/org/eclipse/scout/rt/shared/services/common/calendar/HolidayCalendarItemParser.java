@@ -58,7 +58,6 @@ public class HolidayCalendarItemParser {
   private static final String DATE = "date";
   private static final String WEEKDAY = "weekday";
   private static final String INSTANCE = "instance";
-  private static final String COLOR = "color";
   private static final String TEXT = "text";
   private static final String TOOLTIP = "tooltip";
   private static final String ID = "id";
@@ -126,9 +125,6 @@ public class HolidayCalendarItemParser {
           item.setStart(d);
           item.setSubject(text);
           item.setBody(tooltip);
-          if (holidayElem.hasAttribute(COLOR)) {
-            item.setColor(holidayElem.getAttribute(COLOR));
-          }
           index++;
           holidayMap.put(itemId, item);
         }

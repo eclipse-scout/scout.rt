@@ -33,7 +33,6 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private String m_owner;
   private String m_subject;
   private String m_body;
-  private String m_color;
   private String m_cssClass;
   private RecurrencePattern m_recurrencyPattern;
 
@@ -60,7 +59,6 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
       a.m_owner = this.m_owner;
       a.m_subject = this.m_subject;
       a.m_body = this.m_body;
-      a.m_color = this.m_color;
       a.m_cssClass = this.m_cssClass;
       a.m_recurrencyPattern = this.m_recurrencyPattern;
       return a;
@@ -68,18 +66,6 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
     catch (Exception e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public String getColor() {
-    return m_color;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setColor(String hex) {
-    m_color = hex;
   }
 
   @Override

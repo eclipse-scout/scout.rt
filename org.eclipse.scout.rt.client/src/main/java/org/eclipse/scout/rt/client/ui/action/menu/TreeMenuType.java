@@ -21,6 +21,11 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 public enum TreeMenuType implements IMenuType {
   EmptySpace,
   SingleSelection,
+  /**
+   * <b>Note:</b> The HTML UI does not support multi selection for trees yet. A menu with type {@link #MultiSelection}
+   * may therefore only be used if the selection is set programmatically using
+   * {@link ITree#selectNodes(java.util.Collection, boolean)}!
+   */
   MultiSelection,
   Header
 }

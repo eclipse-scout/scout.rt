@@ -34,8 +34,6 @@ import java.util.zip.InflaterInputStream;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.CollatorProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class StringUtility {
 
@@ -51,7 +49,6 @@ public final class StringUtility {
   public static final Comparator<String> ALPHANUMERIC_COMPARATOR_IGNORE_CASE = new AlphanumericComparator(true);
 
   private static final String[] EMPTY_ARRAY = new String[0];
-  private static final Logger LOG = LoggerFactory.getLogger(StringUtility.class);
 
   public interface ITagProcessor {
     String/* tagReplacement */ processTag(String tagName, String tagContent);
@@ -344,18 +341,6 @@ public final class StringUtility {
   }
 
   /**
-   * @deprecated Can be deleted without replacement. Will be removed in Scout 7.0.
-   */
-  @Deprecated
-  public static String removeMnemonic(String text) {
-    if (text == null) {
-      return null;
-    }
-    Matcher m = MNEMONIC_PATTERN.matcher(text);
-    return m.replaceAll("$1");
-  }
-
-  /**
    * Returns a new string resulting from replacing all new line characters ("\n", "\r\n", "\n\r" or "\r") with a single
    * blank (" ").
    * <p>
@@ -633,23 +618,6 @@ public final class StringUtility {
       startPos = a.begin + start.length();
     }
     return text;
-  }
-
-  public static final Pattern MNEMONIC_PATTERN = Pattern.compile("&([\\S])");
-
-  /**
-   * @deprecated Will be removed in 16.0
-   */
-  @Deprecated
-  public static char getMnemonic(String text) {
-    if (text == null) {
-      return 0x0;
-    }
-    Matcher m = MNEMONIC_PATTERN.matcher(text);
-    if (m.find()) {
-      return m.group(1).charAt(0);
-    }
-    return 0x0;
   }
 
   public static String wrapText(String s, int lineSize) {
@@ -1307,23 +1275,6 @@ public final class StringUtility {
   }
 
   /**
-   * Returns the string-representation of <code>value</code>, or <code>valueWhenNull</code> if value is null.
-   *
-   * @see #substituteWhenEmpty(Object, String)
-   * @deprecated Use {@link ObjectUtility#nvl(Object, Object)} instead<br>
-   *             TODO [7.1] pbz: remove this method
-   */
-  @Deprecated
-  public static String nvl(Object value, String valueWhenNull) {
-    if (value != null) {
-      return value.toString();
-    }
-    else {
-      return valueWhenNull;
-    }
-  }
-
-  /**
    * Replaces each substring of the given source {@link String} that matches the given search {@link String} with the
    * specified replacement {@link String}. The replacement proceeds from the beginning of the string to the end, for
    * example, replacing "aa" with "b" in the string "aaa" will result in "ba" rather than "ab".
@@ -1770,33 +1721,6 @@ public final class StringUtility {
   }
 
   /**
-   * <p>
-   * Attempts to match the entire region against the regex.
-   * </p>
-   * <p>
-   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
-   * </small>
-   * </p>
-   *
-   * @deprecated Use {@link #containsRegEx(String, String)}, {@link #containsString(String, String)} or
-   *             {@link #containsStringIgnoreCase(String, String)} instead. This method will be removed in "P" release.
-   */
-  @Deprecated
-  public static boolean contains(String s, String regex) {
-    if (s == null || regex == null) {
-      return false;
-    }
-    try {
-      Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE | Pattern.DOTALL);
-      return pattern.matcher(s).matches();
-    }
-    catch (RuntimeException e) {
-      LOG.debug("Could not check wether string matches regex [s='{}',regex='{}']", s, regex, e);
-    }
-    return false;
-  }
-
-  /**
    * Creates a new string repeating the <code>token</code> <code>repetitions</code> times. If <code>repetitions</code>
    * <= 0 an empty string is returned.
    */
@@ -1806,18 +1730,6 @@ public final class StringUtility {
       sb.append(token);
     }
     return sb.toString();
-  }
-
-  /**
-   * Similar to {@link #toString(Object, String)} but returns <code>valueWhenEmpty</code> not only if value is null, but
-   * as well when the String representation of <code>value</code> is empty or contains only whitespaces.
-   *
-   * @deprecated TODO [7.1] pbz: remove this method
-   */
-  @Deprecated
-  public static String substituteWhenEmpty(Object value, String valueWhenEmpty) {
-    String stringValue = ObjectUtility.toString(value);
-    return hasText(stringValue) ? stringValue : valueWhenEmpty;
   }
 
   /**

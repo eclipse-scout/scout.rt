@@ -72,13 +72,6 @@ scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
 };
 
 /**
- * @deprecated use {@link #availableSize} instead, will be removed with 7.1
- */
-scout.HtmlComponent.prototype.getAvailableSize = function() {
-  return this.availableSize();
-};
-
-/**
  * Computes the preferred height if the component is scrollable and returns it if it is greater than the actual size.
  * If it is not scrollable, the actual height is returned.<p>
  * The returned width is always the actual width because there are no horizontal scrollbars.
@@ -204,13 +197,6 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
 };
 
 /**
- * @deprecated use {@link #prefSize} instead, will be removed with 7.1
- */
-scout.HtmlComponent.prototype.getPreferredSize = function(options) {
-  return this.prefSize(options);
-};
-
-/**
  * Returns the preferred size of the component, insets included.
  * @exception When component has no layout
  */
@@ -225,35 +211,14 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
 };
 
 /**
- * @deprecated use {@link #insets} instead, will be removed with 7.1
- */
-scout.HtmlComponent.prototype.getInsets = function(options) {
-  return scout.graphics.insets(this.$comp, options);
-};
-
-/**
  * Returns the inset-dimensions of the component (padding and border, no margin).
  */
 scout.HtmlComponent.prototype.insets = function(options) {
   return scout.graphics.insets(this.$comp, options);
 };
 
-/**
- * @deprecated use {@link #margins} instead, will be removed with 7.1
- */
-scout.HtmlComponent.prototype.getMargins = function() {
-  return scout.graphics.margins(this.$comp);
-};
-
 scout.HtmlComponent.prototype.margins = function() {
   return scout.graphics.margins(this.$comp);
-};
-
-/**
- * @deprecated use {@link #size} instead, will be removed with 7.1
- */
-scout.HtmlComponent.prototype.getSize = function(includeMargins) {
-  return scout.graphics.getSize(this.$comp, includeMargins);
 };
 
 /**
@@ -281,13 +246,6 @@ scout.HtmlComponent.prototype.setSize = function(size) {
     scout.graphics.setSize(this.$comp, size);
   }
   this.validateLayout();
-};
-
-/**
- * @deprecated use {@link #offsetBounds} or $elem.cssTop() and $elem.cssLeft() instead, will be removed with 7.1
- */
-scout.HtmlComponent.prototype.getBounds = function() {
-  return scout.graphics.getBounds(this.$comp);
 };
 
 scout.HtmlComponent.prototype.bounds = function(options) {

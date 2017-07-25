@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitAc
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -729,10 +728,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    */
   public static String combineKeyStrokes(String[] keys) {
     StringBuilder builder = new StringBuilder();
-
-    @SuppressWarnings("deprecation")
-    String separator = IKeyStroke.KEY_STROKE_SEPARATOR;
-
+    final char separator = '-';
     for (String key : keys) {
       if (builder.length() > 0) {
         builder.append(separator);

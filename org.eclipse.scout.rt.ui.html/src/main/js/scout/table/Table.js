@@ -2554,22 +2554,8 @@ scout.Table.prototype.columnById = function(columnId) {
   });
 };
 
-/**
- * @deprecated use #columnById instead, will be removed with 7.1
- */
-scout.Table.prototype._columnById = function(columnId) {
-  return this.columnById(columnId);
-};
-
 scout.Table.prototype.columnsByIds = function(columnIds) {
   return columnIds.map(this.columnById.bind(this));
-};
-
-/**
- * @deprecated use #columnByIds instead, will be removed with 7.1
- */
-scout.Table.prototype._columnsByIds = function(columnIds) {
-  return this.columnsByIds(columnIds);
 };
 
 scout.Table.prototype.filter = function() {
@@ -3755,13 +3741,6 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
       this.header.updateHeader(column, oldColumnState);
     }
   }
-};
-
-/**
- * @deprecated use #focusCell instead, will be removed with 7.1
- */
-scout.Table.prototype.requestFocusInCell = function(column, row) {
-  this.focusCell(column, row);
 };
 
 scout.Table.prototype.focusCell = function(column, row) {

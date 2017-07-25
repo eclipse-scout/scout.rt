@@ -290,13 +290,6 @@ scout.arrays = {
     }
   },
 
-  /**
-   * @Deprecated use findFromForward function instead. Will be removed with 7.1
-   */
-  findFromNext: function(arr, startIndex, predicate) {
-    return this.findFromForward(arr, startIndex, predicate);
-  },
-
   findFromReverse: function(arr, startIndex, predicate) {
     if (!arr || !predicate) {
       return null;
@@ -307,13 +300,6 @@ scout.arrays = {
         return element;
       }
     }
-  },
-
-  /**
-   * @Deprecated use findFromReverse function instead. Will be removed with 7.1
-   */
-  findFromPrev: function(arr, startIndex, predicate) {
-    return this.findFromReverse(arr, startIndex, predicate);
   },
 
   /**

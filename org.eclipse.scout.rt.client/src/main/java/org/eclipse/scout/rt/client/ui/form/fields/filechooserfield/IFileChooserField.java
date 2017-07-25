@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
@@ -37,8 +36,6 @@ public interface IFileChooserField extends IValueField<BinaryResource> {
   void setFileIconId(String s);
 
   String getFileIconId();
-
-  IFileChooser getFileChooser();
 
   // Convenience file getter
   String getFileName();

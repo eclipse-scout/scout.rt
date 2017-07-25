@@ -175,41 +175,12 @@ scout.graphics = {
     return size;
   },
 
-  /**
-   * Returns the size of the component, insets included.
-   * @param {boolean} [includeMargin] when set to true, returned dimensions include margins of component, default is <code>false</code>.
-   * @deprecated use {@link #size instead}, will be removed with 7.1
-   */
-  getSize: function($comp, includeMargin) {
-    return scout.graphics.size($comp, {
-      includeMargin: includeMargin
-    });
-  },
-
   setSize: function($comp, vararg, height) {
     var size = vararg instanceof scout.Dimension ?
       vararg : new scout.Dimension(vararg, height);
     $comp
       .cssWidth(size.width)
       .cssHeight(size.height);
-  },
-
-  /**
-   * Returns the size of a visible component or (0,0) when component is invisible.
-   *
-   * @deprecated use scout.graphics.size() instead, will be removed with 7.1
-   */
-  getVisibleSize: function($comp, includeMargin) {
-    return this.size($comp, {
-      includeMargin: includeMargin
-    });
-  },
-
-  /**
-   * @deprecated use {@link #insets} instead, will be removed with 7.1
-   */
-  getInsets: function($comp, options) {
-    return scout.graphics.insets($comp, options);
   },
 
   /**
@@ -257,13 +228,6 @@ scout.graphics = {
       }
     }
     return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
-  },
-
-  /**
-   * @deprecated use {@link #margins} instead, will be removed with 7.1
-   */
-  getMargins: function($comp) {
-    return scout.graphics.margins($comp);
   },
 
   margins: function($comp) {
@@ -350,23 +314,6 @@ scout.graphics = {
   offset: function($elem) {
     var pos = $elem.offset();
     return new scout.Point(pos.left, pos.top);
-  },
-
-  /**
-   * @deprecated use {@link #offsetBounds} or $elem.cssTop() and $elem.cssLeft() instead, will be removed with 7.1
-   */
-  getBounds: function($elem, options) {
-    options = options || {};
-    var parseCssPosition = function(prop) {
-      var value = $elem.css(prop);
-      return 'auto' === value ? 0 : parseInt(value, 10);
-    };
-    var includeMargin = scout.nvl(options.includeMargin, false);
-    return new scout.Rectangle(
-      parseCssPosition('left'),
-      parseCssPosition('top'),
-      $elem.outerWidth(includeMargin),
-      $elem.outerHeight(includeMargin));
   },
 
   _bounds: function($elem, pos, options) {

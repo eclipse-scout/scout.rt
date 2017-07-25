@@ -91,8 +91,6 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     return m_messageStatusMap.get(messageType);
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
   public String getNodeId() {
     return m_nodeId;
   }

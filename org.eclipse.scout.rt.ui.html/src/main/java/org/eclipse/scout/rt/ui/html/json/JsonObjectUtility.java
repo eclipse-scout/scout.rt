@@ -15,7 +15,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -184,14 +183,6 @@ public final class JsonObjectUtility {
       }
       return json.toString();
     }
-  }
-
-  /**
-   * @deprecated use {@link JsonAdapterUtility#adapterIdsToJson(Collection)} instead. Will be removed in P-release.
-   */
-  @Deprecated
-  public static <T> JSONArray adapterIdsToJson(Collection<IJsonAdapter<T>> adapters) {
-    return JsonAdapterUtility.adapterIdsToJson(adapters);
   }
 
   /**

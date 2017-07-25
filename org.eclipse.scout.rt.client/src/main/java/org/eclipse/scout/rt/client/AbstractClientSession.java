@@ -58,8 +58,6 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -161,17 +159,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public String getUserId() {
     return getSharedContextVariable("userId", String.class);
-  }
-
-  /**
-   * @deprecated use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public ScoutTexts getTexts() {
-    return BEANS.get(ScoutTexts.class);
   }
 
   @Override
@@ -295,14 +282,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public void replaceSharedVariableMapInternal(SharedVariableMap newMap) {
     m_sharedVariableMap.updateInternal(newMap);
-  }
-
-  /**
-   * @deprecated use {@link #initializeSharedVariables()}, will be removed in Scout 7.1
-   */
-  @Deprecated
-  protected void initializeSharedVariables(long timeout, TimeUnit unit) {
-    initializeSharedVariables();
   }
 
   /**

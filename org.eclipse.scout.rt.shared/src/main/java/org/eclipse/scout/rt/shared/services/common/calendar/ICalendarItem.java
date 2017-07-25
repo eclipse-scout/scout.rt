@@ -27,18 +27,6 @@ public interface ICalendarItem {
 
   void setLastModified(long b);
 
-  /**
-   * @deprecated use getCssClass instead. Will be removed in Scout 6.1.
-   */
-  @Deprecated
-  String getColor();
-
-  /**
-   * @deprecated use setCssClass instead. Will be removed in Scout 6.1.
-   */
-  @Deprecated
-  void setColor(String hex);
-
   String getCssClass();
 
   void setCssClass(String cssClass);

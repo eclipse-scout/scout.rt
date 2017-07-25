@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
-import org.eclipse.scout.rt.platform.context.PropertyMap;
-import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 
 /**
  * The desktop model (may) consist of
@@ -51,16 +49,6 @@ public interface IDesktopUIFacade {
    * event occurs after openFromUI().
    */
   void fireGuiAttached();
-
-  /**
-   * @deprecated Do not use this method anymore, use {@link #fireGuiAttached()} instead. The argument
-   *             <code>deepLinkPath</code> is ignored! It's value is available in {@link PropertyMap#CURRENT} under the
-   *             key {@link DeepLinkUrlParameter#DEEP_LINK}.
-   *             <p>
-   *             This method will be removed in "P" release.
-   */
-  @Deprecated
-  void fireGuiAttached(String deepLinkPath);
 
   /**
    * GUI fires this event when the application/workbench is closing

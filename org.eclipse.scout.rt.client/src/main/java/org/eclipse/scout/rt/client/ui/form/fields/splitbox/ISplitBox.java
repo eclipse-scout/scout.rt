@@ -40,19 +40,6 @@ public interface ISplitBox extends ICompositeField {
   String SPLITTER_POSITION_TYPE_RELATIVE_FIRST = "relativeFirst";
 
   /**
-   * The splitter position is the size of the <b>first</b> inner box relative to full size of the split box, i.e. it is
-   * a percentage value in the range 0..1. This is the default splitter position type.
-   * <p>
-   * Example: 0.3 means the first box uses 30% of the available space, the second box uses 70%.
-   *
-   * @deprecated Use {@value #SPLITTER_POSITION_TYPE_RELATIVE_FIRST} instead.
-   *             <p>
-   *             TODO [8.0] pbz: Remove deprecated constant
-   */
-  @Deprecated
-  String SPLITTER_POSITION_TYPE_RELATIVE = SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
-
-  /**
    * The splitter position is the size of the <b>second</b> inner box relative to full size of the split box, i.e. it is
    * a percentage value in the range 0..1. This is the default splitter position type.
    * <p>

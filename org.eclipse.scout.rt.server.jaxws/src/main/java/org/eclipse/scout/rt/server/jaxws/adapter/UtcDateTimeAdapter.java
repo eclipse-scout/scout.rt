@@ -125,7 +125,6 @@ public class UtcDateTimeAdapter extends XmlAdapter<String, Date> {
     zuluTime.setTimeInMillis(date.getTime());
 
     final XMLGregorianCalendar zuluXmlTime = FACTORY.newXMLGregorianCalendar(zuluTime);
-    beforeMarshall(zuluXmlTime);
 
     return zuluXmlTime.toXMLFormat();
   }
@@ -150,32 +149,7 @@ public class UtcDateTimeAdapter extends XmlAdapter<String, Date> {
 
     final Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(utcMillis);
-    beforeUnmarshall(calendar);
 
     return calendar.getTime();
-  }
-
-  /**
-   * Method invoked to intercept a 'zulu' time before being marshalled.
-   * <p>
-   * The default implementation does nothing. TODO [8.0] hmu: remove
-   *
-   * @deprecated will be removed in 7.1
-   */
-  @Deprecated
-  protected void beforeMarshall(final XMLGregorianCalendar zuluTime) {
-    // NOOP
-  }
-
-  /**
-   * Method invoked to intercept a 'zulu' time before being unmarshalled.
-   * <p>
-   * TODO [8.0] hmu: remove
-   *
-   * @deprecated will be removed in 7.1 The default implementation does nothing.
-   */
-  @Deprecated
-  protected void beforeUnmarshall(final Calendar zuluTime) {
-    // NOOP
   }
 }

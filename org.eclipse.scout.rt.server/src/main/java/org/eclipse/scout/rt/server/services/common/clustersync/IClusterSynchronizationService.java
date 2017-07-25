@@ -39,13 +39,6 @@ public interface IClusterSynchronizationService extends IService {
   void publishTransactional(Serializable notification);
 
   /**
-   * @return the node of the currently connected cluster
-   * @deprecated will be removed in 7.1.x; use BEANS.get(NodeIdentifier.class).get();
-   */
-  @Deprecated
-  String getNodeId();
-
-  /**
    * @return info about sent and received messages
    */
   IClusterNodeStatusInfo getStatusInfo();

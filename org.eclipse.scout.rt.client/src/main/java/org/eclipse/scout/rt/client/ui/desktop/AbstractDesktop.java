@@ -2417,12 +2417,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       attachGui();
     }
 
-    @SuppressWarnings("deprecation") // TODO [7.0] bsh: Remove in P release
-    @Override
-    public void fireGuiAttached(String deepLinkPath) {
-      fireGuiAttached();
-    }
-
     @Override
     public void fireGuiDetached() {
       detachGui();

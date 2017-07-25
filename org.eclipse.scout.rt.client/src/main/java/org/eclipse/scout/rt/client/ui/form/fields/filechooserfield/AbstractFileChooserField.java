@@ -15,8 +15,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserfield.IFileChooserFieldExtension;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -118,18 +116,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     return propertySupport.getPropertyInt(PROP_MAXIMUM_UPLOAD_SIZE);
   }
 
-  /**
-   * @deprecated The UI will display the native file chooser dialog on click. There is no {@link FileChooser} created on
-   *             java side anymore. Will be removed with 7.0
-   */
-  @Deprecated
-  @Override
-  public IFileChooser getFileChooser() {
-    FileChooser fileChooser = new FileChooser(getFileExtensions(), false);
-    fileChooser.setMaximumUploadSize(getMaximumUploadSize());
-    return fileChooser;
-  }
-
   // Convenience file getter
 
   @Override
@@ -183,21 +169,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
         return;
       }
       parseAndSetValue(value);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void startFileChooserFromUI() {
-      if (!isEnabled() || !isVisible()) {
-        return;
-      }
-      IFileChooser fileChooser = getFileChooser();
-      List<BinaryResource> result = fileChooser.startChooser();
-      // If "cancel" was clicked, the result is empty. We do not want to override the existing value in
-      // this case. (It may also have been "OK with no file", but this state is not distinguishable.)
-      if (!result.isEmpty()) {
-        setValue(CollectionUtility.firstElement(result));
-      }
     }
   }
 

@@ -48,13 +48,6 @@ public interface ISession {
    */
   boolean isActive();
 
-  /**
-   * @deprecated use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Deprecated
-  ScoutTexts getTexts();
-
   Object getData(String key);
 
   void setData(String key, Object value);

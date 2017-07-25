@@ -226,14 +226,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * TODO [7.0] rmu: make final
-   *
-   * @deprecated Multiselection in trees is not supported by the UI.
+   * Multi-select is not supported by the HTML UI yet. Therefore the configured method is final for the moment.
    */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(40)
-  @Deprecated
-  protected boolean getConfiguredMultiSelect() {
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected final boolean getConfiguredMultiSelect() {
     return false;
   }
 

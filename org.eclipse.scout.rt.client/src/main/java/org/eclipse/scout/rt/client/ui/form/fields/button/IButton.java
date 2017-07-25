@@ -34,16 +34,7 @@ public interface IButton extends IFormField {
   String PROP_IMAGE = "image";
   String PROP_SELECTED = "selected";
   String PROP_CONTEXT_MENU = "contextMenu";
-
-  /***
-   * Misspelled. Use {@link PROP_KEY_STROKE} instead. Will be removed in 8.0.
-   *
-   * @deprecated
-   */
-  @Deprecated
-  String PROP_KEY_STOKE = "keyStroke";
-  @SuppressWarnings("deprecated")
-  String PROP_KEY_STROKE = PROP_KEY_STOKE;
+  String PROP_KEY_STROKE = "keyStroke";
   String PROP_KEY_STROKE_SCOPE_CLASS = "keyStrokeScopeClass";
   String PROP_KEY_STROKE_SCOPE = "keyStrokeScope";
   String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";

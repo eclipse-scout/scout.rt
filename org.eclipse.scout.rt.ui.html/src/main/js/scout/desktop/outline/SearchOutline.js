@@ -110,13 +110,6 @@ scout.SearchOutline.prototype._renderSearchStatus = function() {
   this.$searchStatus.textOrNbsp(this.searchStatus);
 };
 
-/**
- * @deprecated use #focusQueryField instead, will be removed with 7.1
- */
-scout.SearchOutline.prototype.requestFocusQueryField = function() {
-  this.focusQueryField();
-};
-
 scout.SearchOutline.prototype.focusQueryField = function() {
   this.validateFocus();
 };

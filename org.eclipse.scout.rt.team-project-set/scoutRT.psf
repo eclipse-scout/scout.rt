@@ -3,7 +3,6 @@
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705155466_3" label="scout.rt" name="scout.rt">
     <item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.server.jaxws.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-    <item elementID="=org.eclipse.scout.rt.server.jms" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.mom.api" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.platform" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

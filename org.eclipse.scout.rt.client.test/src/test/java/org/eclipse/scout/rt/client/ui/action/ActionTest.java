@@ -111,10 +111,9 @@ public class ActionTest {
   /**
    * test for {@link AbstractAction#combineKeyStrokes(String...)}
    */
-  @SuppressWarnings("deprecation")
   @Test
   public void testCombineKeyStrokes() throws Exception {
-    assertEquals(IKeyStroke.CONTROL + IKeyStroke.KEY_STROKE_SEPARATOR + IKeyStroke.F1, AbstractAction.combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.F1));
+    assertEquals(IKeyStroke.CONTROL + '-' + IKeyStroke.F1, AbstractAction.combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.F1));
   }
 
   /**

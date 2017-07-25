@@ -49,33 +49,6 @@ public class ScoutTexts {
     m_textProviders = BEANS.all(ITextProviderService.class);
   }
 
-  /**
-   * @deprecated Use {@link TEXTS#get(String, String...)} instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Deprecated
-  public static String get(String key, String... messageArguments) {
-    return getInstance().getText(key, messageArguments);
-  }
-
-  /**
-   * @deprecated Use {@link TEXTS#get(Locale, String, String...)} instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Deprecated
-  public static String get(Locale locale, String key, String... messageArguments) {
-    return getInstance().getText(locale, key, messageArguments);
-  }
-
-  /**
-   * @deprecated Use {@link TEXTS} or <code>BEANS.get(ScoutTexts.class)</code> instead.
-   */
-  // TODO [7.1] abr: remove this method
-  @Deprecated
-  public static ScoutTexts getInstance() {
-    return BEANS.get(ScoutTexts.class);
-  }
-
   public final String getText(String key, String... messageArguments) {
     return getText(null, key, messageArguments);
   }

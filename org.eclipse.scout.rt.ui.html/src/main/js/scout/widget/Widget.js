@@ -1156,7 +1156,7 @@ scout.Widget.prototype.isPreserveOnPropertyChangeProperty = function(propertyNam
 
 scout.Widget.prototype._addProperties = function(propertyName, properties) {
   properties = scout.arrays.ensure(properties);
-  properties.forEach(function(property){
+  properties.forEach(function(property) {
     if (this[propertyName].indexOf(property) > -1) {
       throw new Error(propertyName + ' already contains the property ' + property);
     }
@@ -1332,13 +1332,6 @@ scout.Widget.prototype.widget = function(widgetId) {
 };
 
 /**
- * @deprecated Use this.widget() instead, will be removed with 7.1
- */
-scout.Widget.prototype.getWidgetById = function(widgetId) {
-  return this.widget(widgetId);
-};
-
-/**
  * Tries to set the focus on the widget.
  * <p>
  * By default the focus is set on the container but this may vary from widget to widget.
@@ -1350,13 +1343,6 @@ scout.Widget.prototype.focus = function() {
   }
 
   this.session.focusManager.requestFocus(this.$container);
-};
-
-/**
- * @deprecated use #focus instead, will be removed with 7.1
- */
-scout.Widget.prototype.requestFocus = function() {
-  this.focus();
 };
 
 /**

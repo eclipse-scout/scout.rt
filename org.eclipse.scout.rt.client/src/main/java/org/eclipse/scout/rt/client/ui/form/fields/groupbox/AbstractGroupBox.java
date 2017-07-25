@@ -492,15 +492,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     clearCategorization();
   }
 
-  /**
-   * @deprecated use {@link #getFieldGrid()} instead
-   */
-  @Override
-  @Deprecated
-  public IGroupBoxBodyGrid getBodyGrid() {
-    return getFieldGrid();
-  }
-
   @Override
   public IGroupBoxBodyGrid getFieldGrid() {
     return m_bodyGrid;
@@ -517,18 +508,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public int getGridColumnCount() {
     return propertySupport.getPropertyInt(PROP_GRID_COLUMN_COUNT);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setGridColumnCountHint(int c) {
-    setGridColumnCount(c);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public int getGridColumnCountHint() {
-    return getGridColumnCount();
   }
 
   @Override

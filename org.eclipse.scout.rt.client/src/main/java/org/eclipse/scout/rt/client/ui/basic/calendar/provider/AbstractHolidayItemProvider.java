@@ -51,7 +51,7 @@ public abstract class AbstractHolidayItemProvider extends AbstractCalendarItemPr
   @Override
   protected void execDecorateCell(Cell cell, ICalendarItem item) {
     HolidayItem h = (HolidayItem) item;
-    cell.setBackgroundColor((h.getColor()));
+    cell.setCssClass(h.getCssClass());
   }
 
 }

@@ -21,7 +21,6 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -680,16 +679,6 @@ public final class DateUtility {
       }
       return array;
     }
-  }
-
-  /**
-   * @return {@code value} if is not {@code null} otherwise {@code valueWhenNull}.
-   * @deprecated Use {@link ObjectUtility#nvl(Object, Object)} instead <br>
-   *             TODO [7.1] pbz: remove this method
-   */
-  @Deprecated
-  public static <T extends Date> T nvl(T value, T valueWhenNull) {
-    return ObjectUtility.nvl(value, valueWhenNull);
   }
 
   public static Date convertCalendar(Calendar c) {
