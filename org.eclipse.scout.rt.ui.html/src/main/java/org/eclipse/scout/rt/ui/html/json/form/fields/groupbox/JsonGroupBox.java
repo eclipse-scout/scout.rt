@@ -27,10 +27,7 @@ import org.json.JSONObject;
  */
 public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeField<GROUP_BOX, IFormField> implements IJsonContextMenuOwner {
 
-  // from UI
   public static final String EVENT_EXPANDED = "expanded";
-
-  public static final String PROP_MAIN_BOX = "mainBox";
 
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
@@ -70,12 +67,6 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
       @Override
       protected Boolean modelValue() {
         return getModel().isBorderVisible();
-      }
-    });
-    putJsonProperty(new JsonProperty<IGroupBox>(PROP_MAIN_BOX, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isMainBox();
       }
     });
     putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDABLE, model) {

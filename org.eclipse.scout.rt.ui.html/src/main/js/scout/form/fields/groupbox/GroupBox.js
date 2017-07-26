@@ -52,9 +52,7 @@ scout.GroupBox.prototype._init = function(model) {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
-  if (this.mainBox) {
-    this.menuBar.large();
-  }
+  this._setMainBox(this.mainBox);
   this._updateMenuBar();
 };
 
@@ -178,6 +176,17 @@ scout.GroupBox.prototype._installScrollbars = function() {
       parent: this,
       axis: 'x'
     });
+  }
+};
+
+scout.GroupBox.prototype.setMainBox = function(mainBox) {
+  this.setProperty('mainBox', mainBox);
+};
+
+scout.GroupBox.prototype._setMainBox = function(mainBox) {
+  this._setProperty('mainBox', mainBox);
+  if (this.mainBox) {
+    this.menuBar.large();
   }
 };
 

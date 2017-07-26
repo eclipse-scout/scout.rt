@@ -18,8 +18,7 @@ describe("GroupBoxBodyGrid01", function() {
 
     this.fields = [];
     this.groupBox = scout.create('GroupBox', {
-      parent: session.desktop,
-      mainBox: false
+      parent: session.desktop
     });
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,

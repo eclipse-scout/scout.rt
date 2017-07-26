@@ -104,7 +104,7 @@ $.cleanData = (function(orig) {
   return function(elems) {
     var events, elem, i;
     for (i = 0;
-      (elem = elems[i]); i++) {
+      (elem = elems[i]); i++) { // NOSONAR
       try {
         // Only trigger remove when necessary to save time
         events = $._data(elem, 'events');
@@ -112,7 +112,9 @@ $.cleanData = (function(orig) {
           $(elem).triggerHandler('remove');
         }
         // http://bugs.jquery.com/ticket/8235
-      } catch (e) {}
+      } catch (e) {
+        // NOP
+      }
     }
     orig(elems);
   };

@@ -89,7 +89,6 @@
     "GroupBox": {
       "borderDecoration": "auto",
       "borderVisible": true,
-      "mainBox": false,
       "scrollable": false,
       "expandable": false,
       "expanded": true,
