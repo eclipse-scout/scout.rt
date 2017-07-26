@@ -49,8 +49,7 @@ describe("GroupBoxBodyGrid11", function() {
     this.fields = [];
     this.groupBox = scout.create('GroupBox', {
       parent: session.desktop,
-      gridColumnCount: 2,
-      mainBox: false
+      gridColumnCount: 2
     });
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,

@@ -26,6 +26,23 @@ describe('Form', function() {
     jasmine.clock().uninstall();
   });
 
+  describe('init', function() {
+    it('marks the root group box as main box', function() {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [{
+            objectType: 'GroupBox'
+          }]
+        }
+      });
+      expect(form.rootGroupBox.mainBox).toBe(true);
+      expect(form.rootGroupBox.fields[0].mainBox).toBe(false);
+    });
+
+  });
+
   describe('open', function() {
 
     it('opens the form', function() {
@@ -85,7 +102,6 @@ describe('Form', function() {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
-          mainBox: true,
           menus: [{
             objectType: 'CloseMenu',
           }]
@@ -104,8 +120,7 @@ describe('Form', function() {
       var form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox',
-          mainBox: true
+          objectType: 'GroupBox'
         }
       });
       spyOn(form, 'close').and.callThrough();

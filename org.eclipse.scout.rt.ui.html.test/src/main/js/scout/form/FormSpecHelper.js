@@ -20,27 +20,30 @@ scout.FormSpecHelper.prototype.createViewWithOneField = function(parent) {
 
 scout.FormSpecHelper.prototype.createFormWithOneField = function(parent) {
   parent = scout.nvl(parent, this.session.desktop);
-  var form = scout.create('Form', {parent: parent});
-  var rootGroupBox = this.createGroupBoxWithFields(form, true, 1);
-  form.rootGroupBox = rootGroupBox;
+  var form = scout.create('Form', {
+    parent: parent
+  });
+  var rootGroupBox = this.createGroupBoxWithFields(form, 1);
+  form._setRootGroupBox(rootGroupBox);
   return form;
 };
 
-scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parent, mainBox, numFields) {
-  return this.createGroupBoxWithFields(parent, false, 1);
+scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parent, numFields) {
+  return this.createGroupBoxWithFields(parent, 1);
 };
 
-scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, mainBox, numFields) {
+scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, numFields) {
   parent = scout.nvl(parent, this.session.desktop);
-  mainBox = scout.nvl(mainBox, false);
   numFields = scout.nvl(numFields, 1);
   var
     fields = [],
     groupBox = scout.create('GroupBox', {
-    parent: parent,
-    mainBox: scout.nvl(mainBox, false)});
+      parent: parent
+    });
   for (var i = 0; i < numFields; i++) {
-    fields.push(scout.create('StringField', {parent: groupBox}));
+    fields.push(scout.create('StringField', {
+      parent: groupBox
+    }));
   }
   groupBox.setProperty('fields', fields);
   return groupBox;
@@ -51,10 +54,14 @@ scout.FormSpecHelper.prototype.createRadioButtonGroup = function(parent, numRadi
   numRadioButtons = scout.nvl(numRadioButtons, 2);
   var
     fields = [],
-    radioButtonGroup = scout.create('RadioButtonGroup', {parent: parent});
+    radioButtonGroup = scout.create('RadioButtonGroup', {
+      parent: parent
+    });
 
   for (var i = 0; i < numRadioButtons; i++) {
-    fields.push(scout.create('RadioButton', {parent: radioButtonGroup}));
+    fields.push(scout.create('RadioButton', {
+      parent: radioButtonGroup
+    }));
   }
   radioButtonGroup.setProperty('formFields', fields);
   radioButtonGroup.setProperty('radioButtons', fields);
@@ -65,8 +72,9 @@ scout.FormSpecHelper.prototype.createFormWithFields = function(parent, isModal, 
   parent = scout.nvl(parent, this.session.desktop);
   var form = scout.create('Form', {
     parent: parent,
-    displayHint: isModal ? 'dialog' : 'view'});
-  var rootGroupBox = this.createGroupBoxWithFields(form, true, numFields);
+    displayHint: isModal ? 'dialog' : 'view'
+  });
+  var rootGroupBox = this.createGroupBoxWithFields(form, numFields);
   form._setRootGroupBox(rootGroupBox);
   return form;
 };

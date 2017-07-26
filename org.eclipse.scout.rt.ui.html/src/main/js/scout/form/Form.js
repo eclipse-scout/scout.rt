@@ -385,9 +385,12 @@ scout.Form.prototype._renderHeader = function() {
 
 scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
   this._setProperty('rootGroupBox', rootGroupBox);
-  if (this.rootGroupBox &&
-    (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
-    this.rootGroupBox.menuBar.bottom();
+  if (this.rootGroupBox) {
+    this.rootGroupBox.setMainBox(true);
+
+    if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
+      this.rootGroupBox.menuBar.bottom();
+    }
   }
 };
 

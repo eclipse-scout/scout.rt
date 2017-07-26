@@ -88,8 +88,7 @@ describe("GroupBox", function() {
           y: 0,
           widthInPixel: 27,
           heightInPixel: 46
-        },
-        mainBox: true
+        }
       });
       rootGroupBox = scout.create('GroupBox', model);
       form = scout.create('Form', {
@@ -133,7 +132,7 @@ describe("GroupBox", function() {
 
   describe('enabled', function() {
     it('propagation', function() {
-      var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, false, 2);
+      var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
       groupBoxWithTwoChildren.render();
 
       expectEnabled(groupBoxWithTwoChildren, true, true);
