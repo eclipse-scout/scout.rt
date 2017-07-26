@@ -200,6 +200,7 @@
   // Form
   __include("scout/form/Form.js");
   __include("scout/form/FormAdapter.js");
+  __include("scout/form/FormGrid.js");
   __include("scout/form/FormLayout.js");
   __include("scout/form/FormMenu.js");
   __include("scout/form/FormMenuAdapter.js");

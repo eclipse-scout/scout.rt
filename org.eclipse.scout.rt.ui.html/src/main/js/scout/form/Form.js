@@ -20,6 +20,7 @@ scout.Form = function() {
   this.minimizeEnabled = true;
   this.minimized = false;
   this.modal = true;
+  this.logicalGrid = scout.create('FormGrid');
   this.dialogs = [];
   this.views = [];
   this.messageBoxes = [];

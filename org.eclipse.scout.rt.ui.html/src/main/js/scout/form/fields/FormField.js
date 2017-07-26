@@ -26,7 +26,7 @@ scout.FormField = function() {
   this.menus = [];
   this.menusVisible = false;
   this.gridData;
-  this.gridDataHints = scout.create('GridData');
+  this.gridDataHints = new scout.GridData();
   this.$label;
   this.errorStatus = null;
 
