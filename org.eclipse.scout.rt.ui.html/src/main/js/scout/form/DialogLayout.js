@@ -21,10 +21,10 @@ scout.DialogLayout.prototype.layout = function($container) {
   }
 
   var dialogSize, currentBounds,
-    htmlComp = this._form.htmlComp,
+    htmlComp = this.form.htmlComp,
     dialogMargins = htmlComp.margins(),
     windowSize = $container.windowSize(),
-    cacheBounds = this._form.readCacheBounds();
+    cacheBounds = this.form.readCacheBounds();
 
   if (cacheBounds) {
     dialogSize = cacheBounds.dimension();

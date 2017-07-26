@@ -13,6 +13,16 @@ scout.FormAdapter = function() {
 };
 scout.inherits(scout.FormAdapter, scout.ModelAdapter);
 
+/**
+ * @override
+ */
+scout.FormAdapter.prototype._initModel = function(model, parent) {
+  model = scout.FormAdapter.parent.prototype._initModel.call(this, model, parent);
+  // Set logical grid to null -> Calculation happens on server side
+  model.logicalGrid = null;
+  return model;
+};
+
 scout.FormAdapter.prototype._onWidgetAbort = function(event) {
   // Do not close the form immediately, server will send the close event
   event.preventDefault();

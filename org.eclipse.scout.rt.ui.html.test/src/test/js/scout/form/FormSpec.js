@@ -40,7 +40,6 @@ describe('Form', function() {
       expect(form.rootGroupBox.mainBox).toBe(true);
       expect(form.rootGroupBox.fields[0].mainBox).toBe(false);
     });
-
   });
 
   describe('open', function() {
@@ -184,6 +183,26 @@ describe('Form', function() {
       expect(form.readCacheBounds()).toBe(null);
     });
 
+  });
+
+  describe('rootGroupBox.gridData', function() {
+    it('is created using gridDataHints when the logical grid is validated', function() {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          gridDataHints: {
+            heightInPixel: 100
+          }
+        }
+      });
+      form.render();
+      expect(form.rootGroupBox.gridData.heightInPixel).toBe(0);
+
+      // Logical grid will be validated along with the layout
+      form.revalidateLayout();
+      expect(form.rootGroupBox.gridData.heightInPixel).toBe(100);
+    });
   });
 
 });

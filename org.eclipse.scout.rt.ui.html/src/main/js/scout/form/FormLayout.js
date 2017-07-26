@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.FormLayout = function(form) {
   scout.FormLayout.parent.call(this);
-  this._form = form;
+  this.form = form;
 };
 scout.inherits(scout.FormLayout, scout.AbstractLayout);
 
@@ -19,11 +19,13 @@ scout.FormLayout.prototype.layout = function($container) {
     htmlRootGb = this._htmlRootGroupBox(),
     rootGbSize;
 
+  this.form.validateLogicalGrid();
+
   rootGbSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets())
     .subtract(htmlRootGb.margins());
 
-  if (this._form.isDialog()) {
+  if (this.form.isDialog()) {
     rootGbSize.height -= this._titleHeight();
   }
 
@@ -36,6 +38,8 @@ scout.FormLayout.prototype.preferredLayoutSize = function($container) {
     htmlRootGb = this._htmlRootGroupBox(),
     prefSize;
 
+  this.form.validateLogicalGrid();
+
   prefSize = htmlRootGb.prefSize()
     .add(htmlContainer.insets())
     .add(htmlRootGb.margins());
@@ -45,11 +49,11 @@ scout.FormLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.FormLayout.prototype._htmlRootGroupBox = function() {
-  var $rootGroupBox = this._form.$container.children('.root-group-box');
+  var $rootGroupBox = this.form.$container.children('.root-group-box');
   return scout.HtmlComponent.get($rootGroupBox);
 };
 
 scout.FormLayout.prototype._titleHeight = function() {
-  var $titleBox = this._form.$container.children('.header');
+  var $titleBox = this.form.$container.children('.header');
   return scout.graphics.prefSize($titleBox, true).height;
 };

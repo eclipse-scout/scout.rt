@@ -42,7 +42,7 @@ describe("GroupBox", function() {
     var groupBox, model = {
       id: '2',
       label: "fooBar",
-      gridData: {
+      gridDataHints: {
         x: 0,
         y: 0
       }
@@ -83,7 +83,7 @@ describe("GroupBox", function() {
       model = $.extend(createSimpleModel('GroupBox', session), {
         id: '3',
         label: "fooBar",
-        gridData: {
+        gridDataHints: {
           x: 0,
           y: 0,
           widthInPixel: 27,
