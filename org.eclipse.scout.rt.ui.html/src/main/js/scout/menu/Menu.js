@@ -18,7 +18,6 @@ scout.Menu = function() {
   this.menuTypes = [];
   this.popup;
   this.excludedByFilter = false;
-  this.subMenuIconVisible = true;
   this.preventDoubleClick = false;
 
   /**
@@ -79,12 +78,8 @@ scout.Menu.prototype._renderItem = function() {
     .on('mousedown', mouseEventHandler)
     .on('contextmenu', mouseEventHandler)
     .on('click', mouseEventHandler);
-  if (this.childActions.length > 0 && this.text && this.subMenuIconVisible) {
-    var icon = scout.icons.parseIconId(scout.Menu.SUBMENU_ICON);
-    this.$submenuIcon = this.$container
-      .appendSpan('submenu-icon')
-      .text(icon.iconCharacter);
-  }
+
+  this._renderSubMenuIcon();
 
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
@@ -189,6 +184,28 @@ scout.Menu.prototype._renderChildActions = function() {
     this.childActions.forEach(function(menu) {
       menu.render($popup);
     });
+  }
+
+  this._renderSubMenuIcon();
+};
+
+scout.Menu.prototype._renderSubMenuIcon = function() {
+  var shouldBeVisible = this.childActions.length > 0 && this.text;
+
+  if (shouldBeVisible) {
+    if (!this.$submenuIcon) {
+      var icon = scout.icons.parseIconId(scout.Menu.SUBMENU_ICON);
+      this.$submenuIcon = this.$container
+        .appendSpan('submenu-icon')
+        .text(icon.iconCharacter);
+      this.invalidateLayoutTree();
+    }
+  } else {
+    if (this.$submenuIcon) {
+      this.$submenuIcon.remove();
+      this.$submenuIcon = null;
+      this.invalidateLayoutTree();
+    }
   }
 };
 
@@ -323,7 +340,9 @@ scout.Menu.prototype.clone = function(model) {
   var clone = scout.Menu.parent.prototype.clone.call(this, model);
   var childClones = [];
   this.childActions.forEach(function(child) {
-    var childClone = child.clone({parent: clone});
+    var childClone = child.clone({
+      parent: clone
+    });
     childClones.push(childClone);
   });
   clone.childActions = childClones;
