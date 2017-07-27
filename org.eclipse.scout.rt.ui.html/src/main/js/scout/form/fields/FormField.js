@@ -559,8 +559,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     return;
   }
 
-  var opts,
-    text = this.tooltipText,
+  var text = this.tooltipText,
     severity = scout.Status.OK,
     autoRemove = true,
     menus = [];
@@ -602,20 +601,31 @@ scout.FormField.prototype._showStatusMessage = function() {
     this.tooltip.setMenus(menus);
   } else {
     // create new tooltip
-    opts = {
+    this.tooltip = this._createTooltip({
       parent: this,
       text: text,
       severity: severity,
       autoRemove: autoRemove,
       $anchor: this.$status,
       menus: menus
-    };
-    this.tooltip = scout.create('Tooltip', opts);
+    });
     this.tooltip.one('destroy', function() {
       this.tooltip = null;
     }.bind(this));
-    this.tooltip.render();
+    this.tooltip.render(this._$tooltipParent());
   }
+};
+
+scout.FormField.prototype._createTooltip = function(model) {
+  return scout.create('Tooltip', model);
+};
+
+/**
+ * May be overridden to explicitly provide a tooltip $parent
+ */
+scout.FormField.prototype._$tooltipParent = function() {
+  // Will be determined by the tooltip itself
+  return undefined;
 };
 
 scout.FormField.prototype._hideStatusMessage = function() {

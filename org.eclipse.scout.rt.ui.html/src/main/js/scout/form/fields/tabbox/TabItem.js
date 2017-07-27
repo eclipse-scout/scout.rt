@@ -258,6 +258,27 @@ scout.TabItem.prototype._renderStatusVisible = function() {
   }
 };
 
+/**
+ * @override
+ */
+scout.TabItem.prototype._createTooltip = function(model) {
+  model.renderLaterPredicate = function() {
+    // this.$anchor is the status of the tab item.
+    // The default predicate of the tooltip checks if the parent is rendered, but parent.rendered refers to the content and not to the tab which itself is (unfortunately) not a separate widget.
+    // So the default predicate would return false if the tab is not selected (this.rendered/attached = false) even though the tab is rendered (this._tabRendered = true), which means tooltip could not be shown if tab is not selected.
+    return !this.$anchor.isAttached();
+  };
+  return scout.TabItem.parent.prototype._createTooltip.call(this, model);
+};
+
+/**
+ * @override
+ */
+scout.TabItem.prototype._$tooltipParent = function() {
+  // Tooltip may not resolve the entry point if its parent (the tab item) is not rendered, see also comment in createTooltip
+  return this.$tabContainer.entryPoint();
+};
+
 scout.TabItem.prototype._setMenusVisible = function() {
   // Always invisible because menus are displayed in menu bar and not with status icon
   // Actually not needed at the moment because only value fields have menus (at least at the java model).
