@@ -86,4 +86,41 @@ describe("scout.promises", function() {
     deferredArray[1].resolve(1);
   });
 
+  it("does not cut off error arguments", function(done) {
+    var deferredArray = createDeferredArray(1);
+    var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    scout.promises.oneByOne(promiseCreator).then(function() {
+      throw new Error('Unexpected code branch');
+    }, function() {
+      expect(arguments).toBeTruthy();
+      expect(arguments.length).toBe(2);
+      expect(arguments[0]).toBe('Foo');
+      expect(arguments[1]).toBe('Bar');
+      done();
+    });
+    setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Foo', 'Bar'));
+  });
+
+  it("adds all result arguments, one for each deferred", function(done) {
+    var deferredArray = scout.arrays.init(3, null).map(function() { return new $.Deferred(); });
+    var promiseCreator = new scout.PromiseCreator(deferredArray.map(function(v, i) { return function() { return deferredArray[i].promise(); }; }));
+    scout.promises.oneByOne(promiseCreator).then(function() {
+      expect(arguments).toBeTruthy();
+      expect(arguments.length).toBe(3);
+      // same behavior as if multiple Deferred or Promise or Thenable objects have been used with $.when or $.promiseAll method
+      // empty argument resolve call adds an undefined to result
+      expect(arguments[0]).toBeUndefined();
+      // one argument resolve call just adds the argument to result
+      expect(arguments[1]).toBe('Foo');
+      // multiple argument resolve call adds all arguments as an array to result
+      expect(arguments[2]).toEqual(['Bar', true]);
+      done();
+    }, function(msg) {
+      throw new Error('Unexpected code branch');
+    });
+    deferredArray[0].resolve();
+    deferredArray[1].resolve('Foo');
+    deferredArray[2].resolve('Bar', true);
+  });
+
 });
