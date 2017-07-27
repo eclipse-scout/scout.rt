@@ -66,7 +66,7 @@ public class HealthCheckerTest {
 
   protected void awaitDone(IFuture future) {
     if (future != null) {
-      future.awaitDone();
+      future.awaitDoneAndGet();
     }
   }
 
