@@ -16,7 +16,7 @@ scout.inherits(scout.TimePickerTouchPopupLayout, scout.TouchPopupLayout);
 scout.TimePickerTouchPopupLayout.prototype.layout = function($container) {
   scout.TimePickerTouchPopupLayout.parent.prototype.layout.call(this, $container);
   var htmlPicker = this.popup.getTimePicker().htmlComp;
-  htmlPicker.setSize(this.popup._widgetContainerHtmlComp.getSize());
+  htmlPicker.setSize(this.popup._widgetContainerHtmlComp.size());
 };
 
 /**

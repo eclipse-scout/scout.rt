@@ -390,7 +390,7 @@ scout.TableAdapter.prototype._onColumnStructureChanged = function(columns) {
 };
 
 scout.TableAdapter.prototype._onColumnOrderChanged = function(columnIds) {
-  var columns = this.widget._columnsByIds(columnIds);
+  var columns = this.widget.columnsByIds(columnIds);
   this.widget.updateColumnOrder(columns);
 };
 
