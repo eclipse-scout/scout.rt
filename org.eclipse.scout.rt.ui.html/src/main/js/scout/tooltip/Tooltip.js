@@ -39,9 +39,9 @@ scout.Tooltip = function() {
   this.menus = [];
   this._addWidgetProperties(['menus']);
   this._renderLater = false;
+  this.renderLaterPredicate = this._shouldRenderLater.bind(this); // allow replacing the predicate by the creator of the tooltip
 };
 scout.inherits(scout.Tooltip, scout.Widget);
-
 
 /**
  * We override the public render function here because we must also execute postRender
@@ -53,14 +53,17 @@ scout.inherits(scout.Tooltip, scout.Widget);
 scout.Tooltip.prototype.render = function($parent) {
   // when the parent of the tooltip is detached,
   // or the tooltip-anchor is detached
-  if (!this.parent.isAttachedAndRendered() ||
-      this.$anchor && !this.$anchor.isAttached()) {
+  if (this.renderLaterPredicate()) {
     this._renderLater = true;
     return;
   }
   // Use entry point by default
   $parent = $parent || this.entryPoint();
   scout.Tooltip.parent.prototype.render.call(this, $parent);
+};
+
+scout.Tooltip.prototype._shouldRenderLater = function() {
+  return !this.parent.isAttachedAndRendered() || this.$anchor && !this.$anchor.isAttached();
 };
 
 scout.Tooltip.prototype._render = function() {
