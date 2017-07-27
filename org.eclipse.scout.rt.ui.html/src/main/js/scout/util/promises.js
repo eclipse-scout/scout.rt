@@ -28,7 +28,7 @@ scout.promises = {
     }
 
     function onFail() {
-      deferred.reject(promiseCreator.error);
+      deferred.reject.apply(deferred, promiseCreator.error);
     }
 
     function _repeat(promiseCreator) {
@@ -37,7 +37,7 @@ scout.promises = {
           .done(onDone)
           .fail(onFail);
       } else {
-        deferred.resolve(promiseCreator.results);
+        deferred.resolve.apply(deferred, promiseCreator.results);
       }
     }
   },
@@ -61,7 +61,7 @@ scout.promises = {
     }
 
     function onFail() {
-      deferred.reject(promiseCreator.error);
+      deferred.reject.apply(deferred, promiseCreator.error);
     }
 
     function _repeat(promiseCreator) {
@@ -74,7 +74,7 @@ scout.promises = {
           .done(onDone)
           .fail(onFail);
       } else {
-        deferred.resolve(promiseCreator.results);
+        deferred.resolve.apply(deferred, promiseCreator.results);
       }
     }
   }
@@ -112,8 +112,8 @@ scout.PromiseCreator.prototype.next = function() {
     .done(function() {
       this._addResults.apply(this, arguments);
     }.bind(this))
-    .fail(function(error) {
-      this.error = error || new Error('Promise execution failed');
+    .fail(function() {
+      this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
     }.bind(this));
 };
 
@@ -132,9 +132,14 @@ scout.PromiseCreator.prototype._createPromise = function() {
 };
 
 scout.PromiseCreator.prototype._addResults = function() {
-  if (arguments.length > 0) {
-    this.results.push(scout.objects.argumentsToArray(arguments));
+  var result = scout.objects.argumentsToArray(arguments);
+  if (result.length === 0) {
+    result = undefined;
   }
+  else if (result.length === 1) {
+    result = result[0];
+  }
+  this.results.push(result);
 };
 
 scout.PromiseCreator.prototype.abort = function() {
