@@ -18,7 +18,6 @@ scout.Menu = function() {
   this.menuTypes = [];
   this.popup;
   this.excludedByFilter = false;
-  this.subMenuIconVisible = true;
 
   /**
    * This property is set if this is a subMenu. The property is set when this submenu is rendered.
@@ -76,9 +75,8 @@ scout.Menu.prototype._renderItem = function($parent) {
     .on('mousedown', mouseEventHandler)
     .on('contextmenu', mouseEventHandler)
     .on('click', mouseEventHandler);
-  if (this.childActions.length > 0 && this.text && this.subMenuIconVisible) {
-    this.$submenuIcon = this.$container.appendSpan('submenu-icon');
-  }
+
+  this._renderSubMenuIcon();
 
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
@@ -180,6 +178,25 @@ scout.Menu.prototype._renderChildActions = function() {
     this.childActions.forEach(function(menu) {
       menu.render($popup);
     });
+  }
+
+  this._renderSubMenuIcon();
+};
+
+scout.Menu.prototype._renderSubMenuIcon = function() {
+  var shouldBeVisible = this.childActions.length > 0 && this.text;
+
+  if (shouldBeVisible) {
+    if (!this.$submenuIcon) {
+      this.$submenuIcon = this.$container.appendSpan('submenu-icon');
+      this.invalidateLayoutTree();
+    }
+  } else {
+    if (this.$submenuIcon) {
+      this.$submenuIcon.remove();
+      this.$submenuIcon = null;
+      this.invalidateLayoutTree();
+    }
   }
 };
 
