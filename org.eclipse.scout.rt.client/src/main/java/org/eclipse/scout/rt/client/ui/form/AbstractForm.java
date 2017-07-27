@@ -2464,19 +2464,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     // load properties
     Element xProps = XmlUtility.getFirstChildElement(root, "properties");
-    Map<String, Object> props = loadPropertiesFromXml(xProps);
-    BeanUtility.setProperties(this, props, true, null);
+    if (xProps != null) {
+      Map<String, Object> props = loadPropertiesFromXml(xProps);
+      BeanUtility.setProperties(this, props, true, null);
 
-    // load extension properties
-    for (Element xExtension : XmlUtility.getChildElements(xProps, "extension")) {
-      String extensionId = xExtension.getAttribute("extensionId");
-      String extensionQname = xExtension.getAttribute("extensionQname");
-      IFormExtension<? extends AbstractForm> extension = findFormExtensionById(extensionQname, extensionId);
-      if (extension == null) {
-        continue;
+      // load extension properties
+      for (Element xExtension : XmlUtility.getChildElements(xProps, "extension")) {
+        String extensionId = xExtension.getAttribute("extensionId");
+        String extensionQname = xExtension.getAttribute("extensionQname");
+        IFormExtension<? extends AbstractForm> extension = findFormExtensionById(extensionQname, extensionId);
+        if (extension == null) {
+          continue;
+        }
+        Map<String, Object> extensionProps = loadPropertiesFromXml(xExtension);
+        BeanUtility.setProperties(extension, extensionProps, true, null);
       }
-      Map<String, Object> extensionProps = loadPropertiesFromXml(xExtension);
-      BeanUtility.setProperties(extension, extensionProps, true, null);
     }
 
     // load fields
@@ -2546,16 +2548,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   protected Map<String, Object> loadPropertiesFromXml(Element xProps) {
     Map<String, Object> props = new HashMap<String, Object>();
-    if (xProps != null) {
-      for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
-        String name = xProp.getAttribute("name");
-        try {
-          Object o = XmlUtility.getObjectAttribute(xProp, "value");
-          props.put(name, o);
-        }
-        catch (Exception e) {
-          LOG.warn("Could not load XML property {}", name, e);
-        }
+    for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
+      String name = xProp.getAttribute("name");
+      try {
+        Object o = XmlUtility.getObjectAttribute(xProp, "value");
+        props.put(name, o);
+      }
+      catch (Exception e) {
+        LOG.warn("Could not load XML property {}", name, e);
       }
     }
     return props;

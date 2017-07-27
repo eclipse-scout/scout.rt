@@ -17,12 +17,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Tests loading and storing to xml of forms with extensions.
@@ -199,6 +202,30 @@ public class StoreAndLoadXmlWithPropertyExtensionFormTest extends AbstractLocalE
     assertEquals("staticFieldValue", loadedForm.getTextField().getValue());
     assertNull(loadedForm.getTextField().getTextFieldProperty()); // field properties are not stored in XML
     assertNull(loadedFieldExtension.getExtensionProperty()); // field extension properties are not stored in XML
+  }
+
+  @Test
+  public void testLoadXmlWithoutPropertiesElement() {
+    String xml;
+    {
+      // create form
+      TestForm form = new TestForm();
+      form.getTextField().setValue("staticFieldValue");
+
+      // store to xml and remove properties element
+      Document xmlDoc = form.storeToXml();
+      Element formState = xmlDoc.getDocumentElement();
+      Element properties = XmlUtility.getFirstChildElement(formState, "properties");
+      assertNotNull(properties);
+      formState.removeChild(properties);
+      xml = XmlUtility.wellformDocument(xmlDoc);
+    }
+
+    TestForm loadedForm = new TestForm();
+    loadedForm.loadFromXmlString(xml);
+
+    assertNull(loadedForm.getProperty());
+    assertEquals("staticFieldValue", loadedForm.getTextField().getValue());
   }
 
   public static final class TestForm extends AbstractForm {
