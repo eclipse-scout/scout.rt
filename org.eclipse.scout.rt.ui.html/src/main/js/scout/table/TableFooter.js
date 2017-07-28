@@ -69,7 +69,7 @@ scout.TableFooter.prototype._render = function() {
   if (filter) {
     this._$textFilter.val(filter.text);
   }
-  this.$deletableIcon = $filter.appendSpan('delete-icon unfocusable needsclick')
+  this.$clearIcon = $filter.appendSpan('delete-icon unfocusable needsclick')
     .on('mousedown', this._onDeleteFilterMouseDown.bind(this));
 
   // load info ("X rows loaded, click to reload")

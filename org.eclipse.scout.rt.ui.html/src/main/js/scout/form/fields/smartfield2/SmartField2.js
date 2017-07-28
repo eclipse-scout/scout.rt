@@ -12,7 +12,7 @@ scout.SmartField2 = function() {
   scout.SmartField2.parent.call(this);
 
   this.focused = false;
-  this.deletable = false;
+  this.clearable = false;
   this.popup = null;
   this.lookupCall = null;
   this.codeType = null;
@@ -118,7 +118,7 @@ scout.SmartField2.prototype._render = function() {
 
 scout.SmartField2.prototype._renderProperties = function() {
   scout.SmartField2.parent.prototype._renderProperties.call(this);
-  this._renderDeletable();
+  this._renderClearable();
 };
 
 scout.SmartField2.prototype.cssClassName = function() {
@@ -140,7 +140,7 @@ scout.SmartField2.prototype._renderDisplayText = function() {
     displayText = textLines[0];
   }
   scout.fields.valOrText(this.$field, displayText);
-  this._updateDeletable();
+  this._updateClearable();
 };
 
 /**
@@ -656,9 +656,9 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var deletable = this.deletable;
+  var clearable = this.clearable;
   this.$field.focus();
-  if (deletable) {
+  if (clearable) {
     this.clear();
     return;
   }
@@ -675,7 +675,7 @@ scout.SmartField2.prototype._clear = function() {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
     setTimeout(this.openPopup.bind(this, true));
   }
-  this._updateDeletable();
+  this._updateClearable();
 };
 
 scout.SmartField2.prototype.togglePopup = function() {
@@ -706,7 +706,7 @@ scout.SmartField2.prototype._onFieldFocus = function(event) {
 };
 
 scout.SmartField2.prototype._onInputChanged = function(event) {
-  this._updateDeletable();
+  this._updateClearable();
 };
 
 scout.SmartField2.prototype._onFieldKeyUp = function(event) {
@@ -837,7 +837,7 @@ scout.SmartField2.prototype._isFunctionKey = function(event) {
 scout.SmartField2.prototype._onLookupRowSelected = function(event) {
   this.setLookupRow(event.lookupRow);
   this._inputAccepted();
-  this._updateDeletable();
+  this._updateClearable();
   this.closePopup();
 };
 
@@ -975,29 +975,29 @@ scout.SmartField2.prototype.setFocused = function(focused) {
 };
 
 scout.SmartField2.prototype._renderFocused = function() {
-  this._updateDeletable();
+  this._updateClearable();
 };
 
-scout.SmartField2.prototype._updateDeletable = function() {
+scout.SmartField2.prototype._updateClearable = function() {
   if (this.touch) {
     return;
   }
   if (!this.$field) {
     return;
   }
-  var deletable = scout.strings.hasText(this._readDisplayText());
+  var clearable = scout.strings.hasText(this._readDisplayText());
   if (!this.embedded) {
-    deletable = deletable && this.focused;
+    clearable = clearable && this.focused;
   }
-  this.setDeletable(deletable);
+  this.setClearable(clearable);
 };
 
-scout.SmartField2.prototype.setDeletable = function(deletable) {
-  this.setProperty('deletable', deletable);
+scout.SmartField2.prototype.setClearable = function(clearable) {
+  this.setProperty('clearable', clearable);
 };
 
-scout.SmartField2.prototype._renderDeletable = function() {
-  this.$container.toggleClass('deletable', this.deletable);
+scout.SmartField2.prototype._renderClearable = function() {
+  this.$container.toggleClass('clearable', this.clearable);
 };
 
 scout.SmartField2.prototype._triggerAcceptInputFail = function() {

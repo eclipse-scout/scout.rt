@@ -119,7 +119,7 @@ describe('SmartField2', function() {
 
   describe('touch popup', function() {
 
-    it('marks field as deletable even if the field is not focused', function() {
+    it('marks field as clearable even if the field is not focused', function() {
       var field = createFieldWithLookupCall({
         touch: true
       });
@@ -130,8 +130,8 @@ describe('SmartField2', function() {
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
       expect(field.popup._field.$field.val()).toBe('Foo');
-      expect(field.popup._field.$container).toHaveClass('deletable');
-      expect(field.popup._field.deletable).toBe(true);
+      expect(field.popup._field.$container).toHaveClass('clearable');
+      expect(field.popup._field.clearable).toBe(true);
     });
 
   });

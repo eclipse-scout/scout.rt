@@ -12,7 +12,7 @@ scout.SearchOutline = function() {
   scout.SearchOutline.parent.call(this);
   this.hasText = false;
   this.$searchPanel;
-  this.$deletableIcon;
+  this.$clearIcon;
   this.$searchStatus;
   this.$queryField;
 };
@@ -52,8 +52,8 @@ scout.SearchOutline.prototype._render = function() {
   this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
     .on('input', this._createOnQueryFieldInputFunction().bind(this))
     .on('keypress', this._onQueryFieldKeyPress.bind(this));
-  this.$deletableIcon = this.$searchPanel.appendSpan('delete-icon unfocusable needsclick')
-    .on('mousedown', this._onDeletableIconMouseDown.bind(this));
+  this.$clearIcon = this.$searchPanel.appendSpan('delete-icon unfocusable needsclick')
+    .on('mousedown', this._onClearIconMouseDown.bind(this));
 
   this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
     .on('click', this._onTitleClick.bind(this));
@@ -130,7 +130,7 @@ scout.SearchOutline.prototype._createOnQueryFieldInputFunction = function(event)
   return fn;
 };
 
-scout.SearchOutline.prototype._onDeletableIconMouseDown = function(event) {
+scout.SearchOutline.prototype._onClearIconMouseDown = function(event) {
   this.$queryField.val('');
   this._updateHasText();
   this._search();

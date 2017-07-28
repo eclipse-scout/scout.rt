@@ -13,7 +13,7 @@ scout.DateField = function() {
 
   this.popup;
   this.autoDate;
-  this.dateDeletable = false;
+  this.dateClearable = false;
   this.dateFocused = false;
   this.dateFormatPattern;
   this.disabledCopyOverlay = true;
@@ -25,7 +25,7 @@ scout.DateField = function() {
   this.timePickerResolution;
   this.timeFormatPattern;
   this.timeFocused = false;
-  this.timeDeletable = false;
+  this.timeClearable = false;
 
   this.$dateField;
   this.$timeField;
@@ -116,8 +116,8 @@ scout.DateField.prototype._renderProperties = function() {
   // Has to be the last call, otherwise _renderErrorStatus() would operate on the wrong state.
   scout.DateField.parent.prototype._renderProperties.call(this);
 
-  this._renderDateDeletable();
-  this._renderTimeDeletable();
+  this._renderDateClearable();
+  this._renderTimeClearable();
 };
 
 scout.DateField.prototype._remove = function() {
@@ -301,11 +301,11 @@ scout.DateField.prototype._renderEnabled = function() {
 scout.DateField.prototype._renderDisplayText = function() {
   if (this.hasDate) {
     this._renderDateDisplayText();
-    this._updateDateDeletable();
+    this._updateDateClearable();
   }
   if (this.hasTime) {
     this._renderTimeDisplayText();
-    this._updateTimeDeletable();
+    this._updateTimeClearable();
   }
   this._removePredictionFields();
 };
@@ -323,7 +323,7 @@ scout.DateField.prototype._readDisplayText = function() {
 
 scout.DateField.prototype._renderDateDisplayText = function() {
   scout.fields.valOrText(this.$dateField, this.dateDisplayText);
-  this._updateDateDeletable();
+  this._updateDateClearable();
 };
 
 scout.DateField.prototype._readDateDisplayText = function() {
@@ -481,29 +481,29 @@ scout.DateField.prototype.setDateFocused = function(dateFocused) {
 };
 
 scout.DateField.prototype._renderDateFocused = function() {
-  this._updateDateDeletable();
+  this._updateDateClearable();
 };
 
-scout.DateField.prototype._updateDateDeletable = function() {
+scout.DateField.prototype._updateDateClearable = function() {
   if (this.touch) {
     return;
   }
   if (!this.$field) {
     return;
   }
-  var deletable = scout.strings.hasText(this._readDateDisplayText());
+  var clearable = scout.strings.hasText(this._readDateDisplayText());
   if (!this.embedded) {
-    deletable = deletable && this.dateFocused;
+    clearable = clearable && this.dateFocused;
   }
-  this.setDateDeletable(deletable);
+  this.setDateClearable(clearable);
 };
 
-scout.DateField.prototype.setDateDeletable = function(dateDeletable) {
-  this.setProperty('dateDeletable', dateDeletable);
+scout.DateField.prototype.setDateClearable = function(dateClearable) {
+  this.setProperty('dateClearable', dateClearable);
 };
 
-scout.DateField.prototype._renderDateDeletable = function() {
-  this.$container.toggleClass('date-deletable', this.dateDeletable);
+scout.DateField.prototype._renderDateClearable = function() {
+  this.$container.toggleClass('date-clearable', this.dateClearable);
 };
 
 scout.DateField.prototype._clear = function() {
@@ -511,12 +511,12 @@ scout.DateField.prototype._clear = function() {
   if (this.hasDate) {
     this.$dateField.val('');
     this._setDateValid(true);
-    this._updateDateDeletable();
+    this._updateDateClearable();
   }
   if (this.hasTime) {
     this.$timeField.val('');
     this._setTimeValid(true);
-    this._updateTimeDeletable();
+    this._updateTimeClearable();
   }
 };
 
@@ -524,16 +524,16 @@ scout.DateField.prototype._onDateIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var deletable = this.dateDeletable;
+  var clearable = this.dateClearable;
   this.$dateField.focus();
-  if (deletable) {
+  if (clearable) {
     this.clear();
     if (this.value) {
       this.selectDate(this.value, false);
     } else {
       this.preselectDate(this._referenceDate(), false);
     }
-    this._updateDateDeletable();
+    this._updateDateClearable();
     event.preventDefault();
     return;
   }
@@ -547,45 +547,45 @@ scout.DateField.prototype.setTimeFocused = function(timeFocused) {
 };
 
 scout.DateField.prototype._renderTimeFocused = function() {
-  this._updateTimeDeletable();
+  this._updateTimeClearable();
 };
 
-scout.DateField.prototype._updateTimeDeletable = function() {
+scout.DateField.prototype._updateTimeClearable = function() {
   if (this.touch) {
     return;
   }
   if (!this.$field) {
     return;
   }
-  var deletable = scout.strings.hasText(this._readTimeDisplayText());
+  var clearable = scout.strings.hasText(this._readTimeDisplayText());
   if (!this.embedded) {
-    deletable = deletable && this.timeFocused;
+    clearable = clearable && this.timeFocused;
   }
-  this.setTimeDeletable(deletable);
+  this.setTimeClearable(clearable);
 };
 
-scout.DateField.prototype.setTimeDeletable = function(timeDeletable) {
-  this.setProperty('timeDeletable', timeDeletable);
+scout.DateField.prototype.setTimeClearable = function(timeClearable) {
+  this.setProperty('timeClearable', timeClearable);
 };
 
-scout.DateField.prototype._renderTimeDeletable = function() {
-  this.$container.toggleClass('time-deletable', this.timeDeletable);
+scout.DateField.prototype._renderTimeClearable = function() {
+  this.$container.toggleClass('time-clearable', this.timeClearable);
 };
 
 scout.DateField.prototype._onTimeIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var deletable = this.timeDeletable;
+  var clearable = this.timeClearable;
   this.$timeField.focus();
-  if (deletable) {
+  if (clearable) {
     this.clear();
     if (this.value) {
       this.selectTime(this.value, false);
     } else {
       this.preselectTime(this._referenceDate(), false);
     }
-    this._updateTimeDeletable();
+    this._updateTimeClearable();
     event.preventDefault();
     return;
   }
@@ -791,7 +791,7 @@ scout.DateField.prototype._onDateFieldInput = function(event) {
     // No valid prediction!
     this._removePredictionFields();
   }
-  this._updateDateDeletable();
+  this._updateDateClearable();
 };
 
 scout.DateField.prototype.acceptInput = function() {
@@ -994,7 +994,7 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
     this._tempTimeDate = null;
     this._removePredictionFields();
   }
-  this._updateTimeDeletable();
+  this._updateTimeClearable();
 };
 
 scout.DateField.prototype._onDatePickerDateSelect = function(event) {
