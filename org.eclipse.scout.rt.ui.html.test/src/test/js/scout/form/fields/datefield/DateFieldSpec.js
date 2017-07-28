@@ -926,7 +926,7 @@ describe('DateField', function() {
 
         // selected date in picker (first day) must be 09/27/1999
         expect(dateField.$dateField.text()).toBe('27.09.1999');
-        expect(dateField.$timeField.val()).toBe('04:42');
+        expect(dateField.$timeField.text()).toBe('04:42');
         expect(dateField.displayText).toBe('27.09.1999\n04:42');
 
         dateField.$dateField.triggerMouseDown();
@@ -1054,7 +1054,7 @@ describe('DateField', function() {
         expectDate(dateField.value, 2016, 02, 29, 10, 42);
         expect(dateField.displayText).toBe('29.02.2016\n10:42');
         expect(dateField.$dateField.text()).toBe('29.02.2016');
-        expect(dateField.$timeField.val()).toBe('10:42');
+        expect(dateField.$timeField.text()).toBe('10:42');
       });
 
       it('shows datefield with same date as clicked datefield', function() {
