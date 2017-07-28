@@ -670,9 +670,9 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   event.preventDefault();
 };
 
-scout.SmartField2.prototype.clear = function() {
-  scout.SmartField2.parent.prototype.clear.call(this);
-  this.resetDisplayText();
+scout.SmartField2.prototype._clear = function() {
+  this._userWasTyping = true;
+  this.$field.val('');
 };
 
 scout.SmartField2.prototype.togglePopup = function() {

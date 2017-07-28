@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * ValueField assumes $field has a .val() method which returns the value of that field.
  * @abstract
  */
 scout.ValueField = function() {
@@ -208,10 +207,13 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
  * clears the display text and the value to null.
  */
 scout.ValueField.prototype.clear = function(){
-  this.clearErrorStatus();
-  this.setValue(null);
-  this.setDisplayText();
+  this._clear();
+  this.acceptInput();
   this._triggerClear();
+};
+
+scout.ValueField.prototype._clear = function(){
+  // to be implemented by sublcasses
 };
 
 scout.ValueField.prototype._triggerClear = function() {

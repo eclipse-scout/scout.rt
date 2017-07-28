@@ -361,7 +361,6 @@ describe('DateField', function() {
 
   });
 
-
   describe('click', function() {
 
     it('opens the datepicker', function() {
@@ -373,6 +372,24 @@ describe('DateField', function() {
 
       dateField.$dateField.triggerMouseDown();
       expect(findDatePicker().length).toBe(1);
+    });
+
+    it('opens the picker and preselects the current date but not the previous date if it was cleared before', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop
+      });
+      dateField.render();
+      dateField.setValue(scout.dates.create('2017-05-23 00:00:00.000'));
+      dateField.$dateField.triggerMouseDown();
+
+      expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, scout.dates.create('2017-05-23 00:00:00.000'))).toBe(true);
+      dateField.popup.close();
+
+      dateField.clear();
+      dateField.$dateField.triggerMouseDown();
+      expect(dateField.getDatePicker().selectedDate).toBe(null);
+      expect(scout.dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
+      expect(dateField.value).toBe(null);
     });
 
   });

@@ -37,7 +37,7 @@ describe("BasicField", function() {
     return helper.createFieldModel();
   }
 
-  describe("acceptInput must always be sent to server at the end of input, if at least one change has been was made", function() {
+  describe("acceptInput must always be sent to server at the end of input, if at least one change has been made", function() {
     it("updateDisplayTextOnModify = true, with changed text", function() {
       field.updateDisplayTextOnModify = true;
       field.render();
@@ -206,6 +206,33 @@ describe("BasicField", function() {
       jasmine.clock().tick(251); // because of debounce
       // expect not to fail
     });
+  });
+
+  describe('clear', function() {
+
+    it('removes the text and accepts input also with updateDisplayTextOnAnyKey set to true', function() {
+      // Behavior should be similar to ctrl+A
+      var field = scout.create('StringField', {
+        parent: session.desktop,
+        updateDisplayTextOnAnyKey: true
+      });
+      var inputAccepted = false;
+      field.render();
+      field.setValue('abc');
+      field.on('acceptInput', function() {
+        inputAccepted = true;
+      });
+      expect(field.$field.val()).toBe('abc');
+      expect(field.value).toBe('abc');
+      expect(field.displayText).toBe('abc');
+
+      field.clear();
+      expect(field.$field.val()).toBe('');
+      expect(field.value).toBe('');
+      expect(field.displayText).toBe('');
+      expect(inputAccepted).toBe(true);
+    });
+
   });
 
 });
