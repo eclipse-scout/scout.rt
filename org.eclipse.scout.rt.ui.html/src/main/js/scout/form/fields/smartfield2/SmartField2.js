@@ -140,6 +140,7 @@ scout.SmartField2.prototype._renderDisplayText = function() {
     displayText = textLines[0];
   }
   scout.fields.valOrText(this.$field, displayText);
+  this._updateDeletable();
 };
 
 /**
@@ -230,7 +231,6 @@ scout.SmartField2.prototype._inputAccepted = function(triggerEvent, acceptByLook
   if (triggerEvent) {
     this._triggerAcceptInput(acceptByLookupRow);
   }
-  this.closePopup();
   this._focusNextTabbable();
   this._acceptInputDeferred.resolve();
 };
@@ -656,12 +656,10 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var _deletable = this.deletable;
+  var deletable = this.deletable;
   this.$field.focus();
-  if (_deletable) {
+  if (deletable) {
     this.clear();
-    this.closePopup();
-    this._updateDeletable();
     return;
   }
   if (!this.embedded) {
@@ -673,6 +671,11 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
 scout.SmartField2.prototype._clear = function() {
   this._userWasTyping = true;
   this.$field.val('');
+  if (this.isPopupOpen()) {
+    // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
+    setTimeout(this.openPopup.bind(this, true));
+  }
+  this._updateDeletable();
 };
 
 scout.SmartField2.prototype.togglePopup = function() {
@@ -695,6 +698,7 @@ scout.SmartField2.prototype._onFieldBlur = function(event) {
   scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
   this.setFocused(false);
   this.setLoading(false);
+  this.closePopup();
 };
 
 scout.SmartField2.prototype._onFieldFocus = function(event) {
@@ -834,6 +838,7 @@ scout.SmartField2.prototype._onLookupRowSelected = function(event) {
   this.setLookupRow(event.lookupRow);
   this._inputAccepted();
   this._updateDeletable();
+  this.closePopup();
 };
 
 scout.SmartField2.prototype._onActiveFilterSelected = function(event) {
@@ -985,7 +990,6 @@ scout.SmartField2.prototype._updateDeletable = function() {
     deletable = deletable && this.focused;
   }
   this.setDeletable(deletable);
-
 };
 
 scout.SmartField2.prototype.setDeletable = function(deletable) {

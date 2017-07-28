@@ -43,3 +43,10 @@ scout.DatePickerPopup.prototype._render = function() {
 scout.DatePickerPopup.prototype.getDatePicker = function() {
   return this.picker;
 };
+
+/**
+ * @override because the icon is not in the $anchor container.
+ */
+scout.DatePickerPopup.prototype._isMouseDownOnAnchor = function(event) {
+  return this.field.$dateField.isOrHas(event.target) || this.field.$dateFieldIcon.isOrHas(event.target);
+};

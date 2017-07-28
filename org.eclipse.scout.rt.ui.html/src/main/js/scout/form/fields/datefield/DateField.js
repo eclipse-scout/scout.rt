@@ -524,9 +524,9 @@ scout.DateField.prototype._onDateIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var _deletable = this.dateDeletable;
+  var deletable = this.dateDeletable;
   this.$dateField.focus();
-  if (_deletable) {
+  if (deletable) {
     this.clear();
     if (this.value) {
       this.selectDate(this.value, false);
@@ -538,7 +538,7 @@ scout.DateField.prototype._onDateIconMouseDown = function(event) {
     return;
   }
   if (!this.embedded) {
-    this.toggleDatePopup();
+    this.openDatePopupAndSelect(this.value);
   }
 };
 
@@ -576,9 +576,9 @@ scout.DateField.prototype._onTimeIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
-  var _deletable = this.timeDeletable;
+  var deletable = this.timeDeletable;
   this.$timeField.focus();
-  if (_deletable) {
+  if (deletable) {
     this.clear();
     if (this.value) {
       this.selectTime(this.value, false);
@@ -590,14 +590,14 @@ scout.DateField.prototype._onTimeIconMouseDown = function(event) {
     return;
   }
   if (!this.embedded) {
-    this.toggleTimePopup();
+    this.openTimePopupAndSelect(this.value);
   }
 };
 
 scout.DateField.prototype._onDateFieldBlur = function() {
   // Close picker and update model
-  if (!this.embedded) {
-    // in embedded mode we must update the date prediction but not close the popup
+  if (!this.embedded && this.popup instanceof scout.DatePickerPopup) {
+    // in embedded mode we must update the date prediction but not close the popup (don't accidentially close time picker poupp)
     this.closePopup();
   }
   this.setDateFocused(false);
@@ -611,7 +611,7 @@ scout.DateField.prototype._onDateFieldFocus = function(event) {
 
 scout.DateField.prototype._onTimeFieldBlur = function() {
   //Close picker and update model
-  if (!this.embedded) {
+  if (!this.embedded && this.popup instanceof scout.TimePickerPopup) {
     // in embedded mode we must update the date prediction but not close the popup
     this.closePopup();
   }

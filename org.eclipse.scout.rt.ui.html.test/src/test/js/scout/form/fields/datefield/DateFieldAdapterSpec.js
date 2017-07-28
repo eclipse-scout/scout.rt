@@ -25,6 +25,7 @@ describe("DateFieldAdapter", function() {
     jasmine.clock().uninstall();
     $('.tooltip').remove();
     $('.date-picker').remove();
+    $('.time-picker').remove();
   });
 
   function createWithAdapter(model) {
