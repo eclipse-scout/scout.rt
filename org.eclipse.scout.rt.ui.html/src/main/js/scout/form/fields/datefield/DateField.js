@@ -331,7 +331,7 @@ scout.DateField.prototype._readDateDisplayText = function() {
 };
 
 scout.DateField.prototype._renderTimeDisplayText = function() {
-  this.$timeField.val(this.timeDisplayText);
+  scout.fields.valOrText(this.$timeField, this.timeDisplayText);
 };
 
 scout.DateField.prototype._readTimeDisplayText = function() {
