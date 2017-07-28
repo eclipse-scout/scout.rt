@@ -77,6 +77,48 @@ scout.promises = {
         deferred.resolve(promiseCreator.results);
       }
     }
+  },
+
+  /**
+   * Use a promise creator to try to keep a fixed size pool of promises of working. As soon as one
+   * promise is finished, the next promise will be created and executed (as a long as there are more
+   * promises available).
+   *
+   * @param maxPoolSize defines how many promises should be created and executed at most in parallel.
+   * @param promiseCreator
+   * @param timeout specifies a timeout to wait for until the next promise will be started.
+   * @returns {Promise}
+   */
+  parallel: function(maxPoolSize, promiseCreator, timeout) {
+    timeout = timeout || 0;
+    var deferred = $.Deferred();
+    var poolSize = 0;
+    _startNext(promiseCreator);
+    return deferred.promise();
+
+    // use set timeout to prevent stack overflow
+    function onDone() {
+      poolSize--;
+      setTimeout(_startNext.bind(this, promiseCreator), timeout);
+    }
+
+    function onFail() {
+      deferred.reject(promiseCreator.error);
+    }
+
+    function _startNext(promiseCreator) {
+      if (deferred.state() !== "pending") {
+        // deferred has already been rejected or resolved, do not start anymore promises or call done handler
+        return;
+      }
+      while (promiseCreator.hasNext() && poolSize < maxPoolSize) {
+        poolSize++;
+        promiseCreator.next().done(onDone).fail(onFail);
+      }
+      if (poolSize === 0) {
+        deferred.resolve.apply(deferred, [promiseCreator.results]);
+      }
+    }
   }
 
 };
