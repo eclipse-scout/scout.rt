@@ -224,7 +224,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget;
 
-  if (!this.closeOnAnchorMouseDown && this.$anchor && this.$anchor.isOrHas(event.target)) {
+  if (!this.closeOnAnchorMouseDown && this._isMouseDownOnAnchor(event)) {
     // 1. Often times, click on the anchor opens and 2. click closes the popup
     // If we were closing the popup here, it would not be possible to achieve the described behavior anymore -> let anchor handle open and close.
     return false;
@@ -237,6 +237,10 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
   // because the popup may open other popups which probably is not a dom child but a sibling
   // Also ignore clicks if the popup is covert by a glasspane
   return !this.isOrHas(targetWidget) && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
+};
+
+scout.Popup.prototype._isMouseDownOnAnchor = function(event) {
+  return !!this.$anchor && this.$anchor.isOrHas(event.target);
 };
 
 /**

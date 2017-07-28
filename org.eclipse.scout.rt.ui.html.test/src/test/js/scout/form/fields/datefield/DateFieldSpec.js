@@ -26,6 +26,7 @@ describe('DateField', function() {
     jasmine.clock().uninstall();
     $('.tooltip').remove();
     $('.date-picker').remove();
+    $('.time-picker').remove();
   });
 
   function createModel(model) {
@@ -1156,7 +1157,6 @@ describe('DateField', function() {
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
       });
-
     });
   });
 

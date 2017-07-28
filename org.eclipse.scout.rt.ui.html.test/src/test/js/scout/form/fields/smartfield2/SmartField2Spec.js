@@ -1,5 +1,3 @@
-
-
 /*******************************************************************************
  * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -26,11 +24,12 @@ describe('SmartField2', function() {
     jasmine.clock().uninstall();
   });
 
-  function createFieldWithLookupCall() {
-    return scout.create('SmartField2', {
+  function createFieldWithLookupCall(model) {
+    model = $.extend({}, {
       parent: session.desktop,
       lookupCall: 'DummyLookupCall'
-    });
+    }, model);
+    return scout.create('SmartField2', model);
   }
 
   function findTableProposals() {
@@ -84,7 +83,7 @@ describe('SmartField2', function() {
 
     it('load proposals for the current displayText', function() {
       field = createFieldWithLookupCall();
-      field.render(session.desktop.$container);
+      field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
       field._onFieldKeyUp({});
@@ -98,8 +97,46 @@ describe('SmartField2', function() {
 
   });
 
-  describe('default (smart field) with table proposal', function() {
+  describe('clear', function() {
 
+    it('does not close the popup but does a browse all', function() {
+      var field = createFieldWithLookupCall();
+      field.render();
+      field.$field.focus(); // must be focused, otherwise popup will not open
+      field.$field.val('b');
+      field._onFieldKeyUp({});
+      jasmine.clock().tick(500);
+      expect(field.popup).not.toBe(null);
+      expect(findTableProposals()).toEqual(['Bar', 'Baz']);
+
+      field.clear();
+      jasmine.clock().tick(500);
+      expect(field.popup).not.toBe(null);
+      expect(findTableProposals()).toEqual(['Foo', 'Bar', 'Baz']);
+    });
+
+  });
+
+  describe('touch popup', function() {
+
+    it('marks field as deletable even if the field is not focused', function() {
+      var field = createFieldWithLookupCall({
+        touch: true
+      });
+      field.render();
+      field.setValue(1);
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      expect(field.popup).not.toBe(null);
+      expect(field.popup._field.$field.val()).toBe('Foo');
+      expect(field.popup._field.$container).toHaveClass('deletable');
+      expect(field.popup._field.deletable).toBe(true);
+    });
+
+  });
+
+  describe('default (smart field) with table proposal', function() {
 
   });
 

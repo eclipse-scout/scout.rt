@@ -59,13 +59,9 @@ scout.BasicField.prototype._onDeletableIconMouseDown = function(event) {
   }
 };
 
-scout.BasicField.prototype.clear = function() {
-  scout.BasicField.parent.prototype.clear.call(this);
-  this._updateDeletable();
-};
-
 scout.BasicField.prototype._clear = function() {
   this.$field.val('');
+  this._updateDeletable();
 };
 
 scout.BasicField.prototype._onFieldInput = function() {
