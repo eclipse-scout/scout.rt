@@ -46,6 +46,46 @@ describe("scout.promises", function() {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Bar'));
   });
 
+  it("parallel stops executing after failed promise", function(done) {
+    var deferredArray = createDeferredArray(9);
+    var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    scout.promises.parallel(3, promiseCreator).then(function() {
+      fail('Unexpected code branch');
+    }, function(msg) {
+      expect(msg).toBe(4);
+      expect(deferredArray[0].state()).toBe('resolved');
+      expect(deferredArray[1].state()).toBe('resolved');
+      expect(deferredArray[2].state()).toBe('pending');
+      expect(deferredArray[3].state()).toBe('resolved');
+      expect(deferredArray[4].state()).toBe('rejected');
+      expect(deferredArray[5].state()).toBe('pending');
+      expect(deferredArray[6]).toBeNull();
+      expect(deferredArray[7]).toBeNull();
+      expect(deferredArray[8]).toBeNull();
+      done();
+    });
+    deferredArray[1].then(function() {
+      setTimeout(deferredArray[0].resolve.bind(this, 2), 0);
+      expect(deferredArray[0]).not.toBeNull();
+      expect(deferredArray[1]).not.toBeNull();
+      expect(deferredArray[2]).not.toBeNull();
+      expect(deferredArray[3]).toBeNull();
+      expect(deferredArray[4]).toBeNull();
+    });
+    deferredArray[0].then(function() {
+      setTimeout(deferredArray[3].resolve.bind(this, 3), 0);
+      expect(deferredArray[2]).not.toBeNull();
+      expect(deferredArray[3]).not.toBeNull();
+      expect(deferredArray[4]).toBeNull();
+      expect(deferredArray[5]).toBeNull();
+      expect(deferredArray[6]).toBeNull();
+      deferredArray[3].then(function() {
+        setTimeout(deferredArray[4].reject.bind(this, 4), 0);
+      });
+    });
+    deferredArray[1].resolve(1);
+  });
+
   it("does not cut off error arguments", function(done) {
     var deferredArray = createDeferredArray(1);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
