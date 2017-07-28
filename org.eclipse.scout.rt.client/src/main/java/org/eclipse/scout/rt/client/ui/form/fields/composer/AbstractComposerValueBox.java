@@ -349,6 +349,11 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
 
     @Override
+    protected boolean getConfiguredAutoCheckChildNodes() {
+      return true;
+    }
+
+    @Override
     protected int getConfiguredGridH() {
       return 4;
     }
