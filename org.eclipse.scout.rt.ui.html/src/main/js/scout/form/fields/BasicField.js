@@ -17,13 +17,13 @@ scout.BasicField = function() {
   this._displayTextModifiedTimeoutId = null;
   this.updateDisplayTextOnModify = false;
   this.focused = false;
-  this.deletable = false;
+  this.clearable = false;
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 
 scout.BasicField.prototype._renderProperties = function() {
   scout.BasicField.parent.prototype._renderProperties.call(this);
-  this._renderDeletable();
+  this._renderClearable();
 };
 
 scout.BasicField.prototype.addContainer = function($parent, cssClass, layout) {
@@ -50,9 +50,9 @@ scout.BasicField.prototype._onFieldFocus = function(event) {
   this.setFocused(true);
 };
 
-scout.BasicField.prototype._onDeletableIconMouseDown = function(event) {
+scout.BasicField.prototype._onClearIconMouseDown = function(event) {
   scout.BasicField.parent.prototype._onIconMouseDown.call(this, event);
-  if (this.deletable) {
+  if (this.clearable) {
     this.clear();
     event.preventDefault();
     return;
@@ -61,14 +61,14 @@ scout.BasicField.prototype._onDeletableIconMouseDown = function(event) {
 
 scout.BasicField.prototype._clear = function() {
   this.$field.val('');
-  this._updateDeletable();
+  this._updateClearable();
 };
 
 scout.BasicField.prototype._onFieldInput = function() {
   if (this.updateDisplayTextOnModify) {
     this._onDisplayTextModified();
   }
-  this._updateDeletable();
+  this._updateClearable();
 };
 
 scout.BasicField.prototype.addField = function($field) {
@@ -80,25 +80,25 @@ scout.BasicField.prototype.addField = function($field) {
   }
 };
 
-scout.BasicField.prototype.addDeletableIcon = function() {
-  this.$deletableIcon = this.$container.appendSpan('delete-icon unfocusable')
-    .on('mousedown', this._onDeletableIconMouseDown.bind(this));
+scout.BasicField.prototype.addClearableIcon = function() {
+  this.$clearIcon = this.$container.appendSpan('delete-icon unfocusable')
+    .on('mousedown', this._onClearIconMouseDown.bind(this));
 };
 
 scout.BasicField.prototype.isFocusOnField = function(target) {
-  return scout.BasicField.parent.prototype.isFocusOnField.call(this, target) || this.$deletableIcon.isOrHas(target);
+  return scout.BasicField.parent.prototype.isFocusOnField.call(this, target) || this.$clearIcon.isOrHas(target);
 };
 
-scout.BasicField.prototype._updateDeletable = function() {
-  this.setDeletable(scout.strings.hasText(this._readDisplayText()) && this.focused);
+scout.BasicField.prototype._updateClearable = function() {
+  this.setClearable(scout.strings.hasText(this._readDisplayText()) && this.focused);
 };
 
-scout.BasicField.prototype.setDeletable = function(deletable) {
-  this.setProperty('deletable', deletable);
+scout.BasicField.prototype.setClearable = function(clearable) {
+  this.setProperty('clearable', clearable);
 };
 
-scout.BasicField.prototype._renderDeletable = function() {
-  this.$container.toggleClass('deletable', this.deletable);
+scout.BasicField.prototype._renderClearable = function() {
+  this.$container.toggleClass('clearable', this.clearable);
 };
 
 scout.BasicField.prototype.setFocused = function(focused) {
@@ -106,7 +106,7 @@ scout.BasicField.prototype.setFocused = function(focused) {
 };
 
 scout.BasicField.prototype._renderFocused = function() {
-  this._updateDeletable();
+  this._updateClearable();
 };
 /**
  * Called when the property 'updateDisplayTextOnModified' is TRUE and the display text (field's input
@@ -136,7 +136,7 @@ scout.BasicField.prototype.acceptInput = function(whileTyping) {
 
 scout.BasicField.prototype._renderDisplayText = function() {
   this.$field.val(this.displayText);
-  this._updateDeletable();
+  this._updateClearable();
 };
 
 scout.BasicField.prototype._readDisplayText = function() {

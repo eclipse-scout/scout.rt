@@ -37,7 +37,7 @@ scout.NumberField.prototype._render = function() {
   this.addMandatoryIndicator();
   var $field = scout.fields.makeTextField(this.$parent);
   this.addField($field);
-  this.addDeletableIcon();
+  this.addClearableIcon();
   this.addStatus();
 };
 

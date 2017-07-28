@@ -133,9 +133,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     this._layoutIcon(formField, fieldBounds, right, top);
   }
 
-  // Deletable icon if present
-  if (formField.$deletableIcon && formField.$field) {
-    this._layoutDeletableIcon(formField, fieldBounds, right, top);
+  // Clearable icon if present
+  if (formField.$clearIcon && formField.$field) {
+    this._layoutClearableIcon(formField, fieldBounds, right, top);
   }
 
   // Make sure tooltip is at correct position after layouting, if there is one
@@ -250,7 +250,7 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
     .cssLineHeight(height);
 };
 
-scout.FormFieldLayout.prototype._layoutDeletableIcon = function(formField, fieldBounds, right, top) {
+scout.FormFieldLayout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
   var height = this.rowHeight;
   var iconWidth = 0;
   if (fieldBounds) {
@@ -258,7 +258,7 @@ scout.FormFieldLayout.prototype._layoutDeletableIcon = function(formField, field
     height = fieldBounds.height;
   }
   if (formField.gridData.horizontalAlignment > 0) {
-    formField.$deletableIcon
+    formField.$clearIcon
       .cssLeft(fieldBounds.x + formField.$field.cssBorderRightWidth())
       .cssTop(top)
       .cssHeight(height)
@@ -267,7 +267,7 @@ scout.FormFieldLayout.prototype._layoutDeletableIcon = function(formField, field
     if (formField.$icon) {
       iconWidth = scout.graphics.prefSize(formField.$icon, true).width;
     }
-    formField.$deletableIcon
+    formField.$clearIcon
       .cssRight(formField.$field.cssBorderRightWidth() + right + iconWidth)
       .cssTop(top)
       .cssHeight(height)
