@@ -13,7 +13,6 @@
  */
 scout.BasicField = function() {
   scout.BasicField.parent.call(this);
-  this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
   this.disabledCopyOverlay = true;
   this._displayTextModifiedTimeoutId = null;
   this.updateDisplayTextOnModify = false;
@@ -24,7 +23,6 @@ scout.inherits(scout.BasicField, scout.ValueField);
 
 scout.BasicField.prototype._renderProperties = function() {
   scout.BasicField.parent.prototype._renderProperties.call(this);
-  this._renderUpdateDisplayTextOnModify();
   this._renderDeletable();
 };
 
@@ -42,14 +40,6 @@ scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplay
   }
 
   this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
-};
-
-scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
-  if (this.updateDisplayTextOnModify) {
-    this.$field.on('input', this._onDisplayTextModifiedHandler);
-  } else {
-    this.$field.off('input', this._onDisplayTextModifiedHandler);
-  }
 };
 
 scout.BasicField.prototype._onFieldBlur = function(event) {
@@ -74,20 +64,23 @@ scout.BasicField.prototype.clear = function() {
   this._updateDeletable();
 };
 
+scout.BasicField.prototype._clear = function() {
+  this.$field.val('');
+};
+
 scout.BasicField.prototype._onFieldInput = function() {
   if (this.updateDisplayTextOnModify) {
     this._onDisplayTextModified();
   }
   this._updateDeletable();
-
 };
 
 scout.BasicField.prototype.addField = function($field) {
   scout.BasicField.parent.prototype.addField.call(this, $field);
   if ($field) {
-    $field.blur(this._onFieldBlur.bind(this))
-      .focus(this._onFieldFocus.bind(this));
-    $field.on('input', this._onFieldInput.bind(this));
+    $field.on('blur', this._onFieldBlur.bind(this))
+      .on('focus', this._onFieldFocus.bind(this))
+      .on('input', this._onFieldInput.bind(this));
   }
 };
 

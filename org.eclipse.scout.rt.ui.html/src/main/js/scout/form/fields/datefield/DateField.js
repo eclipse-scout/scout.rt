@@ -506,20 +506,18 @@ scout.DateField.prototype._renderDateDeletable = function() {
   this.$container.toggleClass('date-deletable', this.dateDeletable);
 };
 
-scout.DateField.prototype.clear = function() {
+scout.DateField.prototype._clear = function() {
   this._removePredictionFields();
   if (this.hasDate) {
-    this._setDateDisplayText(null);
+    this.$dateField.val('');
     this._setDateValid(true);
     this._updateDateDeletable();
   }
   if (this.hasTime) {
-    this._setTimeDisplayText(null);
+    this.$timeField.val('');
     this._setTimeValid(true);
     this._updateTimeDeletable();
   }
-  scout.DateField.parent.prototype.clear.call(this);
-
 };
 
 scout.DateField.prototype._onDateIconMouseDown = function(event) {

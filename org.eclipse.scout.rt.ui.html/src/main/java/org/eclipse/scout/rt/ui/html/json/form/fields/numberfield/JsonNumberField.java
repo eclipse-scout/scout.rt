@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonBasicField;
@@ -39,11 +38,6 @@ public class JsonNumberField<T extends INumberField> extends JsonBasicField<T> {
   @Override
   protected void handleUiAcceptInputAfterTyping(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
-  }
-
-  @Override
-  protected void handleUiClear(JsonEvent event) {
-    getModel().getUIFacade().parseAndSetValueFromUI(null);
   }
 
   @Override

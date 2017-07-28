@@ -28,7 +28,6 @@ scout.SmartField2TouchPopup.prototype._init = function(options) {
   this.setStatus(options.status);
 
   this._field.on('acceptInput acceptInputFail', this._onFieldAcceptInput.bind(this));
-  this._field.on('clear', this._onFieldClear.bind(this));
 };
 
 scout.SmartField2TouchPopup.prototype._initWidget = function(options) {
@@ -61,12 +60,6 @@ scout.SmartField2TouchPopup.prototype._onFieldAcceptInput = function(event) {
   if (!event.errorStatus) {
     this._touchField.setValue(event.value);
   }
-};
-
-scout.SmartField2TouchPopup.prototype._onFieldClear = function(event) {
-  // Delegate to original field
-  this._widget.clearSelection();
-  this._touchField.clear();
 };
 
 scout.SmartField2TouchPopup.prototype._onMouseDownOutside = function(event) {

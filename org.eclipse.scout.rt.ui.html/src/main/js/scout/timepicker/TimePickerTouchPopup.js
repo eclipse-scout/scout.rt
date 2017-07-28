@@ -16,7 +16,6 @@ scout.inherits(scout.TimePickerTouchPopup, scout.TouchPopup);
 scout.TimePickerTouchPopup.prototype._init = function(options) {
   scout.TimePickerTouchPopup.parent.prototype._init.call(this, options);
   this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
-  this._field.on('clear', this._onFieldClear.bind(this));
 };
 
 /**
@@ -54,9 +53,4 @@ scout.TimePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
   if (!event.errorStatus) {
     this._touchField.setValue(event.value);
   }
-};
-
-scout.TimePickerTouchPopup.prototype._onFieldClear = function(event) {
-  // Delegate to original field
-  this._touchField.clear();
 };

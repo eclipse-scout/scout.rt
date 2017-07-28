@@ -567,6 +567,31 @@ describe('ValueField', function() {
 
   });
 
+  describe('clear', function() {
+
+    it('removes the text and accepts input', function() {
+      // Not quite the same as ctrl-a del, but it is easier to handle.
+      // E.g. DateField uses displayText to mark the day when the popup opens. If display text is not set a day might be selected even though input was cleared.
+      var field = helper.createField('StringField');
+      var inputAccepted = false;
+      field.render();
+      field.setValue('abc');
+      field.on('acceptInput', function() {
+        inputAccepted = true;
+      });
+      expect(field.$field.val()).toBe('abc');
+      expect(field.value).toBe('abc');
+      expect(field.displayText).toBe('abc');
+
+      field.clear();
+      expect(field.$field.val()).toBe('');
+      expect(field.value).toBe('');
+      expect(field.displayText).toBe('');
+      expect(inputAccepted).toBe(true);
+    });
+
+  });
+
   describe('validation: initialValue, touched, empty and mandatory', function() {
 
     var field;
