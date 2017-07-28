@@ -100,6 +100,7 @@ describe('SmartField2', function() {
   describe('clear', function() {
 
     it('does not close the popup but does a browse all', function() {
+      // This is especially important for mobile, but makes sense for regular case too.
       var field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open

@@ -663,7 +663,11 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
     return;
   }
   if (!this.embedded) {
-    this.togglePopup();
+    if (this.isDropdown()) {
+      this.togglePopup();
+    } else if (!this.popup) {
+      this.openPopup(true);
+    }
   }
   event.preventDefault();
 };
@@ -983,6 +987,10 @@ scout.SmartField2.prototype._updateClearable = function() {
     return;
   }
   if (!this.$field) {
+    return;
+  }
+  if (this.isDropdown()) {
+    this.setClearable(false);
     return;
   }
   var clearable = scout.strings.hasText(this._readDisplayText());
