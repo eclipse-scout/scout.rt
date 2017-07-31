@@ -39,3 +39,4 @@
 *.exe    binary
 *polite.ini    binary
 *.ise    binary
+*.woff   binary
