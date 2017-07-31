@@ -22,6 +22,17 @@
     }
   }
 
+  &.clearable > .file-input {
+    ~ .icon {
+      cursor: pointer;
+      padding-top: 1px;
+
+      &::before {
+        content: @icon-remove;
+      }
+    }
+  }
+
   & > .legacy-upload-form {
     & > .legacy-upload-file-input {
       padding: 3px;

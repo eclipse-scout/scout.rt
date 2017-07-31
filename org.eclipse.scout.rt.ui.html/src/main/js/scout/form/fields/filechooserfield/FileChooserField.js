@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.FileChooserField = function() {
   scout.FileChooserField.parent.call(this);
+  this.clearable = false;
+  this.focused = false;
 };
 scout.inherits(scout.FileChooserField, scout.ValueField);
 
@@ -45,8 +47,16 @@ scout.FileChooserField.prototype._render = function() {
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderFileInput();
+  this.$field
+    .on('focus', this._onFieldFocus.bind(this))
+    .on('blur', this._onFieldBlur.bind(this));
   this.addIcon();
   this.addStatus();
+};
+
+scout.FileChooserField.prototype._renderProperties = function() {
+  scout.FileChooserField.parent.prototype._renderProperties.call(this);
+  this._renderClearable();
 };
 
 scout.FileChooserField.prototype._renderFileInput = function() {
@@ -69,6 +79,14 @@ scout.FileChooserField.prototype._readDisplayText = function() {
   return this.fileInput.text;
 };
 
+/**
+ * @override
+ */
+scout.FileChooserField.prototype._renderDisplayText = function() {
+  scout.FileChooserField.parent.prototype._renderDisplayText.call(this);
+  this._updateClearable();
+};
+
 scout.FileChooserField.prototype.setAcceptTypes = function(acceptTypes) {
   this.setProperty('acceptTypes', acceptTypes);
   this.fileInput.setAcceptTypes(acceptTypes);
@@ -84,9 +102,47 @@ scout.FileChooserField.prototype.setMaximumUploadSize = function(maximumUploadSi
   this.fileInput.setMaximumUploadSize(maximumUploadSize);
 };
 
+scout.FileChooserField.prototype._updateClearable = function() {
+  this.setClearable(!this.fileInput.legacy && scout.strings.hasText(this._readDisplayText()) && this.focused);
+};
+
+scout.FileChooserField.prototype.setClearable = function(clearable) {
+  this.setProperty('clearable', clearable);
+};
+
+scout.FileChooserField.prototype._renderClearable = function() {
+  this.$container.toggleClass('clearable', this.clearable);
+};
+
+scout.FileChooserField.prototype._clear = function() {
+  this.fileInput.clear();
+};
+
+scout.FileChooserField.prototype.setFocused = function(focused) {
+  this.setProperty('focused', focused);
+};
+
+scout.FileChooserField.prototype._renderFocused = function() {
+  this._updateClearable();
+};
+
+scout.FileChooserField.prototype._onFieldBlur = function(event) {
+  scout.FileChooserField.parent.prototype._onFieldBlur.call(this, event);
+  this.setFocused(false);
+};
+
+scout.FileChooserField.prototype._onFieldFocus = function(event) {
+  this.setFocused(true);
+};
+
 scout.FileChooserField.prototype._onIconMouseDown = function(event) {
   scout.FileChooserField.parent.prototype._onIconMouseDown.call(this, event);
-  this.fileInput.browse();
+
+  if (this.clearable) {
+    this.clear();
+  } else {
+    this.fileInput.browse();
+  }
 };
 
 scout.FileChooserField.prototype._onFileChange = function() {
@@ -95,4 +151,5 @@ scout.FileChooserField.prototype._onFileChange = function() {
   if (!success) {
     this.fileInput.clear();
   }
+  this._updateClearable();
 };
