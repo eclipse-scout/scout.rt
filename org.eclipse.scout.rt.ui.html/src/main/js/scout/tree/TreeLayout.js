@@ -11,6 +11,7 @@
 scout.TreeLayout = function(tree) {
   scout.TreeLayout.parent.call(this);
   this.tree = tree;
+  this.nodeDimensionsDirty = false;
 };
 scout.inherits(scout.TreeLayout, scout.AbstractLayout);
 
@@ -45,7 +46,10 @@ scout.TreeLayout.prototype._layout = function($container) {
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
   // Check if width has changed
-  if (htmlContainer.sizeCached && htmlContainer.sizeCached.width !== htmlContainer.size().width) {
+  this.nodeDimensionsDirty = this.nodeDimensionsDirty ||
+    (htmlContainer.sizeCached && htmlContainer.sizeCached.width !== htmlContainer.size().width);
+  if (this.nodeDimensionsDirty) {
+    this.nodeDimensionsDirty = false;
     if (this.tree.isHorizontalScrollingEnabled()) {
       // Width is only relevant if horizontal scrolling is enabled -> mark as dirty
       this.tree.nodeWidthDirty = true;
@@ -78,5 +82,10 @@ scout.TreeLayout.prototype.preferredLayoutSize = function($container) {
   // This is necessary because the tree does not render the view port on any change (like insert or delete nodes). Instead it just invalidates the layout.
   this.tree._renderViewport();
 
+  // Node dimensions were fixed when calling _renderViewport using the current size, but that size might change during layout
+  // Only necessary the first time it is layouted, afterwards htmlContainer.sizeCached will be set
+  if (!this.tree.htmlComp.layouted) {
+    this.nodeDimensionsDirty = true;
+  }
   return scout.graphics.prefSize($container);
 };
