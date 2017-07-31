@@ -52,7 +52,7 @@ scout.SearchOutline.prototype._render = function() {
   this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
     .on('input', this._createOnQueryFieldInputFunction().bind(this))
     .on('keypress', this._onQueryFieldKeyPress.bind(this));
-  this.$clearIcon = this.$searchPanel.appendSpan('delete-icon unfocusable needsclick')
+  this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable needsclick')
     .on('mousedown', this._onClearIconMouseDown.bind(this));
 
   this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
