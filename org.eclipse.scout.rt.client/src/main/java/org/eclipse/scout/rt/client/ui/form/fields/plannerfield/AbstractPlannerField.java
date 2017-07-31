@@ -51,6 +51,10 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     return ConfigurationUtility.filterClass(dca, IPlanner.class);
   }
 
+  /**
+   * @deprecated will be removed with 7.1
+   */
+  @Deprecated
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(20)
   protected int getConfiguredSplitterPosition() {
@@ -145,11 +149,13 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     getPlanner().disposePlanner();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public int getSplitterPosition() {
     return propertySupport.getPropertyInt(PROP_SPLITTER_POSITION);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setSplitterPosition(int splitterPosition) {
     propertySupport.setPropertyInt(PROP_SPLITTER_POSITION, splitterPosition);

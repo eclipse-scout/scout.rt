@@ -33,6 +33,7 @@ public class JsonPlannerField<PLANNER extends IPlanner<RESOURCE_ID, ACTIVITY_ID>
   protected void initJsonProperties(IPlannerField<PLANNER> model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IPlannerField<PLANNER>>(IPlannerField.PROP_SPLITTER_POSITION, model) {
+      @SuppressWarnings("deprecation")
       @Override
       protected Integer modelValue() {
         return getModel().getSplitterPosition();

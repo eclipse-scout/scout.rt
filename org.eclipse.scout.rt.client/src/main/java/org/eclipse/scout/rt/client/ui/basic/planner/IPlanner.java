@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Range;
 
 /**
- * The activity map is a specialized model which contains a set of {@link Activity}s that are grouped by resource.
+ * The planner contains a list of {@link Resource}s that are associated with 0..n {@link Activity}s.
  *
  * @since 5.1
  */
@@ -76,10 +76,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
    * {@link Activity}
    */
   String PROP_SELECTED_ACTIVITY = "selectedActivity";
-  /**
-   * {@link Object} Container of this planner, {@link IPlannerField}
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   */
   String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
 
@@ -219,11 +215,7 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   void deselectAllResources();
 
   /**
-   * {@link Object}
-   * <p>
-   * Container of this map, {@link IPlannerFieldOld}
-   * <p>
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * Container of this map, typically the {@link IPlannerField}
    *
    * @since 3.8.1
    */
