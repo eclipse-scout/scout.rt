@@ -14,7 +14,8 @@ scout.FileChooserFieldDeleteKeyStroke = function(field) {
   this.which = [scout.keys.DELETE];
   this.stopPropagation = true;
 
-  this.renderingHints.hAlign = scout.hAlign.LEFT;
+  this.renderingHints.offset = 25;
+  this.renderingHints.hAlign = scout.hAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);
@@ -25,5 +26,5 @@ scout.inherits(scout.FileChooserFieldDeleteKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.FileChooserFieldDeleteKeyStroke.prototype.handle = function(event) {
-  this.field.fileInput.clear();
+  this.field.clear();
 };
