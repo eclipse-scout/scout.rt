@@ -46,6 +46,7 @@ scout.BasicField.prototype._onFieldBlur = function(event) {
   scout.BasicField.parent.prototype._onFieldBlur.call(this, event);
   this.setFocused(false);
 };
+
 scout.BasicField.prototype._onFieldFocus = function(event) {
   this.setFocused(true);
 };
@@ -55,7 +56,6 @@ scout.BasicField.prototype._onClearIconMouseDown = function(event) {
   if (this.clearable) {
     this.clear();
     event.preventDefault();
-    return;
   }
 };
 
@@ -80,8 +80,8 @@ scout.BasicField.prototype.addField = function($field) {
   }
 };
 
-scout.BasicField.prototype.addClearableIcon = function() {
-  this.$clearIcon = this.$container.appendSpan('delete-icon unfocusable')
+scout.BasicField.prototype.addClearIcon = function() {
+  this.$clearIcon = this.$container.appendSpan('clear-icon unfocusable')
     .on('mousedown', this._onClearIconMouseDown.bind(this));
 };
 
@@ -108,6 +108,7 @@ scout.BasicField.prototype.setFocused = function(focused) {
 scout.BasicField.prototype._renderFocused = function() {
   this._updateClearable();
 };
+
 /**
  * Called when the property 'updateDisplayTextOnModified' is TRUE and the display text (field's input
  * value) has been modified by a user action, e.g. a key or paste event. If the property is FALSE, this

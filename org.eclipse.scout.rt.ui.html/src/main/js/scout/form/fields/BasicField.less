@@ -1,6 +1,6 @@
 .basic-field.clearable {
 
-  & > .delete-icon {
+  & > .clear-icon {
     position: absolute;
     margin-right: @text-field-padding-x;
     cursor: pointer;
@@ -20,12 +20,12 @@
   & > .field > .input-field {
     padding-right: @text-field-padding-x + 15px;
 
-    &:focus ~ .delete-icon::before,
-    &.focused ~ .delete-icon::before {
+    &:focus ~ .clear-icon::before,
+    &.focused ~ .clear-icon::before {
       color: @text-field-icon-focus-color;
     }
 
-    &.has-error ~ .delete-icon::before {
+    &.has-error ~ .clear-icon::before {
       color: @text-field-icon-error-color;
     }
 
@@ -33,7 +33,7 @@
       padding-right: @text-field-padding-x;
     }
 
-    &.disabled ~ .delete-icon {
+    &.disabled ~ .clear-icon {
       display: none;
     }
 
@@ -41,7 +41,7 @@
       padding-left: @text-field-padding-x + 15px;
       padding-right: @text-field-padding-x;
 
-      ~ .delete-icon {
+      ~ .clear-icon {
         margin-left: @text-field-padding-x;
         margin-right: 0;
       }

@@ -38,13 +38,13 @@
     #scout.glow(@palette-white);
     &.has-text {
       padding-right: @text-field-padding-x + 15px;
-      & ~ .delete-icon {
+      & ~ .clear-icon {
         display: block;
       }
     }
   }
 
-  & ~ .delete-icon {
+  & ~ .clear-icon {
     display: none;
     position: absolute;
     right: 0;
@@ -81,7 +81,7 @@
     margin-left: @outline-title-margin-left;
     width: calc(~'100%' - (@outline-title-margin-left + @outline-title-margin-right));
 
-    & ~ .delete-icon {
+    & ~ .clear-icon {
       margin-right: @outline-title-margin-right;
       padding-right: @text-field-padding-x;
     }

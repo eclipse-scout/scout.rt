@@ -27,19 +27,20 @@
     }
   }
 }
+
 .proposal-field.clearable,
 .smart-field.clearable {
-  & > .icon {
-
-  }
   & > input,
   & > .input-field,
   & > .field > input,
   & > .field > .input-field {
-    #scout.text-field-with-icon(@icon-remove);
     ~ .icon {
       cursor: pointer;
       padding-top: 1px;
+
+      &::before {
+        content: @icon-remove;
+      }
     }
   }
 }
