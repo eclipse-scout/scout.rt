@@ -13,7 +13,6 @@ scout.PlannerField = function() {
   this._addWidgetProperties(['planner']);
 
   this.gridDataHints.weightY = 1.0;
-  this.splitterPosition = 168;
 };
 scout.inherits(scout.PlannerField, scout.FormField);
 
@@ -38,5 +37,3 @@ scout.PlannerField.prototype._removePlanner = function() {
   this.planner.remove();
   this._removeField();
 };
-
-scout.PlannerField.prototype._renderSplitterPosition = function() {};

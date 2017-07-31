@@ -14,9 +14,6 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.shared.data.basic.MemoryOptimizedObject;
 
-/**
- * Representation of an activity containing an ActivityData
- */
 public class Activity<RESOURCE_ID, ACTIVITY_ID> extends MemoryOptimizedObject {
   private static final long serialVersionUID = 1L;
 

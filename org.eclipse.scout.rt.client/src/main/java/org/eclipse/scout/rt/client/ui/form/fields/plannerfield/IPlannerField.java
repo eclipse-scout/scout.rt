@@ -14,28 +14,16 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
- * The planner contains a list of resources that are associated with 0..n timeline activities.<br>
- * As "meeting planner", the subjects are "persons" and the activities are "busy/free" timespans.
- * <p>
- * This class strintly uses java.util.Date staticly AND dynamicly<br>
- * All Date-Objects and subclasses are run through
- * {@link org.eclipse.scout.rt.platform.time.bsiag.DateUtility#toUtilDate(java.util.Date)}()
+ * The planner field is mainly a wrapper for a {@link IPlanner}.
+ *
+ * @see IPlanner
  */
 public interface IPlannerField<P extends IPlanner<?, ?>> extends IFormField {
 
-  String PROP_SPLITTER_POSITION = "splitterPosition";
-
   P getPlanner();
 
-  int getSplitterPosition();
-
-  void setSplitterPosition(int splitterPosition);
-
   /**
-   * (re)load table data
+   * (re)load the resources
    */
   void loadResources();
-
-  IPlannerFieldUIFacade getUIFacade();
-
 }

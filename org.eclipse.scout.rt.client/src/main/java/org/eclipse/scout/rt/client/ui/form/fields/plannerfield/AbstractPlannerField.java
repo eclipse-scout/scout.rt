@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ModelContextProxy;
-import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.IPlannerFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourcesChain;
@@ -24,10 +22,8 @@ import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
-import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -35,7 +31,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 @ClassId("9520b5cc-221e-4d0f-8cc3-5c4a1ba06b77")
 public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<P> {
 
-  private IPlannerFieldUIFacade m_uiFacade;
   private P m_planner;
 
   public AbstractPlannerField() {
@@ -49,12 +44,6 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   private Class<? extends IPlanner> getConfiguredPlanner() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClass(dca, IPlanner.class);
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(20)
-  protected int getConfiguredSplitterPosition() {
-    return 168;
   }
 
   @Override
@@ -112,9 +101,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   @SuppressWarnings("unchecked")
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
-    setSplitterPosition(getConfiguredSplitterPosition());
 
     List<IPlanner> contributedPlanners = m_contributionHolder.getContributionsByClass(IPlanner.class);
     m_planner = (P) CollectionUtility.firstElement(contributedPlanners);
@@ -146,16 +133,6 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   @Override
-  public int getSplitterPosition() {
-    return propertySupport.getPropertyInt(PROP_SPLITTER_POSITION);
-  }
-
-  @Override
-  public void setSplitterPosition(int splitterPosition) {
-    propertySupport.setPropertyInt(PROP_SPLITTER_POSITION, splitterPosition);
-  }
-
-  @Override
   public final P getPlanner() {
     return m_planner;
   }
@@ -163,24 +140,6 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   @Override
   public void loadResources() {
     interceptPopulateResources();
-  }
-
-  @Override
-  public IPlannerFieldUIFacade getUIFacade() {
-    return m_uiFacade;
-  }
-
-  protected class P_UIFacade implements IPlannerFieldUIFacade {
-
-    @Override
-    public void refreshFromUI() {
-      loadResources();
-    }
-
-    @Override
-    public void setSplitterPositionFromUI(Integer value) {
-      propertySupport.setPropertyNoFire(PROP_SPLITTER_POSITION, value);
-    }
   }
 
   protected final List<Resource<RI>> interceptLoadResources() {

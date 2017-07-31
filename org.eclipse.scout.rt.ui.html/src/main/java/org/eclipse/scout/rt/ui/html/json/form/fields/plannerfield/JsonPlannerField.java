@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
@@ -27,17 +26,6 @@ public class JsonPlannerField<PLANNER extends IPlanner<RESOURCE_ID, ACTIVITY_ID>
   @Override
   public String getObjectType() {
     return "PlannerField";
-  }
-
-  @Override
-  protected void initJsonProperties(IPlannerField<PLANNER> model) {
-    super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IPlannerField<PLANNER>>(IPlannerField.PROP_SPLITTER_POSITION, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getSplitterPosition();
-      }
-    });
   }
 
   @Override

@@ -114,9 +114,6 @@
       "dropType": 0,
       "dropMaximumSize": 52428800
     },
-    "PlannerField": {
-      "splitterPosition": 168
-    },
     "Planner": {
       "activitySelectable": false,
       "availableDisplayModes": [],
