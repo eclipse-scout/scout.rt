@@ -104,7 +104,7 @@ describe("scout.promises", function() {
   it("adds all result arguments, one for each deferred", function(done) {
     var deferredArray = scout.arrays.init(3, null).map(function() { return new $.Deferred(); });
     var promiseCreator = new scout.PromiseCreator(deferredArray.map(function(v, i) { return function() { return deferredArray[i].promise(); }; }));
-    scout.promises.oneByOne(promiseCreator).then(function() {
+    scout.promises.groupwise(4, promiseCreator).then(function() {
       expect(arguments).toBeTruthy();
       expect(arguments.length).toBe(3);
       // same behavior as if multiple Deferred or Promise or Thenable objects have been used with $.when or $.promiseAll method
@@ -119,8 +119,13 @@ describe("scout.promises", function() {
       fail('Unexpected code branch');
       done();
     });
-    deferredArray[0].resolve();
-    deferredArray[1].resolve('Foo');
+    // resolve order 2, 1, 0
+    deferredArray[1].then(function() {
+      setTimeout(deferredArray[0].resolve.bind(deferredArray[0]));
+    });
+    deferredArray[2].then(function() {
+      setTimeout(deferredArray[1].resolve.bind(deferredArray[1], 'Foo'));
+    });
     deferredArray[2].resolve('Bar', true);
   });
 

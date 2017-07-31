@@ -150,9 +150,10 @@ scout.PromiseCreator.prototype.hasNext = function() {
 };
 
 scout.PromiseCreator.prototype.next = function() {
+  var thisItem = this.currentItem;
   return this.createPromise()
     .done(function() {
-      this._addResults.apply(this, arguments);
+      this._addResults.apply(this, [thisItem, scout.objects.argumentsToArray(arguments)]);
     }.bind(this))
     .fail(function() {
       this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
@@ -173,15 +174,14 @@ scout.PromiseCreator.prototype._createPromise = function() {
   return this.items[this.currentItem]();
 };
 
-scout.PromiseCreator.prototype._addResults = function() {
-  var result = scout.objects.argumentsToArray(arguments);
+scout.PromiseCreator.prototype._addResults = function(index, result) {
   if (result.length === 0) {
     result = undefined;
   }
   else if (result.length === 1) {
     result = result[0];
   }
-  this.results.push(result);
+  this.results[index] = result;
 };
 
 scout.PromiseCreator.prototype.abort = function() {
