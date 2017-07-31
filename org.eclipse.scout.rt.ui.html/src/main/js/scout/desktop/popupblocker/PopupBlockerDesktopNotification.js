@@ -7,7 +7,7 @@ scout.inherits(scout.PopupBlockerDesktopNotification, scout.DesktopNotification)
 
 scout.PopupBlockerDesktopNotification.prototype._init = function(model) {
   scout.PopupBlockerDesktopNotification.parent.prototype._init.call(this, model);
-  this.linkText = this.session.text('ui.OpenManually');
+  this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));
   this._setStatus({
     message: this.session.text('ui.PopupBlockerDetected'),
     severity: scout.Status.Severity.WARNING

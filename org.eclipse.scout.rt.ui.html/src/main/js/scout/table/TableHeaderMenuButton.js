@@ -12,9 +12,7 @@ scout.inherits(scout.TableHeaderMenuButton, scout.Widget);
 
 scout.TableHeaderMenuButton.prototype._init = function(options) {
   scout.TableHeaderMenuButton.parent.prototype._init.call(this, options);
-  $.extend(this, options);
-  this.text = this.session.text(this.textKey);
-  this.visible = scout.nvl(options.visible, true);
+  this.text = scout.nvl(this.text, this.session.text(this.textKey));
 };
 
 /**

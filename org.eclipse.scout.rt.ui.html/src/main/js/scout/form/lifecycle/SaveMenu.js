@@ -17,9 +17,9 @@ scout.SaveMenu = function() {
 };
 scout.inherits(scout.SaveMenu, scout.Menu);
 
-scout.SaveMenu.prototype.init = function(model) {
-  scout.SaveMenu.parent.prototype.init.call(this, model);
-  this.text = this.session.text('SaveButton');
+scout.SaveMenu.prototype._init = function(model) {
+  scout.SaveMenu.parent.prototype._init.call(this, model);
+  this.text = scout.nvl(this.text, this.session.text('SaveButton'));
 };
 
 scout.SaveMenu.prototype.getForm = function() {

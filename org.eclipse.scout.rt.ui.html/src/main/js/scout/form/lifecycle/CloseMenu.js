@@ -17,9 +17,9 @@ scout.CloseMenu = function() {
 };
 scout.inherits(scout.CloseMenu, scout.Menu);
 
-scout.CloseMenu.prototype.init = function(model) {
-  scout.CloseMenu.parent.prototype.init.call(this, model);
-  this.text = this.session.text('CloseButton');
+scout.CloseMenu.prototype._init = function(model) {
+  scout.CloseMenu.parent.prototype._init.call(this, model);
+  this.text = scout.nvl(this.text, this.session.text('CloseButton'));
 };
 
 scout.CloseMenu.prototype.getForm = function() {

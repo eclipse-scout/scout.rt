@@ -18,7 +18,7 @@ scout.DateField = function() {
   this.dateFormatPattern;
   this.disabledCopyOverlay = true;
   this.hasDate = true;
-  this.oldDisplayText = '';
+  this.oldDisplayText = null;
 
   this.hasTime = false;
   this.hasTimePopup = true;

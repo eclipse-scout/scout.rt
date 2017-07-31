@@ -17,9 +17,9 @@ scout.CancelMenu = function() {
 };
 scout.inherits(scout.CancelMenu, scout.Menu);
 
-scout.CancelMenu.prototype.init = function(model) {
-  scout.CancelMenu.parent.prototype.init.call(this, model);
-  this.text = this.session.text('CancelButton');
+scout.CancelMenu.prototype._init = function(model) {
+  scout.CancelMenu.parent.prototype._init.call(this, model);
+  this.text = scout.nvl(this.text, this.session.text('CancelButton'));
 };
 
 scout.CancelMenu.prototype.getForm = function() {

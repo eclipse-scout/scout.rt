@@ -16,9 +16,9 @@ scout.ResetMenu = function() {
 };
 scout.inherits(scout.ResetMenu, scout.Menu);
 
-scout.ResetMenu.prototype.init = function(model) {
-  scout.ResetMenu.parent.prototype.init.call(this, model);
-  this.text = this.session.text('ResetButton');
+scout.ResetMenu.prototype._init = function(model) {
+  scout.ResetMenu.parent.prototype._init.call(this, model);
+  this.text = scout.nvl(this.text, this.session.text('ResetButton'));
 };
 
 scout.ResetMenu.prototype.getForm = function() {

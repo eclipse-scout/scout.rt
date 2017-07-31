@@ -20,8 +20,7 @@ scout.inherits(scout.TableHeaderMenuGroup, scout.Widget);
 
 scout.TableHeaderMenuGroup.prototype._init = function(options) {
   scout.TableHeaderMenuGroup.parent.prototype._init.call(this, options);
-  $.extend(this, options);
-  this.text = this.session.text(this.textKey);
+  this.text = scout.nvl(this.text, this.session.text(this.textKey));
 };
 
 scout.TableHeaderMenuGroup.prototype._render = function() {
