@@ -53,10 +53,6 @@
       "visible": true,
       "selected": false,
       "horizontalAlignment": -1,
-      "iconId": "",
-      "tooltipText": "",
-      "text": "",
-      "cssClass": "",
       "toggleAction": false,
       "keyStroke": null,
       "keyStrokeFirePolicy": 0
@@ -303,7 +299,6 @@
       "horizontalAlignment": -1,
       "htmlEnabled": false,
       "editable": false,
-      "errorStatus": "",
       "mandatory": false
     },
     "TableRow": {

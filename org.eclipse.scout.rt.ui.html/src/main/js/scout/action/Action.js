@@ -13,10 +13,10 @@ scout.Action = function() {
 
   this.selected = false;
   this.horizontalAlignment = -1;
-  this.iconId = '';
-  this.tooltipText = '';
-  this.text = '';
-  this.cssClass = '';
+  this.iconId = null;
+  this.tooltipText = null;
+  this.text = null;
+  this.cssClass = null;
   this.toggleAction = false;
   this.keyStroke = null;
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;

@@ -17,9 +17,9 @@ scout.OkMenu = function() {
 };
 scout.inherits(scout.OkMenu, scout.Menu);
 
-scout.OkMenu.prototype.init = function(model) {
-  scout.OkMenu.parent.prototype.init.call(this, model);
-  this.text = this.session.text('OkButton');
+scout.OkMenu.prototype._init = function(model) {
+  scout.OkMenu.parent.prototype._init.call(this, model);
+  this.text = scout.nvl(this.text, this.session.text('OkButton'));
 };
 
 scout.OkMenu.prototype.getForm = function() {

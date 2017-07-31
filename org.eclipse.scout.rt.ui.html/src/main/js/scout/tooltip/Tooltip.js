@@ -14,7 +14,7 @@ scout.Tooltip = function() {
   /**
    * Either a String or a function which returns a String
    */
-  this.text = '';
+  this.text = null;
 
   this.arrowPosition = 25;
   this.arrowPositionUnit = '%';
@@ -165,7 +165,7 @@ scout.Tooltip.prototype.setSeverity = function(severity) {
 };
 
 scout.Tooltip.prototype._renderText = function() {
-  var text = this.text;
+  var text = this.text || '';
   if (this.htmlEnabled) {
     this.$content.html(text);
   } else {
