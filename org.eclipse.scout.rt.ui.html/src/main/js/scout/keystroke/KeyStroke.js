@@ -31,6 +31,7 @@ scout.KeyStroke = function() {
         return true; // by default, keystrokes are rendered
       }
     }.bind(this),
+    gap: 4,
     offset: 4,
     hAlign: scout.hAlign.LEFT,
     text: null,
@@ -204,15 +205,52 @@ scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
     return null;
   }
 
-  var $keyBox = scout.keyStrokeBox.drawSingleKeyBoxItem(
-    this.renderingHints.offset,
-    this.renderingHints.text || scout.codesToKeys[event.which],
-    $drawingArea,
-    this.ctrl, this.alt, this.shift,
-    this.renderingHints.hAlign === scout.hAlign.RIGHT);
-
+  var $keyBox = this._renderKeyBox($drawingArea, event.which);
   this._postRenderKeyBox($drawingArea, $keyBox);
   return $drawingArea;
+};
+
+scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
+  var $existingKeyBoxes = $('.key-box', $parent);
+  var text = this.renderingHints.text || scout.codesToKeys[keyCode];
+  var align = this.renderingHints.hAlign === scout.hAlign.RIGHT ? 'right' : 'left';
+  var offset = this.renderingHints.offset;
+  $existingKeyBoxes = $existingKeyBoxes.filter(function() {
+    if (align === 'right') {
+      return $(this).hasClass('right');
+    }
+    return !$(this).hasClass('right');
+  });
+  if ($existingKeyBoxes.length > 0) {
+    var $boxLastAdded = $existingKeyBoxes.first();
+    if (this.renderingHints.hAlign === scout.hAlign.RIGHT) {
+      offset = $parent.outerWidth() - $boxLastAdded.position().left + this.renderingHints.gap;
+    } else {
+      offset = $boxLastAdded.position().left + this.renderingHints.gap + $boxLastAdded.outerWidth();
+    }
+  }
+  if (this.shift) {
+    text = 'Shift ' + text;
+  }
+  if (this.alt) {
+    text = 'Alt ' + text;
+  }
+  if (this.ctrl) {
+    text = 'Ctrl ' + text;
+  }
+  var position = $parent.css('position');
+  if (position === 'absolute' || position === 'relative' || (position === 'static' && $existingKeyBoxes.length > 0)) {
+    return $parent.prependDiv('key-box ', text)
+      .css(align, offset + 'px')
+      .addClass(align);
+  }
+  var pos = $parent.position();
+  if (pos) {
+    return $parent.prependDiv('key-box ', text)
+      .css(align, (pos.left + offset) + 'px')
+      .addClass(align);
+  }
+  $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $parent=' + $parent);
 };
 
 /**
