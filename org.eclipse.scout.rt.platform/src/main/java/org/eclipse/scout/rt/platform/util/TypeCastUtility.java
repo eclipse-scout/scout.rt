@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -1988,7 +1989,7 @@ public final class TypeCastUtility {
           desc.parameterizedTypeIndex = 0;
           TypeVariable<?>[] vars = c.getTypeParameters();
           for (int i = 0; i < vars.length; i++) {
-            if (vars[i] == desc.typeVariable) {
+            if (Objects.equals(vars[i], desc.typeVariable)) {
               if (debugEnabled) {
                 LOG.debug("{} has index {}", desc.typeVariable, i);
               }
