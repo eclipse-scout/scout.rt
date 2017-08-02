@@ -177,7 +177,7 @@ scout.Menu.prototype._renderSubMenuIcon = function() {
   var shouldBeVisible = this.childActions.length > 0 && this.text;
 
   if (shouldBeVisible) {
-    if (this.$submenuIcon === null) {
+    if (!this.$submenuIcon) {
       this.$submenuIcon = this.$container.appendSpan('submenu-icon');
       this.invalidateLayoutTree();
     }
