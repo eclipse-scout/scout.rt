@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -1994,18 +1995,21 @@ public final class TypeCastUtility {
         if (debugEnabled) {
           LOG.debug("visit {}", VerboseUtility.dumpGenerics(c));
         }
-        if (desc.resolvedClazz == null) {
+        if (desc.resolvedClazz == null && desc.typeVariable != null) {
           //find the index of the typeParameter
-          desc.parameterizedTypeIndex = 0;
+          desc.parameterizedTypeIndex = -1;
           TypeVariable<?>[] vars = c.getTypeParameters();
           for (int i = 0; i < vars.length; i++) {
-            if (vars[i] == desc.typeVariable) {
+            if (Objects.equals(vars[i], desc.typeVariable)) {
               if (debugEnabled) {
                 LOG.debug("{} has index {}", desc.typeVariable, i);
               }
               desc.parameterizedTypeIndex = i;
               break;
             }
+          }
+          if (desc.parameterizedTypeIndex == -1) {
+            throw new IllegalStateException("Unable to resolve type variable " + desc.typeVariable + " for " + c + ".");
           }
         }
         return true;
