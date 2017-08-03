@@ -352,6 +352,31 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(true);
       });
 
+      it('opens the bench again if a view is shown right after the last view was closed', function() {
+        var form = formHelper.createViewWithOneField();
+        var form2 = formHelper.createViewWithOneField();
+        expect(form.rendered).toBe(false);
+        expect(form2.rendered).toBe(false);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
+
+        desktop.showForm(form);
+        expect(form.rendered).toBe(true);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+
+        // Close the form and open another one while the bench is removing due to the close of the previous form
+        form.close();
+        desktop.showForm(form2);
+        expect(desktop.bench.removalPending).toBe(true);
+        jasmine.clock().tick();
+        desktop.bench.$container.trigger('animationend');
+        jasmine.clock().tick();
+        expect(form2.rendered).toBe(true);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+      });
+
       it('hides bench and shows navigation if the last view gets closed', function() {
         var form1 = formHelper.createViewWithOneField();
         var form2 = formHelper.createViewWithOneField();

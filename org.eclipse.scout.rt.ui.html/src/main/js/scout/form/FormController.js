@@ -139,6 +139,10 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     // Show bench and hide navigation if this is the first view to be shown
     this.session.desktop.sendOutlineToBack();
     this.session.desktop.switchToBench();
+  } else if (this.session.desktop.bench.removalPending) {
+    // If a new form should be shown while the bench is being removed because the last form was closed, schedule the rendering to make sure the bench and the new form will be opened right after the bench has been removed
+    setTimeout(this._renderView.bind(this, view, register, position, selectView));
+    return;
   }
   this.session.desktop.bench.addView(view, selectView);
 };
