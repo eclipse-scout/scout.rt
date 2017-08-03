@@ -793,8 +793,8 @@ scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTar
   }, this);
 };
 
-scout.Desktop.prototype.showForm = function(form, displayParent, position) {
-  displayParent = displayParent || this;
+scout.Desktop.prototype.showForm = function(form, position) {
+  var displayParent = form.displayParent || this;
 
   this._setFormActivated(form);
   // register listener to recover active form when child dialog is removed
