@@ -176,11 +176,9 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   }
 
   dialog.on('remove', function() {
-    if (this.displayParent.dialogs.length > 0) {
-      desktop._setFormActivated(this.displayParent.dialogs[this.displayParent.dialogs.length - 1]);
-    } else if (this.displayParent instanceof scout.Form && !this.displayParent.detailForm) {
-      // activate display parent, but not if it is the detail form
-      desktop._setFormActivated(this.displayParent);
+    var formToActivate = this._findFormToActivateAfterDialogRemove();
+    if (formToActivate) {
+      desktop._setFormActivated(formToActivate);
     } else {
       desktop._setOutlineActivated();
     }
@@ -196,6 +194,23 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     // Only display the dialog if its 'displayParent' is visible to the user.
     if (!this.displayParent.inFront()) {
       dialog.detach();
+    }
+  }
+};
+
+scout.FormController.prototype._findFormToActivateAfterDialogRemove = function() {
+  if (this.displayParent.dialogs.length > 0) {
+    return this.displayParent.dialogs[this.displayParent.dialogs.length - 1];
+  }
+  if (this.displayParent instanceof scout.Form && !this.displayParent.detailForm) {
+    // activate display parent, but not if it is the detail form
+    return this.displayParent;
+  }
+  var desktop = this.session.desktop;
+  if (desktop.bench) {
+    var form = desktop.bench.activeViews()[0];
+    if (form && !form.detailForm) {
+      return form;
     }
   }
 };

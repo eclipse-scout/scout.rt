@@ -325,6 +325,91 @@ describe('Desktop', function() {
 
   });
 
+  describe('activeForm', function() {
+
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
+    it('will be set to the display parent form if dialog closes', function() {
+      var dialogParent = formHelper.createFormWithOneField({
+        displayHint: 'dialog'
+      });
+      var dialog = formHelper.createFormWithOneField({
+        displayHint: 'dialog',
+        displayParent: dialogParent
+      });
+      dialogParent.open();
+      expect(desktop.activeForm).toBe(dialogParent);
+
+      dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      dialog.close();
+      expect(desktop.activeForm).toBe(dialogParent);
+    });
+
+    it('will be set to currentView if dialog closes and there is no display parent form', function() {
+      var view = formHelper.createFormWithOneField({
+        displayHint: 'view'
+      });
+      var dialog = formHelper.createFormWithOneField({
+        displayHint: 'dialog'
+      });
+      view.open();
+      expect(desktop.activeForm).toBe(view);
+
+      dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      dialog.close();
+      expect(desktop.activeForm).toBe(view);
+    });
+
+    it('will be set to undefined if dialog closes and there is no currentView and no display parent', function() {
+      var dialog = formHelper.createFormWithOneField({
+        displayHint: 'dialog'
+      });
+      dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      dialog.close();
+      expect(desktop.activeForm).toBeUndefined();
+    });
+
+    it('must not be the detail form', function() {
+      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+      var detailForm = outline.nodes[0].detailForm;
+      var dialog = formHelper.createFormWithOneField({
+        displayHint: 'dialog'
+      });
+      dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      dialog.close();
+      expect(desktop.activeForm).toBeUndefined();
+    });
+
+    it('must not be the detail form even if it is the display parent', function() {
+      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+      var detailForm = outline.nodes[0].detailForm;
+      var dialog = formHelper.createFormWithOneField({
+        displayHint: 'dialog',
+        displayParent: detailForm
+      });
+      dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      dialog.close();
+      expect(desktop.activeForm).toBeUndefined();
+    });
+
+  });
+
   describe('displayStyle', function() {
 
     describe('COMPACT', function() {

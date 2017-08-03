@@ -12,17 +12,18 @@ scout.FormSpecHelper = function(session) {
   this.session = session;
 };
 
-scout.FormSpecHelper.prototype.createViewWithOneField = function(parent) {
-  var form = this.createFormWithOneField(parent);
+scout.FormSpecHelper.prototype.createViewWithOneField = function(model) {
+  var form = this.createFormWithOneField(model);
   form.displayHint = scout.Form.DisplayHint.VIEW;
   return form;
 };
 
-scout.FormSpecHelper.prototype.createFormWithOneField = function(parent) {
-  parent = scout.nvl(parent, this.session.desktop);
-  var form = scout.create('Form', {
-    parent: parent
-  });
+scout.FormSpecHelper.prototype.createFormWithOneField = function(model) {
+  var defaults = {
+    parent: this.session.desktop
+  };
+  model = $.extend({}, defaults, model);
+  var form = scout.create('Form', model);
   var rootGroupBox = this.createGroupBoxWithFields(form, 1);
   form._setRootGroupBox(rootGroupBox);
   return form;
