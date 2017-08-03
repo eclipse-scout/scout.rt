@@ -83,7 +83,7 @@ public class DefaultExceptionMapperTest {
 
   @Test
   public void testToResponseWebApplicationException() {
-    DefaultExceptionMapper mapper = new DefaultExceptionMapper();
+    WebApplicationExceptionMapper mapper = new WebApplicationExceptionMapper();
     WebApplicationException webException = new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
     Response response = mapper.toResponse(webException);
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
