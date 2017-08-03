@@ -7,11 +7,9 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
-import org.eclipse.scout.rt.rest.IRestResource;
-import org.eclipse.scout.rt.rest.ObjectMapperResolver;
-import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.rest.exception.DefaultExceptionMapper;
 import org.eclipse.scout.rt.rest.exception.VetoExceptionMapper;
+import org.eclipse.scout.rt.rest.exception.WebApplicationExceptionMapper;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,8 +40,9 @@ public class RestApplicationTest {
   public void testGetClasses() {
     RestApplication app = new RestApplication();
     Set<Class<?>> classes = app.getClasses();
-    assertTrue(classes.contains(VetoExceptionMapper.class));
     assertTrue(classes.contains(DefaultExceptionMapper.class));
+    assertTrue(classes.contains(VetoExceptionMapper.class));
+    assertTrue(classes.contains(WebApplicationExceptionMapper.class));
     assertTrue(classes.contains(ObjectMapperResolver.class));
     assertTrue(classes.contains(FixtureResource.class));
   }

@@ -27,11 +27,11 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
 
   @Override
   public Response toResponseImpl(Exception exception) {
-    if (exception instanceof WebApplicationException) {
-      return ((WebApplicationException) exception).getResponse();
-    }
+    LOG.error("Exception occured while processing rest request", exception);
+    return createResponse(exception);
+  }
 
-    LOG.error("Exception while processing rest request", exception);
+  protected Response createResponse(Exception exception) {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
 }
