@@ -766,3 +766,16 @@ scout.DesktopBench.prototype.getTabs = function() {
   tabs = tabs.concat(this.getTabBox('SE').getController().getTabs());
   return tabs;
 };
+
+/**
+ * @returns all the currently active views (the selected ones) of all the visible tab boxes
+ */
+scout.DesktopBench.prototype.activeViews = function() {
+  var activeViews = [];
+  this.visibleColumns().forEach(function(column) {
+    column.visibleTabBoxes().forEach(function(tabBox) {
+      activeViews.push(tabBox.currentView);
+    });
+  });
+  return activeViews;
+};
