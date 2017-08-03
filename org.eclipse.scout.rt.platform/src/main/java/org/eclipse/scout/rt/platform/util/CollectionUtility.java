@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -773,7 +772,7 @@ public final class CollectionUtility {
     if (c == null) {
       return 0;
     }
-    return Arrays.hashCode(c.toArray());
+    return c.hashCode();
   }
 
   // TODO [7.0] abr: ???
