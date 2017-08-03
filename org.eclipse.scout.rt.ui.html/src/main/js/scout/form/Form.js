@@ -182,7 +182,7 @@ scout.Form.prototype._createLifecycle = function() {
  */
 scout.Form.prototype.open = function() {
   this.displayParent = this.displayParent || this.session.desktop;
-  this.session.desktop.showForm(this, this.displayParent);
+  this.session.desktop.showForm(this);
   return this.load();
 };
 
