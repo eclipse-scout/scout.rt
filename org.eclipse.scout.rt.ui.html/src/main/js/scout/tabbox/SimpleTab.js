@@ -355,7 +355,7 @@ scout.SimpleTab.prototype._onMouseDown = function(event) {
 
 scout.SimpleTab.prototype._onClose = function() {
   if (this.view) {
-    this.view.close();
+    this.view.abort();
   }
 };
 
