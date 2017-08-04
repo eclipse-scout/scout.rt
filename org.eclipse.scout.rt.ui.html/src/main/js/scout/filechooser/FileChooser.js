@@ -158,11 +158,22 @@ scout.FileChooser.prototype.upload = function() {
   }
 };
 
+scout.FileChooser.prototype.setDisplayParent = function(displayParent) {
+  this.setProperty('displayParent', displayParent);
+};
+
+scout.FileChooser.prototype._setDisplayParent = function(displayParent) {
+  this._setProperty('displayParent', displayParent);
+  if (displayParent) {
+    this.setParent(displayParent);
+  }
+};
+
 /**
  * Renders the file chooser and links it with the display parent.
  */
 scout.FileChooser.prototype.open = function() {
-  this.displayParent = this.displayParent || this.session.desktop;
+  this.setDisplayParent(this.displayParent || this.session.desktop);
   this.displayParent.fileChooserController.registerAndRender(this);
 };
 
@@ -191,8 +202,9 @@ scout.FileChooser.prototype.cancel = function() {
  * Destroys the file chooser and unlinks it from the display parent.
  */
 scout.FileChooser.prototype._close = function() {
-  this.displayParent = this.displayParent || this.session.desktop;
-  this.displayParent.fileChooserController.unregisterAndRemove(this);
+  if (this.displayParent) {
+    this.displayParent.fileChooserController.unregisterAndRemove(this);
+  }
   this.destroy();
 };
 

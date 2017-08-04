@@ -408,6 +408,20 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBeUndefined();
     });
 
+    it('must be a form', function() {
+      var outline = outlineHelper.createOutlineWithOneDetailTable();
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+      var dialog = formHelper.createFormWithOneField({
+        displayHint: 'dialog'
+      });
+      dialog.open();
+      expect(desktop.activeForm).toBe(dialog);
+
+      dialog.close();
+      expect(desktop.activeForm).toBeUndefined();
+    });
+
   });
 
   describe('displayStyle', function() {

@@ -58,7 +58,7 @@ scout.nvl = function() {
 
 /**
  * Use this method in your functions to assert that a mandatory parameter is passed
- * to the function. Throws an Error when value is not set.
+ * to the function. Throws an error when value is not set.
  *
  * @param type (optional) if this parameter is set, the given value must be of this type (instanceof check)
  * @return the value (for direct assignment)
@@ -69,6 +69,23 @@ scout.assertParameter = function(parameterName, value, type) {
   }
   if (type && !(value instanceof type)) {
     throw new Error('Parameter \'' + parameterName + '\' has wrong type');
+  }
+  return value;
+};
+
+/**
+ * Use this method to assert that a mandatory property is set. Throws an error when value is not set.
+ *
+ * @param type (optional) if this parameter is set, the value must be of this type (instanceof check)
+ * @return the value (for direct assignment)
+ */
+scout.assertProperty = function(object, propertyName, type) {
+  var value = object[propertyName];
+  if (scout.objects.isNullOrUndefined(value)) {
+    throw new Error('Missing required property \'' + propertyName + '\'');
+  }
+  if (type && !(value instanceof type)) {
+    throw new Error('Property \'' + propertyName + '\' has wrong type');
   }
   return value;
 };

@@ -158,6 +158,9 @@ scout.Page.prototype.pageForTableRow = function(row) {
 
 scout.Page.prototype.setDetailForm = function(form) {
   this.detailForm = form;
+  if (this.detailForm) {
+    this.detailForm.setModal(false);
+  }
 };
 
 scout.Page.prototype.setDetailTable = function(table) {

@@ -795,6 +795,7 @@ scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTar
 
 scout.Desktop.prototype.showForm = function(form, position) {
   var displayParent = form.displayParent || this;
+  form.setDisplayParent(displayParent);
 
   this._setFormActivated(form);
   // register listener to recover active form when child dialog is removed

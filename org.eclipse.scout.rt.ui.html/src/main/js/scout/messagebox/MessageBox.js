@@ -190,11 +190,22 @@ scout.MessageBox.prototype._onButtonClick = function(event, option) {
   });
 };
 
+scout.MessageBox.prototype.setDisplayParent = function(displayParent) {
+  this.setProperty('displayParent', displayParent);
+};
+
+scout.MessageBox.prototype._setDisplayParent = function(displayParent) {
+  this._setProperty('displayParent', displayParent);
+  if (displayParent) {
+    this.setParent(displayParent);
+  }
+};
+
 /**
  * Renders the message box and links it with the display parent.
  */
 scout.MessageBox.prototype.open = function() {
-  this.displayParent = this.displayParent || this.session.desktop;
+  this.setDisplayParent(this.displayParent || this.session.desktop);
   this.displayParent.messageBoxController.registerAndRender(this);
 };
 
@@ -202,8 +213,9 @@ scout.MessageBox.prototype.open = function() {
  * Destroys the message box and unlinks it from the display parent.
  */
 scout.MessageBox.prototype.close = function() {
-  this.displayParent = this.displayParent || this.session.desktop;
-  this.displayParent.messageBoxController.unregisterAndRemove(this);
+  if (this.displayParent) {
+    this.displayParent.messageBoxController.unregisterAndRemove(this);
+  }
   this.destroy();
 };
 

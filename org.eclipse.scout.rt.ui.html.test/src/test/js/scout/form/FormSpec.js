@@ -9,14 +9,21 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe('Form', function() {
-  var session, helper;
+  var session, helper, outlineHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
-    session = sandboxSession();
+    session = sandboxSession({
+      desktop: {
+        headerVisible: true,
+        navigationVisible: true,
+        benchVisible: true
+      }
+    });
     helper = new scout.FormSpecHelper(session);
+    outlineHelper = new scout.OutlineSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
 
@@ -181,6 +188,119 @@ describe('Form', function() {
       form.cacheBounds = false;
       form.updateCacheBounds();
       expect(form.readCacheBounds()).toBe(null);
+    });
+
+  });
+
+  describe('modal', function() {
+
+    it('creates a glass pane if true', function() {
+      var form = helper.createFormWithOneField({
+        modal: true
+      });
+      form.open();
+      expect($('.glasspane').length).toBe(3);
+      form.close();
+      expect($('.glasspane').length).toBe(0);
+    });
+
+    it('does not create a glass pane if false', function() {
+      var form = helper.createFormWithOneField({
+        modal: false
+      });
+      form.open();
+      expect($('.glasspane').length).toBe(0);
+      form.close();
+      expect($('.glasspane').length).toBe(0);
+    });
+
+  });
+
+  describe('displayParent', function() {
+    var desktop;
+
+    beforeEach(function() {
+      desktop = session.desktop;
+    });
+
+    it('is required if form is managed by a form controller, defaults to desktop', function() {
+      var form = helper.createFormWithOneField();
+      expect(form.displayParent).toBeUndefined();
+      form.open();
+      expect(form.displayParent).toBe(desktop);
+      form.close();
+    });
+
+    it('is not required if form is just rendered', function() {
+      var form = helper.createFormWithOneField();
+      expect(form.displayParent).toBeUndefined();
+      form.render();
+      expect(form.displayParent).toBeUndefined();
+      form.destroy();
+    });
+
+    it('always same as parent if display parent is set', function() {
+      // Parent would be something different, removing the parent would remove the form which is not expected, because only removing the display parent has to remove the form
+      var initialParent = new scout.NullWidget();
+      var form = helper.createFormWithOneField({
+        parent: initialParent,
+        session: session
+      });
+      expect(form.displayParent).toBeUndefined();
+      expect(form.parent).toBe(initialParent);
+      form.open();
+      expect(form.displayParent).toBe(desktop);
+      expect(form.parent).toBe(desktop);
+      form.close();
+    });
+
+    it('blocks desktop if modal and displayParent is desktop', function() {
+      var form = helper.createFormWithOneField({
+        modal: true,
+        displayParent: desktop
+      });
+      form.open();
+      expect($('.glasspane').length).toBe(3);
+      expect(desktop.navigation.$container.children('.glasspane').length).toBe(1);
+      expect(desktop.bench.$container.children('.glasspane').length).toBe(1);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(1);
+      form.close();
+      expect($('.glasspane').length).toBe(0);
+    });
+
+    it('blocks detail form and outline if modal and displayParent is outline', function() {
+      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+      var form = helper.createFormWithOneField({
+        modal: true,
+        displayParent: outline
+      });
+      form.open();
+      expect($('.glasspane').length).toBe(2);
+      expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
+      expect(outline.nodes[0].detailForm.$container.children('.glasspane').length).toBe(1);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(0);
+      form.close();
+      expect($('.glasspane').length).toBe(0);
+    });
+
+    it('blocks form if modal and displayParent is form', function() {
+      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      var detailForm = outline.nodes[0].detailForm;
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+      var form = helper.createFormWithOneField({
+        modal: true,
+        displayParent: detailForm
+      });
+      form.open();
+      expect($('.glasspane').length).toBe(1);
+      expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
+      expect(detailForm.$container.children('.glasspane').length).toBe(1);
+      expect(desktop.header.$container.children('.glasspane').length).toBe(0);
+      form.close();
+      expect($('.glasspane').length).toBe(0);
     });
 
   });

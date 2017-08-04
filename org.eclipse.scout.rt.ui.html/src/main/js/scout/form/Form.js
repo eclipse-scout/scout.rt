@@ -15,6 +15,7 @@ scout.Form = function() {
   this.askIfNeedSave = true;
   this.data = {};
   this.displayHint = scout.Form.DisplayHint.DIALOG;
+  this.displayParent; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
   this.maximizeEnabled = true;
   this.maximized = false;
   this.minimizeEnabled = true;
@@ -65,21 +66,6 @@ scout.Form.prototype._init = function(model) {
 
   this._setRootGroupBox(this.rootGroupBox);
   this._setStatus(this.status);
-
-  // Only render glassPanes if modal and not being a wrapped Form.
-  var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this, renderGlassPanes);
-  var propertyChangeHandler = function(event) {
-    // render glasspanes on parents after initialized
-    if (event.propertyName === 'displayParent') {
-      this._glassPaneRenderer.renderGlassPanes();
-    }
-  }.bind(this);
-  this.on('propertyChange', propertyChangeHandler);
-  this.one('destroy', function() {
-    this.off('propertyChange', propertyChangeHandler);
-  }.bind(this));
-
   this._installLifecycle();
 };
 
@@ -99,6 +85,7 @@ scout.Form.prototype._renderProperties = function() {
   this._renderSaveNeeded();
   this._renderCssClass();
   this._renderStatus();
+  this._renderModal();
 };
 
 scout.Form.prototype._postRender = function() {
@@ -119,7 +106,10 @@ scout.Form.prototype._remove = function() {
   this.formController.remove();
   this.messageBoxController.remove();
   this.fileChooserController.remove();
-  this._glassPaneRenderer.removeGlassPanes();
+  if (this._glassPaneRenderer) {
+    this._glassPaneRenderer.removeGlassPanes();
+    this._glassPaneRenderer = null;
+  }
   this._uninstallFocusContext();
   scout.Form.parent.prototype._remove.call(this);
 };
@@ -162,6 +152,23 @@ scout.Form.prototype._renderForm = function() {
   }
 };
 
+scout.Form.prototype.setModal = function(modal) {
+  this.setProperty('modal', modal);
+};
+
+scout.Form.prototype._renderModal = function() {
+  if (this.parent instanceof scout.WrappedFormField) {
+    return;
+  }
+  if (this.modal && !this._glassPaneRenderer) {
+    this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
+    this._glassPaneRenderer.renderGlassPanes();
+  } else if (!this.modal && this._glassPaneRenderer) {
+    this._glassPaneRenderer.removeGlassPanes();
+    this._glassPaneRenderer = null;
+  }
+};
+
 scout.Form.prototype._installLifecycle = function() {
   this.lifecycle = this._createLifecycle();
   this.lifecycle.handle('load', this._onLifecycleLoad.bind(this));
@@ -181,7 +188,6 @@ scout.Form.prototype._createLifecycle = function() {
  * Renders the form by adding it to the desktop.
  */
 scout.Form.prototype.open = function() {
-  this.displayParent = this.displayParent || this.session.desktop;
   this.session.desktop.showForm(this);
   return this.load();
 };
@@ -637,10 +643,14 @@ scout.Form.prototype.setDisabledStyle = function(disabledStyle) {
 };
 
 scout.Form.prototype.setDisplayParent = function(displayParent) {
-  if (this.displayParent === displayParent) {
-    return;
-  }
   this.setProperty('displayParent', displayParent);
+};
+
+scout.Form.prototype._setDisplayParent = function(displayParent) {
+  this._setProperty('displayParent', displayParent);
+  if (displayParent) {
+    this.setParent(displayParent);
+  }
 };
 
 /**

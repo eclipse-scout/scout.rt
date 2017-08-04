@@ -22,7 +22,7 @@ scout.FileChooserController = function(displayParent, session) {
  * Adds the given file chooser to this controller and renders it.
  */
 scout.FileChooserController.prototype.registerAndRender = function(fileChooser) {
-  fileChooser._setProperty('displayParent', this.displayParent);
+  scout.assertProperty(fileChooser, 'displayParent');
   this.displayParent.fileChoosers.push(fileChooser);
   this._render(fileChooser);
 };

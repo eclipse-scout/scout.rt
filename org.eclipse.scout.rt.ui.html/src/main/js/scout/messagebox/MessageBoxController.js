@@ -22,7 +22,7 @@ scout.MessageBoxController = function(displayParent, session) {
  * Adds the given message box to this controller and renders it.
  */
 scout.MessageBoxController.prototype.registerAndRender = function(messageBox) {
-  messageBox._setProperty('displayParent', this.displayParent);
+  scout.assertProperty(messageBox, 'displayParent');
   this.displayParent.messageBoxes.push(messageBox);
   this._render(messageBox);
 };
