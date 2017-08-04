@@ -20,12 +20,12 @@ describe("DateFieldAdapter", function() {
   });
 
   afterEach(function() {
-    session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $('.tooltip').remove();
-    $('.date-picker').remove();
-    $('.time-picker').remove();
+    removePopups(session, '.date-picker-popup');
+    removePopups(session, '.time-picker-popup');
+    removePopups(session, '.touch-popup');
   });
 
   function createWithAdapter(model) {
