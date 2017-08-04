@@ -18,6 +18,9 @@ scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);
 /**
  * @override
  */
+/**
+ * @override
+ */
 scout.DateFieldAdapter.prototype._init = function(model) {
   scout.DateFieldAdapter.parent.prototype._init.call(this, model);
   this._errorStatus = scout.Status.ensure(model.errorStatus);
@@ -72,6 +75,20 @@ scout.DateFieldAdapter.prototype._syncDisplayText = function(displayText) {
   if (this._errorStatus) {
     this._errorStatusDisplayText = displayText;
   }
+};
+
+/**
+ * @override
+ */
+scout.DateFieldAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
+  return Object.keys(newProperties).sort(function(a, b) {
+    if (a === 'hasDate' || a === 'hasTime') {
+      // make sure hasDate and hasTime are always set before displayText,
+      // otherwise toggling hasDate and hasTime dynamically won't work because renderDisplayText would try to write the time into the date field
+      return -1;
+    }
+    return 1;
+  });
 };
 
 scout.DateFieldAdapter.prototype._syncErrorStatus = function(errorStatus) {

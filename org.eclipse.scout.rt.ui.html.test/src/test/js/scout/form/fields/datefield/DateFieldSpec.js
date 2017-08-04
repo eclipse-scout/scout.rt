@@ -88,6 +88,12 @@ describe('DateField', function() {
     }
   }
 
+  function expectTime(date, hour, minute, second) {
+    expect(date.getHours()).toBe(hour);
+    expect(date.getMinutes()).toBe(minute);
+    expect(date.getSeconds()).toBe(second);
+  }
+
   function selectFirstDayInPicker($picker) {
     var $day = $picker.find('.date-picker-day').first();
     var date = $day.data('date');
@@ -730,6 +736,24 @@ describe('DateField', function() {
         expect(dateField.$dateField.val()).toBe('01.10.2015');
       });
 
+      it('increases minutes to the next 30 if pressed in time field', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          hasTime: true,
+          value: scout.dates.create('2017-04-14 12:18:00.000')
+        });
+        dateField.render();
+        dateField.$timeField.triggerKeyDown(scout.keys.DOWN);
+
+        expectTime(dateField.value, 12, 18, 0);
+        expect(dateField.$timeField.val()).toBe('12:30');
+        expect(dateField.displayText).toBe('14.04.2017\n12:30');
+        expectTime(dateField.value, 12, 18, 0); // value is still unchanged
+
+        dateField.acceptInput();
+        expectTime(dateField.value, 12, 30, 0);
+      });
+
     });
 
     describe('UP', function() {
@@ -1158,6 +1182,123 @@ describe('DateField', function() {
         expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
       });
     });
+  });
+
+  describe('hasDate', function() {
+
+    it('renders date field if set to true', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        hasDate: true
+      });
+      dateField.render();
+      expect(dateField.$dateField.length).toBe(1);
+    });
+
+    it('renders before time field even if set later', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        hasDate: false,
+        hasTime: true
+      });
+      dateField.render();
+      expect(dateField.$dateField).toBeUndefined();
+
+      dateField.setHasDate(true);
+      expect(dateField.$dateField.length).toBe(1);
+      expect(dateField.$dateField.next('.time').length).toBe(1);
+    });
+
+    it('does not loose date if hasDate is toggled', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2017-05-01 05:50:00.000',
+        hasDate: true,
+        hasTime: true
+      });
+      field.render();
+      expect(field.$dateField.val()).toBe('01.05.2017');
+      expect(field.$timeField.val()).toBe('05:50');
+      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.displayText).toBe('01.05.2017\n05:50');
+
+      field.setHasDate(false);
+      expect(field.$timeField.val()).toBe('05:50');
+      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.displayText).toBe('05:50');
+
+      // enter another time, date should be preserved
+      field.$timeField.val('02:30');
+      field.$timeField.trigger('input');
+      field.acceptInput();
+      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 02:30:00.000').toISOString());
+      expect(field.displayText).toBe('02:30');
+
+      field.setHasDate(true);
+      expect(field.$dateField.val()).toBe('01.05.2017');
+      expect(field.$timeField.val()).toBe('02:30');
+      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 02:30:00.000').toISOString());
+      expect(field.displayText).toBe('01.05.2017\n02:30');
+    });
+
+  });
+
+  describe('hasTime', function() {
+
+    it('renders time field if set to true', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        hasTime: true
+      });
+      dateField.render();
+      expect(dateField.$timeField.length).toBe(1);
+    });
+
+    it('renders after date field even if set later', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        hasDate: true
+      });
+      dateField.render();
+      expect(dateField.$timeField).toBeUndefined();
+
+      dateField.setHasTime(true);
+      expect(dateField.$timeField.length).toBe(1);
+      expect(dateField.$timeField.prev('.date').length).toBe(1);
+    });
+
+    it('does not loose time if hasTime is toggled', function() {
+      var field = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2017-05-01 05:50:00.000',
+        hasDate: true,
+        hasTime: true
+      });
+      field.render();
+      expect(field.$dateField.val()).toBe('01.05.2017');
+      expect(field.$timeField.val()).toBe('05:50');
+      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.displayText).toBe('01.05.2017\n05:50');
+
+      field.setHasTime(false);
+      expect(field.$dateField.val()).toBe('01.05.2017');
+      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.displayText).toBe('01.05.2017');
+
+      // enter another date, time should be preserved
+      field.$dateField.val('02.02.2016');
+      field.$dateField.trigger('input');
+      field.acceptInput();
+      expect(field.value.toISOString()).toBe(scout.dates.create('2016-02-02 05:50:00.000').toISOString());
+      expect(field.displayText).toBe('02.02.2016');
+
+      field.setHasTime(true);
+      expect(field.$dateField.val()).toBe('02.02.2016');
+      expect(field.$timeField.val()).toBe('05:50');
+      expect(field.value.toISOString()).toBe(scout.dates.create('2016-02-02 05:50:00.000').toISOString());
+      expect(field.displayText).toBe('02.02.2016\n05:50');
+    });
+
   });
 
 });

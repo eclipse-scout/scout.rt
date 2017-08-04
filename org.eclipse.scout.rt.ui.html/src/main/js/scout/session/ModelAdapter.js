@@ -307,7 +307,8 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
 };
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
-  Object.keys(newProperties).forEach(function(propertyName) {
+  var orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
+  orderedPropertyNames.forEach(function(propertyName) {
     var value = newProperties[propertyName];
     var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName);
     if (this[syncFuncName]) {
@@ -316,6 +317,13 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
       this.widget.callSetter(propertyName, value);
     }
   }, this);
+};
+
+/**
+ * May be overridden to return a custom order of how the properties will be set.
+ */
+scout.ModelAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
+  return Object.keys(newProperties);
 };
 
 /**

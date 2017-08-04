@@ -14,6 +14,7 @@ scout.DateField = function() {
   this.popup;
   this.autoDate;
   this.dateClearable = false;
+  this.dateDisplayText = null;
   this.dateFocused = false;
   this.dateFormatPattern;
   this.disabledCopyOverlay = true;
@@ -22,6 +23,7 @@ scout.DateField = function() {
 
   this.hasTime = false;
   this.hasTimePopup = true;
+  this.timeDisplayText = null;
   this.timePickerResolution;
   this.timeFormatPattern;
   this.timeFocused = false;
@@ -135,12 +137,24 @@ scout.DateField.prototype.setHasDate = function(hasDate) {
   this.setProperty('hasDate', hasDate);
 };
 
+scout.DateField.prototype._setHasDate = function(hasDate) {
+  this._setProperty('hasDate', hasDate);
+  if (this.initialized) {
+    // if property changes on the fly, update the display text
+    this._updateDisplayTextProperty();
+  }
+};
+
 scout.DateField.prototype._renderHasDate = function() {
   if (this.hasDate && !this.$dateField) {
     // Add $dateField
     this.$dateField = scout.fields.makeInputOrDiv(this, 'date')
       .on('mousedown', this._onDateFieldMouseDown.bind(this))
       .appendTo(this.$field);
+    if (this.$timeField) {
+      // make sure date field comes before time field, otherwise tab won't work as expected
+      this.$dateField.insertBefore(this.$timeField);
+    }
     if (!this.touch) {
       this.$dateField
         .on('keydown', this._onDateFieldKeyDown.bind(this))
@@ -165,6 +179,7 @@ scout.DateField.prototype._renderHasDate = function() {
   }
 
   if (!this.rendering) {
+    this._renderDisplayText();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
@@ -173,12 +188,24 @@ scout.DateField.prototype.setHasTime = function(hasTime) {
   this.setProperty('hasTime', hasTime);
 };
 
+scout.DateField.prototype._setHasTime = function(hasTime) {
+  this._setProperty('hasTime', hasTime);
+  if (this.initialized) {
+    // if property changes on the fly, update the display text
+    this._updateDisplayTextProperty();
+  }
+};
+
 scout.DateField.prototype._renderHasTime = function() {
   if (this.hasTime && !this.$timeField) {
     // Add $timeField
     this.$timeField = scout.fields.makeInputOrDiv(this, 'time')
       .on('mousedown', this._onTimeFieldMouseDown.bind(this))
       .appendTo(this.$field);
+    if (this.$dateField) {
+      // make sure time field comes after date field, otherwise tab won't work as expected
+      this.$timeField.insertAfter(this.$dateField);
+    }
     if (!this.touch || !this.hasTimePopup) {
       this.$timeField
         .on('keydown', this._onTimeFieldKeyDown.bind(this))
@@ -203,6 +230,7 @@ scout.DateField.prototype._renderHasTime = function() {
   }
 
   if (!this.rendering) {
+    this._renderDisplayText();
     this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
@@ -357,8 +385,14 @@ scout.DateField.prototype._setDisplayText = function(displayText) {
   this._setProperty('displayText', displayText);
 
   var parts = this._splitDisplayText(displayText);
-  this.dateDisplayText = parts.dateText;
-  this.timeDisplayText = parts.timeText;
+  if (this.hasDate) {
+    // preserve dateDisplayText if hasDate is set to false (only override if it is true)
+    this.dateDisplayText = parts.dateText;
+  }
+  if (this.hasTime) {
+    // preserve timeDisplayText if hasTime is set to false (only override if it is true)
+    this.timeDisplayText = parts.timeText;
+  }
 };
 
 /**
@@ -379,6 +413,10 @@ scout.DateField.prototype._validateValue = function(value) {
   }
   if (!(value instanceof Date)) {
     throw this.session.text(this.invalidValueMessageKey, value);
+  }
+  if (!this.hasDate && !this.value && value) {
+    // truncate to 01.01.1970 if no date was entered before. Otherwise preserve date part (important for toggling hasDate on the fly)
+    value = scout.dates.combineDateTime(null, value);
   }
   return value;
 };
@@ -1083,7 +1121,7 @@ scout.DateField.prototype._splitDisplayText = function(displayText) {
 };
 
 scout.DateField.prototype._updateDisplayTextProperty = function() {
-  this.displayText = this._computeDisplayText(this.dateDisplayText, this.timeDisplayText);
+  this._setProperty('displayText', this._computeDisplayText(this.dateDisplayText, this.timeDisplayText));
 };
 
 /**
@@ -1124,7 +1162,7 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
 scout.DateField.prototype._newTimestampAsDate = function(date, time) {
   var result = null;
   if (date || time) {
-    result = this._referenceDate();
+    result = this.value || this._referenceDate();
     if (date) {
       result = scout.dates.combineDateTime(date, result);
     }
@@ -1324,7 +1362,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
 scout.DateField.prototype._predictTime = function(inputText) {
   inputText = inputText || '';
 
-  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this._referenceDate());
+  var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this.value ||this._referenceDate());
   if (analyzeInfo.error) {
     this._setTimeValid(false);
     return null;
@@ -1542,17 +1580,19 @@ scout.DateField.prototype._formatValue = function(value) {
     dateText = '',
     timeText = '';
 
-  if (value) {
-    if (this.hasDate) {
+  if (this.hasDate) {
+    if (value) {
       dateText = this.isolatedDateFormat.format(value);
     }
-    if (this.hasTime) {
+    this.dateDisplayText = dateText;
+  }
+  if (this.hasTime) {
+    if (value) {
       timeText = this.isolatedTimeFormat.format(value);
     }
+    this.timeDisplayText = timeText;
   }
 
-  this.dateDisplayText = dateText;
-  this.timeDisplayText = timeText;
   return this._computeDisplayText(this.dateDisplayText, this.timeDisplayText);
 };
 
