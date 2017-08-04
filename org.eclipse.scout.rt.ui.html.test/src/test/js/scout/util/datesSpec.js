@@ -585,4 +585,23 @@ describe("scout.dates", function() {
 
   });
 
+  describe("combineDateTime", function() {
+
+    it("creates a new date by using date part of param date and time part of param time.", function() {
+      var date = scout.dates.combineDateTime(scout.dates.create('2014-11-21 12:23:11.123'), scout.dates.create('2017-12-10 05:15:50.999'));
+      expect(date.toISOString()).toBe(scout.dates.create('2014-11-21 05:15:50.999').toISOString());
+    });
+
+    it("uses 01-01-1970 as date part if date is ommitted", function() {
+      var date = scout.dates.combineDateTime(null, scout.dates.create('2017-12-10 05:15:50.999'));
+      expect(date.toISOString()).toBe(scout.dates.create('1970-01-01 05:15:50.999').toISOString());
+    });
+
+    it("uses 00:00 as time part if time is ommitted", function() {
+      var date = scout.dates.combineDateTime(scout.dates.create('2017-12-10 05:15:50.999'));
+      expect(date.toISOString()).toBe(scout.dates.create('2017-12-10 00:00:00.000').toISOString());
+    });
+
+  });
+
 });
