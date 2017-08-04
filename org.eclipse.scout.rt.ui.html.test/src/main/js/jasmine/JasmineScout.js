@@ -141,9 +141,11 @@ function uninstallUnloadHandlers(session) {
  * Removes all open popups for the given session.
  * May be used to make sure handlers get properly detached
  */
-function removePopups(session) {
-  session.$entryPoint.children('.popup').each(function() {
+function removePopups(session, cssClass) {
+  cssClass = cssClass || '.popup';
+  session.$entryPoint.children(cssClass).each(function() {
     var popup = scout.Widget.getWidgetFor($(this));
+    popup.animateRemoval = false;
     popup.remove();
   });
 }

@@ -22,11 +22,10 @@ describe('SmartField', function() {
   });
 
   afterEach(function() {
-    session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    $('.smart-field-popup').remove();
-    $('.touch-popup').remove();
+    removePopups(session);
+    removePopups(session, '.touch-popup');
   });
 
   function createSmartFieldWithAdapter() {

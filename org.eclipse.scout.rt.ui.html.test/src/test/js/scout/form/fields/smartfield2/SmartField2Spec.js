@@ -22,6 +22,8 @@ describe('SmartField2', function() {
 
   afterEach(function() {
     jasmine.clock().uninstall();
+    removePopups(session);
+    removePopups(session, '.touch-popup');
   });
 
   function createFieldWithLookupCall(model) {
