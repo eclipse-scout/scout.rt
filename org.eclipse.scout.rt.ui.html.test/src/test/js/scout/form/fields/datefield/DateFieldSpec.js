@@ -199,7 +199,7 @@ describe("DateField", function() {
           showBusyIndicator: true
         }),
         new scout.RemoteEvent(dateField.id, 'timestampChanged', {
-          timestamp: '2015-02-11'
+          timestamp: '2015-02-11 00:00:00.000'
         })
       ];
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
@@ -275,7 +275,7 @@ describe("DateField", function() {
           showBusyIndicator: true
         }),
         new scout.RemoteEvent(dateField.id, 'timestampChanged', {
-          timestamp: '2016-02-01'
+          timestamp: '2016-02-01 00:00:00.000'
         })
       ];
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
@@ -665,12 +665,12 @@ describe("DateField", function() {
         expect(dateField.popup).toBe(null);
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
-        
+
         dateField.popup._field.$timeField.val('10:42');
         dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
-                
+
         expect(dateField.popup).toBe(null);
-        
+
         expectDate(dateField.timestampAsDate, 2016, 02, 29, 10, 42);
         expect(dateField.displayText).toBe('29.02.2016\n10:42');
         expect(dateField.$dateField.text()).toBe('29.02.2016');

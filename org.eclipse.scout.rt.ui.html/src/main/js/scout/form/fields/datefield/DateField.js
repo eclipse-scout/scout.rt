@@ -114,6 +114,10 @@ scout.DateField.prototype._renderHasDate = function() {
     this.$dateField = scout.fields.makeInputOrDiv(this, 'date')
       .on('mousedown', this._onDateFieldMousedown.bind(this))
       .appendTo(this.$field);
+    if (this.$timeField) {
+      // make sure date field comes before time field, otherwise tab won't work as expected
+      this.$dateField.insertBefore(this.$timeField);
+    }
     if (!this.touch) {
       this.$dateField
         .on('keydown', this._onDateFieldKeydown.bind(this))
@@ -126,16 +130,16 @@ scout.DateField.prototype._renderHasDate = function() {
     this.$dateFieldIcon = scout.fields.appendIcon(this.$field, 'date')
       .on('mousedown', this._onDateIconMousedown.bind(this));
 
-    this.invalidateLayout();
-
   } else if (!this.hasDate && this.$dateField) {
     // Remove $dateField
     this.$dateField.remove();
     this.$dateField = null;
     this.$dateFieldIcon.remove();
     this.$dateFieldIcon = null;
+  }
 
-    this.invalidateLayout();
+  if (!this.rendering) {
+    this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
 
@@ -147,11 +151,13 @@ scout.DateField.prototype._renderHasTime = function() {
       .on('input', this._onTimeFieldInput.bind(this))
       .on('blur', this._onTimeFieldBlur.bind(this))
       .appendTo(this.$field);
+    if (this.$dateField) {
+      // make sure time field comes after date field, otherwise tab won't work as expected
+      this.$timeField.insertAfter(this.$dateField);
+    }
     this.$timeFieldIcon = scout.fields.appendIcon(this.$field, 'time')
       .on('mousedown', this._onTimeIconMousedown.bind(this));
     scout.HtmlComponent.install(this.$timeField, this.session);
-
-    this.invalidateLayout();
 
   } else if (!this.hasTime && this.$timeField) {
     // Remove $timeField
@@ -159,8 +165,10 @@ scout.DateField.prototype._renderHasTime = function() {
     this.$timeField = null;
     this.$timeFieldIcon.remove();
     this.$timeFieldIcon = null;
+  }
 
-    this.invalidateLayout();
+  if (!this.rendering) {
+    this.htmlDateTimeComposite.invalidateLayoutTree();
   }
 };
 
@@ -853,7 +861,11 @@ scout.DateField.prototype._findAllowedReferenceDate = function(referenceDate) {
 };
 
 scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServer) {
-  var timestamp = scout.dates.toJsonDate(timestampAsDate, false, this.hasDate, this.hasTime);
+  if (!this.hasDate && !this.timestampAsDate && timestampAsDate) {
+    // truncate to 01.01.1970 if no date was entered before. Otherwise preserve date part (important for toggling hasDate on the fly)
+    timestampAsDate = scout.dates.combineDateTime(null, timestampAsDate);
+  }
+  var timestamp = scout.dates.toJsonDate(timestampAsDate, false);
   if (timestamp !== this.timestamp || this.errorStatus) {
     this.timestamp = timestamp;
     this.timestampAsDate = timestampAsDate;
