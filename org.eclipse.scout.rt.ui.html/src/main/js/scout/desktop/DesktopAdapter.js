@@ -67,7 +67,7 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
       return (widgetEvent.type === 'formActivate' &&
         widgetEvent.form === form);
     });
-    form.displayParent = displayParent.widget;
+    form.setDisplayParent(displayParent.widget);
     this.widget.showForm(form, event.position);
   }
 };
@@ -83,13 +83,8 @@ scout.DesktopAdapter.prototype._onFormHide = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onFormActivate = function(event) {
-  var form,
-    displayParent = this.session.getModelAdapter(event.displayParent);
-
-  if (displayParent) {
-    form = this.session.getOrCreateWidget(event.form, displayParent.widget);
-    this.widget.activateForm(form, false);
-  }
+  var form = this.session.getWidget(event.form);
+  this.widget.activateForm(form);
 };
 
 scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
@@ -98,6 +93,7 @@ scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
 
   if (displayParent) {
     messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent.widget);
+    messageBox.setDisplayParent(displayParent.widget);
     displayParent.widget.messageBoxController.registerAndRender(messageBox);
   }
 };
@@ -118,6 +114,7 @@ scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
 
   if (displayParent) {
     fileChooser = this.session.getOrCreateWidget(event.fileChooser, displayParent.widget);
+    fileChooser.setDisplayParent(displayParent.widget);
     displayParent.widget.fileChooserController.registerAndRender(fileChooser);
   }
 };

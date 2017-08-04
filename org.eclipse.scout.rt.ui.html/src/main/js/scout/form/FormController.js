@@ -24,7 +24,7 @@ scout.FormController = function(model) {
  * if select view is set the view rendered in _renderView is also selected.
  */
 scout.FormController.prototype.registerAndRender = function(form, position, selectView) {
-  form._setProperty('displayParent', this.displayParent);
+  scout.assertProperty(form, 'displayParent');
   if (form.isPopupWindow()) {
     this._renderPopupWindow(form);
   } else if (form.isView()) {
@@ -209,7 +209,7 @@ scout.FormController.prototype._findFormToActivateAfterDialogRemove = function()
   var desktop = this.session.desktop;
   if (desktop.bench) {
     var form = desktop.bench.activeViews()[0];
-    if (form && !form.detailForm) {
+    if (form instanceof scout.Form && !form.detailForm) {
       return form;
     }
   }
