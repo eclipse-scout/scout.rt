@@ -79,7 +79,7 @@ scout.DesktopTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
 };
 
 scout.DesktopTab.prototype._onClose = function() {
-  this.view.close();
+  this.view.abort();
 };
 
 /**
