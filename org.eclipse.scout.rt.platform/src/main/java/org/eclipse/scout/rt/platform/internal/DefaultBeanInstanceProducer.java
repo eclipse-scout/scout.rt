@@ -139,8 +139,13 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     }
 
     if (m_creatorThread.compareAndSet(null, Thread.currentThread())) {
-      // current thread has to create instance
       try {
+        // check again to avoid race conditions
+        instance = m_applicationScopedInstance.get();
+        if (instance != null) {
+          return instance;
+        }
+        // current thread has to create instance
         instance = safeCreateInstance(bean.getBeanClazz());
         m_applicationScopedInstance.set(instance);
         return instance;
