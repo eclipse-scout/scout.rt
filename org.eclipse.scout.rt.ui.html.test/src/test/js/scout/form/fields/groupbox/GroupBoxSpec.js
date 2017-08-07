@@ -76,39 +76,6 @@ describe("GroupBox", function() {
     });
   });
 
-  describe('test predefined height and width in pixel', function() {
-    var form, formAdapter, formController, rootGroupBox, model;
-
-    beforeEach(function() {
-      model = $.extend(createSimpleModel('GroupBox', session), {
-        id: '3',
-        label: "fooBar",
-        gridDataHints: {
-          x: 0,
-          y: 0,
-          widthInPixel: 27,
-          heightInPixel: 46
-        }
-      });
-      rootGroupBox = scout.create('GroupBox', model);
-      form = scout.create('Form', {
-        parent: session.desktop,
-        rootGroupBox: rootGroupBox
-      });
-      session.desktop.$container = $('#sandbox');
-    });
-
-    it('adds group-box div when label is set', function() {
-      var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
-        .appendTo($('head'));
-      session.desktop.formController._renderDialog(form);
-      expect(form.rootGroupBox.$container.cssHeight()).toBe(46);
-      expect(form.rootGroupBox.$container.cssWidth()).toBe(27);
-      $tmpStyle.remove();
-    });
-
-  });
-
   describe('focus', function() {
     it('focus first focusable field in groupBox', function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
@@ -131,7 +98,7 @@ describe("GroupBox", function() {
   });
 
   describe('enabled', function() {
-    it('propagation', function() {
+    it('is not propagated to children by default', function() {
       var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
       groupBoxWithTwoChildren.render();
 
@@ -143,6 +110,15 @@ describe("GroupBox", function() {
       expectEnabled(groupBoxWithTwoChildren, false, false, 'disabled');
       expectEnabled(groupBoxWithTwoChildren.getFields()[0], true, false, 'disabled');
       expectEnabled(groupBoxWithTwoChildren.getFields()[1], true, false, 'disabled');
+    });
+
+    it('but maybe propagated to children if required', function() {
+      var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
+      groupBoxWithTwoChildren.render();
+
+      expectEnabled(groupBoxWithTwoChildren, true, true);
+      expectEnabled(groupBoxWithTwoChildren.getFields()[0], true, true);
+      expectEnabled(groupBoxWithTwoChildren.getFields()[1], true, true);
 
       groupBoxWithTwoChildren.setEnabled(false, true, true);
       expectEnabled(groupBoxWithTwoChildren, false, false, 'disabled');
@@ -234,6 +210,26 @@ describe("GroupBox", function() {
         logicalGrid: scout.create('HorizontalGroupBoxBodyGrid')
       });
       expect(groupBox.logicalGrid instanceof scout.HorizontalGroupBoxBodyGrid).toBe(true);
+    });
+
+    it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function() {
+      var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
+        .appendTo($('head'));
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          gridDataHints: {
+            widthInPixel: 27,
+            heightInPixel: 30
+          }
+        }
+      });
+      form.open();
+      expect(form.rootGroupBox.$container.cssHeight()).toBe(30);
+      expect(form.rootGroupBox.$container.cssWidth()).toBe(27);
+      form.close();
+      $tmpStyle.remove();
     });
   });
 
