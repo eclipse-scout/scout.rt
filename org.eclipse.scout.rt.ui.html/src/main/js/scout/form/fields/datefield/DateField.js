@@ -742,7 +742,7 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
       // If input is empty or invalid, set picker to reference date
       pickerStartDate = this._referenceDate();
       if (this.hasTime) { // keep time part
-        pickerStartDate = scout.dates.combineDateTime(pickerStartDate, this.value || this.autoDate);
+        pickerStartDate = scout.dates.combineDateTime(pickerStartDate, this.value || this._referenceDate());
       }
       this.openDatePopupAndSelect(pickerStartDate);
       this._updateDisplayText(pickerStartDate);
@@ -780,7 +780,7 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
       // If input is empty or invalid, set picker to reference date
       pickerStartDate = this._referenceDate();
       if (this.hasTime) { // keep time part
-        pickerStartDate = scout.dates.combineDateTime(pickerStartDate, this.value || this.autoDate);
+        pickerStartDate = scout.dates.combineDateTime(pickerStartDate, this.value || this._referenceDate());
       }
       this.openDatePopupAndSelect(pickerStartDate);
       this._updateDisplayText(pickerStartDate);

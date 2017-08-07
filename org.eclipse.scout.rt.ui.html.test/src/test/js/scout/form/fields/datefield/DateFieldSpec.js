@@ -634,20 +634,24 @@ describe('DateField', function() {
         model.displayText = '01.10.2014\n';
       });
 
-      it('opens the picker and selects the current date', function() {
+      it('opens the picker and selects the current date and time', function() {
         var dateField = scout.create('DateField', {
-          parent: session.desktop
+          parent: session.desktop,
+          hasTime: true
         });
         dateField.render();
         dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
 
+        var expectedTime = scout.dates.ceil(new Date(), dateField.timePickerResolution);
         expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
-        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
+        expect(dateField.$timeField.val()).toBe(dateField.isolatedTimeFormat.format(expectedTime));
+        expect(dateField.displayText).toBe(dateField.formatValue(expectedTime));
         expect(dateField.value).toBe(null); // value is still unchanged
 
         dateField.acceptInput();
         expect(scout.dates.isSameDay(dateField.value, new Date())).toBe(true);
+        expectTime(dateField.value, expectedTime.getHours(), expectedTime.getMinutes(), expectedTime.getSeconds());
       });
 
       it('selects the current date if picker is open and no date is selected', function() {
