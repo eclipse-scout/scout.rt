@@ -26,7 +26,6 @@ scout.RemoteApp.prototype._createErrorHandler = function() {
  */
 scout.RemoteApp.prototype._loadSession = function($entryPoint, options) {
   options = options || {};
-  options.remote = true;
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
   session.start();

@@ -84,13 +84,6 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
 };
 
 /**
- * TODO [7.0] awe, cgu: (value-field) refactor DateField.js -
- * rename timestampAsDate to value (also on JsonDateField)
- * use Date object everywhere and todays 'timestamp' date-string
- * only when we communicate with the UI server. Then remove the toJsonDate
- * function used here and work with the Date object. Implement a _setValue
- * method to convert the date-string into a Date object in DateField.js
- *
  * @override ColumnUserFilter.js
  */
 scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {

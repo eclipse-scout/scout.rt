@@ -414,7 +414,7 @@ scout.DateField.prototype._validateValue = function(value) {
   if (!(value instanceof Date)) {
     throw this.session.text(this.invalidValueMessageKey, value);
   }
-  if (!this.hasDate && !this.value && value) {
+  if (!this.hasDate && !this.value) {
     // truncate to 01.01.1970 if no date was entered before. Otherwise preserve date part (important for toggling hasDate on the fly)
     value = scout.dates.combineDateTime(null, value);
   }

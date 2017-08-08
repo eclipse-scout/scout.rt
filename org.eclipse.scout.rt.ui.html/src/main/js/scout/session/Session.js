@@ -37,7 +37,6 @@ scout.Session = function() {
   this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.clientSessionId = this._getClientSessionIdFromStorage();
   this.forceNewClientSession = false;
-  this.remote = false;
   this.remoteUrl = 'json';
   this.unloadUrl = 'unload';
   this.modelAdapterRegistry = {};
@@ -148,8 +147,6 @@ scout.Session.prototype.init = function(model) {
     this.locale = scout.Locale.ensure(options.locale);
     this.textMap = scout.texts.get(this.locale.languageTag);
   }
-  // TODO [7.0] cgu flag necessary for modeladapter, remove it
-  this.remote = scout.nvl(options.remote, this.remote);
   if (options.backgroundJobPollingEnabled === false) {
     this.backgroundJobPollingSupport.enabled = false;
   }
