@@ -14,6 +14,7 @@ scout.Action = function() {
   this.selected = false;
   this.horizontalAlignment = -1;
   this.iconId = null;
+  this.imageLoadingInvalidatesLayout = true;
   this.tooltipText = null;
   this.text = null;
   this.cssClass = null;
@@ -77,6 +78,7 @@ scout.Action.prototype._renderProperties = function() {
 
 scout.Action.prototype._remove = function() {
   this._removeText();
+  this._removeIconId();
   scout.Action.parent.prototype._remove.call(this);
 };
 
@@ -100,9 +102,41 @@ scout.Action.prototype._removeText = function() {
   }
 };
 
+scout.Action.prototype.setIconId = function(iconId) {
+  this.setProperty('iconId', iconId);
+};
+
 scout.Action.prototype._renderIconId = function() {
   var iconId = this.iconId || '';
-  this.$container.icon(iconId);
+  if (this.imageLoadingInvalidatesLayout) {
+    // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
+    // This may not work for every container using the action (.e.g. MenuBar), so it may be disabled
+    if (!iconId) {
+      this._removeIconId();
+      return;
+    }
+    if (this.icon) {
+      this.icon.setIconDesc(iconId);
+      return;
+    }
+    this.icon = scout.create('Icon', {
+      parent: this,
+      iconDesc: iconId,
+      prepend: true
+    });
+    this.icon.one('destroy', function() {
+      this.icon = null;
+    }.bind(this));
+    this.icon.render();
+  } else {
+    this.$container.icon(iconId);
+  }
+};
+
+scout.Action.prototype._removeIconId = function() {
+  if (this.icon) {
+    this.icon.destroy();
+  }
 };
 
 /**
@@ -127,6 +161,10 @@ scout.Action.prototype._renderKeyStroke = function() {
   }
 };
 
+scout.Action.prototype.setTooltipText = function(tooltipText) {
+  this.setProperty('tooltipText', tooltipText);
+};
+
 scout.Action.prototype._renderTooltipText = function() {
   this._updateTooltip();
 };
@@ -148,10 +186,6 @@ scout.Action.prototype._shouldInstallTooltip = function() {
 
 scout.Action.prototype._renderTabbable = function() {
   this.$container.setTabbable(this.tabbable && !scout.device.supportsTouch());
-};
-
-scout.Action.prototype._renderHorizontalAlignment = function() {
-  // nothing to render, property is only considered by the menubar
 };
 
 scout.Action.prototype._renderCompact = function() {

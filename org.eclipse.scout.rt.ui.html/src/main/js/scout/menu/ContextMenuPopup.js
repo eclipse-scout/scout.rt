@@ -313,11 +313,13 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     menu.render(this.$body);
     this._attachMenuListeners(menu);
 
-    // TEMPORARY FIX: Invalidate popup layout after images icons have been loaded, because the
+    // Invalidate popup layout after images icons have been loaded, because the
     // correct size might not be known yet. If the layout would not be revalidated, the popup
     // size will be wrong (text is cut off after image has been loaded).
-    // TODO [7.0] bsh: Remove this code, use Image.js instead
-    menu.$container.find('img').on('load error', this._invalidateLayoutTreeAndRepositionPopup.bind(this));
+    // The menu item actually does it by itself, but the popup needs to be repositioned too.
+    if (menu.icon) {
+      menu.icon.on('load error', this._invalidateLayoutTreeAndRepositionPopup.bind(this));
+    }
   }, this);
 
   this._handleInitialSubMenus(initialSubMenuRendering);

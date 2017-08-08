@@ -120,6 +120,7 @@ scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container, la
     parent: this._menuBar,
     horizontalAlignment: 1,
     iconId: scout.icons.ELLIPSIS_V,
+    imageLoadingInvalidatesLayout: false,
     tabbable: false
   });
   ellipsis.render($container);
