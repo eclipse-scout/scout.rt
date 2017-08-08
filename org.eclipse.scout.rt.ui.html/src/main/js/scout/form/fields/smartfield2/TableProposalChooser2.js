@@ -102,7 +102,7 @@ scout.TableProposalChooser2.prototype.trySelectCurrentValue = function() {
   if (scout.objects.isNullOrUndefined(currentValue)) {
     return;
   }
-  var tableRow = this.model.rows.find(function(row) {
+  var tableRow = scout.arrays.find(this.model.rows, function(row) {
     return row.lookupRow.key === currentValue;
   });
   if (tableRow) {
