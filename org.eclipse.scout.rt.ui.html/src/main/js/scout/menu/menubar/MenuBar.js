@@ -149,14 +149,12 @@ scout.MenuBar.prototype._removeMenuListeners = function() {
   }.bind(this));
 };
 
-scout.MenuBar.prototype._updateMenuListeners = function(menuItems) {
-  // Remove listeners from existing items
-  this._removeMenuListeners();
-
+scout.MenuBar.prototype._initMenuItems = function(menuItems) {
   // Attach a propertyChange listener to the new items, so the menu-bar
   // can be updated when one of its items changes (e.g. visible, keystroke etc.)
   menuItems.forEach(function(item) {
     item.on('propertyChange', this._menuItemPropertyChangeListener);
+    item.imageLoadingInvalidatesLayout = false; // menubar is rebuilt on any layout change, hence image loading would create a loop
   }.bind(this));
 };
 
@@ -173,10 +171,11 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 
     // The menuSorter may add separators to the list of items -> destroy the old ones first
     this._destroyMenuSorterSeparators();
-    this._updateMenuListeners(menuItems);
+    this._removeMenuListeners();
     this._internalMenuItems = menuItems;
     this._orderedMenuItems = this.menuSorter.order(menuItems, this);
     this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
+    this._initMenuItems(this.menuItems);
     this.link(menuItems);
   }
 

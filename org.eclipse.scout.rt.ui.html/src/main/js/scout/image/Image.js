@@ -12,6 +12,7 @@ scout.Image = function() {
   scout.Image.parent.call(this);
   this.autoFit = false;
   this.imageUrl = null;
+  this.prepend = false;
 };
 scout.inherits(scout.Image, scout.Widget);
 
@@ -20,7 +21,7 @@ scout.Image.prototype._render = function() {
     .on('load', this._onImageLoad.bind(this))
     .on('error', this._onImageError.bind(this));
 
-  if (scout.nvl(this.prepend, true)) {
+  if (this.prepend) {
     this.$container.prependTo(this.$parent);
   } else {
     this.$container.appendTo(this.$parent);
