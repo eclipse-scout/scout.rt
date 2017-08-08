@@ -141,8 +141,10 @@ scout.SearchOutline.prototype._onClearIconMouseDown = function(event) {
   this.$queryField.val('');
   this._updateHasText();
   this._search();
+  // focus field if x is pressed when the field does not have the focus
+  this.$queryField.focus();
+  // stay in field when x is pressed
   event.preventDefault();
-
 };
 
 scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
