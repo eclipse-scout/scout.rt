@@ -36,11 +36,12 @@
   &:focus {
     border-color: @navigation-background-color;
     #scout.glow(@palette-white);
-    &.has-text {
-      padding-right: @text-field-padding-x + 15px;
-      & ~ .clear-icon {
-        display: block;
-      }
+  }
+
+  &.has-text {
+    padding-right: @text-field-padding-x + 15px;
+    & ~ .clear-icon {
+      display: block;
     }
   }
 
