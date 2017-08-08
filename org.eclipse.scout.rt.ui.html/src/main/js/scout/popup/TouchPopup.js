@@ -22,6 +22,7 @@ scout.TouchPopup = function() {
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
   this.withGlassPane = true;
+  this._touchFieldPropertyChangeListener = this._onTouchFieldPropertyChange.bind(this);
 };
 scout.inherits(scout.TouchPopup, scout.Popup);
 
@@ -32,7 +33,13 @@ scout.TouchPopup.prototype._init = function(options) {
   // clone original touch field
   // original and clone both point to the same popup instance
   this._field = this._touchField.clone(this._fieldOverrides());
+  this._touchField.on('propertyChange', this._touchFieldPropertyChangeListener);
   this._initWidget(options);
+};
+
+scout.TouchPopup.prototype._destroy = function() {
+  this._touchField.off('propertyChange', this._touchFieldPropertyChangeListener);
+  scout.TouchPopup.parent.prototype._destroy.call(this);
 };
 
 scout.TouchPopup.prototype._fieldOverrides = function() {
@@ -90,4 +97,10 @@ scout.TouchPopup.prototype._render = function() {
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
+};
+
+scout.TouchPopup.prototype._onTouchFieldPropertyChange = function(event) {
+  if (event.propertyName === 'errorStatus') {
+    this._field.setErrorStatus(event.newValue);
+  }
 };

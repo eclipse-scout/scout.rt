@@ -13,7 +13,7 @@ scout.ProposalChooser2 = function() {
 
   this.$container = null;
   this.$status = null;
-  this.$activeFilter = null;
+  this.activeFilterGroup = null;
   this.htmlComp = null;
   this._updateStatusTimeout = null;
   this.status = null;
@@ -200,7 +200,6 @@ scout.ProposalChooser2.prototype._renderActiveFilterButton = function(value, ind
 
   this.activeFilterGroup.addButton(radio);
 };
-
 
 scout.ProposalChooser2.prototype.setVirtual = function(virtual) {
   if (this.model instanceof scout.Table) {
