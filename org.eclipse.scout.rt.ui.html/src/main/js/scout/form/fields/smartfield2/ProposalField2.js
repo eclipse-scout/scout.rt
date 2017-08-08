@@ -11,7 +11,7 @@
 scout.ProposalField2 = function() {
   scout.ProposalField2.parent.call(this);
 
-  this.maxLength = -1; // FIXME [awe] 7.0 - SF2: implement maxLength and trimText
+  this.maxLength = 4000;
   this.trimText = true;
 
   /**
@@ -51,6 +51,20 @@ scout.ProposalField2.prototype._lookupByTextOrAllDone = function(result) {
 
 scout.ProposalField2.prototype._formatValue = function(value) {
   return scout.nvl(value, '');
+};
+
+scout.ProposalField2.prototype._validateValue = function(value) {
+  if (scout.objects.isNullOrUndefined(value)) {
+    return value;
+  }
+  var validValue = scout.strings.asString(value);
+  if (this.trimText) {
+    validValue = validValue.trim();
+  }
+  if (validValue.length > this.maxLength) {
+    validValue = validValue.substring(0, this.maxLength);
+  }
+  return validValue;
 };
 
 scout.ProposalField2.prototype._ensureValue = function(value) {

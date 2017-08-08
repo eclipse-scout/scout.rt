@@ -36,7 +36,7 @@ describe('ProposalField2', function() {
     });
 
     it('defaults', function() {
-      expect(field.maxLength).toBe(-1);
+      expect(field.maxLength).toBe(4000);
       expect(field.trimText).toBe(true);
     });
 
