@@ -8,15 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global section, narrow to .scout for usage as portlet */
-
-/* TODO [7.0] awe, cgu, bsh: (css) YUI compressor destroys calc(100% + x) expressions (only with plus operator)
- * This bug will be fixed with YUI compressor 2.4.9 which is not released yet:
- * https://github.com/yui/yuicompressor/commits/master
- * We must update maven-yui-compressor-plugin (v >= 1.6.0, with YUI >= 2.4.9) or...
- * Hack the old maven plugin wo work with a new YUI version or...
- * Download YUI 2.4.9 and call as Java program from maven.
- */
 body {
   #scout.font-text-normal();
   position: fixed;
