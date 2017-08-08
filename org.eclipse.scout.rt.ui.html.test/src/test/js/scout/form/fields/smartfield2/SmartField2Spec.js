@@ -164,7 +164,8 @@ describe('SmartField2', function() {
       field.popup._widget.activeFilterGroup.radioButtons[1].select();
       // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
       field.popup._field.lookupCall.data = [];
-      field.popup._field._lookupByTextOrAll(true);
+      field.popup._field.$field.triggerKeyDown(scout.keys.BACKSPACE);
+      field.popup._field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
     });
