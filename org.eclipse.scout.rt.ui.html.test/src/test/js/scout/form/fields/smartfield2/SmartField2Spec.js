@@ -64,12 +64,13 @@ describe('SmartField2', function() {
       expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
     });
 
-    it('when setValue is called, load the correct lookup row', function() {
+    it('when setValue is called, load and set the correct lookup row', function() {
       field = createFieldWithLookupCall();
       field.setValue(1);
       jasmine.clock().tick(300);
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe(1);
+      expect(field.lookupRow.key).toBe(1);
 
       // set the value to null again
       field.setValue(null);
@@ -81,6 +82,7 @@ describe('SmartField2', function() {
       jasmine.clock().tick(300);
       expect(field.displayText).toBe('Bar');
       expect(field.value).toBe(2);
+      expect(field.lookupRow.key).toBe(2);
     });
 
     it('load proposals for the current displayText', function() {
@@ -168,6 +170,30 @@ describe('SmartField2', function() {
       field.popup._field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
+    });
+
+  });
+
+  describe('acceptInput', function() {
+
+    it('should not be triggered, when search text is (still) empty or equals to the text of the lookup row', function() {
+      var field = createFieldWithLookupCall();
+      var eventTriggered = false;
+      field.render();
+      field.on('acceptInput', function() {
+        eventTriggered = true;
+      });
+      // empty case
+      field.acceptInput();
+      expect(eventTriggered).toBe(false);
+
+      // text equals case
+      field.setValue(1); // set lookup row [1, Foo]
+      jasmine.clock().tick(500);
+      expect(field.lookupRow.text).toBe('Foo');
+      expect(field.$field.val()).toBe('Foo');
+      field.acceptInput();
+      expect(eventTriggered).toBe(false);
     });
 
   });

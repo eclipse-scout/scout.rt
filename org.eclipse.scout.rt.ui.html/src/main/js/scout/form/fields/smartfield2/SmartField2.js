@@ -162,6 +162,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   var
     searchText = this._readDisplayText(),
+    searchTextEmpty = scout.strings.empty(searchText),
     searchTextChanged = this._checkDisplayTextChanged(searchText),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
@@ -180,14 +181,22 @@ scout.SmartField2.prototype.acceptInput = function() {
   }
 
   // Do nothing when search text is equals to the text of the current lookup row
-  if (this.lookupRow && this.lookupRow.text === searchText && !selectedLookupRow) {
-    $.log.debug('(SmartField2#acceptInput) unchanged. Close popup');
+  if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
+    $.log.debug('(SmartField2#acceptInput) unchanged: text is equals. Close popup');
+    this._inputAccepted(false);
+    return;
+  }
+
+  // Do nothing when we don't have a current lookup row and search text is empty
+  if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
+    $.log.debug('(SmartField2#acceptInput) unchanged: text is empty. Close popup');
     this._inputAccepted(false);
     return;
   }
 
   // 1.) when search text is empty and no lookup-row is selected, simply set the value to null
-  if (scout.strings.empty(searchText) && !selectedLookupRow) {
+  // Note: here we assume that a current lookup row is set.
+  if (!selectedLookupRow && searchTextEmpty) {
     $.log.debug('(SmartField2#acceptInput) empty. Set lookup-row to null, close popup');
     this.clearErrorStatus();
     this.setLookupRow(null);
@@ -414,8 +423,14 @@ scout.SmartField2.prototype._formatValue = function(value) {
   }
 
   // we must do a lookup first to get the display text
+  // Note: this has a side-effect as it sets the property lookupRow on the smart field
   return this._executeLookup(this.lookupCall.getByKey.bind(this.lookupCall, value))
-    .then(this._formatLookupRow.bind(this));
+    .then(this._lookupByKeyDone.bind(this));
+};
+
+scout.SmartField2.prototype._lookupByKeyDone = function(lookupRow) {
+  this.lookupRow = lookupRow;
+  return this._formatLookupRow(lookupRow);
 };
 
 /**
