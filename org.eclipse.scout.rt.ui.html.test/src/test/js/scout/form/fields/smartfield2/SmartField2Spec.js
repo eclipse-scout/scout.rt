@@ -107,6 +107,7 @@ describe('SmartField2', function() {
       var field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
       field.render();
+      field.$field.focus();
       field.setValue(1);
       jasmine.clock().tick(500);
       field.$field.triggerClick();
@@ -138,7 +139,9 @@ describe('SmartField2', function() {
       expect(field.$field.text()).toBe('Foo');
       expect(field.popup._widget.model.selectedRows.length).toBe(1);
 
+      field.popup._field.$field.focus();
       field.popup._field.clear();
+      jasmine.clock().tick(500);
       expect(field.popup._field.value).toBe(null);
       expect(field.popup._field.displayText).toBe('');
       expect(field.popup._field.$field.val()).toBe('');
@@ -176,6 +179,7 @@ describe('SmartField2', function() {
         touch: true
       });
       field.render();
+      field.$field.focus();
       field.setValue(1);
       jasmine.clock().tick(500);
       field.$field.triggerClick();
