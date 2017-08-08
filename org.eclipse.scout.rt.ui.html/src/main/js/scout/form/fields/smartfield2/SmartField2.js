@@ -429,7 +429,7 @@ scout.SmartField2.prototype._formatValue = function(value) {
 };
 
 scout.SmartField2.prototype._lookupByKeyDone = function(lookupRow) {
-  this.lookupRow = lookupRow;
+  this.setLookupRow(lookupRow);
   return this._formatLookupRow(lookupRow);
 };
 

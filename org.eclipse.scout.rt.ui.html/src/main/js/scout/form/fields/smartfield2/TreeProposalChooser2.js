@@ -248,3 +248,7 @@ scout.TreeProposalChooser2.prototype._appendChildNode = function(parentNode, tre
   parentNode.leaf = false;
   parentNode.childrenLoaded = true;
 };
+
+scout.TreeProposalChooser2.prototype.clearLookupRows = function() {
+  this.model.removeAllNodes();
+};
