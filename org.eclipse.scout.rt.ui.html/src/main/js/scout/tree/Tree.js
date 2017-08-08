@@ -804,6 +804,10 @@ scout.Tree.prototype.updateNodeHeights = function() {
   });
 };
 
+scout.Tree.prototype.removeAllNodes = function() {
+  this._removeNodes(this.nodes);
+};
+
 /**
  * @param parentNode optional. If provided, this node's state will be updated (e.g. it will be collapsed)
  */

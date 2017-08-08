@@ -102,5 +102,7 @@ scout.TouchPopup.prototype._render = function() {
 scout.TouchPopup.prototype._onTouchFieldPropertyChange = function(event) {
   if (event.propertyName === 'errorStatus') {
     this._field.setErrorStatus(event.newValue);
+  } else if (event.propertyName === 'lookupRow') {
+    this._field.setLookupRow(event.newValue);
   }
 };
