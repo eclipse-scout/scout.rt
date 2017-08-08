@@ -137,6 +137,38 @@ describe('SmartField2', function() {
       expect(field.popup._field.clearable).toBe(true);
     });
 
+    it('stays open if active / inactive radio buttons are clicked', function() {
+      var field = createFieldWithLookupCall({
+        touch: true,
+        activeFilterEnabled: true
+      });
+      field.render();
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      field.popup._widget.activeFilterGroup.radioButtons[1].select();
+      jasmine.clock().tick(500);
+      expect(field.popup).not.toBe(null);
+    });
+
+    it('stays open even if there are no results (with active filter)', function() {
+      // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
+      var field = createFieldWithLookupCall({
+        touch: true,
+        activeFilterEnabled: true
+      });
+      field.render();
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      field.popup._widget.activeFilterGroup.radioButtons[1].select();
+      // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
+      field.popup._field.lookupCall.data = [];
+      field.popup._field._lookupByTextOrAll(true);
+      jasmine.clock().tick(500);
+      expect(field.popup).not.toBe(null);
+    });
+
   });
 
   describe('default (smart field) with table proposal', function() {

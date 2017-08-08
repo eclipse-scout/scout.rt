@@ -24,10 +24,19 @@ scout.StaticLookupCall = function() {
   scout.StaticLookupCall.parent.call(this);
 
   this._delay = 0; // delay in [ms]
+  this.data = null;
 };
 scout.inherits(scout.StaticLookupCall, scout.LookupCall);
 
 scout.StaticLookupCall.MAX_ROW_COUNT = 100;
+
+scout.StaticLookupCall.prototype._init = function(model) {
+  scout.StaticLookupCall.parent.prototype._init.call(this, model);
+  if (!this.data) {
+    // data may either be provided by the model or by implementing the _data function
+    this.data = this._data();
+  }
+};
 
 scout.StaticLookupCall.prototype.getAll = function() {
   var deferred = $.Deferred();
@@ -36,7 +45,7 @@ scout.StaticLookupCall.prototype.getAll = function() {
 };
 
 scout.StaticLookupCall.prototype._queryAll = function(deferred) {
-  var datas = this._data().slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
+  var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
   deferred.resolve({
     lookupRows: datas.map(this._dataToLookupRow)
   });
@@ -49,7 +58,7 @@ scout.StaticLookupCall.prototype.getByText = function(text) {
 };
 
 scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
-  var datas = this._data().filter(function(data) {
+  var datas = this.data.filter(function(data) {
     return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
   });
   var lookupRows = datas.map(this._dataToLookupRow);
@@ -94,7 +103,7 @@ scout.StaticLookupCall.prototype.getByKey = function(key) {
 };
 
 scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
-  var data = scout.arrays.find(this._data(), function(data) {
+  var data = scout.arrays.find(this.data, function(data) {
     return data[0] === key;
   });
   if (data) {
@@ -111,7 +120,7 @@ scout.StaticLookupCall.prototype.getByRec = function(rec) {
 };
 
 scout.StaticLookupCall.prototype._queryByRec = function(deferred, rec) {
-  var lookupRows = this._data().reduce(function(aggr, data) {
+  var lookupRows = this.data.reduce(function(aggr, data) {
     if (data[2] === rec) {
       aggr.push(this._dataToLookupRow(data));
     }
@@ -139,12 +148,11 @@ scout.StaticLookupCall.prototype._dataToLookupRow = function(data) {
  * where the inner array contains the values required to create a scout.LookupRow. By
  * default the first two elements of the array must be:
  *
- *   0: Text
- *   1: Key
+ *   0: Key
+ *   1: Text
  *
  * When your data contains more elements you must also implement the _dataToLookupRow() function.
  */
 scout.StaticLookupCall.prototype._data = function() {
-  throw new Error('_data not implemented');
+  return [];
 };
-

@@ -15,7 +15,6 @@
  */
 scout.SmartField2TouchPopup = function() {
   scout.SmartField2TouchPopup.parent.call(this);
-  this._addWidgetProperties('proposalChooser');
 };
 scout.inherits(scout.SmartField2TouchPopup, scout.TouchPopup);
 

@@ -34,8 +34,7 @@ scout.SmartField2 = function() {
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
 
-  this._addWidgetProperties(['proposalChooser']);
-  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall']);
+  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilterEnabled', 'activeFilterLabels']);
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -61,11 +60,13 @@ scout.SmartField2.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 scout.SmartField2.prototype._init = function(model) {
   scout.SmartField2.parent.prototype._init.call(this, model);
 
-  this.activeFilterLables = [
-    this.session.text('ui.All'),
-    this.session.text('ui.Inactive'),
-    this.session.text('ui.Active')
-  ];
+  if (this.activeFilterLabels.length === 0) {
+    this.activeFilterLabels = [
+      this.session.text('ui.All'),
+      this.session.text('ui.Inactive'),
+      this.session.text('ui.Active')
+    ];
+  }
 
   scout.fields.initTouch(this, model);
 };
@@ -516,7 +517,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   // In cases where the user has tabbed to the next field, while results for the previous
   // smartfield are still loading: don't show the proposal popup.
-  if (!this.isFocused()) {
+  if (!this.isFocused() && !this.touch) {
     this.closePopup();
     return;
   }
@@ -1051,4 +1052,15 @@ scout.SmartField2.prototype._createLoadingSupport = function() {
     widget: this,
     loadingIndicatorDelay: 400 // ms
   });
+};
+
+/**
+ * @override FormField.js
+ */
+scout.SmartField2.prototype._showStatusMessage = function() {
+  if (this.touch && this.isPopupOpen()) {
+    // Do not display a tooltip if the touch popup is open, the tooltip will be displayed there
+    return;
+  }
+  scout.SmartField2.parent.prototype._showStatusMessage.call(this);
 };
