@@ -103,6 +103,53 @@ describe('SmartField2', function() {
 
   describe('clear', function() {
 
+    it('clears the value', function() {
+      var field = createFieldWithLookupCall();
+      jasmine.clock().tick(500);
+      field.render();
+      field.setValue(1);
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(1);
+      expect(field.displayText).toBe('Foo');
+      expect(field.$field.val()).toBe('Foo');
+      expect(field.popup.proposalChooser.model.selectedRows.length).toBe(1);
+
+      field.clear();
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+      expect(field.$field.val()).toBe('');
+      expect(field.popup.proposalChooser.model.selectedRows.length).toBe(0);
+    });
+
+    it('clears the value, also in touch mode', function() {
+      var field = createFieldWithLookupCall({
+        touch: true
+      });
+      field.render();
+      field.setValue(1);
+      jasmine.clock().tick(500);
+      field.$field.triggerClick();
+      jasmine.clock().tick(500);
+      expect(field.value).toBe(1);
+      expect(field.displayText).toBe('Foo');
+      expect(field.$field.text()).toBe('Foo');
+      expect(field.popup._widget.model.selectedRows.length).toBe(1);
+
+      field.popup._field.clear();
+      expect(field.popup._field.value).toBe(null);
+      expect(field.popup._field.displayText).toBe('');
+      expect(field.popup._field.$field.val()).toBe('');
+      expect(field.popup._widget.model.selectedRows.length).toBe(0);
+
+      field.popup.close();
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+      expect(field.$field.val()).toBe('');
+    });
+
     it('does not close the popup but does a browse all', function() {
       // This is especially important for mobile, but makes sense for regular case too.
       var field = createFieldWithLookupCall();
