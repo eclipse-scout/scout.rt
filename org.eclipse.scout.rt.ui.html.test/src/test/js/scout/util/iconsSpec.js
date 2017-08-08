@@ -37,15 +37,15 @@ describe('scout.icons', function() {
   });
 
   it('parses returns a CSS class for custom fonts', function() {
-    icon = new scout.Icon();
-    icon.iconType = scout.Icon.IconType.FONT_ICON;
+    icon = new scout.IconDesc();
+    icon.iconType = scout.IconDesc.IconType.FONT_ICON;
     icon.font = 'widgetIcons';
     expect(icon.cssClass()).toBe('font-widgetIcons');
   });
 
   it('appends CSS class string with custom fonts', function() {
-    icon = new scout.Icon();
-    icon.iconType = scout.Icon.IconType.FONT_ICON;
+    icon = new scout.IconDesc();
+    icon.iconType = scout.IconDesc.IconType.FONT_ICON;
     icon.font = 'widgetIcons';
     expect(icon.appendCssClass('font-icon')).toBe('font-icon font-widgetIcons');
   });

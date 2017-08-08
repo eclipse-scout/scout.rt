@@ -569,11 +569,19 @@ $.fn.appendTextNode = function(text) {
   return $(this.document(true).createTextNode(text)).appendTo(this);
 };
 
+/**
+ * @param {scout.IconDesc|string} iconId
+ */
 $.fn.appendIcon = function(iconId, cssClass) {
   if (!iconId) {
     return this.appendImg(null, cssClass);
   }
-  var icon = scout.icons.parseIconId(iconId);
+  var icon;
+  if (iconId instanceof scout.IconDesc) {
+    icon = iconId;
+  } else {
+    icon = scout.icons.parseIconId(iconId);
+  }
   if (icon.isFontIcon()) {
     return this.makeSpan(cssClass, icon.iconCharacter)
       .addClass('icon')
@@ -753,6 +761,7 @@ $.fn.setTabbable = function(tabbable) {
  * @param {function} [addToDomFunc] optional function which is used to add the new icon element to the DOM
  *     When not set, this.prepend($icon) is called.
  * @returns {$}
+ * @see scout.Icon as an alternative
  */
 $.fn.icon = function(iconId, addToDomFunc) {
   var icon, $icon = this.data('$icon');
