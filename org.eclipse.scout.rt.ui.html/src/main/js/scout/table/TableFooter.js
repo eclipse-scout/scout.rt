@@ -424,6 +424,12 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   if (this.open) {
     // Calling open again may resize the container -> don't return
   }
+  var currentControl = this.$controlContent.data('control');
+  if (this.animating && currentControl !== control) {
+    // Make sure the existing content is removed if the close animation was aborted and another control selected while the container is still closing
+    // (The done callback won't be executed when calling stop(true))
+    currentControl.onControlContainerClosed();
+  }
   this.animating = true;
   this.open = true;
 
