@@ -949,14 +949,14 @@ scout.SmartField2.prototype._setValue = function(value) {
   // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
   // must of the time. Thus we must remove the reference to the old lookup row as early as possible
   if (!this._lockLookupRow) {
-    if (value) {
+    if (scout.objects.isNullOrUndefined(value)) {
+      // when value is set to null, we must also reset the cached lookup row
+      this._setLookupRow(null);
+    } else {
       // when a value is set, we only keep the cached lookup row when the key of the lookup row is equals to the value
       if (this.lookupRow && this.lookupRow.key !== value) {
         this._setLookupRow(null);
       }
-    } else {
-      // when value is set to null, we must also reset the cached lookup row
-      this._setLookupRow(null);
     }
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
@@ -974,19 +974,23 @@ scout.SmartField2.prototype.getValueForSelection = function() {
 };
 
 scout.SmartField2.prototype._showSelection = function() {
-  if (scout.objects.isNullOrUndefined(this.value)) {
-    return false;
-  }
-  if (scout.objects.isNullOrUndefined(this.lookupRow)) {
+  if (scout.objects.isNullOrUndefined(this.value) ||
+      scout.objects.isNullOrUndefined(this.lookupRow)) {
     return false;
   }
 
-  // check if text matches (deal with multi-line)
-  var text = this._readDisplayText();
-  var additionalLines = this.additionalLines();
-  if (additionalLines) {
-    text = [text].concat(additionalLines).join('\n');
+  var text;
+  if (this.rendered) {
+    // check if text matches (deal with multi-line)
+    text = this._readDisplayText();
+    var additionalLines = this.additionalLines();
+    if (additionalLines) {
+      text = [text].concat(additionalLines).join('\n');
+    }
+  } else {
+    text = this.displayText;
   }
+
   return text === this.lookupRow.text;
 };
 

@@ -41,6 +41,18 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
   @Override
   protected void initJsonProperties(MODEL model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(IValueField.PROP_VALUE, model) {
+      @Override
+      protected VALUE modelValue() {
+        return getModel().getValue();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return JsonSmartField2.this.valueToJson((VALUE) value);
+      }
+    });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_RESULT, model) {
       @Override
       protected Object modelValue() {
@@ -191,6 +203,13 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
   @Override
   protected Object jsonToValue(String jsonValue) {
     return getLookupRowKeyForId(jsonValue); // jsonValue == mapped key
+  }
+
+  protected Object valueToJson(VALUE value) {
+    if (value == null) {
+      return value;
+    }
+    return getIdForLookupRowKey(value);
   }
 
   @Override

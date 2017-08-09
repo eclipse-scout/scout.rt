@@ -39,6 +39,12 @@ public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> ext
   }
 
   @Override
+  protected Object valueToJson(VALUE value) {
+    assert value instanceof String;
+    return value;
+  }
+
+  @Override
   protected void setValueFromUI(Object value) {
     getModel().getUIFacade().setValueAsStringFromUI((String) value);
   }
