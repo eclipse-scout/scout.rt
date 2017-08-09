@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe('scout.Icon', function() {
+describe('Icon', function() {
 
   var session;
 
@@ -24,7 +24,7 @@ describe('scout.Icon', function() {
         parent: session.desktop,
         iconDesc: scout.icons.INFO
       });
-      icon.render();
+      icon.render(session.$entryPoint);
       expect(icon.$container[0].tagName).toBe('SPAN');
     });
 
@@ -33,7 +33,7 @@ describe('scout.Icon', function() {
         parent: session.desktop,
         iconDesc: 'icon/image.png'
       });
-      icon.render();
+      icon.render(session.$entryPoint);
       expect(icon.$container[0].tagName).toBe('IMG');
     });
 
