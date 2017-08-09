@@ -39,7 +39,8 @@ scout.SmartField2TouchPopup.prototype._createProposalChooser = function() {
   var objectType = this.parent.browseHierarchy ? 'TreeProposalChooser2' : 'TableProposalChooser2';
   return scout.create(objectType, {
     parent: this,
-    touch: true
+    touch: true,
+    smartField: this._field
   });
 };
 
