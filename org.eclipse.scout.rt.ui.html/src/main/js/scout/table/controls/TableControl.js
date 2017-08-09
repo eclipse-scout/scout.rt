@@ -109,6 +109,7 @@ scout.TableControl.prototype.renderContent = function() {
       this.tableFooter.$controlContainer.addClass(this.cssClass + '-table-control-container');
       this.tableFooter.$controlContent.addClass(this.cssClass + '-table-control-content');
     }
+    this.tableFooter.$controlContent.data('control', this);
     this._renderContent(this.tableFooter.$controlContent);
     this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
     if (this.htmlComp) {
