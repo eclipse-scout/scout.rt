@@ -26,7 +26,7 @@ scout.SmartField2TouchPopup.prototype._init = function(options) {
   this.setLookupResult(options.lookupResult);
   this.setStatus(options.status);
 
-  this._field.on('acceptInput acceptInputFail', this._onFieldAcceptInput.bind(this));
+  this.one('close', this._beforeClosePopup.bind(this));
 };
 
 scout.SmartField2TouchPopup.prototype._initWidget = function(options) {
@@ -53,24 +53,8 @@ scout.SmartField2TouchPopup.prototype._fieldOverrides = function() {
   return obj;
 };
 
-scout.SmartField2TouchPopup.prototype._onFieldAcceptInput = function(event) {
-  // Delegate to original field
-  this._touchField.setDisplayText(event.displayText);
-  this._touchField.setErrorStatus(event.errorStatus);
-  if (!event.errorStatus) {
-    this._touchField.setValue(event.value);
-  }
-};
-
 scout.SmartField2TouchPopup.prototype._onMouseDownOutside = function(event) {
-  // Sync display text first because accept input needs the correct display text
-  this._delegateDisplayText();
-  this._touchField.acceptInput();
-  this.close();
-};
-
-scout.SmartField2TouchPopup.prototype._delegateDisplayText = function() {
-  this._touchField.setDisplayText(this._field._readDisplayText());
+  this.close(); // see: #_beforeClosePopup()
 };
 
 /**
@@ -107,4 +91,17 @@ scout.SmartField2TouchPopup.prototype.selectFirstLookupRow = function() {
 
 scout.SmartField2TouchPopup.prototype.selectLookupRow = function() {
   this._widget.triggerLookupRowSelected();
+};
+
+scout.SmartField2TouchPopup.prototype._beforeClosePopup = function(event) {
+  var embeddedField = this._field;
+  if (embeddedField._lookupInProgress) {
+    embeddedField.one('acceptInput acceptInputFail', done.bind(this, embeddedField));
+  } else {
+    done.call(this, embeddedField);
+  }
+
+  function done(embeddedField) {
+    this.smartField.acceptInputFromField(embeddedField);
+  }
 };

@@ -50,11 +50,14 @@ scout.SmartField2Adapter.prototype.lookupByRec = function(rec) {
 scout.SmartField2Adapter.prototype._onWidgetAcceptInput = function(event) {
   var eventData = {
     displayText: event.displayText,
-    value: event.value
+    errorStatus: event.errorStatus
   };
 
-  if (event.acceptByLookupRow) {
-    eventData.lookupRow = event.lookupRow;
+  if (!event.errorStatus) {
+    eventData.value = event.value;
+    if (event.acceptByLookupRow) {
+      eventData.lookupRow = event.lookupRow;
+    }
   }
 
   this._send('acceptInput', eventData, {

@@ -106,7 +106,8 @@ scout.CellEditorPopup.prototype._postRender = function() {
   var field = this.cell.field;
   if (field.onCellEditorRendered) {
     field.onCellEditorRendered({
-      openFieldPopup: this.table.openFieldPopupOnCellEdit
+      openFieldPopup: this.table.openFieldPopupOnCellEdit,
+      cellEditorPopup: this
     });
   }
 };
