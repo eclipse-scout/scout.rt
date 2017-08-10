@@ -61,6 +61,17 @@ scout.Column.prototype._init = function(model) {
   this._setDisplayable(this.displayable);
 };
 
+scout.Column.prototype.destroy = function() {
+  this._destroy();
+};
+
+/**
+ * Override this function in order to implement custom destroy logic.
+ */
+scout.Column.prototype._destroy = function(model) {
+  // NOP
+};
+
 /**
  * Converts the vararg if it is of type string to an object with
  * a property 'text' with the original value.
