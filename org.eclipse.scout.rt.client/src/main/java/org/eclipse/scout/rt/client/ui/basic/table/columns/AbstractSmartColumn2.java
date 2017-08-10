@@ -350,6 +350,9 @@ public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> 
         BEANS.get(ExceptionHandler.class).handle(pe);
       }
     }
+    else {
+      super.updateDisplayText(row, value);
+    }
   }
 
   @Override
@@ -363,6 +366,9 @@ public abstract class AbstractSmartColumn2<VALUE> extends AbstractColumn<VALUE> 
       catch (RuntimeException pe) {
         BEANS.get(ExceptionHandler.class).handle(pe);
       }
+    }
+    else {
+      super.updateDisplayText(row, cell);
     }
   }
 

@@ -180,6 +180,12 @@ scout.SmartField2.prototype.acceptInput = function() {
     clearTimeout(this._pendingLookup);
   }
 
+  if (this.touch) {
+    $.log.debug('(SmartField2#acceptInput) Always send acceptInput for touch field!');
+    this._inputAccepted();
+    return;
+  }
+
   // Do nothing when search text is equals to the text of the current lookup row
   if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
     $.log.debug('(SmartField2#acceptInput) unchanged: text is equals. Close popup');
@@ -445,6 +451,7 @@ scout.SmartField2.prototype._formatLookupRow = function(lookupRow) {
 /**
  * @param {boolean} [browse] whether or not the lookup call should execute getAll() or getByText() with the current display text.
  *     if browse is undefined, browse is set to true automatically if search text is empty
+ * @returns {Promise}
  */
 scout.SmartField2.prototype.openPopup = function(browse) {
   var searchText = this._readDisplayText();
@@ -463,7 +470,7 @@ scout.SmartField2.prototype.openPopup = function(browse) {
     browse = false;
   }
 
-  this._lookupByTextOrAll(browse, searchText);
+  return this._lookupByTextOrAll(browse, searchText);
 };
 
 scout.SmartField2.prototype._hasUiError = function(codes) {
@@ -492,6 +499,9 @@ scout.SmartField2.prototype._hasUiError = function(codes) {
   });
 };
 
+/**
+ * @returns {Promise}
+ */
 scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
   // default values
   searchText = scout.nvl(searchText, this._readDisplayText());
@@ -508,9 +518,11 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
     this._pendingLookup = null;
   }
 
+  var deferred = $.Deferred();
   var doneHandler = function(result) {
     result.browse = browse;
     this._lookupByTextOrAllDone(result);
+    deferred.resolve(result);
   }.bind(this);
 
   // execute lookup byAll immediately
@@ -526,13 +538,17 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
         .done(doneHandler);
     }.bind(this), scout.SmartField2.DEBOUNCE_DELAY);
   }
+
+  return deferred.promise();
 };
 
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   // In cases where the user has tabbed to the next field, while results for the previous
-  // smartfield are still loading: don't show the proposal popup.
-  if (!this.isFocused() && !this.touch) {
+  // smart-field are still loading: don't show the proposal popup. In the case of a cell-editor
+  // it's also possible that the smart-field is not rendered anymore when the lookup is done
+  if (!this.rendered ||
+      !this.isFocused() && !this.touch && !this.embedded) {
     this.closePopup();
     return;
   }
@@ -621,9 +637,17 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
   });
 
   this.popup.open();
-  this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
-  this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this));
-  this.popup.on('remove', function() {
+
+  /* This variable is required to route events to the right field:
+   * - in normal mode popup events should be processed by the normal smart-field
+   * - in touch mode, the field flagged with the 'touch' property should process no
+   *   events at all, instead the field flagged with the 'embedded' property should
+   *   process these events.
+   */
+  var fieldForPopup = this.touch ? this.popup._field : this;
+  this.popup.on('lookupRowSelected', fieldForPopup._onLookupRowSelected.bind(fieldForPopup));
+  this.popup.on('activeFilterSelected', fieldForPopup._onActiveFilterSelected.bind(fieldForPopup));
+  this.popup.one('remove', function() {
     this.popup = null;
     if (this.rendered) {
       this.$container.removeClass('popup-open');
@@ -1051,7 +1075,8 @@ scout.SmartField2.prototype._triggerAcceptInputEvent = function(eventType, accep
  */
 scout.SmartField2.prototype.onCellEditorRendered = function(options) {
   if (options.openFieldPopup) {
-    this.togglePopup();
+    this._cellEditorPopup = options.cellEditorPopup;
+    this.openPopup(true);
   }
 };
 
@@ -1082,4 +1107,29 @@ scout.SmartField2.prototype._showStatusMessage = function() {
     return;
   }
   scout.SmartField2.parent.prototype._showStatusMessage.call(this);
+};
+
+/**
+ * In touch mode, we must close the cell editor popup explicitly, because the touch-popup and its glasspane
+ * prevents the cell editor popup from receiving mouse down events.
+ */
+scout.SmartField2.prototype.acceptInputFromField = function(otherField) {
+  var errorStatus = otherField.errorStatus;
+
+  if (this.lookupRow !== otherField.lookupRow) {
+    this.setLookupRow(otherField.lookupRow);
+  }
+  if (errorStatus) {
+    errorStatus.severity = scout.Status.Severity.ERROR; // FIXME [awe] 7.0 - wahrscheinlich müssen wir das schon in acceptInput machen
+  }
+  this.setErrorStatus(errorStatus);
+  scout.fields.valOrText(this.$field, otherField.displayText);
+
+  if (this._cellEditorPopup) {
+    // this will call acceptInput on the touch smart-field (== this)
+    this._cellEditorPopup.completeEdit();
+    this._cellEditorPopup = null;
+  } else {
+    this.acceptInput();
+  }
 };
