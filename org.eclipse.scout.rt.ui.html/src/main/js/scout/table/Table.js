@@ -171,6 +171,17 @@ scout.Table.prototype._initColumns = function() {
   this._setHeadAndTailSortColumns();
 };
 
+scout.Table.prototype._destroy = function() {
+  this._destroyColumns();
+  scout.Table.parent.prototype._destroy.call(this);
+};
+
+scout.Table.prototype._destroyColumns = function() {
+  this.columns.forEach(function(column) {
+    column.destroy();
+  });
+};
+
 /**
  * @override
  */
@@ -3669,6 +3680,7 @@ scout.Table.prototype.containsAggregatedNumberColumn = function() {
  * Does not modify the rows, it expects a deleteAll and insert operation to follow which will do the job.
  */
 scout.Table.prototype.updateColumnStructure = function(columns) {
+  this._destroyColumns();
   this.columns = columns;
   this._initColumns();
 
