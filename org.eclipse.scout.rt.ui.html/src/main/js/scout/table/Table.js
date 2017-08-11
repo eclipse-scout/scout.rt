@@ -3764,7 +3764,7 @@ scout.Table.prototype.setCellValue = function(column, row, value) {
 
 scout.Table.prototype.visibleColumns = function() {
   return this.columns.filter(function(column) {
-    return column.visible;
+    return column.isVisible();
   });
 };
 
