@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Column = function() {
+  this.autoOptimizeWidth = false;
+  this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
   this.cssClass;
   this.editable = false;
   this.removable = false;
@@ -19,6 +21,7 @@ scout.Column = function() {
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;
   this.index = -1;
+  this.initialized = false;
   this.mandatory = false;
   this.sortActive = false;
   this.sortAscending = true;
@@ -26,8 +29,9 @@ scout.Column = function() {
   this.summary = false;
   this.type = 'text';
   this.width = 60;
-  this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
-  this.showSeparator = true; // currently a UI-only property, defaults to true
+  this.initialWidth; // the width the column initially has
+  this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
+  this.showSeparator = true;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
   this.comparator = scout.comparators.TEXT;
@@ -52,6 +56,7 @@ scout.Column.prototype.init = function(model) {
   }
   scout.texts.resolveTextProperty(this);
   this._init(model);
+  this.initialized = true;
 };
 
 /**
@@ -59,6 +64,7 @@ scout.Column.prototype.init = function(model) {
  */
 scout.Column.prototype._init = function(model) {
   this._setDisplayable(this.displayable);
+  this._setAutoOptimizeWidth(this.autoOptimizeWidth);
 };
 
 scout.Column.prototype.destroy = function() {
@@ -582,6 +588,21 @@ scout.Column.prototype.setDisplayable = function(displayable) {
 scout.Column.prototype._setDisplayable = function(displayable) {
   this.displayable = displayable;
   this.setVisible(displayable);
+};
+
+scout.Column.prototype.setAutoOptimizeWidth = function(autoOptimizeWidth) {
+  if (this.autoOptimizeWidth === autoOptimizeWidth) {
+    return;
+  }
+  this._setAutoOptimizeWidth(autoOptimizeWidth);
+};
+
+scout.Column.prototype._setAutoOptimizeWidth = function(autoOptimizeWidth) {
+  this.autoOptimizeWidth = autoOptimizeWidth;
+  this.autoOptimizeWidthRequired = autoOptimizeWidth;
+  if (this.initialized) {
+    this.table.invalidateLayoutTree();
+  }
 };
 
 scout.Column.prototype.isContentValid = function(row) {

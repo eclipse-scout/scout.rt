@@ -402,4 +402,139 @@ describe('Column', function() {
 
   });
 
+  describe('autoOptimizeWidth', function() {
+
+    it('will resize the column to fit its content after layouting', function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[1].autoOptimizeWidth = true;
+      var table = helper.createTable(model);
+      spyOn(table, 'resizeToFit').and.callThrough();
+      table.render();
+      expect(table.columns[0].autoOptimizeWidth).toBe(false);
+      expect(table.columns[1].autoOptimizeWidth).toBe(true);
+      expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
+      expect(table.resizeToFit).not.toHaveBeenCalled();
+
+      table.validateLayout();
+      expect(table.columns[1].autoOptimizeWidth).toBe(true);
+      expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+      expect(table.resizeToFit.calls.count()).toBe(1);
+    });
+
+    describe('autoOptimizeWidthRequired', function() {
+      it('will be set to true if a row is updated and the content changed', function() {
+        var model = helper.createModelFixture(3, 2);
+        model.columns[0].autoOptimizeWidth = true;
+        model.columns[1].autoOptimizeWidth = true;
+        var table = helper.createTable(model);
+        table.render();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
+        table.validateLayout();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        spyOn(table, 'resizeToFit').and.callThrough();
+
+        // Update row but don't change relevant content -> no need to update the width
+        table.updateRow({
+          id: table.rows[1].id,
+          cells: ['cell1_0', 'cell1_1', 'abc']
+        });
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        table.validateLayout();
+        expect(table.resizeToFit).not.toHaveBeenCalled();
+
+        // Update content of second column -> resize that column but not the other
+        table.updateRow({
+          id: table.rows[1].id,
+          cells: ['cell1_0', 'new content', 'abc']
+        });
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
+        table.validateLayout();
+        expect(table.resizeToFit.calls.count()).toBe(1);
+      });
+
+      it('will be set to true if a row is inserted', function() {
+        var model = helper.createModelFixture(3, 2);
+        model.columns[0].autoOptimizeWidth = true;
+        model.columns[1].autoOptimizeWidth = true;
+        var table = helper.createTable(model);
+        table.render();
+        table.validateLayout();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        spyOn(table, 'resizeToFit').and.callThrough();
+
+        table.insertRow(['a', 'b', 'c']);
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
+        table.validateLayout();
+        expect(table.resizeToFit.calls.count()).toBe(2);
+      });
+
+      it('will be set to true if a row is deleted', function() {
+        var model = helper.createModelFixture(3, 2);
+        model.columns[0].autoOptimizeWidth = true;
+        model.columns[1].autoOptimizeWidth = true;
+        var table = helper.createTable(model);
+        table.render();
+        table.validateLayout();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        spyOn(table, 'resizeToFit').and.callThrough();
+
+        table.deleteRow(table.rows[1]);
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
+        table.validateLayout();
+        expect(table.resizeToFit.calls.count()).toBe(2);
+      });
+
+      it('will be set to true if all rows are deleted', function() {
+        var model = helper.createModelFixture(3, 2);
+        model.columns[0].autoOptimizeWidth = true;
+        model.columns[1].autoOptimizeWidth = true;
+        var table = helper.createTable(model);
+        table.render();
+        table.validateLayout();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        spyOn(table, 'resizeToFit').and.callThrough();
+
+        table.deleteAllRows();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
+        table.validateLayout();
+        expect(table.resizeToFit.calls.count()).toBe(2);
+      });
+
+      it('will be set to true if autoOptimizeWidth is set dynamically', function() {
+        var model = helper.createModelFixture(3, 2);
+        var table = helper.createTable(model);
+        table.render();
+        table.validateLayout();
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        spyOn(table, 'resizeToFit').and.callThrough();
+
+        table.columns[0].setAutoOptimizeWidth(true);
+        expect(table.columns[0].autoOptimizeWidth).toBe(true);
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        table.validateLayout();
+        expect(table.resizeToFit.calls.count()).toBe(1);
+
+        table.columns[0].setAutoOptimizeWidth(false);
+        expect(table.columns[0].autoOptimizeWidth).toBe(false);
+        expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
+        expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
+        table.validateLayout();
+        expect(table.resizeToFit.calls.count()).toBe(1);
+      });
+    });
+
+  });
+
 });

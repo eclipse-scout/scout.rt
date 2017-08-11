@@ -1886,6 +1886,27 @@ scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
   }, this);
 };
 
+scout.Table.prototype._markAutoOptimizeWidthColumnsAsDirty = function() {
+  this.columns.forEach(function(column) {
+    column.autoOptimizeWidthRequired = true;
+  });
+};
+
+scout.Table.prototype._markAutoOptimizeWidthColumnsAsDirtyIfNeeded = function(autoOptimizeWidthColumns, oldRow, newRow) {
+  var i,
+    marked = false;
+  for (i = autoOptimizeWidthColumns.length - 1; i >= 0; i--) {
+    var column = autoOptimizeWidthColumns[i];
+    if (this.cellValue(column, oldRow) !== this.cellValue(column, newRow)) {
+      column.autoOptimizeWidthRequired = true;
+      // Remove column from list since it is now marked and does not have to be processed next time
+      autoOptimizeWidthColumns.splice(i, 1);
+      marked = true;
+    }
+  }
+  return marked;
+};
+
 scout.Table.prototype.setMultiCheck = function(multiCheck) {
   this.setProperty('multiCheck', multiCheck);
 };
@@ -1977,6 +1998,7 @@ scout.Table.prototype.insertRows = function(rows) {
 
   this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
+  this._markAutoOptimizeWidthColumnsAsDirty();
 
   // this event should be triggered before the rowOrderChanged event (triggered by the _sort function).
   this._triggerRowsInserted(rows);
@@ -2041,6 +2063,7 @@ scout.Table.prototype.deleteRows = function(rows) {
   }
   this._group();
   this._updateBackgroundEffect();
+  this._markAutoOptimizeWidthColumnsAsDirty();
   this._triggerRowsDeleted(rows);
 
   if (invalidate) {
@@ -2073,6 +2096,7 @@ scout.Table.prototype.deleteAllRows = function() {
   this.deselectAll();
   this._filteredRows = [];
 
+  this._markAutoOptimizeWidthColumnsAsDirty();
   if (filterChanged) {
     this._rowsFiltered();
   }
@@ -2093,7 +2117,10 @@ scout.Table.prototype.updateRow = function(row) {
 };
 
 scout.Table.prototype.updateRows = function(rows) {
-  var filterChanged, newHiddenRows = [];
+  var filterChanged, autoOptimizeWidthColumnsDirty, newHiddenRows = [];
+  var autoOptimizeWidthColumns = this.columns.filter(function(column) {
+    return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
+  });
 
   // Update model
   rows.forEach(function(updatedRow) {
@@ -2107,6 +2134,10 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = updatedRow;
     }
+
+    // Check if cell content changed and if yes mark auto optimize width column as dirty
+    autoOptimizeWidthColumnsDirty = this._markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns, oldRow, updatedRow);
+
     // TODO [7.0] cgu: remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
@@ -2149,6 +2180,9 @@ scout.Table.prototype.updateRows = function(rows) {
   }
   this._sortAfterUpdate();
   this._updateBackgroundEffect();
+  if (autoOptimizeWidthColumnsDirty) {
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.Table.prototype._sortAfterUpdate = function() {
@@ -2751,6 +2785,7 @@ scout.Table.prototype.resizeToFit = function(column) {
   if (column.width !== calculatedSize) {
     this.resizeColumn(column, calculatedSize);
   }
+  column.autoOptimizeWidthRequired = false;
 };
 
 /**

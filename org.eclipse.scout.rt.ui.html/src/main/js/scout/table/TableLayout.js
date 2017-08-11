@@ -55,9 +55,7 @@ scout.TableLayout.prototype.layout = function($container) {
   $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
   this._dataHeightPositive = $data.height() > 0;
 
-  if (this.table.autoResizeColumns) {
-    this._layoutColumns();
-  }
+  this._layoutColumns();
 
   // Size of last column may have to be adjusted due to the header menu items
   if (header) {
@@ -85,19 +83,37 @@ scout.TableLayout.prototype.layout = function($container) {
   this.table.updateScrollbars();
 };
 
-/**
- * Resizes the columns to make them use all the available space.
- */
 scout.TableLayout.prototype._layoutColumns = function() {
+  this._autoOptimizeColumnsWidths();
+  if (this.table.autoResizeColumns) {
+    this._autoResizeColumns();
+  }
+};
+
+/**
+ * Resizes all visible columns with autoOptimizeWidth set to true, if necessary (means if autoOptimizeWidthRequired is true)
+ */
+scout.TableLayout.prototype._autoOptimizeColumnsWidths = function() {
+  this.table.visibleColumns().forEach(function(column) {
+    if (column.autoOptimizeWidth && column.autoOptimizeWidthRequired) {
+      this.table.resizeToFit(column);
+    }
+  }, this);
+};
+
+/**
+ * Resizes the visible columns to make them use all the available space.
+ */
+scout.TableLayout.prototype._autoResizeColumns = function() {
   var newWidth, weight,
     relevantColumns = [],
     currentWidth = 0,
     totalInitialWidth = 0,
     availableWidth = Math.floor(this.table.$data.width() - this.table.rowBorderWidth);
 
-  // Handle fixed columns
+  // Don't resize fixed and auto optimize width columns
   this.table.visibleColumns().forEach(function(column) {
-    if (column.fixedWidth) {
+    if (column.fixedWidth || column.autoOptimizeWidth) {
       availableWidth -= column.width;
     } else {
       relevantColumns.push(column);
