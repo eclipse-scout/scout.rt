@@ -2093,8 +2093,8 @@ scout.Table.prototype.deleteAllRows = function() {
   // Update model
   this.rows = [];
   this.rowsMap = {};
-  this.deselectAll();
   this._filteredRows = [];
+  this.deselectAll();
 
   this._markAutoOptimizeWidthColumnsAsDirty();
   if (filterChanged) {
