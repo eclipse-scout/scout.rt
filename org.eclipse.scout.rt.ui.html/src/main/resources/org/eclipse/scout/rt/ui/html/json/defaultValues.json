@@ -310,6 +310,7 @@
       "filterAccepted": true
     },
     "Column": {
+      "autoOptimizeWidth": false,
       "editable": false,
       "enabled": true,
       "fixedWidth": false,
