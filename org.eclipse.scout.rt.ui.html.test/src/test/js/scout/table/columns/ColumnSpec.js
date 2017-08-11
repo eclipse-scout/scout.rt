@@ -421,6 +421,20 @@ describe('Column', function() {
       expect(table.resizeToFit.calls.count()).toBe(1);
     });
 
+    it('also works if there is no header', function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[1].autoOptimizeWidth = true;
+      model.headerVisible = false;
+      var table = helper.createTable(model);
+      spyOn(table, 'resizeToFit').and.callThrough();
+      table.render();
+      expect(table.resizeToFit).not.toHaveBeenCalled();
+
+      table.validateLayout();
+      expect(table.columns[1].autoOptimizeWidth).toBe(true);
+      expect(table.resizeToFit.calls.count()).toBe(1);
+    });
+
     describe('autoOptimizeWidthRequired', function() {
       it('will be set to true if a row is updated and the content changed', function() {
         var model = helper.createModelFixture(3, 2);

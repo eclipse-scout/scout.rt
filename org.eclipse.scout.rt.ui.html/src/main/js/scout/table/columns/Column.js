@@ -487,7 +487,9 @@ scout.Column.prototype.calculateOptimalWidth = function() {
   };
 
   // Create divs for all relevant cells of the column
-  addDivForMeasurement(this.$header.clone()); // header
+  if (this.$header) {
+    addDivForMeasurement(this.$header.clone()); // header
+  }
   this.table.rows.forEach(function(row) {
     addDivForMeasurement($(this.buildCellForRow(row))); // model rows
   }, this);
