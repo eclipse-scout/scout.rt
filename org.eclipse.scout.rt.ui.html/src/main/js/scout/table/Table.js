@@ -2069,8 +2069,8 @@ scout.Table.prototype.deleteAllRows = function() {
   // Update model
   this.rows = [];
   this.rowsMap = {};
-  this.deselectAll();
   this._filteredRows = [];
+  this.deselectAll();
 
   if (filterChanged) {
     this._rowsFiltered();

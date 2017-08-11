@@ -118,7 +118,7 @@ scout.AggregateTableControl.prototype._aggregate = function() {
   this.table._forEachVisibleColumn('aggrFinish', aggregateRow);
 
   this.aggregateRow = aggregateRow;
-  if (this.rendered && this.selected) {
+  if (this.contentRendered && this.selected) {
     this._rerenderAggregate();
   }
 };
@@ -168,7 +168,7 @@ scout.AggregateTableControl.prototype._onTableChanged = function() {
 
 scout.AggregateTableControl.prototype._onAggregationFunctionChanged = function() {
   this._updateEnabledAndSelectedState(true);
-  if (this.selected && this.rendered) {
+  if (this.contentRendered && this.selected) {
     this._aggregate();
   }
 };
@@ -185,7 +185,7 @@ scout.AggregateTableControl.prototype._onTableColumnMoved = function(event) {
 
 scout.AggregateTableControl.prototype._onTableColumnStructureChanged = function() {
   this._updateEnabledAndSelectedState();
-  if (this.selected && this.rendered) {
+  if (this.contentRendered && this.selected) {
     this._aggregate();
   }
 };
