@@ -166,7 +166,7 @@ scout.SmartField2.prototype.acceptInput = function() {
     searchTextChanged = this._checkDisplayTextChanged(searchText),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
 
-  this._setProperty('displayText', searchText); // FIXME [awe] 7.0 - SF2: set lookupRow/value to null when displayText does not match anymore (write a test)!
+  this._setProperty('displayText', searchText);
   this._acceptInputDeferred = $.Deferred();
 
   // in case the user has typed something after he has selected a lookup row
@@ -196,6 +196,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   // Do nothing when we don't have a current lookup row and search text is empty
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
     $.log.debug('(SmartField2#acceptInput) unchanged: text is empty. Close popup');
+    this.clearErrorStatus();
     this._inputAccepted(false);
     return;
   }
@@ -221,11 +222,14 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   // 3.) proposal chooser is not open -> try to accept the current display text
   // this causes a lookup which may fail and open a new proposal chooser (property
-  // change for 'result'). Or in case the text is empty, just set the value to null
+  // change for 'result').
   if (searchTextChanged) {
     this._acceptByText(searchText);
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
+  } else if (this._hasUiError(scout.SmartField2.ErrorCode.NOT_UNIQUE) && this.popup) {
+    // popup has been opened (again) with errorStatus NOT_UNIQUE, and search text is still the same
+    this.popup.selectFirstLookupRow();
   }
 
   return this._acceptInputDeferred.promise();
@@ -326,7 +330,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     this.closePopup();
     this.setValue(null);
     this.setDisplayText(searchText);
-    this.setErrorStatus(scout.Status.warn({
+    this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldCannotComplete', searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
@@ -335,7 +339,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
   if (result.numLookupRows > 1) {
     this.setValue(null);
     this.setDisplayText(searchText);
-    this.setErrorStatus(scout.Status.warn({
+    this.setErrorStatus(scout.Status.error({
       message: this.session.text('SmartFieldNotUnique', searchText),
       code: scout.SmartField2.ErrorCode.NOT_UNIQUE
     }));
@@ -551,11 +555,6 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
       !this.isFocused() && !this.touch && !this.embedded) {
     this.closePopup();
     return;
-  }
-
-  // Remove error codes set from UI
-  if (this._hasUiError()) {
-    this.setErrorStatus(null);
   }
 
   // We don't want to set an error status on the field for the 'no data' case
@@ -1053,20 +1052,17 @@ scout.SmartField2.prototype._renderClearable = function() {
 };
 
 scout.SmartField2.prototype._triggerAcceptInputFail = function() {
-  this._triggerAcceptInputEvent('acceptInputFail', false);
+  this._triggerAcceptInput(false, true);
 };
 
-scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow) {
-  this._triggerAcceptInputEvent('acceptInput', acceptByLookupRow);
-};
-
-scout.SmartField2.prototype._triggerAcceptInputEvent = function(eventType, acceptByLookupRow) {
-  this.trigger(eventType, {
+scout.SmartField2.prototype._triggerAcceptInput = function(acceptByLookupRow, failure) {
+  this.trigger('acceptInput', {
     displayText: this.displayText,
     errorStatus: this.errorStatus,
     value: this.value,
     lookupRow: this.lookupRow,
-    acceptByLookupRow: acceptByLookupRow
+    acceptByLookupRow: scout.nvl(acceptByLookupRow, true),
+    failure: scout.nvl(failure, false)
   });
 };
 
@@ -1118,9 +1114,6 @@ scout.SmartField2.prototype.acceptInputFromField = function(otherField) {
 
   if (this.lookupRow !== otherField.lookupRow) {
     this.setLookupRow(otherField.lookupRow);
-  }
-  if (errorStatus) {
-    errorStatus.severity = scout.Status.Severity.ERROR; // FIXME [awe] 7.0 - wahrscheinlich müssen wir das schon in acceptInput machen
   }
   this.setErrorStatus(errorStatus);
   scout.fields.valOrText(this.$field, otherField.displayText);
