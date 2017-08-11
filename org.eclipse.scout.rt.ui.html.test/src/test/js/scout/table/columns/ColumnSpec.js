@@ -537,4 +537,27 @@ describe('Column', function() {
 
   });
 
+  describe('displayable', function() {
+
+    it('if set to false, column may not be made visible', function() {
+      var model = helper.createModelFixture(3, 2);
+      var table = helper.createTable(model);
+      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[0].displayable).toBe(true);
+      expect(table.columns[0].isVisible()).toBe(true);
+      expect(table.visibleColumns().length).toBe(3);
+
+      table.columns[0].setDisplayable(false);
+      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[0].displayable).toBe(false);
+      expect(table.columns[0].isVisible()).toBe(false);
+      expect(table.visibleColumns().length).toBe(2);
+
+      table.columns[0].setDisplayable(true);
+      expect(table.columns[0].visible).toBe(true);
+      expect(table.columns[0].displayable).toBe(true);
+      expect(table.columns[0].isVisible()).toBe(true);
+      expect(table.visibleColumns().length).toBe(3);
+    });
+  });
 });
