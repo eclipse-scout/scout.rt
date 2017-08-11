@@ -575,19 +575,23 @@ scout.Column.prototype.setVisible = function(visible) {
 
 scout.Column.prototype._setVisible = function(visible) {
   this.visible = visible;
-  this.table.onColumnVisibilityChanged(this);
+  if (this.initialized) {
+    this.table.onColumnVisibilityChanged(this);
+  }
 };
 
 scout.Column.prototype.setDisplayable = function(displayable) {
   if (this.displayable === displayable) {
     return;
   }
-  this._setDisplayable('displayable', displayable);
+  this._setDisplayable(displayable);
 };
 
 scout.Column.prototype._setDisplayable = function(displayable) {
   this.displayable = displayable;
-  this.setVisible(displayable);
+  if (this.initialized) {
+    this.table.onColumnVisibilityChanged(this);
+  }
 };
 
 scout.Column.prototype.setAutoOptimizeWidth = function(autoOptimizeWidth) {
