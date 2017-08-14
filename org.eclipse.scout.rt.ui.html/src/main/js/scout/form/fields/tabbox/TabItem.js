@@ -69,6 +69,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderTooltipText();
   this._renderErrorStatus();
   this._tabRendered = true;
+  this.trigger('tabRender');
 };
 
 scout.TabItem.prototype._onTabMouseDown = function(event) {
@@ -124,6 +125,7 @@ scout.TabItem.prototype.removeTab = function() {
     this._removeStatus();
     this._removeLabel();
     this._tabRendered = false;
+    this.trigger('tabRemove');
   }
 };
 

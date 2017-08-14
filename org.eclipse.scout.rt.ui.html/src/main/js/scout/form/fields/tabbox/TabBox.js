@@ -82,13 +82,15 @@ scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
     tabItem.on('propertyChange', this._tabItemPropertyChangeHandler);
+    tabItem.one('tabRemove', function() {
+      tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
+    }.bind(this));
   }, this);
 };
 
 scout.TabBox.prototype._removeTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.removeTab();
-    tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
   }, this);
 };
 
