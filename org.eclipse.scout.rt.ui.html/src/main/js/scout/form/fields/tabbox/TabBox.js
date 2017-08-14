@@ -23,17 +23,7 @@ scout.TabBox = function() {
   this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [7.0] awe: do this in Calendar too, for selectedComponent
   this._$tabArea;
   this._$tabContent;
-
-  this._tabItemPropertyChangeHandler = function(event) {
-    var numProperties = event.changedProperties.length;
-    if (numProperties === 1 && event.changedProperties[0] === 'enabled') {
-      // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
-      return;
-    }
-    if (numProperties > 0) {
-      scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
-    }
-  }.bind(this);
+  this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
 };
 scout.inherits(scout.TabBox, scout.CompositeField);
 
@@ -91,13 +81,15 @@ scout.TabBox.prototype._renderTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.renderTab(this._$tabArea);
     tabItem.on('propertyChange', this._tabItemPropertyChangeHandler);
+    tabItem.one('tabRemove', function() {
+      tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
+    }.bind(this));
   }, this);
 };
 
 scout.TabBox.prototype._removeTabs = function() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.removeTab();
-    tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
   }, this);
 };
 
@@ -270,5 +262,16 @@ scout.TabBox.prototype.focus = function() {
   }
   if (this.selectedTab) {
     this.selectedTab.requestFocus();
+  }
+};
+
+scout.TabBox.prototype._onTabItemPropertyChange = function(event) {
+  var numProperties = event.changedProperties.length;
+  if (numProperties === 1 && event.changedProperties[0] === 'enabled') {
+    // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
+    return;
+  }
+  if (numProperties > 0) {
+    scout.HtmlComponent.get(this._$tabArea).invalidateLayoutTree();
   }
 };
