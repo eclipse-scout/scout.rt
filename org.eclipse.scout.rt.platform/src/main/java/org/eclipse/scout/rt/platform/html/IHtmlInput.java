@@ -18,6 +18,7 @@ public interface IHtmlInput extends IHtmlElement {
   String TYPE_RADIO = "radio";
   String TYPE_BUTTON = "button";
   String TYPE_HIDDEN = "hidden";
+  String TYPE_NUMBER = "number";
 
   String TYPE_SUBMIT = "submit";
   String TYPE_RESET = "reset";
