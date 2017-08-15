@@ -42,6 +42,7 @@ scout.Lifecycle.prototype.init = function(model) {
 scout.Lifecycle.prototype.load = function() {
   return this._load().then(function() {
     this.markAsSaved();
+    this.events.trigger('postLoad');
   }.bind(this));
 };
 

@@ -173,6 +173,7 @@ scout.Form.prototype._installLifecycle = function() {
   this.lifecycle = this._createLifecycle();
   this.lifecycle.handle('load', this._onLifecycleLoad.bind(this));
   this.lifecycle.handle('save', this._onLifecycleSave.bind(this));
+  this.lifecycle.on('postLoad', this._onLifecyclePostLoad.bind(this));
   this.lifecycle.on('reset', this._onLifecycleReset.bind(this));
   this.lifecycle.on('close', this._onLifecycleClose.bind(this));
 };
@@ -215,6 +216,16 @@ scout.Form.prototype._load = function() {
   return $.resolvedPromise().then(function() {
     return this.data;
   }.bind(this));
+};
+
+scout.Form.prototype._onLifecyclePostLoad = function() {
+  return this._postLoad().then(function() {
+    this.trigger('postLoad');
+  }.bind(this));
+};
+
+scout.Form.prototype._postLoad = function() {
+  return $.resolvedPromise();
 };
 
 scout.Form.prototype.setData = function(data) {
@@ -740,6 +751,10 @@ scout.Form.prototype._uninstallFocusContext = function() {
   if (this.isDialog() || this.isPopupWindow()) {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
+};
+
+scout.Form.prototype.touch = function() {
+  this.rootGroupBox.touch();
 };
 
 /**

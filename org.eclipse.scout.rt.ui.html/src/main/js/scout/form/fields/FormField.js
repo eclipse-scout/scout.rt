@@ -1038,7 +1038,12 @@ scout.FormField.prototype.visitParents = function(visitor) {
 };
 
 scout.FormField.prototype.markAsSaved = function() {
-  this.touched = false;
+  this.setProperty('touched', false);
+  this.updateRequiresSave();
+};
+
+scout.FormField.prototype.touch = function() {
+  this.setProperty('touched', true);
   this.updateRequiresSave();
 };
 
