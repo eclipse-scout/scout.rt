@@ -160,18 +160,18 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
   @Override
   protected void handleUiAcceptInput(JsonEvent event) {
     JSONObject data = event.getData();
-    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
-      this.handleUiDisplayTextChange(data);
-    }
-    if (data.has(IValueField.PROP_ERROR_STATUS)) {
-      this.handleUiErrorStatusChange(data);
-    }
     // When we have a lookup row, we prefer the lookup row over the value
     if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
       this.handleUiLookupRowChange(data);
     }
     else if (data.has(IValueField.PROP_VALUE)) {
       handleUiValueChange(data);
+    }
+    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
+      this.handleUiDisplayTextChange(data);
+    }
+    if (data.has(IValueField.PROP_ERROR_STATUS)) {
+      this.handleUiErrorStatusChange(data);
     }
   }
 

@@ -541,7 +541,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }
 
   // prepareCellEdit
-  scout.objects.replacePrototypeFunction(scout.Table, 'prepareCellEdit', function(column, row, openFieldPopupOnCellEdit) {
+  scout.objects.replacePrototypeFunction(scout.Table, 'prepareCellEditInternal', function(column, row, openFieldPopupOnCellEdit) {
     if (this.modelAdapter) {
       this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
       this.trigger('prepareCellEdit', {
@@ -549,7 +549,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
         row: row
       });
     } else {
-      this.prepareCellEditOrig(column, row, openFieldPopupOnCellEdit);
+      this.prepareCellEditInternalOrig(column, row, openFieldPopupOnCellEdit);
     }
   }, true);
 

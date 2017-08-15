@@ -206,10 +206,12 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   }
 
   // Do nothing when we don't have a current lookup row and search text is empty
+  // trigger event when search text has changed. This is required for the case where
+  // a field is cleared, and the remote model must be updated (value=null)
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
     $.log.debug('(SmartField2#acceptInput) unchanged: text is empty. Close popup');
     this.clearErrorStatus();
-    this._inputAccepted(false);
+    this._inputAccepted(searchTextChanged);
     return;
   }
 
@@ -242,6 +244,9 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   } else if (this._hasNotUniqueError() && this.popup) {
     // popup has been opened (again) with errorStatus NOT_UNIQUE, and search text is still the same
     this.popup.selectFirstLookupRow();
+  } else {
+    // even though there's nothing todo, someone could wait for our promise to be resolved
+    this._acceptInputDeferred.resolve();
   }
 
   return this._acceptInputDeferred.promise();
@@ -364,6 +369,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
     }
   }
 
+  this._acceptInputDeferred.resolve();
   this._triggerAcceptInputFail();
 };
 
