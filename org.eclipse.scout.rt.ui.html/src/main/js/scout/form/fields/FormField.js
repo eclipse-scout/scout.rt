@@ -452,24 +452,48 @@ scout.FormField.prototype._renderDisabledStyle = function() {
   this._renderDisabledStyleInternal(this.$mandatory);
 };
 
+scout.FormField.prototype.setFont = function(font) {
+  this.setProperty('font', font);
+};
+
 scout.FormField.prototype._renderFont = function() {
   scout.styles.legacyStyle(this, this.$field);
+};
+
+scout.FormField.prototype.setForegroundColor = function(foregroundColor) {
+  this.setProperty('foregroundColor', foregroundColor);
 };
 
 scout.FormField.prototype._renderForegroundColor = function() {
   scout.styles.legacyStyle(this, this.$field);
 };
 
+scout.FormField.prototype.setBackgroundColor = function(backgroundColor) {
+  this.setProperty('backgroundColor', backgroundColor);
+};
+
 scout.FormField.prototype._renderBackgroundColor = function() {
   scout.styles.legacyStyle(this, this.$field);
+};
+
+scout.FormField.prototype.setLabelFont = function(labelFont) {
+  this.setProperty('labelFont', labelFont);
 };
 
 scout.FormField.prototype._renderLabelFont = function() {
   scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
+scout.FormField.prototype.setLabelForegroundColor = function(labelForegroundColor) {
+  this.setProperty('labelForegroundColor', labelForegroundColor);
+};
+
 scout.FormField.prototype._renderLabelForegroundColor = function() {
   scout.styles.legacyStyle(this, this.$label, 'label');
+};
+
+scout.FormField.prototype.setLabelBackgroundColor = function(labelBackgroundColor) {
+  this.setProperty('labelBackgroundColor', labelBackgroundColor);
 };
 
 scout.FormField.prototype._renderLabelBackgroundColor = function() {
