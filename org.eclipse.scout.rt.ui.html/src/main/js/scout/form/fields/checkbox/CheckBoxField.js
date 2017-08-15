@@ -63,6 +63,9 @@ scout.CheckBoxField.prototype._renderDisplayText = function() {
 };
 
 scout.CheckBoxField.prototype._onMouseDown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
   this.toggleChecked();
   if (event.currentTarget === this.$checkBoxLabel[0]) {
     this.focus();
