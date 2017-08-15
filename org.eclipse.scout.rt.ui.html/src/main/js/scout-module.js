@@ -398,7 +398,6 @@
   __include("scout/form/fields/browserfield/BrowserFieldAdapter.js");
   __include("scout/form/fields/button/Button.js");
   __include("scout/form/fields/button/ButtonAdapter.js");
-  __include("scout/form/fields/button/ButtonLayout.js");
   __include("scout/form/fields/button/ButtonKeyStroke.js");
   __include("scout/form/fields/calendarfield/CalendarField.js");
   __include("scout/form/fields/calendarfield/CalendarFieldAdapter.js");
@@ -447,6 +446,7 @@
   __include("scout/form/fields/plannerfield/PlannerField.js");
   __include("scout/form/fields/plannerfield/PlannerFieldAdapter.js");
   __include("scout/form/fields/radiobutton/RadioButton.js");
+  __include("scout/form/fields/radiobutton/RadioButtonLayout.js");
   __include("scout/form/fields/radiobutton/RadioButtonAdapter.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroup.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupAdapter.js");

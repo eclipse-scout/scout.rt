@@ -134,7 +134,7 @@ scout.Button.prototype._render = function() {
       $button.setTabbable(false);
     }
   }
-  this.addContainer(this.$parent, 'button-field', new scout.ButtonLayout(this));
+  this.addContainer(this.$parent, 'button-field');
   this.addField($button);
   // TODO [7.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
@@ -180,7 +180,7 @@ scout.Button.prototype._renderForegroundColor = function() {
 
 scout.Button.prototype._renderBackgroundColor = function() {
   scout.Button.parent.prototype._renderBackgroundColor.call(this);
-  scout.styles.legacyStyle(this, this.$buttonLabel);
+  scout.styles.legacyStyle(this, this.$fieldContainer);
 };
 
 scout.Button.prototype._renderFont = function() {

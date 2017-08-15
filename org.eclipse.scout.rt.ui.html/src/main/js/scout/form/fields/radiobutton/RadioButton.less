@@ -8,58 +8,80 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+ @radio-button-circle-size: 18px;
+
 .radio-button > .field {
-  cursor: pointer;
   display: inline-block;
   position: relative;
-  padding: @borderless-field-padding-y 0 @borderless-field-padding-y 25px;
+  padding: 6px 0;
   margin-left: @mandatory-indicator-width;
   outline: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 19px;
-    height: 19px;
-    margin-right: 10px;
-    position: absolute;
-    left: 0;
-    top: 5px;
+  & > .radio-button-circle,
+  & > .label,
+  & > .icon {
+    /* only the label should be clickable, not the whole field */
+    cursor: pointer;
+    vertical-align: middle;
+    display: inline-block
+  }
+
+  & > .label {
+    color: @control-color;
+    padding-top: 2px;
+    padding-left: 7px;
+    #scout.overflow-ellipsis-nowrap();
+  }
+
+  & > .icon {
+    padding-left: 7px;
+  }
+
+  & > .radio-button-circle {
+    width: @radio-button-circle-size;
+    height: @radio-button-circle-size;
     background-color: @control-background-color;
     border: 2px solid @palette-gray-5;
     border-radius: 50%;
-  }
+    text-align: center;
+    position: relative;
 
-  &.checked::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    left: 6px;
-    top: 11px;
-    width: 7px;
-    height: 7px;
-    background-color: @palette-gray-10;
-    border: 2px solid @palette-gray-10;
-    border-radius: 50%;
-  }
+    &:focus {
+      border-color: @focus-border-color;
+      outline: none;
+    }
 
-  &:focus::before {
-    border-color: @focus-border-color;
-  }
+    &.checked::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border: 3px solid @control-background-color;
+      background-color: @palette-gray-10;
+      border-radius: 50%;
+    }
 
-  &.disabled::before {
-    background-color: @control-disabled-background-color;
-  }
+    &.disabled {
+      background-color: @control-disabled-background-color;
+      cursor: default;
 
-  &.disabled.checked::after {
-    background-color: @palette-gray-6;
-    border-color: @palette-gray-6;
+      &.checked::before {
+        background-color: @palette-gray-6;
+      }
+    }
   }
+}
 
-  &.disabled {
+.radio-button.disabled > .field {
+
+  & > .label,
+  & > .icon {
     cursor: default;
+    color: @control-disabled-color;
   }
 }
