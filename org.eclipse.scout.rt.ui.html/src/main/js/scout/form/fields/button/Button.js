@@ -175,7 +175,22 @@ scout.Button.prototype._renderProperties = function() {
 scout.Button.prototype._renderForegroundColor = function() {
   scout.Button.parent.prototype._renderForegroundColor.call(this);
   // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
-  this.$buttonLabel.css('color', scout.styles.modelToCssColor(this.foregroundColor));
+  scout.styles.legacyStyle(this, this.$buttonLabel);
+};
+
+scout.Button.prototype._renderBackgroundColor = function() {
+  scout.Button.parent.prototype._renderBackgroundColor.call(this);
+  scout.styles.legacyStyle(this, this.$buttonLabel);
+};
+
+scout.Button.prototype._renderFont = function() {
+  scout.Button.parent.prototype._renderFont.call(this);
+  scout.styles.legacyStyle(this, this.$buttonLabel);
+};
+
+scout.Button.prototype._renderFontStyle = function() {
+  scout.Button.parent.prototype._renderFontStyle.call(this);
+  scout.styles.legacyStyle(this, this.$buttonLabel);
 };
 
 /**
@@ -262,19 +277,9 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function() {
-  if (this.iconId) {
-    // If there is an icon, we don't need to ensure &nbsp; for empty strings
-    this.$buttonLabel.text(this.label);
+  this.$buttonLabel.textOrNbsp(this.label);
+  this._updateLabelAndIconStyle();
 
-    // Toggle with-label class on icon
-    var $iconTarget = this.$link || this.$field;
-    var $icon = $iconTarget.data('$icon');
-    if ($icon) {
-      $icon.toggleClass('with-label', !!this.label);
-    }
-  } else {
-    this.$buttonLabel.textOrNbsp(this.label);
-  }
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
 };
@@ -287,11 +292,10 @@ scout.Button.prototype.setIconId = function(iconId) {
  * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
  */
 scout.Button.prototype._renderIconId = function() {
-  var $iconTarget = this.$link || this.$field;
+  var $iconTarget = this.$link || this.$fieldContainer;
   $iconTarget.icon(this.iconId);
   var $icon = $iconTarget.data('$icon');
   if ($icon) {
-    $icon.toggleClass('with-label', !!this.label);
     // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.
     // We add a listener to revalidate the button layout after this has happened. The 'loading' and
     // 'broken' classes ensure the incomplete icon is not taking any space.
@@ -304,6 +308,8 @@ scout.Button.prototype._renderIconId = function() {
         .on('error', updateButtonLayoutAfterImageLoaded.bind(this, false));
     }
   }
+
+  this._updateLabelAndIconStyle();
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
 
@@ -314,6 +320,17 @@ scout.Button.prototype._renderIconId = function() {
     $icon.toggleClass('broken', !success);
     this.htmlComp.invalidateLayoutTree();
   }
+};
+
+scout.Button.prototype.get$Icon = function() {
+  var $iconTarget = this.$link || this.$fieldContainer;
+  return $iconTarget.children('.icon');
+};
+
+scout.Button.prototype._updateLabelAndIconStyle = function() {
+  var hasText = !!this.label;
+  this.$buttonLabel.setVisible(hasText || !this.iconId);
+  this.get$Icon().toggleClass('with-label', hasText);
 };
 
 scout.Button.prototype._setKeyStroke = function(keyStroke) {
