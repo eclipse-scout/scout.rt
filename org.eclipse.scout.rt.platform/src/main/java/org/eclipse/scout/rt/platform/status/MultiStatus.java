@@ -69,6 +69,14 @@ public class MultiStatus extends Status implements IMultiStatus {
     return formatMessages(filterSameOrder(filterSameSeverity(m_children)));
   }
 
+  @Override
+  public int getCode() {
+    if (m_children.size() > 0) {
+      return m_children.first().getCode();
+    }
+    return super.getCode();
+  }
+
   private List<IStatus> filterSameOrder(Collection<IStatus> statuses) {
     List<IStatus> res = new ArrayList<>();
     for (IStatus s : statuses) {

@@ -879,8 +879,9 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
       }
     }
 
-    VetoException veto = new VetoException(TEXTS.get("SmartFieldCannotComplete", text));
-    veto.withCode(numResults > 1 ? NOT_UNIQUE_ERROR_CODE : NO_RESULTS_ERROR_CODE);
+    boolean notUnique = numResults > 1;
+    VetoException veto = new VetoException(TEXTS.get(notUnique ? "SmartFieldNotUnique" : "SmartFieldCannotComplete", text));
+    veto.withCode(notUnique ? NOT_UNIQUE_ERROR_CODE : NO_RESULTS_ERROR_CODE);
     throw veto;
   }
 

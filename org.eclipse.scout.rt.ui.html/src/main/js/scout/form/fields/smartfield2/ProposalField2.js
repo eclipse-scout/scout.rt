@@ -113,3 +113,54 @@ scout.ProposalField2.prototype.getValueForSelection = function() {
   }
   return this.lookupRow.key;
 };
+
+/**
+ * This function is overridden by ProposalField because it has a different behavior than the smart-field.
+ */
+scout.ProposalField2.prototype._acceptLookupRowAndValueFromField = function(otherField) {
+  if (this.lookupRow !== otherField.lookupRow) {
+    this.setLookupRow(otherField.lookupRow);
+  }
+};
+
+/**
+ * In ProposalField value and display-text is the same. When a custom text has been entered,
+ * the value is set and the lookup-row is null.
+ */
+scout.ProposalField2.prototype._copyValuesFromField = function(otherField) {
+  if (this.lookupRow !== otherField.lookupRow) {
+    this.setLookupRow(otherField.lookupRow);
+  }
+  if (this.value !== otherField.value) {
+    this.setValue(otherField.value);
+  }
+};
+
+scout.ProposalField2.prototype._acceptInput = function(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+  // Do nothing when search text is equals to the text of the current lookup row
+  if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
+    $.log.debug('(SmartField2#acceptInput) unchanged: text is equals. Close popup');
+    this._inputAccepted(false);
+    return;
+  }
+
+  // 2.) proposal chooser is open -> use the selected row as value
+  if (selectedLookupRow) {
+    $.log.debug('(SmartField2#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
+    this.clearErrorStatus();
+    this.setLookupRow(selectedLookupRow);
+    this._inputAccepted();
+    return;
+  }
+
+  // 3.) proposal chooser is not open -> try to accept the current display text
+  // this causes a lookup which may fail and open a new proposal chooser (property
+  // change for 'result').
+  if (searchTextChanged) {
+    this._acceptByText(searchText);
+  } else if (!this._hasUiError()) {
+    this._inputAccepted(false);
+  } 
+  
+  return this._acceptInputDeferred.promise();
+};

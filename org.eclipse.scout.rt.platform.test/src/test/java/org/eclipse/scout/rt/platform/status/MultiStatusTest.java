@@ -195,12 +195,21 @@ public class MultiStatusTest {
     assertEquals(TestStatus.class.getSimpleName(), multiStatus.getMessage());
   }
 
+  @Test
+  public void testCode() throws Exception {
+    MultiStatus multiStatus = new MultiStatus();
+    multiStatus.add(new TestStatus());
+    multiStatus.add(new TestStatus2());
+    assertEquals("must return code from first child status", 6, multiStatus.getCode());
+  }
+
   @Order(10)
   class TestStatus extends Status {
     private static final long serialVersionUID = 1L;
 
     public TestStatus() {
       super(TestStatus.class.getSimpleName());
+      setCode(6);
     }
   }
 
@@ -210,6 +219,7 @@ public class MultiStatusTest {
 
     public TestStatus2() {
       super(TestStatus2.class.getSimpleName());
+      setCode(7);
     }
   }
 

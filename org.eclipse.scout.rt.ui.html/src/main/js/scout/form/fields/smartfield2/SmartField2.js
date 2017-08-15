@@ -33,6 +33,7 @@ scout.SmartField2 = function() {
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
+  this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilterEnabled', 'activeFilterLabels']);
 };
@@ -181,9 +182,20 @@ scout.SmartField2.prototype.acceptInput = function() {
   }
 
   if (this.touch) {
-    $.log.debug('(SmartField2#acceptInput) Always send acceptInput for touch field!');
+    $.log.debug('(SmartField2#acceptInput) Always send acceptInput for touch field');
     this._inputAccepted();
     return;
+  }
+
+  return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+};
+
+/**
+ * This function is intended to be overridden. Proposal field has another behavior than the smart field.
+ */
+scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+  if (this._notUnique) {
+    this._setNotUniqueError(searchText);
   }
 
   // Do nothing when search text is equals to the text of the current lookup row
@@ -223,11 +235,11 @@ scout.SmartField2.prototype.acceptInput = function() {
   // 3.) proposal chooser is not open -> try to accept the current display text
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result').
-  if (searchTextChanged) {
+  if (searchTextChanged || this._userWasTyping) {
     this._acceptByText(searchText);
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
-  } else if (this._hasUiError(scout.SmartField2.ErrorCode.NOT_UNIQUE) && this.popup) {
+  } else if (this._hasNotUniqueError() && this.popup) {
     // popup has been opened (again) with errorStatus NOT_UNIQUE, and search text is still the same
     this.popup.selectFirstLookupRow();
   }
@@ -276,6 +288,7 @@ scout.SmartField2.prototype._focusNextTabbable = function() {
 scout.SmartField2.prototype._acceptByTextDone = function(result) {
   this._userWasTyping = false;
   this._extendResult(result);
+  this._notUnique = result.numLookupRows > 1;
 
   // when there's exactly one result, we accept that lookup row
   if (result.numLookupRows === 1) {
@@ -339,10 +352,7 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
   if (result.numLookupRows > 1) {
     this.setValue(null);
     this.setDisplayText(searchText);
-    this.setErrorStatus(scout.Status.error({
-      message: this.session.text('SmartFieldNotUnique', searchText),
-      code: scout.SmartField2.ErrorCode.NOT_UNIQUE
-    }));
+    this._setNotUniqueError(searchText);
     if (this.isPopupOpen()) {
       this.popup.setLookupResult(result);
     } else {
@@ -439,6 +449,7 @@ scout.SmartField2.prototype._formatValue = function(value) {
 };
 
 scout.SmartField2.prototype._lookupByKeyDone = function(lookupRow) {
+  this._notUnique = false;
   this.setLookupRow(lookupRow);
   return this._formatLookupRow(lookupRow);
 };
@@ -548,6 +559,10 @@ scout.SmartField2.prototype._lookupByTextOrAll = function(browse, searchText) {
 
 scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
+  var numLookupRows = result.lookupRows.length,
+    emptyResult = numLookupRows === 0;
+  this._notUnique = !result.browse && numLookupRows > 1;
+
   // In cases where the user has tabbed to the next field, while results for the previous
   // smart-field are still loading: don't show the proposal popup. In the case of a cell-editor
   // it's also possible that the smart-field is not rendered anymore when the lookup is done
@@ -559,8 +574,6 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   // We don't want to set an error status on the field for the 'no data' case
   // Only show the message as status in the proposal chooser popup
-  var numLookupRows = result.lookupRows.length,
-    emptyResult = numLookupRows === 0;
   if (emptyResult && result.browse) {
     var status = scout.Status.warn({
         message: this.session.text('SmartFieldNoDataFound')
@@ -940,6 +953,8 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
   if (this.lookupRow === lookupRow) {
     return;
   }
+  this._notUnique = false;
+  this.clearErrorStatus();
   this._setLookupRow(lookupRow);
   // this flag is required so lookup row is not changed again, when _setValue is called
   this._lockLookupRow = true;
@@ -959,6 +974,7 @@ scout.SmartField2.prototype.setLookupRow = function(lookupRow) {
 };
 
 scout.SmartField2.prototype.resetDisplayText = function() {
+  this._setProperty('displayText', this._formatValue(this.value));
   if (this.rendered) {
     this._renderDisplayText();
   }
@@ -983,6 +999,7 @@ scout.SmartField2.prototype._setValue = function(value) {
     }
   }
   scout.SmartField2.parent.prototype._setValue.call(this, value);
+  this._notUnique = false;
 };
 
 /**
@@ -1110,13 +1127,7 @@ scout.SmartField2.prototype._showStatusMessage = function() {
  * prevents the cell editor popup from receiving mouse down events.
  */
 scout.SmartField2.prototype.acceptInputFromField = function(otherField) {
-  var errorStatus = otherField.errorStatus;
-
-  if (this.lookupRow !== otherField.lookupRow) {
-    this.setLookupRow(otherField.lookupRow);
-  }
-  this.setErrorStatus(errorStatus);
-  scout.fields.valOrText(this.$field, otherField.displayText);
+  this._copyValuesFromField(otherField);
 
   if (this._cellEditorPopup) {
     // this will call acceptInput on the touch smart-field (== this)
@@ -1125,4 +1136,26 @@ scout.SmartField2.prototype.acceptInputFromField = function(otherField) {
   } else {
     this.acceptInput();
   }
+};
+
+/**
+ * This function is overridden by ProposalField because it has a different behavior than the smart-field.
+ */
+scout.SmartField2.prototype._copyValuesFromField = function(otherField) {
+  if (this.lookupRow !== otherField.lookupRow) {
+    this.setLookupRow(otherField.lookupRow);
+  }
+  this.setErrorStatus(otherField.errorStatus);
+  scout.fields.valOrText(this.$field, otherField.displayText);
+};
+
+scout.SmartField2.prototype._setNotUniqueError = function(searchText) {
+  this.setErrorStatus(scout.Status.error({
+    message: this.session.text('SmartFieldNotUnique', searchText),
+    code: scout.SmartField2.ErrorCode.NOT_UNIQUE
+  }));
+};
+
+scout.SmartField2.prototype._hasNotUniqueError = function(searchText) {
+  return this._notUnique || this._hasUiError(scout.SmartField2.ErrorCode.NOT_UNIQUE);
 };

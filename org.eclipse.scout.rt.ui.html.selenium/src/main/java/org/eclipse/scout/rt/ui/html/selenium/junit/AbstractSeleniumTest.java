@@ -154,7 +154,18 @@ public abstract class AbstractSeleniumTest {
    * field).
    */
   public WebElement findInputField(Class<?> modelClass) {
-    return findInputField(null, modelClass);
+    return findInputField(SeleniumUtil.byModelClass(modelClass));
+  }
+
+  /**
+   * Finds the first <code>input</code> {@link WebElement} that is found in the hierarchy referenced by the given
+   * locator (by).
+   *
+   * @param by
+   * @return
+   */
+  public WebElement findInputField(By by) {
+    return findElement(by).findElement(By.tagName("input"));
   }
 
   /**
