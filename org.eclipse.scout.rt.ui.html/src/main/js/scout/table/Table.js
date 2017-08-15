@@ -1243,16 +1243,18 @@ scout.Table.prototype._removeRowsInRange = function(range) {
 };
 
 scout.Table.prototype.removeAllRows = function() {
-  this.$rows().each(function(i, elem) {
-    var $row = $(elem),
-      row = $row.data('row');
-    if ($row.hasClass('hiding')) {
-      // Do not remove rows which are removed using an animation
-      // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
-      return;
-    }
-    this._removeRow(row);
-  }.bind(this));
+  if (this.rendered) {
+    this.$rows().each(function(i, elem) {
+      var $row = $(elem),
+        row = $row.data('row');
+      if ($row.hasClass('hiding')) {
+        // Do not remove rows which are removed using an animation
+        // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
+        return;
+      }
+      this._removeRow(row);
+    }.bind(this));
+  }
   this.viewRangeRendered = new scout.Range(0, 0);
 };
 
