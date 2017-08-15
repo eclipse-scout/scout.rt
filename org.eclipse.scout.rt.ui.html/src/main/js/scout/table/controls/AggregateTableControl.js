@@ -129,12 +129,12 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
   this.$contentContainer.scrollLeft(scrollLeft);
 };
 
-scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(aggregationFunctionChangedd) {
+scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(aggregationFunctionChanged) {
   var enabled = this.table.containsAggregatedNumberColumn();
 
   // Select control if enabled, aggregation function changed and table is not grouped
   if (enabled) {
-    if (aggregationFunctionChangedd && !this.table.isGrouped()) {
+    if (aggregationFunctionChanged && !this.table.isGrouped()) {
       this.setSelected(true);
     }
   } else if (this.selected) {
