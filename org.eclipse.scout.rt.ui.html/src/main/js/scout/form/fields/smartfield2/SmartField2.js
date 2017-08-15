@@ -629,7 +629,13 @@ scout.SmartField2.prototype._ensurePopup = function(result, status) {
 };
 
 scout.SmartField2.prototype._handleEmptyResult = function() {
-  if (this.embedded) {
+  if (this.touch) {
+    // In mobile mode we always open the popup, event if we don't have a result
+    // Otherwise it would be impossible to enter text in a proposal field with
+    // an empty proposal list.
+    var emptyResult = {lookupRows: []};
+    this._ensurePopup(emptyResult);
+  } else if (this.embedded) {
     this.popup.clearLookupRows();
   } else {
     this.closePopup();
