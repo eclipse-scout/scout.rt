@@ -1500,12 +1500,24 @@ scout.Table.prototype._triggerRowAction = function(row, column) {
 };
 
 /**
+ * This functions starts the cell editor for the given row and column. Prepare must wait until
+ * a pending completeCellEdit operation is resolved.
+ */
+scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCellEdit) {
+  var promise = $.resolvedPromise();
+  if (this.cellEditorPopup) {
+    promise = this.cellEditorPopup.waitForCompleteCellEdit();
+  }
+  promise.then(this.prepareCellEditInternal.bind(this, column, row, openFieldPopupOnCellEdit));
+};
+
+/**
  * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
  *    additional property 'cellEditor' on the editor-field. The field instance may use this property
  *    to decide whether or not it should open a popup immediately after it is rendered. This is used
  *    for Smart- and DateFields.
  */
-scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCellEdit) {
+scout.Table.prototype.prepareCellEditInternal = function(column, row, openFieldPopupOnCellEdit) {
   this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
   var field = column.createDefaultEditor(row);
   this.startCellEdit(column, row, field);

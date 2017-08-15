@@ -160,7 +160,10 @@ scout.ProposalField2.prototype._acceptInput = function(searchText, searchTextEmp
     this._acceptByText(searchText);
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
-  } 
-  
+  } else {
+    // even though there's nothing todo, someone could wait for our promise to be resolved
+    this._acceptInputDeferred.resolve();
+  }
+
   return this._acceptInputDeferred.promise();
 };

@@ -170,3 +170,10 @@ scout.CellEditorPopup.prototype.cancelEdit = function() {
 scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
   this.completeEdit();
 };
+
+scout.CellEditorPopup.prototype.waitForCompleteCellEdit = function() {
+  if (this._pendingCompleteCellEdit) {
+    return this._pendingCompleteCellEdit.promise();
+  }
+  return $.resolvedPromise();
+};
