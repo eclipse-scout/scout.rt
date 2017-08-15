@@ -466,8 +466,7 @@ public final class HTML {
    *     &nbsp;HTML.tr(<br>
    *     &nbsp;&nbsp;HTML.td("cell3"),<br>
    *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )<br>
-   *     ).cellspacing(1).cellpadding(2)<br>
+   *     )
    * </code>
    */
   public static IHtmlTable table(IHtmlTableRow... rows) {
@@ -485,8 +484,7 @@ public final class HTML {
    *     &nbsp;HTML.tr(<br>
    *     &nbsp;&nbsp;HTML.td("cell3"),<br>
    *     &nbsp;&nbsp;HTML.td("cell4")<br>
-   *     )<br>
-   *     ).cellspacing(1).cellpadding(2)<br>
+   *     )
    * </code>
    */
   public static IHtmlTable table(List<IHtmlTableRow> rows) {
