@@ -1,9 +1,13 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.IProposalField2;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.json.JSONObject;
 
 public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> extends JsonSmartField2<VALUE, MODEL> {
 
@@ -47,6 +51,26 @@ public class JsonProposalField2<VALUE, MODEL extends IProposalField2<VALUE>> ext
   @Override
   protected void setValueFromUI(Object value) {
     getModel().getUIFacade().setValueAsStringFromUI((String) value);
+  }
+
+  @Override
+  protected void handleUiAcceptInput(JsonEvent event) {
+    JSONObject data = event.getData();
+    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
+      this.handleUiDisplayTextChange(data);
+    }
+    if (data.has(IValueField.PROP_ERROR_STATUS)) {
+      this.handleUiErrorStatusChange(data);
+    }
+    // The difference to the smart-field is that the proposal-field
+    // can receive lookup-row and value in a single event. For instance:
+    // lookupRow=null, value=Foo (in case a custom text has been set)
+    if (data.has(ISmartField2.PROP_LOOKUP_ROW)) {
+      this.handleUiLookupRowChange(data);
+    }
+    if (data.has(IValueField.PROP_VALUE)) {
+      handleUiValueChange(data);
+    }
   }
 
 }
