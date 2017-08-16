@@ -119,7 +119,7 @@ scout.CalendarComponent.prototype._isTask = function() {
 
 scout.CalendarComponent.prototype._arrangeTask = function(taskOffset) {
   this._$parts.forEach(function($part) {
-    $part.css('top', 'calc(85% + ' + taskOffset + 'px)');
+    $part.css('top', taskOffset + 'px');
   });
 };
 
