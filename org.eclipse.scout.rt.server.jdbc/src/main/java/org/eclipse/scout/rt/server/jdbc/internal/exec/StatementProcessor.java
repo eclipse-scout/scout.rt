@@ -1321,7 +1321,7 @@ public class StatementProcessor implements IStatementProcessor {
                 return createOutputTerminal((IHolder) o, bindToken);
               }
               else {
-                throw new ProcessingException("output bind '{}' is not a holder", bindToken.getName());
+                return null;
               }
             }
           }
