@@ -46,7 +46,7 @@ scout.scrollbars = {
     } else {
       this._$scrollables[session] = [$container];
     }
-    $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
+    $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables[session].length);
   },
 
   removeScrollable: function(session, $container) {
@@ -54,7 +54,7 @@ scout.scrollbars = {
     if (this._$scrollables[session]) {
       initLength = this._$scrollables[session].length;
       scout.arrays.$remove(this._$scrollables[session], $container);
-      $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
+      $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables[session].length);
       if (initLength === this._$scrollables[session].length) {
         throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
       }

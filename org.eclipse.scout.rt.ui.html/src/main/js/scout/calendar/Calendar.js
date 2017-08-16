@@ -586,6 +586,8 @@ scout.Calendar.prototype.layoutSize = function(animate) {
     $(this).attr('data-day-name', weekdays[index]);
   });
 
+  var updateScrollbarCallback = this._updateScrollbars.bind(this);
+
   // animate old to new sizes
   $('div', this.$container).each(function() {
     var $e = $(this),
@@ -594,19 +596,30 @@ scout.Calendar.prototype.layoutSize = function(animate) {
 
     if (w !== undefined && w !== $e.outerWidth()) {
       if (animate) {
-        $e.animateAVCSD('width', w);
+        $e.animateAVCSD('width', w, updateScrollbarCallback.bind($e));
       } else {
         $e.css('width', w);
+        updateScrollbarCallback($e);
       }
     }
     if (h !== undefined && h !== $e.outerHeight()) {
       if (animate) {
-        $e.animateAVCSD('height', h);
+        $e.animateAVCSD('height', h, updateScrollbarCallback.bind($e));
       } else {
         $e.css('height', h);
+        updateScrollbarCallback($e);
       }
     }
   });
+};
+
+scout.Calendar.prototype._updateScrollbars = function($parent) {
+  var $scrollables = $('.calendar-scrollable-components', $parent);
+
+  for (var k = 0; k < $scrollables.length; k++) {
+    var $scrollable = $scrollables.eq(k);
+    scout.scrollbars.update($scrollable, true);
+  }
 };
 
 scout.Calendar.prototype.layoutYearPanel = function() {
@@ -724,6 +737,23 @@ scout.Calendar.prototype._updateListPanel = function() {
   }
 };
 
+scout.Calendar.prototype._remove = function() {
+  var $days = $('.calendar-day', this.$grid);
+
+  // Ensure that scrollbars are unregistered
+  for (var k = 0; k < $days.length; k++) {
+    var $day = $days.eq(k);
+    var $scrollableContainer = $day.children('.calendar-scrollable-components');
+
+    if ($scrollableContainer.length > 0) {
+      scout.scrollbars.uninstall($scrollableContainer, this.session);
+      $scrollableContainer.remove();
+    }
+  }
+
+  scout.Calendar.parent.prototype._remove.call(this);
+};
+
 /**
  * Renders the panel on the left, showing all components of the selected date.
  */
@@ -797,13 +827,45 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 /* -- components, arrangement------------------------------------ */
 
 scout.Calendar.prototype._arrangeComponents = function() {
-  var k, $day, $children, dayComponents, day,
+  var k, $day, $allChildren, $children, $scrollableContainer, dayComponents, day,
     $days = $('.calendar-day', this.$grid);
 
   for (k = 0; k < $days.length; k++) {
     $day = $days.eq(k);
     $children = $day.children('.calendar-component:not(.component-task)');
+    $allChildren = $day.children('.calendar-component');
     day = $day.data('date');
+
+    $scrollableContainer = $day.children('.calendar-scrollable-components');
+
+    if ($scrollableContainer.length > 0) {
+      scout.scrollbars.uninstall($scrollableContainer, this.session);
+      $scrollableContainer.remove();
+    }
+
+    if ($allChildren.length > 0) {
+      $scrollableContainer = $day.appendDiv('calendar-scrollable-components');
+
+      if (!this._isMonth()) {
+        $scrollableContainer.addClass('calendar-scrollable-components-week');
+      }
+
+      for (var j = 0; j < $allChildren.length; j++) {
+        var $child = $allChildren.eq(j);
+        // non-tasks (communications) are distributed manually
+        // within the parent container in all views except the monthly view.
+        if (!this._isMonth() && !$child.hasClass('component-task')) {
+          continue;
+        }
+        $scrollableContainer.append($child);
+      }
+
+      scout.scrollbars.install($scrollableContainer, {
+        parent: this,
+        session: this.session,
+        axis: 'y'
+      });
+    }
 
     if (this._isMonth() && $children.length > 2) {
       $day.addClass('many-items');
