@@ -12,6 +12,7 @@ scout.RadioButton = function() {
   scout.RadioButton.parent.call(this);
 
   this.gridDataHints.fillHorizontal = true;
+  this.focusWhenSelected = true;
 };
 scout.inherits(scout.RadioButton, scout.Button);
 
@@ -57,8 +58,8 @@ scout.RadioButton.prototype._onMouseDown = function(event) {
     return;
   }
   this.select();
-  if (scout.isOneOf(event.target, this.$buttonLabel[0], $icon[0])) {
-    this.focus();
+  if (this.focusWhenSelected && scout.isOneOf(event.target, this.$buttonLabel[0], $icon[0])) {
+    this.focusAndPreventDefault(event);
   }
 };
 
@@ -99,6 +100,7 @@ scout.RadioButton.prototype._renderProperties = function() {
 };
 
 scout.RadioButton.prototype._renderSelected = function() {
+  this.$fieldContainer.toggleClass('checked', this.selected);
   this.$field.toggleClass('checked', this.selected);
 };
 

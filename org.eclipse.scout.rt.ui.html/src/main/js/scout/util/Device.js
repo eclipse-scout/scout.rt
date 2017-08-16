@@ -399,10 +399,12 @@ scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
   return scout.Device.Browser.FIREFOX !== this.browser;
 };
 
-scout.Device.prototype.supportsFocusEmptyBeforeDiv = function() {
-  // preventing blur is bad for touch devices because it prevents that the keyboard can close -> return true for touch devices
-  // TODO [7.0] cgu we should look for a better solution which doesn't require preventDefault -> Maybe create separate divs instead of :before for checkbox and radiobuttons
-  return scout.Device.Browser.FIREFOX !== this.browser || this.supportsTouch();
+/**
+ * If the mouse down on an element with a pseudo element removes the pseudo element (e.g. check box toggling),
+ * the firefox cannot focus the element anymore and instead focuses the body. In that case manual focus handling is necessary.
+ */
+scout.Device.prototype.loosesFocusIfPseudoElementIsRemoved = function() {
+  return scout.Device.Browser.FIREFOX === this.browser;
 };
 
 scout.Device.prototype.supportsCssProperty = function(property) {

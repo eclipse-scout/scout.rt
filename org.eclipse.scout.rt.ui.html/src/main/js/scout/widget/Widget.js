@@ -1335,14 +1335,28 @@ scout.Widget.prototype.widget = function(widgetId) {
  * Tries to set the focus on the widget.
  * <p>
  * By default the focus is set on the container but this may vary from widget to widget.
+ * @returns true if the element could be focused, false if not
  */
 scout.Widget.prototype.focus = function() {
   if (!this.rendered) {
     this._postRenderActions.push(this.focus.bind(this));
-    return;
+    return false;
   }
 
-  this.session.focusManager.requestFocus(this.$container);
+  return this.session.focusManager.requestFocus(this.$container);
+};
+
+/**
+ * Calls {@link focus()} and prevents the default behavior of the event if the focusing was successful.
+ */
+scout.Widget.prototype.focusAndPreventDefault = function(event) {
+  if (this.focus()) {
+    // Preventing blur is bad for touch devices because it prevents that the keyboard can close.
+    // In that case focus() will return false because focus manager is disabled.
+    event.preventDefault();
+    return true;
+  }
+  return false;
 };
 
 /**

@@ -81,12 +81,9 @@ public final class SeleniumExpectedConditions {
     return new ExpectedCondition<WebElement>() {
       @Override
       public WebElement apply(WebDriver driver) {
-        List<WebElement> elements = radioButtonGroup.findElements(By.cssSelector(".field.checked"));
+        List<WebElement> elements = radioButtonGroup.findElements(By.cssSelector(".field.checked > .label"));
         if (elements.size() == 1) {
-          WebElement radioButton = elements.get(0);
-          if (radioButton.getText().contains(radioButtonText)) {
-            return radioButton;
-          }
+          return elements.get(0);
         }
         return null;
       }

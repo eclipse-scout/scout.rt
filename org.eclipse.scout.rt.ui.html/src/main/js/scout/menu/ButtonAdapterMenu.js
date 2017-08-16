@@ -101,10 +101,10 @@ scout.ButtonAdapterMenu.prototype.getFocusableElement = function() {
 scout.ButtonAdapterMenu.prototype.focus = function() {
   if (!this.rendered) {
     this._postRenderActions.push(this.focus.bind(this));
-    return;
+    return false;
   }
   this.parent.setTabbableMenu(this);
-  this.session.focusManager.requestFocus(this.$container[0]);
+  return this.session.focusManager.requestFocus(this.$container[0]);
 };
 
 
