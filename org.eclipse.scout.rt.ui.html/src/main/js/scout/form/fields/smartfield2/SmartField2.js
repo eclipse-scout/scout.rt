@@ -629,10 +629,13 @@ scout.SmartField2.prototype._ensurePopup = function(result, status) {
 };
 
 scout.SmartField2.prototype._handleEmptyResult = function() {
-  if (this.touch) {
+  if (this.touch || this.activeFilterEnabled) {
     // In mobile mode we always open the popup, event if we don't have a result
     // Otherwise it would be impossible to enter text in a proposal field with
-    // an empty proposal list.
+    // an empty proposal list. The same goes for activeFilterEnabled state -
+    // a filter can lead to an empty result (for instance when there are no
+    // inactive proposals), and it's hard to switch to another filter value
+    // when the popup does not show up at all.
     var emptyResult = {lookupRows: []};
     this._ensurePopup(emptyResult);
   } else if (this.embedded) {
