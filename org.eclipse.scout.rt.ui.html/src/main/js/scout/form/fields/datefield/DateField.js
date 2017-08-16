@@ -1225,8 +1225,10 @@ scout.DateField.prototype.openDatePopup = function(date) {
 
   this.popup = this.createDatePopup();
   this.popup.open();
+  this.$dateField.addClass('focused');
   this.popup.on('remove', function() {
     this.popup = null;
+    this.$dateField.removeClass('focused');
   }.bind(this));
   this.getDatePicker().on('dateSelect', this._onDatePickerDateSelect.bind(this));
 };
@@ -1253,8 +1255,10 @@ scout.DateField.prototype.openTimePopup = function(date) {
   }
   this.popup = this.createTimePopup();
   this.popup.open();
+  this.$timeField.addClass('focused');
   this.popup.on('remove', function() {
     this.popup = null;
+    this.$timeField.removeClass('focused');
   }.bind(this));
   this.getTimePicker().on('timeSelect', this._onTimePickerTimeSelect.bind(this));
 };
