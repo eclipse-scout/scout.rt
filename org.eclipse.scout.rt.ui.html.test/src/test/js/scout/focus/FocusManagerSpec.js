@@ -11,12 +11,13 @@
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.FocusManager', function() {
-  var session, formHelper, focusHelper, form;
+  var session, formHelper, focusHelper, form, focusManager;
 
   beforeEach(function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     session = sandboxSession();
+    focusManager = session.focusManager;
     formHelper = new scout.FormSpecHelper(session);
     focusHelper = new FocusManagerSpecHelper();
     jasmine.clock().install();
@@ -28,6 +29,13 @@ describe('scout.FocusManager', function() {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
+
+  function createDivWithTwoInputs() {
+    var $container = session.$entryPoint.makeDiv();
+    $container.appendElement('<input type="text" val="input1" class="input1">');
+    $container.appendElement('<input type="text" val="input2" class="input2">');
+    return $container;
+  }
 
   describe('isSelectableText', function() {
 
@@ -61,7 +69,7 @@ describe('scout.FocusManager', function() {
         preventDefault: function() {}
       };
       spyOn(event, 'preventDefault');
-      session.focusManager._handleIEEvent(event);
+      focusManager._handleIEEvent(event);
       expect(document.activeElement).toBe(table.$container[0]);
       expect(event.preventDefault).toHaveBeenCalled();
     });
@@ -78,7 +86,7 @@ describe('scout.FocusManager', function() {
         preventDefault: function() {}
       };
       spyOn(event, 'preventDefault');
-      session.focusManager._handleIEEvent(event);
+      focusManager._handleIEEvent(event);
       expect(document.activeElement).toBe(tree.$container[0]);
       expect(event.preventDefault).toHaveBeenCalled();
     });
@@ -88,7 +96,7 @@ describe('scout.FocusManager', function() {
   describe('validateFocus', function() {
 
     it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', function() {
-      session.focusManager.validateFocus();
+      focusManager.validateFocus();
       var sandbox = $('#sandbox')[0];
       expect(document.activeElement).toBe(sandbox);
     });
@@ -124,29 +132,29 @@ describe('scout.FocusManager', function() {
         $secondField.focus();
         expect($secondField).toBeFocused();
 
-        expect(session.focusManager._findActiveContext()._lastValidFocusedElement).toBe($secondField[0]);
+        expect(focusManager._findActiveContext().lastValidFocusedElement).toBe($secondField[0]);
       });
 
       it('A new FocusContext must be created when a form is opened as dialog', function() {
         var $secondField = form.rootGroupBox.fields[1].$field;
         $secondField.focus(); // must be remembered by focus-context
 
-        var sandboxContext = session.focusManager._findActiveContext();
+        var sandboxContext = focusManager._findActiveContext();
         expect(sandboxContext.$container).toBe(session.$entryPoint);
 
         var dialog = formHelper.createFormWithFields(session.desktop, true, 2);
         dialog.render(session.$entryPoint);
 
-        expect(session.focusManager._focusContexts.length).toBe(2);
+        expect(focusManager._focusContexts.length).toBe(2);
 
-        var dialogContext = session.focusManager._findActiveContext();
+        var dialogContext = focusManager._findActiveContext();
         expect(dialogContext.$container).toBe(dialog.$container);
 
         // focus-context must install handlers on form $container
         expect(focusHelper.handlersRegistered(dialog.$container)).toBe(true);
 
         // must remember last focused field of first focus-context
-        expect(sandboxContext._lastValidFocusedElement).toBe($secondField[0]);
+        expect(sandboxContext.lastValidFocusedElement).toBe($secondField[0]);
       });
 
       it('Must focus another valid field if the focused field is removed', function() {
@@ -168,6 +176,30 @@ describe('scout.FocusManager', function() {
         expect($secondField).toBeFocused();
       });
 
+    });
+
+  });
+
+  describe('activateFocusContext', function() {
+
+    it('activates the context of the given $container and restores its focus', function() {
+      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext($container1);
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+
+      focusManager.installFocusContext($container2);
+      focusManager.requestFocus($container2.children('.input2'));
+      expect(document.activeElement).toBe($container2.children('.input2')[0]);
+
+      focusManager.activateFocusContext($container1);
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+
+      focusManager.activateFocusContext($container2);
+      expect(document.activeElement).toBe($container2.children('.input2')[0]);
+
+      focusManager.uninstallFocusContext($container1);
+      focusManager.uninstallFocusContext($container2);
     });
 
   });

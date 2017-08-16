@@ -151,7 +151,7 @@ scout.FocusManager.prototype.installFocusContext = function($container, focusRul
   this._pushIfAbsendElseMoveTop(focusContext);
 
   if (elementToFocus) {
-    focusContext._validateAndSetFocus(elementToFocus);
+    focusContext.validateAndSetFocus(elementToFocus);
   }
 };
 
@@ -170,12 +170,12 @@ scout.FocusManager.prototype.uninstallFocusContext = function($container) {
 
   // Remove and dispose the current focus context.
   scout.arrays.remove(this._focusContexts, focusContext);
-  focusContext._dispose();
+  focusContext.dispose();
 
   // Activate last active focus context.
   var activeFocusContext = this._findActiveContext();
   if (activeFocusContext) {
-    activeFocusContext._validateAndSetFocus(activeFocusContext._lastValidFocusedElement, filter);
+    activeFocusContext.validateAndSetFocus(activeFocusContext.lastValidFocusedElement, filter);
   }
 };
 
@@ -184,6 +184,22 @@ scout.FocusManager.prototype.uninstallFocusContext = function($container) {
  */
 scout.FocusManager.prototype.isFocusContextInstalled = function($container) {
   return !!this._findFocusContext($container);
+};
+
+/**
+ * Activates the focus context of the given $container or the given focus context and validates the focus so that the previously focused element will be focused again.
+ * @param {(scout.FocusContext|$)} focusContextOr$Container
+ */
+scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Container) {
+  var focusContext = focusContextOr$Container;
+  if (!(focusContextOr$Container instanceof scout.FocusContext)) {
+    focusContext = this._findFocusContext(focusContextOr$Container);
+  }
+  if (!focusContext) {
+    return;
+  }
+  this._pushIfAbsendElseMoveTop(focusContext);
+  this.validateFocus();
 };
 
 /**
@@ -240,7 +256,7 @@ scout.FocusManager.prototype.unregisterGlassPaneDisplayParent = function(display
 scout.FocusManager.prototype.validateFocus = function(filter) {
   var activeContext = this._findActiveContext();
   if (activeContext) {
-    activeContext._validateAndSetFocus(activeContext._lastValidFocusedElement, filter);
+    activeContext.validateAndSetFocus(activeContext.lastValidFocusedElement, filter);
   }
 };
 
@@ -254,7 +270,7 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
 
   var activeContext = this._findActiveContext();
   if (activeContext) {
-    activeContext._validateAndSetFocus(element, filter);
+    activeContext.validateAndSetFocus(element, filter);
   }
 
   return scout.focusUtils.isActiveElement(element);
@@ -269,7 +285,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     $candidates = $container
     .find(':focusable')
     .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
-    .not($entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext._validateAndSetFocus' focuses the $entryPoint as a fallback. */
+    .not($entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext.validateAndSetFocus' focuses the $entryPoint as a fallback. */
     .filter(filter || scout.filters.returnTrue);
 
   for (i = 0; i < $candidates.length; i++) {
