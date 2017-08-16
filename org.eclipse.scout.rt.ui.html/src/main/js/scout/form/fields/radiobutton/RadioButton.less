@@ -33,6 +33,12 @@
     border-radius: 50%;
   }
 
+  &::after {
+    /* Toggling content will break the layout with IE, toggling only visibility is fine */
+    content: '';
+    display: none;
+  }
+
   &.checked::after {
     content: '';
     display: inline-block;
