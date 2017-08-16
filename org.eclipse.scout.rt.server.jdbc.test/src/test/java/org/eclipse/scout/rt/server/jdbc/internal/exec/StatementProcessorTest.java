@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.holders.LongHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.IToken;
@@ -292,4 +293,26 @@ public class StatementProcessorTest {
     }
   }
 
+  public class Session extends AbstractServerSession {
+    private static final long serialVersionUID = 1L;
+
+    public Session() {
+      super(false);
+    }
+  }
+
+  @Test
+  public void testIgnoreInvalidDuplicateBinds() {
+    AbstractSqlService sqlService = new AbstractSqlService() {
+    };
+    BeanInstanceUtil.initializeBeanInstance(sqlService);
+
+    // The abstract server session contains active but without a setter and is thus not a valid bind
+    // In this test, the NVPair active should be used and there should be no exception throw
+    StatementProcessor sp = new StatementProcessor(
+        sqlService,
+        "SELECT 1 FROM DUAL INTO :active ",
+        new Object[]{new Session(), new NVPair("active", new IntegerHolder())});
+    sp.simulate();
+  }
 }
