@@ -30,6 +30,15 @@
   min-height: 400px;
 }
 
+.calendar-scrollable-components {
+  height: 100%;
+}
+
+.calendar-scrollable-components-week {
+  top: 85%;
+  height: 15%;
+}
+
 .calendar-header {
   position: relative;
   display: table;
@@ -366,7 +375,7 @@
       padding-right: 2px;
   }
 
-  & > .calendar-component {
+  & .calendar-component {
     margin-left: 32px;
     margin-bottom: 1px;
     margin-top: 1px;
