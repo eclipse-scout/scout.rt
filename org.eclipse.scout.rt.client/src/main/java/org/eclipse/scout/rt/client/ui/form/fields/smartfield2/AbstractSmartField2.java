@@ -475,13 +475,11 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
   }
 
   @Override
-  public void setActiveFilter(TriState t) {
-    if (isActiveFilterEnabled()) {
-      if (t == null) {
-        t = TriState.TRUE;
-      }
-      propertySupport.setProperty(PROP_ACTIVE_FILTER, t);
+  public void setActiveFilter(TriState activeFilter) {
+    if (activeFilter == null) {
+      activeFilter = TriState.TRUE;
     }
+    propertySupport.setProperty(PROP_ACTIVE_FILTER, activeFilter);
   }
 
   @Override
