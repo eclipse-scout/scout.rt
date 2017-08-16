@@ -61,6 +61,7 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
 
     this.popup.htmlComp.$comp.oneAnimationEnd(function() {
       this.animating = false;
+      this.popup._onAnimationEnd();
     }.bind(this));
 
     this.popup.session.layoutValidator.schedulePostValidateFunction(function() {

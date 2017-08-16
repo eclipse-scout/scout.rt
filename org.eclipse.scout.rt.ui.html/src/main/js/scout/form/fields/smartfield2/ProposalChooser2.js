@@ -219,3 +219,10 @@ scout.ProposalChooser2.prototype.setBusy = function(busy) {
 scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {
   return this.smartField.activeFilterLabels[index];
 };
+
+/**
+ * Override this function to implement update scrollbar behavior.
+ */
+scout.ProposalChooser2.prototype.updateScrollbars = function() {
+  // NOP
+};
