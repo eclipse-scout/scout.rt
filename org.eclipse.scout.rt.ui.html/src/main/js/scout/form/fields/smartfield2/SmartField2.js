@@ -843,7 +843,8 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
-      event.preventDefault();
+      event.preventDefault();  // prevent browser default TAB behavior
+      event.stopPropagation(); // prevent FocusContext#._onKeyDown
       $.log.debug('(SmartField2#_onFieldKeyDown) set _tabPrevented');
       this._tabPrevented = {
         shiftKey: event.shiftKey
