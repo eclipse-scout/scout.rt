@@ -484,10 +484,14 @@ scout.dates = {
 
   /**
    * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.
+   * <p>
+   * If time is omitted, 00:00:00 is used as time part.<br>
+   * If date is omitted, 1970-01-01 is used as date part independent of the time zone, means it is 1970-01-01 in every time zone.
    */
   combineDateTime: function(date, time) {
-    var newDate = new Date(0);
+    var newDate = new Date();
     newDate.setHours(0, 0, 0, 0); // set time part to zero in local time!
+    newDate.setFullYear(1970, 0, 1); // make sure local time has no effect on date (if date is omitted it has to be 1970-01-01)
     if (date) {
       newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
     }
