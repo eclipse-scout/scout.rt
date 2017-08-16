@@ -2312,11 +2312,8 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   this.selectNodes(node);
 
   if (this.checkable && node.enabled && this._isCheckboxClicked(event)) {
-    // TODO [7.0] awe: (check-box) check if we can remove call to supportsFocus* (analog CheckBox.js)
-    // shouldn't be required since the refactoring of the ::before Element in CheckBox.js
-    if (!scout.device.supportsFocusEmptyBeforeDiv()) {
-      this.focus();
-      event.preventDefault();
+    if (scout.device.loosesFocusIfPseudoElementIsRemoved()) {
+      this.focusAndPreventDefault(event);
     }
     this.checkNode(node, !node.checked);
   }

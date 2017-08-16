@@ -96,8 +96,9 @@ scout.TabItem.prototype._onStatusMouseDown = function(event) {
 
 scout.TabItem.prototype.focusTab = function() {
   if (this._tabRendered) {
-    this.session.focusManager.requestFocus(this.$tabContainer);
+    return this.session.focusManager.requestFocus(this.$tabContainer);
   }
+  return false;
 };
 
 scout.TabItem.prototype.setTabActive = function(active) {
@@ -317,7 +318,7 @@ scout.TabItem.prototype.focus = function() {
     this.parent.setSelectedTab(this);
   }
   if (!this.rendered) {
-    return;
+    return false;
   }
-  this.focusTab();
+  return this.focusTab();
 };

@@ -579,13 +579,13 @@ scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
 scout.FormField.prototype.focus = function() {
   if (!this.rendered) {
     this._postRenderActions.push(this.focus.bind(this));
-    return;
+    return false;
   }
   if (this.$field) {
-    this.session.focusManager.requestFocus(this.$field[0]);
+    return this.session.focusManager.requestFocus(this.$field[0]);
   } else {
     var element = this.session.focusManager.findFirstFocusableElement(this.$container);
-    this.session.focusManager.requestFocus(element);
+    return this.session.focusManager.requestFocus(element);
   }
 };
 

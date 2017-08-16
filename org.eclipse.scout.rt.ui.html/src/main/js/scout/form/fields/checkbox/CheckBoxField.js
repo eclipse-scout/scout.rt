@@ -67,8 +67,9 @@ scout.CheckBoxField.prototype._onMouseDown = function(event) {
     return;
   }
   this.toggleChecked();
-  if (event.currentTarget === this.$checkBoxLabel[0]) {
-    this.focus();
+  // Also focus when check box is clicked otherwise firefox would loose the focus (see device.loosesFocusIfPseudoElementIsRemoved)
+  if (scout.isOneOf(event.currentTarget, this.$checkBox[0], this.$checkBoxLabel[0])) {
+    this.focusAndPreventDefault(event);
   }
 };
 
@@ -109,6 +110,7 @@ scout.CheckBoxField.prototype._renderProperties = function() {
 };
 
 scout.CheckBoxField.prototype._renderValue = function() {
+  this.$fieldContainer.toggleClass('checked', this.value === true);
   this.$checkBox.toggleClass('checked', this.value === true);
   this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
 };
