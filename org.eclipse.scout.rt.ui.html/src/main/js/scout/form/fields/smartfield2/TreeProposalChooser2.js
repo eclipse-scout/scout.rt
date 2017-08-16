@@ -136,7 +136,7 @@ scout.TreeProposalChooser2.prototype.trySelectCurrentValue = function() {
     return;
   }
   var allTreeNodes = scout.objects.values(this.model.nodesMap);
-  var treeNode = allTreeNodes.find(function(node) {
+  var treeNode = scout.arrays.find(allTreeNodes, function(node) {
     return node.lookupRow.key === currentValue;
   });
   if (treeNode) {

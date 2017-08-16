@@ -205,3 +205,7 @@ scout.TableProposalChooser2.prototype._transformTableRowData = function(tableRow
   });
   return cells;
 };
+
+scout.TableProposalChooser2.prototype.updateScrollbars = function() {
+  this.model.updateScrollbars();
+};

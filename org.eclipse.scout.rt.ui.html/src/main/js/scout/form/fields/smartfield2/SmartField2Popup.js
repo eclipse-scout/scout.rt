@@ -113,3 +113,7 @@ scout.SmartField2Popup.prototype._onRemoveSmartField = function(event) {
 scout.SmartField2Popup.prototype._isMouseDownOnAnchor = function(event) {
   return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target);
 };
+
+scout.SmartField2Popup.prototype._onAnimationEnd = function() {
+  this.proposalChooser.updateScrollbars();
+};
