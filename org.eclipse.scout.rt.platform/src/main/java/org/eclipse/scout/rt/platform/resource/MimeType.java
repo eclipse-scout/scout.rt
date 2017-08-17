@@ -30,7 +30,7 @@ public enum MimeType {
   GZ("application/gzip", "gz"),
   HTML("text/html", "html"),
   HTM("text/html", "htm"),
-  ICO("image/vnd.microsoft.icon", "ico"),
+  ICO("image/x-icon", "ico"),
   ICS("text/calendar", "ics"),
   IFB("text/calendar", "ifb"),
   JAR("application/java-archive", "jar"),
