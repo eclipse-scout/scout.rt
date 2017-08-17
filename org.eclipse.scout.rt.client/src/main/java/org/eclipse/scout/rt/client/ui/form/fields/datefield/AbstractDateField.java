@@ -178,31 +178,35 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
 
   @Override
   public void setFormat(String format) {
-    format = checkFormatPatternSupported(format);
+    String supportedFormat = checkFormatPatternSupported(format);
+
+    if (supportedFormat == null) {
+      return;
+    }
 
     String dateFormatPattern = null;
     String timeFormatPattern = null;
-    if (format != null) {
-      // Try to extract date and time parts of pattern
-      int h = format.toLowerCase().indexOf('h');
-      if (h >= 0) {
-        dateFormatPattern = format.substring(0, h).trim();
-        timeFormatPattern = format.substring(h).trim();
+
+    // Try to extract date and time parts of pattern
+    int h = supportedFormat.toLowerCase().indexOf('h');
+    if (h >= 0) {
+      dateFormatPattern = supportedFormat.substring(0, h).trim();
+      timeFormatPattern = supportedFormat.substring(h).trim();
+    }
+    else {
+      if (isHasDate()) {
+        dateFormatPattern = supportedFormat;
+        timeFormatPattern = null;
+        if (isHasTime()) {
+          LOG.warn("Could not extract time part from pattern '{}', using default pattern.", supportedFormat);
+        }
       }
       else {
-        if (isHasDate()) {
-          dateFormatPattern = format;
-          timeFormatPattern = null;
-          if (isHasTime()) {
-            LOG.warn("Could not extract time part from pattern '{}', using default pattern.", format);
-          }
-        }
-        else {
-          dateFormatPattern = null;
-          timeFormatPattern = (isHasTime() ? format : null);
-        }
+        dateFormatPattern = null;
+        timeFormatPattern = (isHasTime() ? supportedFormat : null);
       }
     }
+
     setDateFormatPattern(dateFormatPattern);
     setTimeFormatPattern(timeFormatPattern);
   }
