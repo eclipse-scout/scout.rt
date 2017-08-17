@@ -15,7 +15,6 @@
   /* 1px smaller than the header because of the bottom border (see .selected rule below) */
   height: calc(~'100% - 1px');
   padding: 5px;
-  cursor: pointer;
   background-color: @view-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
@@ -24,8 +23,16 @@
     border-right-width: 0;
   }
 
-  &:hover {
+  &:not(.no-hover) {
+    cursor: pointer;
+  }
+
+  &:not(.no-hover):hover {
     color: @hover-color;
+  }
+
+  &.small {
+    width: 130px;
   }
 
   &:active {
