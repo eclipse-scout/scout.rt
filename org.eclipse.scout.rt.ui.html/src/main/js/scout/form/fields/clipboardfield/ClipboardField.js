@@ -67,7 +67,7 @@ scout.ClipboardField.prototype._render = function() {
   // not work in IE9.
   this.addContainer(this.$parent, 'clipboard-field');
   this.addLabel();
-  this.addField(this.$parent.makeElement('<div>'));
+  this.addField(this.$parent.makeElement('<div>').addClass('input-field'));
   this.addStatus();
 
   this.$field

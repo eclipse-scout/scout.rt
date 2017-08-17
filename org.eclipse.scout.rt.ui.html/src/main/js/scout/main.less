@@ -133,8 +133,7 @@ button {
 
 input,
 textarea,
-.input-field,
-.clipboard-field > .field {
+.input-field {
   background-color: @control-background-color;
   color: @control-color;
   border: 1px solid @border-color;
@@ -145,7 +144,8 @@ textarea,
     color: @control-disabled-color;
   }
 
-  &:focus {
+  &:focus,
+  &.focused {
     #scout.focus-border();
   }
 
@@ -154,7 +154,8 @@ textarea,
     background-color: @error-background-color;
   }
 
-  &.has-error:focus {
+  &.has-error:focus,
+  &.has-error.focused {
     #scout.glow(@error-glow-color);
   }
 
