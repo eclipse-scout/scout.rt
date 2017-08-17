@@ -567,7 +567,7 @@ scout.Desktop.prototype.outlineDisplayStyle = function() {
 
 scout.Desktop.prototype.shrinkNavigation = function() {
   if (this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
-      this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
+    this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
     this.outline.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
   } else {
     this.setNavigationVisible(false);
@@ -756,17 +756,36 @@ scout.Desktop.prototype.inFront = function() {
  *
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
  */
-scout.Desktop.prototype.glassPaneTargets = function() {
+scout.Desktop.prototype._glassPaneTargets = function(element) {
   // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
-  var glassPaneTargets = $.makeArray(this.$container
+  var $glassPaneTargets = this.$container
     .children()
     .not('.splitter') // exclude splitter to be locked
     .not('.desktop-notifications') // exclude notification box like 'connection interrupted' to be locked
-    .not('.overlay-separator') // exclude overlay separator (marker element)
-  );
+    .not('.overlay-separator'); // exclude overlay separator (marker element)
+
+  if (element && element.$container) {
+    $glassPaneTargets = $glassPaneTargets.not(element.$container);
+  }
+
+  var glassPaneTargets;
+  if (element instanceof scout.Form && element.displayHint === scout.Form.DisplayHint.VIEW) {
+    $glassPaneTargets = $glassPaneTargets
+      .not('.desktop-bench')
+      .not('.desktop-header');
+
+    if (this.header && this.header.toolBox && this.header.toolBox.$container) {
+      $glassPaneTargets.push(this.header.toolBox.$container);
+    }
+
+    glassPaneTargets = $.makeArray($glassPaneTargets);
+    scout.arrays.pushAll(glassPaneTargets, this._getBenchGlassPaneTargetsForView(element));
+  } else {
+    glassPaneTargets = $.makeArray($glassPaneTargets);
+  }
 
   // When a popup-window is opened its container must also be added to the result
-  this._pushPopupWindowGlassPaneTargets(glassPaneTargets);
+  this._pushPopupWindowGlassPaneTargets(glassPaneTargets, element);
 
   return glassPaneTargets;
 };
@@ -786,7 +805,42 @@ scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
   return deferred;
 };
 
-scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets) {
+scout.Desktop.prototype._getBenchGlassPaneTargetsForView = function(view) {
+  var $glassPanes = [];
+
+  $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.header));
+
+  if (this.bench) {
+    this.bench.visitChildren(function(tabBox) {
+      if (tabBox instanceof scout.SimpleTabBox && tabBox.rendered) {
+        if (tabBox.children.indexOf(view) !== -1) {
+          $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, tabBox));
+        } else {
+          $glassPanes.push(tabBox.$container);
+        }
+      }
+    }.bind(this));
+  }
+  return $glassPanes;
+};
+
+scout.Desktop.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) {
+  var $glassPanes = [];
+  if (tabBox && tabBox.tabArea) {
+    tabBox.tabArea.tabs.forEach(function(tab) {
+      if (tab.view !== view) {
+        $glassPanes.push(tab.$container);
+        // Workaround for javascript not being able to prevent hover event propagation:
+        // In case of tabs, the hover selector is defined on the element that is the direct parent
+        // of the glass pane. Under these circumstances, the hover style isn't be prevented by the glass pane.
+        tab.$container.addClass('no-hover');
+      }
+    });
+  }
+  return $glassPanes;
+};
+
+scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets, element) {
   this.formController._popupWindows.forEach(function(popupWindow) {
     glassPaneTargets.push(popupWindow.initialized ?
       popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
@@ -812,7 +866,7 @@ scout.Desktop.prototype.hideForm = function(form) {
     }
   }
   form.displayParent.formController.unregisterAndRemove(form);
-  if(this.benchVisible && this.bench.getViews().length === 0){
+  if (this.benchVisible && this.bench.getViews().length === 0) {
     this.bringOutlineToFront();
   }
 };
@@ -822,7 +876,7 @@ scout.Desktop.prototype.activateForm = function(form) {
   this._setFormActivated(form);
 
   // If the form has a modal child dialog, this dialog needs to be activated as well.
-  form.dialogs.forEach(function (dialog) {
+  form.dialogs.forEach(function(dialog) {
     if (dialog.modal) {
       this.activateForm(dialog);
     }

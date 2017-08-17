@@ -16,17 +16,20 @@
   vertical-align: top;
   width: 220px;
   padding: 6px 10px 0 20px;
-  cursor: pointer;
   background-color: @view-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
 
-  &.small {
-    width: 130px;
+  &:not(.no-hover) {
+    cursor: pointer;
   }
 
-  &:hover {
+  &:not(.no-hover):hover {
     color: @hover-color;
+  }
+
+  &.small {
+    width: 130px;
   }
 
   &:active {
