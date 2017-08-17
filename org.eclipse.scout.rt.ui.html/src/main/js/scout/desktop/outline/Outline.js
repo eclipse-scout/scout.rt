@@ -834,16 +834,48 @@ scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
   this.setProperty('nodeMenuBarVisible', visible);
 };
 
-scout.Outline.prototype._glassPaneTargets = function() {
+scout.Outline.prototype._glassPaneTargets = function(element) {
   var desktop = this.session.desktop;
-  var elements = [];
+  var $elements = [];
   if (desktop.navigation) {
-    elements.push(desktop.navigation.$body);
+    $elements.push(desktop.navigation.$body);
+  }
+  if (desktop.bench && element instanceof scout.Form && element.displayHint === scout.Form.DisplayHint.VIEW) {
+    scout.arrays.pushAll($elements, this._getBenchGlassPaneTargetsForView(element));
   }
   if (desktop.bench && desktop.bench.outlineContent) {
-    scout.arrays.pushAll(elements, desktop.bench.outlineContent.glassPaneTargets());
+    scout.arrays.pushAll($elements, desktop.bench.outlineContent.glassPaneTargets(element));
   }
-  return elements;
+  return $elements;
+};
+
+scout.Outline.prototype._getBenchGlassPaneTargetsForView = function(view) {
+  var $glassPanes = [];
+  $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.session.desktop.header));
+  this.session.desktop.bench.visitChildren(function(tabBox) {
+    if (tabBox instanceof scout.SimpleTabBox) {
+      if (tabBox.children.indexOf(view) !== -1) {
+        scout.arrays.pushAll($glassPanes, this._getTabGlassPaneTargetsForView(view, tabBox));
+      } else if (tabBox.$container) {
+        $glassPanes.push(tabBox.$container);
+      }
+    }
+  }.bind(this));
+  return $glassPanes;
+};
+
+scout.Outline.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) {
+  var $glassPanes = [];
+  tabBox.tabArea.tabs.forEach(function(tab) {
+    if (tab.view !== view && tab.view.displayParent === this) {
+      $glassPanes.push(tab.$container);
+      // Workaround for javascript not being able to prevent hover event propagation:
+      // In case of tabs, the hover selector is defined on the element that is the direct parent
+      // of the glass pane. Under these circumstances, the hover style isn't be prevented by the glass pane.
+      tab.$container.addClass('no-hover');
+    }
+  }.bind(this));
+  return $glassPanes;
 };
 
 /**

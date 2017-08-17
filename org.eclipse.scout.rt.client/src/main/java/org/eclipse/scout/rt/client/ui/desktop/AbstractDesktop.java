@@ -1181,11 +1181,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     // Validate the Form's modality configuration.
     Assertions.assertNotNull(form.getDisplayParent(), "Property 'displayParent' must not be null");
-    boolean applicationModal = (form.isModal() && form.getDisplayParent() == this);
     boolean view = (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW);
-
-    // Ensure not to show a 'application-modal' view. Otherwise, no user interaction would be possible.
-    Assertions.assertFalse(view && applicationModal, "'desktop-modality' not supported for views");
 
     // Ensure not to show a modal Form if the application is in 'application-modal' state. Otherwise, no user interaction would be possible.
     if (view && form.isModal()) {

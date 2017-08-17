@@ -1024,15 +1024,15 @@ scout.Widget.prototype.link = function(widgets) {
  * If the widget is not rendered yet, a scout.DerredGlassPaneTarget is returned.<br>
  * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
  */
-scout.Widget.prototype.glassPaneTargets = function() {
+scout.Widget.prototype.glassPaneTargets = function(element) {
   if (this.rendered) {
-    return this._glassPaneTargets();
+    return this._glassPaneTargets(element);
   }
 
-  return scout.DeferredGlassPaneTarget.createFor(this, this._glassPaneTargets.bind(this));
+  return scout.DeferredGlassPaneTarget.createFor(this, this._glassPaneTargets.bind(this, element));
 };
 
-scout.Widget.prototype._glassPaneTargets = function() {
+scout.Widget.prototype._glassPaneTargets = function(element) {
   return [this.$container];
 };
 
@@ -1107,7 +1107,7 @@ scout.Widget.prototype._isPreserveOnPropertyChangeProperty = function(propertyNa
 
 scout.Widget.prototype._addProperties = function(propertyName, properties) {
   properties = scout.arrays.ensure(properties);
-  properties.forEach(function(property){
+  properties.forEach(function(property) {
     if (this[propertyName].indexOf(property) > -1) {
       throw new Error(propertyName + ' already contains the property ' + property);
     }

@@ -58,6 +58,9 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
   // Remove glass-panes
   this._$glassPanes.forEach(function($glassPane) {
+    if($glassPane.parent()) {
+      $glassPane.parent().removeClass('no-hover');
+    }
     $glassPane.remove();
   });
 
@@ -95,7 +98,7 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
     return []; // Parent is not a valid display parent.
   }
 
-  return displayParent.glassPaneTargets();
+  return displayParent.glassPaneTargets(this._element);
 };
 
 scout.GlassPaneRenderer.prototype._resolveDisplayParent = function() {
@@ -150,4 +153,6 @@ scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
       classesToRemove: 'animate-modality-highlight animate-open'
     });
   }
+
+  $.suppressEvent(event);
 };

@@ -59,20 +59,6 @@ scout.Form.prototype._init = function(model) {
 
   this._setRootGroupBox(this.rootGroupBox);
   this._setStatus(this.status);
-
-  // Only render glassPanes if modal and not being a wrapped Form.
-  var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, renderGlassPanes);
-  var glasspaneRendererHandler = function(event) {
-    //render glasspanes on parents after initialized
-    if (event.newProperties.displayParent) {
-      this._glassPaneRenderer.renderGlassPanes();
-    }
-  }.bind(this);
-  this.on('propertyChange', glasspaneRendererHandler);
-  this.one('destroy', function() {
-    this.off('propertyChange', glasspaneRendererHandler);
-  }.bind(this));
 };
 
 scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
@@ -99,6 +85,19 @@ scout.Form.prototype._renderProperties = function() {
 
 scout.Form.prototype._render = function($parent) {
   this._renderForm($parent);
+
+  //Only render glassPanes if modal and not being a wrapped Form.
+  var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, renderGlassPanes);
+
+  this.glasspaneRendererHandler = function(event) {
+    //render glasspanes on parents after initialized
+    if (event.newProperties.displayParent) {
+      this._glassPaneRenderer.renderGlassPanes();
+    }
+  }.bind(this);
+  this.on('propertyChange', this.glasspaneRendererHandler);
+  this._glassPaneRenderer.renderGlassPanes();
 };
 
 scout.Form.prototype._renderForm = function($parent) {
@@ -380,6 +379,7 @@ scout.Form.prototype._remove = function() {
   this.messageBoxController.remove();
   this.fileChooserController.remove();
   this._glassPaneRenderer.removeGlassPanes();
+  this.off('propertyChange', this.glasspaneRendererHandler);
   this._uninstallFocusContext();
   scout.Form.parent.prototype._remove.call(this);
 };
