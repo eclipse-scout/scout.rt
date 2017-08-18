@@ -12,11 +12,8 @@
   position: absolute;
   border: 1px solid @popup-border-color;
   border-radius: @border-radius;
-  #scout.drop-shadow();
-
-  &.has-error {
-    border-color: @error-border-color;
-  }
+  #scout.focus-border();
+  overflow: hidden;
 }
 
 .time-picker {

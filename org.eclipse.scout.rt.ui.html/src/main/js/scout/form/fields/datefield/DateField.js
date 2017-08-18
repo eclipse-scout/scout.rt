@@ -77,6 +77,7 @@ scout.DateField.prototype.createDatePopup = function() {
     parent: this,
     $anchor: this.$field,
     boundToAnchor: !this.touch,
+    cssClass: this._errorStatusClass(),
     closeOnAnchorMouseDown: false,
     field: this,
     allowedDates: this.allowedDates,
@@ -91,6 +92,7 @@ scout.DateField.prototype.createTimePopup = function() {
     parent: this,
     $anchor: this.$timeField,
     boundToAnchor: !this.touch,
+    cssClass: this._errorStatusClass(),
     closeOnAnchorMouseDown: false,
     field: this,
     timeResolution: this.timePickerResolution,
@@ -447,7 +449,7 @@ scout.DateField.prototype._setAllowedDates = function(allowedDates) {
 scout.DateField.prototype._renderErrorStatus = function() {
   scout.DateField.parent.prototype._renderErrorStatus.call(this);
   var hasStatus = !!this.errorStatus,
-    statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
+    statusClass = this._errorStatusClass();
 
   if (this.$dateField) {
     this.$dateField.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
@@ -476,6 +478,10 @@ scout.DateField.prototype._renderErrorStatus = function() {
     this.popup.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
     this.popup.$container.toggleClass(statusClass, hasStatus);
   }
+};
+
+scout.DateField.prototype._errorStatusClass = function() {
+  return !!this.errorStatus ? 'has-' + this.errorStatus.cssClass() : '';
 };
 
 /**
