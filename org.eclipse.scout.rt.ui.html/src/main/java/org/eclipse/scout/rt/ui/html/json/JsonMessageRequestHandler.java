@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -134,7 +135,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
             }
           }, DefaultExceptionTranslator.class);
     }
-    catch (Exception e) {
+    catch (Exception | PlatformError e) {
       if (jsonRequest == null || uiSession == null || jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
