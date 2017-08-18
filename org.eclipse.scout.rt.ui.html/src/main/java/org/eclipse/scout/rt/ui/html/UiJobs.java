@@ -16,8 +16,10 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -25,23 +27,24 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiModelJobsAwaitTimeoutProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper methods to work with the Job API from UI.
  */
 @ApplicationScoped
 public class UiJobs {
-
-  /**
-   * The maximal timeout to wait for model jobs to complete.
-   */
-  public static final long AWAIT_TIMEOUT = TimeUnit.HOURS.toMillis(1);
+  private static final Logger LOG = LoggerFactory.getLogger(UiJobs.class);
 
   /**
    * Execution hint to mark futures which represent a poll request.
@@ -52,6 +55,11 @@ public class UiJobs {
    * Execution hint to mark futures which represent a 'response-to-json' job.
    */
   public static final String EXECUTION_HINT_RESPONSE_TO_JSON = UiJobs.class.getName() + ".responseToJson";
+
+  /**
+   * The maximal timeout to wait for model jobs to complete.
+   */
+  private final long m_awaitTimeout = CONFIG.getPropertyValue(UiModelJobsAwaitTimeoutProperty.class);
 
   /**
    * Waits until all model jobs of the given session are in 'done' state, or require 'user interaction'. If the jobs
@@ -74,7 +82,7 @@ public class UiJobs {
           ModelJobFutureFilter.INSTANCE,
           new SessionFutureFilter(clientSession)));
     }
-    catch (TimedOutError | ThreadInterruptedError e) {
+    catch (final ThreadInterruptedError e) {
       // Handle exception in proper ClientRunContext.
       ClientRunContexts.copyCurrent().withSession(clientSession, true).run(new IRunnable() {
 
@@ -84,6 +92,37 @@ public class UiJobs {
         }
       });
     }
+    catch (TimedOutError e) {
+      handleAwaitModelJobsTimedOutError(clientSession, exceptionHandler, e);
+    }
+  }
+
+  protected void handleAwaitModelJobsTimedOutError(final IClientSession clientSession, final Class<? extends ExceptionHandler> exceptionHandler, TimedOutError e) {
+    LOG.warn("Timeout while waiting for model jobs to finish, cancelling running and scheduled model jobs.");
+    cancelModelJobs(clientSession);
+
+    ModelJobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        MessageBoxes.createOk()
+            .withHeader(TEXTS.get("ui.RequestTimeout"))
+            .withBody(TEXTS.get("ui.RequestTimeoutMsg"))
+            .withSeverity(IStatus.ERROR).show();
+      }
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
+        .withName("Handling await model jobs timeout"));
+  }
+
+  /**
+   * Cancels all running model jobs for the requested session (interrupt if necessary).
+   */
+  public void cancelModelJobs(IClientSession clientSession) {
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(clientSession))
+        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
+        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST)
+        .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
+        .toFilter(), true);
   }
 
   /**
@@ -136,6 +175,10 @@ public class UiJobs {
         .andMatchNotState(JobState.NEW) // ignore jobs which are not submitted yet (e.g. created via IFuture.whenDoneSchedule)
         .andMatchNotState(JobState.PENDING) // ignore 'one-shot' jobs which are scheduled with an initial delay because consumed by the poller
         .andMatch(filter)
-        .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        .toFilter(), getAwaitTimeout(), TimeUnit.SECONDS);
+  }
+
+  protected long getAwaitTimeout() {
+    return m_awaitTimeout;
   }
 }
