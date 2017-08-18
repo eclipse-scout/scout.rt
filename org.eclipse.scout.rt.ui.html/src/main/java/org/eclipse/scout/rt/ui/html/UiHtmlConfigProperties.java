@@ -167,6 +167,23 @@ public final class UiHtmlConfigProperties {
   }
 
   /**
+   * The maximal timeout in seconds to wait for model jobs to complete during a UI request. After that timeout the model
+   * jobs will be aborted so that the request may return to the client.
+   */
+  public static class UiModelJobsAwaitTimeoutProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    protected Long getDefaultValue() {
+      return Long.valueOf(TimeUnit.HOURS.toSeconds(1));
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.ui.model.jobs.await.timeout";
+    }
+  }
+
+  /**
    * Number of seconds before the housekeeping job starts after a UI session has been unregistered from the store.
    */
   public static class SessionStoreHousekeepingDelayProperty extends AbstractPositiveIntegerConfigProperty {

@@ -69,7 +69,6 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
-import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiSystem;
@@ -881,13 +880,7 @@ public class UiSession implements IUiSession {
 
   @Override
   public void processCancelRequest() {
-    // Cancel all running model jobs for the requested session (interrupt if necessary)
-    Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
-        .andMatch(new SessionFutureFilter(getClientSession()))
-        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
-        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST)
-        .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
-        .toFilter(), true);
+    BEANS.get(UiJobs.class).cancelModelJobs(getClientSession());
   }
 
   @Override
