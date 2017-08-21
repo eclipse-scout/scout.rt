@@ -51,7 +51,6 @@ scout.TableField.prototype._render = function($parent) {
   this.addMandatoryIndicator();
   this.addStatus();
   this._renderTable();
-  this.$field.addDeviceClass();
 };
 
 scout.TableField.prototype._setTable = function(table) {
@@ -72,6 +71,7 @@ scout.TableField.prototype._renderTable = function() {
   if (this.table) {
     this.table.render(this.$container);
     this.addField(this.table.$container);
+    this.$field.addDeviceClass();
   }
 };
 
