@@ -46,6 +46,7 @@ scout.ListBox.prototype._render = function($parent) {
 scout.ListBox.prototype._renderTable = function() {
   this.table.render(this.$fieldContainer);
   this.addField(this.table.$container);
+  this.$field.addDeviceClass();
 };
 
 scout.ListBox.prototype._renderFilterBox = function() {

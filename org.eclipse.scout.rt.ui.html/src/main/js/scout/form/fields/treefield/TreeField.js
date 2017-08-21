@@ -33,6 +33,7 @@ scout.TreeField.prototype._render = function($parent) {
 scout.TreeField.prototype._renderTree = function() {
   this.tree.render(this.$container);
   this.addField(this.tree.$container);
+  this.$field.addDeviceClass();
 };
 
 scout.TreeField.prototype._removeTree = function() {

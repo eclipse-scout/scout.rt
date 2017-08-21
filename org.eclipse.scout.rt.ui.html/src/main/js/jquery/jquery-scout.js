@@ -704,6 +704,17 @@ $.fn.hasClassSVG = function(cssClass) {
   return old.indexOf(' ' + cssClass + ' ') !== -1;
 };
 
+/**
+ * This function adds a device specific CSS class to the current element.
+ * The current implementation adds a class 'ie' if Internet Explorer is used.
+ */
+$.fn.addDeviceClass = function() {
+  if (scout.device.isInternetExplorer()) {
+    this.addClass('ie');
+  }
+  return this;
+};
+
 // select one and deselect siblings
 $.fn.selectOne = function() {
   this.siblings().removeClass('selected');
