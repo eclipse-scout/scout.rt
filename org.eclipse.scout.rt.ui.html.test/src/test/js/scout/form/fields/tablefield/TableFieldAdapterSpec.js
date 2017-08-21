@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("T2ableFieldAdapter", function() {
+describe("TableFieldAdapter", function() {
   var session, helper, tableHelper;
 
   beforeEach(function() {
