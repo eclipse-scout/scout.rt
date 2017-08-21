@@ -98,8 +98,13 @@ scout.FormController.prototype.remove = function() {
  */
 scout.FormController.prototype.activateForm = function(form) {
   // TODO [7.0] awe: (2nd screen) handle popupWindow?
-  if (form.displayParent instanceof scout.Outline) {
-    this.session.desktop.setOutline(form.displayParent);
+  var displayParent = this.displayParent;
+  while (displayParent) {
+    if (displayParent instanceof scout.Outline) {
+      this.session.desktop.setOutline(displayParent);
+      break;
+    }
+    displayParent = displayParent.displayParent;
   }
 
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
@@ -226,17 +231,17 @@ scout.FormController.prototype._activateView = function(view) {
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {
-  // For modal dialogs of other dialogs delegate the activation up the display-hierarchy to keep them always together
-  // with their displayParent.
-  if (dialog.modal && dialog.displayParent instanceof scout.Form &&
-    dialog.displayParent.displayHint === scout.Form.DisplayHint.DIALOG) {
+
+  // If the display-parent is a view-form --> activate it always.
+  // If it is another dialog --> activate it only if the dialog to activate is modal
+  if (dialog.displayParent instanceof scout.Form &&
+    (dialog.displayParent.displayHint === scout.Form.DisplayHint.VIEW ||
+      (dialog.displayParent.displayHint === scout.Form.DisplayHint.DIALOG && dialog.modal))) {
     this.activateForm(dialog.displayParent);
-    return;
   }
 
-  if (dialog.displayParent instanceof scout.Form &&
-    dialog.displayParent.displayHint === scout.Form.DisplayHint.VIEW) {
-    this.activateForm(dialog.displayParent);
+  if (!dialog.rendered) {
+    return;
   }
 
   // Now the approach is to move all eligible siblings that are in the DOM after the given dialog.

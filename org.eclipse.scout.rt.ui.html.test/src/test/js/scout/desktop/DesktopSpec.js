@@ -371,6 +371,97 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog0);
     });
 
+    it('keeps the order of other non-modal dialogs even when one of them is the display-parent of the dialog to activate', function() {
+      expect(desktop.activeForm).toBeUndefined();
+
+      var dialog0 = formHelper.createFormWithOneField();
+      dialog0.setCssClass('DIALOG0');
+      dialog0.modal = false;
+      desktop.showForm(dialog0);
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.setCssClass('DIALOG1');
+      dialog1.modal = false;
+      dialog1.parent = dialog0;
+      desktop.showForm(dialog1, dialog0);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.setCssClass('DIALOG2');
+      dialog2.modal = false;
+      desktop.showForm(dialog2);
+
+      desktop.activateForm(dialog1);
+      // expect dialog1 to be on top but it's parent still behind dialog2
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, dialog2, dialog1]));
+      expect(desktop.activeForm).toBe(dialog1);
+    });
+
+    it('activates outline when activating dialog of other outline', function() {
+      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      desktop.setOutline(outline1);
+      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.setCssClass('DIALOG1');
+      dialog1.modal = false;
+      dialog1.parent = outline1;
+      desktop.showForm(dialog1, outline1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.setCssClass('DIALOG2');
+      dialog2.modal = false;
+      dialog2.parent = dialog1;
+      desktop.showForm(dialog2, dialog1);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+      expect(dialog2.displayParent).toBe(dialog1);
+
+      desktop.setOutline(outline2);
+      // expect all dialogs hidden
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
+      expect(desktop.activeForm).toBe(undefined);
+
+      desktop.activateForm(dialog1);
+      // expect outline 1 to be activated
+      expect(desktop.outline).toBe(outline1);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, dialog1]));
+    });
+
+    it('activates outline when activating child dialog of other\'s outline dialog', function() {
+      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      desktop.setOutline(outline1);
+      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+
+      var dialog1 = formHelper.createFormWithOneField();
+      dialog1.setCssClass('DIALOG1');
+      dialog1.modal = false;
+      dialog1.parent = outline1;
+      desktop.showForm(dialog1, outline1);
+
+      var dialog2 = formHelper.createFormWithOneField();
+      dialog2.setCssClass('DIALOG2');
+      dialog2.modal = false;
+      dialog2.parent = dialog1;
+      desktop.showForm(dialog2, dialog1);
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
+      expect(desktop.activeForm).toBe(dialog2);
+      expect(dialog2.displayParent).toBe(dialog1);
+
+      desktop.setOutline(outline2);
+      // expect all dialogs hidden
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([]));
+      expect(desktop.activeForm).toBe(undefined);
+
+      desktop.activateForm(dialog2);
+      // expect outline 1 to be activated
+      expect(desktop.outline).toBe(outline1);
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
+    });
+
     it('does not bring non-modal dialog in front of desktop-modal dialog', function() {
       expect(desktop.activeForm).toBeUndefined();
 
