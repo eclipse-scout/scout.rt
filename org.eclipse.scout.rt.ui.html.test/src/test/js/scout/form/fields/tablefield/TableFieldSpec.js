@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("T2ableField", function() {
+describe("TableField", function() {
   var session;
   var helper;
   /** @type {scout.TableSpecHelper} */
