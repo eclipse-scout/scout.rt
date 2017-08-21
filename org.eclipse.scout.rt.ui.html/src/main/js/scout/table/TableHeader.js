@@ -47,8 +47,10 @@ scout.TableHeader.prototype._render = function() {
   }
   // Required to make "height: 100%" rule work. menuBarContainer and menuBar itself must have the same visibility.
   // Otherwise they could cover the sorting/filter icons on the table-header of the column.
-  this.$menuBarContainer = this.$container.appendDiv('menubar-container');
-  this.$menuBarContainer.setVisible(this.menuBar.visible);
+  this.$menuBarContainer = this.$container
+    .appendDiv('menubar-container')
+    .addDeviceClass()
+    .setVisible(this.menuBar.visible);
   this.menuBar.render(this.$menuBarContainer);
   this._$window = this.$container.window();
   this._$body = this.$container.body();
@@ -749,9 +751,7 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
 };
 
 scout.TableHeader.prototype._onTableDataScroll = function() {
-  scout.scrollbars.fix(this.$menuBarContainer);
   this._reconcileScrollPos();
-  this._fixTimeout = scout.scrollbars.unfix(this.$menuBarContainer, this._fixTimeout);
 };
 
 scout.TableHeader.prototype._onMenuBarPropertyChange = function(event) {

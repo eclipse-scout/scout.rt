@@ -46,6 +46,7 @@ scout.TreeBox.prototype._render = function() {
 scout.TreeBox.prototype._renderTree = function($fieldContainer) {
   this.tree.render(this.$fieldContainer);
   this.addField(this.tree.$container);
+  this.$field.addDeviceClass();
 };
 
 scout.TreeBox.prototype._renderFilterBox = function($fieldContainer) {

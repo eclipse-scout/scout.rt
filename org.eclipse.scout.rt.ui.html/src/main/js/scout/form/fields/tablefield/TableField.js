@@ -51,6 +51,7 @@ scout.TableField.prototype._render = function() {
   this.addMandatoryIndicator();
   this.addStatus();
   this._renderTable();
+  this.$field.addDeviceClass();
 };
 
 scout.TableField.prototype._setTable = function(table) {
