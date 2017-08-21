@@ -2878,3 +2878,7 @@ scout.Tree.visitNodes = function(nodes, func, parentNode) {
     }
   }
 };
+
+scout.Tree.prototype.updateScrollbars = function() {
+  scout.scrollbars.update(this.$data);
+};

@@ -28,8 +28,11 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
   var size, popupSize,
     htmlProposalChooser = this._htmlProposalChooser();
 
-  // skip layout while CSS animation is running
+  // skip layout while CSS animation is running (prefSize would not work while animation is running)
   if (this.animating) {
+    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+      this.popup.invalidateLayout();
+    }.bind(this));
     return;
   }
 
@@ -59,14 +62,13 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
     this.animating = true;
     this.popup.htmlComp.$comp.css('visibility', 'hidden');
 
-    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
-      this.animating = false;
-      this.popup._onAnimationEnd();
-    }.bind(this));
-
     this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
       this.popup.htmlComp.$comp.css('visibility', '');
       this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
+      this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+        this.animating = false;
+        this.popup._onAnimationEnd();
+      }.bind(this));
     }.bind(this));
   }
 };
