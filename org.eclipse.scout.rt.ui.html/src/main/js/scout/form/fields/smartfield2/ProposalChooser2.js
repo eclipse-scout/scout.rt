@@ -224,5 +224,5 @@ scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {
  * Override this function to implement update scrollbar behavior.
  */
 scout.ProposalChooser2.prototype.updateScrollbars = function() {
-  // NOP
+  this.model.updateScrollbars();
 };
