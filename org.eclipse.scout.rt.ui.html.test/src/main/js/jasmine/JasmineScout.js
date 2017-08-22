@@ -17,27 +17,6 @@ function mostRecentJsonRequest() {
   }
 }
 
-/**
- * Mocks the bootstrap functions. Otherwise they try to download files, fail and prevent a proper app start.
- */
-function mockBootstrapFunctions() {
-  scout.models.bootstrap = function() {
-    return $.resolvedPromise();
-  };
-  scout.fonts.bootstrap = function() {
-    return $.resolvedPromise();
-  };
-  scout.locales.bootstrap = function() {
-    return $.resolvedPromise();
-  };
-  scout.texts.bootstrap = function() {
-    return $.resolvedPromise();
-  };
-  scout.codes.bootstrap = function() {
-    return $.resolvedPromise();
-  };
-}
-
 function sandboxSession(options) {
   var $sandbox = $('#sandbox').addClass('scout');
 
