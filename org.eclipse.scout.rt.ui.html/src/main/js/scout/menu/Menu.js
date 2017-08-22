@@ -12,7 +12,7 @@ scout.Menu = function() {
   scout.Menu.parent.call(this);
   this._addWidgetProperties('childActions');
 
-  this.defaultMenu = false;
+  this.defaultMenu = null; // null = determined by the menu bar
   this.separator = false;
   this.childActions = [];
   this.menuTypes = [];

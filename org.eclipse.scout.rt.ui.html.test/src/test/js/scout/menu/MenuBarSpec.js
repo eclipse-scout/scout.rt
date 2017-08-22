@@ -197,6 +197,54 @@ describe("MenuBar", function() {
       expect(menu2.$container).toHaveClass('default-menu');
     });
 
+    it('marks first visible and enabled menu that has the "defaultMenu" flag set as default menu', function() {
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
+      var modelMenu3 = createModel('bla');
+      var modelMenu4 = createModel('xyz');
+      var modelMenu5 = createModel('qux');
+      var modelMenu6 = createModel('fum');
+      // menu2 should not be the default (even though it has the default key stroke), because it has defaultMenu=false set explicitly
+      modelMenu2.keyStroke = 'enter';
+      modelMenu2.defaultMenu = false;
+      // menu3 should not be the default menu (even though it requests so), because it is not enabled
+      modelMenu3.defaultMenu = true;
+      modelMenu3.enabled = false;
+      // menu4 should be the default menu
+      modelMenu4.defaultMenu = true;
+      // menu5 should not be the default menu (even though it requests so), because it is not the first to request so
+      modelMenu5.defaultMenu = true;
+      // menu6 should not be the default menu (event though it has the default key stroke), because another menu is already the default menu
+      modelMenu6.keyStroke = 'enter';
+
+      var menuBar = createMenuBar(),
+        menu1 = helper.createMenu(modelMenu1),
+        menu2 = helper.createMenu(modelMenu2),
+        menu3 = helper.createMenu(modelMenu3),
+        menu4 = helper.createMenu(modelMenu4),
+        menu5 = helper.createMenu(modelMenu5),
+        menu6 = helper.createMenu(modelMenu6),
+        menus = [menu1, menu2, menu3, menu4, menu5, menu6];
+
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+
+      expect(menuBar.menuItems.length).toBe(6);
+      expect(menuBar.menuItems[0]).toBe(menu1);
+      expect(menuBar.menuItems[1]).toBe(menu2);
+      expect(menuBar.menuItems[2]).toBe(menu3);
+      expect(menuBar.menuItems[3]).toBe(menu4);
+      expect(menuBar.menuItems[4]).toBe(menu5);
+      expect(menuBar.menuItems[5]).toBe(menu6);
+
+      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu3.$container).not.toHaveClass('default-menu');
+      expect(menu4.$container).toHaveClass('default-menu');
+      expect(menu5.$container).not.toHaveClass('default-menu');
+      expect(menu6.$container).not.toHaveClass('default-menu');
+    });
+
     it('updates state if menu gets enabled or disabled', function() {
       var modelMenu1 = createModel('foo');
       var modelMenu2 = createModel('bar');

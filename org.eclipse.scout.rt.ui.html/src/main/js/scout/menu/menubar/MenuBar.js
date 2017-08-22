@@ -295,7 +295,12 @@ scout.MenuBar.prototype.updateDefaultMenu = function() {
 scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
   var found = false;
   items.some(function(item) {
-    if (item.visible && item.enabled && this._isDefaultKeyStroke(item.actionKeyStroke)) {
+    if (!item.visible || !item.enabled || item.defaultMenu === false) {
+      // Invisible or disabled menus and menus that explicitly have the "defaultMenu"
+      // property set to false cannot be the default menu.
+      return false;
+    }
+    if (item.defaultMenu === true || this._isDefaultKeyStroke(item.actionKeyStroke)) {
       this.setDefaultMenu(item);
       this.setTabbableMenu(item);
       found = true;

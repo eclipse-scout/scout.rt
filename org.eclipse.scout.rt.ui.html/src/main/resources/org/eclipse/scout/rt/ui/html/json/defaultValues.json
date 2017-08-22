@@ -58,7 +58,7 @@
       "keyStrokeFirePolicy": 0
     },
     "Menu": {
-      "defaultMenu": false,
+      "defaultMenu": null,
       "separator": false,
       "outlineMenuWrapper": false,
       "childActions": [],
