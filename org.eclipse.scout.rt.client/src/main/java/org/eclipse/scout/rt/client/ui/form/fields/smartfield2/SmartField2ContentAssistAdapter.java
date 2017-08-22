@@ -532,11 +532,13 @@ public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistFie
     throw new UnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isFocusable() {
     throw new UnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setFocusable(boolean b) {
     throw new UnsupportedOperationException();
@@ -1012,16 +1014,19 @@ public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistFie
     throw new UnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public String getBrowseNewText() {
     throw new UnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setBrowseNewText(String s) {
     throw new UnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void doBrowseNew(String newText) {
     throw new UnsupportedOperationException();
