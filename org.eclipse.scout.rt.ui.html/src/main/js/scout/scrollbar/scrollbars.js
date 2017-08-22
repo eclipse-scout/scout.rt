@@ -410,11 +410,14 @@ scout.scrollbars = {
       return;
     }
 
-    var bounds = scout.graphics.offsetBounds($elem);
+    // getBoundingClientRect used by purpose instead of scout.graphics.offsetBounds to get exact values
+    // Also important: offset() of jquery returns getBoundingClientRect().top + window.pageYOffset.
+    // In case of IE and zoom = 125%, the pageYOffset is 1 because the height of the navigation is bigger than the height of the desktop which may be fractional.
+    var bounds = $elem[0].getBoundingClientRect();
     $elem
       .css('position', 'fixed')
-      .cssLeft(bounds.x - $elem.cssMarginLeft())
-      .cssTop(bounds.y - $elem.cssMarginTop())
+      .cssLeft(bounds.left - $elem.cssMarginLeft())
+      .cssTop(bounds.top - $elem.cssMarginTop())
       .cssWidth(bounds.width)
       .cssHeight(bounds.height);
   },
