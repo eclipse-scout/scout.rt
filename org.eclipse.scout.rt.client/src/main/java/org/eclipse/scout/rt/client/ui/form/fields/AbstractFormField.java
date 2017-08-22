@@ -685,12 +685,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return false;
   }
 
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(190)
-  protected boolean getConfiguredFocusable() {
-    return true;
-  }
-
   /**
    * @return <code>false</code> if this field can get the initial focus when the form is opened (default). Set to
    *         <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
@@ -860,7 +854,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (getConfiguredLabelFont() != null) {
       setLabelFont(FontSpec.parse(getConfiguredLabelFont()));
     }
-    setFocusable(getConfiguredFocusable());
     setPreventInitialFocus(getConfiguredPreventInitialFocus());
     setGridDataHints(new GridData(getConfiguredGridX(), getConfiguredGridY(), getConfiguredGridW(), getConfiguredGridH(), getConfiguredGridWeightX(), getConfiguredGridWeightY(), getConfiguredGridUseUiWidth(), getConfiguredGridUseUiHeight(),
         getConfiguredHorizontalAlignment(), getConfiguredVerticalAlignment(), getConfiguredFillHorizontal(), getConfiguredFillVertical(), getConfiguredWidthInPixel(), getConfiguredHeightInPixel()));
@@ -2039,16 +2032,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (form != null) {
       form.requestFocus(this);
     }
-  }
-
-  @Override
-  public void setFocusable(boolean b) {
-    propertySupport.setPropertyBool(PROP_FOCUSABLE, b);
-  }
-
-  @Override
-  public boolean isFocusable() {
-    return propertySupport.getPropertyBool(PROP_FOCUSABLE);
   }
 
   @Override

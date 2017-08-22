@@ -83,13 +83,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return 1.25;
   }
 
-  @Override
-  @Order(190)
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredFocusable() {
-    return false;
-  }
-
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(340)
   protected double getConfiguredPanDelta() {

@@ -533,16 +533,6 @@ public class SmartField2ContentAssistAdapter<VALUE> implements IContentAssistFie
   }
 
   @Override
-  public boolean isFocusable() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setFocusable(boolean b) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public boolean isPreventInitialFocus() {
     throw new UnsupportedOperationException();
   }

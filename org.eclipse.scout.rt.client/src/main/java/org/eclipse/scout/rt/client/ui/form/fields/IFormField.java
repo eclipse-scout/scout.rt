@@ -99,11 +99,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_GRID_DATA_HINTS = "gridDataHints";
 
   /**
-   * if the field is focusable or not, value is of type {@link Boolean}
-   */
-  String PROP_FOCUSABLE = "focusable";// Build 205
-
-  /**
    * if the field can get the initial focus when the form is opened, value is of type {@link Boolean}
    *
    * @since 6.1
@@ -534,10 +529,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * true if the field does not contain data (semantics)
    */
   boolean isEmpty();
-
-  boolean isFocusable();
-
-  void setFocusable(boolean b);
 
   boolean isPreventInitialFocus();
 
