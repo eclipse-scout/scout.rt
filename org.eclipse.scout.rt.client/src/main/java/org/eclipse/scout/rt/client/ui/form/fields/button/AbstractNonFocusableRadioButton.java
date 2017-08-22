@@ -12,7 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
+/**
+ * @deprecated will be removed with 7.1, property is no longer supported by Html UI
+ */
 @ClassId("292b7886-de8f-42ee-ab52-cd1b4bf3647e")
+@Deprecated
 public abstract class AbstractNonFocusableRadioButton<T> extends AbstractRadioButton<T> {
 
   public AbstractNonFocusableRadioButton() {
@@ -24,6 +28,7 @@ public abstract class AbstractNonFocusableRadioButton<T> extends AbstractRadioBu
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected boolean getConfiguredFocusable() {
     return false;
   }

@@ -685,8 +685,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return false;
   }
 
+  /**
+   * @deprecated will be removed with 7.1, property is no longer supported by Html UI
+   * @return
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
+  @Deprecated
   protected boolean getConfiguredFocusable() {
     return true;
   }
@@ -2042,11 +2047,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setFocusable(boolean b) {
     propertySupport.setPropertyBool(PROP_FOCUSABLE, b);
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public boolean isFocusable() {
     return propertySupport.getPropertyBool(PROP_FOCUSABLE);
   }

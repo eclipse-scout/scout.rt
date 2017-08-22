@@ -86,6 +86,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   @Order(190)
   @ConfigProperty(ConfigProperty.BOOLEAN)
+  @SuppressWarnings("deprecation")
   protected boolean getConfiguredFocusable() {
     return false;
   }

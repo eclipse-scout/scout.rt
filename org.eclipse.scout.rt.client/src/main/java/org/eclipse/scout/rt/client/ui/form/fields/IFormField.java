@@ -100,7 +100,10 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * if the field is focusable or not, value is of type {@link Boolean}
+   *
+   * @deprecated will be removed with 7.1, property is no longer supported by Html UI
    */
+  @Deprecated
   String PROP_FOCUSABLE = "focusable";// Build 205
 
   /**
@@ -535,8 +538,16 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    */
   boolean isEmpty();
 
+  /**
+   * @deprecated will be removed with 7.1, property is no longer supported by Html UI
+   */
+  @Deprecated
   boolean isFocusable();
 
+  /**
+   * @deprecated will be removed with 7.1, property is no longer supported by Html UI
+   */
+  @Deprecated
   void setFocusable(boolean b);
 
   boolean isPreventInitialFocus();
