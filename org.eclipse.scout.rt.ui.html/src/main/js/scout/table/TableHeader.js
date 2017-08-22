@@ -550,11 +550,10 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   var $headerItem = $(event.currentTarget),
     column = $headerItem.data('column');
 
-
   if (this.dragging || this.columnMoved) {
     this.dragging = false;
     this.columnMoved = false;
-  } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey)) {
+  } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey || !this._isHeaderMenuEnabled(column))) {
     this.table.removeColumnGrouping();
     this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
   } else if (this._tableHeaderMenu && this._tableHeaderMenu.isOpenFor($headerItem)) {
