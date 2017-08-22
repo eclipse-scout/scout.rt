@@ -651,12 +651,13 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
   this.$field.addClass('focused');
   this.$container.addClass('popup-open');
 
-  var popupType = this.touch ? 'SmartField2TouchPopup' : 'SmartField2Popup';
+  var useTouch = this.touch && !this.isDropdown();
+  var popupType = useTouch ? 'SmartField2TouchPopup' : 'SmartField2Popup';
   this._pendingOpenPopup = false;
   this.popup = scout.create(popupType, {
     parent: this,
     $anchor: this.$field,
-    boundToAnchor: !this.touch,
+    boundToAnchor: !useTouch,
     closeOnAnchorMouseDown: false,
     field: this,
     lookupResult: result,
@@ -671,7 +672,7 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
    *   events at all, instead the field flagged with the 'embedded' property should
    *   process these events.
    */
-  var fieldForPopup = this.touch ? this.popup._field : this;
+  var fieldForPopup = useTouch ? this.popup._field : this;
   this.popup.on('lookupRowSelected', fieldForPopup._onLookupRowSelected.bind(fieldForPopup));
   this.popup.on('activeFilterSelected', fieldForPopup._onActiveFilterSelected.bind(fieldForPopup));
   this.popup.one('remove', function() {
