@@ -49,7 +49,7 @@ scout.LoadingSupport.prototype.renderLoading = function() {
   clearTimeout(this._loadingIndicatorTimeoutId);
   this._ensure$Container();
 
-  if (this.widget.loading) {
+  if (this.widget.isLoading()) {
     // add loading indicator
     if (this.loadingIndicatorDelay) {
       this._loadingIndicatorTimeoutId = setTimeout(

@@ -633,6 +633,10 @@ scout.Widget.prototype.setLoading = function(loading) {
   this.setProperty('loading', loading);
 };
 
+scout.Widget.prototype.isLoading = function() {
+  return this.loading;
+};
+
 scout.Widget.prototype._renderLoading = function() {
   if (!this.loadingSupport) {
     return;
