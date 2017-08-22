@@ -141,17 +141,26 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   /**
    * see {@link AbstractSmartField#execBrowseNew(String)}
+   *
+   * @deprecated since 6.1 - will be removed with 7.1
    */
+  @Deprecated
   String getBrowseNewText();
 
   /**
    * see {@link AbstractSmartField#execBrowseNew(String)}
+   *
+   * @deprecated since 6.1 - will be removed with 7.1
    */
+  @Deprecated
   void setBrowseNewText(String s);
 
   /**
    * see {@link AbstractSmartField#execBrowseNew(String)}
+   *
+   * @deprecated since 6.1 - will be removed with 7.1
    */
+  @Deprecated
   void doBrowseNew(String newText);
 
   /**
