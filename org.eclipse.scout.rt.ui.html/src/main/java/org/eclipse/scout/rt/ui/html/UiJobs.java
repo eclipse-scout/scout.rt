@@ -57,7 +57,12 @@ public class UiJobs {
   public static final String EXECUTION_HINT_RESPONSE_TO_JSON = UiJobs.class.getName() + ".responseToJson";
 
   /**
-   * The maximal timeout to wait for model jobs to complete.
+   * Execution hint to mark futures which represent a model job to display the "request timed out" error message box.
+   */
+  public static final String EXECUTION_HINT_SHOW_TIMED_OUT_ERROR = UiJobs.class.getName() + ".showTimedOutError";
+
+  /**
+   * The maximal timeout in seconds to wait for model jobs to complete.
    */
   private final long m_awaitTimeout = CONFIG.getPropertyValue(UiModelJobsAwaitTimeoutProperty.class);
 
@@ -110,7 +115,8 @@ public class UiJobs {
             .withSeverity(IStatus.ERROR).show();
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
-        .withName("Handling await model jobs timeout"));
+        .withName("Handling await model jobs timeout")
+        .withExecutionHint(UiJobs.EXECUTION_HINT_SHOW_TIMED_OUT_ERROR));
   }
 
   /**
@@ -178,6 +184,9 @@ public class UiJobs {
         .toFilter(), getAwaitTimeout(), TimeUnit.SECONDS);
   }
 
+  /**
+   * @return the maximal timeout in seconds to wait for model jobs to complete
+   */
   protected long getAwaitTimeout() {
     return m_awaitTimeout;
   }

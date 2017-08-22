@@ -1014,6 +1014,7 @@ public class UiSession implements IUiSession {
             .andMatch(new SessionJobEventFilter(clientSession))
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // events for poll-requests are not of interest
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON) // events for response-to-json are not of interest
+            .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_SHOW_TIMED_OUT_ERROR) // events for the special model job to display a timed out error are not of interest
             .andMatch(newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data is available
             .andMatch(new IFilter<JobEvent>() {
 
