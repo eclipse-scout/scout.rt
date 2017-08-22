@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * Loads a module.js, replace all __include tags, and eval() the dynamic code
+ * Loads a module.js, replace all __include tags, and eval() the dynamic code.
  */
 function loadDynamicScript(modulePath) {
   var moduleText = loadAndResolveScriptContent(modulePath);
@@ -24,6 +24,48 @@ function loadDynamicScript(modulePath) {
   eval(moduleText); // NOSONAR
 }
 
+/**
+ * Loads the given json module and resolves all the fragments.
+ * @returns {Promise}
+ */
+function loadJsonModule(modulePath) {
+  // get path without file name
+  var includePrefix = modulePath.replace(/^(.*\/)[^\/]*$/, '$1');
+  return loadAndResolveJsonContent(modulePath, includePrefix);
+}
+
+function loadAndResolveJsonContent(path, includePrefix) {
+  var def = $.Deferred();
+  $.ajax({
+    async: false,
+    type: 'GET',
+    dataType: 'json',
+    contentType: 'application/json; charset=UTF-8',
+    cache: false,
+    url: path
+  })
+  .done(done)
+  .fail(function(jqXHR, textStatus, errorThrown) {
+    throw new Error('Json module ' + path + ' could not be loaded. Status: ' + textStatus + '. Error thrown: ' + errorThrown);
+  });
+
+  function done(data) {
+    if (!data.files) {
+      return def.resolve(data);
+    }
+    var resolvedContent = {};
+    var promises = data.files.map(function(file, i) {
+      return loadAndResolveJsonContent(includePrefix + file).then(function(part) {
+        resolvedContent[part.id] = part;
+      });
+    });
+    $.promiseAll(promises).done(function(){
+      def.resolve(resolvedContent);
+    });
+  }
+  return def.promise();
+}
+
 function loadAndResolveScriptContent(path) {
   var content = '';
   $.ajax({
@@ -36,9 +78,9 @@ function loadAndResolveScriptContent(path) {
   }).done(function(data) {
     content = data;
   }).fail(function(jqXHR, textStatus, errorThrown) {
-    throw new Error('Script ' + path + ' could not be loaded. Status: ' + textStatus + '. Error thrown: ' + errorThrown);
+    throw new Error('JavaScript module ' + path + ' could not be loaded. Status: ' + textStatus + '. Error thrown: ' + errorThrown);
   });
-  //replace includes
+  // replace includes
   content = content.replace(
     /^\s*__include\s*\(\s*["'](.*?)["']\s*\).*$/gm,
     function(match, p1, p2, offset, string) {
