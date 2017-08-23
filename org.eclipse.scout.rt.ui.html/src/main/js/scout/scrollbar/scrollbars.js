@@ -278,15 +278,6 @@ scout.scrollbars = {
       elementH = elementBounds.height + scrollOffsetDown,
       elementBottom = elementTop + elementH;
 
-    //There are some elements which has a height of 0 (Checkboxes / Radiobuttons) -> try to get field and figure out its height and offset
-    // TODO [7.0] cgu: remove this hack, fix checkbox and radio buttons
-    if (elementH === scrollOffsetDown && $element.data('valuefield') && $element.data('valuefield').$container) {
-      $element = $element.data('valuefield').$container;
-      elementBounds = scout.graphics.offsetBounds($element);
-      elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp;
-      elementH = elementBounds.height + scrollOffsetDown;
-    }
-
     if (elementTop < 0) {
       // Element is on the top of the view port -> scroll up
       scrollTo = $scrollable.scrollTop() + elementTop;
