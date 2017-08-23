@@ -83,6 +83,7 @@ scout.MenuBar.prototype._render = function() {
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
+  this.htmlComp.validateRoot = true;
 
   if (this.position === 'top') {
     this.$parent.prepend(this.$container);
