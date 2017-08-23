@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Simple {@link IHttpHeaderFilter} implementation for {@link HttpProxy} to remove or replace headers by name.
@@ -27,7 +27,7 @@ public class HttpHeaderNameFilter implements IHttpHeaderFilter {
 
   @Override
   public String filter(String name, String value) {
-    return ObjectUtility.equals(m_name, name) ? m_replacement : value;
+    return StringUtility.equalsIgnoreCase(m_name, name) ? m_replacement : value;
   }
 
   public String getName() {
