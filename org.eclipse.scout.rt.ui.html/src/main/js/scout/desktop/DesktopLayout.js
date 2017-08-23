@@ -30,7 +30,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
   if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
     if (desktop.splitter) {
-      desktop.splitter.setPosition(navigationWidth, true);
+      desktop.splitter.setPosition(navigationWidth);
     }
 
     if (desktop.navigationVisible) {
