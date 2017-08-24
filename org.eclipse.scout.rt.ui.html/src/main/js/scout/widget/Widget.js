@@ -160,6 +160,14 @@ scout.Widget.prototype._createChild = function(model) {
   if (model instanceof scout.Widget) {
     return model;
   }
+  if (typeof model === 'string') {
+    // Special case: If only an ID is supplied, try to (locally) resolve the corresponding widget
+    var existingWidget = this.widget(model);
+    if (!existingWidget) {
+      throw new Error('Referenced widget not found: ' + model);
+    }
+    return existingWidget;
+  }
   model.parent = this;
   return scout.create(model);
 };
