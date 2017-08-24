@@ -398,9 +398,8 @@ scout.ModelAdapter.modifyWidgetPrototype = function() {
     }
 
     // Local case (default)
-    model.parent = this;
-    return scout.create(model);
-  });
+    return this._createChildOrig(model);
+  }, true); // <-- true = keep original function
 };
 
 scout.addAppListener('bootstrap', scout.ModelAdapter.modifyWidgetPrototype);

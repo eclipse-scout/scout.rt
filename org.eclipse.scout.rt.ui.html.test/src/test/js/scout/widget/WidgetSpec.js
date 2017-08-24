@@ -618,4 +618,89 @@ describe('Widget', function() {
     });
   });
 
+  describe('Widget properties', function() {
+
+    it("automatically resolves referenced widgets", function() {
+      window.testns = {};
+      // ----- Define class "ComplexTestWidget" -----
+      window.testns.ComplexTestWidget = function() {
+        window.testns.ComplexTestWidget.parent.call(this);
+        this._addWidgetProperties(['items', 'selectedItem']);
+        this._addPreserveOnPropertyChangeProperties(['selectedItem']);
+      };
+      scout.inherits(window.testns.ComplexTestWidget, scout.Widget);
+      // ----- Define class "TestItem" -----
+      window.testns.TestItem = function() {
+        window.testns.TestItem.parent.call(this);
+        this._addWidgetProperties(['linkedItem']);
+      };
+      scout.inherits(window.testns.TestItem, scout.Widget);
+
+      // Create an instance
+      var model1 = {
+        parent: parent,
+        session: session,
+        items: [{
+          objectType: 'testns.TestItem',
+          id: 'TI1',
+          name: 'Item #1'
+        }, {
+          objectType: 'testns.TestItem',
+          id: 'TI2',
+          name: 'Item #2'
+        }],
+        selectedItem: 'TI2'
+      };
+      var ctw1 = scout.create('testns.ComplexTestWidget', model1);
+      expect(ctw1.items.length).toBe(2);
+      expect(ctw1.items[1].name).toBe('Item #2');
+      expect(ctw1.selectedItem).toBe(ctw1.items[1]);
+
+      // Create another instance with an invalid reference
+      var model2 = {
+        parent: parent,
+        session: session,
+        objectType: 'testns.ComplexTestWidget',
+        items: [{
+          objectType: 'testns.TestItem',
+          id: 'TI1',
+          name: 'Item #1'
+        }],
+        selectedItem: 'TI77'
+      };
+      expect(function() {
+        scout.create(model2);
+      }).toThrow(new Error('Referenced widget not found: TI77'));
+      // fix it
+      delete model2.selectedItem;
+      var ctw2 = scout.create(model2);
+      expect(ctw2.items.length).toBe(1);
+      expect(ctw2.items[0].name).toBe('Item #1');
+      expect(ctw2.items[0]).not.toBe(ctw1.items[0]); // not same!
+
+      // Create another instance with unsupported references (same level)
+      var model3 = {
+        parent: parent,
+        session: session,
+        items: [{
+          objectType: 'testns.TestItem',
+          id: 'TI1',
+          name: 'Item #1',
+          linkedItem: 'TI2'
+        }, {
+          objectType: 'testns.TestItem',
+          id: 'TI2',
+          name: 'Item #2'
+        }]
+      };
+      expect(function() {
+        scout.create('testns.ComplexTestWidget', model3);
+      }).toThrow(new Error('Referenced widget not found: TI2'));
+      // fix it
+      delete model3.items[0].linkedItem;
+      var ctw3 = scout.create('testns.ComplexTestWidget', model3);
+      ctw3.items[0].setProperty('linkedItem', ctw3.items[1]);
+    });
+  });
+
 });
