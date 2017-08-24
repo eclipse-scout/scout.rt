@@ -10,23 +10,19 @@
  ******************************************************************************/
 scout.Splitter = function() {
   scout.Splitter.parent.call(this);
-  this.splitHorizontal;
+  this.splitHorizontal = true;
   this.$anchor;
-  this._$root;
-  this.ratio;
-  this.position; // current splitter position in pixels, updated by updatePosition()
-  this.orientation; // Direction sed to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
+  this.$root;
+  this.position = null; // current splitter position in pixels, updated by updatePosition()
+  this.orientation = 'top'; // Direction set to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
-  this._handleMouseDown;
+  this._mouseDownHandler;
 };
 scout.inherits(scout.Splitter, scout.Widget);
 
-scout.Splitter.prototype._init = function(options) {
-  scout.Splitter.parent.prototype._init.call(this, options);
-  this.splitHorizontal = scout.nvl(options.splitHorizontal, true);
-  this.$anchor = options.$anchor;
-  this._$root = options.$root;
-  this.orientation = scout.nvl(options.orientation, (this.splitHorizontal ? 'top' : 'left'));
+scout.Splitter.prototype._init = function(model) {
+  scout.Splitter.parent.prototype._init.call(this, model);
+  this.setPosition(this.position);
 };
 
 scout.Splitter.prototype._render = function($parent) {
@@ -37,17 +33,22 @@ scout.Splitter.prototype._render = function($parent) {
   this._$body = $parent.body();
 };
 
+scout.Splitter.prototype._renderProperties = function() {
+  scout.Splitter.parent.prototype._renderProperties.call(this);
+  this._renderPosition();
+};
+
 scout.Splitter.prototype._renderEnabled = function() {
   scout.Splitter.parent.prototype._renderEnabled.call(this);
-  if(this.enabled){
-    if(!this._handleMouseDown){
-      this._handleMouseDown = this._onMouseDown.bind(this);
-      this.$container.on('mousedown', this._handleMouseDown);
+  if (this.enabled) {
+    if (!this._mouseDownHandler) {
+      this._mouseDownHandler = this._onMouseDown.bind(this);
+      this.$container.on('mousedown', this._mouseDownHandler);
     }
-  }else{
-    if(this._handleMouseDown){
-      this.$container.off('mousedown', this._handleMouseDown);
-      this._handleMouseDown = null;
+  } else {
+    if (this._mouseDownHandler) {
+      this.$container.off('mousedown', this._mouseDownHandler);
+      this._mouseDownHandler = null;
     }
   }
 };
@@ -61,82 +62,80 @@ scout.Splitter.prototype.getLayoutData = function() {
   return this.layoutData;
 };
 
-scout.Splitter.prototype.getPosition = function() {
-  return this.position;
-};
-
-scout.Splitter.prototype.getRatio = function() {
-  return this.ratio;
-};
-
 /**
  * Sets the splitter position to the specified newSize (in pixels). If the newSize is
  * not specified, the size is calculated automatically by reading the this.$anchor
  * element's bounds.
  *
  * @returns the effective position in pixel.
- * Note: This function does not fire any events.
  */
-scout.Splitter.prototype.setPosition = function(newPosition, updateRatio, firePositionChanged) {
-  if (!$.isNumeric(newPosition)) {
-    // Get size automatically from $anchor element's bounds
-    var anchorBounds = scout.graphics.offsetBounds(this.$anchor);
-    if (this.splitHorizontal) {
-      newPosition = anchorBounds.x + anchorBounds.width;
-    } else {
-      newPosition = anchorBounds.y + anchorBounds.height;
-    }
+scout.Splitter.prototype.setPosition = function(position) {
+  if (!$.isNumeric(position)) {
+    position = this._derivePositionFromAnchor();
   }
-  if (newPosition === this.position) {
+  if (position === this.position) {
     return;
   }
-
-  this._setPosition(newPosition, updateRatio, firePositionChanged);
-  return newPosition;
+  this._setPosition(position);
+  return position;
 };
 
-scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, firePositionChanged) {
-  firePositionChanged = scout.nvl(firePositionChanged, true);
-  if (!$.isNumeric(newPosition)) {
+/**
+ * Derives the position from $anchor element's bounds
+ */
+scout.Splitter.prototype._derivePositionFromAnchor = function() {
+  if (!this.$anchor) {
+    return null;
+  }
+  var anchorBounds = scout.graphics.offsetBounds(this.$anchor);
+  if (this.splitHorizontal) {
+    return anchorBounds.x + anchorBounds.width;
+  } else {
+    return anchorBounds.y + anchorBounds.height;
+  }
+};
+
+scout.Splitter.prototype._setPosition = function(position) {
+  if (!$.isNumeric(position)) {
     return;
   }
-  if (newPosition === this.position) {
+  if (position === this.position) {
     return;
   }
-  if (updateRatio) {
-    if (this.splitHorizontal) {
-      this.ratio = newPosition / this._$root.outerWidth(true);
-    } else {
-      this.ratio = newPosition / this._$root.outerHeight(true);
-    }
-  }
-  this.position = newPosition;
-  var positionChangedEvent = {
-    position: newPosition
+  this.position = position;
+  var event = {
+    position: position
   };
-  if (firePositionChanged) {
-    this.trigger('positionChanged', positionChangedEvent);
-  }
+  this.trigger('positionChange', event);
   if (this.rendered) {
-    // Set the new position (center splitter around 'newPosition')
-    var splitterSize = scout.graphics.getVisibleSize(this.$container, true);
-    if (this.splitHorizontal) {
-      var x = newPosition - (splitterSize.width / 2);
-      if (this.orientation === 'right') {
-        this.$container.cssRight(x);
-      } else {
-        this.$container.cssLeft(x);
-      }
+    this._renderPosition();
+  }
+};
+
+scout.Splitter.prototype._renderPosition = function() {
+  if (this.position === null) {
+    return;
+  }
+
+  // center splitter around this.position
+  var splitterSize = scout.graphics.getVisibleSize(this.$container, true);
+  if (this.splitHorizontal) {
+    var x = this.position - (splitterSize.width / 2);
+    if (this.orientation === 'right') {
+      this.$container.cssRight(x);
     } else {
-      var y = newPosition - (splitterSize.height / 2);
-      if (this.orientation === 'bottom') {
-        this.$container.cssBottom(y);
-      } else {
-        this.$container.cssTop(y);
-      }
+      this.$container.cssLeft(x);
+    }
+  } else {
+    var y = this.position - (splitterSize.height / 2);
+    if (this.orientation === 'bottom') {
+      this.$container.cssBottom(y);
+    } else {
+      this.$container.cssTop(y);
     }
   }
 };
+
 scout.Splitter.prototype._onMouseDown = function(event) {
   var splitterCenter = scout.graphics.offsetBounds(this.$container, true).center();
 
@@ -159,7 +158,7 @@ scout.Splitter.prototype._onMouseDown = function(event) {
 };
 
 scout.Splitter.prototype._getSplitterPosition = function(event) {
-  var rootBounds = scout.graphics.offsetBounds(this._$root);
+  var rootBounds = scout.graphics.offsetBounds(this.$root);
   if (this.splitHorizontal) {
     var x = event.pageX + this._cursorOffset.left - rootBounds.x;
     return (this.orientation === 'right' ? rootBounds.width - x : x);
@@ -178,15 +177,15 @@ scout.Splitter.prototype._onMouseMove = function(event) {
     preventDefault: function() {
       this.defaultPrevented = true;
     },
-    setPosition: function(newPosition) {
-      this.position = newPosition;
+    setPosition: function(position) {
+      this.position = position;
     }
   };
   this.trigger('move', moveEvent);
   if (moveEvent.defaultPrevented) {
     return;
   }
-  this._setPosition(moveEvent.position, true);
+  this._setPosition(moveEvent.position);
 };
 
 scout.Splitter.prototype._onMouseUp = function(event) {

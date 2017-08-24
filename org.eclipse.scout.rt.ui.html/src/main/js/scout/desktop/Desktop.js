@@ -884,7 +884,7 @@ scout.Desktop.prototype.onPopstate = function(event) {
 };
 
 scout.Desktop.prototype._onSplitterMove = function(event) {
-  // disallow wider than 50%
+  // disallow a position greater than 50%
   this.resizing = true;
   var max = Math.floor(this.$container.outerWidth(true) / 2);
   if (event.position > max) {
@@ -893,7 +893,10 @@ scout.Desktop.prototype._onSplitterMove = function(event) {
 };
 
 scout.Desktop.prototype._onSplitterPositionChanged = function(event) {
-  this.revalidateLayout();
+  // No need to revalidate while layouting (desktop layout sets the splitter position and would trigger a relayout)
+  if (!this.htmlComp.layouting) {
+    this.revalidateLayout();
+  }
 };
 
 scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
