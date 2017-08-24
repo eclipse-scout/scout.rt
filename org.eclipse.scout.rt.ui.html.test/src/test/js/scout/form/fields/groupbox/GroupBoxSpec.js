@@ -215,6 +215,12 @@ describe("GroupBox", function() {
     it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function() {
       var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
         .appendTo($('head'));
+
+      // stub function because when running in phantom js the window has an unpredictable size, it seems to get smaller when adding new specs...
+      spyOn(scout.DialogLayout, 'fitContainerInWindow').and.callFake(function(windowSize, containerPosition, containerSize, containerMargins) {
+        return containerSize;
+      });
+
       var form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
