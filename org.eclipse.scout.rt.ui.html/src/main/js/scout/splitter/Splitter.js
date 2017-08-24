@@ -137,7 +137,16 @@ scout.Splitter.prototype._renderPosition = function() {
 };
 
 scout.Splitter.prototype._onMouseDown = function(event) {
-  var splitterCenter = scout.graphics.offsetBounds(this.$container, true).center();
+  // The calculation of the offset bounds looks a bit complicated, because we cannot
+  // use "scout.graphics.offsetBounds($el, true)" here. This method would only consider
+  // any margins in the size, not the position.
+  var splitterMargins = scout.graphics.margins(this.$container);
+  var splitterOffsetBounds = scout.graphics.offsetBounds(this.$container);
+  splitterOffsetBounds.x -= splitterMargins.left;
+  splitterOffsetBounds.y -= splitterMargins.top;
+  splitterOffsetBounds.width += splitterMargins.horizontal();
+  splitterOffsetBounds.height += splitterMargins.vertical();
+  var splitterCenter = splitterOffsetBounds.center();
 
   // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
   this._$window
