@@ -903,7 +903,25 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected void execCompleteEdit(ITableRow row, IFormField editingField) {
                 super.execCompleteEdit(row, editingField);
-                getKeyColumn().getValue(row).setWidth(getWidthColumn().getValue(row));
+
+                Integer enteredWidth = getValue(row);
+                // In case we set the value to something different to what the user entered,
+                // we need to update the displayed text to that value as well later.
+                boolean updateValue = false;
+
+                int newWidth;
+                if (enteredWidth == null || enteredWidth < 0) {
+                  newWidth = 60;
+                  updateValue = true;
+                }
+                else {
+                  newWidth = enteredWidth;
+                }
+                getKeyColumn().getValue(row).setWidth(newWidth);
+
+                if (updateValue) {
+                  setValue(row, newWidth);
+                }
               }
 
             }
