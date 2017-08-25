@@ -147,13 +147,7 @@ scout.Column.prototype._updateCellText = function(row, cell) {
   var returned = this._formatValue(value);
   if (returned && $.isFunction(returned.promise)) {
     // Promise is returned -> set display text later
-    returned
-      .then(function(text) {
-        this.setCellText(row, text, cell);
-      }.bind(this), function(error) {
-        this.setCellText(row, '', cell);
-        $.log.error('Could not resolve cell text for value ' + value, error);
-      }.bind(this));
+    this.setCellTextDeferred(returned, row, cell);
   } else {
     this.setCellText(row, returned, cell);
   }
@@ -441,6 +435,21 @@ scout.Column.prototype.setCellValue = function(row, value) {
 
   cell.setValue(value);
   this._updateCellText(row, cell);
+};
+
+scout.Column.prototype.setCellTextDeferred = function(promise, row, cell) {
+  promise
+    .done(function(text) {
+      this.setCellText(row, text, cell);
+    }.bind(this))
+    .fail(function(error) {
+      this.setCellText(row, '', cell);
+      $.log.error('Could not resolve cell text for value ' + cell.value, error);
+    }.bind(this));
+
+  // (then) promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
+  // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
+  this.table.updateBuffer.pushPromise(promise);
 };
 
 scout.Column.prototype.setCellText = function(row, text, cell) {

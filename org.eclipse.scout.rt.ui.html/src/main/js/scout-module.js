@@ -240,6 +240,7 @@
   __include("scout/table/TableSelectionHandler.js");
   __include("scout/table/TableRowDetail.js");
   __include("scout/table/TableTooltip.js");
+  __include("scout/table/TableUpdateBuffer.js");
   __include("scout/table/columns/comparators.js");
   __include("scout/table/columns/Column.js");
   __include("scout/table/columns/AlphanumericSortingStringColumn.js"); // requires Column.js
