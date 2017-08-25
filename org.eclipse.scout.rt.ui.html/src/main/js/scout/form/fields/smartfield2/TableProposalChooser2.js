@@ -90,11 +90,7 @@ scout.TableProposalChooser2.prototype.setLookupResult = function(result) {
   }, this);
   this.model.insertRows(tableRows);
 
-  if (result.browse) {
-    this.trySelectCurrentValue();
-  } else if (tableRows.length === 1) {
-    this.selectFirstLookupRow();
-  }
+  this._selectProposal(result, tableRows);
 };
 
 scout.TableProposalChooser2.prototype.trySelectCurrentValue = function() {
