@@ -319,6 +319,10 @@ describe('jquery-scout', function() {
       $('body').removeClass('invisible');
     });
 
+    it('returns an empty collection if called on empty collection', function() {
+      expect($('.does-not-exist').elementFromPoint(20, 20).length).toBe(0);
+    });
+
   });
 
   describe('cssPxValue', function() {

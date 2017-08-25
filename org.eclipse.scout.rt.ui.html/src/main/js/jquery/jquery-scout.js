@@ -626,6 +626,10 @@ $.fn.elementFromPoint = function(x, y, selector) {
     // If doc is null the $container itself is the document
     doc = $container[0];
   }
+  if (!doc) {
+    // If doc is still null (e.g. because the current jQuery collection does not contain any elements) return an empty collection
+    return $();
+  }
 
   while (true) {
     $element = $(doc.elementFromPoint(x, y));
