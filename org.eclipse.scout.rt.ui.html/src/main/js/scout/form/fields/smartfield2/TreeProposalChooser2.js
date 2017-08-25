@@ -97,11 +97,7 @@ scout.TreeProposalChooser2.prototype.setLookupResult = function(result) {
     this.model.insertNodes(treeNodes);
   }
 
-  if (result.browse) {
-    this.trySelectCurrentValue();
-  } else if (treeNodesFlat.length === 1) {
-    this.selectFirstLookupRow();
-  }
+  this._selectProposal(result, treeNodesFlat);
 };
 
 scout.TreeProposalChooser2.prototype._isLookupByText = function(result) {

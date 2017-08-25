@@ -226,3 +226,18 @@ scout.ProposalChooser2.prototype._activeFilterLabel = function(index) {
 scout.ProposalChooser2.prototype.updateScrollbars = function() {
   this.model.updateScrollbars();
 };
+
+scout.ProposalChooser2.prototype._isProposal = function() {
+  return this.smartField instanceof scout.ProposalField2;
+};
+
+scout.ProposalChooser2.prototype._selectProposal = function(result, proposals) {
+  if (this._isProposal()) {
+    return; // no pre-selection when field is a proposal field
+  }
+  if (result.browse) {
+    this.trySelectCurrentValue();
+  } else if (proposals.length === 1) {
+    this.selectFirstLookupRow();
+  }
+};
