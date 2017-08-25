@@ -47,7 +47,7 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
     // Don't do it the first time (will be done by popup.open), only if the popup is already
     // open and gets layouted again
     this.popup.position();
-  } else {
+  } else if (scout.device.supportsCssAnimation()) { // don't use animation on old browsers like IE9
     // This code here is a bit complicated because:
     // 1. we must position the scrollTo position before we start the animation
     //    because it looks ugly, when we jump to the scroll position after the
