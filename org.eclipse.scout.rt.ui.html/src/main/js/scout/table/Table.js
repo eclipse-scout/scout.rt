@@ -55,6 +55,7 @@ scout.Table = function() {
   this._aggregateRows = [];
   this._animationRowLimit = 25;
   this._blockLoadThreshold = 25;
+  this.updateBuffer = new scout.TableUpdateBuffer(this);
   this.menuBar;
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
@@ -593,6 +594,17 @@ scout.Table.prototype.reload = function() {
   this._removeRows();
   this._renderFiller();
   this._triggerReload();
+};
+
+/**
+ * @override
+ */
+scout.Table.prototype.setLoading = function(loading) {
+  if (!loading && this.updateBuffer.isBuffering()) {
+    // Don't abort loading while buffering, the buffer will do it at the end
+    return;
+  }
+  scout.Table.parent.prototype.setLoading.call(this, loading);
 };
 
 scout.Table.prototype.exportToClipboard = function() {
@@ -2131,6 +2143,10 @@ scout.Table.prototype.updateRow = function(row) {
 };
 
 scout.Table.prototype.updateRows = function(rows) {
+  if (this.updateBuffer.isBuffering()) {
+    this.updateBuffer.buffer(rows);
+    return;
+  }
   var filterChanged, autoOptimizeWidthColumnsDirty, newHiddenRows = [];
   var autoOptimizeWidthColumns = this.columns.filter(function(column) {
     return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
@@ -3600,6 +3616,9 @@ scout.Table.prototype._renderViewport = function() {
   if (!this.isAttachedAndRendered()) {
     // if table is not attached the correct viewPort can not be evaluated. Mark for render after attach.
     this._renderViewPortAfterAttach = true;
+    return;
+  }
+  if (this._renderViewportBlocked) {
     return;
   }
   var viewRange = this._calculateCurrentViewRange();
