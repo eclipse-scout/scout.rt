@@ -323,6 +323,163 @@ describe('Session', function() {
       expect(session.areResponsesQueued()).toBe(false); // <--
       expect(session._processSuccessResponse).toHaveBeenCalled();
     });
+
+    it('resumes polling after successful responses', function() {
+      var session = createSession();
+      session.enableBackgroundJobPolling(true);
+      spyOn(session, '_processSuccessResponse').and.callThrough();
+      spyOn(session, '_processErrorJsonResponse').and.callThrough();
+      spyOn(session, '_processErrorResponse').and.callThrough();
+
+      // Start ?poll request
+      session._resumeBackgroundJobPolling();
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Send response for ?poll request
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
+        status: 200,
+        responseText: '{"events": []}'
+      });
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+      expect(session._processSuccessResponse).toHaveBeenCalled(); // <--
+      expect(session._processErrorJsonResponse).not.toHaveBeenCalled();
+      expect(session._processErrorResponse).not.toHaveBeenCalled();
+    });
+
+    it('does not resume polling after JS errors', function() {
+      var session = createSession();
+      session.enableBackgroundJobPolling(true);
+      spyOn(session, '_processSuccessResponse').and.callThrough();
+      spyOn(session, '_processErrorJsonResponse').and.callThrough();
+      spyOn(session, '_processErrorResponse').and.callThrough();
+
+      // Start ?poll request
+      session._resumeBackgroundJobPolling();
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Send response for ?poll request
+      expect(function() {
+        receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
+          status: 200,
+          responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
+        });
+      }).toThrow();
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.FAILURE); // <--
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(true); // still in queue
+      expect(session._processSuccessResponse).toHaveBeenCalled(); // <--
+      expect(session._processErrorJsonResponse).not.toHaveBeenCalled();
+      expect(session._processErrorResponse).not.toHaveBeenCalled();
+    });
+
+    it('does not resume polling after UI server errors', function() {
+      var session = createSession();
+      session.enableBackgroundJobPolling(true);
+      spyOn(session, '_processSuccessResponse').and.callThrough();
+      spyOn(session, '_processErrorJsonResponse').and.callThrough();
+      spyOn(session, '_processErrorResponse').and.callThrough();
+
+      // Start ?poll request
+      session._resumeBackgroundJobPolling();
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Send "UI server" response for ?poll request
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
+        status: 200,
+        responseText: '{"error": true}'
+      });
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.FAILURE); // <--
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+      expect(session._processSuccessResponse).not.toHaveBeenCalled();
+      expect(session._processErrorJsonResponse).toHaveBeenCalled(); // <--
+      expect(session._processErrorResponse).not.toHaveBeenCalled();
+    });
+
+    it('does not resume polling after HTTP errors', function() {
+      var session = createSession();
+      session.enableBackgroundJobPolling(true);
+      spyOn(session, '_processSuccessResponse').and.callThrough();
+      spyOn(session, '_processErrorJsonResponse').and.callThrough();
+      spyOn(session, '_processErrorResponse').and.callThrough();
+
+      // Start ?poll request
+      session._resumeBackgroundJobPolling();
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Send "UI server" response for ?poll request
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
+        status: 404,
+        responseText: 'Not found'
+      });
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.FAILURE); // <--
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+      expect(session._processSuccessResponse).not.toHaveBeenCalled();
+      expect(session._processErrorJsonResponse).not.toHaveBeenCalled();
+      expect(session._processErrorResponse).toHaveBeenCalled(); // <--
+    });
+
+    it('does not resume polling after session terminated', function() {
+      var session = createSession();
+      session.enableBackgroundJobPolling(true);
+      spyOn(session, '_processSuccessResponse').and.callThrough();
+      spyOn(session, '_processErrorJsonResponse').and.callThrough();
+      spyOn(session, '_processErrorResponse').and.callThrough();
+
+      // Start ?poll request
+      session._resumeBackgroundJobPolling();
+      jasmine.clock().tick(0);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+
+      // Send "UI server" response for ?poll request
+      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
+        status: 200,
+        responseText: '{"sessionTerminated": true}'
+      });
+      jasmine.clock().tick(0);
+      expect(session._backgroundJobPollingSupport.status()).toBe(scout.BackgroundJobPollingStatus.STOPPED); // <--
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session.areEventsQueued()).toBe(false);
+      expect(session.areResponsesQueued()).toBe(false);
+      expect(session._processSuccessResponse).not.toHaveBeenCalled(); // <--
+      expect(session._processErrorJsonResponse).not.toHaveBeenCalled();
+      expect(session._processErrorResponse).not.toHaveBeenCalled();
+    });
   });
 
   describe('init', function() {

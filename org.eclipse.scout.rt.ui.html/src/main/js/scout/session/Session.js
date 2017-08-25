@@ -684,21 +684,28 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       }
     } else if (data.sessionTerminated) {
       $.log.warn('Session terminated, stopped polling for background jobs');
+      this._backgroundJobPollingSupport.setStopped();
       // If were are not yet logged out, redirect to the logout URL (the session that initiated the
       // session invalidation will receive a dedicated logout event, redirect is handled there).
       if (!this._loggedOut && data.redirectUrl) {
         this.logout(data.redirectUrl);
       }
     } else {
-      if (this.areRequestsPending()) {
-        // Add response to queue, handle later by _performUserAjaxRequest()
-        this.responseQueue.add(data);
-      } else {
-        // No user request pending, handle immediately
-        this.responseQueue.process(data);
-        this.layoutValidator.validate();
+      try {
+        // No need to change backgroundJobPollingSupport state, it should still be RUNNING
+        if (this.areRequestsPending()) {
+          // Add response to queue, handle later by _performUserAjaxRequest()
+          this.responseQueue.add(data);
+        } else {
+          // No user request pending, handle immediately
+          this.responseQueue.process(data);
+          this.layoutValidator.validate();
+        }
+        setTimeout(this._pollForBackgroundJobs.bind(this));
+      } catch (error) {
+        this._backgroundJobPollingSupport.setFailed();
+        throw error;
       }
-      setTimeout(this._pollForBackgroundJobs.bind(this));
     }
   }
 
