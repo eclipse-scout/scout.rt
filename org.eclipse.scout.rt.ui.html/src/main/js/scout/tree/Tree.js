@@ -1471,6 +1471,9 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
   return removedNodes;
 };
 
+/**
+ * @returns {boolean} whether or not the function added a node to the flat list
+ */
 scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
   // if node already is in visible list don't do anything. If no parentNode is available this node is on toplevel, if a parent is available
   // it has to be in visible list and also be expanded
@@ -1489,7 +1492,8 @@ scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
 // TODO [7.0] CGU applies to all the add/remove to/from flat list methods:
 // Is it really necessary to update dom on every operation? why not just update the list and renderViewport at the end?
 // The update of the flat list is currently implemented quite complicated -> it should be simplified.
-// And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded=
+// And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until
+// the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded)
 scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
   // add nodes recursively
   if (!this.visibleNodesMap[parentNode.id]) {
@@ -2082,10 +2086,14 @@ scout.Tree.prototype.deleteNode = function(node, parentNode) {
   this.deleteNodes([node], parentNode);
 };
 
+scout.Tree.prototype.deleteAllNodes = function() {
+  this.deleteAllChildNodes();
+};
+
 scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
   var deletedNodes = [];
 
-  nodes = scout.arrays.ensure(nodes);
+  nodes = scout.arrays.ensure(nodes).slice(); // copy
   nodes.forEach(function(node) {
     if (parentNode) {
       if (node.parentNode !== parentNode) {
@@ -2103,6 +2111,8 @@ scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
     this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
   }, this);
 
+  this.deselectNodes(deletedNodes);
+
   // update child node indices
   if (parentNode) {
     this._updateChildNodeIndex(parentNode.childNodes);
@@ -2119,6 +2129,14 @@ scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
     nodes: nodes,
     parentNode: parentNode
   });
+};
+
+scout.Tree.prototype.deselectNodes = function(nodes) {
+  nodes = scout.arrays.ensure(nodes);
+  var selectedNodes = this.selectedNodes.slice(); // copy
+  if (scout.arrays.removeAll(selectedNodes, nodes)) {
+    this.selectNodes(selectedNodes);
+  }
 };
 
 scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
