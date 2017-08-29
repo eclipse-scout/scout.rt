@@ -23,7 +23,7 @@
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
-  <version>7.0.100-SNAPSHOT</version>
+  <version>7.0.100.014_RC2</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout RT</name>
   <description>Eclipse Scout RT</description>
@@ -215,199 +215,199 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.json</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.selenium</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.api</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.api.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.jms</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.jms.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.jackson</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.jackson.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jms</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jaxws.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jdbc</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jdbc.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.serverbridge</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.jaxws.apt</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test.affix</artifactId>
-        <version>7.0.100-SNAPSHOT</version>
+        <version>7.0.100.014_RC2</version>
       </dependency>
 
       <dependency>
@@ -750,7 +750,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.rt</developerConnection>
-    <tag>releases/7.0.x</tag>
+    <tag>7.0.100.014_RC2</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
   </scm>
 
