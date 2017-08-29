@@ -942,3 +942,12 @@ scout.Outline.prototype.pageChanged = function(page) {
 
   this._triggerPageChanged(page);
 };
+
+scout.Outline.prototype.glassPaneTargets = function() {
+  // MessageBoxes are often created with Outlines as displayParent. The default implementation of this function
+  // would not render any glass panes when the outline is collapsed, thus we need to override this behavior.
+
+  // TODO [rsh] This change is still waiting for change #103237 to be pulled. After that has happened,
+  // this method should still check *something*, e.g. inFront().
+  return this._glassPaneTargets();
+};
