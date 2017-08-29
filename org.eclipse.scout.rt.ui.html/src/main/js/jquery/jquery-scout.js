@@ -311,9 +311,9 @@ $.injectScript = function(url, options) {
         myDocument.head.removeChild(scriptTag);
       }
       if (event.type === 'error') {
-        deferred.reject();
+        deferred.reject($(scriptTag));
       } else {
-        deferred.resolve();
+        deferred.resolve($(scriptTag));
       }
     });
   // Use raw JS function to append the <script> tag, because jQuery handles
