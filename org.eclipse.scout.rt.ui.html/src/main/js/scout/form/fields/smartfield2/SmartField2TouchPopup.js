@@ -25,8 +25,8 @@ scout.SmartField2TouchPopup.prototype._init = function(options) {
 
   this.setLookupResult(options.lookupResult);
   this.setStatus(options.status);
-
   this.one('close', this._beforeClosePopup.bind(this));
+  this.smartField.on('propertyChange', this._onPropertyChange.bind(this));
 };
 
 scout.SmartField2TouchPopup.prototype._initWidget = function(options) {
@@ -91,6 +91,12 @@ scout.SmartField2TouchPopup.prototype.selectFirstLookupRow = function() {
 
 scout.SmartField2TouchPopup.prototype.selectLookupRow = function() {
   this._widget.triggerLookupRowSelected();
+};
+
+scout.SmartField2TouchPopup.prototype._onPropertyChange = function(event) {
+  if ('lookupStatus' === event.propertyName) {
+    this._field.setLookupStatus(event.newValue);
+  }
 };
 
 scout.SmartField2TouchPopup.prototype._beforeClosePopup = function(event) {

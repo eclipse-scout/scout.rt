@@ -206,6 +206,16 @@ scout.FormField.prototype._renderMandatory = function() {
   this.$container.toggleClass('mandatory', this.mandatory);
 };
 
+/**
+ * Override this function to return another error status property.
+ * The default implementation returns the property 'errorStatus'.
+ *
+ * @return {scout.Status}
+ */
+scout.FormField.prototype._errorStatus = function() {
+  return this.errorStatus;
+};
+
 scout.FormField.prototype.setErrorStatus = function(errorStatus) {
   this.setProperty('errorStatus', errorStatus);
 };
@@ -220,8 +230,9 @@ scout.FormField.prototype.clearErrorStatus = function() {
 };
 
 scout.FormField.prototype._renderErrorStatus = function() {
-  var hasStatus = !!this.errorStatus,
-    statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
+  var status = this._errorStatus(),
+    hasStatus = !!status,
+    statusClass = hasStatus ? 'has-' + status.cssClass() : '';
 
   this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
   this.$container.addClass(statusClass, hasStatus);
@@ -359,8 +370,9 @@ scout.FormField.prototype._updateStatusVisible = function() {
  * -> errorStatus and tooltip override statusVisible, so $status may be visible event though statusVisible is set to false
  */
 scout.FormField.prototype._computeStatusVisible = function() {
-  var statusVisible = this.statusVisible,
-    hasStatus = !!this.errorStatus,
+  var status = this._errorStatus(),
+    statusVisible = this.statusVisible,
+    hasStatus = !!status,
     hasTooltip = !!this.tooltipText;
 
   return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
@@ -599,7 +611,7 @@ scout.FormField.prototype.recomputeEnabled = function(parentEnabled) {
 };
 
 scout.FormField.prototype._onStatusMouseDown = function(event) {
-  var hasStatus = !!this.errorStatus,
+  var hasStatus = !!this._errorStatus(),
     hasTooltip = !!this.tooltipText,
     hasMenus = this.menusVisible && this._hasMenus();
 
@@ -632,15 +644,16 @@ scout.FormField.prototype._showStatusMessage = function() {
     return;
   }
 
-  var text = this.tooltipText,
+  var status = this._errorStatus(),
+    text = this.tooltipText,
     severity = scout.Status.OK,
     autoRemove = true,
     menus = [];
 
-  if (this.errorStatus) {
-    text = this.errorStatus.message;
-    severity = this.errorStatus.severity;
-    autoRemove = !(this.errorStatus && this.errorStatus.isError());
+  if (status) {
+    text = status.message;
+    severity = status.severity;
+    autoRemove = !(status && status.isError());
     if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
       // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
       this.tooltip.destroy();
@@ -655,7 +668,7 @@ scout.FormField.prototype._showStatusMessage = function() {
 
   // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
   // Menus make most likely no sense if an error status is displayed
-  if (!this.errorStatus && this.menusVisible && this._hasMenus()) {
+  if (!status && this.menusVisible && this._hasMenus()) {
     menus = this._getCurrentMenus();
   }
 
@@ -1090,7 +1103,7 @@ scout.FormField.prototype.computeRequiresSave = function() {
  * @returns {object} which contains 3 properties: valid, validByErrorStatus and validByMandatory
  */
 scout.FormField.prototype.getValidationResult = function() {
-  var validByErrorStatus = !this.errorStatus;
+  var validByErrorStatus = !this._errorStatus();
   var validByMandatory = !this.mandatory || !this.empty;
   var valid = validByErrorStatus && validByMandatory;
   return {
