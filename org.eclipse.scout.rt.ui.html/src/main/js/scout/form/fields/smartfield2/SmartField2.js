@@ -34,8 +34,9 @@ scout.SmartField2 = function() {
   this._acceptInputEnabled = true; // used to prevent multiple execution of blur/acceptInput
   this._acceptInputDeferred = $.Deferred();
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
+  this.lookupStatus = null;
 
-  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilterEnabled', 'activeFilterLabels']);
+  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels']);
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -46,7 +47,8 @@ scout.SmartField2.DisplayStyle = {
 
 scout.SmartField2.ErrorCode = {
   NOT_UNIQUE: 1,
-  NO_RESULTS: 2
+  NO_RESULTS: 2,
+  NO_DATA: 3
 };
 
 scout.SmartField2.DEBOUNCE_DELAY = 200;
@@ -169,6 +171,7 @@ scout.SmartField2.prototype.acceptInput = function() {
 
   this._setProperty('displayText', searchText);
   this._acceptInputDeferred = $.Deferred();
+  this._flushLookupStatus();
 
   // in case the user has typed something after he has selected a lookup row
   // --> ignore the selection.
@@ -495,7 +498,9 @@ scout.SmartField2.prototype.openPopup = function(browse) {
 };
 
 scout.SmartField2.prototype._hasUiError = function(codes) {
-  if (!this.errorStatus) {
+  var status = this._errorStatus();
+
+  if (!status) {
     return false;
   }
 
@@ -506,7 +511,7 @@ scout.SmartField2.prototype._hasUiError = function(codes) {
   }
 
   // collect codes from the status hierarchy
-  var statusList = scout.Status.asFlatList(this.errorStatus);
+  var statusList = scout.Status.asFlatList(status);
   var foundCodes = statusList.reduce(function(list, status) {
     if (status.code && list.indexOf(status.code) === -1) {
       list.push(status.code);
@@ -581,10 +586,10 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   // We don't want to set an error status on the field for the 'no data' case
   // Only show the message as status in the proposal chooser popup
   if (emptyResult && result.browse) {
-    var status = scout.Status.warn({
-        message: this.session.text('SmartFieldNoDataFound')
-      });
-    this.setErrorStatus(status);
+    this.setLookupStatus(scout.Status.warn({
+        message: this.session.text('SmartFieldNoDataFound'),
+        code: scout.SmartField2.ErrorCode.NO_DATA
+      }));
 
     // When active filter is enabled we must always show the popup, because the user
     // must be able to switch the filter properties. Otherwise a user could set the filter
@@ -592,7 +597,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
     // and the user can not switch the filter back to 'active' again because the filter
     // control is not visible.
     if (this.activeFilterEnabled) {
-      this._ensurePopup(result, status);
+      this._ensurePopup(result);
     } else {
       this.closePopup();
     }
@@ -601,7 +606,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   if (emptyResult) {
     this._handleEmptyResult();
-    this.setErrorStatus(scout.Status.warn({
+    this.setLookupStatus(scout.Status.warn({
       message: this.session.text('SmartFieldCannotComplete', result.searchText),
       code: scout.SmartField2.ErrorCode.NO_RESULTS
     }));
@@ -671,10 +676,15 @@ scout.SmartField2.prototype._renderPopup = function(result, status) {
    * - in touch mode, the field flagged with the 'touch' property should process no
    *   events at all, instead the field flagged with the 'embedded' property should
    *   process these events.
+   *
+   * (*1) because the lookup is processed by the field flagged with 'touch' we must
+   *      set the activeFilter on that field too, because the java-model on the server
+   *      is stateful. The java field always passes the activeFilter property to the
+   *      lookup call.
    */
   var fieldForPopup = useTouch ? this.popup._field : this;
   this.popup.on('lookupRowSelected', fieldForPopup._onLookupRowSelected.bind(fieldForPopup));
-  this.popup.on('activeFilterSelected', fieldForPopup._onActiveFilterSelected.bind(fieldForPopup));
+  this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this)); // intentionally use this instead of fieldForPopup *1
   this.popup.one('remove', function() {
     this.popup = null;
     if (this.rendered) {
@@ -940,6 +950,7 @@ scout.SmartField2.prototype.setActiveFilter = function(activeFilter) {
 scout.SmartField2.prototype._executeLookup = function(lookupFunc) {
   this._lookupInProgress = true;
   this.setLoading(true);
+  this._clearLookupStatus();
   return lookupFunc()
     .done(function() {
       this._lookupInProgress = false;
@@ -1132,7 +1143,7 @@ scout.SmartField2.prototype._createLoadingSupport = function() {
  * @override FormField.js
  */
 scout.SmartField2.prototype._showStatusMessage = function() {
-  if (this.touch && this.isPopupOpen()) {
+  if (this.touch && (this._pendingOpenPopup || this.isPopupOpen())) {
     // Do not display a tooltip if the touch popup is open, the tooltip will be displayed there
     return;
   }
@@ -1175,4 +1186,44 @@ scout.SmartField2.prototype._setNotUniqueError = function(searchText) {
 
 scout.SmartField2.prototype._hasNotUniqueError = function(searchText) {
   return this._notUnique || this._hasUiError(scout.SmartField2.ErrorCode.NOT_UNIQUE);
+};
+
+scout.SmartField2.prototype._errorStatus = function() {
+  return this.lookupStatus || this.errorStatus;
+};
+
+scout.SmartField2.prototype.setLookupStatus = function(lookupStatus) {
+  this.setProperty('lookupStatus', lookupStatus);
+  if (this.rendered) {
+    this._renderErrorStatus();
+  }
+};
+
+scout.SmartField2.prototype.clearErrorStatus = function() {
+  this.setErrorStatus(null);
+  this._clearLookupStatus();
+};
+
+scout.SmartField2.prototype._clearLookupStatus = function() {
+  this.setLookupStatus(null);
+};
+
+/**
+ * Checks if there is a lookup status that needs to be set as error status
+ * before we leave the smart-field. The lookup status is set to null, because
+ * it is a temporary state that is only important while the user executes a lookup.
+ */
+scout.SmartField2.prototype._flushLookupStatus = function() {
+  if (!this.lookupStatus) {
+    return;
+  }
+
+  if (this.lookupStatus.code === scout.SmartField2.ErrorCode.NO_RESULTS ||
+      this.lookupStatus.code === scout.SmartField2.ErrorCode.NOT_UNIQUE) {
+    var errorStatus = this.lookupStatus.clone();
+    errorStatus.severity = scout.Status.Severity.ERROR;
+    this.setErrorStatus(errorStatus);
+  }
+
+  this._clearLookupStatus();
 };
