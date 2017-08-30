@@ -25,13 +25,14 @@
 .table-header > .menubar-container {
   position: absolute;
   right: 0;
-  top: 0;
+  /* make menubar a little smaller than header (but still center it). Otherwise browsers may draw the menu bar over the bottom border of the table header when the page is zoomed */
+  top: 1px;
+  height: calc(~'100% - 2px');
   padding-right: 6px;
   padding-left: 6px;
   /* Do not use transparent color here, because otherwise header items would be visible behind */
   background-color: inherit;
   z-index: 1;
-  height: 100%;
 
   & > .menubar {
     height: 100%;
