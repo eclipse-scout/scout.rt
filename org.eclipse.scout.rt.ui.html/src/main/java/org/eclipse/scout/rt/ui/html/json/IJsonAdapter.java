@@ -68,15 +68,15 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
   // getAdapters -> getChildAdapters
   // getParent -> getParentAdapter
 
-  <A extends IJsonAdapter<?>, MODEL> A attachAdapter(MODEL model, IFilter<MODEL> filter);
+  <A extends IJsonAdapter<? super MODEL>, MODEL> A attachAdapter(MODEL model, IFilter<MODEL> filter);
 
   <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models);
 
   <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models, IFilter<MODEL> filter);
 
-  <A extends IJsonAdapter<?>> A getAdapter(Object model);
+  <A extends IJsonAdapter<? super Object>> A getAdapter(Object model);
 
-  <A extends IJsonAdapter<?>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter);
+  <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter);
 
   Collection<IJsonAdapter<?>> getAdapters(Collection<?> models);
 

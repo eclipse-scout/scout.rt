@@ -176,12 +176,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   }
 
-  public final <A extends IJsonAdapter<?>, M> A attachAdapter(M model) {
+  public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model) {
     return attachAdapter(model, null);
   }
 
   @Override
-  public final <A extends IJsonAdapter<?>, M> A attachAdapter(M model, IFilter<M> filter) {
+  public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model, IFilter<M> filter) {
     if (model == null) {
       return null;
     }
@@ -213,12 +213,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * return null. This method is a shortcut for <code>getUiSession().getJsonAdapter(model)</code>.
    */
   @Override
-  public final <A extends IJsonAdapter<?>> A getAdapter(Object model) {
+  public final <A extends IJsonAdapter<? super Object>> A getAdapter(Object model) {
     return getAdapter(model, null);
   }
 
   @Override
-  public <A extends IJsonAdapter<?>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter) {
+  public <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, IFilter<MODEL> filter) {
     if (model == null) {
       return null;
     }
@@ -245,11 +245,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return adapters;
   }
 
-  public final <A extends IJsonAdapter<?>> A getGlobalAdapter(Object model) {
+  public final <A extends IJsonAdapter<? super Object>> A getGlobalAdapter(Object model) {
     return getGlobalAdapter(model, null);
   }
 
-  public final <A extends IJsonAdapter<?>, MODEL> A getGlobalAdapter(MODEL model, IFilter<MODEL> filter) {
+  public final <A extends IJsonAdapter<? super MODEL>, MODEL> A getGlobalAdapter(MODEL model, IFilter<MODEL> filter) {
     if (model == null) {
       return null;
     }
@@ -282,11 +282,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * <p>
    * Global adapters (like every other) get disposed on session disposal.
    */
-  protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model) {
+  protected final <A extends IJsonAdapter<? super M>, M> A attachGlobalAdapter(M model) {
     return attachGlobalAdapter(model, null);
   }
 
-  protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model, IFilter<M> filter) {
+  protected final <A extends IJsonAdapter<? super M>, M> A attachGlobalAdapter(M model, IFilter<M> filter) {
     if (model == null) {
       return null;
     }
