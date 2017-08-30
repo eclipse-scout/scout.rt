@@ -88,6 +88,7 @@ scout.SimpleTab.prototype._remove = function() {
   this._remove$SubTitle();
   this._remove$IconContainer();
   this._remove$StatusContainer();
+  this.$close = null;
   scout.SimpleTab.parent.prototype._remove.call(this);
 };
 
