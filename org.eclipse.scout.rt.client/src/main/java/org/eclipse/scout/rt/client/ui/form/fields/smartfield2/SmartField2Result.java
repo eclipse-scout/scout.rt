@@ -19,9 +19,6 @@ public class SmartField2Result<V> {
 
   private final IContentAssistFieldDataFetchResult<V> m_result;
 
-  /**
-   * @param result
-   */
   public SmartField2Result(IContentAssistFieldDataFetchResult<V> result) {
     m_result = result;
   }
@@ -30,8 +27,8 @@ public class SmartField2Result<V> {
     return m_result.getLookupRows();
   }
 
-  public boolean isLookupFailed() {
-    return m_result.getException() != null;
+  public Throwable getException() {
+    return m_result.getException();
   }
 
   public String getSearchText() {

@@ -9,6 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.SmartField2Result;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -302,10 +303,19 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     else {
       json.put("searchText", result.getSearchText());
     }
-    if (result.isLookupFailed()) {
-      json.put("lookupFailed", result.isLookupFailed());
+    if (result.getException() != null) {
+      json.put("exception", exceptionToJson(result.getException()));
     }
     return json;
+  }
+
+  protected Object exceptionToJson(Throwable exception) {
+    if (exception instanceof PlatformException) {
+      return ((PlatformException) exception).getDisplayMessage();
+    }
+    else {
+      return exception.getMessage();
+    }
   }
 
   protected ILookupRow<VALUE> lookupRowFromJson(JSONObject json) {
