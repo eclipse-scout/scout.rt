@@ -20,6 +20,11 @@ scout.TableUpdateBuffer = function(table) {
 scout.TableUpdateBuffer.prototype.pushPromise = function(promise) {
   this.promises.push(promise);
 
+  // Also make sure viewport is not rendered as long as update events are buffered
+  // Otherwise the other cells might already be visible during buffering
+  this.table._renderViewportBlocked = true;
+  this.table.setLoading(true);
+
   promise.always(function() {
     scout.arrays.remove(this.promises, promise);
 
@@ -28,11 +33,6 @@ scout.TableUpdateBuffer.prototype.pushPromise = function(promise) {
       this.process();
     }
   }.bind(this));
-
-  // Also make sure viewport is not rendered as long as update events are buffered
-  // Otherwise the other cells might already be visible during buffering
-  this.table._renderViewportBlocked = true;
-  this.table.setLoading(true);
 };
 
 scout.TableUpdateBuffer.prototype.isBuffering = function() {
