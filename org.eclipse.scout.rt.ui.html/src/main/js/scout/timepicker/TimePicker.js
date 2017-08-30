@@ -53,7 +53,8 @@ scout.TimePicker.prototype._renderTimeSelection = function() {
 
     $hourRow = $box.appendDiv('hour-row');
     $time = $hourRow.appendDiv('cell  hours')
-      .data('time', new Date(date));
+      .data('time', new Date(date))
+      .on('click', this._onTimeClick.bind(this));
     $time.appendSpan('text')
       .text(scout.dates.format(date, this.session.locale, 'HH'));
 

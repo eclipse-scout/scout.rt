@@ -49,6 +49,7 @@
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
       padding: 2px;
+      cursor: pointer;
 
       .time-picker.touch & {
         padding: 5px;
@@ -76,10 +77,33 @@
       &.hours {
         background-color: @panel-background-color;
         border-right: 1px solid @border-color;
+        &:active:not(.disabled),
+        .time-picker:not(.touch) &:hover:not(.disabled) {
+          + .minutes {
+            & > .text {
+              border-color: @item-selection-border-color;
+              background-color: @palette-blue-0;
+            }
+
+            &.now > .text {
+              border-color: @highlight-color;
+              background-color: @palette-orange-0;
+            }
+
+            &.selected {
+              & > .text {
+                background-color: @palette-blue-4;
+              }
+
+              &.now > .text {
+                background-color: @palette-orange-3;
+              }
+            }
+          }
+        }
       }
 
       &.minutes {
-        cursor: pointer;
 
         &.now {
           color: @highlight-color;
