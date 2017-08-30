@@ -2455,6 +2455,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
+    public void setNavigationHandleVisibleFromUI(boolean visible) {
+      setNavigationHandleVisible(visible);
+    }
+
+    @Override
     public void setHeaderVisibleFromUI(boolean visible) {
       setHeaderVisible(visible);
     }

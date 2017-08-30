@@ -139,6 +139,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_VISIBLE, visible);
       getModel().getUIFacade().setNavigationVisibleFromUI(visible);
     }
+    if (IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE.equals(propertyName)) {
+      boolean visible = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE, visible);
+      getModel().getUIFacade().setNavigationHandleVisibleFromUI(visible);
+    }
     else if (IDesktop.PROP_BENCH_VISIBLE.equals(propertyName)) {
       boolean visible = data.getBoolean(propertyName);
       addPropertyEventFilterCondition(IDesktop.PROP_BENCH_VISIBLE, visible);

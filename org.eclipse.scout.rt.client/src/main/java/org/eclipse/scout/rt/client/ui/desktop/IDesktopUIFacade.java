@@ -65,6 +65,8 @@ public interface IDesktopUIFacade {
 
   void setNavigationVisibleFromUI(boolean visible);
 
+  void setNavigationHandleVisibleFromUI(boolean visible);
+
   void setHeaderVisibleFromUI(boolean visible);
 
   void setBenchVisibleFromUI(boolean visible);

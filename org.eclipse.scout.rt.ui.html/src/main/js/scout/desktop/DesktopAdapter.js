@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
-  this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible', 'geolocationServiceAvailable']);
+  this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
 
