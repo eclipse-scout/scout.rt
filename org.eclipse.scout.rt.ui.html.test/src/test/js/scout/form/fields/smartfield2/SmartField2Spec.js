@@ -250,11 +250,35 @@ describe('SmartField2', function() {
 
   });
 
-  describe('default (smart field) with table proposal', function() {
+  describe('maxBrowseRowCount', function() {
 
-  });
+    it('default - don\'t limit lookup rows', function() {
+      var field = createFieldWithLookupCall();
+      expect(field.browseMaxRowCount).toBe(100);
+      field.render();
+      field.$field.focus();
+      var result = {
+        lookupRows: [1, 2, 3, 4, 5]
+      };
+      field._lookupByTextOrAllDone(result);
+      expect(result.lookupRows.length).toBe(5); // no limit required
+      expect(field.popup.proposalChooser.status).toBe(null);
+    });
 
-  describe('default (smart field) with tree proposal', function() {
+    it('limit lookup rows', function() {
+      var field = createFieldWithLookupCall({
+        browseMaxRowCount: 3
+      });
+      field.render();
+      field.$field.focus();
+      var result = {
+        lookupRows: [1, 2, 3, 4, 5]
+      };
+      field._lookupByTextOrAllDone(result);
+      expect(result.lookupRows.length).toBe(3);
+      expect(result.lookupRows[2]).toBe(3); // last element in array should be '3'
+      expect(field.popup.proposalChooser.status.severity).toBe(scout.Status.Severity.INFO);
+    });
 
   });
 

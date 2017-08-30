@@ -615,6 +615,11 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
 
   var popupStatus = null;
   if (numLookupRows > this.browseMaxRowCount) {
+    // Info: we limit the lookup rows here, but this is more a last line of defense
+    // limit should be always performed on the server, so we don't have to transfer
+    // unnecessary lookup rows over the slow network. Make sure your Scout lookup call
+    // or REST service impl. respects the max. row count property.
+    result.lookupRows = result.lookupRows.slice(0, this.browseMaxRowCount);
     popupStatus = scout.Status.info({
       message: this.session.text('SmartFieldMoreThanXRows', this.browseMaxRowCount)
     });

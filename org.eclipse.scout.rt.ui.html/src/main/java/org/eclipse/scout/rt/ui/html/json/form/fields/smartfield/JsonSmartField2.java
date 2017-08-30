@@ -79,8 +79,8 @@ public class JsonSmartField2<VALUE, MODEL extends ISmartField2<VALUE>> extends J
     });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_MAX_ROW_COUNT, model) {
       @Override
-      protected TriState modelValue() {
-        return getModel().getActiveFilter();
+      protected Integer modelValue() {
+        return getModel().getBrowseMaxRowCount();
       }
     });
     putJsonProperty(new JsonProperty<ISmartField2<VALUE>>(ISmartField2.PROP_BROWSE_AUTO_EXPAND_ALL, model) {
