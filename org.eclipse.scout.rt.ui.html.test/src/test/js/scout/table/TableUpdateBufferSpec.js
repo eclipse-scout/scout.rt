@@ -38,10 +38,12 @@ describe("TableUpdateBuffer", function() {
     table.updateRow(row);
     expect(table.updateBuffer.isBuffering()).toBe(true);
     expect(table.rows[0].cells[0].text).toBe('0_0');
+    expect(table.loading).toBe(true);
 
     promise.done(function() {
       expect(table.updateBuffer.isBuffering()).toBe(false);
       expect(table.rows[0].cells[0].text).toBe('newCellText0');
+      expect(table.loading).toBe(false);
       done();
     });
     deferred.resolve();
@@ -75,6 +77,26 @@ describe("TableUpdateBuffer", function() {
       done();
     });
     deferred.resolve();
+  });
+
+  it("processes immediately when a resolved promise is added", function() {
+    var table = helper.createTable(helper.createModelFixture(2, 2));
+    table.render();
+
+    var deferred = $.Deferred();
+    var promise = deferred.promise();
+    deferred.resolve();
+    table.updateBuffer.pushPromise(promise);
+
+    var row = {
+      id: table.rows[0].id,
+      cells: ['newCellText0', 'newCellText1']
+    };
+    table.updateRow(row);
+    expect(table.updateBuffer.isBuffering()).toBe(false);
+    expect(table.rows[0].cells[0].text).toBe('newCellText0');
+    expect(table.loading).toBe(false);
+    expect(table._renderViewportBlocked).toBe(false);
   });
 
 });
