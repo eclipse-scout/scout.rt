@@ -250,6 +250,20 @@ describe('SmartField2', function() {
 
   });
 
+  describe('lookup', function() {
+
+    it('should set error status when result has an exception', function() {
+      var field = createFieldWithLookupCall();
+      field._lookupByTextOrAllDone({
+        lookupRows: [],
+        exception: 'a total desaster'
+      });
+      expect(field.errorStatus.severity).toBe(scout.Status.Severity.ERROR);
+      expect(field.errorStatus.message).toBe('a total desaster');
+    });
+
+  });
+
   describe('maxBrowseRowCount', function() {
 
     it('default - don\'t limit lookup rows', function() {

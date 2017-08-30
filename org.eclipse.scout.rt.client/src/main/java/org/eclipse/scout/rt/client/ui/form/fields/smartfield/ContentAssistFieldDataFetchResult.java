@@ -20,14 +20,14 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
 
   private final IContentAssistSearchParam<LOOKUP_KEY> m_searchParam;
   private final List<ILookupRow<LOOKUP_KEY>> m_lookupRows;
-  private final Throwable m_processingException;
+  private final Throwable m_exception;
 
-  public ContentAssistFieldDataFetchResult(List<ILookupRow<LOOKUP_KEY>> rows, Throwable failed, IContentAssistSearchParam<LOOKUP_KEY> searchParam) {
+  public ContentAssistFieldDataFetchResult(List<ILookupRow<LOOKUP_KEY>> rows, Throwable exception, IContentAssistSearchParam<LOOKUP_KEY> searchParam) {
     if (rows == null) {
       rows = Collections.emptyList();
     }
     m_lookupRows = rows;
-    m_processingException = failed;
+    m_exception = exception;
     m_searchParam = searchParam;
   }
 
@@ -38,7 +38,7 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
 
   @Override
   public Throwable getException() {
-    return m_processingException;
+    return m_exception;
   }
 
   @Override
@@ -52,7 +52,7 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
     int result = 1;
     result = prime * result + ((m_searchParam == null) ? 0 : m_searchParam.hashCode());
     result = prime * result + ((m_lookupRows == null) ? 0 : m_lookupRows.hashCode());
-    result = prime * result + ((m_processingException == null) ? 0 : m_processingException.hashCode());
+    result = prime * result + ((m_exception == null) ? 0 : m_exception.hashCode());
     return result;
   }
 
@@ -84,12 +84,12 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
     else if (!m_lookupRows.equals(other.m_lookupRows)) {
       return false;
     }
-    if (m_processingException == null) {
-      if (other.m_processingException != null) {
+    if (m_exception == null) {
+      if (other.m_exception != null) {
         return false;
       }
     }
-    else if (!m_processingException.equals(other.m_processingException)) {
+    else if (!m_exception.equals(other.m_exception)) {
       return false;
     }
     return true;
@@ -100,7 +100,7 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
     return new ToStringBuilder(this)
         .attr(m_searchParam)
         .attr("lookupRows", m_lookupRows)
-        .attr("exception", m_processingException)
+        .attr("exception", m_exception)
         .toString();
   }
 

@@ -574,6 +574,15 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
     emptyResult = numLookupRows === 0;
   this._notUnique = !result.browse && numLookupRows > 1;
 
+  // Oops! Something went wrong while the lookup has been processed.
+  if (result.exception) {
+    this.setErrorStatus(scout.Status.error({
+        message: result.exception
+      }));
+    this.closePopup();
+    return;
+  }
+
   // In cases where the user has tabbed to the next field, while results for the previous
   // smart-field are still loading: don't show the proposal popup. In the case of a cell-editor
   // it's also possible that the smart-field is not rendered anymore when the lookup is done
