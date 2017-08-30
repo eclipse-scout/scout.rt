@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,7 +189,8 @@ public class HolidayCalendarItemParser {
       else if ("LAST".equalsIgnoreCase(instancePattern)) {
         instance = -1;
       }
-      else {
+      else if (StringUtility.hasText(instancePattern)) {
+        // tag might be empty instead of null
         instance = Integer.parseInt(instancePattern);
       }
     }
