@@ -82,7 +82,7 @@ scout.ContextMenuPopupLayout.prototype._setMaxWidthFor = function($menuItems) {
 
 scout.ContextMenuPopupLayout.prototype._calcTextMaxWidth = function(menu) {
   var containerWidth = menu.$container.width(),
-    $icon = menu.$container.data('$icon'),
+    $icon = menu.get$Icon(),
     $text = menu.$text,
     $submenuIcon = menu.$submenuIcon,
     textWidth = containerWidth + 1; // add 1px to make it work even if containerWidth is a float

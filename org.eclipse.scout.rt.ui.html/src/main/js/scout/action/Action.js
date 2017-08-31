@@ -131,6 +131,13 @@ scout.Action.prototype._renderIconId = function() {
   }
 };
 
+scout.Action.prototype.get$Icon = function() {
+  if (this.icon) {
+    return this.icon.$container;
+  }
+  return this.$container.data('$icon');
+};
+
 scout.Action.prototype._removeIconId = function() {
   if (this.icon) {
     this.icon.destroy();

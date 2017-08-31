@@ -219,7 +219,7 @@ scout.Tooltip.prototype._renderMenus = function() {
     var iconWidth = 0;
     menu.render(this.$menus);
     if (menu.iconId) {
-      iconWidth = menu.$container.data('$icon').outerWidth(true);
+      iconWidth = menu.get$Icon().outerWidth(true);
       maxIconWidth = Math.max(iconWidth, maxIconWidth);
     }
   }, this);
@@ -230,7 +230,7 @@ scout.Tooltip.prototype._renderMenus = function() {
       if (!menu.iconId) {
         menu.$text.cssPaddingLeft(maxIconWidth);
       } else {
-        menu.$text.cssPaddingLeft(maxIconWidth - menu.$container.data('$icon').outerWidth(true));
+        menu.$text.cssPaddingLeft(maxIconWidth - menu.get$Icon().outerWidth(true));
       }
     }, this);
   }
