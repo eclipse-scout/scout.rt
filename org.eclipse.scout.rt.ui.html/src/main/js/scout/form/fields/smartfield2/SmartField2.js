@@ -254,7 +254,7 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   // this causes a lookup which may fail and open a new proposal chooser (property
   // change for 'result').
   if (searchTextChanged || this._userWasTyping) {
-    this._acceptByText(searchText);
+    this._acceptByText(this._firstTextLine(searchText));
   } else if (!this._hasUiError()) {
     this._inputAccepted(false);
   } else if (this._hasNotUniqueError() && this.popup) {
@@ -266,6 +266,20 @@ scout.SmartField2.prototype._acceptInput = function(searchText, searchTextEmpty,
   }
 
   return this._acceptInputDeferred.promise();
+};
+
+/**
+ * Required for multiline smart-field. Only use first line of search text for accept by text.
+ * Note: for the regular lookup by text, we use the readDisplayText() function which always
+ * returns a single line. But in acceptInput we need the full search text (=display text + additional
+ * lines) in order to check whether or not the display text has changed, compared to the current
+ * lookup row. That's why we must extract the first line here.
+ */
+scout.SmartField2.prototype._firstTextLine = function(text) {
+  if (scout.strings.empty(text)) {
+    return text;
+  }
+  return text.split('\n')[0];
 };
 
 /**
@@ -357,8 +371,7 @@ scout.SmartField2.prototype._extendResult = function(result) {
 };
 
 scout.SmartField2.prototype._acceptInputFail = function(result) {
-  // required for multiline smart-field: only use the first line as display text in case of an error
-  var searchText = this._firstTextLine(result.searchText);
+  var searchText = result.searchText;
 
   // in any other case something went wrong
   if (result.numLookupRows === 0) {
@@ -388,13 +401,6 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
 
   this._acceptInputDeferred.resolve();
   this._triggerAcceptInputFail();
-};
-
-scout.SmartField2.prototype._firstTextLine = function(text) {
-  if (scout.strings.empty(text)) {
-    return text;
-  }
-  return text.split('\n')[0];
 };
 
 scout.SmartField2.prototype.lookupByRec = function(rec) {
