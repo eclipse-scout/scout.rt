@@ -234,18 +234,21 @@ scout.FormField.prototype._renderErrorStatus = function() {
     hasStatus = !!status,
     statusClass = hasStatus ? 'has-' + status.cssClass() : '';
 
-  this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
-  this.$container.addClass(statusClass, hasStatus);
-  if (this.$field) {
-    this.$field.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
-    this.$field.addClass(statusClass, hasStatus);
-  }
-
+  this._updateErrorStatusClasses(statusClass, hasStatus);
   this._updateStatusVisible();
   if (hasStatus) {
     this._showStatusMessage();
   } else {
     this._hideStatusMessage();
+  }
+};
+
+scout.FormField.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
+  this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+  this.$container.addClass(statusClass, hasStatus);
+  if (this.$field) {
+    this.$field.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+    this.$field.addClass(statusClass, hasStatus);
   }
 };
 

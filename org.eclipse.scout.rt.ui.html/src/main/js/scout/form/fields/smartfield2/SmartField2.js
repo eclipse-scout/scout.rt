@@ -357,7 +357,8 @@ scout.SmartField2.prototype._extendResult = function(result) {
 };
 
 scout.SmartField2.prototype._acceptInputFail = function(result) {
-  var searchText = result.searchText;
+  // required for multiline smart-field: only use the first line as display text in case of an error
+  var searchText = this._firstTextLine(result.searchText);
 
   // in any other case something went wrong
   if (result.numLookupRows === 0) {
@@ -387,6 +388,13 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
 
   this._acceptInputDeferred.resolve();
   this._triggerAcceptInputFail();
+};
+
+scout.SmartField2.prototype._firstTextLine = function(text) {
+  if (scout.strings.empty(text)) {
+    return text;
+  }
+  return text.split('\n')[0];
 };
 
 scout.SmartField2.prototype.lookupByRec = function(rec) {
@@ -820,7 +828,7 @@ scout.SmartField2.prototype._onInputChanged = function(event) {
 
 scout.SmartField2.prototype._onFieldKeyUp = function(event) {
   // Escape
-  if (event.which === scout.keys.ESCAPE) {
+  if (event.which === scout.keys.ESC) {
     return;
   }
 

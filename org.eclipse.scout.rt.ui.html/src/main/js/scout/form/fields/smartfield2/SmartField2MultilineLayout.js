@@ -18,11 +18,11 @@ scout.inherits(scout.SmartField2MultilineLayout, scout.AbstractLayout);
 
 scout.SmartField2MultilineLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    $inputField = $container.children('.multiline'),
-    $multilines = $container.children('.multiline-field'),
+    $input = $container.children('.multiline-input'),
+    $lines = $container.children('.multiline-lines'),
     innerSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets());
 
-  $inputField.cssHeight(scout.HtmlEnvironment.formRowHeight);
-  $multilines.cssHeight(innerSize.height - scout.HtmlEnvironment.formRowHeight);
+  $input.cssHeight(scout.HtmlEnvironment.formRowHeight);
+  $lines.cssHeight(innerSize.height - scout.HtmlEnvironment.formRowHeight);
 };

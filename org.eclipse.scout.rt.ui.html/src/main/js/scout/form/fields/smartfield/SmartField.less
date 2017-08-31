@@ -40,7 +40,40 @@
   }
 
   /* Multiline SmartField */
-  & .multiline {
+
+  &.popup-open {
+
+    & .multiline.field.focused {
+      box-shadow: none;
+    }
+
+    & .multiline-input {
+
+      &.has-error:focus {
+        border-color: @error-border-color;
+      }
+
+      &:focus {
+        #scout.focus-border();
+        border-bottom-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+      }
+    }
+
+    & .multiline-lines.focused {
+      border-color: @border-color;
+    }
+  }
+
+  &.has-error .multiline.field.focused {
+    #scout.glow(@error-glow-color);
+  }
+
+  & .multiline.field.focused {
+    #scout.glow(@focus-glow-color);
+  }
+
+  & .multiline-input {
     border-bottom-color: @border-color;
     border-top-left-radius: @border-radius;
     border-top-right-radius: @border-radius;
@@ -49,10 +82,19 @@
     width: 100%;
     padding-left: 10px;
     height: 28px;
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &.has-error:focus {
+      border-color: @error-border-color;
+      border-bottom-color: @border-color;
+    }
   }
 
   /* DIV below the smart field containing the additional lines */
-  & .multiline-field {
+  & .multiline-lines {
     background-color: @control-background-color;
     border: solid 1px @border-color;
     border-top-left-radius: 0;
@@ -66,6 +108,14 @@
 
     .disabled & {
       background-color: @control-disabled-background-color;
+    }
+
+    &.focused {
+      border-color: @focus-border-color;
+    }
+
+    &.has-error {
+      border-color: @error-border-color;
     }
   }
 }

@@ -245,11 +245,19 @@ public final class SeleniumExpectedConditions {
       @Override
       public List<WebElement> apply(WebDriver driver) {
         try {
-          By by = SeleniumUtil.byCssClassAndContainsText("table-row", rowText);
+          By by = By.className("table-row");
           List<WebElement> tableRows = parentElement != null ? parentElement.findElements(by) : driver.findElements(by);
-          if (numRows == tableRows.size()) {
-            return tableRows;
+          // we must have exactly the requested count of rows (too many rows is as bad as too few rows)
+          if (numRows != tableRows.size()) {
+            return null;
           }
+          // and each one of these rows must contain the given text
+          for (WebElement tableRow : tableRows) {
+            if (!tableRow.getText().contains(rowText)) {
+              return null;
+            }
+          }
+          return tableRows;
         }
         catch (StaleElementReferenceException e) { // NOSONAR
           // NOP

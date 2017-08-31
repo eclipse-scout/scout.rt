@@ -17,7 +17,6 @@ scout.keys = {
   ALT: 18,
   PAUSE: 19,
   ESC: 27,
-  ESCAPE: 27,
   PAGE_UP: 33,
   PAGE_DOWN: 34,
   END: 35,
