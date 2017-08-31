@@ -1206,7 +1206,7 @@ describe('DateField', function() {
         hasTime: true
       });
       dateField.render();
-      expect(dateField.$dateField).toBeUndefined();
+      expect(dateField.$dateField).toBe(null);
 
       dateField.setHasDate(true);
       expect(dateField.$dateField.length).toBe(1);
@@ -1264,7 +1264,7 @@ describe('DateField', function() {
         hasDate: true
       });
       dateField.render();
-      expect(dateField.$timeField).toBeUndefined();
+      expect(dateField.$timeField).toBe(null);
 
       dateField.setHasTime(true);
       expect(dateField.$timeField.length).toBe(1);
