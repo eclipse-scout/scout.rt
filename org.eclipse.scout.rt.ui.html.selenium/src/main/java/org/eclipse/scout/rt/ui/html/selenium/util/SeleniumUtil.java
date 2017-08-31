@@ -84,9 +84,12 @@ public final class SeleniumUtil {
 
   /**
    * Returns an XPath selector that matches an element with the given CSS class and containing the given text.
+   * <p>
+   * Info: we use normalize-space to find text in elements that contain new-line <code>\n</code> characters. Also we use
+   * the dot locator (=current element) instead of the <code>text()</code> function.
    */
   private static By byCssClassAndText(String cssClass, String findFunction, String text) {
-    return By.xpath("//*[contains(@class, '" + cssClass + "') and " + findFunction + "(text(), '" + text + "')]");
+    return By.xpath("//*[contains(@class, '" + cssClass + "') and " + findFunction + "(normalize-space(.), '" + text + "')]");
   }
 
   /**
