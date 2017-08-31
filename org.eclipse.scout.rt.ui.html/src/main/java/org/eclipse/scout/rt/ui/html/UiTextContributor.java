@@ -18,13 +18,18 @@ public class UiTextContributor implements IUiTextContributor {
   @Override
   public void contributeUiTextKeys(Set<String> textKeys) {
     textKeys.addAll(Arrays.asList(
-        // From org.eclipse.scout.rt.client
+        // From org.eclipse.scout.rt.shared
         "Remove",
         "ResetTableColumns",
         "ColumnSorting",
         "Column",
         "Cancel",
         "Ok",
+        "CancelButton",
+        "OkButton",
+        "CloseButton",
+        "ResetButton",
+        "SaveButton",
         "SmartFieldCannotComplete",
         "SmartFieldInactiveRow",
         "SmartFieldNotUnique",
@@ -33,7 +38,6 @@ public class UiTextContributor implements IUiTextContributor {
         "NavigationBackward",
         "InvalidValueMessageX",
         "InvalidNumberMessageX",
-        "searchingProposals",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
         "ui.CalendarDay",

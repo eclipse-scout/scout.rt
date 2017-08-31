@@ -28,7 +28,7 @@ scout.SaveMenu.prototype.getForm = function() {
 
 scout.SaveMenu.prototype._doAction = function() {
   var event = new scout.Event();
-  this.trigger('click', event);
+  this.trigger('action', event);
   if (!event.defaultPrevented) {
     this.getForm().save();
   }

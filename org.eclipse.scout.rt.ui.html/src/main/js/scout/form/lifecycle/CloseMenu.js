@@ -28,7 +28,7 @@ scout.CloseMenu.prototype.getForm = function() {
 
 scout.CloseMenu.prototype._doAction = function() {
   var event = new scout.Event();
-  this.trigger('click', event);
+  this.trigger('action', event);
   if (!event.defaultPrevented) {
     this.getForm().close();
   }
