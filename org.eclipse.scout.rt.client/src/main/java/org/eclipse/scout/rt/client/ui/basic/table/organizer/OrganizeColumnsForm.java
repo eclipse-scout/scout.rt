@@ -302,13 +302,13 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             @Override
             protected void execRowsSelected(List<? extends ITableRow> rows) {
-              getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected());
-              getMenuByClass(RenameMenu.class).setVisible(!isDefaultConfigSelected());
-              getMenuByClass(UpdateMenu.class).setVisible(!isDefaultConfigSelected());
+              getMenuByClass(DeleteMenu.class).setVisible(!isDefaultConfigSelected() && rows.size() > 0);
+              getMenuByClass(RenameMenu.class).setVisible(!isDefaultConfigSelected() && rows.size() > 0);
+              getMenuByClass(UpdateMenu.class).setVisible(!isDefaultConfigSelected() && rows.size() > 0);
 
-              getMenuByClass(DeleteMenu.class).setEnabled(!isDefaultConfigSelected());
-              getMenuByClass(RenameMenu.class).setEnabled(!isDefaultConfigSelected());
-              getMenuByClass(UpdateMenu.class).setEnabled(!isDefaultConfigSelected());
+              getMenuByClass(DeleteMenu.class).setEnabled(!isDefaultConfigSelected() && rows.size() > 0);
+              getMenuByClass(RenameMenu.class).setEnabled(!isDefaultConfigSelected() && rows.size() > 0);
+              getMenuByClass(UpdateMenu.class).setEnabled(!isDefaultConfigSelected() && rows.size() > 0);
             }
 
             @Order(10)
@@ -482,6 +482,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
+              protected boolean getConfiguredVisible() {
+                // Initially invisible to prevent flickering
+                return false;
+              }
+
+              @Override
               protected void execAction() {
                 List<ITableRow> rows = getSelectedRows();
                 for (ITableRow row : rows) {
@@ -510,6 +516,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
+              protected boolean getConfiguredVisible() {
+                // Initially invisible to prevent flickering
+                return false;
+              }
+
+              @Override
               protected String getConfiguredKeyStroke() {
                 return IKeyStroke.DELETE;
               }
@@ -534,6 +546,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
                 return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
+              }
+
+              @Override
+              protected boolean getConfiguredVisible() {
+                // Initially invisible to prevent flickering
+                return false;
               }
 
               @Override
