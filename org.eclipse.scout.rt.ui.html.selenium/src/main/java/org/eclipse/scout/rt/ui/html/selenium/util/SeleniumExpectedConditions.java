@@ -202,22 +202,64 @@ public final class SeleniumExpectedConditions {
     return false;
   }
 
-  public static ExpectedCondition<Boolean> tableToHaveNumberOfRows(final WebElement table, final int numRows) {
-    return new ExpectedCondition<Boolean>() {
+  /**
+   * @param parentElement
+   *          if not null, findElement below the given parent, if null, findElements in document
+   * @param numRows
+   * @return The table-rows found by the expected condition
+   */
+  public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final int numRows) {
+    return new ExpectedCondition<List<WebElement>>() {
       @Override
-      public Boolean apply(WebDriver driver) {
+      public List<WebElement> apply(WebDriver driver) {
         try {
-          List<WebElement> elements = table.findElements(By.className("table-row"));
-          return numRows == elements.size();
+          By by = By.className("table-row");
+          List<WebElement> tableRows = parentElement != null ? parentElement.findElements(by) : driver.findElements(by);
+          if (numRows == tableRows.size()) {
+            return tableRows;
+          }
         }
         catch (StaleElementReferenceException e) { // NOSONAR
-          return null;
+          // NOP
         }
+        return null;
       }
 
       @Override
       public String toString() {
-        return String.format("table should have value '%d", numRows);
+        return String.format("table should have %d rows", numRows);
+      }
+    };
+  }
+
+  /**
+   * @param parentElement
+   *          if not null, findElement below the given parent, if null, findElements in document
+   * @param rowText
+   *          text of element table-row, compared with 'contains'
+   * @param numRows
+   * @return The table-rows found by the expected condition
+   */
+  public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final String rowText, final int numRows) {
+    return new ExpectedCondition<List<WebElement>>() {
+      @Override
+      public List<WebElement> apply(WebDriver driver) {
+        try {
+          By by = SeleniumUtil.byCssClassAndContainsText("table-row", rowText);
+          List<WebElement> tableRows = parentElement != null ? parentElement.findElements(by) : driver.findElements(by);
+          if (numRows == tableRows.size()) {
+            return tableRows;
+          }
+        }
+        catch (StaleElementReferenceException e) { // NOSONAR
+          // NOP
+        }
+        return null;
+      }
+
+      @Override
+      public String toString() {
+        return String.format("table should have %d rows with text '%s'", numRows, rowText);
       }
     };
   }

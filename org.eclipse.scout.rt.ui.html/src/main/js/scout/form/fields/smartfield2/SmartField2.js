@@ -133,6 +133,19 @@ scout.SmartField2.prototype.cssClassName = function() {
   return prefix + '-field';
 };
 
+scout.SmartField2.prototype._readSearchText = function() {
+ var fieldText = this._readDisplayText(),
+   displayText = scout.nvl(this.displayText, ''),
+   textLines = displayText.split('\n');
+
+ if (textLines.length === 1 || scout.strings.empty(fieldText)) {
+   return fieldText;
+ }
+ textLines.shift(); // remove first line
+ scout.arrays.insert(textLines, fieldText, 0);
+ return scout.strings.join('\n', textLines);
+};
+
 scout.SmartField2.prototype._readDisplayText = function() {
   return scout.fields.valOrText(this.$field);
 };
@@ -164,7 +177,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   }.bind(this));
 
   var
-    searchText = this._readDisplayText(),
+    searchText = this._readSearchText(),
     searchTextEmpty = scout.strings.empty(searchText),
     searchTextChanged = this._checkDisplayTextChanged(searchText),
     selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;

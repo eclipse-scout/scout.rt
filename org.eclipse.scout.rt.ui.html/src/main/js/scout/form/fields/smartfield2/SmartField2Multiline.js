@@ -62,11 +62,6 @@ scout.SmartField2Multiline.prototype._getInputBounds = function() {
   return fieldBounds;
 };
 
-scout.SmartField2Multiline.prototype._readSearchText = function() {
-  // Only read the first line
-  return scout.fields.valOrText(this.$field);
-};
-
 scout.SmartField2Multiline.prototype._init = function(model) {
   scout.SmartField2Multiline.parent.prototype._init.call(this, model);
   this.on('deleteProposal', this._onDeleteProposal);
