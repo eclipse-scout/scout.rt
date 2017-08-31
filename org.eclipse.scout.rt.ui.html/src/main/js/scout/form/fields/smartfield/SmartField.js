@@ -262,7 +262,7 @@ scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
 
 // navigate in options
 scout.SmartField.prototype._onKeyDown = function(e) {
-  if (e.which === scout.keys.ESCAPE) {
+  if (e.which === scout.keys.ESC) {
     if (this.popup) {
       e.stopPropagation();
     }
@@ -332,7 +332,7 @@ scout.SmartField.prototype._delegateToProposalChooser = function(event) {
 scout.SmartField.prototype._onKeyUp = function(e) {
 
   // Escape
-  if (e.which === scout.keys.ESCAPE) {
+  if (e.which === scout.keys.ESC) {
     e.stopPropagation();
     return;
   }
