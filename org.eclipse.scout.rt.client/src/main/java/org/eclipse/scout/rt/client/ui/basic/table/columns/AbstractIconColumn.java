@@ -28,7 +28,12 @@ public abstract class AbstractIconColumn extends AbstractColumn<String> implemen
 
   @Override
   protected int getConfiguredWidth() {
-    return 32;
+    return NARROW_MIN_WIDTH;
+  }
+
+  @Override
+  protected int getConfiguredMinWidth() {
+    return NARROW_MIN_WIDTH;
   }
 
   @Override

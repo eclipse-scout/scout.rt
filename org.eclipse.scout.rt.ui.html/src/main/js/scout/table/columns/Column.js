@@ -11,7 +11,7 @@
 scout.Column = function() {
   this.autoOptimizeWidth = false;
   this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
-  this.cssClass;
+  this.cssClass = null;
   this.editable = false;
   this.removable = false;
   this.modifiable = false;
@@ -29,7 +29,8 @@ scout.Column = function() {
   this.summary = false;
   this.type = 'text';
   this.width = 60;
-  this.initialWidth; // the width the column initially has
+  this.initialWidth = undefined; // the width the column initially has
+  this.prefMinWidth = null;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
   this.showSeparator = true;
   this.textWrap = false;

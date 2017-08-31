@@ -3529,10 +3529,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void resetColumns(Set<String> options) {
     try {
       setTableChanging(true);
-      // TODO [7.0] asa: move to internal?
-      if (options.contains(IResetColumnsOption.SORTING)) {
-        setSortValid(false);
-      }
       resetColumnsInternal(options);
       interceptResetColumns(options);
     }
@@ -3542,7 +3538,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void resetColumnsInternal(Set<String> options) {
-
+    if (options.contains(IResetColumnsOption.SORTING)) {
+      setSortValid(false);
+    }
     if (options.contains(IResetColumnsOption.ORDER)) {
       TreeMap<CompositeObject, IColumn<?>> orderMap = new TreeMap<CompositeObject, IColumn<?>>();
       int index = 0;

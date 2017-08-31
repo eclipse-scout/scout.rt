@@ -427,7 +427,7 @@ scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
     }
   } else {
     // Reset to preferred min width if no state is visible
-    if (column.prefMinWidth) {
+    if (column.prefMinWidth !== null) {
       column.minWidth = column.prefMinWidth;
       column.prefMinWidth = null;
       // Resize to old min width, assuming user has not manually changed the size because column is still as width as default_min_width

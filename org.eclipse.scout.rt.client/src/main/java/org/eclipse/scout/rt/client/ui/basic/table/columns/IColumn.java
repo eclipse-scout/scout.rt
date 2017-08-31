@@ -47,6 +47,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   String PROP_WIDTH = "width";
   /**
+   * type int
+   */
+  String PROP_MIN_WIDTH = "minWidth";
+  /**
    * type boolean
    */
   String PROP_FIXED_WIDTH = "fixedWidth";
@@ -84,6 +88,9 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * type boolean
    */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
+
+  int MIN_WIDTH = 60;
+  int NARROW_MIN_WIDTH = 32;
 
   void initColumn();
 
@@ -243,6 +250,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * set the width of the column without firing events
    */
   void setWidthInternal(int w);
+
+  int getMinWidth();
+
+  void setMinWidth(int w);
 
   /**
    * @return <code>true</code>, if the column width is fixed, meaning that it is not changed by resizing/auto-resizing
