@@ -329,6 +329,7 @@
       "summary": false,
       "type": "text",
       "uiSortPossible": false,
+      "minWidth": 60,
       "width": 60
     },
     "DateColumn": {
@@ -347,7 +348,13 @@
     },
     "BooleanColumn": {
       "horizontalAlignment": 0,
-      "triStateEnabled": false
+      "triStateEnabled": false,
+      "minWidth": 32
+    },
+    "IconColumn": {
+      "horizontalAlignment": 0,
+      "minWidth": 32,
+      "width": 32
     },
     "TreeNode": {
       "checked": false,
@@ -434,7 +441,8 @@
       "BooleanColumn": null,
       "DateColumn": null,
       "StringColumn": null,
-      "NumberColumn": null
+      "NumberColumn": null,
+      "IconColumn": null
     },
     "TreeNode": {
       "Page": null

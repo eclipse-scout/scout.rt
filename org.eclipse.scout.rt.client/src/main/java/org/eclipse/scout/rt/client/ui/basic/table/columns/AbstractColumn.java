@@ -277,14 +277,30 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * to be displayable on small screens. The user can still make the column smaller, though.<br>
    * If the table's auto resize flag is not set, the column's width is represented by the configured width.
    * <p>
+   * Note if you want to have a very small column, you may have to adjust the minimum width as well.
+   * <p>
    * Subclasses can override this method. Default is {@code 60}.
    *
    * @return Width of this column.
+   * @see #getConfiguredMinWidth()
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(70)
   protected int getConfiguredWidth() {
     return 60;
+  }
+
+  /**
+   * Configures the minimum width of this column.
+   * <p>
+   * With this value you can control how small the user can make the column.
+   *
+   * @return Minimum width of this column.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(72)
+  protected int getConfiguredMinWidth() {
+    return MIN_WIDTH;
   }
 
   /**
@@ -877,6 +893,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setInitialGrouped(getConfiguredGrouped());
     setOrder(calculateViewOrder());
     setWidth(getConfiguredWidth());
+    setMinWidth(getConfiguredMinWidth());
     setFixedWidth(getConfiguredFixedWidth());
     m_flags = FLAGS_BIT_HELPER.changeBit(PRIMARY_KEY, getConfiguredPrimaryKey(), m_flags);
     m_flags = FLAGS_BIT_HELPER.changeBit(SUMMARY, getConfiguredSummary(), m_flags);
@@ -1752,6 +1769,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setWidthInternal(int w) {
     propertySupport.setPropertyNoFire(PROP_WIDTH, w);
+  }
+
+  @Override
+  public int getMinWidth() {
+    return propertySupport.getPropertyInt(PROP_MIN_WIDTH);
+  }
+
+  @Override
+  public void setMinWidth(int w) {
+    propertySupport.setPropertyInt(PROP_MIN_WIDTH, w);
   }
 
   @Override

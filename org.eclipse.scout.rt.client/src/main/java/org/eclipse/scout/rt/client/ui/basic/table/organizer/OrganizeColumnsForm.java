@@ -71,6 +71,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +128,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   @Order(10)
   @ClassId("d9f2e54a-cb41-4453-8ce9-ba41b8e247bd")
   public class MainBox extends AbstractGroupBox {
+
+    @Override
+    protected int getConfiguredWidthInPixel() {
+      return 800;
+    }
 
     @Order(10)
     @ClassId("abaf2e0c-1c14-4b99-81dc-8b83453f5766")
@@ -861,7 +867,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected int getConfiguredWidth() {
-                return 200;
+                return 120;
               }
 
             }
@@ -873,6 +879,16 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected int getConfiguredWidth() {
                 return 40;
+              }
+
+              @Override
+              protected int getConfiguredMinWidth() {
+                return 40;
+              }
+
+              @Override
+              protected boolean getConfiguredFixedWidth() {
+                return true;
               }
 
             }
@@ -891,6 +907,16 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 return 40;
               }
 
+              @Override
+              protected int getConfiguredMinWidth() {
+                return 40;
+              }
+
+              @Override
+              protected boolean getConfiguredFixedWidth() {
+                return true;
+              }
+
             }
 
             @Order(60)
@@ -900,6 +926,16 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected int getConfiguredWidth() {
                 return 40;
+              }
+
+              @Override
+              protected int getConfiguredMinWidth() {
+                return 40;
+              }
+
+              @Override
+              protected boolean getConfiguredFixedWidth() {
+                return true;
               }
 
             }
@@ -915,7 +951,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected int getConfiguredWidth() {
-                return 40;
+                return 60;
+              }
+
+              @Override
+              protected boolean getConfiguredFixedWidth() {
+                return true;
               }
 
               @Override
@@ -927,15 +968,16 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 // we need to update the displayed text to that value as well later.
                 boolean updateValue = false;
 
+                IColumn<?> column = getKeyColumn().getValue(row);
                 int newWidth;
-                if (enteredWidth == null || enteredWidth < 0) {
-                  newWidth = 60;
+                if (enteredWidth == null || enteredWidth < column.getMinWidth()) {
+                  newWidth = column.getMinWidth();
                   updateValue = true;
                 }
                 else {
                   newWidth = enteredWidth;
                 }
-                getKeyColumn().getValue(row).setWidth(newWidth);
+                column.setWidth(newWidth);
 
                 if (updateValue) {
                   setValue(row, newWidth);
@@ -957,6 +999,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected int getConfiguredWidth() {
                 return 10;
+              }
+
+              @Override
+              protected boolean getConfiguredVisible() {
+                // touch devices don't have a regular scrollbar -> no need to show the column
+                return !UserAgentUtility.isTouchDevice();
               }
 
             }

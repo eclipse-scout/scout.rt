@@ -173,6 +173,11 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
     return false;
   }
 
+  @Override
+  protected int getConfiguredMinWidth() {
+    return NARROW_MIN_WIDTH;
+  }
+
   protected static class LocalBooleanColumnExtension<OWNER extends AbstractBooleanColumn> extends LocalColumnExtension<Boolean, OWNER> implements IBooleanColumnExtension<OWNER> {
 
     public LocalBooleanColumnExtension(OWNER owner) {
