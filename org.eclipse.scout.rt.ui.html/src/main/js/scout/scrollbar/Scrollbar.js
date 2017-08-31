@@ -149,12 +149,13 @@ scout.Scrollbar.prototype.update = function() {
   var posNew = scrollPos / (this._scrollSize - this._offsetSize) * thumbRange;
   this._$thumb.css(this._dir, posNew);
 
-  // In IE scrollsize sometimes is 1px bigger than offsetSize even in situations when the content should easily fit in
-  // the rendered size. This fix prevents the scrollbar from being shown in IE when not expected.
-  var ieOffsetFix = scout.device.isInternetExplorer() ? 1 : 0;
+  // Add 1px to make sure scroll bar is not shown if width is a floating point value.
+  // Even if we were using getBoundingClientRect().width to get an exact width,
+  // it would not help because scroll size is always an integer
+  var offsetFix = 1;
 
   // show scrollbar
-  if (this._offsetSize + ieOffsetFix >= this._scrollSize) {
+  if (this._offsetSize + offsetFix >= this._scrollSize) {
     this.$container.css('display', 'none');
   } else {
     this.$container.css('display', '');
