@@ -224,15 +224,7 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
 scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   var data = {};
   data[propertyName] = value;
-  this._send('property', data, {
-    coalesce: function(previous) {
-      if (this.target === previous.target && this.type === previous.type) {
-        $.extend(this, previous);
-        return true;
-      }
-      return false;
-    }
-  });
+  this._send('property', data);
 };
 
 scout.ModelAdapter.prototype.addFilterForWidgetEvent = function(filter) {
