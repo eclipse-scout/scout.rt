@@ -11,10 +11,9 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
 public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>>
@@ -29,7 +28,7 @@ public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractV
   }
 
   @Override
-  public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) {
+  public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) {
     VALUE retChain = chain.execValidateValue(rawValue);
     return retChain;
   }
@@ -37,11 +36,6 @@ public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractV
   @Override
   public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value) {
     return chain.execFormatValue(value);
-  }
-
-  @Override
-  public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) {
-    return chain.execValidateValue(rawValue);
   }
 
   @Override

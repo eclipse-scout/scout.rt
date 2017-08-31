@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ExecMethodExtensionTest.MyForm.MainBox.NameField;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.AbstractStringFieldExtension;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -99,7 +99,7 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
     }
 
     @Override
-    public String execValidateValue(ValueFieldExecValidateChain<String> chain, String rawValue) {
+    public String execValidateValue(ValueFieldValidateValueChain<String> chain, String rawValue) {
       String retVal = chain.execValidateValue(rawValue);
       if (StringUtility.equalsIgnoreCase("berndExtension", retVal)) {
         throw new VetoException("BerndExtension is not allowed");

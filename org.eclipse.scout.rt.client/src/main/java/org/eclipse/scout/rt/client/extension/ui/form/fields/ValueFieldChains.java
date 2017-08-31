@@ -26,16 +26,11 @@ public final class ValueFieldChains {
     public AbstractValueFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions, IValueFieldExtension.class);
     }
-
   }
 
-  public static class ValueFieldExecValidateChain<VALUE> extends AbstractValueFieldChain<VALUE> {
+  public static class ValueFieldValidateValueChain<VALUE> extends AbstractValueFieldChain<VALUE> {
 
-    /**
-     * @param extensions
-     *          the list of all extension sorted reverse considering the execution order. The list must be immutable.
-     */
-    public ValueFieldExecValidateChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public ValueFieldValidateValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -43,7 +38,7 @@ public final class ValueFieldChains {
       MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
         @Override
         protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) {
-          setReturnValue(next.execValidateValue(ValueFieldExecValidateChain.this, rawValue));
+          setReturnValue(next.execValidateValue(ValueFieldValidateValueChain.this, rawValue));
         }
       };
       callChain(methodInvocation, rawValue);
@@ -65,24 +60,6 @@ public final class ValueFieldChains {
         }
       };
       callChain(methodInvocation, validValue);
-      return methodInvocation.getReturnValue();
-    }
-  }
-
-  public static class ValueFieldValidateValueChain<VALUE> extends AbstractValueFieldChain<VALUE> {
-
-    public ValueFieldValidateValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
-      super(extensions);
-    }
-
-    public VALUE execValidateValue(final VALUE rawValue) {
-      MethodInvocation<VALUE> methodInvocation = new MethodInvocation<VALUE>() {
-        @Override
-        protected void callMethod(IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> next) {
-          setReturnValue(next.execValidateValue(ValueFieldValidateValueChain.this, rawValue));
-        }
-      };
-      callChain(methodInvocation, rawValue);
       return methodInvocation.getReturnValue();
     }
   }

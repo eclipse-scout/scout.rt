@@ -21,10 +21,9 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -628,18 +627,13 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
 
     @Override
-    public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) {
+    public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) {
       return getOwner().execValidateValue(rawValue);
     }
 
     @Override
     public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value) {
       return getOwner().execFormatValue(value);
-    }
-
-    @Override
-    public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) {
-      return getOwner().execValidateValue(rawValue);
     }
 
     @Override
@@ -655,7 +649,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   protected final VALUE interceptValidateValue(VALUE rawValue) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    ValueFieldExecValidateChain<VALUE> chain = new ValueFieldExecValidateChain<VALUE>(extensions);
+    ValueFieldValidateValueChain<VALUE> chain = new ValueFieldValidateValueChain<VALUE>(extensions);
     return chain.execValidateValue(rawValue);
   }
 

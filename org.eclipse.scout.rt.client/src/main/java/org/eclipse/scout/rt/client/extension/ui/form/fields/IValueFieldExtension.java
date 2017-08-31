@@ -11,24 +11,16 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
 public interface IValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends IFormFieldExtension<OWNER> {
 
-  /**
-   * @param chain
-   * @param rawValue
-   * @return
-   */
-  VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue);
+  VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue);
 
   String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value);
-
-  VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue);
 
   void execChangedValue(ValueFieldChangedValueChain<VALUE> chain);
 

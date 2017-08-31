@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fixture;
 
-import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.AbstractStringFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
@@ -21,7 +21,7 @@ public class OrigFormStringFieldExtension extends AbstractStringFieldExtension<A
   }
 
   @Override
-  public String execValidateValue(ValueFieldExecValidateChain<String> chain, String rawValue) {
+  public String execValidateValue(ValueFieldValidateValueChain<String> chain, String rawValue) {
     String validatedValue = super.execValidateValue(chain, rawValue);
     ((OrigForm) getOwner().getForm()).logOperation(OrigFormStringFieldExtension.class, OrigForm.EXEC_VALIDATE_VALUE_OPERATION_NAME);
     return validatedValue;
