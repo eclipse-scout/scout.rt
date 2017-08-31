@@ -11,12 +11,12 @@
 scout.DateField = function() {
   scout.DateField.parent.call(this);
 
-  this.popup;
-  this.autoDate;
+  this.popup = null;
+  this.autoDate = null;
   this.dateDisplayText = null;
   this.dateHasText = false;
   this.dateFocused = false;
-  this.dateFormatPattern;
+  this.dateFormatPattern = null;
   this.disabledCopyOverlay = true;
   this.hasDate = true;
   this.oldDisplayText = null;
@@ -25,22 +25,23 @@ scout.DateField = function() {
   this.hasTimePopup = true;
   this.timeDisplayText = null;
   this.timeHasText = false;
-  this.timePickerResolution;
-  this.timeFormatPattern;
+  this.timeDisplayText = null;
+  this.timePickerResolution = 30;
+  this.timeFormatPattern = null;
   this.timeFocused = false;
 
-  this.$dateField;
-  this.$timeField;
-  this.$dateFieldIcon;
-  this.$timeFieldIcon;
-  this.$dateClearIcon;
-  this.$timeClearIcon;
-  this._$predictDateField;
-  this._$predictTimeField;
+  this.$dateField = null;
+  this.$timeField = null;
+  this.$dateFieldIcon = null;
+  this.$timeFieldIcon = null;
+  this.$dateClearIcon = null;
+  this.$timeClearIcon = null;
+  this._$predictDateField = null;
+  this._$predictTimeField = null;
 
   // This is the storage for the time (as date) while the focus in the field (e.g. when
   // pressing up/down). In date fields, the date picker is used for that purposes.
-  this._tempTimeDate;
+  this._tempTimeDate = null;
   this.invalidValueMessageKey = 'ui.InvalidDate';
   this._addCloneProperties(['hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern', 'allowedDates', 'autoDate']);
 };
@@ -60,7 +61,7 @@ scout.DateField.prototype._init = function(model) {
   this._setAutoDate(this.autoDate);
   this._setDisplayText(this.displayText);
   this._setAllowedDates(this.allowedDates);
-  this._setTimePickerResolution(this.timePickerResolution || 30);
+  this._setTimePickerResolution(this.timePickerResolution);
 };
 
 /**
@@ -72,7 +73,6 @@ scout.DateField.prototype._initValue = function(value) {
   this._setTimeFormatPattern(this.timeFormatPattern);
   scout.DateField.parent.prototype._initValue.call(this, value);
 };
-
 
 scout.DateField.prototype.createDatePopup = function() {
   var popupType = this.touch ? 'DatePickerTouchPopup' : 'DatePickerPopup';

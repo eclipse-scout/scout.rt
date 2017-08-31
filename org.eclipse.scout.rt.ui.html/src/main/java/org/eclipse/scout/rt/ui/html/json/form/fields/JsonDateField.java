@@ -57,7 +57,8 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return dateToJson((Date) value);
+        // Always send date and time in case hasDate or hasTime is toggled dynamically
+        return dateToJson((Date) value, true, true);
       }
     });
     putJsonProperty(new JsonProperty<T>(IDateField.PROP_HAS_TIME, model) {
@@ -114,10 +115,14 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   protected String dateToJson(Date date) {
+    return dateToJson(date, getModel().isHasDate(), getModel().isHasTime());
+  }
+
+  protected String dateToJson(Date date, boolean hasDate, boolean hasTime) {
     if (date == null) {
       return null;
     }
-    return new JsonDate(date).asJsonString(false, getModel().isHasDate(), getModel().isHasTime());
+    return new JsonDate(date).asJsonString(false, hasDate, hasTime);
   }
 
   @Override
