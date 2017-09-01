@@ -265,8 +265,9 @@ scout.scrollbars = {
 
   /**
    * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
+   * align is one of top|center|bottom|undefined. Use undefined to ensure the element is in the visible area.
    */
-  scrollTo: function($scrollable, $element) {
+  scrollTo: function($scrollable, $element, align) {
     var scrollTo,
       scrollOffsetUp = 4,
       scrollOffsetDown = 8,
@@ -287,10 +288,26 @@ scout.scrollbars = {
       elementH = elementBounds.height + scrollOffsetDown;
     }
 
-    if (elementTop < 0) {
+    if (align === undefined) {
+      // If the element is above the visible area it will be aligned to top.
+      // If the element is below the visible area it will be aligned to bottom.
+      // If the element is already in the visible area no scrolling is done.
+      align = (elementTop < 0) ? 'top' : (elementBottom > scrollableH ? 'bottom' : undefined);
+    } else {
+      align = align.toLowerCase();
+    }
+
+    if (align === 'center') {
+      // align center
+      scrollTo = $scrollable.scrollTop() + elementTop - Math.max(0, (scrollableH - elementH) / 2);
+
+    } else if (align === 'top') {
+      // align top
       // Element is on the top of the view port -> scroll up
       scrollTo = $scrollable.scrollTop() + elementTop;
-    } else if (elementBottom > scrollableH) {
+
+    } else if (align === 'bottom') {
+      // align bottom
       // Element is on the Bottom of the view port -> scroll down
       // On IE, a fractional position gets truncated when using scrollTop -> ceil to make sure the full element is visible
       scrollTo = Math.ceil($scrollable.scrollTop() + elementBottom - scrollableH);

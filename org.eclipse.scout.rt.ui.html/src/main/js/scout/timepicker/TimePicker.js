@@ -115,7 +115,7 @@ scout.TimePicker.prototype._renderPreselectedTime = function() {
     }
   }.bind(this));
   if ($scrollTo) {
-    scout.scrollbars.scrollTo(this.$container, $scrollTo);
+    scout.scrollbars.scrollTo(this.$container, $scrollTo, 'center');
   }
 };
 
@@ -152,7 +152,7 @@ scout.TimePicker.prototype._renderSelectedTime = function() {
     }
   }.bind(this));
   if ($scrollTo) {
-    scout.scrollbars.scrollTo(this.$container, $scrollTo);
+    scout.scrollbars.scrollTo(this.$container, $scrollTo, 'center');
   }
 };
 
