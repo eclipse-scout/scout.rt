@@ -63,6 +63,12 @@ describe('DateField', function() {
     expect(dateField.$dateField).toBeFocused();
   }
 
+  function focusTime(dateField) {
+    dateField.$timeField.focus();
+    jasmine.clock().tick(101);
+    expect(dateField.$timeField).toBeFocused();
+  }
+
   function openDatePicker(dateField) {
     dateField.$dateField.triggerMouseDown();
     expect(findDatePicker().length).toBe(1);
@@ -274,7 +280,7 @@ describe('DateField', function() {
   });
 
   describe('acceptDate', function() {
-    it('removes time if date was deleted', function() {
+    it('removes time as well if date was deleted', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
         value: '2014-10-01 05:00:00.000',
@@ -286,6 +292,7 @@ describe('DateField', function() {
       expectDate(dateField.value, 2014, 10, 1);
       expect(dateField.$dateField.val()).toBe('01.10.2014');
       expect(dateField.$timeField.val()).toBe('05:00');
+      expect(dateField.errorStatus).toBe(null);
 
       dateField.$dateField.val('');
       expect(dateField.$dateField.val()).toBe('');
@@ -294,10 +301,10 @@ describe('DateField', function() {
       dateField.acceptDate();
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value).toBe(null);
+      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
     });
 
-    it('does not remove time if date was deleted but time has an error', function() {
+    it('does not remove time if date was deleted and time has an error', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
         displayText: '01.10.2014\nasdf',
@@ -325,7 +332,7 @@ describe('DateField', function() {
   });
 
   describe('acceptTime', function() {
-    it('removes date if time was deleted', function() {
+    it('removes date as well if time was deleted', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
         value: '2014-10-01 05:00:00.000',
@@ -337,6 +344,7 @@ describe('DateField', function() {
       expectDate(dateField.value, 2014, 10, 1);
       expect(dateField.$dateField.val()).toBe('01.10.2014');
       expect(dateField.$timeField.val()).toBe('05:00');
+      expect(dateField.errorStatus).toBe(null);
 
       dateField.$timeField.val('');
       expect(dateField.$dateField.val()).toBe('01.10.2014');
@@ -345,10 +353,10 @@ describe('DateField', function() {
       dateField.acceptTime();
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value).toBe(null);
+      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
     });
 
-    it('does not remove date if time was deleted but date has an error', function() {
+    it('does not remove date if time was deleted and date has an error', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
         displayText: 'asdf\n05:00',
@@ -505,6 +513,59 @@ describe('DateField', function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
+
+    it('does not clear the time if date is removed and time field is focused', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2014-10-01 05:00:00.000',
+        hasTime: true
+      });
+      dateField.render();
+      focusDate(dateField);
+      dateField.$dateField.val('');
+      expect(dateField.$dateField.val()).toBe('');
+      expect(dateField.$timeField.val()).toBe('05:00');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
+
+      focusTime(dateField);
+      expect(dateField.$dateField.val()).toBe('');
+      expect(dateField.$timeField.val()).toBe('05:00');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
+
+      // Accepting the input (e.g. by leaving the fields) will clear both fields
+      dateField.acceptInput();
+      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
+      expect(dateField.$dateField.val()).toBe('');
+      expect(dateField.$timeField.val()).toBe('');
+      expect(dateField.value).toBe(null);
+    });
+
+    it('does not clear the date if time is removed and date field is focused', function() {
+      var dateField = scout.create('DateField', {
+        parent: session.desktop,
+        value: '2014-10-01 05:00:00.000',
+        hasTime: true
+      });
+      dateField.render();
+      focusTime(dateField);
+      dateField.$timeField.val('');
+      expect(dateField.$dateField.val()).toBe('01.10.2014');
+      expect(dateField.$timeField.val()).toBe('');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
+
+      focusDate(dateField);
+      expect(dateField.$dateField.val()).toBe('01.10.2014');
+      expect(dateField.$timeField.val()).toBe('');
+      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
+
+      // Accepting the input (e.g. by leaving the fields) will clear both fields
+      dateField.acceptInput();
+      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
+      expect(dateField.$dateField.val()).toBe('');
+      expect(dateField.$timeField.val()).toBe('');
+      expect(dateField.value).toBe(null);
+    });
+
 
   });
 
@@ -1153,6 +1214,38 @@ describe('DateField', function() {
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
       });
+
+      it('does not remove time if date was cleared but another date selected ', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasTime: true,
+          value: '2017-05-01 05:50:00.000'
+        });
+        dateField.render();
+        expect(dateField.$dateField.text()).toBe('01.05.2017');
+        expect(dateField.$timeField.text()).toBe('05:50');
+
+        // Open and check display text
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.$dateField.val()).toBe('01.05.2017');
+
+        // Clear text
+        dateField.popup._field.$dateField.focus();
+        dateField.popup._field.clear();
+        // Selecting a date using the mouse when the focus is still in the input field will normally trigger blur, this seems not to happen here -> do it manually
+        dateField.popup._field.$dateField.blur();
+
+        // Select another date
+        var selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        expect(dateField.popup).toBe(null);
+        expect(dateField.value).toEqual(selectedDate);
+        expect(dateField.$dateField.text()).toBe(dateField.isolatedDateFormat.format(selectedDate));
+
+        // Time must not have been modified
+        expect(dateField.$timeField.text()).toBe('05:50');
+      });
     });
 
     describe('time picker touch popup', function() {
@@ -1228,7 +1321,37 @@ describe('DateField', function() {
         expect(dateField.$timeField.text()).toBe(dateField.displayText);
       });
 
+      it('does not remove date if time was cleared but another time selected ', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasTime: true,
+          value: '2017-05-01 05:50:00.000'
+        });
+        dateField.render();
+        expect(dateField.$dateField.text()).toBe('01.05.2017');
+        expect(dateField.$timeField.text()).toBe('05:50');
 
+        // Open and check display text
+        dateField.$timeField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.$timeField.val()).toBe('05:50');
+
+        // Clear text
+        dateField.popup._field.$timeField.focus();
+        dateField.popup._field.clear();
+        // Selecting a date using the mouse when the focus is still in the input field will normally trigger blur, this seems not to happen here -> do it manually
+        dateField.popup._field.$timeField.blur();
+
+        // Select another time
+        var selectedDate = selectFirstTimeInPicker(dateField.popup._widget.$container);
+        expect(dateField.popup).toBe(null);
+        expectTime(dateField.value, selectedDate.getHours(), selectedDate.getMinutes(), selectedDate.getSeconds());
+        expect(dateField.$timeField.text()).toBe(dateField.isolatedTimeFormat.format(selectedDate));
+
+        // Date must not have been modified
+        expect(dateField.$dateField.text()).toBe('01.05.2017');
+      });
     });
 
   });
