@@ -180,7 +180,7 @@ scout.SmartField2.prototype.acceptInput = function() {
     searchText = this._readSearchText(),
     searchTextEmpty = scout.strings.empty(searchText),
     searchTextChanged = this._checkDisplayTextChanged(searchText),
-    selectedLookupRow = this.popup ? this.popup.getSelectedLookupRow() : null;
+    selectedLookupRow = this.isPopupOpen() ? this.popup.getSelectedLookupRow() : null;
 
   this._setProperty('displayText', searchText);
   this._acceptInputDeferred = $.Deferred();
@@ -294,6 +294,7 @@ scout.SmartField2.prototype._acceptByText = function(searchText) {
 scout.SmartField2.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
   triggerEvent = scout.nvl(triggerEvent, true);
   acceptByLookupRow = scout.nvl(acceptByLookupRow, true);
+  this.closePopup();
   this._userWasTyping = false;
   if (triggerEvent) {
     this._triggerAcceptInput(acceptByLookupRow);

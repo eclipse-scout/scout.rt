@@ -282,6 +282,10 @@ public abstract class AbstractSeleniumTest {
     return s_driver.findElements(SeleniumUtil.byModelClass(modelClass)).isEmpty();
   }
 
+  public boolean elementExists(Class<?> modelClass) {
+    return !this.elementNotExists(modelClass);
+  }
+
   public boolean waitUntilElementStaleness(WebElement element) {
     return waitUntil(ExpectedConditions.stalenessOf(element));
   }
