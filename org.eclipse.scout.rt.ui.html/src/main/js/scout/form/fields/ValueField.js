@@ -204,7 +204,7 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
 };
 
 /**
- * clears the display text and the value to null.
+ * Clears the display text and the value to null.
  */
 scout.ValueField.prototype.clear = function(){
   this._clear();
