@@ -256,10 +256,31 @@ describe('SmartField2', function() {
       var field = createFieldWithLookupCall();
       field._lookupByTextOrAllDone({
         lookupRows: [],
-        exception: 'a total desaster'
+        exception: 'a total disaster'
       });
       expect(field.errorStatus.severity).toBe(scout.Status.Severity.ERROR);
-      expect(field.errorStatus.message).toBe('a total desaster');
+      expect(field.errorStatus.message).toBe('a total disaster');
+    });
+
+  });
+
+  describe('touch / embed', function() {
+
+    it('must clone properties required for embedded field', function() {
+      var field = createFieldWithLookupCall({
+        touch: true,
+        activeFilter: 'TRUE',
+        activeFilterEnabled: true,
+        activeFilterLabels: ['a', 'b', 'c'],
+        browseLoadIncremental: true
+      });
+      var embedded = field.clone({
+        parent: session.desktop
+      });
+      expect(embedded.activeFilter).toBe('TRUE');
+      expect(embedded.activeFilterEnabled).toBe(true);
+      expect(embedded.activeFilterLabels).toEqual(['a', 'b', 'c']);
+      expect(embedded.browseLoadIncremental).toBe(true);
     });
 
   });
