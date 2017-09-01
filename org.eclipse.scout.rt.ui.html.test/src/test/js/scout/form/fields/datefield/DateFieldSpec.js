@@ -101,6 +101,13 @@ describe('DateField', function() {
     return date;
   }
 
+  function selectFirstTimeInPicker($picker) {
+    var $time = $picker.find('.cell.minutes').first();
+    var date = $time.data('time');
+    $time.triggerClick();
+    return date;
+  }
+
   function find$Day(picker, date) {
     var $box = picker.currentMonth.$container;
     return $box.find('.date-picker-day').filter(function(i, elem) {
@@ -933,33 +940,7 @@ describe('DateField', function() {
 
   describe('touch = true', function() {
 
-    describe('touch popup', function() {
-
-      it('updates display text and is not used for time fields', function() {
-        var dateField = scout.create('DateField', {
-          parent: session.desktop,
-          autoDate: '1999-10-03',
-          touch: true,
-          hasTime: true
-        });
-        dateField.render();
-
-        dateField.$dateField.triggerMouseDown();
-        expect(findDatePicker().length).toBe(1);
-
-        selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
-
-        dateField.$timeField.val('0442');
-        dateField._onTimeFieldBlur();
-
-        // selected date in picker (first day) must be 09/27/1999
-        expect(dateField.$dateField.text()).toBe('27.09.1999');
-        expect(dateField.$timeField.text()).toBe('04:42');
-        expect(dateField.displayText).toBe('27.09.1999\n04:42');
-
-        dateField.$dateField.triggerMouseDown();
-        expect(findDatePicker().length).toBe(1);
-      });
+    describe('date picker touch popup', function() {
 
       it('is opened if datefield is touched', function() {
         var dateField = scout.create('DateField', {
@@ -971,22 +952,9 @@ describe('DateField', function() {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
         expect($('.touch-popup').length).toBe(1);
+        expect(scout.widget($('.touch-popup')) instanceof scout.DatePickerTouchPopup).toBe(true);
         expect($('.date-picker-popup').length).toBe(0);
         dateField.popup.close();
-      });
-
-      it('is not opened if timefield is touched', function() {
-        var dateField = scout.create('DateField', {
-          parent: session.desktop,
-          touch: true,
-          hasTime: true
-        });
-        dateField.render();
-
-        dateField.$timeField.triggerClick();
-        expect(dateField.popup.rendered).toBe(true);
-        expect($('.touch-popup').length).toBe(1);
-        expect($('.date-picker-popup').length).toBe(0);
       });
 
       it('is closed when date in picker is selected', function() {
@@ -1186,6 +1154,83 @@ describe('DateField', function() {
         expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
       });
     });
+
+    describe('time picker touch popup', function() {
+      it('is opened if datefield is touched', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasDate: false,
+          hasTime: true
+        });
+        dateField.render();
+
+        dateField.$timeField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect($('.touch-popup').length).toBe(1);
+        expect(scout.widget($('.touch-popup')) instanceof scout.TimePickerTouchPopup).toBe(true);
+        expect($('.time-picker-popup').length).toBe(0);
+        dateField.popup.close();
+      });
+
+      it('is closed when time in picker is selected', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasDate: false,
+          hasTime: true
+        });
+        dateField.render();
+
+        dateField.$timeField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        var selectedDate = selectFirstTimeInPicker(dateField.popup._widget.$container);
+        expect(dateField.popup).toBe(null);
+      });
+
+      it('updates displayText and value of datefield if date in picker is selected', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasDate: false,
+          hasTime: true
+        });
+        dateField.render();
+
+        dateField.$timeField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        var selectedDate = selectFirstTimeInPicker(dateField.popup._widget.$container);
+        expect(dateField.popup).toBe(null);
+        expectTime(dateField.value, selectedDate.getHours(), selectedDate.getMinutes(), selectedDate.getSeconds());
+        expect(dateField.displayText).toBe(dateField.isolatedTimeFormat.format(selectedDate));
+        expect(dateField.$timeField.text()).toBe(dateField.displayText);
+      });
+
+      it('updates displayText and value of datefield if date in picker is entered', function() {
+        var dateField = scout.create('DateField', {
+          parent: session.desktop,
+          touch: true,
+          hasDate: false,
+          hasTime: true
+        });
+        dateField.render();
+
+        dateField.$timeField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        dateField.popup._field.$timeField.val('05:13');
+        dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
+        expect(dateField.popup).toBe(null);
+        expectTime(dateField.value, 5, 13, 0);
+        expect(dateField.displayText).toBe('05:13');
+        expect(dateField.$timeField.text()).toBe(dateField.displayText);
+      });
+
+
+    });
+
   });
 
   describe('hasDate', function() {
