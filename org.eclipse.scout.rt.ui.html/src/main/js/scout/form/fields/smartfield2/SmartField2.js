@@ -779,12 +779,16 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
   if (!this.enabledComputed) {
     return;
   }
+
+  event.preventDefault();
+
   var clearable = this.clearable;
   this.$field.focus();
   if (clearable) {
     this.clear();
     return;
   }
+
   if (!this.embedded) {
     if (this.isDropdown()) {
       this.togglePopup();
@@ -792,7 +796,6 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
       this.openPopup(true);
     }
   }
-  event.preventDefault();
 };
 
 scout.SmartField2.prototype._clear = function() {
@@ -800,7 +803,7 @@ scout.SmartField2.prototype._clear = function() {
   this.$field.val('');
   if (this.isPopupOpen()) {
     // When cleared, browse by all again, need to do it in setTimeout because sending acceptInput and lookupAll at the same time does not seem to work
-    setTimeout(this.openPopup.bind(this, true));
+    setTimeout(this._lookupByTextOrAll.bind(this, true));
   }
   this._updateClearable();
 };
@@ -819,7 +822,6 @@ scout.SmartField2.prototype._onFieldBlur = function(event) {
   var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target);
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
   if (this.embedded && (eventOnField || eventOnPopup)) {
-    this.$field.focus();
     return;
   }
   scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
