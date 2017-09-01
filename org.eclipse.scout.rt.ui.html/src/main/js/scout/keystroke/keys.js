@@ -17,6 +17,11 @@ scout.keys = {
   ALT: 18,
   PAUSE: 19,
   ESC: 27,
+  /**
+   * The duplicate ESC / ESCAPE constant is required for Scout classic
+   * where keys defined in IKeyStroke are mapped to keys defined in keys.js
+   */
+  ESCAPE: 27,
   PAGE_UP: 33,
   PAGE_DOWN: 34,
   END: 35,
