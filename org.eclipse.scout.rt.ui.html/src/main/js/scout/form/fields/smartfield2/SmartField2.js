@@ -294,7 +294,10 @@ scout.SmartField2.prototype._acceptByText = function(searchText) {
 scout.SmartField2.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
   triggerEvent = scout.nvl(triggerEvent, true);
   acceptByLookupRow = scout.nvl(acceptByLookupRow, true);
-  this.closePopup();
+  // don't close when shown in touch popup (also called when clear() is executed)
+  if (!this.embedded) {
+    this.closePopup();
+  }
   this._userWasTyping = false;
   if (triggerEvent) {
     this._triggerAcceptInput(acceptByLookupRow);
