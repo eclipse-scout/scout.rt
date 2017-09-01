@@ -53,4 +53,5 @@ scout.TimePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
   if (!event.errorStatus) {
     this._touchField.setValue(event.value);
   }
+  this._touchField._triggerAcceptInput();
 };

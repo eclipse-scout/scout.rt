@@ -365,7 +365,7 @@ scout.DateField.prototype._renderTimeDisplayText = function() {
 };
 
 scout.DateField.prototype._readTimeDisplayText = function() {
-  return (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
+  return (this._$predictTimeField ? scout.fields.valOrText(this._$predictTimeField) : scout.fields.valOrText(this.$timeField));
 };
 
 /**
@@ -1232,7 +1232,8 @@ scout.DateField.prototype.openDatePopup = function(date) {
   this.popup = this.createDatePopup();
   this.popup.open();
   this.$dateField.addClass('focused');
-  this.popup.on('remove', function() {
+  this.popup.on('remove', function(event) {
+    this._onPopupRemove(event);
     this.popup = null;
     this.$dateField.removeClass('focused');
   }.bind(this));
@@ -1263,6 +1264,7 @@ scout.DateField.prototype.openTimePopup = function(date) {
   this.popup.open();
   this.$timeField.addClass('focused');
   this.popup.on('remove', function() {
+    this._onPopupRemove(event);
     this.popup = null;
     this.$timeField.removeClass('focused');
   }.bind(this));
@@ -1466,9 +1468,32 @@ scout.DateField.prototype._isTimeValid = function() {
  * Method invoked if being rendered within a cell-editor (mode='scout.FormField.Mode.CELLEDITOR'), and once the editor finished its rendering.
  */
 scout.DateField.prototype.onCellEditorRendered = function(options) {
-  if (options.openFieldPopup && this.hasDate) {
-    this.openDatePopupAndSelect(this.value);
+  if (options.openFieldPopup) {
+    if (this.hasDate && !this.hasTime) {
+      this.openDatePopupAndSelect(this.value);
+    } else if (!this.hasDate && this.hasTime) {
+      this.openTimePopupAndSelect(this.value);
+    } else if (!scout.device.supportsTouch()) {
+      // If date AND time are active, don't open popup on touch devices because the user has to choose first what he wants to edit
+      this.openDatePopupAndSelect(this.value);
+    }
   }
+  if (this.touch) {
+    this._cellEditorPopup = options.cellEditorPopup;
+  }
+};
+
+scout.DateField.prototype._onPopupRemove = function(event) {
+  if (!this.touch || !this._cellEditorPopup) {
+    return;
+  }
+  if (this.hasDate && this.hasTime) {
+    // If date and time is shown, user might want to change both, let him close the cell editor when he is finished
+    return;
+  }
+  // Close cell editor when touch popup closes
+  this._cellEditorPopup.completeEdit();
+  this._cellEditorPopup = null;
 };
 
 /**
