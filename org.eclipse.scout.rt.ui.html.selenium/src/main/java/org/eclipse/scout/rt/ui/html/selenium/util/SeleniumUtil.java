@@ -89,16 +89,19 @@ public final class SeleniumUtil {
    * the dot locator (=current element) instead of the <code>text()</code> function.
    */
   private static By byCssClassAndText(String cssClass, String findFunction, String text) {
-    return By.xpath("//*[contains(@class, '" + cssClass + "') and " + findFunction + "(normalize-space(.), '" + text + "')]");
+    return By.xpath("//*[" + cssClassQuery(cssClass) + " and " + findFunction + "(normalize-space(.), '" + text + "')]");
   }
 
   /**
-   * @param element
-   *          Type of HTML element (input, button, etc.)
+   * This query solves the problem that we don't want to find partial matches for a CSS class-name when we query 'class'
+   * attribute in the DOM.
+   *
+   * @param className
+   * @see https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath
    * @return
    */
-  public static By byElement(String element) {
-    return By.xpath(element);
+  private static String cssClassQuery(String cssClass) {
+    return "contains(concat(' ', normalize-space(@class), ' '), ' " + cssClass + " ')";
   }
 
   /**
