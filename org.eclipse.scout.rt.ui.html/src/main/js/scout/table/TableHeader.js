@@ -591,7 +591,8 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
 
   function dragMove(event) {
     diff = Math.floor(event.pageX) - startX;
-    if (diff === 0) {
+    if (-2 < diff && diff < 2) {
+      // Don't move if it was no movement or just a very small one
       return;
     }
 
