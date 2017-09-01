@@ -47,7 +47,7 @@ describe('SmartField2Multiline', function() {
     it('reset multiline-lines DIV on error', function() {
       field._acceptByTextDone({
         lookupRows: [],
-        searchText: 'Xxx\nBar'
+        searchText: 'Xxx'
       });
       expect(field.$field.val()).toBe('Xxx');
       expect(field._$multilineLines.text()).toBe('');
