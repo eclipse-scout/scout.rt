@@ -47,6 +47,12 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
     .appendDiv('glasspane')
     .on('mousedown', this._onMouseDown.bind(this));
 
+  // This is required in touch mode, because FastClick messes up the order
+  // of mouse/click events which is especially important for TouchPopups.
+  if (scout.device.supportsTouch()) {
+    $glassPane.addClass('needsclick');
+  }
+
   // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
   // is blocked, since the widget that blocks (e.g a message-box) may be opened in the main-window.
   if ($glassPane.window(true).popupWindow) {
