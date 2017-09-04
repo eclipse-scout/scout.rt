@@ -75,8 +75,9 @@ scout.TouchPopup.prototype._render = function() {
   this.$container = this.$parent.appendDiv('touch-popup');
 
   this._$header = this.$container.appendDiv('touch-popup-header');
-  this._$header.appendDiv('status closer touch-popup-close-icon')
-      .on('click', this.close.bind(this));
+  this._$header
+    .appendDiv('status closer touch-popup-close-icon')
+    .on('click', this._onCloseIconClick.bind(this));
   this._$header.appendDiv('touch-popup-title').textOrNbsp(this._touchField.label, 'empty');
 
   this._$widgetContainer = this.$container.appendDiv('touch-popup-widget-container');
@@ -104,5 +105,14 @@ scout.TouchPopup.prototype._onTouchFieldPropertyChange = function(event) {
     this._field.setErrorStatus(event.newValue);
   } else if (event.propertyName === 'lookupRow') {
     this._field.setLookupRow(event.newValue);
+  }
+};
+
+scout.TouchPopup.prototype._onCloseIconClick = function(event) {
+  var promise = this._field.acceptInput();
+  if (promise) {
+    promise.always(this.close.bind(this));
+  } else {
+    this.close();
   }
 };
