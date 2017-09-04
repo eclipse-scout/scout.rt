@@ -104,4 +104,162 @@ describe("menus", function() {
 
   });
 
+  describe("updateSeparatorVisibility", function() {
+    it("makes leading separators invisible", function() {
+      var menu1 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu2 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menus = [menu1, menu2];
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(false);
+      expect(menus[1].visible).toBe(true);
+    });
+
+    it("makes trailing separators invisible", function() {
+      var menu1 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menu2 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menus = [menu1, menu2];
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(true);
+      expect(menus[1].visible).toBe(false);
+    });
+
+    it("makes duplicate separators invisible", function() {
+      var menu0 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menu1 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu2 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu3 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menus = [menu0, menu1, menu2, menu3];
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(true);
+      expect(menus[1].visible).toBe(false);
+      expect(menus[2].visible).toBe(true);
+      expect(menus[3].visible).toBe(true);
+    });
+
+    it("makes all separators invisible if there are no other visible menus", function() {
+      var menu0 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu1 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menus = [menu0, menu1];
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(false);
+      expect(menus[1].visible).toBe(false);
+    });
+
+    it("reverts to old state if sibling menus get visible", function() {
+      var menu0 = scout.create('Menu', {
+        parent: session.desktop,
+        visible: false
+      });
+      var menu1 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu2 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menus = [menu0, menu1, menu2];
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(false);
+      expect(menus[1].visible).toBe(false);
+      expect(menus[2].visible).toBe(true);
+
+      menu0.setVisible(true);
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(true);
+      expect(menus[1].visible).toBe(true);
+      expect(menus[2].visible).toBe(true);
+    });
+
+    it("considers all rules", function() {
+      var menu0 = scout.create('Menu', {
+        parent: session.desktop,
+        visible: false
+      });
+      var menu1 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu2 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu3 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menu4 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu5 = scout.create('Menu', {
+        parent: session.desktop
+      });
+      var menu6 = scout.create('Menu', {
+        parent: session.desktop,
+        separator: true
+      });
+      var menu7 = scout.create('Menu', {
+        parent: session.desktop,
+        visible: false
+      });
+      var menus = [menu0, menu1, menu2, menu3, menu4, menu5, menu6, menu7];
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(false);
+      expect(menus[1].visible).toBe(false);
+      expect(menus[2].visible).toBe(false);
+      expect(menus[3].visible).toBe(true);
+      expect(menus[4].visible).toBe(true);
+      expect(menus[5].visible).toBe(true);
+      expect(menus[6].visible).toBe(false);
+      expect(menus[7].visible).toBe(false);
+
+      menu0.setVisible(true);
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(true);
+      expect(menus[1].visible).toBe(false);
+      expect(menus[2].visible).toBe(true);
+      expect(menus[3].visible).toBe(true);
+      expect(menus[4].visible).toBe(true);
+      expect(menus[5].visible).toBe(true);
+      expect(menus[6].visible).toBe(false);
+      expect(menus[7].visible).toBe(false);
+
+      menu7.setVisible(true);
+      scout.menus.updateSeparatorVisibility(menus);
+      expect(menus[0].visible).toBe(true);
+      expect(menus[1].visible).toBe(false);
+      expect(menus[2].visible).toBe(true);
+      expect(menus[3].visible).toBe(true);
+      expect(menus[4].visible).toBe(true);
+      expect(menus[5].visible).toBe(true);
+      expect(menus[6].visible).toBe(true);
+      expect(menus[7].visible).toBe(true);
+    });
+  });
+
 });

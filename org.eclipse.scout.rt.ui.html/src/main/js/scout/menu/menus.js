@@ -88,6 +88,43 @@ scout.menus = {
     return filteredMenus;
   },
 
+  /**
+   * Makes leading, trailing and duplicate separators invisible or reverts the visibility change if needed.
+   */
+  updateSeparatorVisibility: function(menus) {
+    menus = scout.arrays.ensure(menus);
+
+    menus = menus.filter(function(menu) {
+      return menu.visible || menu.separator;
+    });
+
+    if (menus.length === 0) {
+      return;
+    }
+
+    var hasMenuBefore = false;
+    var hasMenuAfter = false;
+    menus.forEach(function(menu, i) {
+      if (!menu.separator) {
+        hasMenuBefore = true;
+        return;
+      }
+      hasMenuAfter = menus[i + 1] && !menus[i + 1].separator;
+
+      // If the separator has a separator next to it, make it invisible
+      if (!hasMenuBefore || !hasMenuAfter) {
+        if (menu.visibleOrig === undefined) {
+          menu.visibleOrig = menu.visible;
+          menu.setVisible(false);
+        }
+      } else if (menu.visibleOrig !== undefined) {
+        // Revert to original state
+        menu.setVisible(menu.visibleOrig);
+        menu.visibleOrig = undefined;
+      }
+    });
+  },
+
   checkType: function(menu, types) {
     types = scout.arrays.ensure(types);
     if (menu.childActions.length > 0) {

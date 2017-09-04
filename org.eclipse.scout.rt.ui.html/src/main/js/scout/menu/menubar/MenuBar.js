@@ -275,6 +275,7 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
+  scout.menus.updateSeparatorVisibility(this.menuItems);
   this.setVisible(!this.hiddenByUi && this.menuItems.some(function(m) {
     return m.visible;
   }));
