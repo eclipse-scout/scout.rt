@@ -131,7 +131,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
     @Override
     protected int getConfiguredWidthInPixel() {
-      return 800;
+      return 880;
     }
 
     @Order(10)
@@ -488,12 +488,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
-              protected boolean getConfiguredVisible() {
-                // Initially invisible to prevent flickering
-                return false;
-              }
-
-              @Override
               protected void execAction() {
                 List<ITableRow> rows = getSelectedRows();
                 for (ITableRow row : rows) {
@@ -522,12 +516,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
-              protected boolean getConfiguredVisible() {
-                // Initially invisible to prevent flickering
-                return false;
-              }
-
-              @Override
               protected String getConfiguredKeyStroke() {
                 return IKeyStroke.DELETE;
               }
@@ -552,12 +540,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected Set<? extends IMenuType> getConfiguredMenuTypes() {
                 return CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection);
-              }
-
-              @Override
-              protected boolean getConfiguredVisible() {
-                // Initially invisible to prevent flickering
-                return false;
               }
 
               @Override
