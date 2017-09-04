@@ -32,7 +32,13 @@ scout.selenium = {
   },
 
   setSupportsTouch: function(touch) {
-    scout.device.features['_touch'] = true;
+    scout.device.features['_touch'] = touch;
+    /* Also load FastClick because without it, we would not test the real thing */
+    /* However: once FastClick is loaded, we cannot unload it. This means you   */
+    /* should not switch touch mode in the middle of a selenium test.           */
+    if (touch) {
+      scout.device._loadFastClickDeferred();
+    }
   },
 
   scrollToBottom: function($element) {
