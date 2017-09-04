@@ -36,7 +36,8 @@ scout.SmartField2 = function() {
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
   this.lookupStatus = null;
 
-  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels', 'browseLoadIncremental']);
+  this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
+    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental']);
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
