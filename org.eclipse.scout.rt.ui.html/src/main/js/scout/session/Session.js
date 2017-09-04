@@ -689,7 +689,6 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   // "fail" --> jqXHR, textStatus, errorThrown
   function onAjaxAlways(data, textStatus, errorThrown) {
     this.setRequestPending(false);
-    this.layoutValidator.validate();
 
     // "success" is false when either
     // a) an HTTP error occurred or
@@ -718,6 +717,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
         this._sendNow();
       }
     }
+    this.layoutValidator.validate();
 
     // Throw previously caught error
     if (jsError) {
