@@ -120,7 +120,7 @@ scout.menus = {
     }
   },
 
-  showContextMenuWithWait: function(session, func) {
+  onRequestsDone: function(session, func) {
     var argumentsArray = Array.prototype.slice.call(arguments);
     argumentsArray.shift(); // remove argument session
     argumentsArray.shift(); // remove argument func, remainder: all other arguments

@@ -492,7 +492,7 @@ scout.Table.prototype.onContextMenu = function(event) {
     }
   };
 
-  scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
+  scout.menus.onRequestsDone(this.session, func.bind(this), event);
 };
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {
@@ -1497,7 +1497,7 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
     this._triggerRowsSelected();
     this._triggerRowsSelectedPending = false;
   }
-  this._updateMenuBar();
+  scout.menus.onRequestsDone(this.session, this._updateMenuBar.bind(this));
 };
 
 scout.Table.prototype._triggerRowClick = function(row, mouseButton, column) {

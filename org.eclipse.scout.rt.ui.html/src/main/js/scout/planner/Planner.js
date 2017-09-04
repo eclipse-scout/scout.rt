@@ -303,7 +303,7 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
     popup.open();
   }.bind(this);
 
-  scout.menus.showContextMenuWithWait(this.session, func, event, allowedType);
+  scout.menus.onRequestsDone(this.session, func, event, allowedType);
 };
 
 scout.Planner.prototype._onGridScroll = function() {
@@ -1197,7 +1197,7 @@ scout.Planner.prototype._setAvailableDisplayModes = function(availableDisplayMod
 scout.Planner.prototype._setSelectionRange = function(selectionRange) {
   selectionRange = scout.DateRange.ensure(selectionRange);
   this._setProperty('selectionRange', selectionRange);
-  this._updateMenuBar();
+  scout.menus.onRequestsDone(this.session, this._updateMenuBar.bind(this));
 };
 
 scout.Planner.prototype._setSelectedResources = function(selectedResources) {
@@ -1208,7 +1208,7 @@ scout.Planner.prototype._setSelectedResources = function(selectedResources) {
     this._removeSelectedResources();
   }
   this._setProperty('selectedResources', selectedResources);
-  this._updateMenuBar();
+  scout.menus.onRequestsDone(this.session, this._updateMenuBar.bind(this));
 };
 
 scout.Planner.prototype._removeSelectedResources = function() {
@@ -1288,7 +1288,7 @@ scout.Planner.prototype._setSelectedActivity = function(selectedActivity) {
     this._removeSelectedActivity();
   }
   this._setProperty('selectedActivity', selectedActivity);
-  this._updateMenuBar();
+  scout.menus.onRequestsDone(this.session, this._updateMenuBar.bind(this));
 };
 
 scout.Planner.prototype._removeSelectedActivity = function() {
@@ -1373,12 +1373,10 @@ scout.Planner.prototype.selectRange = function(range) {
     return;
   }
   this.setProperty('selectionRange', range);
-  this._updateMenuBar();
 };
 
 scout.Planner.prototype.selectActivity = function(activity) {
   this.setProperty('selectedActivity', activity);
-  this._updateMenuBar();
 };
 
 scout.Planner.prototype.selectResources = function(resources) {
@@ -1393,7 +1391,6 @@ scout.Planner.prototype.selectResources = function(resources) {
   this.trigger('resourcesSelected', {
     resources: resources
   });
-  this._updateMenuBar();
 
   if (this.rendered) {
     // Render selection range as well for the case if selectedRange does not change but selected resources do
