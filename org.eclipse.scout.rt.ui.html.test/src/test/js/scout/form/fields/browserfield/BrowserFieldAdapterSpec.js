@@ -33,7 +33,8 @@ describe('BrowserFieldAdapter', function() {
     // postMessage is an async call -> hard to test -> simulate it (window.postMessage('hello world', '*');)
     browserField._onMessage({
       data: 'hello world',
-      origin: 'foo'});
+      origin: 'foo',
+      source: browserField.$field[0].contentWindow});
 
     sendQueuedAjaxCalls();
 
