@@ -31,7 +31,7 @@ scout.SmartField2PopupLayout.prototype.layout = function($container) {
   // skip layout while CSS animation is running (prefSize would not work while animation is running)
   if (this.animating) {
     this.popup.htmlComp.$comp.oneAnimationEnd(function() {
-      this.popup.invalidateLayout();
+      this.popup.revalidateLayout();
     }.bind(this));
     return;
   }
