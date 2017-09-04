@@ -256,6 +256,10 @@ scout.BrowserField.prototype._popupWindowOpen = function() {
 };
 
 scout.BrowserField.prototype._onMessage = function(event) {
+  if (event.source !== this.$field[0].contentWindow) {
+    $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
+    return;
+  }
   $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
   this.trigger('message', {
     data: event.data,
