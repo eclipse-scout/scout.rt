@@ -28,7 +28,8 @@ describe('BrowserField', function() {
     // window.postMessage('hello world', '*');
     browserField._onPostMessage({
       data: 'hello world',
-      origin: 'foo'});
+      origin: 'foo',
+      source: browserField.$field[0].contentWindow});
 
     sendQueuedAjaxCalls();
 
