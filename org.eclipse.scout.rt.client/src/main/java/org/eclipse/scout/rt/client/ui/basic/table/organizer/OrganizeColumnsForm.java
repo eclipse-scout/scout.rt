@@ -403,7 +403,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                   getTable().setTableChanging(true);
                   newRow = getTable().addRow(newRow);
                   getTable().selectRow(newRow);
-                  getMenuByClass(RenameMenu.class).doAction();
+                  getMenuByClass(RenameMenu.class).rename();
                 }
                 finally {
                   getTable().setTableChanging(false);
@@ -554,10 +554,13 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected void execAction() {
+                rename();
+              }
+
+              protected void rename() {
                 getSelectedRow().getCellForUpdate(getConfigNameColumn()).setEditable(true);
                 getTable().requestFocusInCell(getConfigNameColumn(), getSelectedRow());
               }
-
             }
           }
 
