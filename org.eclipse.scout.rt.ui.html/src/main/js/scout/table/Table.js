@@ -13,6 +13,8 @@ scout.Table = function() {
 
   this.autoResizeColumns = false;
   this.columnAddable = false;
+  this.columnLayoutDirty = false;
+  this.columns = [];
   this.checkable = false;
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
@@ -36,7 +38,6 @@ scout.Table = function() {
   this.tableStatusVisible = false;
   this.footerVisible = false;
   this.filters = [];
-  this.columns = [];
   this.rows = [];
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
@@ -170,6 +171,7 @@ scout.Table.prototype._initColumns = function() {
 
   // Sync head and tail sort columns
   this._setHeadAndTailSortColumns();
+  this.columnLayoutDirty = true;
 };
 
 scout.Table.prototype._destroy = function() {
@@ -3430,6 +3432,7 @@ scout.Table.prototype.setAutoResizeColumns = function(autoResizeColumns) {
 
 scout.Table.prototype._renderAutoResizeColumns = function() {
   if (this.autoResizeColumns) {
+    this.columnLayoutDirty = true;
     this.invalidateLayoutTree();
   }
 };
