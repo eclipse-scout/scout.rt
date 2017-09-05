@@ -85,8 +85,13 @@ scout.TableLayout.prototype.layout = function($container) {
 
 scout.TableLayout.prototype._layoutColumns = function() {
   this._autoOptimizeColumnsWidths();
-  if (this.table.autoResizeColumns) {
+
+  var htmlContainer = this.table.htmlComp;
+  var columnLayoutDirty = this.table.columnLayoutDirty || !htmlContainer.sizeCached || htmlContainer.sizeCached.width !== htmlContainer.size().width;
+  // Auto resize only if table width or column structure has changed
+  if (this.table.autoResizeColumns && columnLayoutDirty) {
     this._autoResizeColumns();
+    this.table.columnLayoutDirty = false;
   }
 };
 
