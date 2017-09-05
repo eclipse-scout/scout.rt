@@ -46,6 +46,13 @@ scout.selenium = {
       var scrollHeight = $element[0].scrollHeight;
       $element[0].scrollTop = scrollHeight;
     }
+  },
+
+  scrollToRight: function($element) {
+    if ($element && $element.length > 0) {
+      var scrollWidth = $element[0].scrollWidth;
+      $element[0].scrollLeft = scrollWidth;
+    }
   }
 
 };

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -73,6 +74,13 @@ public final class SeleniumJavaScript {
     String modelClassSelector = SeleniumUtil.getModelClassCssSelector(groupBoxClass);
     String jQuerySelector = "$('div[" + modelClassSelector + "] > .group-box-body')";
     executeScript(test, "scout.selenium.scrollToBottom(" + jQuerySelector + ")");
+  }
+
+  public static void scrollTableToRight(AbstractSeleniumTest test, Class<? extends AbstractTable> tableClass) {
+    test.waitUntilElementClickable(tableClass);
+    String modelClassSelector = SeleniumUtil.getModelClassCssSelector(tableClass);
+    String jQuerySelector = "$('div[" + modelClassSelector + "] > .table-data')";
+    executeScript(test, "scout.selenium.scrollToRight(" + jQuerySelector + ")");
   }
 
   /**
