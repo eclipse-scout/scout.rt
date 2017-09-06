@@ -19,7 +19,6 @@ function mostRecentJsonRequest() {
 
 function sandboxSession(options) {
   var $sandbox = $('#sandbox').addClass('scout');
-  addDefaultStyles();
 
   options = options || {};
   options.portletPartId = options.portletPartId || '0';
@@ -67,11 +66,6 @@ function sandboxDesktop() {
   var $sandbox = window.sandbox();
   $sandbox.addClass('scout desktop');
   return $sandbox;
-}
-
-function addDefaultStyles() {
-  var style = '.hidden {display: none !important;}';
-  $('<style>' + style + '</style>').appendTo('<head>');
 }
 
 function createSimpleModel(objectType, session, id) {
