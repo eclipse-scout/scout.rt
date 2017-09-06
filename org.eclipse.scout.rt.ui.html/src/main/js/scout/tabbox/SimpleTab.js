@@ -97,6 +97,9 @@ scout.SimpleTab.prototype._getOrCreate$Title = function() {
     return this.$title;
   }
   this.$title = this.$container.makeDiv('title');
+  scout.tooltips.installForEllipsis(this.$title, {
+    parent: this
+  });
   if (this.$subTitle) {
     this.$title.insertBefore(this.$subTitle);
   } else if (this.$iconContainer) {
@@ -114,6 +117,9 @@ scout.SimpleTab.prototype._getOrCreate$SubTitle = function() {
     return this.$subTitle;
   }
   this.$subTitle = this.$container.makeDiv('sub-title');
+  scout.tooltips.installForEllipsis(this.$subTitle, {
+    parent: this
+  });
   if (this.$title) {
     this.$subTitle.insertAfter(this.$title);
   } else if (this.$iconContainer) {
@@ -154,6 +160,7 @@ scout.SimpleTab.prototype._getOrCreate$StatusContainer = function() {
 
 scout.SimpleTab.prototype._remove$Title = function() {
   if (this.$title) {
+    scout.tooltips.uninstall(this.$title);
     this.$title.remove();
     this.$title = null;
   }
@@ -161,6 +168,7 @@ scout.SimpleTab.prototype._remove$Title = function() {
 
 scout.SimpleTab.prototype._remove$SubTitle = function() {
   if (this.$subTitle) {
+    scout.tooltips.uninstall(this.$subTitle);
     this.$subTitle.remove();
     this.$subTitle = null;
   }
