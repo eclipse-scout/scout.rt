@@ -670,13 +670,8 @@ scout.DateField.prototype._onDateFieldBlur = function(event) {
     // in embedded mode we must update the date prediction but not close the popup (don't accidentially close time picker poupp)
     this.closePopup();
   }
-  var exactlyOneFieldEmpty = this.hasTime && scout.strings.exactlyOneEmpty(this._readDateDisplayText(), this._readTimeDisplayText());
-  if (!this.hasTime || !exactlyOneFieldEmpty || event.relatedTarget !== this.$timeField[0]) {
-    // Only accept if the field which gets the focus is not the time field
-    // Or date AND time are filled or both empty
-    // Or there is no time field
-    this.acceptDate();
-  }
+  this.setDateFocused(false);
+  this.acceptDate();
   this._removePredictionFields();
 };
 
@@ -699,13 +694,9 @@ scout.DateField.prototype._onTimeFieldBlur = function(event) {
     // in embedded mode we must update the date prediction but not close the popup
     this.closePopup();
   }
-  var exactlyOneFieldEmpty = this.hasDate && scout.strings.exactlyOneEmpty(this._readDateDisplayText(), this._readTimeDisplayText());
-  if (!this.hasDate || !exactlyOneFieldEmpty || event.relatedTarget !== this.$dateField[0]) {
-    // Only accept if the field which gets the focus is not the date field
-    // Or date AND time are filled or both empty
-    // Or there is no date field
-    this.acceptTime();
-  }
+  this._tempTimeDate = null;
+  this.setTimeFocused(false);
+  this.acceptTime();
   this._removePredictionFields();
 };
 
@@ -726,7 +717,7 @@ scout.DateField.prototype._onDateFieldKeyDown = function(event) {
     displayText = scout.fields.valOrText(this.$dateField),
     prediction = this._$predictDateField && scout.fields.valOrText(this._$predictDateField),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
-    pickerStartDate = this._newDate(this.value),
+    pickerStartDate = this.value || this._referenceDate(),
     shiftDate = true;
 
   // Don't propagate tab to cell editor -> tab should focus time field
@@ -900,12 +891,32 @@ scout.DateField.prototype.acceptInput = function() {
   }
 };
 
+/**
+ * Clears the time field if date field is empty before accepting the input
+ */
 scout.DateField.prototype.acceptDate = function() {
+  if (this.hasTime && !this.errorStatus && scout.strings.empty(this.$dateField.val())) {
+    this.$timeField.val('');
+  }
   this.acceptInput();
 };
 
+/**
+ * Clears the date field if time field is empty before accepting the input
+ */
 scout.DateField.prototype.acceptTime = function() {
+  if (this.hasDate && !this.errorStatus && scout.strings.empty(this.$timeField.val())) {
+    this.$dateField.val('');
+  }
   this.acceptInput();
+};
+
+scout.DateField.prototype.acceptDateTime = function(acceptDate, acceptTime) {
+  if (acceptDate) {
+    this.acceptDate();
+  } else if (acceptTime) {
+    this.acceptTime();
+  }
 };
 
 /**
@@ -921,7 +932,7 @@ scout.DateField.prototype._onTimeFieldKeyDown = function(event) {
     displayText = this.$timeField.val(),
     prediction = this._$predictTimeField && this._$predictTimeField.val(),
     modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0),
-    pickerStartTime = this._newTime(this.value),
+    pickerStartTime = this.value || this._referenceDate(),
     shiftTime = true;
 
   // Don't propagate shift-tab to cell editor -> shift tab should focus date field
@@ -1068,7 +1079,7 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
 scout.DateField.prototype._onDatePickerDateSelect = function(event) {
   this._setDateValid(true);
   this._setTimeValid(true);
-  var newValue = this._newDate(event.date);
+  var newValue = this._newTimestampAsDate(event.date, this.value);
   this.setValue(newValue);
   this.closePopup();
   this._triggerAcceptInput();
@@ -1077,7 +1088,7 @@ scout.DateField.prototype._onDatePickerDateSelect = function(event) {
 scout.DateField.prototype._onTimePickerTimeSelect = function(event) {
   this._setDateValid(true);
   this._setTimeValid(true);
-  var newValue = this._newTime(event.time);
+  var newValue = this._newTimestampAsDate(this.value, event.time);
   this.setValue(newValue);
   this.closePopup();
   this._triggerAcceptInput();
@@ -1170,7 +1181,7 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
     dateFieldActive = scout.focusUtils.isActiveElement(this.$dateField);
     timeFieldActive = scout.focusUtils.isActiveElement(this.$timeField);
     // Accept only the currently focused part (the other one cannot have a pending change)
-    this.acceptInput(dateFieldActive, timeFieldActive);
+    this.acceptDateTime(dateFieldActive, timeFieldActive);
     return;
   }
 
@@ -1201,24 +1212,6 @@ scout.DateField.prototype._newTimestampAsDate = function(date, time) {
     }
   }
   return result;
-};
-
-scout.DateField.prototype._newDate = function(date) {
-  var time = this.value;
-  if (this.hasTime && !this._readTimeDisplayText()) {
-    // If time field is empty, use reference time rather than the previous valid value
-    time = this._referenceDate();
-  }
-  return this._newTimestampAsDate(date, time);
-};
-
-scout.DateField.prototype._newTime = function(time) {
-  var date = this.value;
-  if (this.hasDate && !this._readDateDisplayText()) {
-    // If date field is empty, use reference date rather than the previous valid value
-    date = this._referenceDate();
-  }
-  return this._newTimestampAsDate(date, time);
 };
 
 /**
@@ -1349,12 +1342,6 @@ scout.DateField.prototype._parseValue = function(displayText) {
   // Error status was already set by _predict functions, just throw it so that setValue is not called
   if (!success) {
     throw this.errorStatus;
-  }
-
-  // If one of the two fields is empty, return null so both fields are cleared
-  // This makes it easier for the user to clear the fields: Remove the text from one field and accept input -> removes the text from the second field as well
-  if (this.hasDate && this.hasTime && scout.strings.exactlyOneEmpty(dateText, timeText)) {
-    return null;
   }
 
   // parse success -> return new value
