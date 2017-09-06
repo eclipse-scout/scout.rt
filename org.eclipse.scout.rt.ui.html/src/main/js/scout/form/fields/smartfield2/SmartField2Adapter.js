@@ -30,7 +30,9 @@ scout.SmartField2Adapter.prototype._syncDisplayText = function(displayText) {
 };
 
 scout.SmartField2Adapter.prototype.lookupAll = function() {
-  this._send('lookupAll');
+  this._send('lookupAll', {
+    showBusyIndicator: false
+  });
 };
 
 scout.SmartField2Adapter.prototype.lookupByText = function(searchText) {
