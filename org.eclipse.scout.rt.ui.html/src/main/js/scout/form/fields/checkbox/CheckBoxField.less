@@ -29,6 +29,12 @@
     display: inline-block;
     max-width: calc(~'100%' - @check-box-size);
     #scout.overflow-ellipsis-nowrap();
+
+    &.empty {
+      /* Make the label invisible if there is no text to not artificially make the check box wider than it should be
+      The check box square defines the height. */
+      display: none;
+    }
   }
 
   &.has-inner-alignment {

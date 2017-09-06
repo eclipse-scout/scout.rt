@@ -277,7 +277,7 @@ scout.Button.prototype._renderSelected = function() {
  * @override
  */
 scout.Button.prototype._renderLabel = function() {
-  this.$buttonLabel.textOrNbsp(this.label);
+  this.$buttonLabel.textOrNbsp(this.label, 'empty');
   this._updateLabelAndIconStyle();
 
   // Invalidate layout because button may now be longer or shorter

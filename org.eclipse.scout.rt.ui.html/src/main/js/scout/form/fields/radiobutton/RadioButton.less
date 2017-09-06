@@ -34,6 +34,12 @@
     padding-top: 2px;
     padding-left: 7px;
     #scout.overflow-ellipsis-nowrap();
+
+    &.empty {
+      /* Make the label invisible if there is no text to not artificially make the button wider than it should be
+      Compared to the Button.js the circle defines the height */
+      display: none;
+    }
   }
 
   & > .icon {
