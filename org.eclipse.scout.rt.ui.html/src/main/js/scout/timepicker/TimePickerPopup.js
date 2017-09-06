@@ -47,5 +47,5 @@ scout.TimePickerPopup.prototype.getTimePicker = function() {
  * @override because the icon is not in the $anchor container.
  */
 scout.TimePickerPopup.prototype._isMouseDownOnAnchor = function(event) {
-  return this.field.$timeField.isOrHas(event.target) || this.field.$timeFieldIcon.isOrHas(event.target);
+  return this.field.$timeField.isOrHas(event.target) || this.field.$timeFieldIcon.isOrHas(event.target) || this.field.$timeClearIcon.isOrHas(event.target);
 };

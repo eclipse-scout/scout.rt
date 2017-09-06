@@ -10,27 +10,23 @@
  ******************************************************************************/
 .file-chooser-field {
 
+  & > .icon {
+     cursor: pointer;
+     &::before {
+      content: @icon-file;
+    }
+  }
+
   & > .file-input {
-    #scout.text-field-with-icon(@icon-file);
 
     & > input {
       display: none;
     }
 
-    & ~ .icon {
-      cursor: pointer;
+    & > .file-input-text {
+      overflow-x: hidden;
     }
-  }
 
-  &.clearable > .file-input {
-    ~ .icon {
-      cursor: pointer;
-      padding-top: 1px;
-
-      &::before {
-        content: @icon-remove;
-      }
-    }
   }
 
   & > .legacy-upload-form {

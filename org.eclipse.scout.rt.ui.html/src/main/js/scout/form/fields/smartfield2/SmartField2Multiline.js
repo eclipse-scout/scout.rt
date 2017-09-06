@@ -18,7 +18,7 @@ scout.inherits(scout.SmartField2Multiline, scout.SmartField2);
 scout.SmartField2Multiline.prototype._render = function() {
   var $input, htmlComp;
 
-  this.addContainer(this.$parent, 'smart-field', new scout.SmartField2Layout(this));
+  this.addContainer(this.$parent, 'smart-field has-icon', new scout.SmartField2Layout(this));
   this.addLabel();
   this.addFieldContainer(this.$parent.makeDiv('multiline'));
   htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
@@ -44,6 +44,8 @@ scout.SmartField2Multiline.prototype._render = function() {
     this.addMandatoryIndicator();
   }
   this.addIcon(this.$fieldContainer);
+  this.$icon.addClass('needsclick');
+  this.addClearIcon(this.$fieldContainer);
   this.addStatus();
 };
 

@@ -22,6 +22,8 @@ scout.ValueField = function() {
   this.parser = this._parseValue.bind(this);
   this.formatter = this._formatValue.bind(this);
   this._addCloneProperties(['value', 'displayText']);
+  this.focused = false;
+  this.clearable = false;
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
@@ -49,13 +51,14 @@ scout.ValueField.prototype._initValue = function(value) {
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText();
+  this._renderClearable();
 };
 
 /**
  * The default impl. is a NOP, because not every ValueField has a sensible display text.
  */
 scout.ValueField.prototype._renderDisplayText = function() {
-  // NOP
+  this._updateClearable();
 };
 
 /**
@@ -65,8 +68,20 @@ scout.ValueField.prototype._readDisplayText = function() {
   return '';
 };
 
+scout.ValueField.prototype._onClearIconMouseDown = function(event) {
+  if (this.clearable) {
+    this.clear();
+    event.preventDefault();
+  }
+};
+
+scout.ValueField.prototype._onFieldFocus = function(event) {
+  this.setFocused(true);
+};
+
 scout.ValueField.prototype._onFieldBlur = function() {
   this.acceptInput(false);
+  this.setFocused(false);
 };
 
 /**
@@ -108,7 +123,7 @@ scout.ValueField.prototype.parseAndSetValue = function(displayText) {
       var parsedValue = this.parseValue(displayText);
       this.setValue(parsedValue);
     }
-  } catch(error) {
+  } catch (error) {
     this._parsingFailed(displayText, error);
   }
 };
@@ -188,7 +203,15 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
 };
 
 scout.ValueField.prototype.isFocusOnField = function(target) {
-  return this.$field.isOrHas(target);
+  return this.$field.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
+};
+
+scout.ValueField.prototype.setFocused = function(focused) {
+  this.setProperty('focused', focused);
+};
+
+scout.ValueField.prototype._renderFocused = function() {
+  this._updateClearable();
 };
 
 scout.ValueField.prototype._triggerAcceptInput = function(whileTyping) {
@@ -203,16 +226,29 @@ scout.ValueField.prototype.setDisplayText = function(displayText) {
   this.setProperty('displayText', displayText);
 };
 
+scout.ValueField.prototype._updateClearable = function() {
+  this.setClearable(scout.strings.hasText(this._readDisplayText()) && this.focused);
+};
+
+scout.ValueField.prototype.setClearable = function(clearable) {
+  this.setProperty('clearable', clearable);
+};
+
+scout.ValueField.prototype._renderClearable = function() {
+  this.$container.toggleClass('clearable', this.clearable);
+  this.invalidateLayoutTree(false);
+};
 /**
  * Clears the display text and the value to null.
  */
-scout.ValueField.prototype.clear = function(){
+scout.ValueField.prototype.clear = function() {
   this._clear();
+  this._updateClearable();
   this.acceptInput();
   this._triggerClear();
 };
 
-scout.ValueField.prototype._clear = function(){
+scout.ValueField.prototype._clear = function() {
   // to be implemented by sublcasses
 };
 
@@ -247,7 +283,7 @@ scout.ValueField.prototype._setValue = function(value) {
   try {
     var typedValue = this._ensureValue(value);
     this.value = this.validateValue(typedValue);
-  } catch(error) {
+  } catch (error) {
     this._validationFailed(value, error);
     return;
   }
@@ -431,9 +467,26 @@ scout.ValueField.prototype._updateTouched = function() {
   this.touched = !scout.objects.equals(this.value, this.initialValue);
 };
 
+scout.ValueField.prototype.addClearIcon = function($parent) {
+  if (!$parent) {
+    $parent = this.$container;
+  }
+  this.$clearIcon = $parent.appendSpan('clear-icon needsclick unfocusable')
+    .on('mousedown', this._onClearIconMouseDown.bind(this));
+};
+
+scout.ValueField.prototype.addContainer = function($parent, cssClass, layout) {
+  scout.ValueField.parent.prototype.addContainer.call(this, $parent, cssClass, layout);
+  this.$container.addClass('value-field');
+};
+
 scout.ValueField.prototype.addField = function($field) {
   scout.ValueField.parent.prototype.addField.call(this, $field);
   this.$field.data('valuefield', this);
+};
+
+scout.ValueField.prototype._onFieldInput = function() {
+  this._updateClearable();
 };
 
 scout.ValueField.prototype._onStatusMouseDown = function(event) {

@@ -107,47 +107,24 @@
     color: @text-color;
   }
 
-  /* Expects a sibling html element with class 'icon' **/
-  .text-field-with-icon(@icon; @className: ~'') {
-    padding-right: @text-field-padding-x + 15px;
+  .field-with-icon(@className: ~'.icon') {
 
-    & ~ .icon@{className} {
-      position: absolute;
+    & ~ @{className} {
       padding-right: @text-field-padding-x;
-      cursor: text;
     }
 
-    & ~ .icon@{className}::before {
-      #scout.font-icon();
-      font-size: 13px;
-      content: @icon;
-      color: @text-field-icon-color;
-    }
 
-    &:focus ~ .icon@{className}::before,
-      &.focused ~ .icon@{className}::before {
+    &:focus ~ @{className}::before,
+    &.focused ~ @{className}::before {
       color: @text-field-icon-focus-color;
     }
 
-    &.has-error ~ .icon@{className}::before {
+    &.has-error ~ @{className}::before {
       color: @text-field-icon-error-color;
     }
 
-    &.disabled {
-      padding-right: @text-field-padding-x;
-    }
-
-    &.disabled ~ .icon@{className} {
+    &.disabled ~ @{className} {
       display: none;
-    }
-
-    /* When field is too small, hide the icon */
-    &.compact {
-      padding-right: @text-field-padding-x;
-
-      & ~ .icon {
-        display: none;
-      }
     }
   }
 

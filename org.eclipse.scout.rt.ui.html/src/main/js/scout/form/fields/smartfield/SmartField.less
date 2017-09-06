@@ -10,11 +10,8 @@
  ******************************************************************************/
 .proposal-field {
 
-  & > input,
-  & > .input-field,
-  & > .field > input,
-  & > .field > .input-field {
-    #scout.text-field-with-icon(@icon-pencil);
+  & > .icon::before {
+    content: @icon-pencil;
   }
 
   & > .input-field[placeholder]:empty::before {
@@ -28,12 +25,11 @@
 
 .smart-field {
 
-  & > input,
-  & > .input-field,
-  & > .field > input,
-  & > .field > .input-field {
-    #scout.text-field-with-icon(@icon-search);
+  & > .icon::before,
+  & > .field > .icon::before {
+    content: @icon-search;
   }
+
 
   & > .input-field[placeholder]:empty::before {
     #scout.fake-placeholder();

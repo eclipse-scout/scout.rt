@@ -24,6 +24,8 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     $timeField = this._dateField.$timeField,
     $dateFieldIcon = this._dateField.$dateFieldIcon,
     $timeFieldIcon = this._dateField.$timeFieldIcon,
+    $dateClearIcon = this._dateField.$dateClearIcon,
+    $timeClearIcon = this._dateField.$timeClearIcon,
     $predictDateField = this._dateField._$predictDateField,
     $predictTimeField = this._dateField._$predictTimeField,
     htmlDateField = ($dateField ? scout.HtmlComponent.get($dateField) : null),
@@ -63,7 +65,13 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     $dateFieldIcon.cssRight(timeFieldWidth + hgap)
       .cssHeight(dateFieldSize.height)
       .cssLineHeight(dateFieldSize.height);
+    $dateClearIcon.cssRight(timeFieldWidth + hgap)
+      .cssHeight(dateFieldSize.height)
+      .cssLineHeight(dateFieldSize.height);
     $timeFieldIcon.cssRight(0)
+      .cssHeight(timeFieldSize.height)
+      .cssLineHeight(timeFieldSize.height);
+    $timeClearIcon.cssRight(0)
       .cssHeight(timeFieldSize.height)
       .cssLineHeight(timeFieldSize.height);
 
@@ -91,6 +99,10 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
       .cssHeight(dateFieldSize.height)
       .cssLineHeight(dateFieldSize.height);
 
+    $dateClearIcon.cssRight(0)
+      .cssHeight(dateFieldSize.height)
+      .cssLineHeight(dateFieldSize.height);
+
     // Compact style
     $dateField.toggleClass('compact', dateFieldSize.width < this.MIN_DATE_FIELD_WIDTH);
 
@@ -107,6 +119,9 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
 
     // Icons
     $timeFieldIcon.cssRight(0)
+      .cssHeight(timeFieldSize.height)
+      .cssLineHeight(timeFieldSize.height);
+    $timeClearIcon.cssRight(0)
       .cssHeight(timeFieldSize.height)
       .cssLineHeight(timeFieldSize.height);
 

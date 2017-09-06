@@ -96,7 +96,7 @@ scout.SmartField2.prototype._initKeyStrokeContext = function() {
 };
 
 scout.SmartField2.prototype._render = function() {
-  this.addContainer(this.$parent, this.cssClassName(), new scout.SmartField2Layout(this));
+  this.addContainer(this.$parent, 'has-icon ' + this.cssClassName(), new scout.SmartField2Layout(this));
   this.addLabel();
 
   var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
@@ -118,6 +118,7 @@ scout.SmartField2.prototype._render = function() {
   }
   this.addIcon();
   this.$icon.addClass('needsclick');
+  this.addClearIcon();
   this.addStatus();
 };
 
@@ -135,16 +136,16 @@ scout.SmartField2.prototype.cssClassName = function() {
 };
 
 scout.SmartField2.prototype._readSearchText = function() {
- var fieldText = this._readDisplayText(),
-   displayText = scout.nvl(this.displayText, ''),
-   textLines = displayText.split('\n');
+  var fieldText = this._readDisplayText(),
+    displayText = scout.nvl(this.displayText, ''),
+    textLines = displayText.split('\n');
 
- if (textLines.length === 1 || scout.strings.empty(fieldText)) {
-   return fieldText;
- }
- textLines.shift(); // remove first line
- scout.arrays.insert(textLines, fieldText, 0);
- return scout.strings.join('\n', textLines);
+  if (textLines.length === 1 || scout.strings.empty(fieldText)) {
+    return fieldText;
+  }
+  textLines.shift(); // remove first line
+  scout.arrays.insert(textLines, fieldText, 0);
+  return scout.strings.join('\n', textLines);
 };
 
 scout.SmartField2.prototype._readDisplayText = function() {
@@ -153,7 +154,7 @@ scout.SmartField2.prototype._readDisplayText = function() {
 
 scout.SmartField2.prototype._renderDisplayText = function() {
   var displayText = scout.nvl(this.displayText, ''),
-   textLines = displayText.split('\n');
+    textLines = displayText.split('\n');
   if (textLines.length) {
     displayText = textLines[0];
   }
@@ -609,8 +610,8 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   // Oops! Something went wrong while the lookup has been processed.
   if (result.exception) {
     this.setErrorStatus(scout.Status.error({
-        message: result.exception
-      }));
+      message: result.exception
+    }));
     this.closePopup();
     return;
   }
@@ -619,7 +620,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   // smart-field are still loading: don't show the proposal popup. In the case of a cell-editor
   // it's also possible that the smart-field is not rendered anymore when the lookup is done
   if (!this.rendered ||
-      !this.isFocused() && !this.touch && !this.embedded) {
+    !this.isFocused() && !this.touch && !this.embedded) {
     this.closePopup();
     return;
   }
@@ -628,9 +629,9 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   // Only show the message as status in the proposal chooser popup
   if (emptyResult && result.browse) {
     this.setLookupStatus(scout.Status.warn({
-        message: this.session.text('SmartFieldNoDataFound'),
-        code: scout.SmartField2.ErrorCode.NO_DATA
-      }));
+      message: this.session.text('SmartFieldNoDataFound'),
+      code: scout.SmartField2.ErrorCode.NO_DATA
+    }));
 
     // When active filter is enabled we must always show the popup, because the user
     // must be able to switch the filter properties. Otherwise a user could set the filter
@@ -687,7 +688,9 @@ scout.SmartField2.prototype._handleEmptyResult = function() {
     // a filter can lead to an empty result (for instance when there are no
     // inactive proposals), and it's hard to switch to another filter value
     // when the popup does not show up at all.
-    var emptyResult = {lookupRows: []};
+    var emptyResult = {
+      lookupRows: []
+    };
     this._ensurePopup(emptyResult);
   } else if (this.embedded) {
     this.popup.clearLookupRows();
@@ -756,7 +759,7 @@ scout.SmartField2.prototype.closePopup = function() {
  * @override
  */
 scout.SmartField2.prototype.aboutToBlurByMouseDown = function(target) {
-  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target);
+  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || this.$clearIcon.isOrHas(target);
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
   if (!eventOnField && !eventOnPopup) {
     this.acceptInput(); // event outside this value field
@@ -820,7 +823,7 @@ scout.SmartField2.prototype.togglePopup = function() {
 
 scout.SmartField2.prototype._onFieldBlur = function(event) {
   var target = event.target || event.srcElement;
-  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target);
+  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || this.$clearIcon.isOrHas(target);
   var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
   if (this.embedded && (eventOnField || eventOnPopup)) {
     return;
@@ -902,7 +905,7 @@ scout.SmartField2.prototype._onFieldKeyDown = function(event) {
   // We must prevent default focus handling
   if (event.which === scout.keys.TAB) {
     if (this.mode === scout.FormField.Mode.DEFAULT) {
-      event.preventDefault();  // prevent browser default TAB behavior
+      event.preventDefault(); // prevent browser default TAB behavior
       event.stopPropagation(); // prevent FocusContext#._onKeyDown
       $.log.debug('(SmartField2#_onFieldKeyDown) set _tabPrevented');
       this._tabPrevented = {
@@ -1091,7 +1094,7 @@ scout.SmartField2.prototype.getValueForSelection = function() {
 
 scout.SmartField2.prototype._showSelection = function() {
   if (scout.objects.isNullOrUndefined(this.value) ||
-      scout.objects.isNullOrUndefined(this.lookupRow)) {
+    scout.objects.isNullOrUndefined(this.lookupRow)) {
     return false;
   }
 
@@ -1134,14 +1137,6 @@ scout.SmartField2.prototype._updateClearable = function() {
     clearable = clearable && this.focused;
   }
   this.setClearable(clearable);
-};
-
-scout.SmartField2.prototype.setClearable = function(clearable) {
-  this.setProperty('clearable', clearable);
-};
-
-scout.SmartField2.prototype._renderClearable = function() {
-  this.$container.toggleClass('clearable', this.clearable);
 };
 
 scout.SmartField2.prototype._triggerAcceptInputFail = function() {
@@ -1267,7 +1262,7 @@ scout.SmartField2.prototype._flushLookupStatus = function() {
   }
 
   if (this.lookupStatus.code === scout.SmartField2.ErrorCode.NO_RESULTS ||
-      this.lookupStatus.code === scout.SmartField2.ErrorCode.NOT_UNIQUE) {
+    this.lookupStatus.code === scout.SmartField2.ErrorCode.NOT_UNIQUE) {
     var errorStatus = this.lookupStatus.clone();
     errorStatus.severity = scout.Status.Severity.ERROR;
     this.setErrorStatus(errorStatus);

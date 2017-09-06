@@ -1,11 +1,19 @@
 .dropdown-field {
-  & > .field {
-    #scout.text-field-with-icon(@icon-caret-down);
+
+  & > .icon {
     cursor: pointer;
 
-    & ~ .icon::before {
-      cursor: pointer;
+    &::before {
+      content: @icon-caret-down;
     }
+  }
+
+  &.popup-open > .icon::before {
+    content: @icon-caret-up;
+  }
+
+  & > .field {
+    cursor: pointer;
 
     &:focus,
     &.focused {
@@ -14,33 +22,6 @@
 
     &.disabled {
       cursor: default;
-
-      & ~ .icon::before {
-        cursor: default;
-      }
-    }
-  }
-
-  &.popup-open > .field {
-    & ~ .icon::before {
-      content: @icon-caret-up;
-    }
-  }
-}
-
-.proposal-field.clearable,
-.smart-field.clearable {
-  & > input,
-  & > .input-field,
-  & > .field > input,
-  & > .field > .input-field {
-    ~ .icon {
-      cursor: pointer;
-      padding-top: 1px;
-
-      &::before {
-        content: @icon-remove;
-      }
     }
   }
 }
@@ -48,14 +29,19 @@
 .proposal-field.loading,
 .smart-field.loading {
 
+  & > .icon {
+    #scout.animation(rotation 1.25s linear infinite);
+
+    &::before {
+      content: @icon-spinner;
+    }
+  }
+
   & > input,
   & > .input-field,
   & > .field > input,
   & > .field > .input-field {
-    #scout.text-field-with-icon(@icon-spinner);
-
     & ~ .icon {
-      #scout.animation(rotation 1.25s linear infinite);
       margin-right: @text-field-padding-x;
       padding-right: 0;
     }

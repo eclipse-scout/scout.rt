@@ -29,19 +29,27 @@
     }
   }
 
-  &.has-action {
-    & > input[type=text] {
-      #scout.text-field-with-icon(@icon-arrow-right);
-      ~ .icon {
-        cursor: pointer;
+  &.has-icon {
+
+  & > .icon {
+      cursor: pointer;
+      &::before {
+        content: @icon-arrow-right;
       }
     }
+
+    /* adjust paddings in case of both icons (icon and clear-icon) are visible */
     &.clearable{
       & > input[type=text] {
         padding-right: @text-field-padding-x + 40px;
+
         &.halign-right {
           padding-left: @text-field-padding-x + 15px;
           padding-right: @text-field-padding-x + 15px;
+        }
+
+        & ~ .icon {
+          display: block;
         }
       }
     }
