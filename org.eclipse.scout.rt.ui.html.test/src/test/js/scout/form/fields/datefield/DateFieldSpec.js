@@ -301,6 +301,7 @@ describe('DateField', function() {
       dateField.acceptDate();
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('');
+      expect(dateField.value).toBe(null);
       expect(dateField.errorStatus instanceof scout.Status).toBe(false);
     });
 
@@ -353,6 +354,7 @@ describe('DateField', function() {
       dateField.acceptTime();
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('');
+      expect(dateField.value).toBe(null);
       expect(dateField.errorStatus instanceof scout.Status).toBe(false);
     });
 
@@ -513,59 +515,6 @@ describe('DateField', function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
-
-    it('does not clear the time if date is removed and time field is focused', function() {
-      var dateField = scout.create('DateField', {
-        parent: session.desktop,
-        value: '2014-10-01 05:00:00.000',
-        hasTime: true
-      });
-      dateField.render();
-      focusDate(dateField);
-      dateField.$dateField.val('');
-      expect(dateField.$dateField.val()).toBe('');
-      expect(dateField.$timeField.val()).toBe('05:00');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
-
-      focusTime(dateField);
-      expect(dateField.$dateField.val()).toBe('');
-      expect(dateField.$timeField.val()).toBe('05:00');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
-
-      // Accepting the input (e.g. by leaving the fields) will clear both fields
-      dateField.acceptInput();
-      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
-      expect(dateField.$dateField.val()).toBe('');
-      expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value).toBe(null);
-    });
-
-    it('does not clear the date if time is removed and date field is focused', function() {
-      var dateField = scout.create('DateField', {
-        parent: session.desktop,
-        value: '2014-10-01 05:00:00.000',
-        hasTime: true
-      });
-      dateField.render();
-      focusTime(dateField);
-      dateField.$timeField.val('');
-      expect(dateField.$dateField.val()).toBe('01.10.2014');
-      expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
-
-      focusDate(dateField);
-      expect(dateField.$dateField.val()).toBe('01.10.2014');
-      expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2014-10-01 05:00:00.000').toISOString());
-
-      // Accepting the input (e.g. by leaving the fields) will clear both fields
-      dateField.acceptInput();
-      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
-      expect(dateField.$dateField.val()).toBe('');
-      expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value).toBe(null);
-    });
-
 
   });
 

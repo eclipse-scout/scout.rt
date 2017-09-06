@@ -337,10 +337,5 @@ scout.strings = {
     var last = array.slice(limit - 1).join(separator); // combine the rest
     arrayShort.push(last);
     return arrayShort;
-  },
-
-  exactlyOneEmpty: function(value1, value2) {
-    return (this.empty(value1) || this.empty(value2)) && !(this.empty(value1) && this.empty(value2));
   }
-
 };
