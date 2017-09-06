@@ -1149,6 +1149,26 @@ scout.Session.prototype.listen = function() {
   return this._deferred;
 };
 
+/**
+ * Executes the given callback when pending requests are finished, or immediately if there are no requests pending.
+ * @param func callback function
+ * @param vararg arguments to pass to the callback function
+ */
+scout.Session.prototype.onRequestsDone = function(func) {
+  var argumentsArray = Array.prototype.slice.call(arguments);
+  argumentsArray.shift(); // remove argument func, remainder: all other arguments
+
+  if (this.areRequestsPending() || this.areEventsQueued()) {
+    this.listen().done(onEventsProcessed);
+  } else {
+    func.apply(this, argumentsArray);
+  }
+
+  function onEventsProcessed() {
+    func.apply(this, argumentsArray);
+  }
+};
+
 scout.Session.prototype.areEventsQueued = function() {
   return this.asyncEvents.length > 0;
 };

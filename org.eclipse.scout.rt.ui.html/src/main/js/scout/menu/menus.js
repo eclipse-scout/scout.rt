@@ -157,22 +157,6 @@ scout.menus = {
     }
   },
 
-  onRequestsDone: function(session, func) {
-    var argumentsArray = Array.prototype.slice.call(arguments);
-    argumentsArray.shift(); // remove argument session
-    argumentsArray.shift(); // remove argument func, remainder: all other arguments
-
-    if (session.areRequestsPending() || session.areEventsQueued()) {
-      session.listen().done(onEventsProcessed);
-    } else {
-      func.apply(this, argumentsArray);
-    }
-
-    function onEventsProcessed() {
-      func.apply(this, argumentsArray);
-    }
-  },
-
   createEllipsisMenu: function(options) {
     var defaults = {
       iconId: scout.icons.ELLIPSIS_V,

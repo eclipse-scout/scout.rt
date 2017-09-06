@@ -1866,7 +1866,7 @@ scout.Tree.prototype.selectNodes = function(nodes, debounceSend) {
     }
     this.filter(true);
   }
-  scout.menus.onRequestsDone(this.session, this._updateMenuBar.bind(this));
+  this.session.onRequestsDone(this._updateMenuBar.bind(this));
   if (this.rendered) {
     this._renderSelection();
     // restore scrollTop (removeSelection removes all the selection classes which makes a lot of elements invisible and therefore the scrollHeight smaller)
@@ -2306,7 +2306,7 @@ scout.Tree.prototype._showContextMenu = function(event) {
     this.contextMenu.open();
   };
 
-  scout.menus.onRequestsDone(this.session, func.bind(this), event);
+  this.session.onRequestsDone(func.bind(this), event);
 };
 
 scout.Tree.prototype._onNodeMouseDown = function(event) {

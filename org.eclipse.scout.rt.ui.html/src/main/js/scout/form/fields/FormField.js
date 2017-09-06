@@ -637,7 +637,7 @@ scout.FormField.prototype._onStatusMouseDown = function(event) {
       }
     }.bind(this);
 
-    scout.menus.onRequestsDone(this.session, func, event);
+    this.session.onRequestsDone(func, func, event);
   }
 };
 

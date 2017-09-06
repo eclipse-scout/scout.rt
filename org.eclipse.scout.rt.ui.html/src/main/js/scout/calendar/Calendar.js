@@ -821,7 +821,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
     popup.open();
   }.bind(this);
 
-  scout.menus.onRequestsDone(this.session, func, event, allowedType);
+  this.session.onRequestsDone(func, func, event, allowedType);
 };
 
 /* -- components, arrangement------------------------------------ */
