@@ -752,16 +752,16 @@ $.fn.isEnabled = function() {
 };
 
 $.fn.setVisible = function(visible) {
-  var i, elem;
-  for (i = 0; i < this.length; i++) {
-    elem = this[i];
-    if (elemVisible(elem) !== visible) {
-      if (visible) {
-        this.show();
-      } else {
-        this.hide();
-      }
-    }
+  var isVisible = !this.hasClass('hidden');
+  if (isVisible === visible) {
+    return;
+  }
+  if (!visible) {
+    this.addClass('hidden');
+    this.trigger('hide');
+  } else {
+    this.removeClass('hidden');
+    this.trigger('show');
   }
   return this;
 };
@@ -1383,8 +1383,6 @@ $.fn.outerHeight = function() {
 function _ceilNumber(val) {
   return scout.objects.isNumber(val) ? Math.ceil(val) : val;
 }
-
-// TODO [7.0] cgu: provide alternative methods for show and hide which just change the css class (this.addClass('hidden');). Should be a lot faster because it is not necessary to remember any state.
 
 /**
  * Sets the given 'text' as text to the jQuery element, using the text() function (i.e. HTML is encoded automatically).

@@ -119,7 +119,7 @@ scout.ViewMenuTab.prototype._renderInBackground = function() {
 };
 
 scout.ViewMenuTab.prototype._updateArrowIconVisibility = function() {
-  this.$arrowIcon.toggleClass('hidden', !this.selected || this.inBackground);
+  this.$arrowIcon.setVisible(this.selected && !this.inBackground);
 };
 
 scout.ViewMenuTab.prototype._findSelectedViewButton = function() {

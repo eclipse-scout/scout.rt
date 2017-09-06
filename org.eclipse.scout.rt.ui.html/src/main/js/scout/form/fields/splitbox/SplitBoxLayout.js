@@ -124,7 +124,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
 
     // Show collapse handle, if split box has two fields which are visible (one field may be collapsed)
     var collapseHandleVisible = this.splitBox.firstField && this.splitBox.firstField.visible && this.splitBox.secondField && this.splitBox.secondField.visible;
-    $collapseHandle.toggleClass('hidden', !collapseHandleVisible);
+    $collapseHandle.setVisible(collapseHandleVisible);
 
     var x = null;
     if (hasTwoFields) {

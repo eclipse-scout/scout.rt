@@ -377,7 +377,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   }.bind(this));
 
   // Hide menu box with no menu items because on iOS the width of an empty menu box is 1px which breaks the menubar layout (rightWidth === 0 check)
-  $menuBox.toggleClass('hidden', menuItems.length === 0);
+  $menuBox.setVisible(menuItems.length > 0);
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {

@@ -172,7 +172,7 @@ scout.Tooltip.prototype._renderText = function() {
     // use nl2br to allow tooltips with line breaks
     this.$content.html(scout.strings.nl2br(text));
   }
-  this.$content.toggleClass('hidden', !text);
+  this.$content.setVisible(!!text);
   this.$container.toggleClass('no-text', !text);
   if (!this.rendering) {
     this.position();
