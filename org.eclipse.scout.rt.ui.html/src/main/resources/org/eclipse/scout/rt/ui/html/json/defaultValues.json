@@ -133,13 +133,9 @@
     "SequenceBox": {
       "fields": []
     },
-    "SmartField": {
-      "proposal": false,
-      "browseMaxRowCount": 100
-    },
     "SmartFieldMultiline": {
     },
-    "SmartField2": {
+    "SmartField": {
       "activeFilterEnabled": false,
       "activeFilterLabels": [],
       "browseAutoExpandAll": true,
@@ -148,7 +144,7 @@
       "browseMaxRowCount": 100,
       "displayStyle": "default"
     },
-    "ProposalField2": {
+    "ProposalField": {
       "maxLength": 4000,
       "trimText": true
     },
@@ -403,11 +399,8 @@
         "HtmlField": null,
         "LabelField": null,
         "SmartField": {
+          "ProposalField": null,
           "SmartFieldMultiline": null
-        },
-        "SmartField2": {
-          "ProposalField2": null,
-          "SmartField2Multiline": null
         },
         "SliderField": null,
         "RadioButtonGroup": null
