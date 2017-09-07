@@ -148,7 +148,7 @@ public class DefaultSearchFilterServiceTest {
     runBasicAsserts(radioButtonGroup);
     radioButtonGroup.setValue(1L);
     m_searchFilterService.applySearchDelegate(radioButtonGroup, m_searchFilter, false);
-    Assert.assertEquals(LABEL + "=" + radioButtonGroup.getRadioButton1().getLabel(), m_searchFilter.getDisplayTextsPlain());
+    Assert.assertEquals(LABEL + " = " + radioButtonGroup.getRadioButton1().getLabel(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
