@@ -29,7 +29,7 @@ public final class SeleniumUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(SeleniumUtil.class);
 
-  private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/?cache=true&inspector=true"; // /&logging=1
+  private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/"; // /?logging=1
 
   /**
    * DOM attribute as used by Scout widgets to identify the Scout Java model class.
@@ -282,8 +282,7 @@ public final class SeleniumUtil {
   }
 
   public static String getLogoutUrl() {
-    // remove trailing query string, and append logout URL
-    return getWebAppUrl().replaceAll("\\?.*$", "logout");
+    return getWebAppUrl() + "logout";
   }
 
   /**
