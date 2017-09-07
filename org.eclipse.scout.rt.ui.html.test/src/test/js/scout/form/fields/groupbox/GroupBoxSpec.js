@@ -239,4 +239,58 @@ describe("GroupBox", function() {
     });
   });
 
+  describe('scrollable', function() {
+    it('null by default', function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop
+      });
+      expect(groupBox.scrollable).toBe(null);
+    });
+
+    it('is set to true if it is a mainbox', function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        mainBox: true
+      });
+      expect(groupBox.scrollable).toBe(true);
+
+      groupBox = scout.create('GroupBox', {
+        parent: session.desktop
+      });
+      expect(groupBox.scrollable).toBe(null);
+
+      groupBox.setMainBox(true);
+      expect(groupBox.scrollable).toBe(true);
+    });
+
+    it('is not set to true if it is a mainbox but explicitly set to false', function() {
+      var groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        mainBox: true,
+        scrollable: false
+      });
+      expect(groupBox.scrollable).toBe(false);
+
+      groupBox = scout.create('GroupBox', {
+        parent: session.desktop,
+        mainBox: true
+      });
+      expect(groupBox.scrollable).toBe(true);
+
+      groupBox.setScrollable(false);
+      expect(groupBox.scrollable).toBe(false);
+
+      groupBox = scout.create('GroupBox', {
+        parent: session.desktop
+      });
+      expect(groupBox.scrollable).toBe(null);
+
+      groupBox.setScrollable(false);
+      expect(groupBox.scrollable).toBe(false);
+
+      groupBox.setMainBox(true);
+      expect(groupBox.scrollable).toBe(false);
+    });
+  });
+
 });
