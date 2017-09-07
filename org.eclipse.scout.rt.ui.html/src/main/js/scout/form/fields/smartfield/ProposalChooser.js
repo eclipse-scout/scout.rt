@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,34 +10,62 @@
  ******************************************************************************/
 scout.ProposalChooser = function() {
   scout.ProposalChooser.parent.call(this);
-  this._addWidgetProperties(['model']);
-  this.$container;
-  this.$status;
-  this.$activeFilter;
-  this.htmlComp;
 
-  this._updateStatusTimeout;
+  this.$container = null;
+  this.$status = null;
+  this.activeFilterGroup = null;
+  this.htmlComp = null;
+  this._updateStatusTimeout = null;
+  this.status = null;
+  this.statusVisible = true;
+  this.touch = false;
 };
 scout.inherits(scout.ProposalChooser, scout.Widget);
 
-/**
- * @see IContentAssistField#getActiveFilterLabels() - should have the same order.
- */
-scout.ProposalChooser.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
+scout.ProposalChooser.prototype._init = function(model) {
+  scout.ProposalChooser.parent.prototype._init.call(this, model);
 
-scout.ProposalChooser.prototype._init = function(options) {
-  scout.ProposalChooser.parent.prototype._init.call(this, options);
-  // disable focus on field container
-  if (this.model instanceof scout.Tree) {
-    this.model.requestFocusOnNodeControlMouseDown = false;
+  // If smartField is not explicitly provided by model, use smartField instance
+  // from parent (which is usually the SmartFieldPopup)
+  if (!model.smartField) {
+    this.smartField = this.parent.smartField;
   }
+
+  this.model = this._createModel();
+};
+
+scout.ProposalChooser.prototype._createModel = function($parent) {
+  throw new Error('_createModel() not implemented');
+};
+
+scout.ProposalChooser.prototype.setLookupResult = function(result) {
+  throw new Error('setLookupResult() not implemented');
+};
+
+scout.ProposalChooser.prototype.selectFirstLookupRow = function() {
+  throw new Error('selectFirstLookupRow() not implemented');
+};
+
+scout.ProposalChooser.prototype.clearSelection = function() {
+  throw new Error('clearSelection() not implemented');
+};
+
+scout.ProposalChooser.prototype.clearLookupRows = function() {
+  throw new Error('clearLookupRows() not implemented');
+};
+
+scout.ProposalChooser.prototype.triggerLookupRowSelected = function() {
+  throw new Error('triggerLookupRowSelected() not implemented');
 };
 
 scout.ProposalChooser.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('proposal-chooser');
+  this.$container = this.$parent
+    .appendDiv('proposal-chooser')
+    .toggleClass('touch', this.touch);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
-  this.model.render();
+
+  this._renderModel();
 
   // status
   this.$status = this.$container
@@ -45,7 +73,7 @@ scout.ProposalChooser.prototype._render = function() {
     .setVisible(false);
 
   // active filter
-  if (this.activeFilter) {
+  if (this.smartField.activeFilterEnabled) {
     this.activeFilterGroup = scout.create('RadioButtonGroup', {
       parent: this,
       labelVisible: false,
@@ -53,8 +81,8 @@ scout.ProposalChooser.prototype._render = function() {
     });
 
     // add radio buttons
-    scout.ProposalChooser.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
-      this._renderButton(value, index);
+    scout.SmartField.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
+      this._renderActiveFilterButton(value, index);
     }, this);
 
     this.activeFilterGroup.render();
@@ -63,10 +91,13 @@ scout.ProposalChooser.prototype._render = function() {
   }
 };
 
+scout.ProposalChooser.prototype._renderModel = function() {
+  this.model.render();
+};
+
 scout.ProposalChooser.prototype._renderProperties = function() {
   scout.ProposalChooser.parent.prototype._renderProperties.call(this);
   this._updateStatus();
-  this.htmlComp.revalidateLayout();
 };
 
 /**
@@ -75,6 +106,10 @@ scout.ProposalChooser.prototype._renderProperties = function() {
  */
 scout.ProposalChooser.prototype.delegateEvent = function(event) {
   event.originalEvent.smartFieldEvent = true;
+  this.model.$container.trigger(event);
+};
+
+scout.ProposalChooser.prototype.delegateKeyEvent = function(event) {
   this.model.$container.trigger(event);
 };
 
@@ -110,6 +145,10 @@ scout.ProposalChooser.prototype._updateStatus = function() {
 };
 
 scout.ProposalChooser.prototype._updateStatusImpl = function() {
+  if (!this.rendered && !this.rendering) {
+    return;
+  }
+
   var
     oldVisible = this.$status.isVisible(),
     oldMessage = this.$status.text(),
@@ -137,12 +176,12 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
   scout.Status.animateStatusMessage(this.$status, message);
 };
 
-scout.ProposalChooser.prototype._renderButton = function(value, index) {
+scout.ProposalChooser.prototype._renderActiveFilterButton = function(value, index) {
   var radio = scout.create('RadioButton', {
       parent: this.activeFilterGroup,
-      label: this.activeFilterLabels[index],
-      radioValue: scout.ProposalChooser.ACTIVE_FILTER_VALUES[index],
-      selected: this.activeFilter === value,
+      label: this._activeFilterLabel(index),
+      radioValue: scout.SmartField.ACTIVE_FILTER_VALUES[index],
+      selected: this.smartField.activeFilter === value,
       focusWhenSelected: false,
       gridData: {
         x: index,
@@ -153,17 +192,13 @@ scout.ProposalChooser.prototype._renderButton = function(value, index) {
 
   radio.on('propertyChange', function(event) {
     if (event.propertyName === 'selected' && event.newValue === true) {
-      this._onActiveFilterChanged(event.source.radioValue);
+      this.trigger('activeFilterSelected', {
+        activeFilter: event.source.radioValue
+      });
     }
   }.bind(this));
 
   this.activeFilterGroup.addButton(radio);
-};
-
-scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {
-  this.trigger('activeFilterChanged', {
-    state: radioValue
-  });
 };
 
 scout.ProposalChooser.prototype.setVirtual = function(virtual) {
@@ -172,7 +207,37 @@ scout.ProposalChooser.prototype.setVirtual = function(virtual) {
   }
 };
 
+scout.ProposalChooser.prototype.setStatus = function(status) {
+  this.setProperty('status', status);
+};
+
 scout.ProposalChooser.prototype.setBusy = function(busy) {
   this.model.setProperty('loading', busy);
   this.model.setProperty('enabled', !busy);
+};
+
+scout.ProposalChooser.prototype._activeFilterLabel = function(index) {
+  return this.smartField.activeFilterLabels[index];
+};
+
+/**
+ * Override this function to implement update scrollbar behavior.
+ */
+scout.ProposalChooser.prototype.updateScrollbars = function() {
+  this.model.updateScrollbars();
+};
+
+scout.ProposalChooser.prototype._isProposal = function() {
+  return this.smartField instanceof scout.ProposalField;
+};
+
+scout.ProposalChooser.prototype._selectProposal = function(result, proposals) {
+  if (this._isProposal()) {
+    return; // no pre-selection when field is a proposal field
+  }
+  if (result.browse) {
+    this.trySelectCurrentValue();
+  } else if (proposals.length === 1) {
+    this.selectFirstLookupRow();
+  }
 };

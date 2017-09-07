@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
- * Tests for {@link AbstractMixedSmartColumn}
+ * Tests for {@link AbstractSmartColumn}
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
@@ -50,16 +50,15 @@ public class AbstractMixedSmartColumnTest {
 
   @Test
   public void testPrepareEditInternal() {
-    AbstractMixedSmartColumn<Long, Long> column = new AbstractMixedSmartColumn<Long, Long>() {
+    AbstractSmartColumn<Long> column = new AbstractSmartColumn<Long>() {
     };
     column.setCodeTypeClass(TestCodeType.class);
     column.setMandatory(true);
     ITableRow row = mock(ITableRow.class);
     @SuppressWarnings("unchecked")
-    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) column.prepareEditInternal(row);
+    ISmartField<Long> field = (ISmartField<Long>) column.prepareEditInternal(row);
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
     assertEquals("code type class property to be progagated to field", column.getCodeTypeClass(), field.getCodeTypeClass());
-    assertEquals("browse new text to be progagated to field", column.getConfiguredBrowseNewText(), field.getBrowseNewText());
   }
 
   /**
@@ -71,7 +70,7 @@ public class AbstractMixedSmartColumnTest {
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
     @SuppressWarnings("unchecked")
-    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) table.getEditableSmartColumn().prepareEdit(testRow);
+    ISmartField<Long> field = (ISmartField<Long>) table.getEditableSmartColumn().prepareEdit(testRow);
     field.parseAndSetValue(TestCodeType.TestCode.TEXT);
     table.getEditableSmartColumn().completeEdit(testRow, field);
     assertNull(field.getErrorStatus());
@@ -87,7 +86,7 @@ public class AbstractMixedSmartColumnTest {
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
     @SuppressWarnings("unchecked")
-    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) table.getEditableSmartColumn().prepareEdit(testRow);
+    ISmartField<Long> field = (ISmartField<Long>) table.getEditableSmartColumn().prepareEdit(testRow);
     field.parseAndSetValue("-1L");
     table.getEditableSmartColumn().completeEdit(testRow, field);
     assertNotNull(field.getErrorStatus());
@@ -103,7 +102,7 @@ public class AbstractMixedSmartColumnTest {
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
     @SuppressWarnings("unchecked")
-    IMixedSmartField<Long, Long> field = (IMixedSmartField<Long, Long>) table.getEditableSmartColumn().prepareEdit(testRow);
+    ISmartField<Long> field = (ISmartField<Long>) table.getEditableSmartColumn().prepareEdit(testRow);
     field.parseAndSetValue("-1L");
     table.getEditableSmartColumn().completeEdit(testRow, field);
     field.parseAndSetValue(TestCodeType.TestCode.TEXT);
@@ -113,15 +112,15 @@ public class AbstractMixedSmartColumnTest {
   }
 
   /**
-   * Tests that {@link AbstractMixedSmartColumn#execPrepareLookup(ILookupCall, ITableRow)} is called when
-   * {@link IMixedSmartField#prepareKeyLookup(ILookupCall, Object)} is called on the editor field.
+   * Tests that {@link AbstractSmartColumn#execPrepareLookup(ILookupCall, ITableRow)} is called when
+   * {@link ISmartField#prepareKeyLookup(ILookupCall, Object)} is called on the editor field.
    */
   @SuppressWarnings("unchecked")
   @Test
   public void testPrepareLookupCallback() {
     TestMixedSmartColumn column = new TestMixedSmartColumn();
     ITableRow row = Mockito.mock(ITableRow.class);
-    IMixedSmartField<String, Long> field = (IMixedSmartField<String, Long>) column.prepareEditInternal(row);
+    ISmartField<Long> field = (ISmartField<Long>) column.prepareEditInternal(row);
     ILookupCall call = mock(ILookupCall.class);
     field.prepareKeyLookup(call, 10L);
     assertEquals(row, column.lastRow);
@@ -129,15 +128,15 @@ public class AbstractMixedSmartColumnTest {
   }
 
   /**
-   * Tests that {@link AbstractMixedSmartColumn#execPrepareLookup(ILookupCall, ITableRow)} is called when
-   * {@link IMixedSmartField#prepareKeyLookup(ILookupCall, Object)} is called on the editor field.
+   * Tests that {@link AbstractSmartColumn#execPrepareLookup(ILookupCall, ITableRow)} is called when
+   * {@link ISmartField#prepareKeyLookup(ILookupCall, Object)} is called on the editor field.
    */
   @SuppressWarnings("unchecked")
   @Test
   public void tesConvertValueToKeyCallback() {
     TestMixedSmartColumn column = new TestMixedSmartColumn();
     ITableRow row = Mockito.mock(ITableRow.class);
-    AbstractMixedSmartField<String, Long> field = (AbstractMixedSmartField<String, Long>) column.prepareEditInternal(row);
+    AbstractSmartField<Long> field = (AbstractSmartField<Long>) column.prepareEditInternal(row);
     field.setValue("test");
     Long lookupKey = field.getValueAsLookupKey();
     assertEquals(Long.valueOf(0L), lookupKey);
@@ -161,7 +160,7 @@ public class AbstractMixedSmartColumnTest {
   private void assertCompleteEditWithErrors(boolean useUiFacade, Class<? extends ScoutFieldStatus> statusClass) throws Exception {
     P_Table table = new P_Table();
     table.addRowsByArray(new Long[]{3L});
-    IMixedSmartField<?, ?> field = (IMixedSmartField<?, ?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
+    ISmartField<?> field = (ISmartField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
     waitUntilLookupRowsLoaded();
     if (useUiFacade) {
       field.getUIFacade().acceptProposalFromUI("invalid Text", false, false);
@@ -176,7 +175,7 @@ public class AbstractMixedSmartColumnTest {
     assertTrue(c.getErrorStatus().containsStatus(statusClass));
   }
 
-  class TestMixedSmartColumn extends AbstractMixedSmartColumn<String, Long> {
+  class TestMixedSmartColumn extends AbstractSmartColumn<Long> {
     ILookupCall<Long> lastCall;
     ITableRow lastRow;
     String lastValue;
@@ -200,7 +199,7 @@ public class AbstractMixedSmartColumnTest {
       return getColumnSet().getColumnByClass(EditableSmartColumn.class);
     }
 
-    public static class EditableSmartColumn extends AbstractMixedSmartColumn<String, Long> {
+    public static class EditableSmartColumn extends AbstractSmartColumn<Long> {
 
       @Override
       protected boolean getConfiguredEditable() {

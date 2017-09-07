@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.MasterSlaveRelationWithTemplatesFieldTest.MyForm.MainBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -153,7 +153,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
     }
 
     @Order(10)
-    public class MasterField extends AbstractSmartField2<Long> {
+    public class MasterField extends AbstractSmartField<Long> {
       @Override
       protected String getConfiguredLabel() {
         return "Master";

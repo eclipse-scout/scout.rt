@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
 
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.SmartColumnChains.SmartColumn2PrepareLookupChain;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-public interface ISmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends IMixedSmartColumnExtension<VALUE, VALUE, OWNER> {
+public interface ISmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends IColumnExtension<VALUE, OWNER> {
+
+  void execPrepareLookup(SmartColumn2PrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row);
+
 }

@@ -69,10 +69,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.IProposalField2;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.ISmartField2;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -126,10 +124,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerFie
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
-import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonProposalChooser;
-import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonProposalField2;
+import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonProposalField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField2;
 import org.eclipse.scout.rt.ui.html.json.form.fields.splitbox.JsonSplitBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
@@ -222,17 +218,11 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof INumberField<?>) {
       return new JsonNumberField<INumberField>((INumberField<?>) model, session, id, parent);
     }
-    if (model instanceof IProposalField2<?>) {
-      return new JsonProposalField2((IProposalField2<?>) model, session, id, parent);
+    if (model instanceof IProposalField<?>) {
+      return new JsonProposalField((IProposalField<?>) model, session, id, parent);
     }
-    if (model instanceof ISmartField2<?>) {
-      return new JsonSmartField2((ISmartField2<?>) model, session, id, parent);
-    }
-    if (model instanceof IContentAssistField<?, ?>) {
-      return new JsonSmartField((IContentAssistField<?, ?>) model, session, id, parent);
-    }
-    if (model instanceof IProposalChooser) {
-      return new JsonProposalChooser<IProposalChooser>((IProposalChooser) model, session, id, parent);
+    if (model instanceof ISmartField<?>) {
+      return new JsonSmartField((ISmartField<?>) model, session, id, parent);
     }
     if (model instanceof IDateField) {
       return new JsonDateField<IDateField>((IDateField) model, session, id, parent);

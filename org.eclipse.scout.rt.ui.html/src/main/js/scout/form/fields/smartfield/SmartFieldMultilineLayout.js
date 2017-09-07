@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * This layout only layout the INPUT and DIV part of the multi-line smart-field, not the entire form-field.
+ * This layout only layouts the INPUT and DIV part of the multi-line smart-field, not the entire form-field.
  */
 scout.SmartFieldMultilineLayout = function() {
   scout.SmartFieldMultilineLayout.parent.call(this);
@@ -18,11 +18,11 @@ scout.inherits(scout.SmartFieldMultilineLayout, scout.AbstractLayout);
 
 scout.SmartFieldMultilineLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    $inputField = $container.children('.multiline'),
-    $multilines = $container.children('.multiline-field'),
+    $input = $container.children('.multiline-input'),
+    $lines = $container.children('.multiline-lines'),
     innerSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets());
+      .subtract(htmlContainer.insets());
 
-  $inputField.cssHeight(scout.HtmlEnvironment.formRowHeight);
-  $multilines.cssHeight(innerSize.height - scout.HtmlEnvironment.formRowHeight);
+  $input.cssHeight(scout.HtmlEnvironment.formRowHeight);
+  $lines.cssHeight(innerSize.height - scout.HtmlEnvironment.formRowHeight);
 };

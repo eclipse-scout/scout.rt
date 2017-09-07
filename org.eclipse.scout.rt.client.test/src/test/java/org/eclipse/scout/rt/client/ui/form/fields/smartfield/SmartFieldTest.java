@@ -360,11 +360,11 @@ public class SmartFieldTest {
     Long initialValue = 10L;
     StyleField f = m_styleField;
     f.setValue(initialValue);
-    ILookupRow<Long> initialLookupRow = f.getCurrentLookupRow();
+    ILookupRow<Long> initialLookupRow = f.getLookupRow();
     f.getUIFacade().openProposalChooserFromUI("Red", false, true);
     f.getUIFacade().cancelProposalChooserFromUI();
     assertEquals(initialValue, f.getValue());
-    assertEquals(initialLookupRow, f.getCurrentLookupRow());
+    assertEquals(initialLookupRow, f.getLookupRow());
   }
 
   @Test
@@ -522,8 +522,8 @@ public class SmartFieldTest {
 
     assertEquals("Yellow", m_styleField.getDisplayText());
     assertEquals(Long.valueOf(20L), m_styleField.getValue());
-    assertNotNull(m_styleField.getCurrentLookupRow());
-    assertEquals(expectedLookupRow, m_styleField.getCurrentLookupRow());
+    assertNotNull(m_styleField.getLookupRow());
+    assertEquals(expectedLookupRow, m_styleField.getLookupRow());
   }
 
   @Test

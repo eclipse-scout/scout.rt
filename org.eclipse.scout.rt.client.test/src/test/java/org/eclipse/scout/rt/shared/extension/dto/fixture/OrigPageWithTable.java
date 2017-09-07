@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.extension.dto.fixture;
 import org.eclipse.scout.rt.client.dto.PageData;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn2;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table;
@@ -35,7 +35,7 @@ public class OrigPageWithTable extends AbstractPageWithTable<Table> {
     }
 
     @Order(2000)
-    public class SecondSmartColumn extends AbstractSmartColumn2<Long> {
+    public class SecondSmartColumn extends AbstractSmartColumn<Long> {
     }
   }
 }

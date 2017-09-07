@@ -107,7 +107,7 @@ public class ProposalFieldTest {
 
     assertEquals("bName1", m_proposalField.getDisplayText());
     assertEquals("bName1", m_proposalField.getValue());
-    assertNotNull(m_proposalField.getCurrentLookupRow());
+    assertNotNull(m_proposalField.getLookupRow());
   }
 
   /**
@@ -228,7 +228,7 @@ public class ProposalFieldTest {
     assertEquals(expectedValue, m_proposalField.getValue());
 
     // since we've never clicked on a proposal, we don't expect a lookup row is set
-    assertNull(m_proposalField.getCurrentLookupRow());
+    assertNull(m_proposalField.getLookupRow());
   }
 
   @Test

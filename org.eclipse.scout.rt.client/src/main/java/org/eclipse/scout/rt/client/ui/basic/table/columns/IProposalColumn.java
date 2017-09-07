@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-public interface IProposalColumn<LOOKUP_TYPE> extends IContentAssistColumn<String, LOOKUP_TYPE> {
+public interface IProposalColumn<LOOKUP_TYPE> extends ISmartColumn<LOOKUP_TYPE> {
   /**
    * {@link Integer}
    *

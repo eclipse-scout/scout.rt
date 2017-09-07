@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateTimeColumn
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn2;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractTimeColumn;
 import org.eclipse.scout.rt.platform.Order;
@@ -372,7 +372,7 @@ public class TableUtilityTest {
     }
 
     @Order(100)
-    public class SmartColumn extends AbstractSmartColumn2<Long> {
+    public class SmartColumn extends AbstractSmartColumn<Long> {
       @Override
       protected String getConfiguredHeaderText() {
         return "TestSmartColumn";

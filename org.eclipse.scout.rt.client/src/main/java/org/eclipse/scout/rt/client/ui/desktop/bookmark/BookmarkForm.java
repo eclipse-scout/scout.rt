@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDec
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -146,7 +146,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
 
       @Order(20)
       @ClassId("44e332c0-62ac-4474-80c9-88d85994ba06")
-      public class FolderField extends AbstractSmartField2<BookmarkFolder> {
+      public class FolderField extends AbstractSmartField<BookmarkFolder> {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("BookmarkFolder");
@@ -165,7 +165,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
 
       @Order(30)
       @ClassId("68d3442e-32f4-4755-abd8-98f67e6013cd")
-      public class KeyStrokeField extends AbstractSmartField2<String> {
+      public class KeyStrokeField extends AbstractSmartField<String> {
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("KeyStroke");

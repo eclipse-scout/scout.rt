@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IProposalCol
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -24,11 +23,12 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
-@ClassId("ab22d90c-fedf-4f24-9ab2-4fd5096e36fb")
-public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractContentAssistColumn<String, LOOKUP_TYPE> implements IProposalColumn<LOOKUP_TYPE> {
+@ClassId("7e21b24b-ddd8-4114-8b82-91dd396bf11b")
+public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractSmartColumn<LOOKUP_TYPE> implements IProposalColumn<LOOKUP_TYPE>, IContributionOwner {
 
   public AbstractProposalColumn() {
     this(true);
@@ -106,18 +106,20 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   }
 
   @Override
-  public void updateDisplayText(ITableRow row, String value) {
+  public void updateDisplayText(ITableRow row, LOOKUP_TYPE value) {
     Cell cell = row.getCellForUpdate(this);
-    updateDisplayText(row, cell, value);
+    updateDisplayText(row, cell, (String) value);
   }
 
+  @SuppressWarnings("unchecked")
   private void updateDisplayText(ITableRow row, Cell cell, String value) {
-    cell.setText(formatValueInternal(row, value));
+    cell.setText(formatValueInternal(row, (LOOKUP_TYPE) value));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  protected String parseValueInternal(ITableRow row, Object rawValue) {
-    return (String) rawValue;
+  protected LOOKUP_TYPE parseValueInternal(ITableRow row, Object rawValue) {
+    return (LOOKUP_TYPE) rawValue;
   }
 
   @Override
@@ -127,13 +129,13 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   }
 
   @Override
-  protected String formatValueInternal(ITableRow row, String value) {
-    return value;
+  protected String formatValueInternal(ITableRow row, LOOKUP_TYPE value) {
+    return (String) value;
   }
 
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) {
-    ProposalEditorField f = (ProposalEditorField) getDefaultEditor();
+    ProposalField2Editor f = (ProposalField2Editor) getDefaultEditor();
     f.setRow(row);
     mapEditorFieldProperties(f);
     return f;
@@ -146,8 +148,8 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   }
 
   @Override
-  protected IValueField<String> createDefaultEditor() {
-    return new ProposalEditorField();
+  protected ProposalField2Editor createDefaultEditor() {
+    return new ProposalField2Editor();
   }
 
   @Override
@@ -169,25 +171,25 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
     }
   }
 
-  protected static class LocalProposalColumnExtension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends LocalContentAssistColumnExtension<String, LOOKUP_TYPE, OWNER>
+  protected static class LocalProposalColumn2Extension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends LocalSmartColumn2Extension<LOOKUP_TYPE, OWNER>
       implements IProposalColumnExtension<LOOKUP_TYPE, OWNER> {
 
-    public LocalProposalColumnExtension(OWNER owner) {
+    public LocalProposalColumn2Extension(OWNER owner) {
       super(owner);
     }
   }
 
   @Override
   protected IProposalColumnExtension<LOOKUP_TYPE, ? extends AbstractProposalColumn<LOOKUP_TYPE>> createLocalExtension() {
-    return new LocalProposalColumnExtension<LOOKUP_TYPE, AbstractProposalColumn<LOOKUP_TYPE>>(this);
+    return new LocalProposalColumn2Extension<LOOKUP_TYPE, AbstractProposalColumn<LOOKUP_TYPE>>(this);
   }
 
   /**
    * Internal editor field
    */
-  @ClassId("ceb1ae13-664c-43ce-a670-034e1f36c0b5")
+  @ClassId("45103179-6dc2-47b1-9b77-790507533714")
   @SuppressWarnings("bsiRulesDefinition:orderMissing")
-  protected class ProposalEditorField extends AbstractProposalField<LOOKUP_TYPE> {
+  protected class ProposalField2Editor extends AbstractProposalField<LOOKUP_TYPE> {
     private ITableRow m_row;
 
     protected ITableRow getRow() {
@@ -205,8 +207,8 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
     }
 
     @Override
-    public Class<String> getHolderType() {
-      return String.class;
+    public Class<LOOKUP_TYPE> getHolderType() {
+      return AbstractProposalColumn.this.getDataType();
     }
 
     @Override

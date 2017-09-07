@@ -8,16 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
+/**
+ * Info: this class must have the same interface as SmartFieldPopup. That's why there's some
+ * copy/pasted code here, because we don't have multi inheritance.
+ */
 scout.SmartFieldTouchPopup = function() {
   scout.SmartFieldTouchPopup.parent.call(this);
-  this._addWidgetProperties('proposalChooser');
 };
 scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
 scout.SmartFieldTouchPopup.prototype._init = function(options) {
+  options.withFocusContext = false;
+  options.smartField = options.parent; // alias for parent (required by proposal chooser)
   scout.SmartFieldTouchPopup.parent.prototype._init.call(this, options);
-  this._delegateEvents(['acceptProposal', 'proposalTyped', 'cancelProposal']);
-  this._delegateDisplayTextChanges(['acceptProposal', 'proposalTyped', 'deleteProposal']);
+
+  this.setLookupResult(options.lookupResult);
+  this.setStatus(options.status);
+  this.one('close', this._beforeClosePopup.bind(this));
+  this.smartField.on('propertyChange', this._onPropertyChange.bind(this));
+};
+
+scout.SmartFieldTouchPopup.prototype._initWidget = function(options) {
+  this._widget = this._createProposalChooser();
+  this._widget.on('lookupRowSelected', this._triggerEvent.bind(this));
+  this._widget.on('activeFilterSelected', this._triggerEvent.bind(this));
+};
+
+scout.SmartFieldTouchPopup.prototype._createProposalChooser = function() {
+  var objectType = this.parent.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
+  return scout.create(objectType, {
+    parent: this,
+    touch: true,
+    smartField: this._field
+  });
 };
 
 scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
@@ -29,42 +53,61 @@ scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
   return obj;
 };
 
-scout.SmartFieldTouchPopup.prototype.setProposalChooser = function(proposalChooser) {
-  this.setProperty('proposalChooser', proposalChooser);
-};
-
-scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function() {
-  this.proposalChooser.render(this._$widgetContainer);
-  this.proposalChooser.$container.addClass('touch');
-  this._widgetContainerHtmlComp.invalidateLayoutTree();
+scout.SmartFieldTouchPopup.prototype._onMouseDownOutside = function(event) {
+  this.close(); // see: #_beforeClosePopup()
 };
 
 /**
- * @override Popup.js
+ * Delegates the key event to the proposal chooser.
  */
-scout.SmartFieldTouchPopup.prototype._onMouseDownOutside = function(event) {
-  // Sync display text first because accept input needs the correct display text
-  this._delegateDisplayText();
-  this._touchField.acceptInput();
-  this.close();
+scout.SmartFieldTouchPopup.prototype.delegateKeyEvent = function(event) {
+  event.originalEvent.smartFieldEvent = true;
+  this._widget.delegateKeyEvent(event);
 };
 
-scout.SmartFieldTouchPopup.prototype._delegateDisplayText = function() {
-  this._touchField.setDisplayText(this._field.displayText);
+scout.SmartFieldTouchPopup.prototype.getSelectedLookupRow = function() {
+  return this._widget.getSelectedLookupRow();
 };
 
-scout.SmartFieldTouchPopup.prototype._delegateEvents = function(eventTypes) {
-  var that = this;
-  eventTypes.forEach(function(eventType) {
-    that._field.on(eventType, function(event) {
-      that._touchField.events.trigger(event.type, event);
-    });
-  });
+scout.SmartFieldTouchPopup.prototype._triggerEvent = function(event) {
+  this.trigger(event.type, event);
 };
 
-scout.SmartFieldTouchPopup.prototype._delegateDisplayTextChanges = function(eventTypes) {
-  eventTypes.forEach(function(eventType) {
-    this._field.on(eventType, this._delegateDisplayText.bind(this));
-  }, this);
+scout.SmartFieldTouchPopup.prototype.setLookupResult = function(result) {
+  this._widget.setLookupResult(result);
 };
 
+scout.SmartFieldTouchPopup.prototype.setStatus = function(status) {
+  this._widget.setStatus(status);
+};
+
+scout.SmartFieldTouchPopup.prototype.clearLookupRows = function() {
+  this._widget.clearLookupRows();
+};
+
+scout.SmartFieldTouchPopup.prototype.selectFirstLookupRow = function() {
+  this._widget.selectFirstLookupRow();
+};
+
+scout.SmartFieldTouchPopup.prototype.selectLookupRow = function() {
+  this._widget.triggerLookupRowSelected();
+};
+
+scout.SmartFieldTouchPopup.prototype._onPropertyChange = function(event) {
+  if ('lookupStatus' === event.propertyName) {
+    this._field.setLookupStatus(event.newValue);
+  }
+};
+
+scout.SmartFieldTouchPopup.prototype._beforeClosePopup = function(event) {
+  var embeddedField = this._field;
+  if (embeddedField._lookupInProgress) {
+    embeddedField.one('acceptInput acceptInputFail', done.bind(this, embeddedField));
+  } else {
+    done.call(this, embeddedField);
+  }
+
+  function done(embeddedField) {
+    this.smartField.acceptInputFromField(embeddedField);
+  }
+};

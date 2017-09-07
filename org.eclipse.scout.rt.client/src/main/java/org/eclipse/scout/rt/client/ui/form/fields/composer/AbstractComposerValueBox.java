@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.platform.Order;
@@ -848,7 +848,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   @Order(10)
   @ClassId("4707c050-3f4b-4ce3-a8c9-0452522becdc")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
-  public class SmartField extends AbstractSmartField2<Object> implements IComposerValueField {
+  public class SmartField extends AbstractSmartField<Object> implements IComposerValueField {
 
     @Override
     protected void execPrepareLookup(ILookupCall<Object> call) {

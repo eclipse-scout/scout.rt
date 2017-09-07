@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.DataModelAggregationFieldChains.DataModelAggregationFieldAttributeChangedChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield2.AbstractSmartField2Extension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.AbstractSmartFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractDataModelAggregationField;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 
-public abstract class AbstractDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends AbstractSmartField2Extension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
+public abstract class AbstractDataModelAggregationFieldExtension<OWNER extends AbstractDataModelAggregationField> extends AbstractSmartFieldExtension<Integer, OWNER> implements IDataModelAggregationFieldExtension<OWNER> {
 
   public AbstractDataModelAggregationFieldExtension(OWNER owner) {
     super(owner);

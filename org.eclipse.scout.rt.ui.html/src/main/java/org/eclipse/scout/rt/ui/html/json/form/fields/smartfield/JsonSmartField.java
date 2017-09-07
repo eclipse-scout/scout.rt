@@ -1,46 +1,133 @@
-/*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnDescriptor;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldResult;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends IContentAssistField<VALUE, LOOKUP_KEY>> extends JsonValueField<CONTENT_ASSIST_FIELD> {
+public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends JsonValueField<MODEL> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JsonSmartField.class);
-  private static final String PROP_PROPOSAL = "proposal";
+  // Contains always the mapping from the last performed lookup operation
+  // all values are reset each time a new lookup starts
+  private Map<Object, Integer> m_keyToIdMap = new HashMap<>();
+  private Map<Integer, Object> m_idToKeyMap = new HashMap<>();
+  private int m_id = 0;
 
-  private boolean m_proposal;
-
-  public JsonSmartField(CONTENT_ASSIST_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonSmartField(MODEL model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
-    m_proposal = model instanceof IProposalField;
   }
 
   @Override
-  protected void initJsonProperties(CONTENT_ASSIST_FIELD model) {
+  protected void initJsonProperties(MODEL model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<IContentAssistField<VALUE, LOOKUP_KEY>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getUiSession()) {
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(IValueField.PROP_VALUE, model) {
+      @Override
+      protected VALUE modelValue() {
+        return getModel().getValue();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return JsonSmartField.this.valueToJson((VALUE) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_RESULT, model) {
       @Override
       protected Object modelValue() {
-        return getModel().getProposalChooser();
+        return getModel().getResult();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return resultToJson((SmartFieldResult<VALUE>) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_LOOKUP_ROW, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getLookupRow();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        return lookupRowToJson((LookupRow<VALUE>) value, hasMultipleColumns());
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_BROWSE_MAX_ROW_COUNT, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getBrowseMaxRowCount();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_BROWSE_AUTO_EXPAND_ALL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isBrowseAutoExpandAll();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_BROWSE_LOAD_INCREMENTAL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isBrowseLoadIncremental();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_ACTIVE_FILTER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isActiveFilterEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_ACTIVE_FILTER, model) {
+      @Override
+      protected TriState modelValue() {
+        return getModel().getActiveFilter();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_ACTIVE_FILTER_LABELS, model) {
+      @Override
+      protected String[] modelValue() {
+        return getModel().getActiveFilterLabels();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return new JSONArray(value);
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_COLUMN_DESCRIPTORS, model) {
+      @Override
+      protected ColumnDescriptor[] modelValue() {
+        return getModel().getColumnDescriptors();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return columnDescriptorsToJson(value);
       }
     });
   }
@@ -57,74 +144,277 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    // NOTE: it's important we always set the submitted 'displayText' as display text
-    // on the model field instance. Otherwise the java client will be out of sync
-    // with the browser, which will cause a variety of bugs in the UI. This happens
-    // in the UI facade impl.
-    if ("openProposal".equals(event.getType())) {
-      handleUiOpenProposal(event);
+    if ("lookupByText".equals(event.getType())) {
+      handleUiLookupByText(event);
     }
-    else if ("proposalTyped".equals(event.getType())) {
-      handleUiProposalTyped(event);
+    else if ("lookupAll".equals(event.getType())) {
+      handleUiLookupAll();
     }
-    else if ("cancelProposal".equals(event.getType())) {
-      handleUiCancelProposal();
-    }
-    else if ("acceptProposal".equals(event.getType())) {
-      handleUiAcceptProposal(event);
-    }
-    else if ("deleteProposal".equals(event.getType())) {
-      handleUiDeleteProposal(event);
+    else if ("lookupByRec".equals(event.getType())) {
+      handleUiLookupByRec(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiProposalTyped(JsonEvent event) {
-    String text = getDisplayTextAndAddFilter(event);
-    getModel().getUIFacade().proposalTypedFromUI(text);
+  @Override
+  protected void handleUiAcceptInput(JsonEvent event) {
+    JSONObject data = event.getData();
+    // When we have a lookup row, we prefer the lookup row over the value
+    if (data.has(ISmartField.PROP_LOOKUP_ROW)) {
+      this.handleUiLookupRowChange(data);
+    }
+    else if (data.has(IValueField.PROP_VALUE)) {
+      handleUiValueChange(data);
+    }
+    if (data.has(IValueField.PROP_DISPLAY_TEXT)) {
+      this.handleUiDisplayTextChange(data);
+    }
+    if (data.has(IValueField.PROP_ERROR_STATUS)) {
+      this.handleUiErrorStatusChange(data);
+    }
   }
 
-  protected void handleUiDeleteProposal(JsonEvent event) {
-    getModel().getUIFacade().deleteProposalFromUI();
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IValueField.PROP_VALUE.equals(propertyName)) {
+      handleUiValueChange(data);
+    }
+    else if (IValueField.PROP_DISPLAY_TEXT.equals(propertyName)) {
+      this.handleUiDisplayTextChange(data);
+    }
+    else if (ISmartField.PROP_LOOKUP_ROW.equals(propertyName)) {
+      this.handleUiLookupRowChange(data);
+    }
+    else if (ISmartField.PROP_ACTIVE_FILTER.equals(propertyName)) {
+      String activeFilterString = data.optString(ISmartField.PROP_ACTIVE_FILTER, null);
+      TriState activeFilter = TriState.valueOf(activeFilterString);
+      addPropertyEventFilterCondition(ISmartField.PROP_ACTIVE_FILTER, activeFilter);
+      getModel().getUIFacade().setActiveFilterFromUI(activeFilter);
+    }
+    else if (IFormField.PROP_ERROR_STATUS.equals(propertyName)) {
+      this.handleUiErrorStatusChange(data);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
   }
 
-  protected void handleUiAcceptProposal(JsonEvent event) {
-    String text = getDisplayTextAndAddFilter(event);
-    boolean chooser = event.getData().getBoolean("chooser");
-    boolean forceClose = event.getData().getBoolean("forceClose");
-    getModel().getUIFacade().acceptProposalFromUI(text, chooser, forceClose);
+  @Override
+  protected Object jsonToValue(String jsonValue) {
+    return getLookupRowKeyForId(jsonValue); // jsonValue == mapped key
   }
 
-  protected void handleUiCancelProposal() {
-    getModel().getUIFacade().cancelProposalChooserFromUI();
+  protected Object valueToJson(VALUE value) {
+    if (value == null) {
+      return value;
+    }
+    return getIdForLookupRowKey(value);
   }
 
-  // Note: we intentionally do NOT add filter conditions for the displayText of the smart-field, because
-  // while processing the multiple events from the UI (from proposal-chooser, table and smart-field) the
-  // displayText may change multiple times on the model. So in some cases the filter let pass the wrong
-  // value in the end. Because the filter caused more harm than good, we removed it completely.
-
-  protected void handleUiOpenProposal(JsonEvent event) {
-    boolean browseAll = event.getData().optBoolean("browseAll");
-    String displayText = getDisplayTextAndAddFilter(event);
-    boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
-    LOG.debug("handle openProposal -> openProposalFromUI. displayText={} browseAll={} selectCurrentValue={}", displayText, browseAll, selectCurrentValue);
-    getModel().getUIFacade().openProposalChooserFromUI(displayText, browseAll, selectCurrentValue);
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void setValueFromUI(Object value) {
+    getModel().getUIFacade().setValueFromUI((VALUE) value);
   }
 
-  protected String getDisplayTextAndAddFilter(JsonEvent event) {
-    String displayText = event.getData().optString("displayText", null);
-    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
-    return displayText;
+  @Override
+  protected void setDisplayTextFromUI(String displayText) {
+    getModel().getUIFacade().setDisplayTextFromUI(displayText);
+  }
+
+  @Override
+  protected void setErrorStatusFromUI(IStatus status) {
+    getModel().getUIFacade().setErrorStatusFromUI(status);
+  }
+
+  protected void handleUiLookupRowChange(JSONObject data) {
+    JSONObject jsonLookupRow = data.optJSONObject(ISmartField.PROP_LOOKUP_ROW);
+    ILookupRow<VALUE> lookupRow = lookupRowFromJson(jsonLookupRow);
+    addPropertyEventFilterCondition(ISmartField.PROP_LOOKUP_ROW, lookupRow);
+    getModel().getUIFacade().setLookupRowFromUI(lookupRow);
+  }
+
+  protected void handleUiLookupByText(JsonEvent event) {
+    String searchText = event.getData().optString("searchText");
+    getModel().lookupByText(searchText);
+  }
+
+  protected void handleUiLookupByRec(JsonEvent event) {
+    String mappedParentKey = event.getData().optString("rec");
+    VALUE rec = getLookupRowKeyForId(mappedParentKey);
+    getModel().lookupByRec(rec);
+  }
+
+  /**
+   * Why resolve current key and not resolve key with a parameter? Because it is not guaranteed that the key is
+   * serializable / comparable. So we cannot simply send the key from the UI to the server. Additionally we do not have
+   * a list of lookup rows as we have in lookupByText
+   *
+   * @param event
+   */
+  protected void handleUiLookupAll() {
+    getModel().lookupAll();
+  }
+
+  protected void resetKeyMap() {
+    m_keyToIdMap.clear();
+    m_idToKeyMap.clear();
+    m_id = 0;
+  }
+
+  /**
+   * Returns a numeric ID for the given lookup row key. If the key is already mapped to an ID the existing ID is
+   * returned. Otherwise a new ID is returned.
+   *
+   * @param key
+   * @return
+   */
+  protected int getIdForLookupRowKey(Object key) {
+    if (m_keyToIdMap.containsKey(key)) {
+      return m_keyToIdMap.get(key);
+    }
+
+    int id = m_id++;
+    m_keyToIdMap.put(key, id);
+    m_idToKeyMap.put(id, key);
+    return id;
+  }
+
+  protected boolean hasMultipleColumns() {
+    return getModel().getColumnDescriptors() != null;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected JSONObject resultToJson(SmartFieldResult result) {
+    if (result == null) {
+      return null;
+    }
+    JSONObject json = new JSONObject();
+    JSONArray jsonLookupRows = new JSONArray();
+    for (LookupRow<?> lookupRow : (Collection<LookupRow<?>>) result.getLookupRows()) {
+      jsonLookupRows.put(lookupRowToJson(lookupRow, hasMultipleColumns()));
+    }
+    json.put("lookupRows", jsonLookupRows);
+    if (result.isByRec()) {
+      json.put("rec", getIdForLookupRowKey(result.getRec()));
+    }
+    else {
+      json.put("searchText", result.getSearchText());
+    }
+    if (result.getException() != null) {
+      json.put("exception", exceptionToJson(result.getException()));
+    }
+    return json;
+  }
+
+  protected Object exceptionToJson(Throwable exception) {
+    if (exception instanceof PlatformException) {
+      return ((PlatformException) exception).getDisplayMessage();
+    }
+    else {
+      return exception.getMessage();
+    }
+  }
+
+  protected ILookupRow<VALUE> lookupRowFromJson(JSONObject json) {
+    if (json == null) {
+      return null;
+    }
+
+    VALUE lookupRowKey = getLookupRowKeyForId(json.optString("key"));
+    String lookupRowText = json.optString("text");
+    return createLookupRow(lookupRowKey, lookupRowText, json);
+  }
+
+  protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
+    LookupRow<VALUE> lookupRow = new LookupRow<VALUE>(key, text);
+    if (json.has("enabled")) {
+      lookupRow.withEnabled(json.getBoolean("enabled"));
+    }
+    return lookupRow;
+  }
+
+  protected JSONObject lookupRowToJson(LookupRow<?> lookupRow, boolean multipleColumns) {
+    if (lookupRow == null) {
+      return null;
+    }
+
+    JSONObject json = new JSONObject();
+    json.put("key", getIdForLookupRowKey(lookupRow.getKey()));
+    json.put("text", lookupRow.getText());
+    if (StringUtility.hasText(lookupRow.getIconId())) {
+      json.put("iconId", BinaryResourceUrlUtility.createIconUrl(lookupRow.getIconId()));
+    }
+    if (StringUtility.hasText(lookupRow.getTooltipText())) {
+      json.put("tooltipText", lookupRow.getTooltipText());
+    }
+    if (StringUtility.hasText(lookupRow.getBackgroundColor())) {
+      json.put("backgroundColor", lookupRow.getBackgroundColor());
+    }
+    if (StringUtility.hasText(lookupRow.getForegroundColor())) {
+      json.put("foregroundColor", lookupRow.getForegroundColor());
+    }
+    if (lookupRow.getFont() != null) {
+      json.put("font", lookupRow.getFont().toPattern());
+    }
+    if (!lookupRow.isEnabled()) {
+      json.put("enabled", lookupRow.isEnabled());
+    }
+    if (lookupRow.getParentKey() != null) {
+      json.put("parentKey", getIdForLookupRowKey(lookupRow.getParentKey()));
+    }
+    if (!lookupRow.isActive()) {
+      json.put("active", lookupRow.isActive());
+    }
+    if (multipleColumns && lookupRow.getAdditionalTableRowData() != null) {
+      json.put("additionalTableRowData", tableRowDataToJson(lookupRow.getAdditionalTableRowData()));
+    }
+    if (StringUtility.hasText(lookupRow.getCssClass())) {
+      json.put("cssClass", lookupRow.getCssClass());
+    }
+    return json;
+  }
+
+  protected Object tableRowDataToJson(AbstractTableRowData tableRowData) {
+    if (tableRowData == null) {
+      return null;
+    }
+    return MainJsonObjectFactory.get().createJsonObject(tableRowData).toJson();
+  }
+
+  @SuppressWarnings("unchecked")
+  protected VALUE getLookupRowKeyForId(String id) {
+    if (StringUtility.isNullOrEmpty(id)) {
+      return null;
+    }
+    else {
+      return (VALUE) m_idToKeyMap.get(NumberUtility.parseInt(id));
+    }
+  }
+
+  protected JSONArray columnDescriptorsToJson(Object value) {
+    if (value == null) {
+      return null;
+    }
+    ColumnDescriptor[] descs = (ColumnDescriptor[]) value;
+    JSONArray array = new JSONArray();
+    for (ColumnDescriptor desc : descs) {
+      JSONObject json = new JSONObject();
+      json.put("propertyName", desc.getPropertyName());
+      json.put("width", desc.getWidth());
+      json.put("text", desc.getText());
+      array.put(json);
+    }
+    return array;
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_PROPOSAL, m_proposal);
-    putProperty(json, IContentAssistField.PROP_BROWSE_MAX_ROW_COUNT, getModel().getBrowseMaxRowCount());
+    json.put(ISmartField.PROP_DISPLAY_STYLE, getModel().getDisplayStyle());
+    json.put(ISmartField.PROP_BROWSE_HIERARCHY, getModel().isBrowseHierarchy());
     return json;
   }
 }

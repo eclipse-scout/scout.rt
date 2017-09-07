@@ -8,9 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
+package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractProposalColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueFieldUIFacade;
+import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public interface IProposalColumnExtension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends ISmartColumnExtension<LOOKUP_TYPE, OWNER> {
+public interface ISmartFieldUIFacade<VALUE> extends IValueFieldUIFacade<VALUE> {
+
+  void setActiveFilterFromUI(TriState activeFilter);
+
+  void setLookupRowFromUI(ILookupRow<VALUE> lookupRow);
+
 }

@@ -19,24 +19,57 @@
  */
 scout.SmartFieldPopupLayout = function(popup) {
   scout.SmartFieldPopupLayout.parent.call(this, popup);
+
+  this.animating = false;
 };
 scout.inherits(scout.SmartFieldPopupLayout, scout.PopupLayout);
 
 scout.SmartFieldPopupLayout.prototype.layout = function($container) {
   var size, popupSize,
-    htmlProposalChooser = this._htmlProposalChooser($container);
+    htmlProposalChooser = this._htmlProposalChooser();
+
+  // skip layout while CSS animation is running (prefSize would not work while animation is running)
+  if (this.animating) {
+    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+      this.popup.revalidateLayout();
+    }.bind(this));
+    return;
+  }
 
   scout.SmartFieldPopupLayout.parent.prototype.layout.call(this, $container);
 
   popupSize = this.popup.htmlComp.size();
-  if (htmlProposalChooser) {
-    size = popupSize.subtract(this.popup.htmlComp.insets());
-    htmlProposalChooser.setSize(size);
-  }
-  // Reposition because opening direction may have to be switched if popup gets bigger
-  // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
+  size = popupSize.subtract(this.popup.htmlComp.insets());
+  htmlProposalChooser.setSize(size);
+
   if (this.popup.htmlComp.layouted) {
+    // Reposition because opening direction may have to be switched if popup gets bigger
+    // Don't do it the first time (will be done by popup.open), only if the popup is already
+    // open and gets layouted again
     this.popup.position();
+  } else if (scout.device.supportsCssAnimation()) { // don't use animation on old browsers like IE9
+    // This code here is a bit complicated because:
+    // 1. we must position the scrollTo position before we start the animation
+    //    because it looks ugly, when we jump to the scroll position after the
+    //    animation has ended
+    // 2. we must first layout the popup with the table/tree correctly because
+    //    revealSelection doesn't work when popup has not the right size or is
+    //    not visible. That's why we must set the visibility to hidden.
+    // 3. we wait for the layout validator until the popup layout is validated
+    //    which means the scroll position is set correctly. Then we make the
+    //    popup visible again and start the animation (which shrinks the popup
+    //    to 1px height initially.
+    this.animating = true;
+    this.popup.htmlComp.$comp.css('visibility', 'hidden');
+
+    this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
+      this.popup.htmlComp.$comp.css('visibility', '');
+      this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
+      this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+        this.animating = false;
+        this.popup._onAnimationEnd();
+      }.bind(this));
+    }.bind(this));
   }
 };
 
@@ -45,8 +78,8 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
  */
 scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize,
-    htmlProposalChooser = this._htmlProposalChooser($container),
-    fieldBounds = this.popup._field._fieldBounds();
+    htmlProposalChooser = this._htmlProposalChooser(),
+    fieldBounds = scout.graphics.offsetBounds(this.popup.smartField.$field);
 
   if (htmlProposalChooser) {
     prefSize = htmlProposalChooser.prefSize();
@@ -67,8 +100,12 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
   return prefSize;
 };
 
-scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function($container) {
-  return scout.HtmlComponent.optGet($container.children('.proposal-chooser'));
+scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function() {
+  var proposalChooser = this.popup.proposalChooser;
+  if (!proposalChooser) {
+    return null;
+  }
+  return proposalChooser.htmlComp;
 };
 
 scout.SmartFieldPopupLayout.prototype._maxWindowSize = function() {

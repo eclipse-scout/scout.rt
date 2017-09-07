@@ -177,7 +177,7 @@ public class SmartFieldParseValueTest {
     m_smartField.setCurrentLookupRow(currentLookupRow);
     boolean openProposalChooser = m_smartField.handleAcceptByDisplayText(displayText);
     assertFalse(openProposalChooser);
-    assertSame(currentLookupRow, m_smartField.getCurrentLookupRow());
+    assertSame(currentLookupRow, m_smartField.getLookupRow());
     assertNull(m_smartField.getErrorStatus());
   }
 
@@ -191,7 +191,7 @@ public class SmartFieldParseValueTest {
     LookupRows.ROW_1.withEnabled(false);
     boolean openProposalChooser = m_smartField.handleAcceptByDisplayText(displayText);
     assertTrue(openProposalChooser);
-    assertNull(m_smartField.getCurrentLookupRow());
+    assertNull(m_smartField.getLookupRow());
     assertNotNull(m_smartField.getErrorStatus());
   }
 

@@ -8,9 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
+package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractProposalColumn;
+/**
+ * UI facade for proposal fields.
+ *
+ * @since 7.0
+ */
+public interface IProposalFieldUIFacade<VALUE> extends ISmartFieldUIFacade<VALUE> {
 
-public interface IProposalColumnExtension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends ISmartColumnExtension<LOOKUP_TYPE, OWNER> {
+  void setValueAsStringFromUI(String value);
+
 }

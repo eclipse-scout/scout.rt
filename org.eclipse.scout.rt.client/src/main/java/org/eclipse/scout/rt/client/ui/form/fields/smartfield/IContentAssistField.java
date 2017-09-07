@@ -48,12 +48,6 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   void removeSmartFieldListener(ContentAssistFieldListener listener);
 
-  IProposalChooser<?, LOOKUP_KEY> getProposalChooser();
-
-  IProposalChooserProvider<LOOKUP_KEY> getProposalChooserProvider();
-
-  void setProposalChooserProvider(IProposalChooserProvider<LOOKUP_KEY> provider);
-
   /**
    * true: inactive rows are display and can be also be parsed using the UI facade according to
    * {@link #getActiveFilter()} false: inactive rows are only display when the smart field valid is set by the model.

@@ -11,53 +11,68 @@
 scout.SmartFieldMultiline = function() {
   scout.SmartFieldMultiline.parent.call(this);
   this.options;
-  this._$multilineField;
+  this._$multilineLines;
 };
 scout.inherits(scout.SmartFieldMultiline, scout.SmartField);
 
 scout.SmartFieldMultiline.prototype._render = function() {
-  var $field, htmlComp;
+  var $input, htmlComp;
 
-  this.addContainer(this.$parent, 'smart-field', new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, 'smart-field has-icon', new scout.SmartFieldLayout(this));
   this.addLabel();
-  this.addFieldContainer(this.$parent.makeDiv());
+  this.addFieldContainer(this.$parent.makeDiv('multiline'));
   htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 
-  $field = scout.fields.makeInputOrDiv(this, 'multiline')
-    .on('mousedown', this._onMouseDown.bind(this))
+  $input = scout.fields.makeInputOrDiv(this, 'multiline-input')
+    .on('mousedown', this._onFieldMouseDown.bind(this))
     .appendTo(this.$fieldContainer);
+
   if (!this.touch) {
-    $field
+    $input
       .blur(this._onFieldBlur.bind(this))
-      .focus(this._onFocus.bind(this))
-      .keyup(this._onKeyUp.bind(this))
-      .keydown(this._onKeyDown.bind(this));
+      .focus(this._onFieldFocus.bind(this))
+      .keyup(this._onFieldKeyUp.bind(this))
+      .keydown(this._onFieldKeyDown.bind(this))
+      .on('input', this._onInputChanged.bind(this));
   }
-  this.addField($field);
-  this._$multilineField = this.$fieldContainer.appendDiv('multiline-field');
+  this.addField($input);
+  this._$multilineLines = this.$fieldContainer
+    .appendDiv('multiline-lines')
+    .on('click', this._onMultilineLinesClick.bind(this));
   if (!this.embedded) {
     this.addMandatoryIndicator();
   }
   this.addIcon(this.$fieldContainer);
+  this.$icon.addClass('needsclick');
+  this.addClearIcon(this.$fieldContainer);
   this.addStatus();
 };
 
 /**
- * @override ValueField.js
+ * Sets the focus to the input field when user clicks on text lines, but only if nothing is selected.
+ * Otherwise it would be impossible for the user to select the text. That's why we cannot use the
+ * mousedown event here too.
  */
-scout.SmartFieldMultiline.prototype._renderDisplayText = function() {
-  scout.SmartFieldMultiline.parent.prototype._renderDisplayText.call(this);
-  if (this._additionalLines) {
-    this._$multilineField.html(scout.arrays.formatEncoded(this._additionalLines, '<br/>'));
-  } else {
-    this._$multilineField.empty();
+scout.SmartFieldMultiline.prototype._onMultilineLinesClick = function(event) {
+  if (this.enabled) {
+    var selection = this.$field.window(true).getSelection();
+    if (!selection.toString()) {
+      this.$field.focus();
+    }
   }
 };
 
-/**
- * @override SmartField.js
- */
+scout.SmartFieldMultiline.prototype._renderDisplayText = function() {
+  scout.SmartFieldMultiline.parent.prototype._renderDisplayText.call(this);
+  var additionalLines = this.additionalLines();
+  if (additionalLines) {
+    this._$multilineLines.html(scout.arrays.formatEncoded(additionalLines, '<br/>'));
+  } else {
+    this._$multilineLines.empty();
+  }
+};
+
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   var fieldBounds = scout.graphics.offsetBounds(this.$fieldContainer),
     textFieldBounds = scout.graphics.offsetBounds(this.$field);
@@ -65,24 +80,13 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   return fieldBounds;
 };
 
-/**
- * @override SmartField.js
- */
-scout.SmartFieldMultiline.prototype._readSearchText = function() {
-  // Only read the first line
-  return scout.fields.valOrText(this.$field);
+scout.SmartFieldMultiline.prototype._renderFocused = function() {
+  scout.SmartFieldMultiline.parent.prototype._renderFocused.call(this);
+  this._$multilineLines.toggleClass('focused', this.focused);
 };
 
-/**
- * @override SmartField.js
- */
-scout.SmartFieldMultiline.prototype._init = function(model) {
-  scout.SmartFieldMultiline.parent.prototype._init.call(this, model);
-  this.on('deleteProposal', this._onDeleteProposal);
-};
-
-scout.SmartFieldMultiline.prototype._onDeleteProposal = function(event) {
-  if (event.source.rendered) {
-    event.source._$multilineField.html('');
-  }
+scout.SmartFieldMultiline.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
+  scout.SmartFieldMultiline.parent.prototype._updateErrorStatusClasses.call(this, statusClass, hasStatus);
+  this._$multilineLines.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+  this._$multilineLines.addClass(statusClass, hasStatus);
 };
