@@ -291,6 +291,11 @@
   __include("scout/timepicker/TimePickerPopupLayout.js");
   __include("scout/timepicker/TimePickerTouchPopup.js");
   __include("scout/timepicker/TimePickerTouchPopupLayout.js");
+  // Tiles
+  __include("scout/tiles/Tile.js");
+  __include("scout/tiles/Tiles.js");
+  __include("scout/tiles/TilesGrid.js");
+  __include("scout/tiles/TilesLayout.js");
   // Tree
   __include("scout/tree/Tree.js");
   __include("scout/tree/TreeAdapter.js");
@@ -503,6 +508,7 @@
   __include("scout/form/fields/tabbox/TabItemLayout.js");
   __include("scout/form/fields/tablefield/TableField.js");
   __include("scout/form/fields/tablefield/TableFieldAdapter.js");
+  __include("scout/form/fields/tilesfield/TilesField.js");
   __include("scout/form/fields/treebox/TreeBox.js");
   __include("scout/form/fields/treebox/TreeBoxAdapter.js");
   __include("scout/form/fields/treebox/TreeBoxLayout.js");

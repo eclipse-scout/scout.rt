@@ -781,6 +781,11 @@ scout.Widget.prototype.invalidateLogicalGrid = function(invalidateLayout) {
   }
 };
 
+scout.Widget.prototype.revalidateLogicalGrid = function(invalidateLayout) {
+  this.invalidateLogicalGrid(invalidateLayout);
+  this.validateLogicalGrid();
+};
+
 scout.Widget.prototype.setLogicalGrid = function(logicalGrid) {
   this.setProperty('logicalGrid', logicalGrid);
 };

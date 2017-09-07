@@ -11,31 +11,28 @@
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
-scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap) {
+scout.LogicalGridLayoutInfo = function(model) {
   this.gridDatas = [];
-  this.$components = $components;
-  this.cols;
-  this.rows;
+  this.$components = null;
+  this.cols = 0;
+  this.rows = 0;
   this.width = [];
   this.height = [];
-  this.weightX;
-  this.weightY;
-  this.hgap = hgap;
-  this.vgap = vgap;
+  this.weightX = [];
+  this.weightY = [];
+  this.hgap = 0;
+  this.vgap = 0;
+  this.rowHeight = 0;
+  this.columnWidth = 0;
   this.m_cellBounds = [];
+  $.extend(this, model);
 
   // create a modifiable copy of the grid datas
   var i, gd, x, y;
-  for (i = 0; i < cons.length; i++) {
-    this.gridDatas[i] = new scout.LogicalGridData(cons[i]);
+  for (i = 0; i < this.cons.length; i++) {
+    this.gridDatas[i] = new scout.LogicalGridData(this.cons[i]);
   }
-  if ($components.length === 0) {
-    this.cols = 0;
-    this.rows = 0;
-    this.width = [];
-    this.height = [];
-    this.weightX = [];
-    this.weightY = [];
+  if (this.$components.length === 0) {
     return;
   }
   // eliminate unused rows and columns
@@ -93,15 +90,11 @@ scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap) {
   //
   this.cols = usedCols.size();
   this.rows = usedRows.size();
-  this.width = [];
-  this.height = [];
-  this.weightX = [];
-  this.weightY = [];
-  $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + $components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
-  this._initializeInfo(hgap, vgap);
+  $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + this.$components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
+  this._initializeInfo();
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
+scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
   var comp,
     compCount = this.$components.length,
     compSize = [];
@@ -153,11 +146,11 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
     }
   }
   this.compSize = compSize;
-  this._initializeColumns(compSize, hgap);
-  this._initializeRows(compSize, vgap);
+  this._initializeColumns(compSize);
+  this._initializeRows(compSize);
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hgap) {
+scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize) {
   var compCount = compSize.length;
   var prefWidths = scout.arrays.init(this.cols, 0);
   var fixedWidths = scout.arrays.init(this.cols, false);
@@ -194,11 +187,11 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
         }
       }
       if (cons.widthHint > 0) {
-        distWidth = cons.widthHint - spanWidth - (hSpan - 1) * hgap;
+        distWidth = cons.widthHint - spanWidth - (hSpan - 1) * this.hgap;
       } else if (cons.useUiWidth) {
-        distWidth = compSize[i].width - spanWidth - (hSpan - 1) * hgap;
+        distWidth = compSize[i].width - spanWidth - (hSpan - 1) * this.hgap;
       } else {
-        distWidth = this.logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * hgap;
+        distWidth = this.logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * this.hgap;
       }
       if (distWidth > 0) {
         var equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
@@ -264,7 +257,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
   }
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap) {
+scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize) {
   var compCount = compSize.length;
   var prefHeights = scout.arrays.init(this.rows, 0);
   var fixedHeights = scout.arrays.init(this.rows, false);
@@ -301,11 +294,11 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
         }
       }
       if (cons.heightHint > 0) {
-        distHeight = cons.heightHint - spanHeight - (vSpan - 1) * vgap;
+        distHeight = cons.heightHint - spanHeight - (vSpan - 1) * this.vgap;
       } else if (cons.useUiHeight) {
-        distHeight = compSize[i].height - spanHeight - (vSpan - 1) * vgap;
+        distHeight = compSize[i].height - spanHeight - (vSpan - 1) * this.vgap;
       } else {
-        distHeight = this.logicalHeightInPixel(cons) - spanHeight - (vSpan - 1) * vgap;
+        distHeight = this.logicalHeightInPixel(cons) - spanHeight - (vSpan - 1) * this.vgap;
       }
       if (distHeight > 0) {
         var equalHeight = Math.floor((distHeight + spanHeight) / vSpan);
@@ -473,13 +466,13 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
 
 scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(cons) {
   var gridW = cons.gridw;
-  return (scout.HtmlEnvironment.formColumnWidth * gridW) + (this.hgap * Math.max(0, gridW - 1));
+  return (this.columnWidth * gridW) + (this.hgap * Math.max(0, gridW - 1));
 };
 
 scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
   var gridH = cons.gridh,
     addition = cons.logicalRowHeightAddition || 0;
-  return (scout.HtmlEnvironment.formRowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
+  return (this.rowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
 };
 
 scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {

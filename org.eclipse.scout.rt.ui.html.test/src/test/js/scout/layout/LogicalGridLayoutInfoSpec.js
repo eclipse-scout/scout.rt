@@ -29,12 +29,12 @@ describe("LogicalGridLayoutInfo", function() {
     var mockJquery = function(compName) {
       var jquery = this;
       return {
-        data:function(dataKey) {
+        data: function(dataKey) {
           if ('htmlComponent' === dataKey) {
             return mockHtmlComp(jquery);
           }
         },
-        attr:function(attrKey) {
+        attr: function(attrKey) {
           return attrKey === 'id' ? compName : undefined;
         }
       };
@@ -42,7 +42,7 @@ describe("LogicalGridLayoutInfo", function() {
 
     function mockHtmlComp(jquery) {
       return {
-        prefSize:function() {
+        prefSize: function() {
           return new scout.Dimension(1, 1);
         }
       };
@@ -69,7 +69,13 @@ describe("LogicalGridLayoutInfo", function() {
     gd2.weightx = 1.0;
 
     var cons = [gd1, gd2];
-    var lgli = new scout.LogicalGridLayoutInfo(components, cons, 5, 5);
+    var lgli = new scout.LogicalGridLayoutInfo({
+      $components: components,
+      cons: cons,
+      hgap: 5,
+      vgap: 5,
+      rowHeight: 30
+    });
     var parentSize = new scout.Dimension(500, 23);
     var parentInsets = new scout.Insets(0, 0, 0, 0);
 

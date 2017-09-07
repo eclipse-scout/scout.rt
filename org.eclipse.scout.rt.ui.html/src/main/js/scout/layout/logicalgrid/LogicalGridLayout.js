@@ -10,17 +10,23 @@
  ******************************************************************************/
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
+ *
+ * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidthInPixel
+ *
  */
-scout.LogicalGridLayout = function(widget, hgap, vgap, minWidthInPixel) {
+scout.LogicalGridLayout = function(widget, options) {
   scout.LogicalGridLayout.parent.call(this);
   this.cssClass = 'logical-grid-layout';
   this.validityBasedOnContainerSize = new scout.Dimension();
   this.valid = false;
   this.widget = widget;
   this.info = null;
-  this.hgap = hgap || 0;
-  this.vgap = vgap || 0;
-  this.minWidthInPixel = minWidthInPixel || 0;
+  this.hgap = 0;
+  this.vgap = 0;
+  this.rowHeight = scout.HtmlEnvironment.formRowHeight;
+  this.columnWidth = scout.HtmlEnvironment.formColumnWidth;
+  this.minWidthInPixel = 0;
+  $.extend(this, options);
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
@@ -57,11 +63,22 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container) {
       visibleCons.push(cons);
     }
   });
-  this.info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.hgap, this.vgap);
+  this.info = new scout.LogicalGridLayoutInfo({
+    $components: visibleComps,
+    cons: visibleCons,
+    hgap: this.hgap,
+    vgap: this.vgap,
+    rowHeight: this.rowHeight,
+    columnWidth: this.columnWidth
+  });
   $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
 
 scout.LogicalGridLayout.prototype.layout = function($container) {
+  this._layout($container);
+};
+
+scout.LogicalGridLayout.prototype._layout = function($container) {
   this._verifyLayout($container);
   var htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.availableSize(),

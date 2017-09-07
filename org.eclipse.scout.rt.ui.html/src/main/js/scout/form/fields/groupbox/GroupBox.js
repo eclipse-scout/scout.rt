@@ -150,7 +150,13 @@ scout.GroupBox.prototype._createLayout = function() {
 
 scout.GroupBox.prototype._createBodyLayout = function() {
   var env = scout.HtmlEnvironment;
-  return new scout.LogicalGridLayout(this, env.formColumnGap, env.formRowGap, this.minWidthInPixel);
+  return new scout.LogicalGridLayout(this, {
+    hgap: env.formColumnGap,
+    vgap: env.formRowGap,
+    columnWidth: env.formColumnWidth,
+    rowWidth: env.formRowHeight,
+    minWidthInPixel: this.minWidthInPixel
+  });
 };
 
 scout.GroupBox.prototype._renderControls = function() {
