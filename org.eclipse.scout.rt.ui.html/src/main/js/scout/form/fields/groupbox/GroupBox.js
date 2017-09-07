@@ -19,7 +19,9 @@ scout.GroupBox = function() {
   this.borderDecoration = scout.GroupBox.BorderDecoration.AUTO;
   this.borderVisible = true;
   this.mainBox = false;
-  this.scrollable = false;
+  // set to null to enable conditional default
+  // -> it will be set to true if it is a mainbox unless it was explicitly set to false
+  this.scrollable = null;
   this.expandable = false;
   this.expanded = true;
   this.logicalGrid = scout.create('scout.VerticalSmartGroupBoxBodyGrid');
@@ -122,8 +124,6 @@ scout.GroupBox.prototype._render = function() {
   this.$body = this.$container.appendDiv('group-box-body');
   this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
   this.htmlBody.setLayout(this._createBodyLayout());
-
-  this._installScrollbars();
 };
 
 scout.GroupBox.prototype._remove = function() {
@@ -141,6 +141,7 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderBorderVisible();
   this._renderExpandable();
   this._renderMenuBarVisible();
+  this._renderScrollable();
 };
 
 scout.GroupBox.prototype._createLayout = function() {
@@ -162,9 +163,11 @@ scout.GroupBox.prototype._renderControls = function() {
   }, this);
 };
 
-scout.GroupBox.prototype._installScrollbars = function() {
-  scout.scrollbars.uninstall(this.$body, this.session);
+scout.GroupBox.prototype.setScrollable = function(scrollable) {
+  this.setProperty('scrollable', scrollable);
+};
 
+scout.GroupBox.prototype._renderScrollable = function() {
   // horizontal (x-axis) scrollbar is only installed when minWidthInPixel is > 0
   if (this.scrollable) {
     scout.scrollbars.install(this.$body, {
@@ -176,6 +179,8 @@ scout.GroupBox.prototype._installScrollbars = function() {
       parent: this,
       axis: 'x'
     });
+  } else {
+    scout.scrollbars.uninstall(this.$body, this.session);
   }
 };
 
@@ -187,6 +192,9 @@ scout.GroupBox.prototype._setMainBox = function(mainBox) {
   this._setProperty('mainBox', mainBox);
   if (this.mainBox) {
     this.menuBar.large();
+    if (this.scrollable === null) {
+      this.setScrollable(true);
+    }
   }
 };
 

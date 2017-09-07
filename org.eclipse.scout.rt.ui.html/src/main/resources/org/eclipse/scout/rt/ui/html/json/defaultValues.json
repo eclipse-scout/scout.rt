@@ -85,7 +85,6 @@
     "GroupBox": {
       "borderDecoration": "auto",
       "borderVisible": true,
-      "scrollable": false,
       "expandable": false,
       "expanded": true,
       "fields": [],
