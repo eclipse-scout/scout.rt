@@ -10,8 +10,6 @@
  ******************************************************************************/
 scout.FileChooserField = function() {
   scout.FileChooserField.parent.call(this);
-  this.clearable = false;
-  this.focused = false;
 };
 scout.inherits(scout.FileChooserField, scout.ValueField);
 
@@ -43,7 +41,7 @@ scout.FileChooserField.prototype._initKeyStrokeContext = function() {
 };
 
 scout.FileChooserField.prototype._render = function() {
-  this.addContainer(this.$parent, 'file-chooser-field');
+  this.addContainer(this.$parent, 'file-chooser-field has-icon');
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderFileInput();
@@ -51,6 +49,7 @@ scout.FileChooserField.prototype._render = function() {
     .on('focus', this._onFieldFocus.bind(this))
     .on('blur', this._onFieldBlur.bind(this));
   this.addIcon();
+  this.addClearIcon();
   this.addStatus();
 };
 
@@ -106,14 +105,6 @@ scout.FileChooserField.prototype._updateClearable = function() {
   this.setClearable(!this.fileInput.legacy && scout.strings.hasText(this._readDisplayText()) && this.focused);
 };
 
-scout.FileChooserField.prototype.setClearable = function(clearable) {
-  this.setProperty('clearable', clearable);
-};
-
-scout.FileChooserField.prototype._renderClearable = function() {
-  this.$container.toggleClass('clearable', this.clearable);
-};
-
 scout.FileChooserField.prototype._clear = function() {
   this.fileInput.clear();
 };
@@ -137,12 +128,7 @@ scout.FileChooserField.prototype._onFieldFocus = function(event) {
 
 scout.FileChooserField.prototype._onIconMouseDown = function(event) {
   scout.FileChooserField.parent.prototype._onIconMouseDown.call(this, event);
-
-  if (this.clearable) {
-    this.clear();
-  } else {
-    this.fileInput.browse();
-  }
+  this.fileInput.browse();
 };
 
 scout.FileChooserField.prototype._onFileChange = function() {

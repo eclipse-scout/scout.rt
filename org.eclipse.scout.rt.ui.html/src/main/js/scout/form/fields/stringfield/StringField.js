@@ -210,13 +210,13 @@ scout.StringField.prototype.setHasAction = function(hasAction) {
 
 scout.StringField.prototype._renderHasAction = function() {
   if (this.hasAction) {
-    this.$container.addClass('has-action');
+    this.$container.addClass('has-icon');
     this.addIcon();
     this.invalidateLayoutTree(false);
   } else {
     if (this.$icon) {
       this.$icon.remove();
-      this.$container.removeClass('has-action');
+      this.$container.removeClass('has-icon');
     }
   }
 };

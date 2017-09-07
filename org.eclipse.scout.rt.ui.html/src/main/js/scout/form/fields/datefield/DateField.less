@@ -10,16 +10,76 @@
  ******************************************************************************/
 .date-field > .field {
 
+  & > .icon {
+
+    &.date-clear,
+    &.time-clear {
+      cursor: pointer;
+      display: none;
+
+      &::before {
+        content: @icon-remove;
+      }
+    }
+
+    &.date {
+
+      &::before {
+        content: @icon-calendar;
+      }
+    }
+
+    &.time {
+    
+      &::before {
+        content: @icon-clock;
+      }
+    }
+  }
+
   & > input,
   & > .input-field {
     position: absolute;
 
     &.date {
-      #scout.text-field-with-icon(@icon-calendar);
+      #scout.field-with-icon( ~'.icon.date');
+      #scout.field-with-icon( ~'.icon.date-clear');
+      padding-right: @text-field-padding-x + 15px;
+
+      &.disabled {
+        padding-right: @text-field-padding-x;
+        & ~ .icon {
+          display: none;
+        }
+      }
+      /* When field is too small, hide the icon */
+      &.compact {
+        padding-right: @text-field-padding-x;
+        & ~ .icon {
+          display: none;
+        }
+      }
     }
 
     &.time {
-      #scout.text-field-with-icon(@icon-clock, ~'.time');
+      #scout.field-with-icon( ~'.icon.time');
+      #scout.field-with-icon( ~'.icon.time-clear');
+      padding-right: @text-field-padding-x + 15px;
+
+      &.disabled {
+        padding-right: @text-field-padding-x;
+        & ~ .icon {
+          display: none;
+        }
+      }
+
+      When field is too small, hide the icon
+      &.compact {
+        padding-right: @text-field-padding-x;
+        & ~ .icon {
+          display: none;
+        }
+      }
     }
   }
 
@@ -47,32 +107,24 @@
 }
 
 .date-field.date-clearable > .field {
-  & > input,
-  & > .input-field {
+  & > .icon.date-clear {
+    display: block;
+  }
 
-    &.date {
-      #scout.text-field-with-icon(@icon-remove,~'.date');
-      ~ .icon.date {
-        cursor: pointer;
-        padding-top: 1px;
-      }
-    }
+  & > .icon.date {
+    display: none;
   }
 }
 
 .date-field.time-clearable > .field {
-  & > input,
-  & > .input-field {
-    &.time {
-      #scout.text-field-with-icon(@icon-remove,~'.time');
-      ~ .icon.time{
-        cursor: pointer;
-        padding-top: 1px;
-      }
-    }
+  & > .icon.time-clear {
+    display: block;
+  }
+
+  & > .icon.time {
+    display: none;
   }
 }
-
 
 .date-picker-popup,
 .time-picker-popup {

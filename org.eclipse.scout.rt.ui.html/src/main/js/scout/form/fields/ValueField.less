@@ -1,0 +1,96 @@
+.value-field {
+
+  & > .icon,
+  & > .field > .icon,
+  & > .clear-icon,
+  & > .field > .clear-icon {
+    position: absolute;
+    padding-right: @text-field-padding-x;
+
+    &::before {
+      #scout.font-icon();
+      font-size: 13px;
+      color: @text-field-icon-color;
+    }
+  }
+
+  & > .clear-icon,
+  & > .field > .clear-icon {
+    cursor: pointer;
+    display: none;
+
+    &::before {
+      content: @icon-remove;
+    }
+  }
+
+  & > .icon,
+  & > .field > .icon {
+    cursor: text;
+  }
+
+  &.has-icon {
+
+    & > input,
+    & > .input-field,
+    & > .field > input,
+    & > .field > .input-field,
+     & > .file-input {
+      #scout.field-with-icon(~'.icon');
+      padding-right: @text-field-padding-x + 15px;
+
+      &.disabled {
+        padding-right: @text-field-padding-x;
+        & ~ .icon {
+          display: none;
+        }
+      }
+
+      /* When field is too small, hide the icon */
+      &.compact {
+        padding-right: @text-field-padding-x;
+        & ~ .icon {
+          display: none;
+        }
+      }
+    }
+  }
+  &:not(.loading).clearable {
+
+    & > .clear-icon,
+    & > .field > .clear-icon {
+      display: block;
+    }
+
+    & > .icon,
+    & > .field > .icon {
+      display: none;
+    }
+
+    & > input,
+    & > .input-field,
+    & > .field > input,
+    & > .field > .input-field {
+      padding-right: @text-field-padding-x + 15px;
+
+      &.disabled {
+        padding-right: @text-field-padding-x;
+      }
+
+      /* When field is too small, hide the icon */
+      &.compact {
+        padding-right: @text-field-padding-x;
+        & ~ .clear-icon {
+          display: none;
+        }
+      }
+    }
+  }
+
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field {
+    #scout.field-with-icon(~'.clear-icon');
+  }
+}

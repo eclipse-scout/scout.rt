@@ -51,3 +51,20 @@ scout.SmartField2Layout.prototype._layoutIcon = function(formField, fieldBounds,
     .cssHeight(height)
     .cssLineHeight(height);
 };
+
+/**
+ * Layout for clear icon in multiline smart-field works a bit different because the icon here is _inside_
+ * an additional field container, which contains the INPUT field and the icon.
+ *
+ * @override FormFieldLayout.js
+ */
+scout.SmartField2Layout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
+  var multiline = formField instanceof scout.SmartField2Multiline;
+  // Cannot use field bounds because icon should have same height as input field
+  var height = this._smartField.$field.outerHeight();
+  formField.$clearIcon
+    .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
+    .cssTop(top)
+    .cssHeight(height)
+    .cssLineHeight(height);
+};

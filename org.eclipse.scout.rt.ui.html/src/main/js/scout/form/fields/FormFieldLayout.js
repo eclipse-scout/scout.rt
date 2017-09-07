@@ -129,12 +129,12 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
 
   // Icon is placed inside the field (as overlay)
-  if (formField.$icon && formField.$field) {
+  if (formField.$field && formField.$icon && formField.$icon.isVisible()) {
     this._layoutIcon(formField, fieldBounds, right, top);
   }
 
   // Clearable icon if present
-  if (formField.$clearIcon && formField.$field) {
+  if (formField.$field && formField.$clearIcon && formField.$clearIcon.isVisible()) {
     this._layoutClearableIcon(formField, fieldBounds, right, top);
   }
 
@@ -238,40 +238,42 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
-  var height = this.rowHeight;
+  var height = this.rowHeight,
+    borderTop = formField.$field.cssBorderTopWidth();
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
     height = fieldBounds.height;
   }
   formField.$icon
     .cssRight(formField.$field.cssBorderRightWidth() + right)
-    .cssTop(top)
-    .cssHeight(height)
-    .cssLineHeight(height);
+    .cssTop(top + borderTop)
+    .cssHeight(height - borderTop - formField.$field.cssBorderBottomWidth())
+    .cssLineHeight(height - borderTop - formField.$field.cssBorderBottomWidth());
 };
 
 scout.FormFieldLayout.prototype._layoutClearableIcon = function(formField, fieldBounds, right, top) {
-  var height = this.rowHeight;
+  var height = this.rowHeight,
+    borderTop = formField.$field.cssBorderTopWidth();
   var iconWidth = 0;
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
     height = fieldBounds.height;
   }
-  if (formField.gridData.horizontalAlignment > 0) {
+  if (formField instanceof scout.BasicField && formField.gridData.horizontalAlignment > 0) {
     formField.$clearIcon
       .cssLeft(fieldBounds.x + formField.$field.cssBorderRightWidth())
-      .cssTop(top)
-      .cssHeight(height)
-      .cssLineHeight(height);
+      .cssTop(top + borderTop)
+      .cssHeight(height - borderTop - formField.$field.cssBorderBottomWidth())
+      .cssLineHeight(height - borderTop - formField.$field.cssBorderBottomWidth());
   } else {
-    if (formField.$icon) {
+    if (formField.$icon && formField.$icon.isVisible()) {
       iconWidth = scout.graphics.prefSize(formField.$icon, true).width;
     }
     formField.$clearIcon
       .cssRight(formField.$field.cssBorderRightWidth() + right + iconWidth)
-      .cssTop(top)
-      .cssHeight(height)
-      .cssLineHeight(height);
+      .cssTop(top + borderTop)
+      .cssHeight(height - borderTop - formField.$field.cssBorderBottomWidth())
+      .cssLineHeight(height - borderTop - formField.$field.cssBorderBottomWidth());
   }
 };
 

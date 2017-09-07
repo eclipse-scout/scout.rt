@@ -1,41 +1,9 @@
 .basic-field.clearable {
 
-  & > .clear-icon {
-    position: absolute;
-    padding-right: @text-field-padding-x;
-    cursor: pointer;
-    padding-top: 1px;
-
-    &::before{
-      #scout.font-icon();
-      font-size: 13px;
-      content: @icon-remove;
-      color: @text-field-icon-color;
-    }
-  }
-
   & > input,
   & > .input-field,
   & > .field > input,
   & > .field > .input-field {
-    padding-right: @text-field-padding-x + 15px;
-
-    &:focus ~ .clear-icon::before,
-    &.focused ~ .clear-icon::before {
-      color: @text-field-icon-focus-color;
-    }
-
-    &.has-error ~ .clear-icon::before {
-      color: @text-field-icon-error-color;
-    }
-
-    &.disabled {
-      padding-right: @text-field-padding-x;
-    }
-
-    &.disabled ~ .clear-icon {
-      display: none;
-    }
 
     &.halign-right {
       padding-left: @text-field-padding-x + 15px;

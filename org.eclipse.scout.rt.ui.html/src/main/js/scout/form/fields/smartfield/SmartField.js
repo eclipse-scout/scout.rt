@@ -91,7 +91,7 @@ scout.SmartField.prototype.createPopup = function() {
 
 scout.SmartField.prototype._render = function() {
   var cssClass = this.proposal ? 'proposal-field' : 'smart-field';
-  this.addContainer(this.$parent, cssClass, new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, cssClass+' has-icon', new scout.SmartFieldLayout(this));
   this.addLabel();
 
   var $field = scout.fields.makeInputOrDiv(this)
