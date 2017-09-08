@@ -236,8 +236,14 @@ scout.ValueField.prototype.setClearable = function(clearable) {
 
 scout.ValueField.prototype._renderClearable = function() {
   this.$container.toggleClass('clearable', this.clearable);
-  this.invalidateLayoutTree(false);
+  this.revalidateLayoutTree(false);
 };
+
+scout.ValueField.prototype._renderEnabled = function() {
+  scout.ValueField.parent.prototype._renderEnabled.call(this);
+  this.revalidateLayoutTree(false);
+};
+
 /**
  * Clears the display text and the value to null.
  */
