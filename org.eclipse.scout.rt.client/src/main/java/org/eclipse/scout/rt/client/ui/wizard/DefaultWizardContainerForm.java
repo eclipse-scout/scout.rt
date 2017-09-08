@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.AbstractWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.ContentBox;
@@ -295,6 +296,11 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     @Override
     protected void execLoad() {
       setInnerWizardForm(getWizard() == null ? null : getWizard().getWizardForm());
+      // When displayed as dialog, the root group box border should be visible. Otherwise, the form title
+      // and the wizard progress field would be too close.
+      if (getDisplayHint() == DISPLAY_HINT_DIALOG) {
+        getMainBox().setBorderDecoration(IGroupBox.BORDER_DECORATION_EMPTY);
+      }
     }
   }
 }
