@@ -365,7 +365,7 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
     if ($info[0].style.width === '') {
       $info.cssWidth(0);
     }
-    $info.show().stop().widthToContent(animationOpts);
+    $info.setVisible(true).stop().widthToContent(animationOpts);
   } else {
     // Mark element as hiding so that the layout does not try to resize it
     $info.data('hiding', true);
@@ -375,7 +375,7 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
       progress: this.revalidateLayout.bind(this),
       complete: function() {
         $info.removeData('hiding');
-        $info.hide();
+        $info.setVisible(false);
       }
     });
   }
