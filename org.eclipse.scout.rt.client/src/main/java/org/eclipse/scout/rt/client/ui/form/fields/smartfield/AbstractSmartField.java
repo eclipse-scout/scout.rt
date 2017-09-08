@@ -413,6 +413,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   protected void initConfig() {
+    setResult(null);
     setActiveFilter(TriState.TRUE);
     m_decorationRow = new LookupRow<VALUE>(null, "");
     super.initConfig();

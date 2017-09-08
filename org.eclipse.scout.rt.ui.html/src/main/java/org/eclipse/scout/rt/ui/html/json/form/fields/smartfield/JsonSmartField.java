@@ -55,6 +55,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       }
     });
     putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_RESULT, model) {
+
+      @Override
+      public boolean accept() {
+        return getModel().getResult() != null;
+      }
+
       @Override
       protected Object modelValue() {
         return getModel().getResult();
