@@ -390,7 +390,7 @@ scout.Desktop.prototype._renderSplitter = function() {
   this.splitter.$container.insertBefore(this.$overlaySeparator);
   this.splitter.on('move', this._onSplitterMove.bind(this));
   this.splitter.on('moveEnd', this._onSplitterMoveEnd.bind(this));
-  this.splitter.on('positionChanged', this._onSplitterPositionChanged.bind(this));
+  this.splitter.on('positionChange', this._onSplitterPositionChanged.bind(this));
   this.updateSplitterPosition();
 };
 
