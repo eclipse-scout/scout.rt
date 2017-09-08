@@ -190,6 +190,7 @@ function linkWidgetAndAdapter(widget, adapterClass) {
   adapter.widget = widget;
   widget.modelAdapter = adapter;
   adapter._attachWidget();
+  adapter._postCreateWidget();
 }
 
 function stripCommentsFromJson(input) {

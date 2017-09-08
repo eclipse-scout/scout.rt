@@ -194,10 +194,7 @@ scout.SmartField.prototype.acceptInput = function() {
     selectedLookupRow = null;
   }
 
-  // abort pending lookups
-  if (this._pendingLookup) {
-    clearTimeout(this._pendingLookup);
-  }
+  this._clearPendingLookup();
 
   if (this.touch) {
     $.log.debug('(SmartField#acceptInput) Always send acceptInput for touch field');
@@ -206,6 +203,13 @@ scout.SmartField.prototype.acceptInput = function() {
   }
 
   return this._acceptInput(searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+};
+
+scout.SmartField.prototype._clearPendingLookup = function() {
+  if (this._pendingLookup) {
+    clearTimeout(this._pendingLookup);
+    this._pendingLookup = null;
+  }
 };
 
 /**
@@ -571,11 +575,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
     browse = true;
   }
 
-  // clear pending lookup
-  if (this._pendingLookup) {
-    clearTimeout(this._pendingLookup);
-    this._pendingLookup = null;
-  }
+  this._clearPendingLookup();
 
   var deferred = $.Deferred();
   var doneHandler = function(result) {
