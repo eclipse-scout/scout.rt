@@ -108,9 +108,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   private IContentAssistFieldLookupRowFetcher<VALUE> m_lookupRowFetcher;
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
-
   private String m_wildcard;
-  private SmartFieldResult m_result;
 
   private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
   private final AtomicInteger m_valueChangedLookupCounter = new AtomicInteger();
@@ -496,11 +494,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public SmartFieldResult getResult() {
-    return m_result;
+    return (SmartFieldResult) propertySupport.getProperty(PROP_RESULT);
   }
 
   protected void setResult(SmartFieldResult<VALUE> result) {
-    propertySupport.firePropertyChange(PROP_RESULT, null, result);
+    propertySupport.setProperty(PROP_RESULT, result);
   }
 
   @Override

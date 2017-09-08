@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -81,7 +80,10 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
 
   @Override
   public void setMaxLength(int maxLength) {
-    propertySupport.setPropertyInt(PROP_MAX_LENGTH, maxLength);
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   @Override
@@ -91,7 +93,10 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
 
   @Override
   public void setTrimText(boolean trimText) {
-    propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, trimText);
+    boolean changed = propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, trimText);
+    if (changed && isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   @Override
@@ -108,6 +113,23 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
   @Override
   public IProposalFieldUIFacade<VALUE> getUIFacade() {
     return (IProposalFieldUIFacade<VALUE>) super.getUIFacade();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected VALUE validateValueInternal(VALUE rawValue) {
+    VALUE validValue = super.validateValueInternal(rawValue);
+    if (validValue != null) {
+      String stringValue = (String) validValue;
+      if (isTrimText()) {
+        stringValue = stringValue.trim();
+      }
+      if (stringValue.length() > getMaxLength()) {
+        stringValue = stringValue.substring(0, getMaxLength());
+      }
+      validValue = (VALUE) stringValue;
+    }
+    return validValue;
   }
 
   @Override
