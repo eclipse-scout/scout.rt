@@ -16,13 +16,13 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
+public class SmartFieldDataFetchResult<LOOKUP_KEY> implements ISmartFieldDataFetchResult<LOOKUP_KEY> {
 
-  private final IContentAssistSearchParam<LOOKUP_KEY> m_searchParam;
+  private final ISmartFieldSearchParam<LOOKUP_KEY> m_searchParam;
   private final List<ILookupRow<LOOKUP_KEY>> m_lookupRows;
   private final Throwable m_exception;
 
-  public ContentAssistFieldDataFetchResult(List<ILookupRow<LOOKUP_KEY>> rows, Throwable exception, IContentAssistSearchParam<LOOKUP_KEY> searchParam) {
+  public SmartFieldDataFetchResult(List<ILookupRow<LOOKUP_KEY>> rows, Throwable exception, ISmartFieldSearchParam<LOOKUP_KEY> searchParam) {
     if (rows == null) {
       rows = Collections.emptyList();
     }
@@ -42,7 +42,7 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
   }
 
   @Override
-  public IContentAssistSearchParam<LOOKUP_KEY> getSearchParam() {
+  public ISmartFieldSearchParam<LOOKUP_KEY> getSearchParam() {
     return m_searchParam;
   }
 
@@ -67,7 +67,7 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
     if (getClass() != obj.getClass()) {
       return false;
     }
-    ContentAssistFieldDataFetchResult other = (ContentAssistFieldDataFetchResult) obj;
+    SmartFieldDataFetchResult other = (SmartFieldDataFetchResult) obj;
     if (m_searchParam == null) {
       if (other.m_searchParam != null) {
         return false;

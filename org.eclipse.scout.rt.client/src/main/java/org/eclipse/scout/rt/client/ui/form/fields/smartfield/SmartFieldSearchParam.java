@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
-public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearchParam<LOOKUP_KEY> {
+public class SmartFieldSearchParam<LOOKUP_KEY> implements ISmartFieldSearchParam<LOOKUP_KEY> {
 
   private final String m_searchText;
   private final LOOKUP_KEY m_parentKey;
@@ -19,7 +19,7 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
    * @param isByParentSearch
    * @param selectCurrentValue
    */
-  ContentAssistSearchParam(String wildcard, String searchText, LOOKUP_KEY parentKey, boolean isByParentSearch, boolean selectCurrentValue) {
+  SmartFieldSearchParam(String wildcard, String searchText, LOOKUP_KEY parentKey, boolean isByParentSearch, boolean selectCurrentValue) {
     m_wildcard = wildcard;
     m_searchText = searchText;
     m_parentKey = parentKey;
@@ -84,7 +84,7 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
     if (getClass() != obj.getClass()) {
       return false;
     }
-    ContentAssistSearchParam other = (ContentAssistSearchParam) obj;
+    SmartFieldSearchParam other = (SmartFieldSearchParam) obj;
     if (m_isByParentSearch != other.m_isByParentSearch) {
       return false;
     }
@@ -128,12 +128,12 @@ public class ContentAssistSearchParam<LOOKUP_KEY> implements IContentAssistSearc
         .toString();
   }
 
-  public static <LOOKUP_KEY> IContentAssistSearchParam<LOOKUP_KEY> createTextParam(String wildcard, String searchText, boolean selectCurrentValue) {
-    return new ContentAssistSearchParam<LOOKUP_KEY>(wildcard, searchText, null, false, selectCurrentValue);
+  public static <LOOKUP_KEY> ISmartFieldSearchParam<LOOKUP_KEY> createTextParam(String wildcard, String searchText, boolean selectCurrentValue) {
+    return new SmartFieldSearchParam<LOOKUP_KEY>(wildcard, searchText, null, false, selectCurrentValue);
   }
 
-  public static <LOOKUP_KEY> IContentAssistSearchParam<LOOKUP_KEY> createParentParam(LOOKUP_KEY parentKey, boolean selectCurrentValue) {
-    return new ContentAssistSearchParam<LOOKUP_KEY>(null, null, parentKey, true, selectCurrentValue);
+  public static <LOOKUP_KEY> ISmartFieldSearchParam<LOOKUP_KEY> createParentParam(LOOKUP_KEY parentKey, boolean selectCurrentValue) {
+    return new SmartFieldSearchParam<LOOKUP_KEY>(null, null, parentKey, true, selectCurrentValue);
   }
 
 }

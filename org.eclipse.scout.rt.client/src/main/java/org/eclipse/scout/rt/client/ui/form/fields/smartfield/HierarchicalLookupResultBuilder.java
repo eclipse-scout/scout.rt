@@ -30,7 +30,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
 
   private final ISmartField<VALUE> m_smartField;
 
-  private ILookupRowProvider2<VALUE> m_lookupRowProvider;
+  private ILookupRowByKeyProvider<VALUE> m_lookupRowProvider;
 
   private final Map<VALUE, ILookupRow<VALUE>> m_keyCache = new HashMap<>();
 
@@ -147,7 +147,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
   /**
    * @return all new rows to be inserted (including parents of search result)
    */
-  public IContentAssistFieldDataFetchResult<VALUE> addParentLookupRows(IContentAssistFieldDataFetchResult<VALUE> result) {
+  public ISmartFieldDataFetchResult<VALUE> addParentLookupRows(ISmartFieldDataFetchResult<VALUE> result) {
     List<ILookupRow<VALUE>> lookupRows;
     if (m_smartField.isLoadParentNodes()) {
       if (m_smartField.isBrowseLoadIncremental()) {
@@ -162,10 +162,10 @@ public class HierarchicalLookupResultBuilder<VALUE> {
     else {
       lookupRows = result.getLookupRows();
     }
-    return new ContentAssistFieldDataFetchResult<VALUE>(lookupRows, result.getException(), result.getSearchParam());
+    return new SmartFieldDataFetchResult<VALUE>(lookupRows, result.getException(), result.getSearchParam());
   }
 
-  private class P_KeyLookupRowProvider implements ILookupRowProvider2<VALUE> {
+  private class P_KeyLookupRowProvider implements ILookupRowByKeyProvider<VALUE> {
 
     @Override
     public ILookupRow<VALUE> getLookupRow(VALUE key) {
@@ -182,7 +182,7 @@ public class HierarchicalLookupResultBuilder<VALUE> {
     }
   }
 
-  private class P_BrowseLookupRowProvider implements ILookupRowProvider2<VALUE> {
+  private class P_BrowseLookupRowProvider implements ILookupRowByKeyProvider<VALUE> {
 
     private final FinalValue<Map<VALUE, ILookupRow<VALUE>>> m_rows = new FinalValue<>();
 

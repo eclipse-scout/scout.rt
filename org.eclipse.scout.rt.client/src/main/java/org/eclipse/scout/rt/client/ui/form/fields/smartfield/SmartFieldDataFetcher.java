@@ -16,15 +16,15 @@ import java.util.List;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
-public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
+public class SmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
-  public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
-    super(contentAssistField);
+  public SmartFieldDataFetcher(ISmartField<LOOKUP_KEY> smartField) {
+    super(smartField);
 
   }
 
   @Override
-  public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean synchronous) {
+  public void update(ISmartFieldSearchParam<LOOKUP_KEY> query, boolean synchronous) {
     String searchText = query.getSearchQuery();
     String text = searchText;
     if (text == null) {
@@ -32,17 +32,17 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     }
 
     final String textNonNull = text;
-    final int maxCount = getContentAssistField().getBrowseMaxRowCount();
+    final int maxCount = getSmartField().getBrowseMaxRowCount();
     final ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(query);
     final int maxRowCount = (maxCount > 0 ? maxCount + 1 : 0);
 
     if (synchronous) {
       try {
-        if (getContentAssistField().getWildcard().equals(text) || text.isEmpty()) {
-          callback.onSuccess(getContentAssistField().callBrowseLookup(text, maxRowCount));
+        if (getSmartField().getWildcard().equals(text) || text.isEmpty()) {
+          callback.onSuccess(getSmartField().callBrowseLookup(text, maxRowCount));
         }
         else {
-          callback.onSuccess(getContentAssistField().callTextLookup(text, maxRowCount));
+          callback.onSuccess(getSmartField().callTextLookup(text, maxRowCount));
         }
       }
       catch (RuntimeException e) {
@@ -50,31 +50,31 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
       }
     }
     else {
-      if (getContentAssistField().getWildcard().equals(textNonNull) || textNonNull.isEmpty()) {
-        getContentAssistField().callBrowseLookupInBackground(textNonNull, maxRowCount, callback);
+      if (getSmartField().getWildcard().equals(textNonNull) || textNonNull.isEmpty()) {
+        getSmartField().callBrowseLookupInBackground(textNonNull, maxRowCount, callback);
       }
       else {
-        getContentAssistField().callTextLookupInBackground(textNonNull, maxRowCount, callback);
+        getSmartField().callTextLookupInBackground(textNonNull, maxRowCount, callback);
       }
     }
   }
 
   private final class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
-    private final IContentAssistSearchParam<LOOKUP_KEY> m_param;
+    private final ISmartFieldSearchParam<LOOKUP_KEY> m_param;
 
-    private P_LookupCallDataCallback(IContentAssistSearchParam<LOOKUP_KEY> param) {
+    private P_LookupCallDataCallback(ISmartFieldSearchParam<LOOKUP_KEY> param) {
       m_param = param;
       setResult(null);
     }
 
     @Override
     public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-      setResult(new ContentAssistFieldDataFetchResult<>(new ArrayList<ILookupRow<LOOKUP_KEY>>(rows), null, m_param));
+      setResult(new SmartFieldDataFetchResult<>(new ArrayList<ILookupRow<LOOKUP_KEY>>(rows), null, m_param));
     }
 
     @Override
     public void onFailure(RuntimeException exception) {
-      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_param));
+      setResult(new SmartFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_param));
     }
   }
 }

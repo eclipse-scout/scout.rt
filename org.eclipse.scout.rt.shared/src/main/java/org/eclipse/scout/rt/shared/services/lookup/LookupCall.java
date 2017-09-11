@@ -103,8 +103,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   }
 
   /**
-   * @return true if the lookup results should be displayed multiline for non-multiline IContentAssistFields <br />
-   *         (Note: This property has no effect if the IContentAssistField itself is configured multiline)
+   * @return true if the lookup results should be displayed multiline for non-multiline ISmartFields <br />
+   *         (Note: This property has no effect if the ISmartField itself is configured multiline)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)

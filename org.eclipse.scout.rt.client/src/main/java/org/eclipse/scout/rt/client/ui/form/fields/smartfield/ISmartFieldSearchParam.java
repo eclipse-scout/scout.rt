@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-public interface IContentAssistSearchParam<LOOKUP_KEY> {
+public interface ISmartFieldSearchParam<LOOKUP_KEY> {
 
   /**
    * @return The original search text as typed in the UI

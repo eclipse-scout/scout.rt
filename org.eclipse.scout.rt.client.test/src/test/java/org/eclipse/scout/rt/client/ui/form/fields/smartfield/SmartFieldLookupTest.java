@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 
 /**
- * Tests the lookup in {@link AbstractContentAssistField} <br>
+ * Tests the lookup in {@link AbstractSmartField} <br>
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")

@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public class SmartFieldResult<V> {
 
-  private final IContentAssistFieldDataFetchResult<V> m_result;
+  private final ISmartFieldDataFetchResult<V> m_result;
 
-  public SmartFieldResult(IContentAssistFieldDataFetchResult<V> result) {
+  public SmartFieldResult(ISmartFieldDataFetchResult<V> result) {
     m_result = result;
   }
 

@@ -53,7 +53,7 @@ public class IncrementalTreeBuilderTest {
   @Test
   public void testCreatePaths_NonEmpty() {
     @SuppressWarnings("unchecked")
-    IKeyLookupProvider<Long> mockProvider = Mockito.mock(IKeyLookupProvider.class);
+    ILookupRowByKeyProvider<Long> mockProvider = Mockito.mock(ILookupRowByKeyProvider.class);
     ITree tree = createTestTree();
     IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(mockProvider);
     ArrayList<ILookupRow<Long>> rows = new ArrayList<>();
@@ -71,7 +71,7 @@ public class IncrementalTreeBuilderTest {
     lookupRowsMap.put(null, new LookupRow<Long>(null, "(none)"));
     Collection<ILookupRow<Long>> rows = lookupRowsMap.values();
 
-    IKeyLookupProvider<Long> provider = new IKeyLookupProvider<Long>() {
+    ILookupRowByKeyProvider<Long> provider = new ILookupRowByKeyProvider<Long>() {
 
       @Override
       public ILookupRow<Long> getLookupRow(Long key) {

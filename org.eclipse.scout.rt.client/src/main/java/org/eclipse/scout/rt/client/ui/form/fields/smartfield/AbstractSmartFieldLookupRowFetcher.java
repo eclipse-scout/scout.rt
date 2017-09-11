@@ -14,13 +14,13 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 
-public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> implements IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
+public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
   private final BasicPropertySupport m_propertySupport;
-  private final IContentAssistField<?, LOOKUP_KEY> m_contentAssistField;
+  private final ISmartField<LOOKUP_KEY> m_smartField;
 
-  public AbstractContentAssistFieldLookupRowFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
-    m_contentAssistField = contentAssistField;
+  public AbstractSmartFieldLookupRowFetcher(ISmartField<LOOKUP_KEY> smartField) {
+    m_smartField = smartField;
     m_propertySupport = new BasicPropertySupport(this);
   }
 
@@ -64,24 +64,24 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
     m_propertySupport.removePropertyChangeListener(propertyName, listener);
   }
 
-  public IContentAssistField<?, LOOKUP_KEY> getContentAssistField() {
-    return m_contentAssistField;
+  public ISmartField<LOOKUP_KEY> getSmartField() {
+    return m_smartField;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public IContentAssistFieldDataFetchResult<LOOKUP_KEY> getResult() {
-    return (IContentAssistFieldDataFetchResult<LOOKUP_KEY>) m_propertySupport.getProperty(PROP_SEARCH_RESULT);
+  public ISmartFieldDataFetchResult<LOOKUP_KEY> getResult() {
+    return (ISmartFieldDataFetchResult<LOOKUP_KEY>) m_propertySupport.getProperty(PROP_SEARCH_RESULT);
   }
 
   @Override
-  public IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
-    String wildcard = getContentAssistField().getWildcard();
-    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(wildcard, searchText, selectCurrentValue);
-    return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, null, param);
+  public ISmartFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
+    String wildcard = getSmartField().getWildcard();
+    ISmartFieldSearchParam<LOOKUP_KEY> param = SmartFieldSearchParam.createTextParam(wildcard, searchText, selectCurrentValue);
+    return new SmartFieldDataFetchResult<LOOKUP_KEY>(null, null, param);
   }
 
-  protected void setResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+  protected void setResult(ISmartFieldDataFetchResult<LOOKUP_KEY> result) {
     // Always propagate the event of an executed search to the listeners even if the search result did not change. Thus, the proposal popup is opened for every search.
     m_propertySupport.setPropertyAlwaysFire(PROP_SEARCH_RESULT, result);
   }

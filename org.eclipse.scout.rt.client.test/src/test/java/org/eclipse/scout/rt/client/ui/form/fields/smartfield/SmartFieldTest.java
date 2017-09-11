@@ -469,7 +469,7 @@ public class SmartFieldTest {
     m_styleField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
+        if (ISmartFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
           bc.setBlocking(false);
         }
       }

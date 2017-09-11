@@ -10,25 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.rt.client.ui.IModelEvent;
+import java.util.List;
 
-public class ContentAssistFieldEvent extends java.util.EventObject implements IModelEvent {
-  private static final long serialVersionUID = 1L;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-  private final int m_type;
+public interface ISmartFieldDataFetchResult<LOOKUP_KEY> {
 
-  public ContentAssistFieldEvent(IContentAssistField source, int type) {
-    super(source);
-    m_type = type;
-  }
+  Throwable getException();
 
-  public IContentAssistField getSmartField() {
-    return (IContentAssistField) getSource();
-  }
+  List<ILookupRow<LOOKUP_KEY>> getLookupRows();
 
-  @Override
-  public int getType() {
-    return m_type;
-  }
+  ISmartFieldSearchParam<LOOKUP_KEY> getSearchParam();
 
 }

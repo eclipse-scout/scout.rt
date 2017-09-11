@@ -25,15 +25,15 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HierarchicalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
-  private static final Logger LOG = LoggerFactory.getLogger(HierarchicalContentAssistDataFetcher.class);
+public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> {
+  private static final Logger LOG = LoggerFactory.getLogger(HierarchicalSmartFieldDataFetcher.class);
 
-  public HierarchicalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
-    super(contentAssistField);
+  public HierarchicalSmartFieldDataFetcher(ISmartField<LOOKUP_KEY> smartField) {
+    super(smartField);
   }
 
   @Override
-  public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean blocking) {
+  public void update(ISmartFieldSearchParam<LOOKUP_KEY> query, boolean blocking) {
     IFuture<Void> fRes =
         scheduleLookup(query)
             .whenDoneSchedule(updateResult(query), newModelJobInput());
@@ -42,12 +42,12 @@ public class HierarchicalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCo
     }
   }
 
-  private IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final IContentAssistSearchParam<LOOKUP_KEY> query) {
+  private IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final ISmartFieldSearchParam<LOOKUP_KEY> query) {
     return new IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable>() {
 
       @Override
       public void accept(List<ILookupRow<LOOKUP_KEY>> rows, Throwable error) {
-        ContentAssistFieldDataFetchResult<LOOKUP_KEY> result = new ContentAssistFieldDataFetchResult<>(rows, error, query);
+        SmartFieldDataFetchResult<LOOKUP_KEY> result = new SmartFieldDataFetchResult<>(rows, error, query);
         if (result.getException() != null) {
           logException(result.getException());
         }
@@ -92,20 +92,20 @@ public class HierarchicalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCo
         .withExceptionHandling(null, false);
   }
 
-  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IContentAssistSearchParam<LOOKUP_KEY> query) {
+  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(ISmartFieldSearchParam<LOOKUP_KEY> query) {
     if (query.isByParentSearch()) {
-      return getContentAssistField().callSubTreeLookupInBackground(query.getParentKey(), false);
+      return getSmartField().callSubTreeLookupInBackground(query.getParentKey(), false);
     }
     else if (isTextLookup(query.getSearchQuery()) && !query.isSelectCurrentValue()) {
-      return getContentAssistField().callTextLookupInBackground(query.getSearchQuery(), true);
+      return getSmartField().callTextLookupInBackground(query.getSearchQuery(), true);
     }
     else {
-      return getContentAssistField().callBrowseLookupInBackground(true);
+      return getSmartField().callBrowseLookupInBackground(true);
     }
   }
 
   protected boolean isTextLookup(String searchText) {
-    return !StringUtility.isNullOrEmpty(searchText) && !getContentAssistField().getWildcard().equals(searchText);
+    return !StringUtility.isNullOrEmpty(searchText) && !getSmartField().getWildcard().equals(searchText);
   }
 
 }

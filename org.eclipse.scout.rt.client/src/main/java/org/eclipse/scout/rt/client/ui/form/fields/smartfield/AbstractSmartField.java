@@ -105,7 +105,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   private ILookupCall<VALUE> m_lookupCall;
 
   // cached lookup row
-  private IContentAssistFieldLookupRowFetcher<VALUE> m_lookupRowFetcher;
+  private ISmartFieldLookupRowFetcher<VALUE> m_lookupRowFetcher;
   private boolean m_installingRowContext = false;
   private LookupRow m_decorationRow;
   private String m_wildcard;
@@ -443,7 +443,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   private void initLookupRowFetcher() {
-    IContentAssistFieldLookupRowFetcher<VALUE> lookupRowFetcher = createLookupRowFetcher();
+    ISmartFieldLookupRowFetcher<VALUE> lookupRowFetcher = createLookupRowFetcher();
     lookupRowFetcher.addPropertyChangeListener(new P_LookupRowFetcherPropertyListener());
     setLookupRowFetcher(lookupRowFetcher);
   }
@@ -642,11 +642,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     return m_wildcard;
   }
 
-  public IContentAssistFieldLookupRowFetcher<VALUE> getLookupRowFetcher() {
+  public ISmartFieldLookupRowFetcher<VALUE> getLookupRowFetcher() {
     return m_lookupRowFetcher;
   }
 
-  public void setLookupRowFetcher(IContentAssistFieldLookupRowFetcher<VALUE> fetcher) {
+  public void setLookupRowFetcher(ISmartFieldLookupRowFetcher<VALUE> fetcher) {
     m_lookupRowFetcher = fetcher;
   }
 
@@ -854,7 +854,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   protected VALUE handleMissingLookupRow(String text) {
     doSearch(text, false, true);
-    IContentAssistFieldDataFetchResult<VALUE> fetchResult = getLookupRowFetcher().getResult();
+    ISmartFieldDataFetchResult<VALUE> fetchResult = getLookupRowFetcher().getResult();
 
     int numResults = 0;
     if (fetchResult != null && fetchResult.getLookupRows() != null) {
@@ -929,17 +929,17 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public void lookupByRec(VALUE parentKey) {
-    doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
+    doSearch(SmartFieldSearchParam.createParentParam(parentKey, false), false);
   }
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
-    IContentAssistSearchParam<VALUE> param = ContentAssistSearchParam.createTextParam(getWildcard(), text, selectCurrentValue);
+    ISmartFieldSearchParam<VALUE> param = SmartFieldSearchParam.createTextParam(getWildcard(), text, selectCurrentValue);
     doSearch(param, synchronous);
   }
 
   @Override
-  public void doSearch(IContentAssistSearchParam<VALUE> param, boolean synchronous) {
+  public void doSearch(ISmartFieldSearchParam<VALUE> param, boolean synchronous) {
     getLookupRowFetcher().update(param, synchronous);
   }
 
@@ -1063,7 +1063,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     }
   }
 
-  protected void handleFetchResult(IContentAssistFieldDataFetchResult<VALUE> result) {
+  protected void handleFetchResult(ISmartFieldDataFetchResult<VALUE> result) {
     if (result == null) {
       setResult(null);
     }
@@ -1075,16 +1075,16 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     }
   }
 
-  protected IContentAssistFieldDataFetchResult<VALUE> addHierarchicalResults(IContentAssistFieldDataFetchResult<VALUE> result) {
+  protected ISmartFieldDataFetchResult<VALUE> addHierarchicalResults(ISmartFieldDataFetchResult<VALUE> result) {
     return new HierarchicalLookupResultBuilder<VALUE>(this).addParentLookupRows(result);
   }
 
-  protected IContentAssistFieldLookupRowFetcher<VALUE> createLookupRowFetcher() {
+  protected ISmartFieldLookupRowFetcher<VALUE> createLookupRowFetcher() {
     if (isBrowseHierarchy()) {
-      return new HierarchicalContentAssistDataFetcher<VALUE>(new SmartFieldContentAssistAdapter<VALUE>(this));
+      return new HierarchicalSmartFieldDataFetcher<VALUE>(this);
     }
     else {
-      return new ContentAssistFieldDataFetcher<VALUE>(new SmartFieldContentAssistAdapter<VALUE>(this));
+      return new SmartFieldDataFetcher<VALUE>(this);
     }
   }
 
@@ -1098,8 +1098,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-        handleFetchResult((IContentAssistFieldDataFetchResult<VALUE>) evt.getNewValue());
+      if (ISmartFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
+        handleFetchResult((ISmartFieldDataFetchResult<VALUE>) evt.getNewValue());
       }
     }
   }

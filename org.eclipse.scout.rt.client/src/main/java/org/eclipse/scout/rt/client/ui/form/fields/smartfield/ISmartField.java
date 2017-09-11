@@ -198,7 +198,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    */
   void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous);
 
-  void doSearch(IContentAssistSearchParam<VALUE> param, boolean synchronous);
+  void doSearch(ISmartFieldSearchParam<VALUE> param, boolean synchronous);
 
   // blocking lookups
   /**

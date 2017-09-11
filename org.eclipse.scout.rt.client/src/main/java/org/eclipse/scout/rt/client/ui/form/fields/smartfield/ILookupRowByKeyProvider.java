@@ -3,9 +3,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
- * Resolves a key
+ * Provides a lookup row.
  */
-interface IKeyLookupProvider<LOOKUP_KEY> {
+interface ILookupRowByKeyProvider<LOOKUP_KEY> {
 
   /**
    * @return {@link ILookupRow}, <code>null</code>, if not found

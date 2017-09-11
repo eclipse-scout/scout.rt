@@ -87,7 +87,7 @@ public class SmartFieldMultilineTest {
 
     m_singleCallMultiField.setLookupRow(LookupRows.multiLineRow().get(0));
     // if multi line texts are not handled correctly the currentLookupRow would be
-    // set to null in AbstractContentAssistField#parseValueInternal()
+    // set to null in AbstractSmartField#parseValueInternal()
     assertNotNull(m_singleCallMultiField.getLookupRow());
     assertEquals(4L, m_singleCallMultiField.getLookupRow().getKey().longValue());
   }

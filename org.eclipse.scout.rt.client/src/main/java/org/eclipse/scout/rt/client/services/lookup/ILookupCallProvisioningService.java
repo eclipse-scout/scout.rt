@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.services.lookup;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -24,11 +24,10 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
  * Callers are fields and components that deal with getConfiguredLookupCall and getConfiguredCodeType and create new
  * instances usign clone().
  * <p>
- * Known are {@link IContentAssistField}, {@link IListBox}, {@link ITreeBox}, {@link IRadioButtonGroup},
- * {@link ISmartColumn}
+ * Known are {@link ISmartField}, {@link IListBox}, {@link ITreeBox}, {@link IRadioButtonGroup}, {@link ISmartColumn}
  * <p>
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388242
- * 
+ *
  * @since 3.8.1
  */
 public interface ILookupCallProvisioningService extends IService {

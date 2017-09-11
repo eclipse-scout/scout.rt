@@ -24,11 +24,11 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  */
 public class IncrementalTreeBuilder<LOOKUP_KEY> {
 
-  private final IKeyLookupProvider<LOOKUP_KEY> m_provider;
+  private final ILookupRowByKeyProvider<LOOKUP_KEY> m_provider;
 
   private final Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> m_keyCache = new HashMap<>();
 
-  public IncrementalTreeBuilder(IKeyLookupProvider<LOOKUP_KEY> provider) {
+  public IncrementalTreeBuilder(ILookupRowByKeyProvider<LOOKUP_KEY> provider) {
     m_provider = provider;
   }
 

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeListener;
 
-public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
+public interface ISmartFieldLookupRowFetcher<LOOKUP_KEY> {
 
   String PROP_SEARCH_RESULT = "searchResult";
 
@@ -38,11 +38,11 @@ public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
    */
   void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
-  void update(IContentAssistSearchParam<LOOKUP_KEY> searchParam, boolean synchronous);
+  void update(ISmartFieldSearchParam<LOOKUP_KEY> searchParam, boolean synchronous);
 
-  IContentAssistFieldDataFetchResult<LOOKUP_KEY> getResult();
+  ISmartFieldDataFetchResult<LOOKUP_KEY> getResult();
 
-  IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue);
+  ISmartFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue);
 
   String getLastSearchText();
 
