@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.selenium.junit;
 
+import java.net.URL;
+
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.ui.html.selenium.annotation.UrlParams;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
 import org.junit.rules.TestWatcher;
@@ -35,20 +38,22 @@ public class SessionRule extends TestWatcher {
   @Override
   protected void starting(Description description) {
     // Before each test method, ensure a new session is created.
-    String webAppUrl = SeleniumUtil.getWebAppUrl();
+    URL webAppUrl = SeleniumUtil.getWebAppUrl();
     if (description.getTestClass().isAnnotationPresent(UrlParams.class)) {
       String urlParams = description.getTestClass().getAnnotation(UrlParams.class).value();
       if (!StringUtility.isNullOrEmpty(urlParams)) {
-        webAppUrl = webAppUrl + "?" + urlParams;
+        UriBuilder builder = new UriBuilder(webAppUrl);
+        builder.queryString(urlParams);
+        webAppUrl = builder.createURL();
       }
     }
-    m_driver.get(webAppUrl);
+    m_driver.get(webAppUrl.toString());
   }
 
   @Override
   protected void finished(Description description) {
     // After each test-method, call the logout URL to destroy the current session
     // (without creating a new one automatically)
-    m_driver.get(SeleniumUtil.getLogoutUrl());
+    m_driver.get(SeleniumUtil.getLogoutUrl().toString());
   }
 }

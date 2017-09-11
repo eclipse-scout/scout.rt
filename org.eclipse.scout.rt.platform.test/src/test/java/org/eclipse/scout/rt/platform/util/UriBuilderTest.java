@@ -234,7 +234,7 @@ public class UriBuilderTest {
   static final String VALUE2 = "value2";
 
   @Test
-  public void testParamenter() throws Exception {
+  public void testParameter() throws Exception {
     UriBuilder builder = new UriBuilder();
     assertNotNull(builder.getParameters());
     assertTrue(builder.getParameters().isEmpty());
@@ -294,11 +294,8 @@ public class UriBuilderTest {
     assertEquals(baseUri, builder.createURI());
   }
 
-  /**
-   * This tests checks whether
-   */
   @Test
-  public void testQueryString() throws Exception {
+  public void testParameter_WithSpecialCharacters() throws Exception {
     UriBuilder builder = new UriBuilder(TEST_URI_PATH);
     builder.parameter("key", "value"); // simple key/value
     builder.parameter("k&y", "=alue"); // contains an equals sign (invalid value for url parameter)
@@ -308,5 +305,20 @@ public class UriBuilderTest {
     assertTrue(s.contains("key=value"));
     assertTrue(s.contains("k%26y=%3Dalue"));
     assertTrue(s.contains("ke2=va+ue"));
+  }
+
+  @Test
+  public void testQueryString() throws Exception {
+    UriBuilder builder = new UriBuilder(TEST_URI_PATH);
+    builder.queryString("foo=1&bar=baz");
+    assertEquals(2, builder.getParameters().size());
+    assertEquals("1", builder.getParameters().get("foo"));
+    assertEquals("baz", builder.getParameters().get("bar"));
+
+    // if initial URL already contains a query parameter, parameters passed
+    // with queryString method must be appended.
+    builder = new UriBuilder(TEST_URI_PATH + "?init=1");
+    builder.queryString("foo=1&bar=baz");
+    assertEquals(3, builder.getParameters().size());
   }
 }

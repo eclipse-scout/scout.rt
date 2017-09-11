@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.selenium.util;
 
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -29,7 +31,9 @@ public final class SeleniumUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(SeleniumUtil.class);
 
-  private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/"; // /?logging=1
+  private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/";
+
+  private static final String DEFAULT_QUERY_PARAMS = "cache=true"; // /&logging=1
 
   /**
    * DOM attribute as used by Scout widgets to identify the Scout Java model class.
@@ -273,16 +277,24 @@ public final class SeleniumUtil {
     return SLOW_DOWN_FACTOR;
   }
 
-  public static String getWebAppUrl() {
+  public static URL getWebAppUrl() {
     String webAppUrl = System.getProperty("web.app.url");
     if (webAppUrl == null) {
       webAppUrl = DEFAULT_WEB_APP_URL;
     }
-    return webAppUrl;
+    String webQueryParams = System.getProperty("query.params");
+    if (webQueryParams == null) {
+      webQueryParams = DEFAULT_QUERY_PARAMS;
+    }
+    UriBuilder builder = new UriBuilder(webAppUrl);
+    builder.queryString(webQueryParams);
+    return builder.createURL();
   }
 
-  public static String getLogoutUrl() {
-    return getWebAppUrl() + "logout";
+  public static URL getLogoutUrl() {
+    UriBuilder builder = new UriBuilder(getWebAppUrl());
+    builder.addPath("logout");
+    return builder.createURL();
   }
 
   /**

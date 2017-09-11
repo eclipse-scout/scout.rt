@@ -130,6 +130,22 @@ public class UriBuilder {
     return this;
   }
 
+  /**
+   * Adds query string parameters. The queryString argument must have the format <code>key1=foo&key2=bar[&...]</code>.
+   * Each key/value pair is added as a parameter to the builder.
+   *
+   * @param queryString
+   * @return
+   */
+  public UriBuilder queryString(String queryString) { // FIXME AWE write a unit test
+    String[] keyValuePairs = queryString.split("&");
+    for (String keyValuePair : keyValuePairs) {
+      String[] keyValue = keyValuePair.split("=");
+      this.parameter(keyValue[0], keyValue[1]);
+    }
+    return this;
+  }
+
   public UriBuilder parameter(String name, String value) {
     if (!StringUtility.hasText(name)) {
       return this;
