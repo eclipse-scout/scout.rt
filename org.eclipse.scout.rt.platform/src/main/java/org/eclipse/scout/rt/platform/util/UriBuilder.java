@@ -137,7 +137,7 @@ public class UriBuilder {
    * @param queryString
    * @return
    */
-  public UriBuilder queryString(String queryString) { // FIXME AWE write a unit test
+  public UriBuilder queryString(String queryString) {
     String[] keyValuePairs = queryString.split("&");
     for (String keyValuePair : keyValuePairs) {
       String[] keyValue = keyValuePair.split("=");
