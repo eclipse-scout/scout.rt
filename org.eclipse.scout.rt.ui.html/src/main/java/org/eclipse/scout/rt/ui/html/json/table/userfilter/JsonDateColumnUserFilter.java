@@ -15,8 +15,7 @@ import java.util.Date;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.DateColumnUserFilterState;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.json.JSONObject;
 
 public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUserFilterState> {
@@ -30,20 +29,12 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
     return "DateColumnUserFilter";
   }
 
-  // TODO [7.0] awe: (filter) use JsonDate in place of this poor-mans solution.
-  // also for this.toDate() method (see DateField)
   protected String dateToJson(Date date) {
-    if (date == null) {
-      return null;
-    }
-    return DateUtility.format(date, "yyyy-MM-dd");
+    return JsonDate.format(date, JsonDate.JSON_PATTERN_DATE_ONLY, false);
   }
 
   protected Date toDate(String dateString) {
-    if (StringUtility.isNullOrEmpty(dateString)) {
-      return null;
-    }
-    return DateUtility.parse(dateString, "yyyy-MM-dd");
+    return JsonDate.parse(dateString, JsonDate.JSON_PATTERN_DATE_ONLY);
   }
 
   @Override
