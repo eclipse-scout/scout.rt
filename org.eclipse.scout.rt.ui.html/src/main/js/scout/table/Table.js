@@ -1343,7 +1343,7 @@ scout.Table.prototype._showRow = function(row) {
     return;
   }
 
-  $row.setVisible(false);
+  $row.hide(); // intentionally don't use setVisible(false) here
   $row.addClass('showing');
   $row.removeClass('hiding');
   $row.stop().slideDown({
