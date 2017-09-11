@@ -108,11 +108,19 @@ scout.TouchPopup.prototype._onTouchFieldPropertyChange = function(event) {
   }
 };
 
-scout.TouchPopup.prototype._onCloseIconClick = function(event) {
+/**
+ * Calls accept input on the embedded field.
+ */
+scout.TouchPopup.prototype._acceptInput = function() {
   var promise = this._field.acceptInput();
   if (promise) {
     promise.always(this.close.bind(this));
   } else {
     this.close();
   }
+
+};
+
+scout.TouchPopup.prototype._onCloseIconClick = function(event) {
+  this._acceptInput();
 };

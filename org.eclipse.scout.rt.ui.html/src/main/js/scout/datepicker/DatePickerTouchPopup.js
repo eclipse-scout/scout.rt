@@ -32,6 +32,11 @@ scout.DatePickerTouchPopup.prototype._render = function() {
   scout.DatePickerTouchPopup.parent.prototype._render.call(this);
   this._field.$container.addClass('date');
 };
+
+scout.DatePickerTouchPopup.prototype._onMouseDownOutside = function() {
+  this._acceptInput();
+};
+
 /**
  * @implements DatePickerPopup
  */

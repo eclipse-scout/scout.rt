@@ -292,6 +292,22 @@ describe('SmartField', function() {
       expect(embedded.browseLoadIncremental).toBe(true);
     });
 
+    it('_copyValuesFromField', function() {
+      var touchField = createFieldWithLookupCall();
+      var embeddedField = touchField.clone({
+        parent: session.desktop
+      });
+      embeddedField.setLookupRow(new scout.LookupRow(123, 'baz'));
+      embeddedField.setErrorStatus(scout.Status.error({message: 'bar'}));
+      embeddedField.setDisplayText('Foo');
+
+      touchField._copyValuesFromField(embeddedField);
+
+      expect(touchField.lookupRow.text).toBe('baz');
+      expect(touchField.errorStatus.message).toBe('bar');
+      expect(touchField.displayText).toBe('Foo');
+    });
+
   });
 
   describe('maxBrowseRowCount', function() {

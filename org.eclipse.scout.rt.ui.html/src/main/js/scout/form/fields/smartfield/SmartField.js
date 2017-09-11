@@ -385,7 +385,9 @@ scout.SmartField.prototype._acceptInputFail = function(result) {
 
   // in any other case something went wrong
   if (result.numLookupRows === 0) {
-    this.closePopup();
+    if (!this.embedded) {
+      this.closePopup();
+    }
     this.setValue(null);
     this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
@@ -822,15 +824,12 @@ scout.SmartField.prototype.togglePopup = function() {
 };
 
 scout.SmartField.prototype._onFieldBlur = function(event) {
-  var target = event.target || event.srcElement;
-  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || this.$clearIcon.isOrHas(target);
-  var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-  if (this.embedded && (eventOnField || eventOnPopup)) {
-    return;
-  }
-  scout.SmartField.parent.prototype._onFieldBlur.call(this, event);
   this.setFocused(false);
   this.setLoading(false);
+  if (this.embedded) {
+    return;
+  }
+  scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
   this.closePopup();
 };
 
@@ -1217,7 +1216,7 @@ scout.SmartField.prototype._copyValuesFromField = function(otherField) {
     this.setLookupRow(otherField.lookupRow);
   }
   this.setErrorStatus(otherField.errorStatus);
-  scout.fields.valOrText(this.$field, otherField.displayText);
+  this.setDisplayText(otherField.displayText);
 };
 
 scout.SmartField.prototype._setNotUniqueError = function(searchText) {
