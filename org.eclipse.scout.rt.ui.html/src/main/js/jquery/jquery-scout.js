@@ -754,7 +754,7 @@ $.fn.isEnabled = function() {
 $.fn.setVisible = function(visible) {
   var isVisible = !this.hasClass('hidden');
   if (isVisible === visible) {
-    return;
+    return this;
   }
   if (!visible) {
     this.addClass('hidden');
