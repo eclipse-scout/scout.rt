@@ -198,6 +198,7 @@ scout.SmartField2.prototype.acceptInput = function() {
   // abort pending lookups
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
+    this._pendingLookup = null;
   }
 
   if (this.touch) {
@@ -382,7 +383,9 @@ scout.SmartField2.prototype._acceptInputFail = function(result) {
 
   // in any other case something went wrong
   if (result.numLookupRows === 0) {
-    this.closePopup();
+    if (!this.embedded) {
+      this.closePopup();
+    }
     this.setValue(null);
     this.setDisplayText(searchText);
     this.setErrorStatus(scout.Status.error({
@@ -833,15 +836,12 @@ scout.SmartField2.prototype.togglePopup = function() {
 };
 
 scout.SmartField2.prototype._onFieldBlur = function(event) {
-  var target = event.target || event.srcElement;
-  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || this.$clearIcon.isOrHas(target);
-  var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-  if (this.embedded && (eventOnField || eventOnPopup)) {
+  this.setFocused(false);
+  this.setLoading(false);
+  if (this.embedded) {
     return;
   }
   scout.SmartField2.parent.prototype._onFieldBlur.call(this, event);
-  this.setFocused(false);
-  this.setLoading(false);
   this.closePopup();
 };
 
@@ -1228,7 +1228,7 @@ scout.SmartField2.prototype._copyValuesFromField = function(otherField) {
     this.setLookupRow(otherField.lookupRow);
   }
   this.setErrorStatus(otherField.errorStatus);
-  scout.fields.valOrText(this.$field, otherField.displayText);
+  this.setDisplayText(otherField.displayText);
 };
 
 scout.SmartField2.prototype._setNotUniqueError = function(searchText) {

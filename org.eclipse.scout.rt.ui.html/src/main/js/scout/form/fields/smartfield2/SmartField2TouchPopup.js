@@ -53,8 +53,8 @@ scout.SmartField2TouchPopup.prototype._fieldOverrides = function() {
   return obj;
 };
 
-scout.SmartField2TouchPopup.prototype._onMouseDownOutside = function(event) {
-  this.close(); // see: #_beforeClosePopup()
+scout.SmartField2TouchPopup.prototype._onMouseDownOutside = function() {
+  this._acceptInput(); // see: #_beforeClosePopup()
 };
 
 /**
