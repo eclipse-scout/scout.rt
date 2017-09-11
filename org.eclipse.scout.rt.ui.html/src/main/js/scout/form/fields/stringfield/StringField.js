@@ -90,7 +90,11 @@ scout.StringField.prototype._render = function() {
   }
 
   this.addField($field);
-  this.addClearIcon();
+
+  if (!this.multilineText) {
+    this.addClearIcon();
+  }
+
   this.addStatus();
 };
 

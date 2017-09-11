@@ -45,11 +45,10 @@ scout.SmartField2Layout.prototype._layoutIcon = function(formField, fieldBounds,
   var multiline = formField instanceof scout.SmartField2Multiline;
   // Cannot use field bounds because icon should have same height as input field
   var height = this._smartField.$field.outerHeight();
-  formField.$icon
-    .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
-    .cssTop(top)
-    .cssHeight(height)
-    .cssLineHeight(height);
+  formField.$icon.cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
+    .cssTop(top + formField.$field.cssBorderTopWidth())
+    .cssHeight(height - formField.$field.cssBorderTopWidth() - formField.$field.cssBorderBottomWidth())
+    .cssLineHeight(height - formField.$field.cssBorderTopWidth() - formField.$field.cssBorderBottomWidth());
 };
 
 /**
@@ -62,9 +61,8 @@ scout.SmartField2Layout.prototype._layoutClearableIcon = function(formField, fie
   var multiline = formField instanceof scout.SmartField2Multiline;
   // Cannot use field bounds because icon should have same height as input field
   var height = this._smartField.$field.outerHeight();
-  formField.$clearIcon
-    .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
-    .cssTop(top)
-    .cssHeight(height)
-    .cssLineHeight(height);
+  formField.$clearIcon.cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
+    .cssTop(top + formField.$field.cssBorderTopWidth())
+    .cssHeight(height - formField.$field.cssBorderTopWidth() - formField.$field.cssBorderBottomWidth())
+    .cssLineHeight(height - formField.$field.cssBorderTopWidth() - formField.$field.cssBorderBottomWidth());
 };

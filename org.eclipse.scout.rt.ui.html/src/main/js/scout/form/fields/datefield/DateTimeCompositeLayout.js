@@ -62,18 +62,23 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     $timeField.cssRight(0);
 
     // Icons
-    $dateFieldIcon.cssRight(timeFieldWidth + hgap)
-      .cssHeight(dateFieldSize.height)
-      .cssLineHeight(dateFieldSize.height);
-    $dateClearIcon.cssRight(timeFieldWidth + hgap)
-      .cssHeight(dateFieldSize.height)
-      .cssLineHeight(dateFieldSize.height);
-    $timeFieldIcon.cssRight(0)
-      .cssHeight(timeFieldSize.height)
-      .cssLineHeight(timeFieldSize.height);
-    $timeClearIcon.cssRight(0)
-      .cssHeight(timeFieldSize.height)
-      .cssLineHeight(timeFieldSize.height);
+    $dateFieldIcon.cssTop($dateField.cssBorderTopWidth())
+      .cssRight(timeFieldWidth + hgap)
+      .cssHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth())
+      .cssLineHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth());
+
+    $dateClearIcon.cssTop($dateField.cssBorderTopWidth())
+      .cssRight(timeFieldWidth + hgap)
+      .cssHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth())
+      .cssLineHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth());
+    $timeFieldIcon.cssTop($timeField.cssBorderTopWidth())
+      .cssRight(0)
+      .cssHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth())
+      .cssLineHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth());
+    $timeClearIcon.cssTop($timeField.cssBorderTopWidth())
+      .cssRight(0)
+      .cssHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth())
+      .cssLineHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth());
 
     // Compact style
     $dateField.toggleClass('compact', dateFieldSize.width < this.MIN_DATE_FIELD_WIDTH);
@@ -95,13 +100,15 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     htmlDateField.setSize(dateFieldSize);
 
     // Icons
-    $dateFieldIcon.cssRight(0)
-      .cssHeight(dateFieldSize.height)
-      .cssLineHeight(dateFieldSize.height);
+    $dateFieldIcon.cssTop($dateField.cssBorderTopWidth())
+      .cssRight(0)
+      .cssHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth())
+      .cssLineHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth());
 
-    $dateClearIcon.cssRight(0)
-      .cssHeight(dateFieldSize.height)
-      .cssLineHeight(dateFieldSize.height);
+    $dateClearIcon.cssTop($dateField.cssBorderTopWidth())
+      .cssRight(0)
+      .cssHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth())
+      .cssLineHeight(dateFieldSize.height - $dateField.cssBorderTopWidth() - $dateField.cssBorderBottomWidth());
 
     // Compact style
     $dateField.toggleClass('compact', dateFieldSize.width < this.MIN_DATE_FIELD_WIDTH);
@@ -118,12 +125,14 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     htmlTimeField.setSize(timeFieldSize);
 
     // Icons
-    $timeFieldIcon.cssRight(0)
-      .cssHeight(timeFieldSize.height)
-      .cssLineHeight(timeFieldSize.height);
-    $timeClearIcon.cssRight(0)
-      .cssHeight(timeFieldSize.height)
-      .cssLineHeight(timeFieldSize.height);
+    $timeFieldIcon.cssTop($timeField.cssBorderTopWidth())
+      .cssRight(0)
+      .cssHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth())
+      .cssLineHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth());
+    $timeClearIcon.cssTop($timeField.cssBorderTopWidth())
+      .cssRight(0)
+      .cssHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth())
+      .cssLineHeight(timeFieldSize.height - $timeField.cssBorderTopWidth() - $timeField.cssBorderBottomWidth());
 
     // Compact style
     $timeField.toggleClass('compact', timeFieldSize.width < this.MIN_TIME_FIELD_WIDTH);
