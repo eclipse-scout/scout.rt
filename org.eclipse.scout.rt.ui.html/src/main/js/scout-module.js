@@ -296,6 +296,7 @@
   __include("scout/tiles/Tiles.js");
   __include("scout/tiles/TilesGrid.js");
   __include("scout/tiles/TilesLayout.js");
+  __include("scout/tiles/PlaceholderTile.js");
   // Tree
   __include("scout/tree/Tree.js");
   __include("scout/tree/TreeAdapter.js");

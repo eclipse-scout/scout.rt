@@ -18,6 +18,7 @@ scout.Tiles = function() {
   this.logicalGridVGap = 20;
   this.logicalGridRowHeight = 150;
   this.logicalGridColumnWidth = 200;
+  this.withPlaceholders = false;
   this._addWidgetProperties(['tiles']);
 };
 scout.inherits(scout.Tiles, scout.Widget);
@@ -42,15 +43,51 @@ scout.Tiles.prototype._renderProperties = function() {
 };
 
 scout.Tiles.prototype.setTiles = function(tiles) {
-  this.setProperty('tiles', tiles);
+  if (scout.objects.equals(this.tiles, tiles)) {
+    return;
+  }
+
+  tiles = this._prepareProperty('tiles', tiles);
+  if (this.rendered) {
+    var tilesToRemove = this.tiles.slice();
+
+    // only remove those which are not in the new array
+    scout.arrays.removeAll(tilesToRemove, tiles);
+    this._removeTiles(tilesToRemove);
+  }
+  this._setProperty('tiles', tiles);
+  if (this.rendered) {
+    this._renderTiles();
+  }
 };
 
 scout.Tiles.prototype._renderTiles = function() {
   this.tiles.forEach(function(tile) {
-    tile.render();
-    tile.setLayoutData(new scout.LogicalGridData(tile));
-  }, this);
-  this.invalidateLayoutTree();
+    if (!tile.rendered) {
+      tile.render();
+      tile.setLayoutData(new scout.LogicalGridData(tile));
+    }
+  });
+  if (!this.htmlComp.layouting) {
+    // no need to invalidate when tile placeholders are added or removed while layouting
+    this.invalidateLayoutTree();
+  }
+};
+
+scout.Tiles.prototype._removeTiles = function(tiles) {
+  tiles.forEach(function(tile) {
+    tile.remove();
+  });
+};
+
+scout.Tiles.prototype.addTiles = function(tiles) {
+  this.setTiles(this.tiles.concat(tiles));
+};
+
+scout.Tiles.prototype.deleteTiles = function(tilesToDelete) {
+  var tiles = this.tiles.slice();
+  scout.arrays.removeAll(tiles, tilesToDelete);
+  this.setTiles(tiles);
 };
 
 scout.Tiles.prototype._renderLogicalGridHGap = function() {
@@ -71,4 +108,93 @@ scout.Tiles.prototype._renderLogicalGridRowHeight = function() {
 scout.Tiles.prototype._renderLogicalGridColumnWidth = function() {
   this.htmlComp.layout.columnWidth = this.logicalGridColumnWidth;
   this.invalidateLayoutTree();
+};
+
+scout.Tiles.prototype.setWithPlaceholders = function(withPlaceholders) {
+  this.setProperty('withPlaceholders', withPlaceholders);
+};
+
+scout.Tiles.prototype._renderWithPlaceholders = function() {
+  this.invalidateLayoutTree();
+};
+
+scout.Tiles.prototype.fillUpWithPlaceholders= function() {
+  if (!this.withPlaceholders) {
+    this._deletePlaceholders();
+    return;
+  }
+  this._deleteObsoletePlaceholders();
+  this._addPlaceholders();
+};
+
+scout.Tiles.prototype._createPlaceholders = function() {
+  var numPlaceholders, lastX,
+    columnCount = this.gridColumnCount,
+    tiles = this.tiles,
+    placeholders = [];
+
+  if (tiles.length > 0) {
+    lastX = tiles[tiles.length - 1].gridData.x;
+  } else {
+    // If there are no tiles, create one row with placeholders
+    lastX = -1;
+  }
+
+  if (lastX === columnCount - 1) {
+    // If last tile is the last element in the row, don't create placeholders
+    return [];
+  }
+
+  // Otherwise create placeholders for every missing tile in the last row
+  numPlaceholders = columnCount - 1 - lastX;
+  for (var i = 0; i < numPlaceholders; i++) {
+    var tile = scout.create('PlaceholderTile', {
+      parent: this
+    });
+    placeholders.push(tile);
+  }
+  return placeholders;
+};
+
+scout.Tiles.prototype._deleteObsoletePlaceholders = function() {
+  var tiles = [],
+    obsolete = false;
+
+  this.tiles.forEach(function(tile) {
+    if (!(tile instanceof scout.PlaceholderTile)) {
+      tiles.push(tile);
+      return;
+    }
+    // Remove all placeholder in the row if there is one at x=0
+    if (tile.gridData.x === 0) {
+      obsolete = true;
+    }
+    if (!obsolete) {
+      tiles.push(tile);
+    }
+  }, this);
+
+  this.setTiles(tiles);
+};
+
+scout.Tiles.prototype._deletePlaceholders = function() {
+  var tiles = this.tiles.filter(function(tile) {
+    return !(tile instanceof scout.PlaceholderTile);
+  });
+  this.setTiles(tiles);
+};
+
+scout.Tiles.prototype._addPlaceholders = function() {
+  var placeholders = this._createPlaceholders();
+  this.addTiles(placeholders);
+};
+
+scout.Tiles.prototype.validateLogicalGrid = function() {
+  if (!this.logicalGrid.dirty) {
+    return;
+  }
+  this.logicalGrid.validate(this);
+  this.fillUpWithPlaceholders();
+  this.logicalGrid.setDirty(true);
+  this.logicalGrid.validate(this);
 };
