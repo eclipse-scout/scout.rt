@@ -37,7 +37,8 @@ scout.SmartField2 = function() {
   this.lookupStatus = null;
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
-    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental']);
+    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental'
+  ]);
 };
 scout.inherits(scout.SmartField2, scout.ValueField);
 
@@ -800,6 +801,16 @@ scout.SmartField2.prototype._onIconMouseDown = function(event) {
       this.openPopup(true);
     }
   }
+};
+
+scout.SmartField2.prototype._onClearIconMouseDown = function(event) {
+  $.log.debug('(SmartField2#_onClearIconMouseDown)');
+  if (!this.enabledComputed) {
+    return;
+  }
+  event.preventDefault();
+  this.$field.focus();
+  this.clear();
 };
 
 scout.SmartField2.prototype._clear = function() {
