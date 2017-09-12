@@ -23,7 +23,7 @@ public class ChartValueGroupBean implements IChartValueGroupBean {
 
   private Object m_groupKey;
   private String m_groupName;
-  private final List<BigDecimal> m_values = new ArrayList<BigDecimal>();
+  private final List<BigDecimal> m_values = new ArrayList<>();
   private String m_colorHexValue = null;
   private String m_cssClass = null;
 

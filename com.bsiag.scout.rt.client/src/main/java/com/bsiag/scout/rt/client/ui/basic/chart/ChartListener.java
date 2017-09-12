@@ -14,6 +14,7 @@ import java.util.EventListener;
 /**
  * @since 5.2
  */
+@FunctionalInterface
 public interface ChartListener extends EventListener {
 
   void chartChanged(ChartEvent e);

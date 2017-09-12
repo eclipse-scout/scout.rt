@@ -9,8 +9,6 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.chartfield;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -42,15 +40,12 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
     super.initConfig();
     setChartInternal(createChart());
     // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED_COMPUTED, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (m_chart == null) {
-          return;
-        }
-        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-        m_chart.setEnabled(newEnabled);
+    addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
+      if (m_chart == null) {
+        return;
       }
+      boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
+      m_chart.setEnabled(newEnabled);
     });
   }
 

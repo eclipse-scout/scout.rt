@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 /**
  * @since 5.2
  */
+@FunctionalInterface
 public interface IChartUIFacade {
 
   /**
