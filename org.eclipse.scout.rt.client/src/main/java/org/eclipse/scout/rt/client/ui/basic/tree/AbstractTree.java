@@ -134,13 +134,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     this(true);
   }
 
-  public AbstractTree(boolean callInitialzier) {
+  public AbstractTree(boolean callInitializer) {
     m_listenerList = new EventListenerList();
     m_checkedNodes = new HashSet<ITreeNode>();
     m_deletedNodes = new HashMap<Object, ITreeNode>();
     m_nodeFilters = new ArrayList<ITreeNodeFilter>(1);
     m_objectExtensions = new ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>>(this, false);
-    if (callInitialzier) {
+    if (callInitializer) {
       callInitializer();
     }
   }

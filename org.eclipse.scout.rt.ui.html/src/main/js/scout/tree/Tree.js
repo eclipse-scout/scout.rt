@@ -35,7 +35,11 @@ scout.Tree = function() {
   this.scrollToSelection = false;
   this.scrollTop = 0;
   this.selectedNodes = [];
+
+  // performance optimization: E.g. rather than iterating over the whole tree when unchecking all nodes,
+  // we explicitly keep track of nodes to uncheck (useful e.g. for single-check mode in very large trees).
   this.checkedNodes = [];
+
   this.groupedNodes = {};
   this.visibleNodesFlat = [];
   this.visibleNodesMap = {};
@@ -2202,6 +2206,8 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
     node.checked = opts.checked;
     if (node.checked) {
       this.checkedNodes.push(node);
+    } else {
+      scout.arrays.remove(this.checkedNodes, node);
     }
     updatedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, opts.checked, true);
