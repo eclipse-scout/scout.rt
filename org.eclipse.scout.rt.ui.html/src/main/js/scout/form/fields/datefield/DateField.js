@@ -1322,7 +1322,7 @@ scout.DateField.prototype.openTimePopup = function(date) {
   this.popup = this.createTimePopup();
   this.popup.open();
   this.$timeField.addClass('focused');
-  this.popup.on('remove', function() {
+  this.popup.on('remove', function(event) {
     this._onPopupRemove(event);
     this.popup = null;
     this.$timeField.removeClass('focused');
